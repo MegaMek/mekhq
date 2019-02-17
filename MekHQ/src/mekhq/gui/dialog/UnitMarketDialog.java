@@ -74,6 +74,7 @@ import mekhq.gui.model.XTableColumnModel;
 import mekhq.gui.preferences.JCheckBoxPreference;
 import mekhq.gui.preferences.JNumberSpinnerPreference;
 import mekhq.gui.preferences.JTablePreference;
+import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.sorter.WeightClassSorter;
 import mekhq.preferences.PreferencesNode;
 
@@ -132,6 +133,7 @@ public class UnitMarketDialog extends JDialog {
         initComponents();
         filterOffers();
         setLocationRelativeTo(frame);
+        setUserPreferences();
     }
 
     @SuppressWarnings("serial")
@@ -158,7 +160,6 @@ public class UnitMarketDialog extends JDialog {
 		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitMarketDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(resourceMap.getString("Form.title")); // NOI18N
-        setName("Form"); // NOI18N
         getContentPane().setLayout(new BorderLayout());
 
         panelFilterBtns.setLayout(new GridBagLayout());
@@ -307,7 +308,6 @@ public class UnitMarketDialog extends JDialog {
         btnAdd.setEnabled(null !=  selectedEntity);
         panelOKBtns.add(btnAdd, new java.awt.GridBagConstraints());
 
-
         btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
         btnClose.addActionListener(evt -> btnCloseActionPerformed(evt));
@@ -315,7 +315,6 @@ public class UnitMarketDialog extends JDialog {
 
         getContentPane().add(panelOKBtns, BorderLayout.PAGE_END);
 
-        setUserPreferences();
         pack();
     }
 
@@ -337,8 +336,11 @@ public class UnitMarketDialog extends JDialog {
         spnThreshold.setName("thresholdValue");
         preferences.manage(new JNumberSpinnerPreference(spnThreshold));
 
-        tableUnits.setName("unitsTable"); // NOI18N
+        tableUnits.setName("unitsTable");
         preferences.manage(new JTablePreference(tableUnits));
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 
     public Entity getUnit() {

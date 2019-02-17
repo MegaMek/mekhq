@@ -53,12 +53,21 @@ public class JCheckBoxPreference extends PreferenceElement implements ChangeList
     }
 
     @Override
-    protected void protectedSetInitialValue(String value) {
+    protected void initialize(String value) {
         assert value != null && value.trim().length() > 0;
 
         JCheckBox element = weakRef.get();
         if (element != null) {
             element.setSelected(Boolean.parseBoolean(value));
+        }
+    }
+
+    @Override
+    protected void clean() {
+        JCheckBox element = weakRef.get();
+        if (element != null) {
+            element.removeChangeListener(this);
+            weakRef.clear();
         }
     }
 }

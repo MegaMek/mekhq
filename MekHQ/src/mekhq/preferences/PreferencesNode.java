@@ -55,18 +55,16 @@ public class PreferencesNode {
     public void manage(PreferenceElement element) {
         final String METHOD_NAME = "manage";
 
-        if (this.elements.containsKey(element.getName())) {
-            MekHQ.getLogger().error(
-                    PreferencesNode.class,
-                    METHOD_NAME,
-                    "Trying to manage preference for Element " + element.getName() +  " which already exists in Node " + node.getName());
-            return;
+        PreferenceElement actual = this.elements.get(element.getName());
+        if (actual != null) {
+            this.initialValues.put(actual.getName(), actual.getValue());
+            actual.clean();
         }
 
         this.elements.put(element.getName(), element);
 
         if (this.initialValues.containsKey(element.getName())) {
-            element.setInitialValue(this.initialValues.get(element.getName()));
+            element.initialize(this.initialValues.get(element.getName()));
         }
     }
 

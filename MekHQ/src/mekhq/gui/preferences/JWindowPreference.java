@@ -29,35 +29,39 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 import java.lang.ref.WeakReference;
 
-public class JFramePreference extends PreferenceElement implements WindowStateListener, ComponentListener {
-    private final WeakReference<JFrame> weakRef;
+public class JWindowPreference extends PreferenceElement implements WindowStateListener, ComponentListener {
+    private final WeakReference<Window> weakRef;
     private int width;
     private int height;
     private int screenX;
     private int screenY;
     private boolean isMaximized;
 
-    public JFramePreference(JFrame frame) {
-        super (frame.getName());
+    public JWindowPreference(Window window) {
+        super (window.getName());
 
-        this.width = frame.getWidth();
-        this.height = frame.getHeight();
-        this.screenX = frame.getLocationOnScreen().x;
-        this.screenY = frame.getLocationOnScreen().y;
-        this.isMaximized = (frame.getState() & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH;
+        try {
+            this.width = window.getWidth();
+            this.height = window.getHeight();
+            this.screenX = window.getLocationOnScreen().x;
+            this.screenY = window.getLocationOnScreen().y;
 
-        this.weakRef = new WeakReference<>(frame);
-        frame.addWindowStateListener(this);
-        frame.addComponentListener(this);
+            if (window instanceof JFrame) {
+                this.isMaximized = (((JFrame)window).getState() & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH;
+            } else {
+                this.isMaximized = false;
+            }
+        } catch (Exception ignored) {
+        }
+
+        this.weakRef = new WeakReference<>(window);
+        window.addWindowStateListener(this);
+        window.addComponentListener(this);
     }
 
     @Override
     public void windowStateChanged(WindowEvent e) {
-        if ((e.getNewState() & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH) {
-            this.isMaximized = true;
-        } else {
-            this.isMaximized = false;
-        }
+        this.isMaximized = (e.getNewState() & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH;
     }
 
     @Override
@@ -82,10 +86,10 @@ public class JFramePreference extends PreferenceElement implements WindowStateLi
     }
 
     @Override
-    protected void protectedSetInitialValue(String value) {
+    protected void initialize(String value) {
         assert value != null && value.trim().length() > 0;
 
-        JFrame element = weakRef.get();
+        Window element = weakRef.get();
         if (element != null) {
             String[] parts = value.split("\\|", -1);
 
@@ -98,18 +102,28 @@ public class JFramePreference extends PreferenceElement implements WindowStateLi
                     Integer.parseInt(parts[3]));
 
             if (Boolean.parseBoolean(parts[4])) {
-                element.setExtendedState(element.getExtendedState() | Frame.MAXIMIZED_BOTH);
+                if (element instanceof JFrame) {
+                    ((JFrame)element).setExtendedState(((JFrame)element).getExtendedState() | Frame.MAXIMIZED_BOTH);
+                }
             }
         }
     }
 
     @Override
-    public void componentShown(ComponentEvent e) {
+    protected void clean() {
+        Window element = weakRef.get();
+        if (element != null) {
+            element.removeWindowStateListener(this);
+            element.removeComponentListener(this);
+            weakRef.clear();
+        }
+    }
 
+    @Override
+    public void componentShown(ComponentEvent e) {
     }
 
     @Override
     public void componentHidden(ComponentEvent e) {
-
     }
 }

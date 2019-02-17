@@ -52,10 +52,19 @@ public class StringPreference extends PreferenceElement implements PropertyChang
     }
 
     @Override
-    protected void protectedSetInitialValue(String value) {
+    protected void initialize(String value) {
         ObservableString element = weakRef.get();
         if (element != null) {
             element.setValue(value);
+        }
+    }
+
+    @Override
+    protected void clean() {
+        ObservableString element = weakRef.get();
+        if (element != null) {
+            element.removePropertyChangeListener(this);
+            weakRef.clear();
         }
     }
 }

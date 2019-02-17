@@ -34,24 +34,10 @@ package mekhq.preferences;
  */
 public abstract class PreferenceElement {
     private String name;
-    private boolean initialized = false;
 
     protected PreferenceElement(String name) {
         assert name != null && name.trim().length() > 0;
         this.name = name;
-    }
-
-    /**
-     * Sets the initial value for the preference.
-     * This method should only be called once during initialization.
-     * @param value initial value.
-     */
-    void setInitialValue(String value) {
-        assert value != null;
-        assert !this.initialized;
-
-        this.initialized = true;
-        this.protectedSetInitialValue(value);
     }
 
     /**
@@ -73,5 +59,10 @@ public abstract class PreferenceElement {
      * Sets the initial value for the preference.
      * @param value initial value.
      */
-    protected abstract void protectedSetInitialValue(String value);
+    protected abstract void initialize(String value);
+
+    /**
+     * Cleans the preference resources.
+     */
+    protected abstract void clean();
 }

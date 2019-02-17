@@ -54,12 +54,21 @@ public class JNumberSpinnerPreference extends PreferenceElement implements Chang
     }
 
     @Override
-    protected void protectedSetInitialValue(String value) {
+    protected void initialize(String value) {
         assert value != null && value.trim().length() > 0;
 
         JSpinner element = weakRef.get();
         if (element != null) {
             element.setValue(Integer.parseInt(value));
+        }
+    }
+
+    @Override
+    protected void clean() {
+        JSpinner element = weakRef.get();
+        if (element != null) {
+            element.removeChangeListener(this);
+            weakRef.clear();
         }
     }
 }

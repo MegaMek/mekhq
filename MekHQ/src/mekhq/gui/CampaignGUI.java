@@ -55,7 +55,7 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.xml.parsers.DocumentBuilder;
 
 import mekhq.campaign.finances.Money;
-import mekhq.gui.preferences.JFramePreference;
+import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -407,7 +407,7 @@ public class CampaignGUI extends JPanel {
         PreferencesNode preferences = MekHQ.getPreferences().forClass(CampaignGUI.class);
 
         frame.setName("mainWindow");
-        preferences.manage(new JFramePreference(frame));
+        preferences.manage(new JWindowPreference(frame));
     }
 
     public CampaignGuiTab getTab(GuiTabType tabType) {

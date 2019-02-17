@@ -38,6 +38,9 @@ public class JTablePreference extends PreferenceElement implements MouseListener
         if (table.getRowSorter().getSortKeys().size() > 0) {
             this.columnIndex = table.getRowSorter().getSortKeys().get(0).getColumn();
             this.sortOrder = table.getRowSorter().getSortKeys().get(0).getSortOrder();
+        } else {
+            columnIndex = 0;
+            sortOrder = SortOrder.ASCENDING;
         }
 
         this.weakRef = new WeakReference<>(table);
@@ -68,7 +71,7 @@ public class JTablePreference extends PreferenceElement implements MouseListener
     }
 
     @Override
-    protected void protectedSetInitialValue(String value) {
+    protected void initialize(String value) {
         assert value != null && value.trim().length() > 0;
         final String METHOD_NAME = "protectedSetInitialValue";
 
@@ -81,6 +84,15 @@ public class JTablePreference extends PreferenceElement implements MouseListener
 
             element.getRowSorter().getSortKeys().clear();
             element.getRowSorter().setSortKeys(sortKeys);
+        }
+    }
+
+    @Override
+    protected void clean() {
+        JTable element = weakRef.get();
+        if (element != null) {
+            element.removeMouseListener(this);
+            weakRef.clear();
         }
     }
 
