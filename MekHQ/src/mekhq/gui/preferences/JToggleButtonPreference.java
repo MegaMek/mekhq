@@ -57,7 +57,8 @@ public class JToggleButtonPreference extends PreferenceElement implements Change
 
         JToggleButton element = weakRef.get();
         if (element != null) {
-            element.setSelected(Boolean.parseBoolean(value));
+            this.value = Boolean.parseBoolean(value);
+            element.setSelected(this.value);
         }
     }
 

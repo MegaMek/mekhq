@@ -55,7 +55,8 @@ public class StringPreference extends PreferenceElement implements PropertyChang
     protected void initialize(String value) {
         ObservableString element = weakRef.get();
         if (element != null) {
-            element.setValue(value);
+            this.value = value;
+            element.setValue(this.value);
         }
     }
 

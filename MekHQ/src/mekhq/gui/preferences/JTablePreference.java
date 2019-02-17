@@ -72,14 +72,16 @@ public class JTablePreference extends PreferenceElement implements MouseListener
     @Override
     protected void initialize(String value) {
         assert value != null && value.trim().length() > 0;
-        final String METHOD_NAME = "protectedSetInitialValue";
 
         JTable element = weakRef.get();
         if (element != null) {
             String[] parts = value.split("\\|", -1);
 
+            this.columnIndex = Integer.parseInt(parts[0]);
+            this.sortOrder = SortOrder.valueOf(parts[1]);
+
             ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
-            sortKeys.add(new RowSorter.SortKey(Integer.parseInt(parts[0]), SortOrder.valueOf(parts[1])));
+            sortKeys.add(new RowSorter.SortKey(this.columnIndex, this.sortOrder));
 
             element.getRowSorter().setSortKeys(sortKeys);
         }

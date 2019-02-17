@@ -89,15 +89,15 @@ public class JWindowPreference extends PreferenceElement implements WindowStateL
         if (element != null) {
             String[] parts = value.split("\\|", -1);
 
-            element.setSize(
-                    Integer.parseInt(parts[0]),
-                    Integer.parseInt(parts[1]));
+            this.width = Integer.parseInt(parts[0]);
+            this.height = Integer.parseInt(parts[1]);
+            this.screenX = Integer.parseInt(parts[2]);
+            this.screenY = Integer.parseInt(parts[3]);
+            this.isMaximized = Boolean.parseBoolean(parts[4]);
 
-            element.setLocation(
-                    Integer.parseInt(parts[2]),
-                    Integer.parseInt(parts[3]));
-
-            if (Boolean.parseBoolean(parts[4])) {
+            element.setSize(this.width, this.height);
+            element.setLocation(this.screenX, this.screenY);
+            if (this.isMaximized) {
                 if (element instanceof JFrame) {
                     ((JFrame)element).setExtendedState(((JFrame)element).getExtendedState() | Frame.MAXIMIZED_BOTH);
                 }

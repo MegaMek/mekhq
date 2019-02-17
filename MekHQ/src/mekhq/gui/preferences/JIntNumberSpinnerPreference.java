@@ -62,7 +62,8 @@ public class JIntNumberSpinnerPreference extends PreferenceElement implements Ch
             SpinnerNumberModel model = ((SpinnerNumberModel)element.getModel());
             if ((Integer)model.getMinimum() <= newValue &&
                     (Integer)model.getMaximum() >= newValue) {
-                element.setValue(newValue);
+                this.value = newValue;
+                element.setValue(this.value);
             }
         }
     }
