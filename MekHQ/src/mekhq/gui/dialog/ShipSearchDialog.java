@@ -42,9 +42,13 @@ import megamek.common.MechSummaryCache;
 import megamek.common.TargetRoll;
 import megamek.common.UnitType;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.Contract;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.preferences.JToggleButtonPreference;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  * Manages searches for Dropships or Jumpships for Against the Bot.
@@ -74,6 +78,7 @@ public class ShipSearchDialog extends JDialog {
 		this.gui = gui;
 		
 		init();
+		setUserPreferences();
 	}
 	
     private void init() {
@@ -184,22 +189,23 @@ public class ShipSearchDialog extends JDialog {
         if (gui.getCampaign().getShipSearchResult() != null) {
             MechSummary ms = MechSummaryCache.getInstance().getMech(gui.getCampaign().getShipSearchResult());
 
-            JLabel lblAvailable = new JLabel();
-            if (ms == null) {
-                lblAvailable.setText("Cannot find entry for " + gui.getCampaign().getShipSearchResult());
-            } else {
-                lblAvailable.setText(resourceMap.getString("lblAvailable.text")
-                    + gui.getCampaign().getShipSearchResult());
+            if (ms != null || gui.getCampaign().getShipSearchResult() != null) {
+                JLabel lblAvailable = new JLabel();
+                if (ms == null && gui.getCampaign().getShipSearchResult() != null) {
+                    lblAvailable.setText("Cannot find entry for " + gui.getCampaign().getShipSearchResult());
+                } else {
+                    lblAvailable.setText(resourceMap.getString("lblAvailable.text")
+                            + gui.getCampaign().getShipSearchResult());
+                }
+                gbc.gridx = 0;
+                gbc.gridy = 8;
+                mainPanel.add(lblAvailable);
             }
-            gbc.gridx = 0;
-            gbc.gridy = 8;
-            mainPanel.add(lblAvailable);
 
             button = new JButton(resourceMap.getString("btnPurchase.text"));
             panButtons.add(button);
             button.addActionListener(ev -> purchase());
-            button.setEnabled(ms != null && gui.getCampaign().getFunds()
-                    .isGreaterThan(Money.of(ms.getCost())));
+            button.setEnabled(ms != null && gui.getCampaign().getFunds().isGreaterThan(Money.of(ms.getCost())));
         }
 
         if (isInSearch()) {
@@ -225,7 +231,23 @@ public class ShipSearchDialog extends JDialog {
 
         pack();
     }
-	
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(ShipSearchDialog.class);
+
+        btnDropship.setName("dropship");
+        preferences.manage(new JToggleButtonPreference(btnDropship));
+
+        btnJumpship.setName("jumpship");
+        preferences.manage(new JToggleButtonPreference(btnJumpship));
+
+        btnWarship.setName("warship");
+        preferences.manage(new JToggleButtonPreference(btnWarship));
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
+
 	public TargetRoll getDSTarget() {
 		return gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.DROPSHIP,
 				gui.getCampaign());
