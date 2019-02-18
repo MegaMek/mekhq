@@ -645,6 +645,7 @@ public class MekHQ implements GameListener {
 	}
 
     private static void setLookAndFeel(String themeName, Frame window) {
+	    final String METHOD_NAME = "setLookAndFeel";
         Runnable runnable = () -> {
             try {
                 UIManager.setLookAndFeel(themeName);
@@ -655,7 +656,10 @@ public class MekHQ implements GameListener {
                     InstantiationException |
                     IllegalAccessException |
                     UnsupportedLookAndFeelException e) {
-                e.printStackTrace();
+                MekHQ.getLogger().error(
+                        MekHQ.class,
+                        METHOD_NAME,
+                        e);
             }
         };
         SwingUtilities.invokeLater(runnable);

@@ -368,7 +368,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 
         partsTable.setName("partsTable");
         preferences.manage(new JTablePreference(partsTable));
-        
+
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
     }

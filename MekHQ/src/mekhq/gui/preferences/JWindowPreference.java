@@ -47,11 +47,14 @@ public class JWindowPreference extends PreferenceElement implements WindowStateL
             this.screenY = window.getLocationOnScreen().y;
 
             if (window instanceof JFrame) {
-                this.isMaximized = (((JFrame)window).getState() & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH;
+                this.isMaximized = (((JFrame)window).getExtendedState() & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH;
             } else {
                 this.isMaximized = false;
             }
         } catch (Exception ignored) {
+            // getLocationOnScreen can throw if the Window is still not visible.
+            // This tends to happens with JDialogs, but that's ok as we will capture
+            // their position later if the user moves on the componentMoved method.
         }
 
         this.weakRef = new WeakReference<>(window);

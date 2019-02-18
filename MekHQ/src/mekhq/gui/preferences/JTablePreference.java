@@ -50,11 +50,13 @@ public class JTablePreference extends PreferenceElement implements MouseListener
     @Override
     public void mouseClicked(MouseEvent e) {
         JTable table = this.weakRef.get();
-
         if (table != null) {
             int uiIndex = table.getColumnModel().getColumnIndexAtX(e.getX());
-            this.columnIndex = table.getColumnModel().getColumn(uiIndex).getModelIndex();
+            if (uiIndex == -1) {
+                return;
+            }
 
+            this.columnIndex = table.getColumnModel().getColumn(uiIndex).getModelIndex();
             for (RowSorter.SortKey key : table.getRowSorter().getSortKeys()) {
                 if (key.getColumn() == this.columnIndex) {
                     this.sortOrder = key.getSortOrder();
