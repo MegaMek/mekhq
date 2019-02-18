@@ -58,6 +58,11 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.preferences.JComboBoxPreference;
+import mekhq.gui.preferences.JIntNumberSpinnerPreference;
+import mekhq.gui.preferences.JTextFieldPreference;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 public class GMToolsDialog extends JDialog implements ActionListener {
     private static final long serialVersionUID = 7724064095803583812L;
@@ -103,6 +108,7 @@ public class GMToolsDialog extends JDialog implements ActionListener {
         initComponents();
         pack();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     /**
@@ -120,6 +126,7 @@ public class GMToolsDialog extends JDialog implements ActionListener {
         initComponents();
         pack();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     private JPanel getDiceRoller() {
@@ -295,6 +302,34 @@ public class GMToolsDialog extends JDialog implements ActionListener {
     private void initComponents() {
         getContentPane().add(getDiceRoller(), newGridBagConstraints(0,0));
         getContentPane().add(getRATRoller(), newGridBagConstraints(0,1));
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(GMToolsDialog.class);
+
+        numDice.setName("numDice");
+        preferences.manage(new JIntNumberSpinnerPreference(numDice));
+
+        sizeDice.setName("sizeDice");
+        preferences.manage(new JIntNumberSpinnerPreference(sizeDice));
+
+        yearPicker.setName("year");
+        preferences.manage(new JTextFieldPreference(yearPicker));
+
+        factionPicker.setName("faction");
+        preferences.manage(new JComboBoxPreference(factionPicker));
+
+        qualityPicker.setName("quality");
+        preferences.manage(new JComboBoxPreference(qualityPicker));
+
+        unitTypePicker.setName("unitType");
+        preferences.manage(new JComboBoxPreference(unitTypePicker));
+
+        unitWeightPicker.setName("unitWeight");
+        preferences.manage(new JComboBoxPreference(unitWeightPicker));
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
     
     @Override
