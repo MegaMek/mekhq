@@ -50,6 +50,7 @@ import megamek.common.Entity;
 import megamek.common.TargetRoll;
 import megamek.common.UnitType;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
@@ -63,10 +64,14 @@ import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.model.RetirementTableModel;
 import mekhq.gui.model.UnitAssignmentTableModel;
 import mekhq.gui.model.XTableColumnModel;
+import mekhq.gui.preferences.JComboBoxPreference;
+import mekhq.gui.preferences.JIntNumberSpinnerPreference;
+import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.sorter.BonusSorter;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.RankSorter;
 import mekhq.gui.sorter.WeightClassSorter;
+import mekhq.preferences.PreferencesNode;
 
 /**
  * @author Neoancient
@@ -142,6 +147,7 @@ public class RetirementDefectionDialog extends JDialog {
 		}
 
 	    setLocationRelativeTo(gui.getFrame());
+		setUserPreferences();
 	}
 
 	private void initComponents(boolean doRetirement) {
@@ -463,6 +469,19 @@ public class RetirementDefectionDialog extends JDialog {
 		btnDone.setVisible(!doRetirement);
 		add(btnPanel, BorderLayout.PAGE_END);
 	}
+
+	private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(RetirementDefectionDialog.class);
+
+        cbGroupOverview.setName("group");
+        preferences.manage(new JComboBoxPreference(cbGroupOverview));
+
+        spnGeneralMod.setName("modifier");
+        preferences.manage(new JIntNumberSpinnerPreference(spnGeneralMod));
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
 
 	public ActionListener buttonListener = new ActionListener() {
 		@Override

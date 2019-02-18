@@ -11,7 +11,10 @@ import java.awt.Dimension;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 
+import mekhq.MekHQ;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -32,6 +35,7 @@ public class MaintenanceReportDialog extends javax.swing.JDialog {
         setMinimumSize(new Dimension(700, 500));
         setPreferredSize(new Dimension(700, 500));
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
     
     private void initComponents() {
@@ -45,5 +49,11 @@ public class MaintenanceReportDialog extends javax.swing.JDialog {
         
         getContentPane().add(new JScrollPane(txtReport), BorderLayout.CENTER);
     }
-    
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(MaintenanceReportDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
 }
