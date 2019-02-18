@@ -31,6 +31,9 @@ import mekhq.campaign.event.ReportEvent;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.DailyReportLogPanel;
 import mekhq.gui.ReportHyperlinkListener;
+import mekhq.gui.preferences.JIntNumberSpinnerPreference;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 public class AdvanceDaysDialog extends JDialog implements ActionListener {
     private static final long serialVersionUID = 1L;
@@ -56,6 +59,7 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
         this.setMinimumSize(new Dimension(500,500));
         initComponents();
         setLocationRelativeTo(owner);
+        setUserPreferences();
     }
 
     public void initComponents() {
@@ -89,6 +93,16 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
                 MekHQ.unregisterHandler(this);
             }
         });
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(AdvanceDaysDialog.class);
+
+        spnDays.setName("numberDays");
+        preferences.manage(new JIntNumberSpinnerPreference(spnDays));
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 
     /* (non-Javadoc)
