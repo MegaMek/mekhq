@@ -54,7 +54,7 @@ public class LargeCraftAmmoSwapDialog extends JDialog {
         this.unit = unit;
         
         getContentPane().setLayout(new BorderLayout());
-        mainPanel = new BayMunitionsChoicePanel(unit.getEntity(), unit.campaign.getGame());
+        mainPanel = new BayMunitionsChoicePanel(unit.getEntity(), unit.getCampaign().getGame());
         getContentPane().add(new JScrollPane(mainPanel), BorderLayout.CENTER);
         JPanel panButtons = new JPanel();
         JButton button = new JButton("OK");
