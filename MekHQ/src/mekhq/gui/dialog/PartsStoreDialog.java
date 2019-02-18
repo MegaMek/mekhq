@@ -589,7 +589,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 			    return details;
 			}
 			if(col == COL_COST) {
-				return formatter.format(part.getActualValue());
+				return part.getActualValue().toAmountString();
 			}
 			if(col == COL_TON) {
 				return Math.round(part.getTonnage() * 100) / 100.0;

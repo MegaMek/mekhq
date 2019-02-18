@@ -86,7 +86,7 @@ public class ShipSearchDialog extends JDialog {
 
         JLabel lblInstructions = new JLabel();
         lblInstructions.setText("<html>" + String.format(resourceMap.getString("instructions.text"),
-                NumberFormat.getInstance().format(gui.getCampaign().getAtBConfig().getShipSearchCost()))
+                gui.getCampaign().getAtBConfig().getShipSearchCost().toAmountAndSymbolString())
                 + "</html>");
         contentPane.add(lblInstructions, BorderLayout.NORTH);
 
@@ -210,7 +210,7 @@ public class ShipSearchDialog extends JDialog {
         } else {
             button = new JButton(resourceMap.getString("btnStartSearch.text"));
             button.setToolTipText(String.format(resourceMap.getString("btnStartSearch.toolTipText"),
-                    NumberFormat.getInstance().format(gui.getCampaign().getAtBConfig().shipSearchCostPerWeek()),
+                    gui.getCampaign().getAtBConfig().shipSearchCostPerWeek().toAmountAndSymbolString(),
                     gui.getCampaign().getAtBConfig().getShipSearchLengthWeeks()));
             button.addActionListener(ev -> startSearch());
             button.setEnabled(!isInContract());
