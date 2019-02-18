@@ -121,7 +121,6 @@ public class BloodnameDialog extends JDialog {
 		setTitle ("Bloodname Generator");
         getContentPane().setLayout(new GridBagLayout());
         setPreferredSize(new Dimension(350,300));
-        setMinimumSize(new Dimension(350,300));
 
 		initComponents();
 

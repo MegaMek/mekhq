@@ -34,8 +34,8 @@ public class ReportDialog extends JDialog {
         super(parent, false);
         setTitle(report.getTitle());
         txtReport = report.getReport();
-        initComponents();   
-        setMinimumSize(new Dimension(800, 500));
+        initComponents();
+        setPreferredSize(new Dimension(800, 500));
         setLocationRelativeTo(parent);
         setUserPreferences();
     }

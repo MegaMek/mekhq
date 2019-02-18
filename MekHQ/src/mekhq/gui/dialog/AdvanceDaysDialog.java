@@ -56,7 +56,6 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
         setName("formADD"); // NOI18N
         getContentPane().setLayout(new java.awt.GridBagLayout());
         this.setPreferredSize(new Dimension(500,500));
-        this.setMinimumSize(new Dimension(500,500));
         initComponents();
         setLocationRelativeTo(owner);
         setUserPreferences();

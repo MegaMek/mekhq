@@ -31,6 +31,7 @@ import java.awt.event.ItemListener;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
+import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -45,6 +46,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeListener;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
@@ -53,8 +55,10 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.universe.Planets;
+import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.view.ContractPaymentBreakdown;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -80,6 +84,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         dateFormatter = new SimpleDateFormat("EEEE, MMMM d yyyy");
         initComponents();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     protected void initComponents() {
@@ -165,6 +170,13 @@ public class NewContractDialog extends javax.swing.JDialog {
         getContentPane().add(btnClose, gridBagConstraints);
 
         pack();
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(NewContractDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 
 	protected void initDescPanel(ResourceBundle resourceMap, JPanel descPanel) {

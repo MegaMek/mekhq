@@ -32,7 +32,6 @@ public class MaintenanceReportDialog extends javax.swing.JDialog {
         initComponents();     
         txtReport.setText(unit.getLastMaintenanceReport());
         txtReport.setCaretPosition(0);
-        setMinimumSize(new Dimension(700, 500));
         setPreferredSize(new Dimension(700, 500));
         setLocationRelativeTo(parent);
         setUserPreferences();

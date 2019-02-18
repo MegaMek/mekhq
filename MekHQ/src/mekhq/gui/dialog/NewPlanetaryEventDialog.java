@@ -172,7 +172,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("form"); //$NON-NLS-1$
         setTitle(resourceMap.getString("Form.title")); //$NON-NLS-1$
-        setMinimumSize(new Dimension(600, 600));
+        setPreferredSize(new Dimension(600, 600));
         
         final Container content = getContentPane();
         content.setLayout(new GridBagLayout());
