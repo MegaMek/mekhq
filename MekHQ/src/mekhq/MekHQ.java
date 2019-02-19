@@ -82,6 +82,7 @@ import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.preferences.StringPreference;
 import mekhq.gui.utilities.ObservableString;
 import mekhq.preferences.MekHqPreferences;
+import mekhq.preferences.PreferencesNode;
 
 /**
  * The main class of the application.
@@ -102,6 +103,17 @@ public class MekHQ implements GameListener {
 
     private static MMLogger logger = null;
 	private static MekHqPreferences preferences = null;
+
+    // Directory options
+    private static ObservableString personnelDirectory;
+    private static ObservableString campaignOptionsDirectory;
+    private static ObservableString partsDirectory;
+    private static ObservableString planetsDirectory;
+    private static ObservableString starMapsDirectory;
+    private static ObservableString unitsDirectory;
+    private static ObservableString campaignsDirectory;
+    private static ObservableString scenarioTemplatesDirectory;
+    private static ObservableString financesDirectory;
 
 	//stuff related to MM games
     private Server myServer = null;
@@ -176,6 +188,42 @@ public class MekHQ implements GameListener {
 	    return selectedTheme;
     }
 
+	public static ObservableString getPersonnelDirectory() {
+	    return personnelDirectory;
+    }
+
+    public static ObservableString getCampaignOptionsDirectory() {
+        return campaignOptionsDirectory;
+    }
+
+    public static ObservableString getPartsDirectory() {
+        return partsDirectory;
+    }
+
+    public static ObservableString getPlanetsDirectory() {
+        return planetsDirectory;
+    }
+
+    public static ObservableString getStarMapsDirectory() {
+        return starMapsDirectory;
+    }
+
+    public static ObservableString getUnitsDirectory() {
+        return unitsDirectory;
+    }
+
+    public static ObservableString getCampaignsDirectory() {
+	    return campaignsDirectory;
+    }
+
+    public static ObservableString getScenarioTemplatesDirectory() {
+        return scenarioTemplatesDirectory;
+    }
+
+    public static ObservableString getFinancesDirectory() {
+	    return financesDirectory;
+    }
+
 	/**
 	 * Designed to centralize output and logging.
 	 * Purely a pass-through to the version with a log level.
@@ -231,21 +279,51 @@ public class MekHQ implements GameListener {
      * At startup create and show the main frame of the application.
      */
     protected void startup() {
-        selectedTheme = new ObservableString("selectedTheme", UIManager.getLookAndFeel().getClass().getName());
-        selectedTheme.addPropertyChangeListener(new MekHqPropertyChangedListener());
-
         showInfo();
 
-        //Setup user in preferences
+        //Setup user preferences
         getPreferences().loadFromFile(PREFERENCES_FILE);
-        getPreferences()
-                .forClass(MekHQ.class)
-                .manage(new StringPreference(selectedTheme));
+        setUserPreferences();
 
     	initEventHandlers();
         //create a start up frame and display it
         StartUpGUI sud = new StartUpGUI(this);
         sud.setVisible(true);
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = getPreferences().forClass(MekHQ.class);
+
+        selectedTheme = new ObservableString("selectedTheme", UIManager.getLookAndFeel().getClass().getName());
+        selectedTheme.addPropertyChangeListener(new MekHqPropertyChangedListener());
+        preferences.manage(new StringPreference(selectedTheme));
+
+        personnelDirectory = new ObservableString("personnelDirectory", ".");
+        preferences.manage(new StringPreference(personnelDirectory));
+
+        campaignOptionsDirectory = new ObservableString("campaignOptionsDirectory", ".");
+        preferences.manage(new StringPreference(campaignOptionsDirectory));
+
+        partsDirectory = new ObservableString("partsDirectory", ".");
+        preferences.manage(new StringPreference(partsDirectory));
+
+        planetsDirectory = new ObservableString("planetsDirectory", ".");
+        preferences.manage(new StringPreference(planetsDirectory));
+
+        starMapsDirectory = new ObservableString("starMapsDirectory", ".");
+        preferences.manage(new StringPreference(starMapsDirectory));
+
+        unitsDirectory = new ObservableString("unitsDirectory", ".");
+        preferences.manage(new StringPreference(unitsDirectory));
+
+        campaignsDirectory = new ObservableString("campaignsDirectory", ".");
+        preferences.manage(new StringPreference(campaignsDirectory));
+
+        scenarioTemplatesDirectory = new ObservableString("scenarioTemplatesDirectory", ".");
+        preferences.manage(new StringPreference(scenarioTemplatesDirectory));
+
+        financesDirectory = new ObservableString("financesDirectory", ".");
+        preferences.manage(new StringPreference(financesDirectory));
     }
 
     public void exit() {
@@ -278,6 +356,7 @@ public class MekHQ implements GameListener {
         redirectOutput();
         MekHQ.getInstance().startup();
     }
+
     private void showInfo() {
         final String METHOD_NAME = "showInfo";
         final long TIMESTAMP = new File(PreferenceManager
