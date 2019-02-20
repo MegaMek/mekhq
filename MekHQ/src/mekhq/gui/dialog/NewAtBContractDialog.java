@@ -101,12 +101,18 @@ public class NewAtBContractDialog extends NewContractDialog {
         if (getCurrentEmployerCode() != null) {
         	((AtBContract)contract).setEmployerCode(getCurrentEmployerCode(), campaign.getGameYear());
         }
+        
         if (getCurrentEnemyCode() != null) {
         	((AtBContract)contract).setEnemyCode(getCurrentEnemyCode());
         }
-        ((AtBContract) contract)
-                .setPlanetId((Planets.getInstance().getPlanetByName((String) cbPlanets.getSelectedItem(),
-                        Utilities.getDateTimeDay(campaign.getCalendar()))).getId());
+        
+        
+        if(cbPlanets.getSelectedItem() != null) {
+            ((AtBContract) contract).setPlanetId((Planets.getInstance().getPlanetByName((String) cbPlanets.getSelectedItem(),
+                    Utilities.getDateTimeDay(campaign.getCalendar()))).getId());
+        }
+        
+        
         spnMultiplier.setModel(new SpinnerNumberModel(contract.getMultiplier(), 0.1, 10.0, 0.1));
         updatePaymentMultiplier();
         contract.calculateContract(campaign);
