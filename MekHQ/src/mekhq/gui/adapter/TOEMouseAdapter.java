@@ -3,7 +3,12 @@ package mekhq.gui.adapter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.StringTokenizer;
+import java.util.UUID;
+import java.util.Vector;
 import java.util.stream.Collectors;
 
 import javax.swing.JMenu;
@@ -17,16 +22,13 @@ import javax.swing.tree.TreePath;
 import org.apache.commons.lang3.tuple.Pair;
 
 import megamek.client.ui.swing.util.MenuScroller;
-import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import megamek.common.GunEmplacement;
 import megamek.common.UnitType;
 import mekhq.MekHQ;
-import mekhq.campaign.log.LogEntryController;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.NetworkChangedEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
-import mekhq.campaign.event.PersonTechAssignmentEvent;
 import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.log.ServiceLogger;
@@ -42,8 +44,7 @@ import mekhq.gui.dialog.ImageChoiceDialog;
 import mekhq.gui.dialog.TextAreaDialog;
 import mekhq.gui.utilities.StaticChecks;
 
-public class TOEMouseAdapter extends MouseInputAdapter implements
-ActionListener {
+public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener {
     private CampaignGUI gui;
 
     public TOEMouseAdapter(CampaignGUI gui) {
@@ -171,7 +172,7 @@ ActionListener {
             for (Force force : forces) {
                 gui.undeployForce(force);
                 force.clearScenarioIds(gui.getCampaign(), true);
-                if (null != force && null != scenario) {
+                if (null != scenario) {
                     scenario.addForces(force.getId());
                     force.setScenarioId(scenario.getId());
                     for (UUID uid : force.getAllUnits()) {
@@ -251,7 +252,7 @@ ActionListener {
                 }
             }
         } else if (command.contains("REMOVE_LANCE_TECH")) {
-            if (singleForce.getTechID() != null) {
+            if (null != singleForce && singleForce.getTechID() != null) {
                 Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
                 oldTech.clearTechUnitIDs();
 

@@ -727,6 +727,7 @@ public class Campaign implements Serializable, ITechManager {
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                     "Unable to load unit: " + ms.getEntryName()); //$NON-NLS-1$
             MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
+            return;
         }
         Entity en = mechFileParser.getEntity();
 
@@ -899,7 +900,7 @@ public class Campaign implements Serializable, ITechManager {
             if (null != prevForce && prevForce.getUnits().size() == 0) {
                 lances.remove(prevForce.getId());
             }
-            if (null == lances.get(id)) {
+            if (null == lances.get(id) && null != force) {
                 lances.put(id, new Lance(force.getId(), this));
             }
         }
@@ -2245,6 +2246,7 @@ public class Campaign implements Serializable, ITechManager {
         //Edge reroll, if applicable
         if (roll < target.getValue()
                 && getCampaignOptions().useSupportEdge() 
+                && null != person
                 && person.getOptions().booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL)
                 && person.getCurrentEdge() > 0) {
             person.setCurrentEdge(person.getCurrentEdge() - 1);
@@ -2286,11 +2288,11 @@ public class Campaign implements Serializable, ITechManager {
         if (null != person) {
             // The person should have their acquisitions incremented
             person.incrementAcquisition();
-        }
 
-        if (xpGained > 0) {
-            person.setXp(person.getXp() + xpGained);
-            report += " (" + xpGained + "XP gained) ";
+            if (xpGained > 0) {
+                person.setXp(person.getXp() + xpGained);
+                report += " (" + xpGained + "XP gained) ";
+            }
         }
 
         if (found) {

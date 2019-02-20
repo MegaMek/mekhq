@@ -1909,26 +1909,26 @@ public class Person implements Serializable, MekHqXmlSerializable {
             if (null != pilotNickname) {
                 retVal.setCallsign(pilotNickname);
             }
+
+            if (retVal.id == null) {
+                MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
+                        "ID not pre-defined; generating person's ID."); //$NON-NLS-1$
+                retVal.id = UUID.randomUUID();
+            }
+    
+            // Prisoner and Bondsman updating
+            if (retVal.prisonerStatus != PRISONER_NOT && retVal.rank == 0) {
+                if (retVal.prisonerStatus == PRISONER_BONDSMAN) {
+                    retVal.setRankNumeric(Ranks.RANK_BONDSMAN);
+                } else {
+                    retVal.setRankNumeric(Ranks.RANK_PRISONER);
+                }
+            }
         } catch (Exception ex) {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
             MekHQ.getLogger().error(Person.class, METHOD_NAME, ex);
-        }
-
-        if (retVal.id == null) {
-            MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
-                    "ID not pre-defined; generating person's ID."); //$NON-NLS-1$
-            retVal.id = UUID.randomUUID();
-        }
-
-        // Prisoner and Bondsman updating
-        if (retVal.prisonerStatus != PRISONER_NOT && retVal.rank == 0) {
-            if (retVal.prisonerStatus == PRISONER_BONDSMAN) {
-                retVal.setRankNumeric(Ranks.RANK_BONDSMAN);
-            } else {
-                retVal.setRankNumeric(Ranks.RANK_PRISONER);
-            }
         }
 
         return retVal;
@@ -3803,15 +3803,16 @@ public class Person implements Serializable, MekHqXmlSerializable {
     
     public String getChildList() {
         List<UUID> ancestors = new ArrayList<>();
-        for(Ancestors a : campaign.getAncestors()) {
-            if((null != a)
-                && getId().equals(a.getMotherID()) || getId().equals(a.getFatherID())) {
+        for (Ancestors a : campaign.getAncestors()) {
+            if ((null != a)
+                && (getId().equals(a.getMotherID()) || getId().equals(a.getFatherID()))) {
                 ancestors.add(a.getId());
             }
         }
+        
         List<String> children = new ArrayList<>();
         for (Person p : campaign.getPersonnel()) {
-            if(ancestors.contains(p.getAncestorsID())) {
+            if (ancestors.contains(p.getAncestorsID())) {
                 children.add(p.getFullName());
             }
         }

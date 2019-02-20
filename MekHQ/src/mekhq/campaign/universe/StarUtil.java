@@ -433,21 +433,22 @@ public final class StarUtil {
         if( subtypeValue % 100 == 0 ) { subtypeFormat = "%.0f"; } //$NON-NLS-1$
         else if( subtypeValue % 10 == 0 ) { subtypeFormat = "%.1f"; } //$NON-NLS-1$
 
-        if( luminosity.equals(Planet.LUM_VI) ) {
-            // subdwarfs
-            return "sd" + getSpectralClassName(spectralClass) + String.format(subtypeFormat, subtypeValue / 100.0); //$NON-NLS-1$
-        } else if( luminosity.equals(Planet.LUM_VI_PLUS) ) {
-            // extreme subdwarfs
-            return "esd" + getSpectralClassName(spectralClass) + String.format(subtypeFormat, subtypeValue / 100.0); //$NON-NLS-1$
-        } else if( luminosity.equals(Planet.LUM_VII) ) {
-            // white dwarfs
-            return String.format(Locale.ROOT, "D" + subtypeFormat, subtypeValue / 100.0); //$NON-NLS-1$
-        } else {
-            // main class
-            return String.format(Locale.ROOT, "%s" + subtypeFormat + "%s", //$NON-NLS-1$ //$NON-NLS-2$
-                    getSpectralClassName(spectralClass),
-                    subtypeValue / 100.0, (null != luminosity ? luminosity : Planet.LUM_V));
+        if (null != luminosity) {
+            if (luminosity.equals(Planet.LUM_VI)) {
+                // subdwarfs
+                return "sd" + getSpectralClassName(spectralClass) + String.format(subtypeFormat, subtypeValue / 100.0); //$NON-NLS-1$
+            } else if(luminosity.equals(Planet.LUM_VI_PLUS)) {
+                // extreme subdwarfs
+                return "esd" + getSpectralClassName(spectralClass) + String.format(subtypeFormat, subtypeValue / 100.0); //$NON-NLS-1$
+            } else if(luminosity.equals(Planet.LUM_VII)) {
+                // white dwarfs
+                return String.format(Locale.ROOT, "D" + subtypeFormat, subtypeValue / 100.0); //$NON-NLS-1$
+            }
         }
+        // main class
+        return String.format(Locale.ROOT, "%s" + subtypeFormat + "%s", //$NON-NLS-1$ //$NON-NLS-2$
+                getSpectralClassName(spectralClass),
+                subtypeValue / 100.0, (null != luminosity ? luminosity : Planet.LUM_V));
     }
 
     /** Parser for spectral type strings */

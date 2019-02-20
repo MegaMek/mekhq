@@ -781,143 +781,143 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
                 } else if (wn2.getNodeName().equalsIgnoreCase("childPartId")) {
                     retVal.childPartIds.add(Integer.parseInt(wn2.getTextContent()));
                 }
-            }
-        } catch (Exception ex) {
-            // Errrr, apparently either the class name was invalid...
-            // Or the listed name doesn't exist.
-            // Doh!
-            MekHQ.getLogger().error(Part.class, METHOD_NAME, ex);
-        }
+			}
 
-        // Refit protection of unit id
-        if (retVal != null && retVal.unitId != null && retVal.refitId != null) {
-            retVal.setUnit(null);
-        }
+			// Refit protection of unit id
+			if (retVal.unitId != null && retVal.refitId != null) {
+				retVal.setUnit(null);
+			}
+		} catch (Exception ex) {
+			// Errrr, apparently either the class name was invalid...
+			// Or the listed name doesn't exist.
+			// Doh!
+		    MekHQ.getLogger().error(Part.class, METHOD_NAME, ex);
+		}
 
-        return retVal;
-    }
+		return retVal;
+	}
 
-    protected abstract void loadFieldsFromXmlNode(Node wn);
+	protected abstract void loadFieldsFromXmlNode(Node wn);
 
-    @Override
-    public int getActualTime() {
-        return (int) Math.ceil(getBaseTime() * mode.timeMultiplier);
-    }
+	@Override
+	public int getActualTime() {
+	    return (int) Math.ceil(getBaseTime() * mode.timeMultiplier);
+	}
 
-    @Override
-    public int getTimeLeft() {
-        // Cannot be less than 0 time left.
-        return Math.max(0, getActualTime() - getTimeSpent());
-    }
+	@Override
+	public int getTimeLeft() {
+		// Cannot be less than 0 time left.
+		return Math.max(0, getActualTime() - getTimeSpent());
+	}
 
-    @Override
-    public int getTimeSpent() {
-        return timeSpent;
-    }
+	@Override
+	public int getTimeSpent() {
+		return timeSpent;
+	}
 
-    public void addTimeSpent(int m) {
-        this.timeSpent += m;
-    }
+	public void addTimeSpent(int m) {
+		this.timeSpent += m;
+	}
 
-    public void resetTimeSpent() {
-        this.timeSpent = 0;
-    }
+	public void resetTimeSpent() {
+		this.timeSpent = 0;
+	}
 
-    public void resetOvertime() {
-        this.workingOvertime = false;
-    }
+	public void resetOvertime() {
+		this.workingOvertime = false;
+	}
 
-    @Override
-    public int getSkillMin() {
-        return skillMin;
-    }
+	@Override
+	public int getSkillMin() {
+		return skillMin;
+	}
 
-    public void setSkillMin(int i) {
-        this.skillMin = i;
-    }
+	public void setSkillMin(int i) {
+		this.skillMin = i;
+	}
 
-    public WorkTime getMode() {
-        return mode;
-    }
+	public WorkTime getMode() {
+		return mode;
+	}
 
-    public void setMode(WorkTime wt) {
-        if (canChangeWorkMode()) {
-            this.mode = wt;
-        } else {
-            this.mode = WorkTime.NORMAL;
-        }
-    }
+	public void setMode(WorkTime wt) {
+	    if (canChangeWorkMode()) {
+	        this.mode = wt;
+	    } else {
+	        this.mode = WorkTime.NORMAL;
+	    }
+	}
+	
+	/*
+	 * Reset our WorkTime back to normal so that we can adjust as
+	 * necessary
+	 */
+	public void resetModeToNormal() {
+		setMode(WorkTime.NORMAL);
+	}
+	
+	@Override
+	public boolean canChangeWorkMode() {
+	    return !(isOmniPodded() && isSalvaging());
+	}
 
-    /*
-     * Reset our WorkTime back to normal so that we can adjust as
-     * necessary
-     */
-    public void resetModeToNormal() {
-        setMode(WorkTime.NORMAL);
-    }
-
-    @Override
-    public boolean canChangeWorkMode() {
-        return !(isOmniPodded() && isSalvaging());
-    }
-
-    @Override
-    public TargetRoll getAllMods(Person tech) {
-        int difficulty = getDifficulty();
-
-        if (isOmniPodded() && (isSalvaging() || this instanceof MissingPart)
-                && (null != unit) && !(unit.getEntity() instanceof Tank)) {
-            difficulty -= 2;
-        }
-
-        if (null == mode) {
-            mode = WorkTime.NORMAL;
-        }
-
-        TargetRoll mods = new TargetRoll(difficulty, "difficulty");
-        int modeMod = mode.getMod(campaign.getCampaignOptions().isDestroyByMargin());
-        if (modeMod != 0) {
-            mods.addModifier(modeMod, getCurrentModeName());
-        }
-        if(null != unit) {
-            mods.append(unit.getSiteMod());
-            if(unit.getEntity().hasQuirk("easy_maintain")) {
-                mods.addModifier(-1, "easy to maintain");
-            }
-            else if(unit.getEntity().hasQuirk("difficult_maintain")) {
-                mods.addModifier(1, "difficult to maintain");
-            }
-        }
-        if(isClanTechBase() || (this instanceof MekLocation && this.getUnit() != null && this.getUnit().getEntity().isClan())) {
-            if (null != tech && !tech.isClanner()
-                    && !tech.getOptions().booleanOption(PersonnelOptions.TECH_CLAN_TECH_KNOWLEDGE)) {
-                mods.addModifier(2, "Clan tech");
-            }
-        }
-        if(null != tech
-                && tech.getOptions().booleanOption(PersonnelOptions.TECH_WEAPON_SPECIALIST)
-                && (IPartWork.findCorrectRepairType(this) == Part.REPAIR_PART_TYPE.WEAPON
-                || IPartWork.findCorrectMassRepairType(this) == Part.REPAIR_PART_TYPE.PHYSICAL_WEAPON)) {
-            mods.addModifier(-1, "Weapon specialist");
-        }
-        if(null != tech
-                && tech.getOptions().booleanOption(PersonnelOptions.TECH_ARMOR_SPECIALIST)
-                        && IPartWork.findCorrectRepairType(this) == Part.REPAIR_PART_TYPE.ARMOR) {
-            mods.addModifier(-1, "Armor specialist");
-        }
-        if(null != tech
-                && tech.getOptions().booleanOption(PersonnelOptions.TECH_INTERNAL_SPECIALIST)
-                && (IPartWork.findCorrectRepairType(this) == Part.REPAIR_PART_TYPE.ACTUATOR
-                || IPartWork.findCorrectMassRepairType(this) == Part.REPAIR_PART_TYPE.ELECTRONICS
-                || IPartWork.findCorrectMassRepairType(this) == Part.REPAIR_PART_TYPE.ENGINE
-                || IPartWork.findCorrectMassRepairType(this) == Part.REPAIR_PART_TYPE.GYRO
-                || IPartWork.findCorrectMassRepairType(this) == Part.REPAIR_PART_TYPE.MEK_LOCATION
-                || IPartWork.findCorrectMassRepairType(this) == Part.REPAIR_PART_TYPE.GENERAL_LOCATION)) {
-            mods.addModifier(-1, "Internal specialist");
-        }
-        String qualityName = getQualityName(quality, campaign.getCampaignOptions().reverseQualityNames());
-        switch(quality) {
-        case QUALITY_A:
+	@Override
+	public TargetRoll getAllMods(Person tech) {
+	    int difficulty = getDifficulty();
+	    
+	    if (isOmniPodded() && (isSalvaging() || this instanceof MissingPart)
+	            && (null != unit) && !(unit.getEntity() instanceof Tank)) {
+	        difficulty -= 2;
+	    }
+	    
+	    if (null == mode) {
+	    	mode = WorkTime.NORMAL;
+	    }
+	    
+		TargetRoll mods = new TargetRoll(difficulty, "difficulty");
+		int modeMod = mode.getMod(campaign.getCampaignOptions().isDestroyByMargin());
+		if (modeMod != 0) {
+			mods.addModifier(modeMod, getCurrentModeName());
+		}
+		if(null != unit) {
+			mods.append(unit.getSiteMod());
+	        if(unit.getEntity().hasQuirk("easy_maintain")) {
+	            mods.addModifier(-1, "easy to maintain");
+	        }
+	        else if(unit.getEntity().hasQuirk("difficult_maintain")) {
+	            mods.addModifier(1, "difficult to maintain");
+	        }
+		}
+		if(isClanTechBase() || (this instanceof MekLocation && this.getUnit() != null && this.getUnit().getEntity().isClan())) {
+			if (null != tech && !tech.isClanner()
+			        && !tech.getOptions().booleanOption(PersonnelOptions.TECH_CLAN_TECH_KNOWLEDGE)) {
+				mods.addModifier(2, "Clan tech");
+			}
+		}
+		if(null != tech 
+				&& tech.getOptions().booleanOption(PersonnelOptions.TECH_WEAPON_SPECIALIST)
+				&& (IPartWork.findCorrectRepairType(this) == Part.REPAIR_PART_TYPE.WEAPON 
+				|| IPartWork.findCorrectMassRepairType(this) == Part.REPAIR_PART_TYPE.PHYSICAL_WEAPON)) {
+			mods.addModifier(-1, "Weapon specialist");
+		}
+		if(null != tech 
+				&& tech.getOptions().booleanOption(PersonnelOptions.TECH_ARMOR_SPECIALIST)
+						&& IPartWork.findCorrectRepairType(this) == Part.REPAIR_PART_TYPE.ARMOR) {
+			mods.addModifier(-1, "Armor specialist");
+		}
+		if(null != tech 
+				&& tech.getOptions().booleanOption(PersonnelOptions.TECH_INTERNAL_SPECIALIST)
+				&& (IPartWork.findCorrectRepairType(this) == Part.REPAIR_PART_TYPE.ACTUATOR
+			 	|| IPartWork.findCorrectMassRepairType(this) == Part.REPAIR_PART_TYPE.ELECTRONICS
+			 	|| IPartWork.findCorrectMassRepairType(this) == Part.REPAIR_PART_TYPE.ENGINE
+			 	|| IPartWork.findCorrectMassRepairType(this) == Part.REPAIR_PART_TYPE.GYRO
+			 	|| IPartWork.findCorrectMassRepairType(this) == Part.REPAIR_PART_TYPE.MEK_LOCATION
+			 	|| IPartWork.findCorrectMassRepairType(this) == Part.REPAIR_PART_TYPE.GENERAL_LOCATION)) {
+			mods.addModifier(-1, "Internal specialist");
+		}
+		String qualityName = getQualityName(quality, campaign.getCampaignOptions().reverseQualityNames());
+		switch(quality) {
+		case QUALITY_A:
             mods.addModifier(3, qualityName);
             break;
         case QUALITY_B:
