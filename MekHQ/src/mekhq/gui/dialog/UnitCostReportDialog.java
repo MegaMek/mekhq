@@ -11,7 +11,10 @@ import java.awt.Dimension;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 
+import mekhq.MekHQ;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  * @author pheonixstorm
@@ -30,9 +33,9 @@ public class UnitCostReportDialog extends javax.swing.JDialog {
         initComponents();     
         txtReport.setText(unit.displayMonthlyCost());
         txtReport.setCaretPosition(0);
-        setMinimumSize(new Dimension(500, 200));
         setPreferredSize(new Dimension(700, 500));
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -45,5 +48,12 @@ public class UnitCostReportDialog extends javax.swing.JDialog {
         txtReport.setEditable(false);
         
         getContentPane().add(new JScrollPane(txtReport), BorderLayout.CENTER);
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(UnitCostReportDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 }

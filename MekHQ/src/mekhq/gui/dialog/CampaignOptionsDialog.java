@@ -116,10 +116,12 @@ import mekhq.gui.FileDialogs;
 import mekhq.gui.SpecialAbilityPanel;
 import mekhq.gui.model.RankTableModel;
 import mekhq.gui.model.SortedComboBoxModel;
+import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.utilities.JMoneyTextField;
 import mekhq.gui.utilities.TableCellListener;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
+import mekhq.preferences.PreferencesNode;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -554,6 +556,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         useQuirksBox.setSelected(options.useQuirks());
         chkSupportStaffOnly.setSelected(options.isAcquisitionSupportStaffOnly());
+
+        setUserPreferences();
     }
 
     /**
@@ -4381,6 +4385,13 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(CampaignOptionsDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
 
     private void txtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNameActionPerformed
         // TODO add your handling code here:

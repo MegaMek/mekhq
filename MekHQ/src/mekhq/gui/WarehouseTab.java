@@ -91,10 +91,13 @@ import mekhq.gui.adapter.ProcurementTableMouseAdapter;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.model.ProcurementTableModel;
 import mekhq.gui.model.TechTableModel;
+import mekhq.gui.preferences.JComboBoxPreference;
+import mekhq.gui.preferences.JTablePreference;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.PartsDetailSorter;
 import mekhq.gui.sorter.TargetSorter;
 import mekhq.gui.sorter.TechSorter;
+import mekhq.preferences.PreferencesNode;
 
 /**
  * Displays all spare parts in stock, parts on order, and permits repair of damaged
@@ -157,6 +160,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     WarehouseTab(CampaignGUI gui, String name) {
         super(gui, name);
         MekHQ.registerHandler(this);
+        setUserPreferences();
     }
 
     /*
@@ -437,6 +441,19 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
 
         setLayout(new BorderLayout());
         add(splitWarehouse, BorderLayout.CENTER);
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(WarehouseTab.class);
+
+        choiceParts.setName("partsType");
+        preferences.manage(new JComboBoxPreference(choiceParts));
+
+        choicePartsView.setName("partsView");
+        preferences.manage(new JComboBoxPreference(choicePartsView));
+
+        partsTable.setName("partsTable");
+        preferences.manage(new JTablePreference(partsTable));
     }
 
     /* For parts export */

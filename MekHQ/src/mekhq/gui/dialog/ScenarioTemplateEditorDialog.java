@@ -40,6 +40,7 @@ import javax.swing.border.LineBorder;
 import megamek.client.bot.princess.CardinalEdge;
 import megamek.common.EntityWeightClass;
 import megamek.common.UnitType;
+import mekhq.MekHQ;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioMapParameters;
@@ -48,6 +49,8 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.gui.FileDialogs;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  * Handles editing, saving and loading of scenario template definitions.
@@ -140,6 +143,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         initComponents();
         pack();
         validate();
+        setUserPreferences();
     }
     
     /**
@@ -173,7 +177,17 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         
         globalScrollPane.setPreferredSize(new Dimension((int) globalPanel.getPreferredSize().getWidth() + 10, (int) globalPanel.getPreferredSize().getHeight()));
     }
-    
+
+    /**
+     * Use user preferences for this dialog.
+     */
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(ScenarioTemplateEditorDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
+
     /**
      * Sets up text entry boxes in the top - briefing, scenario name, labels.
      * @param gbc

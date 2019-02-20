@@ -23,3 +23,4 @@ MekHQ/.idea/
 /properties_local.gradle
 
 MekHQ/out/
+MekHQ/mmconf/mekhq.preferences

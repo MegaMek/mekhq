@@ -89,7 +89,11 @@ import mekhq.campaign.parts.VeeStabiliser;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.preferences.JComboBoxPreference;
+import mekhq.gui.preferences.JTablePreference;
+import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.sorter.PartsDetailSorter;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -157,6 +161,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         filterParts();
         setLocationRelativeTo(frame);
         selectedPart = null;
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -353,6 +358,19 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		getContentPane().add(panButtons, BorderLayout.PAGE_END);
 		this.setPreferredSize(new Dimension(700,600));
         pack();
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(PartsStoreDialog.class);
+
+        choiceParts.setName("partsType");
+        preferences.manage(new JComboBoxPreference(choiceParts));
+
+        partsTable.setName("partsTable");
+        preferences.manage(new JTablePreference(partsTable));
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 
     public void filterParts() {

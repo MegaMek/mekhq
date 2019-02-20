@@ -35,6 +35,7 @@ import megamek.common.Entity;
 import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
@@ -46,9 +47,14 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.PersonnelTab;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.model.XTableColumnModel;
+import mekhq.gui.preferences.JComboBoxPreference;
+import mekhq.gui.preferences.JTablePreference;
+import mekhq.gui.preferences.JToggleButtonPreference;
+import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.LevelSorter;
 import mekhq.gui.view.PersonViewPanel;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -100,6 +106,7 @@ public class PersonnelMarketDialog extends JDialog {
         initComponents();
         filterPersonnel();
         setLocationRelativeTo(frame);
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -286,7 +293,29 @@ public class PersonnelMarketDialog extends JDialog {
         pack();
     }
 
-	public Person getPerson() {
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(PersonnelMarketDialog.class);
+
+        comboPersonType.setName("personType");
+        preferences.manage(new JComboBoxPreference(comboPersonType));
+
+        radioNormalRoll.setName("normalRoll");
+        preferences.manage(new JToggleButtonPreference(radioNormalRoll));
+
+        radioPaidRecruitment.setName("paidRecruitment");
+        preferences.manage(new JToggleButtonPreference(radioPaidRecruitment));
+
+        comboRecruitType.setName("recruitType");
+        preferences.manage(new JComboBoxPreference(comboRecruitType));
+
+        tablePersonnel.setName("unitsTable");
+        preferences.manage(new JTablePreference(tablePersonnel));
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
+
+    public Person getPerson() {
 	    return selectedPerson;
 	}
 

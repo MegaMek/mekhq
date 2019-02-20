@@ -27,20 +27,11 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.ResourceBundle;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.table.TableColumn;
 
 import mekhq.campaign.finances.Money;
@@ -233,7 +224,7 @@ public final class FinancesTab extends CampaignGuiTab {
         gridBagConstraints.weighty = 1.0;
         add(panelFinanceRight, gridBagConstraints);
     }
-    
+
     private XYDataset setupFinanceDataset() {
         TimeSeries s1 = new TimeSeries("C-Bills"); // NOI18N
         ArrayList<Transaction> transactions = getCampaign().getFinances().getAllTransactions();

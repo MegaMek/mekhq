@@ -79,10 +79,13 @@ import mekhq.gui.model.TaskTableModel;
 import mekhq.gui.model.TechTableModel;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.model.XTableColumnModel;
+import mekhq.gui.preferences.JTablePreference;
+import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.sorter.TaskSorter;
 import mekhq.gui.sorter.TechSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.gui.sorter.UnitTypeSorter;
+import mekhq.preferences.PreferencesNode;
 import mekhq.service.MassRepairService;
 import mekhq.service.PartsAcquisitionService;
 
@@ -128,6 +131,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     RepairTab(CampaignGUI gui, String name) {
         super(gui, name);
         MekHQ.registerHandler(this);
+        setUserPreferences();
     }
 
     /*
@@ -459,6 +463,13 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         add(panTechs, gridBagConstraints);
 
         filterTechs();
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(RepairTab.class);
+
+        servicedUnitTable.setName("serviceUnitsTable");
+        preferences.manage(new JTablePreference(servicedUnitTable));
     }
 
     protected void updateTechTarget() {

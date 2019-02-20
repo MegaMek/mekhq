@@ -30,7 +30,6 @@ public class TextAreaDialog extends javax.swing.JDialog {
         initComponents();     
         txtDesc.setText(text);
         changed = false;
-        setMinimumSize(new Dimension(400, 500));
         setPreferredSize(new Dimension(400, 500));
         setLocationRelativeTo(parent);
     }

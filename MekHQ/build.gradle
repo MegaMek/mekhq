@@ -51,6 +51,7 @@ dependencies {
 
     implementation 'log4j:log4j:1.2.17'
     implementation 'javax.xml.bind:jaxb-api:2.3.0'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.9.8'
     runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:2.3.0'
     runtimeOnly 'org.glassfish.jaxb:jaxb-core:2.3.0'
     runtimeOnly 'com.sun.activation:javax.activation:1.2.0'

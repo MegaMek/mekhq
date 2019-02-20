@@ -21,6 +21,9 @@ import javax.swing.JDialog;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 
+import mekhq.MekHQ;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 import org.joda.time.DateTime;
 
 import megamek.common.util.EncodeControl;
@@ -47,6 +50,7 @@ public class ChooseFactionsDialog extends JDialog {
         this.changed = false;
         initComponents();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     protected void initComponents() {
@@ -54,8 +58,8 @@ public class ChooseFactionsDialog extends JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("form"); //$NON-NLS-1$
         setTitle(resourceMap.getString("Form.title")); //$NON-NLS-1$
-        setMinimumSize(new Dimension(400, 500));
-        
+        setPreferredSize(new Dimension(400, 500));
+
         final Container content = getContentPane();
         content.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -115,7 +119,14 @@ public class ChooseFactionsDialog extends JDialog {
         }), gbc);
         pack();
     }
-    
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(ChooseFactionsDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
+
     public List<String> getResult() {
         return result;
     }

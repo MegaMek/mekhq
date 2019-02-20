@@ -64,8 +64,10 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.dialog.PopupValueChoiceDialog;
 import mekhq.gui.model.PartsInUseTableModel;
 import mekhq.gui.model.PartsInUseTableModel.ButtonColumn;
+import mekhq.gui.preferences.JTablePreference;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.TwoNumbersSorter;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -102,6 +104,7 @@ public final class OverviewTab extends CampaignGuiTab {
     OverviewTab(CampaignGUI gui, String name) {
         super(gui, name);
         MekHQ.registerHandler(this);
+        setUserPreferences();
     }
 
     /*
@@ -210,6 +213,13 @@ public final class OverviewTab extends CampaignGuiTab {
         gridBagConstraints.weighty = 1.0;
         // gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
         add(getTabOverview(), gridBagConstraints);
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(OverviewTab.class);
+
+        overviewPartsInUseTable.setName("partsInUseTable");
+        preferences.manage(new JTablePreference(overviewPartsInUseTable));
     }
 
     /**
