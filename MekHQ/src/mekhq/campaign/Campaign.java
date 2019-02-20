@@ -1504,6 +1504,11 @@ public class Campaign implements Serializable, ITechManager {
             // a relic.
             return;
         }
+
+        // Update the lastPartId we've seen to avoid overwriting a part,
+        // which may occur if a replacement ID is assigned
+        lastPartId = Math.max(lastPartId, p.getId());
+
         // go ahead and check for existing parts because some version weren't
         // properly collecting parts
         if (!(p instanceof MissingPart) && null == p.getUnitId()) {
@@ -1528,7 +1533,6 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
 
-        lastPartId = Math.max(lastPartId, p.getId());
         parts.put(p.getId(), p);
         MekHQ.triggerEvent(new PartNewEvent(p));
     }
