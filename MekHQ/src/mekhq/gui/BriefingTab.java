@@ -646,21 +646,24 @@ public final class BriefingTab extends CampaignGuiTab {
 
         // code to support deployment of reinforcements for legacy ATB scenarios.
         if((scenario instanceof AtBScenario) && !(scenario instanceof AtBDynamicScenario)) {
-            int assignedForceId = ((AtBScenario) scenario).getLance(getCampaign()).getForceId();
-            int cmdrStrategy = 0;
-            Person commander = getCampaign().getPerson(Lance.findCommander(assignedForceId, getCampaign()));
-            if (null != commander && null != commander.getSkill(SkillType.S_STRATEGY)) {
-                cmdrStrategy = commander.getSkill(SkillType.S_STRATEGY).getLevel();
-            }
-            List<Entity> reinforcementEntities = new ArrayList<>();
-            
-            for(Unit unit : chosen) {
-                if(unit.getForceId() != assignedForceId) {
-                    reinforcementEntities.add(unit.getEntity());
+            Lance assignedLance = ((AtBScenario) scenario).getLance(getCampaign());
+            if(assignedLance != null) {            
+                int assignedForceId = assignedLance.getForceId();
+                int cmdrStrategy = 0;
+                Person commander = getCampaign().getPerson(Lance.findCommander(assignedForceId, getCampaign()));
+                if (null != commander && null != commander.getSkill(SkillType.S_STRATEGY)) {
+                    cmdrStrategy = commander.getSkill(SkillType.S_STRATEGY).getLevel();
                 }
+                List<Entity> reinforcementEntities = new ArrayList<>();
+                
+                for(Unit unit : chosen) {
+                    if(unit.getForceId() != assignedForceId) {
+                        reinforcementEntities.add(unit.getEntity());
+                    }
+                }
+                
+                AtBDynamicScenarioFactory.setDeploymentTurnsForReinforcements(reinforcementEntities, cmdrStrategy);
             }
-            
-            AtBDynamicScenarioFactory.setDeploymentTurnsForReinforcements(reinforcementEntities, cmdrStrategy);
         }
         
         if (getCampaign().getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario) {
