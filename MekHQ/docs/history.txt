@@ -6,6 +6,8 @@ v0.45.4-SNAPSHOT
 + Issue #1085: Find different replacement part if original missing or has a new ID
 + Issue #1076: Address bug in Personnel Market where GM Add still costs money and add GM Hire Full Complement
 + PR #1084: Save user preferences for UI settings such as window sizes and positions, et al
++ Issue #1082: Fix issue preventing creation of new AtB contract
++ Issue #1086: Fix issue introduced in 45.3 preventing "special" AtB scenarios from starting
 
 v0.45.3 (2019-02-12 0500 UTC)
 + Issue #990: Feature: Add bulk confirm dialog if more than one unit is removed
