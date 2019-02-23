@@ -40,21 +40,18 @@ public class JWindowPreference extends PreferenceElement implements WindowStateL
     public JWindowPreference(Window window) {
         super (window.getName());
 
-        try {
-            this.width = window.getWidth();
-            this.height = window.getHeight();
+        this.width = window.getWidth();
+        this.height = window.getHeight();
+
+        if (window.isVisible()) {
             this.screenX = window.getLocationOnScreen().x;
             this.screenY = window.getLocationOnScreen().y;
+        }
 
-            if (window instanceof JFrame) {
-                this.isMaximized = (((JFrame)window).getExtendedState() & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH;
-            } else {
-                this.isMaximized = false;
-            }
-        } catch (Exception ignored) {
-            // getLocationOnScreen can throw if the Window is still not visible.
-            // This tends to happens with JDialogs, but that's ok as we will capture
-            // their position later if the user moves on the componentMoved method.
+        if (window instanceof JFrame) {
+            this.isMaximized = (((JFrame)window).getExtendedState() & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH;
+        } else {
+            this.isMaximized = false;
         }
 
         this.weakRef = new WeakReference<>(window);
@@ -75,8 +72,10 @@ public class JWindowPreference extends PreferenceElement implements WindowStateL
 
     @Override
     public void componentMoved(ComponentEvent e) {
-        this.screenX = e.getComponent().getLocationOnScreen().x;
-        this.screenY = e.getComponent().getLocationOnScreen().y;
+        if (e.getComponent().isVisible()) {
+            this.screenX = e.getComponent().getLocationOnScreen().x;
+            this.screenY = e.getComponent().getLocationOnScreen().y;
+        }
     }
 
     @Override
