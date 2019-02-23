@@ -308,9 +308,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
                 if (null != u) {
                     u.addPilotOrSoldier(selectedPerson, useTransfers);
+                    u.resetPilotAndEntity();
+                    u.runDiagnostic(false);
                 }
-                u.resetPilotAndEntity();
-                u.runDiagnostic(false);
                 break;
             }
             case CMD_ADD_SOLDIER:
@@ -330,9 +330,10 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             u.addPilotOrSoldier(p, useTransfers);
                         }
                     }
+
+                    u.resetPilotAndEntity();
+                    u.runDiagnostic(false);
                 }
-                u.resetPilotAndEntity();
-                u.runDiagnostic(false);
                 break;
             }
             case CMD_ADD_DRIVER:
@@ -348,9 +349,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
                 if (null != u) {
                     u.addDriver(selectedPerson, useTransfers);
+                    u.resetPilotAndEntity();
+                    u.runDiagnostic(false);
                 }
-                u.resetPilotAndEntity();
-                u.runDiagnostic(false);
                 break;
             }
             case CMD_ADD_VESSEL_PILOT:
@@ -370,9 +371,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             u.addDriver(p, useTransfers);
                         }
                     }
+                    u.resetPilotAndEntity();
+                    u.runDiagnostic(false);
                 }
-                u.resetPilotAndEntity();
-                u.runDiagnostic(false);
                 break;
             }
             case CMD_ADD_GUNNER:
@@ -392,9 +393,10 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             u.addGunner(p, useTransfers);
                         }
                     }
+
+                    u.resetPilotAndEntity();
+                    u.runDiagnostic(false);
                 }
-                u.resetPilotAndEntity();
-                u.runDiagnostic(false);
                 break;
             }
             case CMD_ADD_CREW:
@@ -414,9 +416,10 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             u.addVesselCrew(p, useTransfers);
                         }
                     }
+
+                    u.resetPilotAndEntity();
+                    u.runDiagnostic(false);
                 }
-                u.resetPilotAndEntity();
-                u.runDiagnostic(false);
                 break;
             }
             case CMD_ADD_NAVIGATOR:
@@ -436,9 +439,10 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             u.setNavigator(p, useTransfers);
                         }
                     }
+
+                    u.resetPilotAndEntity();
+                    u.runDiagnostic(false);
                 }
-                u.resetPilotAndEntity();
-                u.runDiagnostic(false);
                 break;
             }
             case CMD_ADD_TECH_OFFICER:
@@ -458,9 +462,10 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             u.setTechOfficer(p, useTransfers);
                         }
                     }
+
+                    u.resetPilotAndEntity();
+                    u.runDiagnostic(false);
                 }
-                u.resetPilotAndEntity();
-                u.runDiagnostic(false);
                 break;
             }
             case CMD_ADD_TECH:
@@ -471,9 +476,10 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     if (u.canTakeTech()) {
                         u.setTech(selectedPerson);
                     }
+
+                    u.resetPilotAndEntity();
+                    u.runDiagnostic(false);
                 }
-                u.resetPilotAndEntity();
-                u.runDiagnostic(false);
                 break;
             }
             case CMD_ADD_PREGNANCY:

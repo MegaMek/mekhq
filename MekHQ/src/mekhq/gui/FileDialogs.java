@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package mekhq.gui;
 
 import java.io.File;
@@ -44,10 +45,14 @@ public class FileDialogs {
      * @return the file selected, if any
      */
     public static Optional<File> openPersonnel(JFrame frame) {
-        return GUI.fileDialogOpen( frame,
-                                   "Load Personnel",
-                                   new File("."), //$NON-NLS-1$
-                                   FileType.PRSX );
+        Optional<File> value = GUI.fileDialogOpen(
+                frame,
+                "Load Personnel",
+                FileType.PRSX,
+                MekHQ.getPersonnelDirectory().getValue());
+
+        value.ifPresent(x -> MekHQ.getPersonnelDirectory().setValue(x.getParent()));
+        return value;
     }
 
     /**
@@ -57,14 +62,20 @@ public class FileDialogs {
      */
     public static Optional<File> savePersonnel(JFrame frame, Campaign campaign) {
 
-        String fileName = String.format( "%s%s_ExportedPersonnel.prsx", //$NON-NLS-1$
-                                         campaign.getName(),
-                                         campaign.getShortDateAsString() );
+        String fileName = String.format(
+                "%s%s_ExportedPersonnel.prsx", //$NON-NLS-1$
+                campaign.getName(),
+                campaign.getShortDateAsString() );
 
-        return GUI.fileDialogSave( frame,
-                                   "Save Personnel",
-                                   new File(".", fileName), //$NON-NLS-1$
-                                   FileType.PRSX);
+        Optional<File> value = GUI.fileDialogSave(
+                frame,
+                "Save Personnel",
+                FileType.PRSX,
+                MekHQ.getPersonnelDirectory().getValue(),
+                fileName);
+
+        value.ifPresent(x -> MekHQ.getPersonnelDirectory().setValue(x.getParent()));
+        return value;
     }
 
     /**
@@ -73,51 +84,14 @@ public class FileDialogs {
      * @return the file selected, if any
      */
     public static Optional<File> openCampaignOptions(JFrame frame) {
-        return GUI.fileDialogOpen( frame,
-                                   "Load Campaign Options",
-                                   new File("."), //$NON-NLS-1$
-                                   FileType.XML );
-    }
+        Optional<File> value = GUI.fileDialogOpen(
+                frame,
+                "Load Campaign Options",
+                FileType.XML,
+                MekHQ.getCampaignOptionsDirectory().getValue());
 
-    /**
-     * Displays a dialog window from which the user can select a <tt>.parts</tt> file to open.
-     *
-     * @return the file selected, if any
-     */
-    public static Optional<File> openParts(JFrame frame) {
-        return GUI.fileDialogOpen( frame,
-                                   "Load Pards",
-                                   new File("."), //$NON-NLS-1$
-                                   FileType.PARTS );
-    }
-
-    /**
-     * Displays a dialog window from which the user can select a <tt>.parts</tt> file to save to.
-     *
-     * @return the file selected, if any
-     */
-    public static Optional<File> saveParts(JFrame frame, Campaign campaign) {
-
-        String fileName = String.format( "%s%s_ExportedParts.parts", //$NON-NLS-1$
-                                         campaign.getName(),
-                                         campaign.getShortDateAsString() );
-
-        return GUI.fileDialogSave( frame,
-                                   "Save Pards",
-                                   new File(".", fileName), //$NON-NLS-1$
-                                   FileType.PARTS );
-    }
-
-    /**
-     * Displays a dialog window from which the user can select a <tt>.tsv</tt> file to open.
-     *
-     * @return the file selected, if any
-     */
-    public static Optional<File> openPlanetsTsv(JFrame frame) {
-        return GUI.fileDialogOpen( frame,
-                                   "Load Planets from SUCS format TSV file",
-                                   new File("."), //$NON-NLS-1$
-                                   FileType.TSV );
+        value.ifPresent(x -> MekHQ.getCampaignOptionsDirectory().setValue(x.getParent()));
+        return value;
     }
 
     /**
@@ -126,22 +100,53 @@ public class FileDialogs {
      * @return the file selected, if any
      */
     public static Optional<File> saveCampaignOptions(JFrame frame) {
-        return GUI.fileDialogSave( frame,
-                                   "Save Campaign Options as Presets",
-                                   new File(MekHQ.PRESET_DIR, "myoptions.xml"), //$NON-NLS-1$
-                                   FileType.XML );
+        Optional<File> value = GUI.fileDialogSave(
+                frame,
+                "Save Campaign Options as Presets",
+                FileType.XML,
+                MekHQ.getCampaignOptionsDirectory().getValue(),
+                "myoptions.xml");
+
+        value.ifPresent(x -> MekHQ.getCampaignOptionsDirectory().setValue(x.getParent()));
+        return value;
     }
 
     /**
-     * Displays a dialog window from which the user can select a <tt>.png</tt> file to save to.
+     * Displays a dialog window from which the user can select a <tt>.parts</tt> file to open.
      *
      * @return the file selected, if any
      */
-    public static Optional<File> saveStarMap(JFrame frame) {
-        return GUI.fileDialogSave( frame,
-                                   "",
-                                   new File(".", "starmap.png"), //$NON-NLS-1$ //$NON-NLS-2$
-                                   FileType.PNG );
+    public static Optional<File> openParts(JFrame frame) {
+        Optional<File> value = GUI.fileDialogOpen(
+                frame,
+                "Load Parts",
+                FileType.PARTS,
+                MekHQ.getPartsDirectory().getValue());
+
+        value.ifPresent(x -> MekHQ.getPartsDirectory().setValue(x.getParent()));
+        return value;
+    }
+
+    /**
+     * Displays a dialog window from which the user can select a <tt>.parts</tt> file to save to.
+     *
+     * @return the file selected, if any
+     */
+    public static Optional<File> saveParts(JFrame frame, Campaign campaign) {
+        String fileName = String.format(
+                "%s%s_ExportedParts.parts", //$NON-NLS-1$
+                campaign.getName(),
+                campaign.getShortDateAsString() );
+
+        Optional<File> value =  GUI.fileDialogSave(
+                frame,
+                "Save Parts",
+                FileType.PARTS,
+                MekHQ.getPartsDirectory().getValue(),
+                fileName);
+
+        value.ifPresent(x -> MekHQ.getPartsDirectory().setValue(x.getParent()));
+        return value;
     }
 
     /**
@@ -150,10 +155,14 @@ public class FileDialogs {
      * @return the file selected, if any
      */
     public static Optional<File> openUnits(JFrame frame) {
-        return GUI.fileDialogOpen( frame,
-                                   "Load Units",
-                                   new File("."), //$NON-NLS-1$
-                                   FileType.MUL );
+        Optional<File> value = GUI.fileDialogOpen(
+                frame,
+                "Load Units",
+                FileType.MUL,
+                MekHQ.getUnitsDirectory().getValue());
+
+        value.ifPresent(x -> MekHQ.getUnitsDirectory().setValue(x.getParent()));
+        return value;
     }
 
     /**
@@ -162,10 +171,15 @@ public class FileDialogs {
      * @return the file selected, if any
      */
     public static Optional<File> saveDeployUnits(JFrame frame, Scenario scenario) {
-        return GUI.fileDialogSave( frame,
-                                   "Deploy Units",
-                                   new File(".", scenario.getName() + ".mul"), //$NON-NLS-1$ //$NON-NLS-2$
-                                   FileType.MUL );
+        Optional<File> value = GUI.fileDialogSave(
+                frame,
+                "Deploy Units",
+                FileType.MUL,
+                MekHQ.getUnitsDirectory().getValue(),
+                scenario.getName() + ".mul");
+
+        value.ifPresent(x -> MekHQ.getUnitsDirectory().setValue(x.getParent()));
+        return value;
     }
 
     /**
@@ -174,10 +188,14 @@ public class FileDialogs {
      * @return the file selected, if any
      */
     public static Optional<File> openCampaign(JFrame frame) {
-        return GUI.fileDialogOpen( frame,
-                                   "Load Campaign",
-                                   new File(MekHQ.CAMPAIGN_DIRECTORY),
-                                   FileType.CPNX );
+        Optional<File> value = GUI.fileDialogOpen(
+                frame,
+                "Load Campaign",
+                FileType.CPNX,
+                MekHQ.getCampaignsDirectory().getValue());
+
+        value.ifPresent(x -> MekHQ.getCampaignsDirectory().setValue(x.getParent()));
+        return value;
     }
 
     /**
@@ -187,15 +205,20 @@ public class FileDialogs {
      */
     public static Optional<File> saveCampaign(JFrame frame, Campaign campaign) {
 
-        String fileName = String.format( "%s%s.%s", //$NON-NLS-1$
-                                         campaign.getName(),
-                                         campaign.getShortDateAsString(),
-                                         campaign.getPreferGzippedOutput() ? "cpnx.gz" : "cpnx" );
+        String fileName = String.format(
+                "%s%s.%s", //$NON-NLS-1$
+                campaign.getName(),
+                campaign.getShortDateAsString(),
+                campaign.getPreferGzippedOutput() ? "cpnx.gz" : "cpnx" );
 
-        return GUI.fileDialogSave( frame,
-                                   "Save Campaign",
-                                   new File(MekHQ.CAMPAIGN_DIRECTORY, fileName),
-                                   FileType.CPNX );
+        Optional<File> value = GUI.fileDialogSave( frame,
+                "Save Campaign",
+                FileType.CPNX,
+                MekHQ.getCampaignsDirectory().getValue(),
+                fileName);
+
+        value.ifPresent(x -> MekHQ.getCampaignsDirectory().setValue(x.getParent()));
+        return value;
     }
 
     /**
@@ -204,10 +227,14 @@ public class FileDialogs {
      * @return the file selected, if any
      */
     public static Optional<File> openScenarioTemplate(JFrame frame) {
-        return GUI.fileDialogOpen( frame,
-                                   "Load Scenario Template",
-                                   new File("."),
-                                   FileType.XML );
+        Optional<File> value = GUI.fileDialogOpen(
+                frame,
+                "Load Scenario Template",
+                FileType.XML,
+                MekHQ.getScenarioTemplatesDirectory().getValue());
+
+        value.ifPresent(x -> MekHQ.getScenarioTemplatesDirectory().setValue(x.getParent()));
+        return value;
     }
 
     /**
@@ -217,13 +244,51 @@ public class FileDialogs {
      */
     public static Optional<File> saveScenarioTemplate(JFrame frame, ScenarioTemplate template) {
 
-        String fileName = String.format( "%s.xml", //$NON-NLS-1$
-                                         template.name);
+        String fileName = String.format(
+                "%s.xml", //$NON-NLS-1$
+                template.name);
 
-        return GUI.fileDialogSave( frame,
-                                   "Save Scenario Template",
-                                   new File(".", fileName),
-                                   FileType.XML );
+        Optional<File> value = GUI.fileDialogSave(
+                frame,
+                "Save Scenario Template",
+                FileType.XML,
+                MekHQ.getScenarioTemplatesDirectory().getValue(),
+                fileName);
+
+        value.ifPresent(x -> MekHQ.getScenarioTemplatesDirectory().setValue(x.getParent()));
+        return value;
     }
-    
+
+    /**
+     * Displays a dialog window from which the user can select a <tt>.tsv</tt> file to open.
+     *
+     * @return the file selected, if any
+     */
+    public static Optional<File> openPlanetsTsv(JFrame frame) {
+        Optional<File> value = GUI.fileDialogOpen(
+                frame,
+                "Load Planets from SUCS format TSV file",
+                FileType.TSV,
+                MekHQ.getPlanetsDirectory().getValue());
+
+        value.ifPresent(x -> MekHQ.getPlanetsDirectory().setValue(x.getParent()));
+        return value;
+    }
+
+    /**
+     * Displays a dialog window from which the user can select a <tt>.png</tt> file to save to.
+     *
+     * @return the file selected, if any
+     */
+    public static Optional<File> saveStarMap(JFrame frame) {
+        Optional<File> value = GUI.fileDialogSave(
+                frame,
+                "Save star map to PNG file",
+                FileType.PNG,
+                MekHQ.getStarMapsDirectory().getValue(),
+                "starmap.png");
+
+        value.ifPresent(x -> MekHQ.getStarMapsDirectory().setValue(x.getParent()));
+        return value;
+    }
 }

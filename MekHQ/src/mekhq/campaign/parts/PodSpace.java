@@ -70,7 +70,7 @@ public class PodSpace implements Serializable, IPartWork {
     public PodSpace(int location, Unit unit) {
         this.location = location;
         this.unit = unit;
-        this.campaign = unit.campaign;
+        this.campaign = unit.getCampaign();
         //We don't need a LOC_WINGS podspace, but we do need one for the fuselage equipment, which is stored at LOC_NONE.
         if (unit.getEntity() instanceof Aero && location == Aero.LOC_WINGS) {
             this.location = -1;
@@ -161,7 +161,7 @@ public class PodSpace implements Serializable, IPartWork {
             }
             if (repairInPlace) {
                 for (int id : childPartIds) {
-                    final Part p = unit.campaign.getPart(id);
+                    final Part p = unit.getCampaign().getPart(id);
                     if (p != null && p instanceof MissingPart) {
                         return null;
                     }
@@ -169,7 +169,7 @@ public class PodSpace implements Serializable, IPartWork {
                 return unit.getEntity().getLocationName(location) + " is not missing any pod-mounted equipment.";
             } else {
                 for (int id : childPartIds) {
-                    final Part p = unit.campaign.getPart(id);
+                    final Part p = unit.getCampaign().getPart(id);
                     if (p == null || !p.needsFixing()) {
                         continue;
                     }

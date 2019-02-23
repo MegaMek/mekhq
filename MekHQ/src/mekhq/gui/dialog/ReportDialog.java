@@ -14,7 +14,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.border.EmptyBorder;
 
+import mekhq.MekHQ;
 import mekhq.campaign.report.Report;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -31,13 +34,13 @@ public class ReportDialog extends JDialog {
         super(parent, false);
         setTitle(report.getTitle());
         txtReport = report.getReport();
-        initComponents();   
-        setMinimumSize(new Dimension(800, 500));
+        initComponents();
+        setPreferredSize(new Dimension(800, 500));
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
     
     private void initComponents() {
-        
         setLayout(new BorderLayout());
         
         scrReport = new JScrollPane(txtReport);
@@ -45,7 +48,12 @@ public class ReportDialog extends JDialog {
         scrReport.setBorder( new EmptyBorder(2,10,2,2));
         
         getContentPane().add(scrReport, BorderLayout.CENTER);
-    
     }
-    
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(UnitRatingDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
 }

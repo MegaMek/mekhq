@@ -31,7 +31,6 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.ResourceBundle;
@@ -50,8 +49,6 @@ import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -74,7 +71,12 @@ import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.market.UnitMarket;
 import mekhq.gui.model.UnitMarketTableModel;
 import mekhq.gui.model.XTableColumnModel;
+import mekhq.gui.preferences.JToggleButtonPreference;
+import mekhq.gui.preferences.JIntNumberSpinnerPreference;
+import mekhq.gui.preferences.JTablePreference;
+import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.sorter.WeightClassSorter;
+import mekhq.preferences.PreferencesNode;
 
 /**
  * Code copied heavily from PersonnelMarketDialog
@@ -131,6 +133,7 @@ public class UnitMarketDialog extends JDialog {
         initComponents();
         filterOffers();
         setLocationRelativeTo(frame);
+        setUserPreferences();
     }
 
     @SuppressWarnings("serial")
@@ -157,7 +160,6 @@ public class UnitMarketDialog extends JDialog {
 		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitMarketDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(resourceMap.getString("Form.title")); // NOI18N
-        setName("Form"); // NOI18N
         getContentPane().setLayout(new BorderLayout());
 
         panelFilterBtns.setLayout(new GridBagLayout());
@@ -213,12 +215,9 @@ public class UnitMarketDialog extends JDialog {
         panel.add(spnThreshold);
         panel.add(lblPctThreshold);
         chkPctThreshold.addItemListener(checkboxListener);
-        spnThreshold.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(ChangeEvent arg0) {
-				threshold = (Integer)spnThreshold.getValue();
-				filterOffers();
-			}
+        spnThreshold.addChangeListener(arg0 -> {
+            threshold = (Integer)spnThreshold.getValue();
+            filterOffers();
         });
 
         gbc.gridx = 0;
@@ -235,19 +234,16 @@ public class UnitMarketDialog extends JDialog {
 
         gbc = new GridBagConstraints();
         tableUnits.setModel(marketModel);
-        tableUnits.setName("tableUnits"); // NOI18N
         tableUnits.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tableUnits.setColumnModel(new XTableColumnModel());
         tableUnits.createDefaultColumnsFromModel();
         sorter = new TableRowSorter<>(marketModel);
         sorter.setComparator(UnitMarketTableModel.COL_WEIGHTCLASS, new WeightClassSorter());
-        Comparator<String> numComparator = new Comparator<String>() {
-			public int compare(String arg0, String arg1) {
-				if (arg0.length() != arg1.length()) {
-					return arg0.length() - arg1.length();
-				}
-				return arg0.compareTo(arg1);
-			}
+        Comparator<String> numComparator = (arg0, arg1) -> {
+            if (arg0.length() != arg1.length()) {
+                return arg0.length() - arg1.length();
+            }
+            return arg0.compareTo(arg1);
         };
         sorter.setComparator(UnitMarketTableModel.COL_PRICE, numComparator);
         sorter.setComparator(UnitMarketTableModel.COL_PERCENT, numComparator);
@@ -312,7 +308,6 @@ public class UnitMarketDialog extends JDialog {
         btnAdd.setEnabled(null !=  selectedEntity);
         panelOKBtns.add(btnAdd, new java.awt.GridBagConstraints());
 
-
         btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
         btnClose.addActionListener(evt -> btnCloseActionPerformed(evt));
@@ -323,7 +318,32 @@ public class UnitMarketDialog extends JDialog {
         pack();
     }
 
-	public Entity getUnit() {
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(UnitMarketDialog.class);
+
+        chkShowMeks.setName("showMeks");
+        preferences.manage(new JToggleButtonPreference(chkShowMeks));
+
+        chkShowAero.setName("showAero");
+        preferences.manage(new JToggleButtonPreference(chkShowAero));
+
+        chkShowVees.setName("showVees");
+        preferences.manage(new JToggleButtonPreference(chkShowVees));
+
+        chkPctThreshold.setName("useThreshold");
+        preferences.manage(new JToggleButtonPreference(chkPctThreshold));
+
+        spnThreshold.setName("thresholdValue");
+        preferences.manage(new JIntNumberSpinnerPreference(spnThreshold));
+
+        tableUnits.setName("unitsTable");
+        preferences.manage(new JTablePreference(tableUnits));
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
+
+    public Entity getUnit() {
 	    return selectedEntity;
 	}
 

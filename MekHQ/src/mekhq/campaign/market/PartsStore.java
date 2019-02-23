@@ -162,17 +162,15 @@ public class PartsStore implements Serializable {
 			}
 			//FIXME: I can't pull entity movement mode and quad shape off of mechsummary
 			//try loading the full entity, but this might take too long
-			if(null != summary) {
-		 		Entity newEntity = null;
-		 		try {
-		 			newEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
-				} catch (EntityLoadingException e) {
-					e.printStackTrace();
-				}
-		 		if(null != newEntity) {
-		 			BattleArmorSuit ba = new BattleArmorSuit(summary.getChassis(), summary.getModel(), (int)summary.getTons(), 1, summary.getWeightClass(), summary.getWalkMp(), summary.getJumpMp(), newEntity.entityIsQuad(), summary.isClan(), newEntity.getMovementMode(), c);
-		 			parts.add(ba);
-		 		}
+			Entity newEntity = null;
+			try {
+				newEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+			} catch (EntityLoadingException e) {
+				e.printStackTrace();
+			}
+			if(null != newEntity) {
+				BattleArmorSuit ba = new BattleArmorSuit(summary.getChassis(), summary.getModel(), (int)summary.getTons(), 1, summary.getWeightClass(), summary.getWalkMp(), summary.getJumpMp(), newEntity.entityIsQuad(), summary.isClan(), newEntity.getMovementMode(), c);
+				parts.add(ba);
 			}
 		}
 	}

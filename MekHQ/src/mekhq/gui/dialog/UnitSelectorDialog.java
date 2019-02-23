@@ -63,6 +63,10 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.unit.UnitTechProgression;
+import mekhq.gui.preferences.JComboBoxPreference;
+import mekhq.gui.preferences.JTablePreference;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -126,6 +130,7 @@ public class UnitSelectorDialog extends JDialog {
         MechSummary[] allMechs = MechSummaryCache.getInstance().getAllMechs();
         setMechs(allMechs);
         setLocationRelativeTo(frame);
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -383,6 +388,22 @@ public class UnitSelectorDialog extends JDialog {
         getContentPane().add(panelOKBtns, BorderLayout.PAGE_END);
 
         pack();
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(UnitSelectorDialog.class);
+
+        comboUnitType.setName("unitType");
+        preferences.manage(new JComboBoxPreference(comboUnitType));
+
+        comboWeight.setName("weight");
+        preferences.manage(new JComboBoxPreference(comboWeight));
+
+        tableUnits.setName("unitsTable");
+        preferences.manage(new JTablePreference(tableUnits));
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 
     private void comboUnitTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboUnitTypeActionPerformed

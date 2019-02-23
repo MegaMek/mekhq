@@ -120,7 +120,7 @@ public class BasicInfo extends JPanel {
             if (null == base) {
                 return null;
             }
-            int tint = PlayerColors.getColorRGB(u.campaign.getColorIndex());
+            int tint = PlayerColors.getColorRGB(u.getCampaign().getColorIndex());
             EntityImage entityImage = new EntityImage(base, tint, getCamo(u), this);
             return entityImage.loadPreviewImage();
         }

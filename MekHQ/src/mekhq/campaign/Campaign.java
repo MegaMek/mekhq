@@ -727,6 +727,7 @@ public class Campaign implements Serializable, ITechManager {
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                     "Unable to load unit: " + ms.getEntryName()); //$NON-NLS-1$
             MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
+            return;
         }
         Entity en = mechFileParser.getEntity();
 
@@ -899,7 +900,7 @@ public class Campaign implements Serializable, ITechManager {
             if (null != prevForce && prevForce.getUnits().size() == 0) {
                 lances.remove(prevForce.getId());
             }
-            if (null == lances.get(id)) {
+            if (null == lances.get(id) && null != force) {
                 lances.put(id, new Lance(force.getId(), this));
             }
         }
@@ -1504,6 +1505,11 @@ public class Campaign implements Serializable, ITechManager {
             // a relic.
             return;
         }
+
+        // Update the lastPartId we've seen to avoid overwriting a part,
+        // which may occur if a replacement ID is assigned
+        lastPartId = Math.max(lastPartId, p.getId());
+
         // go ahead and check for existing parts because some version weren't
         // properly collecting parts
         if (!(p instanceof MissingPart) && null == p.getUnitId()) {
@@ -1528,7 +1534,6 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
 
-        lastPartId = Math.max(lastPartId, p.getId());
         parts.put(p.getId(), p);
         MekHQ.triggerEvent(new PartNewEvent(p));
     }
@@ -2241,6 +2246,7 @@ public class Campaign implements Serializable, ITechManager {
         //Edge reroll, if applicable
         if (roll < target.getValue()
                 && getCampaignOptions().useSupportEdge() 
+                && null != person
                 && person.getOptions().booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL)
                 && person.getCurrentEdge() > 0) {
             person.setCurrentEdge(person.getCurrentEdge() - 1);
@@ -2282,11 +2288,11 @@ public class Campaign implements Serializable, ITechManager {
         if (null != person) {
             // The person should have their acquisitions incremented
             person.incrementAcquisition();
-        }
 
-        if (xpGained > 0) {
-            person.setXp(person.getXp() + xpGained);
-            report += " (" + xpGained + "XP gained) ";
+            if (xpGained > 0) {
+                person.setXp(person.getXp() + xpGained);
+                report += " (" + xpGained + "XP gained) ";
+            }
         }
 
         if (found) {
@@ -5986,11 +5992,26 @@ public class Campaign implements Serializable, ITechManager {
         }
     }
 
+    /**
+     * Hires a full complement of personnel for a given unit.
+     * @param uid The unique identifier of the unit.
+     */
     public void hirePersonnelFor(UUID uid) {
+        hirePersonnelFor(uid, false);
+    }
+
+    /**
+     * Hires or adds a full complement of personnel for a given unit.
+     * @param uid The unique identifier of the unit.
+     * @param isGM A value indicating whether or not this action is undertaken
+     *             by a GM and should bypass any costs associated.
+     */
+    public void hirePersonnelFor(UUID uid, boolean isGM) {
         Unit unit = getUnit(uid);
         if (null == unit) {
             return;
         }
+
         while (unit.canTakeMoreDrivers()) {
             Person p = null;
             if (unit.getEntity() instanceof LandAirMech) {
@@ -6027,8 +6048,12 @@ public class Campaign implements Serializable, ITechManager {
             if (null == p) {
                 break;
             }
-            if (!recruitPerson(p)) {
-                return;
+            if (!isGM) {
+                if (!recruitPerson(p)) {
+                    return;
+                }
+            } else {
+                addPerson(p);
             }
             if (unit.usesSoloPilot() || unit.usesSoldiers()) {
                 unit.addPilotOrSoldier(p);
@@ -6036,6 +6061,7 @@ public class Campaign implements Serializable, ITechManager {
                 unit.addDriver(p);
             }
         }
+
         while (unit.canTakeMoreGunners()) {
             Person p = null;
             if (unit.getEntity() instanceof Tank) {
@@ -6046,22 +6072,34 @@ public class Campaign implements Serializable, ITechManager {
             } else if (unit.getEntity() instanceof Mech) {
                 p = newPerson(Person.T_MECHWARRIOR);
             }
-            if (!recruitPerson(p)) {
-                return;
+            if (!isGM) {
+                if (!recruitPerson(p)) {
+                    return;
+                }
+            } else {
+                addPerson(p);
             }
             unit.addGunner(p);
         }
         while (unit.canTakeMoreVesselCrew()) {
             Person p = newPerson(Person.T_SPACE_CREW);
-            if (!recruitPerson(p)) {
-                return;
+            if (!isGM) {
+                if (!recruitPerson(p)) {
+                    return;
+                }
+            } else {
+                addPerson(p);
             }
             unit.addVesselCrew(p);
         }
         if (unit.canTakeNavigator()) {
             Person p = newPerson(Person.T_NAVIGATOR);
-            if (!recruitPerson(p)) {
-                return;
+            if (!isGM) {
+                if (!recruitPerson(p)) {
+                    return;
+                }
+            } else {
+                addPerson(p);
             }
             unit.setNavigator(p);
         }
@@ -6073,8 +6111,12 @@ public class Campaign implements Serializable, ITechManager {
             } else {
                 p = newPerson(Person.T_MECHWARRIOR);
             }
-            if (!recruitPerson(p)) {
-                return;
+            if (!isGM) {
+                if (!recruitPerson(p)) {
+                    return;
+                }
+            } else {
+                addPerson(p);
             }
             unit.setTechOfficer(p);
         }

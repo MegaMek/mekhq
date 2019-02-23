@@ -138,7 +138,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
             column.setCellRenderer(injuryModel.getRenderer());
             width += injuryModel.getColumnWidth(i);
         }
-        setMinimumSize(new Dimension(width, 500));
+        setPreferredSize(new Dimension(width, 500));
         injuriesTable.setIntercellSpacing(new Dimension(0, 0));
         injuriesTable.setShowGrid(false);
         injuriesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

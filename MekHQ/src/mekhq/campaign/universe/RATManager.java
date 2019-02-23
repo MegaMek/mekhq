@@ -245,6 +245,7 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
                     "While loading altFactions: "); //$NON-NLS-1$
             MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
+            return;
         }
 
         Element elem = xmlDoc.getDocumentElement();
@@ -306,6 +307,7 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
                     MekHQ.getLogger().log(RATManager.class, METHOD_NAME, LogLevel.ERROR,
                             "While loading RAT info from " + f.getName() + ": "); //$NON-NLS-1$
                     MekHQ.getLogger().error(RATManager.class, METHOD_NAME, ex);
+                    continue;
                 }
                 Element elem = xmlDoc.getDocumentElement();
                 NodeList nl = elem.getChildNodes();
@@ -481,13 +483,21 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
         RAT rat = findRAT(faction, unitType, weightClass, year, quality);
         if (rat != null) {
             if (unitType == UnitType.TANK) {
-                filter = filter.and(ms -> ms.getUnitType().equals("Tank"));
+                filter = filter != null ? filter.and(RATManager::isTank) : RATManager::isTank;
             } else if (unitType == UnitType.VTOL) {
-                filter = filter.and(ms -> ms.getUnitType().equals("VTOL"));
+                filter = filter != null ? filter.and(RATManager::isVTOL) : RATManager::isVTOL;
             }
             return RandomUnitGenerator.getInstance().generate(count, rat.ratName, filter);
         }
-        return new ArrayList<MechSummary>();
+        return new ArrayList<>();
+    }
+
+    private static boolean isTank(MechSummary summary) {
+        return summary.getUnitType().equals("Tank");
+    }
+
+    private static boolean isVTOL(MechSummary summary) {
+        return summary.getUnitType().equals("VTOL");
     }
 
     @Override

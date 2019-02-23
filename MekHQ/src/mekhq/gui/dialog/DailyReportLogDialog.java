@@ -14,9 +14,12 @@ import java.util.List;
 
 import javax.swing.JDialog;
 
+import mekhq.MekHQ;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.DailyReportLogPanel;
 import mekhq.gui.ReportHyperlinkListener;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -34,9 +37,10 @@ public class DailyReportLogDialog extends JDialog {
         super(parent, false);
         this.gui = gui;
         panLog = new DailyReportLogPanel(listener);
-        initComponents();   
-        setMinimumSize(new Dimension(400, 500));
+        initComponents();
+        setPreferredSize(new Dimension(400, 500));
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
     
     private void initComponents() {
@@ -51,7 +55,14 @@ public class DailyReportLogDialog extends JDialog {
         setLayout(new BorderLayout());
         add(panLog, BorderLayout.CENTER);
     }
-    
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(DailyReportLogDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
+
     public void refreshLog(String report) {
         panLog.refreshLog(report);
     }
