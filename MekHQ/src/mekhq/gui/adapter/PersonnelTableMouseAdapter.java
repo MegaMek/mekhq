@@ -1,3 +1,22 @@
+/*
+ * Copyright (c) 2019 The MegaMek Team. All rights reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package mekhq.gui.adapter;
 
 import java.awt.*;
@@ -27,7 +46,6 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.log.CustomLogEntry;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.Kill;
@@ -38,18 +56,7 @@ import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.dialog.CustomizePersonDialog;
-import mekhq.gui.dialog.EditKillLogDialog;
-import mekhq.gui.dialog.EditLogEntryDialog;
-import mekhq.gui.dialog.EditPersonnelHitsDialog;
-import mekhq.gui.dialog.EditPersonnelInjuriesDialog;
-import mekhq.gui.dialog.EditPersonnelLogDialog;
-import mekhq.gui.dialog.GMToolsDialog;
-import mekhq.gui.dialog.ImageChoiceDialog;
-import mekhq.gui.dialog.KillDialog;
-import mekhq.gui.dialog.PopupValueChoiceDialog;
-import mekhq.gui.dialog.RetirementDefectionDialog;
-import mekhq.gui.dialog.TextAreaDialog;
+import mekhq.gui.dialog.*;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.utilities.MultiLineTooltip;
 import mekhq.gui.utilities.StaticChecks;
@@ -84,10 +91,12 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String CMD_CALLSIGN = "CALLSIGN"; //$NON-NLS-1$
     private static final String CMD_DEPENDENT = "DEPENDENT"; //$NON-NLS-1$
     private static final String CMD_COMMANDER = "COMMANDER"; //$NON-NLS-1$
-    private static final String CMD_EDIT_LOG_ENTRY = "LOG_SINGLE"; //$NON-NLS-1$
     private static final String CMD_EDIT_PERSONNEL_LOG = "LOG"; //$NON-NLS-1$
+    private static final String CMD_ADD_LOG_ENTRY = "ADD_PERSONNEL_LOG_SINGLE"; //$NON-NLS-1$
+    private static final String CMD_EDIT_MISSIONS_LOG = "MISSIONS_LOG"; //$NON-NLS-1$
+    private static final String CMD_ADD_MISSION_ENTRY = "ADD_MISSION_ENTRY"; //$NON-NLS-1$
     private static final String CMD_EDIT_KILL_LOG = "KILL_LOG"; //$NON-NLS-1$
-    private static final String CMD_KILL = "KILL"; //$NON-NLS-1$
+    private static final String CMD_ADD_KILL = "ADD_KILL"; //$NON-NLS-1$
     private static final String CMD_BUY_EDGE = "EDGE_BUY"; //$NON-NLS-1$
     private static final String CMD_SET_EDGE = "EDGE_SET"; //$NON-NLS-1$
     private static final String CMD_SET_XP = "XP_SET"; //$NON-NLS-1$
@@ -788,7 +797,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             case CMD_SACK:
             {
                 boolean showDialog = false;
-                ArrayList<UUID> toRemove = new ArrayList<UUID>();
+                ArrayList<UUID> toRemove = new ArrayList<>();
                 for (Person person : people) {
                     if (gui.getCampaign().getRetirementDefectionTracker()
                             .removeFromCampaign(
@@ -963,28 +972,38 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
                 break;
             }
-            case CMD_KILL:
+            case CMD_ADD_KILL:
             {
-                KillDialog nkd;
+                AddOrEditKillEntryDialog nkd;
                 Unit unit = gui.getCampaign().getUnit(selectedPerson.getUnitId());
                 if (people.length > 1) {
-                    nkd = new KillDialog(gui.getFrame(), true, new Kill(null, QUESTION_MARK,
-                        unit != null ? unit.getName() : resourceMap.getString("bareHands.text"), gui.getCampaign().getDate()), resourceMap.getString("crew.text")); //$NON-NLS-1$ //$NON-NLS-2$
+                    nkd = new AddOrEditKillEntryDialog(
+                            gui.getFrame(),
+                            true,
+                            null,
+                            unit != null ? unit.getName() : resourceMap.getString("bareHands.text"),
+                            gui.getCampaign().getDate());
                 } else {
-                    nkd = new KillDialog(gui.getFrame(), true, new Kill(selectedPerson.getId(), QUESTION_MARK,
-                        unit != null ? unit.getName() : resourceMap.getString("bareHands.text"), gui.getCampaign().getDate()), selectedPerson.getFullName()); //$NON-NLS-1$
+                    nkd = new AddOrEditKillEntryDialog(
+                            gui.getFrame(),
+                            true,
+                            selectedPerson.getId(),
+                            unit != null ? unit.getName() : resourceMap.getString("bareHands.text"),
+                            gui.getCampaign().getDate());
                 }
                 nkd.setVisible(true);
-                if (!nkd.wasCancelled()) {
-                    Kill kill = nkd.getKill();
+                if (nkd.getKill().isPresent()) {
+                    Kill kill = nkd.getKill().get();
                     if (people.length > 1) {
                         for (Person person : people) {
                             Kill k = kill.clone();
                             k.setPilotId(person.getId());
                             gui.getCampaign().addKill(k);
+                            MekHQ.triggerEvent(new PersonLogEvent(person));
                         }
                     } else {
                         gui.getCampaign().addKill(kill);
+                        MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
                     }
                 }
                 break;
@@ -999,13 +1018,29 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 epld.setVisible(true);
                 MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
                 break;
-            case CMD_EDIT_LOG_ENTRY:
-                EditLogEntryDialog eeld = new EditLogEntryDialog(gui.getFrame(), true, new CustomLogEntry(gui.getCampaign().getDate(), ""), selectedPerson); //$NON-NLS-1$
-                eeld.setVisible(true);
-                LogEntry entry = eeld.getEntry();
-                if (null != entry) {
+            case CMD_ADD_LOG_ENTRY:
+                AddOrEditPersonnelEntryDialog addPersonnelLogDialog = new AddOrEditPersonnelEntryDialog(gui.getFrame(), true, gui.getCampaign().getDate()); //$NON-NLS-1$
+                addPersonnelLogDialog.setVisible(true);
+                Optional<LogEntry> personnelEntry = addPersonnelLogDialog.getEntry();
+                if (personnelEntry.isPresent()) {
                     for (Person person : people) {
-                        person.addLogEntry(entry.clone());
+                        person.addLogEntry(personnelEntry.get().clone());
+                        MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
+                    }
+                }
+                break;
+            case CMD_EDIT_MISSIONS_LOG:
+                EditMissionLogDialog emld = new EditMissionLogDialog(gui.getFrame(), true, gui.getCampaign(), selectedPerson);
+                emld.setVisible(true);
+                MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
+                break;
+            case CMD_ADD_MISSION_ENTRY:
+                AddOrEditMissionEntryDialog addMissionDialog = new AddOrEditMissionEntryDialog(gui.getFrame(), true, gui.getCampaign().getDate()); //$NON-NLS-1$
+                addMissionDialog.setVisible(true);
+                Optional<LogEntry> missionEntry = addMissionDialog.getEntry();
+                if (missionEntry.isPresent()) {
+                    for (Person person : people) {
+                        person.addMissionLogEntry(missionEntry.get().clone());
                         MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
                     }
                 }
@@ -2436,20 +2471,34 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 
             }
             menuItem = new JMenuItem(resourceMap.getString("addSingleLogEntry.text")); //$NON-NLS-1$
-            menuItem.setActionCommand(CMD_EDIT_LOG_ENTRY);
+            menuItem.setActionCommand(CMD_ADD_LOG_ENTRY);
             menuItem.addActionListener(this);
             menuItem.setEnabled(true);
             popup.add(menuItem);
-            if (oneSelected || StaticChecks.allHaveSameUnit(selected)) {
-                menuItem = new JMenuItem(resourceMap.getString("assignKill.text")); //$NON-NLS-1$
-                menuItem.setActionCommand(CMD_KILL);
+            if (oneSelected) {
+                // Edit mission log
+                menuItem = new JMenuItem(resourceMap.getString("editMissionLog.text")); //$NON-NLS-1$
+                menuItem.setActionCommand(CMD_EDIT_MISSIONS_LOG);
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(true);
                 popup.add(menuItem);
             }
+            // Add one item to all personnel mission logs
+            menuItem = new JMenuItem(resourceMap.getString("addMissionEntry.text")); //$NON-NLS-1$
+            menuItem.setActionCommand(CMD_ADD_MISSION_ENTRY);
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(true);
+            popup.add(menuItem);
             if (oneSelected) {
                 menuItem = new JMenuItem(resourceMap.getString("editKillLog.text")); //$NON-NLS-1$
                 menuItem.setActionCommand(CMD_EDIT_KILL_LOG);
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(true);
+                popup.add(menuItem);
+            }
+            if (oneSelected || StaticChecks.allHaveSameUnit(selected)) {
+                menuItem = new JMenuItem(resourceMap.getString("assignKill.text")); //$NON-NLS-1$
+                menuItem.setActionCommand(CMD_ADD_KILL);
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(true);
                 popup.add(menuItem);

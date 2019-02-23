@@ -468,7 +468,7 @@ public class Ranks {
                 	
                 	// If this is an older version from before the full blown rank system with
                 	// professions, we need to translate it to match the new constants
-                	if (version != null && Version.versionCompare(version, "0.3.4-r1782")) {
+                	if (version != null && version.isLowerThan("0.3.4-r1782")) {
                 		// Translate the rank system
                 		if (retVal.rankSystem == RankTranslator.RT_SL) {
                 			String change = (String) JOptionPane.showInputDialog(

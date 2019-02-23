@@ -98,7 +98,7 @@ public class LootDialog extends javax.swing.JDialog {
         listUnits = new JList<>(new DefaultListModel<>());
         listParts = new JList<>(new DefaultListModel<>());
 
-        //ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.KillDialog", new EncodeControl());
+        //ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddOrEditKillEntryDialog", new EncodeControl());
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Potential Rewards");
         getContentPane().setLayout(new java.awt.GridBagLayout());

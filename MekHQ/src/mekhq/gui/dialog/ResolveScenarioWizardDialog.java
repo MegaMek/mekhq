@@ -1182,9 +1182,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     }
 
     private void finish() {
-
-
-        //unit status
+    	//unit status
         for(int i = 0; i < chksTotaled.size(); i++) {
             JCheckBox box = chksTotaled.get(i);
             UUID id = UUID.fromString(box.getActionCommand());
