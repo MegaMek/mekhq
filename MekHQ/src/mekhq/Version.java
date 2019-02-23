@@ -111,7 +111,7 @@ public class Version {
      * @return true if checkVersion is less than this Version object
      */
     public boolean isHigherThan(Version other) {
-        return Version.compare(other, this) == 1;
+        return Version.compare(other, this) > 0;
     }
 
     /**
@@ -120,7 +120,7 @@ public class Version {
      * Use this method to determine if this version is lower than
      * the version passed
      *
-     * @param checkVersion  The version we want to see if it is higher than this version.
+     * @param other The version we want to see if it is higher than this version.
      *
      * @return true if this is lower than checkVersion
      */
@@ -134,13 +134,12 @@ public class Version {
      * Use this method to determine if this version is lower than
      * the version passed
      *
-     * @param checkVersion  The version we want to see if it is higher than this version.
+     * @param other The version we want to see if it is higher than this version.
      *
      * @return true if this is lower than checkVersion
      */
     public boolean isLowerThan(Version other) {
-        // Pass to the static method for the final computation
-        return Version.compare(this, other) != -1;
+            return Version.compare(this, other) > 0;
     }
 
     /**
@@ -149,7 +148,7 @@ public class Version {
      * @param left  left version to compare
      * @param right right version to compare
      * 
-     * @return -1 if left is higher, +1 if right is higher. 0 if they are equal.
+     * @return a negative value if left is higher, a positive value1 if right is higher. 0 if they are equal.
      */
     private static int compare(Version left, Version right) {
         // Check Major version
