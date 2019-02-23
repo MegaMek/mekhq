@@ -46,18 +46,18 @@ public class Version {
             
             // Check for other information embedded in the snapshot & handle it
             if (snap.indexOf("-") > 0) {
-            	// Create a new temporary array split by the hyphen
+                // Create a new temporary array split by the hyphen
                 temp = snap.split("\\-");
                 // The snapshot is the first element of the new array
                 snap = temp[0];
                 
                 // Loop over other elements searching for usable parameters
                 for (int i = 1; i < temp.length; i++) {
-                	// For now the only usable parameter is the revision
-                	if (temp[i].matches("r[0-9]+")) {
-                		String rev = temp[i].replace("r", "");
+                    // For now the only usable parameter is the revision
+                    if (temp[i].matches("r[0-9]+")) {
+                        String rev = temp[i].replace("r", "");
                         revision = Integer.parseInt(rev);
-                	}
+                    }
                 }
             }
             
@@ -85,15 +85,29 @@ public class Version {
     /**
      * Compare Versions
      * 
-     * Use this method to determine if the version passed is less than
-     * this Version object
+     * Use this method to determine if this version is higher than
+     * the version passed
      * 
-     * @param checkVersion  The version we want to see if is less than this version.
+     * @param checkVersion  The version we want to see if it is lower than this version.
      * 
-     * @return true if checkVersion is less than this Version object
+     * @return true if this is higher than checkVersion
      */
-    public boolean versionCompare(String checkVersion) {
-    	return versionCompare(new Version(checkVersion));
+    public boolean isHigherThan(String checkVersion) {
+        return isHigherThan(new Version(checkVersion));
+    }
+
+    /**
+     * Compare Versions
+     *
+     * Use this method to determine if this version is lower than
+     * the version passed
+     *
+     * @param checkVersion  The version we want to see if it is higher than this version.
+     *
+     * @return true if this is lower than checkVersion
+     */
+    public boolean isLowerThan(String checkVersion) {
+        return !isHigherThan(checkVersion);
     }
     
     /**
@@ -106,9 +120,9 @@ public class Version {
      * 
      * @return true if checkVersion is less than this Version object
      */
-    public boolean versionCompare(Version checkVersion) {
-    	// Pass to the static method for the final computation
-    	return Version.versionCompare(checkVersion, this);
+    public boolean isHigherThan(Version checkVersion) {
+        // Pass to the static method for the final computation
+        return Version.isHigherThan(checkVersion, this);
     }
     
     /**
@@ -119,8 +133,8 @@ public class Version {
      * 
      * @return true if checkVersion is less than staticVersion
      */
-    public static boolean versionCompare(String checkVersion, String staticVersion) {
-    	return versionCompare(new Version(checkVersion), new Version(staticVersion));
+    public static boolean isHigherThan(String checkVersion, String staticVersion) {
+        return isHigherThan(new Version(checkVersion), new Version(staticVersion));
     }
     
     /**
@@ -131,8 +145,8 @@ public class Version {
      * 
      * @return true if checkVersion is less than staticVersion
      */
-    public static boolean versionCompare(Version checkVersion, String staticVersion) {
-    	return versionCompare(checkVersion, new Version(staticVersion));
+    public static boolean isHigherThan(Version checkVersion, String staticVersion) {
+        return isHigherThan(checkVersion, new Version(staticVersion));
     }
     
     /**
@@ -143,8 +157,8 @@ public class Version {
      * 
      * @return true if checkVersion is less than staticVersion
      */
-    public static boolean versionCompare(String checkVersion, Version staticVersion) {
-    	return versionCompare(new Version(checkVersion), staticVersion);
+    public static boolean isHigherThan(String checkVersion, Version staticVersion) {
+        return isHigherThan(new Version(checkVersion), staticVersion);
     }
     
     /**
@@ -155,16 +169,34 @@ public class Version {
      * 
      * @return true if checkVersion is less than staticVersion
      */
-    public static boolean versionCompare(Version checkVersion, Version staticVersion) {
-    	// Major version is less
-    	if (checkVersion.getMajorVersion() < staticVersion.getMajorVersion())
-    		return true;
-    	else if (checkVersion.getMajorVersion() == staticVersion.getMajorVersion() && checkVersion.getMinorVersion() < staticVersion.getMinorVersion())
-    		return true;
-    	else if (checkVersion.getMajorVersion() == staticVersion.getMajorVersion() && checkVersion.getMinorVersion() == staticVersion.getMinorVersion() && checkVersion.getSnapshot() < staticVersion.getSnapshot())
-    		return true;
-    	else if (checkVersion.getRevision() != -1 && staticVersion.getRevision() != -1 && checkVersion.getRevision() < staticVersion.getRevision())
-    		return true;
-    	return false;
+    public static boolean isHigherThan(Version checkVersion, Version staticVersion) {
+        // Check Major version
+        if (checkVersion.getMajorVersion() < staticVersion.getMajorVersion()) {
+            return true;
+        } else if (checkVersion.getMajorVersion() > staticVersion.getMajorVersion()) {
+            return false;
+        }
+
+        // Major version is equal, try with Minor
+        if (checkVersion.getMinorVersion() < staticVersion.getMinorVersion()) {
+            return true;
+        } else if (checkVersion.getMinorVersion() > staticVersion.getMinorVersion()) {
+            return false;
+        }
+
+        // Minor version is also equal, try snapshot
+        if (checkVersion.getSnapshot() < staticVersion.getSnapshot()) {
+            return true;
+        } else if (checkVersion.getSnapshot() > staticVersion.getSnapshot()) {
+            return false;
+        }
+
+        // Snapshot is also equal, try revision if we have it
+        if (checkVersion.getRevision() != -1 && staticVersion.getRevision() != -1
+                && checkVersion.getRevision() < staticVersion.getRevision()) {
+            return true;
+        }
+
+        return false;
     }
 }

@@ -29,6 +29,7 @@ import java.util.function.IntSupplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.*;
@@ -321,6 +322,18 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     //lets just go ahead and pass in the campaign - to hell with OOP
     private Campaign campaign;
+
+    // For upgrading personnel entries to missiong log entries
+    private static String missionParticipatedString;
+    private static String getMissionParticipatedString() {
+        if (missionParticipatedString == null) {
+            ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries", new EncodeControl());
+            missionParticipatedString = resourceMap.getString("participatedInMission.text");
+            missionParticipatedString = missionParticipatedString.substring(0, missionParticipatedString.indexOf(" "));
+        }
+
+        return missionParticipatedString;
+    }
 
     // initializes the AtB ransom values
     static {
@@ -1628,7 +1641,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("gender")) {
                     retVal.gender = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
-                    if (Version.versionCompare(version, "0.3.4-r1782")) {
+                    if (Version.isHigherThan(version, "0.3.4-r1782")) {
                         RankTranslator rt = new RankTranslator(c);
                         try {
                             retVal.rank = rt.getNewRank(c.getRanks().getOldRankSystem(), Integer.parseInt(wn2.getTextContent()));
@@ -1749,7 +1762,21 @@ public class Person implements Serializable, MekHqXmlSerializable {
                                     "Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName()); //$NON-NLS-1$
                             continue;
                         }
-                        retVal.addLogEntry(LogEntryFactory.getInstance().generateInstanceFromXML(wn3));
+
+                        LogEntry entry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
+
+                        // If the version of this campaign is earlier than 0.45.4,
+                        // we didn't have the mission log separated from the personnel log,
+                        // so we need to separate the log entries manually
+                        if (version.isLowerThan("0.45.4")) {
+                            if (entry.getDesc().startsWith(getMissionParticipatedString())) {
+                                retVal.addMissionLogEntry(entry);
+                            } else {
+                                retVal.addLogEntry(entry);
+                            }
+                        } else {
+                            retVal.addLogEntry(entry);
+                        }
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("missionLog")) {
                     NodeList nl2 = wn2.getChildNodes();

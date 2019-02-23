@@ -342,7 +342,7 @@ public class CampaignXmlParser {
 
         // If the version is earlier than 0.3.4 r1782, then we need to translate
         // the rank system.
-        if (Version.versionCompare(version, "0.3.4-r1782")) {
+        if (Version.isHigherThan(version, "0.3.4-r1782")) {
             retVal.setRankSystem(
                     RankTranslator.translateRankSystem(retVal.getRanks().getOldRankSystem(), retVal.getFactionCode()));
             if (retVal.getRanks() == null) {
@@ -951,7 +951,7 @@ public class CampaignXmlParser {
                 } else if (xn.equalsIgnoreCase("rankNames")) {
                     rankNames = wn.getTextContent().trim();
                 } else if (xn.equalsIgnoreCase("ranks") || xn.equalsIgnoreCase("rankSystem")) {
-                    if (Version.versionCompare(version, "0.3.4-r1645")) {
+                    if (Version.isHigherThan(version, "0.3.4-r1645")) {
                         rankSystem = Integer.parseInt(wn.getTextContent().trim());
                     } else {
                         Ranks r = Ranks.generateInstanceFromXML(wn, version);
