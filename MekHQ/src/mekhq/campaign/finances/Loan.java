@@ -66,7 +66,6 @@ public class Loan implements MekHqXmlSerializable {
     private int collateral;
     private int nPayments;
     private Money payAmount;
-    private Money totalValue;
     private Money collateralValue;
     private boolean overdue;
 
@@ -179,7 +178,6 @@ public class Loan implements MekHqXmlSerializable {
         double r = ((double)rate/100.0)/denom;
         nPayments = years * denom;
         payAmount = principal.multipliedBy(r * Math.pow(1+r,nPayments)).dividedBy(Math.pow(1+r, nPayments)-1);
-        totalValue = payAmount.multipliedBy(nPayments);
         collateralValue = principal.multipliedBy(collateral).dividedBy(100);
     }
 
@@ -342,14 +340,6 @@ public class Loan implements MekHqXmlSerializable {
 		this.years = years;
 	}
 
-    public Money getTotalValue() {
-        return totalValue;
-    }
-
-	public void setTotalValue(Money totalValue) {
-		this.totalValue = totalValue;
-	}
-
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<loan>");
@@ -397,11 +387,6 @@ public class Loan implements MekHqXmlSerializable {
                 +"<overdue>"
                 +overdue
                 +"</overdue>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<totalValue>"
-                +totalValue
-                +totalValue.toXmlString()
-                +"</totalValue>");
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "nextPayment", df.format(nextPayment.getTime()));
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</loan>");
@@ -421,8 +406,6 @@ public class Loan implements MekHqXmlSerializable {
                 retVal.principal = Money.fromXmlString(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("payAmount")) {
                 retVal.payAmount = Money.fromXmlString(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("totalValue")) {
-                retVal.totalValue = Money.fromXmlString(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("collateralValue")) {
                 retVal.collateralValue = Money.fromXmlString(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("rate")) {
