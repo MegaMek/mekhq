@@ -111,7 +111,7 @@ public class Version {
      * @return true if checkVersion is less than this Version object
      */
     public boolean isHigherThan(Version other) {
-        return Version.compare(other, this) > 0;
+        return Version.compare(this, other) > 0;
     }
 
     /**
@@ -139,7 +139,7 @@ public class Version {
      * @return true if this is lower than checkVersion
      */
     public boolean isLowerThan(Version other) {
-            return Version.compare(this, other) > 0;
+            return Version.compare(other, this) > 0;
     }
 
     /**
@@ -148,43 +148,43 @@ public class Version {
      * @param left  left version to compare
      * @param right right version to compare
      * 
-     * @return a negative value if left is higher, a positive value1 if right is higher. 0 if they are equal.
+     * @return a positive value if left is higher, a negative value if right is higher. 0 if they are equal.
      */
     private static int compare(Version left, Version right) {
         // Check Major version
-        if (left.getMajorVersion() < right.getMajorVersion()) {
+        if (left.getMajorVersion() > right.getMajorVersion()) {
             return 1;
-        } else if (left.getMajorVersion() > right.getMajorVersion()) {
+        } else if (left.getMajorVersion() < right.getMajorVersion()) {
             return -1;
         }
 
         // Major version is equal, try with Minor
-        if (left.getMinorVersion() < right.getMinorVersion()) {
+        if (left.getMinorVersion() > right.getMinorVersion()) {
             return 1;
-        } else if (left.getMinorVersion() > right.getMinorVersion()) {
+        } else if (left.getMinorVersion() < right.getMinorVersion()) {
             return -1;
         }
 
         // Minor version is also equal, try snapshot
-        if (left.getSnapshot() < right.getSnapshot()) {
+        if (left.getSnapshot() > right.getSnapshot()) {
             return 1;
-        } else if (left.getSnapshot() > right.getSnapshot()) {
+        } else if (left.getSnapshot() < right.getSnapshot()) {
             return -1;
         }
 
         // Snapshot is also equal, try revision if we have it
         if (left.hasRevision() && right.hasRevision()) {
-            if (left.getRevision() < right.getRevision()) {
+            if (left.getRevision() > right.getRevision()) {
                 return 1;
-            } else if (left.getRevision() > right.getRevision()) {
+            } else if (left.getRevision() < right.getRevision()) {
                 return -1;
             }
         }
 
         // If one side has a revision and the other does not, that side is higher
-        if (!left.hasRevision() && right.hasRevision()) {
+        if (left.hasRevision() && !right.hasRevision()) {
             return 1;
-        } else if (left.hasRevision() && !right.hasRevision()) {
+        } else if (!left.hasRevision() && right.hasRevision()) {
             return -1;
         }
 
