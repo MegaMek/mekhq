@@ -399,7 +399,6 @@ public class Loan implements MekHqXmlSerializable {
                 +"</overdue>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<totalValue>"
-                +totalValue
                 +totalValue.toXmlString()
                 +"</totalValue>");
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
