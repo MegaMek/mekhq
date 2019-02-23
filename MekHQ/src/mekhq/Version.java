@@ -139,7 +139,7 @@ public class Version {
      * @return true if this is lower than checkVersion
      */
     public boolean isLowerThan(Version other) {
-            return Version.compare(other, this) > 0;
+            return Version.compare(this, other) < 0;
     }
 
     /**
