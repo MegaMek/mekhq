@@ -2,6 +2,7 @@
  * Version.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2019 The MekHQ Team.
  * 
  * This file is part of MekHQ.
  * 
@@ -21,18 +22,17 @@
 
 package mekhq;
 
-
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  * This is a very simple class that keeps track of versioning
  */
 public class Version {
-    
+    private static final int NO_REVISION = -1;
     private int snapshot;
     private int minor;
     private int major;
-    private int revision = -1;
+    private int revision = NO_REVISION;
     
     public Version(String version) {
         if(null != version && version.length() > 0) {
@@ -65,6 +65,10 @@ public class Version {
             snapshot = Integer.parseInt(snap);
         }
     }
+
+    public boolean hasRevision() {
+        return revision != NO_REVISION;
+    }
     
     public int getRevision() {
         return revision;
@@ -88,12 +92,26 @@ public class Version {
      * Use this method to determine if this version is higher than
      * the version passed
      * 
-     * @param checkVersion  The version we want to see if it is lower than this version.
+     * @param other  The version we want to see if it is lower than this version.
      * 
      * @return true if this is higher than checkVersion
      */
-    public boolean isHigherThan(String checkVersion) {
-        return isHigherThan(new Version(checkVersion));
+    public boolean isHigherThan(String other) {
+        return isHigherThan(new Version(other));
+    }
+
+    /**
+     * Compare Versions
+     *
+     * Use this method to determine if the version passed is less than
+     * this Version object.
+     *
+     * @param other  The version we want to see if is less than this version
+     *
+     * @return true if checkVersion is less than this Version object
+     */
+    public boolean isHigherThan(Version other) {
+        return Version.compare(other, this) == 1;
     }
 
     /**
@@ -106,97 +124,71 @@ public class Version {
      *
      * @return true if this is lower than checkVersion
      */
-    public boolean isLowerThan(String checkVersion) {
-        return !isHigherThan(checkVersion);
+    public boolean isLowerThan(String other) {
+        return isLowerThan(new Version(other));
     }
-    
+
     /**
      * Compare Versions
-     * 
-     * Use this method to determine if the version passed is less than
-     * this Version object.
-     * 
-     * @param checkVersion  The version we want to see if is less than this version
-     * 
-     * @return true if checkVersion is less than this Version object
+     *
+     * Use this method to determine if this version is lower than
+     * the version passed
+     *
+     * @param checkVersion  The version we want to see if it is higher than this version.
+     *
+     * @return true if this is lower than checkVersion
      */
-    public boolean isHigherThan(Version checkVersion) {
+    public boolean isLowerThan(Version other) {
         // Pass to the static method for the final computation
-        return Version.isHigherThan(checkVersion, this);
+        return Version.compare(this, other) != -1;
     }
-    
+
     /**
-     * Compare Versions
+     * Compare versions
      * 
-     * @param checkVersion  The version we want to see if is less than the other
-     * @param staticVersion The static version that we're comparing against
+     * @param left  left version to compare
+     * @param right right version to compare
      * 
-     * @return true if checkVersion is less than staticVersion
+     * @return -1 if left is higher, +1 if right is higher. 0 if they are equal.
      */
-    public static boolean isHigherThan(String checkVersion, String staticVersion) {
-        return isHigherThan(new Version(checkVersion), new Version(staticVersion));
-    }
-    
-    /**
-     * Compare Versions
-     * 
-     * @param checkVersion  The version we want to see if is less than the other
-     * @param staticVersion The static version that we're comparing against
-     * 
-     * @return true if checkVersion is less than staticVersion
-     */
-    public static boolean isHigherThan(Version checkVersion, String staticVersion) {
-        return isHigherThan(checkVersion, new Version(staticVersion));
-    }
-    
-    /**
-     * Compare Versions
-     * 
-     * @param checkVersion  The version we want to see if is less than the other
-     * @param staticVersion The static version that we're comparing against
-     * 
-     * @return true if checkVersion is less than staticVersion
-     */
-    public static boolean isHigherThan(String checkVersion, Version staticVersion) {
-        return isHigherThan(new Version(checkVersion), staticVersion);
-    }
-    
-    /**
-     * Compare Versions
-     * 
-     * @param checkVersion  The version we want to see if is less than the other
-     * @param staticVersion The static version that we're comparing against
-     * 
-     * @return true if checkVersion is less than staticVersion
-     */
-    public static boolean isHigherThan(Version checkVersion, Version staticVersion) {
+    private static int compare(Version left, Version right) {
         // Check Major version
-        if (checkVersion.getMajorVersion() < staticVersion.getMajorVersion()) {
-            return true;
-        } else if (checkVersion.getMajorVersion() > staticVersion.getMajorVersion()) {
-            return false;
+        if (left.getMajorVersion() < right.getMajorVersion()) {
+            return 1;
+        } else if (left.getMajorVersion() > right.getMajorVersion()) {
+            return -1;
         }
 
         // Major version is equal, try with Minor
-        if (checkVersion.getMinorVersion() < staticVersion.getMinorVersion()) {
-            return true;
-        } else if (checkVersion.getMinorVersion() > staticVersion.getMinorVersion()) {
-            return false;
+        if (left.getMinorVersion() < right.getMinorVersion()) {
+            return 1;
+        } else if (left.getMinorVersion() > right.getMinorVersion()) {
+            return -1;
         }
 
         // Minor version is also equal, try snapshot
-        if (checkVersion.getSnapshot() < staticVersion.getSnapshot()) {
-            return true;
-        } else if (checkVersion.getSnapshot() > staticVersion.getSnapshot()) {
-            return false;
+        if (left.getSnapshot() < right.getSnapshot()) {
+            return 1;
+        } else if (left.getSnapshot() > right.getSnapshot()) {
+            return -1;
         }
 
         // Snapshot is also equal, try revision if we have it
-        if (checkVersion.getRevision() != -1 && staticVersion.getRevision() != -1
-                && checkVersion.getRevision() < staticVersion.getRevision()) {
-            return true;
+        if (left.hasRevision() && right.hasRevision()) {
+            if (left.getRevision() < right.getRevision()) {
+                return 1;
+            } else if (left.getRevision() > right.getRevision()) {
+                return -1;
+            }
         }
 
-        return false;
+        // If one side has a revision and the other does not, that side is higher
+        if (!left.hasRevision() && right.hasRevision()) {
+            return 1;
+        } else if (left.hasRevision() && !right.hasRevision()) {
+            return -1;
+        }
+
+        return 0;
     }
 }
