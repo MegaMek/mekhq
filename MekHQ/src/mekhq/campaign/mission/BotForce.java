@@ -62,6 +62,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         this.name = name;
         this.team = team;
         this.start = start;
+        // Filter all nulls out of the parameter entityList
         this.entityList = new ArrayList<>(entityList.stream().filter(x -> x != null).collect(Collectors.toList()));
         this.camoCategory = camoCategory;
         this.camoFileName = camoFileName;
@@ -116,6 +117,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
     }
 
     public void setEntityList(ArrayList<Entity> entityList) {
+        // Filter all nulls out of the parameter entityList
         this.entityList = new ArrayList<>(entityList.stream().filter(x -> x != null).collect(Collectors.toList()));
     }
 
