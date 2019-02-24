@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -37,7 +38,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
     private BehaviorSettings behaviorSettings;
 
     public BotForce() {
-        this.entityList = new ArrayList<Entity>();
+        this.entityList = new ArrayList<>();
         try {
             behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR.getCopy();
         } catch (PrincessException ex) {
@@ -61,7 +62,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         this.name = name;
         this.team = team;
         this.start = start;
-        this.entityList = entityList;
+        this.entityList = new ArrayList<>(entityList.stream().filter(x -> x != null).collect(Collectors.toList()));
         this.camoCategory = camoCategory;
         this.camoFileName = camoFileName;
         this.colorIndex = colorIndex;
@@ -115,7 +116,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
     }
 
     public void setEntityList(ArrayList<Entity> entityList) {
-        this.entityList = entityList;
+        this.entityList = new ArrayList<>(entityList.stream().filter(x -> x != null).collect(Collectors.toList()));
     }
 
     public int getTeam() {
@@ -162,9 +163,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         int bv = 0;
         
         for(Entity entity : getEntityList()) {
-            if (entity != null) {
-                bv += entity.calculateBattleValue(true, false);
-            }
+            bv += entity.calculateBattleValue(true, false);
         }
         
         return bv;
@@ -196,9 +195,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
 
         pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<entities>");
         for (Entity en : entityList) {
-            if (en != null) {
-                pw1.println(AtBScenario.writeEntityWithCrewToXmlString(en, indent + 2, entityList));
-            }
+            pw1.println(AtBScenario.writeEntityWithCrewToXmlString(en, indent + 2, entityList));
         }
         pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</entities>");
 
