@@ -162,7 +162,9 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         int bv = 0;
         
         for(Entity entity : getEntityList()) {
-            bv += entity.calculateBattleValue(true, false);
+            if (entity != null) {
+                bv += entity.calculateBattleValue(true, false);
+            }
         }
         
         return bv;
