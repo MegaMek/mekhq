@@ -3,7 +3,7 @@ package mekhq.campaign.mission;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.UUID;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.w3c.dom.Node;
@@ -46,7 +46,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
                     "Error getting Princess default behaviors"); //$NON-NLS-1$
             MekHQ.getLogger().error(getClass(), "BotForce()", ex); //$NON-NLS-1$
         }
-    };
+    }
 
     public BotForce(String name, int team, int start, ArrayList<Entity> entityList) {
         this(name, team, start, start, entityList, Player.NO_CAMO, null, -1);
@@ -63,7 +63,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         this.team = team;
         this.start = start;
         // Filter all nulls out of the parameter entityList
-        this.entityList = new ArrayList<>(entityList.stream().filter(x -> x != null).collect(Collectors.toList()));
+        this.entityList = entityList.stream().filter(Objects::nonNull).collect(Collectors.toCollection(ArrayList::new));
         this.camoCategory = camoCategory;
         this.camoFileName = camoFileName;
         this.colorIndex = colorIndex;
@@ -118,7 +118,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
 
     public void setEntityList(ArrayList<Entity> entityList) {
         // Filter all nulls out of the parameter entityList
-        this.entityList = new ArrayList<>(entityList.stream().filter(x -> x != null).collect(Collectors.toList()));
+        this.entityList = entityList.stream().filter(Objects::nonNull).collect(Collectors.toCollection(ArrayList::new));
     }
 
     public int getTeam() {
@@ -162,10 +162,18 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
     }
     
     public int getTotalBV() {
+        final String METHOD_NAME = "getTotalBV";
+
         int bv = 0;
         
         for(Entity entity : getEntityList()) {
-            bv += entity.calculateBattleValue(true, false);
+            for (Entity en : entityList) {
+                if (en == null) {
+                    MekHQ.getLogger().error(BotForce.class, METHOD_NAME, "Null entity when calculating the BV a bot force, we should never find a null here. Please investigate");
+                } else {
+                    bv += entity.calculateBattleValue(true, false);
+                }
+            }
         }
         
         return bv;
@@ -188,6 +196,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
     }
 
     public void writeToXml(PrintWriter pw1, int indent) {
+        final String METHOD_NAME = "writeToXml";
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "name", MekHqXmlUtil.escape(name));
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "team", team);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "start", start);
@@ -197,7 +206,11 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
 
         pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<entities>");
         for (Entity en : entityList) {
-            pw1.println(AtBScenario.writeEntityWithCrewToXmlString(en, indent + 2, entityList));
+            if (en == null) {
+                MekHQ.getLogger().error(BotForce.class, METHOD_NAME, "Null entity when saving a bot force, we should never find a null here. Please investigate");
+            } else {
+                pw1.println(AtBScenario.writeEntityWithCrewToXmlString(en, indent + 2, entityList));
+            }
         }
         pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</entities>");
 
