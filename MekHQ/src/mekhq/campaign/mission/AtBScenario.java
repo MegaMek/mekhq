@@ -1458,20 +1458,27 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         boolean spawnAerotech = !opForOwnsPlanet && Compute.d6() > 
                 CampaignOptions.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforAeroChance() / 2;   
         
-        ArrayList<Entity> aircraft = new ArrayList<Entity>();
+        ArrayList<Entity> aircraft = new ArrayList<>();
+        Entity aero;
         if (spawnConventional) {
             // skill level is 0-4 where 0 is "ultra-green" and 4 is "elite badass"
             for(int unitCount = 0; unitCount <= campaign.getCampaignOptions().getSkillLevel(); unitCount++) {
-                aircraft.add(getEntity(contract.getEnemyCode(), contract.getEnemySkill(), contract.getEnemyQuality(), 
-                    UnitType.CONV_FIGHTER, EntityWeightClass.WEIGHT_LIGHT, campaign));
+                aero = getEntity(contract.getEnemyCode(), contract.getEnemySkill(), contract.getEnemyQuality(),
+                        UnitType.CONV_FIGHTER, EntityWeightClass.WEIGHT_LIGHT, campaign);
+                if (aero != null) {
+                    aircraft.add(aero);
+                }
             }
         } else if(spawnAerotech) {
             for(int unitCount = 0; unitCount <= campaign.getCampaignOptions().getSkillLevel(); unitCount++) {
                 // compute weight class
                 int weightClass = randomAeroWeights[Compute.d6() - 1];                
-                
-                aircraft.add(getEntity(contract.getEnemyCode(), contract.getEnemySkill(), contract.getEnemyQuality(), 
-                    UnitType.AERO, weightClass, campaign));
+
+                aero = getEntity(contract.getEnemyCode(), contract.getEnemySkill(), contract.getEnemyQuality(),
+                        UnitType.AERO, weightClass, campaign);
+                if (aero != null) {
+                    aircraft.add(aero);
+                }
             }
         }
         
@@ -1518,7 +1525,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         boolean isTurretAppropriateTerrain = (terrainType == TER_HEAVYURBAN) || (terrainType == TER_LIGHTURBAN);
         boolean isInfantryAppropriateTerrain = isTurretAppropriateTerrain || terrainType == TER_WOODED;
         
-        ArrayList<Entity> scrubs = new ArrayList<Entity>();
+        ArrayList<Entity> scrubs = new ArrayList<>();
         // don't bother spawning turrets if there won't be anything to put them on
         if (spawnTurrets && isTurretAppropriateTerrain) {
             // skill level is 0-4 where 0 is "ultra-green" and 4 is "elite badass" and drives the number of extra units
@@ -1527,8 +1534,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         
         if(spawnConventionalInfantry && isInfantryAppropriateTerrain) {
             for(int unitCount = 0; unitCount <= campaign.getCampaignOptions().getSkillLevel(); unitCount++) {
-                scrubs.add(getEntity(contract.getEnemyCode(), contract.getEnemySkill(), contract.getEnemyQuality(), 
-                    UnitType.INFANTRY, EntityWeightClass.WEIGHT_LIGHT, campaign));
+                Entity infantry = getEntity(contract.getEnemyCode(), contract.getEnemySkill(), contract.getEnemyQuality(),
+                        UnitType.INFANTRY, EntityWeightClass.WEIGHT_LIGHT, campaign);
+                if (infantry != null) {
+                    scrubs.add(infantry);
+                }
             }
         }
         
@@ -1541,8 +1551,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 if(generatedUnit != null) {
                     scrubs.add(generatedUnit);
                 } else {
-                    scrubs.add(getEntity(contract.getEnemyCode(), contract.getEnemySkill(), contract.getEnemyQuality(), 
-                            UnitType.INFANTRY, EntityWeightClass.WEIGHT_LIGHT, campaign));
+                    Entity infantry = getEntity(contract.getEnemyCode(), contract.getEnemySkill(), contract.getEnemyQuality(),
+                            UnitType.INFANTRY, EntityWeightClass.WEIGHT_LIGHT, campaign);
+                    if (infantry != null) {
+                        scrubs.add(infantry);
+                    }
                 }
             }
         }
