@@ -10,6 +10,7 @@ can be loaded into MegaMek.  For more details, see
 the website: http://megamek.org/mekhq
 
 ### Compiling
+[![Build Status](https://dev.azure.com/drivingguy/Megamek/_apis/build/status/MegaMek.mekhq?branchName=master)](https://dev.azure.com/drivingguy/Megamek/_build/latest?definitionId=1&branchName=master) [![Total alerts](https://img.shields.io/lgtm/alerts/g/MegaMek/mekhq.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/MegaMek/mekhq/alerts/)
 
 1) Install [Gradle](https://gradle.org/).
 
