@@ -148,6 +148,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         oldIntegratedHS = new ArrayList<>();
         newIntegratedHS = new ArrayList<>();
         fixableString = null;
+        cost = Money.zero();
     }
 
     public Refit(Unit oUnit, Entity newEn, boolean custom, boolean refurbish) {
