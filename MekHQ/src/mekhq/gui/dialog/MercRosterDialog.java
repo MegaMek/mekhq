@@ -25,8 +25,11 @@ import javax.swing.JTextField;
 import javax.swing.ProgressMonitor;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MercRosterAccess;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  * A dialog that sets up a connection with a mysql MercRoster database to upload campaign data
@@ -56,6 +59,7 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
         this.campaign = c;
         initComponents();      
         this.setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -164,7 +168,14 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
         
         pack();
     }
-    
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(MercRosterDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
+
     private void upload() {
         String address = txtAddress.getText();
         int port = Integer.parseInt(txtPort.getText());
@@ -203,5 +214,4 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
             //nothing
         }
     }
-
 }

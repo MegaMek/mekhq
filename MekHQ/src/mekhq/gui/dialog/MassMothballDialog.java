@@ -55,6 +55,8 @@ import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.UnitTableMouseAdapter;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  * This class handles the display of the Mass Mothball/Reactivate dialog
@@ -127,8 +129,9 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         this.setResizable(true);
         this.pack();
         this.validate();
+        setUserPreferences();
     }
-    
+
     /**
      * Adds the table headers to the content pane
      * @param gbc
@@ -229,7 +232,14 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         buttonExecute.addActionListener(this);
         contentPanel.add(buttonExecute, gbc);
     }
-    
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(MassMothballDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
+
     /**
      * Worker function that sorts out the passed-in units by unit type and stores them in the local dictionary.
      * @param units Units to sort

@@ -37,8 +37,10 @@ import javax.swing.JRadioButton;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
+import mekhq.MekHQ;
 import mekhq.campaign.personnel.SpecialAbility;
-
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -61,6 +63,7 @@ public class SelectUnusedAbilityDialog extends JDialog {
         cancelled = false;
         initComponents();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -111,7 +114,14 @@ public class SelectUnusedAbilityDialog extends JDialog {
 
         pack();
     }
-    
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(SelectUnusedAbilityDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
+
     private void done() {
     	if(null != group.getSelection()) {
     		String name = group.getSelection().getActionCommand();

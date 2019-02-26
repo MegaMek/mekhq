@@ -34,7 +34,10 @@ import megamek.common.BattleArmor;
 import megamek.common.Infantry;
 import megamek.common.MechSummaryCache;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.parts.Refit;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -54,9 +57,6 @@ public class RefitNameDialog extends JDialog {
     private JLabel lblModel;
     private JTextField txtModel;
 
-
-
-
     /** Creates new form RefitTeamDialog */
     public RefitNameDialog(Frame parent, boolean modal, Refit r) {
         super(parent, modal);
@@ -65,6 +65,7 @@ public class RefitNameDialog extends JDialog {
         cancelled = false;
         initComponents();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -161,6 +162,13 @@ public class RefitNameDialog extends JDialog {
         getContentPane().add(btnCancel, gridBagConstraints);
 
         pack();
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(RefitNameDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed

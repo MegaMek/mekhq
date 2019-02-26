@@ -46,7 +46,10 @@ import megamek.common.Crew;
 import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
+import mekhq.MekHQ;
 import mekhq.campaign.force.Force;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -126,7 +129,6 @@ public class ImageChoiceDialog extends JDialog {
         this(parent, modal, category, file, items, false);
     }
 
-
     /** Creates new form ImageChoiceDialog */
     public ImageChoiceDialog(Frame parent, boolean modal, String category, String file, DirectoryItems items, boolean force) {
         super(parent, modal);
@@ -150,6 +152,7 @@ public class ImageChoiceDialog extends JDialog {
         }
         tableImages.setRowSelectionInterval(rowIndex, rowIndex);
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -480,6 +483,13 @@ public class ImageChoiceDialog extends JDialog {
         getContentPane().add(btnCancel, gbc);
 
         pack();
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(ImageChoiceDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 
     private void btnCancelActionPerformed(ActionEvent evt) {

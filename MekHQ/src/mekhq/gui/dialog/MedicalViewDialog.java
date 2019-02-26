@@ -66,6 +66,8 @@ import javax.swing.JTextArea;
 import javax.swing.UIManager;
 
 import mekhq.campaign.log.LogEntryType;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 import org.joda.time.chrono.GJChronology;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -217,6 +219,7 @@ public class MedicalViewDialog extends JDialog {
         okayButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 20));
         getContentPane().add(okayButton);
         pack();
+        setUserPreferences();
     }
     
     private void initComponents(Container cont) {
@@ -268,6 +271,13 @@ public class MedicalViewDialog extends JDialog {
         gbc.gridy = 5;
         
         cont.add(genNotes(campaign, person), gbc);
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(MedicalViewDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 
     @Override

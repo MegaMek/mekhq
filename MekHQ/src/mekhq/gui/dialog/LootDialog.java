@@ -35,10 +35,13 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
 
 import megamek.common.Entity;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.parts.Part;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -83,6 +86,7 @@ public class LootDialog extends javax.swing.JDialog {
         }
         initComponents();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -252,6 +256,13 @@ public class LootDialog extends javax.swing.JDialog {
         getContentPane().add(btnCancel, gridBagConstraints);
 
         pack();
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(LootDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 
     public Loot getLoot() {

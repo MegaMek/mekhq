@@ -35,8 +35,11 @@ import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.PersonalLogEntry;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -84,6 +87,7 @@ public class AddOrEditPersonnelEntryDialog extends javax.swing.JDialog {
 
         initComponents();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     public Optional<LogEntry> getEntry() {
@@ -159,6 +163,13 @@ public class AddOrEditPersonnelEntryDialog extends javax.swing.JDialog {
         getContentPane().add(panMain, BorderLayout.CENTER);
         getContentPane().add(panBtn, BorderLayout.PAGE_END);
         pack();
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(AddOrEditPersonnelEntryDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {

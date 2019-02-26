@@ -443,7 +443,6 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         partsSorter.setRowFilter(partsTypeFilter);
     }
 
-
     private void addPart(boolean purchase, int row, int quantity) {
     	addPart(purchase, false, row, quantity);
     }

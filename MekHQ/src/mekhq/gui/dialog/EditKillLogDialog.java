@@ -26,9 +26,12 @@ import java.awt.Frame;
 import java.util.ResourceBundle;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.control.EditKillLogControl;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 import javax.swing.*;
 
@@ -57,6 +60,7 @@ public class EditKillLogDialog extends javax.swing.JDialog {
 
         initComponents();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -77,5 +81,12 @@ public class EditKillLogDialog extends javax.swing.JDialog {
         getContentPane().add(btnOK, BorderLayout.PAGE_END);
 
         pack();
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(EditKillLogDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 }

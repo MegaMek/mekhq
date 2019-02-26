@@ -48,6 +48,8 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.rating.IUnitRating;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  * @author Taharqa
@@ -113,6 +115,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         maxCollateralValue = campaign.getFinances().getMaxCollateral(campaign);
         initComponents();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -379,6 +382,13 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         getContentPane().add(panBtn, BorderLayout.PAGE_END);
 
         pack();
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(NewLoanDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 
     private void setUpInfo() {

@@ -59,6 +59,7 @@ import megamek.client.ui.swing.MechViewPanel;
 import megamek.common.Entity;
 import megamek.common.GunEmplacement;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
@@ -71,6 +72,8 @@ import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -221,6 +224,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         currentPanel = UNITSPANEL;
         initComponents();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -1073,6 +1077,13 @@ public class ResolveScenarioWizardDialog extends JDialog {
         pack();
 
 
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(ResolveScenarioWizardDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 
     private void switchPanel(String name) {

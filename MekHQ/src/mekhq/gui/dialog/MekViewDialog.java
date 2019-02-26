@@ -12,6 +12,9 @@ import java.util.ResourceBundle;
 
 import megamek.common.MechView;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -30,6 +33,7 @@ public class MekViewDialog extends javax.swing.JDialog {
         super(parent, modal);
         this.mview = mv;
         initComponents();
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -65,15 +69,20 @@ public class MekViewDialog extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(MekViewDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
+
 	private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkayActionPerformed
 	    this.setVisible(false);
 	}//GEN-LAST:event_btnOkayActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnOkay;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextPane txtMek;
     // End of variables declaration//GEN-END:variables
-
 }

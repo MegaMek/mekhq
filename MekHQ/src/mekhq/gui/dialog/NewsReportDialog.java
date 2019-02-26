@@ -12,7 +12,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.border.EmptyBorder;
 
+import mekhq.MekHQ;
 import mekhq.campaign.universe.NewsItem;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -33,6 +36,7 @@ public class NewsReportDialog extends javax.swing.JDialog {
         setMinimumSize(new Dimension(500, 300));
         setPreferredSize(new Dimension(500, 300));
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
     
     private void initComponents() {
@@ -49,5 +53,11 @@ public class NewsReportDialog extends javax.swing.JDialog {
         
         getContentPane().add(scrNews, BorderLayout.CENTER);
     }
-    
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(NewsReportDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
 }

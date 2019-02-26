@@ -44,6 +44,7 @@ import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.Loan;
@@ -51,6 +52,8 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  * A dialog to decide how you want to pay off collateral when you 
@@ -87,6 +90,7 @@ public class PayCollateralDialog extends JDialog {
         paid = false;
         initComponents();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -246,6 +250,13 @@ public class PayCollateralDialog extends JDialog {
         getContentPane().add(panMain, BorderLayout.CENTER);
         getContentPane().add(panBtn, BorderLayout.PAGE_END);
         pack();
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(PayCollateralDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 
     public boolean wasCancelled() {

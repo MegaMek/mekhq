@@ -50,9 +50,11 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.model.XTableColumnModel;
+import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.sorter.PartsDetailSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.gui.sorter.UnitTypeSorter;
+import mekhq.preferences.PreferencesNode;
 import mekhq.service.MassRepairService;
 import mekhq.service.MassRepairService.MassRepairPartSet;
 
@@ -140,6 +142,7 @@ public class MassRepairSalvageDialog extends JDialog {
 		}
 
 		setLocationRelativeTo(_parent);
+		setUserPreferences();
 	}
 
 	public MassRepairSalvageDialog(Frame _parent, boolean _modal, CampaignGUI _campaignGUI, int mode) {
@@ -1253,6 +1256,13 @@ public class MassRepairSalvageDialog extends JDialog {
 		protected JSpinner minBTHSpn = null;
 		protected JSpinner maxBTHSpn = null;
 	}
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(MassRepairSalvageDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
 
 	public JCheckBox getUseExtraTimeBox() {
 		return useExtraTimeBox;

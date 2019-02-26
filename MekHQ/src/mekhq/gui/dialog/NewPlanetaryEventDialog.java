@@ -36,6 +36,9 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import mekhq.MekHQ;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -161,6 +164,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         this.date = Utilities.getDateTimeDay(campaign.getCalendar());
         initComponents();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
     
     public List<Planet.PlanetaryEvent> getChangedEvents() {
@@ -829,7 +833,14 @@ public class NewPlanetaryEventDialog extends JDialog {
         pane.add(controlCombined, gbc);
 
     }
-    
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(NewPlanetaryEventDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
+
     private Planet.PlanetaryEvent getCurrentEvent() {
         return planet.getEvent(date);
     }

@@ -20,9 +20,12 @@
 package mekhq.gui.dialog;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.ServiceLogEntry;
 import mekhq.campaign.personnel.Person;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 import javax.swing.*;
 import javax.swing.text.html.Option;
@@ -78,6 +81,7 @@ public class AddOrEditMissionEntryDialog extends JDialog {
 
         initComponents();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     public Optional<LogEntry> getEntry() {
@@ -149,6 +153,13 @@ public class AddOrEditMissionEntryDialog extends JDialog {
         getContentPane().add(panMain, BorderLayout.CENTER);
         getContentPane().add(panBtn, BorderLayout.PAGE_END);
         pack();
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(AddOrEditMissionEntryDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 
     private void changeDate() {

@@ -44,10 +44,13 @@ import javax.swing.JTextArea;
 import javax.swing.WindowConstants;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.personnel.BodyLocation;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.gui.model.FilterableComboBoxModel;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -83,6 +86,7 @@ public class EditInjuryEntryDialog extends JDialog {
         injury = e;
         initComponents();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -327,7 +331,14 @@ public class EditInjuryEntryDialog extends JDialog {
         getContentPane().add(panBtn, BorderLayout.PAGE_END);
         pack();
     }
-    
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(EditInjuryEntryDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
+
     private void btnOKActionPerformed(ActionEvent evt) {
         injury.setTime(Integer.parseInt(txtDays.getText()));
         injury.setHits(Integer.parseInt(txtHits.getText()));

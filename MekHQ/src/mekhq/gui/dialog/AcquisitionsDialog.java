@@ -38,6 +38,8 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.GuiTabType;
 import mekhq.gui.RepairTab;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 import mekhq.service.PartsAcquisitionService;
 import mekhq.service.PartsAcquisitionService.PartCountInfo;
 
@@ -67,6 +69,7 @@ public class AcquisitionsDialog extends JDialog {
         initComponents();
 
         setLocationRelativeTo(_parent);
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -229,6 +232,13 @@ public class AcquisitionsDialog extends JDialog {
         sbText.append("</font></html>");
 
         return sbText.toString();
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(AcquisitionsDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 
     private void calculateBonusParts() {

@@ -37,8 +37,11 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import mekhq.MekHQ;
 import mekhq.campaign.personnel.SkillPrereq;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 
 /**
@@ -63,6 +66,7 @@ public class EditSkillPrereqDialog extends JDialog {
         prereq = pre;
         initComponents();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -135,7 +139,14 @@ public class EditSkillPrereqDialog extends JDialog {
 
         pack();
     }
-    
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(EditSkillPrereqDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
+
     private void done() {
     	prereq = new SkillPrereq();
     	for(String type : SkillType.skillList) {

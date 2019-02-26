@@ -27,9 +27,12 @@ import java.util.ResourceBundle;
 import javax.swing.*;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.Finances;
+import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.utilities.JMoneyTextField;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -54,6 +57,7 @@ public class EditAssetDialog extends JDialog {
         cancelled = false;
         initComponents();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -182,6 +186,13 @@ public class EditAssetDialog extends JDialog {
         getContentPane().add(btnClose, gridBagConstraints);
 
         pack();
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(EditAssetDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {

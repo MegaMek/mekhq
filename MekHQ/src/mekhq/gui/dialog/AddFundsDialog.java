@@ -24,9 +24,12 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
+import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.utilities.JMoneyTextField;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -46,6 +49,7 @@ public class AddFundsDialog extends JDialog implements FocusListener {
     public AddFundsDialog(Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -65,6 +69,13 @@ public class AddFundsDialog extends JDialog implements FocusListener {
         setLocationRelativeTo(getParent());
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(AddFundsDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
 
     private JPanel buildFieldsPanel() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 2));

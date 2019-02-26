@@ -530,7 +530,6 @@ public class RetirementDefectionDialog extends JDialog {
         }
     };
 
-
     private void initResults() {
         /* Find unassigned units that can be stolen */
         ArrayList<UUID> unassignedMechs = new ArrayList<UUID>();

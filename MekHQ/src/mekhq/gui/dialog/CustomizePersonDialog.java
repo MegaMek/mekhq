@@ -48,6 +48,7 @@ import megamek.common.options.Option;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
@@ -59,6 +60,8 @@ import mekhq.campaign.universe.Faction.Tag;
 import mekhq.gui.control.EditKillLogControl;
 import mekhq.gui.control.EditMissionLogControl;
 import mekhq.gui.control.EditPersonnelLogControl;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -133,6 +136,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         this.person = person;
         initializePilotAndOptions();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     private void initializePilotAndOptions () {
@@ -709,6 +713,13 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(CustomizePersonDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
 
 	private DefaultComboBoxModel<Faction> getFactionsComboBoxModel() {
         int year = person.getCampaign().getGameYear();

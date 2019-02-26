@@ -40,6 +40,9 @@ import megamek.common.Entity;
 import megamek.common.Mounted;
 import megamek.common.options.IOption;
 import megamek.common.options.WeaponQuirks;
+import mekhq.MekHQ;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  * @author Deric Page (dericpage@users.sourceforge.net)
@@ -72,6 +75,7 @@ public class QuirksDialog extends JDialog implements DialogOptionListener, Actio
         validate();
         pack();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     private void initGUI() {
@@ -89,6 +93,13 @@ public class QuirksDialog extends JDialog implements DialogOptionListener, Actio
         setLayout(new BorderLayout());
         add(scroller, BorderLayout.CENTER);
         add(buildButtonPanel(), BorderLayout.SOUTH);
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(QuirksDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 
     private JPanel buildButtonPanel() {
