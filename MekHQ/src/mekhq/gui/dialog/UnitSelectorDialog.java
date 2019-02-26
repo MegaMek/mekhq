@@ -752,25 +752,22 @@ public class UnitSelectorDialog extends JDialog {
      *
      */
     public class FormattedNumberSorter implements Comparator<String> {
-
         @Override
         public int compare(String s0, String s1) {
-            //lets find the weight class integer for each name
-            long l0 = 0;
+            DecimalFormat format = new DecimalFormat();
+            double l0 = 0;
             try {
-                l0 = DecimalFormat.getInstance().parse(s0.replace(",", "")).longValue();
+                l0 = format.parse(s0).doubleValue();
             } catch (java.text.ParseException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            long l1 = 0;
+            double l1 = 0;
             try {
-                l1 = DecimalFormat.getInstance().parse(s1.replace(",", "")).longValue();
+                l1 = format.parse(s1).doubleValue();
             } catch (java.text.ParseException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            return ((Comparable<Long>)l0).compareTo(l1);
+            return ((Comparable<Double>)l0).compareTo(l1);
         }
     }
 
