@@ -10,6 +10,7 @@ v0.45.4-SNAPSHOT
 + Issue #1086: Fix issue introduced in 45.3 preventing "special" AtB scenarios from starting
 + Issue #1106: Fix issue introduced in 45.3 preventing AtB scenarios containing aircraft from starting under some conditions
 + Issue #112: Adds mission log and counter for personnel
++ Issue #1115: Fix stack overflow in BattleArmorSuit::getTonnage
 
 v0.45.3 (2019-02-12 0500 UTC)
 + Issue #990: Feature: Add bulk confirm dialog if more than one unit is removed
