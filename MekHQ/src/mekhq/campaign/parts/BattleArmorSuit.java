@@ -224,7 +224,7 @@ public class BattleArmorSuit extends Part {
         }
         for(int childId : childPartIds) {
             Part p = campaign.getPart(childId);
-            if(null != p) {
+            if(null != p && !(p instanceof BattleArmorSuit)) {
                 tons += p.getTonnage();
             }
         }
