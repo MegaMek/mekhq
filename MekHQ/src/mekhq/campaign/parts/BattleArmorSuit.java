@@ -63,8 +63,6 @@ import mekhq.campaign.unit.Unit;
 public class BattleArmorSuit extends Part {
     private static final long serialVersionUID = -122291037522319765L;
 
-
-
     protected String chassis;
     protected String model;
     protected boolean clan;
@@ -140,7 +138,7 @@ public class BattleArmorSuit extends Part {
     public double getTonnage() {
         //if there are no linked parts and the unit is null,
         //then use the pre-recorded alternate costs
-        if(null == unit && childPartIds.size()==0) {
+        if(null == unit && getChildPartIds().size()==0) {
             return alternateTon;
         }
         double tons = 0;
@@ -149,7 +147,7 @@ public class BattleArmorSuit extends Part {
             if(clan) {
                 tons += 0.13;
             } else {
-                    tons += 0.08;
+                tons += 0.08;
             }
             tons += groundMP * .025;
             if(jumpType == EntityMovementMode.INF_UMU) {
@@ -165,7 +163,7 @@ public class BattleArmorSuit extends Part {
             if(clan) {
                 tons += 0.15;
             } else {
-                    tons += 0.1;
+                tons += 0.1;
             }
             tons += groundMP * .03;
             if(jumpType == EntityMovementMode.INF_UMU) {
@@ -181,7 +179,7 @@ public class BattleArmorSuit extends Part {
             if(clan) {
                 tons += 0.25;
             } else {
-                    tons += 0.175;
+                tons += 0.175;
             }
             tons += groundMP * .04;
             if(jumpType == EntityMovementMode.INF_UMU) {
@@ -197,7 +195,7 @@ public class BattleArmorSuit extends Part {
             if(clan) {
                 tons += 0.4;
             } else {
-                    tons += 0.3;
+                tons += 0.3;
             }
             tons += groundMP * .08;
             if(jumpType == EntityMovementMode.INF_UMU) {
@@ -211,7 +209,7 @@ public class BattleArmorSuit extends Part {
             if(clan) {
                 tons += 0.7;
             } else {
-                    tons += 0.55;
+                tons += 0.55;
             }
             tons += groundMP * .16;
             tons += jumpMP * .25;
@@ -219,10 +217,10 @@ public class BattleArmorSuit extends Part {
         }
         //if there are no linked parts and the unit is null,
         //then use the pre-recorded extra costs
-        if(null == unit && childPartIds.size()==0) {
+        if(null == unit && getChildPartIds().size()==0) {
             tons += alternateTon;
         }
-        for(int childId : childPartIds) {
+        for(int childId : getChildPartIds()) {
             Part p = campaign.getPart(childId);
             if(null != p && !(p instanceof BattleArmorSuit)) {
                 tons += p.getTonnage();
@@ -235,7 +233,7 @@ public class BattleArmorSuit extends Part {
     public Money getStickerPrice() {
         //if there are no linked parts and the unit is null,
         //then use the pre-recorded alternate costs
-        if(null == unit && childPartIds.size()==0) {
+        if(null == unit && getChildPartIds().size()==0) {
             return alternateCost;
         }
         Money cost = Money.zero();
@@ -268,7 +266,7 @@ public class BattleArmorSuit extends Part {
             cost = cost.plus(50000 * (jumpMP + 1));
         }
         cost = cost.plus(25000 * (groundMP-1));
-        for(int childId : childPartIds) {
+        for(int childId : getChildPartIds()) {
             Part p = campaign.getPart(childId);
             if(null != p) {
                 if(p instanceof BaArmor) {
