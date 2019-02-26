@@ -57,6 +57,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -89,8 +91,8 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
         populateRefits();
         initComponents();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
-    
     
     private void initComponents() {
     	
@@ -236,7 +238,14 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
         
         pack();
     }
-    
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(ChooseRefitDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
+
     private void beginRefit() {
     	setVisible(false);
     	gui.refitUnit(getSelectedRefit(), false);

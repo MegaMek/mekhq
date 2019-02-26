@@ -11,7 +11,10 @@ import java.util.ResourceBundle;
 import javax.swing.DefaultComboBoxModel;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.mission.Mission;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -28,8 +31,9 @@ public class CompleteMissionDialog extends javax.swing.JDialog {
         super(parent, modal);  
         this.mission = m;
         this.status = -1;
-        initComponents();     
+        initComponents();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -105,6 +109,13 @@ public class CompleteMissionDialog extends javax.swing.JDialog {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(CompleteMissionDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
 
     private void btnDoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDoneActionPerformed
     	status = choiceOutcome.getSelectedIndex()+1;

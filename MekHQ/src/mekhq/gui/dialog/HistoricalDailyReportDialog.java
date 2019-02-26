@@ -48,7 +48,6 @@ import mekhq.preferences.PreferencesNode;
 
 
 public class HistoricalDailyReportDialog extends JDialog {
-
     private static final long serialVersionUID = -4373796917722483042L;
 
     // max number of days that will be stored in the history, also used as a limit in the UI

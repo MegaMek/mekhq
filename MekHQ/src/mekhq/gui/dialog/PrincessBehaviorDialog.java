@@ -31,6 +31,8 @@ import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.ui.swing.BotConfigDialog;
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 public class PrincessBehaviorDialog extends BotConfigDialog implements ActionListener {
 
@@ -51,8 +53,16 @@ public class PrincessBehaviorDialog extends BotConfigDialog implements ActionLis
 	    
 	    this.nameField.setText(name);
 	    super.setPrincessFields();
+	    setUserPreferences();
 	}
-	
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(PrincessBehaviorDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
+
 	public BehaviorSettings getBehaviorSettings() {
 		return princessBehavior;
 	}

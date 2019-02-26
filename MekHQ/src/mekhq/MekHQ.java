@@ -316,7 +316,7 @@ public class MekHQ implements GameListener {
         unitsDirectory = new ObservableString("unitsDirectory", ".");
         preferences.manage(new StringPreference(unitsDirectory));
 
-        campaignsDirectory = new ObservableString("campaignsDirectory", ".");
+        campaignsDirectory = new ObservableString("campaignsDirectory", "./campaigns");
         preferences.manage(new StringPreference(campaignsDirectory));
 
         scenarioTemplatesDirectory = new ObservableString("scenarioTemplatesDirectory", ".");

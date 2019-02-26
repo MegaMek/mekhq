@@ -12,6 +12,9 @@ import java.util.ResourceBundle;
 import javax.swing.JButton;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -30,7 +33,6 @@ public class MissionTypeDialog extends javax.swing.JDialog {
     }
 
     private void initComponents() {
-
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MissionTypeDialog", new EncodeControl()); //$NON-NLS-1$
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -58,6 +60,14 @@ public class MissionTypeDialog extends javax.swing.JDialog {
         getContentPane().add(btnContract);
 
         setSize(250, 150);
+        setUserPreferences();
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(MissionTypeDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
     
     public boolean isContract() {

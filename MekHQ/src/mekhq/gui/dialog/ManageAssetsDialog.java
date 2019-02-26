@@ -48,6 +48,8 @@ import mekhq.campaign.event.AssetRemovedEvent;
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.Finances;
 import mekhq.gui.model.DataTableModel;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -79,7 +81,6 @@ public class ManageAssetsDialog extends JDialog {
     }
 
     private void initComponents() {
-
         btnOK = new javax.swing.JButton();
         btnAdd = new javax.swing.JButton();
         btnEdit = new javax.swing.JButton();
@@ -124,6 +125,14 @@ public class ManageAssetsDialog extends JDialog {
         getContentPane().add(btnOK, BorderLayout.PAGE_END);
 
         pack();
+        setUserPreferences();
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(ManageAssetsDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {

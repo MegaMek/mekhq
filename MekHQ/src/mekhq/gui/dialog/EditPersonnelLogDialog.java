@@ -28,9 +28,12 @@ import java.util.ResourceBundle;
 import javax.swing.*;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.control.EditPersonnelLogControl;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -57,6 +60,7 @@ public class EditPersonnelLogDialog extends javax.swing.JDialog {
 
         initComponents();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -77,5 +81,12 @@ public class EditPersonnelLogDialog extends javax.swing.JDialog {
         getContentPane().add(btnOK, BorderLayout.PAGE_END);
 
         pack();
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(EditPersonnelLogDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 }

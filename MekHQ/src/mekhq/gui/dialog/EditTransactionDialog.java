@@ -33,6 +33,8 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 public class EditTransactionDialog extends JDialog implements ActionListener, FocusListener, MouseListener {
 
@@ -68,6 +70,7 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
         setTitle("Edit Financial Transaction");
         setLocationRelativeTo(parent);
         pack();
+        setUserPreferences();
     }
 
     private void initGUI() {
@@ -78,6 +81,13 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
         } catch (ParseException e) {
             MekHQ.getLogger().error(getClass(), "initGUI()", e);
         }
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(EditTransactionDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 
     private JPanel buildMainPanel() throws ParseException {

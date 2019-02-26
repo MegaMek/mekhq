@@ -293,7 +293,6 @@ public class HireBulkPersonnelDialog extends JDialog {
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
-
     }
 
     private void hire() {

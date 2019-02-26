@@ -37,10 +37,13 @@ import megamek.client.ui.swing.BombChoicePanel;
 import megamek.common.BombType;
 import megamek.common.EquipmentType;
 import megamek.common.IBomber;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  * @author Deric Page (dericpage@users.sourceforge.net)
@@ -73,6 +76,7 @@ public class BombsDialog extends JDialog implements ActionListener {
         validate();
         pack();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     private void initGUI() {
@@ -118,6 +122,13 @@ public class BombsDialog extends JDialog implements ActionListener {
         return panel;
     }
 
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(BombsDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (okayButton.equals(e.getSource())) {
@@ -156,5 +167,4 @@ public class BombsDialog extends JDialog implements ActionListener {
             setVisible(false);
         }
     }
-
 }

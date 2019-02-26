@@ -28,7 +28,10 @@ import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.ResolveScenarioTracker;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -54,6 +57,7 @@ public class ChooseMulFilesDialog extends javax.swing.JDialog {
         cancelled = false;
         initComponents();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -175,12 +179,17 @@ public class ChooseMulFilesDialog extends javax.swing.JDialog {
     	 pack();
     }
 
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(ChooseMulFilesDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
 
     private void btnNextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
     	tracker.processMulFiles();
     	this.setVisible(false);
     }
-
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
     	cancelled = true;

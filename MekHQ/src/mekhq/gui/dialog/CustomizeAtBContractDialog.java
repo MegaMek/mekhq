@@ -54,6 +54,7 @@ import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Player;
 import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
@@ -62,7 +63,9 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Planets;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.gui.FactionComboBox;
+import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.utilities.JSuggestField;
+import mekhq.preferences.PreferencesNode;
 
 /**
  * @author Neoancient
@@ -125,6 +128,7 @@ public class CustomizeAtBContractDialog extends JDialog {
 		
 		initComponents();
 		setLocationRelativeTo(parent);
+		setUserPreferences();
 	}
 
     private void initComponents() {
@@ -524,6 +528,13 @@ public class CustomizeAtBContractDialog extends JDialog {
         buttonPanel.add(btnClose, gbc);
         
         pack();
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(CustomizeAtBContractDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 
     ActionListener camoButtonListener = new ActionListener() {

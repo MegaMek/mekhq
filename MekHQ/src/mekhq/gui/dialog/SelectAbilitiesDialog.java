@@ -33,8 +33,10 @@ import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 
+import mekhq.MekHQ;
 import mekhq.campaign.personnel.SpecialAbility;
-
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -59,6 +61,7 @@ public class SelectAbilitiesDialog extends JDialog {
         cancelled = false;
         initComponents();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -113,7 +116,14 @@ public class SelectAbilitiesDialog extends JDialog {
 
         pack();
     }
-    
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(SelectAbilitiesDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
+
     private void done() {
     	selected = new Vector<String>();
     	for(int i = 0; i < spaNames.size(); i++) {

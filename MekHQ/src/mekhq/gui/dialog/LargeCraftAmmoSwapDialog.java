@@ -30,9 +30,12 @@ import javax.swing.JScrollPane;
 
 import megamek.client.ui.swing.BayMunitionsChoicePanel;
 import megamek.common.Mounted;
+import mekhq.MekHQ;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  * @author Neoancient
@@ -66,8 +69,16 @@ public class LargeCraftAmmoSwapDialog extends JDialog {
         getContentPane().add(panButtons, BorderLayout.SOUTH);
         
         pack();
+        setUserPreferences();
     }
-    
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(AcquisitionsDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
+
     public boolean wasCanceled() {
         return canceled;
     }
@@ -105,5 +116,4 @@ public class LargeCraftAmmoSwapDialog extends JDialog {
         canceled = false;
         setVisible(false);
     }
-
 }

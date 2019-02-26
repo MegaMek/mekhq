@@ -11,6 +11,9 @@ import java.util.ResourceBundle;
 import javax.swing.JLabel;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -37,6 +40,7 @@ public class GamePresetDescriptionDialog extends javax.swing.JDialog {
         setMinimumSize(new Dimension(400, 250));
         setPreferredSize(new Dimension(400, 250));
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 	
 	private void initComponents() {
@@ -119,7 +123,14 @@ public class GamePresetDescriptionDialog extends javax.swing.JDialog {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
 		add(btnCancel, gridBagConstraints);		
 	}
-	
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(GamePresetDescriptionDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
+
 	public String getTitle() {
 		return txtTitle.getText();
 	}

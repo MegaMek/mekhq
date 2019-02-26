@@ -35,17 +35,21 @@ import javax.swing.JFrame;
 import megamek.MegaMek;
 import megamek.common.util.EncodeControl;
 import megameklab.com.MegaMekLab;
+import mekhq.MekHQ;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 public class MekHQAboutBox extends javax.swing.JDialog {
-	private static final long serialVersionUID = -8514528257894201641L;
+    private static final long serialVersionUID = -8514528257894201641L;
 
-	public MekHQAboutBox(JFrame parent) {
+    public MekHQAboutBox(JFrame parent) {
         super(parent);
         initComponents();
+        setUserPreferences();
     }
 
     private void initComponents() {
-		java.awt.GridBagConstraints gridBagConstraints;
+        java.awt.GridBagConstraints gridBagConstraints;
 
         javax.swing.JLabel appTitleLabel = new javax.swing.JLabel();
         javax.swing.JLabel versionLabel = new javax.swing.JLabel();
@@ -71,19 +75,19 @@ public class MekHQAboutBox extends javax.swing.JDialog {
         appTitleLabel.setText(mekhqProperties.getString("Application.title")); // NOI18N
         appTitleLabel.setName("appTitleLabel"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.gridwidth = 2;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		gridBagConstraints.weightx = 0.0;
-		gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
         getContentPane().add(appTitleLabel, gridBagConstraints);
         
         versionLabel.setText(resourceMap.getString("versionLabel.text")); // NOI18N
         versionLabel.setName("versionLabel"); // NOI18N
         gridBagConstraints.gridy = 1;
-		gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.gridwidth = 1;
         getContentPane().add(versionLabel, gridBagConstraints);
         
         appVersionLabel.setText(mekhqProperties.getString("Application.version")); // NOI18N
@@ -118,7 +122,7 @@ public class MekHQAboutBox extends javax.swing.JDialog {
         homepageLabel.setText(resourceMap.getString("homepageLabel.text")); // NOI18N
         homepageLabel.setName("homepageLabel"); // NOI18N
         gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 4;
         getContentPane().add(homepageLabel, gridBagConstraints);
         
         // use a JButton but make it look more like a regular link
@@ -130,14 +134,14 @@ public class MekHQAboutBox extends javax.swing.JDialog {
         appHomepage.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent evt) {
-            	if (Desktop.isDesktopSupported()) {
-            		try {
-            			URI uri = new URI(mekhqProperties.getString("Application.homepage"));
-            			Desktop.getDesktop().browse(uri);
-            		} catch (Exception e) {
-            			return;
-            		}
-            	}
+                if (Desktop.isDesktopSupported()) {
+                    try {
+                        URI uri = new URI(mekhqProperties.getString("Application.homepage"));
+                        Desktop.getDesktop().browse(uri);
+                    } catch (Exception e) {
+                        return;
+                    }
+                }
             }
         });
         
@@ -163,5 +167,11 @@ public class MekHQAboutBox extends javax.swing.JDialog {
         
         pack();
     }
-  
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(MekHQAboutBox.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
 }

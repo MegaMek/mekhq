@@ -36,7 +36,10 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.GamePreset;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  * This dialog will allow the users to choose from a set of possible game presets
@@ -63,6 +66,7 @@ public class ChooseGamePresetDialog extends javax.swing.JDialog {
         selectedPreset = null;
         initComponents();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -157,7 +161,13 @@ public class ChooseGamePresetDialog extends javax.swing.JDialog {
     	 pack();
     }
 
-    
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(ChooseGamePresetDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
+
     private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
     	int sel = 0;
     	for(JRadioButton button : presetButtons) {
@@ -170,7 +180,6 @@ public class ChooseGamePresetDialog extends javax.swing.JDialog {
     	
     	this.setVisible(false);
     }
-
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
     	cancelled = true;

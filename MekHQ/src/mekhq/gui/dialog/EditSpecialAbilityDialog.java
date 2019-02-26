@@ -39,8 +39,11 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
+import mekhq.MekHQ;
 import mekhq.campaign.personnel.SkillPrereq;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 
 /**
@@ -75,7 +78,6 @@ public class EditSpecialAbilityDialog extends JDialog {
     private boolean cancelled;
     private int currentXP;
 
-
     @SuppressWarnings("unchecked")
 	public EditSpecialAbilityDialog(Frame parent, SpecialAbility spa, Hashtable<String, SpecialAbility> hash) {
         super(parent, true);
@@ -91,6 +93,7 @@ public class EditSpecialAbilityDialog extends JDialog {
         currentXP = ability.getCost();
         initComponents();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -406,6 +409,13 @@ public class EditSpecialAbilityDialog extends JDialog {
         }
 
         return panSkill;
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(EditSpecialAbilityDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 
     private void edit() {

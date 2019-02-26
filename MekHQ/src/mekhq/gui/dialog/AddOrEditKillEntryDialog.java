@@ -26,7 +26,10 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Kill;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 
 /**
@@ -69,6 +72,7 @@ public class AddOrEditKillEntryDialog extends javax.swing.JDialog {
         this.date = this.kill.getDate();
         initComponents();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     public Optional<Kill> getKill() {
@@ -172,6 +176,13 @@ public class AddOrEditKillEntryDialog extends javax.swing.JDialog {
         getContentPane().add(btnClose, gridBagConstraints);
 
         pack();
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(AddOrEditKillEntryDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed

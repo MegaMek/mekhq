@@ -36,7 +36,10 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.WindowConstants;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  * Provides an editor for the number of hits sustained by a person,
@@ -58,6 +61,7 @@ public class EditPersonnelHitsDialog extends JDialog {
 
         initComponents();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -90,6 +94,13 @@ public class EditPersonnelHitsDialog extends JDialog {
         getContentPane().add(btnOK, BorderLayout.PAGE_END);
 
         pack();
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(EditPersonnelHitsDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 
     private void btnOKActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed

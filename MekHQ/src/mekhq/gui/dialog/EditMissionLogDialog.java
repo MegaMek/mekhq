@@ -20,9 +20,12 @@
 package mekhq.gui.dialog;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.control.EditMissionLogControl;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 import javax.swing.*;
 import java.awt.*;
@@ -50,6 +53,7 @@ public class EditMissionLogDialog extends JDialog {
 
         initComponents();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -70,5 +74,12 @@ public class EditMissionLogDialog extends JDialog {
         getContentPane().add(btnOK, BorderLayout.PAGE_END);
 
         pack();
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(EditMissionLogDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 }

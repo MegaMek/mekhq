@@ -44,7 +44,6 @@ public class DailyReportLogDialog extends JDialog {
     }
     
     private void initComponents() {
-        
         setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent we) {
