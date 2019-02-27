@@ -19,7 +19,9 @@
 package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
+import java.math.RoundingMode;
 
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -112,7 +114,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
 
     /**
      * Sets the bay for this ammo bin. Does not check whether the ammo bin is actually in the bay.
-     * @param bay
+     * @param bay the bay that will contain this ammo bin
      */
     public void setBay(Mounted bay) {
         if (null != unit) {
@@ -123,7 +125,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
     
     /**
      * Sets the bay for this ammo bin. Does not check whether the ammo bin is actually in the bay.
-     * @param bayEqNum
+     * @param bayEqNum the number of the bay that will contain this ammo bin
      */
     public void setBay(int bayEqNum) {
         if (null != unit) {
@@ -155,21 +157,34 @@ public class LargeCraftAmmoBin extends AmmoBin {
     }
     
     @Override
-    public long getValueNeeded() {
-        return adjustCostsForCampaignOptions((long)(capacity * getPricePerTon()
-                * ((double)shotsNeeded / getShotsPerTon())));
+    public Money getValueNeeded() {
+        if (getShotsPerTon() <= 0) {
+            return Money.zero();
+        }
+
+        return adjustCostsForCampaignOptions(getPricePerTon()
+                .multipliedBy(capacity)
+                .multipliedBy(shotsNeeded)
+                .dividedBy(getShotsPerTon()));
     }
 
     @Override
-    protected long getPricePerTon() {
+    protected Money getPricePerTon() {
         // Since ammo swaps are handled by moving capacity from one bay to another, the ammo type
         // of the bay and the unit should be the same.
-        return (long) getType().getRawCost();
+        return Money.of(getType().getRawCost());
     }
     
     @Override
-    public long getStickerPrice() {
-        return (long)(capacity * getPricePerTon() * (1.0 * getCurrentShots()/getShotsPerTon()));
+    public Money getStickerPrice() {
+        if (getShotsPerTon() <= 0) {
+            return Money.zero();
+        }
+
+        return getPricePerTon()
+                .multipliedBy(capacity)
+                .multipliedBy(getCurrentShots())
+                .dividedBy(getShotsPerTon());
     }
 
     @Override

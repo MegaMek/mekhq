@@ -10,7 +10,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.Image;
-import java.text.DecimalFormat;
 import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
@@ -30,6 +29,7 @@ import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.EntityImage;
+
 /**
  * A custom panel that gets filled in with goodies from a unit record
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
@@ -96,7 +96,7 @@ public class UnitViewPanel extends javax.swing.JPanel {
 		if(null == image) {
 			image = getImageFor(unit, lblImage);     
 		}
-        Icon icon = null;
+        Icon icon;
 		if(null != image) {
 			if(image.getWidth(lblImage) > 200) {
                 image = image.getScaledInstance(200, -1, Image.SCALE_DEFAULT);               
@@ -284,8 +284,7 @@ public class UnitViewPanel extends javax.swing.JPanel {
 		pnlStats.add(lblCost, gridBagConstraints);
 		
 		txtCost.setName("lblCost2"); // NOI18N
-		DecimalFormat format = new DecimalFormat();
-		txtCost.setText(format.format(unit.getSellValue()));
+		txtCost.setText(unit.getSellValue().toAmountAndSymbolString());
 		txtCost.setEditable(false);
 		txtCost.setLineWrap(true);
 		txtCost.setWrapStyleWord(true);
@@ -333,7 +332,7 @@ public class UnitViewPanel extends javax.swing.JPanel {
 			return null;
 		}
         Image base = mt.imageFor(u.getEntity(), c, -1);
-        int tint = PlayerColors.getColorRGB(u.campaign.getColorIndex());
+        int tint = PlayerColors.getColorRGB(u.getCampaign().getColorIndex());
         EntityImage entityImage = new EntityImage(base, tint, getCamo(u), c);
         return entityImage.loadPreviewImage();
     }

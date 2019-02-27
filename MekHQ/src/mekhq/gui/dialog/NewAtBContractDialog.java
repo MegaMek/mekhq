@@ -38,6 +38,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
+import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
@@ -48,7 +49,9 @@ import mekhq.campaign.universe.Planets;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.gui.FactionComboBox;
 import mekhq.gui.model.SortedComboBoxModel;
+import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.utilities.JSuggestField;
+import mekhq.preferences.PreferencesNode;
 
 /**
  * @author Neoancient
@@ -82,8 +85,16 @@ public class NewAtBContractDialog extends NewContractDialog {
 
 	public NewAtBContractDialog(java.awt.Frame parent, boolean modal, Campaign c) {
 		super(parent, modal, c);
+		setUserPreferences();
 	}
-	 
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(NewAtBContractDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
+
 	@Override
 	protected void initComponents() {
 		currentFactions = RandomFactionGenerator.getInstance().getCurrentFactions();
@@ -101,12 +112,18 @@ public class NewAtBContractDialog extends NewContractDialog {
         if (getCurrentEmployerCode() != null) {
         	((AtBContract)contract).setEmployerCode(getCurrentEmployerCode(), campaign.getGameYear());
         }
+        
         if (getCurrentEnemyCode() != null) {
         	((AtBContract)contract).setEnemyCode(getCurrentEnemyCode());
         }
-        ((AtBContract) contract)
-                .setPlanetId((Planets.getInstance().getPlanetByName((String) cbPlanets.getSelectedItem(),
-                        Utilities.getDateTimeDay(campaign.getCalendar()))).getId());
+        
+        
+        if(cbPlanets.getSelectedItem() != null) {
+            ((AtBContract) contract).setPlanetId((Planets.getInstance().getPlanetByName((String) cbPlanets.getSelectedItem(),
+                    Utilities.getDateTimeDay(campaign.getCalendar()))).getId());
+        }
+        
+        
         spnMultiplier.setModel(new SpinnerNumberModel(contract.getMultiplier(), 0.1, 10.0, 0.1));
         updatePaymentMultiplier();
         contract.calculateContract(campaign);

@@ -3,7 +3,6 @@ package mekhq.gui.adapter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.text.DecimalFormat;
 import java.util.UUID;
 
 import javax.swing.JMenu;
@@ -112,11 +111,9 @@ public class LoanTableMouseAdapter extends MouseInputAdapter implements
             JMenu menu = null;
             // **lets fill the pop up menu**//
             menuItem = new JMenuItem("Pay Off Full Balance ("
-                    + DecimalFormat.getInstance().format(
-                            loan.getRemainingValue()) + ")");
+                    + loan.getRemainingValue().toAmountAndSymbolString() + ")");
             menuItem.setActionCommand("PAY_BALANCE");
-            menuItem.setEnabled(gui.getCampaign().getFunds() >= loan
-                    .getRemainingValue());
+            menuItem.setEnabled(gui.getCampaign().getFunds().isGreaterOrEqualThan(loan.getRemainingValue()));
             menuItem.addActionListener(this);
             popup.add(menuItem);
             menuItem = new JMenuItem("Default on This Loan");

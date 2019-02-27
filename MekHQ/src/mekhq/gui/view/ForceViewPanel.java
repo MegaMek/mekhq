@@ -30,6 +30,7 @@ import megamek.common.UnitType;
 import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -200,7 +201,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		pnlStats.setLayout(new java.awt.GridBagLayout());
 		
 	 	long bv = 0;
-    	long cost = 0;
+    	Money cost = Money.zero();
     	double ton = 0;
     	String commander = "";
     	String LanceTech = "";
@@ -212,7 +213,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
     		if(null != u) {
     			Person p = u.getCommander();
     			bv += u.getEntity().calculateBattleValue(true, !u.hasPilot());
-    			cost += u.getEntity().getCost(true);
+    			cost = cost.plus(u.getEntity().getCost(true));
     			ton += u.getEntity().getWeight();
     			String utype = UnitType.getTypeDisplayableName(u.getEntity().getUnitType());
     			if(null == type) {
@@ -226,7 +227,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
     		}
     	}
  		//sort person vector by rank
- 		Collections.sort(people, new Comparator<Person>(){		 
+ 		Collections.sort(people, new Comparator<Person>(){
             public int compare(final Person p1, final Person p2) {
                return ((Comparable<Integer>)p2.getRankNumeric()).compareTo(p1.getRankNumeric());
             }
@@ -244,7 +245,6 @@ public class ForceViewPanel extends javax.swing.JPanel {
     		assigned = force.getParentForce().getName();
     	}
     	
-    	DecimalFormat format = new DecimalFormat();
     	int nexty = 0;
     	
     	if(null != type) {
@@ -341,7 +341,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		pnlStats.add(lblBV1, gridBagConstraints);
 		
 		lblBV2.setName("lblBV2"); // NOI18N
-		lblBV2.setText(format.format(bv));
+		lblBV2.setText(DecimalFormat.getInstance().format(bv));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = nexty;
@@ -362,7 +362,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		pnlStats.add(lblTonnage1, gridBagConstraints);
 		
 		lblTonnage2.setName("lblTonnage2"); // NOI18N
-		lblTonnage2.setText(format.format(ton));
+		lblTonnage2.setText(DecimalFormat.getInstance().format(ton));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = nexty;
@@ -390,7 +390,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		pnlStats.add(lblCost1, gridBagConstraints);
 		
 		lblCost2.setName("lblCost2"); // NOI18N
-		lblCost2.setText(format.format(cost) + " C-bills");
+		lblCost2.setText(cost.toAmountAndSymbolString());
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = nexty;
@@ -535,7 +535,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 			return null;
 		}
         Image base = icons.getMechTiles().imageFor(u.getEntity(), c, -1);
-        int tint = PlayerColors.getColorRGB(u.campaign.getColorIndex());
+        int tint = PlayerColors.getColorRGB(u.getCampaign().getColorIndex());
         EntityImage entityImage = new EntityImage(base, tint, getCamo(u), c);
         return entityImage.loadPreviewImage();
     }
@@ -590,7 +590,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
     	//we are not going to use the campaign methods here because we can be more efficient
     	//by only traversing once
     	int bv = 0;
-    	int cost = 0;
+    	Money cost = Money.zero();
     	double ton = 0;
     	int number = 0;
     	String commander = "No personnel found";
@@ -605,7 +605,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
                 } else {
                     bv += u.getEntity().calculateBattleValue(true, true);
                 }
-    			cost += u.getEntity().getCost(true);
+    			cost = cost.plus(u.getEntity().getCost(true));
     			ton += u.getEntity().getWeight();
     			if(null != p) {
     				people.add(p);
@@ -621,15 +621,13 @@ public class ForceViewPanel extends javax.swing.JPanel {
     	if(people.size() > 0) {
     		commander = people.get(0).getFullTitle();
     	}
-    	DecimalFormat format = new DecimalFormat();
         String toReturn = "<html><font size='2'><b>" + f.getName() + "</b> (" + commander + ")<br/>";
         toReturn += "<b>Number of Units:</b> " + number + "<br/>";
         toReturn += bv + " BV, ";
-        toReturn += format.format(ton) + " tons, ";
-        toReturn += format.format(cost) + " C-bills";
+        toReturn += DecimalFormat.getInstance().format(ton) + " tons, ";
+        toReturn += cost.toAmountAndSymbolString();
         toReturn += "</font></html>";
         return toReturn;
     }
 
 }
-	

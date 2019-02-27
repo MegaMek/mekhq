@@ -19,10 +19,13 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Ranks;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.view.PersonViewPanel;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -51,6 +54,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
         this.person = person;
         initComponents();
         setLocationRelativeTo(hqView.getFrame());
+        setUserPreferences();
     }
 
     private void refreshView() {
@@ -163,6 +167,13 @@ public class NewRecruitDialog extends javax.swing.JDialog {
         panSidebar.add(button);
 
         return panSidebar;
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(NewRecruitDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 
     private void hire() {

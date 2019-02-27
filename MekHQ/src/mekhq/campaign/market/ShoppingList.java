@@ -194,7 +194,7 @@ public class ShoppingList implements MekHqXmlSerializable {
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("unitOrder")) {
                     UnitOrder u = UnitOrder.generateInstanceFromXML(wn2, c, version);
-                    u.campaign = c;
+                    u.setCampaign(c);
                     if(null != u.getEntity()) {
                         retVal.shoppingList.add(u);
                     }

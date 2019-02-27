@@ -20,6 +20,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -136,8 +137,8 @@ public class Cubicle extends Part {
     }
 
     @Override
-    public long getStickerPrice() {
-        return bayType.getCost();
+    public Money getStickerPrice() {
+        return Money.of(bayType.getCost());
     }
 
     @Override
@@ -192,5 +193,4 @@ public class Cubicle extends Part {
     public ITechnology getTechAdvancement() {
         return bayType;
     }
-
 }

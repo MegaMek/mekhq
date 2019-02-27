@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -159,7 +160,7 @@ public class MekLocation extends Part {
     }
     
     @Override
-    public long getStickerPrice() {
+    public Money getStickerPrice() {
         double totalStructureCost = EquipmentType.getStructureCost(getStructureType()) * getUnitTonnage();
         int muscCost = isTsm() ? 16000 : 2000;
         double totalMuscleCost = muscCost * getUnitTonnage();
@@ -173,7 +174,7 @@ public class MekLocation extends Part {
         	    cost += 50000;
         	}
         }
-        return (long) Math.round(cost);
+        return Money.of(cost);
     }
 
     private boolean isArm() {
@@ -366,8 +367,7 @@ public class MekLocation extends Part {
 			percent = ((double) unit.getEntity().getInternalForReal(loc)) / ((double) unit.getEntity().getOInternal(loc));
 			if(percent <= 0.0) {
 				remove(false);
-				return;
-			} 
+			}
 		}
 	}
 	

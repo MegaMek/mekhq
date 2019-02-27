@@ -89,7 +89,11 @@ import mekhq.campaign.parts.VeeStabiliser;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.preferences.JComboBoxPreference;
+import mekhq.gui.preferences.JTablePreference;
+import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.sorter.PartsDetailSorter;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -157,6 +161,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         filterParts();
         setLocationRelativeTo(frame);
         selectedPart = null;
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -355,6 +360,19 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         pack();
     }
 
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(PartsStoreDialog.class);
+
+        choiceParts.setName("partsType");
+        preferences.manage(new JComboBoxPreference(choiceParts));
+
+        partsTable.setName("partsTable");
+        preferences.manage(new JTablePreference(partsTable));
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
+
     public void filterParts() {
         RowFilter<PartsTableModel, Integer> partsTypeFilter = null;
         final int nGroup = choiceParts.getSelectedIndex();
@@ -424,7 +442,6 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         };
         partsSorter.setRowFilter(partsTypeFilter);
     }
-
 
     private void addPart(boolean purchase, int row, int quantity) {
     	addPart(purchase, false, row, quantity);
@@ -589,7 +606,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 			    return details;
 			}
 			if(col == COL_COST) {
-				return formatter.format(part.getActualValue());
+				return part.getActualValue().toAmountString();
 			}
 			if(col == COL_TON) {
 				return Math.round(part.getTonnage() * 100) / 100.0;
@@ -771,26 +788,22 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 	 *
 	 */
 	public class FormattedNumberSorter implements Comparator<String> {
-
 		@Override
 		public int compare(String s0, String s1) {
-			//lets find the weight class integer for each name
-			DecimalFormat format = new DecimalFormat();
-			int l0 = 0;
+            DecimalFormat format = new DecimalFormat();
+			double l0 = 0;
 			try {
-				l0 = format.parse(s0).intValue();
+				l0 = format.parse(s0).doubleValue();
 			} catch (java.text.ParseException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			int l1 = 0;
+			double l1 = 0;
 			try {
-				l1 = format.parse(s1).intValue();
+				l1 = format.parse(s1).doubleValue();
 			} catch (java.text.ParseException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			return ((Comparable<Integer>)l0).compareTo(l1);
+			return ((Comparable<Double>)l0).compareTo(l1);
 		}
 	}
 }

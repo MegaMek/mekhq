@@ -34,8 +34,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.rating.IUnitRating;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)
@@ -72,6 +75,14 @@ public class UnitRatingDialog extends JDialog implements ActionListener {
         pack();
         setLocationRelativeTo(getParent());
         setResizable(false);
+        setUserPreferences();
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(UnitRatingDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 
     private JPanel getMainPanel() {

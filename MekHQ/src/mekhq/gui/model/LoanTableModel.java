@@ -3,7 +3,6 @@ package mekhq.gui.model;
 import java.awt.Color;
 import java.awt.Component;
 import java.text.DateFormat;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import javax.swing.JTable;
@@ -75,16 +74,16 @@ public class LoanTableModel extends DataTableModel {
             return loan.getDescription();
         }
         if(col == COL_COLLATERAL) {
-            return DecimalFormat.getInstance().format(loan.getCollateralAmount());
+            return loan.getCollateralAmount().toAmountAndSymbolString();
         }
         if(col == COL_VALUE) {
-            return DecimalFormat.getInstance().format(loan.getRemainingValue());
+            return loan.getRemainingValue().toAmountAndSymbolString();
         }
         if(col == COL_PAYMENT) {
-            return DecimalFormat.getInstance().format(loan.getPaymentAmount());
+            return loan.getPaymentAmount().toAmountAndSymbolString();
         }
         if(col == COL_PRINCIPAL) {
-            return DecimalFormat.getInstance().format(loan.getPrincipal());
+            return loan.getPrincipal().toAmountAndSymbolString();
         }
         if(col == COL_SCHEDULE) {
             return Finances.getScheduleName(loan.getPaymentSchedule());

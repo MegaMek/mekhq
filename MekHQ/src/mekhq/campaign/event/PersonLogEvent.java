@@ -29,5 +29,4 @@ public class PersonLogEvent extends PersonEvent {
     public PersonLogEvent(Person person) {
         super(person);
     }
-
 }

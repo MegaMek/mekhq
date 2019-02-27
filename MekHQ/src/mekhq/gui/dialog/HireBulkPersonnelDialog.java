@@ -33,6 +33,9 @@ import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import mekhq.MekHQ;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.Years;
@@ -82,6 +85,7 @@ public class HireBulkPersonnelDialog extends JDialog {
         this.campaign = c;
         initComponents();
         setLocationRelativeTo(getParent());
+        setUserPreferences();
     }
 
     private static GridBagConstraints newConstraints(int xPos, int yPos) {
@@ -282,6 +286,13 @@ public class HireBulkPersonnelDialog extends JDialog {
         getContentPane().add(panButtons, gridBagConstraints);
         
         pack();
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(HireBulkPersonnelDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 
     private void hire() {

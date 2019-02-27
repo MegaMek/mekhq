@@ -68,7 +68,6 @@ import megameklab.com.util.CConfig;
 import megameklab.com.util.RefreshListener;
 import megameklab.com.util.UnitUtil;
 import mekhq.MekHQ;
-import mekhq.Utilities;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.unit.Unit;
 
@@ -219,7 +218,7 @@ public class MekLabTab extends CampaignGuiTab {
         } catch (EntityLoadingException ex) {
             MekHQ.getLogger().error(getClass(), "loadUnit(Unit)", ex); //$NON-NLS-1$
         }
-        entity.setYear(unit.campaign.getCalendar().get(Calendar.YEAR));
+        entity.setYear(unit.getCampaign().getCalendar().get(Calendar.YEAR));
         UnitUtil.updateLoadedUnit(entity);
         entity.setModel(entity.getModel() + " Mk II");
         removeAll();
@@ -253,7 +252,7 @@ public class MekLabTab extends CampaignGuiTab {
         } catch (EntityLoadingException ex) {
             MekHQ.getLogger().error(getClass(), "resetUnit()", ex); //$NON-NLS-1$
         }
-        entity.setYear(unit.campaign.getCalendar().get(Calendar.YEAR));
+        entity.setYear(unit.getCampaign().getCalendar().get(Calendar.YEAR));
         UnitUtil.updateLoadedUnit(entity);
         removeAll();
         labPanel = getCorrectLab(entity);
@@ -335,7 +334,7 @@ public class MekLabTab extends CampaignGuiTab {
         lblName.setText("<html><b>" + unit.getName() + "</b></html>");
         lblRefit.setText(refit.getRefitClassName());
         lblTime.setText(refit.getTime() + " minutes");
-        lblCost.setText(Utilities.getCurrencyString(refit.getCost()));
+        lblCost.setText(refit.getCost().toAmountAndSymbolString());
         lblMove.setText("Movement: " + walk + "/" + run + "/" + jump);
         if (bvDiff > 0) {
             lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (<font color='green'>+"

@@ -31,32 +31,25 @@ import org.w3c.dom.NodeList;
 
 /**
  * An asset is a fake pre-existing asset that a user can enter in order to increase loan
- * collateral and get bigger loans - it is generally for merc campaigns that are just starting out
+ * collateral and get bigger loans - it is generally for mercenary campaigns that are just starting out
  * Assets can also generate income on a schedule
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Asset implements MekHqXmlSerializable {
 
     private String name;
-    private long value;
+    private Money value;
     //lets only allow monthly and yearly and pay at the first of each
     private int schedule;
-    private long income;
+    private Money income;
     
     public Asset() {
         name = "New Asset";
-        value = 0;
+        value = Money.zero();
         schedule = Finances.SCHEDULE_YEARLY;
-        income = 0;
+        income = Money.zero();
     }
-    
-    public Asset(String n, long v, long inc, int s) {
-        name = n;
-        schedule = s;
-        value = v;
-        income = inc;
-    }
-    
+
     public String getName() {
         return name;
     }
@@ -65,11 +58,11 @@ public class Asset implements MekHqXmlSerializable {
         name = s;
     }
     
-    public long getValue() {
+    public Money getValue() {
         return value;
     }
     
-    public void setValue(Long l) {
+    public void setValue(Money l) {
         value = l;
     }
     
@@ -81,11 +74,11 @@ public class Asset implements MekHqXmlSerializable {
         schedule = s;
     }
     
-    public long getIncome() {
+    public Money getIncome() {
         return income;
     }
     
-    public void setIncome(long l) {
+    public void setIncome(Money l) {
         income = l;
     }
     
@@ -98,7 +91,7 @@ public class Asset implements MekHqXmlSerializable {
                 +"</name>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<value>"
-                +value
+                +value.toXmlString()
                 +"</value>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<schedule>"
@@ -106,7 +99,7 @@ public class Asset implements MekHqXmlSerializable {
                 +"</schedule>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<income>"
-                +income
+                +income.toXmlString()
                 +"</income>");
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</asset>");
     }
@@ -120,9 +113,9 @@ public class Asset implements MekHqXmlSerializable {
             if (wn2.getNodeName().equalsIgnoreCase("name")) {
                 retVal.name = wn2.getTextContent();
             } else if (wn2.getNodeName().equalsIgnoreCase("value")) {
-                retVal.value = Long.parseLong(wn2.getTextContent().trim());
+                retVal.value = Money.fromXmlString(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("income")) {
-                retVal.income = Long.parseLong(wn2.getTextContent().trim());
+                retVal.income = Money.fromXmlString(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("schedule")) {
                 retVal.schedule = Integer.parseInt(wn2.getTextContent().trim());
             } 

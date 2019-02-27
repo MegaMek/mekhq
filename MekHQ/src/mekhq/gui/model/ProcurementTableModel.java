@@ -1,7 +1,6 @@
 package mekhq.gui.model;
 
 import java.awt.Component;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import javax.swing.JTable;
@@ -92,10 +91,10 @@ public class ProcurementTableModel extends DataTableModel {
             return shoppingItem.getAcquisitionName();
         }
         if(col == COL_COST) {
-            return DecimalFormat.getInstance().format(shoppingItem.getBuyCost());
+            return shoppingItem.getBuyCost().toAmountAndSymbolString();
         }
         if(col == COL_TOTAL_COST) {
-            return DecimalFormat.getInstance().format(shoppingItem.getBuyCost() * shoppingItem.getQuantity());
+            return shoppingItem.getBuyCost().multipliedBy(shoppingItem.getQuantity()).toAmountAndSymbolString();
         }
         if(col == COL_TARGET) {
             TargetRoll target = getCampaign().getTargetForAcquisition(shoppingItem, getCampaign().getLogisticsPerson(), false);

@@ -25,7 +25,6 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ResourceBundle;
 
@@ -374,10 +373,9 @@ public class AtBContractViewPanel extends JPanel {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblPayout, gridBagConstraints);
-        
-        DecimalFormat numFormatter = new DecimalFormat();
+
         txtPayout.setName("txtPayout"); // NOI18N
-        txtPayout.setText(numFormatter.format(contract.getMonthlyPayOut()) + " C-Bills");
+        txtPayout.setText(contract.getMonthlyPayOut().toAmountAndSymbolString());
         txtPayout.setEditable(false);
         txtPayout.setLineWrap(true);
         txtPayout.setWrapStyleWord(true);
@@ -435,8 +433,6 @@ public class AtBContractViewPanel extends JPanel {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtBLC, gridBagConstraints);
-        
-        DecimalFormat formatter = new DecimalFormat();
 
         if(contract.getSalvagePct() > 0 && !contract.isSalvageExchange()) {
             lblSalvageValueMerc = new JLabel(resourceMap.getString("lblSalvageValueMerc.text"));       
@@ -447,7 +443,7 @@ public class AtBContractViewPanel extends JPanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblSalvageValueMerc, gridBagConstraints);
             txtSalvageValueMerc = new JTextArea();
-            txtSalvageValueMerc.setText(formatter.format(contract.getSalvagedByUnit()) + " C-Bills");       
+            txtSalvageValueMerc.setText(contract.getSalvagedByUnit().toAmountAndSymbolString());
             txtSalvageValueMerc.setEditable(false);
             txtSalvageValueMerc.setLineWrap(true);
             txtSalvageValueMerc.setWrapStyleWord(true);
@@ -468,7 +464,7 @@ public class AtBContractViewPanel extends JPanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblSalvageValueEmployer, gridBagConstraints);
             txtSalvageValueEmployer = new JTextArea();
-            txtSalvageValueEmployer.setText(formatter.format(contract.getSalvagedByEmployer()) + " C-Bills");       
+            txtSalvageValueEmployer.setText(contract.getSalvagedByEmployer().toAmountAndSymbolString());
             txtSalvageValueEmployer.setEditable(false);
             txtSalvageValueEmployer.setLineWrap(true);
             txtSalvageValueEmployer.setWrapStyleWord(true);
@@ -495,8 +491,17 @@ public class AtBContractViewPanel extends JPanel {
         } else {
             lblSalvagePct.setText(resourceMap.getString("lblSalvagePct.text"));   
             int maxSalvagePct = contract.getSalvagePct();
-            int currentSalvagePct = (int)(100*((double)contract.getSalvagedByUnit())/(contract.getSalvagedByUnit()+contract.getSalvagedByEmployer()));
-            txtSalvagePct.setText(currentSalvagePct + "% (max " + maxSalvagePct + "%)");       
+
+            int currentSalvagePct = 0;
+            if (contract.getSalvagedByUnit().plus(contract.getSalvagedByEmployer()).isPositive()) {
+                currentSalvagePct = contract.getSalvagedByUnit()
+                        .multipliedBy(100)
+                        .dividedBy(contract.getSalvagedByUnit().plus(contract.getSalvagedByEmployer()))
+                        .getAmount()
+                        .intValue();
+            }
+
+            txtSalvagePct.setText(currentSalvagePct + "% (max " + maxSalvagePct + "%)");
         }
            
         gridBagConstraints = new GridBagConstraints();

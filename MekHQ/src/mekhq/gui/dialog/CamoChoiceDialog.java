@@ -28,6 +28,9 @@ import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Player;
 import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -66,6 +69,7 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
             }
         }
         tableCamo.setRowSelectionInterval(rowIndex, rowIndex);
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -173,6 +177,13 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(CamoChoiceDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
 
 	private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
 	    setVisible(false);

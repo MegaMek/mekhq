@@ -3,7 +3,6 @@ package mekhq.gui.model;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Image;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import javax.swing.JTable;
@@ -19,6 +18,7 @@ import megamek.common.TechConstants;
 import megamek.common.UnitType;
 import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
@@ -42,16 +42,17 @@ public class UnitTableModel extends DataTableModel {
     public final static int COL_STATUS   =   6;
     public final static int COL_QUALITY  =   7;
     public final static int COL_PILOT    =   8;
-    public final static int COL_CREW     =   9;
-    public final static int COL_TECH_CRW =   10;
-    public final static int COL_MAINTAIN  =  11;
-    public final static int COL_BV        =  12;
-    public final static int COL_REPAIR  =    13;
-    public final static int COL_PARTS    =   14;
-    public final static int COL_SITE     =   15;
-    public final static int COL_QUIRKS   =   16;
-    public final static int COL_RSTATUS   =  17;
-    public final static int N_COL =          18;
+    public final static int COL_FORCE    =   9;
+    public final static int COL_CREW     =   10;
+    public final static int COL_TECH_CRW =   11;
+    public final static int COL_MAINTAIN  =  12;
+    public final static int COL_BV        =  13;
+    public final static int COL_REPAIR  =    14;
+    public final static int COL_PARTS    =   15;
+    public final static int COL_SITE     =   16;
+    public final static int COL_QUIRKS   =   17;
+    public final static int COL_RSTATUS   =  18;
+    public final static int N_COL =          19;
 
     public UnitTableModel(Campaign c) {
         data = new ArrayList<Unit>();
@@ -88,6 +89,8 @@ public class UnitTableModel extends DataTableModel {
             return "Status";
         case COL_PILOT:
             return "Assigned to";
+        case COL_FORCE:
+            return "Force";
         case COL_TECH_CRW:
             return "Tech Crew";
         case COL_CREW:
@@ -122,6 +125,7 @@ public class UnitTableModel extends DataTableModel {
         case COL_RSTATUS:
             return 80;
         case COL_PILOT:
+        case COL_FORCE:
         case COL_TECH:
         case COL_NAME:
         case COL_TECH_CRW:
@@ -191,7 +195,6 @@ public class UnitTableModel extends DataTableModel {
         }
         Entity e = u.getEntity();
         //PilotPerson pp = u.getPilot();
-        DecimalFormat format = new DecimalFormat();
         if(null == e) {
             return "?";
         }
@@ -208,7 +211,7 @@ public class UnitTableModel extends DataTableModel {
             return e.getWeightClassName();
         }
         if(col == COL_COST) {
-            return format.format(u.getSellValue());
+            return u.getSellValue().toAmountAndSymbolString();
         }
         if(col == COL_MAINTAIN) {
             return u.getMaintenanceCost();
@@ -234,6 +237,14 @@ public class UnitTableModel extends DataTableModel {
                 return "-";
             } else {
                 return u.getCommander().getFullTitle();
+            }
+        }
+        if(col == COL_FORCE) {
+            Force force = u.getCampaign().getForce(u.getForceId());
+            if(null == force) {
+                return "-";
+            } else {
+                return force.getFullName();
             }
         }
         if(col == COL_BV) {

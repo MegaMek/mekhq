@@ -49,36 +49,35 @@ public class Loan implements MekHqXmlSerializable {
     // If you add more Canon institutions, please add them at the beginning and change the next line.
     // The first four of these are Canon, the rest are made up.
     private static final List<String> madeUpInstitutions = Arrays.asList("Southern Bank and Trust" /* Canon */, "The Alliance Reserve Bank" /* Canon */,
-    	"Capellan Commonality Bank" /* Canon */, "Potwin Bank and Trust" /* Canon */, "Comstar Reserve", "Federated Employees Union",
+    	"Capellan Commonality Bank" /* Canon */, "Potwin Bank and Trust" /* Canon */, "ComStar Reserve", "Federated Employees Union",
     	"Bank of Oriente", "New Avalon Interstellar Bank", "Federated Boeing Credit Union", "First Commonwealth Bank",
     	"Donegal Bank and Trust", "Defiance Industries Credit Union", "Superior Bank of Sarna", "St. Ives Bank and Trust",
-    	"Luthien Bank of the Dragon", "Golden Bank of Sian", "Rasalhauge National Bank", "Canopus Federal Reserve",
+    	"Luthien Bank of the Dragon", "Golden Bank of Sian", "Rasalhague National Bank", "Canopus Federal Reserve",
     	"Concordat Bank and Trust", "Outworlds Alliance National Bank", "Hegemony Bank and Trust",
     	"Andurien First National Bank");
 
     private String institution;
     private String refNumber;
-    private long principal;
+    private Money principal;
 	private int rate;
     private GregorianCalendar nextPayment;
     private int years;
     private int schedule;
     private int collateral;
     private int nPayments;
-    private long payAmount;
-    private long totalValue;
-    private long collateralValue;
+    private Money payAmount;
+    private Money collateralValue;
     private boolean overdue;
 
     public Loan() {
         //dont do anything, this is for loading
     }
 
-    public Loan(long p, int r, int c, int y, int s, GregorianCalendar today) {
+    public Loan(Money p, int r, int c, int y, int s, GregorianCalendar today) {
         this(p, r, c, y, s, today, Utilities.getRandomItem(madeUpInstitutions), randomRefNumber());
     }
 
-    public Loan(long p, int r, int c, int y, int s, GregorianCalendar today, String i, String ref) {
+    public Loan(Money p, int r, int c, int y, int s, GregorianCalendar today, String i, String ref) {
         this.principal = p;
         this.rate = r;
         this.collateral = c;
@@ -178,16 +177,15 @@ public class Loan implements MekHqXmlSerializable {
         }
         double r = ((double)rate/100.0)/denom;
         nPayments = years * denom;
-        payAmount = (long)((principal * r * Math.pow(1+r,nPayments))/(Math.pow(1+r, nPayments)-1));
-        totalValue = payAmount * nPayments;
-        collateralValue = (long)(((double)collateral/100.0)*principal);
+        payAmount = principal.multipliedBy(r * Math.pow(1+r,nPayments)).dividedBy(Math.pow(1+r, nPayments)-1);
+        collateralValue = principal.multipliedBy(collateral).dividedBy(100);
     }
 
-    public long getPrincipal() {
+    public Money getPrincipal() {
         return principal;
     }
 
-	public void setPrincipal(long principal) {
+	public void setPrincipal(Money principal) {
 		this.principal = principal;
 	}
 
@@ -231,12 +229,12 @@ public class Loan implements MekHqXmlSerializable {
         return (today.equals(nextPayment) || today.after(nextPayment)) && nPayments > 0;
     }
 
-    public long getPaymentAmount() {
+    public Money getPaymentAmount() {
         return payAmount;
     }
 
-    public long getRemainingValue() {
-        return payAmount * nPayments;
+    public Money getRemainingValue() {
+        return payAmount.multipliedBy(nPayments);
     }
 
     public Date getNextPayDate() {
@@ -310,23 +308,23 @@ public class Loan implements MekHqXmlSerializable {
 		this.nPayments = nPayments;
 	}
 
-	public long getPayAmount() {
+	public Money getPayAmount() {
 		return payAmount;
 	}
 
-	public void setPayAmount(long payAmount) {
+	public void setPayAmount(Money payAmount) {
 		this.payAmount = payAmount;
 	}
 
-    public long getCollateralAmount() {
+    public Money getCollateralAmount() {
         return collateralValue;
     }
 
-	public long getCollateralValue() {
+	public Money getCollateralValue() {
 		return collateralValue;
 	}
 
-	public void setCollateralValue(long collateralValue) {
+	public void setCollateralValue(Money collateralValue) {
 		this.collateralValue = collateralValue;
 	}
 
@@ -342,14 +340,6 @@ public class Loan implements MekHqXmlSerializable {
 		this.years = years;
 	}
 
-    public long getTotalValue() {
-        return totalValue;
-    }
-
-	public void setTotalValue(long totalValue) {
-		this.totalValue = totalValue;
-	}
-
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<loan>");
@@ -363,7 +353,7 @@ public class Loan implements MekHqXmlSerializable {
                 +"</refNumber>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<principal>"
-                +principal
+                +principal.toXmlString()
                 +"</principal>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<rate>"
@@ -387,20 +377,16 @@ public class Loan implements MekHqXmlSerializable {
                 +"</nPayments>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<payAmount>"
-                +payAmount
+                +payAmount.toXmlString()
                 +"</payAmount>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<collateralValue>"
-                +collateralValue
+                +collateralValue.toXmlString()
                 +"</collateralValue>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<overdue>"
                 +overdue
                 +"</overdue>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<totalValue>"
-                +totalValue
-                +"</totalValue>");
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "nextPayment", df.format(nextPayment.getTime()));
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</loan>");
@@ -417,13 +403,11 @@ public class Loan implements MekHqXmlSerializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("refNumber")) {
                 retVal.refNumber = wn2.getTextContent();
             } else if (wn2.getNodeName().equalsIgnoreCase("principal")) {
-                retVal.principal = Long.parseLong(wn2.getTextContent().trim());
+                retVal.principal = Money.fromXmlString(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("payAmount")) {
-                retVal.payAmount = Long.parseLong(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("totalValue")) {
-                retVal.totalValue = Long.parseLong(wn2.getTextContent().trim());
+                retVal.payAmount = Money.fromXmlString(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("collateralValue")) {
-                retVal.collateralValue = Long.parseLong(wn2.getTextContent().trim());
+                retVal.collateralValue = Money.fromXmlString(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("rate")) {
                 retVal.rate = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("years")) {
@@ -439,18 +423,12 @@ public class Loan implements MekHqXmlSerializable {
                 retVal.nextPayment = (GregorianCalendar) GregorianCalendar.getInstance();
                 try {
                     retVal.nextPayment.setTime(df.parse(wn2.getTextContent().trim()));
-                } catch (DOMException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (ParseException e) {
+                } catch (DOMException | ParseException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("overdue")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true"))
-                    retVal.overdue = true;
-                else
-                    retVal.overdue = false;
+                retVal.overdue = wn2.getTextContent().equalsIgnoreCase("true");
             }
         }
         return retVal;
@@ -460,18 +438,16 @@ public class Loan implements MekHqXmlSerializable {
         //we are going to treat the score from StellarOps the same as dragoons score
         //TODO: pirates and government forces
         if(rating <= 0) {
-            return new Loan(10000000, 35, 80, 1, Finances.SCHEDULE_MONTHLY, cal);
-        }
-        else if(rating < 5) {
-            return new Loan(10000000, 20, 60, 1, Finances.SCHEDULE_MONTHLY, cal);
+            return new Loan(Money.of(10000000), 35, 80, 1, Finances.SCHEDULE_MONTHLY, cal);
+        } else if(rating < 5) {
+            return new Loan(Money.of(10000000), 20, 60, 1, Finances.SCHEDULE_MONTHLY, cal);
         } else if(rating < 10) {
-            return new Loan(10000000, 15, 40, 2, Finances.SCHEDULE_MONTHLY, cal);
+            return new Loan(Money.of(10000000), 15, 40, 2, Finances.SCHEDULE_MONTHLY, cal);
         } else if(rating < 14) {
-            return new Loan(10000000, 10, 25, 3, Finances.SCHEDULE_MONTHLY, cal);
+            return new Loan(Money.of(10000000), 10, 25, 3, Finances.SCHEDULE_MONTHLY, cal);
         } else {
-            return new Loan(10000000, 7, 15, 5, Finances.SCHEDULE_MONTHLY, cal);
+            return new Loan(Money.of(10000000), 7, 15, 5, Finances.SCHEDULE_MONTHLY, cal);
         }
-
     }
 
     /* These two bracket methods below return a 3=length integer array
@@ -559,7 +535,7 @@ public class Loan implements MekHqXmlSerializable {
 
     public static String randomRefNumber() {
         int length = Compute.randomInt(5)+6;
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         int nSinceSlash = 2;
         while(length > 0) {
             if(Compute.randomInt(9) < 3) {

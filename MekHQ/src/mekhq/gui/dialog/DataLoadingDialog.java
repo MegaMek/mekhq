@@ -51,12 +51,15 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignFactory;
 import mekhq.campaign.GamePreset;
 import mekhq.campaign.event.OptionsChangedEvent;
+import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.mod.am.InjuryTypes;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planets;
 import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.RandomFactionGenerator;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 public class DataLoadingDialog extends JDialog implements PropertyChangeListener {
 
@@ -113,6 +116,14 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         task = new Task();
         task.addPropertyChangeListener(this);
         task.execute();
+        setUserPreferences();
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(DataLoadingDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 
     class Task extends SwingWorker<Void, Void> {
@@ -131,6 +142,11 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             	Faction.generateFactions();
             } catch (Exception ex) {
     			ex.printStackTrace();
+            }
+            try{
+                CurrencyManager.getInstance().loadCurrencies();
+            } catch (Exception ex) {
+                MekHQ.getLogger().error(DataLoadingDialog.class, METHOD_NAME, ex);
             }
             try {
             	Bloodname.loadBloodnameData();
@@ -315,5 +331,4 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
 			break;
 		}
 	}
-
 }

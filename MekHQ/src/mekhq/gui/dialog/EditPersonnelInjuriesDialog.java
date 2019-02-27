@@ -47,9 +47,12 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -81,6 +84,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         injuryModel = new InjuryTableModel(injuries);
         initComponents();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -138,7 +142,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
             column.setCellRenderer(injuryModel.getRenderer());
             width += injuryModel.getColumnWidth(i);
         }
-        setMinimumSize(new Dimension(width, 500));
+        setPreferredSize(new Dimension(width, 500));
         injuriesTable.setIntercellSpacing(new Dimension(0, 0));
         injuriesTable.setShowGrid(false);
         injuriesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -169,7 +173,13 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         pack();
     }
 
-    
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(EditPersonnelInjuriesDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
+
     private void btnOKActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
         this.setVisible(false);
     }

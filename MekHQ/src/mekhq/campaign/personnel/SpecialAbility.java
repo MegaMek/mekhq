@@ -356,7 +356,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
             }
         }
         if (v != null) {
-            if (defaultSpecialAbilities != null && Version.versionCompare(v, "0.3.6-r1965")) {
+            if (defaultSpecialAbilities != null && v.isLowerThan("0.3.6-r1965")) {
                 if (defaultSpecialAbilities.get(retVal.lookupName) != null
                         && defaultSpecialAbilities.get(retVal.lookupName).getPrereqSkills() != null) {
                     retVal.prereqSkills = (Vector<SkillPrereq>) defaultSpecialAbilities.get(retVal.lookupName).getPrereqSkills().clone();

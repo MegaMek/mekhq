@@ -49,6 +49,7 @@ import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.Weapon;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.AeroHeatSink;
 import mekhq.campaign.parts.AeroSensor;
 import mekhq.campaign.parts.AmmoStorage;
@@ -85,7 +86,6 @@ import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.JumpJet;
 import mekhq.campaign.parts.equipment.MASC;
 
-
 /**
  * This is a parts store which will contain one copy of every possible
  * part that might be needed as well as a variety of helper functions to
@@ -109,8 +109,8 @@ public class PartsStore implements Serializable {
 	private Map<String, Part> nameAndDetailMap;
 
 	public PartsStore(Campaign c) {
-		parts = new ArrayList<Part>(EXPECTED_SIZE);
-		nameAndDetailMap = new HashMap<String, Part>(EXPECTED_SIZE);
+		parts = new ArrayList<>(EXPECTED_SIZE);
+		nameAndDetailMap = new HashMap<>(EXPECTED_SIZE);
 		stock(c);
 	}
 
@@ -162,17 +162,15 @@ public class PartsStore implements Serializable {
 			}
 			//FIXME: I can't pull entity movement mode and quad shape off of mechsummary
 			//try loading the full entity, but this might take too long
-			if(null != summary) {
-		 		Entity newEntity = null;
-		 		try {
-		 			newEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
-				} catch (EntityLoadingException e) {
-					e.printStackTrace();
-				}
-		 		if(null != newEntity) {
-		 			BattleArmorSuit ba = new BattleArmorSuit(summary.getChassis(), summary.getModel(), (int)summary.getTons(), 1, summary.getWeightClass(), summary.getWalkMp(), summary.getJumpMp(), newEntity.entityIsQuad(), summary.isClan(), newEntity.getMovementMode(), c);
-		 			parts.add(ba);
-		 		}
+			Entity newEntity = null;
+			try {
+				newEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+			} catch (EntityLoadingException e) {
+				e.printStackTrace();
+			}
+			if(null != newEntity) {
+				BattleArmorSuit ba = new BattleArmorSuit(summary.getChassis(), summary.getModel(), (int)summary.getTons(), 1, summary.getWeightClass(), summary.getWalkMp(), summary.getJumpMp(), newEntity.entityIsQuad(), summary.isClan(), newEntity.getMovementMode(), c);
+				parts.add(ba);
 			}
 		}
 	}
@@ -350,8 +348,7 @@ public class PartsStore implements Serializable {
         if (engine.hasFlag(Engine.TANK_ENGINE) && engine.isFusion()) {
             weight *= 1.5f;
         }
-        double toReturn = TestEntity.ceilMaxHalf(weight, TestEntity.Ceil.HALFTON);
-        return toReturn;
+        return TestEntity.ceilMaxHalf(weight, TestEntity.Ceil.HALFTON);
 	}
 
 	private void stockEngines(Campaign c) {
@@ -444,7 +441,7 @@ public class PartsStore implements Serializable {
 		}
 		parts.add(new AeroSensor(0, true, c));
 		parts.add(new Avionics(0, c));
-		parts.add(new FireControlSystem(0, 0, c));
+		parts.add(new FireControlSystem(0, Money.zero(), c));
 		parts.add(new LandingGear(0, c));
 		parts.add(new BayDoor(0, c));
 		for (BayType btype : BayType.values()) {

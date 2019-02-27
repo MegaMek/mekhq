@@ -25,8 +25,6 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -41,14 +39,15 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.log.LogEntry;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.DailyReportLogPanel;
-
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 
 public class HistoricalDailyReportDialog extends JDialog {
-
     private static final long serialVersionUID = -4373796917722483042L;
 
     // max number of days that will be stored in the history, also used as a limit in the UI
@@ -75,10 +74,10 @@ public class HistoricalDailyReportDialog extends JDialog {
         super(owner, true);
         this.gui = gui;
         this.setPreferredSize(new Dimension(650,500));
-        this.setMinimumSize(new Dimension(650,500));
         initComponents();
 
         setLocationRelativeTo(owner);
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -89,7 +88,7 @@ public class HistoricalDailyReportDialog extends JDialog {
         if (gui.getCampaign().getCampaignOptions().historicalDailyLog()) {
             pickTimeLabel = new JLabel(resourceMap.getString("pickTime.text"));
             Integer[] days = new Integer[] {7, 30, 60, 90, MAX_DAYS_HISTORY};
-            pickTime = new JComboBox<Integer>(days);
+            pickTime = new JComboBox<>(days);
             logPanel = new DailyReportLogPanel(null);
             daysLabel = new JLabel(resourceMap.getString("days.text"));
             filterPanel = new JPanel();
@@ -98,19 +97,9 @@ public class HistoricalDailyReportDialog extends JDialog {
 
             updateLogPanel((Integer)pickTime.getSelectedItem());
 
-            pickTime.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent event) {
-                    updateLogPanel((Integer)pickTime.getSelectedItem());
-                }
-            });
+            pickTime.addActionListener(event -> updateLogPanel((Integer)pickTime.getSelectedItem()));
 
-            closeBtn.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent event) {
-                    setVisible(false);
-                }
-            });
+            closeBtn.addActionListener(event -> setVisible(false));
 
             filterPanel.add(pickTimeLabel);
             filterPanel.add(pickTime);
@@ -153,6 +142,13 @@ public class HistoricalDailyReportDialog extends JDialog {
             JLabel notice = new JLabel(resourceMap.getString("enableInCampaignOptions.text"));
             getContentPane().add(notice, gridBag);
         }
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(HistoricalDailyReportDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 
     private void updateLogPanel(Integer days) {

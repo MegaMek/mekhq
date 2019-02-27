@@ -3,14 +3,12 @@ package mekhq.campaign.personnel;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.spy;
 
-import mekhq.TestUtilities;
 import org.junit.Test;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 public class PersonTest {
-
     private Person mockPerson;
 
     @Test
@@ -68,7 +66,8 @@ public class PersonTest {
         assertEquals(0, mockPerson.awardController.getAwards().size());
     }
 
-    @Test public void testGetNumberOfAwards() throws ParseException {
+    @Test
+    public void testGetNumberOfAwards() throws ParseException {
         initPerson();
         initAwards();
 
@@ -88,7 +87,7 @@ public class PersonTest {
     }
 
     private void initPerson(){
-        mockPerson = spy(new Person("Test", TestUtilities.getTestCampaign(), "MERC"));
+        mockPerson = spy(new Person("Test", null, "MERC"));
     }
 
     private void initAwards(){

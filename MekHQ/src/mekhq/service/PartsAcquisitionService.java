@@ -7,6 +7,7 @@ import java.util.Map;
 
 import megamek.common.TargetRoll;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.personnel.Person;
@@ -15,7 +16,7 @@ import mekhq.campaign.work.IAcquisitionWork;
 
 public class PartsAcquisitionService {
 	private static Map<String, List<IAcquisitionWork>> acquisitionMap = null;
-	private static Map<String, PartCountInfo> partCountInfoMap = new HashMap<String, PartCountInfo>();
+	private static Map<String, PartCountInfo> partCountInfoMap = new HashMap<>();
 
 	private static int inTransitCount = 0;
 	private static int onOrderCount = 0;
@@ -23,7 +24,7 @@ public class PartsAcquisitionService {
 	private static int missingCount = 0;
 	private static int requiredCount = 0;
 	private static int unavailableCount = 0;
-	private static long missingTotalPrice = 0;
+	private static Money missingTotalPrice = Money.zero();
 
 	private PartsAcquisitionService() {
 	}
@@ -92,16 +93,16 @@ public class PartsAcquisitionService {
 		PartsAcquisitionService.unavailableCount = unavailableCount;
 	}
 
-	public static long getMissingTotalPrice() {
+	public static Money getMissingTotalPrice() {
 		return missingTotalPrice;
 	}
 
-	public static void setMissingTotalPrice(long missingTotalPrice) {
+	public static void setMissingTotalPrice(Money missingTotalPrice) {
 		PartsAcquisitionService.missingTotalPrice = missingTotalPrice;
 	}
 
 	public static void buildPartsList(Campaign campaign) {
-		acquisitionMap = new HashMap<String, List<IAcquisitionWork>>();
+		acquisitionMap = new HashMap<>();
 
 		for (Unit unit : campaign.getServiceableUnits()) {
 			ArrayList<IAcquisitionWork> unitPartsList = campaign.getAcquisitionsForUnit(unit.getId());
@@ -114,7 +115,7 @@ public class PartsAcquisitionService {
 				List<IAcquisitionWork> awList = acquisitionMap.get(aw.getAcquisitionDisplayName());
 
 				if (null == awList) {
-					awList = new ArrayList<IAcquisitionWork>();
+					awList = new ArrayList<>();
 					acquisitionMap.put(aw.getAcquisitionDisplayName(), awList);
 				}
 
@@ -126,7 +127,7 @@ public class PartsAcquisitionService {
 	}
 
 	public static void generateSummaryCounts(Campaign campaign) {
-		partCountInfoMap = new HashMap<String, PartCountInfo>();
+		partCountInfoMap = new HashMap<>();
 
 		Person admin = campaign.getLogisticsPerson();
 
@@ -179,7 +180,7 @@ public class PartsAcquisitionService {
 		missingCount = 0;
 		requiredCount = 0;
 		unavailableCount = 0;
-		missingTotalPrice = 0;
+		missingTotalPrice = Money.zero();
 
 		//campaign.addReport("***START: generateSummaryCounts");
 		
@@ -194,7 +195,8 @@ public class PartsAcquisitionService {
 				if (!pci.isCanBeAcquired()) {
 					unavailableCount += pci.getMissingCount();
 				} else {
-					missingTotalPrice += (pci.getMissingCount() * pci.getStickerPrice());
+					missingTotalPrice = missingTotalPrice.plus(
+					        pci.getStickerPrice().multipliedBy(pci.getMissingCount()));
 				}
 			}
 
@@ -212,7 +214,7 @@ public class PartsAcquisitionService {
 		private int onOrderCount;
 		private String countModifier = "";
 		private int omniPodCount;
-		private long stickerPrice;
+		private Money stickerPrice;
 		private String failedMessage;
 		private boolean canBeAcquired = true;
 
@@ -272,11 +274,11 @@ public class PartsAcquisitionService {
 			this.countModifier = countModifier;
 		}
 
-		public long getStickerPrice() {
+		public Money getStickerPrice() {
 			return stickerPrice;
 		}
 
-		public void setStickerPrice(long stickerPrice) {
+		public void setStickerPrice(Money stickerPrice) {
 			this.stickerPrice = stickerPrice;
 		}
 

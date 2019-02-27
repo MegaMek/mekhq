@@ -39,6 +39,7 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.event.RepairStatusChangedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.MissingPart;
@@ -68,8 +69,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
     private CampaignGUI gui;
     private JTable unitTable;
     private UnitTableModel unitModel;
-    private ResourceBundle resourceMap = null;
-    
+    private ResourceBundle resourceMap;
     public final static String COMMAND_MOTHBALL = "MOTHBALL";
     public final static String COMMAND_ACTIVATE = "ACTIVATE";
 
@@ -97,15 +97,15 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             	if (unit.isDeployed()) {
             		continue;
             	}
-            	
+
                 for (Person p : unit.getCrew()) {
                     unit.remove(p, true);
                 }
-                
+
                 unit.removeTech();
-                
+
                 Person engineer = unit.getEngineer();
-                
+
                 if (null != engineer) {
                 	unit.remove(engineer, true);
                 }
@@ -171,11 +171,10 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
         } else if (command.equalsIgnoreCase("SELL")) {
             for (Unit unit : units) {
                 if (!unit.isDeployed()) {
-                    long sellValue = unit.getSellValue();
+                    Money sellValue = unit.getSellValue();
                     NumberFormat numberFormat = NumberFormat
                             .getNumberInstance();
-                    String text = numberFormat.format(sellValue) + " "
-                            + (sellValue != 0 ? "CBills" : "CBill");
+                    String text = sellValue.toAmountAndSymbolString();
                     if (0 == JOptionPane.showConfirmDialog(null,
                             "Do you really want to sell " + unit.getName()
                                     + " for " + text, "Sell Unit?",
@@ -330,7 +329,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                             "Do you really want to disband this unit "
                                     + unit.getName() + "?",
                             "Disband Unit?", JOptionPane.YES_NO_OPTION)) {
-                        Vector<Part> parts = new Vector<Part>();
+                        Vector<Part> parts = new Vector<>();
                         for (Part p : unit.getParts()) {
                             parts.add(p);
                         }
@@ -349,8 +348,9 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 }
             }
         } else if (command.contains("HIRE_FULL")) {
+            boolean isGM = command.contains("_GM");
             for (Unit unit : units) {
-                gui.getCampaign().hirePersonnelFor(unit.getId());
+                gui.getCampaign().hirePersonnelFor(unit.getId(), isGM);
             }
         } else if (command.contains("CUSTOMIZE")
                 && !command.contains("CANCEL")) {
@@ -407,12 +407,12 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             double refund = gui.getCampaign().getCampaignOptions()
                     .GetCanceledOrderReimbursement();
             if (null != selectedUnit) {
-                long refundAmount = (long) (refund * selectedUnit
-                        .getBuyCost());
+                Money refundAmount = selectedUnit.getBuyCost().multipliedBy(refund);
                 gui.getCampaign().removeUnit(selectedUnit.getId());
-                gui.getCampaign().getFinances().credit(refundAmount,
+                gui.getCampaign().getFinances().credit(
+                        refundAmount,
                         Transaction.C_EQUIP,
-                        "refund for cancelled equipmemt sale",
+                        "refund for cancelled equipment sale",
                         gui.getCampaign().getDate());
             }
         } else if (command.equalsIgnoreCase("ARRIVE")) {
@@ -424,7 +424,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 gui.showMassMothballDialog(units, false);
                 return;
             }
-            
+
             UUID id = null;
             if (!selectedUnit.isSelfCrewed()) {
                 id = gui.selectTech(selectedUnit, "mothball", true);
@@ -453,7 +453,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 gui.showMassMothballDialog(units, true);
                 return;
             }
-            
+
             UUID id = null;
             if (!selectedUnit.isSelfCrewed()) {
                 id = gui.selectTech(selectedUnit, "activation", true);
@@ -519,13 +519,13 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
         } else if(command.equalsIgnoreCase("RESTORE_UNIT")) {
             for (Unit unit : units) {
                 unit.setSalvage(false);
-                
+
                 boolean needsCheck = true;
                 while(unit.isAvailable() && needsCheck) {
                     needsCheck = false;
                     for(int x = 0; x < unit.getParts().size(); x++) {
                         Part part = unit.getParts().get(x);
-                                                
+
                         if(part instanceof MissingPart) {
                             // We magically acquire a replacement part, then fix the missing one.
                             part.getCampaign().addPart(((MissingPart) part).getNewPart(), 0);
@@ -548,24 +548,24 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                             part.setTeamId(null);
                             part.cancelReservation();
                         }
-                        
+
                         // replace damaged armor and reload ammo bins after fixing their respective locations
                         if(part instanceof Armor) {
                             final Armor armor = (Armor) part;
                             armor.setAmount(armor.getTotalAmount());
                         } else if(part instanceof AmmoBin) {
                             final AmmoBin ammoBin = (AmmoBin) part;
-                            
+
                             // we magically find the ammo we need, then load the bin
-                            // we only want to get the amount of ammo the bin actually needs                            
+                            // we only want to get the amount of ammo the bin actually needs
                             if(ammoBin.getShotsNeeded() > 0) {
                                 ammoBin.setShotsNeeded(0);
                                 ammoBin.updateConditionFromPart();
                             }
                         }
-                        
+
                     }
-                    
+
                     // TODO: Make this less painful. We just want to fix hips and shoulders.
                     Entity entity = unit.getEntity();
                     if(entity instanceof Mech) {
@@ -642,7 +642,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             }
             // change the location
             menu = new JMenu("Change site");
-            int i = 0;
+            int i;
             for (i = 0; i < Unit.SITE_N; i++) {
                 cbMenuItem = new JCheckBoxMenuItem(Unit.getSiteName(i));
                 if (StaticChecks.areAllSameSite(units) && unit.getSite() == i) {
@@ -754,11 +754,11 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                     popup.add(menuItem);
                 }
             }
-            
+
             if(unitTable.getSelectedRowCount() > 1) {
                 boolean allMothballed = true;
                 boolean allAvailable = true;
-                
+
                 for(int x = 0; x < units.length; x++) {
                     // infantry, jumpships and warships cannot be mothballed
                     if(units[x].isSelfCrewed()) {
@@ -766,16 +766,16 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                         allAvailable = false;
                         break;
                     }
-                    
+
                     if(!units[x].isMothballed()) {
                         allMothballed = false;
                     }
-                    
+
                     if(!units[x].isAvailable()) {
                         allAvailable = false;
                     }
                 }
-                
+
                 if(allAvailable) {
                     menuItem = new JMenuItem("Mass Mothball");
                     menuItem.setActionCommand(COMMAND_MOTHBALL);
@@ -788,7 +788,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                     popup.add(menuItem);
                 }
             }
-            
+
             if (oneSelected && unit.requiresMaintenance()
                     && !unit.isSelfCrewed() && unit.isAvailable()) {
                 menu = new JMenu("Assign Tech");
@@ -869,7 +869,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 menuItem.setEnabled(unit.isAvailable()
                         && (unit.getEntity() instanceof megamek.common.Mech
                                 || unit.getEntity() instanceof megamek.common.Tank
-                                || unit.getEntity() instanceof megamek.common.Aero 
+                                || unit.getEntity() instanceof megamek.common.Aero
                                 || unit.getEntity() instanceof BattleArmor
                                 || unit.getEntity() instanceof megamek.common.Protomech));
                 menu.add(menuItem);
@@ -951,7 +951,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 menuItem.setEnabled(true);
                 popup.add(menuItem);
             }
-                
+
             // remove all personnel
             popup.addSeparator();
             menuItem = new JMenuItem("Remove all personnel");
@@ -994,6 +994,13 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             menuItem.addActionListener(this);
             menuItem.setEnabled(gui.getCampaign().isGM() && unit.isDeployed());
             menu.add(menuItem);
+            if (unit.getCrew().size() < unit.getFullCrewSize()) {
+                menuItem = new JMenuItem("Add full complement");
+                menuItem.setActionCommand("HIRE_FULL_GM");
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(unit.isAvailable() && gui.getCampaign().isGM());
+                menu.add(menuItem);
+            }
             menuItem = new JMenuItem("Edit Damage...");
             menuItem.setActionCommand("EDIT_DAMAGE");
             menuItem.addActionListener(this);

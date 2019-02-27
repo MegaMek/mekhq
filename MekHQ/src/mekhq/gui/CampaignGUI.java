@@ -40,7 +40,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
-import java.text.NumberFormat;
 import java.util.Calendar;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -51,25 +50,13 @@ import java.util.UUID;
 import java.util.Vector;
 import java.util.zip.GZIPOutputStream;
 
-import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JToggleButton;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.xml.parsers.DocumentBuilder;
 
+import mekhq.campaign.finances.Money;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -224,9 +211,10 @@ public class CampaignGUI extends JPanel {
     public CampaignGUI(MekHQ app) {
         this.app = app;
         reportHLL = new ReportHyperlinkListener(this);
-    	standardTabs = new EnumMap<>(GuiTabType.class);
+        standardTabs = new EnumMap<>(GuiTabType.class);
         initComponents();
         MekHQ.registerHandler(this);
+        setUserPreferences();
     }
 
     public void showAboutBox() {
@@ -279,17 +267,17 @@ public class CampaignGUI extends JPanel {
     }
 
     public void toggleOverviewTab() {
-    	boolean show = !hasTab(GuiTabType.OVERVIEW);
+        boolean show = !hasTab(GuiTabType.OVERVIEW);
         miShowOverview.setSelected(show);
         showOverviewTab(show);
     }
     
     public void showOverviewTab(boolean show) {
-    	if (show) {
-    		addStandardTab(GuiTabType.OVERVIEW);
-    	} else {
-    		removeStandardTab(GuiTabType.OVERVIEW);
-    	}    	
+        if (show) {
+            addStandardTab(GuiTabType.OVERVIEW);
+        } else {
+            removeStandardTab(GuiTabType.OVERVIEW);
+        }
     }
 
     public void showGMToolsDialog() {
@@ -335,10 +323,10 @@ public class CampaignGUI extends JPanel {
     }
 
     private void initComponents() {
-
         resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl()); //$NON-NLS-1$
 
         frame = new JFrame("MekHQ"); //$NON-NLS-1$
+        MekHQ.setWindow(frame);
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
         tabMain = new JTabbedPane();
@@ -413,13 +401,20 @@ public class CampaignGUI extends JPanel {
 
         mainPanel.setDividerLocation(0.75);
     }
-    
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(CampaignGUI.class);
+
+        frame.setName("mainWindow");
+        preferences.manage(new JWindowPreference(frame));
+    }
+
     public CampaignGuiTab getTab(GuiTabType tabType) {
-    	return standardTabs.get(tabType);
+        return standardTabs.get(tabType);
     }
     
     public boolean hasTab(GuiTabType tabType) {
-    	return standardTabs.containsKey(tabType);
+        return standardTabs.containsKey(tabType);
     }
     
     /**
@@ -428,21 +423,21 @@ public class CampaignGUI extends JPanel {
      * @param tab The type of tab to add
      */
     public void addStandardTab(GuiTabType tab) {
-    	if (tab.equals(GuiTabType.CUSTOM)) {
-    		throw new IllegalArgumentException("Attempted to add custom tab as standard");
-    	}
-    	if (!standardTabs.containsKey(tab)) {
-    		CampaignGuiTab t = tab.createTab(this);
-    		standardTabs.put(tab, t);
-    		int index = tabMain.getTabCount();
-    		for (int i = 0; i < tabMain.getTabCount(); i++) {
-    			if (((CampaignGuiTab)tabMain.getComponentAt(i)).tabType().getDefaultPos() > tab.getDefaultPos()) {
-    				index = i;
-    				break;
-    			}
-    		}
-    		tabMain.insertTab(t.getTabName(), null, t, null, index);
-    	}
+        if (tab.equals(GuiTabType.CUSTOM)) {
+            throw new IllegalArgumentException("Attempted to add custom tab as standard");
+        }
+        if (!standardTabs.containsKey(tab)) {
+            CampaignGuiTab t = tab.createTab(this);
+            standardTabs.put(tab, t);
+            int index = tabMain.getTabCount();
+            for (int i = 0; i < tabMain.getTabCount(); i++) {
+                if (((CampaignGuiTab)tabMain.getComponentAt(i)).tabType().getDefaultPos() > tab.getDefaultPos()) {
+                    index = i;
+                    break;
+                }
+            }
+            tabMain.insertTab(t.getTabName(), null, t, null, index);
+        }
     }
     
     /**
@@ -451,14 +446,14 @@ public class CampaignGUI extends JPanel {
      * @param tab The tab to add
      */
     public void addCustomTab(CampaignGuiTab tab) {
-    	if (tabMain.indexOfComponent(tab) >= 0) {
-    		return;
-    	}
-    	if (tab.tabType().equals(GuiTabType.CUSTOM)) {
-    		tabMain.addTab(tab.getTabName(), tab);
-    	} else {
-    		addStandardTab(tab.tabType());
-    	}
+        if (tabMain.indexOfComponent(tab) >= 0) {
+            return;
+        }
+        if (tab.tabType().equals(GuiTabType.CUSTOM)) {
+            tabMain.addTab(tab.getTabName(), tab);
+        } else {
+            addStandardTab(tab.tabType());
+        }
     }
     
     /**
@@ -469,14 +464,14 @@ public class CampaignGUI extends JPanel {
      * @param index	The position to place the tab
      */
     public void insertCustomTab(CampaignGuiTab tab, int index) {
-    	if (tabMain.indexOfComponent(tab) >= 0) {
-    		return;
-    	}
-    	if (tab.tabType().equals(GuiTabType.CUSTOM)) {
-    		tabMain.insertTab(tab.getTabName(), null, tab, null, Math.min(index, tabMain.getTabCount()));
-    	} else {
-    		addStandardTab(tab.tabType());
-    	}
+        if (tabMain.indexOfComponent(tab) >= 0) {
+            return;
+        }
+        if (tab.tabType().equals(GuiTabType.CUSTOM)) {
+            tabMain.insertTab(tab.getTabName(), null, tab, null, Math.min(index, tabMain.getTabCount()));
+        } else {
+            addStandardTab(tab.tabType());
+        }
     }
     
     /**
@@ -486,27 +481,27 @@ public class CampaignGUI extends JPanel {
      * @param stdTab	The build-in tab after which to place the new one
      */
     public void insertCustomTabAfter(CampaignGuiTab tab, GuiTabType stdTab) {
-    	if (tabMain.indexOfComponent(tab) >= 0) {
-    		return;
-    	}
-    	if (tab.tabType().equals(GuiTabType.CUSTOM)) {
-	    	int index = tabMain.indexOfTab(stdTab.getTabName());
-	    	if (index < 0) {
-	    		if (stdTab.getDefaultPos() == 0) {
-	    			index = tabMain.getTabCount();
-	    		} else {
-		    		for (int i = stdTab.getDefaultPos() - 1; i >= 0; i--) {
-		    			index = tabMain.indexOfTab(GuiTabType.values()[i].getTabName());
-		    			if (index >= 0) {
-		    				break;
-		    			}
-		    		}
-	    		}
-	    	}
-			insertCustomTab(tab, index);
-    	} else {
-    		addStandardTab(tab.tabType());
-    	}
+        if (tabMain.indexOfComponent(tab) >= 0) {
+            return;
+        }
+        if (tab.tabType().equals(GuiTabType.CUSTOM)) {
+            int index = tabMain.indexOfTab(stdTab.getTabName());
+            if (index < 0) {
+                if (stdTab.getDefaultPos() == 0) {
+                    index = tabMain.getTabCount();
+                } else {
+                    for (int i = stdTab.getDefaultPos() - 1; i >= 0; i--) {
+                        index = tabMain.indexOfTab(GuiTabType.values()[i].getTabName());
+                        if (index >= 0) {
+                            break;
+                        }
+                    }
+                }
+            }
+            insertCustomTab(tab, index);
+        } else {
+            addStandardTab(tab.tabType());
+        }
     }
     
     /**
@@ -516,27 +511,27 @@ public class CampaignGUI extends JPanel {
      * @param stdTab	The build-in tab before which to place the new one
      */
     public void insertCustomTabBefore(CampaignGuiTab tab, GuiTabType stdTab) {
-    	if (tabMain.indexOfComponent(tab) >= 0) {
-    		return;
-    	}
-    	if (tab.tabType().equals(GuiTabType.CUSTOM)) {
-	    	int index = tabMain.indexOfTab(stdTab.getTabName());
-	    	if (index < 0) {
-	    		if (stdTab.getDefaultPos() == GuiTabType.values().length - 1) {
-	    			index = tabMain.getTabCount();
-	    		} else {
-		    		for (int i = stdTab.getDefaultPos() + 1; i >= GuiTabType.values().length; i++) {
-		    			index = tabMain.indexOfTab(GuiTabType.values()[i].getTabName());
-		    			if (index >= 0) {
-		    				break;
-		    			}
-		    		}
-	    		}
-	    	}
-			insertCustomTab(tab, Math.max(0, index - 1));
-    	} else {
-    		addStandardTab(tab.tabType());
-    	}
+        if (tabMain.indexOfComponent(tab) >= 0) {
+            return;
+        }
+        if (tab.tabType().equals(GuiTabType.CUSTOM)) {
+            int index = tabMain.indexOfTab(stdTab.getTabName());
+            if (index < 0) {
+                if (stdTab.getDefaultPos() == GuiTabType.values().length - 1) {
+                    index = tabMain.getTabCount();
+                } else {
+                    for (int i = stdTab.getDefaultPos() + 1; i >= GuiTabType.values().length; i++) {
+                        index = tabMain.indexOfTab(GuiTabType.values()[i].getTabName());
+                        if (index >= 0) {
+                            break;
+                        }
+                    }
+                }
+            }
+            insertCustomTab(tab, Math.max(0, index - 1));
+        } else {
+            addStandardTab(tab.tabType());
+        }
     }
     
     /**
@@ -545,11 +540,11 @@ public class CampaignGUI extends JPanel {
      * @param tabType	The tab to remove
      */
     public void removeStandardTab(GuiTabType tabType) {
-    	CampaignGuiTab tab = standardTabs.get(tabType);
-    	if (tab != null) {
-    		MekHQ.unregisterHandler(tab);
-        	removeTab(tab);
-    	}
+        CampaignGuiTab tab = standardTabs.get(tabType);
+        if (tab != null) {
+            MekHQ.unregisterHandler(tab);
+            removeTab(tab);
+        }
     }
     
     /**
@@ -559,7 +554,7 @@ public class CampaignGUI extends JPanel {
      */
     public void removeTab(CampaignGuiTab tab) {
         tab.disposeTab();
-    	removeTab(tab.getTabName());
+        removeTab(tab.getTabName());
     }
     
     /**
@@ -568,14 +563,14 @@ public class CampaignGUI extends JPanel {
      * @param tabName	The name of the tab to remove
      */
     public void removeTab(String tabName) {
-    	int index = tabMain.indexOfTab(tabName);
-    	if (index >= 0) {
-        	CampaignGuiTab tab = (CampaignGuiTab)tabMain.getComponentAt(index);
-        	if (standardTabs.containsKey(tab.tabType())) {
-        		standardTabs.remove(tab.tabType());
-        	}
-    		tabMain.removeTabAt(index);
-    	}
+        int index = tabMain.indexOfTab(tabName);
+        if (index >= 0) {
+            CampaignGuiTab tab = (CampaignGuiTab)tabMain.getComponentAt(index);
+            if (standardTabs.containsKey(tab.tabType())) {
+                standardTabs.remove(tab.tabType());
+            }
+            tabMain.removeTabAt(index);
+        }
     }
     
     private void initMenu() {
@@ -766,6 +761,7 @@ public class CampaignGUI extends JPanel {
         menuFile.add(menuOptionsMM);
 
         menuThemes = new JMenu("Themes");
+
         refreshThemeChoices();
         menuFile.add(menuThemes);
 
@@ -1323,52 +1319,33 @@ public class CampaignGUI extends JPanel {
     }
 
     private void changeTheme(java.awt.event.ActionEvent evt) {
-        final String lafClassName = evt.getActionCommand();
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    UIManager.setLookAndFeel(lafClassName);
-                    SwingUtilities.updateComponentTreeUI(frame);
-                    refreshThemeChoices();
-                } catch (Exception exception) {
-                    JOptionPane.showMessageDialog(frame,
-                            "Can't change look and feel", "Invalid PLAF",
-                            JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        };
-        SwingUtilities.invokeLater(runnable);
+        MekHQ.getSelectedTheme().setValue(evt.getActionCommand());
+        refreshThemeChoices();
     }
 
     private void refreshThemeChoices() {
         menuThemes.removeAll();
         JCheckBoxMenuItem miPlaf;
-        for (LookAndFeelInfo plaf : UIManager.getInstalledLookAndFeels()) {
-            miPlaf = new JCheckBoxMenuItem(plaf.getName());
-            if (plaf.getName().equalsIgnoreCase(
-                    UIManager.getLookAndFeel().getName())) {
+        for (LookAndFeelInfo laf : UIManager.getInstalledLookAndFeels()) {
+            miPlaf = new JCheckBoxMenuItem(laf.getName());
+            if (laf.getClassName().equalsIgnoreCase(MekHQ.getSelectedTheme().getValue())) {
                 miPlaf.setSelected(true);
             }
+
             menuThemes.add(miPlaf);
-            miPlaf.setActionCommand(plaf.getClassName());
-            miPlaf.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    changeTheme(evt);
-                }
-            });
+            miPlaf.setActionCommand(laf.getClassName());
+            miPlaf.addActionListener(evt -> changeTheme(evt));
         }
     }
     //TODO: trigger from event
     public void filterTasks() {
-    	if (getTab(GuiTabType.REPAIR) != null) {
-    		((RepairTab)getTab(GuiTabType.REPAIR)).filterTasks();
-    	}
+        if (getTab(GuiTabType.REPAIR) != null) {
+            ((RepairTab)getTab(GuiTabType.REPAIR)).filterTasks();
+        }
     }
         
     public void focusOnUnit(UUID id) {
-    	HangarTab ht = (HangarTab)getTab(GuiTabType.HANGAR);
+        HangarTab ht = (HangarTab)getTab(GuiTabType.HANGAR);
         if (null == id || null == ht) {
             return;
         }
@@ -1399,7 +1376,7 @@ public class CampaignGUI extends JPanel {
                 }
             }
             ((RepairTab)getTab(GuiTabType.REPAIR)).focusOnUnit(id);
-	        tabMain.setSelectedComponent(getTab(GuiTabType.REPAIR));
+            tabMain.setSelectedComponent(getTab(GuiTabType.REPAIR));
         }
     }
 
@@ -1409,7 +1386,7 @@ public class CampaignGUI extends JPanel {
         }
         PersonnelTab pt = (PersonnelTab)getTab(GuiTabType.PERSONNEL);
         if (pt == null) {
-        	return;
+            return;
         }
         if (mainPanel.getDividerLocation() < 700) {
             if (mainPanel.getLastDividerLocation() > 700) {
@@ -1474,7 +1451,7 @@ public class CampaignGUI extends JPanel {
         if (!getCampaign().getCampaignOptions().checkMaintenance()) {
             return false;
         }
-        Vector<Unit> notMaintained = new Vector<Unit>();
+        Vector<Unit> notMaintained = new Vector<>();
         int totalAstechMinutesNeeded = 0;
         for (Unit u : getCampaign().getUnits()) {
             if (u.requiresMaintenance() && null == u.getTech()) {
@@ -1668,7 +1645,7 @@ public class CampaignGUI extends JPanel {
         return ".cpnx";
     }
 
-	private void menuLoadXmlActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuLoadActionPerformed
+    private void menuLoadXmlActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuLoadActionPerformed
         File f = selectLoadCampaignFile();
         if (null == f) {
             return;
@@ -1749,7 +1726,7 @@ public class CampaignGUI extends JPanel {
             }
         }
         if (staticRATs != getCampaign().getCampaignOptions().useStaticRATs()) {
-        	getCampaign().initUnitGenerator();
+            getCampaign().initUnitGenerator();
         }
         if (factionIntroDate != getCampaign().getCampaignOptions().useFactionIntroDate()) {
             getCampaign().updateTechFactionCode();
@@ -1899,7 +1876,7 @@ public class CampaignGUI extends JPanel {
             r.setTeamId(engineer.getId());
         } else if (getCampaign().getTechs().size() > 0) {
             String name;
-            HashMap<String, Person> techHash = new HashMap<String, Person>();
+            HashMap<String, Person> techHash = new HashMap<>();
             String skillLvl = "Unknown";
             int TimePerDay = 0;
             for (Person tech : getCampaign().getTechs()) {
@@ -1988,7 +1965,7 @@ public class CampaignGUI extends JPanel {
         }
         getCampaign().refit(r);
         if (hasTab(GuiTabType.MEKLAB)) {
-        	((MekLabTab)getTab(GuiTabType.MEKLAB)).clearUnit();
+            ((MekLabTab)getTab(GuiTabType.MEKLAB)).clearUnit();
         }
     }
 
@@ -2043,7 +2020,7 @@ public class CampaignGUI extends JPanel {
      */
     public @Nullable UUID selectTech(Unit u, String desc, boolean ignoreMaintenance) {
         String name;
-        HashMap<String, Person> techHash = new HashMap<String, Person>();
+        HashMap<String, Person> techHash = new HashMap<>();
         for (Person tech : getCampaign().getTechs()) {
             if (tech.canTech(u.getEntity()) && !tech.isMothballing()) {
                 int time = tech.getMinutesLeft();
@@ -2090,47 +2067,84 @@ public class CampaignGUI extends JPanel {
         });
     }
     
-	/**
-	 * Exports Planets to a file (CSV, XML, etc.)
-	 * @param format
-	 * @param dialogTitle
-	 * @param filename
-	 */
+    /**
+     * Exports Planets to a file (CSV, XML, etc.)
+     * @param format
+     * @param dialogTitle
+     * @param filename
+     */
     protected void exportPlanets(FileType format, String dialogTitle, String filename) {
-        GUI.fileDialogSave(frame, dialogTitle, new File(".", "planets." + format.getRecommendedExtension()), format).ifPresent(f -> {
-            File file = checkFileEnding(f, format.getRecommendedExtension());
-            checkToBackupFile(file, file.getPath());
-            String report = Planets.getInstance().exportPlanets(file.getPath(), format.getRecommendedExtension());
-            JOptionPane.showMessageDialog(mainPanel, report);
-        });
+        GUI.fileDialogSave(
+                frame,
+                dialogTitle,
+                format,
+                MekHQ.getPlanetsDirectory().getValue(),
+                "planets." + format.getRecommendedExtension())
+                .ifPresent(f -> {
+                    MekHQ.getPlanetsDirectory().setValue(f.getParent());
+                    File file = checkFileEnding(f, format.getRecommendedExtension());
+                    checkToBackupFile(file, file.getPath());
+                    String report = Planets.getInstance().exportPlanets(file.getPath(), format.getRecommendedExtension());
+                    JOptionPane.showMessageDialog(mainPanel, report);
+                });
     }
     
-	/**
-	 * Exports Personnel to a file (CSV, XML, etc.)
-	 * @param format
-	 * @param dialogTitle
-	 * @param filename
-	 */
+    /**
+     * Exports Personnel to a file (CSV, XML, etc.)
+     * @param format
+     * @param dialogTitle
+     * @param filename
+     */
     protected void exportPersonnel(FileType format, String dialogTitle, String filename) {
-    	if (((PersonnelTab)getTab(GuiTabType.PERSONNEL)).getPersonnelTable().getRowCount() != 0) {
-    		exportTable(((PersonnelTab)getTab(GuiTabType.PERSONNEL)).getPersonnelTable(), filename, format, dialogTitle);
-    	} else {
-    		JOptionPane.showMessageDialog(mainPanel, resourceMap.getString("dlgNoPersonnel.text"));
-    	} 
+        if (((PersonnelTab)getTab(GuiTabType.PERSONNEL)).getPersonnelTable().getRowCount() != 0) {
+            GUI.fileDialogSave(
+                    frame,
+                    dialogTitle,
+                    format,
+                    MekHQ.getPersonnelDirectory().getValue(),
+                    filename + "." + format.getRecommendedExtension())
+                    .ifPresent(f -> {
+                        MekHQ.getPersonnelDirectory().setValue(f.getParent());
+                        File file = checkFileEnding(f, format.getRecommendedExtension());
+                        checkToBackupFile(file, file.getPath());
+                        String report = "";
+                        // TODO add support for xml and json export
+                        if (format.equals(FileType.CSV)) {
+                            JOptionPane.showMessageDialog(mainPanel, report);
+                        }
+                    });
+        } else {
+            JOptionPane.showMessageDialog(mainPanel, resourceMap.getString("dlgNoPersonnel.text"));
+        }
     }
     
-	/**
-	 * Exports Units to a file (CSV, XML, etc.)
-	 * @param format
-	 * @param dialogTitle
-	 * @param filename
-	 */
+    /**
+     * Exports Units to a file (CSV, XML, etc.)
+     * @param format
+     * @param dialogTitle
+     * @param filename
+     */
     protected void exportUnits(FileType format, String dialogTitle, String filename) {
-    	if (((HangarTab)getTab(GuiTabType.HANGAR)).getUnitTable().getRowCount() != 0) {
-    		exportTable(((HangarTab)getTab(GuiTabType.HANGAR)).getUnitTable(), filename, format, dialogTitle);
-    	} else {
-    		JOptionPane.showMessageDialog(mainPanel, resourceMap.getString("dlgNoUnits"));
-    	} 
+        if (((HangarTab)getTab(GuiTabType.HANGAR)).getUnitTable().getRowCount() != 0) {
+            GUI.fileDialogSave(
+                    frame,
+                    dialogTitle,
+                    format,
+                    MekHQ.getUnitsDirectory().getValue(),
+                    filename + "." + format.getRecommendedExtension())
+                    .ifPresent(f -> {
+                        MekHQ.getUnitsDirectory().setValue(f.getParent());
+                        File file = checkFileEnding(f, format.getRecommendedExtension());
+                        checkToBackupFile(file, file.getPath());
+                        String report = "";
+                        // TODO add support for xml and json export
+                        if (format.equals(FileType.CSV)) {
+                            JOptionPane.showMessageDialog(mainPanel, report);
+                        }
+                    });
+        } else {
+            JOptionPane.showMessageDialog(mainPanel, resourceMap.getString("dlgNoUnits"));
+        }
     }
 
     /**
@@ -2138,23 +2152,30 @@ public class CampaignGUI extends JPanel {
      */
     protected void exportFinances(FileType format, String dialogTitle, String filename) {
         if (!getCampaign().getFinances().getAllTransactions().isEmpty()) {
-            GUI.fileDialogSave(frame, dialogTitle, new File(".", filename + "." + format.getRecommendedExtension()), format).ifPresent(f -> {
-                File file = checkFileEnding(f, format.getRecommendedExtension());
-                checkToBackupFile(file, file.getPath());
-                String report = getCampaign().getFinances().exportFinances(file.getPath(), format.getRecommendedExtension());
-                JOptionPane.showMessageDialog(mainPanel, report);
-            });
+            GUI.fileDialogSave(
+                    frame,
+                    dialogTitle,
+                    format,
+                    MekHQ.getFinancesDirectory().getValue(),
+                    filename + "." + format.getRecommendedExtension())
+                    .ifPresent(f -> {
+                        MekHQ.getFinancesDirectory().setValue(f.getParent());
+                        File file = checkFileEnding(f, format.getRecommendedExtension());
+                        checkToBackupFile(file, file.getPath());
+                        String report = getCampaign().getFinances().exportFinances(file.getPath(), format.getRecommendedExtension());
+                        JOptionPane.showMessageDialog(mainPanel, report);
+                    });
         } else {
             JOptionPane.showMessageDialog(mainPanel, resourceMap.getString("dlgNoFinances.text"));
             return;
         }
     }
 
-	/**
-	 * Checks if a file already exists, if so it makes a backup copy.
-	 * @param file
-	 * @param path
-	 */
+    /**
+     * Checks if a file already exists, if so it makes a backup copy.
+     * @param file
+     * @param path
+     */
     private void checkToBackupFile(File file, String path) {
         // check for existing file and make a back-up if found
         String path2 = path + "_backup";
@@ -2164,12 +2185,12 @@ public class CampaignGUI extends JPanel {
         }
     }
     
-	/**
-	 * Checks to make sure the file has the appropriate ending / extension.
-	 * @param file
-	 * @param format
-	 * @return File
-	 */
+    /**
+     * Checks to make sure the file has the appropriate ending / extension.
+     * @param file
+     * @param format
+     * @return File
+     */
     private File checkFileEnding(File file, String format) {
         String path = file.getPath();
         if (!path.endsWith("." + format)) {
@@ -2329,7 +2350,7 @@ public class CampaignGUI extends JPanel {
         PrintWriter pw = null;
 
         try {
-        	PersonnelTab pt = (PersonnelTab)getTab(GuiTabType.PERSONNEL);
+            PersonnelTab pt = (PersonnelTab)getTab(GuiTabType.PERSONNEL);
             int row = pt.getPersonnelTable().getSelectedRow();
             if (row < 0) {
                 MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.WARNING, //$NON-NLS-1$
@@ -2397,12 +2418,19 @@ public class CampaignGUI extends JPanel {
 
     private void saveOptionsFile(FileType format, String dialogTitle, String filename) throws IOException {
         final String METHOD_NAME = "saveOptionsFile()";
-        
-        Optional<File> maybeFile = GUI.fileDialogSave(frame, dialogTitle, new File(".", filename + "." + format.getRecommendedExtension()), format);
+
+        Optional<File> maybeFile = GUI.fileDialogSave(
+                frame,
+                dialogTitle,
+                format,
+                MekHQ.getCampaignOptionsDirectory().getValue(),
+                filename + "." + format.getRecommendedExtension());
 
         if (!maybeFile.isPresent()) {
             return;
         }
+
+        MekHQ.getCampaignOptionsDirectory().setValue(maybeFile.get().getParent());
 
         File file = checkFileEnding(maybeFile.get(), format.getRecommendedExtension());
         checkToBackupFile(file, file.getPath());
@@ -2693,84 +2721,72 @@ public class CampaignGUI extends JPanel {
         PrintWriter pw = null;
 
         if (getTab(GuiTabType.WAREHOUSE) != null) {
-	        try {
-	        	JTable partsTable = ((WarehouseTab)getTab(GuiTabType.WAREHOUSE)).getPartsTable();
-	        	PartsTableModel partsModel = ((WarehouseTab)getTab(GuiTabType.WAREHOUSE)).getPartsModel();
-	            int row = partsTable.getSelectedRow();
-	            if (row < 0) {
-	                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.WARNING, //$NON-NLS-1$
-	                        "ERROR: Cannot export parts if none are selected! Ignoring."); //$NON-NLS-1$
-	                return;
-	            }
-	            Part selectedPart = partsModel.getPartAt(partsTable
-	                    .convertRowIndexToModel(row));
-	            int[] rows = partsTable.getSelectedRows();
-	            Part[] parts = new Part[rows.length];
-	            for (int i = 0; i < rows.length; i++) {
-	                parts[i] = partsModel.getPartAt(partsTable
-	                        .convertRowIndexToModel(rows[i]));
-	            }
-	            fos = new FileOutputStream(file);
-	            pw = new PrintWriter(new OutputStreamWriter(fos, "UTF-8"));
-	
-	            // File header
-	            pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-	
-	            ResourceBundle resourceMap = ResourceBundle
-	                    .getBundle("mekhq.resources.MekHQ");
-	            // Start the XML root.
-	            pw.println("<parts version=\""
-	                    + resourceMap.getString("Application.version") + "\">");
-	
-	            if (rows.length > 1) {
-	                for (int i = 0; i < rows.length; i++) {
-	                    parts[i].writeToXml(pw, 1);
-	                }
-	            } else {
-	                selectedPart.writeToXml(pw, 1);
-	            }
-	            // Okay, we're done.
-	            // Close everything out and be done with it.
-	            pw.println("</parts>");
-	            pw.flush();
-	            pw.close();
-	            fos.close();
-	            // delete the backup file because we didn't need it
-	            if (backupFile.exists()) {
-	                backupFile.delete();
-	            }
+            try {
+                JTable partsTable = ((WarehouseTab)getTab(GuiTabType.WAREHOUSE)).getPartsTable();
+                PartsTableModel partsModel = ((WarehouseTab)getTab(GuiTabType.WAREHOUSE)).getPartsModel();
+                int row = partsTable.getSelectedRow();
+                if (row < 0) {
+                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.WARNING, //$NON-NLS-1$
+                            "ERROR: Cannot export parts if none are selected! Ignoring."); //$NON-NLS-1$
+                    return;
+                }
+                Part selectedPart = partsModel.getPartAt(partsTable
+                        .convertRowIndexToModel(row));
+                int[] rows = partsTable.getSelectedRows();
+                Part[] parts = new Part[rows.length];
+                for (int i = 0; i < rows.length; i++) {
+                    parts[i] = partsModel.getPartAt(partsTable
+                            .convertRowIndexToModel(rows[i]));
+                }
+                fos = new FileOutputStream(file);
+                pw = new PrintWriter(new OutputStreamWriter(fos, "UTF-8"));
+
+                // File header
+                pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+
+                ResourceBundle resourceMap = ResourceBundle
+                        .getBundle("mekhq.resources.MekHQ");
+                // Start the XML root.
+                pw.println("<parts version=\""
+                        + resourceMap.getString("Application.version") + "\">");
+
+                if (rows.length > 1) {
+                    for (int i = 0; i < rows.length; i++) {
+                        parts[i].writeToXml(pw, 1);
+                    }
+                } else {
+                    selectedPart.writeToXml(pw, 1);
+                }
+                // Okay, we're done.
+                // Close everything out and be done with it.
+                pw.println("</parts>");
+                pw.flush();
+                pw.close();
+                fos.close();
+                // delete the backup file because we didn't need it
+                if (backupFile.exists()) {
+                    backupFile.delete();
+                }
                 MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                         "Parts saved to " + file); //$NON-NLS-1$
-	        } catch (Exception ex) {
+            } catch (Exception ex) {
                 MekHQ.getLogger().error(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
-	            JOptionPane
-	                    .showMessageDialog(
-	                            getFrame(),
-	                            "Oh no! The program was unable to correctly export your parts. We know this\n"
-	                                    + "is annoying and apologize. Please help us out and submit a bug with the\n"
-	                                    + "mekhqlog.txt file from this game so we can prevent this from happening in\n"
-	                                    + "the future.", "Could not export parts",
-	                            JOptionPane.ERROR_MESSAGE);
-	            // restore the backup file
-	            file.delete();
-	            if (backupFile.exists()) {
-	                Utilities.copyfile(backupFile, file);
-	                backupFile.delete();
-	            }
-	        }
-        }
-    }
-
-    private void exportTable(JTable table, String filename, FileType format, String dialogTitle) {
-        GUI.fileDialogSave(frame, dialogTitle, new File(".", filename + "." + format.getRecommendedExtension()), format).ifPresent(f -> {
-            File file = checkFileEnding(f, format.getRecommendedExtension());
-            checkToBackupFile(file, file.getPath());
-            String report = "";
-            // TODO add support for xml and json export
-            if (format.equals(FileType.CSV)) {
-                JOptionPane.showMessageDialog(mainPanel, report);
+                JOptionPane
+                        .showMessageDialog(
+                                getFrame(),
+                                "Oh no! The program was unable to correctly export your parts. We know this\n"
+                                        + "is annoying and apologize. Please help us out and submit a bug with the\n"
+                                        + "mekhqlog.txt file from this game so we can prevent this from happening in\n"
+                                        + "the future.", "Could not export parts",
+                                JOptionPane.ERROR_MESSAGE);
+                // restore the backup file
+                file.delete();
+                if (backupFile.exists()) {
+                    Utilities.copyfile(backupFile, file);
+                    backupFile.delete();
+                }
             }
-        });
+        }
     }
 
     public void refreshAllTabs() {
@@ -2780,26 +2796,26 @@ public class CampaignGUI extends JPanel {
     }
 
     public void refreshLab() {
-    	MekLabTab lab = (MekLabTab)getTab(GuiTabType.MEKLAB);
-    	if (null == lab) {
-    		return;
-    	}
-    	Unit u = lab.getUnit();
-    	if (null == u) {
-    		return;
-    	}
-    	if (null == getCampaign().getUnit(u.getId())) {
-    		// this unit has been removed so clear the mek lab
-    		lab.clearUnit();
-    	} else {
-    		// put a try-catch here so that bugs in the meklab don't screw up
-    		// other stuff
-    		try {
-    			lab.refreshRefitSummary();
-    		} catch (Exception err) {
-    			err.printStackTrace();
-    		}
-    	}
+        MekLabTab lab = (MekLabTab)getTab(GuiTabType.MEKLAB);
+        if (null == lab) {
+            return;
+        }
+        Unit u = lab.getUnit();
+        if (null == u) {
+            return;
+        }
+        if (null == getCampaign().getUnit(u.getId())) {
+            // this unit has been removed so clear the mek lab
+            lab.clearUnit();
+        } else {
+            // put a try-catch here so that bugs in the meklab don't screw up
+            // other stuff
+            try {
+                lab.refreshRefitSummary();
+            } catch (Exception err) {
+                err.printStackTrace();
+            }
+        }
     }
 
     public void refreshCalendar() {
@@ -2820,31 +2836,32 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshFunds() {
-        long funds = getCampaign().getFunds();
-        NumberFormat numberFormat = NumberFormat.getIntegerInstance();
+        Money funds = getCampaign().getFunds();
         String inDebt = "";
         if (getCampaign().getFinances().isInDebt()) {
             inDebt = " <font color='red'>(in Debt)</font>";
         }
-        String text = "<html><b>Funds:</b> " + numberFormat.format(funds)
-                + " C-Bills" + inDebt + "</html>";
+        String text = "<html><b>Funds:</b> "
+                + funds.toAmountAndSymbolString()
+                + inDebt
+                + "</html>";
         lblFunds.setText(text);
     }
 
     private void refreshRating() {
         if (getCampaign().getCampaignOptions().useDragoonRating()) {
-        	// this is the one situation where we do want to refresh the rating,
-        	// as it means something has happened to influence it
-        	getCampaign().getUnitRating().reInitialize();
-        	
+            // this is the one situation where we do want to refresh the rating,
+            // as it means something has happened to influence it
+            getCampaign().getUnitRating().reInitialize();
+
             String text;
-        	if (UnitRatingMethod.FLD_MAN_MERCS_REV.equals(getCampaign().getCampaignOptions().getUnitRatingMethod())) {
+            if (UnitRatingMethod.FLD_MAN_MERCS_REV.equals(getCampaign().getCampaignOptions().getUnitRatingMethod())) {
                 text = String.format(resourceMap.getString("bottomRating.DragoonsRating"), getCampaign().getUnitRatingText());
             }
             else {
                 text = String.format(resourceMap.getString("bottomRating.CampaignOpsRating"), getCampaign().getUnitRatingText());
             }
-        	
+
             lblRating.setText(text);
         } else {
             lblRating.setText("");
@@ -3008,7 +3025,7 @@ public class CampaignGUI extends JPanel {
         }
         
         if (null != scenario) {
-        	MekHQ.triggerEvent(new DeploymentChangedEvent(f, scenario));
+            MekHQ.triggerEvent(new DeploymentChangedEvent(f, scenario));
         }
     }
 

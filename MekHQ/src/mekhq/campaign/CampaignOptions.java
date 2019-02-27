@@ -1,5 +1,5 @@
 /*
- * PartInventiry.java
+ * CampaignOptions.java
  *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  *
@@ -24,10 +24,9 @@ package mekhq.campaign;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -201,7 +200,6 @@ public class CampaignOptions implements Serializable {
     private boolean noClanPartsFromIS;
     private boolean planetAcquisitionVerbose;
 
-
     //xp related
     private int scenarioXP;
     private int killsForXP;
@@ -233,14 +231,14 @@ public class CampaignOptions implements Serializable {
     private int maintenanceCycleDays;
     private int maintenanceBonus;
     private boolean useQualityMaintenance;
-	private boolean useUnofficalMaintenance;
+	private boolean useUnofficialMaintenance;
 	private boolean reverseQualityNames;
 
     //Dragoon's Rating
     private UnitRatingMethod unitRatingMethod;
 
     //salary related
-    private int[] salaryTypeBase;
+    private Money[] salaryTypeBase;
     private double[] salaryXpMultiplier;
     private double salaryCommissionMultiplier;
     private double salaryEnlistedMultiplier;
@@ -453,7 +451,7 @@ public class CampaignOptions implements Serializable {
         maintenanceCycleDays = 7;
         maintenanceBonus = -1;
         useQualityMaintenance = true;
-        useUnofficalMaintenance = false;
+        useUnofficialMaintenance = false;
         reverseQualityNames = false;
         checkMaintenance = true;
         useRandomHitsForVees = false;
@@ -475,32 +473,31 @@ public class CampaignOptions implements Serializable {
         personnelMarketRandomGreenRemoval = 4;
         personnelMarketRandomUltraGreenRemoval = 4;
         personnelMarketDylansWeight = 0.3;
-        salaryTypeBase = new int[Person.T_NUM];
-        salaryTypeBase[Person.T_MECHWARRIOR] = 1500;
-        salaryTypeBase[Person.T_AERO_PILOT] = 1500;
-        salaryTypeBase[Person.T_VEE_GUNNER] = 900;
-        salaryTypeBase[Person.T_GVEE_DRIVER] = 900;
-        salaryTypeBase[Person.T_NVEE_DRIVER] = 900;
-        salaryTypeBase[Person.T_VTOL_PILOT] = 900;
-        salaryTypeBase[Person.T_CONV_PILOT] = 900;
-        salaryTypeBase[Person.T_INFANTRY] = 750;
-        salaryTypeBase[Person.T_BA] = 960;
-        salaryTypeBase[Person.T_SPACE_PILOT] = 1000;
-        salaryTypeBase[Person.T_SPACE_GUNNER] = 1000;
-        salaryTypeBase[Person.T_SPACE_CREW] = 1000;
-        salaryTypeBase[Person.T_NAVIGATOR] = 1000;
-        salaryTypeBase[Person.T_DOCTOR] = 1500;
-        salaryTypeBase[Person.T_ADMIN_COM] = 500;
-        salaryTypeBase[Person.T_ADMIN_HR] = 500;
-        salaryTypeBase[Person.T_ADMIN_LOG] = 500;
-        salaryTypeBase[Person.T_ADMIN_TRA] = 500;
-        salaryTypeBase[Person.T_MECH_TECH] = 800;
-        salaryTypeBase[Person.T_AERO_TECH] = 800;
-        salaryTypeBase[Person.T_BA_TECH] = 800;
-        salaryTypeBase[Person.T_MECHANIC] = 800;
-        salaryTypeBase[Person.T_ASTECH] = 400;
-        salaryTypeBase[Person.T_MEDIC] = 400;
-        salaryTypeBase[Person.T_PROTO_PILOT] = 960;
+        salaryTypeBase = new Money[Person.T_NUM];
+        salaryTypeBase[Person.T_MECHWARRIOR] = Money.of(1500);
+        salaryTypeBase[Person.T_AERO_PILOT] = Money.of(1500);
+        salaryTypeBase[Person.T_VEE_GUNNER] = Money.of(900);
+        salaryTypeBase[Person.T_GVEE_DRIVER] = Money.of(900);
+        salaryTypeBase[Person.T_NVEE_DRIVER] = Money.of(900);
+        salaryTypeBase[Person.T_VTOL_PILOT] = Money.of(900);
+        salaryTypeBase[Person.T_CONV_PILOT] = Money.of(900);
+        salaryTypeBase[Person.T_INFANTRY] = Money.of(750);
+        salaryTypeBase[Person.T_BA] = Money.of(960);
+        salaryTypeBase[Person.T_SPACE_PILOT] = Money.of(1000);
+        salaryTypeBase[Person.T_SPACE_GUNNER] = Money.of(1000);
+        salaryTypeBase[Person.T_SPACE_CREW] = Money.of(1000);
+        salaryTypeBase[Person.T_NAVIGATOR] = Money.of( 1000);
+        salaryTypeBase[Person.T_DOCTOR] = Money.of(1500);
+        salaryTypeBase[Person.T_ADMIN_HR] = Money.of(500);
+        salaryTypeBase[Person.T_ADMIN_LOG] = Money.of(500);
+        salaryTypeBase[Person.T_ADMIN_TRA] = Money.of(500);
+        salaryTypeBase[Person.T_MECH_TECH] = Money.of(800);
+        salaryTypeBase[Person.T_AERO_TECH] = Money.of(800);
+        salaryTypeBase[Person.T_BA_TECH] = Money.of(800);
+        salaryTypeBase[Person.T_MECHANIC] = Money.of(800);
+        salaryTypeBase[Person.T_ASTECH] = Money.of(400);
+        salaryTypeBase[Person.T_MEDIC] = Money.of(400);
+        salaryTypeBase[Person.T_PROTO_PILOT] = Money.of(960);
         salaryXpMultiplier = new double[5];
         salaryXpMultiplier[SkillType.EXP_ULTRA_GREEN] = 0.6;
         salaryXpMultiplier[SkillType.EXP_GREEN] = 0.6;
@@ -572,7 +569,7 @@ public class CampaignOptions implements Serializable {
         massRepairScrapImpossible = false;
         massRepairUseAssignedTechsFirst = false;
         massRepairReplacePod = true;
-        massRepairOptions = new ArrayList<MassRepairOption>();
+        massRepairOptions = new ArrayList<>();
         
         for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
         	massRepairOptions.add(new MassRepairOption(MassRepairOption.VALID_REPAIR_TYPES[i]));
@@ -1569,12 +1566,12 @@ public class CampaignOptions implements Serializable {
         useQualityMaintenance = b;
     }
 
-    public boolean useUnofficalMaintenance() {
-        return useUnofficalMaintenance;
+    public boolean useUnofficialMaintenance() {
+        return useUnofficialMaintenance;
     }
 
-    public void setUseUnofficalMaintenance(boolean b) {
-    	useUnofficalMaintenance = b;
+    public void setUseUnofficialMaintenance(boolean b) {
+    	useUnofficialMaintenance = b;
     }
 
     public boolean reverseQualityNames() {
@@ -1713,14 +1710,14 @@ public class CampaignOptions implements Serializable {
         minimumHitsForVees = d;
     }
 
-    public int getBaseSalary(int type) {
+    public Money getBaseSalary(int type) {
         if (type < 0 || type >= salaryTypeBase.length) {
-            return 0;
+            return Money.zero();
         }
         return salaryTypeBase[type];
     }
 
-    public void setBaseSalary(int base, int type) {
+    public void setBaseSalary(Money base, int type) {
         if (type < 0 || type >= salaryTypeBase.length) {
             return;
         }
@@ -2217,12 +2214,7 @@ public class CampaignOptions implements Serializable {
 			massRepairOptions.remove(foundIdx + 1);
 		}
 		
-		Collections.sort(massRepairOptions, new Comparator<MassRepairOption>() {
-			@Override
-			public int compare(MassRepairOption o1, MassRepairOption o2) {
-				return o1.getType() < o2.getType() ? -1 : 1;
-			}
-		});
+		massRepairOptions.sort((o1, o2) -> o1.getType() < o2.getType() ? -1 : 1);
 	}
 
 	public void setAllowOpforAeros(boolean allowOpforAeros) {
@@ -2365,7 +2357,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maintenanceBonus", maintenanceBonus);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useQualityMaintenance", useQualityMaintenance);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "reverseQualityNames", reverseQualityNames);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnofficalMaintenance", useUnofficalMaintenance);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnofficalMaintenance", useUnofficialMaintenance);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "checkMaintenance", checkMaintenance);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomHitsForVees", useRandomHitsForVees);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "minimumHitsForVees", minimumHitsForVees);
@@ -2491,7 +2483,7 @@ public class CampaignOptions implements Serializable {
         
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<salaryTypeBase>"
-                    + Utilities.printIntegerArray(salaryTypeBase)
+                    + Utilities.printMoneyArray(salaryTypeBase)
                     + "</salaryTypeBase>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<salaryXpMultiplier>"
@@ -2502,16 +2494,16 @@ public class CampaignOptions implements Serializable {
                     + "<usePortraitForType>"
                     + Utilities.printBooleanArray(usePortraitForType)
                     + "</usePortraitForType>");
-        String csv = "";
+        StringBuilder csv = new StringBuilder();
         for (int i = 0; i < rats.length; i++) {
-        	csv += rats[i];
+        	csv.append(rats[i]);
         	if (i < rats.length - 1) {
-        		csv += ",";
+        		csv.append(",");
         	}
         }
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                 + "<rats>"
-                + MekHqXmlUtil.escape(csv)
+                + MekHqXmlUtil.escape(csv.toString())
                 + "</rats>");
         if (staticRATs) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<staticRATs/>");
@@ -2548,11 +2540,7 @@ public class CampaignOptions implements Serializable {
             if (wn2.getNodeName().equalsIgnoreCase("clanPriceModifier")) {
                 retVal.clanPriceModifier = Double.parseDouble(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useFactionForNames")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.useFactionForNames = true;
-                } else {
-                    retVal.useFactionForNames = false;
-                }
+                retVal.useFactionForNames = wn2.getTextContent().equalsIgnoreCase("true");
             } else if (wn2.getNodeName().equalsIgnoreCase("repairSystem")) {
                 retVal.repairSystem = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useEraMods")) {
@@ -2729,72 +2717,32 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("blcSaleValue")) {
                 retVal.blcSaleValue = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("acquisitionSupportStaffOnly")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.acquisitionSupportStaffOnly = true;
-                } else {
-                    retVal.acquisitionSupportStaffOnly = false;
-                }
+                retVal.acquisitionSupportStaffOnly = wn2.getTextContent().equalsIgnoreCase("true");
             } else if (wn2.getNodeName().equalsIgnoreCase("limitByYear")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.limitByYear = true;
-                } else {
-                    retVal.limitByYear = false;
-                }
+                retVal.limitByYear = wn2.getTextContent().equalsIgnoreCase("true");
             } else if (wn2.getNodeName().equalsIgnoreCase("disallowExtinctStuff")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.disallowExtinctStuff = true;
-                } else {
-                    retVal.disallowExtinctStuff = false;
-                }
+                retVal.disallowExtinctStuff = wn2.getTextContent().equalsIgnoreCase("true");
             } else if (wn2.getNodeName().equalsIgnoreCase("allowClanPurchases")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.allowClanPurchases = true;
-                } else {
-                    retVal.allowClanPurchases = false;
-                }
+                retVal.allowClanPurchases = wn2.getTextContent().equalsIgnoreCase("true");
             } else if (wn2.getNodeName().equalsIgnoreCase("allowISPurchases")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.allowISPurchases = true;
-                } else {
-                    retVal.allowISPurchases = false;
-                }
+                retVal.allowISPurchases = wn2.getTextContent().equalsIgnoreCase("true");
             } else if (wn2.getNodeName().equalsIgnoreCase("allowCanonOnly")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.allowCanonOnly = true;
-                } else {
-                    retVal.allowCanonOnly = false;
-                }
+                retVal.allowCanonOnly = wn2.getTextContent().equalsIgnoreCase("true");
             } else if (wn2.getNodeName().equalsIgnoreCase("allowCanonRefitOnly")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.allowCanonRefitOnly = true;
-                } else {
-                    retVal.allowCanonRefitOnly = false;
-                }
+                retVal.allowCanonRefitOnly = wn2.getTextContent().equalsIgnoreCase("true");
             } else if (wn2.getNodeName().equalsIgnoreCase("useAmmoByType")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.useAmmoByType = true;
-                } else {
-                    retVal.useAmmoByType = false;
-                }
+                retVal.useAmmoByType = wn2.getTextContent().equalsIgnoreCase("true");
             } else if (wn2.getNodeName().equalsIgnoreCase("variableTechLevel")) {
                 retVal.variableTechLevel = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("factionIntroDate")) {
                 retVal.factionIntroDate = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("usePercentageMaint")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.usePercentageMaint = true;
-                } else {
-                    retVal.usePercentageMaint = false;
-                }
+                retVal.usePercentageMaint = wn2.getTextContent().equalsIgnoreCase("true");
             } else if (wn2.getNodeName().equalsIgnoreCase("techLevel")) {
                 retVal.techLevel = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useUnitRating") || wn2.getNodeName().equalsIgnoreCase
                     ("useDragoonRating")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.useUnitRating = true;
-                } else {
-                    retVal.useUnitRating = false;
-                }
+                retVal.useUnitRating = wn2.getTextContent().equalsIgnoreCase("true");
             } else if (wn2.getNodeName().equalsIgnoreCase("unitRatingMethod") || wn2.getNodeName().equalsIgnoreCase
                     ("dragoonsRatingMethod")) {
                 if (!wn2.getTextContent().isEmpty() && (wn2.getTextContent() != null)) {
@@ -2827,7 +2775,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("reverseQualityNames")) {
                 retVal.reverseQualityNames = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficalMaintenance")) {
-                retVal.useUnofficalMaintenance = Boolean.parseBoolean(wn2.getTextContent());
+                retVal.useUnofficialMaintenance = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("checkMaintenance")) {
                 retVal.checkMaintenance = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("minimumHitsForVees")) {
@@ -2878,10 +2826,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("salaryAntiMekMultiplier")) {
                 retVal.salaryAntiMekMultiplier = Double.parseDouble(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("salaryTypeBase")) {
-                String[] values = wn2.getTextContent().split(",");
-                for (int i = 0; i < values.length; i++) {
-                    retVal.salaryTypeBase[i] = Integer.parseInt(values[i]);
-                }
+                retVal.salaryTypeBase = Utilities.readMoneyArray(wn2);
             } else if (wn2.getNodeName().equalsIgnoreCase("salaryXpMultiplier")) {
                 String[] values = wn2.getTextContent().split(",");
                 for (int i = 0; i < values.length; i++) {

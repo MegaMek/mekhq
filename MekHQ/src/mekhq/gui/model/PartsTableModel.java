@@ -1,7 +1,6 @@
 package mekhq.gui.model;
 
 import java.awt.Component;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import javax.swing.JTable;
@@ -76,7 +75,7 @@ public class PartsTableModel extends DataTableModel {
         } else {
             part = (Part)data.get(row);
         }
-        DecimalFormat format = new DecimalFormat();
+
         if(col == COL_NAME) {
             return "<html><nobr>"+part.getName()+"</nobr></html>";
         }
@@ -84,10 +83,10 @@ public class PartsTableModel extends DataTableModel {
             return "<html><nobr>"+part.getDetails()+"</nobr></html>";
         }
         if(col == COL_COST) {
-            return format.format(part.getActualValue());
+            return part.getActualValue().toAmountAndSymbolString();
         }
         if(col == COL_TOTAL_COST) {
-            return format.format(part.getActualValue() * part.getQuantity());
+            return part.getActualValue().multipliedBy(part.getQuantity()).toAmountAndSymbolString();
         }
         if(col == COL_QUANTITY) {
             return part.getQuantity();

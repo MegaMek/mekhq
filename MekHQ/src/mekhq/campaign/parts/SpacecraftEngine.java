@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -99,8 +100,8 @@ public class SpacecraftEngine extends Part {
     }
 
     @Override 
-    public long getStickerPrice() {
-        return (long)Math.round(engineTonnage * 1000);
+    public Money getStickerPrice() {
+        return Money.of(engineTonnage * 1000);
     }
 
     @Override
@@ -146,11 +147,7 @@ public class SpacecraftEngine extends Part {
             if (wn2.getNodeName().equalsIgnoreCase("engineTonnage")) {
                 engineTonnage = Double.parseDouble(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
-                if(wn2.getTextContent().equalsIgnoreCase("true")) {
-                    clan = true;
-                } else {
-                    clan = false;
-                }
+                clan = wn2.getTextContent().equalsIgnoreCase("true");
             } 
         }
     }
@@ -204,8 +201,7 @@ public class SpacecraftEngine extends Part {
             }
             if(engineHits >= engineCrits) {
                 remove(false);
-                return;
-            } 
+            }
             else if(engineHits > 0) {
                 hits = engineHits;
             } else {

@@ -1,6 +1,18 @@
 VERSION HISTORY:
 ----------------
-v0.45.3-SNAPSHOT
+v0.45.4-SNAPSHOT
++ PR #1067: Switch to Joda Money library internally for financial math
++ Issue #1057: Don't allow Rotor damage to go negative or use negative damages
++ Issue #1085: Find different replacement part if original missing or has a new ID
++ Issue #1076: Address bug in Personnel Market where GM Add still costs money and add GM Hire Full Complement
++ PR #1084: Save user preferences for UI settings such as window sizes and positions, et al
++ Issue #1082: Fix issue preventing creation of new AtB contract
++ Issue #1086: Fix issue introduced in 45.3 preventing "special" AtB scenarios from starting
++ Issue #1106: Fix issue introduced in 45.3 preventing AtB scenarios containing aircraft from starting under some conditions
++ Issue #112: Adds mission log and counter for personnel
++ Issue #1115: Fix stack overflow in BattleArmorSuit::getTonnage
+
+v0.45.3 (2019-02-12 0500 UTC)
 + Issue #990: Feature: Add bulk confirm dialog if more than one unit is removed
 + PR #995: Speed up campaign load times by optimizing spare parts importing
 + PR #994: Fix exception seen during log entry updates
@@ -32,6 +44,7 @@ v0.45.3-SNAPSHOT
 + PR #1045: Resolve errata for reloading times of capital missile ammo (now 1 hour per missile)
 + Issue #1049: Warehouse tab may fail to properly render
 + PR #1053: Add a Change Camouflage context menu item to forces in the TOE
++ Issue #361: Adds assigned Force to the columns on the hangar tab
 
 v0.45.2 (2018-11-18 0200 UTC)
 + Switched build system from ant to gradle.

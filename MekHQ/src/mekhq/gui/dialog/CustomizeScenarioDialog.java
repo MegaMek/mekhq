@@ -49,6 +49,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.TableColumn;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
@@ -62,6 +63,8 @@ import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.model.LootTableModel;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -102,7 +105,6 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
     private javax.swing.JLabel lblStatus;
     private javax.swing.JButton btnDate;
 
-    
     public CustomizeScenarioDialog(java.awt.Frame parent, boolean modal, Scenario s, Mission m, Campaign c) {
         super(parent, modal);
         this.frame = parent;
@@ -127,6 +129,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         lootModel = new LootTableModel(loots);
         initComponents();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -339,6 +342,13 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         getContentPane().add(panBtn, BorderLayout.PAGE_END);
         
         pack();
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(CustomizeScenarioDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
     
     private void btnOKActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed

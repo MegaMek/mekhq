@@ -42,8 +42,13 @@ import megamek.common.MechSummaryCache;
 import megamek.common.TargetRoll;
 import megamek.common.UnitType;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.Contract;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.preferences.JToggleButtonPreference;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  * Manages searches for Dropships or Jumpships for Against the Bot.
@@ -73,157 +78,176 @@ public class ShipSearchDialog extends JDialog {
 		this.gui = gui;
 		
 		init();
+		setUserPreferences();
 	}
 	
-	private void init() {
-		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ShipSearchDialog",
-				new EncodeControl()); //$NON-NLS-1$
-		setTitle(resourceMap.getString("title.text"));
-		
-		Container contentPane = getContentPane();
-		contentPane.setLayout(new BorderLayout());
+    private void init() {
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ShipSearchDialog",
+                new EncodeControl()); //$NON-NLS-1$
+        setTitle(resourceMap.getString("title.text"));
 
-		JLabel lblInstructions = new JLabel();
-		lblInstructions.setText("<html>" + String.format(resourceMap.getString("instructions.text"),
-				NumberFormat.getInstance().format(gui.getCampaign().getAtBConfig().getShipSearchCost()))
-				+ "</html>");
-		contentPane.add(lblInstructions, BorderLayout.NORTH);
+        Container contentPane = getContentPane();
+        contentPane.setLayout(new BorderLayout());
 
-		JPanel mainPanel = new JPanel(new GridBagLayout());
-		GridBagConstraints gbc = new GridBagConstraints();
-		
-		gbc.gridwidth = GridBagConstraints.REMAINDER;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
-		gbc.insets = new Insets(5, 5, 5, 5);
-				
-		ButtonGroup group = new ButtonGroup();
-		if (gui.getCampaign().getAtBConfig().shipSearchTargetBase(UnitType.DROPSHIP) != null) {
-			btnDropship.setText(resourceMap.getString("btnDropship.text"));
-			group.add(btnDropship);
-			gbc.gridx = 0;
-			gbc.gridy = 0;
-			mainPanel.add(btnDropship, gbc);
-		
-			TargetRoll target = gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.DROPSHIP,
-					gui.getCampaign());
-			lblDropshipTarget.setText("Target: " + target.getValue() + " ["
-					+ target.getDesc() + "]");
-			gbc.gridx = 0;
-			gbc.gridy = 1;
-			mainPanel.add(lblDropshipTarget, gbc);
-		}
-		
-		if (gui.getCampaign().getAtBConfig().shipSearchTargetBase(UnitType.JUMPSHIP) != null) {
-			btnJumpship.setText(resourceMap.getString("btnJumpship.text"));
-			group.add(btnJumpship);
-			gbc.gridx = 0;
-			gbc.gridy = 2;
-			mainPanel.add(btnJumpship, gbc);
-			
-			TargetRoll target = gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.JUMPSHIP,
-					gui.getCampaign());
-			lblJumpshipTarget.setText("Target: " + target.getValue() + " ["
-					+ target.getDesc() + "]");
-			gbc.gridx = 0;
-			gbc.gridy = 3;
-			mainPanel.add(lblJumpshipTarget, gbc);
-		}
-		
-		if (gui.getCampaign().getAtBConfig().shipSearchTargetBase(UnitType.WARSHIP) != null) {
-			btnWarship.setText(resourceMap.getString("btnWarship.text"));
-			group.add(btnWarship);
-			gbc.gridx = 0;
-			gbc.gridy = 4;
-			mainPanel.add(btnWarship, gbc);
-			
-			TargetRoll target = gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.WARSHIP,
-					gui.getCampaign());
-			lblWarshipTarget.setText("Target: " + target.getValue() + " ["
-					+ target.getDesc() + "]");
-			gbc.gridx = 0;
-			gbc.gridy = 5;
-			mainPanel.add(lblWarshipTarget, gbc);
-		}
-		
-		if (isInContract() && !isInSearch()) {
-			JLabel lblInContract = new JLabel(resourceMap.getString("lblInContract.text"));
-			gbc.gridx = 0;
-			gbc.gridy = 6;
-			mainPanel.add(lblInContract, gbc);
-		}
-		
-		if (isInContract() || isInSearch()) {
-			btnDropship.setEnabled(false);
-			lblDropshipTarget.setEnabled(false);
-			btnJumpship.setEnabled(false);
-			lblJumpshipTarget.setEnabled(false);
-			btnWarship.setEnabled(false);
-			lblWarshipTarget.setEnabled(false);
-		}
-		
-		if (gui.getCampaign().getAtBConfig().shipSearchTargetBase(UnitType.DROPSHIP) != null) {
-			btnDropship.setSelected(true);
-		} else if (gui.getCampaign().getAtBConfig().shipSearchTargetBase(UnitType.JUMPSHIP) != null) {
-			btnJumpship.setSelected(true);
-		} else if (gui.getCampaign().getAtBConfig().shipSearchTargetBase(UnitType.WARSHIP) != null) {
-			btnWarship.setSelected(true);
-		} else {
-			JLabel label = new JLabel(resourceMap.getString("lblNoSearch.text"));
-			gbc.gridx = 0;
-			gbc.gridy = 7;
-			mainPanel.add(label, gbc);
-		}
-		
-		contentPane.add(mainPanel, BorderLayout.CENTER);
-		
-		JPanel panButtons = new JPanel();
-		
-		JButton button;
-		
-		if (gui.getCampaign().getShipSearchResult() != null) {
-			MechSummary ms = MechSummaryCache.getInstance().getMech(gui.getCampaign().getShipSearchResult());
+        JLabel lblInstructions = new JLabel();
+        lblInstructions.setText("<html>" + String.format(resourceMap.getString("instructions.text"),
+                gui.getCampaign().getAtBConfig().getShipSearchCost().toAmountAndSymbolString())
+                + "</html>");
+        contentPane.add(lblInstructions, BorderLayout.NORTH);
 
-			JLabel lblAvailable = new JLabel();
-			if (ms == null) {
-				lblAvailable.setText("Cannot find entry for " + gui.getCampaign().getShipSearchResult());
-			} else {
-				lblAvailable.setText(resourceMap.getString("lblAvailable.text")
-					+ gui.getCampaign().getShipSearchResult());
-			}
-			gbc.gridx = 0;
-			gbc.gridy = 8;
-			mainPanel.add(lblAvailable);
-			
-			button = new JButton(resourceMap.getString("btnPurchase.text"));
-			panButtons.add(button);
-			button.addActionListener(ev -> purchase());
-			button.setEnabled(ms != null && gui.getCampaign().getFunds() >= ms.getCost());
-		}
+        JPanel mainPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
 
-		if (isInSearch()) {
-			button = new JButton(resourceMap.getString("btnEndSearch.text"));
-			button.setToolTipText(resourceMap.getString("btnEndSearch.toolTipText"));		
-			button.addActionListener(ev -> endSearch());
-			panButtons.add(button);
-		} else {
-			button = new JButton(resourceMap.getString("btnStartSearch.text"));
-			button.setToolTipText(String.format(resourceMap.getString("btnStartSearch.toolTipText"),
-					NumberFormat.getInstance().format(gui.getCampaign().getAtBConfig().shipSearchCostPerWeek()),
-					gui.getCampaign().getAtBConfig().getShipSearchLengthWeeks()));
-			button.addActionListener(ev -> startSearch());
-			button.setEnabled(!isInContract());
-			panButtons.add(button);
-		}
-		
-		button = new JButton(resourceMap.getString("btnCancel.text"));
-		button.addActionListener(ev -> setVisible(false));
-		panButtons.add(button);
-		
-		contentPane.add(panButtons, BorderLayout.SOUTH);
-		
-		pack();
-	}
-	
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+
+        ButtonGroup group = new ButtonGroup();
+        if (gui.getCampaign().getAtBConfig().shipSearchTargetBase(UnitType.DROPSHIP) != null) {
+            btnDropship.setText(resourceMap.getString("btnDropship.text"));
+            group.add(btnDropship);
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            mainPanel.add(btnDropship, gbc);
+
+            TargetRoll target = gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.DROPSHIP,
+                    gui.getCampaign());
+            lblDropshipTarget.setText("Target: " + target.getValue() + " ["
+                    + target.getDesc() + "]");
+            gbc.gridx = 0;
+            gbc.gridy = 1;
+            mainPanel.add(lblDropshipTarget, gbc);
+        }
+
+        if (gui.getCampaign().getAtBConfig().shipSearchTargetBase(UnitType.JUMPSHIP) != null) {
+            btnJumpship.setText(resourceMap.getString("btnJumpship.text"));
+            group.add(btnJumpship);
+            gbc.gridx = 0;
+            gbc.gridy = 2;
+            mainPanel.add(btnJumpship, gbc);
+
+            TargetRoll target = gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.JUMPSHIP,
+                    gui.getCampaign());
+            lblJumpshipTarget.setText("Target: " + target.getValue() + " ["
+                    + target.getDesc() + "]");
+            gbc.gridx = 0;
+            gbc.gridy = 3;
+            mainPanel.add(lblJumpshipTarget, gbc);
+        }
+
+        if (gui.getCampaign().getAtBConfig().shipSearchTargetBase(UnitType.WARSHIP) != null) {
+            btnWarship.setText(resourceMap.getString("btnWarship.text"));
+            group.add(btnWarship);
+            gbc.gridx = 0;
+            gbc.gridy = 4;
+            mainPanel.add(btnWarship, gbc);
+
+            TargetRoll target = gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.WARSHIP,
+                    gui.getCampaign());
+            lblWarshipTarget.setText("Target: " + target.getValue() + " ["
+                    + target.getDesc() + "]");
+            gbc.gridx = 0;
+            gbc.gridy = 5;
+            mainPanel.add(lblWarshipTarget, gbc);
+        }
+
+        if (isInContract() && !isInSearch()) {
+            JLabel lblInContract = new JLabel(resourceMap.getString("lblInContract.text"));
+            gbc.gridx = 0;
+            gbc.gridy = 6;
+            mainPanel.add(lblInContract, gbc);
+        }
+
+        if (isInContract() || isInSearch()) {
+            btnDropship.setEnabled(false);
+            lblDropshipTarget.setEnabled(false);
+            btnJumpship.setEnabled(false);
+            lblJumpshipTarget.setEnabled(false);
+            btnWarship.setEnabled(false);
+            lblWarshipTarget.setEnabled(false);
+        }
+
+        if (gui.getCampaign().getAtBConfig().shipSearchTargetBase(UnitType.DROPSHIP) != null) {
+            btnDropship.setSelected(true);
+        } else if (gui.getCampaign().getAtBConfig().shipSearchTargetBase(UnitType.JUMPSHIP) != null) {
+            btnJumpship.setSelected(true);
+        } else if (gui.getCampaign().getAtBConfig().shipSearchTargetBase(UnitType.WARSHIP) != null) {
+            btnWarship.setSelected(true);
+        } else {
+            JLabel label = new JLabel(resourceMap.getString("lblNoSearch.text"));
+            gbc.gridx = 0;
+            gbc.gridy = 7;
+            mainPanel.add(label, gbc);
+        }
+
+        contentPane.add(mainPanel, BorderLayout.CENTER);
+
+        JPanel panButtons = new JPanel();
+
+        JButton button;
+
+        if (gui.getCampaign().getShipSearchResult() != null) {
+            MechSummary ms = MechSummaryCache.getInstance().getMech(gui.getCampaign().getShipSearchResult());
+
+            if (ms != null || gui.getCampaign().getShipSearchResult() != null) {
+                JLabel lblAvailable = new JLabel();
+                if (ms == null && gui.getCampaign().getShipSearchResult() != null) {
+                    lblAvailable.setText("Cannot find entry for " + gui.getCampaign().getShipSearchResult());
+                } else {
+                    lblAvailable.setText(resourceMap.getString("lblAvailable.text")
+                            + gui.getCampaign().getShipSearchResult());
+                }
+                gbc.gridx = 0;
+                gbc.gridy = 8;
+                mainPanel.add(lblAvailable);
+            }
+
+            button = new JButton(resourceMap.getString("btnPurchase.text"));
+            panButtons.add(button);
+            button.addActionListener(ev -> purchase());
+            button.setEnabled(ms != null && gui.getCampaign().getFunds().isGreaterThan(Money.of(ms.getCost())));
+        }
+
+        if (isInSearch()) {
+            button = new JButton(resourceMap.getString("btnEndSearch.text"));
+            button.setToolTipText(resourceMap.getString("btnEndSearch.toolTipText"));
+            button.addActionListener(ev -> endSearch());
+            panButtons.add(button);
+        } else {
+            button = new JButton(resourceMap.getString("btnStartSearch.text"));
+            button.setToolTipText(String.format(resourceMap.getString("btnStartSearch.toolTipText"),
+                    gui.getCampaign().getAtBConfig().shipSearchCostPerWeek().toAmountAndSymbolString(),
+                    gui.getCampaign().getAtBConfig().getShipSearchLengthWeeks()));
+            button.addActionListener(ev -> startSearch());
+            button.setEnabled(!isInContract());
+            panButtons.add(button);
+        }
+
+        button = new JButton(resourceMap.getString("btnCancel.text"));
+        button.addActionListener(ev -> setVisible(false));
+        panButtons.add(button);
+
+        contentPane.add(panButtons, BorderLayout.SOUTH);
+
+        pack();
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(ShipSearchDialog.class);
+
+        btnDropship.setName("dropship");
+        preferences.manage(new JToggleButtonPreference(btnDropship));
+
+        btnJumpship.setName("jumpship");
+        preferences.manage(new JToggleButtonPreference(btnJumpship));
+
+        btnWarship.setName("warship");
+        preferences.manage(new JToggleButtonPreference(btnWarship));
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
+
 	public TargetRoll getDSTarget() {
 		return gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.DROPSHIP,
 				gui.getCampaign());

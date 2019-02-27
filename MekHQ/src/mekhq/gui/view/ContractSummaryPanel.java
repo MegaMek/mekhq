@@ -24,7 +24,6 @@ package mekhq.gui.view;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ResourceBundle;
 
@@ -100,7 +99,6 @@ public class ContractSummaryPanel extends JPanel {
 	private JLabel lblSalvageRights;
 	private JTextArea txtSalvageRights;
 
-    private DecimalFormat formatter = new DecimalFormat();
     private Font f;
 
     private ResourceBundle resourceMap;

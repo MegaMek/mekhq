@@ -35,9 +35,13 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
 
 import megamek.common.Entity;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.parts.Part;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -72,8 +76,8 @@ public class LootDialog extends javax.swing.JDialog {
         this.loot = l;
         this.campaign = c;
         cancelled = true;
-        units = new ArrayList<Entity>();
-        parts = new ArrayList<Part>();
+        units = new ArrayList<>();
+        parts = new ArrayList<>();
         for(Entity e : l.getUnits()) {
             units.add(e);
         }
@@ -82,6 +86,7 @@ public class LootDialog extends javax.swing.JDialog {
         }
         initComponents();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -94,10 +99,10 @@ public class LootDialog extends javax.swing.JDialog {
         btnRemoveUnit = new JButton("Remove");
         btnAddPart = new JButton("Add");
         btnRemovePart = new JButton("Remove");
-        listUnits = new JList<String>(new DefaultListModel<String>());
-        listParts = new JList<String>(new DefaultListModel<String>());
+        listUnits = new JList<>(new DefaultListModel<>());
+        listParts = new JList<>(new DefaultListModel<>());
 
-        //ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.KillDialog", new EncodeControl());
+        //ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddOrEditKillEntryDialog", new EncodeControl());
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Potential Rewards");
         getContentPane().setLayout(new java.awt.GridBagLayout());
@@ -132,7 +137,7 @@ public class LootDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(new JLabel("Cash"), gridBagConstraints);
 
-        spnCash = new JSpinner(new SpinnerNumberModel(loot.getCash(), 0, 300000000, 10000));
+        spnCash = new JSpinner(new SpinnerNumberModel(loot.getCash().getAmount().intValue(), 0, 300000000, 10000));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -152,11 +157,7 @@ public class LootDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(new JLabel("Units"), gridBagConstraints);
 
-        btnAddUnit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                addUnit();
-            }
-        });
+        btnAddUnit.addActionListener(evt -> addUnit());
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -167,11 +168,7 @@ public class LootDialog extends javax.swing.JDialog {
         getContentPane().add(btnAddUnit, gridBagConstraints);
 
         btnRemoveUnit.setEnabled(false);
-        btnRemoveUnit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-               removeUnit();
-            }
-        });
+        btnRemoveUnit.addActionListener(evt -> removeUnit());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 2;
@@ -191,13 +188,7 @@ public class LootDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         scrUnits = new JScrollPane(listUnits);
         listUnits.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        listUnits.getSelectionModel().addListSelectionListener(
-                new javax.swing.event.ListSelectionListener() {
-                    public void valueChanged(
-                            javax.swing.event.ListSelectionEvent evt) {
-                        listUnitsValueChanged();
-                    }
-                });
+        listUnits.getSelectionModel().addListSelectionListener(evt -> listUnitsValueChanged());
         refreshUnitList();
         getContentPane().add(scrUnits, gridBagConstraints);
 
@@ -210,11 +201,7 @@ public class LootDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(new JLabel("Parts"), gridBagConstraints);
 
-        btnAddPart.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                addPart();
-            }
-        });
+        btnAddPart.addActionListener(evt -> addPart());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
@@ -224,11 +211,7 @@ public class LootDialog extends javax.swing.JDialog {
         getContentPane().add(btnAddPart, gridBagConstraints);
 
         btnRemovePart.setEnabled(false);
-        btnRemovePart.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-               removePart();
-            }
-        });
+        btnRemovePart.addActionListener(evt -> removePart());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 4;
@@ -248,21 +231,11 @@ public class LootDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         scrParts = new JScrollPane(listParts);
         listParts.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        listParts.getSelectionModel().addListSelectionListener(
-                new javax.swing.event.ListSelectionListener() {
-                    public void valueChanged(
-                            javax.swing.event.ListSelectionEvent evt) {
-                        listPartsValueChanged();
-                    }
-                });
+        listParts.getSelectionModel().addListSelectionListener(evt -> listPartsValueChanged());
         refreshPartList();
         getContentPane().add(scrParts, gridBagConstraints);
 
-        btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                done();
-            }
-        });
+        btnOK.addActionListener(evt -> done());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
@@ -272,11 +245,7 @@ public class LootDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(btnOK, gridBagConstraints);
 
-        btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                setVisible(false);
-            }
-        });
+        btnCancel.addActionListener(evt -> setVisible(false));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 6;
@@ -287,6 +256,13 @@ public class LootDialog extends javax.swing.JDialog {
         getContentPane().add(btnCancel, gridBagConstraints);
 
         pack();
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(LootDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 
     public Loot getLoot() {
@@ -334,7 +310,7 @@ public class LootDialog extends javax.swing.JDialog {
 
     private void done() {
         loot.setName(txtName.getText());
-        loot.setCash((int)Math.ceil((Double)spnCash.getModel().getValue()));
+        loot.setCash(Money.of((Double)spnCash.getModel().getValue()));
         cancelled = false;
         loot.clearUnits();
         loot.clearParts();

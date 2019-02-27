@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -41,10 +42,10 @@ import mekhq.campaign.personnel.SkillType;
  */
 public class AeroSensor extends Part {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -717866644605314883L;
+    /**
+     *
+     */
+    private static final long serialVersionUID = -717866644605314883L;
 
     final static TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_ALL)
             .setISAdvancement(DATE_ES, DATE_ES, DATE_ES)
@@ -52,9 +53,9 @@ public class AeroSensor extends Part {
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     private boolean largeCraft;
-	
-	public AeroSensor() {
-    	this(0, false, null);
+
+    public AeroSensor() {
+        this(0, false, null);
     }
     
     public AeroSensor(int tonnage, boolean lc, Campaign c) {
@@ -64,33 +65,31 @@ public class AeroSensor extends Part {
     }
     
     public AeroSensor clone() {
-    	AeroSensor clone = new AeroSensor(getUnitTonnage(), largeCraft, campaign);
+        AeroSensor clone = new AeroSensor(getUnitTonnage(), largeCraft, campaign);
         clone.copyBaseData(this);
-    	return clone;
+        return clone;
     }
         
-	@Override
-	public void updateConditionFromEntity(boolean checkForDestruction) {
-		int priorHits = hits;
-		if(null != unit && unit.getEntity() instanceof Aero) {
-			hits = ((Aero)unit.getEntity()).getSensorHits();
-			if(checkForDestruction 
-					&& hits > priorHits 
-					&& (hits < 3 && !campaign.getCampaignOptions().useAeroSystemHits())
+    @Override
+    public void updateConditionFromEntity(boolean checkForDestruction) {
+        int priorHits = hits;
+        if(null != unit && unit.getEntity() instanceof Aero) {
+            hits = ((Aero)unit.getEntity()).getSensorHits();
+            if(checkForDestruction
+                    && hits > priorHits
+                    && (hits < 3 && !campaign.getCampaignOptions().useAeroSystemHits())
                     && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
-				remove(false);
-				return;
-			} else if (hits >= 3) {
                 remove(false);
-                return;
+            } else if (hits >= 3) {
+                remove(false);
             }
-		}
-	}
-	
-	@Override 
-	public int getBaseTime() {
-	    int time = 0;
-	    Entity e = unit.getEntity();
+        }
+    }
+
+    @Override
+    public int getBaseTime() {
+        int time = 0;
+        Entity e = unit.getEntity();
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair times
             if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
@@ -115,12 +114,12 @@ public class AeroSensor extends Part {
         } else {
             time = 120;
         }
-		return time;
-	}
-	
-	@Override
-	public int getDifficulty() {
-	    if (campaign.getCampaignOptions().useAeroSystemHits()) {
+        return time;
+    }
+
+    @Override
+    public int getDifficulty() {
+        if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair time and difficulty
             if(isSalvaging()) {
                 return -2;
@@ -132,126 +131,122 @@ public class AeroSensor extends Part {
                 return 0;
             }
         }
-		if(isSalvaging()) {
-			return -2;
-		}
-		return -1;
-	}
-
-
-	@Override
-	public void updateConditionFromPart() {
-		if(null != unit && unit.getEntity() instanceof Aero) {
-			((Aero)unit.getEntity()).setSensorHits(hits);
-		}
-		
-	}
-
-	@Override
-	public void fix() {
-		super.fix();
-		if(null != unit && unit.getEntity() instanceof Aero) {
-			((Aero)unit.getEntity()).setSensorHits(0);
-		}
-	}
-
-	@Override
-	public void remove(boolean salvage) {
-		if(null != unit && unit.getEntity() instanceof Aero) {
-			((Aero)unit.getEntity()).setSensorHits(3);
-			Part spare = campaign.checkForExistingSparePart(this);
-			if(!salvage) {
-				campaign.removePart(this);
-			} else if(null != spare) {
-				spare.incrementQuantity();
-				campaign.removePart(this);
-			}
-			unit.removePart(this);
-			Part missing = getMissingPart();
-			unit.addPart(missing);
-			campaign.addPart(missing, 0);
-		}
-		setUnit(null);
-		updateConditionFromEntity(false);
-	}
-
-	@Override
-	public MissingPart getMissingPart() {
-		return new MissingAeroSensor(getUnitTonnage(), largeCraft, campaign);
-	}
-
-	@Override
-	public String checkFixable() {
-		return null;
-	}
-
-	@Override
-	public boolean needsFixing() {
-		return hits > 0;
-	}
-
-	@Override
-	public long getStickerPrice() {
-		if(largeCraft) {
-			return 80000;
-		}
-		return 2000 * getUnitTonnage();
-	}
-
-	@Override
-	public double getTonnage() {
-		return 0;
-	}
-
-	@Override
-	public boolean isSamePartType(Part part) {
-		return part instanceof AeroSensor && largeCraft == ((AeroSensor)part).isForDropShip()
-				&& (largeCraft || getUnitTonnage() == part.getUnitTonnage());
-	}
-
-	public boolean isForDropShip() {
-		return largeCraft;
-	}
-	
-	@Override
-	public void writeToXml(PrintWriter pw1, int indent) {
-		writeToXmlBegin(pw1, indent);
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<dropship>"
-				+largeCraft
-				+"</dropship>");
-		writeToXmlEnd(pw1, indent);
-	}
-
-	@Override
-	protected void loadFieldsFromXmlNode(Node wn) {
-		NodeList nl = wn.getChildNodes();
-		
-		for (int x=0; x<nl.getLength(); x++) {
-			Node wn2 = nl.item(x);		
-			if (wn2.getNodeName().equalsIgnoreCase("dropship")) {
-				if(wn2.getTextContent().trim().equalsIgnoreCase("true")) {
-					largeCraft = true;
-				} else {
-					largeCraft = false;
-				}
-			}
-		}
-	}
-	
-	@Override
-    public String getDetails() {
-		String dropper = "";
-		if(largeCraft) {
-			dropper = " (dropship)";
-		}
-		return super.getDetails() + ", " + getUnitTonnage() + " tons" + dropper;
+        if(isSalvaging()) {
+            return -2;
+        }
+        return -1;
     }
-	
-	@Override
-	public boolean isRightTechType(String skillType) {
-		return skillType.equals(SkillType.S_TECH_AERO);
-	}
+
+
+    @Override
+    public void updateConditionFromPart() {
+        if(null != unit && unit.getEntity() instanceof Aero) {
+            ((Aero)unit.getEntity()).setSensorHits(hits);
+        }
+
+    }
+
+    @Override
+    public void fix() {
+        super.fix();
+        if(null != unit && unit.getEntity() instanceof Aero) {
+            ((Aero)unit.getEntity()).setSensorHits(0);
+        }
+    }
+
+    @Override
+    public void remove(boolean salvage) {
+        if(null != unit && unit.getEntity() instanceof Aero) {
+            ((Aero)unit.getEntity()).setSensorHits(3);
+            Part spare = campaign.checkForExistingSparePart(this);
+            if(!salvage) {
+                campaign.removePart(this);
+            } else if(null != spare) {
+                spare.incrementQuantity();
+                campaign.removePart(this);
+            }
+            unit.removePart(this);
+            Part missing = getMissingPart();
+            unit.addPart(missing);
+            campaign.addPart(missing, 0);
+        }
+        setUnit(null);
+        updateConditionFromEntity(false);
+    }
+
+    @Override
+    public MissingPart getMissingPart() {
+        return new MissingAeroSensor(getUnitTonnage(), largeCraft, campaign);
+    }
+
+    @Override
+    public String checkFixable() {
+        return null;
+    }
+
+    @Override
+    public boolean needsFixing() {
+        return hits > 0;
+    }
+
+    @Override
+    public Money getStickerPrice() {
+        if(largeCraft) {
+            return Money.of(80000);
+        }
+        return Money.of(2000 * getUnitTonnage());
+    }
+
+    @Override
+    public double getTonnage() {
+        return 0;
+    }
+
+    @Override
+    public boolean isSamePartType(Part part) {
+        return part instanceof AeroSensor && largeCraft == ((AeroSensor)part).isForDropShip()
+                && (largeCraft || getUnitTonnage() == part.getUnitTonnage());
+    }
+
+    public boolean isForDropShip() {
+        return largeCraft;
+    }
+
+    @Override
+    public void writeToXml(PrintWriter pw1, int indent) {
+        writeToXmlBegin(pw1, indent);
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<dropship>"
+                +largeCraft
+                +"</dropship>");
+        writeToXmlEnd(pw1, indent);
+    }
+
+    @Override
+    protected void loadFieldsFromXmlNode(Node wn) {
+        NodeList nl = wn.getChildNodes();
+
+        for (int x=0; x<nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
+            if (wn2.getNodeName().equalsIgnoreCase("dropship")) {
+                largeCraft = wn2.getTextContent().trim().equalsIgnoreCase("true");
+            }
+        }
+    }
+
+    @Override
+    public String getDetails() {
+        String dropper = "";
+        if(largeCraft) {
+            dropper = " (dropship)";
+        }
+        return super.getDetails() + ", " + getUnitTonnage() + " tons" + dropper;
+    }
+
+    @Override
+    public boolean isRightTechType(String skillType) {
+        return skillType.equals(SkillType.S_TECH_AERO);
+    }
 
     @Override
     public String getLocationName() {
@@ -269,12 +264,12 @@ public class AeroSensor extends Part {
         return Entity.LOC_NONE;
     }
     
-	@Override
-	public TechAdvancement getTechAdvancement() {
-	    return TECH_ADVANCEMENT;
-	}
-	@Override
-	public int getMassRepairOptionType() {
-    	return Part.REPAIR_PART_TYPE.ELECTRONICS;
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return TECH_ADVANCEMENT;
+    }
+    @Override
+    public int getMassRepairOptionType() {
+        return Part.REPAIR_PART_TYPE.ELECTRONICS;
     }
 }

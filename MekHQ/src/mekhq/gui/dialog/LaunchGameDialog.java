@@ -21,7 +21,10 @@ import javax.swing.SwingConstants;
 
 import megamek.client.ui.Messages;
 import megamek.common.preference.PreferenceManager;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 public class LaunchGameDialog extends JDialog implements ActionListener {
 	private static final long serialVersionUID = 9094845543518155461L;
@@ -48,6 +51,7 @@ public class LaunchGameDialog extends JDialog implements ActionListener {
     	this.server = server;
     	this.campaign = c;
         initComponents();
+        setUserPreferences();
     }
     
     public void initComponents() {
@@ -124,6 +128,13 @@ public class LaunchGameDialog extends JDialog implements ActionListener {
         setLocation(parent.getLocation().x + parent.getSize().width / 2
                 - getSize().width / 2, parent.getLocation().y
                 + parent.getSize().height / 2 - getSize().height / 2);
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(LaunchGameDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
     }
 
 	@Override

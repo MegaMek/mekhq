@@ -28,42 +28,42 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 
-import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.NumberFormatter;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.rating.IUnitRating;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 /**
  * @author Taharqa
  */
 public class NewLoanDialog extends javax.swing.JDialog implements ActionListener, ChangeListener {
     private static final long serialVersionUID = -8038099101234445018L;
+
+    private ResourceBundle resourceMap;
+    private NumberFormatter numberFormatter;
     private Frame frame;
     private Loan loan;
     private Campaign campaign;
-    private DecimalFormat formatter;
     private int rating;
-    private long maxCollateralValue;
+    private Money maxCollateralValue;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JPanel panMain;
@@ -74,7 +74,6 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
     private JTextField txtName;
     private JTextField txtNumber;
 
-    private JTextField txtPrincipal;
     private JButton btnPlusTenMillion;
     private JButton btnMinusTenMillion;
     private JButton btnPlusMillion;
@@ -84,6 +83,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
     private JButton btnPlusTenK;
     private JButton btnMinusTenK;
 
+    private JFormattedTextField txtPrincipal;
     private JSlider sldInterest;
     private JSlider sldCollateral;
     private JSlider sldLength;
@@ -107,14 +107,15 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
     public NewLoanDialog(java.awt.Frame parent, boolean modal, Campaign c) {
         super(parent, modal);
         this.frame = parent;
-        campaign = c;
+        this.campaign = c;
+        this.numberFormatter = new NumberFormatter(NumberFormat.getInstance());
         IUnitRating unitRating = c.getUnitRating();
         rating = unitRating.getModifier();
         loan = Loan.getBaseLoanFor(rating, campaign.getCalendar());
         maxCollateralValue = campaign.getFinances().getMaxCollateral(campaign);
-        formatter = new DecimalFormat();
         initComponents();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     private void initComponents() {
@@ -134,10 +135,10 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         lblTotalPayment = new JLabel();
         lblCollateralAmount = new JLabel();
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewLoanDialog", new EncodeControl()); //$NON-NLS-1$
+        resourceMap = ResourceBundle.getBundle("mekhq.resources.NewLoanDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
-        setTitle(resourceMap.getString("title"));
+        setTitle(resourceMap.getString("title.text"));
 
         getContentPane().setLayout(new BorderLayout());
         panMain.setLayout(new GridBagLayout());
@@ -203,7 +204,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        panMain.add(new JLabel("Reference Number:"), gridBagConstraints);
+        panMain.add(new JLabel(resourceMap.getString("lblReference.text")), gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -214,57 +215,27 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panMain.add(txtNumber, gridBagConstraints);
 
-        txtPrincipal = new javax.swing.JTextField(formatter.format(loan.getPrincipal()));
+        txtPrincipal = new javax.swing.JFormattedTextField();
+        txtPrincipal.setFormatterFactory(new DefaultFormatterFactory(numberFormatter));
+        txtPrincipal.setText(loan.getPrincipal().toAmountAndSymbolString());
         txtPrincipal.setEditable(false);
-        btnPlusTenMillion = new JButton("+10mil");
-        btnMinusTenMillion = new JButton("-10mil");
-        btnPlusMillion = new JButton("+1mil");
-        btnMinusMillion = new JButton("-1mil");
-        btnPlusHundredK = new JButton("+100K");
-        btnMinusHundredK = new JButton("-100K");
-        btnPlusTenK = new JButton("+10K");
-        btnMinusTenK = new JButton("-10K");
+        btnPlusTenMillion = new JButton(resourceMap.getString("btnPlus10mil.text"));
+        btnMinusTenMillion = new JButton(resourceMap.getString("btnMinus10mil.text"));
+        btnPlusMillion = new JButton(resourceMap.getString("btnPlus1mil.text"));
+        btnMinusMillion = new JButton(resourceMap.getString("btnMinus1mil.text"));
+        btnPlusHundredK = new JButton(resourceMap.getString("btnPlus100k.text"));
+        btnMinusHundredK = new JButton(resourceMap.getString("btnMinus100k.text"));
+        btnPlusTenK = new JButton(resourceMap.getString("btnPlus10k.text"));
+        btnMinusTenK = new JButton(resourceMap.getString("btnMinus10k.text"));
         checkMinusButtons();
-        btnPlusTenMillion.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                adjustPrincipal(10000000);
-            }
-        });
-        btnMinusTenMillion.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                adjustPrincipal(-10000000);
-            }
-        });
-        btnPlusMillion.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                adjustPrincipal(1000000);
-            }
-        });
-        btnMinusMillion.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                adjustPrincipal(-1000000);
-            }
-        });
-        btnPlusHundredK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                adjustPrincipal(100000);
-            }
-        });
-        btnMinusHundredK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                adjustPrincipal(-100000);
-            }
-        });
-        btnPlusTenK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                adjustPrincipal(10000);
-            }
-        });
-        btnMinusTenK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                adjustPrincipal(-10000);
-            }
-        });
+        btnPlusTenMillion.addActionListener(evt -> adjustPrincipal(Money.of(10000000)));
+        btnMinusTenMillion.addActionListener(evt -> adjustPrincipal(Money.of(-10000000)));
+        btnPlusMillion.addActionListener(evt -> adjustPrincipal(Money.of(1000000)));
+        btnMinusMillion.addActionListener(evt -> adjustPrincipal(Money.of(-1000000)));
+        btnPlusHundredK.addActionListener(evt -> adjustPrincipal(Money.of(100000)));
+        btnMinusHundredK.addActionListener(evt -> adjustPrincipal(Money.of(-100000)));
+        btnPlusTenK.addActionListener(evt -> adjustPrincipal(Money.of(10000)));
+        btnMinusTenK.addActionListener(evt -> adjustPrincipal(Money.of(-10000)));
 
         JPanel plusPanel = new JPanel(new GridLayout(2, 4));
         plusPanel.add(btnPlusTenMillion);
@@ -281,11 +252,11 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         sldCollateral.addChangeListener(this);
         sldLength.addChangeListener(this);
 
-        DefaultComboBoxModel<String> scheduleModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> scheduleModel = new DefaultComboBoxModel<>();
         for (int i = 0; i < Finances.SCHEDULE_NUM; i++) {
             scheduleModel.addElement(Finances.getScheduleName(i));
         }
-        choiceSchedule = new JComboBox<String>(scheduleModel);
+        choiceSchedule = new JComboBox<>(scheduleModel);
         choiceSchedule.setSelectedIndex(loan.getPaymentSchedule());
 
         choiceSchedule.addActionListener(this);
@@ -296,7 +267,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        panMain.add(new JLabel("Principal:"), gridBagConstraints);
+        panMain.add(new JLabel(resourceMap.getString("lblPrincipal.text")), gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -320,7 +291,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        panMain.add(new JLabel("Annual Interest:"), gridBagConstraints);
+        panMain.add(new JLabel(resourceMap.getString("lblAnnualInterest.text")), gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -337,7 +308,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        panMain.add(new JLabel("Collateral:"), gridBagConstraints);
+        panMain.add(new JLabel(resourceMap.getString("lblCollateral.text")), gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -354,7 +325,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        panMain.add(new JLabel("Length (years):"), gridBagConstraints);
+        panMain.add(new JLabel(resourceMap.getString("lblLengthYears.text")), gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -372,7 +343,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        panMain.add(new JLabel("Payment Schedule:"), gridBagConstraints);
+        panMain.add(new JLabel(resourceMap.getString("lblPaymentSchedule.text")), gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -393,23 +364,14 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panMain.add(panInfo, gridBagConstraints);
 
-
         btnAdd = new JButton(resourceMap.getString("btnOkay.text")); // NOI18N
         btnAdd.setName("btnOK"); // NOI18N
-        btnAdd.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                addLoan();
-            }
-        });
+        btnAdd.addActionListener(evt -> addLoan());
         panBtn.add(btnAdd);
 
         btnCancel = new JButton(resourceMap.getString("btnCancel.text")); // NOI18N
         btnCancel.setName("btnClose"); // NOI18N
-        btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cancel();
-            }
-        });
+        btnCancel.addActionListener(evt -> cancel());
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
@@ -422,9 +384,16 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         pack();
     }
 
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(NewLoanDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
+
     private void setUpInfo() {
         panInfo.setLayout(new GridLayout());
-        panInfo.setBorder(BorderFactory.createTitledBorder("Loan Details"));
+        panInfo.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("detailsTitle.text")));
         refreshValues();
 
         JPanel panLeft = new JPanel(new GridBagLayout());
@@ -436,7 +405,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        panLeft.add(new JLabel("APR:"), gridBagConstraints);
+        panLeft.add(new JLabel(resourceMap.getString("lblAPR.text")), gridBagConstraints);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
@@ -446,7 +415,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         gridBagConstraints.gridy++;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panLeft.add(new JLabel("Collateral %:"), gridBagConstraints);
+        panLeft.add(new JLabel(resourceMap.getString("lblCollateralPct.text")), gridBagConstraints);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
@@ -456,7 +425,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         gridBagConstraints.gridy++;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panLeft.add(new JLabel("Length:"), gridBagConstraints);
+        panLeft.add(new JLabel(resourceMap.getString("lblLength.text")), gridBagConstraints);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
@@ -466,7 +435,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         gridBagConstraints.gridy++;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panLeft.add(new JLabel("Schedule:"), gridBagConstraints);
+        panLeft.add(new JLabel(resourceMap.getString("lblSchedule.text")), gridBagConstraints);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
@@ -478,7 +447,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        panRight.add(new JLabel("Principal Amount:"), gridBagConstraints);
+        panRight.add(new JLabel(resourceMap.getString("lblPrincipalAmount.text")), gridBagConstraints);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
@@ -488,7 +457,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         gridBagConstraints.gridy++;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panRight.add(new JLabel("First Payment Due:"), gridBagConstraints);
+        panRight.add(new JLabel(resourceMap.getString("lblFirstPayment.text")), gridBagConstraints);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
@@ -498,7 +467,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         gridBagConstraints.gridy++;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panRight.add(new JLabel("Installment Amount:"), gridBagConstraints);
+        panRight.add(new JLabel(resourceMap.getString("lblInstallmentAmount.text")), gridBagConstraints);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
@@ -508,7 +477,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         gridBagConstraints.gridy++;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panRight.add(new JLabel("Number of Payments:"), gridBagConstraints);
+        panRight.add(new JLabel(resourceMap.getString("lblNumberPayments.text")), gridBagConstraints);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
@@ -518,7 +487,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         gridBagConstraints.gridy++;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panRight.add(new JLabel("Total Amount:"), gridBagConstraints);
+        panRight.add(new JLabel(resourceMap.getString("lblTotalAmount.text")), gridBagConstraints);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
@@ -528,7 +497,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         gridBagConstraints.gridy++;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panRight.add(new JLabel("Collateral Amount:"), gridBagConstraints);
+        panRight.add(new JLabel(resourceMap.getString("lblCollateralAmount.text")), gridBagConstraints);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
@@ -538,22 +507,22 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         gridBagConstraints.gridy++;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panRight.add(new JLabel("Max Collateral Value:"), gridBagConstraints);
+        panRight.add(new JLabel(resourceMap.getString("lblMaxCollateral.text")), gridBagConstraints);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        panRight.add(new JLabel(formatter.format(maxCollateralValue)), gridBagConstraints);
+        panRight.add(new JLabel(maxCollateralValue.toAmountAndSymbolString()), gridBagConstraints);
 
         panInfo.add(panLeft);
         panInfo.add(panRight);
     }
 
-    private void refreshLoan(long principal) {
+    private void refreshLoan(Money principal) {
     	// Modify loan settings
     	loan.setPrincipal(principal);
-    	loan.setRate((int) sldInterest.getValue());
-    	loan.setCollateral((int) sldCollateral.getValue());
-    	loan.setYears((int) sldLength.getValue());
+    	loan.setRate(sldInterest.getValue());
+    	loan.setCollateral(sldCollateral.getValue());
+    	loan.setYears(sldLength.getValue());
     	loan.setSchedule(choiceSchedule.getSelectedIndex());
     	loan.setInstitution(txtName.getText());
     	loan.setRefNumber(txtNumber.getText());
@@ -568,26 +537,31 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
     }
 
     private void refreshValues() {
-        txtPrincipal.setText(formatter.format(loan.getPrincipal()));
-        lblAPR.setText(loan.getInterestRate() + "%");
-        lblCollateralPct.setText(loan.getCollateralPercent() + "%");
-        lblYears.setText(loan.getYears() + " years");
-        lblSchedule.setText(Finances.getScheduleName(loan.getPaymentSchedule()));
-        lblPrincipal.setText(formatter.format(loan.getPrincipal()));
-        lblFirstPayment.setText(SimpleDateFormat.getDateInstance().format(loan.getNextPayDate()));
-        lblPayAmount.setText(formatter.format(loan.getPaymentAmount()));
-        lblNPayment.setText(formatter.format(loan.getRemainingPayments()));
-        lblTotalPayment.setText(formatter.format(loan.getRemainingValue()));
-        lblCollateralAmount.setText(formatter.format(loan.getCollateralAmount()));
+        final String METHOD_NAME = "refreshValues";
+        try {
+            txtPrincipal.setText(loan.getPrincipal().toAmountAndSymbolString());
+            lblAPR.setText(loan.getInterestRate() + "%");
+            lblCollateralPct.setText(loan.getCollateralPercent() + "%");
+            lblYears.setText(loan.getYears() + " years");
+            lblSchedule.setText(Finances.getScheduleName(loan.getPaymentSchedule()));
+            lblPrincipal.setText(loan.getPrincipal().toAmountAndSymbolString());
+            lblFirstPayment.setText(SimpleDateFormat.getDateInstance().format(loan.getNextPayDate()));
+            lblPayAmount.setText(loan.getPaymentAmount().toAmountAndSymbolString());
+            lblNPayment.setText(numberFormatter.valueToString(loan.getRemainingPayments()));
+            lblTotalPayment.setText(loan.getRemainingValue().toAmountAndSymbolString());
+            lblCollateralAmount.setText(loan.getCollateralAmount().toAmountAndSymbolString());
+        } catch (Exception ex ){
+            MekHQ.getLogger().error(NewLoanDialog.class, METHOD_NAME, ex);
+        }
     }
 
-
     private void addLoan() {
-        if (maxCollateralValue < loan.getCollateralAmount()) {
-            JOptionPane.showMessageDialog(frame,
-                                          "The collateral amount of this loan is higher than the total value of assets",
-                                          "Collateral Too High",
-                                          JOptionPane.ERROR_MESSAGE);
+        if (maxCollateralValue.isLessThan(loan.getCollateralAmount())) {
+            JOptionPane.showMessageDialog(
+                    frame,
+                    resourceMap.getString("addLoanErrorMessage.text"),
+                    resourceMap.getString("addLoanErrorTitle.text"),
+                    JOptionPane.ERROR_MESSAGE);
             return;
         }
         campaign.addLoan(loan);
@@ -597,7 +571,6 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
     private void cancel() {
         this.setVisible(false);
     }
-
 
     private void setSliders() {
         if (campaign.getCampaignOptions().useLoanLimits()) {
@@ -664,17 +637,16 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         refreshLoan(loan.getPrincipal());
     }
 
-    private void adjustPrincipal(long value) {
-        long newPrincipal = loan.getPrincipal() + value;
+    private void adjustPrincipal(Money value) {
+        Money newPrincipal = loan.getPrincipal().plus(value);
         refreshLoan(newPrincipal);
         checkMinusButtons();
     }
 
     private void checkMinusButtons() {
-        btnMinusTenMillion.setEnabled(loan.getPrincipal() > 10000000);
-        btnMinusMillion.setEnabled(loan.getPrincipal() > 1000000);
-        btnMinusHundredK.setEnabled(loan.getPrincipal() > 100000);
-        btnMinusTenK.setEnabled(loan.getPrincipal() > 10000);
+        btnMinusTenMillion.setEnabled(loan.getPrincipal().isGreaterThan(Money.of(10000000)));
+        btnMinusMillion.setEnabled(loan.getPrincipal().isGreaterThan(Money.of(1000000)));
+        btnMinusHundredK.setEnabled(loan.getPrincipal().isGreaterThan(Money.of(100000)));
+        btnMinusTenK.setEnabled(loan.getPrincipal().isGreaterThan(Money.of(10000)));
     }
-
 }

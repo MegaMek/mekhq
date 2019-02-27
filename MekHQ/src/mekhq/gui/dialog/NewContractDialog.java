@@ -27,12 +27,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
+import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -44,10 +43,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
@@ -56,8 +55,10 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.universe.Planets;
+import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.view.ContractPaymentBreakdown;
+import mekhq.preferences.PreferencesNode;
 
 /**
  *
@@ -68,7 +69,6 @@ public class NewContractDialog extends javax.swing.JDialog {
     protected Frame frame;
     protected Contract contract;
     protected Campaign campaign;
-    protected DecimalFormat formatter;
     protected SimpleDateFormat dateFormatter;
     private JComboBox<Person> cboNegotiator;
 
@@ -81,10 +81,10 @@ public class NewContractDialog extends javax.swing.JDialog {
         campaign = c;
         contract = new Contract("New Contract", "New Employer");
         contract.calculateContract(campaign);
-        formatter = new DecimalFormat();
         dateFormatter = new SimpleDateFormat("EEEE, MMMM d yyyy");
         initComponents();
         setLocationRelativeTo(parent);
+        setUserPreferences();
     }
 
     protected void initComponents() {
@@ -149,12 +149,7 @@ public class NewContractDialog extends javax.swing.JDialog {
      
         btnOK.setText(resourceMap.getString("btnOkay.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
-        btnOK.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOKActionPerformed(evt);
-            }
-        });
+        btnOK.addActionListener(evt -> btnOKActionPerformed(evt));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
@@ -165,12 +160,7 @@ public class NewContractDialog extends javax.swing.JDialog {
 
         btnClose.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
-        btnClose.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCloseActionPerformed(evt);
-            }
-        });
+        btnClose.addActionListener(evt -> btnCloseActionPerformed(evt));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
@@ -182,13 +172,20 @@ public class NewContractDialog extends javax.swing.JDialog {
         pack();
     }
 
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(NewContractDialog.class);
+
+        this.setName("dialog");
+        preferences.manage(new JWindowPreference(this));
+    }
+
 	protected void initDescPanel(ResourceBundle resourceMap, JPanel descPanel) {
 		java.awt.GridBagConstraints gridBagConstraints;
 		txtName = new javax.swing.JTextField();
         JLabel lblName = new JLabel();
         txtEmployer = new javax.swing.JTextField();
         JLabel lblEmployer = new JLabel();
-        cboNegotiator = new JComboBox<Person>();
+        cboNegotiator = new JComboBox<>();
         txtType = new javax.swing.JTextField();
         JLabel lblType = new JLabel();
         btnOK = new javax.swing.JButton();
@@ -368,12 +365,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         //btnDate.setMinimumSize(new java.awt.Dimension(400, 30));
         btnDate.setName("btnDate"); // NOI18N
         //btnDate.setPreferredSize(new java.awt.Dimension(400, 30));
-        btnDate.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                changeStartDate();
-            }
-        });
+        btnDate.addActionListener(evt -> changeStartDate());
 
         checkMRBC = new JCheckBox(resourceMap.getString("checkMRBC.text"));
         checkMRBC.setSelected(contract.payMRBCFee());
@@ -390,20 +382,20 @@ public class NewContractDialog extends javax.swing.JDialog {
         spnMultiplier = new JSpinner(new SpinnerNumberModel(contract.getMultiplier(), 0.5, 10.0, 0.1));
         spnMultiplier.addChangeListener(contractUpdateChangeListener);
         
-        DefaultComboBoxModel<String> overheadModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> overheadModel = new DefaultComboBoxModel<>();
 		for (int i = 0; i < Contract.OH_NUM; i++) {
 			overheadModel.addElement(Contract.getOverheadCompName(i));
 		}
-		choiceOverhead = new JComboBox<String>(overheadModel);
+		choiceOverhead = new JComboBox<>(overheadModel);
 		choiceOverhead.setSelectedIndex(contract.getOverheadComp());
         choiceOverhead.addActionListener(contractUpdateActionListener);
         choiceOverhead.addFocusListener(contractUpdateFocusListener);
         
-        DefaultComboBoxModel<String> commandModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> commandModel = new DefaultComboBoxModel<>();
 		for (int i = 0; i < Contract.COM_NUM; i++) {
 			commandModel.addElement(Contract.getCommandRightsName(i));
 		}
-		choiceCommand = new JComboBox<String>(commandModel);
+		choiceCommand = new JComboBox<>(commandModel);
 		choiceCommand.setSelectedIndex(contract.getCommandRights());
 		choiceCommand.addActionListener(contractUpdateActionListener);
 		
@@ -776,26 +768,11 @@ public class NewContractDialog extends javax.swing.JDialog {
         }
     };
 
-    protected ActionListener contractUpdateActionListener = new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            doUpdateContract(e.getSource());
-        }
-    };
+    protected ActionListener contractUpdateActionListener = e -> doUpdateContract(e.getSource());
 
-    protected ItemListener contractUpdateItemListener = new ItemListener() {
-        @Override
-        public void itemStateChanged(ItemEvent e) {
-            doUpdateContract(e.getSource());
-        }
-    };
+    protected ItemListener contractUpdateItemListener = e -> doUpdateContract(e.getSource());
 
-    protected ChangeListener contractUpdateChangeListener = new ChangeListener() {
-        @Override
-        public void stateChanged(ChangeEvent e) {
-            doUpdateContract(e.getSource());
-        }
-    };
+    protected ChangeListener contractUpdateChangeListener = e -> doUpdateContract(e.getSource());
 
     protected void doUpdateContract(Object source) {
         if (suggestPlanet.equals(source)) {

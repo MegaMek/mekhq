@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.util.Base64;
 
 public final class TestUtilities {
-
     public static Campaign getTestCampaign() {
         return new Campaign();
     }

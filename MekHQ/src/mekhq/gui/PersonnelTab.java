@@ -60,11 +60,15 @@ import mekhq.campaign.personnel.Person;
 import mekhq.gui.adapter.PersonnelTableMouseAdapter;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.model.XTableColumnModel;
+import mekhq.gui.preferences.JComboBoxPreference;
+import mekhq.gui.preferences.JTablePreference;
+import mekhq.gui.preferences.JToggleButtonPreference;
 import mekhq.gui.sorter.BonusSorter;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.LevelSorter;
 import mekhq.gui.sorter.RankSorter;
 import mekhq.gui.view.PersonViewPanel;
+import mekhq.preferences.PreferencesNode;
 
 /**
  * Tab for interacting with all personnel
@@ -122,6 +126,7 @@ public final class PersonnelTab extends CampaignGuiTab {
     PersonnelTab(CampaignGUI gui, String name) {
         super(gui, name);
         MekHQ.registerHandler(this);
+        setUserPreferences();
     }
 
     @Override
@@ -284,6 +289,22 @@ public final class PersonnelTab extends CampaignGuiTab {
         add(splitPersonnel, gridBagConstraints);
 
         filterPersonnel();
+    }
+
+    private void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(PersonnelTab.class);
+
+        choicePerson.setName("personnelType");
+        preferences.manage(new JComboBoxPreference(choicePerson));
+
+        choicePersonView.setName("personnelView");
+        preferences.manage(new JComboBoxPreference(choicePersonView));
+
+        chkGroupByUnit.setName("groupByUnit");
+        preferences.manage(new JToggleButtonPreference(chkGroupByUnit));
+
+        personnelTable.setName("personnelTable");
+        preferences.manage(new JTablePreference(personnelTable));
     }
 
     /* For export */
