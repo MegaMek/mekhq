@@ -65,7 +65,8 @@ public class EnginePart extends Part {
     }
 
     public EnginePart clone() {
-        EnginePart clone = new EnginePart(getUnitTonnage(), new Engine(engine.getRating(), engine.getEngineType(), engine.getFlags()), campaign, forHover);
+        EnginePart clone = new EnginePart(getUnitTonnage(),
+                new Engine(engine.getRating(), engine.getEngineType(), engine.getFlags()), campaign, forHover);
         clone.copyBaseData(this);
         return clone;
     }
@@ -78,32 +79,32 @@ public class EnginePart extends Part {
     public double getTonnage() {
         double weight = Engine.ENGINE_RATINGS[(int) Math.ceil(engine.getRating() / 5.0)];
         switch (engine.getEngineType()) {
-            case Engine.COMBUSTION_ENGINE:
-                weight *= 2.0f;
-                break;
-            case Engine.NORMAL_ENGINE:
-                break;
-            case Engine.XL_ENGINE:
-                weight *= 0.5f;
-                break;
-            case Engine.LIGHT_ENGINE:
-                weight *= 0.75f;
-                break;
-            case Engine.XXL_ENGINE:
-                weight /= 3f;
-                break;
-            case Engine.COMPACT_ENGINE:
-                weight *= 1.5f;
-                break;
-            case Engine.FISSION:
-                weight *= 1.75;
-                weight = Math.max(5, weight);
-                break;
-            case Engine.FUEL_CELL:
-                weight *= 1.2;
-                break;
-            case Engine.NONE:
-                return 0;
+        case Engine.COMBUSTION_ENGINE:
+            weight *= 2.0f;
+            break;
+        case Engine.NORMAL_ENGINE:
+            break;
+        case Engine.XL_ENGINE:
+            weight *= 0.5f;
+            break;
+        case Engine.LIGHT_ENGINE:
+            weight *= 0.75f;
+            break;
+        case Engine.XXL_ENGINE:
+            weight /= 3f;
+            break;
+        case Engine.COMPACT_ENGINE:
+            weight *= 1.5f;
+            break;
+        case Engine.FISSION:
+            weight *= 1.75;
+            weight = Math.max(5, weight);
+            break;
+        case Engine.FUEL_CELL:
+            weight *= 1.2;
+            break;
+        case Engine.NONE:
+            return 0;
         }
         weight = TestEntity.ceilMaxHalf(weight, TestEntity.Ceil.HALFTON);
 
@@ -113,14 +114,14 @@ public class EnginePart extends Part {
         double toReturn = TestEntity.ceilMaxHalf(weight, TestEntity.Ceil.HALFTON);
         // hover have a minimum weight of 20%
         if (forHover) {
-            return Math.max(TestEntity.ceilMaxHalf(getUnitTonnage()/5.0, TestEntity.Ceil.HALFTON), toReturn);
+            return Math.max(TestEntity.ceilMaxHalf(getUnitTonnage() / 5.0, TestEntity.Ceil.HALFTON), toReturn);
         }
         return toReturn;
     }
 
     @Override
     public Money getStickerPrice() {
-        return Money.of((double)getEngine().getBaseCost() / 75.0 * getEngine().getRating() * getUnitTonnage());
+        return Money.of((double) getEngine().getBaseCost() / 75.0 * getEngine().getRating() * getUnitTonnage());
     }
 
     @Override
@@ -133,7 +134,7 @@ public class EnginePart extends Part {
 
     public void fixTankFlag(boolean hover) {
         int flags = engine.getFlags();
-        if(!engine.hasFlag(Engine.TANK_ENGINE)) {
+        if (!engine.hasFlag(Engine.TANK_ENGINE)) {
             flags |= Engine.TANK_ENGINE;
         }
         engine = new Engine(engine.getRating(), engine.getEngineType(), flags);
@@ -143,7 +144,7 @@ public class EnginePart extends Part {
 
     public void fixClanFlag() {
         int flags = engine.getFlags();
-        if(!engine.hasFlag(Engine.CLAN_ENGINE)) {
+        if (!engine.hasFlag(Engine.CLAN_ENGINE)) {
             flags |= Engine.CLAN_ENGINE;
         }
         engine = new Engine(engine.getRating(), engine.getEngineType(), flags);
@@ -153,17 +154,14 @@ public class EnginePart extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         int year = campaign.getCalendar().get(GregorianCalendar.YEAR);
-        return part instanceof EnginePart
-                && getName().equals(part.getName())
-                && getEngine().getEngineType() == ((EnginePart) part)
-                        .getEngine().getEngineType()
-                && getEngine().getRating() == ((EnginePart) part).getEngine()
-                        .getRating()
-                && getEngine().getTechType(year) == ((EnginePart) part).getEngine()
-                        .getTechType(year)
-                && getEngine().hasFlag(Engine.TANK_ENGINE) == ((EnginePart) part).getEngine().hasFlag(Engine.TANK_ENGINE)
+        return part instanceof EnginePart && getName().equals(part.getName())
+                && getEngine().getEngineType() == ((EnginePart) part).getEngine().getEngineType()
+                && getEngine().getRating() == ((EnginePart) part).getEngine().getRating()
+                && getEngine().getTechType(year) == ((EnginePart) part).getEngine().getTechType(year)
+                && getEngine().hasFlag(Engine.TANK_ENGINE) == ((EnginePart) part).getEngine()
+                        .hasFlag(Engine.TANK_ENGINE)
                 && getUnitTonnage() == ((EnginePart) part).getUnitTonnage()
-                && getTonnage() == ((EnginePart)part).getTonnage();
+                && getTonnage() == ((EnginePart) part).getTonnage();
     }
 
     @Override
@@ -172,18 +170,10 @@ public class EnginePart extends Part {
         // The engine is a MM object...
         // And doesn't support XML serialization...
         // But it's defined by 3 ints. So we'll save those here.
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<engineType>"
-                + engine.getEngineType() + "</engineType>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<engineRating>"
-                + engine.getRating() + "</engineRating>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<engineFlags>"
-                +engine.getFlags()
-                +"</engineFlags>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<forHover>"
-                +forHover
-                +"</forHover>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<engineType>" + engine.getEngineType() + "</engineType>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<engineRating>" + engine.getRating() + "</engineRating>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<engineFlags>" + engine.getFlags() + "</engineFlags>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<forHover>" + forHover + "</forHover>");
         writeToXmlEnd(pw1, indent);
     }
 
@@ -194,7 +184,7 @@ public class EnginePart extends Part {
         int engineRating = -1;
         int engineFlags = 0;
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
             if (wn2.getNodeName().equalsIgnoreCase("engineType")) {
@@ -214,46 +204,47 @@ public class EnginePart extends Part {
     @Override
     public void fix() {
         super.fix();
-        if(null != unit) {
-            if(unit.getEntity() instanceof Mech) {
+        if (null != unit) {
+            if (unit.getEntity() instanceof Mech) {
                 unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
             }
-            if(unit.getEntity() instanceof Aero) {
-                ((Aero)unit.getEntity()).setEngineHits(0);
+            if (unit.getEntity() instanceof Aero) {
+                ((Aero) unit.getEntity()).setEngineHits(0);
             }
-            if(unit.getEntity() instanceof Tank) {
-                ((Tank)unit.getEntity()).engineFix();
+            if (unit.getEntity() instanceof Tank) {
+                ((Tank) unit.getEntity()).engineFix();
             }
-            if(unit.getEntity() instanceof Protomech) {
-                ((Protomech)unit.getEntity()).setEngineHit(false);
+            if (unit.getEntity() instanceof Protomech) {
+                ((Protomech) unit.getEntity()).setEngineHit(false);
             }
         }
     }
 
     @Override
     public MissingPart getMissingPart() {
-        return new MissingEnginePart(getUnitTonnage(), new Engine(engine.getRating(), engine.getEngineType(), engine.getFlags()), campaign, forHover);
+        return new MissingEnginePart(getUnitTonnage(),
+                new Engine(engine.getRating(), engine.getEngineType(), engine.getFlags()), campaign, forHover);
     }
 
     @Override
     public void remove(boolean salvage) {
-        if(null != unit) {
-            if(unit.getEntity() instanceof Mech) {
+        if (null != unit) {
+            if (unit.getEntity() instanceof Mech) {
                 unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
             }
-            if(unit.getEntity() instanceof Aero) {
-                ((Aero)unit.getEntity()).setEngineHits(((Aero)unit.getEntity()).getMaxEngineHits());
+            if (unit.getEntity() instanceof Aero) {
+                ((Aero) unit.getEntity()).setEngineHits(((Aero) unit.getEntity()).getMaxEngineHits());
             }
-            if(unit.getEntity() instanceof Tank) {
-                ((Tank)unit.getEntity()).engineHit();
+            if (unit.getEntity() instanceof Tank) {
+                ((Tank) unit.getEntity()).engineHit();
             }
-            if(unit.getEntity() instanceof Protomech) {
-                ((Protomech)unit.getEntity()).setEngineHit(true);
+            if (unit.getEntity() instanceof Protomech) {
+                ((Protomech) unit.getEntity()).setEngineHit(true);
             }
             Part spare = campaign.checkForExistingSparePart(this);
-            if(!salvage) {
+            if (!salvage) {
                 campaign.removePart(this);
-            } else if(null != spare) {
+            } else if (null != spare) {
                 spare.incrementQuantity();
                 campaign.removePart(this);
             }
@@ -267,40 +258,37 @@ public class EnginePart extends Part {
 
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
-        if(null != unit) {
+        if (null != unit) {
             int engineHits = 0;
             int engineCrits = 0;
             Entity entity = unit.getEntity();
-            if(unit.getEntity() instanceof Mech) {
+            if (unit.getEntity() instanceof Mech) {
                 for (int i = 0; i < entity.locations(); i++) {
-                    engineHits += entity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM,
-                            Mech.SYSTEM_ENGINE, i);
-                    engineCrits += entity.getNumberOfCriticals(
-                            CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, i);
+                    engineHits += entity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, i);
+                    engineCrits += entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, i);
                 }
             }
-            if(unit.getEntity() instanceof Aero) {
-                engineHits = ((Aero)unit.getEntity()).getEngineHits();
+            if (unit.getEntity() instanceof Aero) {
+                engineHits = ((Aero) unit.getEntity()).getEngineHits();
                 engineCrits = 3;
             }
-            if(unit.getEntity() instanceof Tank) {
+            if (unit.getEntity() instanceof Tank) {
                 engineCrits = 2;
-                if(((Tank)unit.getEntity()).isEngineHit()) {
+                if (((Tank) unit.getEntity()).isEngineHit()) {
                     engineHits = 1;
                 }
             }
-            if(unit.getEntity() instanceof Protomech) {
+            if (unit.getEntity() instanceof Protomech) {
                 engineCrits = 1;
-                if(unit.getEntity().getInternal(Protomech.LOC_TORSO) == IArmorState.ARMOR_DESTROYED) {
+                if (unit.getEntity().getInternal(Protomech.LOC_TORSO) == IArmorState.ARMOR_DESTROYED) {
                     engineHits = 1;
                 } else {
-                    engineHits = ((Protomech)unit.getEntity()).getEngineHits();
+                    engineHits = ((Protomech) unit.getEntity()).getEngineHits();
                 }
             }
-            if(engineHits >= engineCrits) {
+            if (engineHits >= engineCrits) {
                 remove(false);
-            }
-            else if(engineHits > 0) {
+            } else if (engineHits > 0) {
                 hits = engineHits;
             } else {
                 hits = 0;
@@ -310,11 +298,11 @@ public class EnginePart extends Part {
 
     @Override
     public int getBaseTime() {
-        //TODO: keep an aero flag here, so we dont need the unit
-        if(null != unit && unit.getEntity() instanceof Aero && hits > 0) {
+        // TODO: keep an aero flag here, so we dont need the unit
+        if (null != unit && unit.getEntity() instanceof Aero && hits > 0) {
             return 300;
         }
-        if(isSalvaging()) {
+        if (isSalvaging()) {
             return 360;
         }
         if (hits == 1) {
@@ -329,11 +317,11 @@ public class EnginePart extends Part {
 
     @Override
     public int getDifficulty() {
-        //TODO: keep an aero flag here, so we dont need the unit
-        if(null != unit && unit.getEntity() instanceof Aero && hits > 0) {
+        // TODO: keep an aero flag here, so we dont need the unit
+        if (null != unit && unit.getEntity() instanceof Aero && hits > 0) {
             return 1;
         }
-        if(isSalvaging()) {
+        if (isSalvaging()) {
             return -1;
         }
         if (hits == 1) {
@@ -346,7 +334,6 @@ public class EnginePart extends Part {
         return 0;
     }
 
-
     @Override
     public boolean needsFixing() {
         return hits > 0;
@@ -354,97 +341,96 @@ public class EnginePart extends Part {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit) {
-            if(hits == 0) {
-                if(unit.getEntity() instanceof Mech) {
+        if (null != unit) {
+            if (hits == 0) {
+                if (unit.getEntity() instanceof Mech) {
                     unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
                 }
-                if(unit.getEntity() instanceof Aero) {
-                    ((Aero)unit.getEntity()).setEngineHits(0);
+                if (unit.getEntity() instanceof Aero) {
+                    ((Aero) unit.getEntity()).setEngineHits(0);
                 }
-                if(unit.getEntity() instanceof Tank) {
-                    ((Tank)unit.getEntity()).engineFix();
+                if (unit.getEntity() instanceof Tank) {
+                    ((Tank) unit.getEntity()).engineFix();
                 }
-                if(unit.getEntity() instanceof Protomech) {
-                    ((Protomech)unit.getEntity()).setEngineHit(false);
+                if (unit.getEntity() instanceof Protomech) {
+                    ((Protomech) unit.getEntity()).setEngineHit(false);
                 }
             } else {
-                if(unit.getEntity() instanceof Mech) {
+                if (unit.getEntity() instanceof Mech) {
                     unit.damageSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, hits);
                 }
-                if(unit.getEntity() instanceof Aero) {
-                    ((Aero)unit.getEntity()).setEngineHits(hits);
+                if (unit.getEntity() instanceof Aero) {
+                    ((Aero) unit.getEntity()).setEngineHits(hits);
                 }
-                if(unit.getEntity() instanceof Tank) {
-                    ((Tank)unit.getEntity()).engineHit();
+                if (unit.getEntity() instanceof Tank) {
+                    ((Tank) unit.getEntity()).engineHit();
                 }
-                if(unit.getEntity() instanceof Protomech) {
-                    ((Protomech)unit.getEntity()).setEngineHit(true);
+                if (unit.getEntity() instanceof Protomech) {
+                    ((Protomech) unit.getEntity()).setEngineHit(true);
                 }
             }
         }
     }
 
     @Override
-     public String checkFixable() {
-        if(null == unit) {
+    public String checkFixable() {
+        if (null == unit) {
             return null;
         }
-        if(isSalvaging()) {
+        if (isSalvaging()) {
             return null;
         }
-        for(int i = 0; i < unit.getEntity().locations(); i++) {
-            if(unit.isLocationBreached(i)) {
+        for (int i = 0; i < unit.getEntity().locations(); i++) {
+            if (unit.isLocationBreached(i)) {
                 return unit.getEntity().getLocationName(i) + " is breached.";
             }
-            if(unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, i) > 0
+            if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, i) > 0
                     && unit.isLocationDestroyed(i)) {
                 return unit.getEntity().getLocationName(i) + " is destroyed.";
             }
         }
         return null;
-     }
+    }
 
     @Override
     public boolean isMountedOnDestroyedLocation() {
-        if(null == unit) {
+        if (null == unit) {
             return false;
         }
-        for(int i = 0; i < unit.getEntity().locations(); i++) {
-             if(unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, i) > 0
-                     && unit.isLocationDestroyed(i)) {
-                 return true;
-             }
-         }
+        for (int i = 0; i < unit.getEntity().locations(); i++) {
+            if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, i) > 0
+                    && unit.isLocationDestroyed(i)) {
+                return true;
+            }
+        }
         return false;
     }
 
-     @Override
-     public String getDetails() {
-         if(null != unit) {
-             return super.getDetails();
-         }
-         String hvrString = "";
-         if(forHover) {
-             hvrString = " (hover)";
-         }
-         return super.getDetails() + ", " + getUnitTonnage() + " tons" + hvrString;
-     }
-
-     @Override
-     public boolean isPartForEquipmentNum(int index, int loc) {
-         return Mech.SYSTEM_ENGINE == index && loc == getLocation();
-     }
-
-     @Override
-        public boolean isRightTechType(String skillType) {
-            if(getEngine().hasFlag(Engine.TANK_ENGINE)) {
-                return skillType.equals(SkillType.S_TECH_MECHANIC);
-            }
-            else {
-                return skillType.equals(SkillType.S_TECH_MECH) || skillType.equals(SkillType.S_TECH_AERO);
-            }
+    @Override
+    public String getDetails() {
+        if (null != unit) {
+            return super.getDetails();
         }
+        String hvrString = "";
+        if (forHover) {
+            hvrString = " (hover)";
+        }
+        return super.getDetails() + ", " + getUnitTonnage() + " tons" + hvrString;
+    }
+
+    @Override
+    public boolean isPartForEquipmentNum(int index, int loc) {
+        return Mech.SYSTEM_ENGINE == index && loc == getLocation();
+    }
+
+    @Override
+    public boolean isRightTechType(String skillType) {
+        if (getEngine().hasFlag(Engine.TANK_ENGINE)) {
+            return skillType.equals(SkillType.S_TECH_MECHANIC);
+        } else {
+            return skillType.equals(SkillType.S_TECH_MECH) || skillType.equals(SkillType.S_TECH_AERO);
+        }
+    }
 
     @Override
     public String getLocationName() {
@@ -464,26 +450,25 @@ public class EnginePart extends Part {
 
     @Override
     public boolean isInLocation(String loc) {
-         if(null == unit || null == unit.getEntity()) {
-             return false;
-         }
-         if (unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_CT) {
-             return true;
-         }
-         boolean needsSideTorso = false;
-         switch (getEngine().getEngineType()) {
-             case Engine.XL_ENGINE:
-             case Engine.LIGHT_ENGINE:
-             case Engine.XXL_ENGINE:
-                 needsSideTorso = true;
-                 break;
-         }
-         if (needsSideTorso
-                 && (unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_LT
-                         || unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_RT)) {
-             return true;
-         }
-         return false;
+        if (null == unit || null == unit.getEntity()) {
+            return false;
+        }
+        if (unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_CT) {
+            return true;
+        }
+        boolean needsSideTorso = false;
+        switch (getEngine().getEngineType()) {
+        case Engine.XL_ENGINE:
+        case Engine.LIGHT_ENGINE:
+        case Engine.XXL_ENGINE:
+            needsSideTorso = true;
+            break;
+        }
+        if (needsSideTorso && (unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_LT
+                || unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_RT)) {
+            return true;
+        }
+        return false;
     }
 
     @Override

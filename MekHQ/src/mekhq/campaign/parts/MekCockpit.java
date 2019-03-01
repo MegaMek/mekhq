@@ -113,21 +113,17 @@ public class MekCockpit extends Part {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return part instanceof MekCockpit 
-                && ((MekCockpit)part).getType() == type;
+        return part instanceof MekCockpit && ((MekCockpit) part).getType() == type;
     }
-    
+
     public int getType() {
         return type;
     }
-    
+
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<type>"
-                +type
-                +"</type>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<type>" + type + "</type>");
         writeToXmlEnd(pw1, indent);
     }
 
@@ -135,7 +131,7 @@ public class MekCockpit extends Part {
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
             if (wn2.getNodeName().equalsIgnoreCase("type")) {
@@ -147,7 +143,7 @@ public class MekCockpit extends Part {
     @Override
     public void fix() {
         super.fix();
-        if(null != unit) {
+        if (null != unit) {
             unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT);
         }
     }
@@ -159,12 +155,12 @@ public class MekCockpit extends Part {
 
     @Override
     public void remove(boolean salvage) {
-        if(null != unit) {
+        if (null != unit) {
             unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT);
             Part spare = campaign.checkForExistingSparePart(this);
-            if(!salvage) {
+            if (!salvage) {
                 campaign.removePart(this);
-            } else if(null != spare) {
+            } else if (null != spare) {
                 spare.incrementQuantity();
                 campaign.removePart(this);
             }
@@ -180,11 +176,11 @@ public class MekCockpit extends Part {
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
         int priorHits = hits;
-        if(null != unit) {
+        if (null != unit) {
             Entity entity = unit.getEntity();
             for (int i = 0; i < entity.locations(); i++) {
                 if (entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT, i) > 0) {
-                    //check for missing equipment as well
+                    // check for missing equipment as well
                     if (!unit.isSystemMissing(Mech.SYSTEM_COCKPIT, i)) {
                         hits = entity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT, i);
                         break;
@@ -194,8 +190,7 @@ public class MekCockpit extends Part {
                     }
                 }
             }
-            if(checkForDestruction
-                    && hits > priorHits
+            if (checkForDestruction && hits > priorHits
                     && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
             }
@@ -204,19 +199,19 @@ public class MekCockpit extends Part {
 
     @Override
     public int getBaseTime() {
-        if(isSalvaging()) {
+        if (isSalvaging()) {
             return 300;
         }
-        //TODO: These are made up values until the errata establish them
+        // TODO: These are made up values until the errata establish them
         return 200;
     }
 
     @Override
     public int getDifficulty() {
-        if(isSalvaging()) {
+        if (isSalvaging()) {
             return 0;
         }
-        //TODO: These are made up values until the errata establish them
+        // TODO: These are made up values until the errata establish them
         return 3;
     }
 
@@ -227,8 +222,8 @@ public class MekCockpit extends Part {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit) {
-            if(hits == 0) {
+        if (null != unit) {
+            if (hits == 0) {
                 unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT);
             } else {
                 unit.damageSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT, hits);
@@ -238,18 +233,18 @@ public class MekCockpit extends Part {
 
     @Override
     public String checkFixable() {
-        if(null == unit) {
+        if (null == unit) {
             return null;
         }
-        if(isSalvaging()) {
+        if (isSalvaging()) {
             return null;
         }
-        for(int i = 0; i < unit.getEntity().locations(); i++) {
-            if(unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT, i) > 0) {
-                if(unit.isLocationBreached(i)) {
+        for (int i = 0; i < unit.getEntity().locations(); i++) {
+            if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT, i) > 0) {
+                if (unit.isLocationBreached(i)) {
                     return unit.getEntity().getLocationName(i) + " is breached.";
                 }
-                if(unit.isLocationDestroyed(i)) {
+                if (unit.isLocationDestroyed(i)) {
                     return unit.getEntity().getLocationName(i) + " is destroyed.";
                 }
             }
@@ -259,27 +254,27 @@ public class MekCockpit extends Part {
 
     @Override
     public boolean isMountedOnDestroyedLocation() {
-        if(null == unit) {
+        if (null == unit) {
             return false;
         }
-        for(int i = 0; i < unit.getEntity().locations(); i++) {
-             if(unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT, i) > 0
-                     && unit.isLocationDestroyed(i)) {
-                 return true;
-             }
-         }
+        for (int i = 0; i < unit.getEntity().locations(); i++) {
+            if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT, i) > 0
+                    && unit.isLocationDestroyed(i)) {
+                return true;
+            }
+        }
         return false;
     }
 
-     @Override
-     public boolean isPartForEquipmentNum(int index, int loc) {
-         return Mech.SYSTEM_COCKPIT == index && loc == getLocation();
-     }
+    @Override
+    public boolean isPartForEquipmentNum(int index, int loc) {
+        return Mech.SYSTEM_COCKPIT == index && loc == getLocation();
+    }
 
-     @Override
-     public boolean isRightTechType(String skillType) {
-         return skillType.equals(SkillType.S_TECH_MECH);
-     }
+    @Override
+    public boolean isRightTechType(String skillType) {
+        return skillType.equals(SkillType.S_TECH_MECH);
+    }
 
     @Override
     public String getLocationName() {
@@ -289,7 +284,7 @@ public class MekCockpit extends Part {
 
     @Override
     public int getLocation() {
-        if(type == Mech.COCKPIT_TORSO_MOUNTED) {
+        if (type == Mech.COCKPIT_TORSO_MOUNTED) {
             return Mech.LOC_CT;
         } else {
             return Mech.LOC_HEAD;
