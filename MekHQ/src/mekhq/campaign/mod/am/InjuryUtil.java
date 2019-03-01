@@ -278,9 +278,8 @@ public final class InjuryUtil {
                 if (roll < fumbleLimit && c.getCampaignOptions().useSupportEdge()
                         && (doc.getOptions().booleanOption(PersonnelOptions.EDGE_MEDICAL) && doc.getCurrentEdge() > 0)) {
                     result.add(new GameEffect(
-                    String.format("%s made a mistake, but used Edge to reroll.",
-                            doc.getHyperlinkedFullTitle(), p.getHyperlinkedName(),
-                            p.getGenderPronoun(Person.PRONOUN_HISHER), i.getName())));
+                    String.format("%s made a mistake in the treatment of %s, but used Edge to reroll.",
+                            doc.getHyperlinkedFullTitle(), p.getHyperlinkedName())));
                     doc.setCurrentEdge(doc.getCurrentEdge() - 1);
                     roll = Compute.randomInt(100);
                 }
