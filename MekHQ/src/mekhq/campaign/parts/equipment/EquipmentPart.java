@@ -155,7 +155,7 @@ public class EquipmentPart extends Part {
     	return part instanceof EquipmentPart
         		&& getType().equals(((EquipmentPart)part).getType())
         		&& getTonnage() == part.getTonnage()
-        		&& getStickerPrice() == part.getStickerPrice()
+        		&& getStickerPrice().equals(part.getStickerPrice())
         		&& isOmniPodded() == part.isOmniPodded();
     }
 
