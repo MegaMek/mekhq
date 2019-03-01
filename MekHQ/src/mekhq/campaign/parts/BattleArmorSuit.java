@@ -325,7 +325,7 @@ public class BattleArmorSuit extends Part {
         return part instanceof BattleArmorSuit
                 && chassis.equals(((BattleArmorSuit)part).getChassis())
                 && model.equals(((BattleArmorSuit)part).getModel())
-                && this.getStickerPrice() == part.getStickerPrice();
+                && getStickerPrice().equals(part.getStickerPrice());
     }
 
     @Override

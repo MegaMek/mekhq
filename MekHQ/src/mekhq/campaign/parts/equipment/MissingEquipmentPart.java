@@ -187,7 +187,7 @@ public class MissingEquipmentPart extends MissingPart {
 		if(part instanceof EquipmentPart) {
 			EquipmentPart eqpart = (EquipmentPart)part;
 			EquipmentType et = eqpart.getType();
-			return type.equals(et) && getTonnage() == part.getTonnage() && part.getStickerPrice() == newPart.getStickerPrice();
+			return type.equals(et) && getTonnage() == part.getTonnage() && part.getStickerPrice().equals(newPart.getStickerPrice());
 		}
 		return false;
 	}

@@ -21,7 +21,6 @@
 package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
-import java.math.RoundingMode;
 
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
@@ -156,7 +155,7 @@ public class EquipmentPart extends Part {
     	return part instanceof EquipmentPart
         		&& getType().equals(((EquipmentPart)part).getType())
         		&& getTonnage() == part.getTonnage()
-        		&& getStickerPrice() == part.getStickerPrice()
+        		&& getStickerPrice().equals(part.getStickerPrice())
         		&& isOmniPodded() == part.isOmniPodded();
     }
 
