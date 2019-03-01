@@ -79,7 +79,7 @@ public class EquipmentPart extends Part {
     }
     
     public EquipmentPart(int tonnage, EquipmentType et, int equipNum, Campaign c) {
-        this(0, et, equipNum, false, c);
+        this(tonnage, et, equipNum, false, c);
     }
 
     public EquipmentPart(int tonnage, EquipmentType et, int equipNum, boolean omniPodded, Campaign c) {
