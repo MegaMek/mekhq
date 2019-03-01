@@ -231,7 +231,7 @@ public class MekSensor extends Part {
 
 	@Override
 	public boolean isPartForEquipmentNum(int index, int loc) {
-		return Mech.SYSTEM_SENSORS == index;
+		return Mech.SYSTEM_SENSORS == index && loc == getLocation();
 	}
 
 	@Override

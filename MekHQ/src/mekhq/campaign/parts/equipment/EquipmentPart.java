@@ -619,7 +619,7 @@ public class EquipmentPart extends Part {
 
     @Override
     public boolean isPartForEquipmentNum(int index, int loc) {
-    	return equipmentNum == index;
+    	return equipmentNum == index && loc == getLocation();
     }
 
     @Override

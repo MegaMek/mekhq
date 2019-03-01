@@ -130,11 +130,9 @@ public class CampaignXmlParser {
     /**
      * Designed to create a campaign object from an input stream containing an XML structure.
      *
-     * @param is The file holding the XML, in InputStream form.
      * @return The created Campaign object, or null if there was a problem.
-     * @throws ParseException
-     * @throws DOMException
-     * @throws NullEntityException
+     * @throws CampaignXmlParseException Thrown when there was a problem parsing the CPNX file
+     * @throws NullEntityException Thrown when an entity is referenced but cannot be loaded or found
      */
     public Campaign parse() throws CampaignXmlParseException, NullEntityException {
         final String METHOD_NAME = "parse()"; //$NON-NLS-1$

@@ -433,7 +433,7 @@ public class EnginePart extends Part {
 
      @Override
      public boolean isPartForEquipmentNum(int index, int loc) {
-         return Mech.SYSTEM_ENGINE == index;
+         return Mech.SYSTEM_ENGINE == index && loc == getLocation();
      }
 
      @Override
