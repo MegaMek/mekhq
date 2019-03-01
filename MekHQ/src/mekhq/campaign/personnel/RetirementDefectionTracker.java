@@ -482,7 +482,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
                 }
             }
             if (roll >= 6 && (p.getPrimaryRole() == Person.T_AERO_PILOT ||
-                    p.getPrimaryRole() == Person.T_AERO_PILOT)) {
+                    p.getSecondaryRole() == Person.T_AERO_PILOT)) {
                 stolenUnit = true;
             } else {
                 if (p.getProfession() == Ranks.RPROF_INF) {
