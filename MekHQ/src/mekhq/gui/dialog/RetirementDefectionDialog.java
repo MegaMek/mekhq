@@ -147,7 +147,7 @@ public class RetirementDefectionDialog extends JDialog {
         }
 
         setLocationRelativeTo(gui.getFrame());
-        setUserPreferences();
+        setUserPreferences(doRetirement);
     }
 
     private void initComponents(boolean doRetirement) {
@@ -470,14 +470,16 @@ public class RetirementDefectionDialog extends JDialog {
         add(btnPanel, BorderLayout.PAGE_END);
     }
 
-    private void setUserPreferences() {
+    private void setUserPreferences(boolean doRetirement) {
         PreferencesNode preferences = MekHQ.getPreferences().forClass(RetirementDefectionDialog.class);
 
-        cbGroupOverview.setName("group");
-        preferences.manage(new JComboBoxPreference(cbGroupOverview));
+        if (doRetirement) {
+            cbGroupOverview.setName("group");
+            preferences.manage(new JComboBoxPreference(cbGroupOverview));
 
-        spnGeneralMod.setName("modifier");
-        preferences.manage(new JIntNumberSpinnerPreference(spnGeneralMod));
+            spnGeneralMod.setName("modifier");
+            preferences.manage(new JIntNumberSpinnerPreference(spnGeneralMod));
+        }
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
