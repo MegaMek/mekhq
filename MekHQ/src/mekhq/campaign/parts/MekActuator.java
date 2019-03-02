@@ -44,221 +44,211 @@ import mekhq.campaign.personnel.SkillType;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MekActuator extends Part {
-	private static final long serialVersionUID = 719878556021696393L;
-	
-    static final TechAdvancement TA_STANDARD = new TechAdvancement(TECH_BASE_ALL)
-            .setAdvancement(2300, 2350, 2505).setApproximate(true, false, false)
-            .setPrototypeFactions(F_TA).setProductionFactions(F_TH)
-            .setStaticTechLevel(SimpleTechLevel.INTRO);
-    static final TechAdvancement TA_SUPERHEAVY = new TechAdvancement(TECH_BASE_IS)
-            .setAdvancement(2905, 2940, 3076).setApproximate(true, false, false)
-            .setPrototypeFactions(F_FW).setProductionFactions(F_FW)
-            .setStaticTechLevel(SimpleTechLevel.ADVANCED);
-    
-	protected int type;
-	protected int location;
+    private static final long serialVersionUID = 719878556021696393L;
 
-	public MekActuator() {
-		this(0, 0, null);
-	}
-	
-	public MekActuator clone() {
-		MekActuator clone = new MekActuator(getUnitTonnage(), type, location, campaign);
+    static final TechAdvancement TA_STANDARD = new TechAdvancement(TECH_BASE_ALL).setAdvancement(2300, 2350, 2505)
+            .setApproximate(true, false, false).setPrototypeFactions(F_TA).setProductionFactions(F_TH)
+            .setStaticTechLevel(SimpleTechLevel.INTRO);
+    static final TechAdvancement TA_SUPERHEAVY = new TechAdvancement(TECH_BASE_IS).setAdvancement(2905, 2940, 3076)
+            .setApproximate(true, false, false).setPrototypeFactions(F_FW).setProductionFactions(F_FW)
+            .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+
+    protected int type;
+    protected int location;
+
+    public MekActuator() {
+        this(0, 0, null);
+    }
+
+    public MekActuator clone() {
+        MekActuator clone = new MekActuator(getUnitTonnage(), type, location, campaign);
         clone.copyBaseData(this);
-		return clone;
-	}
-	
+        return clone;
+    }
+
     public int getType() {
         return type;
     }
-    
+
     public void setLocation(int loc) {
-    	this.location = loc;
+        this.location = loc;
     }
-    
+
     public MekActuator(int tonnage, int type, Campaign c) {
         this(tonnage, type, -1, c);
     }
-    
+
     public MekActuator(int tonnage, int type, int loc, Campaign c) {
-    	super(tonnage, c);
+        super(tonnage, c);
         this.type = type;
         Mech m = new BipedMech();
-        this.name = m.getSystemName(type) + " Actuator" ;
+        this.name = m.getSystemName(type) + " Actuator";
         this.location = loc;
     }
 
     @Override
     public double getTonnage() {
-    	//TODO: how much do actuators weight?
-    	//apparently nothing
-    	return 0;
+        // TODO: how much do actuators weight?
+        // apparently nothing
+        return 0;
     }
-    
+
     @Override
     public Money getStickerPrice() {
         double unitCost = 0;
         switch (getType()) {
-            case (Mech.ACTUATOR_UPPER_ARM) : {
-                unitCost = 100;
-                break;
-            }
-            case (Mech.ACTUATOR_LOWER_ARM) : {
-                unitCost = 50;
-                break;
-            }
-            case (Mech.ACTUATOR_HAND) : {
-                unitCost = 80;
-                break;
-            }
-            case (Mech.ACTUATOR_UPPER_LEG) : {
-                unitCost = 150;
-                break;
-            }
-            case (Mech.ACTUATOR_LOWER_LEG) : {
-                unitCost = 80;
-                break;
-            }
-            case (Mech.ACTUATOR_FOOT) : {
-                unitCost = 120;
-                break;
-            }
-            case (Mech.ACTUATOR_HIP) : {
-                // not used
-                unitCost = 0;
-                break;
-            }
-            case (Mech.ACTUATOR_SHOULDER) : {
-                // not used
-                unitCost = 0;
-                break;
-            }
+        case (Mech.ACTUATOR_UPPER_ARM): {
+            unitCost = 100;
+            break;
+        }
+        case (Mech.ACTUATOR_LOWER_ARM): {
+            unitCost = 50;
+            break;
+        }
+        case (Mech.ACTUATOR_HAND): {
+            unitCost = 80;
+            break;
+        }
+        case (Mech.ACTUATOR_UPPER_LEG): {
+            unitCost = 150;
+            break;
+        }
+        case (Mech.ACTUATOR_LOWER_LEG): {
+            unitCost = 80;
+            break;
+        }
+        case (Mech.ACTUATOR_FOOT): {
+            unitCost = 120;
+            break;
+        }
+        case (Mech.ACTUATOR_HIP): {
+            // not used
+            unitCost = 0;
+            break;
+        }
+        case (Mech.ACTUATOR_SHOULDER): {
+            // not used
+            unitCost = 0;
+            break;
+        }
         }
         return Money.of(getUnitTonnage() * unitCost);
     }
 
     @Override
-    public boolean isSamePartType (Part part) {
-        return part instanceof MekActuator
-                && getType() == ((MekActuator)part).getType()
-                && getUnitTonnage() == ((MekActuator)part).getUnitTonnage();
+    public boolean isSamePartType(Part part) {
+        return part instanceof MekActuator && getType() == ((MekActuator) part).getType()
+                && getUnitTonnage() == ((MekActuator) part).getUnitTonnage();
     }
-    
+
     public int getLocation() {
-    	return location;
+        return location;
     }
-    
-	@Override
-	public void writeToXml(PrintWriter pw1, int indent) {
-		writeToXmlBegin(pw1, indent);
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<type>"
-				+type
-				+"</type>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<location>"
-				+location
-				+"</location>");
-		writeToXmlEnd(pw1, indent);
-	}
 
-	@Override
-	protected void loadFieldsFromXmlNode(Node wn) {
-		NodeList nl = wn.getChildNodes();
-		
-		for (int x=0; x<nl.getLength(); x++) {
-			Node wn2 = nl.item(x);
-			
-			if (wn2.getNodeName().equalsIgnoreCase("type")) {
-				type = Integer.parseInt(wn2.getTextContent());
-			} else if (wn2.getNodeName().equalsIgnoreCase("location")) {
-				location = Integer.parseInt(wn2.getTextContent());
-			} 
-		}
-	}
+    @Override
+    public void writeToXml(PrintWriter pw1, int indent) {
+        writeToXmlBegin(pw1, indent);
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<type>" + type + "</type>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<location>" + location + "</location>");
+        writeToXmlEnd(pw1, indent);
+    }
 
-	@Override
-	public void fix() {
-		super.fix();
-		if(null != unit) {
-			unit.repairSystem(CriticalSlot.TYPE_SYSTEM, type, location);
-		}
-	}
-	
-	@Override
-	public int getTechLevel() {
-		return TechConstants.T_ALLOWED_ALL;
-	}
+    @Override
+    protected void loadFieldsFromXmlNode(Node wn) {
+        NodeList nl = wn.getChildNodes();
 
-	@Override
-	public MissingPart getMissingPart() {
-		return new MissingMekActuator(getUnitTonnage(), type, location, campaign);
-	}
+        for (int x = 0; x < nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
 
-	@Override
-	public void remove(boolean salvage) {
-		if(null != unit) {
-			unit.destroySystem(CriticalSlot.TYPE_SYSTEM, type, location);
-			Part spare = campaign.checkForExistingSparePart(this);
-			if(!salvage) {
-				campaign.removePart(this);
-			} else if(null != spare) {
-				spare.incrementQuantity();
-				campaign.removePart(this);
-			}
-			unit.removePart(this);
-			Part missing = getMissingPart();
-			unit.addPart(missing);
-			campaign.addPart(missing, 0);
-		}	
-		setUnit(null);
-		updateConditionFromEntity(false);
-		location = -1;
-	}
+            if (wn2.getNodeName().equalsIgnoreCase("type")) {
+                type = Integer.parseInt(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("location")) {
+                location = Integer.parseInt(wn2.getTextContent());
+            }
+        }
+    }
 
-	@Override
-	public void updateConditionFromEntity(boolean checkForDestruction) {
-		int priorHits = hits;
-		if(null != unit) {
-			//check for missing equipment
-			if(unit.isSystemMissing(type, location)) {
-				remove(false);
-				return;
-			}
-			hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, type, location);
-			if(checkForDestruction 
-					&& hits > priorHits 
-					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
-				remove(false);
-			}
-		}
-	}
-	
-	@Override 
-	public int getBaseTime() {
-		if(isSalvaging()) {
-			return isOmniPodded()? 30 : 90;
-		}
-		return 120;
-	}
-	
-	@Override
-	public int getDifficulty() {
-		if(isSalvaging()) {
-			return -3;
-		}
-		return 0;
-	}
+    @Override
+    public void fix() {
+        super.fix();
+        if (null != unit) {
+            unit.repairSystem(CriticalSlot.TYPE_SYSTEM, type, location);
+        }
+    }
 
-	@Override
-	public boolean needsFixing() {
-		return hits > 0;
-	}
-	
-	@Override
-	public String getDetails() {
-		if(null != unit) {
-		    StringJoiner sj = new StringJoiner(", ");
+    @Override
+    public int getTechLevel() {
+        return TechConstants.T_ALLOWED_ALL;
+    }
+
+    @Override
+    public MissingPart getMissingPart() {
+        return new MissingMekActuator(getUnitTonnage(), type, location, campaign);
+    }
+
+    @Override
+    public void remove(boolean salvage) {
+        if (null != unit) {
+            unit.destroySystem(CriticalSlot.TYPE_SYSTEM, type, location);
+            Part spare = campaign.checkForExistingSparePart(this);
+            if (!salvage) {
+                campaign.removePart(this);
+            } else if (null != spare) {
+                spare.incrementQuantity();
+                campaign.removePart(this);
+            }
+            unit.removePart(this);
+            Part missing = getMissingPart();
+            unit.addPart(missing);
+            campaign.addPart(missing, 0);
+        }
+        setUnit(null);
+        updateConditionFromEntity(false);
+        location = -1;
+    }
+
+    @Override
+    public void updateConditionFromEntity(boolean checkForDestruction) {
+        int priorHits = hits;
+        if (null != unit) {
+            // check for missing equipment
+            if (unit.isSystemMissing(type, location)) {
+                remove(false);
+                return;
+            }
+            hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, type, location);
+            if (checkForDestruction && hits > priorHits
+                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                remove(false);
+            }
+        }
+    }
+
+    @Override
+    public int getBaseTime() {
+        if (isSalvaging()) {
+            return isOmniPodded() ? 30 : 90;
+        }
+        return 120;
+    }
+
+    @Override
+    public int getDifficulty() {
+        if (isSalvaging()) {
+            return -3;
+        }
+        return 0;
+    }
+
+    @Override
+    public boolean needsFixing() {
+        return hits > 0;
+    }
+
+    @Override
+    public String getDetails() {
+        if (null != unit) {
+            StringJoiner sj = new StringJoiner(", ");
             if (getLocationName() != null) {
                 sj.add(getLocationName());
             }
@@ -267,80 +257,80 @@ public class MekActuator extends Part {
                 sj.add(repairCost.toAmountAndSymbolString() + " to repair");
             }
             return sj.toString();
-		}
-		return getUnitTonnage() + " tons";
-	}
+        }
+        return getUnitTonnage() + " tons";
+    }
 
-	@Override
-	public void updateConditionFromPart() {
-		if(null != unit) {
-			if(hits > 0) {
-				unit.damageSystem(CriticalSlot.TYPE_SYSTEM, type, location, 1);
-			} else {
-				unit.repairSystem(CriticalSlot.TYPE_SYSTEM, type, location);
-			}
-		}	
-	}
-	
-	@Override
-	public String checkFixable() {
-		if(null == unit) {
-			return null;
-		}
-		if(isSalvaging()) {
-			return null;
-		}
-		if(unit.isLocationBreached(location)) {
-			return unit.getEntity().getLocationName(location) + " is breached.";
-		}
-		if(isMountedOnDestroyedLocation()) {
-			return unit.getEntity().getLocationName(location) + " is destroyed.";
-		}
-		return null;
-	}
-	
-	@Override
-	public boolean isMountedOnDestroyedLocation() {
-		return null != unit && unit.isLocationDestroyed(location);
-	}
-	
-	@Override
-	public boolean onBadHipOrShoulder() {
-		return null != unit && unit.hasBadHipOrShoulder(location);
-	}
-	
-	@Override
-	public boolean isPartForEquipmentNum(int index, int loc) {
-		return index == type && loc == location;
-	}
-	
-	@Override
-	public boolean isRightTechType(String skillType) {
-		return skillType.equals(SkillType.S_TECH_MECH);
-	}
-	
-	@Override
-	public boolean isOmniPoddable() {
-		return type == Mech.ACTUATOR_LOWER_ARM || type == Mech.ACTUATOR_HAND;
-	}
-	
-	@Override
-	public boolean isOmniPodded() {
-	    return isOmniPoddable() && getUnit() != null && getUnit().getEntity().isOmni();
-	}
+    @Override
+    public void updateConditionFromPart() {
+        if (null != unit) {
+            if (hits > 0) {
+                unit.damageSystem(CriticalSlot.TYPE_SYSTEM, type, location, 1);
+            } else {
+                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, type, location);
+            }
+        }
+    }
 
-	@Override
-	public String getLocationName() {
-		return unit.getEntity().getLocationName(location);
-	}
-	
-	@Override
-	public TechAdvancement getTechAdvancement() {
-	    return (getUnitTonnage() <= 100)? TA_STANDARD : TA_SUPERHEAVY;
-	}
-	
-	@Override
-	public int getMassRepairOptionType() {
-    	return Part.REPAIR_PART_TYPE.ACTUATOR;
+    @Override
+    public String checkFixable() {
+        if (null == unit) {
+            return null;
+        }
+        if (isSalvaging()) {
+            return null;
+        }
+        if (unit.isLocationBreached(location)) {
+            return unit.getEntity().getLocationName(location) + " is breached.";
+        }
+        if (isMountedOnDestroyedLocation()) {
+            return unit.getEntity().getLocationName(location) + " is destroyed.";
+        }
+        return null;
+    }
+
+    @Override
+    public boolean isMountedOnDestroyedLocation() {
+        return null != unit && unit.isLocationDestroyed(location);
+    }
+
+    @Override
+    public boolean onBadHipOrShoulder() {
+        return null != unit && unit.hasBadHipOrShoulder(location);
+    }
+
+    @Override
+    public boolean isPartForEquipmentNum(int index, int loc) {
+        return index == type && loc == location;
+    }
+
+    @Override
+    public boolean isRightTechType(String skillType) {
+        return skillType.equals(SkillType.S_TECH_MECH);
+    }
+
+    @Override
+    public boolean isOmniPoddable() {
+        return type == Mech.ACTUATOR_LOWER_ARM || type == Mech.ACTUATOR_HAND;
+    }
+
+    @Override
+    public boolean isOmniPodded() {
+        return isOmniPoddable() && getUnit() != null && getUnit().getEntity().isOmni();
+    }
+
+    @Override
+    public String getLocationName() {
+        return unit.getEntity().getLocationName(location);
+    }
+
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return (getUnitTonnage() <= 100) ? TA_STANDARD : TA_SUPERHEAVY;
+    }
+
+    @Override
+    public int getMassRepairOptionType() {
+        return Part.REPAIR_PART_TYPE.ACTUATOR;
     }
 }
