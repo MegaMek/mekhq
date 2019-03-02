@@ -242,7 +242,7 @@ public final class InjuryUtil {
             time += Compute.d6();
         }
 
-        time = Math.round(time * mod * p.getAbilityTimeModifier() / 10000);
+        time = (int)Math.round((time * mod * p.getAbilityTimeModifier()) / 10000.0);
         return time;
     }
     
@@ -269,7 +269,7 @@ public final class InjuryUtil {
                 if (roll < Math.max(1, fumbleLimit / 10)) {
                     mistakeXP += c.getCampaignOptions().getMistakeXP();
                     xpGained += mistakeXP;
-                } else if (roll > Math.min(98, 99 - Math.round(99 - critLimt) / 10)) {
+                } else if (roll > Math.min(98, 99 - (int)Math.round((99 - critLimt) / 10.0))) {
                     successXP += c.getCampaignOptions().getSuccessXP();
                     xpGained += successXP;
                 }
@@ -278,9 +278,8 @@ public final class InjuryUtil {
                 if (roll < fumbleLimit && c.getCampaignOptions().useSupportEdge()
                         && (doc.getOptions().booleanOption(PersonnelOptions.EDGE_MEDICAL) && doc.getCurrentEdge() > 0)) {
                     result.add(new GameEffect(
-                    String.format("%s made a mistake, but used Edge to reroll.",
-                            doc.getHyperlinkedFullTitle(), p.getHyperlinkedName(),
-                            p.getGenderPronoun(Person.PRONOUN_HISHER), i.getName())));
+                    String.format("%s made a mistake in the treatment of %s, but used Edge to reroll.",
+                            doc.getHyperlinkedFullTitle(), p.getHyperlinkedName())));
                     doc.setCurrentEdge(doc.getCurrentEdge() - 1);
                     roll = Compute.randomInt(100);
                 }

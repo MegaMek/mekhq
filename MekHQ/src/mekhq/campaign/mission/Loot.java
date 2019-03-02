@@ -161,10 +161,9 @@ public class Loot implements MekHqXmlSerializable {
                 +"</cash>");
         for(Entity e : units) {
             String lookupName = e.getChassis() + " " + e.getModel();
-            lookupName.replaceAll("\\s+$", "");
             pw1.println(MekHqXmlUtil.indentStr(indent+1)
                     +"<entityName>"
-                    +lookupName
+                    +lookupName.trim()
                     +"</entityName>");
         }
         for(Part p : parts) {

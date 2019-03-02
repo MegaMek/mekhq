@@ -2578,7 +2578,7 @@ public class Campaign implements Serializable, ITechManager {
         if (roll >= target.getValue()) {
             report = report + partWork.succeed();
             if (getCampaignOptions().payForRepairs()
-                    && action == " fix "
+                    && action.equals(" fix ")
                     && !(partWork instanceof Armor)) {
                 Money cost = ((Part) partWork).getStickerPrice().multipliedBy(0.2);
                 report += "<br>Repairs cost " +

@@ -1095,23 +1095,23 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
 
             if (isHeatSink) {
-                if (TechConstants.getTechName(etype.getTechLevel(year)).equals(
-                        "Inner Sphere"))
+                if (TechConstants.getTechName(etype.getTechLevel(year)).equals("Inner Sphere")) {
                     heatSinkIsClanTechBase = false;
-                else if (TechConstants.getTechName(etype.getTechLevel(year))
-                        .equals("Clan"))
+                } else if (TechConstants.getTechName(etype.getTechLevel(year)).equals("Clan")) {
                     heatSinkIsClanTechBase = true;
+                }
                 break;
             }
         }
 
         String heatSinkTypeString = heatSinkIsClanTechBase ? "(CL) " : "(IS) ";
-        if (heatSinkType == MiscType.F_LASER_HEAT_SINK)
+        if (heatSinkType.equals(MiscType.F_LASER_HEAT_SINK)) {
             heatSinkTypeString += "Laser Heat Sink";
-        else if (heatSinkType == MiscType.F_DOUBLE_HEAT_SINK)
+        } else if (heatSinkType.equals(MiscType.F_DOUBLE_HEAT_SINK)) {
             heatSinkTypeString += "Double Heat Sink";
-        else if (heatSinkType == MiscType.F_HEAT_SINK)
+        } else if (heatSinkType.equals(MiscType.F_HEAT_SINK)) {
             heatSinkTypeString += "Heat Sink";
+        }
 
         return heatSinkTypeString;
     }

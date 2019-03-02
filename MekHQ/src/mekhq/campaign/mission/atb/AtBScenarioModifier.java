@@ -170,7 +170,7 @@ public class AtBScenarioModifier {
             Unmarshaller um = context.createUnmarshaller();
             File xmlFile = new File(fileName);
             if(!xmlFile.exists()) {
-                MekHQ.getLogger().warning(AtBScenarioModifier.class, "Deserialize", String.format("Specified file %d does not exist", fileName));
+                MekHQ.getLogger().warning(AtBScenarioModifier.class, "Deserialize", String.format("Specified file %s does not exist", fileName));
                 return null;
             }
 
