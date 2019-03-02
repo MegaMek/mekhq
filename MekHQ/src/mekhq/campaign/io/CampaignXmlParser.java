@@ -413,7 +413,9 @@ public class CampaignXmlParser {
                         continue;
                     }
                     // Remove existing duplicate parts.
-                    if (u.getPartForEquipmentNum(((EquipmentPart) prt).getEquipmentNum(), ((EquipmentPart) prt).getLocation()) != null) {
+                    Part duplicatePart = u.getPartForEquipmentNum(((EquipmentPart) prt).getEquipmentNum(), ((EquipmentPart) prt).getLocation());
+                    if (duplicatePart instanceof EquipmentPart
+                        && ((EquipmentPart)prt).getType() == ((EquipmentPart)duplicatePart).getType()) {
                         removeParts.add(prt);
                         continue;
                     }
@@ -426,7 +428,10 @@ public class CampaignXmlParser {
                         continue;
                     }
                     // Remove existing duplicate parts.
-                    if (u.getPartForEquipmentNum(((MissingEquipmentPart) prt).getEquipmentNum(), ((MissingEquipmentPart) prt).getLocation()) != null) {
+                    Part duplicatePart = u.getPartForEquipmentNum(((MissingEquipmentPart) prt).getEquipmentNum(), 
+                        ((MissingEquipmentPart) prt).getLocation());
+                    if (duplicatePart instanceof EquipmentPart
+                        && ((MissingEquipmentPart)prt).getType() == ((EquipmentPart)duplicatePart).getType()) {
                         removeParts.add(prt);
                         continue;
                     }
