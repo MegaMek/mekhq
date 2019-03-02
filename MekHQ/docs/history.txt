@@ -12,7 +12,8 @@ v0.45.4-SNAPSHOT
 + Issue #112: Adds mission log and counter for personnel
 + Issue #1115: Fix stack overflow in BattleArmorSuit::getTonnage
 + Issue #1116: [Feature] Show people's Bloodnames in "Fluff" filter on personnel tab
-+ Issue #1125/1127: Fix issues with loading units containing damaged AMS and MASC systems.
++ Issue #1125 #1127: Fix issues with loading units containing damaged AMS and MASC systems.
++ Issue #1109: Fix issue where damaged equipment can be restored with a reload
 
 v0.45.3 (2019-02-12 0500 UTC)
 + Issue #990: Feature: Add bulk confirm dialog if more than one unit is removed
