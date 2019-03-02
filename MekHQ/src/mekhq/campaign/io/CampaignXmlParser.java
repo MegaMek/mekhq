@@ -427,14 +427,6 @@ public class CampaignXmlParser {
                         removeParts.add(prt);
                         continue;
                     }
-                    // Remove existing duplicate parts.
-                    Part duplicatePart = u.getPartForEquipmentNum(((MissingEquipmentPart) prt).getEquipmentNum(), 
-                        ((MissingEquipmentPart) prt).getLocation());
-                    if (duplicatePart instanceof EquipmentPart
-                        && ((MissingEquipmentPart)prt).getType() == ((EquipmentPart)duplicatePart).getType()) {
-                        removeParts.add(prt);
-                        continue;
-                    }
                 }
                 //if the type is a BayWeapon, remove
                 if(prt instanceof EquipmentPart
