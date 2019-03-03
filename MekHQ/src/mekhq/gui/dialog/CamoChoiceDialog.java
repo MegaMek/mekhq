@@ -351,8 +351,7 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
 
         @Override
         public void mouseClicked(MouseEvent e) {
-
-            if (e.getClickCount() == 2) {
+            if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
                 int row = tableCamo.rowAtPoint(e.getPoint());
                 category = camoModel.getCategory();
                 if(category.equals(Player.NO_CAMO)) {

@@ -243,7 +243,7 @@ public final class PersonnelTab extends CampaignGuiTab {
                 personnelTable, personModel) {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
+                if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
                     if ((splitPersonnel.getSize().width
                             - splitPersonnel.getDividerLocation() + splitPersonnel
                                 .getDividerSize()) < PersonnelTab.PERSONNEL_VIEW_WIDTH) {
@@ -253,7 +253,6 @@ public final class PersonnelTab extends CampaignGuiTab {
                         // collapse
                         splitPersonnel.setDividerLocation(1.0);
                     }
-
                 }
             }            
         });
