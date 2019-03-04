@@ -301,50 +301,58 @@ public class Finances implements Serializable {
         if (calendar.get(Calendar.DAY_OF_MONTH) == 1) {
             if (campaignOptions.usePeacetimeCost()) {
                 if (!campaignOptions.showPeacetimeCost()) {
-                    if (debit(campaign.getPeacetimeCost(), Transaction.C_MAINTAIN,
+                    Money peacetimeCost = campaign.getPeacetimeCost();
+                    
+                    if (debit(peacetimeCost, Transaction.C_MAINTAIN,
                             resourceMap.getString("PeacetimeCosts.title"), calendar.getTime())) {
                         campaign.addReport(String.format(
                                 resourceMap.getString("PeacetimeCosts.text"),
-                                campaign.getPeacetimeCost().toAmountAndSymbolString()));
+                                peacetimeCost.toAmountAndSymbolString()));
                     } else {
                         campaign.addReport(
                                 String.format(resourceMap.getString("NotImplemented.text"), "for operating costs"));
                     }
                 } else {
-                    if (debit(campaign.getMonthlySpareParts(), Transaction.C_MAINTAIN,
+                    Money sparePartsCost = campaign.getMonthlySpareParts();
+                    Money ammoCost = campaign.getMonthlyAmmo();
+                    Money fuelCost = campaign.getMonthlyFuel();
+                    
+                    if (debit(sparePartsCost, Transaction.C_MAINTAIN,
                             resourceMap.getString("PeacetimeCostsParts.title"), calendar.getTime())) {
                         campaign.addReport(String.format(
                                 resourceMap.getString("PeacetimeCostsParts.text"),
-                                campaign.getMonthlySpareParts().toAmountAndSymbolString()));
+                                sparePartsCost.toAmountAndSymbolString()));
                     } else {
                         campaign.addReport(
                                 String.format(resourceMap.getString("NotImplemented.text"), "for spare parts"));
                     }
-                    if (debit(campaign.getMonthlyAmmo(), Transaction.C_MAINTAIN,
+                    if (debit(ammoCost, Transaction.C_MAINTAIN,
                             resourceMap.getString("PeacetimeCostsAmmunition.title"), calendar.getTime())) {
                         campaign.addReport(String.format(
                                 resourceMap.getString("PeacetimeCostsAmmunition.text"),
-                                campaign.getMonthlySpareParts().toAmountAndSymbolString()));
+                                ammoCost.toAmountAndSymbolString()));
                     } else {
                         campaign.addReport(
                                 String.format(resourceMap.getString("NotImplemented.text"), "for training munitions"));
                     }
-                    if (debit(campaign.getMonthlyFuel(), Transaction.C_MAINTAIN,
+                    if (debit(fuelCost, Transaction.C_MAINTAIN,
                             resourceMap.getString("PeacetimeCostsFuel.title"), calendar.getTime())) {
                         campaign.addReport(String.format(
                                 resourceMap.getString("PeacetimeCostsFuel.text"),
-                                campaign.getMonthlySpareParts().toAmountAndSymbolString()));
+                                fuelCost.toAmountAndSymbolString()));
                     } else {
                         campaign.addReport(String.format(resourceMap.getString("NotImplemented.text"), "for fuel"));
                     }
                 }
             }
             if (campaignOptions.payForSalaries()) {
-                if (debit(campaign.getPayRoll(), Transaction.C_SALARY, resourceMap.getString("Salaries.title"),
+                Money payrollCost = campaign.getPayRoll();
+                
+                if (debit(payrollCost, Transaction.C_SALARY, resourceMap.getString("Salaries.title"),
                         calendar.getTime())) {
                     campaign.addReport(
                             String.format(resourceMap.getString("Salaries.text"),
-                                    campaign.getPayRoll().toAmountAndSymbolString()));
+                                    payrollCost.toAmountAndSymbolString()));
                 } else {
                     campaign.addReport(
                             String.format(resourceMap.getString("NotImplemented.text"), "payroll costs"));
@@ -353,12 +361,14 @@ public class Finances implements Serializable {
 
             // Handle overhead expenses
             if (campaignOptions.payForOverhead()) {
-                if (debit(campaign.getOverheadExpenses(), Transaction.C_OVERHEAD,
+                Money overheadCost = campaign.getOverheadExpenses();
+                
+                if (debit(overheadCost, Transaction.C_OVERHEAD,
                         resourceMap.getString("Overhead.title"),
                         calendar.getTime())) {
                     campaign.addReport(String.format(
                             resourceMap.getString("Overhead.text"),
-                            campaign.getOverheadExpenses().toAmountAndSymbolString()));
+                            overheadCost.toAmountAndSymbolString()));
                 } else {
                     campaign.addReport(
                             String.format(resourceMap.getString("NotImplemented.text"), "overhead costs"));
