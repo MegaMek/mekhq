@@ -130,11 +130,9 @@ public class CampaignXmlParser {
     /**
      * Designed to create a campaign object from an input stream containing an XML structure.
      *
-     * @param is The file holding the XML, in InputStream form.
      * @return The created Campaign object, or null if there was a problem.
-     * @throws ParseException
-     * @throws DOMException
-     * @throws NullEntityException
+     * @throws CampaignXmlParseException Thrown when there was a problem parsing the CPNX file
+     * @throws NullEntityException Thrown when an entity is referenced but cannot be loaded or found
      */
     public Campaign parse() throws CampaignXmlParseException, NullEntityException {
         final String METHOD_NAME = "parse()"; //$NON-NLS-1$
@@ -1702,15 +1700,12 @@ public class CampaignXmlParser {
 
             // deal with equipmentparts that are now subtyped
             int pid = p.getId();
-            if (p instanceof EquipmentPart
-                    && ((EquipmentPart) p).getType() instanceof MiscType
-                    && ((EquipmentPart) p).getType().hasFlag(MiscType.F_MASC) && !(p instanceof MASC)) {
+            if (isLegacyMASC(p)) {
                 p = new MASC(p.getUnitTonnage(), ((EquipmentPart) p).getType(),
                         ((EquipmentPart) p).getEquipmentNum(), retVal, 0, p.isOmniPodded());
                 p.setId(pid);
             }
-            if (p instanceof MissingEquipmentPart
-                    && ((MissingEquipmentPart) p).getType().hasFlag(MiscType.F_MASC) && !(p instanceof MASC)) {
+            if (isLegacyMissingMASC(p)) {
                 p = new MissingMASC(p.getUnitTonnage(),
                         ((MissingEquipmentPart) p).getType(), ((MissingEquipmentPart) p).getEquipmentNum(), retVal,
                         ((MissingEquipmentPart) p).getTonnage(), 0, p.isOmniPodded());
@@ -1774,6 +1769,32 @@ public class CampaignXmlParser {
 
         MekHQ.getLogger().log(CampaignXmlParser.class, METHOD_NAME, LogLevel.INFO,
                 "Load Part Nodes Complete!"); //$NON-NLS-1$
+    }
+    
+    /**
+     * Determines if the supplied part is a MASC from an older save. This means that it needs to be converted
+     * to an actual MASC part.
+     * @param p The part to check.
+     * @return Whether it's an old MASC.
+     */
+    private static boolean isLegacyMASC(Part p) {
+        return (p instanceof EquipmentPart) && 
+                !(p instanceof MASC) &&
+                ((EquipmentPart) p).getType().hasFlag(MiscType.F_MASC) && 
+                (((EquipmentPart) p).getType() instanceof MiscType);
+    }
+    
+    /**
+     * Determines if the supplied part is a "missing" MASC from an older save. This means that it needs to be converted
+     * to an actual "missing" MASC part.
+     * @param p The part to check.
+     * @return Whether it's an old "missing" MASC.
+     */
+    private static boolean isLegacyMissingMASC(Part p) {
+        return (p instanceof MissingEquipmentPart) && 
+                !(p instanceof MissingMASC) &&
+                ((MissingEquipmentPart) p).getType().hasFlag(MiscType.F_MASC) && 
+                (((MissingEquipmentPart) p).getType() instanceof MiscType);
     }
     
     private static void updatePlanetaryEventsFromXML(Node wn) {

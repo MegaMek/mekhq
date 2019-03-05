@@ -757,7 +757,7 @@ public class ImageChoiceDialog extends JDialog {
 
         @Override
         public void mouseClicked(MouseEvent evt) {
-            if (evt.getClickCount() == 2) {
+            if (evt.getButton() == MouseEvent.BUTTON1 && evt.getClickCount() == 2) {
                 if (tableImages.equals(evt.getSource())) {
                     int row = tableImages.rowAtPoint(evt.getPoint());
                     if(row < imageTableModel.getRowCount()) {

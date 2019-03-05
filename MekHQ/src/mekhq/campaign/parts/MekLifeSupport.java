@@ -216,7 +216,7 @@ public class MekLifeSupport extends Part {
 	
 	@Override
 	public boolean isPartForEquipmentNum(int index, int loc) {
-		return Mech.SYSTEM_LIFE_SUPPORT == index;
+		return Mech.SYSTEM_LIFE_SUPPORT == index && loc == getLocation();
 	}
 	
 	@Override

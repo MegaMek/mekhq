@@ -1460,34 +1460,6 @@ public class Utilities {
         return roman;
     }
 
-    // TODO: Optionize this to allow user to choose roman or arabic numerals
-    public static int getArabicNumberFromRomanNumerals(String name) {
-        // If we're 0, then we just return an empty string
-        if (name.equals("")) { //$NON-NLS-1$
-            return 0;
-        }
-
-        // Roman numeral, prepended with a space for display purposes
-        int arabic = 0;
-        String roman = name;
-
-        for (int i = 0; i < roman.length(); i++) {
-            int num = romanNumerals.toString().indexOf(roman.charAt(i));
-            if (i < roman.length()) {
-                int temp = romanNumerals.toString().indexOf(roman.charAt(i+1));
-                // If this is a larger number, then we need to combine them
-                if (temp > num) {
-                    num = temp - num;
-                    i++;
-                }
-            }
-
-            arabic += num;
-        }
-
-        return arabic-1;
-    }
-
     public static Map<String, Integer> sortMapByValue(Map<String, Integer> unsortMap, boolean highFirst) {
 
         // Convert Map to List

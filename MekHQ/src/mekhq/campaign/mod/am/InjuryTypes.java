@@ -92,7 +92,7 @@ public final class InjuryTypes {
             if(rand < 5) {
                 mod += (Compute.d6() < 4) ? rand : -rand;
             }
-            return  Math.round(time * mod * p.getAbilityTimeModifier() / 10000);
+            return (int)Math.round((time * mod * p.getAbilityTimeModifier()) / 10000.0);
         }
         
         @Override

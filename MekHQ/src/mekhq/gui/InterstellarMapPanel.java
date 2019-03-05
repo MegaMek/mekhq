@@ -364,7 +364,6 @@ public class InterstellarMapPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON1) {
-
                     if (e.getClickCount() >= 2) {
                         //center and zoom
                         changeSelectedPlanet(nearestNeighbour(scr2mapX(e.getX()), scr2mapY(e.getY())));
