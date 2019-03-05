@@ -206,7 +206,7 @@ public final class HangarTab extends CampaignGuiTab {
                 unitTable, unitModel) {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
+                if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
                     if ((splitUnit.getSize().width - splitUnit.getDividerLocation() + splitUnit
                             .getDividerSize()) < HangarTab.UNIT_VIEW_WIDTH) {
                         // expand
@@ -215,7 +215,6 @@ public final class HangarTab extends CampaignGuiTab {
                         // collapse
                         splitUnit.setDividerLocation(1.0);
                     }
-
                 }
             }            
         });
