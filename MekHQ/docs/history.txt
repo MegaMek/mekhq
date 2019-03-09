@@ -17,6 +17,7 @@ v0.45.4-SNAPSHOT
 + Issue #713: Fix incorrect reporting of training munitions/fuel costs, minor performance improvement on monthly rollover
 + PR #1136: Don't expand/contract tab panels on right double click (Mac OS X improvement)
 + PR #1143: In Repair tab -> Acquisitions, user can once again click 'Order One' more than once
++ Adding CampaignAnon AtB Instruction guide (very good for new players) - See AtB Stuff folder in Docs.
 
 v0.45.3 (2019-02-12 0500 UTC)
 + Issue #990: Feature: Add bulk confirm dialog if more than one unit is removed

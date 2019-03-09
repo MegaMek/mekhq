@@ -5,6 +5,11 @@
      Jay Lawson <jaylawson39@yahoo.com>
 
   Lead Developers:
+	 Carl Spain
+	 Christopher Watford
+	 NickAragua
+		 
+  Emeritus Developers:
      Dylan Myers <https://github.com/Dylan-M>
      Nicholas Walczak <arlith@users.sourceforge.net>
      Sebastian Brocks <beerockxs@users.sourceforge.net>
@@ -26,8 +31,11 @@
          Dave Nawton <hammer-gs@users.sourceforge.net>
 
       Splash Screen Images:
-      	 Anthony Scroggins (http://shimmering-sword.deviantart.com)
-
+		 Florian "SpOoKy777" Mellies (https://www.deviantart.com/spooky777)
+      	 
+	  Original Screen Images:
+	     Anthony Scroggins (http://shimmering-sword.deviantart.com)
+		 
       Starterbook Campaign Files:
          Dave Nawton <hammer-gs@users.sourceforge.net>
 
@@ -44,6 +52,11 @@
         Chris Thompson <http://bg.battletech.com/forums/index.php?action=profile;u=757>
         CarnageINC
         krazzyharry
+		
+	 Against the Bot Guide
+		CampaignAnon 
+		
+	
 
   And Of Course...
      FASA, WizKids, FanPro and Catalyst Game Labs for creating and publishing the original game of
