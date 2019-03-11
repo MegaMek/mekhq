@@ -17,6 +17,7 @@ import java.awt.geom.AffineTransform;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
+import megamek.common.Coords;
 import mekhq.campaign.stratcon.IStratconDisplayable;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconScenario;
@@ -175,8 +176,8 @@ public class StratconTab extends CampaignGuiTab {
             translatedClickedPoint.translate(0, -(HEX_Y_RADIUS * 2));
         }
 
-        for(int x = 0; x < campaignState.getWidth(); x++) {            
-            for(int y = 0; y < campaignState.getHeight(); y++) {
+        for(int x = 0; x < campaignState.getTrack(0).getWidth(); x++) {            
+            for(int y = 0; y < campaignState.getTrack(0).getHeight(); y++) {
                 if(drawHexType == DrawHexType.Outline) {
                     g2D.setColor(new Color(0, 0, 0));
                     g2D.drawPolygon(graphHex);                    
@@ -186,7 +187,7 @@ public class StratconTab extends CampaignGuiTab {
                         boardState.selectedX = x;
                         boardState.selectedY = y;
                     } else {
-                        g2D.setColor(campaignState.getHexColor(x, y));
+                        g2D.setColor(Color.DARK_GRAY);
                     }
 
                     g2D.fillPolygon(graphHex);
@@ -224,9 +225,9 @@ public class StratconTab extends CampaignGuiTab {
         scenarioMarker.addPoint(xRadius, yRadius);
         scenarioMarker.addPoint(xRadius, -yRadius);
 
-        for(int x = 0; x < campaignState.getWidth(); x++) {            
-            for(int y = 0; y < campaignState.getHeight(); y++) {
-                if(campaignState.getScenario(x, y) != null) {
+        for(int x = 0; x < campaignState.getTrack(0).getWidth(); x++) {            
+            for(int y = 0; y < campaignState.getTrack(0).getHeight(); y++) {
+                if(campaignState.getTrack(0).getScenario(new Coords(x, y)) != null) {
                     g2D.setColor(Color.RED);
                     g2D.drawPolygon(scenarioMarker);
                 }
@@ -258,7 +259,7 @@ public class StratconTab extends CampaignGuiTab {
         int yRadius = (int) (HEX_Y_RADIUS);
         int xRadius = (int) (HEX_X_RADIUS);
 
-        int yTranslation = campaignState.getHeight() * yRadius * 2;
+        int yTranslation = campaignState.getTrack(0).getHeight() * yRadius * 2;
         if(evenColumn) {
             yTranslation += yRadius;
         } else {
@@ -302,7 +303,7 @@ public class StratconTab extends CampaignGuiTab {
             boolean pointFoundOnBoard = detectClickedHex();
 
             if(pointFoundOnBoard) {
-                IStratconDisplayable selectedDisplayable = campaignState.getScenario(boardState.selectedX, boardState.selectedY);
+                IStratconDisplayable selectedDisplayable = campaignState.getTrack(0).getScenario(new Coords(boardState.selectedX, boardState.selectedY));
                 if(selectedDisplayable != null) {
                     detailsFrame.displayInfo(selectedDisplayable.getInfo());
                     detailsFrame.setBounds((int) clickedPoint.getX() + 100, (int) clickedPoint.getY(), detailsFrame.getWidth(), detailsFrame.getHeight());
@@ -317,7 +318,7 @@ public class StratconTab extends CampaignGuiTab {
 
             if(pointFoundOnBoard) {
                 //detailsFrame.displayInfo("right clicked" + " " + boardState.selectedX + ":" + boardState.selectedY);
-                StratconScenario selectedScenario = campaignState.getScenario(boardState.selectedX, boardState.selectedY);
+                StratconScenario selectedScenario = campaignState.getTrack(0).getScenario(new Coords(boardState.selectedX, boardState.selectedY));
                 if(selectedScenario != null) {
                     scenarioWizard.setVisible(true);
                     scenarioWizard.setCurrentScenario(selectedScenario);

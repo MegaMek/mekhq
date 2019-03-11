@@ -27,16 +27,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.Vector;
+
+import javax.swing.text.html.parser.Entity;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.UnitType;
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
@@ -595,6 +600,11 @@ public class Force implements Serializable {
         }
     }
 
+    /**
+     * Calculates the force's total BV, including sub forces.
+     * @param c The working campaign.
+     * @return Total BV
+     */
     public int getTotalBV(Campaign c) {
         int bvTotal = 0;
 
@@ -612,5 +622,31 @@ public class Force implements Serializable {
         }
 
         return bvTotal;
+    }
+    
+    /**
+     * Calculates the unit type most represented in this force
+     * and all subforces.
+     * @param c Working campaign
+     * @return Majority unit type.
+     */
+    public int getPrimaryUnitType(Campaign c) {
+        Map<Integer, Integer> unitTypeBuckets = new TreeMap<>();
+        int biggestBucketID = -1;
+        int biggestBucketCount = 0;
+        
+        for(UUID id : getUnits()) {
+            int unitType = c.getUnit(id).getEntity().getUnitType();
+
+            unitTypeBuckets.putIfAbsent(unitType, 0);
+            unitTypeBuckets.put(unitType, unitTypeBuckets.get(unitType) + 1);
+            
+            if(unitTypeBuckets.get(unitType) > biggestBucketCount) {
+                biggestBucketCount = unitTypeBuckets.get(unitType);
+                biggestBucketID = unitType;
+            }
+        }
+        
+        return biggestBucketID;
     }
 }

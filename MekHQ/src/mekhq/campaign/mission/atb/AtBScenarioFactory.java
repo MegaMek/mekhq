@@ -19,7 +19,6 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.atb.scenario.AceDuelBuiltInScenario;
 import mekhq.campaign.mission.atb.scenario.AlliedTraitorsBuiltInScenario;
 import mekhq.campaign.mission.atb.scenario.AllyRescueBuiltInScenario;
@@ -45,8 +44,7 @@ import mekhq.campaign.mission.atb.scenario.StarLeagueCache2BuiltInScenario;
 
 public class AtBScenarioFactory {
 	private static Map<Integer, List<Class<IAtBScenario>>> scenarioMap = new HashMap<>();
-	private static Map<Integer, List<ScenarioTemplate>> dynamicScenarioMap = new HashMap<>();
-
+	
 	static {
 	    // leave legacy scenario registrations here for now
 		registerScenario(new AceDuelBuiltInScenario());
@@ -71,41 +69,8 @@ public class AtBScenarioFactory {
 		registerScenario(new StandUpBuiltInScenario());
 		registerScenario(new StarLeagueCache1BuiltInScenario());
 		registerScenario(new StarLeagueCache2BuiltInScenario());
-		
-		// load dynamic scenarios
-		AtBScenarioManifest scenarioManifest = AtBScenarioManifest.Deserialize("./data/scenariotemplates/LegacyAtB/ScenarioManifest.xml");
-        
-        // load user-specified scenario list
-        AtBScenarioManifest userManifest = AtBScenarioManifest.Deserialize("./data/scenariotemplates/LegacyAtB/UserScenarioManifest.xml");
-        
-        loadScenariosFromManifest(scenarioManifest);
-        loadScenariosFromManifest(userManifest);
 	}
 	
-	/**
-	 * Helper function that loads scenario templates from the given manifest.
-	 * @param manifest The manifest to process
-	 */
-	private static void loadScenariosFromManifest(AtBScenarioManifest manifest) {
-	    if(manifest == null) {
-	        return;
-	    }
-	    
-	    for(int key : manifest.scenarioFileNames.keySet()) {
-            if(!dynamicScenarioMap.containsKey(key)) {
-                dynamicScenarioMap.put(key, new ArrayList<>());
-            }
-            
-            String filePath = String.format("./data/ScenarioTemplates/LegacyAtB/%s", manifest.scenarioFileNames.get(key).trim());
-            
-            ScenarioTemplate template = ScenarioTemplate.Deserialize(filePath);
-            
-            if(template != null) {
-                dynamicScenarioMap.get(key).add(template);
-            }
-        }
-	}
-
 	private AtBScenarioFactory() {
 	}
 

@@ -4,7 +4,11 @@ import java.util.List;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
+import mekhq.campaign.mission.AtBDynamicScenarioFactory;
+import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
+import mekhq.campaign.mission.ScenarioTemplate;
 
 public class StratconScenario implements IStratconDisplayable {
     public enum ScenarioState {
@@ -18,11 +22,9 @@ public class StratconScenario implements IStratconDisplayable {
 
     private AtBDynamicScenario backingScenario;
     private ScenarioState currentState;
-    private StratconCampaignState campaignState;
+    private int requiredPlayerLances;
 
-
-
-    public void initializeScenario(Campaign campaign) {
+    public void initializeScenario(Campaign campaign, AtBContract contract, MapLocation location) {
         // scenario initialized from template - includes name, type, objectives, terrain/map, weather, lighting, gravity, atmo pressure
         // player assigns primary forces (list of ints that are force IDs)
         // roll events
@@ -32,8 +34,13 @@ public class StratconScenario implements IStratconDisplayable {
         // make event adjustments to scenario forces
         // player assigns reinforcements (list of ints that are force IDs)
         // [at any point afterwards] assign external forces from other scenario
-        backingScenario = new AtBDynamicScenario();
-        //backingScenario.initBattleEnvironment(campaign);
+        ScenarioTemplate sourceTemplate = StratconScenarioFactory.getRandomScenario(location);
+        backingScenario = AtBDynamicScenarioFactory.initializeScenarioFromTemplate(sourceTemplate, contract, campaign);
+    }
+    
+    public void initializeScenario(Campaign campaign, AtBContract contract, int unitType) {
+        ScenarioTemplate sourceTemplate = StratconScenarioFactory.getRandomScenario(unitType);
+        backingScenario = AtBDynamicScenarioFactory.initializeScenarioFromTemplate(sourceTemplate, contract, campaign);
     }
 
     public void commitPrimaryForces(List<Force> primaryForces) {
@@ -113,5 +120,19 @@ public class StratconScenario implements IStratconDisplayable {
 
         stateBuilder.append("</html>");
         return stateBuilder.toString();
+    }
+
+    
+    public int getRequiredPlayerLances() {
+        return requiredPlayerLances;
+    }
+    
+
+    public void setRequiredPlayerLances(int requiredPlayerLances) {
+        requiredPlayerLances = requiredPlayerLances;
+    }
+    
+    public void incrementRequiredPlayerLances() {
+        requiredPlayerLances++;
     }
 }

@@ -6,75 +6,32 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import megamek.common.Coords;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 
 public class StratconCampaignState {
-    private HashMap<Integer, HashMap<Integer, StratconScenario>> scenarios;
-    private List<Integer> missionIDs;
     private Campaign campaign;
+    private AtBContract contract;
 
     // these are all state variables that affect the current Stratcon Campaign
     private double globalOpforBVMultiplier;
     private int supportPoints;
     private int victoryPoints;
     private int strategicObjectivePoints;
-    private List<Integer> scenarioOddsByTrack;
-    private List<List<Integer>> scenarioOddsModifiers;
+    private List<StratconTrackState> tracks;
 
     public StratconCampaignState(Campaign campaign) {
-        scenarios = new HashMap<>();
+        tracks = new ArrayList<>();
         this.campaign = campaign; 
-
-        globalOpforBVMultiplier = 0.05;
-        supportPoints = 5;
-        victoryPoints = 2;
-        strategicObjectivePoints = 1;
-        scenarioOddsByTrack = Arrays.asList(20, 40, 80, 40);
-
-        addNewScenario(0, 0);
-        addNewScenario(1, 2);
-        addNewScenario(1, 3);
-        addNewScenario(7, 2);
-
-        getScenario(0, 0).setCurrentState(ScenarioState.UNRESOLVED);
-        getScenario(1, 2).setCurrentState(ScenarioState.DEFEATED);
-        getScenario(1, 3).setCurrentState(ScenarioState.COMPLETED);
-        getScenario(7, 2).setCurrentState(ScenarioState.IGNORED);
-    }
-
-    public int getWidth() {
-        return 12;
-    }
-
-    public int getHeight() {
-        return 4;
-    }
-
-    public Color getHexColor(int x, int y) {
-        return Color.GRAY;
-    }
-
-    public void addNewScenario(int x, int y) {
-        if(!scenarios.containsKey(x)) {
-            scenarios.put(x, new HashMap<>());
-        }
-
-        StratconScenario sts = new StratconScenario();
-        sts.initializeScenario(campaign);
-        scenarios.get(x).put(y, sts);
-    }
-
-    public StratconScenario getScenario(int x, int y) {
-        if(!scenarios.containsKey(x) || !scenarios.get(x).containsKey(y)) {
-            return null;
-        }
-
-        return scenarios.get(x).get(y);
-    }
-
-    public List<Integer> getMissionIDs() {
-        return missionIDs;
+        
+        StratconTrackState testTrack = new StratconTrackState();
+        testTrack.setDisplayableName("Test Track");
+        testTrack.setHeight(8);
+        testTrack.setWidth(12);
+        
+        tracks.add(testTrack);
     }
 
     /**
@@ -83,5 +40,15 @@ public class StratconCampaignState {
      */
     public double getGlobalOpforBVMultiplier() {
         return globalOpforBVMultiplier;
+    }
+    
+    public StratconTrackState getTrack(int index) {
+        return tracks.get(index);
+    }
+    
+    public void generateScenariosForTracks() {
+        for(StratconTrackState track : tracks) {
+            track.generateScenarios(campaign, contract);
+        }
     }
 }

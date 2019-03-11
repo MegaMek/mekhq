@@ -34,7 +34,7 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 @XmlRootElement(name="ScenarioTemplate")
 public class ScenarioTemplate {
     public static final String ROOT_XML_ELEMENT_NAME = "ScenarioTemplate";
-    
+    public static final String PRIMARY_PLAYER_FORCE_ID = "Player";
     
     public String name;
     public String shortBriefing;
@@ -46,6 +46,14 @@ public class ScenarioTemplate {
     @XmlElementWrapper(name="scenarioForces")
     @XmlElement(name="scenarioForce")
     public Map<String, ScenarioForceTemplate> scenarioForces = new HashMap<>();
+    
+    /**
+     * Returns the "primary" player force. This is always the force with the name "Player".
+     * @return Primary player force.
+     */
+    public ScenarioForceTemplate getPrimaryPlayerForce() {
+        return scenarioForces.get(PRIMARY_PLAYER_FORCE_ID);
+    }
     
     public List<ScenarioForceTemplate> getAllScenarioForces() {
         return scenarioForces.values().stream().collect(Collectors.toList());
