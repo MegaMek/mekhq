@@ -21,6 +21,7 @@ import megamek.common.Coords;
 import mekhq.campaign.stratcon.IStratconDisplayable;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconScenario;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.gui.stratcon.InfoFrame;
 import mekhq.gui.stratcon.StratconScenarioWizard;
 
@@ -96,7 +97,8 @@ public class StratconTab extends CampaignGuiTab {
 
     @Override
     public void initTab() {
-        campaignState = new StratconCampaignState(getCampaign());
+        //campaignState =
+        campaignState = new StratconCampaignState(getCampaign(), (AtBContract) this.getCampaign().getActiveContracts().get(0));
     }
 
     @Override
@@ -321,11 +323,13 @@ public class StratconTab extends CampaignGuiTab {
                 StratconScenario selectedScenario = campaignState.getTrack(0).getScenario(new Coords(boardState.selectedX, boardState.selectedY));
                 if(selectedScenario != null) {
                     scenarioWizard.setVisible(true);
-                    scenarioWizard.setCurrentScenario(selectedScenario);
+                    scenarioWizard.setCurrentScenario(selectedScenario, campaignState);
                 }
             }
 
             repaint();
+        } else if(e.getButton() == MouseEvent.BUTTON2) {
+            campaignState.getTrack(0).generateScenarios(getCampaign(), (AtBContract) this.getCampaign().getActiveContracts().get(0));
         }
     }
 

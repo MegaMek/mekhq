@@ -290,8 +290,10 @@ public class AtBDynamicScenarioFactory {
             }
             
             // if we are using the 'atb aero mix', let's decide now whether it's aero or conventional fighter
+            // if we are in space, let's not put conventional fighters there
             int actualUnitType = forceTemplate.getAllowedUnitType();
-            if(isPlanetOwner && actualUnitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX) {
+            if(isPlanetOwner && actualUnitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX &&
+                    scenario.getTemplate().mapParameters.getMapLocation() != MapLocation.Space) {
                 actualUnitType = Compute.d6() > 3 ? UnitType.AERO : UnitType.CONV_FIGHTER;
             } else if(actualUnitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX) {
                 actualUnitType = UnitType.AERO;
@@ -647,7 +649,7 @@ public class AtBDynamicScenarioFactory {
      * @param campaign The campaign
      * @param when Before or after force generation
      */
-    private static void applyScenarioModifiers(AtBDynamicScenario scenario, Campaign campaign, EventTiming when) {
+    public static void applyScenarioModifiers(AtBDynamicScenario scenario, Campaign campaign, EventTiming when) {
         for(AtBScenarioModifier scenarioMod : scenario.getScenarioModifiers()) {
             scenarioMod.processModifier(scenario, campaign, when);
         }
@@ -1592,7 +1594,7 @@ public class AtBDynamicScenarioFactory {
             return Board.START_ANY;
         default:
             // directional edges start at 1
-            return ((edge + 3) % 8) + 1;
+            return ((edge + 4) % 8) + 1;
         }
     }
     

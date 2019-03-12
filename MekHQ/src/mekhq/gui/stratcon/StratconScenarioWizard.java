@@ -15,14 +15,17 @@ import javax.swing.event.ListSelectionListener;
 
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
+import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.stratcon.StratconCampaignState;
 
 public class StratconScenarioWizard extends JDialog {
     StratconScenario currentScenario;
     Campaign campaign;
+    StratconCampaignState currentCampaignState;
 
     JLabel lblTotalBV = new JLabel();
     JList<Force> playerForceList = new JList<>();
@@ -32,8 +35,9 @@ public class StratconScenarioWizard extends JDialog {
         this.campaign = campaign;
     }
 
-    public void setCurrentScenario(StratconScenario scenario) {
+    public void setCurrentScenario(StratconScenario scenario, StratconCampaignState campaignState) {
         currentScenario = scenario;
+        currentCampaignState = campaignState;
         setUI();
     }
 
@@ -111,7 +115,7 @@ public class StratconScenarioWizard extends JDialog {
      */
     private void btnCommitClicked(ActionEvent e) {
         if(currentScenario.getCurrentState() == ScenarioState.UNRESOLVED) {
-            currentScenario.commitPrimaryForces(playerForceList.getSelectedValuesList());
+            currentScenario.commitPrimaryForces(campaign, currentCampaignState.getContract());
         }
     }
 

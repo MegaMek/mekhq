@@ -22,9 +22,18 @@ public class StratconCampaignState {
     private int strategicObjectivePoints;
     private List<StratconTrackState> tracks;
 
-    public StratconCampaignState(Campaign campaign) {
+    public AtBContract getContract() {
+        return contract;
+    }
+
+    public void setContract(AtBContract contract) {
+        this.contract = contract;
+    }
+
+    public StratconCampaignState(Campaign campaign, AtBContract contract) {
         tracks = new ArrayList<>();
         this.campaign = campaign; 
+        this.setContract(contract);
         
         StratconTrackState testTrack = new StratconTrackState();
         testTrack.setDisplayableName("Test Track");
@@ -48,7 +57,7 @@ public class StratconCampaignState {
     
     public void generateScenariosForTracks() {
         for(StratconTrackState track : tracks) {
-            track.generateScenarios(campaign, contract);
+            track.generateScenarios(campaign, getContract());
         }
     }
 }

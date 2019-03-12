@@ -210,6 +210,10 @@ public class AtBDynamicScenario extends AtBScenario {
         return scenarioModifiers;
     }
     
+    public void addScenarioModifier(AtBScenarioModifier modifier) {
+        scenarioModifiers.add(modifier);
+    }
+    
     @Override
     public int getScenarioType() {
         return 0;

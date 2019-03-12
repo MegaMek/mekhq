@@ -2,6 +2,7 @@ package mekhq.campaign.stratcon;
 
 import java.util.List;
 
+import megamek.common.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
@@ -9,20 +10,28 @@ import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.ScenarioTemplate;
+import mekhq.campaign.mission.atb.AtBScenarioModifier;
+import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 
 public class StratconScenario implements IStratconDisplayable {
     public enum ScenarioState {
         UNRESOLVED,
         PRIMARY_FORCES_COMMITTED,
-        READY_TO_PLAY,
         COMPLETED,
         IGNORED,
         DEFEATED;
     }
+    
+    private String SCENARIO_MODIFIER_ALLIED_GROUND_UNITS = "";
+    private String SCENARIO_MODIFIER_ALLIED_AIR_UNITS = "";
+    private String SCENARIO_MODIFIER_LIAISON = "";
+    private String SCENARIO_MODIFIER_HOUSE_CO = "";
+    private String SCENARIO_MODIFIER_INTEGRATED_UNITS = "";
 
     private AtBDynamicScenario backingScenario;
     private ScenarioState currentState;
     private int requiredPlayerLances;
+    private boolean requiredScenario;
 
     public void initializeScenario(Campaign campaign, AtBContract contract, MapLocation location) {
         // scenario initialized from template - includes name, type, objectives, terrain/map, weather, lighting, gravity, atmo pressure
@@ -35,15 +44,36 @@ public class StratconScenario implements IStratconDisplayable {
         // player assigns reinforcements (list of ints that are force IDs)
         // [at any point afterwards] assign external forces from other scenario
         ScenarioTemplate sourceTemplate = StratconScenarioFactory.getRandomScenario(location);
-        backingScenario = AtBDynamicScenarioFactory.initializeScenarioFromTemplate(sourceTemplate, contract, campaign);
+        initializeScenario(campaign, contract, sourceTemplate);
     }
     
     public void initializeScenario(Campaign campaign, AtBContract contract, int unitType) {
         ScenarioTemplate sourceTemplate = StratconScenarioFactory.getRandomScenario(unitType);
-        backingScenario = AtBDynamicScenarioFactory.initializeScenarioFromTemplate(sourceTemplate, contract, campaign);
+        initializeScenario(campaign, contract, sourceTemplate);
+    }
+    
+    private void initializeScenario(Campaign campaign, AtBContract contract, ScenarioTemplate template) {
+        backingScenario = AtBDynamicScenarioFactory.initializeScenarioFromTemplate(template, contract, campaign);
+        
+        // do an appropriate allied force if the contract calls for it
+        // do any attached or integrated units
+        setAlliedForceModifier(contract);
+        setAttachedUnitsModifier(contract);
+        
+        if((contract.getCommandRights() == AtBContract.COM_HOUSE) ||
+                (contract.getCommandRights() == AtBContract.COM_INTEGRATED)) {
+            requiredScenario = true;
+        }
+        
+        AtBDynamicScenarioFactory.setScenarioModifiers(backingScenario);
+        AtBDynamicScenarioFactory.applyScenarioModifiers(backingScenario, campaign, EventTiming.PreForceGeneration);
     }
 
-    public void commitPrimaryForces(List<Force> primaryForces) {
+    public void addPrimaryForce(int forceID) {
+        backingScenario.addForces(forceID);
+    }
+    
+    public void commitPrimaryForces(Campaign campaign, AtBContract contract) {
         //backingScenario.setPrimaryPlayerForces(primaryForces);
         currentState = ScenarioState.PRIMARY_FORCES_COMMITTED;
 
@@ -54,10 +84,7 @@ public class StratconScenario implements IStratconDisplayable {
         // d) apply any event-related adjustments
         // e) place the scenario in the briefing room
         generateEvents();
-        processPreForceGenerationEvents();
-        generateAlliedForces();
-        generateAttachedUnits();
-        generateOpposingForces();
+        AtBDynamicScenarioFactory.finalizeScenario(backingScenario, contract, campaign);
     }
 
     public void generateEvents() {
@@ -68,24 +95,60 @@ public class StratconScenario implements IStratconDisplayable {
 
     }
 
-    public void generateAlliedForces() {
-
+    /**
+     * Set up the appropriate primary allied force modifier, if any 
+     * @param contract The scenario's contract.
+     */
+    private void setAlliedForceModifier(AtBContract contract) {
+        int alliedUnitOdds = 0;
+        
+        // first, we determine the odds of having an allied unit present
+        if(contract.getMissionType() == AtBContract.MT_RIOTDUTY) {
+            alliedUnitOdds = 50;
+        } else {
+            switch(contract.getCommandRights()) {
+            case AtBContract.COM_INTEGRATED:
+                alliedUnitOdds = 50;
+                break;
+            case AtBContract.COM_HOUSE:
+                alliedUnitOdds = 30;
+                break;
+            case AtBContract.COM_LIAISON:
+                alliedUnitOdds = 10;
+                break;
+            }
+        }
+        
+        // if an allied unit is present, then we want to make sure that it's ground units
+        // for ground battles
+        if(Compute.randomInt(100) <= alliedUnitOdds) {
+            if((backingScenario.getTemplate().mapParameters.getMapLocation() == MapLocation.LowAtmosphere) ||
+               (backingScenario.getTemplate().mapParameters.getMapLocation() == MapLocation.Space)) {
+                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(SCENARIO_MODIFIER_ALLIED_AIR_UNITS));
+            } else {
+                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(SCENARIO_MODIFIER_ALLIED_GROUND_UNITS));
+            }
+        }
     }
 
-    public void generateAttachedUnits() {
-
-    }
-
-    public void generateOpposingForces() {
-        // calculate BV budget.
-        // BV budget is defined as ((primary player force BV * difficulty multiplier) + primary allied/not attached force BV) 
-        // * scenario multiplier
-        // * campaign state multiplier
-
-    }
-
-    public void processPostForceGenerationEvents() {
-
+    /**
+     * Set the 'attached' units modifier for the current scenario (integraed, house, liaison)
+     * @param contract The scenario's contract
+     */
+    public void setAttachedUnitsModifier(AtBContract contract) {
+        switch(contract.getCommandRights()) {
+        case AtBContract.COM_INTEGRATED:
+            backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(SCENARIO_MODIFIER_INTEGRATED_UNITS));
+            break;
+        case AtBContract.COM_HOUSE:
+            backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(SCENARIO_MODIFIER_HOUSE_CO));
+            break;
+        case AtBContract.COM_LIAISON:
+            if(isRequiredScenario()) {
+                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(SCENARIO_MODIFIER_LIAISON));
+            }
+            break;
+        }
     }
 
     public ScenarioState getCurrentState() {
@@ -129,10 +192,18 @@ public class StratconScenario implements IStratconDisplayable {
     
 
     public void setRequiredPlayerLances(int requiredPlayerLances) {
-        requiredPlayerLances = requiredPlayerLances;
+        this.requiredPlayerLances = requiredPlayerLances;
     }
     
     public void incrementRequiredPlayerLances() {
         requiredPlayerLances++;
+    }
+
+    public boolean isRequiredScenario() {
+        return requiredScenario;
+    }
+
+    public void setRequiredScenario(boolean requiredScenario) {
+        this.requiredScenario = requiredScenario;
     }
 }

@@ -113,6 +113,15 @@ public class AtBScenarioModifier {
         return scenarioModifiers;
     }
     
+    /**
+     * Convenience method to get a scenario modifier with the specified key.
+     * @param key The key
+     * @return The scenario modifier, if any.
+     */
+    public static AtBScenarioModifier getScenarioModifier(String key) {
+        return scenarioModifiers.get(key);
+    }
+    
     static {
         loadManifest();
         loadScenarioModifiers();
