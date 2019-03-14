@@ -24,8 +24,9 @@ import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.gui.stratcon.InfoFrame;
 import mekhq.gui.stratcon.StratconScenarioWizard;
+import mekhq.gui.stratcon.TrackForceAssignmentUI;
 
-public class StratconTab extends CampaignGuiTab {
+public class StratconTab extends CampaignGuiTab implements ActionListener {
     /**
      * 
      */
@@ -33,6 +34,8 @@ public class StratconTab extends CampaignGuiTab {
 
     private static final int HEX_X_RADIUS = 42;
     private static final int HEX_Y_RADIUS = 37;
+    
+    private static final String RCLICK_COMMAND_MANAGE_FORCES = "ManageForces";
 
     private enum DrawHexType {
         Hex,
@@ -52,6 +55,7 @@ public class StratconTab extends CampaignGuiTab {
     JMenuItem menuItemAssignForces;
     JMenuItem menuItemInitiateScenario;
     StratconScenarioWizard scenarioWizard;
+    TrackForceAssignmentUI assignmentUI;
 
     StratconTab(CampaignGUI gui, String tabName) {
         super(gui, tabName);
@@ -97,8 +101,12 @@ public class StratconTab extends CampaignGuiTab {
 
     @Override
     public void initTab() {
-        //campaignState =
         campaignState = new StratconCampaignState(getCampaign(), (AtBContract) this.getCampaign().getActiveContracts().get(0));
+        
+        assignmentUI = new TrackForceAssignmentUI(getCampaign());
+        assignmentUI.setVisible(false);
+        
+        buildRightClickMenu();
     }
 
     @Override
@@ -109,6 +117,16 @@ public class StratconTab extends CampaignGuiTab {
     @Override
     public GuiTabType tabType() {
         return GuiTabType.STRATCON;
+    }
+    
+    private void buildRightClickMenu() {
+        rightClickMenu = new JPopupMenu();
+        
+        JMenuItem itemManageForceAssignments = new JMenuItem();
+        itemManageForceAssignments.setText("Manage Force Assignments");
+        itemManageForceAssignments.setActionCommand(RCLICK_COMMAND_MANAGE_FORCES);
+        itemManageForceAssignments.addActionListener(this);
+        rightClickMenu.add(itemManageForceAssignments);
     }
 
     @Override
@@ -315,7 +333,8 @@ public class StratconTab extends CampaignGuiTab {
 
             repaint();
         } else if(e.getButton() == MouseEvent.BUTTON3) {
-            clickedPoint = new Point(e.getX(), e.getY());
+            rightClickMenu.show(this, e.getX(), e.getY());
+            /*clickedPoint = new Point(e.getX(), e.getY());
             boolean pointFoundOnBoard = detectClickedHex();
 
             if(pointFoundOnBoard) {
@@ -327,14 +346,10 @@ public class StratconTab extends CampaignGuiTab {
                 }
             }
 
-            repaint();
+            repaint();*/
         } else if(e.getButton() == MouseEvent.BUTTON2) {
             campaignState.getTrack(0).generateScenarios(getCampaign(), (AtBContract) this.getCampaign().getActiveContracts().get(0));
         }
-    }
-
-    public void actionHandler(ActionEvent e) {
-
     }
 
     public void focusLostHandler(FocusEvent e) {
@@ -345,5 +360,14 @@ public class StratconTab extends CampaignGuiTab {
     private class BoardState {
         public int selectedX;
         public int selectedY;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        switch(e.getActionCommand()) {
+        case RCLICK_COMMAND_MANAGE_FORCES:
+            assignmentUI.display(campaignState, 0);
+            assignmentUI.setVisible(true);
+        }
     }
 }

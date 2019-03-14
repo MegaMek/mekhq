@@ -2,8 +2,10 @@ package mekhq.campaign.stratcon;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import megamek.common.Compute;
 import megamek.common.Coords;
@@ -27,14 +29,14 @@ public class StratconTrackState {
     private int height;
     private Map<Coords, StratconFacility> facilities;
     private Map<Coords, StratconScenario> scenarios;
-    private List<Integer> assignedForceIDs;
+    private Set<Integer> assignedForceIDs;
     private int scenarioOdds;
     private int requiredLanceCount;
     
     public StratconTrackState() {
         facilities = new HashMap<>();
         scenarios = new HashMap<>();
-        assignedForceIDs = new ArrayList<>();
+        setAssignedForceIDs(new HashSet<>());
     }
     
     public String getDisplayableName() {
@@ -89,6 +91,22 @@ public class StratconTrackState {
         this.requiredLanceCount = requiredLanceCount;
     }
 
+    public void assignForce(int forceID) {
+        getAssignedForceIDs().add(forceID);
+    }
+    
+    public void unassignForce(int forceID) {
+        getAssignedForceIDs().remove(forceID);
+    }
+    
+    public Set<Integer> getAssignedForceIDs() {
+        return assignedForceIDs;
+    }
+
+    public void setAssignedForceIDs(Set<Integer> assignedForceIDs) {
+        this.assignedForceIDs = assignedForceIDs;
+    }
+    
     public void generateScenarios(Campaign campaign, AtBContract contract) {
         List<StratconScenario> generatedScenarios = new ArrayList<>();
         boolean autoAssignLances = (contract.getCommandRights() == AtBContract.COM_HOUSE) ||
@@ -97,7 +115,7 @@ public class StratconTrackState {
         // create scenario for each force if we roll higher than the track's scenario odds
         // if we already have a scenario in the given coords, let's make it a larger battle instead
         // otherwise, generate an appropriate scenario for the unit type of the force being examined
-        for(int forceID : assignedForceIDs) {
+        for(int forceID : getAssignedForceIDs()) {
             if(Compute.randomInt(100) > scenarioOdds) {
                 // get coordinates
                 int x = Compute.randomInt(width);

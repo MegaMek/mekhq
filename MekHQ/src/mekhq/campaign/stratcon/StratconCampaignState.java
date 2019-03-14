@@ -55,6 +55,10 @@ public class StratconCampaignState {
         return tracks.get(index);
     }
     
+    public List<StratconTrackState> getTracks() {
+        return tracks;
+    }
+    
     public void generateScenariosForTracks() {
         for(StratconTrackState track : tracks) {
             track.generateScenarios(campaign, getContract());
