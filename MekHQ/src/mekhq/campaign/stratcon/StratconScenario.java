@@ -1,10 +1,7 @@
 package mekhq.campaign.stratcon;
 
-import java.util.List;
-
 import megamek.common.Compute;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
@@ -13,6 +10,11 @@ import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 
+/**
+ * Class that handles scenario metadata and interaction at the StratCon level
+ * @author NickAragua
+ *
+ */
 public class StratconScenario implements IStratconDisplayable {
     public enum ScenarioState {
         UNRESOLVED,
@@ -22,12 +24,17 @@ public class StratconScenario implements IStratconDisplayable {
         DEFEATED;
     }
     
-    private String SCENARIO_MODIFIER_ALLIED_GROUND_UNITS = "";
-    private String SCENARIO_MODIFIER_ALLIED_AIR_UNITS = "";
-    private String SCENARIO_MODIFIER_LIAISON = "";
-    private String SCENARIO_MODIFIER_HOUSE_CO = "";
-    private String SCENARIO_MODIFIER_INTEGRATED_UNITS = "";
-
+    private String SCENARIO_MODIFIER_ALLIED_GROUND_UNITS = "PrimaryAlliesGround.xml";
+    private String SCENARIO_MODIFIER_ALLIED_AIR_UNITS = "PrimaryAlliesAir.xml";
+    private String SCENARIO_MODIFIER_LIAISON_GROUND = "LiaisonGround.xml";
+    private String SCENARIO_MODIFIER_HOUSE_CO_GROUND = "HouseOfficerGround.xml";
+    private String SCENARIO_MODIFIER_INTEGRATED_UNITS_GROUND = "IntegratedAlliesGround.xml";
+    private String SCENARIO_MODIFIER_LIAISON_AIR = "LiaisonAir.xml";
+    private String SCENARIO_MODIFIER_HOUSE_CO_AIR = "HouseOfficerAir.xml";
+    private String SCENARIO_MODIFIER_INTEGRATED_UNITS_AIR = "IntegratedAlliesAir.xml";
+    private String SCENARIO_MODIFIER_TRAINEES_AIR = "AlliedTraineesAir.xml";
+    private String SCENARIO_MODIFIER_TRAINEES_GROUND = "AlliedTraineesGround.xml";
+    
     private AtBDynamicScenario backingScenario;
     private ScenarioState currentState;
     private int requiredPlayerLances;
@@ -44,12 +51,17 @@ public class StratconScenario implements IStratconDisplayable {
         // player assigns reinforcements (list of ints that are force IDs)
         // [at any point afterwards] assign external forces from other scenario
         ScenarioTemplate sourceTemplate = StratconScenarioFactory.getRandomScenario(location);
-        initializeScenario(campaign, contract, sourceTemplate);
+        if(sourceTemplate != null) {
+            initializeScenario(campaign, contract, sourceTemplate);
+        }
     }
     
     public void initializeScenario(Campaign campaign, AtBContract contract, int unitType) {
         ScenarioTemplate sourceTemplate = StratconScenarioFactory.getRandomScenario(unitType);
-        initializeScenario(campaign, contract, sourceTemplate);
+
+        if(sourceTemplate != null) {
+            initializeScenario(campaign, contract, sourceTemplate);
+        }
     }
     
     private void initializeScenario(Campaign campaign, AtBContract contract, ScenarioTemplate template) {
@@ -132,20 +144,47 @@ public class StratconScenario implements IStratconDisplayable {
     }
 
     /**
-     * Set the 'attached' units modifier for the current scenario (integraed, house, liaison)
+     * Set the 'attached' units modifier for the current scenario (integrated, house, liaison),
+     * and make sure we're not deploying ground units to an air scenario
      * @param contract The scenario's contract
      */
     public void setAttachedUnitsModifier(AtBContract contract) {
+        boolean airBattle = (backingScenario.getTemplate().mapParameters.getMapLocation() == MapLocation.LowAtmosphere) ||
+                (backingScenario.getTemplate().mapParameters.getMapLocation() == MapLocation.Space);
+        
+        // if we're on cadre duty, we're getting three trainees, period
+        if(contract.getMissionType() == AtBContract.MT_CADREDUTY) {
+            if(airBattle) {
+                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(SCENARIO_MODIFIER_TRAINEES_AIR));                
+            } else {
+                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(SCENARIO_MODIFIER_TRAINEES_GROUND));
+            }
+            return;
+        }
+        
+        // if we're under non-independent command rights, a supervisor may come along
         switch(contract.getCommandRights()) {
         case AtBContract.COM_INTEGRATED:
-            backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(SCENARIO_MODIFIER_INTEGRATED_UNITS));
+            if(airBattle) {
+                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(SCENARIO_MODIFIER_INTEGRATED_UNITS_AIR));                
+            } else {
+                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(SCENARIO_MODIFIER_INTEGRATED_UNITS_GROUND));
+            }
             break;
         case AtBContract.COM_HOUSE:
-            backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(SCENARIO_MODIFIER_HOUSE_CO));
+            if(airBattle) {
+                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(SCENARIO_MODIFIER_HOUSE_CO_AIR));
+            } else {
+                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(SCENARIO_MODIFIER_HOUSE_CO_GROUND));
+            }            
             break;
         case AtBContract.COM_LIAISON:
             if(isRequiredScenario()) {
-                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(SCENARIO_MODIFIER_LIAISON));
+                if(airBattle) {
+                    backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(SCENARIO_MODIFIER_LIAISON_AIR));
+                } else {
+                    backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(SCENARIO_MODIFIER_LIAISON_GROUND));
+                } 
             }
             break;
         }

@@ -349,6 +349,7 @@ public class StratconTab extends CampaignGuiTab implements ActionListener {
             repaint();*/
         } else if(e.getButton() == MouseEvent.BUTTON2) {
             campaignState.getTrack(0).generateScenarios(getCampaign(), (AtBContract) this.getCampaign().getActiveContracts().get(0));
+            repaint();
         }
     }
 

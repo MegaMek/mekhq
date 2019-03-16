@@ -109,8 +109,9 @@ public class StratconTrackState {
     
     public void generateScenarios(Campaign campaign, AtBContract contract) {
         List<StratconScenario> generatedScenarios = new ArrayList<>();
-        boolean autoAssignLances = (contract.getCommandRights() == AtBContract.COM_HOUSE) ||
-                (contract.getCommandRights() == AtBContract.COM_INTEGRATED);
+        boolean autoAssignLances = contract.getCommandRights() == AtBContract.COM_INTEGRATED;
+        
+        //StratconScenarioFactory.reloadScenarios();
         
         // create scenario for each force if we roll higher than the track's scenario odds
         // if we already have a scenario in the given coords, let's make it a larger battle instead
