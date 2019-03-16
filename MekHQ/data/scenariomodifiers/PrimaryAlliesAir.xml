@@ -1,27 +1,27 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>Allied units will be arrivins shortly to assist your force in its mission.</additionalBriefingText>
+	<additionalBriefingText>To compensate for the presence of a large opposing force, allied units will be working alongside us on this operation.</additionalBriefingText>
 	<benefitsPlayer>true</benefitsPlayer>
-	<eventTiming>PostForceGeneration</eventTiming>
+	<eventTiming>PreForceGeneration</eventTiming>
 	<forceDefinition>
-<actualDeploymentZone>-1</actualDeploymentZone>
-<allowAeroBombs>true</allowAeroBombs>
-<allowedUnitType>-2</allowedUnitType>
+		<actualDeploymentZone>-1</actualDeploymentZone>
+<allowAeroBombs>false</allowAeroBombs>
+<allowedUnitType>-3</allowedUnitType>
 <arrivalTurn>0</arrivalTurn>
 <canReinforceLinked>false</canReinforceLinked>
-<contributesToBV>false</contributesToBV>
-<contributesToMapSize>false</contributesToMapSize>
-<contributesToUnitCount>false</contributesToUnitCount>
+<contributesToBV>true</contributesToBV>
+<contributesToMapSize>true</contributesToMapSize>
+<contributesToUnitCount>true</contributesToUnitCount>
 <deployOffboard>false</deployOffboard>
 <deploymentZones/>
 <destinationZone>4</destinationZone>
 <fixedUnitCount>-1</fixedUnitCount>
 <forceAlignment>1</forceAlignment>
 <forceMultiplier>1.0</forceMultiplier>
-<forceName>Allied Ground Support</forceName>
+<forceName>Allied Force</forceName>
 <generationMethod>3</generationMethod>
-<generationOrder>3</generationOrder>
+<generationOrder>1</generationOrder>
 <maxWeightClass>4</maxWeightClass>
-<retreatThreshold>50</retreatThreshold>
+<retreatThreshold>0</retreatThreshold>
 <startingAltitude>0</startingAltitude>
 <syncDeploymentType>SameEdge</syncDeploymentType>
 <syncedForceName>Player</syncedForceName>

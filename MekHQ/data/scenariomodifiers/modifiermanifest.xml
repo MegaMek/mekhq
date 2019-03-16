@@ -129,19 +129,34 @@
 
 		<!-- Scenario modifiers that come from campaign state go here -->
 		<modifier>
-			IntegratedAllies.xml
+			IntegratedAlliesGround.xml
 		</modifier>
 		<modifier>
-			HouseOfficer.xml
+			HouseOfficerGround.xml
 		</modifier>
 		<modifier>
-			Liaison.xml
+			LiaisonGround.xml
 		</modifier>
 		<modifier>
-			PrimaryAllies.xml
+			IntegratedAlliesAir.xml
 		</modifier>
 		<modifier>
-			AlliedTrainees.xml
+			HouseOfficerAir.xml
+		</modifier>
+		<modifier>
+			LiaisonAir.xml
+		</modifier>
+		<modifier>
+			PrimaryAlliesAir.xml
+		</modifier>
+		<modifier>
+			PrimaryAlliesGround.xml
+		</modifier>
+		<modifier>
+			AlliedTraineesGround.xml
+		</modifier>
+		<modifier>
+			AlliedTraineesAir.xml
 		</modifier>
 	</modifiers>
 </scenarioModifierManifest>
