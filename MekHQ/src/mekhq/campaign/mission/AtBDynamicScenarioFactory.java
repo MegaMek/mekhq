@@ -1490,7 +1490,9 @@ public class AtBDynamicScenarioFactory {
         // first, we figure out the slowest "atb speed" of this group.
         for(Entity entity : entityList) {
             int speed = calculateAtBSpeed(entity);
-            if(speed < minimumSpeed) {
+            
+            // don't reduce minimum speed to 0, since dividing by zero further down is problematic
+            if((speed < minimumSpeed) && (speed > 0)) {
                 minimumSpeed = speed;
             }
         }
@@ -1503,7 +1505,12 @@ public class AtBDynamicScenarioFactory {
         int actualArrivalTurn = Math.max(0, (REINFORCEMENT_ARRIVAL_SCALE / minimumSpeed) - turnModifier);
         
         for(Entity entity : entityList) {
-            entity.setDeployRound(actualArrivalTurn);
+            // if the entity is immobile, then set the deployment round such that it's unlikely to ever arrive
+            if(entity.getWalkMP() == 0) {
+                entity.setDeployRound(REINFORCEMENT_ARRIVAL_SCALE);
+            } else {
+                entity.setDeployRound(actualArrivalTurn);
+            }
         }
     }
     
