@@ -268,7 +268,7 @@ public class MekCockpit extends Part {
 
     @Override
     public boolean isPartForEquipmentNum(int index, int loc) {
-        return Mech.SYSTEM_COCKPIT == index && loc == getLocation();
+        return false;
     }
 
     @Override

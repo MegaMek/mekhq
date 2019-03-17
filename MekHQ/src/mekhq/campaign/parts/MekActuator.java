@@ -301,7 +301,7 @@ public class MekActuator extends Part {
 
     @Override
     public boolean isPartForEquipmentNum(int index, int loc) {
-        return index == type && loc == location;
+        return false;
     }
 
     @Override

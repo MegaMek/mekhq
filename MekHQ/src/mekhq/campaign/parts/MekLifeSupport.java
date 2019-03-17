@@ -214,10 +214,10 @@ public class MekLifeSupport extends Part {
 		return false;
 	}
 	
-	@Override
-	public boolean isPartForEquipmentNum(int index, int loc) {
-		return Mech.SYSTEM_LIFE_SUPPORT == index && loc == getLocation();
-	}
+    @Override
+    public boolean isPartForEquipmentNum(int index, int loc) {
+        return false;
+    }
 	
 	@Override
 	public boolean isRightTechType(String skillType) {
