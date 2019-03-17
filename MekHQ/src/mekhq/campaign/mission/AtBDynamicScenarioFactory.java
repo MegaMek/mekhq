@@ -1505,12 +1505,7 @@ public class AtBDynamicScenarioFactory {
         int actualArrivalTurn = Math.max(0, (REINFORCEMENT_ARRIVAL_SCALE / minimumSpeed) - turnModifier);
         
         for(Entity entity : entityList) {
-            // if the entity is immobile, then set the deployment round such that it's unlikely to ever arrive
-            if(entity.getWalkMP() == 0) {
-                entity.setDeployRound(REINFORCEMENT_ARRIVAL_SCALE);
-            } else {
-                entity.setDeployRound(actualArrivalTurn);
-            }
+            entity.setDeployRound(actualArrivalTurn);
         }
     }
     
