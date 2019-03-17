@@ -18,6 +18,8 @@ v0.45.4-SNAPSHOT
 + PR #1136: Don't expand/contract tab panels on right double click (Mac OS X improvement)
 + PR #1143: In Repair tab -> Acquisitions, user can once again click 'Order One' more than once
 + Adding CampaignAnon AtB Instruction guide (very good for new players) - See AtB Stuff folder in Docs.
++ Issue #1144: fix bug where bondsmen could not be recruited
++ Issue #1148: fix bug where loan could not be paid off
 
 v0.45.3 (2019-02-12 0500 UTC)
 + Issue #990: Feature: Add bulk confirm dialog if more than one unit is removed
