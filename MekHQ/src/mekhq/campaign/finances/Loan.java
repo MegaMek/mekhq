@@ -562,14 +562,14 @@ public class Loan implements MekHqXmlSerializable {
         Loan loan = (Loan)obj;
         return this.getDescription().equals(loan.getDescription())
                 && this.getInterestRate() == loan.getInterestRate()
-                && this.getCollateralAmount() == loan.getCollateralAmount()
+                && this.getCollateralAmount().equals(loan.getCollateralAmount())
                 && this.getCollateralPercent() == loan.getCollateralPercent()
                 && this.getNextPayDate().equals(loan.getNextPayDate())
                 && this.getYears() == loan.getYears()
-                && this.getPrincipal() == loan.getPrincipal()
+                && this.getPrincipal().equals(loan.getPrincipal())
                 && this.getPaymentSchedule() == loan.getPaymentSchedule()
                 && this.getRemainingPayments() == loan.getRemainingPayments()
-                && this.getRemainingValue() == loan.getRemainingValue();
+                && this.getRemainingValue().equals(loan.getRemainingValue());
     }
 
     @Override
