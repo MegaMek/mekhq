@@ -20,6 +20,7 @@ v0.45.4-SNAPSHOT
 + Adding CampaignAnon AtB Instruction guide (very good for new players) - See AtB Stuff folder in Docs.
 + Issue #1144: fix bug where bondsmen could not be recruited
 + Issue #1148: fix bug where loan could not be paid off
++ Issue #1150: fix bug introduced in 45.3 preventing AtB scenarios reinforced by immobile player units from starting
 
 v0.45.3 (2019-02-12 0500 UTC)
 + Issue #990: Feature: Add bulk confirm dialog if more than one unit is removed
