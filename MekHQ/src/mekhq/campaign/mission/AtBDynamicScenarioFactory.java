@@ -1490,7 +1490,9 @@ public class AtBDynamicScenarioFactory {
         // first, we figure out the slowest "atb speed" of this group.
         for(Entity entity : entityList) {
             int speed = calculateAtBSpeed(entity);
-            if(speed < minimumSpeed) {
+            
+            // don't reduce minimum speed to 0, since dividing by zero further down is problematic
+            if((speed < minimumSpeed) && (speed > 0)) {
                 minimumSpeed = speed;
             }
         }
