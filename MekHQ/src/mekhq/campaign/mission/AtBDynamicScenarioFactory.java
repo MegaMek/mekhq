@@ -85,6 +85,7 @@ public class AtBDynamicScenarioFactory {
         scenario.setScenarioTemplate(template);
         scenario.setEffectiveOpforSkill(contract.getEnemySkill());
         scenario.setEffectiveOpforQuality(contract.getEnemyQuality());
+        scenario.setMissionId(contract.getId());
         
         // apply any fixed modifiers
         for(String modifierName : template.scenarioModifiers) {

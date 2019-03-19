@@ -1,5 +1,8 @@
 package mekhq.campaign.stratcon;
 
+import java.util.List;
+import java.util.UUID;
+
 import megamek.common.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
@@ -9,6 +12,7 @@ import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
+import net.bytebuddy.asm.Advice.This;
 
 /**
  * Class that handles scenario metadata and interaction at the StratCon level
@@ -39,6 +43,7 @@ public class StratconScenario implements IStratconDisplayable {
     private ScenarioState currentState;
     private int requiredPlayerLances;
     private boolean requiredScenario;
+    private Campaign currentCampaign;
 
     public void initializeScenario(Campaign campaign, AtBContract contract, MapLocation location) {
         // scenario initialized from template - includes name, type, objectives, terrain/map, weather, lighting, gravity, atmo pressure
@@ -79,6 +84,10 @@ public class StratconScenario implements IStratconDisplayable {
         
         AtBDynamicScenarioFactory.setScenarioModifiers(backingScenario);
         AtBDynamicScenarioFactory.applyScenarioModifiers(backingScenario, campaign, EventTiming.PreForceGeneration);
+        setCurrentState(ScenarioState.UNRESOLVED);
+        
+        // retain the current campaign for convenience
+        currentCampaign = campaign;
     }
 
     public void addPrimaryForce(int forceID) {
@@ -202,6 +211,12 @@ public class StratconScenario implements IStratconDisplayable {
         StringBuilder stateBuilder = new StringBuilder();
         stateBuilder.append("<html>");
 
+        stateBuilder.append(backingScenario.getName());
+        stateBuilder.append("<br/>");
+        stateBuilder.append(backingScenario.getTemplate().shortBriefing);
+        stateBuilder.append("<br/>");
+        
+        stateBuilder.append("Status: ");
         switch(currentState) {
         case UNRESOLVED:
             stateBuilder.append("Unresolved");
@@ -219,6 +234,19 @@ public class StratconScenario implements IStratconDisplayable {
             stateBuilder.append("Unknown");
             break;
         }
+        
+        List<UUID> unitIDs = backingScenario.getForces(currentCampaign).getUnits();
+        
+        if(!unitIDs.isEmpty()) {
+            stateBuilder.append("Assigned Units:<br/>");
+            
+            for(UUID unitID : unitIDs) {
+                stateBuilder.append("&nbsp;&nbsp;");
+                stateBuilder.append(currentCampaign.getUnit(unitID).getName());
+                stateBuilder.append("<br/>");
+            }
+        }
+        
 
         stateBuilder.append("</html>");
         return stateBuilder.toString();
