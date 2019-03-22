@@ -212,8 +212,31 @@ public class SpacecraftEngine extends Part {
 
     @Override 
     public int getBaseTime() {
+        int time = 0;
+        if (campaign.getCampaignOptions().useAeroSystemHits()) {
+            //Test of proposed errata for repair times
+            Entity e = unit.getEntity();
+            if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+                time = 120;
+                if (e.hasNavalC3()) {
+                    time *= 2;
+                }
+            } else {
+                time = 60; 
+            }
+            if (isSalvaging()) {
+                time *= 10;
+            }
+            if (hits == 1) {
+                time *= 1;
+            } 
+            if (hits == 2) {
+                time *= 2;
+            }
+            return time;
+        }
         if(isSalvaging()) {
-            return 43200;
+            return time;
         }
         return 300;
     }
@@ -239,6 +262,10 @@ public class SpacecraftEngine extends Part {
 
     @Override
     public String checkFixable() {
+        if (isSalvaging()) {
+            // Assuming it wasn't completely integrated into the ship it was built for, where are you going to keep this?
+            return "You cannot salvage a spacecraft engine. You must scrap it instead.";
+        }
         return null;
     }
 
