@@ -197,7 +197,7 @@ public class SpacecraftEngine extends Part {
             int engineCrits = 0;
             if(unit.getEntity() instanceof Aero) {
                 engineHits = ((Aero)unit.getEntity()).getEngineHits();
-                engineCrits = 3;
+                engineCrits = 6;
             }
             if(engineHits >= engineCrits) {
                 remove(false);
@@ -215,29 +215,20 @@ public class SpacecraftEngine extends Part {
         int time = 0;
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair times
-            Entity e = unit.getEntity();
-            if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
-                time = 120;
-                if (e.hasNavalC3()) {
-                    time *= 2;
-                }
-            } else {
-                time = 60; 
-            }
-            if (isSalvaging()) {
-                time *= 10;
-            }
-            if (hits == 1) {
-                time *= 1;
-            } 
-            if (hits == 2) {
-                time *= 2;
+            time = 300;
+            //Light Damage
+            if (hits > 0 && hits < 3) {
+                time *= (1 * hits);
+            //Moderate damage
+            } else if (hits > 2 && hits < 5) {
+                time *= (2 * hits);
+            //Heavy damage
+            } else if (hits > 4) {
+                time *= (4 * hits);
             }
             return time;
         }
-        if(isSalvaging()) {
-            return time;
-        }
+        //Removed time for isSalvaging. Can't salvage an engine.
         return 300;
     }
 
