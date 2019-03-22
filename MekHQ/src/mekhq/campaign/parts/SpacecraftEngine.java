@@ -215,7 +215,23 @@ public class SpacecraftEngine extends Part {
         int time = 0;
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair times
-            time = 300;
+            Entity e = unit.getEntity();
+            //Per errata, small craft now use fighter engine times but still have the
+            //large craft engine part
+            if (e != null && !e.isLargeCraft()) {
+                if (isSalvaging()) {
+                    return 360;
+                }
+                if (hits == 1) {
+                    return 100;
+                } else if (hits == 2) {
+                    return 200;
+                } else if (hits > 2) {
+                    return 300;
+                }
+            } else {
+                time = 300; 
+            }
             //Light Damage
             if (hits > 0 && hits < 3) {
                 time *= (1 * hits);
