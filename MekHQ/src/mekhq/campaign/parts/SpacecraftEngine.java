@@ -213,25 +213,25 @@ public class SpacecraftEngine extends Part {
     @Override 
     public int getBaseTime() {
         int time = 0;
+        Entity e = unit.getEntity();
+        //Per errata, small craft now use fighter engine times but still have the
+        //large craft engine part
+        if (e != null && !e.isLargeCraft()) {
+            if (isSalvaging()) {
+                return 360;
+            }
+            if (hits == 1) {
+                time = 100;
+            } else if (hits == 2) {
+                time = 200;
+            } else if (hits > 2) {
+                time = 300;
+            }
+            return time;
+        }
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair times
-            Entity e = unit.getEntity();
-            //Per errata, small craft now use fighter engine times but still have the
-            //large craft engine part
-            if (e != null && !e.isLargeCraft()) {
-                if (isSalvaging()) {
-                    return 360;
-                }
-                if (hits == 1) {
-                    return 100;
-                } else if (hits == 2) {
-                    return 200;
-                } else if (hits > 2) {
-                    return 300;
-                }
-            } else {
-                time = 300; 
-            }
+            time = 300; 
             //Light Damage
             if (hits > 0 && hits < 3) {
                 time *= (1 * hits);
@@ -245,11 +245,31 @@ public class SpacecraftEngine extends Part {
             return time;
         }
         //Removed time for isSalvaging. Can't salvage an engine.
+        //Return the base 5 hours from SO if not using the improved times option
         return 300;
     }
 
     @Override
     public int getDifficulty() {
+        Entity e = unit.getEntity();
+        //Per errata, small craft now use fighter engine difficulty table
+        if (e != null && !e.isLargeCraft()) {
+            return -1;
+        }
+        if (campaign.getCampaignOptions().useAeroSystemHits()) {
+            //Test of proposed errata for repair times and difficulty
+            //Light Damage
+            if (hits > 0 && hits < 3) {
+                return 1;
+            //Moderate damage
+            } else if (hits > 2 && hits < 5) {
+                return 2;
+            //Heavy damage
+            } else if (hits > 4) {
+                return 3;
+            }
+        }
+        //Otherwise, use the listed +1 difficulty from SO
         return 1;
     }
 
@@ -270,8 +290,11 @@ public class SpacecraftEngine extends Part {
     @Override
     public String checkFixable() {
         if (isSalvaging()) {
-            // Assuming it wasn't completely integrated into the ship it was built for, where are you going to keep this?
-            return "You cannot salvage a spacecraft engine. You must scrap it instead.";
+            Entity e = unit.getEntity();
+            if (e != null && e.isLargeCraft()) {
+                // Assuming it wasn't completely integrated into the ship it was built for, where are you going to keep this?
+                return "You cannot salvage a spacecraft engine. You must scrap it instead.";
+            }
         }
         return null;
     }
