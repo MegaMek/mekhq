@@ -101,6 +101,24 @@ public class SpacecraftEngine extends Part {
 
     @Override 
     public Money getStickerPrice() {
+        //Add engine cost from SO p158 for advanced aerospace
+        //Drive Unit + Engine + Engine Control Unit
+        if (unit != null && unit.getEntity() != null) {
+            if(unit.getEntity() instanceof Warship) {
+                return Money.of((500 * unit.getEntity().getOriginalWalkMP() * (unit.getEntity().getWeight() / 100)) 
+                        + (engineTonnage * 1000)
+                        + 1000);
+            } else if(unit.getEntity() instanceof Jumpship) {
+                // If we're a space station or dropship, need the station keeping thrust
+                Jumpship js = (Jumpship) unit.getEntity();
+                if (js != null) {
+                    return Money.of((500 * js.getStationKeepingThrust() * (js.getWeight() / 100)) 
+                            + (engineTonnage * 1000)
+                            + 1000);
+                }
+            }
+        }
+        // Small craft and dropships, TM p283
         return Money.of(engineTonnage * 1000);
     }
 
