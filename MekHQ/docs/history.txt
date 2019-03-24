@@ -1,5 +1,7 @@
 VERSION HISTORY:
 ----------------
+v0.45.5-SNAPSHOT
+
 v0.45.4 (2019-03-24 1700 UTC)
 + PR #1067: Switch to Joda Money library internally for financial math
 + Issue #1057: Don't allow Rotor damage to go negative or use negative damages
