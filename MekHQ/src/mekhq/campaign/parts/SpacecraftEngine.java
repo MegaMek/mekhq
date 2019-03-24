@@ -53,7 +53,7 @@ public class SpacecraftEngine extends Part {
             .setAvailability(RATING_C, RATING_D, RATING_C, RATING_C)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
-    double engineTonnage;  
+    double engineTonnage;
     boolean clan;
 
     public SpacecraftEngine() {
