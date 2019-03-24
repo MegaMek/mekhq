@@ -813,7 +813,11 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
      */
     @Override
     public boolean isOmniPodded() {
-        return getUnit() != null && getUnit().getEntity().getEquipment(equipmentNum).isOmniPodMounted();
+        if (getUnit() == null || getUnit().getEntity() == null) {
+            return false;
+        }
+        Mounted m = getUnit().getEntity().getEquipment(equipmentNum);
+        return m != null && m.isOmniPodMounted();
     }
     
     @Override
