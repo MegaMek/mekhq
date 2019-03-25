@@ -109,7 +109,7 @@ public class SpacecraftEngine extends Part {
                         + (engineTonnage * 1000)
                         + 1000);
             } else if(unit.getEntity() instanceof Jumpship) {
-                // If we're a space station or dropship, need the station keeping thrust, which is always 0.2
+                // If we're a space station or jumpship, need the station keeping thrust, which is always 0.2
                 return Money.of((500 * 0.2 * (unit.getEntity().getWeight() / 100)) 
                             + (engineTonnage * 1000)
                             + 1000);
