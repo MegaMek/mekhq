@@ -178,6 +178,13 @@ public class FireControlSystem extends Part {
 
 	@Override
 	public String checkFixable() {
+	    if (isSalvaging()) {
+            Entity e = unit.getEntity();
+            if (e != null && e.isLargeCraft()) {
+                // FCS/CIC computers are designed for and built into the ship. Can't salvage and use somewhere else
+                return "You cannot salvage a spacecraft FCS. You must scrap it instead.";
+            }
+        }
 		return null;
 	}
 
