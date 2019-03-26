@@ -1,6 +1,8 @@
 package mekhq.campaign.stratcon;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import megamek.common.Compute;
@@ -12,7 +14,6 @@ import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
-import net.bytebuddy.asm.Advice.This;
 
 /**
  * Class that handles scenario metadata and interaction at the StratCon level
@@ -21,12 +22,26 @@ import net.bytebuddy.asm.Advice.This;
  */
 public class StratconScenario implements IStratconDisplayable {
     public enum ScenarioState {
+        NONEXISTENT,
         UNRESOLVED,
         PRIMARY_FORCES_COMMITTED,
         COMPLETED,
         IGNORED,
         DEFEATED;
     }
+    
+    private final static Map<ScenarioState, String> scenarioStateNames;
+    
+    static {
+        scenarioStateNames = new HashMap<>();
+        scenarioStateNames.put(ScenarioState.NONEXISTENT, "Shouldn't be seen");
+        scenarioStateNames.put(ScenarioState.UNRESOLVED, "Unresolved");
+        scenarioStateNames.put(ScenarioState.PRIMARY_FORCES_COMMITTED, "Primary forces committed");
+        scenarioStateNames.put(ScenarioState.COMPLETED, "Victory");
+        scenarioStateNames.put(ScenarioState.IGNORED, "Ignored");
+        scenarioStateNames.put(ScenarioState.DEFEATED, "Defeat");
+    }
+    
     
     private String SCENARIO_MODIFIER_ALLIED_GROUND_UNITS = "PrimaryAlliesGround.xml";
     private String SCENARIO_MODIFIER_ALLIED_AIR_UNITS = "PrimaryAlliesAir.xml";
@@ -40,7 +55,7 @@ public class StratconScenario implements IStratconDisplayable {
     private String SCENARIO_MODIFIER_TRAINEES_GROUND = "AlliedTraineesGround.xml";
     
     private AtBDynamicScenario backingScenario;
-    private ScenarioState currentState;
+    private ScenarioState currentState = ScenarioState.UNRESOLVED;
     private int requiredPlayerLances;
     private boolean requiredScenario;
     private Campaign currentCampaign;
@@ -93,27 +108,21 @@ public class StratconScenario implements IStratconDisplayable {
     public void addPrimaryForce(int forceID) {
         backingScenario.addForces(forceID);
     }
+
+    public List<Integer> getAssignedForces() {
+        return backingScenario.getForceIDs();
+    }
     
+    /**
+     * This method triggers the performance of all operations that should occur
+     * after the player has committed the primary forces to this scenario.
+     * @param campaign
+     * @param contract
+     */
     public void commitPrimaryForces(Campaign campaign, AtBContract contract) {
-        //backingScenario.setPrimaryPlayerForces(primaryForces);
         currentState = ScenarioState.PRIMARY_FORCES_COMMITTED;
 
-        // now that we have the primary forces, we need to:
-        // a) roll events, immediately applying any that are relevant
-        // b) determine if there are any allied primary forces
-        // c) generate attached unit(s) (if any)
-        // d) apply any event-related adjustments
-        // e) place the scenario in the briefing room
-        generateEvents();
         AtBDynamicScenarioFactory.finalizeScenario(backingScenario, contract, campaign);
-    }
-
-    public void generateEvents() {
-
-    }
-
-    public void processPreForceGenerationEvents() {
-
     }
 
     /**
@@ -217,28 +226,12 @@ public class StratconScenario implements IStratconDisplayable {
         stateBuilder.append("<br/>");
         
         stateBuilder.append("Status: ");
-        switch(currentState) {
-        case UNRESOLVED:
-            stateBuilder.append("Unresolved");
-            break;
-        case COMPLETED:
-            stateBuilder.append("Completed");
-            break;
-        case IGNORED:
-            stateBuilder.append("Ignored");
-            break;
-        case DEFEATED:
-            stateBuilder.append("Defeated");
-            break;
-        default:
-            stateBuilder.append("Unknown");
-            break;
-        }
-        
-        List<UUID> unitIDs = backingScenario.getForces(currentCampaign).getUnits();
+        stateBuilder.append(scenarioStateNames.get(currentState));
+
+        List<UUID> unitIDs = backingScenario.getForces(currentCampaign).getAllUnits();
         
         if(!unitIDs.isEmpty()) {
-            stateBuilder.append("Assigned Units:<br/>");
+            stateBuilder.append("<br/><br/>Assigned Units:<br/>");
             
             for(UUID unitID : unitIDs) {
                 stateBuilder.append("&nbsp;&nbsp;");

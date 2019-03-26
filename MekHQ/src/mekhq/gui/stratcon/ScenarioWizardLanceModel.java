@@ -9,19 +9,29 @@ import javax.swing.event.ListDataListener;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
+import mekhq.campaign.stratcon.StratconTrackState;
 
 public class ScenarioWizardLanceModel implements ListModel<Force> {
     private List<Force> lances;
 
     /**
      * Constructor. Populates a scenario wizard lance model with all forces in a campaign indiscriminately
-     * @param campaign
+     * @param campaign The campaign
      */
     public ScenarioWizardLanceModel(Campaign campaign) {
         lances = new ArrayList<Force>();
 
         for(int key : campaign.getLances().keySet()) {
             lances.add(campaign.getForce(key));
+        }
+    }
+    
+    
+    public ScenarioWizardLanceModel(Campaign campaign, StratconTrackState trackState) {
+        lances = new ArrayList<Force>();
+        
+        for(int forceID : trackState.getAvailableForceIDs()) {
+            lances.add(campaign.getForce(forceID));
         }
     }
 

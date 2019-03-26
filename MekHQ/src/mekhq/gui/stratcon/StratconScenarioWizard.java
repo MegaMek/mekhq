@@ -22,9 +22,13 @@ import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.stratcon.StratconCampaignState;
 
-public class StratconScenarioWizard extends JDialog {
+public class StratconScenarioWizard extends JDialog implements ActionListener {
+    private final static String CMD_MOVE_RIGHT = "CMD_MOVE_RIGHT";
+    private final static String CMD_MOVE_LEFT = "CMD_MOVE_LEFT";
+    
     StratconScenario currentScenario;
     Campaign campaign;
+    StratconTrackState currentTrackState;
     StratconCampaignState currentCampaignState;
 
     JLabel lblTotalBV = new JLabel();
@@ -35,9 +39,10 @@ public class StratconScenarioWizard extends JDialog {
         this.campaign = campaign;
     }
 
-    public void setCurrentScenario(StratconScenario scenario, StratconCampaignState campaignState) {
+    public void setCurrentScenario(StratconScenario scenario, StratconTrackState trackState, StratconCampaignState campaignState) {
         currentScenario = scenario;
         currentCampaignState = campaignState;
+        currentTrackState = trackState;
         setUI();
     }
 
@@ -50,7 +55,14 @@ public class StratconScenarioWizard extends JDialog {
 
         gbc.gridx = 0;
         gbc.gridy++;
-        setPlayerForceSelector(gbc);
+        switch(currentScenario.getCurrentState()) {        
+            case UNRESOLVED:
+                setAssignPrimaryForcesUI(gbc);
+                break;
+            default:
+                setAssignReinforcementsUI(gbc);
+                break;
+        }
 
         gbc.gridx = 0;
         gbc.gridy++;
@@ -58,11 +70,55 @@ public class StratconScenarioWizard extends JDialog {
         pack();
         validate();
     }
+    
+    public void setAssignPrimaryForcesUI(GridBagConstraints gbc) {
+        // generate a lance selector with the following parameters:
+        // all forces assigned to the current track that aren't already assigned elsewhere
+        // max number of items that can be selected = current scenario required lances
+        
+        setPlayerForceSelector(gbc, true);
+    }
+    
+    public void setAssignReinforcementsUI(GridBagConstraints gbc) {
+        // generate a lance selector with the following parameters:
+        // A) all forces assigned to the current track that aren't already assigned elsewhere
+        // PLUS B) all forces in the campaign that aren't already deployed to a scenario
+        // max number of items is unlimited, but some have an SP selection cost (the ones from B)
+        
+        // to the right, have an SP cost readout (fancy: turns red when goes below 0 SP)
+        // have three buttons: request allied air support, request allied ground support, request allied arty support
+        // last two unavailable on atmo and space maps for obvious reasons, each costs 1 SP
+        // grayed out if campaign state SP 
+        
+        JButton btnRight = new JButton(">>>");
+        btnRight.setActionCommand(CMD_MOVE_RIGHT);
+        btnRight.addActionListener(this);
+        
+        JButton btnLeft = new JButton("<<<");
+        btnLeft.setActionCommand(CMD_MOVE_LEFT);
+        btnLeft.addActionListener(this);
+        
+        gbc.gridy = 1;
+        gbc.anchor = GridBagConstraints.SOUTH;
+        gbc.fill = GridBagConstraints.NONE;
+        getContentPane().add(btnRight, gbc);
+        
+        gbc.gridy = 2;
+        gbc.anchor = GridBagConstraints.NORTH;
+        getContentPane().add(btnLeft, gbc);
+    }
 
-    public void setPlayerForceSelector(GridBagConstraints gbc) {
+    public void setPlayerForceSelector(GridBagConstraints gbc, boolean trackForcesOnly) {
         JScrollPane forceListContainer = new JScrollPane();
 
-        ScenarioWizardLanceModel lanceModel = new ScenarioWizardLanceModel(campaign);
+        ScenarioWizardLanceModel lanceModel;
+        
+        if(trackForcesOnly) {
+            lanceModel = new ScenarioWizardLanceModel(campaign, currentTrackState);
+        } else {
+            lanceModel = new ScenarioWizardLanceModel(campaign);
+        }
+        
         playerForceList.setModel(lanceModel);
         playerForceList.setCellRenderer(new ScenarioWizardLanceRenderer(campaign));
         playerForceList.addListSelectionListener(new ListSelectionListener() { 
@@ -78,6 +134,7 @@ public class StratconScenarioWizard extends JDialog {
         getContentPane().add(forceListContainer, gbc);
 
         gbc.gridx = 1;
+        gbc.gridheight = 1;
         gbc.anchor = GridBagConstraints.NORTH;
         lblTotalBV.setText("Selected BV: 0");
         getContentPane().add(lblTotalBV, gbc);
@@ -136,5 +193,11 @@ public class StratconScenarioWizard extends JDialog {
         }
 
         lblTotalBV.setText(String.format("Selected BV: %d", totalBV));
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        // TODO Auto-generated method stub
+        
     }
 }

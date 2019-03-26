@@ -99,12 +99,41 @@ public class StratconTrackState {
         getAssignedForceIDs().remove(forceID);
     }
     
+    /**
+     * Returns the set of all force IDs assigned to this track, regardless of scenario deployment status
+     */
     public Set<Integer> getAssignedForceIDs() {
         return assignedForceIDs;
     }
 
     public void setAssignedForceIDs(Set<Integer> assignedForceIDs) {
         this.assignedForceIDs = assignedForceIDs;
+    }
+    
+    /**
+     * Returns the set of all force IDs for forces assigned to this track
+     * that have not been assigned to a scenario already.
+     * @return
+     */
+    public Set<Integer> getAvailableForceIDs() {
+        Set<Integer> retVal = new HashSet<>();
+        
+        for(int forceID : assignedForceIDs) {
+            boolean forceAssigned = false;
+            
+            for(StratconScenario scenario : scenarios.values()) {
+                if(scenario.getAssignedForces().contains(forceID)) {
+                    forceAssigned = true;
+                    break;
+                }
+            }
+            
+            if(!forceAssigned) {
+                retVal.add(forceID);
+            }
+        }
+        
+        return retVal;
     }
     
     public void generateScenarios(Campaign campaign, AtBContract contract) {
@@ -161,9 +190,5 @@ public class StratconTrackState {
             generatedScenarios.get(scenarioIndex).setAttachedUnitsModifier(contract);
         }
     }
-    
-    private void generateFixedScenario(Campaign campaign, AtBContract contract, Coords coords) 
-    {
-        
-    }
+
 }

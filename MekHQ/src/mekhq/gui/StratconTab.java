@@ -21,6 +21,7 @@ import megamek.common.Coords;
 import mekhq.campaign.stratcon.IStratconDisplayable;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconScenario;
+import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.gui.stratcon.InfoFrame;
 import mekhq.gui.stratcon.StratconScenarioWizard;
@@ -36,6 +37,7 @@ public class StratconTab extends CampaignGuiTab implements ActionListener {
     private static final int HEX_Y_RADIUS = 37;
     
     private static final String RCLICK_COMMAND_MANAGE_FORCES = "ManageForces";
+    private static final String RCLICK_COMMAND_MANAGE_SCENARIO = "ManageScenario";
 
     private enum DrawHexType {
         Hex,
@@ -52,8 +54,9 @@ public class StratconTab extends CampaignGuiTab implements ActionListener {
     InfoFrame detailsFrame;
     Point clickedPoint;
     JPopupMenu rightClickMenu;
-    JMenuItem menuItemAssignForces;
     JMenuItem menuItemInitiateScenario;
+    JMenuItem menuItemManageScenario;
+    
     StratconScenarioWizard scenarioWizard;
     TrackForceAssignmentUI assignmentUI;
 
@@ -75,8 +78,6 @@ public class StratconTab extends CampaignGuiTab implements ActionListener {
             }
         };
 
-        menuItemAssignForces = new JMenuItem("Assign Forces");
-        menuItemAssignForces.addActionListener(acl);
         menuItemInitiateScenario = new JMenuItem("Initiate Scenario");
         menuItemInitiateScenario.addActionListener(acl);
 
@@ -106,7 +107,7 @@ public class StratconTab extends CampaignGuiTab implements ActionListener {
         assignmentUI = new TrackForceAssignmentUI(getCampaign());
         assignmentUI.setVisible(false);
         
-        buildRightClickMenu();
+        buildRightClickMenu(null);
     }
 
     @Override
@@ -119,7 +120,7 @@ public class StratconTab extends CampaignGuiTab implements ActionListener {
         return GuiTabType.STRATCON;
     }
     
-    private void buildRightClickMenu() {
+    private void buildRightClickMenu(StratconScenario scenario) {
         rightClickMenu = new JPopupMenu();
         
         JMenuItem itemManageForceAssignments = new JMenuItem();
@@ -127,6 +128,14 @@ public class StratconTab extends CampaignGuiTab implements ActionListener {
         itemManageForceAssignments.setActionCommand(RCLICK_COMMAND_MANAGE_FORCES);
         itemManageForceAssignments.addActionListener(this);
         rightClickMenu.add(itemManageForceAssignments);
+        
+        //if(scenario != null) {
+            menuItemManageScenario = new JMenuItem();
+            menuItemManageScenario.setText("Manage Scenario");
+            menuItemManageScenario.setActionCommand(RCLICK_COMMAND_MANAGE_SCENARIO);
+            menuItemManageScenario.addActionListener(this);
+            rightClickMenu.add(menuItemManageScenario);
+        //}
     }
 
     @Override
@@ -333,20 +342,16 @@ public class StratconTab extends CampaignGuiTab implements ActionListener {
 
             repaint();
         } else if(e.getButton() == MouseEvent.BUTTON3) {
-            rightClickMenu.show(this, e.getX(), e.getY());
-            /*clickedPoint = new Point(e.getX(), e.getY());
+            clickedPoint = new Point(e.getX(), e.getY());
             boolean pointFoundOnBoard = detectClickedHex();
 
+            StratconScenario selectedScenario = null;
             if(pointFoundOnBoard) {
-                //detailsFrame.displayInfo("right clicked" + " " + boardState.selectedX + ":" + boardState.selectedY);
-                StratconScenario selectedScenario = campaignState.getTrack(0).getScenario(new Coords(boardState.selectedX, boardState.selectedY));
-                if(selectedScenario != null) {
-                    scenarioWizard.setVisible(true);
-                    scenarioWizard.setCurrentScenario(selectedScenario, campaignState);
-                }
+                selectedScenario = campaignState.getTrack(0).getScenario(new Coords(boardState.selectedX, boardState.selectedY));
             }
-
-            repaint();*/
+             
+            menuItemManageScenario.setEnabled(selectedScenario != null);
+            rightClickMenu.show(this, e.getX(), e.getY());
         } else if(e.getButton() == MouseEvent.BUTTON2) {
             campaignState.getTrack(0).generateScenarios(getCampaign(), (AtBContract) this.getCampaign().getActiveContracts().get(0));
             repaint();
@@ -369,6 +374,15 @@ public class StratconTab extends CampaignGuiTab implements ActionListener {
         case RCLICK_COMMAND_MANAGE_FORCES:
             assignmentUI.display(campaignState, 0);
             assignmentUI.setVisible(true);
+            break;
+        case RCLICK_COMMAND_MANAGE_SCENARIO:
+            scenarioWizard.setCurrentScenario(campaignState.getTrack(0).getScenario(new Coords(boardState.selectedX, boardState.selectedY)),
+                    campaignState.getTrack(0),
+                    campaignState);
+            scenarioWizard.setVisible(true);
+            break;
         }
+        
+        repaint();
     }
 }
