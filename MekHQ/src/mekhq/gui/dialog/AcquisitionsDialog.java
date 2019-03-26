@@ -299,7 +299,7 @@ public class AcquisitionsDialog extends JDialog {
             }
 
             if ((partCountInfo.getMissingCount() > 0) && partCountInfo.isCanBeAcquired()) {
-                campaignGUI.getCampaign().getShoppingList().addShoppingItem(targetWork, partCountInfo.getMissingCount(),
+                campaignGUI.getCampaign().getShoppingList().addShoppingItem(part.getAcquisitionWork(), partCountInfo.getMissingCount(),
                         campaignGUI.getCampaign());
 
                 refresh();
@@ -556,9 +556,9 @@ public class AcquisitionsDialog extends JDialog {
                 btnOrderOne.setToolTipText("Order one item");
                 btnOrderOne.setName("btnOrderOne"); // NOI18N
                 btnOrderOne.addActionListener(ev -> {
-                    campaignGUI.getCampaign().getShoppingList().addShoppingItem(targetWork, 1,
+                    campaignGUI.getCampaign().getShoppingList().addShoppingItem(part.getAcquisitionWork(), 1,
                             campaignGUI.getCampaign());
-
+                    
                     refresh();
                 });
 

@@ -131,10 +131,10 @@ public class AtBScenarioModifier {
      * Loads the scenario modifier manifest.
      */
     private static void loadManifest() {
-        scenarioModifierManifest = ScenarioModifierManifest.Deserialize("./data/ScenarioModifiers/modifiermanifest.xml");
+        scenarioModifierManifest = ScenarioModifierManifest.Deserialize("./data/scenariomodifiers/modifiermanifest.xml");
         
         // load user-specified modifier list
-        ScenarioModifierManifest userModList = ScenarioModifierManifest.Deserialize("./data/ScenarioModifiers/usermodifiermanifest.xml");
+        ScenarioModifierManifest userModList = ScenarioModifierManifest.Deserialize("./data/scenariomodifiers/usermodifiermanifest.xml");
         if(userModList != null) {
             scenarioModifierManifest.fileNameList.addAll(userModList.fileNameList);
         }
@@ -152,7 +152,7 @@ public class AtBScenarioModifier {
         scenarioModifiers = new HashMap<>();
         
         for(String fileName : scenarioModifierManifest.fileNameList) {
-            String filePath = String.format("./data/ScenarioModifiers/%s", fileName);
+            String filePath = String.format("./data/scenariomodifiers/%s", fileName);
             
             try {
                 AtBScenarioModifier modifier = Deserialize(filePath);
