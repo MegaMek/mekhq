@@ -57,7 +57,7 @@ public class CombatInformationCenter extends Part {
     public CombatInformationCenter(int tonnage, Money cost, Campaign c) {
         super(tonnage, c);
         this.cost = cost;
-        this.name = "Fire Control System";
+        this.name = "Combat Information Center";
     }
         
     public CombatInformationCenter clone() {
@@ -70,7 +70,7 @@ public class CombatInformationCenter extends Part {
 	public void updateConditionFromEntity(boolean checkForDestruction) {
 		int priorHits = hits;
 		if(null != unit && unit.getEntity() instanceof Aero) {
-			hits = ((Aero)unit.getEntity()).getFCSHits();
+			hits = ((Aero)unit.getEntity()).getCICHits();
 			if(checkForDestruction 
 					&& hits > priorHits 
 					&& (hits < 3 && !campaign.getCampaignOptions().useAeroSystemHits())
@@ -88,16 +88,9 @@ public class CombatInformationCenter extends Part {
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair times
             Entity e = unit.getEntity();
-            if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
-                time = 120;
-                if (e.hasNavalC3()) {
-                    time *= 2;
-                }
-            } else {
-                time = 60; 
-            }
-            if (isSalvaging()) {
-                time *= 10;
+            time = 120;
+            if (e.hasNavalC3()) {
+                time *= 2;
             }
             if (hits == 1) {
                 time *= 1;
@@ -119,9 +112,6 @@ public class CombatInformationCenter extends Part {
 	public int getDifficulty() {
 	    if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair time and difficulty
-            if(isSalvaging()) {
-                return 0;
-            }
             if (hits == 1) {
                 return 1;
             } 
@@ -138,7 +128,7 @@ public class CombatInformationCenter extends Part {
 	@Override
 	public void updateConditionFromPart() {
 		if(null != unit && unit.getEntity() instanceof Aero) {
-			((Aero)unit.getEntity()).setFCSHits(hits);
+			((Aero)unit.getEntity()).setCICHits(hits);
 		}
 		
 	}
@@ -147,14 +137,14 @@ public class CombatInformationCenter extends Part {
 	public void fix() {
 		super.fix();
 		if(null != unit && unit.getEntity() instanceof Aero) {
-			((Aero)unit.getEntity()).setFCSHits(0);
+			((Aero)unit.getEntity()).setCICHits(0);
 		}
 	}
 
 	@Override
 	public void remove(boolean salvage) {
 		if(null != unit && unit.getEntity() instanceof Aero) {
-			((Aero)unit.getEntity()).setFCSHits(3);
+			((Aero)unit.getEntity()).setCICHits(3);
 			Part spare = campaign.checkForExistingSparePart(this);
 			if(!salvage) {
 				campaign.removePart(this);
@@ -173,17 +163,14 @@ public class CombatInformationCenter extends Part {
 
 	@Override
 	public MissingPart getMissingPart() {
-		return new MissingFireControlSystem(getUnitTonnage(), cost, campaign);
+		return new MissingCIC(getUnitTonnage(), cost, campaign);
 	}
 
 	@Override
 	public String checkFixable() {
 	    if (isSalvaging()) {
-            Entity e = unit.getEntity();
-            if (e != null && e.isLargeCraft()) {
-                // FCS/CIC computers are designed for and built into the ship. Can't salvage and use somewhere else
-                return "You cannot salvage a spacecraft FCS. You must scrap it instead.";
-            }
+            // FCS/CIC computers are designed for and built into the ship. Can't salvage and use somewhere else
+            return "You cannot salvage a spacecraft FCS. You must scrap it instead.";
         }
 		return null;
 	}
