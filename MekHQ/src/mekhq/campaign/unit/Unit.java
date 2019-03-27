@@ -4383,11 +4383,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             partsCost = partsCost.plus(entity.getWeight() * .001 * 15000);
         } else if (entity instanceof Tank) {
             partsCost = partsCost.plus(entity.getWeight() * .001 * 8000);
-        } else if ((entity instanceof Mech) || (entity instanceof BattleArmor)
-                || ((Infantry) entity).isMechanized()) {
+        } else if ((entity instanceof Mech) || (entity instanceof BattleArmor)) {
             partsCost = partsCost.plus(entity.getWeight() * .001 * 10000);
         } else if (entity instanceof Infantry) {
-            if (entity.getMovementMode() == EntityMovementMode.INF_LEG) {
+            if (((Infantry)entity).isMechanized()) {
+                partsCost = partsCost.plus(entity.getWeight() * .001 * 10000);
+            } else if (entity.getMovementMode() == EntityMovementMode.INF_LEG) {
                 partsCost = partsCost.plus(3 * .002 * 10000);
             } else if (entity.getMovementMode() == EntityMovementMode.INF_JUMP) {
                 partsCost = partsCost.plus(4 * .002 * 10000);
