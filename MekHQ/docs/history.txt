@@ -1,6 +1,7 @@
 VERSION HISTORY:
 ----------------
 v0.45.5-SNAPSHOT
++ PR #1163: Fix vast overvaluing of opfor BV in the briefing tab
 
 v0.45.4 (2019-03-24 1700 UTC)
 + PR #1067: Switch to Joda Money library internally for financial math
