@@ -31,7 +31,6 @@ import megamek.common.Aero;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.Jumpship;
-import megamek.common.SmallCraft;
 import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
