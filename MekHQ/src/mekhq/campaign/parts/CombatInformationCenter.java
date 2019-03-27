@@ -188,12 +188,9 @@ public class CombatInformationCenter extends Part {
 
 	public void calculateCost() {
 		if(null != unit) {
-			if(unit.getEntity() instanceof SmallCraft) {
-				cost = Money.of(100000 + 10000 * ((SmallCraft)unit.getEntity()).getArcswGuns());
-			}
-			else if(unit.getEntity() instanceof Jumpship) {
-				cost = Money.of(100000 + 10000 * ((Jumpship)unit.getEntity()).getArcswGuns());
-			}
+		    // There's more to CIC than just Fire Control
+		    // Use Bridge + Computer + FC Computer + Gunnery Control System costs, p158 SO.
+		    cost = Money.of(200000 + (10 * unit.getEntity().getWeight()) + 200000 + 100000 + (10000 * ((Jumpship)unit.getEntity()).getArcswGuns()));
 		}
 	}
 	
