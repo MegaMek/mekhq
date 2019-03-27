@@ -116,6 +116,7 @@ import mekhq.campaign.parts.Avionics;
 import mekhq.campaign.parts.BaArmor;
 import mekhq.campaign.parts.BattleArmorSuit;
 import mekhq.campaign.parts.BayDoor;
+import mekhq.campaign.parts.CombatInformationCenter;
 import mekhq.campaign.parts.Cubicle;
 import mekhq.campaign.parts.DropshipDockingCollar;
 import mekhq.campaign.parts.EnginePart;
@@ -1828,6 +1829,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         Part motiveSystem = null;
         Part avionics = null;
         Part fcs = null;
+        Part cic = null;
         Part landingGear = null;
         Part turretLock = null;
         ArrayList<Part> aeroHeatSinks = new ArrayList<>();
@@ -2470,6 +2472,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 addPart(fcs);
                 partsToAdd.add(fcs);
                 ((FireControlSystem)fcs).calculateCost();
+            }
+            if(null == cic) {
+                cic = new CombatInformationCenter((int)entity.getWeight(), Money.zero(), getCampaign());
+                addPart(cic);
+                partsToAdd.add(cic);
+                ((FireControlSystem)cic).calculateCost();
             }
             if(null == sensor) {
                 sensor = new AeroSensor((int) entity.getWeight(), entity instanceof Dropship || entity instanceof Jumpship, getCampaign());
