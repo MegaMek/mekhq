@@ -2467,17 +2467,17 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 addPart(avionics);
                 partsToAdd.add(avionics);
             }
-            if(null == fcs) {
+            if(null == cic && entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+                cic = new CombatInformationCenter((int)entity.getWeight(), Money.zero(), getCampaign());
+                addPart(cic);
+                partsToAdd.add(cic);
+                ((CombatInformationCenter)cic).calculateCost();
+            }
+            if(null == fcs && !(entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP))) {
                 fcs = new FireControlSystem((int)entity.getWeight(), Money.zero(), getCampaign());
                 addPart(fcs);
                 partsToAdd.add(fcs);
                 ((FireControlSystem)fcs).calculateCost();
-            }
-            if(null == cic) {
-                cic = new CombatInformationCenter((int)entity.getWeight(), Money.zero(), getCampaign());
-                addPart(cic);
-                partsToAdd.add(cic);
-                ((FireControlSystem)cic).calculateCost();
             }
             if(null == sensor) {
                 sensor = new AeroSensor((int) entity.getWeight(), entity instanceof Dropship || entity instanceof Jumpship, getCampaign());
