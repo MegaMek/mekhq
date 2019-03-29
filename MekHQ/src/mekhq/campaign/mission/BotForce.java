@@ -167,12 +167,10 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         int bv = 0;
         
         for(Entity entity : getEntityList()) {
-            for (Entity en : entityList) {
-                if (en == null) {
-                    MekHQ.getLogger().error(BotForce.class, METHOD_NAME, "Null entity when calculating the BV a bot force, we should never find a null here. Please investigate");
-                } else {
-                    bv += entity.calculateBattleValue(true, false);
-                }
+            if (entity == null) {
+                MekHQ.getLogger().error(BotForce.class, METHOD_NAME, "Null entity when calculating the BV a bot force, we should never find a null here. Please investigate");
+            } else {
+                bv += entity.calculateBattleValue(true, false);
             }
         }
         
