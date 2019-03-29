@@ -4,7 +4,10 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -25,6 +28,7 @@ import mekhq.campaign.stratcon.StratconCampaignState;
 public class StratconScenarioWizard extends JDialog implements ActionListener {
     private final static String CMD_MOVE_RIGHT = "CMD_MOVE_RIGHT";
     private final static String CMD_MOVE_LEFT = "CMD_MOVE_LEFT";
+    private final static String CMD_MOVE_CONFIRM = "CMD_CONFIRM";
     
     StratconScenario currentScenario;
     Campaign campaign;
@@ -32,11 +36,16 @@ public class StratconScenarioWizard extends JDialog implements ActionListener {
     StratconCampaignState currentCampaignState;
 
     JLabel lblTotalBV = new JLabel();
-    JList<Force> playerForceList = new JList<>();
+    JList<Force> availableForceList = new JList<>();
+    JList<Force> selectedForceList = new JList<>();
+    
+    JButton btnRight = new JButton(">>>");
+    JButton btnLeft = new JButton("<<<");
 
 
     public StratconScenarioWizard(Campaign campaign) {
         this.campaign = campaign;
+        initializeButtons();
     }
 
     public void setCurrentScenario(StratconScenario scenario, StratconTrackState trackState, StratconCampaignState campaignState) {
@@ -54,7 +63,11 @@ public class StratconScenarioWizard extends JDialog implements ActionListener {
         getContentPane().setLayout(new GridBagLayout());
 
         gbc.gridx = 0;
-        gbc.gridy++;
+        gbc.gridy = 0;
+        
+        setInstructions(gbc);
+        gbc.gridy = 2;
+        
         switch(currentScenario.getCurrentState()) {        
             case UNRESOLVED:
                 setAssignPrimaryForcesUI(gbc);
@@ -64,22 +77,54 @@ public class StratconScenarioWizard extends JDialog implements ActionListener {
                 break;
         }
 
-        gbc.gridx = 0;
-        gbc.gridy++;
+        gbc.gridy = GridBagConstraints.REMAINDER;
         setNavigationButtons(gbc);
         pack();
         validate();
     }
     
-    public void setAssignPrimaryForcesUI(GridBagConstraints gbc) {
+    private void setInstructions(GridBagConstraints gbc) {
+        JLabel lblInfo = new JLabel(currentScenario.getInfo(false));
+        getContentPane().add(lblInfo,  gbc);
+        gbc.gridy++;
+        
+        JLabel lblInstructions = new JLabel();
+        switch(currentScenario.getCurrentState()) {
+        case UNRESOLVED:
+            lblInstructions.setText("Assign the required number of lances to the scenario.");
+            break;
+        default:
+            lblInstructions.setText("Assign any reinforcements or make allied support requests.");
+            break;
+        }
+        
+        getContentPane().add(lblInstructions, gbc);
+    }
+    
+    private void setAssignPrimaryForcesUI(GridBagConstraints gbc) {
         // generate a lance selector with the following parameters:
         // all forces assigned to the current track that aren't already assigned elsewhere
         // max number of items that can be selected = current scenario required lances
         
-        setPlayerForceSelector(gbc, true);
+        addAvailableForceList(gbc);
+        addSelectedBVLabel(gbc);
+        
+        gbc.gridx = 1;
+        gbc.gridy++;
+        gbc.anchor = GridBagConstraints.SOUTH;
+        gbc.fill = GridBagConstraints.NONE;
+        getContentPane().add(btnRight, gbc);
+        
+        gbc.gridy++;
+        gbc.anchor = GridBagConstraints.NORTH;
+        getContentPane().add(btnLeft, gbc);
+        
+        gbc.gridx = 2;
+        gbc.gridy -= 2;
+        addSelectedForceList(gbc);
     }
     
-    public void setAssignReinforcementsUI(GridBagConstraints gbc) {
+    private void setAssignReinforcementsUI(GridBagConstraints gbc) {
         // generate a lance selector with the following parameters:
         // A) all forces assigned to the current track that aren't already assigned elsewhere
         // PLUS B) all forces in the campaign that aren't already deployed to a scenario
@@ -90,54 +135,78 @@ public class StratconScenarioWizard extends JDialog implements ActionListener {
         // last two unavailable on atmo and space maps for obvious reasons, each costs 1 SP
         // grayed out if campaign state SP 
         
-        JButton btnRight = new JButton(">>>");
-        btnRight.setActionCommand(CMD_MOVE_RIGHT);
-        btnRight.addActionListener(this);
+        addAvailableForceList(gbc);
         
-        JButton btnLeft = new JButton("<<<");
-        btnLeft.setActionCommand(CMD_MOVE_LEFT);
-        btnLeft.addActionListener(this);
-        
-        gbc.gridy = 1;
+        gbc.gridx = 1;
+        gbc.gridy++;
         gbc.anchor = GridBagConstraints.SOUTH;
         gbc.fill = GridBagConstraints.NONE;
         getContentPane().add(btnRight, gbc);
         
-        gbc.gridy = 2;
+        gbc.gridy++;
         gbc.anchor = GridBagConstraints.NORTH;
         getContentPane().add(btnLeft, gbc);
+        
+        gbc.gridx = 2;
+        gbc.gridy -= 2;
+        addSelectedForceList(gbc);
     }
 
-    public void setPlayerForceSelector(GridBagConstraints gbc, boolean trackForcesOnly) {
+    private void addAvailableForceList(GridBagConstraints gbc) {
         JScrollPane forceListContainer = new JScrollPane();
 
         ScenarioWizardLanceModel lanceModel;
         
-        if(trackForcesOnly) {
-            lanceModel = new ScenarioWizardLanceModel(campaign, currentTrackState);
+        // if we're waiting to assign primary forces, we can only do so from the current track 
+        if(currentScenario.getCurrentState() == ScenarioState.UNRESOLVED) {
+            lanceModel = new ScenarioWizardLanceModel(campaign, currentTrackState.getAvailableForceIDs());
+        // if we want to assign reinforcements, then we can do so from any unassigned forces
         } else {
-            lanceModel = new ScenarioWizardLanceModel(campaign);
+            lanceModel = new ScenarioWizardLanceModel(campaign, currentCampaignState.getAvailableForceIDs());
         }
         
-        playerForceList.setModel(lanceModel);
-        playerForceList.setCellRenderer(new ScenarioWizardLanceRenderer(campaign));
-        playerForceList.addListSelectionListener(new ListSelectionListener() { 
+        availableForceList.setModel(lanceModel);
+        availableForceList.setCellRenderer(new ScenarioWizardLanceRenderer(campaign));
+        availableForceList.addListSelectionListener(new ListSelectionListener() { 
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                playerForceSelectorChanged(e);
+                availableForceSelectorChanged(e);
             }
         });
 
-        forceListContainer.setViewportView(playerForceList);
+        forceListContainer.setViewportView(availableForceList);
 
-        gbc.gridx = 0;
+        gbc.gridheight = 3;
         getContentPane().add(forceListContainer, gbc);
+    }
+    
+    private void addSelectedForceList(GridBagConstraints gbc) {
+        JScrollPane forceListContainer = new JScrollPane();
 
-        gbc.gridx = 1;
+        ScenarioWizardLanceModel lanceModel = new ScenarioWizardLanceModel(campaign, currentScenario.getAssignedForces());
+        
+        selectedForceList.setModel(lanceModel);
+        selectedForceList.setCellRenderer(new ScenarioWizardLanceRenderer(campaign));
+        selectedForceList.addListSelectionListener(new ListSelectionListener() { 
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                assignedForceSelectorChanged(e);
+            }
+        });
+
+        forceListContainer.setViewportView(selectedForceList);
+
+        gbc.gridheight = 3;
+        getContentPane().add(forceListContainer, gbc);
+    }
+    
+    private void addSelectedBVLabel(GridBagConstraints gbc) {
+        gbc.gridx++;
         gbc.gridheight = 1;
         gbc.anchor = GridBagConstraints.NORTH;
         lblTotalBV.setText("Selected BV: 0");
         getContentPane().add(lblTotalBV, gbc);
+        gbc.gridx--;
     }
 
     /**
@@ -166,22 +235,49 @@ public class StratconScenarioWizard extends JDialog implements ActionListener {
     }
 
     /**
+     * Sets up the move right / move left buttons
+     */
+    private void initializeButtons() {
+        btnRight.setActionCommand(CMD_MOVE_RIGHT);
+        btnRight.addActionListener(this);        
+        
+        btnLeft.setActionCommand(CMD_MOVE_LEFT);
+        btnLeft.addActionListener(this);
+    }
+    
+    /**
      * Event handler for when the user clicks the 'commit' button.
-     * Behaves differently depending on the state of the 
+     * Behaves differently depending on the state of the scenario
      * @param e
      */
     private void btnCommitClicked(ActionEvent e) {
-        if(currentScenario.getCurrentState() == ScenarioState.UNRESOLVED) {
-            currentScenario.commitPrimaryForces(campaign, currentCampaignState.getContract());
+        // gather up all the forces on the right side, and assign them to the scenario
+        DefaultListModel<Force> assignedListModel = (DefaultListModel<Force>) selectedForceList.getModel();
+        Set<Integer> forceIDs = new HashSet<>(); 
+        for(int x = 0; x < assignedListModel.size(); x++) {
+            forceIDs.add(assignedListModel.get(x).getId());
         }
+        
+        // scenarios that haven't had primary forces committed yet get those committed now
+        // and the scenario gets published to the campaign and may be played immediately from the briefing room
+        if(currentScenario.getCurrentState() == ScenarioState.UNRESOLVED) {
+            currentScenario.addForces(forceIDs);
+            currentScenario.commitPrimaryForces(campaign, currentCampaignState.getContract());
+        // scenarios that have had primary forces committed can have reinforcements added and removed "at will"
+        // until they've been actually played out
+        } else {
+            currentScenario.clearReinforcements();
+            currentScenario.addForces(forceIDs);
+        }
+        
+        setVisible(false);
     }
 
     /**
-     * Event handler for when the user makes a selection on the player force selector.
-     * Updates the "selected BV" label.
+     * Event handler for when the user makes a selection on the assigned force selector.
      * @param e The event fired. 
      */
-    private void playerForceSelectorChanged(ListSelectionEvent e) {
+    private void assignedForceSelectorChanged(ListSelectionEvent e) {
         if(!(e.getSource() instanceof JList<?>)) {
             return;
         }
@@ -193,11 +289,48 @@ public class StratconScenarioWizard extends JDialog implements ActionListener {
         }
 
         lblTotalBV.setText(String.format("Selected BV: %d", totalBV));
+        
+        boolean enableButton = !sourceList.isSelectionEmpty() &&
+                !currentScenario.getPrimaryPlayerForceIDs().contains(sourceList.getSelectedValue().getId());
+        
+        btnLeft.setEnabled(enableButton);
+    }
+    
+    /**
+     * Event handler for when the user makes a selection on the available force selector.
+     * @param e The event fired. 
+     */
+    private void availableForceSelectorChanged(ListSelectionEvent e) {
+        if(!(e.getSource() instanceof JList<?>)) {
+            return;
+        }
+
+        /*JList<Force> sourceList = (JList<Force>) e.getSource();
+                
+        boolean enableButton = !sourceList.isSelectionEmpty() &&
+                !currentScenario.getAssignedForces().contains(sourceList.getSelectedValue().getId());
+        
+        btnRight.setEnabled(enableButton);*/
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        // TODO Auto-generated method stub
+        ScenarioWizardLanceModel selectedForceModel = (ScenarioWizardLanceModel) selectedForceList.getModel();
+        ScenarioWizardLanceModel availableForceModel = (ScenarioWizardLanceModel) availableForceList.getModel();
         
+        switch(e.getActionCommand()) {
+        case CMD_MOVE_RIGHT:
+            if(!availableForceList.isSelectionEmpty()) {
+                selectedForceModel.addElement(availableForceList.getSelectedValue());
+                availableForceModel.removeElement(availableForceList.getSelectedValue());
+            }
+            break;
+        case CMD_MOVE_LEFT:
+            if(!selectedForceList.isSelectionEmpty()) {
+                availableForceModel.addElement(selectedForceList.getSelectedValue());
+                selectedForceModel.removeElement(selectedForceList.getSelectedValue());
+            }
+            break;
+        }
     }
 }

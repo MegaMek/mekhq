@@ -626,7 +626,7 @@ public class AtBDynamicScenarioFactory {
     public static void setScenarioModifiers(AtBDynamicScenario scenario) {
         // this is hardcoded for now, but the eventual plan is to let the user configure how many modifiers
         // they want applied
-        int numMods = 2;//Compute.randomInt(2);
+        int numMods = Compute.randomInt(2);
         
         for(int x = 0; x < numMods; x++) {
             int scenarioIndex = Compute.randomInt(AtBScenarioModifier.getScenarioModifiers().size());

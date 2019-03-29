@@ -115,8 +115,8 @@ public class StratconTrackState {
      * that have not been assigned to a scenario already.
      * @return
      */
-    public Set<Integer> getAvailableForceIDs() {
-        Set<Integer> retVal = new HashSet<>();
+    public List<Integer> getAvailableForceIDs() {
+        List<Integer> retVal = new ArrayList<>();
         
         for(int forceID : assignedForceIDs) {
             boolean forceAssigned = false;

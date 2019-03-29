@@ -4,10 +4,13 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import megamek.common.Coords;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 
@@ -63,5 +66,33 @@ public class StratconCampaignState {
         for(StratconTrackState track : tracks) {
             track.generateScenarios(campaign, getContract());
         }
+    }
+    
+    /**
+     * This is a list of all force IDs for forces that 
+     * a) have not been assigned to a track
+     * b) are combat-capable
+     * c) are not deployed to a scenario
+     * @return
+     */
+    public List<Integer> getAvailableForceIDs() {
+        List<Integer> retVal = new ArrayList<>();
+        
+        Set<Integer> forcesInTracks = new HashSet<>();
+        for(StratconTrackState track : tracks) {
+            forcesInTracks.addAll(track.getAssignedForceIDs());
+        }
+        
+        for(int key : campaign.getLances().keySet()) {
+            Force force = campaign.getForce(key);
+            if(force != null && 
+                    !force.isDeployed() && 
+                    !force.getUnits().isEmpty() &&
+                    !forcesInTracks.contains(force.getId())) {
+                retVal.add(force.getId());
+            }
+        }
+        
+        return retVal;
     }
 }

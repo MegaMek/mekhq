@@ -30,6 +30,9 @@ public class AtBDynamicScenario extends AtBScenario {
      */
     private static final long serialVersionUID = 4671466413188687036L;
 
+    // by convention, this is the ID specified in the template for the primary player force
+    public static final String PRIMARY_PLAYER_FORCE_ID = "Player";
+    
     // derived fields used for various calculations
     private int effectivePlayerUnitCount;
     private int effectivePlayerBV;
@@ -162,6 +165,22 @@ public class AtBDynamicScenario extends AtBScenario {
     
     public void setEffectiveOpforQuality(int qualityLevel) {
         effectiveOpforQuality = qualityLevel;
+    }
+    
+    /**
+     * A list of all the force IDs associated with pre-defined scenario templates
+     * @return
+     */
+    public List<Integer> getPrimaryPlayerForceIDs() {
+        List<Integer> retval = new ArrayList<>();
+        
+        for(int forceID : getForceIDs()) {
+            if(getPlayerForceTemplates().containsKey(forceID)) {
+                retval.add(forceID);
+            }
+        }
+        
+        return retval;
     }
     
     /**

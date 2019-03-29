@@ -3,6 +3,7 @@ package mekhq.campaign.stratcon;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import megamek.common.Compute;
@@ -108,9 +109,29 @@ public class StratconScenario implements IStratconDisplayable {
     public void addPrimaryForce(int forceID) {
         backingScenario.addForces(forceID);
     }
+    
+    public void addForces(Set<Integer> forceIDs) {
+        for(int forceID : forceIDs) {
+            if(!backingScenario.getForceIDs().contains(forceID)) {
+                addPrimaryForce(forceID);
+            }
+        }
+    }
+    
+    public void clearReinforcements() {
+        for(int forceID : backingScenario.getForceIDs()) {
+            if(!backingScenario.getPlayerForceTemplates().containsKey(forceID)) {
+                backingScenario.removeForce(forceID);
+            }
+        }
+    }
 
     public List<Integer> getAssignedForces() {
         return backingScenario.getForceIDs();
+    }
+    
+    public List<Integer> getPrimaryPlayerForceIDs() {
+        return backingScenario.getPrimaryPlayerForceIDs();
     }
     
     /**
@@ -123,6 +144,8 @@ public class StratconScenario implements IStratconDisplayable {
         currentState = ScenarioState.PRIMARY_FORCES_COMMITTED;
 
         AtBDynamicScenarioFactory.finalizeScenario(backingScenario, contract, campaign);
+        
+        campaign.addScenario(backingScenario, contract);
     }
 
     /**
@@ -217,6 +240,10 @@ public class StratconScenario implements IStratconDisplayable {
     }
 
     public String getInfo() {
+        return getInfo(true);
+    }
+    
+    public String getInfo(boolean includeForces) {
         StringBuilder stateBuilder = new StringBuilder();
         stateBuilder.append("<html>");
 
@@ -228,18 +255,19 @@ public class StratconScenario implements IStratconDisplayable {
         stateBuilder.append("Status: ");
         stateBuilder.append(scenarioStateNames.get(currentState));
 
-        List<UUID> unitIDs = backingScenario.getForces(currentCampaign).getAllUnits();
-        
-        if(!unitIDs.isEmpty()) {
-            stateBuilder.append("<br/><br/>Assigned Units:<br/>");
+        if(includeForces) {
+            List<UUID> unitIDs = backingScenario.getForces(currentCampaign).getAllUnits();
             
-            for(UUID unitID : unitIDs) {
-                stateBuilder.append("&nbsp;&nbsp;");
-                stateBuilder.append(currentCampaign.getUnit(unitID).getName());
-                stateBuilder.append("<br/>");
+            if(!unitIDs.isEmpty()) {
+                stateBuilder.append("<br/><br/>Assigned Units:<br/>");
+                
+                for(UUID unitID : unitIDs) {
+                    stateBuilder.append("&nbsp;&nbsp;");
+                    stateBuilder.append(currentCampaign.getUnit(unitID).getName());
+                    stateBuilder.append("<br/>");
+                }
             }
-        }
-        
+        }        
 
         stateBuilder.append("</html>");
         return stateBuilder.toString();
@@ -265,5 +293,9 @@ public class StratconScenario implements IStratconDisplayable {
 
     public void setRequiredScenario(boolean requiredScenario) {
         this.requiredScenario = requiredScenario;
+    }
+    
+    public AtBDynamicScenario getBackingScenario() {
+        return backingScenario;
     }
 }
