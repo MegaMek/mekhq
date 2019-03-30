@@ -130,7 +130,11 @@ public class MissingKFBoom extends MissingPart {
 	
 	@Override
 	public TechAdvancement getTechAdvancement() {
+	    if (boomType != Dropship.BOOM_STANDARD) {
+            return KfBoom.TA_PROTOTYPE_KF_BOOM;
+        } else {
             return KfBoom.TA_KFBOOM;
+        }
 	}
 	
 }
