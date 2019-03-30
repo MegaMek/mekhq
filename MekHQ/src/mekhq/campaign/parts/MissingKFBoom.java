@@ -78,7 +78,7 @@ public class MissingKFBoom extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new KfBoom(getUnitTonnage(), campaign, boomType);
+		return new KfBoom(campaign, boomType);
 	}
 
 	@Override
@@ -130,11 +130,7 @@ public class MissingKFBoom extends MissingPart {
 	
 	@Override
 	public TechAdvancement getTechAdvancement() {
-        if (boomType != Dropship.COLLAR_NO_BOOM) {
-            return KfBoom.TA_BOOM;
-        } else {
-            return KfBoom.TA_NO_BOOM;
-        }
+            return KfBoom.TA_KFBOOM;
 	}
 	
 }
