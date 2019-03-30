@@ -78,7 +78,7 @@ public class MissingKFBoom extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new KfBoom(campaign, boomType);
+		return new KfBoom(getUnitTonnage(), campaign, boomType);
 	}
 
 	@Override
