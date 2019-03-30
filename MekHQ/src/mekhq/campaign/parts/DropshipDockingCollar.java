@@ -66,6 +66,7 @@ public class DropshipDockingCollar extends Part {
     
     public DropshipDockingCollar(int tonnage, Campaign c, int collarType) {
         super(tonnage, c);
+        this.collarType = collarType;
         this.name = "Dropship Docking Collar";
         if (collarType == Dropship.COLLAR_NO_BOOM) {
             name += " (No Boom)";
@@ -171,10 +172,8 @@ public class DropshipDockingCollar extends Part {
 	public Money getStickerPrice() {
 	    if (collarType == Dropship.COLLAR_STANDARD) {
 	        return Money.of(10000);
-	    } else if (collarType == Dropship.COLLAR_PROTOTYPE) {
-	        return Money.of(1010000) ;
 	    } else {
-	        return Money.zero();
+	        return Money.of(1010000) ;
 	    }
 	}
 	
