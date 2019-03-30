@@ -52,6 +52,11 @@ public class KfBoom extends Part {
             .setProductionFactions(F_TH).setTechRating(RATING_C)
             .setAvailability(RATING_D, RATING_C, RATING_C, RATING_C)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
+    static final TechAdvancement TA_PROTOTYPE_KF_BOOM = new TechAdvancement(TECH_BASE_ALL)
+            .setAdvancement(2458, 2470, 2500).setPrototypeFactions(F_TH)
+            .setProductionFactions(F_TH).setTechRating(RATING_C)
+            .setAvailability(RATING_F, RATING_X, RATING_X, RATING_X)
+            .setStaticTechLevel(SimpleTechLevel.ADVANCED);
     
     private int boomType = Dropship.BOOM_STANDARD;
 	
@@ -61,6 +66,7 @@ public class KfBoom extends Part {
     
     public KfBoom(int tonnage, Campaign c, int boomType) {
         super(tonnage, c);
+        this.boomType = boomType;
         this.name = "Dropship K-F Boom";
         if (boomType == Dropship.BOOM_PROTOTYPE) {
             name += " (Prototype)";
@@ -219,6 +225,10 @@ public class KfBoom extends Part {
 	
 	@Override
 	public TechAdvancement getTechAdvancement() {
-	        return TA_KFBOOM;
+	    if (boomType != Dropship.BOOM_STANDARD) {
+            return TA_PROTOTYPE_KF_BOOM;
+        } else {
+            return TA_KFBOOM;
+        }
 	}
 }
