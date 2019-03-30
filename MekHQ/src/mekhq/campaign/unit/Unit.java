@@ -123,6 +123,7 @@ import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.FireControlSystem;
 import mekhq.campaign.parts.InfantryArmorPart;
 import mekhq.campaign.parts.InfantryMotiveType;
+import mekhq.campaign.parts.KfBoom;
 import mekhq.campaign.parts.LandingGear;
 import mekhq.campaign.parts.MekActuator;
 import mekhq.campaign.parts.MekCockpit;
@@ -136,10 +137,12 @@ import mekhq.campaign.parts.MissingAeroSensor;
 import mekhq.campaign.parts.MissingAvionics;
 import mekhq.campaign.parts.MissingBattleArmorSuit;
 import mekhq.campaign.parts.MissingBayDoor;
+import mekhq.campaign.parts.MissingCIC;
 import mekhq.campaign.parts.MissingCubicle;
 import mekhq.campaign.parts.MissingDropshipDockingCollar;
 import mekhq.campaign.parts.MissingEnginePart;
 import mekhq.campaign.parts.MissingFireControlSystem;
+import mekhq.campaign.parts.MissingKFBoom;
 import mekhq.campaign.parts.MissingLandingGear;
 import mekhq.campaign.parts.MissingMekActuator;
 import mekhq.campaign.parts.MissingMekCockpit;
@@ -1839,6 +1842,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         Part secondaryW = null;
         Part infantryArmor = null;
         Part dropCollar = null;
+        Part kfBoom = null;
         Part protoLeftArmActuator = null;
         Part protoRightArmActuator = null;
         Part protoLegsActuator = null;
@@ -2009,6 +2013,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 if(part instanceof FireControlSystem) {
                     ((FireControlSystem)fcs).calculateCost();
                 }
+            } else if(part instanceof CombatInformationCenter || part instanceof MissingCIC) {
+                cic = part;
+                //for reverse compatability, calculate costs
+                if(part instanceof CombatInformationCenter) {
+                    ((CombatInformationCenter)cic).calculateCost();
+                }
             } else if(part instanceof AeroSensor || part instanceof MissingAeroSensor) {
                 sensor = part;
             } else if(part instanceof LandingGear || part instanceof MissingLandingGear) {
@@ -2024,6 +2034,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 turretLock = part;
             } else if(part instanceof DropshipDockingCollar || part instanceof MissingDropshipDockingCollar) {
                 dropCollar = part;
+            } else if(part instanceof KfBoom || part instanceof MissingKFBoom) {
+                kfBoom = part;
             } else if(part instanceof ProtomekArmActuator || part instanceof MissingProtomekArmActuator) {
                 int loc;
                 if(part instanceof ProtomekArmActuator) {
@@ -2500,6 +2512,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         ((Dropship) entity).getCollarType());
                 addPart(dropCollar);
                 partsToAdd.add(dropCollar);
+            }
+            if(null == kfBoom && entity instanceof Dropship) {
+                kfBoom = new KfBoom((int) entity.getWeight(), getCampaign(),
+                        ((Dropship) entity).getBoomType());
+                addPart(kfBoom);
+                partsToAdd.add(kfBoom);
             }
             int hsinks = ((Aero)entity).getOHeatSinks() - aeroHeatSinks.size();
             int podhsinks = ((Aero)entity).getPodHeatSinks() - podAeroHeatSinks;
