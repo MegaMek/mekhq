@@ -89,7 +89,7 @@ public class LandingGear extends Part {
 	    if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair times
             Entity e = unit.getEntity();
-            if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+            if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP)) {
                 time = 120;
             } else {
                 time = 60;
