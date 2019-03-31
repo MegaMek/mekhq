@@ -29,28 +29,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import megamek.client.Client;
-import megamek.common.Aero;
-import megamek.common.Compute;
-import megamek.common.Crew;
-import megamek.common.CriticalSlot;
-import megamek.common.EjectedCrew;
-import megamek.common.Entity;
-import megamek.common.IAero;
-import megamek.common.IArmorState;
-import megamek.common.IEntityRemovalConditions;
-import megamek.common.Infantry;
-import megamek.common.Jumpship;
-import megamek.common.MULParser;
-import megamek.common.Mech;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
-import megamek.common.MechSummaryCache;
-import megamek.common.MechWarrior;
-import megamek.common.MiscType;
-import megamek.common.Mounted;
-import megamek.common.Protomech;
-import megamek.common.SmallCraft;
-import megamek.common.Tank;
+import megamek.common.*;
 import megamek.common.event.GameVictoryEvent;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.logging.LogLevel;
@@ -249,6 +228,14 @@ public class ResolveScenarioTracker {
                         enemyEjections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew)e);
                         continue;
                     }
+
+                    if (e instanceof BattleArmor && e.isDestroyed()) {
+                        // BA can only be salvaged with a 10+ roll
+                        if (Utilities.dice(2, 6) < 10) {
+                            continue;
+                        }
+                    }
+
                     TestUnit nu = generateNewTestUnit(e);
                     UnitStatus us = new UnitStatus(nu);
                     us.setTotalLoss(false);
