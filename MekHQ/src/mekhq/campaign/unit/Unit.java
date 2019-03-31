@@ -1794,6 +1794,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
 
         ArrayList<Part> partsToAdd = new ArrayList<>();
+        ArrayList<Part> partsToRemove = new ArrayList<>();
 
         Part gyro = null;
         Part engine = null;
@@ -2007,13 +2008,20 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 qvGear = part;
             } else if(part instanceof Avionics || part instanceof MissingAvionics) {
                 avionics = part;
+            //Don't initialize FCS for JS/WS/SS, use CIC for these instead
             } else if(part instanceof FireControlSystem || part instanceof MissingFireControlSystem) {
                 fcs = part;
                 //for reverse compatability, calculate costs
                 if(part instanceof FireControlSystem) {
                     ((FireControlSystem)fcs).calculateCost();
                 }
-            } else if(part instanceof CombatInformationCenter || part instanceof MissingCIC) {
+                // If a JS/WS/SS already has an FCS, remove it
+                if (entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+                    partsToRemove.add(part);
+                }
+            //Don't initialize CIC for any ASF/SC/DS, use FCS for these instead
+            } else if((part instanceof CombatInformationCenter || part instanceof MissingCIC)
+                    && (entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP))) {
                 cic = part;
                 //for reverse compatability, calculate costs
                 if(part instanceof CombatInformationCenter) {
@@ -2023,6 +2031,10 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 sensor = part;
             } else if(part instanceof LandingGear || part instanceof MissingLandingGear) {
                 landingGear = part;
+                // If a JS/WS/SS already has Landing Gear, remove it
+                if (entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+                    partsToRemove.add(part);
+                }
             } else if(part instanceof AeroHeatSink || part instanceof MissingAeroHeatSink) {
                 aeroHeatSinks.add(part);
                 if (part.isOmniPodded()) {
@@ -2072,6 +2084,10 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
 
             part.updateConditionFromPart();
+        }
+        // Remove invalid Aero parts due to changes after 0.45.4
+        for (Part part : partsToRemove) {
+            removePart(part);
         }
         //now check to see what is null
         for(int i = 0; i<locations.length; i++) {
@@ -2496,7 +2512,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 addPart(sensor);
                 partsToAdd.add(sensor);
             }
-            if(null == landingGear) {
+            if(null == landingGear && !(entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP))) {
                 landingGear = new LandingGear((int) entity.getWeight(), getCampaign());
                 addPart(landingGear);
                 partsToAdd.add(landingGear);
