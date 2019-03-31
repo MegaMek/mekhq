@@ -3506,6 +3506,12 @@ public class Campaign implements Serializable, ITechManager {
                 unit.getEntity().setOwner(player);
                 unit.getEntity().setGame(game);
                 unit.getEntity().restore();
+                
+                // Aerospace parts have changed after 0.45.4. Reinitialize parts for Small Craft and up
+                if (unit.getEntity().hasETypeFlag(Entity.ETYPE_JUMPSHIP)
+                        || unit.getEntity().hasETypeFlag(Entity.ETYPE_SMALL_CRAFT)) {
+                    unitsToCheck.add(unit.getId());
+                }
             }
         }
 
