@@ -1,6 +1,11 @@
 VERSION HISTORY:
 ----------------
-v0.45.4-SNAPSHOT
+v0.45.5-SNAPSHOT
++ PR #1163: Fix vast overvaluing of opfor BV in the briefing ta
++ Issue #1161: don't cast non-Infantry to Infantry during peacetime cost calculations
++ Issue #70: BA has a 100% salvage chance
+
+v0.45.4 (2019-03-24 1700 UTC)
 + PR #1067: Switch to Joda Money library internally for financial math
 + Issue #1057: Don't allow Rotor damage to go negative or use negative damages
 + Issue #1085: Find different replacement part if original missing or has a new ID
@@ -21,6 +26,8 @@ v0.45.4-SNAPSHOT
 + Issue #1144: fix bug where bondsmen could not be recruited
 + Issue #1148: fix bug where loan could not be paid off
 + Issue #1150: fix bug introduced in 45.3 preventing AtB scenarios reinforced by immobile player units from starting
++ Issue #1138: fix NPE in isOmniPodded check for AmmoBin's after refit
++ Issue #1161: don't cast non-Infantry to Infantry during peacetime cost calculations
 
 v0.45.3 (2019-02-12 0500 UTC)
 + Issue #990: Feature: Add bulk confirm dialog if more than one unit is removed
