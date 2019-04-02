@@ -2660,6 +2660,11 @@ public class Campaign implements Serializable, ITechManager {
         } else if (contract.getStartDate().after(getDate())) {
             // Contracts in the future don't have deficits...yet.
             return 0;
+        } else if (contract.getStartDate().equals(getDate())) {
+            // Do not check for deficits the first day of the contract,
+            // as players won't have had time to assign forces to the contract
+            // yet
+            return 0;
         }
 
         int total = -contract.getRequiredLances();
