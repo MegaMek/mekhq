@@ -2657,11 +2657,13 @@ public class Campaign implements Serializable, ITechManager {
         if (!contract.isActive()) {
             // Inactive contracts have no deficits.
             return 0;
-        } else if (contract.getStartDate().after(getDate())) {
-            // Contracts in the future don't have deficits...yet.
+        } else if (contract.getStartDate().compareTo(getDate()) >= 0) {
+            // Do not check for deficits if the contract has not started or
+            // it is the first day of the contract, as players won't have
+            // had time to assign forces to the contract yet
             return 0;
         }
-
+        
         int total = -contract.getRequiredLances();
         int role = -Math.max(1, contract.getRequiredLances() / 2);
 
