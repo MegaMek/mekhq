@@ -37,13 +37,6 @@ public class StratconCampaignState {
         tracks = new ArrayList<>();
         this.campaign = campaign; 
         this.setContract(contract);
-        
-        StratconTrackState testTrack = new StratconTrackState();
-        testTrack.setDisplayableName("Test Track");
-        testTrack.setHeight(8);
-        testTrack.setWidth(12);
-        
-        tracks.add(testTrack);
     }
 
     /**
@@ -60,6 +53,10 @@ public class StratconCampaignState {
     
     public List<StratconTrackState> getTracks() {
         return tracks;
+    }
+    
+    public void addTrack(StratconTrackState track) {
+        tracks.add(track);
     }
     
     public void generateScenariosForTracks() {

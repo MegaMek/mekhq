@@ -20,6 +20,7 @@ import javax.swing.JPopupMenu;
 import megamek.common.Coords;
 import mekhq.campaign.stratcon.IStratconDisplayable;
 import mekhq.campaign.stratcon.StratconCampaignState;
+import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.mission.AtBContract;
@@ -49,16 +50,16 @@ public class StratconTab extends CampaignGuiTab implements ActionListener {
 
     private StratconCampaignState campaignState;
 
-    BoardState boardState = new BoardState();
+    private BoardState boardState = new BoardState();
 
-    InfoFrame detailsFrame;
-    Point clickedPoint;
-    JPopupMenu rightClickMenu;
-    JMenuItem menuItemInitiateScenario;
-    JMenuItem menuItemManageScenario;
+    private InfoFrame detailsFrame;
+    private Point clickedPoint;
+    private JPopupMenu rightClickMenu;
+    private JMenuItem menuItemInitiateScenario;
+    private JMenuItem menuItemManageScenario;
     
-    StratconScenarioWizard scenarioWizard;
-    TrackForceAssignmentUI assignmentUI;
+    private StratconScenarioWizard scenarioWizard;
+    private TrackForceAssignmentUI assignmentUI;
 
     StratconTab(CampaignGUI gui, String tabName) {
         super(gui, tabName);
@@ -102,7 +103,7 @@ public class StratconTab extends CampaignGuiTab implements ActionListener {
 
     @Override
     public void initTab() {
-        campaignState = new StratconCampaignState(getCampaign(), (AtBContract) this.getCampaign().getActiveContracts().get(0));
+        campaignState = StratconRulesManager.InitializeCampaignState((AtBContract) this.getCampaign().getActiveContracts().get(0), getCampaign());
         
         assignmentUI = new TrackForceAssignmentUI(getCampaign());
         assignmentUI.setVisible(false);
@@ -153,6 +154,9 @@ public class StratconTab extends CampaignGuiTab implements ActionListener {
         g2D.setTransform(originTransform);
         g2D.translate(HEX_X_RADIUS, HEX_Y_RADIUS);
         drawScenarios(g2D);
+        g2D.setTransform(originTransform);
+        g2D.translate(HEX_X_RADIUS, HEX_Y_RADIUS);
+        drawFacilities(g2D);
 
         g2D.setTransform(initialTransform);
         if(clickedPoint != null) {
@@ -269,6 +273,32 @@ public class StratconTab extends CampaignGuiTab implements ActionListener {
             scenarioMarker.translate(translationVector[0], translationVector[1]);
         }
     }
+    
+    private void drawFacilities(Graphics2D g2D) {
+        Polygon facilityMarker = new Polygon();
+        int xRadius = HEX_X_RADIUS / 3;
+        int yRadius = HEX_Y_RADIUS / 3;
+
+        facilityMarker.addPoint(-xRadius, -yRadius);
+        facilityMarker.addPoint(-xRadius, yRadius);
+        facilityMarker.addPoint(xRadius, yRadius);
+        facilityMarker.addPoint(xRadius, -yRadius);
+
+        for(int x = 0; x < campaignState.getTrack(0).getWidth(); x++) {            
+            for(int y = 0; y < campaignState.getTrack(0).getHeight(); y++) {
+                if(campaignState.getTrack(0).getFacility(new Coords(x, y)) != null) {
+                    g2D.setColor(Color.GREEN);
+                    g2D.drawPolygon(facilityMarker);
+                }
+
+                int[] downwardVector = getDownwardYVector();
+                facilityMarker.translate(downwardVector[0], downwardVector[1]);
+            }
+
+            int[] translationVector = getRightAndUPVector(x % 2 == 0);
+            facilityMarker.translate(translationVector[0], translationVector[1]);
+        }
+    }
 
     /**
      * Returns the translation that we need to make to render the "next downward" hex.
@@ -353,7 +383,10 @@ public class StratconTab extends CampaignGuiTab implements ActionListener {
             menuItemManageScenario.setEnabled(selectedScenario != null);
             rightClickMenu.show(this, e.getX(), e.getY());
         } else if(e.getButton() == MouseEvent.BUTTON2) {
-            campaignState.getTrack(0).generateScenarios(getCampaign(), (AtBContract) this.getCampaign().getActiveContracts().get(0));
+            //campaignState.getTrack(0).generateScenarios(getCampaign(), (AtBContract) this.getCampaign().getActiveContracts().get(0));
+            AtBContract testContract = (AtBContract) this.getCampaign().getActiveContracts().get(0);
+            
+            campaignState = StratconRulesManager.InitializeCampaignState(testContract, getCampaign()); 
         }
         
         repaint();

@@ -24,7 +24,9 @@ public class StratconFacility {
     
     private ForceAlignment owner;
     private String displayableName;
-    // we'll want to store a garrison here as well
+    private FacilityType facilityType;
+    private boolean visible;
+    // we'll want to store a garrison here as well eventu
     
     public ForceAlignment getOwner() {
         return owner;
@@ -35,10 +37,30 @@ public class StratconFacility {
     }
     
     public String getDisplayableName() {
-        return displayableName;
+        return String.format("%s: %s", displayableName, facilityType.toString());
     }
     
     public void setDisplayableName(String displayableName) {
         this.displayableName = displayableName;
+    }
+
+    public FacilityType getFacilityType() {
+        return facilityType;
+    }
+
+    public void setFacilityType(FacilityType facilityType) {
+        this.facilityType = facilityType;
+    }
+
+    public boolean getVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
+    
+    public boolean isVisible() {
+        return (owner == ForceAlignment.Allied) || visible;
     }
 }

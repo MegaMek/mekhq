@@ -31,6 +31,7 @@ public class StratconTrackState {
     private Map<Coords, StratconScenario> scenarios;
     private Set<Integer> assignedForceIDs;
     private int scenarioOdds;
+    private int deploymentTime;
     private int requiredLanceCount;
     
     public StratconTrackState() {
@@ -71,6 +72,10 @@ public class StratconTrackState {
         this.facilities = facilities;
     }
 
+    public StratconFacility getFacility(Coords coords) {
+        return facilities.get(coords);
+    }
+    
     public Map<Coords, StratconScenario> getScenarios() {
         return scenarios;
     }
@@ -90,6 +95,14 @@ public class StratconTrackState {
     public void setRequiredLanceCount(int requiredLanceCount) {
         this.requiredLanceCount = requiredLanceCount;
     }
+    
+    public int getDeploymentTime() {
+        return deploymentTime;
+    }
+
+    public void setDeploymentTime(int deploymentTime) {
+        this.deploymentTime = deploymentTime;
+    }
 
     public void assignForce(int forceID) {
         getAssignedForceIDs().add(forceID);
@@ -108,6 +121,14 @@ public class StratconTrackState {
 
     public void setAssignedForceIDs(Set<Integer> assignedForceIDs) {
         this.assignedForceIDs = assignedForceIDs;
+    }
+    
+    public void addFacility(Coords coords, StratconFacility facility) {
+        facilities.put(coords, facility);
+    }
+    
+    public void removeFacility(Coords coords) {
+        facilities.remove(coords);
     }
     
     /**
@@ -190,5 +211,4 @@ public class StratconTrackState {
             generatedScenarios.get(scenarioIndex).setAttachedUnitsModifier(contract);
         }
     }
-
 }
