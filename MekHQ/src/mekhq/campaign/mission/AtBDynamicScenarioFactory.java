@@ -252,7 +252,8 @@ public class AtBDynamicScenarioFactory {
                                     forceTemplate.getAllowedUnitType() == UnitType.AERO;
         
         // here we determine the "lance size". Aircraft almost always come in pairs, mechs and tanks, not so much.
-        int lanceSize = usingAerospace ? 2 : getLanceSize(factionCode);
+        int lanceSize = usingAerospace ? getAeroLanceSize(forceTemplate.getAllowedUnitType(), isPlanetOwner, factionCode) : 
+                                        getLanceSize(factionCode);
         
         
         // don't generate forces flagged as player-supplied
@@ -1243,7 +1244,6 @@ public class AtBDynamicScenarioFactory {
     private static void setDeploymentZones(AtBDynamicScenario scenario) {
         // loop through all scenario player forces
         //  for each one, look up the template. If none, random? If yes, calculateDeploymentZone
-        //  for 
         // repeat for bot forces
         
         for(int forceID : scenario.getForceIDs()) {
@@ -1587,7 +1587,7 @@ public class AtBDynamicScenarioFactory {
      * @param edge The starting edge
      * @return Opposite edge, as defined in Board.java
      */
-    private static int getOppositeEdge(int edge) {
+    static int getOppositeEdge(int edge) {
         switch(edge) {
         case Board.START_EDGE:
             return Board.START_CENTER;
@@ -1597,7 +1597,7 @@ public class AtBDynamicScenarioFactory {
             return Board.START_ANY;
         default:
             // directional edges start at 1
-            return ((edge + 4) % 8) + 1;
+            return ((edge + 3) % 8) + 1;
         }
     }
     
@@ -1639,19 +1639,23 @@ public class AtBDynamicScenarioFactory {
      * @param isPlanetOwner
      * @return
      */
-    public static int getAeroLanceSize(int unitTypeCode, boolean isPlanetOwner) {
+    public static int getAeroLanceSize(int unitTypeCode, boolean isPlanetOwner, String factionCode) {
+        // capellans use units of three aircraft at a time, others use two
+        // TODO: except maybe clans?
+        int numFightersPerFlight = factionCode == "CC" ? 3 : 2;
+        
         if(unitTypeCode == UnitType.AERO) {
-            return 2;
+            return numFightersPerFlight;
         } else if(unitTypeCode == UnitType.CONV_FIGHTER) {
-            return (Compute.randomInt(3) + 1) * 2;
+            return (Compute.randomInt(3) + 1) * numFightersPerFlight;
         } else {
             int useASFRoll = isPlanetOwner ? Compute.d6() : 6;
-            int weightCountRoll = (Compute.randomInt(3) + 1 * 2); // # of conventional fighters, just in case
+            int weightCountRoll = (Compute.randomInt(3) * numFightersPerFlight); // # of conventional fighters, just in case
             
             // if we are the planet owner, we may use ASF or conventional fighters 
             boolean useASF = useASFRoll >= 4;
             // if we are using ASF, we "always" use 2 at a time, otherwise, use the # of conventional fighters 
-            int unitCount = useASF ? 2 : weightCountRoll;
+            int unitCount = useASF ? numFightersPerFlight : weightCountRoll;
             
             return unitCount;
         }
