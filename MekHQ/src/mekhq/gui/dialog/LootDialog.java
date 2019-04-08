@@ -310,7 +310,7 @@ public class LootDialog extends javax.swing.JDialog {
 
     private void done() {
         loot.setName(txtName.getText());
-        loot.setCash(Money.of((Double)spnCash.getModel().getValue()));
+        loot.setCash(Money.of((Integer) spnCash.getModel().getValue()));
         cancelled = false;
         loot.clearUnits();
         loot.clearParts();
