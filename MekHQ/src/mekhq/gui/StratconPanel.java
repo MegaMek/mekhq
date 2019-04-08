@@ -16,6 +16,7 @@ import java.awt.geom.AffineTransform;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 
 import megamek.common.Coords;
 import mekhq.campaign.Campaign;
@@ -166,6 +167,14 @@ public class StratconPanel extends JPanel implements ActionListener {
         // it's probably finicky, so any major changes to the rendering mechanism will likely break the detection
         if(clickedPoint != null) {
             translatedClickedPoint = (Point) clickedPoint.clone();
+            
+            // since we have the possibility of scrolling, we need to convert the on-screen clicked coordinates
+            // to on-board coordinates. Thankfully, SwingUtilities provides the main computational ability for that
+            Point actualPanelPoint = SwingUtilities.convertPoint(this, translatedClickedPoint, this.getParent());
+            translatedClickedPoint.translate((int) -(actualPanelPoint.getX() - translatedClickedPoint.getX()), 
+                                                (int) -(actualPanelPoint.getY() - translatedClickedPoint.getY()));
+            
+            // now we translate to the starting point of where we're drawing and then go down a hex
             translatedClickedPoint.translate((int) g2D.getTransform().getTranslateX(), (int) g2D.getTransform().getTranslateY());
             translatedClickedPoint.translate(0, -(HEX_Y_RADIUS * 2));
         }
@@ -319,7 +328,7 @@ public class StratconPanel extends JPanel implements ActionListener {
         }
 
         if(e.getButton() == MouseEvent.BUTTON1) {        
-            clickedPoint = new Point(e.getX(), e.getY());
+            clickedPoint = e.getPoint();
             boolean pointFoundOnBoard = detectClickedHex();
 
             repaint();

@@ -213,6 +213,11 @@ public class AtBDynamicScenarioFactory {
     */
     public static int generateForce(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign,
             int effectiveBV, int effectiveUnitCount, int weightClass, ScenarioForceTemplate forceTemplate) {
+        // don't generate forces flagged as player-supplied
+        if(forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal()) {
+            return 0;
+        }        
+        
         String factionCode = "";
         int skill = 0;
         int quality = 0;
@@ -254,12 +259,6 @@ public class AtBDynamicScenarioFactory {
         // here we determine the "lance size". Aircraft almost always come in pairs, mechs and tanks, not so much.
         int lanceSize = usingAerospace ? getAeroLanceSize(forceTemplate.getAllowedUnitType(), isPlanetOwner, factionCode) : 
                                         getLanceSize(factionCode);
-        
-        
-        // don't generate forces flagged as player-supplied
-        if(forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal()) {
-            return 0;
-        }
     
         // determine generation parameters
         int forceBV = 0;

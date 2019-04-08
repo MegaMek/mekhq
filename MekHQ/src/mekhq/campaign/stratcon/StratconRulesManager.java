@@ -48,8 +48,8 @@ public class StratconRulesManager {
         int numHexes = numLances * 28;
         int height = (int) Math.floor(Math.sqrt(numHexes));
         int width = numHexes / height;
-        retVal.setWidth(40);
-        retVal.setHeight(40);
+        retVal.setWidth(width);
+        retVal.setHeight(height);
         
         // generate the facilities
         for(int fCount = 0; fCount < numLances; fCount++) {
