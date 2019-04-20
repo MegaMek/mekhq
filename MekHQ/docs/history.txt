@@ -7,6 +7,7 @@ v0.45.5-SNAPSHOT
 + Issue #1165: Player no longer gets dinged contract score for not having forces deployed immediately upon AtB contract start
 + Issue #1170: Fixed issue introduced in 45.4 where player couldn't hire personnel from personnel market with mechs
 + Issue #1164, #1174: Fix various issues involving money, in add/edit transaction, add/edit loot.
++ Issue #1182: Fixes a NPE because some money amounts are not always initialized in all contracts.
 
 v0.45.4 (2019-03-24 1700 UTC)
 + PR #1067: Switch to Joda Money library internally for financial math
