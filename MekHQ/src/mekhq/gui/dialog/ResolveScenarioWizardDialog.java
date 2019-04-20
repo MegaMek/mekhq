@@ -165,8 +165,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private JLabel lblSalvageValueEmployer2;
     private JLabel lblSalvagePct2;
 
-    private Money salvageEmployer;
-    private Money salvageUnit;
+    private Money salvageEmployer = Money.zero();
+    private Money salvageUnit = Money.zero();
     private int currentSalvagePct;
     private int maxSalvagePct;
 
