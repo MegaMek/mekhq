@@ -84,10 +84,9 @@ public abstract class BaseDialog extends JDialog implements WindowListener {
 
         this.resources = resources;
         this.createUI();
-        this.setPreferences();
 
         this.pack();
-        this.setVisible(true);
+        this.setPreferences();
     }
 
     /**

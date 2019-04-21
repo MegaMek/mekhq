@@ -22,14 +22,22 @@
 package mekhq.gui.dialog;
 
 import megamek.common.logging.MMLogger;
+import mekhq.MekHqConstants;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ResourceBundle;
+import java.util.prefs.Preferences;
 
 public class MekHqOptionsDialog extends BaseDialog {
-    ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MekHqOptionsDialog");
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MekHqOptionsDialog");
+    private final Preferences userPreferences = Preferences.userRoot().node(MekHqConstants.AUTOSAVE_NODE);
+
+    private JRadioButton optionSaveDaily;
+    private JRadioButton optionSaveWeekly;
+    private JCheckBox checkSaveBeforeMissions;
+    private JSpinner spinnerSavedGamesCount;
 
     public MekHqOptionsDialog(JFrame parent, MMLogger logger) {
         super(parent, logger);
@@ -43,21 +51,21 @@ public class MekHqOptionsDialog extends BaseDialog {
         // Create UI components
         JLabel labelSavedInfo = new JLabel(resources.getString("labelSavedInfo.text"));
 
-        JRadioButton optionSaveDaily = new JRadioButton(resources.getString("optionSaveDaily.text"));
+        optionSaveDaily = new JRadioButton(resources.getString("optionSaveDaily.text"));
         optionSaveDaily.setMnemonic(KeyEvent.VK_D);
 
-        JRadioButton optionSaveWeekly = new JRadioButton(resources.getString("optionSaveWeekly.text"));
+        optionSaveWeekly = new JRadioButton(resources.getString("optionSaveWeekly.text"));
         optionSaveWeekly.setMnemonic(KeyEvent.VK_W);
 
         ButtonGroup saveFrequencyGroup = new ButtonGroup();
         saveFrequencyGroup.add(optionSaveDaily);
         saveFrequencyGroup.add(optionSaveWeekly);
 
-        JCheckBox checkSaveBeforeMissions = new JCheckBox(resources.getString("checkSaveBeforeMissions.text"));
+        checkSaveBeforeMissions = new JCheckBox(resources.getString("checkSaveBeforeMissions.text"));
         checkSaveBeforeMissions.setMnemonic(KeyEvent.VK_S);
 
         JLabel labelSavedGamesCount = new JLabel(resources.getString("labelSavedGamesCount.text"));
-        JSpinner spinnerSavedGamesCount = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1));
+        spinnerSavedGamesCount = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1));
         labelSavedGamesCount.setLabelFor(spinnerSavedGamesCount);
 
         // Layout the UI
@@ -95,8 +103,16 @@ public class MekHqOptionsDialog extends BaseDialog {
 
     @Override
     protected void okAction() {
+        this.userPreferences.putBoolean(MekHqConstants.SAVE_DAILY_KEY, this.optionSaveDaily.isSelected());
+        this.userPreferences.putBoolean(MekHqConstants.SAVE_WEEKLY_KEY, this.optionSaveWeekly.isSelected());
+        this.userPreferences.putBoolean(MekHqConstants.SAVE_BEFORE_MISSIONS_KEY, this.checkSaveBeforeMissions.isSelected());
+        this.userPreferences.putInt(MekHqConstants.MAXIMUM_NUMBER_SAVES_KEY, (Integer)this.spinnerSavedGamesCount.getValue());
     }
 
     private void setInitialState() {
+        this.optionSaveDaily.setSelected(this.userPreferences.getBoolean(MekHqConstants.SAVE_DAILY_KEY, false));
+        this.optionSaveWeekly.setSelected(this.userPreferences.getBoolean(MekHqConstants.SAVE_WEEKLY_KEY, true));
+        this.checkSaveBeforeMissions.setSelected(this.userPreferences.getBoolean(MekHqConstants.SAVE_BEFORE_MISSIONS_KEY, false));
+        this.spinnerSavedGamesCount.setValue(this.userPreferences.getInt(MekHqConstants.MAXIMUM_NUMBER_SAVES_KEY, 5));
     }
 }

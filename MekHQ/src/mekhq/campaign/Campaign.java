@@ -3062,6 +3062,8 @@ public class Campaign implements Serializable, ITechManager {
 
     /** @return <code>true</code> if the new day arrived */
     public boolean newDay() {
+        // AUTOSAVE HERE!
+
         if(MekHQ.triggerEvent(new DayEndingEvent(this))) {
             return false;
         }
@@ -3095,7 +3097,6 @@ public class Campaign implements Serializable, ITechManager {
         processNewDayPersonnel();
 
         resetAstechMinutes();
-
 
         processNewDayUnits();
 
