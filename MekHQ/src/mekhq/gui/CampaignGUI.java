@@ -1722,7 +1722,7 @@ public class CampaignGUI extends JPanel {
     }// GEN-LAST:event_menuOptionsActionPerformed
 
     private void menuMekHqOptionsActionPerformed(ActionEvent evt) {
-        MekHqOptionsDialog dialog = new MekHqOptionsDialog(getFrame());
+        MekHqOptionsDialog dialog = new MekHqOptionsDialog(getFrame(), MekHQ.getLogger());
         dialog.setVisible(true);
     }
 

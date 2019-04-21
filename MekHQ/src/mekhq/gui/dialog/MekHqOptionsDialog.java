@@ -1,37 +1,52 @@
+/*
+ * MekHqOptionsDialog.java
+ *
+ * Copyright (c) 2019 MekHQ Team. All rights reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package mekhq.gui.dialog;
 
-import mekhq.MekHQ;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
+import megamek.common.logging.MMLogger;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ResourceBundle;
 
-public class MekHqOptionsDialog extends JDialog {
+public class MekHqOptionsDialog extends BaseDialog {
     ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MekHqOptionsDialog");
 
-    public MekHqOptionsDialog(JFrame parent) {
-        super(parent);
+    public MekHqOptionsDialog(JFrame parent, MMLogger logger) {
+        super(parent, logger);
 
-        initComponents();
-        setInitialState();
-        setUserPreferences();
+        this.initialize(resources);
+        this.setInitialState();
     }
 
-    private void initComponents() {
-        this.setTitle(resources.getString("dialog.text"));
-        this.setName("dialog.name");
-
-        JLabel labelSavedInfo = new JLabel("labelSavedInfo.text");
-        labelSavedInfo.setName("labelSavedInfo.name");
+    @Override
+    protected Container createCustomUI() {
+        // Create UI components
+        JLabel labelSavedInfo = new JLabel(resources.getString("labelSavedInfo.text"));
 
         JRadioButton optionSaveDaily = new JRadioButton(resources.getString("optionSaveDaily.text"));
-        optionSaveDaily.setName("optionSaveDaily.name");
         optionSaveDaily.setMnemonic(KeyEvent.VK_D);
 
         JRadioButton optionSaveWeekly = new JRadioButton(resources.getString("optionSaveWeekly.text"));
-        optionSaveWeekly.setName("optionSaveWeekly.name");
         optionSaveWeekly.setMnemonic(KeyEvent.VK_W);
 
         ButtonGroup saveFrequencyGroup = new ButtonGroup();
@@ -39,17 +54,16 @@ public class MekHqOptionsDialog extends JDialog {
         saveFrequencyGroup.add(optionSaveWeekly);
 
         JCheckBox checkSaveBeforeMissions = new JCheckBox(resources.getString("checkSaveBeforeMissions.text"));
-        checkSaveBeforeMissions.setName("checkSaveBeforeMissions.name");
         checkSaveBeforeMissions.setMnemonic(KeyEvent.VK_S);
 
-        JLabel labelSavedGamesCount = new JLabel("labelSavedGamesCount.text");
-        labelSavedGamesCount.setName("labelSavedGamesCount.name");
-
+        JLabel labelSavedGamesCount = new JLabel(resources.getString("labelSavedGamesCount.text"));
         JSpinner spinnerSavedGamesCount = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1));
-        spinnerSavedGamesCount.setName("spinnerSavedGamesCount.name");
+        labelSavedGamesCount.setLabelFor(spinnerSavedGamesCount);
 
-        GroupLayout layout = new GroupLayout(this);
-        this.setLayout(layout);
+        // Layout the UI
+        JPanel body = new JPanel();
+        GroupLayout layout = new GroupLayout(body);
+        body.setLayout(layout);
 
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
@@ -75,16 +89,14 @@ public class MekHqOptionsDialog extends JDialog {
                     .addComponent(labelSavedGamesCount)
                     .addComponent(spinnerSavedGamesCount))
         );
+
+        return body;
+    }
+
+    @Override
+    protected void okAction() {
     }
 
     private void setInitialState() {
-
-    }
-
-    private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(MekHqOptionsDialog.class);
-
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
     }
 }
