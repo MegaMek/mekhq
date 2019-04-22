@@ -34,6 +34,7 @@ public class MekHqOptionsDialog extends BaseDialog {
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MekHqOptionsDialog");
     private final Preferences userPreferences = Preferences.userRoot().node(MekHqConstants.AUTOSAVE_NODE);
 
+    private JRadioButton optionNoSave;
     private JRadioButton optionSaveDaily;
     private JRadioButton optionSaveWeekly;
     private JCheckBox checkSaveBeforeMissions;
@@ -51,6 +52,9 @@ public class MekHqOptionsDialog extends BaseDialog {
         // Create UI components
         JLabel labelSavedInfo = new JLabel(resources.getString("labelSavedInfo.text"));
 
+        optionNoSave = new JRadioButton(resources.getString("optionNoSave.text"));
+        optionNoSave.setMnemonic(KeyEvent.VK_D);
+
         optionSaveDaily = new JRadioButton(resources.getString("optionSaveDaily.text"));
         optionSaveDaily.setMnemonic(KeyEvent.VK_D);
 
@@ -58,6 +62,7 @@ public class MekHqOptionsDialog extends BaseDialog {
         optionSaveWeekly.setMnemonic(KeyEvent.VK_W);
 
         ButtonGroup saveFrequencyGroup = new ButtonGroup();
+        saveFrequencyGroup.add(optionNoSave);
         saveFrequencyGroup.add(optionSaveDaily);
         saveFrequencyGroup.add(optionSaveWeekly);
 
@@ -79,6 +84,7 @@ public class MekHqOptionsDialog extends BaseDialog {
         layout.setVerticalGroup(
             layout.createSequentialGroup()
                 .addComponent(labelSavedInfo)
+                .addComponent(optionNoSave)
                 .addComponent(optionSaveDaily)
                 .addComponent(optionSaveWeekly)
                 .addComponent(checkSaveBeforeMissions)
@@ -90,6 +96,7 @@ public class MekHqOptionsDialog extends BaseDialog {
         layout.setHorizontalGroup(
             layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                 .addComponent(labelSavedInfo)
+                .addComponent(optionNoSave)
                 .addComponent(optionSaveDaily)
                 .addComponent(optionSaveWeekly)
                 .addComponent(checkSaveBeforeMissions)
@@ -103,6 +110,7 @@ public class MekHqOptionsDialog extends BaseDialog {
 
     @Override
     protected void okAction() {
+        this.userPreferences.putBoolean(MekHqConstants.NO_SAVE_KEY, this.optionNoSave.isSelected());
         this.userPreferences.putBoolean(MekHqConstants.SAVE_DAILY_KEY, this.optionSaveDaily.isSelected());
         this.userPreferences.putBoolean(MekHqConstants.SAVE_WEEKLY_KEY, this.optionSaveWeekly.isSelected());
         this.userPreferences.putBoolean(MekHqConstants.SAVE_BEFORE_MISSIONS_KEY, this.checkSaveBeforeMissions.isSelected());
@@ -110,9 +118,10 @@ public class MekHqOptionsDialog extends BaseDialog {
     }
 
     private void setInitialState() {
+        this.optionNoSave.setSelected(this.userPreferences.getBoolean(MekHqConstants.NO_SAVE_KEY, false));
         this.optionSaveDaily.setSelected(this.userPreferences.getBoolean(MekHqConstants.SAVE_DAILY_KEY, false));
         this.optionSaveWeekly.setSelected(this.userPreferences.getBoolean(MekHqConstants.SAVE_WEEKLY_KEY, true));
         this.checkSaveBeforeMissions.setSelected(this.userPreferences.getBoolean(MekHqConstants.SAVE_BEFORE_MISSIONS_KEY, false));
-        this.spinnerSavedGamesCount.setValue(this.userPreferences.getInt(MekHqConstants.MAXIMUM_NUMBER_SAVES_KEY, 5));
+        this.spinnerSavedGamesCount.setValue(this.userPreferences.getInt(MekHqConstants.MAXIMUM_NUMBER_SAVES_KEY, MekHqConstants.DEFAULT_NUMBER_SAVES));
     }
 }

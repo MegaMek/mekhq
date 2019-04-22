@@ -35,6 +35,8 @@ import javax.swing.JOptionPane;
 import mekhq.*;
 import mekhq.campaign.finances.*;
 import mekhq.campaign.log.*;
+import mekhq.service.AutosaveService;
+import mekhq.service.IAutosaveService;
 import org.joda.time.DateTime;
 
 import megamek.client.RandomNameGenerator;
@@ -285,6 +287,8 @@ public class Campaign implements Serializable, ITechManager {
     private IUnitGenerator unitGenerator;
     private IUnitRating unitRating;
 
+    private final IAutosaveService autosaveService;
+
     public Campaign() {
         id = UUID.randomUUID();
         game = new Game();
@@ -312,8 +316,7 @@ public class Campaign implements Serializable, ITechManager {
         forceIds.put(0, forces);
         lances = new Hashtable<>();
         finances = new Finances();
-        location = new CurrentLocation(Planets.getInstance().getPlanets()
-                .get("Outreach"), 0);
+        location = new CurrentLocation(Planets.getInstance().getPlanets().get("Outreach"), 0);
         SkillType.initializeTypes();
         SpecialAbility.initializeSPA();
         astechPool = 0;
@@ -333,6 +336,7 @@ public class Campaign implements Serializable, ITechManager {
         retirementDefectionTracker = new RetirementDefectionTracker();
         fatigueLevel = 0;
         atbConfig = null;
+        autosaveService = new AutosaveService(MekHQ.getLogger());
     }
 
     /**
@@ -3062,11 +3066,11 @@ public class Campaign implements Serializable, ITechManager {
 
     /** @return <code>true</code> if the new day arrived */
     public boolean newDay() {
-        // AUTOSAVE HERE!
-
         if(MekHQ.triggerEvent(new DayEndingEvent(this))) {
             return false;
         }
+
+        this.autosaveService.requestDayAdvanceAutosave(this, this.calendar.get(Calendar.DAY_OF_WEEK));
 
         calendar.add(Calendar.DAY_OF_MONTH, 1);
         currentReport.clear();

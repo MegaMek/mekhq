@@ -1,5 +1,5 @@
 /*
- * MekHqConstants.java
+ * IAutosaveService.java
  *
  * Copyright (c) 2019 MekHQ Team. All rights reserved.
  *
@@ -19,15 +19,27 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq;
+package mekhq.service;
 
-public final class MekHqConstants {
-    public static final String AUTOSAVE_NODE = "mekhq/prefs/autosave";
-    public static final String NO_SAVE_KEY = "noSave";
-    public static final String SAVE_DAILY_KEY = "saveDaily";
-    public static final String SAVE_WEEKLY_KEY = "saveWeekly";
-    public static final String SAVE_BEFORE_MISSIONS_KEY = "saveBeforeMissions";
-    public static final String MAXIMUM_NUMBER_SAVES_KEY = "maximumNumberAutoSaves";
+import mekhq.campaign.Campaign;
 
-    public static final int DEFAULT_NUMBER_SAVES = 5;
+/**
+ * Handles the possible auto-save situations
+ * in MekHQ.
+ */
+public interface IAutosaveService {
+    /**
+     * Handles auto-saving when the day of the campaign advances.
+     *
+     * @param campaign Campaign to save
+     * @param dayOfTheWeek Day of the week when the auto-save is requested
+     */
+    void requestDayAdvanceAutosave(Campaign campaign, int dayOfTheWeek);
+
+    /**
+     * Handles auto-saving before a mission starts.
+     *
+     * @param campaign Campaign to save
+     */
+    void requestBeforeMissionAutosave(Campaign campaign);
 }
