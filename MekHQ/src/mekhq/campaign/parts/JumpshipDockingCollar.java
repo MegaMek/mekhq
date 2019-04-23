@@ -75,6 +75,10 @@ public class JumpshipDockingCollar extends Part {
         }
     }
     
+    public int getCollarNumber() {
+        return collarNumber;
+    }
+    
     public JumpshipDockingCollar clone() {
     	JumpshipDockingCollar clone = new JumpshipDockingCollar(getUnitTonnage(), collarNumber, campaign, collarType);
         clone.copyBaseData(this);
@@ -155,7 +159,7 @@ public class JumpshipDockingCollar extends Part {
 
 	@Override
 	public MissingPart getMissingPart() {
-		return new MissingDropshipDockingCollar(getUnitTonnage(), campaign, collarType);
+		return new MissingJumpshipDockingCollar(getUnitTonnage(), collarNumber, campaign, collarType);
 	}
 
 	@Override
@@ -170,16 +174,16 @@ public class JumpshipDockingCollar extends Part {
 
 	@Override
 	public Money getStickerPrice() {
-	    if (collarType == Dropship.COLLAR_STANDARD) {
-	        return Money.of(10000);
+	    if (collarType == Jumpship.COLLAR_STANDARD) {
+	        return Money.of(100000);
 	    } else {
-	        return Money.of(1010000) ;
+	        return Money.of(500000) ;
 	    }
 	}
 	
 	@Override
 	public double getTonnage() {
-		return 0;
+		return 1000;
 	}
 
 	@Override
@@ -225,7 +229,7 @@ public class JumpshipDockingCollar extends Part {
 	
 	@Override
 	public TechAdvancement getTechAdvancement() {
-	    if (collarType != Dropship.COLLAR_NO_BOOM) {
+	    if (collarType != Jumpship.COLLAR_NO_BOOM) {
 	        return TA_BOOM;
 	    } else {
 	        return TA_NO_BOOM;
