@@ -53,7 +53,7 @@ public class MekHqOptionsDialog extends BaseDialog {
         JLabel labelSavedInfo = new JLabel(resources.getString("labelSavedInfo.text"));
 
         optionNoSave = new JRadioButton(resources.getString("optionNoSave.text"));
-        optionNoSave.setMnemonic(KeyEvent.VK_D);
+        optionNoSave.setMnemonic(KeyEvent.VK_N);
 
         optionSaveDaily = new JRadioButton(resources.getString("optionSaveDaily.text"));
         optionSaveDaily.setMnemonic(KeyEvent.VK_D);

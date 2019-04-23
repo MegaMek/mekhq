@@ -91,7 +91,7 @@ public abstract class BaseDialog extends JDialog implements WindowListener {
 
     /**
      * Creates the custom UI (body) for the dialog.
-     * This custom UI will be placed in the BorderLayoutCENTER.
+     * This custom UI will be placed in the BorderLayout.CENTER.
      * @return
      */
     protected abstract Container createCustomUI();
