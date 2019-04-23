@@ -1,7 +1,7 @@
 /*
- * FireControlSystem.java
+ * CombatInformationCenter.java
  * 
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (C) 2019, MegaMek team
  * 
  * This file is part of MekHQ.
  * 
@@ -38,7 +38,7 @@ import mekhq.campaign.personnel.SkillType;
 
 /**
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author MKerensky
  */
 public class CombatInformationCenter extends Part {
 	
