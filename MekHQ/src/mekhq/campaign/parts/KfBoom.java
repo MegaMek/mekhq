@@ -1,7 +1,7 @@
 /*
- * DropshipDockingCollar.java
+ * KFBoom.java
  * 
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2019 MegaMek Team
  * 
  * This file is part of MekHQ.
  * 
@@ -38,7 +38,7 @@ import mekhq.campaign.personnel.SkillType;
 
 /**
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author MKerensky
  */
 public class KfBoom extends Part {
 	
