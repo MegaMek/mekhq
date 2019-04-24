@@ -81,7 +81,8 @@ public class AutosaveService implements IAutosaveService {
         try {
             String fileName = this.getAutosaveFilename(campaign);
 
-            try (GZIPOutputStream output = new GZIPOutputStream(new FileOutputStream(fileName))) {
+            try (FileOutputStream fos = new FileOutputStream(fileName);
+                 GZIPOutputStream output = new GZIPOutputStream(fos)) {
                 PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, "UTF-8"));
                 campaign.writeToXml(writer);
                 writer.flush();
