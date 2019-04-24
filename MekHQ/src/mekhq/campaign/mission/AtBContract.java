@@ -53,6 +53,8 @@ import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
+import mekhq.campaign.stratcon.StratconCampaignState;
+import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.RandomFactionGenerator;
@@ -169,6 +171,8 @@ public class AtBContract extends Contract implements Serializable {
     protected int battleTypeMod;
     /* Only applies to next week */
     protected int nextWeekBattleTypeMod;
+    
+    private StratconCampaignState stratconCampaignState;
 
     protected AtBContract() {
         this(null);
@@ -1481,6 +1485,14 @@ public class AtBContract extends Contract implements Serializable {
         sharesPct = pct;
     }
     
+    public StratconCampaignState getStratconCampaignState() {
+        return stratconCampaignState;
+    }
+
+    public void setStratconCampaignState(StratconCampaignState stratconCampaignState) {
+        this.stratconCampaignState = stratconCampaignState;
+    }
+
     public void addPlayerMinorBreach() {
         playerMinorBreaches++;
     }

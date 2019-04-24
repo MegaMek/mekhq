@@ -104,6 +104,14 @@ public class StratconTrackState {
         this.deploymentTime = deploymentTime;
     }
 
+    public int getScenarioOdds() {
+        return scenarioOdds;
+    }
+
+    public void setScenarioOdds(int scenarioOdds) {
+        this.scenarioOdds = scenarioOdds;
+    }
+
     public void assignForce(int forceID) {
         getAssignedForceIDs().add(forceID);
     }
@@ -157,58 +165,8 @@ public class StratconTrackState {
         return retVal;
     }
     
-    public void generateScenarios(Campaign campaign, AtBContract contract) {
-        List<StratconScenario> generatedScenarios = new ArrayList<>();
-        boolean autoAssignLances = contract.getCommandRights() == AtBContract.COM_INTEGRATED;
-        
-        //StratconScenarioFactory.reloadScenarios();
-        
-        // create scenario for each force if we roll higher than the track's scenario odds
-        // if we already have a scenario in the given coords, let's make it a larger battle instead
-        // otherwise, generate an appropriate scenario for the unit type of the force being examined
-        for(int forceID : getAssignedForceIDs()) {
-            if(Compute.randomInt(100) > scenarioOdds) {
-                // get coordinates
-                int x = Compute.randomInt(width);
-                int y = Compute.randomInt(height);                
-                
-                Coords scenarioCoords = new Coords(x, y);
-                
-                if(scenarios.containsKey(scenarioCoords)) {
-                    scenarios.get(scenarioCoords).incrementRequiredPlayerLances();
-                    // if under integrated command, automatically assign the lance to the scenario
-                    if(autoAssignLances) {
-                        scenarios.get(scenarioCoords).addPrimaryForce(forceID);
-                    }
-                    continue;
-                }
-                
-                StratconScenario scenario = new StratconScenario();
-                scenario.initializeScenario(campaign, contract, campaign.getForce(forceID).getPrimaryUnitType(campaign));
-                
-                scenarios.put(scenarioCoords, scenario);
-                generatedScenarios.add(scenario);
-                
-                // if under integrated command, automatically assign the lance to the scenario
-                if(autoAssignLances) {
-                    scenario.addPrimaryForce(forceID);
-                }
-            }
-        }
-        
-        // if under integrated command, automatically assign the lance to the scenario
-        if(autoAssignLances) {
-            for(StratconScenario scenario : generatedScenarios) {
-                scenario.commitPrimaryForces(campaign, contract);
-            }
-        }
-        
-        // if under liaison command, pick a random scenario from the ones generated
-        // to set as required and attach liaison
-        if(contract.getCommandRights() == AtBContract.COM_HOUSE) {
-            int scenarioIndex = Compute.randomInt(generatedScenarios.size() - 1);
-            generatedScenarios.get(scenarioIndex).setRequiredScenario(true);
-            generatedScenarios.get(scenarioIndex).setAttachedUnitsModifier(contract);
-        }
+    @Override
+    public String toString() {
+        return getDisplayableName();
     }
 }

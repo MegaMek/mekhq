@@ -1,5 +1,6 @@
 package mekhq.campaign.stratcon;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +60,10 @@ public class StratconScenario implements IStratconDisplayable {
     private ScenarioState currentState = ScenarioState.UNRESOLVED;
     private int requiredPlayerLances;
     private boolean requiredScenario;
+    private Date deploymentDate;
+    private Date actionDate;
+    private Date returnDate;
+    
     private Campaign currentCampaign;
 
     public void initializeScenario(Campaign campaign, AtBContract contract, MapLocation location) {
@@ -297,5 +302,29 @@ public class StratconScenario implements IStratconDisplayable {
     
     public AtBDynamicScenario getBackingScenario() {
         return backingScenario;
+    }
+
+    public Date getDeploymentDate() {
+        return deploymentDate;
+    }
+
+    public void setDeploymentDate(Date deploymentDate) {
+        this.deploymentDate = deploymentDate;
+    }
+
+    public Date getActionDate() {
+        return actionDate;
+    }
+
+    public void setActionDate(Date actionDate) {
+        this.actionDate = actionDate;
+    }
+
+    public Date getReturnDate() {
+        return returnDate;
+    }
+
+    public void setReturnDate(Date returnDate) {
+        this.returnDate = returnDate;
     }
 }

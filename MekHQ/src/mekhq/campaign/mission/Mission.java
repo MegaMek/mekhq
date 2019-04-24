@@ -36,6 +36,7 @@ import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Planets;
 
@@ -323,6 +324,11 @@ public class Mission implements Serializable, MekHqXmlSerializable {
             MekHQ.getLogger().error(Mission.class, METHOD_NAME, ex);
         }
 
+        // temporary hack
+        if(retVal instanceof AtBContract) {
+            ((AtBContract) retVal).setStratconCampaignState(StratconRulesManager.InitializeCampaignState((AtBContract) retVal, c));
+        }
+        
         return retVal;
     }
 

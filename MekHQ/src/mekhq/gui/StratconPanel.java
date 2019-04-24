@@ -24,9 +24,15 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconScenario;
+import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.gui.stratcon.StratconScenarioWizard;
 import mekhq.gui.stratcon.TrackForceAssignmentUI;
 
+/**
+ * This panel handles AtB-Stratcon GUI interactions with a specific scenario track.
+ * @author NickAragua
+ *
+ */
 public class StratconPanel extends JPanel implements ActionListener {
     /**
      * 
@@ -47,6 +53,7 @@ public class StratconPanel extends JPanel implements ActionListener {
 
     private float scale = 1f;
 
+    private StratconTrackState currentTrack;
     private StratconCampaignState campaignState;
     private Campaign campaign;
 
@@ -63,14 +70,6 @@ public class StratconPanel extends JPanel implements ActionListener {
     StratconPanel(CampaignGUI gui) {
         campaign = gui.getCampaign();
         scenarioWizard = new StratconScenarioWizard(campaign);
-        campaignState = StratconRulesManager.InitializeCampaignState((AtBContract) campaign.getActiveContracts().get(0), campaign);
-
-        ActionListener acl = new ActionListener() { 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                actionPerformed(e);
-            }
-        };
         
         buildRightClickMenu(null);
         
@@ -85,6 +84,13 @@ public class StratconPanel extends JPanel implements ActionListener {
         });
     }
 
+    public void selectTrack(StratconCampaignState campaignState, StratconTrackState track) {
+        this.campaignState = campaignState;
+        currentTrack = track;
+        
+        this.repaint();
+    }
+    
     private void buildRightClickMenu(StratconScenario scenario) {
         rightClickMenu = new JPopupMenu();
         
@@ -106,6 +112,9 @@ public class StratconPanel extends JPanel implements ActionListener {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
+        if(campaignState == null || currentTrack == null) {
+            return;
+        }
 
         Graphics2D g2D = (Graphics2D) g;
         AffineTransform initialTransform = g2D.getTransform();
@@ -126,21 +135,16 @@ public class StratconPanel extends JPanel implements ActionListener {
         if(clickedPoint != null) {
             g2D.setColor(Color.BLUE);
             g2D.drawRect((int) clickedPoint.getX(), (int) clickedPoint.getY(), 2, 2);
-
-            /*IStratconDisplayable selectedDisplayable = campaignState.getScenario(boardState.selectedX, boardState.selectedY);
-            if(selectedDisplayable != null && clickedPoint != null) {
-                detailsFrame.displayInfo(selectedDisplayable.getInfo());
-                detailsFrame.setBounds((int) clickedPoint.getX() + 100, (int) clickedPoint.getY(), detailsFrame.getWidth(), detailsFrame.getHeight());
-                detailsFrame.setVisible(true);
-            }*/
         }
     }
 
     /**
-     * This method contains a dirty secret hack: 
-     * @param g2D
-     * @param outline
-     * @param detectHex
+     * This method contains a dirty secret hack, but I forget what it is.
+     * The point of it is to draw all the hexes for the board. 
+     * If it's a "dry run", we don't actually draw the hexes, we just pretend to
+     * until we "draw" one that encompasses the clicked point.
+     * @param g2D - graphics object on which to draw
+     * @param drawHexType - whether to draw the hex backgrounds, hex outlines or a dry run for click detection
      */
     private boolean drawHexes(Graphics2D g2D, DrawHexType drawHexType) {
         Polygon graphHex = new Polygon();
@@ -179,8 +183,8 @@ public class StratconPanel extends JPanel implements ActionListener {
             translatedClickedPoint.translate(0, -(HEX_Y_RADIUS * 2));
         }
 
-        for(int x = 0; x < campaignState.getTrack(0).getWidth(); x++) {            
-            for(int y = 0; y < campaignState.getTrack(0).getHeight(); y++) {
+        for(int x = 0; x < currentTrack.getWidth(); x++) {            
+            for(int y = 0; y < currentTrack.getHeight(); y++) {
                 if(drawHexType == DrawHexType.Outline) {
                     g2D.setColor(new Color(0, 0, 0));
                     g2D.drawPolygon(graphHex);                    
@@ -189,6 +193,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                         g2D.setColor(Color.WHITE);
                         boardState.selectedX = x;
                         boardState.selectedY = y;
+                        pointFound = true;
                     } else {
                         g2D.setColor(Color.DARK_GRAY);
                     }
@@ -228,9 +233,9 @@ public class StratconPanel extends JPanel implements ActionListener {
         scenarioMarker.addPoint(xRadius, yRadius);
         scenarioMarker.addPoint(xRadius, -yRadius);
 
-        for(int x = 0; x < campaignState.getTrack(0).getWidth(); x++) {            
-            for(int y = 0; y < campaignState.getTrack(0).getHeight(); y++) {
-                if(campaignState.getTrack(0).getScenario(new Coords(x, y)) != null) {
+        for(int x = 0; x < currentTrack.getWidth(); x++) {            
+            for(int y = 0; y < currentTrack.getHeight(); y++) {
+                if(currentTrack.getScenario(new Coords(x, y)) != null) {
                     g2D.setColor(Color.RED);
                     g2D.drawPolygon(scenarioMarker);
                 }
@@ -254,9 +259,9 @@ public class StratconPanel extends JPanel implements ActionListener {
         facilityMarker.addPoint(xRadius, yRadius);
         facilityMarker.addPoint(xRadius, -yRadius);
 
-        for(int x = 0; x < campaignState.getTrack(0).getWidth(); x++) {            
-            for(int y = 0; y < campaignState.getTrack(0).getHeight(); y++) {
-                if(campaignState.getTrack(0).getFacility(new Coords(x, y)) != null) {
+        for(int x = 0; x < currentTrack.getWidth(); x++) {            
+            for(int y = 0; y < currentTrack.getHeight(); y++) {
+                if(currentTrack.getFacility(new Coords(x, y)) != null) {
                     g2D.setColor(Color.GREEN);
                     g2D.drawPolygon(facilityMarker);
                 }
@@ -288,7 +293,7 @@ public class StratconPanel extends JPanel implements ActionListener {
         int yRadius = (int) (HEX_Y_RADIUS);
         int xRadius = (int) (HEX_X_RADIUS);
 
-        int yTranslation = campaignState.getTrack(0).getHeight() * yRadius * 2;
+        int yTranslation = currentTrack.getHeight() * yRadius * 2;
         if(evenColumn) {
             yTranslation += yRadius;
         } else {
@@ -338,19 +343,13 @@ public class StratconPanel extends JPanel implements ActionListener {
 
             StratconScenario selectedScenario = null;
             if(pointFoundOnBoard) {
-                selectedScenario = campaignState.getTrack(0).getScenario(new Coords(boardState.selectedX, boardState.selectedY));
+                selectedScenario = currentTrack.getScenario(new Coords(boardState.selectedX, boardState.selectedY));
             }
              
             menuItemManageScenario.setEnabled(selectedScenario != null);
+            repaint();
             rightClickMenu.show(this, e.getX(), e.getY());
-        } else if(e.getButton() == MouseEvent.BUTTON2) {
-            //campaignState.getTrack(0).generateScenarios(getCampaign(), (AtBContract) this.getCampaign().getActiveContracts().get(0));
-            AtBContract testContract = (AtBContract) campaign.getActiveContracts().get(0);
-            
-            campaignState = StratconRulesManager.InitializeCampaignState(testContract, campaign); 
         }
-        
-        repaint();
     }
 
     public void focusLostHandler(FocusEvent e) {
@@ -361,6 +360,7 @@ public class StratconPanel extends JPanel implements ActionListener {
     private class BoardState {
         public int selectedX;
         public int selectedY;
+        public int selectedTrack;
     }
 
     @Override
@@ -371,8 +371,8 @@ public class StratconPanel extends JPanel implements ActionListener {
             assignmentUI.setVisible(true);
             break;
         case RCLICK_COMMAND_MANAGE_SCENARIO:
-            scenarioWizard.setCurrentScenario(campaignState.getTrack(0).getScenario(new Coords(boardState.selectedX, boardState.selectedY)),
-                    campaignState.getTrack(0),
+            scenarioWizard.setCurrentScenario(currentTrack.getScenario(new Coords(boardState.selectedX, boardState.selectedY)),
+                    currentTrack,
                     campaignState);
             scenarioWizard.setVisible(true);
             break;
@@ -383,8 +383,8 @@ public class StratconPanel extends JPanel implements ActionListener {
 
     @Override
     public Dimension getPreferredSize() {
-        int xDimension = (int) (HEX_X_RADIUS * 1.75 * campaignState.getTrack(0).getWidth());
-        int yDimension = (int) (HEX_Y_RADIUS * 2.1 * campaignState.getTrack(0).getHeight());
+        int xDimension = (int) (HEX_X_RADIUS * 1.75 * currentTrack.getWidth());
+        int yDimension = (int) (HEX_Y_RADIUS * 2.1 * currentTrack.getHeight());
         
         return new Dimension(xDimension, yDimension);
     }

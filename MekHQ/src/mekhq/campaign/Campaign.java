@@ -152,6 +152,7 @@ import mekhq.campaign.rating.CampaignOpsReputation;
 import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.rating.UnitRatingMethod;
+import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
@@ -282,6 +283,7 @@ public class Campaign implements Serializable, ITechManager {
     private int shipSearchType;
     private String shipSearchResult; //AtB
     private Calendar shipSearchExpiration; //AtB
+    private StratconRulesManager stratconRulesManager; // AtB
     private IUnitGenerator unitGenerator;
     private IUnitRating unitRating;
 
@@ -546,7 +548,7 @@ public class Campaign implements Serializable, ITechManager {
     public int getFatigueLevel() {
         return fatigueLevel;
     }
-
+    
     /**
      * Initializes the unit generator based on the method chosen in campaignOptions.
      * Called when the unit generator is first used or when the method has been
@@ -8074,6 +8076,7 @@ public class Campaign implements Serializable, ITechManager {
         getContractMarket().generateContractOffers(this, newCampaign);
         getUnitMarket().generateUnitOffers(this);
         setAtBEventProcessor(new AtBEventProcessor(this));
+        stratconRulesManager = new StratconRulesManager();
     }
     
     /**
@@ -8084,6 +8087,7 @@ public class Campaign implements Serializable, ITechManager {
         RandomUnitGenerator.getInstance().dispose();
         RandomNameGenerator.getInstance().dispose();
         atbEventProcessor.shutdown();
+        stratconRulesManager.shutdown();
     }
 
     public boolean checkOverDueLoans() {
