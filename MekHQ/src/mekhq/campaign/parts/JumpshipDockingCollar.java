@@ -27,6 +27,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.Compute;
+import megamek.common.DockingCollar;
 import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.Jumpship;
@@ -92,17 +93,18 @@ public class JumpshipDockingCollar extends Part {
 	@Override
 	public void updateConditionFromEntity(boolean checkForDestruction) {
 		int priorHits = hits;
-		if(null != unit && unit.getEntity().hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
-			 if(((Dropship)unit.getEntity()).isDockCollarDamaged()) {
-				 hits = 1;
-			 } else { 
-				 hits = 0;
-			 }
-			 if(checkForDestruction 
-					 && hits > priorHits
-					 && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
-				 remove(false);
-			 }
+		if (null != unit && unit.getEntity().hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+		    DockingCollar collar = unit.getEntity().getCollarById(collarNumber);
+			if (collar != null && collar.isDamaged()) {
+			    hits = 1;
+			} else { 
+				hits = 0;
+			}
+			if (checkForDestruction 
+					&& hits > priorHits
+					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+				remove(false);
+			}
 		}
 	}
 	
