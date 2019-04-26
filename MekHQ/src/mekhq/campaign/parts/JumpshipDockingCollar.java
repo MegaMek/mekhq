@@ -28,7 +28,6 @@ import org.w3c.dom.NodeList;
 
 import megamek.common.Compute;
 import megamek.common.DockingCollar;
-import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.Jumpship;
 import megamek.common.SimpleTechLevel;
@@ -126,23 +125,32 @@ public class JumpshipDockingCollar extends Part {
 
 	@Override
 	public void updateConditionFromPart() {
-		if(null != unit && unit.getEntity() instanceof Dropship) {
-            ((Dropship) unit.getEntity()).setDamageDockCollar(hits > 0);
+	    if (null != unit && unit.getEntity().hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+            DockingCollar collar = unit.getEntity().getCollarById(collarNumber);
+            if (collar != null) {
+                collar.setDamaged(hits > 0);
+            }
 		}
 	}
 
 	@Override
 	public void fix() {
 		super.fix();
-		if(null != unit && unit.getEntity() instanceof Dropship) {
-			((Dropship)unit.getEntity()).setDamageDockCollar(false);
-		}
+		if (null != unit && unit.getEntity().hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+            DockingCollar collar = unit.getEntity().getCollarById(collarNumber);
+            if (collar != null) {
+                collar.setDamaged(false);
+            }
+        }
 	}
 
 	@Override
 	public void remove(boolean salvage) {
-		if(null != unit && unit.getEntity() instanceof Dropship) {
-            ((Dropship)unit.getEntity()).setDamageDockCollar(true);
+	    if (null != unit && unit.getEntity().hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+            DockingCollar collar = unit.getEntity().getCollarById(collarNumber);
+            if (collar != null) {
+                collar.setDamaged(true);
+            }
 			Part spare = campaign.checkForExistingSparePart(this);
 			if(!salvage) {
 				campaign.removePart(this);
@@ -197,6 +205,7 @@ public class JumpshipDockingCollar extends Part {
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "collarNumber", collarNumber);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "collarType", collarType);
 		writeToXmlEnd(pw1, indent);
 	}
@@ -207,7 +216,9 @@ public class JumpshipDockingCollar extends Part {
 
         for (int x=0; x<nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            if (wn2.getNodeName().equalsIgnoreCase("collarType")) {
+            if (wn2.getNodeName().equalsIgnoreCase("collarNumber")) {
+                collarNumber = Integer.parseInt(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("collarType")) {
                 collarType = Integer.parseInt(wn2.getTextContent());
             }
         }
