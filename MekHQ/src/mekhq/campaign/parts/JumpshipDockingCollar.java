@@ -80,7 +80,7 @@ public class JumpshipDockingCollar extends Part {
     }
     
     public JumpshipDockingCollar clone() {
-    	JumpshipDockingCollar clone = new JumpshipDockingCollar(getUnitTonnage(), collarNumber, campaign, collarType);
+    	JumpshipDockingCollar clone = new JumpshipDockingCollar(0, collarNumber, campaign, collarType);
         clone.copyBaseData(this);
     	return clone;
     }
@@ -169,7 +169,7 @@ public class JumpshipDockingCollar extends Part {
 
 	@Override
 	public MissingPart getMissingPart() {
-		return new MissingJumpshipDockingCollar(getUnitTonnage(), collarNumber, campaign, collarType);
+		return new MissingJumpshipDockingCollar(0, collarNumber, campaign, collarType);
 	}
 
 	@Override
@@ -205,7 +205,6 @@ public class JumpshipDockingCollar extends Part {
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "collarNumber", collarNumber);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "collarType", collarType);
 		writeToXmlEnd(pw1, indent);
 	}
@@ -216,9 +215,7 @@ public class JumpshipDockingCollar extends Part {
 
         for (int x=0; x<nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            if (wn2.getNodeName().equalsIgnoreCase("collarNumber")) {
-                collarNumber = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("collarType")) {
+            if (wn2.getNodeName().equalsIgnoreCase("collarType")) {
                 collarType = Integer.parseInt(wn2.getTextContent());
             }
         }

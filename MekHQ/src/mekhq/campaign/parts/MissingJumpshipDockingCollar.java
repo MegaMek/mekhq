@@ -84,7 +84,7 @@ public class MissingJumpshipDockingCollar extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new JumpshipDockingCollar(getUnitTonnage(), collarNumber, campaign, collarType);
+		return new JumpshipDockingCollar(0, 0, campaign, collarType);
 	}
 
 	@Override
