@@ -238,6 +238,11 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                     cancel(true);
         		}
             }
+            
+            // temporary location:
+            // think about where this needs to get initialized
+            campaign.initStratcon();
+            
             setProgress(4);
             if(newCampaign) {
             	// show the date chooser

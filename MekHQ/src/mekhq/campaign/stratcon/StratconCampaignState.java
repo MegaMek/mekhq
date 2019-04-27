@@ -1,18 +1,13 @@
 package mekhq.campaign.stratcon;
 
-import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import megamek.common.Coords;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 
 public class StratconCampaignState {
     private Campaign campaign;
@@ -57,12 +52,6 @@ public class StratconCampaignState {
     
     public void addTrack(StratconTrackState track) {
         tracks.add(track);
-    }
-    
-    public void generateScenariosForTracks() {
-        for(StratconTrackState track : tracks) {
-            track.generateScenarios(campaign, getContract());
-        }
     }
     
     /**

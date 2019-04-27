@@ -152,7 +152,6 @@ public class StratconRulesManager {
             if(contract instanceof AtBContract) {
                 for(StratconTrackState track : ((AtBContract) contract).getStratconCampaignState().getTracks()) {
                     for(StratconScenario scenario : track.getScenarios().values()) {
-                        //scenario.getCurrentState()
                         if(scenario.getCurrentState() == ScenarioState.UNRESOLVED &&
                                 campaign.getCalendar().getTime().equals(scenario.getDeploymentDate())) {
                             return true;

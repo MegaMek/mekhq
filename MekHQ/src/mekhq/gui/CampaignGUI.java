@@ -115,6 +115,7 @@ import mekhq.campaign.report.PersonnelReport;
 import mekhq.campaign.report.RatingReport;
 import mekhq.campaign.report.Report;
 import mekhq.campaign.report.TransportReport;
+import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.Planets;
@@ -1434,6 +1435,9 @@ public class CampaignGUI extends JPanel {
             if (nagOutstandingScenarios()) {
                 return;
             }
+            if(nagUnresolvedStratconContacts()) {
+                return;
+            }
         }
         if(!getCampaign().newDay()) {
             return;
@@ -1535,6 +1539,16 @@ public class CampaignGUI extends JPanel {
         return false;
     }
 
+    public boolean nagUnresolvedStratconContacts() {
+        if(StratconRulesManager.nagUnresolvedContacts(getCampaign())) {
+            return 0 != JOptionPane.showConfirmDialog(null, 
+                    "You have unresolved contacts on the StratCon interface. Advance day anyway?", 
+                    "Unresolved Stratcon Contacts", JOptionPane.YES_NO_OPTION);
+        }
+        
+        return false;
+    }
+   
     private void hirePerson(java.awt.event.ActionEvent evt) {
         int type = Integer.parseInt(evt.getActionCommand());
         NewRecruitDialog npd = new NewRecruitDialog(this, true,

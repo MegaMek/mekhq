@@ -600,6 +600,10 @@ public class Campaign implements Serializable, ITechManager {
         return atbConfig;
     }
 
+    public void initStratcon() {
+        stratconRulesManager = new StratconRulesManager();
+    }
+    
     /**
      * Sets the date a ship search was started, or null if no search is in progress.
      */
@@ -8076,7 +8080,6 @@ public class Campaign implements Serializable, ITechManager {
         getContractMarket().generateContractOffers(this, newCampaign);
         getUnitMarket().generateUnitOffers(this);
         setAtBEventProcessor(new AtBEventProcessor(this));
-        stratconRulesManager = new StratconRulesManager();
     }
     
     /**
