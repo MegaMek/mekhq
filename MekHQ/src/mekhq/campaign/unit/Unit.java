@@ -45,6 +45,7 @@ import megamek.common.CargoBay;
 import megamek.common.Compute;
 import megamek.common.ConvFighter;
 import megamek.common.CriticalSlot;
+import megamek.common.DockingCollar;
 import megamek.common.Dropship;
 import megamek.common.Engine;
 import megamek.common.Entity;
@@ -123,6 +124,7 @@ import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.FireControlSystem;
 import mekhq.campaign.parts.InfantryArmorPart;
 import mekhq.campaign.parts.InfantryMotiveType;
+import mekhq.campaign.parts.JumpshipDockingCollar;
 import mekhq.campaign.parts.KfBoom;
 import mekhq.campaign.parts.LandingGear;
 import mekhq.campaign.parts.MekActuator;
@@ -1852,6 +1854,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         Part aeroThrustersRight = null;
         Map<Integer, Part> bays = new HashMap<>();
         Map<Integer, List<Part>> bayPartsToAdd = new HashMap<>();
+        Map<Integer, Part> jumpCollars = new HashMap<>();
 
         for(Part part : parts) {
             if(part instanceof MekGyro || part instanceof MissingMekGyro) {
@@ -2081,6 +2084,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 }
             } else if (part instanceof TransportBayPart) {
                 bays.put(((TransportBayPart) part).getBayNumber(), part);
+            } else if (part instanceof JumpshipDockingCollar) {
+                jumpCollars.put(((JumpshipDockingCollar) part).getCollarNumber(), part);
             }
 
             part.updateConditionFromPart();
@@ -2310,7 +2315,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 partsToAdd.add(engine);
             }
         }
-
+        
+        // Transport Bays
         for (Bay bay : entity.getTransportBays()) {
             bayPartsToAdd.put(bay.getBayNumber(), new ArrayList<>());
             BayType btype = BayType.getTypeForBay(bay);
@@ -2534,6 +2540,14 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         ((Dropship) entity).getBoomType());
                 addPart(kfBoom);
                 partsToAdd.add(kfBoom);
+            }
+            if (jumpCollars.isEmpty() && entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+                for (DockingCollar collar : entity.getDockingCollars()) {
+                    Part collarPart = new JumpshipDockingCollar (0, collar.getCollarNumber(), getCampaign(), ((Jumpship)entity).getDockingCollarType());
+                    jumpCollars.put(collar.getCollarNumber(), collarPart);
+                    addPart(collarPart);
+                    partsToAdd.add(collarPart);
+                }
             }
             int hsinks = ((Aero)entity).getOHeatSinks() - aeroHeatSinks.size();
             int podhsinks = ((Aero)entity).getPodHeatSinks() - podAeroHeatSinks;
