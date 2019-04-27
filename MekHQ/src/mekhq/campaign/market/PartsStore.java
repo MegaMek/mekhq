@@ -63,6 +63,7 @@ import mekhq.campaign.parts.Cubicle;
 import mekhq.campaign.parts.DropshipDockingCollar;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.FireControlSystem;
+import mekhq.campaign.parts.JumpshipDockingCollar;
 import mekhq.campaign.parts.KfBoom;
 import mekhq.campaign.parts.LandingGear;
 import mekhq.campaign.parts.MekActuator;
@@ -449,6 +450,8 @@ public class PartsStore implements Serializable {
 		parts.add(new DropshipDockingCollar(0, c, Dropship.COLLAR_NO_BOOM));
 		parts.add(new KfBoom(0, c, Dropship.BOOM_STANDARD));
 		parts.add(new KfBoom(0, c, Dropship.BOOM_PROTOTYPE));
+		parts.add(new JumpshipDockingCollar(0, 0, c, Dropship.COLLAR_STANDARD));
+        parts.add(new JumpshipDockingCollar(0, 0, c, Dropship.COLLAR_NO_BOOM));
 		parts.add(new LandingGear(0, c));
 		parts.add(new BayDoor(0, c));
 		for (BayType btype : BayType.values()) {
