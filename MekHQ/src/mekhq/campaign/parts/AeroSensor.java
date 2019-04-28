@@ -89,10 +89,9 @@ public class AeroSensor extends Part {
     @Override
     public int getBaseTime() {
         int time = 0;
-        Entity e = unit.getEntity();
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair times
-            if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+            if (null != unit && (unit.getEntity().hasETypeFlag(Entity.ETYPE_DROPSHIP) || unit.getEntity().hasETypeFlag(Entity.ETYPE_JUMPSHIP))) {
                 time = 120;
             } else {
                 time = 75;
@@ -106,7 +105,7 @@ public class AeroSensor extends Part {
             return time;
         }
         if (isSalvaging()) {
-            if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+            if (unit.getEntity().hasETypeFlag(Entity.ETYPE_DROPSHIP) || unit.getEntity().hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
                 time = 1200;
             } else {
                 time = 260;
