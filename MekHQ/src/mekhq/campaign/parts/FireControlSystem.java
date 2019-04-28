@@ -87,10 +87,9 @@ public class FireControlSystem extends Part {
 	    int time = 0;
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair times
-            Entity e = unit.getEntity();
-            if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+            if (null != unit && (unit.getEntity().hasETypeFlag(Entity.ETYPE_DROPSHIP) || unit.getEntity().hasETypeFlag(Entity.ETYPE_JUMPSHIP)))  {
                 time = 120;
-                if (e.hasNavalC3()) {
+                if (unit.getEntity().hasNavalC3()) {
                     time *= 2;
                 }
             } else {
