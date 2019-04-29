@@ -1130,15 +1130,17 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     .map(x -> x.getActualValue().multipliedBy(x.getQuality()))
                     .collect(Collectors.toList()));
 
-        //TODO: we need to adjust this for equipment that doesn't show up as parts
-        //Spacecraft need: drive unit, computer, and bridge
+        //We need to adjust this for equipment that doesn't show up as parts
+        //Docking collars, Grav decks, KF Drive - Now parts
+        //Drive unit - see SpacecraftEngine
         if(entity instanceof SmallCraft || entity instanceof Jumpship) {
-            //bridge
-            partsValue = partsValue.plus(200000.0 + 10.0 * entity.getWeight());
-            //computer
-            partsValue = partsValue.plus(200000.0);
-            //drive unit
-            partsValue = partsValue.plus(500.0 * entity.getOriginalWalkMP() * entity.getWeight() / 100.0);
+            if (entity instanceof SmallCraft) {
+                //JS/SS/WS Bridge, Computer - see CombatInformationCenter
+                //bridge
+                partsValue = partsValue.plus(200000.0 + 10.0 * entity.getWeight());
+                //computer
+                partsValue = partsValue.plus(200000.0);
+            }
             // KF Drive, Docking Collars, etc...
             if ((entity instanceof Jumpship) && !(entity instanceof SpaceStation)) {
                 Jumpship js = (Jumpship) entity;
@@ -1171,8 +1173,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 }
                 partsValue = partsValue.plus(driveCost);
 
-                // Docking Collars
-                partsValue = partsValue.plus(100000.0 * js.getDocks());
                 // HPG
                 if (js.hasHPG()) {
                     partsValue = partsValue.plus(1000000000.0);
@@ -2019,12 +2019,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     ((FireControlSystem)fcs).calculateCost();
                 }
                 // If a JS/WS/SS already has an FCS, remove it
-                if (entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+                if (entity instanceof Jumpship) {
                     partsToRemove.add(part);
                 }
             //Don't initialize CIC for any ASF/SC/DS, use FCS for these instead
             } else if((part instanceof CombatInformationCenter || part instanceof MissingCIC)
-                    && (entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP))) {
+                    && (entity instanceof Jumpship)) {
                 cic = part;
                 //for reverse compatability, calculate costs
                 if(part instanceof CombatInformationCenter) {
@@ -2035,7 +2035,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             } else if(part instanceof LandingGear || part instanceof MissingLandingGear) {
                 landingGear = part;
                 // If a JS/WS/SS already has Landing Gear, remove it
-                if (entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+                if (entity instanceof Jumpship) {
                     partsToRemove.add(part);
                 }
             } else if(part instanceof AeroHeatSink || part instanceof MissingAeroHeatSink) {
@@ -2069,14 +2069,14 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             } else if(part instanceof ProtomekJumpJet || part instanceof MissingProtomekJumpJet) {
                 protoJumpJets.add(part);
             } else if ((part instanceof Thrusters)
-                    && (entity.isLargeCraft() || entity.hasETypeFlag(Entity.ETYPE_SMALL_CRAFT))) {
+                    && (entity instanceof SmallCraft || entity instanceof Jumpship)) {
                 if (((Thrusters) part).isLeftThrusters()) {
                     aeroThrustersLeft = part;
                 } else {
                     aeroThrustersRight = part;
                 }
             } else if ((part instanceof MissingThrusters)
-                    && (entity.isLargeCraft() || entity.hasETypeFlag(Entity.ETYPE_SMALL_CRAFT))) {
+                    && (entity instanceof SmallCraft || entity instanceof Jumpship)) {
                 if (((MissingThrusters) part).isLeftThrusters()) {
                     aeroThrustersLeft = part;
                 } else {
@@ -2501,13 +2501,13 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 addPart(avionics);
                 partsToAdd.add(avionics);
             }
-            if(null == cic && entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+            if(null == cic && entity instanceof Jumpship) {
                 cic = new CombatInformationCenter((int)entity.getWeight(), Money.zero(), getCampaign());
                 addPart(cic);
                 partsToAdd.add(cic);
                 ((CombatInformationCenter)cic).calculateCost();
             }
-            if(null == fcs && !(entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP))) {
+            if(null == fcs && !(entity instanceof Jumpship)) {
                 fcs = new FireControlSystem((int)entity.getWeight(), Money.zero(), getCampaign());
                 addPart(fcs);
                 partsToAdd.add(fcs);
@@ -2518,7 +2518,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 addPart(sensor);
                 partsToAdd.add(sensor);
             }
-            if(null == landingGear && !(entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP))) {
+            if(null == landingGear && !(entity instanceof Jumpship)) {
                 landingGear = new LandingGear((int) entity.getWeight(), getCampaign());
                 addPart(landingGear);
                 partsToAdd.add(landingGear);
@@ -2541,7 +2541,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 addPart(kfBoom);
                 partsToAdd.add(kfBoom);
             }
-            if (jumpCollars.isEmpty() && entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+            if (jumpCollars.isEmpty() && entity instanceof Jumpship) {
                 for (DockingCollar collar : entity.getDockingCollars()) {
                     Part collarPart = new JumpshipDockingCollar (0, collar.getCollarNumber(), getCampaign(), ((Jumpship)entity).getDockingCollarType());
                     jumpCollars.put(collar.getCollarNumber(), collarPart);
@@ -2561,7 +2561,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     podhsinks--;
                 }
             }
-            if (entity.isLargeCraft() || entity.hasETypeFlag(Entity.ETYPE_SMALL_CRAFT)) {
+            if (entity instanceof SmallCraft || entity instanceof Jumpship) {
                 if (aeroThrustersLeft == null) {
                     aeroThrustersLeft = new Thrusters(0, getCampaign(), true);
                     addPart(aeroThrustersLeft);

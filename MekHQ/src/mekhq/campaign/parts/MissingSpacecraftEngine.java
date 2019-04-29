@@ -27,7 +27,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.Aero;
+import megamek.common.Dropship;
 import megamek.common.Entity;
+import megamek.common.SmallCraft;
 import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
 import mekhq.MekHqXmlUtil;
@@ -55,10 +57,9 @@ public class MissingSpacecraftEngine extends MissingPart {
 	
 	@Override 
 	public int getBaseTime() {
-	    Entity e = unit.getEntity();
         //Per errata, small craft now use fighter engine times but still have the
         //large craft engine part
-        if (e != null && !e.isLargeCraft()) {
+        if (unit.getEntity() instanceof SmallCraft && !(unit.getEntity() instanceof Dropship)) {
             return 360;
         }
 		return 43200;

@@ -86,9 +86,8 @@ public class CombatInformationCenter extends Part {
 	    int time = 0;
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair times
-            Entity e = unit.getEntity();
             time = 120;
-            if (e.hasNavalC3()) {
+            if (unit != null && unit.getEntity().hasNavalC3()) {
                 time *= 2;
             }
             if (hits == 1) {

@@ -29,6 +29,7 @@ import org.w3c.dom.NodeList;
 
 import megamek.common.Aero;
 import megamek.common.CriticalSlot;
+import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.Jumpship;
 import megamek.common.Mech;
@@ -228,10 +229,9 @@ public class SpacecraftEngine extends Part {
     @Override 
     public int getBaseTime() {
         int time = 0;
-        Entity e = unit.getEntity();
         //Per errata, small craft now use fighter engine times but still have the
         //large craft engine part
-        if (e != null && !e.isLargeCraft()) {
+        if (unit.getEntity() instanceof SmallCraft && !(unit.getEntity() instanceof Dropship)) {
             if (isSalvaging()) {
                 return 360;
             }
@@ -266,9 +266,8 @@ public class SpacecraftEngine extends Part {
 
     @Override
     public int getDifficulty() {
-        Entity e = unit.getEntity();
         //Per errata, small craft now use fighter engine difficulty table
-        if (e != null && !e.isLargeCraft()) {
+        if (unit.getEntity() instanceof SmallCraft && !(unit.getEntity() instanceof Dropship)) {
             return -1;
         }
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
@@ -305,8 +304,7 @@ public class SpacecraftEngine extends Part {
     @Override
     public String checkFixable() {
         if (isSalvaging()) {
-            Entity e = unit.getEntity();
-            if (e != null && e.isLargeCraft()) {
+            if (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship) {
                 // Assuming it wasn't completely integrated into the ship it was built for, where are you going to keep this?
                 return "You cannot salvage a spacecraft engine. You must scrap it instead.";
             }

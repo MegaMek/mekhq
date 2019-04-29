@@ -92,7 +92,7 @@ public class JumpshipDockingCollar extends Part {
 	@Override
 	public void updateConditionFromEntity(boolean checkForDestruction) {
 		int priorHits = hits;
-		if (null != unit && unit.getEntity().hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+		if (unit.getEntity() instanceof Jumpship) {
 		    DockingCollar collar = unit.getEntity().getCollarById(collarNumber);
 			if (collar != null && collar.isDamaged()) {
 			    hits = 1;
@@ -125,7 +125,7 @@ public class JumpshipDockingCollar extends Part {
 
 	@Override
 	public void updateConditionFromPart() {
-	    if (null != unit && unit.getEntity().hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+	    if (unit.getEntity() instanceof Jumpship) {
             DockingCollar collar = unit.getEntity().getCollarById(collarNumber);
             if (collar != null) {
                 collar.setDamaged(hits > 0);
@@ -136,7 +136,7 @@ public class JumpshipDockingCollar extends Part {
 	@Override
 	public void fix() {
 		super.fix();
-		if (null != unit && unit.getEntity().hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+		if (unit.getEntity() instanceof Jumpship) {
             DockingCollar collar = unit.getEntity().getCollarById(collarNumber);
             if (collar != null) {
                 collar.setDamaged(false);
@@ -146,7 +146,7 @@ public class JumpshipDockingCollar extends Part {
 
 	@Override
 	public void remove(boolean salvage) {
-	    if (null != unit && unit.getEntity().hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+	    if (unit.getEntity() instanceof Jumpship) {
             DockingCollar collar = unit.getEntity().getCollarById(collarNumber);
             if (collar != null) {
                 collar.setDamaged(true);

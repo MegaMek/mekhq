@@ -28,7 +28,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.Aero;
+import megamek.common.Dropship;
 import megamek.common.Entity;
+import megamek.common.Jumpship;
 import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -61,10 +63,9 @@ public class MissingFireControlSystem extends MissingPart {
         int time = 0;
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair times
-            Entity e = unit.getEntity();
-            if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+            if (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship) {
                 time = 1200;
-                if (e.hasNavalC3()) {
+                if (unit.getEntity().hasNavalC3()) {
                     time *= 2;
                 }
             } else {
