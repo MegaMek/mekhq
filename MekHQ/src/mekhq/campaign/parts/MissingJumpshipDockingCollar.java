@@ -102,6 +102,7 @@ public class MissingJumpshipDockingCollar extends MissingPart {
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "collarType", collarType);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "collarNumber", collarNumber);
 		writeToXmlEnd(pw1, indent);
 	}
 
@@ -113,6 +114,8 @@ public class MissingJumpshipDockingCollar extends MissingPart {
             Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("collarType")) {
                 collarType = Integer.parseInt(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("collarNumber")) {
+                collarNumber = Integer.parseInt(wn2.getTextContent());
             }
         }
 	}
