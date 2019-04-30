@@ -177,7 +177,8 @@ public class BayDoor extends Part {
 
     @Override
     public TechAdvancement getTechAdvancement() {
-        return new TechAdvancement().setTechRating(RATING_A)
+        return new TechAdvancement(TECH_BASE_ALL).setAdvancement(DATE_PS, DATE_PS, DATE_PS)
+                .setTechRating(RATING_A)
                 .setAvailability(RATING_A, RATING_A, RATING_A, RATING_A)
                 .setStaticTechLevel(SimpleTechLevel.STANDARD);
     }
