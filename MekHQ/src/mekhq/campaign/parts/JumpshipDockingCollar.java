@@ -58,7 +58,7 @@ public class JumpshipDockingCollar extends Part {
             .setAvailability(RATING_C, RATING_X, RATING_X, RATING_X)
             .setStaticTechLevel(SimpleTechLevel.ADVANCED);
     
-    private int collarType = Jumpship.COLLAR_STANDARD;
+    private int collarType;
     private int collarNumber;
 	
 	public JumpshipDockingCollar() {

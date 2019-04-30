@@ -36,6 +36,7 @@ import megamek.common.Dropship;
 import megamek.common.Engine;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.Jumpship;
 import megamek.common.Mech;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
@@ -450,8 +451,8 @@ public class PartsStore implements Serializable {
 		parts.add(new DropshipDockingCollar(0, c, Dropship.COLLAR_NO_BOOM));
 		parts.add(new KfBoom(0, c, Dropship.BOOM_STANDARD));
 		parts.add(new KfBoom(0, c, Dropship.BOOM_PROTOTYPE));
-		parts.add(new JumpshipDockingCollar(0, 0, c, Dropship.COLLAR_STANDARD));
-        parts.add(new JumpshipDockingCollar(0, 0, c, Dropship.COLLAR_NO_BOOM));
+		parts.add(new JumpshipDockingCollar(0, 0, c, Jumpship.COLLAR_STANDARD));
+        parts.add(new JumpshipDockingCollar(0, 0, c, Jumpship.COLLAR_NO_BOOM));
 		parts.add(new LandingGear(0, c));
 		parts.add(new BayDoor(0, c));
 		for (BayType btype : BayType.values()) {
