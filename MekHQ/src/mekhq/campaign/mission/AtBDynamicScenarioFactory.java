@@ -361,7 +361,12 @@ public class AtBDynamicScenarioFactory {
             
             // terminate force generation if we've gone over our unit count or bv budget
             if(forceTemplate.getGenerationMethod() == ForceGenerationMethod.BVScaled.ordinal()) {
-                stopGenerating = forceBV > forceBVBudget;
+                // for bv-scaled forces, we check whether to stop generating after every lance
+                // the target number is the percentage of the bv budget generated so far
+                // if we roll below it, we stop
+                int roll = Compute.randomInt(100);
+                double rollTarget = ((double) forceBV / forceBVBudget) * 100;
+                stopGenerating = roll < rollTarget;
             } else {
                 stopGenerating = generatedEntities.size() >= forceUnitBudget; 
             }

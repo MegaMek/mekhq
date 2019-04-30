@@ -278,6 +278,9 @@ public class StratconScenario implements IStratconDisplayable {
         return stateBuilder.toString();
     }
 
+    public String getName() {
+        return backingScenario.getName();
+    }
     
     public int getRequiredPlayerLances() {
         return requiredPlayerLances;
@@ -318,6 +321,7 @@ public class StratconScenario implements IStratconDisplayable {
 
     public void setActionDate(Date actionDate) {
         this.actionDate = actionDate;
+        backingScenario.setDate(actionDate);
     }
 
     public Date getReturnDate() {

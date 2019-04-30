@@ -1435,6 +1435,9 @@ public class CampaignGUI extends JPanel {
             if (nagOutstandingScenarios()) {
                 return;
             }
+            if(nagInsufficientStratconAssignments()) {
+                return;
+            }
             if(nagUnresolvedStratconContacts()) {
                 return;
             }
@@ -1540,9 +1543,23 @@ public class CampaignGUI extends JPanel {
     }
 
     public boolean nagUnresolvedStratconContacts() {
-        if(StratconRulesManager.nagUnresolvedContacts(getCampaign())) {
+        String nagText = StratconRulesManager.nagUnresolvedContacts(getCampaign());
+        
+        if(!nagText.isEmpty()) {
             return 0 != JOptionPane.showConfirmDialog(null, 
-                    "You have unresolved contacts on the StratCon interface. Advance day anyway?", 
+                    String.format("You have unresolved contacts on the StratCon interface:\n%s\nAdvance day anyway?", nagText), 
+                    "Unresolved Stratcon Contacts", JOptionPane.YES_NO_OPTION);
+        }
+        
+        return false;
+    }
+    
+    public boolean nagInsufficientStratconAssignments() {
+        String nagText = StratconRulesManager.nagInsufficientTrackForces(getCampaign());
+        
+        if(!nagText.isEmpty()) {
+            return 0 != JOptionPane.showConfirmDialog(null, 
+                    String.format("You have insufficient forces assigned on the StratCon interface:\n%s\nAdvance day anyway?", nagText), 
                     "Unresolved Stratcon Contacts", JOptionPane.YES_NO_OPTION);
         }
         

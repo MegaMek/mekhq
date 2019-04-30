@@ -2,6 +2,7 @@ package mekhq.campaign.stratcon;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import megamek.common.Compute;
@@ -113,6 +114,21 @@ public class StratconRulesManager {
                 scenario.initializeScenario(campaign, contract, campaign.getForce(forceID).getPrimaryUnitType(campaign));
                 
                 // set up deployment day, battle day, return day here
+                // safety code to prevent attempts to generate random int with upper bound of 0 which is apparently illegal
+                int deploymentDay = track.getDeploymentTime() < 7 ? Compute.randomInt(7 - track.getDeploymentTime()) : 0;
+                int battleDay = deploymentDay + (track.getDeploymentTime() > 0 ? Compute.randomInt(track.getDeploymentTime()) : 0);
+                int returnDay = deploymentDay + track.getDeploymentTime();
+                
+                GregorianCalendar deploymentDate = (GregorianCalendar) campaign.getCalendar().clone();
+                deploymentDate.add(Calendar.DAY_OF_MONTH, deploymentDay);
+                GregorianCalendar battleDate = (GregorianCalendar) campaign.getCalendar().clone();
+                battleDate.add(Calendar.DAY_OF_MONTH, battleDay);
+                GregorianCalendar returnDate = (GregorianCalendar) campaign.getCalendar().clone();
+                returnDate.add(Calendar.DAY_OF_MONTH, returnDay);
+                
+                scenario.setDeploymentDate(deploymentDate.getTime());
+                scenario.setActionDate(battleDate.getTime());
+                scenario.setReturnDate(returnDate.getTime());
                 
                 track.getScenarios().put(scenarioCoords, scenario);
                 generatedScenarios.add(scenario);
@@ -143,9 +159,11 @@ public class StratconRulesManager {
     /**
      * Determine whether the user should be nagged about unresolved scenarios on AtB Stratcon tracks.
      * @param campaign Campaign to check.
-     * @return To nag or not to nag.
+     * @return An informative string containing the reasons the user was nagged.
      */
-    public static boolean nagUnresolvedContacts(Campaign campaign) {
+    public static String nagUnresolvedContacts(Campaign campaign) {
+        StringBuilder sb = new StringBuilder();
+        
         // check every track attached to an active contract for unresolved scenarios
         // to which the player must deploy forces today
         for(Contract contract : campaign.getActiveContracts()) {
@@ -154,14 +172,44 @@ public class StratconRulesManager {
                     for(StratconScenario scenario : track.getScenarios().values()) {
                         if(scenario.getCurrentState() == ScenarioState.UNRESOLVED &&
                                 campaign.getCalendar().getTime().equals(scenario.getDeploymentDate())) {
-                            return true;
+                            // "scenario name, track name"
+                            sb.append(String.format("%s, %s\n", scenario.getName(), track.getDisplayableName()));
                         }
                     }
                 }
             }
         }
         
-        return false;
+        return sb.toString();
+    }
+    
+    /**
+     * Determine whether the user should be nagged about insufficient forces assigned to StratCon tracks
+     * @param campaign Campaign to check.
+     * @return An informative string containing the reasons the user was nagged.
+     */
+    public static String nagInsufficientTrackForces(Campaign campaign) {
+        if(campaign.getCalendar().get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
+            return "";
+        }
+        
+        StringBuilder sb = new StringBuilder();
+        
+        // check every track attached to an active contract for unresolved scenarios
+        // to which the player must deploy forces today
+        for(Contract contract : campaign.getActiveContracts()) {
+            if(contract instanceof AtBContract) {
+                for(StratconTrackState track : ((AtBContract) contract).getStratconCampaignState().getTracks()) {
+                    if(track.getAssignedForceIDs().size() < track.getRequiredLanceCount()) {
+                        // "track name, x/y lances"
+                        sb.append(String.format("%s, %d/%d lances\n", track.getDisplayableName(), 
+                                track.getAssignedForceIDs().size(), track.getRequiredLanceCount()));
+                    }
+                }
+            }
+        }
+        
+        return sb.toString();
     }
     
     public StratconRulesManager() {
