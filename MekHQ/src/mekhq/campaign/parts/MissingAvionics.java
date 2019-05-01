@@ -25,8 +25,10 @@ import org.w3c.dom.Node;
 
 import megamek.common.Aero;
 import megamek.common.CriticalSlot;
+import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.Jumpship;
 import megamek.common.LandAirMech;
 import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
@@ -56,8 +58,7 @@ public class MissingAvionics extends MissingPart {
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
             int time = 0;
             //Test of proposed errata for repair times
-            Entity e = unit.getEntity();
-            if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+            if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
                 time = 2400;
             } else {
                 time = 600;

@@ -29,6 +29,7 @@ import org.w3c.dom.Node;
 import megamek.common.Aero;
 import megamek.common.Compute;
 import megamek.common.CriticalSlot;
+import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.LandAirMech;
@@ -88,7 +89,7 @@ public class LandingGear extends Part {
 	    int time;
 	    if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair times
-            if (unit != null && unit.getEntity().hasETypeFlag(Entity.ETYPE_DROPSHIP)) {
+            if (unit != null && unit.getEntity() instanceof Dropship) {
                 time = 120;
             } else {
                 time = 60;
@@ -213,7 +214,7 @@ public class LandingGear extends Part {
         if (unit != null && unit.getEntity() instanceof LandAirMech) {
             return skillType.equals(SkillType.S_TECH_MECH);
         }
-		return skillType.equals(SkillType.S_TECH_AERO);
+        return (skillType.equals(SkillType.S_TECH_AERO) || skillType.equals(SkillType.S_TECH_VESSEL));
 	}
 
     @Override

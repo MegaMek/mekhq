@@ -27,7 +27,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.Aero;
+import megamek.common.Dropship;
 import megamek.common.Entity;
+import megamek.common.Jumpship;
 import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -58,8 +60,7 @@ public class MissingAeroSensor extends MissingPart {
     @Override 
 	public int getBaseTime() {
         //Published errata for replacement times of small aero vs large craft
-        Entity e = unit.getEntity();
-        if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+        if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
             return 1200;
         }
         return 260;            

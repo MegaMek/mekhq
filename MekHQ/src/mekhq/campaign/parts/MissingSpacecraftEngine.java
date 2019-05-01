@@ -59,7 +59,7 @@ public class MissingSpacecraftEngine extends MissingPart {
 	public int getBaseTime() {
         //Per errata, small craft now use fighter engine times but still have the
         //large craft engine part
-        if (unit.getEntity() instanceof SmallCraft && !(unit.getEntity() instanceof Dropship)) {
+        if (null != unit && (unit.getEntity() instanceof SmallCraft && !(unit.getEntity() instanceof Dropship))) {
             return 360;
         }
 		return 43200;

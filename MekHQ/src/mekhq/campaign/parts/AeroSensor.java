@@ -29,7 +29,9 @@ import org.w3c.dom.NodeList;
 
 import megamek.common.Aero;
 import megamek.common.Compute;
+import megamek.common.Dropship;
 import megamek.common.Entity;
+import megamek.common.Jumpship;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
@@ -91,7 +93,7 @@ public class AeroSensor extends Part {
         int time = 0;
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair times
-            if (null != unit && (unit.getEntity().hasETypeFlag(Entity.ETYPE_DROPSHIP) || unit.getEntity().hasETypeFlag(Entity.ETYPE_JUMPSHIP))) {
+            if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
                 time = 120;
             } else {
                 time = 75;
@@ -102,10 +104,17 @@ public class AeroSensor extends Part {
             if (hits == 2) {
                 time *= 2;
             }
+            if (isSalvaging()) {
+                if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
+                    time = 1200;
+                } else {
+                    time = 260;
+                }
+            }
             return time;
         }
         if (isSalvaging()) {
-            if (unit.getEntity().hasETypeFlag(Entity.ETYPE_DROPSHIP) || unit.getEntity().hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+            if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
                 time = 1200;
             } else {
                 time = 260;
@@ -244,7 +253,7 @@ public class AeroSensor extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return skillType.equals(SkillType.S_TECH_AERO);
+        return (skillType.equals(SkillType.S_TECH_AERO) || skillType.equals(SkillType.S_TECH_VESSEL));
     }
 
     @Override

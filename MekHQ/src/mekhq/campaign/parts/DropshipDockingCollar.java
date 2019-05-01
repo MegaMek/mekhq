@@ -209,7 +209,7 @@ public class DropshipDockingCollar extends Part {
 	
 	@Override
 	public boolean isRightTechType(String skillType) {
-		return skillType.equals(SkillType.S_TECH_AERO);
+	    return skillType.equals(SkillType.S_TECH_VESSEL);
 	}
 
 	@Override

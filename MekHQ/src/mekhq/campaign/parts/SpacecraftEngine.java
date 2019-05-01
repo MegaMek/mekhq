@@ -104,7 +104,7 @@ public class SpacecraftEngine extends Part {
     public Money getStickerPrice() {
         //Add engine cost from SO p158 for advanced aerospace
         //Drive Unit + Engine + Engine Control Unit
-        if (unit != null && unit.getEntity() != null) {
+        if (unit != null) {
             if(unit.getEntity() instanceof Warship) {
                 return Money.of((500 * unit.getEntity().getOriginalWalkMP() * (unit.getEntity().getWeight() / 100)) 
                         + (engineTonnage * 1000)
@@ -231,7 +231,7 @@ public class SpacecraftEngine extends Part {
         int time = 0;
         //Per errata, small craft now use fighter engine times but still have the
         //large craft engine part
-        if (unit.getEntity() instanceof SmallCraft && !(unit.getEntity() instanceof Dropship)) {
+        if (null != unit && (unit.getEntity() instanceof SmallCraft && !(unit.getEntity() instanceof Dropship))) {
             if (isSalvaging()) {
                 return 360;
             }
@@ -267,7 +267,7 @@ public class SpacecraftEngine extends Part {
     @Override
     public int getDifficulty() {
         //Per errata, small craft now use fighter engine difficulty table
-        if (unit.getEntity() instanceof SmallCraft && !(unit.getEntity() instanceof Dropship)) {
+        if (null != unit && (unit.getEntity() instanceof SmallCraft && !(unit.getEntity() instanceof Dropship))) {
             return -1;
         }
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
@@ -304,7 +304,7 @@ public class SpacecraftEngine extends Part {
     @Override
     public String checkFixable() {
         if (isSalvaging()) {
-            if (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship) {
+            if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
                 // Assuming it wasn't completely integrated into the ship it was built for, where are you going to keep this?
                 return "You cannot salvage a spacecraft engine. You must scrap it instead.";
             }
@@ -319,7 +319,7 @@ public class SpacecraftEngine extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return skillType.equals(SkillType.S_TECH_AERO);	
+        return (skillType.equals(SkillType.S_TECH_AERO) || skillType.equals(SkillType.S_TECH_VESSEL));	
     }
 
     @Override

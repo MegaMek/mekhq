@@ -92,7 +92,7 @@ public class JumpshipDockingCollar extends Part {
 	@Override
 	public void updateConditionFromEntity(boolean checkForDestruction) {
 		int priorHits = hits;
-		if (unit.getEntity() instanceof Jumpship) {
+		if (null != unit && unit.getEntity() instanceof Jumpship) {
 		    DockingCollar collar = unit.getEntity().getCollarById(collarNumber);
 			if (collar != null && collar.isDamaged()) {
 			    hits = 1;
@@ -125,7 +125,7 @@ public class JumpshipDockingCollar extends Part {
 
 	@Override
 	public void updateConditionFromPart() {
-	    if (unit.getEntity() instanceof Jumpship) {
+	    if (null != unit && unit.getEntity() instanceof Jumpship) {
             DockingCollar collar = unit.getEntity().getCollarById(collarNumber);
             if (collar != null) {
                 collar.setDamaged(hits > 0);
@@ -136,7 +136,7 @@ public class JumpshipDockingCollar extends Part {
 	@Override
 	public void fix() {
 		super.fix();
-		if (unit.getEntity() instanceof Jumpship) {
+		if (null != unit && unit.getEntity() instanceof Jumpship) {
             DockingCollar collar = unit.getEntity().getCollarById(collarNumber);
             if (collar != null) {
                 collar.setDamaged(false);
@@ -226,7 +226,7 @@ public class JumpshipDockingCollar extends Part {
 	
 	@Override
 	public boolean isRightTechType(String skillType) {
-		return skillType.equals(SkillType.S_TECH_AERO);
+		return skillType.equals(SkillType.S_TECH_VESSEL);
 	}
 
 	@Override

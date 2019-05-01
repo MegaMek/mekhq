@@ -29,7 +29,9 @@ import org.w3c.dom.NodeList;
 
 import megamek.common.Aero;
 import megamek.common.Compute;
+import megamek.common.Dropship;
 import megamek.common.Entity;
+import megamek.common.Jumpship;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
@@ -95,25 +97,25 @@ public class AeroLifeSupport extends Part {
     @Override
     public int getBaseTime() {
         int time = 0;
-        Entity e = unit.getEntity();
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair times
-            if (isSalvaging()) {
-                if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+            if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
+                if (isSalvaging()) {
                     time = 1200;
                 } else {
-                    time = 180;
+                    time = 120;
                 }
-            }
-            if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
-                time = 120;
             } else {
-                time = 60;
+                if (isSalvaging()) {
+                    time = 180;
+                } else {
+                    time = 60;
+                }
             }
             return time;
         }
         if (isSalvaging()) {
-            if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+            if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
                 time = 6720;
             } else {
                 time = 180;
@@ -127,8 +129,7 @@ public class AeroLifeSupport extends Part {
     @Override
     public int getDifficulty() {
         if(isSalvaging()) {
-            Entity e = unit.getEntity();
-            if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+            if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
                 return 0;
             } else {
                 return -1;
@@ -251,7 +252,7 @@ public class AeroLifeSupport extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return skillType.equals(SkillType.S_TECH_AERO);
+        return (skillType.equals(SkillType.S_TECH_AERO) || skillType.equals(SkillType.S_TECH_VESSEL));
     }
 
     @Override

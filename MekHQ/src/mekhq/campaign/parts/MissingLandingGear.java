@@ -58,7 +58,7 @@ public class MissingLandingGear extends MissingPart {
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
             int time = 0;
             //Test of proposed errata for repair times
-            if (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship) {
+            if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
                 time = 1200;
             } else {
                 time = 600;

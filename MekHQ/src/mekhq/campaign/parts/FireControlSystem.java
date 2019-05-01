@@ -29,6 +29,7 @@ import org.w3c.dom.NodeList;
 
 import megamek.common.Aero;
 import megamek.common.Compute;
+import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.Jumpship;
 import megamek.common.SmallCraft;
@@ -87,7 +88,7 @@ public class FireControlSystem extends Part {
 	    int time = 0;
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair times
-            if (null != unit && (unit.getEntity().hasETypeFlag(Entity.ETYPE_DROPSHIP) || unit.getEntity().hasETypeFlag(Entity.ETYPE_JUMPSHIP)))  {
+            if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship))  {
                 time = 120;
                 if (unit.getEntity().hasNavalC3()) {
                     time *= 2;
@@ -97,11 +98,9 @@ public class FireControlSystem extends Part {
             }
             if (isSalvaging()) {
                 time *= 10;
-            }
-            if (hits == 1) {
+            } else if (hits == 1) {
                 time *= 1;
-            } 
-            if (hits == 2) {
+            } else if (hits == 2) {
                 time *= 2;
             }
             return time;
@@ -178,8 +177,7 @@ public class FireControlSystem extends Part {
 	@Override
 	public String checkFixable() {
 	    if (isSalvaging()) {
-            Entity e = unit.getEntity();
-            if (e != null && e.isLargeCraft()) {
+            if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
                 // FCS/CIC computers are designed for and built into the ship. Can't salvage and use somewhere else
                 return "You cannot salvage a spacecraft FCS. You must scrap it instead.";
             }
@@ -221,7 +219,7 @@ public class FireControlSystem extends Part {
 	
 	@Override
 	public boolean isRightTechType(String skillType) {
-		return skillType.equals(SkillType.S_TECH_AERO);
+	    return (skillType.equals(SkillType.S_TECH_AERO) || skillType.equals(SkillType.S_TECH_VESSEL));
 	}
 	
 	@Override

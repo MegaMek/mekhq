@@ -73,7 +73,7 @@ public class MissingJumpshipDockingCollar extends MissingPart {
 
 	@Override
 	public void updateConditionFromPart() {
-	    if (unit.getEntity() instanceof Jumpship) {
+	    if (null != unit && unit.getEntity() instanceof Jumpship) {
             DockingCollar collar = unit.getEntity().getCollarById(collarNumber);
             if (collar != null) {
                 collar.setDamaged(true);
