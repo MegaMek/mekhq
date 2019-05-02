@@ -39,6 +39,7 @@ import megamek.common.UnitType;
 import megamek.common.logging.LogLevel;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBDynamicScenario;
+import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.unit.Unit;
@@ -265,8 +266,12 @@ public class AtBGameThread extends GameThread {
                     swingGui.getBots().put(name, botClient);
 
                     configureBot(botClient, bf);
+                    
+                    // we need to wait until the game has actually started to do transport loading
+                    if(scenario instanceof AtBDynamicScenario) {
+                        AtBDynamicScenarioFactory.loadTransports((AtBDynamicScenario) scenario, botClient);
+                    }
                 }
-
             }
 
             while(!stop) {

@@ -11,22 +11,29 @@ import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
 
+import megamek.client.Client;
 import megamek.client.RandomNameGenerator;
 import megamek.client.RandomSkillsGenerator;
 import megamek.client.RandomUnitGenerator;
 import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.ratgenerator.MissionRole;
+import megamek.common.Bay;
 import megamek.common.Board;
 import megamek.common.BombType;
 import megamek.common.Compute;
 import megamek.common.Crew;
 import megamek.common.Entity;
+import megamek.common.EntityMovementMode;
 import megamek.common.EntityWeightClass;
+import megamek.common.Infantry;
+import megamek.common.InfantryBay;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.OffBoardDirection;
 import megamek.common.PlanetaryConditions;
+import megamek.common.Transporter;
+import megamek.common.TroopSpace;
 import megamek.common.UnitType;
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
@@ -132,6 +139,8 @@ public class AtBDynamicScenarioFactory {
         for(int x = scenario.getNumBots() - 1; x >= 0; x--) {
             scenario.removeBotForce(x);
         }
+        
+        scenario.getExternalIDLookup().clear();
         
         // fix the player force weight class and unit count at the current time.
         int playerForceWeightClass = calculatePlayerForceWeightClass(scenario, campaign);
@@ -378,6 +387,10 @@ public class AtBDynamicScenarioFactory {
         while(forceUnitBudget > 0 && generatedEntities.size() > forceUnitBudget) {
             generatedEntities.remove(Compute.randomInt(generatedEntities.size()));
         }
+        
+        // "flavor" feature - fill up APCs with infantry
+        List<Entity> transportedEntities = fillTransports(scenario, generatedEntities, factionCode, skill, quality, currentDate.getYear(), campaign);
+        generatedEntities.addAll(transportedEntities);
         
         BotForce generatedForce = new BotForce();
         generatedForce.setEntityList(generatedEntities);
@@ -771,6 +784,112 @@ public class AtBDynamicScenarioFactory {
         }
         
         return createEntityWithCrew(params.getFaction(), skill, campaign, ms);
+    }
+    
+    /**
+     * Fill the given transport entity with a bunch of units that it can carry.
+     * Currently only works for infantry transports.
+     * @param transport
+     * @param params
+     * @param skill
+     * @param campaign
+     */
+    public static List<Entity> fillTransport(AtBDynamicScenario scenario, Entity transport, UnitGeneratorParameters params, int skill, Campaign campaign) {
+        List<Entity> transportedUnits = new ArrayList<>();
+        
+        for(Transporter bay : transport.getTransports()) {
+            if(bay instanceof TroopSpace) {
+                double bayCapacity = ((TroopSpace) bay).getUnused();
+                
+                UnitGeneratorParameters newParams = params.clone();
+                newParams.clearMovementModes();
+                newParams.setUnitType(UnitType.INFANTRY);
+                newParams.setWeightClass(AtBDynamicScenarioFactory.UNIT_WEIGHT_UNSPECIFIED);
+                
+                // to save ourselves having to re-generate a bunch of infantry for smaller bays (3 tons and lower)
+                // we will limit ourselves to generating low-weight foot platoons
+                if(bayCapacity <= IUnitGenerator.FOOT_PLATOON_INFANTRY_WEIGHT) {
+                    newParams.getMovementModes().add(EntityMovementMode.INF_LEG);
+                    newParams.setFilter(inf -> inf.getTons() <= IUnitGenerator.FOOT_PLATOON_INFANTRY_WEIGHT);
+                } else {
+                    newParams.getMovementModes().addAll(IUnitGenerator.ALL_INFANTRY_MODES);
+                    newParams.setFilter(inf -> inf.getTons() <= bayCapacity);
+                }
+                
+                MechSummary ms = campaign.getUnitGenerator().generate(newParams);
+                
+                if (ms == null) {
+                    continue;
+                }
+                
+                Entity infantry = createEntityWithCrew(params.getFaction(), skill, campaign, ms);
+                
+                // if we're dealing with a *really* small bay, drop the # squads down until we can fit it in
+                while(infantry.getWeight() > bayCapacity) {
+                    ((Infantry) infantry).setSquadN(((Infantry) infantry).getSquadN() - 1);
+                    infantry.autoSetInternal();
+                }
+                
+                scenario.addTransportRelationship(transport.getExternalIdAsString(), infantry.getExternalIdAsString());
+                
+                transportedUnits.add(infantry);
+            }
+        }
+        
+        return transportedUnits;
+    }
+    
+    /**
+     * Fill the provided transports with randomly generated units that
+     * can fit into their bays.
+     * @param transports
+     * @param factionCode
+     * @param skill
+     * @param quality
+     * @param year
+     * @param campaign
+     * @return
+     */
+    private static List<Entity> fillTransports(AtBDynamicScenario scenario, List<Entity> transports, String factionCode, int skill, int quality, int year, Campaign campaign) {
+        List<Entity> transportedUnits = new ArrayList<>();
+        
+        UnitGeneratorParameters params = new UnitGeneratorParameters();
+        params.setFaction(factionCode);
+        params.setQuality(quality);
+        params.setYear(year);
+        
+        for(Entity transport : transports) {
+            transportedUnits.addAll(fillTransport(scenario, transport, params, skill, campaign));
+        }
+        
+        return transportedUnits;
+    }
+    
+    /**
+     * Handles loading transported units onto their transports once a megamek scenario has actually started;
+     * @param scenario
+     */
+    public static void loadTransports(AtBDynamicScenario scenario, Client client) {
+        Map<String, Integer> idMap = new HashMap<>();
+        // this is a bit inefficient, should really give the client/game the ability to look up an entity by external ID
+        for(Entity entity : client.getEntitiesVector()) {
+            idMap.put(entity.getExternalIdAsString(), entity.getId());
+        }
+        
+        for(int x = 0; x < scenario.getNumBots(); x++) {
+            BotForce currentBotForce = scenario.getBotForce(x);
+            for(Entity potentialTransport : currentBotForce.getEntityList()) {
+                if(scenario.getTransportLinkages().containsKey(potentialTransport.getExternalIdAsString())) {
+                    for(String cargoID : scenario.getTransportLinkages().get(potentialTransport.getExternalIdAsString())) {
+                        Entity cargo = scenario.getExternalIDLookup().get(cargoID);
+                        
+                        // send load command to the server
+                        client.sendLoadEntity(idMap.get(cargo.getExternalIdAsString()), 
+                                idMap.get(potentialTransport.getExternalIdAsString()), -1);
+                    }
+                }
+            }
+        }
     }
     
     /**
@@ -1503,6 +1622,11 @@ public class AtBDynamicScenarioFactory {
         
         // first, we figure out the slowest "atb speed" of this group.
         for(Entity entity : entityList) {
+            // don't include transported units in this calculation
+            if(entity.getTransportId() != Entity.NONE) {
+                continue;
+            }
+            
             int speed = calculateAtBSpeed(entity);
             
             // don't reduce minimum speed to 0, since dividing by zero further down is problematic

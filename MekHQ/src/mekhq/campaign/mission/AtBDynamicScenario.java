@@ -7,10 +7,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
@@ -48,12 +50,19 @@ public class AtBDynamicScenario extends AtBScenario {
     
     private List<AtBScenarioModifier> scenarioModifiers;
     
+    // key-value pairs linking transports and the units loaded onto them.
+    private Map<String, List<String>> transportLinkages;
+    
+    private Map<String, Entity> externalIDLookup;
+    
     public AtBDynamicScenario() {
         super();
         
         botForceTemplates = new HashMap<>();
         playerForceTemplates = new HashMap<>();
         scenarioModifiers = new ArrayList<>();
+        setTransportLinkages(new HashMap<>());
+        externalIDLookup = new HashMap<>();
     }
 
     @Override
@@ -114,9 +123,30 @@ public class AtBDynamicScenario extends AtBScenario {
         return getMapSizeY();
     }
     
+    /**
+     * Adds a bot force to this dynamic scenario.
+     * @param botForce
+     * @param forceTemplate
+     */
     public void addBotForce(BotForce botForce, ScenarioForceTemplate forceTemplate) {
         super.addBotForce(botForce);        
         botForceTemplates.put(botForce, forceTemplate);
+        
+        // put all bot units into the external ID lookup.
+        for(Entity entity : botForce.getEntityList()) {
+            getExternalIDLookup().put(entity.getExternalIdAsString(), entity);
+        }
+    }
+    
+    /**
+     * Removes a bot force from this dynamic scenario, and its associated template as well.
+     */
+    public void removeBotForce(int x) {
+        BotForce botToRemove = botForces.get(x);
+        
+        botForceTemplates.remove(botToRemove);
+        
+        super.removeBotForce(x);
     }
     
     public int getEffectivePlayerUnitCount() {
@@ -272,10 +302,49 @@ public class AtBDynamicScenario extends AtBScenario {
         }
         
         super.loadFieldsFromXmlNode(wn);
+        
+        // regenerate 
+        if(isCurrent()) {
+            for(int x = 0; x < getNumBots(); x++) {
+                BotForce currentBotForce = getBotForce(x);
+                for(Entity unit : currentBotForce.getEntityList()) {
+                    getExternalIDLookup().put(unit.getExternalIdAsString(), unit);
+                }
+            }
+        }
     }
     
     @Override
     public void setTerrain() {
         AtBDynamicScenarioFactory.setTerrain(this);
+    }
+
+    public Map<String, List<String>> getTransportLinkages() {
+        return transportLinkages;
+    }
+
+    public void setTransportLinkages(HashMap<String, List<String>> transportLinkages) {
+        this.transportLinkages = transportLinkages;
+    }
+    
+    /**
+     * Adds a transport-cargo pair to the internal transport relationship store.
+     * @param transport
+     * @param cargo
+     */
+    public void addTransportRelationship(String transport, String cargo) {
+        if(!transportLinkages.containsKey(transport)) {
+            transportLinkages.put(transport, new ArrayList<>());
+        }
+        
+        transportLinkages.get(transport).add(cargo);
+    }
+
+    public Map<String, Entity> getExternalIDLookup() {
+        return externalIDLookup;
+    }
+
+    public void setExternalIDLookup(HashMap<String, Entity> externalIDLookup) {
+        this.externalIDLookup = externalIDLookup;
     }
 }
