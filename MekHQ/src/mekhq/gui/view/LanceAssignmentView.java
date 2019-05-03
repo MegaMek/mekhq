@@ -158,6 +158,10 @@ public class LanceAssignmentView extends JPanel {
                         int row, int column) {
                     switch (column) {
                     case LanceAssignmentTableModel.COL_FORCE:
+			// Accessibility system chokes on a null value here, so...
+			if (null == value) {
+			    break;
+			}
                     	setText((((Force)value)).getFullName());
                     	break;
                     case LanceAssignmentTableModel.COL_CONTRACT:
