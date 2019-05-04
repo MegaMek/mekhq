@@ -492,7 +492,7 @@ public class PersonnelMarketDialog extends JDialog {
          Entity en = personnelMarket.getAttachedEntity(selectedPerson);
          String unitText = "";
     	 if (unitCost.isPositive()) {
-    		 unitText = "Unit cost: " + new java.text.DecimalFormat().format(unitCost);
+    		 unitText = "Unit cost: " + unitCost.toAmountAndSymbolString();
     	 }
 
 		 if (null != en) {

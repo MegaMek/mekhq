@@ -27,10 +27,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Toolkit;
 import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -55,6 +52,7 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.xml.parsers.DocumentBuilder;
 
 import mekhq.campaign.finances.Money;
+import mekhq.gui.dialog.*;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
 import org.w3c.dom.Document;
@@ -120,33 +118,6 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.Planets;
 import mekhq.campaign.universe.RandomFactionGenerator;
-import mekhq.gui.dialog.AdvanceDaysDialog;
-import mekhq.gui.dialog.BatchXPDialog;
-import mekhq.gui.dialog.BloodnameDialog;
-import mekhq.gui.dialog.CampaignOptionsDialog;
-import mekhq.gui.dialog.ContractMarketDialog;
-import mekhq.gui.dialog.DailyReportLogDialog;
-import mekhq.gui.dialog.DataLoadingDialog;
-import mekhq.gui.dialog.GMToolsDialog;
-import mekhq.gui.dialog.HireBulkPersonnelDialog;
-import mekhq.gui.dialog.HistoricalDailyReportDialog;
-import mekhq.gui.dialog.MaintenanceReportDialog;
-import mekhq.gui.dialog.MassMothballDialog;
-import mekhq.gui.dialog.MekHQAboutBox;
-import mekhq.gui.dialog.MercRosterDialog;
-import mekhq.gui.dialog.NewRecruitDialog;
-import mekhq.gui.dialog.NewsReportDialog;
-import mekhq.gui.dialog.PartsStoreDialog;
-import mekhq.gui.dialog.PersonnelMarketDialog;
-import mekhq.gui.dialog.PopupValueChoiceDialog;
-import mekhq.gui.dialog.RefitNameDialog;
-import mekhq.gui.dialog.ReportDialog;
-import mekhq.gui.dialog.RetirementDefectionDialog;
-import mekhq.gui.dialog.ScenarioTemplateEditorDialog;
-import mekhq.gui.dialog.ShipSearchDialog;
-import mekhq.gui.dialog.UnitCostReportDialog;
-import mekhq.gui.dialog.UnitMarketDialog;
-import mekhq.gui.dialog.UnitSelectorDialog;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.io.FileType;
 
@@ -758,8 +729,12 @@ public class CampaignGUI extends JPanel {
                 menuOptionsMMActionPerformed(evt);
             }
         });
-
         menuFile.add(menuOptionsMM);
+
+        JMenuItem menuMekHqOptions = new JMenuItem(resourceMap.getString("menuMekHqOptions.text"));
+        menuMekHqOptions.setMnemonic(KeyEvent.VK_M);
+        menuMekHqOptions.addActionListener(this::menuMekHqOptionsActionPerformed);
+        menuFile.add(menuMekHqOptions);
 
         menuThemes = new JMenu("Themes");
 
@@ -1777,6 +1752,11 @@ public class CampaignGUI extends JPanel {
             refreshCalendar();
         }
     }// GEN-LAST:event_menuOptionsActionPerformed
+
+    private void menuMekHqOptionsActionPerformed(ActionEvent evt) {
+        MekHqOptionsDialog dialog = new MekHqOptionsDialog(getFrame(), MekHQ.getLogger());
+        dialog.setVisible(true);
+    }
 
     private void miLoadForcesActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miLoadForcesActionPerformed
         try {

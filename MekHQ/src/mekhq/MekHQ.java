@@ -83,6 +83,8 @@ import mekhq.gui.preferences.StringPreference;
 import mekhq.gui.utilities.ObservableString;
 import mekhq.preferences.MekHqPreferences;
 import mekhq.preferences.PreferencesNode;
+import mekhq.service.AutosaveService;
+import mekhq.service.IAutosaveService;
 
 /**
  * The main class of the application.
@@ -126,6 +128,8 @@ public class MekHQ implements GameListener {
     private CampaignGUI campaigngui;
 
     private IconPackage iconPackage = new IconPackage();
+
+    private final IAutosaveService autosaveService;
 
 	/**
 	 * Converts the MekHQ {@link #VERBOSITY_LEVEL} to {@link LogLevel}.
@@ -274,7 +278,11 @@ public class MekHQ implements GameListener {
 	protected static MekHQ getInstance() {
 		return new MekHQ();
 	}
-	
+
+	private MekHQ() {
+	    this.autosaveService = new AutosaveService(getLogger());
+    }
+
     /**
      * At startup create and show the main frame of the application.
      */
@@ -476,6 +484,7 @@ public class MekHQ implements GameListener {
                 stopHost();
                 return;
             } else {
+                this.autosaveService.requestBeforeMissionAutosave(this.campaign);
                 port = lgd.port;
                 playerName = lgd.playerName;
             }

@@ -91,18 +91,18 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
     private int signBonus;
 
     // need to keep track of total value salvaged for salvage rights
-    private Money salvagedByUnit     = Money.zero();
+    private Money salvagedByUnit = Money.zero();
     private Money salvagedByEmployer = Money.zero();
 
     // actual amounts
-    private Money advanceAmount;
-    private Money signingAmount;
-    private Money transportAmount;
-    private Money transitAmount;
-    private Money overheadAmount;
-    private Money supportAmount;
-    private Money baseAmount;
-    private Money feeAmount;
+    private Money advanceAmount = Money.zero();
+    private Money signingAmount = Money.zero();
+    private Money transportAmount = Money.zero();
+    private Money transitAmount = Money.zero();
+    private Money overheadAmount = Money.zero();
+    private Money supportAmount = Money.zero();
+    private Money baseAmount = Money.zero();
+    private Money feeAmount = Money.zero();
 
     public Contract() {
         this(null, null);
