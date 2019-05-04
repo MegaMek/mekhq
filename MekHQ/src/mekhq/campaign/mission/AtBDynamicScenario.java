@@ -302,16 +302,6 @@ public class AtBDynamicScenario extends AtBScenario {
         }
         
         super.loadFieldsFromXmlNode(wn);
-        
-        // regenerate 
-        if(isCurrent()) {
-            for(int x = 0; x < getNumBots(); x++) {
-                BotForce currentBotForce = getBotForce(x);
-                for(Entity unit : currentBotForce.getEntityList()) {
-                    getExternalIDLookup().put(unit.getExternalIdAsString(), unit);
-                }
-            }
-        }
     }
     
     @Override
