@@ -22,6 +22,7 @@ import megamek.common.Coords;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.stratcon.StratconCampaignState;
+import mekhq.campaign.stratcon.StratconCoords;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconTrackState;
@@ -235,7 +236,7 @@ public class StratconPanel extends JPanel implements ActionListener {
 
         for(int x = 0; x < currentTrack.getWidth(); x++) {            
             for(int y = 0; y < currentTrack.getHeight(); y++) {
-                if(currentTrack.getScenario(new Coords(x, y)) != null) {
+                if(currentTrack.getScenario(new StratconCoords(x, y)) != null) {
                     g2D.setColor(Color.RED);
                     g2D.drawPolygon(scenarioMarker);
                 }
@@ -261,7 +262,7 @@ public class StratconPanel extends JPanel implements ActionListener {
 
         for(int x = 0; x < currentTrack.getWidth(); x++) {            
             for(int y = 0; y < currentTrack.getHeight(); y++) {
-                if(currentTrack.getFacility(new Coords(x, y)) != null) {
+                if(currentTrack.getFacility(new StratconCoords(x, y)) != null) {
                     g2D.setColor(Color.GREEN);
                     g2D.drawPolygon(facilityMarker);
                 }
@@ -343,7 +344,7 @@ public class StratconPanel extends JPanel implements ActionListener {
 
             StratconScenario selectedScenario = null;
             if(pointFoundOnBoard) {
-                selectedScenario = currentTrack.getScenario(new Coords(boardState.selectedX, boardState.selectedY));
+                selectedScenario = currentTrack.getScenario(new StratconCoords(boardState.selectedX, boardState.selectedY));
             }
              
             menuItemManageScenario.setEnabled(selectedScenario != null);
@@ -371,7 +372,7 @@ public class StratconPanel extends JPanel implements ActionListener {
             assignmentUI.setVisible(true);
             break;
         case RCLICK_COMMAND_MANAGE_SCENARIO:
-            scenarioWizard.setCurrentScenario(currentTrack.getScenario(new Coords(boardState.selectedX, boardState.selectedY)),
+            scenarioWizard.setCurrentScenario(currentTrack.getScenario(new StratconCoords(boardState.selectedX, boardState.selectedY)),
                     currentTrack,
                     campaignState);
             scenarioWizard.setVisible(true);

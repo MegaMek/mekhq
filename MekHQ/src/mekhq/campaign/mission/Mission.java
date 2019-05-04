@@ -326,7 +326,9 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 
         // temporary hack
         if(retVal instanceof AtBContract) {
-            ((AtBContract) retVal).setStratconCampaignState(StratconRulesManager.InitializeCampaignState((AtBContract) retVal, c));
+            if(((AtBContract) retVal).getStratconCampaignState() == null) {
+                ((AtBContract) retVal).setStratconCampaignState(StratconRulesManager.InitializeCampaignState((AtBContract) retVal, c));
+            }
         }
         
         return retVal;

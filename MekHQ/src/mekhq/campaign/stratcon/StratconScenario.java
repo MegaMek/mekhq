@@ -64,8 +64,6 @@ public class StratconScenario implements IStratconDisplayable {
     private Date actionDate;
     private Date returnDate;
     
-    private Campaign currentCampaign;
-
     public void initializeScenario(Campaign campaign, AtBContract contract, MapLocation location) {
         // scenario initialized from template - includes name, type, objectives, terrain/map, weather, lighting, gravity, atmo pressure
         // player assigns primary forces (list of ints that are force IDs)
@@ -106,9 +104,6 @@ public class StratconScenario implements IStratconDisplayable {
         AtBDynamicScenarioFactory.setScenarioModifiers(backingScenario);
         AtBDynamicScenarioFactory.applyScenarioModifiers(backingScenario, campaign, EventTiming.PreForceGeneration);
         setCurrentState(ScenarioState.UNRESOLVED);
-        
-        // retain the current campaign for convenience
-        currentCampaign = campaign;
     }
 
     public void addPrimaryForce(int forceID) {
@@ -260,7 +255,7 @@ public class StratconScenario implements IStratconDisplayable {
         stateBuilder.append("Status: ");
         stateBuilder.append(scenarioStateNames.get(currentState));
 
-        if(includeForces) {
+        /*if(includeForces) {
             List<UUID> unitIDs = backingScenario.getForces(currentCampaign).getAllUnits();
             
             if(!unitIDs.isEmpty()) {
@@ -272,7 +267,7 @@ public class StratconScenario implements IStratconDisplayable {
                     stateBuilder.append("<br/>");
                 }
             }
-        }        
+        }*/        
 
         stateBuilder.append("</html>");
         return stateBuilder.toString();
@@ -330,5 +325,9 @@ public class StratconScenario implements IStratconDisplayable {
 
     public void setReturnDate(Date returnDate) {
         this.returnDate = returnDate;
+    }
+    
+    public ScenarioTemplate getScenarioTemplate() {
+        return backingScenario.getTemplate();
     }
 }

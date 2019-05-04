@@ -1,5 +1,6 @@
 package mekhq.campaign.stratcon;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -7,17 +8,37 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.namespace.QName;
+
+import org.w3c.dom.Node;
+
 import megamek.common.Compute;
 import megamek.common.Coords;
 import megamek.common.UnitType;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 
+/**
+ * Track-level state object for a stratcon campaign.
+ * @author NickAragua
+ *
+ */
+@XmlRootElement(name="campaignTrack")
 public class StratconTrackState {
+    public static final String ROOT_XML_ELEMENT_NAME = "StratconCampaignState";
     
     // a track has the following characteristics:
     // width/height
@@ -27,8 +48,11 @@ public class StratconTrackState {
     private String displayableName;
     private int width;
     private int height;
-    private Map<Coords, StratconFacility> facilities;
-    private Map<Coords, StratconScenario> scenarios;
+    
+    private Map<StratconCoords, StratconFacility> facilities;
+   
+    private Map<StratconCoords, StratconScenario> scenarios;
+    
     private Set<Integer> assignedForceIDs;
     private int scenarioOdds;
     private int deploymentTime;
@@ -64,27 +88,31 @@ public class StratconTrackState {
         this.height = height;
     }
 
-    public Map<Coords, StratconFacility> getFacilities() {
+    @XmlElementWrapper(name="trackFacilities")
+    @XmlElement(name="facility")
+    public Map<StratconCoords, StratconFacility> getFacilities() {
         return facilities;
     }
 
-    public void setFacilities(Map<Coords, StratconFacility> facilities) {
+    public void setFacilities(Map<StratconCoords, StratconFacility> facilities) {
         this.facilities = facilities;
     }
 
-    public StratconFacility getFacility(Coords coords) {
+    public StratconFacility getFacility(StratconCoords coords) {
         return facilities.get(coords);
     }
     
-    public Map<Coords, StratconScenario> getScenarios() {
+    @XmlElementWrapper(name="trackScenarios")
+    @XmlElement(name="scenario")
+    public Map<StratconCoords, StratconScenario> getScenarios() {
         return scenarios;
     }
 
-    public void setScenarios(Map<Coords, StratconScenario> scenarios) {
+    public void setScenarios(Map<StratconCoords, StratconScenario> scenarios) {
         this.scenarios = scenarios;
     }
     
-    public StratconScenario getScenario(Coords coords) {
+    public StratconScenario getScenario(StratconCoords coords) {
         return scenarios.get(coords);
     }
     
@@ -131,11 +159,11 @@ public class StratconTrackState {
         this.assignedForceIDs = assignedForceIDs;
     }
     
-    public void addFacility(Coords coords, StratconFacility facility) {
+    public void addFacility(StratconCoords coords, StratconFacility facility) {
         facilities.put(coords, facility);
     }
     
-    public void removeFacility(Coords coords) {
+    public void removeFacility(StratconCoords coords) {
         facilities.remove(coords);
     }
     

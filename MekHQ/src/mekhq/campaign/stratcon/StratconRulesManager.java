@@ -3,16 +3,21 @@ package mekhq.campaign.stratcon;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import megamek.common.Compute;
 import megamek.common.Coords;
+import megamek.common.UnitType;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.NewDayEvent;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.stratcon.StratconFacility.FacilityType;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
@@ -27,7 +32,7 @@ public class StratconRulesManager {
     public static final int NUM_LANCES_PER_TRACK = 3;    
     
     public static StratconCampaignState InitializeCampaignState(AtBContract contract, Campaign campaign) {
-        StratconCampaignState retVal = new StratconCampaignState(campaign, contract);
+        StratconCampaignState retVal = new StratconCampaignState(contract);
         
         // a campaign will have X tracks going at a time, where
         // X = # required lances / 3, rounded up. The last track will have fewer required lances.
@@ -78,7 +83,7 @@ public class StratconRulesManager {
             
             sf.setDisplayableName(String.format("Facility %d,%d", x, y));
             
-            retVal.addFacility(new Coords(x, y), sf);
+            retVal.addFacility(new StratconCoords(x, y), sf);
         }
         
         return retVal;
@@ -99,7 +104,7 @@ public class StratconRulesManager {
                 int x = Compute.randomInt(track.getWidth());
                 int y = Compute.randomInt(track.getHeight());                
                 
-                Coords scenarioCoords = new Coords(x, y);
+                StratconCoords scenarioCoords = new StratconCoords(x, y);
                 
                 if(track.getScenarios().containsKey(scenarioCoords)) {
                     track.getScenarios().get(scenarioCoords).incrementRequiredPlayerLances();
@@ -210,6 +215,57 @@ public class StratconRulesManager {
         }
         
         return sb.toString();
+    }
+    
+    /**
+     * Determines whether the force in question has the same primary unit type as the force template.
+     * @param force The force to check.
+     * @param forceTemplate The force template to check.
+     * @param campaign The working campaign.
+     * @return Whether or not the unit types match.
+     */
+    public static boolean forceCompositionMatchesDeclaredUnitType(Force force, ScenarioForceTemplate forceTemplate, Campaign campaign) {
+        int primaryUnitType = force.getPrimaryUnitType(campaign);
+        
+        // special cases are "ATB_MIX" and "ATB_AERO_MIX", which encompass multiple unit types
+        if(forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX) {
+            return primaryUnitType == UnitType.MEK ||
+                    primaryUnitType == UnitType.TANK ||
+                    primaryUnitType == UnitType.VTOL;
+        } else if (forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX) {
+            return primaryUnitType == UnitType.AERO ||
+                    primaryUnitType == UnitType.CONV_FIGHTER;
+        } else {
+            return primaryUnitType == forceTemplate.getAllowedUnitType();
+        }
+    }
+    
+    /**
+     * This is a list of all force IDs for forces that 
+     * a) have not been assigned to a track
+     * b) are combat-capable
+     * c) are not deployed to a scenario
+     * @return
+     */
+    public static List<Integer> getAvailableForceIDs() {
+        List<Integer> retVal = new ArrayList<>();
+        
+        Set<Integer> forcesInTracks = new HashSet<>();
+        /*for(StratconTrackState track : tracks) {
+            forcesInTracks.addAll(track.getAssignedForceIDs());
+        }
+        
+        for(int key : campaign.getLances().keySet()) {
+            Force force = campaign.getForce(key);
+            if(force != null && 
+                    !force.isDeployed() && 
+                    !force.getUnits().isEmpty() &&
+                    !forcesInTracks.contains(force.getId())) {
+                retVal.add(force.getId());
+            }
+        }*/
+        
+        return retVal;
     }
     
     public StratconRulesManager() {

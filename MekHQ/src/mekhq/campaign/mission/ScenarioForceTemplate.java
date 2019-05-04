@@ -28,7 +28,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     // 6) Allowed unit types - This is a set of unit types of which the force may consist
     
     public static final String[] FORCE_ALIGNMENTS = { "Player", "Allied", "Opposing", "Third", "Planet Owner" };
-    public static final String[] FORCE_GENERATION_METHODS = { "Player Supplied", "BV Scaled", "Unit Count Scaled", "Fixed Unit Count" };
+    public static final String[] FORCE_GENERATION_METHODS = { "Player Supplied", "BV Scaled", "Unit Count Scaled", "Fixed Unit Count", "Player/Fixed Unit Count" };
     public static final String[] FORCE_DEPLOYMENT_SYNC_TYPES = { "None", "Same Edge", "Same Arc", "Opposite Edge", "Opposite Arc" };
     public static final String[] DEPLOYMENT_ZONES = { "Any", "Northwest", "North", "Northeast", "East", "Southeast", "South", "Southwest", "West", "Edge", "Center", "Narrow Edge" };
     public static final String[] BOT_DESTINATION_ZONES = { "North", "East", "South", "West", "None", "Opposite Deployment Edge", "Random" };
@@ -77,7 +77,8 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         PlayerSupplied,
         BVScaled,
         UnitCountScaled,
-        FixedUnitCount
+        FixedUnitCount,
+        PlayerOrFixedUnitCount
     }
     
     public enum SynchronizedDeploymentType {

@@ -1238,6 +1238,10 @@ public class AtBContract extends Contract implements Serializable {
                     + specialEventScenarioType
                     +"</specialEventScenarioType>");
         }
+        
+        if(stratconCampaignState != null) {
+            stratconCampaignState.Serialize(pw1);
+        }
     }
 
     public void loadFieldsFromXmlNode(Node wn) throws ParseException {
@@ -1307,6 +1311,9 @@ public class AtBContract extends Contract implements Serializable {
                 specialEventScenarioDate = new SimpleDateFormat("yyyy-MM-dd").parse(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("specialEventScenarioType")) {
                 specialEventScenarioType = Integer.parseInt(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase(StratconCampaignState.ROOT_XML_ELEMENT_NAME)) {
+                stratconCampaignState = StratconCampaignState.Deserialize(wn2);
+                stratconCampaignState.setContract(this);
             }
         }
     }

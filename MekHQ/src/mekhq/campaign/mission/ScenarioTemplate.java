@@ -59,12 +59,6 @@ public class ScenarioTemplate {
         return scenarioForces.values().stream().collect(Collectors.toList());
     }
     
-    public List<ScenarioForceTemplate> getAllPlayerControlledAllies() {
-        return scenarioForces.values().stream().filter(forceTemplate -> 
-            (forceTemplate.getForceAlignment() == ForceAlignment.Player.ordinal()))
-                .collect(Collectors.toList());
-    }
-    
     public List<ScenarioForceTemplate> getAllBotControlledAllies() {
         return scenarioForces.values().stream().filter(forceTemplate -> 
             (forceTemplate.getForceAlignment() == ForceAlignment.Allied.ordinal()) &&
@@ -76,6 +70,18 @@ public class ScenarioTemplate {
         return scenarioForces.values().stream().filter(forceTemplate -> 
             (forceTemplate.getForceAlignment() == ForceAlignment.Opposing.ordinal()) ||
             (forceTemplate.getForceAlignment() == ForceAlignment.Third.ordinal()))
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * All force templates that are controlled and supplied, or potentially supplied, by the player. 
+     * @return List of scenario force templates
+     */
+    public List<ScenarioForceTemplate> getAllPlayerSuppliedForces() {
+        return scenarioForces.values().stream().filter(forceTemplate -> 
+            (forceTemplate.getForceAlignment() == ForceAlignment.Player.ordinal()) &&
+                ((forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal()) ||
+                 (forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerOrFixedUnitCount.ordinal())))  
                 .collect(Collectors.toList());
     }
     
