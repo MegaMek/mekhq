@@ -135,6 +135,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private ArrayList<JSlider> pr_hitSliders = new ArrayList<>();
     private ArrayList<PrisonerStatus> prstatuses = new ArrayList<>();
     private ArrayList<JButton> btnsViewPrisoner;
+
     /*
      * Salvage panel components
      */
@@ -518,9 +519,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.gridx = 3;
             pnlPrisonerStatus.add(kiaCheck, gridBagConstraints);
             btnViewPrisoner = new JButton("View Personnel");
-            btnViewPrisoner.setEnabled(!status.isDead());
-            btnViewPrisoner.setActionCommand(status.getId().toString());
-            btnViewPrisoner.addActionListener(new ViewPrisonerListener());
+            btnViewPrisoner.addActionListener(evt -> showPrisoner(status.getId()));
             btnsViewPrisoner.add(btnViewPrisoner);
             gridBagConstraints.gridx = 4;
             gridBagConstraints.weightx = 1.0;
@@ -1500,8 +1499,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
     private void showPrisoner(UUID id) {
         //dialog
-        PrisonerStatus pstatus;
-        pstatus = tracker.getPrisonerStatus().get(id);
+        PrisonerStatus pstatus = tracker.getPrisonerStatus().get(id);
 
         if(null == pstatus || null == pstatus.getPerson() ) {
             return;
@@ -1514,6 +1512,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         dialog.getContentPane().setLayout(new GridBagLayout());
         JButton btn = new JButton(Messages.getString("Okay")); //$NON-NLS-1$
         btn.addActionListener(e -> dialog.setVisible(false));
+        dialog.getRootPane().setDefaultButton(btn);
 
         JScrollPane scrollPersonnelView = new JScrollPane();
         scrollPersonnelView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -1589,8 +1588,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 idx = prisonerKiaBtns.indexOf(kiaChk);   // find it in prisoners' instead
                 JSlider hitSlider = pr_hitSliders.get(idx);
                 JCheckBox capturedCheck = prisonerBtns.get(idx);
+                JButton viewPersonellbtn = btnsViewPrisoner.get(idx);
                 hitSlider.setEnabled(enable);
                 capturedCheck.setEnabled(enable);
+                viewPersonellbtn.setEnabled(enable);
             } else {
                 JSlider hitSlider = hitSliders.get(idx);
                 JCheckBox miaChk = miaBtns.get(idx);
@@ -1614,18 +1615,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
         public void actionPerformed(java.awt.event.ActionEvent evt) {
             UUID id = UUID.fromString(evt.getActionCommand());
             showUnit(id, salvage);
-        }
-    }
-
-    private class ViewPrisonerListener implements ActionListener {
-
-        public ViewPrisonerListener() {
-        }
-
-        @Override
-        public void actionPerformed(java.awt.event.ActionEvent evt) {
-            UUID id = UUID.fromString(evt.getActionCommand());
-            showPrisoner(id);
         }
     }
 
