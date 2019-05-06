@@ -581,7 +581,7 @@ public class Armor extends Part implements IAcquisitionWork {
                 remove(false);
             } else {
                 skillMin = SkillType.EXP_GREEN;
-                changeAmountAvailable(-1 * Math.min(amountNeeded, getAmountAvailable()));
+                changeAmountAvailable(-1 * Math.min((unit.getEntity().isCapitalScale() ? (amountNeeded * 10) : amountNeeded), getAmountAvailable()));
             }
         }
         return " <font color='red'><b> failed." + scrap + "</b></font>";
