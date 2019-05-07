@@ -47,16 +47,11 @@ public class GravDeck extends Part {
      */
     private static final long serialVersionUID = -3387290388135852860L;
     
-    static final TechAdvancement TA_BOOM = new TechAdvancement(TECH_BASE_ALL)
-            .setAdvancement(2458, 2470, 2500).setPrototypeFactions(F_TH)
-            .setProductionFactions(F_TH).setTechRating(RATING_C)
+    static final TechAdvancement TA_GRAV_DECK = new TechAdvancement(TECH_BASE_ALL)
+            .setAdvancement(DATE_ES, DATE_ES, DATE_ES)
+            .setTechRating(RATING_B)
             .setAvailability(RATING_C, RATING_C, RATING_C, RATING_C)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
-    static final TechAdvancement TA_NO_BOOM = new TechAdvancement(TECH_BASE_ALL)
-            .setAdvancement(2304, 2350, 2364, 2520).setPrototypeFactions(F_TA)
-            .setProductionFactions(F_TH).setTechRating(RATING_B)
-            .setAvailability(RATING_C, RATING_X, RATING_X, RATING_X)
-            .setStaticTechLevel(SimpleTechLevel.ADVANCED);
     
     private int collarType;
     private int collarNumber;
@@ -242,10 +237,6 @@ public class GravDeck extends Part {
 	
 	@Override
 	public TechAdvancement getTechAdvancement() {
-	    if (collarType != Jumpship.COLLAR_NO_BOOM) {
-	        return TA_BOOM;
-	    } else {
-	        return TA_NO_BOOM;
-	    }
+	    return TA_GRAV_DECK;
 	}
 }

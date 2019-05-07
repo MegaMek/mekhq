@@ -29,6 +29,7 @@ import org.w3c.dom.NodeList;
 import megamek.common.DockingCollar;
 import megamek.common.Entity;
 import megamek.common.Jumpship;
+import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -138,12 +139,8 @@ public class MissingGravDeck extends MissingPart {
 	}
 	
 	@Override
-	public TechAdvancement getTechAdvancement() {
-        if (collarType != Jumpship.COLLAR_NO_BOOM) {
-            return JumpshipDockingCollar.TA_BOOM;
-        } else {
-            return JumpshipDockingCollar.TA_NO_BOOM;
-        }
-	}
+    public TechAdvancement getTechAdvancement() {
+        return GravDeck.TA_GRAV_DECK;
+    }
 	
 }
