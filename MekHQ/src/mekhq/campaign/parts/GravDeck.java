@@ -27,7 +27,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.Compute;
-import megamek.common.DockingCollar;
 import megamek.common.Entity;
 import megamek.common.Jumpship;
 import megamek.common.SimpleTechLevel;
@@ -96,12 +95,8 @@ public class GravDeck extends Part {
 	public void updateConditionFromEntity(boolean checkForDestruction) {
 		int priorHits = hits;
 		if (null != unit && unit.getEntity() instanceof Jumpship) {
-		    DockingCollar collar = unit.getEntity().getCollarById(deckNumber);
-			if (collar != null && collar.isDamaged()) {
-			    hits = 1;
-			} else { 
-				hits = 0;
-			}
+		    hits = ((Jumpship) unit.getEntity()).getGravDeckDamageFlag(deckNumber);
+		    
 			if (checkForDestruction 
 					&& hits > priorHits
 					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
@@ -113,26 +108,23 @@ public class GravDeck extends Part {
 	@Override 
 	public int getBaseTime() {
 		if(isSalvaging()) {
-			return 2880;
+			return 4800;
 		}
-		return 120;
+		return 1440;
 	}
 	
 	@Override
 	public int getDifficulty() {
 		if(isSalvaging()) {
-			return -2;
+			return 3;
 		}
-		return 3;
+		return 2;
 	}
 
 	@Override
 	public void updateConditionFromPart() {
 	    if (null != unit && unit.getEntity() instanceof Jumpship) {
-            DockingCollar collar = unit.getEntity().getCollarById(collarNumber);
-            if (collar != null) {
-                collar.setDamaged(hits > 0);
-            }
+	        ((Jumpship) unit.getEntity()).setGravDeckDamageFlag(deckNumber, hits);
 		}
 	}
 
@@ -140,20 +132,15 @@ public class GravDeck extends Part {
 	public void fix() {
 		super.fix();
 		if (null != unit && unit.getEntity() instanceof Jumpship) {
-            DockingCollar collar = unit.getEntity().getCollarById(collarNumber);
-            if (collar != null) {
-                collar.setDamaged(false);
-            }
+		    ((Jumpship) unit.getEntity()).setGravDeckDamageFlag(deckNumber, 0);
         }
 	}
 
 	@Override
 	public void remove(boolean salvage) {
 	    if (unit.getEntity() instanceof Jumpship) {
-            DockingCollar collar = unit.getEntity().getCollarById(collarNumber);
-            if (collar != null) {
-                collar.setDamaged(true);
-            }
+	        ((Jumpship) unit.getEntity()).setGravDeckDamageFlag(deckNumber, 1);
+	        
 			Part spare = campaign.checkForExistingSparePart(this);
 			if(!salvage) {
 				campaign.removePart(this);
@@ -172,7 +159,7 @@ public class GravDeck extends Part {
 
 	@Override
 	public MissingPart getMissingPart() {
-		return new MissingJumpshipDockingCollar(0, collarNumber, campaign, collarType);
+		return new MissingJumpshipDockingCollar(0, deckNumber, campaign, deckType);
 	}
 
 	@Override
@@ -187,10 +174,12 @@ public class GravDeck extends Part {
 
 	@Override
 	public Money getStickerPrice() {
-	    if (collarType == Jumpship.COLLAR_STANDARD) {
-	        return Money.of(100000);
+	    if (deckType == GRAV_DECK_TYPE_STANDARD) {
+	        return Money.of(5000000);
+	    } else if (deckType == GRAV_DECK_TYPE_LARGE) {
+	        return Money.of(10000000);
 	    } else {
-	        return Money.of(500000) ;
+	        return Money.of(40000000);
 	    }
 	}
 	
@@ -202,14 +191,14 @@ public class GravDeck extends Part {
 	@Override
 	public boolean isSamePartType(Part part) {
 		return (part instanceof GravDeck)
-		        && (collarType == ((GravDeck)part).collarType);
+		        && (deckType == ((GravDeck)part).deckType);
 	}
 	
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "collarType", collarType);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "collarNumber", collarNumber);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "deckType", deckType);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "deckNumber", deckNumber);
 		writeToXmlEnd(pw1, indent);
 	}
 
@@ -219,10 +208,10 @@ public class GravDeck extends Part {
 
         for (int x=0; x<nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            if (wn2.getNodeName().equalsIgnoreCase("collarType")) {
-                collarType = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("collarNumber")) {
-                collarNumber = Integer.parseInt(wn2.getTextContent());
+            if (wn2.getNodeName().equalsIgnoreCase("deckType")) {
+                deckType = Integer.parseInt(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("deckNumber")) {
+                deckNumber = Integer.parseInt(wn2.getTextContent());
             }
         }
 	}
