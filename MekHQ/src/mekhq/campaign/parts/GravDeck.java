@@ -53,42 +53,50 @@ public class GravDeck extends Part {
             .setAvailability(RATING_C, RATING_C, RATING_C, RATING_C)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
     
-    private int collarType;
-    private int collarNumber;
+    private int deckType;
+    private int deckNumber;
+    
+    private static int GRAV_DECK_TYPE_STANDARD = 0;
+    private static int GRAV_DECK_TYPE_LARGE = 1;
+    private static int GRAV_DECK_TYPE_HUGE = 2;
 	
 	public GravDeck() {
-    	this(0, 0, null, Jumpship.COLLAR_STANDARD);
+    	this(0, 0, null, GRAV_DECK_TYPE_STANDARD);
     }
     
-    public GravDeck(int tonnage, int collarNumber, Campaign c, int collarType) {
+    public GravDeck(int tonnage, int deckNumber, Campaign c, int deckType) {
         super(tonnage, c);
-        this.collarNumber = collarNumber;
-        this.collarType = collarType;
-        this.name = "Jumpship Docking Collar";
-        if (collarType == Jumpship.COLLAR_NO_BOOM) {
-            name += " (Pre Boom)";
+        this.deckNumber = deckNumber;
+        this.deckType = deckType;
+        this.name = "Grav Deck";
+        if (deckType == GRAV_DECK_TYPE_STANDARD) {
+            name += " (Standard)";
+        } else if (deckType == GRAV_DECK_TYPE_LARGE) {
+            name += " (Large)";
+        } else if (deckType == GRAV_DECK_TYPE_HUGE) {
+            name += " (Huge)";
         }
     }
     
-    public int getCollarNumber() {
-        return collarNumber;
+    public int getDeckNumber() {
+        return deckNumber;
     }
     
     public GravDeck clone() {
-    	GravDeck clone = new GravDeck(0, collarNumber, campaign, collarType);
+    	GravDeck clone = new GravDeck(0, deckNumber, campaign, deckType);
         clone.copyBaseData(this);
     	return clone;
     }
     
-    public int getCollarType() {
-        return collarType;
+    public int getDeckType() {
+        return deckType;
     }
         
 	@Override
 	public void updateConditionFromEntity(boolean checkForDestruction) {
 		int priorHits = hits;
 		if (null != unit && unit.getEntity() instanceof Jumpship) {
-		    DockingCollar collar = unit.getEntity().getCollarById(collarNumber);
+		    DockingCollar collar = unit.getEntity().getCollarById(deckNumber);
 			if (collar != null && collar.isDamaged()) {
 			    hits = 1;
 			} else { 
