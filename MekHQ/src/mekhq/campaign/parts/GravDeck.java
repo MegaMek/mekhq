@@ -185,7 +185,14 @@ public class GravDeck extends Part {
 	
 	@Override
 	public double getTonnage() {
-		return 1000;
+	    //TO tables p 407
+	    if (deckType == GRAV_DECK_TYPE_STANDARD) {
+            return 50;
+        } else if (deckType == GRAV_DECK_TYPE_LARGE) {
+            return 100;
+        } else {
+            return 500;
+        }
 	}
 
 	@Override
