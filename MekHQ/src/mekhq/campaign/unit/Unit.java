@@ -1189,11 +1189,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 Money sinkCost = Money.of(2000.0 + 4000.0 * js.getHeatType());// == HEAT_DOUBLE ? 6000 : 2000
                 partsValue = partsValue.plus(sinkCost.multipliedBy(js.getHeatSinks()));
 
-                // grav deck
-                partsValue = partsValue.plus(5000000.0 * js.getGravDeck());
-                partsValue = partsValue.plus(10000000.0 * js.getGravDeckLarge());
-                    partsValue = partsValue.plus(40000000.0 * js.getGravDeckHuge());
-
                 // get bays
                 int baydoors = 0;
                 Money bayCost = Money.zero();
