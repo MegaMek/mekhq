@@ -780,7 +780,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public IAcquisitionWork getAcquisitionWork() {
-        return this.getMissingPart();
+        return getMissingPart();
     }
 
     @Override
