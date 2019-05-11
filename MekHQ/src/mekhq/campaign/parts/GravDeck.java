@@ -159,7 +159,7 @@ public class GravDeck extends Part {
 
 	@Override
 	public MissingPart getMissingPart() {
-		return new MissingJumpshipDockingCollar(0, deckNumber, campaign, deckType);
+		return new MissingGravDeck(0, deckNumber, campaign, deckType);
 	}
 
 	@Override

@@ -140,8 +140,8 @@ public class MissingGravDeck extends MissingPart {
 
 	@Override
 	public boolean isAcceptableReplacement(Part part, boolean refit) {
-		return (part instanceof JumpshipDockingCollar)
-		        && (refit || (((JumpshipDockingCollar) part).getCollarType() == deckType));
+		return (part instanceof GravDeck)
+		        && (refit || (((GravDeck) part).getDeckType() == deckType));
 	}
 
 	@Override
