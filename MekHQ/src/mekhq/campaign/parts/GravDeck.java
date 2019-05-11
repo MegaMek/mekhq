@@ -55,9 +55,9 @@ public class GravDeck extends Part {
     private int deckType;
     private int deckNumber;
     
-    private static int GRAV_DECK_TYPE_STANDARD = 0;
-    private static int GRAV_DECK_TYPE_LARGE = 1;
-    private static int GRAV_DECK_TYPE_HUGE = 2;
+    public static int GRAV_DECK_TYPE_STANDARD = 0;
+    public static int GRAV_DECK_TYPE_LARGE = 1;
+    public static int GRAV_DECK_TYPE_HUGE = 2;
 	
 	public GravDeck() {
     	this(0, 0, null, GRAV_DECK_TYPE_STANDARD);
