@@ -80,8 +80,8 @@ public class LargeCraftCoolingSystem extends Part {
     
 	@Override
 	public void updateConditionFromEntity(boolean checkForDestruction) {
-	    if(null != unit) {
-            totalSinks = unit.getEntity().getHeatCapacity();
+	    if(null != unit && unit instanceof Aero) {
+            totalSinks = ((Aero) unit.getEntity()).getHeatSinks();
             if(null != mounted) {
                 capacity = mounted.getAmmoCapacity();
                 type = mounted.getType();
