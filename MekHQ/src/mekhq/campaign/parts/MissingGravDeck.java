@@ -45,13 +45,9 @@ public class MissingGravDeck extends MissingPart {
     
     private int deckType;
     private int deckNumber;
-    
-    private static int GRAV_DECK_TYPE_STANDARD = 0;
-    private static int GRAV_DECK_TYPE_LARGE = 1;
-    private static int GRAV_DECK_TYPE_HUGE = 2;
 	
 	public MissingGravDeck() {
-    	this(0, 0, null, GRAV_DECK_TYPE_STANDARD);
+    	this(0, 0, null, GravDeck.GRAV_DECK_TYPE_STANDARD);
     }
     
     public MissingGravDeck(int tonnage, int deckNumber, Campaign c, int deckType) {
@@ -59,11 +55,11 @@ public class MissingGravDeck extends MissingPart {
         this.deckNumber = deckNumber;
         this.deckType = deckType;
         this.name = "Grav Deck";
-        if (deckType == GRAV_DECK_TYPE_STANDARD) {
+        if (deckType == GravDeck.GRAV_DECK_TYPE_STANDARD) {
             name += " (Standard)";
-        } else if (deckType == GRAV_DECK_TYPE_LARGE) {
+        } else if (deckType == GravDeck.GRAV_DECK_TYPE_LARGE) {
             name += " (Large)";
-        } else if (deckType == GRAV_DECK_TYPE_HUGE) {
+        } else if (deckType == GravDeck.GRAV_DECK_TYPE_HUGE) {
             name += " (Huge)";
         }
     }
@@ -95,7 +91,7 @@ public class MissingGravDeck extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new JumpshipDockingCollar(0, 0, campaign, deckType);
+		return new GravDeck(0, 0, campaign, deckType);
 	}
 
 	@Override
@@ -107,9 +103,9 @@ public class MissingGravDeck extends MissingPart {
 	@Override
 	public double getTonnage() {
 	    //TO tables p 407
-        if (deckType == GRAV_DECK_TYPE_STANDARD) {
+        if (deckType == GravDeck.GRAV_DECK_TYPE_STANDARD) {
             return 50;
-        } else if (deckType == GRAV_DECK_TYPE_LARGE) {
+        } else if (deckType == GravDeck.GRAV_DECK_TYPE_LARGE) {
             return 100;
         } else {
             return 500;
