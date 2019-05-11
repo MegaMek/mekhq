@@ -122,6 +122,7 @@ import mekhq.campaign.parts.Cubicle;
 import mekhq.campaign.parts.DropshipDockingCollar;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.FireControlSystem;
+import mekhq.campaign.parts.GravDeck;
 import mekhq.campaign.parts.InfantryArmorPart;
 import mekhq.campaign.parts.InfantryMotiveType;
 import mekhq.campaign.parts.JumpshipDockingCollar;
@@ -1855,6 +1856,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         Map<Integer, Part> bays = new HashMap<>();
         Map<Integer, List<Part>> bayPartsToAdd = new HashMap<>();
         Map<Integer, Part> jumpCollars = new HashMap<>();
+        Map<Integer, Part> gravDecks = new HashMap<>();
 
         for(Part part : parts) {
             if(part instanceof MekGyro || part instanceof MissingMekGyro) {
@@ -2086,6 +2088,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 bays.put(((TransportBayPart) part).getBayNumber(), part);
             } else if (part instanceof JumpshipDockingCollar) {
                 jumpCollars.put(((JumpshipDockingCollar) part).getCollarNumber(), part);
+            } else if (part instanceof GravDeck) {
+                gravDecks.put(((GravDeck) part).getDeckNumber(), part);
             }
 
             part.updateConditionFromPart();
@@ -2547,6 +2551,22 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     jumpCollars.put(collar.getCollarNumber(), collarPart);
                     addPart(collarPart);
                     partsToAdd.add(collarPart);
+                }
+            }
+            if (gravDecks.isEmpty() && entity instanceof Jumpship) {
+                for (int deck : ((Jumpship) entity).getGravDecks()) {
+                    int deckNumber = ((Jumpship) entity).getGravDecks().indexOf(deck);
+                    //Default to standard size
+                    int deckType = GravDeck.GRAV_DECK_TYPE_STANDARD;
+                    if (deck > Jumpship.GRAV_DECK_STANDARD_MAX && deck <= Jumpship.GRAV_DECK_LARGE_MAX) {
+                        deckType = GravDeck.GRAV_DECK_TYPE_LARGE;
+                    } else if (deck > Jumpship.GRAV_DECK_LARGE_MAX) {
+                        deckType = GravDeck.GRAV_DECK_TYPE_HUGE;
+                    }
+                    Part gravDeckPart = new GravDeck (0, deckNumber, getCampaign(), deckType);
+                    gravDecks.put(deckNumber, gravDeckPart);
+                    addPart(gravDeckPart);
+                    partsToAdd.add(gravDeckPart);
                 }
             }
             int hsinks = ((Aero)entity).getOHeatSinks() - aeroHeatSinks.size();
