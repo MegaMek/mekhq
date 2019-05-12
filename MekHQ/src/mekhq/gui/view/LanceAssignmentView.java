@@ -65,52 +65,52 @@ import mekhq.gui.model.XTableColumnModel;
  *
  */
 public class LanceAssignmentView extends JPanel {
-	
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 7280552346074838142L;
-	public static final int ROLE_NONE = 0;
-	public static final int ROLE_FIGHT = 1;
-	public static final int ROLE_DEFEND = 2;
-	public static final int ROLE_SCOUT = 3;
-	public static final int ROLE_TRAINING = 4;
-	public static final int ROLE_NUM = 5;
-	
-	private Campaign campaign;
-	
-	private JTable tblRequiredLances;
-	private JTable tblAssignments;
-	private JPanel panRequiredLances;
-	private JPanel panAssignments;
-	private JComboBox<AtBContract> cbContract;
-	private JComboBox<String> cbRole;
+        
+        
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 7280552346074838142L;
+        public static final int ROLE_NONE = 0;
+        public static final int ROLE_FIGHT = 1;
+        public static final int ROLE_DEFEND = 2;
+        public static final int ROLE_SCOUT = 3;
+        public static final int ROLE_TRAINING = 4;
+        public static final int ROLE_NUM = 5;
+        
+        private Campaign campaign;
+        
+        private JTable tblRequiredLances;
+        private JTable tblAssignments;
+        private JPanel panRequiredLances;
+        private JPanel panAssignments;
+        private JComboBox<AtBContract> cbContract;
+        private JComboBox<String> cbRole;
 
-	public LanceAssignmentView(Campaign c) {
-		campaign = c;
-		
-		initComponents();
-	}
-	
-	@SuppressWarnings("serial")
-	private void initComponents() {
-		cbContract = new JComboBox<AtBContract>();
-		cbContract.setRenderer(new DefaultListCellRenderer() {
-			@Override
-			public Component getListCellRendererComponent(JList<?> list,
-					Object value, int index, boolean isSelected,
-					boolean cellHasFocus) {
-				return new JLabel((null == value)?"None":((AtBContract)value).getName());
-			}
-		});
-		
-		cbRole = new JComboBox<String>(Lance.roleNames);
-		
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		
-		RequiredLancesTableModel rlModel = new RequiredLancesTableModel(campaign); 
-		tblRequiredLances = new JTable(rlModel);
+        public LanceAssignmentView(Campaign c) {
+                campaign = c;
+                
+                initComponents();
+        }
+        
+        @SuppressWarnings("serial")
+        private void initComponents() {
+                cbContract = new JComboBox<AtBContract>();
+                cbContract.setRenderer(new DefaultListCellRenderer() {
+                        @Override
+                        public Component getListCellRendererComponent(JList<?> list,
+                                        Object value, int index, boolean isSelected,
+                                        boolean cellHasFocus) {
+                                return new JLabel((null == value)?"None":((AtBContract)value).getName());
+                        }
+                });
+                
+                cbRole = new JComboBox<String>(Lance.roleNames);
+                
+                setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+                
+                RequiredLancesTableModel rlModel = new RequiredLancesTableModel(campaign); 
+                tblRequiredLances = new JTable(rlModel);
         tblRequiredLances.setColumnModel(new XTableColumnModel());
         tblRequiredLances.createDefaultColumnsFromModel();
         tblRequiredLances.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
@@ -119,19 +119,19 @@ public class LanceAssignmentView extends JPanel {
             column = ((XTableColumnModel)tblRequiredLances.getColumnModel()).getColumnByModelIndex(i);
             column.setPreferredWidth(rlModel.getColumnWidth(i));
             column.setCellRenderer(new DefaultTableCellRenderer() {
-				public Component getTableCellRendererComponent(JTable table,
+                                public Component getTableCellRendererComponent(JTable table,
                         Object value, boolean isSelected, boolean hasFocus,
                         int row, int column) {
                     super.getTableCellRendererComponent(table, value, isSelected,
                             hasFocus, row, column);
                     setHorizontalAlignment(((RequiredLancesTableModel)table.getModel()).
-                    		getAlignment(table.convertColumnIndexToModel(column)));
+                                getAlignment(table.convertColumnIndexToModel(column)));
                     if (table.convertColumnIndexToModel(column) > RequiredLancesTableModel.COL_CONTRACT) {
-                    	if (((String)value).indexOf('/') >= 0) {
-                    		setForeground(Color.RED);
-                    	} else {
-                    		setForeground(Color.BLACK);
-                    	}
+                        if (((String)value).indexOf('/') >= 0) {
+                                setForeground(Color.RED);
+                        } else {
+                                setForeground(Color.BLACK);
+                        }
                     }
                     return this;
                 }
@@ -143,30 +143,32 @@ public class LanceAssignmentView extends JPanel {
         tblRequiredLances.setIntercellSpacing(new Dimension(0, 0));
         tblRequiredLances.setShowGrid(false);
         
-		LanceAssignmentTableModel laModel = new LanceAssignmentTableModel(campaign); 
-		tblAssignments = new JTable(laModel);
-		tblAssignments.setColumnModel(new XTableColumnModel());
-		tblAssignments.createDefaultColumnsFromModel();
-		tblAssignments.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+                LanceAssignmentTableModel laModel = new LanceAssignmentTableModel(campaign); 
+                tblAssignments = new JTable(laModel);
+                tblAssignments.setColumnModel(new XTableColumnModel());
+                tblAssignments.createDefaultColumnsFromModel();
+                tblAssignments.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         column = null;
         for (int i = 0; i < LanceAssignmentTableModel.COL_NUM; i++) {
             column = ((XTableColumnModel)tblAssignments.getColumnModel()).getColumnByModelIndex(i);
             column.setPreferredWidth(rlModel.getColumnWidth(i));
             column.setCellRenderer(new DefaultTableCellRenderer() {
-				public Component getTableCellRendererComponent(JTable table,
+                                public Component getTableCellRendererComponent(JTable table,
                         Object value, boolean isSelected, boolean hasFocus,
                         int row, int column) {
                     switch (column) {
                     case LanceAssignmentTableModel.COL_FORCE:
-                    	setText((((Force)value)).getFullName());
-                    	break;
+                        if (null != value) {
+                            setText((((Force)value)).getFullName());
+                        }
+                        break;
                     case LanceAssignmentTableModel.COL_CONTRACT:
-                    	if (null == value) {
-                    		setText("None");
-                    	} else {
-                    		setText(((AtBContract)value).getName());
-                    	}
-                    	break;
+                        if (null == value) {
+                                setText("None");
+                        } else {
+                                setText(((AtBContract)value).getName());
+                        }
+                        break;
                     default:
                         super.getTableCellRendererComponent(table, value, isSelected,
                                 hasFocus, row, column);
@@ -175,20 +177,20 @@ public class LanceAssignmentView extends JPanel {
                 }
             });
             if (i == LanceAssignmentTableModel.COL_CONTRACT) {
-            	column.setCellEditor(new DefaultCellEditor(cbContract));
+                column.setCellEditor(new DefaultCellEditor(cbContract));
             }
             if (i == LanceAssignmentTableModel.COL_ROLE) {
-            	column.setCellEditor(new DefaultCellEditor(cbRole));
+                column.setCellEditor(new DefaultCellEditor(cbRole));
             }
         }
-    	RowFilter<LanceAssignmentTableModel, Integer> laFilter = null;
-    	laFilter = new RowFilter<LanceAssignmentTableModel, Integer>() {
-    		@Override
-    		public boolean include(Entry<? extends LanceAssignmentTableModel, ? extends Integer> entry) {
-    			Lance l = entry.getModel().getRow(entry.getIdentifier());
-    			return l.isEligible(campaign);
-    		}
-    	};
+        RowFilter<LanceAssignmentTableModel, Integer> laFilter = null;
+        laFilter = new RowFilter<LanceAssignmentTableModel, Integer>() {
+                @Override
+                public boolean include(Entry<? extends LanceAssignmentTableModel, ? extends Integer> entry) {
+                        Lance l = entry.getModel().getRow(entry.getIdentifier());
+                        return l.isEligible(campaign);
+                }
+        };
         TableRowSorter<LanceAssignmentTableModel>laSorter = new TableRowSorter<LanceAssignmentTableModel>(laModel);
         laSorter.setRowFilter(laFilter);
         laSorter.setComparator(LanceAssignmentTableModel.COL_FORCE, forceComparator);
@@ -209,14 +211,14 @@ public class LanceAssignmentView extends JPanel {
 
         int cmdrStrategy = 0;
         if (campaign.getFlaggedCommander() != null &&
-        		campaign.getFlaggedCommander().getSkill(SkillType.S_STRATEGY) != null) {
-        	cmdrStrategy = campaign.getFlaggedCommander().
-        			getSkill(SkillType.S_STRATEGY).getLevel();
+                        campaign.getFlaggedCommander().getSkill(SkillType.S_STRATEGY) != null) {
+                cmdrStrategy = campaign.getFlaggedCommander().
+                                getSkill(SkillType.S_STRATEGY).getLevel();
         }
         int maxDeployedLances = 
-        		campaign.getCampaignOptions().getBaseStrategyDeployment() +
-        		campaign.getCampaignOptions().getAdditionalStrategyDeployment() *
-        		cmdrStrategy;
+                        campaign.getCampaignOptions().getBaseStrategyDeployment() +
+                        campaign.getCampaignOptions().getAdditionalStrategyDeployment() *
+                        cmdrStrategy;
         add(new JLabel("Maximum Deployed Units: " + maxDeployedLances));
 
         panAssignments = new JPanel();
@@ -228,99 +230,99 @@ public class LanceAssignmentView extends JPanel {
 
         refresh();
         tblAssignments.getModel().addTableModelListener(assignmentTableListener);
-	}
-	
-	public void refresh() {
-		cbContract.removeAllItems();
-		ArrayList<AtBContract> activeContracts = new ArrayList<AtBContract>();
-		for (Mission m : campaign.getMissions()) {
-			if (m instanceof AtBContract && m.isActive() &&
-					!((AtBContract)m).getStartDate().after(campaign.getDate())) {
-				activeContracts.add((AtBContract)m);
-				cbContract.addItem((AtBContract)m);
-			}
-		}
-		AtBContract defaultContract = null;
-		if (activeContracts.size() > 0) {
-			defaultContract = activeContracts.get(0);
-		}
-		for (Lance l : campaign.getLances().values()) {
-			if (null == l.getContract(campaign) || !l.getContract(campaign).isActive()) {
-				l.setContract(defaultContract);
-			}
-		}
-		((DataTableModel)tblRequiredLances.getModel()).setData(activeContracts);
-		((DataTableModel)tblAssignments.getModel()).setData(campaign.getLanceList());
-		panRequiredLances.setVisible(tblRequiredLances.getRowCount() > 0);
-	}
-	
-	TableModelListener assignmentTableListener = new TableModelListener() {
-		public void tableChanged(TableModelEvent ev) {
-			((RequiredLancesTableModel)tblRequiredLances.getModel()).fireTableDataChanged();
-		}
-	};
-	
-	/** 
-	 * Sorts Force objects according to where they appear on the TO&E
-	 */
-	
-	public Comparator<Force> forceComparator = new Comparator<Force>() {
-		@Override
-		public int compare(Force f1, Force f2) {
+        }
+        
+        public void refresh() {
+                cbContract.removeAllItems();
+                ArrayList<AtBContract> activeContracts = new ArrayList<AtBContract>();
+                for (Mission m : campaign.getMissions()) {
+                        if (m instanceof AtBContract && m.isActive() &&
+                                        !((AtBContract)m).getStartDate().after(campaign.getDate())) {
+                                activeContracts.add((AtBContract)m);
+                                cbContract.addItem((AtBContract)m);
+                        }
+                }
+                AtBContract defaultContract = null;
+                if (activeContracts.size() > 0) {
+                        defaultContract = activeContracts.get(0);
+                }
+                for (Lance l : campaign.getLances().values()) {
+                        if (null == l.getContract(campaign) || !l.getContract(campaign).isActive()) {
+                                l.setContract(defaultContract);
+                        }
+                }
+                ((DataTableModel)tblRequiredLances.getModel()).setData(activeContracts);
+                ((DataTableModel)tblAssignments.getModel()).setData(campaign.getLanceList());
+                panRequiredLances.setVisible(tblRequiredLances.getRowCount() > 0);
+        }
+        
+        TableModelListener assignmentTableListener = new TableModelListener() {
+                public void tableChanged(TableModelEvent ev) {
+                        ((RequiredLancesTableModel)tblRequiredLances.getModel()).fireTableDataChanged();
+                }
+        };
+        
+        /** 
+         * Sorts Force objects according to where they appear on the TO&E
+         */
+        
+        public Comparator<Force> forceComparator = new Comparator<Force>() {
+                @Override
+                public int compare(Force f1, Force f2) {
 
-			/* Check whether they are the same or one is an ancestor of the other */
-			if (f1.getId() == f2.getId()) {
-				return 0;
-			}
-			if (f1.isAncestorOf(f2)) {
-				return -1;
-			}
-			if (f2.isAncestorOf(f1)) {
-				return 1;
-			}
+                        /* Check whether they are the same or one is an ancestor of the other */
+                        if (f1.getId() == f2.getId()) {
+                                return 0;
+                        }
+                        if (f1.isAncestorOf(f2)) {
+                                return -1;
+                        }
+                        if (f2.isAncestorOf(f1)) {
+                                return 1;
+                        }
 
-			/* Find closest common ancestor. They must be or descend from
-			 * different subforces of this one. */
-			Force f = f1;
-			while (!f.isAncestorOf(f2)) {
-				f = f.getParentForce();
-			}
-			for (Force sf : f.getSubForces()) {
-				if (sf.isAncestorOf(f1) || sf.getId() == f1.getId()) {
-					return -1;
-				}
-				if (sf.isAncestorOf(f2) || sf.getId() == f2.getId()) {
-					return 1;
-				}
-			}
-			/* We should never get here. */
-			return 0;
-		}
-	};
-	
+                        /* Find closest common ancestor. They must be or descend from
+                         * different subforces of this one. */
+                        Force f = f1;
+                        while (!f.isAncestorOf(f2)) {
+                                f = f.getParentForce();
+                        }
+                        for (Force sf : f.getSubForces()) {
+                                if (sf.isAncestorOf(f1) || sf.getId() == f1.getId()) {
+                                        return -1;
+                                }
+                                if (sf.isAncestorOf(f2) || sf.getId() == f2.getId()) {
+                                        return 1;
+                                }
+                        }
+                        /* We should never get here. */
+                        return 0;
+                }
+        };
+        
 }
 
 class RequiredLancesTableModel extends DataTableModel {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -5007787884549927503L;
-	
-	public static final int COL_CONTRACT = 0;
-	public static final int COL_TOTAL = 1;
-	public static final int COL_FIGHT = 2;
-	public static final int COL_DEFEND = 3;
-	public static final int COL_SCOUT = 4;
-	public static final int COL_TRAINING = 5;
-	public static final int COL_NUM = 6;
+        /**
+         * 
+         */
+        private static final long serialVersionUID = -5007787884549927503L;
+        
+        public static final int COL_CONTRACT = 0;
+        public static final int COL_TOTAL = 1;
+        public static final int COL_FIGHT = 2;
+        public static final int COL_DEFEND = 3;
+        public static final int COL_SCOUT = 4;
+        public static final int COL_TRAINING = 5;
+        public static final int COL_NUM = 6;
 
     protected String[] columnNames = {"Contract", "Total", "Fight", "Defend", "Scout", "Training"};
     
     private Campaign campaign;
     
     public RequiredLancesTableModel(Campaign campaign) {
-    	this.campaign = campaign;
-    	data = new ArrayList<AtBContract>();
+        this.campaign = campaign;
+        data = new ArrayList<AtBContract>();
     }
 
     @Override
@@ -330,23 +332,23 @@ class RequiredLancesTableModel extends DataTableModel {
 
     @Override
     public String getColumnName(int column) {
-    	return columnNames[column];
+        return columnNames[column];
     }
-	
+        
     public int getColumnWidth(int col) {
         if (col == COL_CONTRACT) {
-        	return 100;
+                return 100;
         } else {
-        	return 20;
+                return 20;
         }
     }
 
 
     public int getAlignment(int col) {
         if (col == COL_CONTRACT) {
-        	return SwingConstants.LEFT;
+                return SwingConstants.LEFT;
         } else {
-        	return SwingConstants.CENTER;
+                return SwingConstants.CENTER;
         }
     }
 
@@ -361,71 +363,71 @@ class RequiredLancesTableModel extends DataTableModel {
     }
     
     public AtBContract getRow(int row) {
-    	return (AtBContract) data.get(row);
+        return (AtBContract) data.get(row);
     }
     
-	@Override
-	public Object getValueAt(int row, int column) {
-		if (row >= getRowCount()) {
-			return "";
-		}
-		if (COL_CONTRACT == column) {
-			return ((AtBContract)data.get(row)).getName();
-		}
-		if (data.get(row) instanceof AtBContract) {
-			AtBContract contract = (AtBContract)data.get(row);
-			if (column == COL_TOTAL) {
-				int t = 0;
-				for (Lance l : campaign.getLanceList()) {
-					if (l.getContract(campaign) == data.get(row)
-							&& l.getRole() > Lance.ROLE_UNASSIGNED
-							&& l.isEligible(campaign)) {
-						t++;
-					}
-				}
-				if (t < contract.getRequiredLances()) {
-					return t + "/" + contract.getRequiredLances();
-				}
-				return Integer.toString(contract.getRequiredLances());
-			} else if (contract.getRequiredLanceType() == column - 1) {
-				int t = 0;
-				for (Lance l : campaign.getLanceList()) {
-					if (l.getContract(campaign) == data.get(row)
-							&& l.getRole() == l.getContract(campaign).getRequiredLanceType()
-							&& l.isEligible(campaign)) {
-						t++;
-					}
-				}
-				int required = Math.max(contract.getRequiredLances() / 2, 1);
-				if (t < required) {
-					return t + "/" + required;
-				}
-				return Integer.toString(required);
-			}
-		}
-		return "";
-	}	
+        @Override
+        public Object getValueAt(int row, int column) {
+                if (row >= getRowCount()) {
+                        return "";
+                }
+                if (COL_CONTRACT == column) {
+                        return ((AtBContract)data.get(row)).getName();
+                }
+                if (data.get(row) instanceof AtBContract) {
+                        AtBContract contract = (AtBContract)data.get(row);
+                        if (column == COL_TOTAL) {
+                                int t = 0;
+                                for (Lance l : campaign.getLanceList()) {
+                                        if (l.getContract(campaign) == data.get(row)
+                                                        && l.getRole() > Lance.ROLE_UNASSIGNED
+                                                        && l.isEligible(campaign)) {
+                                                t++;
+                                        }
+                                }
+                                if (t < contract.getRequiredLances()) {
+                                        return t + "/" + contract.getRequiredLances();
+                                }
+                                return Integer.toString(contract.getRequiredLances());
+                        } else if (contract.getRequiredLanceType() == column - 1) {
+                                int t = 0;
+                                for (Lance l : campaign.getLanceList()) {
+                                        if (l.getContract(campaign) == data.get(row)
+                                                        && l.getRole() == l.getContract(campaign).getRequiredLanceType()
+                                                        && l.isEligible(campaign)) {
+                                                t++;
+                                        }
+                                }
+                                int required = Math.max(contract.getRequiredLances() / 2, 1);
+                                if (t < required) {
+                                        return t + "/" + required;
+                                }
+                                return Integer.toString(required);
+                        }
+                }
+                return "";
+        }       
 }
 
 class LanceAssignmentTableModel extends DataTableModel {
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -2688617737510762878L;
-	
-	public static final int COL_FORCE = 0;
-	public static final int COL_WEIGHT_CLASS = 1;
-	public static final int COL_CONTRACT = 2;
-	public static final int COL_ROLE = 3;
-	public static final int COL_NUM = 4;
+        
+        /**
+         * 
+         */
+        private static final long serialVersionUID = -2688617737510762878L;
+        
+        public static final int COL_FORCE = 0;
+        public static final int COL_WEIGHT_CLASS = 1;
+        public static final int COL_CONTRACT = 2;
+        public static final int COL_ROLE = 3;
+        public static final int COL_NUM = 4;
 
     protected String[] columnNames = {"Force", "Wt", "Mission", "Role"};
     private Campaign campaign;
     
     public LanceAssignmentTableModel(Campaign campaign) {
-    	this.campaign = campaign;
-    	data = new ArrayList<Lance>();
+        this.campaign = campaign;
+        data = new ArrayList<Lance>();
     }
 
     @Override
@@ -435,31 +437,31 @@ class LanceAssignmentTableModel extends DataTableModel {
 
     @Override
     public String getColumnName(int column) {
-    	return columnNames[column];
+        return columnNames[column];
     }
-	
+        
     public int getColumnWidth(int col) {
-    	switch (col) {
-    	case COL_FORCE:
-    	case COL_CONTRACT:
-        	return 100;
-    	case COL_WEIGHT_CLASS:
-    		return 5;
+        switch (col) {
+        case COL_FORCE:
+        case COL_CONTRACT:
+                return 100;
+        case COL_WEIGHT_CLASS:
+                return 5;
         default:
-        	return 50;
+                return 50;
         }
     }
 
     @Override
     public Class<?> getColumnClass(int c) {
-    	switch (c) {
-    	case COL_FORCE:
-    		return Force.class;
-    	case COL_CONTRACT:
-    		return AtBContract.class;
-    	case COL_ROLE:
-    		return String.class;
-    	}
+        switch (c) {
+        case COL_FORCE:
+                return Force.class;
+        case COL_CONTRACT:
+                return AtBContract.class;
+        case COL_ROLE:
+                return String.class;
+        }
         return String.class;
     }
 
@@ -469,41 +471,41 @@ class LanceAssignmentTableModel extends DataTableModel {
     }
     
     public Lance getRow(int row) {
-    	return (Lance) data.get(row);
+        return (Lance) data.get(row);
     }
     
-	@Override
-	public Object getValueAt(int row, int column) {
-		final String[] WEIGHT_CODES = {"UL", "L", "M", "H", "A", "SH"};
-		 
-		if (row >= getRowCount()) {
-			return "";
-		}
-		switch (column) {
-		case COL_FORCE:
-			return campaign.getForce(((Lance)data.get(row)).getForceId());
-		case COL_WEIGHT_CLASS:
-			return WEIGHT_CODES[((Lance)data.get(row)).getWeightClass(campaign)];
-		case COL_CONTRACT:
-			return (AtBContract)campaign.getMission(((Lance)data.get(row)).getMissionId());
-		case COL_ROLE:
-			return Lance.roleNames[((Lance)data.get(row)).getRole()];
-		default:
-			return "?";
-		}
-	}
+        @Override
+        public Object getValueAt(int row, int column) {
+                final String[] WEIGHT_CODES = {"UL", "L", "M", "H", "A", "SH"};
+                 
+                if (row >= getRowCount()) {
+                        return "";
+                }
+                switch (column) {
+                case COL_FORCE:
+                        return campaign.getForce(((Lance)data.get(row)).getForceId());
+                case COL_WEIGHT_CLASS:
+                        return WEIGHT_CODES[((Lance)data.get(row)).getWeightClass(campaign)];
+                case COL_CONTRACT:
+                        return (AtBContract)campaign.getMission(((Lance)data.get(row)).getMissionId());
+                case COL_ROLE:
+                        return Lance.roleNames[((Lance)data.get(row)).getRole()];
+                default:
+                        return "?";
+                }
+        }
 
-	public void setValueAt(Object value, int row, int col) {
-		if (col == COL_CONTRACT) {
-			((Lance)data.get(row)).setContract((AtBContract)value);
-		}
-		if (col == COL_ROLE) {
-			for (int i = 0; i < Lance.ROLE_NUM; i++) {
-				if (((String)value).equals(Lance.roleNames[i])) {
-					((Lance)data.get(row)).setRole(i);
-				}
-			}
-		}
-		fireTableDataChanged();
-	}
+        public void setValueAt(Object value, int row, int col) {
+                if (col == COL_CONTRACT) {
+                        ((Lance)data.get(row)).setContract((AtBContract)value);
+                }
+                if (col == COL_ROLE) {
+                        for (int i = 0; i < Lance.ROLE_NUM; i++) {
+                                if (((String)value).equals(Lance.roleNames[i])) {
+                                        ((Lance)data.get(row)).setRole(i);
+                                }
+                        }
+                }
+                fireTableDataChanged();
+        }
 }

@@ -274,7 +274,7 @@ public class MissingBattleArmorSuit extends MissingPart {
         		}
             }
             replacement.decrementQuantity();
-            unit.getEntity().setInternal(0, trooper);
+            unit.getEntity().setInternal(1, trooper);
             remove(false);
         }
     }

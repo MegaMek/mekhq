@@ -72,7 +72,7 @@ public class BattleArmorSuit extends Part {
     protected int jumpMP;
     protected EntityMovementMode jumpType;
     protected int weightClass;
-    private Money alternateCost;
+    private Money alternateCost = Money.zero();
     private double alternateTon;
     private int introYear;
 
