@@ -80,14 +80,15 @@ public class StratconScenarioWizard extends JDialog implements ActionListener {
         
         switch(currentScenario.getCurrentState()) {        
             case UNRESOLVED:
-                setAssignPrimaryForcesUI(gbc);
+                setAssignForcesUI(gbc, false);
                 break;
             default:
-                setAssignReinforcementsUI(gbc);
+                setAssignForcesUI(gbc, true);
                 break;
         }
 
-        gbc.gridy = GridBagConstraints.REMAINDER;
+        gbc.gridx = 0;
+        gbc.gridy++;
         setNavigationButtons(gbc);
         pack();
         validate();
@@ -95,7 +96,7 @@ public class StratconScenarioWizard extends JDialog implements ActionListener {
     
     private void setInstructions(GridBagConstraints gbc) {
         JLabel lblInfo = new JLabel(currentScenario.getInfo(false));
-        getContentPane().add(lblInfo,  gbc);
+        getContentPane().add(lblInfo, gbc);
         gbc.gridy++;
         
         JLabel lblInstructions = new JLabel();
@@ -111,14 +112,18 @@ public class StratconScenarioWizard extends JDialog implements ActionListener {
         getContentPane().add(lblInstructions, gbc);
     }
     
-    private void setAssignPrimaryForcesUI(GridBagConstraints gbc) {
+    private void setAssignForcesUI(GridBagConstraints gbc, boolean reinforcements) {
         // generate a lance selector with the following parameters:
         // all forces assigned to the current track that aren't already assigned elsewhere
         // max number of items that can be selected = current scenario required lances
         int controlSetIndex = 0;
         
-        for(ScenarioForceTemplate forceTemplate : currentScenario.getScenarioTemplate().getAllPlayerSuppliedForces()) {
-            JList<Force> availableForceList = addAvailableForceList(gbc, controlSetIndex);
+        List<ScenarioForceTemplate> eligibleForceTemplates = reinforcements ?
+                currentScenario.getScenarioTemplate().getAllPlayerReinforcementForces() :
+                    currentScenario.getScenarioTemplate().getAllPrimaryPlayerForces();
+        
+        for(ScenarioForceTemplate forceTemplate : eligibleForceTemplates) {
+            JList<Force> availableForceList = addAvailableForceList(gbc, controlSetIndex, forceTemplate);
             addSelectedBVLabel(gbc);
             
             gbc.gridx = 1;
@@ -150,47 +155,14 @@ public class StratconScenarioWizard extends JDialog implements ActionListener {
             controlSetIndex++;
         }
     }
-    
-    private void setAssignReinforcementsUI(GridBagConstraints gbc) {
-        // generate a lance selector with the following parameters:
-        // A) all forces assigned to the current track that aren't already assigned elsewhere
-        // PLUS B) all forces in the campaign that aren't already deployed to a scenario
-        // max number of items is unlimited, but some have an SP selection cost (the ones from B)
-        
-        // to the right, have an SP cost readout (fancy: turns red when goes below 0 SP)
-        // have three buttons: request allied air support, request allied ground support, request allied arty support
-        // last two unavailable on atmo and space maps for obvious reasons, each costs 1 SP
-        // grayed out if campaign state SP 
-        
-        addAvailableForceList(gbc, 0);
-        
-        gbc.gridx = 1;
-        gbc.gridy++;
-        gbc.anchor = GridBagConstraints.SOUTH;
-        gbc.fill = GridBagConstraints.NONE;
-        //getContentPane().add(btnRight, gbc);
-        
-        gbc.gridy++;
-        gbc.anchor = GridBagConstraints.NORTH;
-        //getContentPane().add(btnLeft, gbc);
-        
-        gbc.gridx = 2;
-        gbc.gridy -= 2;
-        addAssignedForceList(gbc, 0);
-    }
 
-    private JList<Force> addAvailableForceList(GridBagConstraints gbc, int index) {
+    private JList<Force> addAvailableForceList(GridBagConstraints gbc, int index, ScenarioForceTemplate forceTemplate) {
         JScrollPane forceListContainer = new JScrollPane();
 
         ScenarioWizardLanceModel lanceModel;
         
         // if we're waiting to assign primary forces, we can only do so from the current track 
-        if(currentScenario.getCurrentState() == ScenarioState.UNRESOLVED) {
-            lanceModel = new ScenarioWizardLanceModel(campaign, currentTrackState.getAvailableForceIDs());
-        // if we want to assign reinforcements, then we can do so from any unassigned forces
-        } else {
-            lanceModel = new ScenarioWizardLanceModel(campaign, StratconRulesManager.getAvailableForceIDs());
-        }
+        lanceModel = new ScenarioWizardLanceModel(campaign, StratconRulesManager.getAvailableForceIDs(forceTemplate, campaign));
         
         JList<Force> availableForceList = new JList<>();
         availableForceList.setModel(lanceModel);
@@ -258,8 +230,8 @@ public class StratconScenarioWizard extends JDialog implements ActionListener {
             }
         });
 
-        gbc.gridheight = 1;
-        gbc.gridwidth = 1;
+        gbc.gridheight = GridBagConstraints.REMAINDER;
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
         gbc.anchor = GridBagConstraints.CENTER;
 
         getContentPane().add(btnCommit, gbc);

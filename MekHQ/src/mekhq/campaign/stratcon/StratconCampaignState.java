@@ -122,6 +122,21 @@ public class StratconCampaignState {
     }
     
     /**
+     * Convenience/speed method of determining whether or not a force with the given ID has been deployed to a track in this campaign.
+     * @param forceID the force ID to check
+     * @return Deployed or not.
+     */
+    public boolean isForceDeployedHere(int forceID) {
+        for(StratconTrackState trackState : tracks) {
+            if(trackState.getAssignedForceIDs().contains(forceID)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
      * Serialize this instance of a campaign state to a PrintWriter
      * Omits initial xml declaration
      * @param pw The destination print writer

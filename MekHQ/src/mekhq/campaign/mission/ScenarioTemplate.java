@@ -74,15 +74,41 @@ public class ScenarioTemplate {
     }
     
     /**
-     * All force templates that are controlled and supplied, or potentially supplied, by the player. 
+     * All force templates that are controlled and supplied, or potentially supplied, by the player, that are not reinforcements
      * @return List of scenario force templates
      */
-    public List<ScenarioForceTemplate> getAllPlayerSuppliedForces() {
+    public List<ScenarioForceTemplate> getAllPrimaryPlayerForces() {
         return scenarioForces.values().stream().filter(forceTemplate -> 
             (forceTemplate.getForceAlignment() == ForceAlignment.Player.ordinal()) &&
+            (forceTemplate.getArrivalTurn() != ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) &&
                 ((forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal()) ||
                  (forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerOrFixedUnitCount.ordinal())))  
                 .collect(Collectors.toList());
+    }
+    
+    /**
+     * All force templates that are controlled and supplied, or potentially supplied, by the player, that are not reinforcements
+     * @return List of scenario force templates
+     */
+    public List<ScenarioForceTemplate> getAllPlayerReinforcementForces() {
+        List<ScenarioForceTemplate> retVal = new ArrayList<>();
+        
+        for(ScenarioForceTemplate forceTemplate : scenarioForces.values()) {
+            if((forceTemplate.getForceAlignment() == ForceAlignment.Player.ordinal()) &&
+                    (forceTemplate.getArrivalTurn() == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) &&
+                    ((forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal()) ||
+                     (forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerOrFixedUnitCount.ordinal()))) {
+                retVal.add(forceTemplate);
+            }
+        }
+        
+        return retVal;
+        /*return scenarioForces.values().stream().filter(forceTemplate -> 
+            (forceTemplate.getForceAlignment() == ForceAlignment.Player.ordinal()) &&
+            (forceTemplate.getArrivalTurn() == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) &&
+                ((forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal()) ||
+                 (forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerOrFixedUnitCount.ordinal())))  
+                .collect(Collectors.toList());*/
     }
     
     /**

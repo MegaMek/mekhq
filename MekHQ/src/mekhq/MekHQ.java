@@ -73,6 +73,7 @@ import mekhq.campaign.handler.XPHandler;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.StartUpGUI;
@@ -730,6 +731,7 @@ public class MekHQ implements GameListener {
 	// TODO: This needs to be way more flexible, but it will do for now.
 	private void initEventHandlers() {
 	    EVENT_BUS.register(new XPHandler());
+	    EVENT_BUS.register(new StratconRulesManager());	    
 	}
 
     private static void setLookAndFeel(String themeName, Frame window) {

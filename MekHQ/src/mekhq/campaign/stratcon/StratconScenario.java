@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.xml.bind.annotation.XmlTransient;
+
 import megamek.common.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
@@ -57,6 +59,8 @@ public class StratconScenario implements IStratconDisplayable {
     private String SCENARIO_MODIFIER_TRAINEES_GROUND = "AlliedTraineesGround.xml";
     
     private AtBDynamicScenario backingScenario;
+    
+    private int backingScenarioID; 
     private ScenarioState currentState = ScenarioState.UNRESOLVED;
     private int requiredPlayerLances;
     private boolean requiredScenario;
@@ -144,8 +148,6 @@ public class StratconScenario implements IStratconDisplayable {
         currentState = ScenarioState.PRIMARY_FORCES_COMMITTED;
 
         AtBDynamicScenarioFactory.finalizeScenario(backingScenario, contract, campaign);
-        
-        campaign.addScenario(backingScenario, contract);
     }
 
     /**
@@ -298,6 +300,7 @@ public class StratconScenario implements IStratconDisplayable {
         this.requiredScenario = requiredScenario;
     }
     
+    @XmlTransient
     public AtBDynamicScenario getBackingScenario() {
         return backingScenario;
     }
@@ -329,5 +332,17 @@ public class StratconScenario implements IStratconDisplayable {
     
     public ScenarioTemplate getScenarioTemplate() {
         return backingScenario.getTemplate();
+    }
+
+    public int getBackingScenarioID() {
+        return backingScenarioID;
+    }
+    
+    public void setBackingScenario(AtBDynamicScenario backingScenario) {
+        this.backingScenario = backingScenario;
+    }
+
+    public void setBackingScenarioID(int backingScenarioID) {
+        this.backingScenarioID = backingScenarioID;
     }
 }

@@ -465,12 +465,12 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         cboUnitType.addItemListener(unitTypeChangeListener);
         
         JLabel lblArrivalTurn = new JLabel("Arrival Turn:");
-        lblArrivalTurn.setToolTipText("The turn on which this force arrives. Enter -1 for staggered arrival, -2 for staggered arrival by lance.");
+        lblArrivalTurn.setToolTipText("The turn on which this force arrives. Enter -1 for staggered arrival, -2 for staggered arrival by lance, -3 for 'as reinforcements' arrival time.");
         gbc.gridy++;
         gbc.gridx--;
         forcedPanel.add(lblArrivalTurn, gbc);
         
-        spnArrivalTurn = new JSpinner(new SpinnerNumberModel(0, -2, 100, 1));
+        spnArrivalTurn = new JSpinner(new SpinnerNumberModel(0, ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS, 100, 1));
         gbc.gridx++;
         forcedPanel.add(spnArrivalTurn, gbc);
         
@@ -712,7 +712,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         
         gbc.gridy++;
         btnAllowAllMapTypes = new JRadioButton();
-        btnAllowAllMapTypes.setText("Allow All");
+        btnAllowAllMapTypes.setText("Any Ground Map");
         btnAllowAllMapTypes.addItemListener(new ItemListener() {
 
             @Override
@@ -786,7 +786,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         }
         
         gbc.gridx++;
-        gbc.gridy = currentGridY;
+        gbc.gridy = currentGridY + 1;
         gbc.gridheight = GridBagConstraints.RELATIVE;
         lstAllowedTerrainTypes = new JList<>();
         DefaultListModel<String> terrainTypeModel = new DefaultListModel<>();

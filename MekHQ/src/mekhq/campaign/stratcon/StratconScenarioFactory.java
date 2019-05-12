@@ -111,7 +111,7 @@ public class StratconScenarioFactory {
             }
         }
         
-        int scenarioIndex = Compute.randomInt(dynamicScenarioUnitTypeMap.get(actualUnitType).size());
+        int scenarioIndex = 2;//Compute.randomInt(dynamicScenarioUnitTypeMap.get(actualUnitType).size());
         return dynamicScenarioUnitTypeMap.get(actualUnitType).get(scenarioIndex);
     }
     

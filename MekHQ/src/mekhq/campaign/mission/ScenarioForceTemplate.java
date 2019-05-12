@@ -98,6 +98,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         SPECIAL_ARRIVAL_TURNS = new HashMap<>();
         SPECIAL_ARRIVAL_TURNS.put(ARRIVAL_TURN_STAGGERED, "Staggered");
         SPECIAL_ARRIVAL_TURNS.put(ARRIVAL_TURN_STAGGERED_BY_LANCE, "Staggered By Lance");
+        SPECIAL_ARRIVAL_TURNS.put(ARRIVAL_TURN_AS_REINFORCEMENTS, "Reinforcements");
         
         TEAM_IDS = new HashMap<>();
         TEAM_IDS.put(ForceAlignment.Player.ordinal(), 1);

@@ -186,6 +186,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
     		//load in directory items and tilesets
     		app.getIconPackage().loadDirectories();
             setProgress(3);
+            
             boolean newCampaign = false;
             if(null == fileCampaign) {
             	try {
@@ -238,10 +239,6 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                     cancel(true);
         		}
             }
-            
-            // temporary location:
-            // think about where this needs to get initialized
-            campaign.initStratcon();
             
             setProgress(4);
             if(newCampaign) {

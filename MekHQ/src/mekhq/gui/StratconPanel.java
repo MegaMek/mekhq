@@ -13,6 +13,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 
+import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -375,6 +377,7 @@ public class StratconPanel extends JPanel implements ActionListener {
             scenarioWizard.setCurrentScenario(currentTrack.getScenario(new StratconCoords(boardState.selectedX, boardState.selectedY)),
                     currentTrack,
                     campaignState);
+            scenarioWizard.toFront();
             scenarioWizard.setVisible(true);
             break;
         }

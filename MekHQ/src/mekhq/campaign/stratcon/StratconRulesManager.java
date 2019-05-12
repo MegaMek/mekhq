@@ -6,6 +6,7 @@ import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import megamek.common.Compute;
 import megamek.common.Coords;
@@ -19,8 +20,10 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.stratcon.StratconFacility.FacilityType;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 
 /**
@@ -137,6 +140,8 @@ public class StratconRulesManager {
                 
                 track.getScenarios().put(scenarioCoords, scenario);
                 generatedScenarios.add(scenario);
+                campaign.addScenario(scenario.getBackingScenario(), contract);
+                scenario.setBackingScenarioID(scenario.getBackingScenario().getId());
                 
                 // if under integrated command, automatically assign the lance to the scenario
                 if(autoAssignLances) {
@@ -229,9 +234,15 @@ public class StratconRulesManager {
         
         // special cases are "ATB_MIX" and "ATB_AERO_MIX", which encompass multiple unit types
         if(forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX) {
+            // "AtB mix" is usually ground units, but air units can sub in
             return primaryUnitType == UnitType.MEK ||
                     primaryUnitType == UnitType.TANK ||
-                    primaryUnitType == UnitType.VTOL;
+                    primaryUnitType == UnitType.INFANTRY ||
+                    primaryUnitType == UnitType.BATTLE_ARMOR ||
+                    primaryUnitType == UnitType.PROTOMEK || 
+                    primaryUnitType == UnitType.VTOL ||
+                    primaryUnitType == UnitType.AERO ||
+                    primaryUnitType == UnitType.CONV_FIGHTER;
         } else if (forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX) {
             return primaryUnitType == UnitType.AERO ||
                     primaryUnitType == UnitType.CONV_FIGHTER;
@@ -241,29 +252,65 @@ public class StratconRulesManager {
     }
     
     /**
-     * This is a list of all force IDs for forces that 
+     * This is a list of all force IDs for forces that can be deployed to a scenario in the given force template
      * a) have not been assigned to a track
      * b) are combat-capable
      * c) are not deployed to a scenario
      * @return
      */
-    public static List<Integer> getAvailableForceIDs() {
+    public static List<Integer> getAvailableForceIDs(ScenarioForceTemplate template, Campaign campaign) {
         List<Integer> retVal = new ArrayList<>();
         
         Set<Integer> forcesInTracks = new HashSet<>();
-        /*for(StratconTrackState track : tracks) {
-            forcesInTracks.addAll(track.getAssignedForceIDs());
+        for(Contract contract : campaign.getActiveContracts()) {
+            if(contract instanceof AtBContract) {
+                for(StratconTrackState track : ((AtBContract) contract).getStratconCampaignState().getTracks()) {
+                    forcesInTracks.addAll(track.getAssignedForceIDs());
+                }
+            }
         }
         
         for(int key : campaign.getLances().keySet()) {
             Force force = campaign.getForce(key);
             if(force != null && 
                     !force.isDeployed() && 
+                    (force.getScenarioId() <= 0) &&
                     !force.getUnits().isEmpty() &&
-                    !forcesInTracks.contains(force.getId())) {
+                    !forcesInTracks.contains(force.getId()) &&
+                    forceCompositionMatchesDeclaredUnitType(force, template, campaign)) {
                 retVal.add(force.getId());
             }
-        }*/
+        }
+        
+        return retVal;
+    }
+    
+    /**
+     * Returns a list of individual units eligible for deployment in scenarios run by "Defend" lances
+     * @param campaign
+     * @return List of unit IDs.
+     */
+    public static List<UUID> getEligibleDefensiveUnits(Campaign campaign) {
+        List<UUID> retVal = new ArrayList<>();
+        
+        for(Unit u : campaign.getUnits()) {
+            // "defensive" units are infantry, battle armor and (Weisman help you) gun emplacements
+            if(((u.getEntity().getUnitType() == UnitType.INFANTRY) || 
+                    (u.getEntity().getUnitType() == UnitType.BATTLE_ARMOR) ||
+                    (u.getEntity().getUnitType() == UnitType.GUN_EMPLACEMENT)) &&
+                    (u.getScenarioId() <= 0)) {
+                
+                // this is a little inefficient, but probably there aren't too many active AtB contracts at a time
+                for(Contract contract : campaign.getActiveContracts()) {
+                    if((contract instanceof AtBContract) &&
+                            ((AtBContract) contract).getStratconCampaignState().isForceDeployedHere(u.getForceId())) {
+                        continue;
+                    }
+                }
+                
+                retVal.add(u.getId());
+            }
+        }
         
         return retVal;
     }
