@@ -168,7 +168,7 @@ public class CombatInformationCenter extends Part {
 	public String checkFixable() {
 	    if (isSalvaging()) {
             // FCS/CIC computers are designed for and built into the ship. Can't salvage and use somewhere else
-            return "You cannot salvage a spacecraft FCS. You must scrap it instead.";
+            return "You cannot salvage a spacecraft CIC. You must scrap it instead.";
         }
 		return null;
 	}
