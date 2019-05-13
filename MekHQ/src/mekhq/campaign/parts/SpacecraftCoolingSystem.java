@@ -1,5 +1,5 @@
 /*
- * LargeCraftCoolingSystem.java
+ * SpacecraftCoolingSystem.java
  * 
  * Copyright (C) 2019, MegaMek team
  * 
@@ -32,22 +32,25 @@ import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.Jumpship;
 import megamek.common.Mounted;
+import megamek.common.SmallCraft;
 import megamek.common.TechAdvancement;
+import megamek.common.verifier.TestAdvancedAerospace;
+import megamek.common.verifier.TestSmallCraft;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
 
 /**
- * Container for DS/JS/WS/SS heat sinks. Eliminates need for tracking hundreds/thousands
- * of individual heat sink parts for large spacecraft.
+ * Container for SC/DS/JS/WS/SS heat sinks. Eliminates need for tracking hundreds/thousands
+ * of individual heat sink parts for spacecraft.
  * 
  * The remove action adds a single heatsink of the appropriate type to the warehouse.
  * Fix action replaces one. 
- * Large craft don't actually track damage to heatsinks, so you only fix this part if you're salvaging/replacing.
+ * Small craft and up don't actually track damage to heatsinks, so you only fix this part if you're salvaging/replacing.
  * There might be 12,500 heatsinks in here. Have fun with that.
  * @author MKerensky
  */
-public class LargeCraftCoolingSystem extends Part {
+public class SpacecraftCoolingSystem extends Part {
     
     /**
      * 
@@ -58,39 +61,35 @@ public class LargeCraftCoolingSystem extends Part {
     private int sinksNeeded;
     private int currentSinks;
     private int engineSinks;
-    private int removableSinks;
+    private int removeableSinks;
     private int totalSinks;
 	
-	public LargeCraftCoolingSystem() {
+	public SpacecraftCoolingSystem() {
     	this(0, 0, 0, null);
     }
     
-    public LargeCraftCoolingSystem(int tonnage, int engineSinks, int totalSinks, Campaign c) {
+    public SpacecraftCoolingSystem(int tonnage, int totalSinks, int sinkType, Campaign c) {
         super(tonnage, c);
         this.name = "Spacecraft Cooling System";
-        this.engineSinks = engineSinks;
         this.totalSinks = totalSinks;
+        this.sinkType = sinkType;
+        setEngineHeatSinks();
+        this.removeableSinks = (this.totalSinks - engineSinks);
+        this.sinksNeeded = 0;
     }
         
-    public LargeCraftCoolingSystem clone() {
-    	LargeCraftCoolingSystem clone = new LargeCraftCoolingSystem(0, engineSinks, totalSinks, campaign);
+    public SpacecraftCoolingSystem clone() {
+    	SpacecraftCoolingSystem clone = new SpacecraftCoolingSystem(0, totalSinks, sinkType, campaign);
         clone.copyBaseData(this);
     	return clone;
     }
     
 	@Override
 	public void updateConditionFromEntity(boolean checkForDestruction) {
-	    if(null != unit && unit instanceof Aero) {
-            totalSinks = ((Aero) unit.getEntity()).getHeatSinks();
-            if(null != mounted) {
-                capacity = mounted.getAmmoCapacity();
-                type = mounted.getType();
-                if(mounted.isMissing() || mounted.isDestroyed()) {
-                    mounted.setShotsLeft(0);
-                    return;
-                }
-                shotsNeeded = getFullShots() - mounted.getBaseShotsLeft();
-            }
+	    if(null != unit && unit.getEntity() instanceof Aero) {
+            totalSinks = ((Aero) unit.getEntity()).getOHeatSinks();
+            currentSinks = ((Aero) unit.getEntity()).getHeatSinks();
+            sinksNeeded = (((Aero) unit.getEntity()).getOHeatSinks() - ((Aero) unit.getEntity()).getHeatSinks());
         }
 	}
 	
@@ -113,18 +112,45 @@ public class LargeCraftCoolingSystem extends Part {
 	@Override
 	public void updateConditionFromPart() {
 		if(null != unit && unit.getEntity() instanceof Aero) {
-			((Aero)unit.getEntity()).setCICHits(hits);
+			((Aero)unit.getEntity()).setHeatSinks(currentSinks);
 		}
 		
 	}
 
 	@Override
 	public void fix() {
-		super.fix();
-		if(null != unit && unit.getEntity() instanceof Aero) {
-			((Aero)unit.getEntity()).setCICHits(0);
-		}
+	    replaceHeatSink();
 	}
+	
+	/*
+	 * Pulls a heatsink of the appropriate type from the warehouse and adds it to the cooling system
+	 * 
+	 */
+	public void replaceHeatSink() {
+	    for(Part part : campaign.getSpareParts()) {
+            if(!part.isPresent()) {
+                continue;
+            }
+            if()
+	    }
+	}
+	
+	/*
+     * Calculates 'weight free' heatsinks included with this spacecraft's engine. You can't remove or replace these
+     * 
+     */
+    public void setEngineHeatSinks() {
+        if (null != unit) {
+            if (unit.getEntity() instanceof Jumpship) {
+                engineSinks = TestAdvancedAerospace.weightFreeHeatSinks((Jumpship) unit.getEntity());
+            } else if (unit.getEntity() instanceof SmallCraft) {
+                engineSinks = TestSmallCraft.weightFreeHeatSinks((SmallCraft) unit.getEntity());
+            }
+        } else {
+            //Shouldn't ever get here, but just in case...
+            engineSinks = 0;
+        }
+    }
 
 	@Override
 	public void remove(boolean salvage) {
@@ -148,7 +174,8 @@ public class LargeCraftCoolingSystem extends Part {
 
 	@Override
 	public MissingPart getMissingPart() {
-		return new MissingCIC(getUnitTonnage(), cost, campaign);
+	    //No missing part for this. Just heatsinks to go inside it.
+		return null;
 	}
 
 	@Override
@@ -162,21 +189,13 @@ public class LargeCraftCoolingSystem extends Part {
 
 	@Override
 	public boolean needsFixing() {
-		return hits > 0;
+		return sinksNeeded > 0;
 	}
 
 	@Override
 	public Money getStickerPrice() {
-		calculateCost();
-		return cost;
-	}
-
-	public void calculateCost() {
-		if(null != unit) {
-		    // There's more to CIC than just Fire Control
-		    // Use Bridge + Computer + FC Computer + Gunnery Control System costs, p158 SO.
-		    cost = Money.of(200000 + (10 * unit.getEntity().getWeight()) + 200000 + 100000 + (10000 * ((Jumpship)unit.getEntity()).getArcswGuns()));
-		}
+	    //Cooling system itself has no price
+		return Money.zero();
 	}
 	
 	@Override
@@ -186,7 +205,7 @@ public class LargeCraftCoolingSystem extends Part {
 
 	@Override
 	public boolean isSamePartType(Part part) {
-		return part instanceof LargeCraftCoolingSystem && cost == part.getStickerPrice();
+		return part instanceof SpacecraftCoolingSystem && cost == part.getStickerPrice();
 	}
 	
 	@Override
@@ -228,9 +247,13 @@ public class LargeCraftCoolingSystem extends Part {
 	}
 	
 	@Override
-	public TechAdvancement getTechAdvancement() {
-	    return TA_GENERIC;
-	}
+    public TechAdvancement getTechAdvancement() {
+        if (sinkType == Aero.HEAT_SINGLE) {
+            return AeroHeatSink.TA_SINGLE;
+        } else {
+            return AeroHeatSink.TA_IS_DOUBLE;
+        }
+    }
 	
 	
 }
