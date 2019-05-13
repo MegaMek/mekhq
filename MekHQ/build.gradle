@@ -178,6 +178,7 @@ task stageFiles(type: Copy) {
     include "${data}/images/fluff/mech/*.png"
     include "${data}/images/misc/"
     include "${data}/images/universe/"
+    include "${data}/scenariomodifiers/"
     include "${project.ext.plugins}/"
     include "${campaigns}/"
     include 'license.txt'
