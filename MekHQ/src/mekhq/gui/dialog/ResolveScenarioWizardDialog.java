@@ -21,13 +21,7 @@
 
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -39,17 +33,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSlider;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -70,9 +54,11 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.preferences.JWindowPreference;
+import mekhq.gui.view.PersonViewPanel;
 import mekhq.preferences.PreferencesNode;
 
 /**
@@ -148,6 +134,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private ArrayList<JCheckBox> prisonerBtns = new ArrayList<>();
     private ArrayList<JSlider> pr_hitSliders = new ArrayList<>();
     private ArrayList<PrisonerStatus> prstatuses = new ArrayList<>();
+    private ArrayList<JButton> btnsViewPrisoner;
 
     /*
      * Salvage panel components
@@ -165,8 +152,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private JLabel lblSalvageValueEmployer2;
     private JLabel lblSalvagePct2;
 
-    private Money salvageEmployer;
-    private Money salvageUnit;
+    private Money salvageEmployer = Money.zero();
+    private Money salvageUnit = Money.zero();
     private int currentSalvagePct;
     private int maxSalvagePct;
 
@@ -229,10 +216,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
-
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ResolveScenarioWizardDialog", new EncodeControl()); //$NON-NLS-1$
         cardLayout = new CardLayout();
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ResolveScenarioWizardDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
 
@@ -249,8 +235,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         txtInstructions.setLineWrap(true);
         txtInstructions.setWrapStyleWord(true);
         txtInstructions.setBorder(BorderFactory.createCompoundBorder(
-                 BorderFactory.createTitledBorder(resourceMap.getString("txtInstructions.title")),
-                 BorderFactory.createEmptyBorder(5,5,5,5)));
+                BorderFactory.createTitledBorder(resourceMap.getString("txtInstructions.title")),
+                BorderFactory.createEmptyBorder(5,5,5,5)));
         txtInstructions.setMinimumSize(new Dimension(590,120));
         txtInstructions.setPreferredSize(new Dimension(590,120));
         getContentPane().add(txtInstructions, BorderLayout.PAGE_START);
@@ -489,6 +475,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         i = 2;
         JCheckBox prisonerCheck;
         j = 0;
+        btnsViewPrisoner = new ArrayList<>();
+        JButton btnViewPrisoner;
         for(PrisonerStatus status : tracker.getSortedPrisoners()) {
             j++;
             prstatuses.add(status);
@@ -529,8 +517,13 @@ public class ResolveScenarioWizardDialog extends JDialog {
             prisonerKiaBtns.add(kiaCheck);
             kiaCheck.setSelected(status.getHits() > 5 || status.isDead());
             gridBagConstraints.gridx = 3;
-            gridBagConstraints.weightx = 1.0;
             pnlPrisonerStatus.add(kiaCheck, gridBagConstraints);
+            btnViewPrisoner = new JButton("View Personnel");
+            btnViewPrisoner.addActionListener(evt -> showPrisoner(status.getId()));
+            btnsViewPrisoner.add(btnViewPrisoner);
+            gridBagConstraints.gridx = 4;
+            gridBagConstraints.weightx = 1.0;
+            pnlPrisonerStatus.add(btnViewPrisoner, gridBagConstraints);
             i++;
             if (status.isCaptured() &&
                     tracker.getCampaign().getCampaignOptions().getUseAtB() &&
@@ -863,8 +856,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         txtReport.setLineWrap(true);
         txtReport.setWrapStyleWord(true);
         txtReport.setBorder(BorderFactory.createCompoundBorder(
-                 BorderFactory.createTitledBorder(resourceMap.getString("txtReport.title")),
-                 BorderFactory.createEmptyBorder(5,5,5,5)));
+                BorderFactory.createTitledBorder(resourceMap.getString("txtReport.title")),
+                BorderFactory.createEmptyBorder(5,5,5,5)));
         scrReport.setViewportView(txtReport);
         scrReport.setPreferredSize(new Dimension(500,200));
         scrReport.setMinimumSize(new Dimension(500,200));
@@ -1121,7 +1114,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             txtInstructions.setText(resourceMap.getString("txtInstructions.text.reward"));
         }
         else if(currentPanel.equals(ALLYPANEL)) {
-                txtInstructions.setText(resourceMap.getString("txtInstructions.text.ally"));
+            txtInstructions.setText(resourceMap.getString("txtInstructions.text.ally"));
         }
         else {
             txtInstructions.setText("");
@@ -1130,8 +1123,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         txtInstructions.setLineWrap(true);
         txtInstructions.setWrapStyleWord(true);
         txtInstructions.setBorder(BorderFactory.createCompoundBorder(
-                 BorderFactory.createTitledBorder(resourceMap.getString("txtInstructions.title")),
-                 BorderFactory.createEmptyBorder(5,5,5,5)));
+                BorderFactory.createTitledBorder(resourceMap.getString("txtInstructions.title")),
+                BorderFactory.createEmptyBorder(5,5,5,5)));
         txtInstructions.setMinimumSize(new Dimension(590,150));
         txtInstructions.setPreferredSize(new Dimension(590,150));
         getContentPane().add(txtInstructions, BorderLayout.PAGE_START);
@@ -1193,7 +1186,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     }
 
     private void finish() {
-    	//unit status
+        //unit status
         for(int i = 0; i < chksTotaled.size(); i++) {
             JCheckBox box = chksTotaled.get(i);
             UUID id = UUID.fromString(box.getActionCommand());
@@ -1295,7 +1288,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             return tracker.getCampaign().getCampaignOptions().getUseAtB() &&
                     tracker.getScenario() instanceof AtBScenario &&
                     (((AtBScenario)tracker.getScenario()).getAttachedUnitIds().size() +
-                    ((AtBScenario)tracker.getScenario()).getSurvivalBonusIds().size() > 0);
+                            ((AtBScenario)tracker.getScenario()).getSurvivalBonusIds().size() > 0);
         }
         else if(panelName.equals(PILOTPANEL)) {
             return tracker.getPeopleStatus().keySet().size() > 0;
@@ -1504,6 +1497,53 @@ public class ResolveScenarioWizardDialog extends JDialog {
         name.setText(ustatus.getDesc());
     }
 
+    private void showPrisoner(UUID id) {
+        //dialog
+        PrisonerStatus pstatus = tracker.getPrisonerStatus().get(id);
+
+        if(null == pstatus || null == pstatus.getPerson() ) {
+            return;
+        }
+
+        PersonViewPanel pvp = new PersonViewPanel(
+                pstatus.getPerson(),tracker.getCampaign(),tracker.getCampaign().getApp().getIconPackage());
+
+        final JDialog dialog = new JDialog(frame, "Prisoner View", true); //$NON-NLS-1$
+        dialog.getContentPane().setLayout(new GridBagLayout());
+        JButton btn = new JButton(Messages.getString("Okay")); //$NON-NLS-1$
+        btn.addActionListener(e -> dialog.setVisible(false));
+        dialog.getRootPane().setDefaultButton(btn);
+
+        JScrollPane scrollPersonnelView = new JScrollPane();
+        scrollPersonnelView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPersonnelView.setViewportView(pvp);
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+
+        //scroll panel
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.CENTER;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        dialog.getContentPane().add(scrollPersonnelView,gridBagConstraints);
+
+        //Okay button
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.CENTER;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        dialog.getContentPane().add(btn, gridBagConstraints);
+
+        dialog.setMinimumSize(new Dimension(600, 300));
+        dialog.setPreferredSize(new Dimension(600, 300));
+        dialog.validate();
+        dialog.setLocationRelativeTo(frame);
+        dialog.setVisible(true);
+    }
+
     private class CheckTotalListener implements ItemListener {
 
         @Override
@@ -1513,7 +1553,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             btnsEditUnit.get(idx).setEnabled(!chksTotaled.get(idx).isSelected());
         }
     }
-    
+
     private class CheckDeadPrisonerListener implements ChangeListener {
 
         @Override
@@ -1548,8 +1588,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 idx = prisonerKiaBtns.indexOf(kiaChk);   // find it in prisoners' instead
                 JSlider hitSlider = pr_hitSliders.get(idx);
                 JCheckBox capturedCheck = prisonerBtns.get(idx);
+                JButton viewPersonellbtn = btnsViewPrisoner.get(idx);
                 hitSlider.setEnabled(enable);
                 capturedCheck.setEnabled(enable);
+                viewPersonellbtn.setEnabled(enable);
             } else {
                 JSlider hitSlider = hitSliders.get(idx);
                 JCheckBox miaChk = miaBtns.get(idx);

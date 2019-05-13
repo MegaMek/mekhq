@@ -1209,8 +1209,12 @@ public class ResolveScenarioTracker {
                 blcValue = blcValue.plus(repairBLC);
                 if(blc > 0 && blcValue.isPositive()) {
                     Money finalValue = blcValue.multipliedBy(blc);
-                    campaign.getFinances().credit(finalValue, Transaction.C_BLC, "B" + blcString, campaign.getCalendar().getTime());
-                    campaign.addReport( finalValue.toAmountAndSymbolString() + " in b" + blcString + " has been credited to your account.");
+                    campaign.getFinances().credit(
+                            finalValue,
+                            Transaction.C_BLC,
+                            blcString.substring(0, 1).toUpperCase() + blcString.substring(1),
+                            campaign.getCalendar().getTime());
+                    campaign.addReport( finalValue.toAmountAndSymbolString() + " in " + blcString + " has been credited to your account.");
                 }
             }
         }

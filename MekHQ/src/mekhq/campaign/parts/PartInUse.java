@@ -19,7 +19,7 @@ public class PartInUse {
     private double tonnagePerItem;
     private int transferCount;
     private int plannedCount;
-    private Money cost;
+    private Money cost = Money.zero();
     
     private void appendDetails(StringBuilder sb, Part part) {
         String details = part.getDetails();

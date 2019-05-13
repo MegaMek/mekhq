@@ -1,9 +1,16 @@
 VERSION HISTORY:
 ----------------
 v0.45.5-SNAPSHOT
-+ PR #1163: Fix vast overvaluing of opfor BV in the briefing ta
++ PR #1163: Fix vast overvaluing of opfor BV in the briefing tab
 + Issue #1161: don't cast non-Infantry to Infantry during peacetime cost calculations
-+ Issue #70: BA has a 100% salvage chance
++ Issue #70: BA no longer has a 100% salvage chance
++ Issue #1165: Player no longer gets dinged contract score for not having forces deployed immediately upon AtB contract start
++ Issue #1170: Fixed issue introduced in 45.4 where player couldn't hire personnel from personnel market with mechs
++ Issue #1164, #1174: Fix various issues involving money, in add/edit transaction, add/edit loot.
++ Issue #1182: Fixes a NPE because some money amounts are not always initialized in all contracts.
++ Issue #1171: Adds autosave feature (daily or weekly, and/or before missions).
++ Issue #1128: Player can now view stats for enemy personnel when resolving a scenario.
++ Issue #1197: Fix bug where personnel could not be assigned to Battle Armor after repair.
 
 v0.45.4 (2019-03-24 1700 UTC)
 + PR #1067: Switch to Joda Money library internally for financial math

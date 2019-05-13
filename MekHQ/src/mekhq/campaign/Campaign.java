@@ -35,6 +35,8 @@ import javax.swing.JOptionPane;
 import mekhq.*;
 import mekhq.campaign.finances.*;
 import mekhq.campaign.log.*;
+import mekhq.service.AutosaveService;
+import mekhq.service.IAutosaveService;
 import org.joda.time.DateTime;
 
 import megamek.client.RandomNameGenerator;
@@ -285,6 +287,8 @@ public class Campaign implements Serializable, ITechManager {
     private IUnitGenerator unitGenerator;
     private IUnitRating unitRating;
 
+    private final IAutosaveService autosaveService;
+
     public Campaign() {
         id = UUID.randomUUID();
         game = new Game();
@@ -312,8 +316,7 @@ public class Campaign implements Serializable, ITechManager {
         forceIds.put(0, forces);
         lances = new Hashtable<>();
         finances = new Finances();
-        location = new CurrentLocation(Planets.getInstance().getPlanets()
-                .get("Outreach"), 0);
+        location = new CurrentLocation(Planets.getInstance().getPlanets().get("Outreach"), 0);
         SkillType.initializeTypes();
         SpecialAbility.initializeSPA();
         astechPool = 0;
@@ -333,6 +336,7 @@ public class Campaign implements Serializable, ITechManager {
         retirementDefectionTracker = new RetirementDefectionTracker();
         fatigueLevel = 0;
         atbConfig = null;
+        autosaveService = new AutosaveService(MekHQ.getLogger());
     }
 
     /**
@@ -2657,11 +2661,13 @@ public class Campaign implements Serializable, ITechManager {
         if (!contract.isActive()) {
             // Inactive contracts have no deficits.
             return 0;
-        } else if (contract.getStartDate().after(getDate())) {
-            // Contracts in the future don't have deficits...yet.
+        } else if (contract.getStartDate().compareTo(getDate()) >= 0) {
+            // Do not check for deficits if the contract has not started or
+            // it is the first day of the contract, as players won't have
+            // had time to assign forces to the contract yet
             return 0;
         }
-
+        
         int total = -contract.getRequiredLances();
         int role = -Math.max(1, contract.getRequiredLances() / 2);
 
@@ -3064,6 +3070,8 @@ public class Campaign implements Serializable, ITechManager {
             return false;
         }
 
+        this.autosaveService.requestDayAdvanceAutosave(this, this.calendar.get(Calendar.DAY_OF_WEEK));
+
         calendar.add(Calendar.DAY_OF_MONTH, 1);
         currentReport.clear();
         currentReportHTML = "";
@@ -3093,7 +3101,6 @@ public class Campaign implements Serializable, ITechManager {
         processNewDayPersonnel();
 
         resetAstechMinutes();
-
 
         processNewDayUnits();
 
