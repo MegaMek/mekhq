@@ -122,20 +122,23 @@ public class SpacecraftCoolingSystem extends Part {
 	    replaceHeatSink();
 	}
 	
-	/*
+	/**
 	 * Pulls a heatsink of the appropriate type from the warehouse and adds it to the cooling system
 	 * 
 	 */
 	public void replaceHeatSink() {
+	    Part spare = campaign.checkForExistingSparePart(AeroHeatSink);
 	    for(Part part : campaign.getSpareParts()) {
             if(!part.isPresent()) {
                 continue;
             }
-            if()
+            if (part instanceof AeroHeatSink) {
+                
+            }
 	    }
 	}
 	
-	/*
+	/**
      * Calculates 'weight free' heatsinks included with this spacecraft's engine. You can't remove or replace these
      * 
      */
@@ -154,22 +157,30 @@ public class SpacecraftCoolingSystem extends Part {
 
 	@Override
 	public void remove(boolean salvage) {
-		if(null != unit && unit.getEntity() instanceof Aero) {
-			((Aero)unit.getEntity()).setCICHits(3);
-			Part spare = campaign.checkForExistingSparePart(this);
-			if(!salvage) {
-				campaign.removePart(this);
-			} else if(null != spare) {
-				spare.incrementQuantity();
-				campaign.removePart(this);
-			}
-			unit.removePart(this);
-			Part missing = getMissingPart();
-			unit.addPart(missing);
-			campaign.addPart(missing, 0);
-		}
-		setUnit(null);
-		updateConditionFromEntity(false);
+		removeHeatSink();
+	}
+	
+	/**
+     * Pulls a heatsink of the appropriate type from the cooling system and adds it to the warehouse
+     * 
+     */
+	public void removeHeatSink() {
+	    currentSinks--;
+    	if(null != unit && unit.getEntity() instanceof Aero) {
+            ((Aero)unit.getEntity()).setHeatSinks(currentSinks);
+            Part spare = campaign.checkForExistingSparePart(this);
+            if(!salvage) {
+                campaign.removePart(this);
+            } else if(null != spare) {
+                spare.incrementQuantity();
+                campaign.removePart(this);
+            }
+            unit.removePart(this);
+            Part missing = getMissingPart();
+            unit.addPart(missing);
+            campaign.addPart(missing, 0);
+        }
+        updateConditionFromEntity(false);
 	}
 
 	@Override
@@ -180,10 +191,6 @@ public class SpacecraftCoolingSystem extends Part {
 
 	@Override
 	public String checkFixable() {
-	    if (isSalvaging()) {
-            // FCS/CIC computers are designed for and built into the ship. Can't salvage and use somewhere else
-            return "You cannot salvage a spacecraft FCS. You must scrap it instead.";
-        }
 		return null;
 	}
 
