@@ -84,6 +84,15 @@ public class SpacecraftCoolingSystem extends Part {
     	return clone;
     }
     
+    //Getters for our various internal values
+    public int getSinkType() {
+        return sinkType;
+    }
+    
+    public int getTotalSinks() {
+        return totalSinks;
+    }
+    
 	@Override
 	public void updateConditionFromEntity(boolean checkForDestruction) {
 	    if(null != unit && unit.getEntity() instanceof Aero) {
@@ -184,6 +193,7 @@ public class SpacecraftCoolingSystem extends Part {
             ((Aero)unit.getEntity()).setHeatSinks(currentSinks);
             Part spare = campaign.checkForExistingSparePart(this);
             if(!salvage) {
+                //Scrapping
                 campaign.removePart(this);
             } else if(null != spare) {
                 spare.incrementQuantity();
@@ -226,7 +236,8 @@ public class SpacecraftCoolingSystem extends Part {
 
 	@Override
 	public boolean isSamePartType(Part part) {
-		return part instanceof SpacecraftCoolingSystem && cost == part.getStickerPrice();
+	    //You don't ever replace or remove the whole cooling system, just modify it
+		return false;
 	}
 	
 	@Override
@@ -238,9 +249,17 @@ public class SpacecraftCoolingSystem extends Part {
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<cost>"
-				+cost.toXmlString()
-				+"</cost>");
+				+"<sinkType>"
+				+sinkType
+				+"</sinkType>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<sinksNeeded>"
+                +sinksNeeded
+                +"</sinksNeeded>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<currentSinks>"
+                +currentSinks
+                +"</currentSinks>");
 		writeToXmlEnd(pw1, indent);
 	}
 
@@ -250,9 +269,13 @@ public class SpacecraftCoolingSystem extends Part {
 		
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);		
-			if (wn2.getNodeName().equalsIgnoreCase("cost")) {
-				cost = Money.fromXmlString(wn2.getTextContent().trim());
-			} 
+			if (wn2.getNodeName().equalsIgnoreCase("sinkType")) {
+				sinkType = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("sinksNeeded")) {
+			    sinksNeeded = Integer.parseInt(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("currentSinks")) {
+                currentSinks = Integer.parseInt(wn2.getTextContent());
+            }
 		}
 	}
 
