@@ -168,20 +168,22 @@ public class SpacecraftCoolingSystem extends Part {
 
 	@Override
 	public void remove(boolean salvage) {
-		removeHeatSink();
+		removeHeatSink(salvage);
 	}
 	
 	/**
      * Pulls a heatsink of the appropriate type from the cooling system and adds it to the warehouse
      * 
      */
-	public void removeHeatSink() {
+	public void removeHeatSink(boolean salvage) {
 	    if (unit != null && unit.getEntity() instanceof Aero) {
             //Spare part is usually 'this', but we're looking for spare heatsinks here...
             Part spareHeatSink = new AeroHeatSink(0, ((Aero)unit.getEntity()).getHeatType(), false, campaign);
             Part spare = campaign.checkForExistingSparePart(spareHeatSink);
-           if (null != spare) {
-                spare.decrementQuantity();
+            if(!salvage) {
+                //Scrapping. Don't do anything.
+            } else if (null != spare) {
+                spare.incrementQuantity();
                 campaign.removePart(spare);
            }
            ((Aero)unit.getEntity()).setHeatSinks(((Aero)unit.getEntity()).getHeatSinks() + 1);
