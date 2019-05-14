@@ -127,15 +127,17 @@ public class SpacecraftCoolingSystem extends Part {
 	 * 
 	 */
 	public void replaceHeatSink() {
-	    Part spare = campaign.checkForExistingSparePart(AeroHeatSink);
-	    for(Part part : campaign.getSpareParts()) {
-            if(!part.isPresent()) {
-                continue;
-            }
-            if (part instanceof AeroHeatSink) {
-                
-            }
+	    if (unit != null && unit.getEntity() instanceof Aero) {
+	        //Spare part is usually 'this', but we're looking for spare heatsinks here...
+	        Part spareHeatSink = new AeroHeatSink(0, ((Aero)unit.getEntity()).getHeatType(), false, campaign);
+	        Part spare = campaign.checkForExistingSparePart(spareHeatSink);
+	       if (null != spare) {
+                spare.decrementQuantity();
+                campaign.removePart(spare);
+           }
+	       ((Aero)unit.getEntity()).setHeatSinks(((Aero)unit.getEntity()).getHeatSinks() + 1);
 	    }
+	    updateConditionFromEntity(false);
 	}
 	
 	/**
