@@ -89,7 +89,8 @@ public class SpacecraftCoolingSystem extends Part {
 	    if(null != unit && unit.getEntity() instanceof Aero) {
             totalSinks = ((Aero) unit.getEntity()).getOHeatSinks();
             currentSinks = ((Aero) unit.getEntity()).getHeatSinks();
-            sinksNeeded = (((Aero) unit.getEntity()).getOHeatSinks() - ((Aero) unit.getEntity()).getHeatSinks());
+            //You shouldn't be able to replace or remove heatsinks built into the vessel's engine
+            sinksNeeded = Math.min(removeableSinks, (totalSinks - currentSinks));
         }
 	}
 	
@@ -136,6 +137,7 @@ public class SpacecraftCoolingSystem extends Part {
                 campaign.removePart(spare);
            }
 	       ((Aero)unit.getEntity()).setHeatSinks(((Aero)unit.getEntity()).getHeatSinks() + 1);
+	       
 	    }
 	    updateConditionFromEntity(false);
 	}
@@ -145,15 +147,13 @@ public class SpacecraftCoolingSystem extends Part {
      * 
      */
     public void setEngineHeatSinks() {
+        engineSinks = 0;
         if (null != unit) {
             if (unit.getEntity() instanceof Jumpship) {
                 engineSinks = TestAdvancedAerospace.weightFreeHeatSinks((Jumpship) unit.getEntity());
             } else if (unit.getEntity() instanceof SmallCraft) {
                 engineSinks = TestSmallCraft.weightFreeHeatSinks((SmallCraft) unit.getEntity());
             }
-        } else {
-            //Shouldn't ever get here, but just in case...
-            engineSinks = 0;
         }
     }
 
@@ -167,6 +167,18 @@ public class SpacecraftCoolingSystem extends Part {
      * 
      */
 	public void removeHeatSink() {
+	    if (unit != null && unit.getEntity() instanceof Aero) {
+            //Spare part is usually 'this', but we're looking for spare heatsinks here...
+            Part spareHeatSink = new AeroHeatSink(0, ((Aero)unit.getEntity()).getHeatType(), false, campaign);
+            Part spare = campaign.checkForExistingSparePart(spareHeatSink);
+           if (null != spare) {
+                spare.decrementQuantity();
+                campaign.removePart(spare);
+           }
+           ((Aero)unit.getEntity()).setHeatSinks(((Aero)unit.getEntity()).getHeatSinks() + 1);
+           
+        }
+        updateConditionFromEntity(false);
 	    currentSinks--;
     	if(null != unit && unit.getEntity() instanceof Aero) {
             ((Aero)unit.getEntity()).setHeatSinks(currentSinks);
