@@ -178,6 +178,7 @@ import mekhq.campaign.parts.ProtomekSensor;
 import mekhq.campaign.parts.QuadVeeGear;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.Rotor;
+import mekhq.campaign.parts.SpacecraftCoolingSystem;
 import mekhq.campaign.parts.SpacecraftEngine;
 import mekhq.campaign.parts.StructuralIntegrity;
 import mekhq.campaign.parts.TankLocation;
@@ -1848,6 +1849,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         ArrayList<Part> protoJumpJets = new ArrayList<>();
         Part aeroThrustersLeft = null;
         Part aeroThrustersRight = null;
+        Part coolingSystem = null;
         Map<Integer, Part> bays = new HashMap<>();
         Map<Integer, List<Part>> bayPartsToAdd = new HashMap<>();
         Map<Integer, Part> jumpCollars = new HashMap<>();
@@ -2027,6 +2029,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 if(part instanceof CombatInformationCenter) {
                     ((CombatInformationCenter)cic).calculateCost();
                 }
+            //For Small Craft and larger, add this as a container for all their heatsinks instead of adding hundreds
+            //of individual heatsink parts.
+            } else if(part instanceof SpacecraftCoolingSystem 
+                    && (entity instanceof SmallCraft || entity instanceof Jumpship)) {
+                coolingSystem = part;
             } else if(part instanceof AeroSensor || part instanceof MissingAeroSensor) {
                 sensor = part;
             } else if(part instanceof LandingGear || part instanceof MissingLandingGear) {
@@ -2036,9 +2043,14 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     partsToRemove.add(part);
                 }
             } else if(part instanceof AeroHeatSink || part instanceof MissingAeroHeatSink) {
-                aeroHeatSinks.add(part);
-                if (part.isOmniPodded()) {
-                    podAeroHeatSinks++;
+             // If a SC/DS/JS/WS/SS already has heatsinks, remove them. We're using the spacecraft cooling system instead
+                if (entity instanceof Jumpship) {
+                    partsToRemove.add(part);
+                } else {
+                    aeroHeatSinks.add(part);
+                    if (part.isOmniPodded()) {
+                        podAeroHeatSinks++;
+                    }
                 }
             } else if(part instanceof MotiveSystem) {
                 motiveSystem = part;
@@ -2511,6 +2523,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 addPart(fcs);
                 partsToAdd.add(fcs);
                 ((FireControlSystem)fcs).calculateCost();
+            }
+            if(null == coolingSystem && (entity instanceof SmallCraft || entity instanceof Jumpship)) {
+                coolingSystem = new SpacecraftCoolingSystem((int)entity.getWeight(), ((Aero)entity).getOHeatSinks(), ((Aero)entity).getHeatType(), getCampaign());
+                addPart(coolingSystem);
+                partsToAdd.add(coolingSystem);
             }
             if(null == sensor) {
                 sensor = new AeroSensor((int) entity.getWeight(), entity instanceof Dropship || entity instanceof Jumpship, getCampaign());
