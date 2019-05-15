@@ -186,27 +186,9 @@ public class SpacecraftCoolingSystem extends Part {
                 spare.incrementQuantity();
                 campaign.removePart(spare);
            }
-           ((Aero)unit.getEntity()).setHeatSinks(((Aero)unit.getEntity()).getHeatSinks() + 1);
-           
+           ((Aero)unit.getEntity()).setHeatSinks(((Aero)unit.getEntity()).getHeatSinks() - 1);
         }
-        updateConditionFromEntity(false);
-	    currentSinks--;
-    	if(null != unit && unit.getEntity() instanceof Aero) {
-            ((Aero)unit.getEntity()).setHeatSinks(currentSinks);
-            Part spare = campaign.checkForExistingSparePart(this);
-            if(!salvage) {
-                //Scrapping
-                campaign.removePart(this);
-            } else if(null != spare) {
-                spare.incrementQuantity();
-                campaign.removePart(this);
-            }
-            unit.removePart(this);
-            Part missing = getMissingPart();
-            unit.addPart(missing);
-            campaign.addPart(missing, 0);
-        }
-        updateConditionFromEntity(false);
+	    updateConditionFromEntity(false);
 	}
 
 	@Override
