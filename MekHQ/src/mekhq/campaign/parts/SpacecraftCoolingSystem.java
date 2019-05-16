@@ -71,8 +71,6 @@ public class SpacecraftCoolingSystem extends Part {
         this.name = "Spacecraft Cooling System";
         this.totalSinks = totalSinks;
         this.sinkType = sinkType;
-        setEngineHeatSinks();
-        this.removeableSinks = (this.totalSinks - engineSinks);
         this.sinksNeeded = 0;
     }
         
@@ -96,6 +94,8 @@ public class SpacecraftCoolingSystem extends Part {
 	    if(null != unit && unit.getEntity() instanceof Aero) {
             totalSinks = ((Aero) unit.getEntity()).getOHeatSinks();
             currentSinks = ((Aero) unit.getEntity()).getHeatSinks();
+            setEngineHeatSinks();
+            removeableSinks = Math.max(0, (totalSinks - engineSinks));
             //You shouldn't be able to replace or remove heatsinks built into the vessel's engine
             sinksNeeded = Math.min(removeableSinks, (totalSinks - currentSinks));
         }
@@ -141,10 +141,8 @@ public class SpacecraftCoolingSystem extends Part {
 	        Part spare = campaign.checkForExistingSparePart(spareHeatSink);
 	       if (null != spare) {
                 spare.decrementQuantity();
-                campaign.removePart(spare);
+                ((Aero)unit.getEntity()).setHeatSinks(((Aero)unit.getEntity()).getHeatSinks() + 1);
            }
-	       ((Aero)unit.getEntity()).setHeatSinks(((Aero)unit.getEntity()).getHeatSinks() + 1);
-	       
 	    }
 	    updateConditionFromEntity(false);
 	}
@@ -154,8 +152,9 @@ public class SpacecraftCoolingSystem extends Part {
      * 
      */
     public void setEngineHeatSinks() {
-        engineSinks = 0;
-        if (null != unit) {
+        //Only calculate this again if we've managed to keep a value of 0 engineSinks or go negative.
+        //According to the construction rules, this *should* always be a positive value.
+        if (engineSinks <= 0 && null != unit) {
             if (unit.getEntity() instanceof Jumpship) {
                 engineSinks = TestAdvancedAerospace.weightFreeHeatSinks((Jumpship) unit.getEntity());
             } else if (unit.getEntity() instanceof SmallCraft) {
@@ -181,8 +180,12 @@ public class SpacecraftCoolingSystem extends Part {
             if(!salvage) {
                 //Scrapping. Don't do anything.
             } else if (null != spare) {
+                //Add one to our spare stocks
                 spare.incrementQuantity();
-                campaign.removePart(spare);
+                spare.setUnit(null);
+           } else {
+               //Start a new collection
+               campaign.addPart(spareHeatSink, 0);
            }
            ((Aero)unit.getEntity()).setHeatSinks(((Aero)unit.getEntity()).getHeatSinks() - 1);
         }
