@@ -2043,8 +2043,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     partsToRemove.add(part);
                 }
             } else if(part instanceof AeroHeatSink || part instanceof MissingAeroHeatSink) {
-             // If a SC/DS/JS/WS/SS already has heatsinks, remove them. We're using the spacecraft cooling system instead
-                if (entity instanceof Jumpship) {
+                // If a SC/DS/JS/WS/SS already has heatsinks, remove them. We're using the spacecraft cooling system instead
+                if (entity instanceof SmallCraft || entity instanceof Jumpship) {
                     partsToRemove.add(part);
                 } else {
                     aeroHeatSinks.add(part);
@@ -2581,16 +2581,19 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     partsToAdd.add(gravDeckPart);
                 }
             }
-            int hsinks = ((Aero)entity).getOHeatSinks() - aeroHeatSinks.size();
-            int podhsinks = ((Aero)entity).getPodHeatSinks() - podAeroHeatSinks;
-            while(hsinks > 0) {
-                AeroHeatSink aHeatSink = new AeroHeatSink((int)entity.getWeight(),
-                        ((Aero)entity).getHeatType(), podhsinks > 0, getCampaign());
-                addPart(aHeatSink);
-                partsToAdd.add(aHeatSink);
-                hsinks--;
-                if (podhsinks > 0) {
-                    podhsinks--;
+            //Only add heatsink parts to fighters. Larger craft get a cooling system instead.
+            if (!(entity instanceof SmallCraft) && !(entity instanceof Jumpship)) {
+                int hsinks = ((Aero)entity).getOHeatSinks() - aeroHeatSinks.size();
+                int podhsinks = ((Aero)entity).getPodHeatSinks() - podAeroHeatSinks;
+                while(hsinks > 0) {
+                    AeroHeatSink aHeatSink = new AeroHeatSink((int)entity.getWeight(),
+                            ((Aero)entity).getHeatType(), podhsinks > 0, getCampaign());
+                    addPart(aHeatSink);
+                    partsToAdd.add(aHeatSink);
+                    hsinks--;
+                    if (podhsinks > 0) {
+                        podhsinks--;
+                    }
                 }
             }
             if (entity instanceof SmallCraft || entity instanceof Jumpship) {
