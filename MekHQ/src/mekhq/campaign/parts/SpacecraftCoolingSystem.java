@@ -45,7 +45,7 @@ import mekhq.campaign.personnel.SkillType;
  * The remove action adds a single heatsink of the appropriate type to the warehouse.
  * Fix action replaces one. 
  * Small craft and up don't actually track damage to heatsinks, so you only fix this part if you're salvaging/replacing.
- * There might be 12,500 heatsinks in here. Have fun with that.
+ * There might be 5,000 heatsinks in here. Have fun with that.
  * @author MKerensky
  */
 public class SpacecraftCoolingSystem extends Part {
@@ -89,6 +89,11 @@ public class SpacecraftCoolingSystem extends Part {
         return totalSinks;
     }
     
+    public int getRemoveableSinks() {
+        return removeableSinks;
+    }
+    
+    
 	@Override
 	public void updateConditionFromEntity(boolean checkForDestruction) {
 	    if(null != unit && unit.getEntity() instanceof Aero) {
@@ -129,6 +134,17 @@ public class SpacecraftCoolingSystem extends Part {
 	public void fix() {
 	    replaceHeatSink();
 	}
+	
+	@Override
+    public String succeed() {
+        if(isSalvaging()) {
+            remove(true);
+            return " <font color='green'><b> salvaged.</b></font>";
+        } else {
+            fix();
+            return " <font color='green'><b> replaced.</b></font>";
+        }
+    }
 	
 	/**
 	 * Pulls a heatsink of the appropriate type from the warehouse and adds it to the cooling system
