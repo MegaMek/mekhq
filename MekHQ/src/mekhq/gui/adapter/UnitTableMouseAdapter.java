@@ -23,6 +23,7 @@ import javax.swing.event.MouseInputAdapter;
 
 import megamek.client.ui.swing.UnitEditorDialog;
 import megamek.client.ui.swing.util.MenuScroller;
+import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
 import megamek.common.CriticalSlot;
@@ -43,6 +44,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.MissingPart;
+import mekhq.campaign.parts.MissingThrusters;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.equipment.AmmoBin;
@@ -525,8 +527,13 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                     needsCheck = false;
                     for(int x = 0; x < unit.getParts().size(); x++) {
                         Part part = unit.getParts().get(x);
-
-                        if(part instanceof MissingPart) {
+                        if (part instanceof MissingPart) {
+                            //Make sure we restore both left and right thrusters
+                            if (part instanceof MissingThrusters) {
+                                if (((Aero)unit.getEntity()).getLeftThrustHits() > 0) {
+                                    ((MissingThrusters)part).setLeftThrusters(true);
+                                }
+                            }
                             // We magically acquire a replacement part, then fix the missing one.
                             part.getCampaign().addPart(((MissingPart) part).getNewPart(), 0);
                             part.fix();
