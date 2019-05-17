@@ -178,7 +178,7 @@ public class SpacecraftCoolingSystem extends Part {
             Part spareHeatSink = new AeroHeatSink(0, ((Aero)unit.getEntity()).getHeatType(), false, campaign);
             Part spare = campaign.checkForExistingSparePart(spareHeatSink);
             if(!salvage) {
-                //Scrapping. Don't do anything.
+                //Scrapping. Shouldn't be able to get here, but don't do anything just in case.
             } else if (null != spare) {
                 //Add one to our spare stocks
                 spare.incrementQuantity();
@@ -213,6 +213,16 @@ public class SpacecraftCoolingSystem extends Part {
 	    //Cooling system itself has no price
 		return Money.zero();
 	}
+	
+	@Override
+    public String checkScrappable() {
+        return "Spacecraft Cooling System cannot be scrapped";
+    }
+
+    @Override
+    public boolean canNeverScrap() {
+        return true;
+    }
 	
 	@Override
 	public double getTonnage() {
