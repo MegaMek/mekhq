@@ -136,6 +136,7 @@ import mekhq.campaign.parts.PartInUse;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.ProtomekArmor;
 import mekhq.campaign.parts.Refit;
+import mekhq.campaign.parts.SpacecraftCoolingSystem;
 import mekhq.campaign.parts.StructuralIntegrity;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -2471,9 +2472,14 @@ public class Campaign implements Serializable, ITechManager {
                 return;
             }
         }
-        report += tech.getHyperlinkedFullTitle() + " attempts to" + action
-                + partWork.getPartName();
-
+        if (partWork instanceof SpacecraftCoolingSystem) {
+            //Change the string since we're not working on the part itself
+            report += tech.getHyperlinkedFullTitle() + " attempts to" + action
+                    + "a heat sink";
+        } else {
+            report += tech.getHyperlinkedFullTitle() + " attempts to" + action
+                    + partWork.getPartName();
+        }
         if (null != partWork.getUnit()) {
             report += " on " + partWork.getUnit().getName();
         }
