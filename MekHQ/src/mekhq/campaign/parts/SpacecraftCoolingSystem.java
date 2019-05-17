@@ -200,6 +200,14 @@ public class SpacecraftCoolingSystem extends Part {
 
 	@Override
 	public String checkFixable() {
+	    if(isSalvaging() && (engineSinks >= currentSinks)) {
+            return "All remaining heat sinks are built-in and cannot be salvaged.";
+        }
+	    Part spareHeatSink = new AeroHeatSink(0, ((Aero)unit.getEntity()).getHeatType(), false, campaign);
+        Part spare = campaign.checkForExistingSparePart(spareHeatSink);
+        if (!isSalvaging() && spare == null) {
+            return "No compatible heat sinks in warehouse!";
+        }
 		return null;
 	}
 
