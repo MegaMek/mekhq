@@ -49,6 +49,12 @@ public class MissingAeroHeatSink extends MissingPart {
     	super(tonnage, omniPodded, c);
     	this.type = type;
     	this.name = "Aero Heat Sink";
+    	if(type == AeroHeatSink.CLAN_HEAT_DOUBLE) {
+            this.name = "Aero Double Heat Sink (Clan)";
+        }
+        if(type == Aero.HEAT_DOUBLE) {
+            this.name = "Aero Double Heat Sink";
+        }
     }
     
     @Override 
@@ -115,7 +121,7 @@ public class MissingAeroHeatSink extends MissingPart {
     public TechAdvancement getTechAdvancement() {
         if (type == Aero.HEAT_SINGLE) {
             return AeroHeatSink.TA_SINGLE;
-        } else if (campaign.getFaction().isClan()) {
+        } else if (type == AeroHeatSink.CLAN_HEAT_DOUBLE) {
             return AeroHeatSink.TA_CLAN_DOUBLE;
         } else {
             return AeroHeatSink.TA_IS_DOUBLE;

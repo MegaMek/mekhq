@@ -305,6 +305,11 @@ public class PartsStore implements Serializable {
         parts.add(hs);
         parts.add(new OmniPod(hs, c));
         parts.add(new AeroHeatSink(0, Aero.HEAT_DOUBLE, true, c));
+        
+        hs = new AeroHeatSink(0, AeroHeatSink.CLAN_HEAT_DOUBLE, false, c);
+        parts.add(hs);
+        parts.add(new OmniPod(hs, c));
+        parts.add(new AeroHeatSink(0, AeroHeatSink.CLAN_HEAT_DOUBLE, true, c));
 	}
 
 	private void stockMekActuators(Campaign c) {
@@ -442,6 +447,7 @@ public class PartsStore implements Serializable {
 	private void stockAeroComponents(Campaign c) {
 		parts.add(new AeroHeatSink(0, Aero.HEAT_SINGLE, false, c));
 		parts.add(new AeroHeatSink(0, Aero.HEAT_DOUBLE, false, c));
+		parts.add(new AeroHeatSink(0, AeroHeatSink.CLAN_HEAT_DOUBLE, false, c));
 		for(int ton = 5; ton <= 200; ton += 5) {
 			parts.add(new AeroSensor(ton, false, c));
 		}

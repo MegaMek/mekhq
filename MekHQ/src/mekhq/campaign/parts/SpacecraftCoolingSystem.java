@@ -71,6 +71,9 @@ public class SpacecraftCoolingSystem extends Part {
         this.name = "Spacecraft Cooling System";
         this.totalSinks = totalSinks;
         this.sinkType = sinkType;
+        if (sinkType == Aero.HEAT_DOUBLE && unit != null && unit.isClan()) {
+            sinkType = AeroHeatSink.CLAN_HEAT_DOUBLE;
+        }
         this.sinksNeeded = 0;
     }
         
@@ -153,7 +156,7 @@ public class SpacecraftCoolingSystem extends Part {
 	public void replaceHeatSink() {
 	    if (unit != null && unit.getEntity() instanceof Aero) {
 	        //Spare part is usually 'this', but we're looking for spare heatsinks here...
-	        Part spareHeatSink = new AeroHeatSink(0, ((Aero)unit.getEntity()).getHeatType(), false, campaign);
+	        Part spareHeatSink = new AeroHeatSink(0, sinkType, false, campaign);
 	        Part spare = campaign.checkForExistingSparePart(spareHeatSink);
 	       if (null != spare) {
                 spare.decrementQuantity();
@@ -191,7 +194,7 @@ public class SpacecraftCoolingSystem extends Part {
 	public void removeHeatSink(boolean salvage) {
 	    if (unit != null && unit.getEntity() instanceof Aero) {
             //Spare part is usually 'this', but we're looking for spare heatsinks here...
-            Part spareHeatSink = new AeroHeatSink(0, ((Aero)unit.getEntity()).getHeatType(), false, campaign);
+            Part spareHeatSink = new AeroHeatSink(0, sinkType, false, campaign);
             Part spare = campaign.checkForExistingSparePart(spareHeatSink);
             if(!salvage) {
                 //Scrapping. Shouldn't be able to get here, but don't do anything just in case.
@@ -219,7 +222,7 @@ public class SpacecraftCoolingSystem extends Part {
 	    if(isSalvaging() && (engineSinks >= currentSinks)) {
             return "All remaining heat sinks are built-in and cannot be salvaged.";
         }
-	    Part spareHeatSink = new AeroHeatSink(0, ((Aero)unit.getEntity()).getHeatType(), false, campaign);
+	    Part spareHeatSink = new AeroHeatSink(0, sinkType, false, campaign);
         Part spare = campaign.checkForExistingSparePart(spareHeatSink);
         if (!isSalvaging() && spare == null) {
             return "No compatible heat sinks in warehouse!";
@@ -250,7 +253,8 @@ public class SpacecraftCoolingSystem extends Part {
 	
 	@Override
 	public double getTonnage() {
-		return 0;
+	    //1 ton for each non-weight-free heatsink
+		return getRemoveableSinks();
 	}
 
 	@Override

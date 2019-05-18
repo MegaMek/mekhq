@@ -1788,8 +1788,14 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     public void initializeParts(boolean addParts) {
 
         int erating = 0;
+        int builtInHeatSinks = 0;
         if(!(entity instanceof FighterSquadron) && (null != entity.getEngine())) {
             erating = entity.getEngine().getRating();
+            if (entity.getEngine().isFusion()) {
+                //10 weight-free heatsinks for fusion engines.
+                //Used for fighters to prevent adding extra parts
+                builtInHeatSinks = 10;
+            }
         }
 
         ArrayList<Part> partsToAdd = new ArrayList<>();
@@ -2046,6 +2052,10 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 // If a SC/DS/JS/WS/SS already has heatsinks, remove them. We're using the spacecraft cooling system instead
                 if (entity instanceof SmallCraft || entity instanceof Jumpship) {
                     partsToRemove.add(part);
+                } else if (entity.getEngine().isFusion() && builtInHeatSinks > 0) {
+                    //Don't add parts for the 10 heatsinks included with a fusion engine
+                    partsToRemove.add(part);
+                    builtInHeatSinks--;
                 } else {
                     aeroHeatSinks.add(part);
                     if (part.isOmniPodded()) {
@@ -2525,7 +2535,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 ((FireControlSystem)fcs).calculateCost();
             }
             if(null == coolingSystem && (entity instanceof SmallCraft || entity instanceof Jumpship)) {
-                coolingSystem = new SpacecraftCoolingSystem((int)entity.getWeight(), ((Aero)entity).getOHeatSinks(), ((Aero)entity).getHeatType(), getCampaign());
+                int sinkType = ((Aero)entity).getHeatType();
+                if (sinkType == Aero.HEAT_DOUBLE && entity.isClan()) {
+                    sinkType = AeroHeatSink.CLAN_HEAT_DOUBLE;
+                }
+                coolingSystem = new SpacecraftCoolingSystem((int)entity.getWeight(), ((Aero)entity).getOHeatSinks(), sinkType, getCampaign());
                 addPart(coolingSystem);
                 partsToAdd.add(coolingSystem);
             }
@@ -2583,11 +2597,18 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
             //Only add heatsink parts to fighters. Larger craft get a cooling system instead.
             if (!(entity instanceof SmallCraft) && !(entity instanceof Jumpship)) {
-                int hsinks = ((Aero)entity).getOHeatSinks() - aeroHeatSinks.size();
+                int hsinks = ((Aero)entity).getOHeatSinks()
+                        - aeroHeatSinks.size()
+                        //Ignore the 10 free heatsinks we took out for fusion powered fighters
+                        - ((entity.getEngine() != null && entity.getEngine().isFusion()) ? 10 : 0);
                 int podhsinks = ((Aero)entity).getPodHeatSinks() - podAeroHeatSinks;
+                int sinkType = ((Aero)entity).getHeatType();
+                if (sinkType == Aero.HEAT_DOUBLE && entity.isClan()) {
+                    sinkType = AeroHeatSink.CLAN_HEAT_DOUBLE;
+                }
                 while(hsinks > 0) {
                     AeroHeatSink aHeatSink = new AeroHeatSink((int)entity.getWeight(),
-                            ((Aero)entity).getHeatType(), podhsinks > 0, getCampaign());
+                            sinkType, podhsinks > 0, getCampaign());
                     addPart(aHeatSink);
                     partsToAdd.add(aHeatSink);
                     hsinks--;

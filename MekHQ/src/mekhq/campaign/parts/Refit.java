@@ -2296,6 +2296,9 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
      */
     private Part heatSinkPart(Entity entity) {
         if (entity instanceof Aero) {
+            if (((Aero) entity).getHeatType() == Aero.HEAT_DOUBLE && entity.isClan()) {
+                return new AeroHeatSink(0, AeroHeatSink.CLAN_HEAT_DOUBLE, false, campaign);
+            }
             return new AeroHeatSink(0, ((Aero) entity).getHeatType(), false, campaign);
         } else if (entity instanceof Mech) {
             Optional<Mounted> mount = entity.getMisc().stream()
