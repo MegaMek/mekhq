@@ -1,5 +1,6 @@
 package mekhq.gui.stratcon;
 
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -16,18 +17,23 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ListModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.ScenarioForceTemplate;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconRulesManager;
 
@@ -47,6 +53,9 @@ public class StratconScenarioWizard extends JDialog implements ActionListener {
     List<JList<Force>> assignedForceLists = new ArrayList<>();
     List<JButton> rightButtons = new ArrayList<>();
     List<JButton> leftButtons = new ArrayList<>();
+    
+    JList<Unit> availableInfantryUnits = new JList<>();
+    JLabel defensiveOptionStatus = new JLabel();
 
     public StratconScenarioWizard(Campaign campaign) {
         this.campaign = campaign;
@@ -74,42 +83,44 @@ public class StratconScenarioWizard extends JDialog implements ActionListener {
 
         gbc.gridx = 0;
         gbc.gridy = 0;
-        
         setInstructions(gbc);
-        gbc.gridy = 2;
         
         switch(currentScenario.getCurrentState()) {        
             case UNRESOLVED:
                 setAssignForcesUI(gbc, false);
                 break;
             default:
+                gbc.gridy++;
                 setAssignForcesUI(gbc, true);
+                gbc.gridy++;
+                setDefensiveUI(gbc);
                 break;
         }
 
-        gbc.gridx = 0;
+        /*gbc.gridx = 0;
         gbc.gridy++;
-        setNavigationButtons(gbc);
+        setNavigationButtons(gbc);*/
         pack();
         validate();
     }
     
     private void setInstructions(GridBagConstraints gbc) {
-        JLabel lblInfo = new JLabel(currentScenario.getInfo(false));
-        getContentPane().add(lblInfo, gbc);
-        gbc.gridy++;
+        JLabel lblInfo = new JLabel();
+        StringBuilder labelBuilder = new StringBuilder();
+        labelBuilder.append("<html>");
+        labelBuilder.append(currentScenario.getInfo(true, true));
         
-        JLabel lblInstructions = new JLabel();
         switch(currentScenario.getCurrentState()) {
         case UNRESOLVED:
-            lblInstructions.setText("Assign the required number of lances to the scenario.");
+            labelBuilder.append("Assign the required number of lances to the scenario.<br/>");
             break;
         default:
-            lblInstructions.setText("Assign any reinforcements or make allied support requests.");
+            labelBuilder.append("Assign any reinforcements or make allied support requests.<br/>");
             break;
         }
         
-        getContentPane().add(lblInstructions, gbc);
+        lblInfo.setText(labelBuilder.toString());
+        getContentPane().add(lblInfo, gbc);
     }
     
     private void setAssignForcesUI(GridBagConstraints gbc, boolean reinforcements) {
@@ -123,40 +134,59 @@ public class StratconScenarioWizard extends JDialog implements ActionListener {
                     currentScenario.getScenarioTemplate().getAllPrimaryPlayerForces();
         
         for(ScenarioForceTemplate forceTemplate : eligibleForceTemplates) {
-            JList<Force> availableForceList = addAvailableForceList(gbc, controlSetIndex, forceTemplate);
-            addSelectedBVLabel(gbc);
+            JPanel forcePairPanel = new JPanel();
+            forcePairPanel.setLayout(new GridBagLayout());
+            GridBagConstraints localGbc = new GridBagConstraints();
+            localGbc.gridx = 0;
+            localGbc.gridy = 0;
+            localGbc.gridheight = 2;
             
-            gbc.gridx = 1;
-            gbc.gridy++;
-            gbc.anchor = GridBagConstraints.SOUTH;
-            gbc.fill = GridBagConstraints.NONE;
+            JList<Force> availableForceList = addAvailableForceList(forcePairPanel, localGbc, controlSetIndex, forceTemplate);
+            
+            localGbc.gridx = 1;
+            localGbc.gridheight = 1;
+            localGbc.gridy = 0;
+            localGbc.anchor = GridBagConstraints.SOUTH;
             
             JButton btnRight = new JButton(">>>");
             btnRight.setActionCommand(String.format("%s|%d", CMD_MOVE_RIGHT, controlSetIndex));
             btnRight.addActionListener(this);       
             rightButtons.add(btnRight);
-            getContentPane().add(btnRight, gbc);
+            forcePairPanel.add(btnRight, localGbc);
             
-            gbc.gridy++;
-            gbc.anchor = GridBagConstraints.NORTH;
+            localGbc.gridy = 1;
+            localGbc.anchor = GridBagConstraints.NORTH;
             
             JButton btnLeft = new JButton("<<<");
             btnLeft.setActionCommand(String.format("%s|%d", CMD_MOVE_LEFT, controlSetIndex));
             btnLeft.addActionListener(this);
             leftButtons.add(btnLeft);
-            getContentPane().add(btnLeft, gbc);
+            forcePairPanel.add(btnLeft, localGbc);
             
-            gbc.gridx = 2;
-            gbc.gridy -= 2;
-            JList<Force> assignedForceList = addAssignedForceList(gbc, controlSetIndex);
+            localGbc.gridx = 2;
+            localGbc.gridy = 0;
+            localGbc.gridheight = 2;
+            JList<Force> assignedForceList = addAssignedForceList(forcePairPanel, localGbc, controlSetIndex);
             
             availableForceLists.add(availableForceList);
             assignedForceLists.add(assignedForceList);
+            
+            getContentPane().add(forcePairPanel, gbc);
             controlSetIndex++;
         }
     }
 
-    private JList<Force> addAvailableForceList(GridBagConstraints gbc, int index, ScenarioForceTemplate forceTemplate) {
+    /**
+     * Set up the UI for "defensive elements".
+     * @param gbc
+     */
+    private void setDefensiveUI(GridBagConstraints gbc) {
+        addIndividualUnitSelector(StratconRulesManager.getEligibleDefensiveUnits(campaign), 
+                gbc, 
+                currentScenario.getBackingScenario().getLanceCommanderSkill(SkillType.S_TACTICS, campaign));
+    }
+    
+    private JList<Force> addAvailableForceList(JPanel parent, GridBagConstraints gbc, int index, ScenarioForceTemplate forceTemplate) {
         JScrollPane forceListContainer = new JScrollPane();
 
         ScenarioWizardLanceModel lanceModel;
@@ -176,12 +206,11 @@ public class StratconScenarioWizard extends JDialog implements ActionListener {
 
         forceListContainer.setViewportView(availableForceList);
 
-        gbc.gridheight = 3;
-        getContentPane().add(forceListContainer, gbc);
+        parent.add(forceListContainer, gbc);
         return availableForceList;
     }
     
-    private JList<Force> addAssignedForceList(GridBagConstraints gbc, int index) {
+    private JList<Force> addAssignedForceList(JPanel parent, GridBagConstraints gbc, int index) {
         JScrollPane forceListContainer = new JScrollPane();
 
         ScenarioWizardLanceModel lanceModel = new ScenarioWizardLanceModel(campaign, currentScenario.getAssignedForces());
@@ -198,20 +227,93 @@ public class StratconScenarioWizard extends JDialog implements ActionListener {
 
         forceListContainer.setViewportView(assignedForceList);
 
-        gbc.gridheight = 3;
-        getContentPane().add(forceListContainer, gbc);
+        parent.add(forceListContainer, gbc);
         return assignedForceList;
     }
-    
-    private void addSelectedBVLabel(GridBagConstraints gbc) {
-        gbc.gridx++;
-        gbc.gridheight = 1;
-        gbc.anchor = GridBagConstraints.NORTH;
-        lblTotalBV.setText("Selected BV: 0");
-        getContentPane().add(lblTotalBV, gbc);
-        gbc.gridx--;
-    }
 
+    /**
+     * Adds an individual unit selector, given a list of individual units, a global grid bag constraint set
+     * and a maximum selection size.
+     * @param units
+     * @param gbc
+     * @param maxSelectionSize
+     */
+    private void addIndividualUnitSelector(List<Unit> units, GridBagConstraints gbc, int maxSelectionSize) {
+        JPanel unitPanel = new JPanel();
+        unitPanel.setLayout(new GridBagLayout());
+        GridBagConstraints localGbc = new GridBagConstraints();
+        
+        localGbc.gridx = 0;
+        localGbc.gridy = 0;
+        localGbc.anchor = GridBagConstraints.WEST;
+        JLabel instructions = new JLabel();
+        instructions.setText(String.format("Select individual units (%d max)", maxSelectionSize));
+        unitPanel.add(instructions);
+        
+        localGbc.gridy++;        
+        DefaultListModel<Unit> availableModel = new DefaultListModel<>();
+        for(Unit u : units) {
+            availableModel.addElement(u);
+        }
+        
+        JLabel unitStatusLabel = new JLabel();
+        
+        // add the # units selected control
+        JLabel unitSelectionLabel = new JLabel();
+        unitSelectionLabel.setText("0 selected");
+        
+        localGbc.gridy++;
+        unitPanel.add(unitSelectionLabel, localGbc);
+        
+        availableInfantryUnits.setModel(availableModel);
+        availableInfantryUnits.addListSelectionListener(new ListSelectionListener() { 
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                availableUnitSelectorChanged(e, unitSelectionLabel, unitStatusLabel, maxSelectionSize);
+            }
+        });
+        
+        JScrollPane infantryContainer = new JScrollPane();
+        infantryContainer.setViewportView(availableInfantryUnits);
+        localGbc.gridy++;
+        unitPanel.add(infantryContainer, localGbc);
+        
+        // add the 'status display' control
+        localGbc.gridx++;
+        localGbc.anchor = GridBagConstraints.NORTHWEST;
+        unitPanel.add(unitStatusLabel, localGbc);
+        
+        getContentPane().add(unitPanel, gbc);
+    }
+    
+    /**
+     * Worker function that builds an "html-enabled" string indicating the brief status of an individual unit
+     * @param u
+     * @return
+     */
+    private String buildUnitStatus(Unit u) {
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append(u.getName());
+        sb.append(": ");
+        sb.append(u.getStatus());
+        
+        int injuryCount = 0;
+        
+        for(Person p : u.getCrew()) {
+            if(p.hasInjuries(true)) {
+                injuryCount++;
+            }
+        }
+        
+        if(injuryCount > 0) {
+            sb.append(String.format(", <span color='red'>%d/%d injured crew</span>", injuryCount, u.getCrew().size()));
+        }
+        
+        sb.append("<br/>");
+        return sb.toString();
+    }
+    
     /**
      * Sets the navigation button
      * @param gbc
@@ -309,6 +411,41 @@ public class StratconScenarioWizard extends JDialog implements ActionListener {
         btnRight.setEnabled(enableButton);*/
     }
 
+    /**
+     * Event handler for when an available unit selector's selection changes.
+     * Updates the "# units selected" label and the unit status label. 
+     * Also checks maximum selection size and disables commit button (TBD).
+     * @param e
+     * @param selectionCountLabel Which label to update with how many items are selected
+     * @param unitStatusLabel Which label to update with detailed unit info
+     * @param maxSelectionSize How many items can be selected at most
+     */
+    private void availableUnitSelectorChanged(ListSelectionEvent e, JLabel selectionCountLabel, JLabel unitStatusLabel, int maxSelectionSize) {
+        if(!(e.getSource() instanceof JList<?>)) {
+            return;
+        }
+        
+        JList<Unit> changedList = (JList<Unit>) e.getSource();
+        selectionCountLabel.setText(String.format("%d selected", changedList.getSelectedIndices().length));
+        if(changedList.getSelectedIndices().length > maxSelectionSize) {
+            selectionCountLabel.setForeground(Color.RED);
+        } else {
+            selectionCountLabel.setForeground(Color.BLACK);
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("<html>");
+        
+        for(Unit u : changedList.getSelectedValuesList()) {
+            sb.append(buildUnitStatus(u));
+        }
+        
+        sb.append("</html>");
+        
+        unitStatusLabel.setText(sb.toString());
+        pack();
+    }
+    
     @Override
     public void actionPerformed(ActionEvent e) {
         String commandString = e.getActionCommand().substring(0, e.getActionCommand().indexOf("|"));

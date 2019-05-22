@@ -290,8 +290,8 @@ public class StratconRulesManager {
      * @param campaign
      * @return List of unit IDs.
      */
-    public static List<UUID> getEligibleDefensiveUnits(Campaign campaign) {
-        List<UUID> retVal = new ArrayList<>();
+    public static List<Unit> getEligibleDefensiveUnits(Campaign campaign) {
+        List<Unit> retVal = new ArrayList<>();
         
         for(Unit u : campaign.getUnits()) {
             // "defensive" units are infantry, battle armor and (Weisman help you) gun emplacements
@@ -308,7 +308,7 @@ public class StratconRulesManager {
                     }
                 }
                 
-                retVal.add(u.getId());
+                retVal.add(u);
             }
         }
         

@@ -242,20 +242,20 @@ public class StratconScenario implements IStratconDisplayable {
     }
 
     public String getInfo() {
-        return getInfo(true);
+        return getInfo(true, true);
     }
     
-    public String getInfo(boolean includeForces) {
+    public String getInfo(boolean includeForces, boolean html) {
         StringBuilder stateBuilder = new StringBuilder();
-        stateBuilder.append("<html>");
 
         stateBuilder.append(backingScenario.getName());
-        stateBuilder.append("<br/>");
+        stateBuilder.append(html ? "<br/>" : "");
         stateBuilder.append(backingScenario.getTemplate().shortBriefing);
-        stateBuilder.append("<br/>");
+        stateBuilder.append(html ? "<br/>" : "");
         
         stateBuilder.append("Status: ");
         stateBuilder.append(scenarioStateNames.get(currentState));
+        stateBuilder.append("<br/>");
 
         /*if(includeForces) {
             List<UUID> unitIDs = backingScenario.getForces(currentCampaign).getAllUnits();
