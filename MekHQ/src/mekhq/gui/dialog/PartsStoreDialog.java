@@ -100,31 +100,31 @@ import mekhq.preferences.PreferencesNode;
  * @author  Taharqa
  */
 public class PartsStoreDialog extends javax.swing.JDialog {
-	private static final long serialVersionUID = -8038099101234445018L;
+    private static final long serialVersionUID = -8038099101234445018L;
 
-	//parts filter groups
-	private static final int SG_ALL      = 0;
-	private static final int SG_ARMOR    = 1;
-	private static final int SG_SYSTEM   = 2;
-	private static final int SG_EQUIP    = 3;
-	private static final int SG_LOC      = 4;
-	private static final int SG_WEAP     = 5;
-	private static final int SG_AMMO     = 6;
-	private static final int SG_MISC     = 7;
-	private static final int SG_ENGINE   = 8;
-	private static final int SG_GYRO     = 9;
-	private static final int SG_ACT      = 10;
-	private static final int SG_COCKPIT  = 11;
-	private static final int SG_BA_SUIT  = 12;
-	private static final int SG_OMNI_POD = 13;
-	private static final int SG_NUM      = 14;
+    //parts filter groups
+    private static final int SG_ALL      = 0;
+    private static final int SG_ARMOR    = 1;
+    private static final int SG_SYSTEM   = 2;
+    private static final int SG_EQUIP    = 3;
+    private static final int SG_LOC      = 4;
+    private static final int SG_WEAP     = 5;
+    private static final int SG_AMMO     = 6;
+    private static final int SG_MISC     = 7;
+    private static final int SG_ENGINE   = 8;
+    private static final int SG_GYRO     = 9;
+    private static final int SG_ACT      = 10;
+    private static final int SG_COCKPIT  = 11;
+    private static final int SG_BA_SUIT  = 12;
+    private static final int SG_OMNI_POD = 13;
+    private static final int SG_NUM      = 14;
 
     @SuppressWarnings("unused")
-	private Frame frame; // FIXME: Unused? Do we need it?
+    private Frame frame; // FIXME: Unused? Do we need it?
     private Campaign campaign;
     private CampaignGUI campaignGUI;
     private PartsTableModel partsModel;
-	private TableRowSorter<PartsTableModel> partsSorter;
+    private TableRowSorter<PartsTableModel> partsSorter;
     boolean addToCampaign;
     Part selectedPart = null;
     private Person logisticsPerson;
@@ -135,7 +135,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
     private JLabel lblFilter;
     private javax.swing.JTextField txtFilter;
     private JComboBox<String> choiceParts;
-	private JLabel lblPartsChoice;
+    private JLabel lblPartsChoice;
     private JPanel panButtons;
     private JButton btnAdd;
     private JButton btnBuyBulk;
@@ -145,7 +145,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 
     /** Creates new form PartsStoreDialog */
     public PartsStoreDialog(boolean modal, CampaignGUI gui) {
-    	this(gui.getFrame(), modal, gui, gui.getCampaign(), true);
+        this(gui.getFrame(), modal, gui, gui.getCampaign(), true);
     }
 
     /** Creates new form PartsStoreDialog */
@@ -173,55 +173,55 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         getContentPane().setLayout(new BorderLayout());
 
         partsTable = new JTable(partsModel);
-		partsTable.setName("partsTable"); // NOI18N
-		partsSorter = new TableRowSorter<PartsTableModel>(partsModel);
+        partsTable.setName("partsTable"); // NOI18N
+        partsSorter = new TableRowSorter<PartsTableModel>(partsModel);
         partsSorter.setComparator(PartsTableModel.COL_DETAIL, new PartsDetailSorter());
         partsTable.setRowSorter(partsSorter);
-		TableColumn column = null;
+        TableColumn column = null;
         for (int i = 0; i < PartsTableModel.N_COL; i++) {
             column = partsTable.getColumnModel().getColumn(i);
             column.setPreferredWidth(partsModel.getColumnWidth(i));
             column.setCellRenderer(partsModel.getRenderer());
         }
         partsTable.setIntercellSpacing(new Dimension(0, 0));
-		partsTable.setShowGrid(false);
-		scrollPartsTable = new JScrollPane();
-		scrollPartsTable.setName("scrollPartsTable"); // NOI18N
-		scrollPartsTable.setViewportView(partsTable);
-		getContentPane().add(scrollPartsTable, BorderLayout.CENTER);
+        partsTable.setShowGrid(false);
+        scrollPartsTable = new JScrollPane();
+        scrollPartsTable.setName("scrollPartsTable"); // NOI18N
+        scrollPartsTable.setViewportView(partsTable);
+        getContentPane().add(scrollPartsTable, BorderLayout.CENTER);
 
-		GridBagConstraints c = new GridBagConstraints();
-		panFilter = new JPanel();
-		lblPartsChoice = new JLabel(resourceMap.getString("lblPartsChoice.text")); // NOI18N
-		DefaultComboBoxModel<String> partsGroupModel = new DefaultComboBoxModel<String>();
-		for (int i = 0; i < SG_NUM; i++) {
-			partsGroupModel.addElement(getPartsGroupName(i));
-		}
-		choiceParts = new JComboBox<String>(partsGroupModel);
-		choiceParts.setName("choiceParts"); // NOI18N
-		choiceParts.setSelectedIndex(0);
-		choiceParts.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				filterParts();
-			}
-		});
-		panFilter.setLayout(new GridBagLayout());
-		c.gridx = 0;
-		c.gridy = 0;
-		c.weightx = 0.0;
-		c.anchor = java.awt.GridBagConstraints.WEST;
-		c.insets = new Insets(5,5,5,5);
-		panFilter.add(lblPartsChoice, c);
-		c.gridx = 1;
-		c.weightx = 1.0;
-		panFilter.add(choiceParts, c);
+        GridBagConstraints c = new GridBagConstraints();
+        panFilter = new JPanel();
+        lblPartsChoice = new JLabel(resourceMap.getString("lblPartsChoice.text")); // NOI18N
+        DefaultComboBoxModel<String> partsGroupModel = new DefaultComboBoxModel<String>();
+        for (int i = 0; i < SG_NUM; i++) {
+            partsGroupModel.addElement(getPartsGroupName(i));
+        }
+        choiceParts = new JComboBox<String>(partsGroupModel);
+        choiceParts.setName("choiceParts"); // NOI18N
+        choiceParts.setSelectedIndex(0);
+        choiceParts.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                filterParts();
+            }
+        });
+        panFilter.setLayout(new GridBagLayout());
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weightx = 0.0;
+        c.anchor = java.awt.GridBagConstraints.WEST;
+        c.insets = new Insets(5,5,5,5);
+        panFilter.add(lblPartsChoice, c);
+        c.gridx = 1;
+        c.weightx = 1.0;
+        panFilter.add(choiceParts, c);
 
-		lblFilter = new JLabel(resourceMap.getString("lblFilter.text")); // NOI18N
+        lblFilter = new JLabel(resourceMap.getString("lblFilter.text")); // NOI18N
         lblFilter.setName("lblFilter"); // NOI18N
         c.gridx = 0;
         c.gridy = 1;
-		c.weightx = 0.0;
-		panFilter.add(lblFilter, c);
+        c.weightx = 0.0;
+        panFilter.add(lblFilter, c);
         txtFilter = new javax.swing.JTextField();
         txtFilter.setText(""); // NOI18N
         txtFilter.setMinimumSize(new java.awt.Dimension(200, 28));
@@ -241,131 +241,131 @@ public class PartsStoreDialog extends javax.swing.JDialog {
             });
         c.gridx = 1;
         c.gridy = 1;
-		c.weightx = 1.0;
-		panFilter.add(txtFilter, c);
-		getContentPane().add(panFilter, BorderLayout.PAGE_START);
+        c.weightx = 1.0;
+        panFilter.add(txtFilter, c);
+        getContentPane().add(panFilter, BorderLayout.PAGE_START);
 
-		panButtons = new JPanel();
-		if (addToCampaign) {
-			btnAdd = new JButton(resourceMap.getString("btnAdd.text"));
-			btnAdd.addActionListener(new java.awt.event.ActionListener() {
-	            public void actionPerformed(java.awt.event.ActionEvent evt) {
-	            	if (partsTable.getSelectedRowCount() > 0) {
-	            		int selectedRow[] = partsTable.getSelectedRows();
-	            		for (int i : selectedRow) {
+        panButtons = new JPanel();
+        if (addToCampaign) {
+            btnAdd = new JButton(resourceMap.getString("btnAdd.text"));
+            btnAdd.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    if (partsTable.getSelectedRowCount() > 0) {
+                        int selectedRow[] = partsTable.getSelectedRows();
+                        for (int i : selectedRow) {
                             PartProxy partProxy = partsModel.getPartProxyAt(partsTable.convertRowIndexToModel(i));
                             addPart(false, partProxy.getPart(), 1);
                             partProxy.updateTargetAndInventories();
-			                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TARGET);
-			                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TRANSIT);
-			                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_SUPPLY);
-			                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_QUEUE);
-	            		}
-	            	}
-	            }
-	        });
-			btnAdd.setEnabled(campaign.isGM());
-			btnBuyBulk = new JButton(resourceMap.getString("btnBuyBulk.text"));
-			btnBuyBulk.addActionListener(new java.awt.event.ActionListener() {
-	            public void actionPerformed(java.awt.event.ActionEvent evt) {
-	            	if (partsTable.getSelectedRowCount() > 0) {
-	            		int quantity = 1;
-            			PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(campaignGUI.getFrame(), true, "How Many?", quantity, 1, CampaignGUI.MAX_QUANTITY_SPINNER);
-            			pcd.setVisible(true);
-            			quantity = pcd.getValue();
+                            partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TARGET);
+                            partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TRANSIT);
+                            partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_SUPPLY);
+                            partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_QUEUE);
+                        }
+                    }
+                }
+            });
+            btnAdd.setEnabled(campaign.isGM());
+            btnBuyBulk = new JButton(resourceMap.getString("btnBuyBulk.text"));
+            btnBuyBulk.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    if (partsTable.getSelectedRowCount() > 0) {
+                        int quantity = 1;
+                        PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(campaignGUI.getFrame(), true, "How Many?", quantity, 1, CampaignGUI.MAX_QUANTITY_SPINNER);
+                        pcd.setVisible(true);
+                        quantity = pcd.getValue();
 
-	            		int selectedRow[] = partsTable.getSelectedRows();
-	            		for (int i : selectedRow) {
+                        int selectedRow[] = partsTable.getSelectedRows();
+                        for (int i : selectedRow) {
                             PartProxy partProxy = partsModel.getPartProxyAt(partsTable.convertRowIndexToModel(i));
                             addPart(true, false, partProxy.getPart(), quantity);
                             partProxy.updateTargetAndInventories();
-			                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TARGET);
-			                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TRANSIT);
-			                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_SUPPLY);
-			                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_QUEUE);
-	            		}
-	            	}
-	            }
-	        });
-			btnBuy = new JButton(resourceMap.getString("btnBuy.text"));
-			btnBuy.addActionListener(new java.awt.event.ActionListener() {
-	            public void actionPerformed(java.awt.event.ActionEvent evt) {
-	            	if (partsTable.getSelectedRowCount() > 0) {
-	            		int selectedRow[] = partsTable.getSelectedRows();
-	            		for (int i : selectedRow) {
+                            partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TARGET);
+                            partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TRANSIT);
+                            partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_SUPPLY);
+                            partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_QUEUE);
+                        }
+                    }
+                }
+            });
+            btnBuy = new JButton(resourceMap.getString("btnBuy.text"));
+            btnBuy.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    if (partsTable.getSelectedRowCount() > 0) {
+                        int selectedRow[] = partsTable.getSelectedRows();
+                        for (int i : selectedRow) {
                             PartProxy partProxy = partsModel.getPartProxyAt(partsTable.convertRowIndexToModel(i));
                             addPart(true, partProxy.getPart(), 1);
                             partProxy.updateTargetAndInventories();
-			                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TARGET);
-			                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TRANSIT);
-			                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_SUPPLY);
-			                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_QUEUE);            }
-	            		}
-	            	}
-	        });
-			btnUseBonusPart = new JButton();
-			if (campaign.getCampaignOptions().getUseAtB()) {
-				btnUseBonusPart.setText(resourceMap.getString("useBonusPart.text") + " (" + campaign.totalBonusParts() + ")");
-				btnUseBonusPart.addActionListener(new java.awt.event.ActionListener() {
-		            public void actionPerformed(java.awt.event.ActionEvent evt) {
-		            	if (partsTable.getSelectedRowCount() > 0) {
-		            		int selectedRow[] = partsTable.getSelectedRows();
-		            		for (int i : selectedRow) {
-				                if (campaign.totalBonusParts() > 0) {
+                            partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TARGET);
+                            partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TRANSIT);
+                            partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_SUPPLY);
+                            partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_QUEUE);            }
+                        }
+                    }
+            });
+            btnUseBonusPart = new JButton();
+            if (campaign.getCampaignOptions().getUseAtB()) {
+                btnUseBonusPart.setText(resourceMap.getString("useBonusPart.text") + " (" + campaign.totalBonusParts() + ")");
+                btnUseBonusPart.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        if (partsTable.getSelectedRowCount() > 0) {
+                            int selectedRow[] = partsTable.getSelectedRows();
+                            for (int i : selectedRow) {
+                                if (campaign.totalBonusParts() > 0) {
                                     campaign.addReport(resourceMap.getString("bonusPartLog.text") + " " + partsModel.getPartAt(partsTable.convertRowIndexToModel(i)).getPartName());
                                 }
                                 PartProxy partProxy = partsModel.getPartProxyAt(partsTable.convertRowIndexToModel(i));
                                 addPart(true, campaign.totalBonusParts() > 0, partProxy.getPart(), 1);
                                 partProxy.updateTargetAndInventories();
-				                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TARGET);
-				                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TRANSIT);
-				                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_SUPPLY);
-				                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_QUEUE);
+                                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TARGET);
+                                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TRANSIT);
+                                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_SUPPLY);
+                                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_QUEUE);
 
-								btnUseBonusPart.setText(resourceMap.getString("useBonusPart.text") + " (" + campaign.totalBonusParts() + ")");
-				            	btnUseBonusPart.setVisible(campaign.totalBonusParts() > 0);
-		            		}
-		            	}
-	                }
-		        });
-				btnUseBonusPart.setVisible(campaign.totalBonusParts() > 0);
-			}
-			btnClose = new JButton(resourceMap.getString("btnClose.text"));
-			btnClose.addActionListener(new java.awt.event.ActionListener() {
-	            public void actionPerformed(java.awt.event.ActionEvent evt) {
-	                setVisible(false);
-	            }
-	        });
-			panButtons.setLayout(new GridBagLayout());
-			panButtons.add(btnBuyBulk, new GridBagConstraints());
-			panButtons.add(btnBuy, new GridBagConstraints());
-			if (campaign.getCampaignOptions().getUseAtB()) {
-				panButtons.add(btnUseBonusPart, new GridBagConstraints());
-			}
-			panButtons.add(btnAdd, new GridBagConstraints());
-			panButtons.add(btnClose, new GridBagConstraints());
-		} else {
+                                btnUseBonusPart.setText(resourceMap.getString("useBonusPart.text") + " (" + campaign.totalBonusParts() + ")");
+                                btnUseBonusPart.setVisible(campaign.totalBonusParts() > 0);
+                            }
+                        }
+                    }
+                });
+                btnUseBonusPart.setVisible(campaign.totalBonusParts() > 0);
+            }
+            btnClose = new JButton(resourceMap.getString("btnClose.text"));
+            btnClose.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    setVisible(false);
+                }
+            });
+            panButtons.setLayout(new GridBagLayout());
+            panButtons.add(btnBuyBulk, new GridBagConstraints());
+            panButtons.add(btnBuy, new GridBagConstraints());
+            if (campaign.getCampaignOptions().getUseAtB()) {
+                panButtons.add(btnUseBonusPart, new GridBagConstraints());
+            }
+            panButtons.add(btnAdd, new GridBagConstraints());
+            panButtons.add(btnClose, new GridBagConstraints());
+        } else {
             //if we aren't adding the unit to the campaign, then different buttons
             btnAdd = new JButton("Add");
-			btnAdd.addActionListener(new java.awt.event.ActionListener() {
-	            public void actionPerformed(java.awt.event.ActionEvent evt) {
-	                setSelectedPart();
-	                setVisible(false);
-	            }
-	        });
+            btnAdd.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    setSelectedPart();
+                    setVisible(false);
+                }
+            });
             panButtons.add(btnAdd, new GridBagConstraints());
 
             btnClose = new JButton("Cancel"); // NOI18N
-			btnClose.addActionListener(new java.awt.event.ActionListener() {
-	            public void actionPerformed(java.awt.event.ActionEvent evt) {
-	            	selectedPart = null;
-	                setVisible(false);
-	            }
-	        });
+            btnClose.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    selectedPart = null;
+                    setVisible(false);
+                }
+            });
             panButtons.add(btnClose, new GridBagConstraints());
-		}
-		getContentPane().add(panButtons, BorderLayout.PAGE_END);
-		this.setPreferredSize(new Dimension(700,600));
+        }
+        getContentPane().add(panButtons, BorderLayout.PAGE_END);
+        this.setPreferredSize(new Dimension(700,600));
         pack();
     }
 
@@ -386,152 +386,152 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         RowFilter<PartsTableModel, Integer> partsTypeFilter = null;
         final int nGroup = choiceParts.getSelectedIndex();
         partsTypeFilter = new RowFilter<PartsTableModel,Integer>() {
-        	@Override
-        	public boolean include(Entry<? extends PartsTableModel, ? extends Integer> entry) {
-        		PartsTableModel partsModel = entry.getModel();
-        		Part part = partsModel.getPartAt(entry.getIdentifier());
-        		if ((txtFilter.getText().length() > 0)
-        		        && !part.getName().toLowerCase().contains(txtFilter.getText().toLowerCase())
-        		        && !part.getDetails().toLowerCase().contains(txtFilter.getText().toLowerCase())) {
+            @Override
+            public boolean include(Entry<? extends PartsTableModel, ? extends Integer> entry) {
+                PartsTableModel partsModel = entry.getModel();
+                Part part = partsModel.getPartAt(entry.getIdentifier());
+                if ((txtFilter.getText().length() > 0)
+                        && !part.getName().toLowerCase().contains(txtFilter.getText().toLowerCase())
+                        && !part.getDetails().toLowerCase().contains(txtFilter.getText().toLowerCase())) {
                     return false;
                 }
-    			if(part.getTechBase() == Part.T_CLAN && !campaign.getCampaignOptions().allowClanPurchases()) {
-    				return false;
-    			}
-    			if((part.getTechBase() == Part.T_IS)
-    			        && !campaign.getCampaignOptions().allowISPurchases()
-    			        // Hack to allow Clan access to SL tech but not post-Exodus tech
-    			        // until 3050.
-    			        && !(campaign.useClanTechBase() && (part.getIntroductionDate() > 2787)
-    			                && (part.getIntroductionDate() < 3050))) {
-    				return false;
-    			}
-    			if (!campaign.isLegal(part)) {
-    			    return false;
-    			}
-        		if(nGroup == SG_ALL) {
-        			return true;
-        		} else if(nGroup == SG_ARMOR) {
-        			return part instanceof Armor; // ProtomekAmor and BaArmor are derived from Armor
-        		} else if(nGroup == SG_SYSTEM) {
-        			return part instanceof MekLifeSupport
-        				|| part instanceof MekSensor
-        				|| part instanceof LandingGear
-        				|| part instanceof Avionics
-        				|| part instanceof FireControlSystem
-        				|| part instanceof AeroSensor
-        				|| part instanceof VeeSensor
-        				|| part instanceof VeeStabiliser
-        				|| part instanceof ProtomekSensor;
-        		} else if(nGroup == SG_EQUIP) {
-        			return part instanceof EquipmentPart || part instanceof ProtomekJumpJet;
-        		} else if(nGroup == SG_LOC) {
-        			return part instanceof MekLocation || part instanceof TankLocation || part instanceof ProtomekLocation;
-        		} else if(nGroup == SG_WEAP) {
-        			return part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof WeaponType;
-        		} else if(nGroup == SG_AMMO) {
-        			return part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof AmmoType;
-        		} else if(nGroup == SG_MISC) {
-        			return (part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof MiscType) || part instanceof ProtomekJumpJet;
-        		} else if(nGroup == SG_ENGINE) {
-        			return part instanceof EnginePart;
-        		} else if(nGroup == SG_GYRO) {
-        			return part instanceof MekGyro;
-        		} else if(nGroup == SG_ACT) {
-        			return part instanceof MekActuator || part instanceof ProtomekArmActuator || part instanceof ProtomekLegActuator;
-        		} else if(nGroup == SG_COCKPIT) {
-        			return part instanceof MekCockpit;
+                if(part.getTechBase() == Part.T_CLAN && !campaign.getCampaignOptions().allowClanPurchases()) {
+                    return false;
+                }
+                if((part.getTechBase() == Part.T_IS)
+                        && !campaign.getCampaignOptions().allowISPurchases()
+                        // Hack to allow Clan access to SL tech but not post-Exodus tech
+                        // until 3050.
+                        && !(campaign.useClanTechBase() && (part.getIntroductionDate() > 2787)
+                                && (part.getIntroductionDate() < 3050))) {
+                    return false;
+                }
+                if (!campaign.isLegal(part)) {
+                    return false;
+                }
+                if(nGroup == SG_ALL) {
+                    return true;
+                } else if(nGroup == SG_ARMOR) {
+                    return part instanceof Armor; // ProtomekAmor and BaArmor are derived from Armor
+                } else if(nGroup == SG_SYSTEM) {
+                    return part instanceof MekLifeSupport
+                        || part instanceof MekSensor
+                        || part instanceof LandingGear
+                        || part instanceof Avionics
+                        || part instanceof FireControlSystem
+                        || part instanceof AeroSensor
+                        || part instanceof VeeSensor
+                        || part instanceof VeeStabiliser
+                        || part instanceof ProtomekSensor;
+                } else if(nGroup == SG_EQUIP) {
+                    return part instanceof EquipmentPart || part instanceof ProtomekJumpJet;
+                } else if(nGroup == SG_LOC) {
+                    return part instanceof MekLocation || part instanceof TankLocation || part instanceof ProtomekLocation;
+                } else if(nGroup == SG_WEAP) {
+                    return part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof WeaponType;
+                } else if(nGroup == SG_AMMO) {
+                    return part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof AmmoType;
+                } else if(nGroup == SG_MISC) {
+                    return (part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof MiscType) || part instanceof ProtomekJumpJet;
+                } else if(nGroup == SG_ENGINE) {
+                    return part instanceof EnginePart;
+                } else if(nGroup == SG_GYRO) {
+                    return part instanceof MekGyro;
+                } else if(nGroup == SG_ACT) {
+                    return part instanceof MekActuator || part instanceof ProtomekArmActuator || part instanceof ProtomekLegActuator;
+                } else if(nGroup == SG_COCKPIT) {
+                    return part instanceof MekCockpit;
                 } else if(nGroup == SG_BA_SUIT) {
                     return part instanceof BattleArmorSuit;
                 } else if(nGroup == SG_OMNI_POD) {
                     return part instanceof OmniPod;
-        		}
-        		return false;
-        	}
+                }
+                return false;
+            }
         };
         partsSorter.setRowFilter(partsTypeFilter);
     }
 
     private void addPart(boolean purchase, Part part, int quantity) {
-    	addPart(purchase, false, part, quantity);
+        addPart(purchase, false, part, quantity);
     }
 
     private void addPart(boolean purchase, boolean bonus, Part part, int quantity) {
         final String METHOD_NAME = "addPart(boolean,boolean,Part,int)"; //$NON-NLS-1$
 
-		if(bonus) {
-			String report = part.getAcquisitionWork().find(0);
-			if (report.endsWith("0 days.")) {
-				AtBContract contract = null;
-				for (Mission m : campaign.getMissions()) {
-					if (m.isActive() && m instanceof AtBContract &&
-							((AtBContract)m).getNumBonusParts() > 0) {
-						contract = (AtBContract)m;
-						break;
-					}
-				}
-				if (null == contract) {
-			        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-			                "AtB: used bonus part but no contract has bonus parts available."); //$NON-NLS-1$
-				} else {
-					contract.useBonusPart();
-				}
-			}
-		} else if(purchase) {
-			campaign.getShoppingList().addShoppingItem(part.getAcquisitionWork(), quantity, campaign);
-		} else {
-			while(quantity > 0) {
-				campaign.addPart(part.clone(), 0);
-				quantity--;
-			}
-		}
+        if(bonus) {
+            String report = part.getAcquisitionWork().find(0);
+            if (report.endsWith("0 days.")) {
+                AtBContract contract = null;
+                for (Mission m : campaign.getMissions()) {
+                    if (m.isActive() && m instanceof AtBContract &&
+                            ((AtBContract)m).getNumBonusParts() > 0) {
+                        contract = (AtBContract)m;
+                        break;
+                    }
+                }
+                if (null == contract) {
+                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                            "AtB: used bonus part but no contract has bonus parts available."); //$NON-NLS-1$
+                } else {
+                    contract.useBonusPart();
+                }
+            }
+        } else if(purchase) {
+            campaign.getShoppingList().addShoppingItem(part.getAcquisitionWork(), quantity, campaign);
+        } else {
+            while(quantity > 0) {
+                campaign.addPart(part.clone(), 0);
+                quantity--;
+            }
+        }
     }
 
     private void setSelectedPart() {
-    	int row = partsTable.getSelectedRow();
-		if(row < 0) {
-			return;
-		}
-		selectedPart = partsModel.getPartAt(partsTable.convertRowIndexToModel(row));
+        int row = partsTable.getSelectedRow();
+        if(row < 0) {
+            return;
+        }
+        selectedPart = partsModel.getPartAt(partsTable.convertRowIndexToModel(row));
     }
 
     public Part getPart() {
-    	return selectedPart;
+        return selectedPart;
     }
 
     public static String getPartsGroupName(int group) {
-    	switch(group) {
-    	case SG_ALL:
-    		return "All Parts";
-    	case SG_ARMOR:
-    		return "Armor";
-    	case SG_SYSTEM:
-    		return "System Components";
-    	case SG_EQUIP:
-    		return "Equipment";
-    	case SG_LOC:
-    		return "Locations";
-    	case SG_WEAP:
-    		return "Weapons";
-    	case SG_AMMO:
-    		return "Ammunition";
-    	case SG_MISC:
-    		return "Miscellaneous Equipment";
-    	case SG_ENGINE:
-    		return "Engines";
-    	case SG_GYRO:
-    		return "Gyros";
-    	case SG_ACT:
-    		return "Actuators";
-    	case SG_COCKPIT:
-    		return "Cockpits";
-    	case SG_BA_SUIT:
-    		return "Battle Armor Suits";
-    	case SG_OMNI_POD:
-    	    return "Empty OmniPods";
-    	default:
-    		return "?";
-    	}
+        switch(group) {
+        case SG_ALL:
+            return "All Parts";
+        case SG_ARMOR:
+            return "Armor";
+        case SG_SYSTEM:
+            return "System Components";
+        case SG_EQUIP:
+            return "Equipment";
+        case SG_LOC:
+            return "Locations";
+        case SG_WEAP:
+            return "Weapons";
+        case SG_AMMO:
+            return "Ammunition";
+        case SG_MISC:
+            return "Miscellaneous Equipment";
+        case SG_ENGINE:
+            return "Engines";
+        case SG_GYRO:
+            return "Gyros";
+        case SG_ACT:
+            return "Actuators";
+        case SG_COCKPIT:
+            return "Cockpits";
+        case SG_BA_SUIT:
+            return "Battle Armor Suits";
+        case SG_OMNI_POD:
+            return "Empty OmniPods";
+        default:
+            return "?";
+        }
     }
 
     private Person getLogisticsPerson() {
@@ -542,23 +542,23 @@ public class PartsStoreDialog extends javax.swing.JDialog {
     }
 
     /**
-	 * A table model for displaying parts - similar to the one in CampaignGUI, but not exactly
-	 */
-	public class PartsTableModel extends AbstractTableModel {
-		private static final long serialVersionUID = 534443424190075264L;
+     * A table model for displaying parts - similar to the one in CampaignGUI, but not exactly
+     */
+    public class PartsTableModel extends AbstractTableModel {
+        private static final long serialVersionUID = 534443424190075264L;
 
-		protected String[] columnNames;
-		protected ArrayList<PartProxy> data;
+        protected String[] columnNames;
+        protected ArrayList<PartProxy> data;
 
-		public final static int COL_NAME    =    0;
-		public final static int COL_DETAIL   =   1;
-		public final static int COL_TECH_BASE  = 2;
-		public final static int COL_COST     =   3;
-		public final static int COL_TON       =  4;
-	    public final static int COL_TARGET    =  5;
-	    public final static int COL_SUPPLY    =  6;
-	    public final static int COL_TRANSIT   =  7;
-	    public final static int COL_QUEUE     =  8;
+        public final static int COL_NAME    =    0;
+        public final static int COL_DETAIL   =   1;
+        public final static int COL_TECH_BASE  = 2;
+        public final static int COL_COST     =   3;
+        public final static int COL_TON       =  4;
+        public final static int COL_TARGET    =  5;
+        public final static int COL_SUPPLY    =  6;
+        public final static int COL_TRANSIT   =  7;
+        public final static int COL_QUEUE     =  8;
         public final static int N_COL          = 9;
 
         public class TargetProxy implements Comparable<TargetProxy> {
@@ -596,8 +596,8 @@ public class PartsStoreDialog extends javax.swing.JDialog {
                     if (target.getValue() != TargetRoll.IMPOSSIBLE &&
                         target.getValue() != TargetRoll.AUTOMATIC_SUCCESS &&
                         target.getValue() != TargetRoll.AUTOMATIC_FAIL) {
-	                    details += "+";
-	                }
+                        details += "+";
+                    }
                 }
 
                 return details;
@@ -753,14 +753,14 @@ public class PartsStoreDialog extends javax.swing.JDialog {
             }
         }
 
-		public PartsTableModel(ArrayList<Part> inventory) {
+        public PartsTableModel(ArrayList<Part> inventory) {
             data = new ArrayList<>(inventory.size());
             for (Part p : inventory) {
                 data.add(new PartProxy(p));
             }
-		}
+        }
 
-		public int getRowCount() {
+        public int getRowCount() {
             return data.size();
         }
 
@@ -771,9 +771,9 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         @Override
         public String getColumnName(int column) {
             switch(column) {
-            	case COL_NAME:
-            		return "Name";
-            	case COL_DETAIL:
+                case COL_NAME:
+                    return "Name";
+                case COL_DETAIL:
                     return "Detail";
                 case COL_COST:
                     return "Cost";
@@ -794,135 +794,135 @@ public class PartsStoreDialog extends javax.swing.JDialog {
             }
         }
 
-		public Object getValueAt(int row, int col) {
-	        PartProxy part;
-	        if(data.isEmpty()) {
-	        	return "";
-	        } else {
-	        	part = (PartProxy)data.get(row);
-	        }
-			if(col == COL_NAME) {
-				return part.getName();
-			}
-			if(col == COL_DETAIL) {
-			    return part.getDetails();
-			}
-			if(col == COL_COST) {
-				return part.getCost();
-			}
-			if(col == COL_TON) {
-				return part.getTonnage();
-			}
-			if(col == COL_TECH_BASE) {
-				return part.getTechBase();
-			}
-			if(col == COL_TARGET) {
-			    return part.getTarget();
-			}
-			if(col == COL_SUPPLY) {
+        public Object getValueAt(int row, int col) {
+            PartProxy part;
+            if(data.isEmpty()) {
+                return "";
+            } else {
+                part = (PartProxy)data.get(row);
+            }
+            if(col == COL_NAME) {
+                return part.getName();
+            }
+            if(col == COL_DETAIL) {
+                return part.getDetails();
+            }
+            if(col == COL_COST) {
+                return part.getCost();
+            }
+            if(col == COL_TON) {
+                return part.getTonnage();
+            }
+            if(col == COL_TECH_BASE) {
+                return part.getTechBase();
+            }
+            if(col == COL_TARGET) {
+                return part.getTarget();
+            }
+            if(col == COL_SUPPLY) {
                 return part.getSupply();
             }
-			if(col == COL_TRANSIT) {
+            if(col == COL_TRANSIT) {
                 return part.getTransit();
             }
-			if(col == COL_QUEUE) {
-			    return part.getOrdered();
-			}
-			return "?";
-		}
+            if(col == COL_QUEUE) {
+                return part.getOrdered();
+            }
+            return "?";
+        }
 
-		@Override
-		public boolean isCellEditable(int row, int col) {
-			return false;
-		}
+        @Override
+        public boolean isCellEditable(int row, int col) {
+            return false;
+        }
 
-		@Override
-		public Class<? extends Object> getColumnClass(int c) {
-			return getValueAt(0, c).getClass();
+        @Override
+        public Class<? extends Object> getColumnClass(int c) {
+            return getValueAt(0, c).getClass();
         }
 
         public PartProxy getPartProxyAt(int row) {
             return data.get(row);
         }
 
-		public Part getPartAt(int row) {
-			return data.get(row).getPart();
-		}
+        public Part getPartAt(int row) {
+            return data.get(row).getPart();
+        }
 
-		public Part[] getPartstAt(int[] rows) {
-			Part[] parts = new Part[rows.length];
-			for (int i = 0; i < rows.length; i++) {
-				int row = rows[i];
-				parts[i] = data.get(row).getPart();
-			}
-			return parts;
-		}
+        public Part[] getPartstAt(int[] rows) {
+            Part[] parts = new Part[rows.length];
+            for (int i = 0; i < rows.length; i++) {
+                int row = rows[i];
+                parts[i] = data.get(row).getPart();
+            }
+            return parts;
+        }
 
-		 public int getColumnWidth(int c) {
-	            switch(c) {
-	            case COL_NAME:
-	            case COL_DETAIL:
-	        		return 100;
-	            case COL_COST:
-	            case COL_TARGET:
-	                return 40;
-	            case COL_SUPPLY:
-	            case COL_TRANSIT:
-	            case COL_QUEUE:
-	                return 30;
-	            default:
-	                return 15;
-	            }
-	        }
+         public int getColumnWidth(int c) {
+                switch(c) {
+                case COL_NAME:
+                case COL_DETAIL:
+                    return 100;
+                case COL_COST:
+                case COL_TARGET:
+                    return 40;
+                case COL_SUPPLY:
+                case COL_TRANSIT:
+                case COL_QUEUE:
+                    return 30;
+                default:
+                    return 15;
+                }
+            }
 
-	        public int getAlignment(int col) {
-	            switch(col) {
-	            case COL_COST:
-	            case COL_TON:
-	            	return SwingConstants.RIGHT;
-	            case COL_TARGET:
-	                return SwingConstants.CENTER;
-	            default:
-	            	return SwingConstants.LEFT;
-	            }
-	        }
+            public int getAlignment(int col) {
+                switch(col) {
+                case COL_COST:
+                case COL_TON:
+                    return SwingConstants.RIGHT;
+                case COL_TARGET:
+                    return SwingConstants.CENTER;
+                default:
+                    return SwingConstants.LEFT;
+                }
+            }
 
-	        public String getTooltip(int row, int col) {
-	            PartProxy part;
-	            if(data.isEmpty()) {
-	                return null;
-	            } else {
-	                part = data.get(row);
-	            }
-	        	switch(col) {
-	        	case COL_TARGET:
-	        	    return part.getTarget().getDescription();
-	            default:
-	            	return null;
-	            }
-	        }
-	        public PartsTableModel.Renderer getRenderer() {
-				return new PartsTableModel.Renderer();
-			}
+            public String getTooltip(int row, int col) {
+                PartProxy part;
+                if(data.isEmpty()) {
+                    return null;
+                } else {
+                    part = data.get(row);
+                }
+                switch(col) {
+                case COL_TARGET:
+                    return part.getTarget().getDescription();
+                default:
+                    return null;
+                }
+            }
+            public PartsTableModel.Renderer getRenderer() {
+                return new PartsTableModel.Renderer();
+            }
 
-			public class Renderer extends DefaultTableCellRenderer {
+            public class Renderer extends DefaultTableCellRenderer {
 
-				private static final long serialVersionUID = 9054581142945717303L;
+                private static final long serialVersionUID = 9054581142945717303L;
 
-				public Component getTableCellRendererComponent(JTable table,
-						Object value, boolean isSelected, boolean hasFocus,
-						int row, int column) {
-					super.getTableCellRendererComponent(table, value, isSelected,
-							hasFocus, row, column);
-					setOpaque(true);
-					int actualCol = table.convertColumnIndexToModel(column);
-					int actualRow = table.convertRowIndexToModel(row);
-					setHorizontalAlignment(getAlignment(actualCol));
-					setToolTipText(getTooltip(actualRow, actualCol));
+                public Component getTableCellRendererComponent(JTable table,
+                        Object value, boolean isSelected, boolean hasFocus,
+                        int row, int column) {
+                    super.getTableCellRendererComponent(table, value, isSelected,
+                            hasFocus, row, column);
+                    setOpaque(true);
+                    int actualCol = table.convertColumnIndexToModel(column);
+                    int actualRow = table.convertRowIndexToModel(row);
+                    setHorizontalAlignment(getAlignment(actualCol));
+                    setToolTipText(getTooltip(actualRow, actualCol));
 
-					return this;
-				}
+                    return this;
+                }
 
-			}
-	}
+            }
+    }
 }
