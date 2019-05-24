@@ -28,9 +28,7 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.ResourceBundle;
 
 import javax.swing.DefaultComboBoxModel;
@@ -64,7 +62,6 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.parts.AeroSensor;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Avionics;
-import mekhq.campaign.parts.BaArmor;
 import mekhq.campaign.parts.BattleArmorSuit;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.FireControlSystem;
@@ -80,7 +77,6 @@ import mekhq.campaign.parts.OmniPod;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.ProtomekArmActuator;
-import mekhq.campaign.parts.ProtomekArmor;
 import mekhq.campaign.parts.ProtomekJumpJet;
 import mekhq.campaign.parts.ProtomekLegActuator;
 import mekhq.campaign.parts.ProtomekLocation;
@@ -89,10 +85,9 @@ import mekhq.campaign.parts.TankLocation;
 import mekhq.campaign.parts.VeeSensor;
 import mekhq.campaign.parts.VeeStabiliser;
 import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.dialog.PartsStoreDialog.PartsTableModel.FormattedValue;
-import mekhq.gui.dialog.PartsStoreDialog.PartsTableModel.TargetProxy;
 import mekhq.gui.preferences.JComboBoxPreference;
 import mekhq.gui.preferences.JTablePreference;
 import mekhq.gui.preferences.JWindowPreference;
@@ -127,11 +122,11 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 	private Frame frame; // FIXME: Unused? Do we need it?
     private Campaign campaign;
     private CampaignGUI campaignGUI;
-    private DecimalFormat formatter;
     private PartsTableModel partsModel;
 	private TableRowSorter<PartsTableModel> partsSorter;
     boolean addToCampaign;
     Part selectedPart = null;
+    private Person logisticsPerson;
 
     private JTable partsTable;
     private JScrollPane scrollPartsTable;
@@ -159,7 +154,6 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         this.campaignGUI = gui;
         this.campaign = campaign;
         this.addToCampaign = add;
-        formatter = new DecimalFormat();
         partsModel = new PartsTableModel(campaign.getPartsStore().getInventory());
         initComponents();
         filterParts();
@@ -529,6 +523,13 @@ public class PartsStoreDialog extends javax.swing.JDialog {
     	}
     }
 
+    private Person getLogisticsPerson() {
+        if (null == logisticsPerson) {
+            logisticsPerson = campaign.getLogisticsPerson();
+        }
+        return logisticsPerson;
+    }
+
     /**
 	 * A table model for displaying parts - similar to the one in CampaignGUI, but not exactly
 	 */
@@ -663,11 +664,6 @@ public class PartsStoreDialog extends javax.swing.JDialog {
             public String getDetails() {
                 if (null == details) {
                     details = part.getDetails();
-                    details = details.replaceFirst("\\d+\\shit\\(s\\),\\s", "");
-                    details = details.replaceFirst("\\d+\\shit\\(s\\)", "").trim();
-                    if (details.endsWith(",")) {
-                        details = details.substring(0, details.length() - 1);
-                    }
                 }
 
                 return details;
@@ -696,7 +692,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
                         shoppingItem = (IAcquisitionWork)part;
                     }
                     if (null != shoppingItem) {
-                        TargetRoll target = campaign.getTargetForAcquisition(shoppingItem, campaign.getLogisticsPerson());
+                        TargetRoll target = campaign.getTargetForAcquisition(shoppingItem, getLogisticsPerson());
                         targetProxy = new TargetProxy(target);
                     }
                     else {
