@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import megamek.common.Aero;
 import megamek.common.Compute;
@@ -34,7 +35,9 @@ import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Jumpship;
 import megamek.common.LandAirMech;
+import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
 
@@ -48,18 +51,37 @@ public class KFDriveCoil extends Part {
      * 
      */
     private static final long serialVersionUID = 4515211961051281110L;
+    
+    static final TechAdvancement TA_STANDARD_CORE = new TechAdvancement(TECH_BASE_ALL)
+            .setAdvancement(2107, 2120, 2300).setPrototypeFactions(F_TA)
+            .setProductionFactions(F_TA).setTechRating(RATING_D)
+            .setAvailability(RATING_C, RATING_C, RATING_C, RATING_C)
+            .setStaticTechLevel(SimpleTechLevel.STANDARD);
+    static final TechAdvancement TA_NO_BOOM = new TechAdvancement(TECH_BASE_ALL)
+            .setAdvancement(2304, 2350, 2364, 2520).setPrototypeFactions(F_TA)
+            .setProductionFactions(F_TH).setTechRating(RATING_B)
+            .setAvailability(RATING_C, RATING_X, RATING_X, RATING_X)
+            .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+    
+    //Standard, primitive, compact, subcompact...
+    private int coreType;
+    
+    public int getCoreType() {
+        return coreType;
+    }
 
     public KFDriveCoil() {
-    	this(0, null);
+    	this(0, Jumpship.DRIVE_CORE_STANDARD, null);
     }
     
-    public KFDriveCoil(int tonnage, Campaign c) {
+    public KFDriveCoil(int tonnage, int coreType, Campaign c) {
         super(tonnage, c);
+        this.coreType = coreType;
         this.name = "K-F Drive Coil";
     }
         
     public KFDriveCoil clone() {
-    	KFDriveCoil clone = new KFDriveCoil(0, campaign);
+    	KFDriveCoil clone = new KFDriveCoil(0, coreType, campaign);
         clone.copyBaseData(this);
     	return clone;
     }
@@ -114,28 +136,29 @@ public class KFDriveCoil extends Part {
 	@Override
 	public void fix() {
 		super.fix();
-		if (null != unit && unit.getEntity() instanceof Aero) {
-			((Aero)unit.getEntity()).setGearHit(false);
-		} else if (null != unit && unit.getEntity() instanceof LandAirMech) {
-            unit.repairSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_LANDING_GEAR);
+		if (null != unit && unit.getEntity() instanceof Jumpship) {
+		    Jumpship js = ((Jumpship)unit.getEntity());
+			js.setKFDriveCoilHit(false);
+			//Also repair your KF Drive integrity - +1 point if you have other components to fix
+			//Otherwise, fix it all.
+			if (js.isKFDriveDamaged()) {
+			    js.setKFIntegrity(Math.min((js.getKFIntegrity() + 1), js.getOKFIntegrity()));
+			} else {
+			    js.setKFIntegrity(js.getOKFIntegrity());
+			}
 		}
 	}
 
 	@Override
 	public void remove(boolean salvage) {
 		if(null != unit) {
-		    if (unit.getEntity() instanceof Aero) {
-		        ((Aero)unit.getEntity()).setGearHit(true);
-		    } else if (unit.getEntity() instanceof LandAirMech) {
-		        unit.damageSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_LANDING_GEAR, 3);
+		    if (unit.getEntity() instanceof Jumpship) {
+		        ((Jumpship)unit.getEntity()).setKFDriveCoilHit(true);
 		    }
-			Part spare = campaign.checkForExistingSparePart(this);
-			if(!salvage) {
-				campaign.removePart(this);
-			} else if(null != spare) {
-				spare.incrementQuantity();
-				campaign.removePart(this);
-			}
+	        //All the BT lore says you can't jump while carrying around another KF Drive, therefore
+			//you can't salvage and keep this in the warehouse, just remove/scrap and replace it
+		    //See SO p130 for reference
+			campaign.removePart(this);
 			unit.removePart(this);
 			Part missing = getMissingPart();
 			unit.addPart(missing);
@@ -147,7 +170,7 @@ public class KFDriveCoil extends Part {
 
 	@Override
 	public MissingPart getMissingPart() {
-		return new MissingLandingGear(getUnitTonnage(), campaign);
+		return new MissingKFDriveCoil(getUnitTonnage(), campaign);
 	}
 
 	@Override
@@ -184,35 +207,37 @@ public class KFDriveCoil extends Part {
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<coreType>"
+                +coreType
+                +"</coreType>");
 		writeToXmlEnd(pw1, indent);
 	}
 
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {
-		//nothing to load
+        NodeList nl = wn.getChildNodes();
+        for (int x=0; x<nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
+            
+            if (wn2.getNodeName().equalsIgnoreCase("coreType")) {
+                coreType = Integer.parseInt(wn2.getTextContent());
+            } 
+        }
 	}
 	
 	@Override
 	public boolean isRightTechType(String skillType) {
-        if (unit != null && unit.getEntity() instanceof LandAirMech) {
-            return skillType.equals(SkillType.S_TECH_MECH);
-        }
-        return (skillType.equals(SkillType.S_TECH_AERO) || skillType.equals(SkillType.S_TECH_VESSEL));
+        return skillType.equals(SkillType.S_TECH_VESSEL);
 	}
 
     @Override
     public String getLocationName() {
-        if (null != unit) {
-            return unit.getEntity().getLocationName(unit.getEntity().getBodyLocation());
-        }
         return null;
     }
 
     @Override
     public int getLocation() {
-        if (null != unit) {
-            return unit.getEntity().getBodyLocation();
-        }
         return Entity.LOC_NONE;
     }
     
