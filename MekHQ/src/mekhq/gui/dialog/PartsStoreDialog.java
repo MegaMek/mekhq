@@ -53,10 +53,12 @@ import megamek.common.AmmoType;
 import megamek.common.MiscType;
 import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
+import megamek.common.annotations.Nullable;
 import megamek.common.logging.LogLevel;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.parts.AeroSensor;
@@ -89,6 +91,8 @@ import mekhq.campaign.parts.VeeStabiliser;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.dialog.PartsStoreDialog.PartsTableModel.FormattedValue;
+import mekhq.gui.dialog.PartsStoreDialog.PartsTableModel.TargetProxy;
 import mekhq.gui.preferences.JComboBoxPreference;
 import mekhq.gui.preferences.JTablePreference;
 import mekhq.gui.preferences.JWindowPreference;
@@ -176,8 +180,6 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         partsTable = new JTable(partsModel);
 		partsTable.setName("partsTable"); // NOI18N
 		partsSorter = new TableRowSorter<PartsTableModel>(partsModel);
-		partsSorter.setComparator(PartsTableModel.COL_TARGET, new TargetSorter());
-        partsSorter.setComparator(PartsTableModel.COL_COST, new FormattedNumberSorter());
         partsSorter.setComparator(PartsTableModel.COL_DETAIL, new PartsDetailSorter());
         partsTable.setRowSorter(partsSorter);
 		TableColumn column = null;
@@ -449,9 +451,9 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 
     private void addPart(boolean purchase, boolean bonus, int row, int quantity) {
         final String METHOD_NAME = "addPart(boolean,boolean,int,int)"; //$NON-NLS-1$
-        
+
         Part selectedPart = partsModel.getPartAt(partsTable.convertRowIndexToModel(row));
-        
+
 		if(bonus) {
 			String report = selectedPart.getAcquisitionWork().find(0);
 			if (report.endsWith("0 days.")) {
@@ -534,7 +536,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		private static final long serialVersionUID = 534443424190075264L;
 
 		protected String[] columnNames;
-		protected ArrayList<Part> data;
+		protected ArrayList<PartProxy> data;
 
 		public final static int COL_NAME    =    0;
 		public final static int COL_DETAIL   =   1;
@@ -547,8 +549,200 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 	    public final static int COL_QUEUE     =  8;
         public final static int N_COL          = 9;
 
+        public class TargetProxy implements Comparable<TargetProxy> {
+            private TargetRoll target;
+            private String details;
+            private String description;
+
+            public TargetProxy(@Nullable TargetRoll t) {
+                target = t;
+            }
+
+            public TargetRoll getTargetRoll() {
+                return target;
+            }
+
+            @Nullable
+            public String getDescription() {
+                if (null == target) {
+                    return null;
+                }
+                if (null == description) {
+                    description = target.getDesc();
+                }
+                return description;
+            }
+
+            @Override
+            public String toString() {
+                if (null == target) {
+                    return "-";
+                }
+
+                if (null == details) {
+                    details = target.getValueAsString();
+                    if (target.getValue() != TargetRoll.IMPOSSIBLE &&
+                        target.getValue() != TargetRoll.AUTOMATIC_SUCCESS &&
+                        target.getValue() != TargetRoll.AUTOMATIC_FAIL) {
+	                    details += "+";
+	                }
+                }
+
+                return details;
+            }
+
+            private int coerceTargetRoll() {
+                int r = target.getValue();
+                if (r == TargetRoll.IMPOSSIBLE) {
+                    return Integer.MAX_VALUE;
+                }
+                else if(r == TargetRoll.AUTOMATIC_FAIL) {
+                    return Integer.MAX_VALUE-1;
+                }
+                else if(r == TargetRoll.AUTOMATIC_SUCCESS) {
+                    return Integer.MIN_VALUE;
+                }
+                return r;
+            }
+
+            @Override
+            public int compareTo(TargetProxy o) {
+                return Integer.compare(coerceTargetRoll(), o.coerceTargetRoll());
+            }
+        }
+
+        public class FormattedValue<T extends Comparable<T>> implements Comparable<FormattedValue<T>> {
+            private T value;
+            private String formatted;
+
+            public FormattedValue(T v, String f) {
+                value = v;
+                formatted = f;
+            }
+
+            public T getValue() {
+                return value;
+            }
+
+            @Override
+            public String toString() {
+                return formatted;
+            }
+
+            @Override
+            public int compareTo(FormattedValue<T> o) {
+                if (null == o) {
+                    return -1;
+                }
+                return getValue().compareTo(o.getValue());
+            }
+        }
+
+        public class PartProxy {
+            private Part part;
+            private String details;
+            private TargetProxy targetProxy;
+            private FormattedValue<Money> cost;
+            private PartInventory inventories;
+            private FormattedValue<Integer> ordered;
+            private FormattedValue<Integer> supply;
+            private FormattedValue<Integer> transit;
+
+            public PartProxy(Part p) {
+                part = p;
+            }
+
+            public Part getPart() {
+                return part;
+            }
+
+            public String getName() {
+                return part.getName();
+            }
+
+            public String getDetails() {
+                if (null == details) {
+                    details = part.getDetails();
+                    details = details.replaceFirst("\\d+\\shit\\(s\\),\\s", "");
+                    details = details.replaceFirst("\\d+\\shit\\(s\\)", "").trim();
+                    if (details.endsWith(",")) {
+                        details = details.substring(0, details.length() - 1);
+                    }
+                }
+
+                return details;
+            }
+
+            public FormattedValue<Money> getCost() {
+                if (null == cost) {
+                    Money actualValue = part.getActualValue();
+                    cost = new FormattedValue<>(actualValue, actualValue.toAmountString());
+                }
+                return cost;
+            }
+
+            public double getTonnage() {
+                return Math.round(part.getTonnage() * 100) / 100.0;
+            }
+
+            public String getTechBase() {
+                return part.getTechBaseName();
+            }
+
+            public TargetProxy getTarget() {
+                if (null == targetProxy) {
+                    IAcquisitionWork shoppingItem = (MissingPart)part.getMissingPart();
+                    if (null == shoppingItem && part instanceof IAcquisitionWork) {
+                        shoppingItem = (IAcquisitionWork)part;
+                    }
+                    if (null != shoppingItem) {
+                        TargetRoll target = campaign.getTargetForAcquisition(shoppingItem, campaign.getLogisticsPerson());
+                        targetProxy = new TargetProxy(target);
+                    }
+                    else {
+                        targetProxy = new TargetProxy(null);
+                    }
+                }
+
+                return targetProxy;
+            }
+
+            public FormattedValue<Integer> getOrdered() {
+                if (null == inventories) {
+                    inventories = campaign.getPartInventory(part);
+                }
+                if (null == ordered) {
+                    ordered = new FormattedValue<>(inventories.getOrdered(), inventories.orderedAsString());
+                }
+                return ordered;
+            }
+
+            public FormattedValue<Integer> getSupply() {
+                if (null == inventories) {
+                    inventories = campaign.getPartInventory(part);
+                }
+                if (null == supply) {
+                    supply = new FormattedValue<>(inventories.getSupply(), inventories.supplyAsString());
+                }
+                return supply;
+            }
+
+            public FormattedValue<Integer> getTransit() {
+                if (null == inventories) {
+                    inventories = campaign.getPartInventory(part);
+                }
+                if (null == transit) {
+                    transit = new FormattedValue<>(inventories.getTransit(), inventories.transitAsString());
+                }
+                return transit;
+            }
+        }
+
 		public PartsTableModel(ArrayList<Part> inventory) {
-			data = inventory;
+            data = new ArrayList<>(inventory.size());
+            for (Part p : inventory) {
+                data.add(new PartProxy(p));
+            }
 		}
 
 		public int getRowCount() {
@@ -586,58 +780,38 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         }
 
 		public Object getValueAt(int row, int col) {
-	        Part part;
+	        PartProxy part;
 	        if(data.isEmpty()) {
 	        	return "";
 	        } else {
-	        	part = (Part)data.get(row);
+	        	part = (PartProxy)data.get(row);
 	        }
-	        PartInventory inventories = campaign.getPartInventory(part);
 			if(col == COL_NAME) {
 				return part.getName();
 			}
 			if(col == COL_DETAIL) {
-			    String details = part.getDetails();
-			    details = details.replaceFirst("\\d+\\shit\\(s\\),\\s", "");
-			    details = details.replaceFirst("\\d+\\shit\\(s\\)", "").trim();
-			    if (details.endsWith(",")) {
-			        details = details.substring(0, details.length() - 1);
-			    }
-			    return details;
+			    return part.getDetails();
 			}
 			if(col == COL_COST) {
-				return part.getActualValue().toAmountString();
+				return part.getCost();
 			}
 			if(col == COL_TON) {
-				return Math.round(part.getTonnage() * 100) / 100.0;
+				return part.getTonnage();
 			}
 			if(col == COL_TECH_BASE) {
-				return part.getTechBaseName();
+				return part.getTechBase();
 			}
 			if(col == COL_TARGET) {
-			    IAcquisitionWork shoppingItem = (MissingPart)part.getMissingPart();
-		        if(null == shoppingItem && part instanceof IAcquisitionWork) {
-		            shoppingItem = (IAcquisitionWork)part;
-		        }
-	            if(null != shoppingItem) {
-	                TargetRoll target = campaign.getTargetForAcquisition(shoppingItem, campaign.getLogisticsPerson());
-	                String value = target.getValueAsString();
-	                if(target.getValue() != TargetRoll.IMPOSSIBLE && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS && target.getValue() != TargetRoll.AUTOMATIC_FAIL) {
-	                    value += "+";
-	                }
-	                return value;
-	            } else {
-	                return "-";
-	            }
+			    return part.getTarget();
 			}
 			if(col == COL_SUPPLY) {
-                return inventories.supplyAsString();
+                return part.getSupply();
             }
 			if(col == COL_TRANSIT) {
-                return inventories.transitAsString();
+                return part.getTransit();
             }
 			if(col == COL_QUEUE) {
-			    return inventories.orderedAsString();
+			    return part.getOrdered();
 			}
 			return "?";
 		}
@@ -653,14 +827,14 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		}
 
 		public Part getPartAt(int row) {
-			return ((Part) data.get(row));
+			return ((PartProxy) data.get(row)).getPart();
 		}
 
 		public Part[] getPartstAt(int[] rows) {
 			Part[] parts = new Part[rows.length];
 			for (int i = 0; i < rows.length; i++) {
 				int row = rows[i];
-				parts[i] = ((Part) data.get(row));
+				parts[i] = ((PartProxy) data.get(row)).getPart();
 			}
 			return parts;
 		}
@@ -695,24 +869,15 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 	        }
 
 	        public String getTooltip(int row, int col) {
-	            Part part;
+	            PartProxy part;
 	            if(data.isEmpty()) {
 	                return null;
 	            } else {
-	                part = (Part)data.get(row);
+	                part = data.get(row);
 	            }
 	        	switch(col) {
 	        	case COL_TARGET:
-	        	    IAcquisitionWork shoppingItem = (MissingPart)part.getMissingPart();
-	                if(null == shoppingItem && part instanceof IAcquisitionWork) {
-	                    shoppingItem = (IAcquisitionWork)part;
-	                }
-	                if(null != shoppingItem) {
-	                    TargetRoll target = campaign.getTargetForAcquisition(shoppingItem, campaign.getLogisticsPerson());
-	                    return target.getDesc();
-	                } else {
-	                    return null;
-	                }
+	        	    return part.getTarget().getDescription();
 	            default:
 	            	return null;
 	            }
@@ -740,70 +905,5 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 				}
 
 			}
-	}
-
-	/**
-     * A comparator for target numbers written as strings
-     * @author Jay Lawson
-     *
-     */
-    public class TargetSorter implements Comparator<String> {
-
-        @Override
-        public int compare(String s0, String s1) {
-            s0 = s0.replaceAll("\\+", "");
-            s1 = s1.replaceAll("\\+", "");
-            int r0 = 0;
-            int r1 = 0;
-            if(s0.equals("Impossible")) {
-                r0 = Integer.MAX_VALUE;
-            }
-            else if(s0.equals("Automatic Failure")) {
-                r0 = Integer.MAX_VALUE-1;
-            }
-            else if(s0.equals("Automatic Success")) {
-                r0 = Integer.MIN_VALUE;
-            } else {
-                r0 = Integer.parseInt(s0);
-            }
-            if(s1.equals("Impossible")) {
-                r1 = Integer.MAX_VALUE;
-            }
-            else if(s1.equals("Automatic Failure")) {
-                r1 = Integer.MAX_VALUE-1;
-            }
-            else if(s1.equals("Automatic Success")) {
-                r1 = Integer.MIN_VALUE;
-            } else {
-                r1 = Integer.parseInt(s1);
-            }
-            return ((Comparable<Integer>)r0).compareTo(r1);
-
-        }
-    }
-
-	/**
-	 * A comparator for numbers that have been formatted with DecimalFormat
-	 * @author Jay Lawson
-	 *
-	 */
-	public class FormattedNumberSorter implements Comparator<String> {
-		@Override
-		public int compare(String s0, String s1) {
-            DecimalFormat format = new DecimalFormat();
-			double l0 = 0;
-			try {
-				l0 = format.parse(s0).doubleValue();
-			} catch (java.text.ParseException e) {
-				e.printStackTrace();
-			}
-			double l1 = 0;
-			try {
-				l1 = format.parse(s1).doubleValue();
-			} catch (java.text.ParseException e) {
-				e.printStackTrace();
-			}
-			return ((Comparable<Double>)l0).compareTo(l1);
-		}
 	}
 }
