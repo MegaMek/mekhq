@@ -88,6 +88,7 @@ import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.dialog.PartsStoreDialog.PartsTableModel.PartProxy;
 import mekhq.gui.preferences.JComboBoxPreference;
 import mekhq.gui.preferences.JTablePreference;
 import mekhq.gui.preferences.JWindowPreference;
@@ -252,7 +253,13 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 	            	if (partsTable.getSelectedRowCount() > 0) {
 	            		int selectedRow[] = partsTable.getSelectedRows();
 	            		for (int i : selectedRow) {
-	            			addPart(false, i, 1);
+                            PartProxy partProxy = partsModel.getPartProxyAt(partsTable.convertRowIndexToModel(i));
+                            addPart(false, partProxy.getPart(), 1);
+                            partProxy.updateTargetAndInventories();
+			                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TARGET);
+			                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TRANSIT);
+			                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_SUPPLY);
+			                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_QUEUE);
 	            		}
 	            	}
 	            }
@@ -269,7 +276,9 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 
 	            		int selectedRow[] = partsTable.getSelectedRows();
 	            		for (int i : selectedRow) {
-			            	addPart(true, false, i, quantity);
+                            PartProxy partProxy = partsModel.getPartProxyAt(partsTable.convertRowIndexToModel(i));
+                            addPart(true, false, partProxy.getPart(), quantity);
+                            partProxy.updateTargetAndInventories();
 			                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TARGET);
 			                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TRANSIT);
 			                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_SUPPLY);
@@ -284,7 +293,9 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 	            	if (partsTable.getSelectedRowCount() > 0) {
 	            		int selectedRow[] = partsTable.getSelectedRows();
 	            		for (int i : selectedRow) {
-			                addPart(true, i, 1);
+                            PartProxy partProxy = partsModel.getPartProxyAt(partsTable.convertRowIndexToModel(i));
+                            addPart(true, partProxy.getPart(), 1);
+                            partProxy.updateTargetAndInventories();
 			                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TARGET);
 			                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TRANSIT);
 			                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_SUPPLY);
@@ -300,10 +311,12 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		            	if (partsTable.getSelectedRowCount() > 0) {
 		            		int selectedRow[] = partsTable.getSelectedRows();
 		            		for (int i : selectedRow) {
-				                if (campaign.totalBonusParts() > 0)
-				                	campaign.addReport(resourceMap.getString("bonusPartLog.text") + " " + partsModel.getPartAt(partsTable.convertRowIndexToModel(i)).getPartName());
-
-				                addPart(true, campaign.totalBonusParts() > 0, i, 1);
+				                if (campaign.totalBonusParts() > 0) {
+                                    campaign.addReport(resourceMap.getString("bonusPartLog.text") + " " + partsModel.getPartAt(partsTable.convertRowIndexToModel(i)).getPartName());
+                                }
+                                PartProxy partProxy = partsModel.getPartProxyAt(partsTable.convertRowIndexToModel(i));
+                                addPart(true, campaign.totalBonusParts() > 0, partProxy.getPart(), 1);
+                                partProxy.updateTargetAndInventories();
 				                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TARGET);
 				                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TRANSIT);
 				                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_SUPPLY);
@@ -439,17 +452,15 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         partsSorter.setRowFilter(partsTypeFilter);
     }
 
-    private void addPart(boolean purchase, int row, int quantity) {
-    	addPart(purchase, false, row, quantity);
+    private void addPart(boolean purchase, Part part, int quantity) {
+    	addPart(purchase, false, part, quantity);
     }
 
-    private void addPart(boolean purchase, boolean bonus, int row, int quantity) {
-        final String METHOD_NAME = "addPart(boolean,boolean,int,int)"; //$NON-NLS-1$
-
-        Part selectedPart = partsModel.getPartAt(partsTable.convertRowIndexToModel(row));
+    private void addPart(boolean purchase, boolean bonus, Part part, int quantity) {
+        final String METHOD_NAME = "addPart(boolean,boolean,Part,int)"; //$NON-NLS-1$
 
 		if(bonus) {
-			String report = selectedPart.getAcquisitionWork().find(0);
+			String report = part.getAcquisitionWork().find(0);
 			if (report.endsWith("0 days.")) {
 				AtBContract contract = null;
 				for (Mission m : campaign.getMissions()) {
@@ -467,10 +478,10 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 				}
 			}
 		} else if(purchase) {
-			campaign.getShoppingList().addShoppingItem(selectedPart.getAcquisitionWork(), quantity, campaign);
+			campaign.getShoppingList().addShoppingItem(part.getAcquisitionWork(), quantity, campaign);
 		} else {
 			while(quantity > 0) {
-				campaign.addPart(selectedPart.clone(), 0);
+				campaign.addPart(part.clone(), 0);
 				quantity--;
 			}
 		}
@@ -653,6 +664,14 @@ public class PartsStoreDialog extends javax.swing.JDialog {
                 part = p;
             }
 
+            public void updateTargetAndInventories() {
+                targetProxy = null;
+                inventories = null;
+                ordered = null;
+                supply = null;
+                transit = null;
+            }
+
             public Part getPart() {
                 return part;
             }
@@ -820,17 +839,21 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		@Override
 		public Class<? extends Object> getColumnClass(int c) {
 			return getValueAt(0, c).getClass();
-		}
+        }
+
+        public PartProxy getPartProxyAt(int row) {
+            return data.get(row);
+        }
 
 		public Part getPartAt(int row) {
-			return ((PartProxy) data.get(row)).getPart();
+			return data.get(row).getPart();
 		}
 
 		public Part[] getPartstAt(int[] rows) {
 			Part[] parts = new Part[rows.length];
 			for (int i = 0; i < rows.length; i++) {
 				int row = rows[i];
-				parts[i] = ((PartProxy) data.get(row)).getPart();
+				parts[i] = data.get(row).getPart();
 			}
 			return parts;
 		}
