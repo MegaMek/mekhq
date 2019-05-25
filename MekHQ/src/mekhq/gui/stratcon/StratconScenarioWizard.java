@@ -10,7 +10,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -37,26 +39,33 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconRulesManager;
 
-public class StratconScenarioWizard extends JDialog implements ActionListener {
-    private final static String CMD_MOVE_RIGHT = "CMD_MOVE_RIGHT";
-    private final static String CMD_MOVE_LEFT = "CMD_MOVE_LEFT";
-    private final static String CMD_MOVE_CONFIRM = "CMD_CONFIRM";
+public class StratconScenarioWizard extends JDialog {
+    private final static int TACTICS_NOT_LOADED = -1;
     
     StratconScenario currentScenario;
     Campaign campaign;
     StratconTrackState currentTrackState;
     StratconCampaignState currentCampaignState;
+    ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AtBStratCon");
 
     JLabel lblTotalBV = new JLabel();
     
     List<JList<Force>> availableForceLists = new ArrayList<>();
-    List<JList<Force>> assignedForceLists = new ArrayList<>();
-    List<JButton> rightButtons = new ArrayList<>();
-    List<JButton> leftButtons = new ArrayList<>();
+    List<JList<Unit>> availableUnitLists = new ArrayList<>();
     
     JList<Unit> availableInfantryUnits = new JList<>();
     JLabel defensiveOptionStatus = new JLabel();
 
+    // lazy-loaded commander tactics property and backing field    
+    private int commanderTactics = TACTICS_NOT_LOADED;
+    private int getCommanderTactics() {
+        if(commanderTactics == TACTICS_NOT_LOADED) {
+            commanderTactics = currentScenario.getBackingScenario().getLanceCommanderSkill(SkillType.S_TACTICS, campaign);
+        }
+        
+        return commanderTactics;
+    }
+    
     public StratconScenarioWizard(Campaign campaign) {
         this.campaign = campaign;
     }
@@ -65,11 +74,10 @@ public class StratconScenarioWizard extends JDialog implements ActionListener {
         currentScenario = scenario;
         currentCampaignState = campaignState;
         currentTrackState = trackState;
+        commanderTactics = TACTICS_NOT_LOADED;
         
         availableForceLists.clear();
-        assignedForceLists.clear();
-        rightButtons.clear();
-        leftButtons.clear();
+        availableUnitLists.clear();
         
         setUI();
     }
@@ -97,9 +105,9 @@ public class StratconScenarioWizard extends JDialog implements ActionListener {
                 break;
         }
 
-        /*gbc.gridx = 0;
+        gbc.gridx = 0;
         gbc.gridy++;
-        setNavigationButtons(gbc);*/
+        setNavigationButtons(gbc);
         pack();
         validate();
     }
@@ -112,13 +120,14 @@ public class StratconScenarioWizard extends JDialog implements ActionListener {
         
         switch(currentScenario.getCurrentState()) {
         case UNRESOLVED:
-            labelBuilder.append("Assign the required number of lances to the scenario.<br/>");
+            labelBuilder.append("primaryForceAssignemntInstructions.text");
             break;
         default:
-            labelBuilder.append("Assign any reinforcements or make allied support requests.<br/>");
+            labelBuilder.append("reinforcementsAndSupportInstructions.text");
             break;
         }
         
+        labelBuilder.append("<br/>");
         lblInfo.setText(labelBuilder.toString());
         getContentPane().add(lblInfo, gbc);
     }
@@ -127,52 +136,37 @@ public class StratconScenarioWizard extends JDialog implements ActionListener {
         // generate a lance selector with the following parameters:
         // all forces assigned to the current track that aren't already assigned elsewhere
         // max number of items that can be selected = current scenario required lances
-        int controlSetIndex = 0;
         
         List<ScenarioForceTemplate> eligibleForceTemplates = reinforcements ?
                 currentScenario.getScenarioTemplate().getAllPlayerReinforcementForces() :
                     currentScenario.getScenarioTemplate().getAllPrimaryPlayerForces();
         
         for(ScenarioForceTemplate forceTemplate : eligibleForceTemplates) {
-            JPanel forcePairPanel = new JPanel();
-            forcePairPanel.setLayout(new GridBagLayout());
+            JPanel forcePanel = new JPanel();
+            forcePanel.setLayout(new GridBagLayout());
             GridBagConstraints localGbc = new GridBagConstraints();
             localGbc.gridx = 0;
             localGbc.gridy = 0;
-            localGbc.gridheight = 2;
-            
-            JList<Force> availableForceList = addAvailableForceList(forcePairPanel, localGbc, controlSetIndex, forceTemplate);
-            
-            localGbc.gridx = 1;
-            localGbc.gridheight = 1;
-            localGbc.gridy = 0;
-            localGbc.anchor = GridBagConstraints.SOUTH;
-            
-            JButton btnRight = new JButton(">>>");
-            btnRight.setActionCommand(String.format("%s|%d", CMD_MOVE_RIGHT, controlSetIndex));
-            btnRight.addActionListener(this);       
-            rightButtons.add(btnRight);
-            forcePairPanel.add(btnRight, localGbc);
+            JLabel assignForceListInstructions = new JLabel("selectForceForTemplate.text");
+            forcePanel.add(assignForceListInstructions, localGbc);
             
             localGbc.gridy = 1;
-            localGbc.anchor = GridBagConstraints.NORTH;
+            JLabel selectedForceInfo = new JLabel();
+            JList<Force> availableForceList = addAvailableForceList(forcePanel, localGbc, forceTemplate);
             
-            JButton btnLeft = new JButton("<<<");
-            btnLeft.setActionCommand(String.format("%s|%d", CMD_MOVE_LEFT, controlSetIndex));
-            btnLeft.addActionListener(this);
-            leftButtons.add(btnLeft);
-            forcePairPanel.add(btnLeft, localGbc);
-            
-            localGbc.gridx = 2;
-            localGbc.gridy = 0;
-            localGbc.gridheight = 2;
-            JList<Force> assignedForceList = addAssignedForceList(forcePairPanel, localGbc, controlSetIndex);
+            availableForceList.addListSelectionListener(new ListSelectionListener() { 
+                @Override
+                public void valueChanged(ListSelectionEvent e) {
+                    availableForceSelectorChanged(e, selectedForceInfo);
+                }
+            });
             
             availableForceLists.add(availableForceList);
-            assignedForceLists.add(assignedForceList);
             
-            getContentPane().add(forcePairPanel, gbc);
-            controlSetIndex++;
+            localGbc.gridx = 1;
+            forcePanel.add(selectedForceInfo, localGbc);
+            
+            getContentPane().add(forcePanel, gbc);
         }
     }
 
@@ -181,12 +175,40 @@ public class StratconScenarioWizard extends JDialog implements ActionListener {
      * @param gbc
      */
     private void setDefensiveUI(GridBagConstraints gbc) {
-        addIndividualUnitSelector(StratconRulesManager.getEligibleDefensiveUnits(campaign), 
-                gbc, 
-                currentScenario.getBackingScenario().getLanceCommanderSkill(SkillType.S_TACTICS, campaign));
+        gbc.anchor = GridBagConstraints.WEST;
+        JLabel lblDefensivePostureInstructions = new JLabel("lblDefensivePostureInstructions.Text");
+        getContentPane().add(lblDefensivePostureInstructions, gbc);
+        
+        gbc.gridy++;
+        availableInfantryUnits =
+                addIndividualUnitSelector(StratconRulesManager.getEligibleDefensiveUnits(campaign), gbc, getCommanderTactics());
+        
+        
+        
+        gbc.gridy++;
+        gbc.anchor = GridBagConstraints.WEST;
+        
+        JLabel lblDefensiveMinefieldCount = new JLabel(String.format(resourceMap.getString("lblDefensiveMinefieldCount.text"), 
+                getCommanderTactics()));
+        
+        availableInfantryUnits.addListSelectionListener(new ListSelectionListener() { 
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                availableInfantrySelectorChanged(e, lblDefensiveMinefieldCount);
+            }
+        });
+        
+        getContentPane().add(lblDefensiveMinefieldCount, gbc);
     }
     
-    private JList<Force> addAvailableForceList(JPanel parent, GridBagConstraints gbc, int index, ScenarioForceTemplate forceTemplate) {
+    /**
+     * Add an "available force list" to the given control
+     * @param parent
+     * @param gbc
+     * @param forceTemplate
+     * @return
+     */
+    private JList<Force> addAvailableForceList(JPanel parent, GridBagConstraints gbc, ScenarioForceTemplate forceTemplate) {
         JScrollPane forceListContainer = new JScrollPane();
 
         ScenarioWizardLanceModel lanceModel;
@@ -197,48 +219,21 @@ public class StratconScenarioWizard extends JDialog implements ActionListener {
         JList<Force> availableForceList = new JList<>();
         availableForceList.setModel(lanceModel);
         availableForceList.setCellRenderer(new ScenarioWizardLanceRenderer(campaign));
-        availableForceList.addListSelectionListener(new ListSelectionListener() { 
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                availableForceSelectorChanged(e);
-            }
-        });
-
+        
         forceListContainer.setViewportView(availableForceList);
 
         parent.add(forceListContainer, gbc);
         return availableForceList;
     }
-    
-    private JList<Force> addAssignedForceList(JPanel parent, GridBagConstraints gbc, int index) {
-        JScrollPane forceListContainer = new JScrollPane();
-
-        ScenarioWizardLanceModel lanceModel = new ScenarioWizardLanceModel(campaign, currentScenario.getAssignedForces());
-        
-        JList<Force> assignedForceList = new JList<>();
-        assignedForceList.setModel(lanceModel);
-        assignedForceList.setCellRenderer(new ScenarioWizardLanceRenderer(campaign));
-        assignedForceList.addListSelectionListener(new ListSelectionListener() { 
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                assignedForceSelectorChanged(e, index);
-            }
-        });
-
-        forceListContainer.setViewportView(assignedForceList);
-
-        parent.add(forceListContainer, gbc);
-        return assignedForceList;
-    }
 
     /**
      * Adds an individual unit selector, given a list of individual units, a global grid bag constraint set
      * and a maximum selection size.
-     * @param units
-     * @param gbc
-     * @param maxSelectionSize
+     * @param units The list of units to use as data source.
+     * @param gbc Gridbag constraints to indicate where the control will go
+     * @param maxSelectionSize Maximum number of units that can be selected
      */
-    private void addIndividualUnitSelector(List<Unit> units, GridBagConstraints gbc, int maxSelectionSize) {
+    private JList<Unit> addIndividualUnitSelector(List<Unit> units, GridBagConstraints gbc, int maxSelectionSize) {
         JPanel unitPanel = new JPanel();
         unitPanel.setLayout(new GridBagLayout());
         GridBagConstraints localGbc = new GridBagConstraints();
@@ -247,7 +242,7 @@ public class StratconScenarioWizard extends JDialog implements ActionListener {
         localGbc.gridy = 0;
         localGbc.anchor = GridBagConstraints.WEST;
         JLabel instructions = new JLabel();
-        instructions.setText(String.format("Select individual units (%d max)", maxSelectionSize));
+        instructions.setText(String.format(resourceMap.getString("lblSelectIndividualUnits.text"), maxSelectionSize));
         unitPanel.add(instructions);
         
         localGbc.gridy++;        
@@ -265,8 +260,9 @@ public class StratconScenarioWizard extends JDialog implements ActionListener {
         localGbc.gridy++;
         unitPanel.add(unitSelectionLabel, localGbc);
         
-        availableInfantryUnits.setModel(availableModel);
-        availableInfantryUnits.addListSelectionListener(new ListSelectionListener() { 
+        JList<Unit> availableUnits = new JList<>();
+        availableUnits.setModel(availableModel);
+        availableUnits.addListSelectionListener(new ListSelectionListener() { 
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 availableUnitSelectorChanged(e, unitSelectionLabel, unitStatusLabel, maxSelectionSize);
@@ -274,7 +270,7 @@ public class StratconScenarioWizard extends JDialog implements ActionListener {
         });
         
         JScrollPane infantryContainer = new JScrollPane();
-        infantryContainer.setViewportView(availableInfantryUnits);
+        infantryContainer.setViewportView(availableUnits);
         localGbc.gridy++;
         unitPanel.add(infantryContainer, localGbc);
         
@@ -284,6 +280,27 @@ public class StratconScenarioWizard extends JDialog implements ActionListener {
         unitPanel.add(unitStatusLabel, localGbc);
         
         getContentPane().add(unitPanel, gbc);
+        
+        return availableUnits;
+    }
+    
+    /**
+     * Worker function that builds an "html-enabled" string indicating the brief status of a force
+     * @param f
+     * @return
+     */
+    private String buildForceStatus(Force f) {
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append(f.getFullName());
+        sb.append(":<br/>");
+        
+        for(UUID unitID : f.getUnits()) {
+            Unit u = campaign.getUnit(unitID);
+            sb.append(buildUnitStatus(u));
+        }
+        
+        return sb.toString();
     }
     
     /**
@@ -322,7 +339,6 @@ public class StratconScenarioWizard extends JDialog implements ActionListener {
         // you're on one of two screens:
         // the 'primary force selection' screen
         // the 'reinforcement selection' screen
-        // you can re-visit the second one
         JButton btnCommit = new JButton("Commit");
         btnCommit.setActionCommand("COMMIT_CLICK");
         btnCommit.addActionListener(new ActionListener() { 
@@ -345,14 +361,12 @@ public class StratconScenarioWizard extends JDialog implements ActionListener {
      * @param e
      */
     private void btnCommitClicked(ActionEvent e) {
-        // gather up all the forces on the right side, and assign them to the scenario
+        // gather up all the forces selected and add them to a set
         Set<Integer> forceIDs = new HashSet<>(); 
         
-        for(JList<Force> assignedForceList : assignedForceLists) {
-            DefaultListModel<Force> assignedListModel = (DefaultListModel<Force>) assignedForceList.getModel();
-            
-            for(int x = 0; x < assignedListModel.size(); x++) {
-                forceIDs.add(assignedListModel.get(x).getId());
+        for(JList<Force> forceList : this.availableForceLists) {
+            for(Force force : forceList.getSelectedValuesList()) {
+                forceIDs.add(force.getId());
             }
         }
         
@@ -370,45 +384,27 @@ public class StratconScenarioWizard extends JDialog implements ActionListener {
         
         setVisible(false);
     }
-
-    /**
-     * Event handler for when the user makes a selection on the assigned force selector.
-     * @param e The event fired. 
-     */
-    private void assignedForceSelectorChanged(ListSelectionEvent e, int controlIndex) {
-        if(!(e.getSource() instanceof JList<?>)) {
-            return;
-        }
-
-        int totalBV = 0;
-        JList<Force> sourceList = (JList<Force>) e.getSource();
-        for(Force force : sourceList.getSelectedValuesList()) {
-            totalBV += force.getTotalBV(campaign);
-        }
-
-        lblTotalBV.setText(String.format("Selected BV: %d", totalBV));
-        
-        boolean enableButton = !sourceList.isSelectionEmpty() &&
-                !currentScenario.getPrimaryPlayerForceIDs().contains(sourceList.getSelectedValue().getId());
-        
-        leftButtons.get(controlIndex).setEnabled(enableButton);
-    }
     
     /**
      * Event handler for when the user makes a selection on the available force selector.
      * @param e The event fired. 
      */
-    private void availableForceSelectorChanged(ListSelectionEvent e) {
+    private void availableForceSelectorChanged(ListSelectionEvent e, JLabel forceStatusLabel) {
         if(!(e.getSource() instanceof JList<?>)) {
             return;
         }
 
-        /*JList<Force> sourceList = (JList<Force>) e.getSource();
-                
-        boolean enableButton = !sourceList.isSelectionEmpty() &&
-                !currentScenario.getAssignedForces().contains(sourceList.getSelectedValue().getId());
+        JList<Force> sourceList = (JList<Force>) e.getSource();
         
-        btnRight.setEnabled(enableButton);*/
+        StringBuilder sb = new StringBuilder();
+        sb.append("<html>");
+        for(Force force : sourceList.getSelectedValuesList()) {
+            sb.append(buildForceStatus(force));
+        }
+        sb.append("</html>");
+        forceStatusLabel.setText(sb.toString());
+        
+        pack();
     }
 
     /**
@@ -446,30 +442,18 @@ public class StratconScenarioWizard extends JDialog implements ActionListener {
         pack();
     }
     
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        String commandString = e.getActionCommand().substring(0, e.getActionCommand().indexOf("|"));
-        int commandIndex = Integer.parseInt(e.getActionCommand().substring(e.getActionCommand().indexOf("|") + 1));
-        
-        JList<Force> availableForceList = availableForceLists.get(commandIndex);
-        JList<Force> assignedForceList = assignedForceLists.get(commandIndex);
-        
-        ScenarioWizardLanceModel assignedForceModel = (ScenarioWizardLanceModel) assignedForceList.getModel();
-        ScenarioWizardLanceModel availableForceModel = (ScenarioWizardLanceModel) availableForceList.getModel();
-        
-        switch(commandString) {
-        case CMD_MOVE_RIGHT:
-            if(!availableForceList.isSelectionEmpty()) {
-                assignedForceModel.addElement(availableForceList.getSelectedValue());
-                availableForceModel.removeElement(availableForceList.getSelectedValue());
-            }
-            break;
-        case CMD_MOVE_LEFT:
-            if(!assignedForceList.isSelectionEmpty()) {
-                availableForceModel.addElement(assignedForceList.getSelectedValue());
-                assignedForceModel.removeElement(assignedForceList.getSelectedValue());
-            }
-            break;
+    /**
+     * Specific event handler for logic related to available infantry units.
+     * Updates the defensive minefield count
+     * @param e
+     */
+    private void availableInfantrySelectorChanged(ListSelectionEvent e, JLabel defensiveMineCountLabel) {
+        if(!(e.getSource() instanceof JList<?>)) {
+            return;
         }
+        
+        JList<Unit> changedList = (JList<Unit>) e.getSource();
+        defensiveMineCountLabel.setText(String.format(resourceMap.getString("lblDefensiveMinefieldCount.text"), 
+                Math.max(0, getCommanderTactics() - changedList.getSelectedIndices().length)));        
     }
 }
