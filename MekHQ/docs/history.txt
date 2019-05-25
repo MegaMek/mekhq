@@ -11,6 +11,7 @@ v0.45.5-SNAPSHOT
 + Issue #1171: Adds autosave feature (daily or weekly, and/or before missions).
 + Issue #1128: Player can now view stats for enemy personnel when resolving a scenario.
 + Issue #1197: Fix bug where personnel could not be assigned to Battle Armor after repair.
++ Issue #1185: Player can acquire ammo bins via parts acquisition dialog.
 
 v0.45.4 (2019-03-24 1700 UTC)
 + PR #1067: Switch to Joda Money library internally for financial math
