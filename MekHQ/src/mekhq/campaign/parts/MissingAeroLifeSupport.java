@@ -108,7 +108,7 @@ public class MissingAeroLifeSupport extends MissingPart {
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
         return part instanceof AeroLifeSupport && fighter == ((AeroLifeSupport)part).isForFighter()
-                && (cost == part.getStickerPrice());
+                && (cost.equals(part.getStickerPrice()));
     }
 
     @Override
