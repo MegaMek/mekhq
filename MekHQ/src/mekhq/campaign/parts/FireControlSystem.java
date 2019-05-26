@@ -210,7 +210,7 @@ public class FireControlSystem extends Part {
 
 	@Override
 	public boolean isSamePartType(Part part) {
-		return part instanceof FireControlSystem && cost == part.getStickerPrice();
+		return part instanceof FireControlSystem && cost.equals(part.getStickerPrice());
 	}
 	
 	@Override
