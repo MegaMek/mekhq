@@ -1,5 +1,5 @@
 /*
- * KFFieldInitiator.java
+ * KFHeliumTank.java
  * 
  * Copyright (c) 2019, The MegaMek Team
  * 
@@ -40,14 +40,14 @@ import mekhq.campaign.personnel.SkillType;
  *
  * @author MKerensky
  */
-public class KFFieldInitiator extends Part {
+public class KFHeliumTank extends Part {
 
     /**
      * 
      */
-    private static final long serialVersionUID = 855888549623558483L;
+    private static final long serialVersionUID = 5737177123881418170L;
 
-    public static final TechAdvancement TA_FIELD_INITIATOR = new TechAdvancement(TECH_BASE_ALL)
+    public static final TechAdvancement TA_HELIUM_TANK = new TechAdvancement(TECH_BASE_ALL)
             .setAdvancement(2107, 2120, 2300).setPrototypeFactions(F_TA)
             .setProductionFactions(F_TA).setTechRating(RATING_D)
             .setAvailability(RATING_D, RATING_E, RATING_D, RATING_D)
@@ -60,18 +60,18 @@ public class KFFieldInitiator extends Part {
         return coreType;
     }
 
-    public KFFieldInitiator() {
+    public KFHeliumTank() {
     	this(0, Jumpship.DRIVE_CORE_STANDARD, null);
     }
     
-    public KFFieldInitiator(int tonnage, int coreType, Campaign c) {
+    public KFHeliumTank(int tonnage, int coreType, Campaign c) {
         super(tonnage, c);
         this.coreType = coreType;
-        this.name = "K-F Field Initiator";
+        this.name = "K-F Helium Tank";
     }
         
-    public KFFieldInitiator clone() {
-    	KFFieldInitiator clone = new KFFieldInitiator(0, coreType, campaign);
+    public KFHeliumTank clone() {
+    	KFHeliumTank clone = new KFHeliumTank(0, coreType, campaign);
         clone.copyBaseData(this);
     	return clone;
     }
@@ -81,7 +81,7 @@ public class KFFieldInitiator extends Part {
 		int priorHits = hits;
 		if(null != unit) {
 		    if (unit.getEntity() instanceof Jumpship) {
-    			if(((Jumpship)unit.getEntity()).getKFFieldInitiatorHit()) {
+    			if(((Jumpship)unit.getEntity()).getKFHeliumTankHit()) {
     				hits = 1;
     			} else {
     				hits = 0;
@@ -98,28 +98,29 @@ public class KFFieldInitiator extends Part {
 	@Override 
 	public int getBaseTime() {
 	    int time;
-        if(isSalvaging()) {
-            //SO KF Drive times, p184-5
-            time = 28800;
-        } else {
-            time = 4800;
-        }
-        return time;
+		if(isSalvaging()) {
+		    //10x the repair time
+			time = 1800;
+		} else {
+		    //BattleSpace, p28
+		    time = 180;
+		}
+		return time;
 	}
 	
 	@Override
 	public int getDifficulty() {
-	    //SO Difficulty Mods
-        if(isSalvaging()) {
-            return 2;
-        }
-        return 5;
+	    //Battlespace, p28 - pretty easy to fix. Replacing's a pain.
+	    if (isSalvaging()) {
+	        return 4;
+	    }
+		return 0;
 	}
 
 	@Override
 	public void updateConditionFromPart() {
 		if(null != unit && unit.getEntity() instanceof Jumpship) {
-		        ((Jumpship)unit.getEntity()).setKFFieldInitiatorHit(needsFixing());
+		        ((Jumpship)unit.getEntity()).setKFHeliumTankHit(needsFixing());
 		}
 	}
 
@@ -128,11 +129,11 @@ public class KFFieldInitiator extends Part {
 		super.fix();
 		if (null != unit && unit.getEntity() instanceof Jumpship) {
 		    Jumpship js = ((Jumpship)unit.getEntity());
-			js.setKFFieldInitiatorHit(false);
-			//Also repair your KF Drive integrity - +1 point if you have other components to fix
+			js.setKFHeliumTankHit(false);
+			//Also repair your KF Drive integrity - up to 2/3 of the total if you have other components to fix
 			//Otherwise, fix it all.
 			if (js.isKFDriveDamaged()) {
-			    js.setKFIntegrity(Math.min((js.getKFIntegrity() + 1), js.getOKFIntegrity()));
+			    js.setKFIntegrity(Math.min((js.getKFHeliumTankIntegrity()), js.getOKFIntegrity()));
 			} else {
 			    js.setKFIntegrity(js.getOKFIntegrity());
 			}
@@ -144,9 +145,9 @@ public class KFFieldInitiator extends Part {
 		if(null != unit) {
 		    if (unit.getEntity() instanceof Jumpship) {
 		        Jumpship js = ((Jumpship)unit.getEntity());
-		        js.setKFIntegrity(Math.max(0, js.getKFIntegrity() - 1));
-		        js.setKFFieldInitiatorHit(true);
-		        //You can transport a field initiator
+                js.setKFIntegrity(Math.max(0, js.getKFIntegrity() - js.getKFHeliumTankIntegrity()));
+		        js.setKFHeliumTankHit(true);
+		        //You can transport a helium tank
                 //See SO p130 for reference
 		        Part spare = campaign.checkForExistingSparePart(this);
 	            if(!salvage) {
@@ -168,7 +169,7 @@ public class KFFieldInitiator extends Part {
 
 	@Override
 	public MissingPart getMissingPart() {
-		return new MissingKFFieldInitiator(getUnitTonnage(), coreType, campaign);
+		return new MissingKFHeliumTank(getUnitTonnage(), coreType, campaign);
 	}
 
 	@Override
@@ -183,10 +184,10 @@ public class KFFieldInitiator extends Part {
 
 	@Override
 	public Money getStickerPrice() {
-	    if (unit != null) {
-	        return Money.of(25000000 + (5000000 * unit.getEntity().getDocks()));
+	    if (unit != null && unit.getEntity() instanceof Jumpship) {
+	        return Money.of(50000 * ((Jumpship)unit.getEntity()).getOKFIntegrity());
 	    }
-	    return Money.of(25000000);
+	    return Money.of(50000);
 	}
 
 	@Override
@@ -196,7 +197,7 @@ public class KFFieldInitiator extends Part {
 
 	@Override
 	public boolean isSamePartType(Part part) {
-		return part instanceof KFFieldInitiator && coreType == ((KFFieldInitiator)part).getCoreType();
+		return part instanceof KFHeliumTank && coreType == ((KFHeliumTank)part).getCoreType();
 	}
 
 	@Override
@@ -238,7 +239,7 @@ public class KFFieldInitiator extends Part {
     
 	@Override
 	public TechAdvancement getTechAdvancement() {
-	    return TA_FIELD_INITIATOR;
+	    return TA_HELIUM_TANK;
 	}
 	
 }

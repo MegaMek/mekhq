@@ -141,7 +141,9 @@ public class KFDriveController extends Part {
 	public void remove(boolean salvage) {
 		if(null != unit) {
 		    if (unit.getEntity() instanceof Jumpship) {
-		        ((Jumpship)unit.getEntity()).setKFDriveControllerHit(true);
+		        Jumpship js = ((Jumpship)unit.getEntity());
+                js.setKFIntegrity(Math.max(0, js.getKFIntegrity() - 1));
+		        js.setKFDriveControllerHit(true);
 		        //You can transport a drive controller
                 //See SO p130 for reference
 		        Part spare = campaign.checkForExistingSparePart(this);

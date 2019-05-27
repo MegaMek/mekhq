@@ -143,6 +143,8 @@ public class KFDriveCoil extends Part {
 	public void remove(boolean salvage) {
 		if(null != unit) {
 		    if (unit.getEntity() instanceof Jumpship) {
+		        Jumpship js = ((Jumpship)unit.getEntity());
+                js.setKFIntegrity(Math.max(0, js.getKFIntegrity() - 1));
 		        ((Jumpship)unit.getEntity()).setKFDriveCoilHit(true);
 		    }
 	        //All the BT lore says you can't jump while carrying around another KF Drive, therefore
