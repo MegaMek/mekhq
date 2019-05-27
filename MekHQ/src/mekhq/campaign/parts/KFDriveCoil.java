@@ -51,7 +51,7 @@ public class KFDriveCoil extends Part {
             .setAdvancement(2107, 2120, 2300).setPrototypeFactions(F_TA)
             .setProductionFactions(F_TA).setTechRating(RATING_D)
             .setAvailability(RATING_D, RATING_E, RATING_D, RATING_D)
-            .setStaticTechLevel(SimpleTechLevel.STANDARD);
+            .setStaticTechLevel(SimpleTechLevel.ADVANCED);
     
     //Standard, primitive, compact, subcompact...
     private int coreType;
