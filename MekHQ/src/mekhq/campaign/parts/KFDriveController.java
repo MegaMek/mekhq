@@ -1,0 +1,237 @@
+/*
+ * KFDriveController.java
+ * 
+ * Copyright (c) 2019, The MegaMek Team
+ * 
+ * This file is part of MekHQ.
+ * 
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package mekhq.campaign.parts;
+
+import java.io.PrintWriter;
+
+import mekhq.campaign.finances.Money;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.common.Compute;
+import megamek.common.Entity;
+import megamek.common.Jumpship;
+import megamek.common.SimpleTechLevel;
+import megamek.common.TechAdvancement;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.SkillType;
+
+/**
+ *
+ * @author MKerensky
+ */
+public class KFDriveController extends Part {
+    
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 9055868918414331808L;
+
+    public static final TechAdvancement TA_DRIVE_CONTROLLER = new TechAdvancement(TECH_BASE_ALL)
+            .setAdvancement(2107, 2120, 2300).setPrototypeFactions(F_TA)
+            .setProductionFactions(F_TA).setTechRating(RATING_D)
+            .setAvailability(RATING_D, RATING_E, RATING_D, RATING_D)
+            .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+    
+    //Standard, primitive, compact, subcompact...
+    private int coreType;
+    
+    public int getCoreType() {
+        return coreType;
+    }
+
+    public KFDriveController() {
+    	this(0, Jumpship.DRIVE_CORE_STANDARD, null);
+    }
+    
+    public KFDriveController(int tonnage, int coreType, Campaign c) {
+        super(tonnage, c);
+        this.coreType = coreType;
+        this.name = "K-F Drive Controller";
+    }
+        
+    public KFDriveController clone() {
+    	KFDriveController clone = new KFDriveController(0, coreType, campaign);
+        clone.copyBaseData(this);
+    	return clone;
+    }
+    
+	@Override
+	public void updateConditionFromEntity(boolean checkForDestruction) {
+		int priorHits = hits;
+		if(null != unit) {
+		    if (unit.getEntity() instanceof Jumpship) {
+    			if(((Jumpship)unit.getEntity()).getKFDriveControllerHit()) {
+    				hits = 1;
+    			} else {
+    				hits = 0;
+    			}
+		    }
+			if(checkForDestruction 
+					&& hits > priorHits 
+					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+				remove(false);
+			}
+		}
+	}
+	
+	@Override 
+	public int getBaseTime() {
+	    int time;
+		if(isSalvaging()) {
+		    //10x the repair time
+			time = 3000;
+		} else {
+		    //BattleSpace, p28
+		    time = 300;
+		}
+		return time;
+	}
+	
+	@Override
+	public int getDifficulty() {
+	    //Battlespace, p28 - just as difficult to repair as replace
+		return 5;
+	}
+
+	@Override
+	public void updateConditionFromPart() {
+		if(null != unit && unit.getEntity() instanceof Jumpship) {
+		        ((Jumpship)unit.getEntity()).setKFDriveControllerHit(needsFixing());
+		}
+	}
+
+	@Override
+	public void fix() {
+		super.fix();
+		if (null != unit && unit.getEntity() instanceof Jumpship) {
+		    Jumpship js = ((Jumpship)unit.getEntity());
+			js.setKFDriveControllerHit(false);
+			//Also repair your KF Drive integrity - +1 point if you have other components to fix
+			//Otherwise, fix it all.
+			if (js.isKFDriveDamaged()) {
+			    js.setKFIntegrity(Math.min((js.getKFIntegrity() + 1), js.getOKFIntegrity()));
+			} else {
+			    js.setKFIntegrity(js.getOKFIntegrity());
+			}
+		}
+	}
+
+	@Override
+	public void remove(boolean salvage) {
+		if(null != unit) {
+		    if (unit.getEntity() instanceof Jumpship) {
+		        ((Jumpship)unit.getEntity()).setKFDriveControllerHit(true);
+		        //You can transport a drive controller
+                //See SO p130 for reference
+		        Part spare = campaign.checkForExistingSparePart(this);
+	            if(!salvage) {
+	                campaign.removePart(this);
+	            } else if(null != spare) {
+	                spare.incrementQuantity();
+	                campaign.removePart(this);
+	            }
+	            campaign.removePart(this);
+	            unit.removePart(this);
+	            Part missing = getMissingPart();
+	            unit.addPart(missing);
+	            campaign.addPart(missing, 0);
+		    }
+		}
+		setUnit(null);
+		updateConditionFromEntity(false);
+	}
+
+	@Override
+	public MissingPart getMissingPart() {
+		return new MissingKFDriveController(getUnitTonnage(), coreType, campaign);
+	}
+
+	@Override
+	public String checkFixable() {
+		return null;
+	}
+
+	@Override
+	public boolean needsFixing() {
+		return hits > 0;
+	}
+
+	@Override
+	public Money getStickerPrice() {
+	    return Money.of(50000000);
+	}
+
+	@Override
+	public double getTonnage() {
+		return 0;
+	}
+
+	@Override
+	public boolean isSamePartType(Part part) {
+		return part instanceof KFDriveController && coreType == ((KFDriveController)part).getCoreType();
+	}
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent) {
+		writeToXmlBegin(pw1, indent);
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<coreType>"
+                +coreType
+                +"</coreType>");
+		writeToXmlEnd(pw1, indent);
+	}
+
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+        NodeList nl = wn.getChildNodes();
+        for (int x=0; x<nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
+            
+            if (wn2.getNodeName().equalsIgnoreCase("coreType")) {
+                coreType = Integer.parseInt(wn2.getTextContent());
+            } 
+        }
+	}
+	
+	@Override
+	public boolean isRightTechType(String skillType) {
+        return skillType.equals(SkillType.S_TECH_VESSEL);
+	}
+
+    @Override
+    public String getLocationName() {
+        return null;
+    }
+
+    @Override
+    public int getLocation() {
+        return Entity.LOC_NONE;
+    }
+    
+	@Override
+	public TechAdvancement getTechAdvancement() {
+	    return TA_DRIVE_CONTROLLER;
+	}
+	
+}
