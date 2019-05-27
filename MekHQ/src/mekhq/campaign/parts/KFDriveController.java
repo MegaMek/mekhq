@@ -28,7 +28,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.Compute;
-import megamek.common.Entity;
 import megamek.common.Jumpship;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
@@ -240,7 +239,7 @@ public class KFDriveController extends Part {
 
     @Override
     public int getLocation() {
-        return Entity.LOC_NONE;
+        return Jumpship.LOC_HULL;
     }
     
 	@Override

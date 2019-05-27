@@ -25,8 +25,6 @@ import java.io.PrintWriter;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import megamek.common.Entity;
 import megamek.common.Jumpship;
 import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
@@ -129,7 +127,7 @@ public class MissingKFHeliumTank extends MissingPart {
 
 	@Override
 	public int getLocation() {
-		return Entity.LOC_NONE;
+		return Jumpship.LOC_HULL;
 	}
 	
 	@Override
