@@ -126,6 +126,7 @@ import mekhq.campaign.parts.GravDeck;
 import mekhq.campaign.parts.InfantryArmorPart;
 import mekhq.campaign.parts.InfantryMotiveType;
 import mekhq.campaign.parts.JumpshipDockingCollar;
+import mekhq.campaign.parts.KFDriveCoil;
 import mekhq.campaign.parts.KfBoom;
 import mekhq.campaign.parts.LandingGear;
 import mekhq.campaign.parts.MekActuator;
@@ -146,6 +147,7 @@ import mekhq.campaign.parts.MissingDropshipDockingCollar;
 import mekhq.campaign.parts.MissingEnginePart;
 import mekhq.campaign.parts.MissingFireControlSystem;
 import mekhq.campaign.parts.MissingKFBoom;
+import mekhq.campaign.parts.MissingKFDriveCoil;
 import mekhq.campaign.parts.MissingLandingGear;
 import mekhq.campaign.parts.MissingMekActuator;
 import mekhq.campaign.parts.MissingMekCockpit;
@@ -1839,6 +1841,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         Part avionics = null;
         Part fcs = null;
         Part cic = null;
+        Part chargingSystem = null;
+        Part driveCoil = null;
+        Part driveController = null;
+        Part fieldInitiator = null;
+        Part heliumTank = null;
+        Part lfBattery = null;
         Part landingGear = null;
         Part turretLock = null;
         ArrayList<Part> aeroHeatSinks = new ArrayList<>();
@@ -2035,6 +2043,10 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 if(part instanceof CombatInformationCenter) {
                     ((CombatInformationCenter)cic).calculateCost();
                 }
+            //Only Jumpships and Warships have these
+            } else if((part instanceof KFDriveCoil || part instanceof MissingKFDriveCoil)
+                    && ((entity instanceof Jumpship) && !(entity instanceof SpaceStation))) {
+                driveCoil = part;
             //For Small Craft and larger, add this as a container for all their heatsinks instead of adding hundreds
             //of individual heatsink parts.
             } else if(part instanceof SpacecraftCoolingSystem 
@@ -2527,6 +2539,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 addPart(cic);
                 partsToAdd.add(cic);
                 ((CombatInformationCenter)cic).calculateCost();
+            }
+            if(null == driveCoil && (entity instanceof Jumpship) && !(entity instanceof SpaceStation)) {
+                driveCoil = new KFDriveCoil((int)entity.getWeight(), ((Jumpship)entity).getDriveCoreType(), getCampaign());
+                addPart(driveCoil);
+                partsToAdd.add(driveCoil);
             }
             if(null == fcs && !(entity instanceof Jumpship)) {
                 fcs = new FireControlSystem((int)entity.getWeight(), Money.zero(), getCampaign());
