@@ -178,7 +178,16 @@ public class KFDriveCoil extends Part {
 	@Override
 	public Money getStickerPrice() {
 	    if (unit != null) {
-	        return Money.of(60000000 + (75000000 * unit.getEntity().getDocks()));
+	        int cost = (60000000 + (75000000 * unit.getEntity().getDocks()));
+            if (((Jumpship)unit.getEntity()).getDriveCoreType() == Jumpship.DRIVE_CORE_COMPACT
+                    && ((Jumpship)unit.getEntity()).hasLF()) {
+                cost *= 15;
+            } else if (((Jumpship)unit.getEntity()).hasLF()) {
+                cost *= 3;
+            } else if (((Jumpship)unit.getEntity()).getDriveCoreType() == Jumpship.DRIVE_CORE_COMPACT) {
+                cost *= 5;
+            }
+            return Money.of(cost);
 	    }
 	    return Money.of(60000000);
 	}
