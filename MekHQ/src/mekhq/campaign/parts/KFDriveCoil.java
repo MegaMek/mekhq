@@ -52,16 +52,11 @@ public class KFDriveCoil extends Part {
      */
     private static final long serialVersionUID = 4515211961051281110L;
     
-    static final TechAdvancement TA_STANDARD_CORE = new TechAdvancement(TECH_BASE_ALL)
+    public static final TechAdvancement TA_DRIVE_COIL = new TechAdvancement(TECH_BASE_ALL)
             .setAdvancement(2107, 2120, 2300).setPrototypeFactions(F_TA)
             .setProductionFactions(F_TA).setTechRating(RATING_D)
-            .setAvailability(RATING_C, RATING_C, RATING_C, RATING_C)
+            .setAvailability(RATING_D, RATING_E, RATING_D, RATING_D)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
-    static final TechAdvancement TA_NO_BOOM = new TechAdvancement(TECH_BASE_ALL)
-            .setAdvancement(2304, 2350, 2364, 2520).setPrototypeFactions(F_TA)
-            .setProductionFactions(F_TH).setTechRating(RATING_B)
-            .setAvailability(RATING_C, RATING_X, RATING_X, RATING_X)
-            .setStaticTechLevel(SimpleTechLevel.ADVANCED);
     
     //Standard, primitive, compact, subcompact...
     private int coreType;
@@ -170,7 +165,7 @@ public class KFDriveCoil extends Part {
 
 	@Override
 	public MissingPart getMissingPart() {
-		return new MissingKFDriveCoil(getUnitTonnage(), campaign);
+		return new MissingKFDriveCoil(getUnitTonnage(), coreType, campaign);
 	}
 
 	@Override
@@ -185,7 +180,12 @@ public class KFDriveCoil extends Part {
 
 	@Override
 	public Money getStickerPrice() {
-		return Money.of(10.0 * getUnitTonnage());
+	    if (unit != null) {
+	        return Money.of(60000000 + (75000000 * unit.getEntity().getDocks()));
+	    }
+	    //Fixed value so we don't get a bunch of "I don't know how much this costs" log errors 
+	    //if one of these does wind up without a unit...
+	    return Money.of(60000000);
 	}
 
 	@Override
@@ -195,13 +195,13 @@ public class KFDriveCoil extends Part {
 
 	@Override
 	public int getTechRating() {
-		//go with conventional fighter avionics
-		return EquipmentType.RATING_B;
+		//See Tech Advancement
+		return EquipmentType.RATING_D;
 	}
 
 	@Override
 	public boolean isSamePartType(Part part) {
-		return part instanceof KFDriveCoil;
+		return part instanceof KFDriveCoil && coreType == ((KFDriveCoil)part).getCoreType();
 	}
 
 	@Override
@@ -243,7 +243,7 @@ public class KFDriveCoil extends Part {
     
 	@Override
 	public TechAdvancement getTechAdvancement() {
-	    return TA_GENERIC;
+	    return TA_DRIVE_COIL;
 	}
 	
 }
