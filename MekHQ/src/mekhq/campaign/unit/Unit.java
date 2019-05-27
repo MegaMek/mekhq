@@ -126,8 +126,13 @@ import mekhq.campaign.parts.GravDeck;
 import mekhq.campaign.parts.InfantryArmorPart;
 import mekhq.campaign.parts.InfantryMotiveType;
 import mekhq.campaign.parts.JumpshipDockingCollar;
+import mekhq.campaign.parts.KFChargingSystem;
 import mekhq.campaign.parts.KFDriveCoil;
+import mekhq.campaign.parts.KFDriveController;
+import mekhq.campaign.parts.KFFieldInitiator;
+import mekhq.campaign.parts.KFHeliumTank;
 import mekhq.campaign.parts.KfBoom;
+import mekhq.campaign.parts.LFBattery;
 import mekhq.campaign.parts.LandingGear;
 import mekhq.campaign.parts.MekActuator;
 import mekhq.campaign.parts.MekCockpit;
@@ -147,7 +152,12 @@ import mekhq.campaign.parts.MissingDropshipDockingCollar;
 import mekhq.campaign.parts.MissingEnginePart;
 import mekhq.campaign.parts.MissingFireControlSystem;
 import mekhq.campaign.parts.MissingKFBoom;
+import mekhq.campaign.parts.MissingKFChargingSystem;
 import mekhq.campaign.parts.MissingKFDriveCoil;
+import mekhq.campaign.parts.MissingKFDriveController;
+import mekhq.campaign.parts.MissingKFFieldInitiator;
+import mekhq.campaign.parts.MissingKFHeliumTank;
+import mekhq.campaign.parts.MissingLFBattery;
 import mekhq.campaign.parts.MissingLandingGear;
 import mekhq.campaign.parts.MissingMekActuator;
 import mekhq.campaign.parts.MissingMekCockpit;
@@ -1145,28 +1155,20 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 //computer
                 partsValue = partsValue.plus(200000.0);
             }
-            // KF Drive, Docking Collars, etc...
+            // Jump sail and KF drive support systems
             if ((entity instanceof Jumpship) && !(entity instanceof SpaceStation)) {
                 Jumpship js = (Jumpship) entity;
                 Money driveCost = Money.zero();
-                // coil
-                driveCost = driveCost.plus(60000000.0 + (75000000.0 * js.getDocks()));
-                // initiator
-                driveCost = driveCost.plus(25000000.0 + (5000000.0 * js.getDocks()));
-                // controller
-                driveCost = driveCost.plus(50000000.0);
-                // tankage
-                driveCost = driveCost.plus(50000.0 * js.getKFIntegrity());
                 // sail
                 driveCost = driveCost.plus(50000.0 * (30.0 + (js.getWeight() / 7500.0)));
-                // charging system
-                driveCost = driveCost.plus(500000.0 + (200000.0 * js.getDocks()));
-                // compact core
-                if (js instanceof Warship) {
+                // lithium fusion and compact core?
+                if (js.getDriveCoreType() == Jumpship.DRIVE_CORE_COMPACT && js.hasLF()) {
+                    driveCost = driveCost.multipliedBy(15);
+                } else if (js.getDriveCoreType() == Jumpship.DRIVE_CORE_COMPACT) {
+                    // just a compact core?
                     driveCost = driveCost.multipliedBy(5);
-                }
-                // lithium fusion?
-                if (js.hasLF()) {
+                } else if (js.hasLF()) {
+                    // lithium fusion?
                     driveCost = driveCost.multipliedBy(3);
                 }
                 // Drive Support Systems
@@ -1190,7 +1192,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
                 // heat sinks
                 Money sinkCost = Money.of(2000.0 + 4000.0 * js.getHeatType());// == HEAT_DOUBLE ? 6000 : 2000
-                partsValue = partsValue.plus(sinkCost.multipliedBy(js.getHeatSinks()));
+                partsValue = partsValue.plus(sinkCost.multipliedBy(js.getOHeatSinks()));
 
                 // get bays
                 int baydoors = 0;
@@ -2044,6 +2046,22 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     ((CombatInformationCenter)cic).calculateCost();
                 }
             //Only Jumpships and Warships have these
+            } else if((part instanceof LFBattery || part instanceof MissingLFBattery)
+                    && ((entity instanceof Jumpship) && !(entity instanceof SpaceStation)
+                            && ((Jumpship)entity).hasLF())) {
+                lfBattery = part;
+            } else if((part instanceof KFHeliumTank || part instanceof MissingKFHeliumTank)
+                    && ((entity instanceof Jumpship) && !(entity instanceof SpaceStation))) {
+                heliumTank = part;
+            } else if((part instanceof KFChargingSystem || part instanceof MissingKFChargingSystem)
+                    && ((entity instanceof Jumpship) && !(entity instanceof SpaceStation))) {
+                chargingSystem = part;
+            } else if((part instanceof KFFieldInitiator || part instanceof MissingKFFieldInitiator)
+                    && ((entity instanceof Jumpship) && !(entity instanceof SpaceStation))) {
+                fieldInitiator = part;
+            } else if((part instanceof KFDriveController || part instanceof MissingKFDriveController)
+                    && ((entity instanceof Jumpship) && !(entity instanceof SpaceStation))) {
+                driveController = part;
             } else if((part instanceof KFDriveCoil || part instanceof MissingKFDriveCoil)
                     && ((entity instanceof Jumpship) && !(entity instanceof SpaceStation))) {
                 driveCoil = part;
@@ -2544,6 +2562,32 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 driveCoil = new KFDriveCoil((int)entity.getWeight(), ((Jumpship)entity).getDriveCoreType(), getCampaign());
                 addPart(driveCoil);
                 partsToAdd.add(driveCoil);
+            }
+            if(null == driveController && (entity instanceof Jumpship) && !(entity instanceof SpaceStation)) {
+                driveController = new KFDriveController((int)entity.getWeight(), ((Jumpship)entity).getDriveCoreType(), getCampaign());
+                addPart(driveController);
+                partsToAdd.add(driveController);
+            }
+            if(null == fieldInitiator && (entity instanceof Jumpship) && !(entity instanceof SpaceStation)) {
+                fieldInitiator = new KFFieldInitiator((int)entity.getWeight(), ((Jumpship)entity).getDriveCoreType(), getCampaign());
+                addPart(fieldInitiator);
+                partsToAdd.add(fieldInitiator);
+            }
+            if(null == chargingSystem && (entity instanceof Jumpship) && !(entity instanceof SpaceStation)) {
+                chargingSystem = new KFChargingSystem((int)entity.getWeight(), ((Jumpship)entity).getDriveCoreType(), getCampaign());
+                addPart(chargingSystem);
+                partsToAdd.add(chargingSystem);
+            }
+            if(null == heliumTank && (entity instanceof Jumpship) && !(entity instanceof SpaceStation)) {
+                heliumTank = new KFHeliumTank((int)entity.getWeight(), ((Jumpship)entity).getDriveCoreType(), getCampaign());
+                addPart(heliumTank);
+                partsToAdd.add(heliumTank);
+            }
+            if(null == lfBattery 
+                    && (entity instanceof Jumpship) && !(entity instanceof SpaceStation) && ((Jumpship) entity).hasLF()) {
+                lfBattery = new LFBattery((int)entity.getWeight(), ((Jumpship)entity).getDriveCoreType(), getCampaign());
+                addPart(lfBattery);
+                partsToAdd.add(lfBattery);
             }
             if(null == fcs && !(entity instanceof Jumpship)) {
                 fcs = new FireControlSystem((int)entity.getWeight(), Money.zero(), getCampaign());
