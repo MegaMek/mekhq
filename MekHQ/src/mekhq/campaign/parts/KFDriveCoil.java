@@ -29,7 +29,6 @@ import org.w3c.dom.NodeList;
 
 import megamek.common.Compute;
 import megamek.common.Entity;
-import megamek.common.EquipmentType;
 import megamek.common.Jumpship;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
@@ -185,12 +184,6 @@ public class KFDriveCoil extends Part {
 	@Override
 	public double getTonnage() {
 		return 0;
-	}
-
-	@Override
-	public int getTechRating() {
-		//See Tech Advancement
-		return EquipmentType.RATING_D;
 	}
 
 	@Override
