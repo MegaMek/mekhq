@@ -179,8 +179,6 @@ public class KFDriveCoil extends Part {
 	    if (unit != null) {
 	        return Money.of(60000000 + (75000000 * unit.getEntity().getDocks()));
 	    }
-	    //Fixed value so we don't get a bunch of "I don't know how much this costs" log errors 
-	    //if one of these does wind up without a unit...
 	    return Money.of(60000000);
 	}
 
