@@ -151,9 +151,12 @@ public class KFHeliumTank extends Part {
 		        Part spare = campaign.checkForExistingSparePart(this);
 	            if(!salvage) {
 	                campaign.removePart(this);
-	            } else if(null != spare) {
+	            } else if (null != spare) {
 	                spare.incrementQuantity();
 	                campaign.removePart(this);
+	            } else {
+	                //Start a new collection
+	                campaign.addPart(this, 0);
 	            }
 	            campaign.removePart(this);
 	            unit.removePart(this);

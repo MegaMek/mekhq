@@ -151,6 +151,9 @@ public class KFDriveController extends Part {
 	            } else if(null != spare) {
 	                spare.incrementQuantity();
 	                campaign.removePart(this);
+	            } else {
+	                //Start a new collection
+	                campaign.addPart(this, 0);
 	            }
 	            campaign.removePart(this);
 	            unit.removePart(this);
