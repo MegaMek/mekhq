@@ -253,7 +253,7 @@ public class KFHeliumTank extends Part {
     public String getDetails() {
         return super.getDetails() 
                 + ", " + getUnitTonnage() + " tons" 
-                + ", (" + getDocks() + ") collars";
+                + ", " + getDocks() + " collars";
     }
 	
 	@Override

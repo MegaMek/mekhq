@@ -212,11 +212,11 @@ public class AeroSensor extends Part {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return part instanceof AeroSensor && largeCraft == ((AeroSensor)part).isForDropShip()
+        return part instanceof AeroSensor && largeCraft == ((AeroSensor)part).isForSpaceCraft()
                 && (largeCraft || getUnitTonnage() == part.getUnitTonnage());
     }
 
-    public boolean isForDropShip() {
+    public boolean isForSpaceCraft() {
         return largeCraft;
     }
 
@@ -246,7 +246,7 @@ public class AeroSensor extends Part {
     public String getDetails() {
         String dropper = "";
         if(largeCraft) {
-            dropper = " (dropship)";
+            dropper = " (spacecraft)";
         }
         return super.getDetails() + ", " + getUnitTonnage() + " tons" + dropper;
     }
