@@ -79,6 +79,30 @@ public class MissingKFHeliumTank extends MissingPart {
 	public Part getNewPart() {
 		return new KFHeliumTank(getUnitTonnage(), coreType, campaign);
 	}
+	
+	@Override 
+    public void fix() {
+        Part replacement = findReplacement(false);
+        if(null != replacement) {
+            Part actualReplacement = replacement.clone();
+            unit.addPart(actualReplacement);
+            if (null != unit && unit.getEntity() instanceof Jumpship) {
+                Jumpship js = ((Jumpship)unit.getEntity());
+                //Also repair your KF Drive integrity - up to 2/3 of the total if you have other components to fix
+                //Otherwise, fix it all.
+                if (js.isKFDriveDamaged()) {
+                    js.setKFIntegrity(Math.min((js.getKFIntegrity() + js.getKFHeliumTankIntegrity()), js.getOKFIntegrity()));
+                } else {
+                    js.setKFIntegrity(js.getOKFIntegrity());
+                }
+            }
+            campaign.addPart(actualReplacement, 0);
+            replacement.decrementQuantity();
+            remove(false);
+            //assign the replacement part to the unit           
+            actualReplacement.updateConditionFromPart();
+        }
+    }
 
 	@Override
 	public boolean isAcceptableReplacement(Part part, boolean refit) {
