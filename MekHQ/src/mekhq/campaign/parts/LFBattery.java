@@ -167,6 +167,10 @@ public class LFBattery extends Part {
 
 	@Override
 	public String checkFixable() {
+	    if (isSalvaging()) {
+	        // Can't salvage this part of the K-F Drive.
+	        return "You cannot salvage an L-F Battery. You must scrap it instead.";
+	    }
 		return null;
 	}
 

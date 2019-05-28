@@ -167,6 +167,10 @@ public class KFChargingSystem extends Part {
 
 	@Override
 	public String checkFixable() {
+	    if (isSalvaging()) {
+            // Can't salvage this part of the K-F Drive.
+            return "You cannot salvage a K-F Charging System. You must scrap it instead.";
+        }
 		return null;
 	}
 
