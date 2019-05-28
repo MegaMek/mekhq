@@ -132,7 +132,7 @@ public class KFHeliumTank extends Part {
 			//Also repair your KF Drive integrity - up to 2/3 of the total if you have other components to fix
 			//Otherwise, fix it all.
 			if (js.isKFDriveDamaged()) {
-			    js.setKFIntegrity(Math.min((js.getKFHeliumTankIntegrity()), js.getOKFIntegrity()));
+			    js.setKFIntegrity(Math.min((js.getKFIntegrity() + js.getKFHeliumTankIntegrity()), js.getOKFIntegrity()));
 			} else {
 			    js.setKFIntegrity(js.getOKFIntegrity());
 			}
