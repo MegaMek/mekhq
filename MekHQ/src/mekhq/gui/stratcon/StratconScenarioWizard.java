@@ -50,8 +50,8 @@ public class StratconScenarioWizard extends JDialog {
 
     JLabel lblTotalBV = new JLabel();
     
-    List<JList<Force>> availableForceLists = new ArrayList<>();
-    List<JList<Unit>> availableUnitLists = new ArrayList<>();
+    Map<String, JList<Force>> availableForceLists = new HashMap<>();
+    Map<String, JList<Unit>> availableUnitLists = new HashMap<>();
     
     JList<Unit> availableInfantryUnits = new JList<>();
     JLabel defensiveOptionStatus = new JLabel();
@@ -102,6 +102,8 @@ public class StratconScenarioWizard extends JDialog {
                 setAssignForcesUI(gbc, true);
                 gbc.gridy++;
                 setDefensiveUI(gbc);
+                gbc.gridy++;
+                //setSupportUI(gbc, true);
                 break;
         }
 
@@ -157,11 +159,11 @@ public class StratconScenarioWizard extends JDialog {
             availableForceList.addListSelectionListener(new ListSelectionListener() { 
                 @Override
                 public void valueChanged(ListSelectionEvent e) {
-                    availableForceSelectorChanged(e, selectedForceInfo);
+                    availableForceSelectorChanged(e, selectedForceInfo, reinforcements);
                 }
             });
             
-            availableForceLists.add(availableForceList);
+            availableForceLists.put(forceTemplate.getForceName(), availableForceList);
             
             localGbc.gridx = 1;
             forcePanel.add(selectedForceInfo, localGbc);
@@ -262,6 +264,7 @@ public class StratconScenarioWizard extends JDialog {
         
         JList<Unit> availableUnits = new JList<>();
         availableUnits.setModel(availableModel);
+        availableUnits.setCellRenderer(new ScenarioWizardUnitRenderer(campaign));
         availableUnits.addListSelectionListener(new ListSelectionListener() { 
             @Override
             public void valueChanged(ListSelectionEvent e) {
@@ -289,11 +292,15 @@ public class StratconScenarioWizard extends JDialog {
      * @param f
      * @return
      */
-    private String buildForceStatus(Force f) {
+    private String buildForceStatus(Force f, boolean showForceCost) {
         StringBuilder sb = new StringBuilder();
         
         sb.append(f.getFullName());
-        sb.append(":<br/>");
+        sb.append(": ");
+        if(showForceCost) {
+            sb.append(buildForceCost(f));
+        }
+        sb.append("<br/>");
         
         for(UUID unitID : f.getUnits()) {
             Unit u = campaign.getUnit(unitID);
@@ -331,6 +338,42 @@ public class StratconScenarioWizard extends JDialog {
         return sb.toString();
     }
     
+    private String buildForceCost(Force f) {
+        StringBuilder costBuilder = new StringBuilder();
+        costBuilder.append("(");
+        
+        switch(StratconRulesManager.getReinforcementType(f, currentTrackState, campaign)) {
+        case SupportPoint:
+            costBuilder.append("supportPoint.text");
+            if(currentCampaignState.getSupportPoints() <= 0) {
+                costBuilder.append(", ");
+                if(currentCampaignState.getVictoryPoints() <= 1) {
+                    costBuilder.append("<span color='red'>");
+                }
+                
+                costBuilder.append("supportPointConvert.text");
+                
+                if(currentCampaignState.getVictoryPoints() <= 1) {
+                    costBuilder.append("</span>");
+                }
+            }
+            break;
+        case ChainedScenario:
+            costBuilder.append(String.format("fromChainedScenario.text %s <span color='red'>%d hostile units reinforcing</span>", 
+                    "scenarioname", "unitsfromscenario[stratconscenarioid]"));
+            break;
+        case FightLance:
+            costBuilder.append("lanceInFightRole.text");
+            break;
+        default:
+            costBuilder.append("yikes");
+            break;
+        }
+        
+        costBuilder.append(")");
+        return costBuilder.toString();
+    }
+    
     /**
      * Sets the navigation button
      * @param gbc
@@ -361,25 +404,27 @@ public class StratconScenarioWizard extends JDialog {
      * @param e
      */
     private void btnCommitClicked(ActionEvent e) {
-        // gather up all the forces selected and add them to a set
-        Set<Integer> forceIDs = new HashSet<>(); 
-        
-        for(JList<Force> forceList : this.availableForceLists) {
-            for(Force force : forceList.getSelectedValuesList()) {
-                forceIDs.add(force.getId());
+        // go through all the force lists and add the selected forces to the scenario
+        for(String templateID : availableForceLists.keySet()) {
+            for(Force force : availableForceLists.get(templateID).getSelectedValuesList()) {
+                currentScenario.addForce(force.getId(), templateID);
             }
+        }
+        
+        for(String templateID : availableUnitLists.keySet()) {
+            for(Unit unit : availableUnitLists.get(templateID).getSelectedValuesList()) {
+                currentScenario.addUnit(unit.getId(), templateID);
+            }
+        }
+        
+        for(Unit unit : availableInfantryUnits.getSelectedValuesList()) {
+            currentScenario.addUnit(unit.getId(), ScenarioForceTemplate.PRIMARY_FORCE_TEMPLATE_ID);
         }
         
         // scenarios that haven't had primary forces committed yet get those committed now
         // and the scenario gets published to the campaign and may be played immediately from the briefing room
         if(currentScenario.getCurrentState() == ScenarioState.UNRESOLVED) {
-            currentScenario.addForces(forceIDs);
             currentScenario.commitPrimaryForces(campaign, currentCampaignState.getContract());
-        // scenarios that have had primary forces committed can have reinforcements added and removed "at will"
-        // until they've been actually played out
-        } else {
-            currentScenario.clearReinforcements();
-            currentScenario.addForces(forceIDs);
         }
         
         setVisible(false);
@@ -389,20 +434,26 @@ public class StratconScenarioWizard extends JDialog {
      * Event handler for when the user makes a selection on the available force selector.
      * @param e The event fired. 
      */
-    private void availableForceSelectorChanged(ListSelectionEvent e, JLabel forceStatusLabel) {
+    private void availableForceSelectorChanged(ListSelectionEvent e, JLabel forceStatusLabel, boolean reinforcements) {
         if(!(e.getSource() instanceof JList<?>)) {
             return;
         }
 
         JList<Force> sourceList = (JList<Force>) e.getSource();
         
-        StringBuilder sb = new StringBuilder();
-        sb.append("<html>");
+        StringBuilder statusBuilder = new StringBuilder();
+        StringBuilder costBuilder = new StringBuilder();
+        statusBuilder.append("<html>");
+        costBuilder.append("<html>");
+        
         for(Force force : sourceList.getSelectedValuesList()) {
-            sb.append(buildForceStatus(force));
+            statusBuilder.append(buildForceStatus(force, reinforcements));
         }
-        sb.append("</html>");
-        forceStatusLabel.setText(sb.toString());
+        
+        statusBuilder.append("</html>");
+        costBuilder.append("</html>");
+        
+        forceStatusLabel.setText(statusBuilder.toString());
         
         pack();
     }

@@ -14,6 +14,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
+import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
@@ -29,6 +30,7 @@ public class StratconScenario implements IStratconDisplayable {
         NONEXISTENT,
         UNRESOLVED,
         PRIMARY_FORCES_COMMITTED,
+        REINFORCEMENTS_COMMITTED,
         COMPLETED,
         IGNORED,
         DEFEATED;
@@ -47,16 +49,19 @@ public class StratconScenario implements IStratconDisplayable {
     }
     
     
-    private String SCENARIO_MODIFIER_ALLIED_GROUND_UNITS = "PrimaryAlliesGround.xml";
-    private String SCENARIO_MODIFIER_ALLIED_AIR_UNITS = "PrimaryAlliesAir.xml";
-    private String SCENARIO_MODIFIER_LIAISON_GROUND = "LiaisonGround.xml";
-    private String SCENARIO_MODIFIER_HOUSE_CO_GROUND = "HouseOfficerGround.xml";
-    private String SCENARIO_MODIFIER_INTEGRATED_UNITS_GROUND = "IntegratedAlliesGround.xml";
-    private String SCENARIO_MODIFIER_LIAISON_AIR = "LiaisonAir.xml";
-    private String SCENARIO_MODIFIER_HOUSE_CO_AIR = "HouseOfficerAir.xml";
-    private String SCENARIO_MODIFIER_INTEGRATED_UNITS_AIR = "IntegratedAlliesAir.xml";
-    private String SCENARIO_MODIFIER_TRAINEES_AIR = "AlliedTraineesAir.xml";
-    private String SCENARIO_MODIFIER_TRAINEES_GROUND = "AlliedTraineesGround.xml";
+    private static final String SCENARIO_MODIFIER_ALLIED_GROUND_UNITS = "PrimaryAlliesGround.xml";
+    private static final String SCENARIO_MODIFIER_ALLIED_AIR_UNITS = "PrimaryAlliesAir.xml";
+    private static final String SCENARIO_MODIFIER_LIAISON_GROUND = "LiaisonGround.xml";
+    private static final String SCENARIO_MODIFIER_HOUSE_CO_GROUND = "HouseOfficerGround.xml";
+    private static final String SCENARIO_MODIFIER_INTEGRATED_UNITS_GROUND = "IntegratedAlliesGround.xml";
+    private static final String SCENARIO_MODIFIER_LIAISON_AIR = "LiaisonAir.xml";
+    private static final String SCENARIO_MODIFIER_HOUSE_CO_AIR = "HouseOfficerAir.xml";
+    private static final String SCENARIO_MODIFIER_INTEGRATED_UNITS_AIR = "IntegratedAlliesAir.xml";
+    private static final String SCENARIO_MODIFIER_TRAINEES_AIR = "AlliedTraineesAir.xml";
+    private static final String SCENARIO_MODIFIER_TRAINEES_GROUND = "AlliedTraineesGround.xml";
+    private static final String SCENARIO_MODIFIER_ALLIED_GROUND_SUPPORT = "AlliedGroundSupportImmediate.xml";
+    private static final String SCENARIO_MODIFIER_ALLIED_AIR_SUPPORT = "AlliedAirSupportImmediate.xml";
+    private static final String SCENARIO_MODIFIER_ALLIED_ARTY_SUPPORT = "AlliedArtillerySupportImmediate.xml";
     
     private AtBDynamicScenario backingScenario;
     
@@ -110,16 +115,30 @@ public class StratconScenario implements IStratconDisplayable {
         setCurrentState(ScenarioState.UNRESOLVED);
     }
 
+    /**
+     * Add a force to the backing scenario. Do our best to add the force as a "primary" force, as defined in the scenario template.
+     * @param forceID ID of the force to add.
+     */
     public void addPrimaryForce(int forceID) {
-        backingScenario.addForces(forceID);
+        backingScenario.addForce(forceID, ScenarioForceTemplate.PRIMARY_FORCE_TEMPLATE_ID);
     }
     
-    public void addForces(Set<Integer> forceIDs) {
-        for(int forceID : forceIDs) {
-            if(!backingScenario.getForceIDs().contains(forceID)) {
-                addPrimaryForce(forceID);
-            }
-        }
+    /**
+     * Add a force to the backing scenario, trying to associate it with the given template.
+     * @param forceID
+     * @param templateID
+     */
+    public void addForce(int forceID, String templateID) {
+        backingScenario.addForce(forceID, templateID);
+    }
+    
+    /**
+     * Add an individual unit to the backing scenario, trying to associate it with the given template.
+     * @param unitID
+     * @param templateID
+     */
+    public void addUnit(UUID unitID, String templateID) {
+        backingScenario.addUnit(unitID, templateID);
     }
     
     public void clearReinforcements() {

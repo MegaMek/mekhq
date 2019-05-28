@@ -16,6 +16,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.ScenarioForceTemplate;
@@ -32,7 +33,14 @@ import mekhq.campaign.universe.Planet;
  *
  */
 public class StratconRulesManager {
-    public static final int NUM_LANCES_PER_TRACK = 3;    
+    public enum ReinforcementEligibilityType {
+        None,
+        ChainedScenario,
+        SupportPoint,
+        FightLance
+    }
+    
+    public static final int NUM_LANCES_PER_TRACK = 3;
     
     public static StratconCampaignState InitializeCampaignState(AtBContract contract, Campaign campaign) {
         StratconCampaignState retVal = new StratconCampaignState(contract);
@@ -313,6 +321,33 @@ public class StratconRulesManager {
         }
         
         return retVal;
+    }
+    
+    public static ReinforcementEligibilityType getReinforcementType(Force force, 
+            StratconTrackState trackState, Campaign campaign) {
+        // if the force is part of the track state's chained scenario reinforcement pool 
+        // then the result is ChainedScenario
+        
+        // if the force is a "fight" lance that has been deployed to the track
+        // then the result is FightLance
+        if(campaign.getLances().contains(force.getId()) &&
+            campaign.getLances().get(force.getId()).getRole() == Lance.ROLE_FIGHT &&
+            trackState.getAssignedForceIDs().contains(force.getId())) {
+            return ReinforcementEligibilityType.FightLance;
+        }
+        
+        // if the force is deployed 
+        for(Contract contract : campaign.getActiveContracts()) {
+            if(contract instanceof AtBContract) {
+                for(StratconTrackState track : ((AtBContract) contract).getStratconCampaignState().getTracks()) {
+                    if(track != trackState && track.getAssignedForceIDs().contains(force.getId())) {
+                        return ReinforcementEligibilityType.None;
+                    }
+                }
+            }
+        }
+        
+        return ReinforcementEligibilityType.SupportPoint;
     }
     
     public StratconRulesManager() {

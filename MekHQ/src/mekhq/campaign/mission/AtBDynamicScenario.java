@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -47,6 +48,7 @@ public class AtBDynamicScenario extends AtBScenario {
     
     private Map<BotForce, ScenarioForceTemplate> botForceTemplates;
     private Map<Integer, ScenarioForceTemplate> playerForceTemplates;
+    private Map<UUID, ScenarioForceTemplate> playerUnitTemplates;
     
     private List<AtBScenarioModifier> scenarioModifiers;
     
@@ -60,6 +62,7 @@ public class AtBDynamicScenario extends AtBScenario {
         
         botForceTemplates = new HashMap<>();
         playerForceTemplates = new HashMap<>();
+        playerUnitTemplates = new HashMap<>();
         scenarioModifiers = new ArrayList<>();
         setTransportLinkages(new HashMap<>());
         externalIDLookup = new HashMap<>();
@@ -84,10 +87,40 @@ public class AtBDynamicScenario extends AtBScenario {
         playerForceTemplates.put(forceID, null);
     }
     
+    /**
+     * Add a force to the scenario, explicitly linked to the given template.
+     * @param forceID ID of the force to add.
+     * @param templateName Name of the force template.
+     */
+    public void addForce(int forceID, String templateName) {
+        // if we're not supplied a template name, fall back to trying to automatically place the force
+        if(StringUtils.isEmpty(templateName)) {
+            addForces(forceID);
+            return;
+        }
+        
+        super.addForces(forceID);
+        
+        ScenarioForceTemplate forceTemplate = template.scenarioForces.get(templateName);        
+        playerForceTemplates.put(forceID, forceTemplate);
+    }
+    
+    public void addUnit(UUID unitID, String templateName) {
+        super.addUnit(unitID);
+        ScenarioForceTemplate forceTemplate = template.scenarioForces.get(templateName);
+        playerUnitTemplates.put(unitID, forceTemplate);
+    }
+    
     @Override
     public void removeForce(int fid) {
         super.removeForce(fid);
         playerForceTemplates.remove(fid);
+    }
+    
+    @Override
+    public void removeUnit(UUID unitID) {
+        super.removeUnit(unitID);
+        playerUnitTemplates.remove(unitID);
     }
     
     @Override
@@ -175,6 +208,10 @@ public class AtBDynamicScenario extends AtBScenario {
     
     public Map<Integer, ScenarioForceTemplate> getPlayerForceTemplates() {
         return playerForceTemplates;
+    }
+    
+    public Map<UUID, ScenarioForceTemplate> getPlayerUnitTemplates() {
+        return playerUnitTemplates;
     }
     
     public Map<BotForce, ScenarioForceTemplate> getBotForceTemplates() {
