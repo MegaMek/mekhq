@@ -59,19 +59,27 @@ public class LFBattery extends Part {
     public int getCoreType() {
         return coreType;
     }
+    
+    //How many docking collars does this drive support?
+    private int docks;
+    
+    public int getDocks() {
+        return docks;
+    }
 
     public LFBattery() {
-    	this(0, Jumpship.DRIVE_CORE_STANDARD, null);
+    	this(0, Jumpship.DRIVE_CORE_STANDARD, 0, null);
     }
     
-    public LFBattery(int tonnage, int coreType, Campaign c) {
+    public LFBattery(int tonnage, int coreType, int docks, Campaign c) {
         super(tonnage, c);
         this.coreType = coreType;
+        this.docks = docks;
         this.name = "L-F Battery";
     }
         
     public LFBattery clone() {
-    	LFBattery clone = new LFBattery(0, coreType, campaign);
+    	LFBattery clone = new LFBattery(0, coreType, docks, campaign);
         clone.copyBaseData(this);
     	return clone;
     }
@@ -162,7 +170,7 @@ public class LFBattery extends Part {
 
 	@Override
 	public MissingPart getMissingPart() {
-		return new MissingLFBattery(getUnitTonnage(), coreType, campaign);
+		return new MissingLFBattery(getUnitTonnage(), coreType, docks, campaign);
 	}
 
 	@Override
@@ -192,7 +200,9 @@ public class LFBattery extends Part {
 
 	@Override
 	public boolean isSamePartType(Part part) {
-		return part instanceof LFBattery && coreType == ((LFBattery)part).getCoreType();
+		return part instanceof LFBattery 
+		        && coreType == ((LFBattery)part).getCoreType()
+                && docks == ((LFBattery)part).getDocks();
 	}
 
 	@Override
@@ -202,6 +212,10 @@ public class LFBattery extends Part {
                 +"<coreType>"
                 +coreType
                 +"</coreType>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<docks>"
+                +docks
+                +"</docks>");
 		writeToXmlEnd(pw1, indent);
 	}
 
@@ -213,9 +227,18 @@ public class LFBattery extends Part {
             
             if (wn2.getNodeName().equalsIgnoreCase("coreType")) {
                 coreType = Integer.parseInt(wn2.getTextContent());
-            } 
+            } else if (wn2.getNodeName().equalsIgnoreCase("docks")) {
+                docks = Integer.parseInt(wn2.getTextContent());
+            }
         }
 	}
+	
+	@Override
+    public String getDetails() {
+        return super.getDetails() 
+                + ", " + getUnitTonnage() + " tons" 
+                + ", (" + getDocks() + ") collars";
+    }
 	
 	@Override
 	public boolean isRightTechType(String skillType) {

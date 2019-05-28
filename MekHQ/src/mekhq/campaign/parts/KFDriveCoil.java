@@ -58,19 +58,27 @@ public class KFDriveCoil extends Part {
     public int getCoreType() {
         return coreType;
     }
+    
+    //How many docking collars does this drive support?
+    private int docks;
+    
+    public int getDocks() {
+        return docks;
+    }
 
     public KFDriveCoil() {
-    	this(0, Jumpship.DRIVE_CORE_STANDARD, null);
+    	this(0, Jumpship.DRIVE_CORE_STANDARD, 0, null);
     }
     
-    public KFDriveCoil(int tonnage, int coreType, Campaign c) {
+    public KFDriveCoil(int tonnage, int coreType, int docks, Campaign c) {
         super(tonnage, c);
         this.coreType = coreType;
+        this.docks = docks;
         this.name = "K-F Drive Coil";
     }
         
     public KFDriveCoil clone() {
-    	KFDriveCoil clone = new KFDriveCoil(0, coreType, campaign);
+    	KFDriveCoil clone = new KFDriveCoil(0, coreType, docks, campaign);
         clone.copyBaseData(this);
     	return clone;
     }
@@ -161,7 +169,7 @@ public class KFDriveCoil extends Part {
 
 	@Override
 	public MissingPart getMissingPart() {
-		return new MissingKFDriveCoil(getUnitTonnage(), coreType, campaign);
+		return new MissingKFDriveCoil(getUnitTonnage(), coreType, docks, campaign);
 	}
 
 	@Override
@@ -202,30 +210,45 @@ public class KFDriveCoil extends Part {
 
 	@Override
 	public boolean isSamePartType(Part part) {
-		return part instanceof KFDriveCoil && coreType == ((KFDriveCoil)part).getCoreType();
+		return part instanceof KFDriveCoil 
+		        && coreType == ((KFDriveCoil)part).getCoreType()
+                && docks == ((KFDriveCoil)part).getDocks();
 	}
 
 	@Override
-	public void writeToXml(PrintWriter pw1, int indent) {
-		writeToXmlBegin(pw1, indent);
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+    public void writeToXml(PrintWriter pw1, int indent) {
+        writeToXmlBegin(pw1, indent);
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<coreType>"
                 +coreType
                 +"</coreType>");
-		writeToXmlEnd(pw1, indent);
-	}
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<docks>"
+                +docks
+                +"</docks>");
+        writeToXmlEnd(pw1, indent);
+    }
 
-	@Override
-	protected void loadFieldsFromXmlNode(Node wn) {
+    @Override
+    protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
         for (int x=0; x<nl.getLength(); x++) {
             Node wn2 = nl.item(x);
             
             if (wn2.getNodeName().equalsIgnoreCase("coreType")) {
                 coreType = Integer.parseInt(wn2.getTextContent());
-            } 
+            } else if (wn2.getNodeName().equalsIgnoreCase("docks")) {
+                docks = Integer.parseInt(wn2.getTextContent());
+            }
         }
-	}
+    }
+	
+	@Override
+    public String getDetails() {
+        return super.getDetails() 
+                + ", " + getUnitTonnage() + " tons" 
+                + ", (" + getDocks() + ") collars";
+    }
 	
 	@Override
 	public boolean isRightTechType(String skillType) {

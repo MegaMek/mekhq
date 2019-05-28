@@ -47,14 +47,22 @@ public class MissingKFHeliumTank extends MissingPart {
     public int getCoreType() {
         return coreType;
     }
+    
+    //How many docking collars does this drive support?
+    private int docks;
+    
+    public int getDocks() {
+        return docks;
+    }
 	
 	public MissingKFHeliumTank() {
-	    this(0, Jumpship.DRIVE_CORE_STANDARD, null);
+	    this(0, Jumpship.DRIVE_CORE_STANDARD, 0, null);
     }
     
-    public MissingKFHeliumTank(int tonnage, int coreType, Campaign c) {
+    public MissingKFHeliumTank(int tonnage, int coreType, int docks, Campaign c) {
     	super(0, c);
     	this.coreType = coreType;
+    	this.docks = docks;
         this.name = "K-F Helium Tank";
     }
     
@@ -77,7 +85,7 @@ public class MissingKFHeliumTank extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new KFHeliumTank(getUnitTonnage(), coreType, campaign);
+		return new KFHeliumTank(getUnitTonnage(), coreType, docks, campaign);
 	}
 	
 	@Override 
@@ -106,7 +114,9 @@ public class MissingKFHeliumTank extends MissingPart {
 
 	@Override
 	public boolean isAcceptableReplacement(Part part, boolean refit) {
-		return part instanceof KFHeliumTank && coreType == ((KFHeliumTank)part).getCoreType();
+	    return part instanceof KFHeliumTank 
+                && coreType == ((KFHeliumTank)part).getCoreType()
+                && docks == ((KFHeliumTank)part).getDocks();
 	}
 
 	@Override
@@ -122,26 +132,32 @@ public class MissingKFHeliumTank extends MissingPart {
 	}
 	
 	@Override
-	public void writeToXml(PrintWriter pw1, int indent) {
-		writeToXmlBegin(pw1, indent);
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+    public void writeToXml(PrintWriter pw1, int indent) {
+        writeToXmlBegin(pw1, indent);
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<coreType>"
                 +coreType
                 +"</coreType>");
-		writeToXmlEnd(pw1, indent);
-	}
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<docks>"
+                +docks
+                +"</docks>");
+        writeToXmlEnd(pw1, indent);
+    }
 
-	@Override
-	protected void loadFieldsFromXmlNode(Node wn) {
-		NodeList nl = wn.getChildNodes();
-		
-		for (int x=0; x<nl.getLength(); x++) {
-			Node wn2 = nl.item(x);		
-			if (wn2.getNodeName().equalsIgnoreCase("coreType")) {
+    @Override
+    protected void loadFieldsFromXmlNode(Node wn) {
+        NodeList nl = wn.getChildNodes();
+        for (int x=0; x<nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
+            
+            if (wn2.getNodeName().equalsIgnoreCase("coreType")) {
                 coreType = Integer.parseInt(wn2.getTextContent());
-            } 
-		}
-	}
+            } else if (wn2.getNodeName().equalsIgnoreCase("docks")) {
+                docks = Integer.parseInt(wn2.getTextContent());
+            }
+        }
+    }
 
 	@Override
 	public String getLocationName() {
