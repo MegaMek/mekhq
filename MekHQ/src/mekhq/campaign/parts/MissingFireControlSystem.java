@@ -91,7 +91,7 @@ public class MissingFireControlSystem extends MissingPart {
 
 	@Override
 	public boolean isAcceptableReplacement(Part part, boolean refit) {
-		return part instanceof FireControlSystem && cost == part.getStickerPrice();
+		return part instanceof FireControlSystem && cost.equals(part.getStickerPrice());
 	}
 
 	@Override
