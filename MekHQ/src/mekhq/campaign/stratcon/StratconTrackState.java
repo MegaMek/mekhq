@@ -38,7 +38,7 @@ import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
  */
 @XmlRootElement(name="campaignTrack")
 public class StratconTrackState {
-    public static final String ROOT_XML_ELEMENT_NAME = "StratconCampaignState";
+    public static final String ROOT_XML_ELEMENT_NAME = "StratconTrackState";
     
     // a track has the following characteristics:
     // width/height
@@ -49,11 +49,11 @@ public class StratconTrackState {
     private int width;
     private int height;
     
-    private Map<StratconCoords, StratconFacility> facilities;
-   
-    private Map<StratconCoords, StratconScenario> scenarios;
+    private Map<StratconCoords, StratconFacility> facilities;   
+    private Map<StratconCoords, StratconScenario> scenarios;    
+    private Map<Integer, StratconCoords> assignedForceCoords;
+    private Set<StratconCoords> revealedCoords;
     
-    private Set<Integer> assignedForceIDs;
     private int scenarioOdds;
     private int deploymentTime;
     private int requiredLanceCount;
@@ -61,7 +61,8 @@ public class StratconTrackState {
     public StratconTrackState() {
         facilities = new HashMap<>();
         scenarios = new HashMap<>();
-        setAssignedForceIDs(new HashSet<>());
+        assignedForceCoords = new HashMap<>();
+        revealedCoords = new HashSet<>();
     }
     
     public String getDisplayableName() {
@@ -140,57 +141,36 @@ public class StratconTrackState {
         this.scenarioOdds = scenarioOdds;
     }
 
-    public void assignForce(int forceID) {
-        getAssignedForceIDs().add(forceID);
+    public void assignForce(int forceID, StratconCoords coords) {
+        assignedForceCoords.put(forceID, coords);
     }
     
     public void unassignForce(int forceID) {
-        getAssignedForceIDs().remove(forceID);
+        assignedForceCoords.remove(forceID);
     }
     
-    /**
-     * Returns the set of all force IDs assigned to this track, regardless of scenario deployment status
-     */
-    public Set<Integer> getAssignedForceIDs() {
-        return assignedForceIDs;
+    public Map<Integer, StratconCoords> getAssignedForceCoords() {
+        return assignedForceCoords;
     }
 
-    public void setAssignedForceIDs(Set<Integer> assignedForceIDs) {
-        this.assignedForceIDs = assignedForceIDs;
+    public void setAssignedForceCoords(Map<Integer, StratconCoords> assignedForceCoords) {
+        this.assignedForceCoords = assignedForceCoords;
     }
-    
+
+    public Set<StratconCoords> getRevealedCoords() {
+        return revealedCoords;
+    }
+
+    public void setRevealedCoords(Set<StratconCoords> revealedCoords) {
+        this.revealedCoords = revealedCoords;
+    }
+
     public void addFacility(StratconCoords coords, StratconFacility facility) {
         facilities.put(coords, facility);
     }
     
     public void removeFacility(StratconCoords coords) {
         facilities.remove(coords);
-    }
-    
-    /**
-     * Returns the set of all force IDs for forces assigned to this track
-     * that have not been assigned to a scenario already.
-     * @return
-     */
-    public List<Integer> getAvailableForceIDs() {
-        List<Integer> retVal = new ArrayList<>();
-        
-        for(int forceID : assignedForceIDs) {
-            boolean forceAssigned = false;
-            
-            for(StratconScenario scenario : scenarios.values()) {
-                if(scenario.getAssignedForces().contains(forceID)) {
-                    forceAssigned = true;
-                    break;
-                }
-            }
-            
-            if(!forceAssigned) {
-                retVal.add(forceID);
-            }
-        }
-        
-        return retVal;
     }
     
     @Override

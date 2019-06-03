@@ -1360,30 +1360,18 @@ public class AtBDynamicScenarioFactory {
     }
     
     /**
-     * Worker method that sets deployment zones for the currently-existing forces in a scenario.
-     * Best called after primary player forces have been assigned to the scenario.
+     * Worker method that calculates the deployment zones for all templates in the given scenario
+     * and applies the results to the scenario's bot forces
      * @param scenario The scenario to process
      */
     private static void setDeploymentZones(AtBDynamicScenario scenario) {
-        // loop through all scenario player forces
-        //  for each one, look up the template. If none, random? If yes, calculateDeploymentZone
-        // repeat for bot forces
-        
-        for(int forceID : scenario.getForceIDs()) {
-            ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
-            
-            if(forceTemplate != null) {
-                calculateDeploymentZone(forceTemplate, scenario, forceTemplate.getForceName());
-            }
+        for(ScenarioForceTemplate forceTemplate : scenario.getTemplate().scenarioForces.values()) {
+            calculateDeploymentZone(forceTemplate, scenario, forceTemplate.getForceName());
         }
         
         for(int botIndex = 0; botIndex < scenario.getNumBots(); botIndex++) {
             BotForce botForce = scenario.getBotForce(botIndex);
-            ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(botForce);
-            
-            if(forceTemplate != null) {
-                botForce.setStart(calculateDeploymentZone(forceTemplate, scenario, forceTemplate.getForceName()));
-            }
+            botForce.setStart(scenario.getBotForceTemplates().get(botForce).getActualDeploymentZone());
         }
     }
     

@@ -26,7 +26,7 @@ public class StratconFacility {
     private String displayableName;
     private FacilityType facilityType;
     private boolean visible;
-    // we'll want to store a garrison here as well eventu
+    // we'll want to store a garrison here as well eventually
     
     public ForceAlignment getOwner() {
         return owner;

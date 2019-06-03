@@ -128,7 +128,7 @@ public class StratconCampaignState {
      */
     public boolean isForceDeployedHere(int forceID) {
         for(StratconTrackState trackState : tracks) {
-            if(trackState.getAssignedForceIDs().contains(forceID)) {
+            if(trackState.getAssignedForceCoords().containsKey(forceID)) {
                 return true;
             }
         }

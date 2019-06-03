@@ -1530,13 +1530,13 @@ public class CampaignGUI extends JPanel {
     }
     
     public boolean nagInsufficientStratconAssignments() {
-        String nagText = StratconRulesManager.nagInsufficientTrackForces(getCampaign());
+        /*String nagText = StratconRulesManager.nagInsufficientTrackForces(getCampaign());
         
         if(!nagText.isEmpty()) {
             return 0 != JOptionPane.showConfirmDialog(null, 
                     String.format("You have insufficient forces assigned on the StratCon interface:\n%s\nAdvance day anyway?", nagText), 
                     "Unresolved Stratcon Contacts", JOptionPane.YES_NO_OPTION);
-        }
+        }*/
         
         return false;
     }

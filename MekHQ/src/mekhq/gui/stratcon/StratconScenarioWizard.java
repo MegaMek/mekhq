@@ -95,6 +95,7 @@ public class StratconScenarioWizard extends JDialog {
         
         switch(currentScenario.getCurrentState()) {        
             case UNRESOLVED:
+                gbc.gridy++;
                 setAssignForcesUI(gbc, false);
                 break;
             default:
@@ -216,7 +217,8 @@ public class StratconScenarioWizard extends JDialog {
         ScenarioWizardLanceModel lanceModel;
         
         // if we're waiting to assign primary forces, we can only do so from the current track 
-        lanceModel = new ScenarioWizardLanceModel(campaign, StratconRulesManager.getAvailableForceIDs(forceTemplate, campaign));
+        lanceModel = new ScenarioWizardLanceModel(campaign, 
+                StratconRulesManager.getAvailableForceIDs(forceTemplate.getAllowedUnitType(), campaign));
         
         JList<Force> availableForceList = new JList<>();
         availableForceList.setModel(lanceModel);
@@ -408,17 +410,20 @@ public class StratconScenarioWizard extends JDialog {
         for(String templateID : availableForceLists.keySet()) {
             for(Force force : availableForceLists.get(templateID).getSelectedValuesList()) {
                 currentScenario.addForce(force.getId(), templateID);
+                force.setScenarioId(currentScenario.getBackingScenarioID());
             }
         }
         
         for(String templateID : availableUnitLists.keySet()) {
             for(Unit unit : availableUnitLists.get(templateID).getSelectedValuesList()) {
                 currentScenario.addUnit(unit.getId(), templateID);
+                unit.setScenarioId(currentScenario.getBackingScenarioID());
             }
         }
         
         for(Unit unit : availableInfantryUnits.getSelectedValuesList()) {
             currentScenario.addUnit(unit.getId(), ScenarioForceTemplate.PRIMARY_FORCE_TEMPLATE_ID);
+            unit.setScenarioId(currentScenario.getBackingScenarioID());
         }
         
         // scenarios that haven't had primary forces committed yet get those committed now

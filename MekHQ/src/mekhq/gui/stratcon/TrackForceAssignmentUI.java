@@ -17,6 +17,7 @@ import javax.swing.JList;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.stratcon.StratconCampaignState;
+import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconTrackState;
 
 public class TrackForceAssignmentUI extends JDialog implements ActionListener {
@@ -28,7 +29,6 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
     StratconCampaignState currentCampaignState;
     int currentTrackIndex;
     private JList<Force> availableForceList =  new JList<>();
-    private JList<Force> assignedForceList = new JList<>();
     
     public TrackForceAssignmentUI(Campaign campaign) {
         this.campaign = campaign;
@@ -46,40 +46,13 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.fill = GridBagConstraints.BOTH;
         getContentPane().add(availableForceList, gbc);
-        
-        JButton btnRight = new JButton(">>>");
-        btnRight.setActionCommand(CMD_MOVE_RIGHT);
-        btnRight.addActionListener(this);
-        
-        JButton btnLeft = new JButton("<<<");
-        btnLeft.setActionCommand(CMD_MOVE_LEFT);
-        btnLeft.addActionListener(this);
+
+        gbc.gridy++;
         
         JButton btnConfirm = new JButton("Confirm");
         btnConfirm.setActionCommand(CMD_CONFIRM);
         btnConfirm.addActionListener(this);
         
-        gbc.gridx = 1;
-        gbc.gridheight = 1;
-        gbc.anchor = GridBagConstraints.SOUTH;
-        gbc.fill = GridBagConstraints.NONE;
-        getContentPane().add(btnRight, gbc);
-        
-        gbc.gridy = 1;
-        gbc.anchor = GridBagConstraints.NORTH;
-        getContentPane().add(btnLeft, gbc);
-        
-        gbc.gridheight = 2;
-        gbc.gridx = 2;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.CENTER;
-        gbc.fill = GridBagConstraints.BOTH;
-        getContentPane().add(assignedForceList, gbc);
-        
-        gbc.gridheight = 1;
-        gbc.gridy = 3;
-        gbc.anchor = GridBagConstraints.EAST;
-        gbc.fill = GridBagConstraints.NONE;
         getContentPane().add(btnConfirm, gbc);
         
         pack();
@@ -88,32 +61,23 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
     
     public void display(StratconCampaignState campaignState, int currentTrackIndex) {       
         // first, we build a list of force IDs already assigned to this or other tracks
-        Set<Integer> unavailableForceIDs = new HashSet<>();
-        
-        for(int trackIndex = 0; trackIndex < campaignState.getTracks().size(); trackIndex++) {
-            StratconTrackState track = campaignState.getTrack(trackIndex);
-            for(int forceID : track.getAssignedForceIDs()) {
-                unavailableForceIDs.add(forceID);
-            }
-        }
-        
         // now, we add all un-assigned forces to the left side
         DefaultListModel<Force> availableForcesModel = new DefaultListModel<>();
-        for(Force force : campaign.getAllForces()) {
-            if(!unavailableForceIDs.contains(force.getId())) {
-                availableForcesModel.addElement(force);
-            }
-        }
+        //for(Force force : StratconRulesManager.getAvailableForceIDs(template, campaign)) {
+            //if(!unavailableForceIDs.contains(force.getId())) {
+                //availableForcesModel.addElement(force);
+            //}
+        //}
         
         availableForceList.setModel(availableForcesModel);
         
         // and all forces already assigned to this track to the right side
         DefaultListModel<Force> assignedForcesModel = new DefaultListModel<>();
-        for(int forceID : campaignState.getTrack(currentTrackIndex).getAssignedForceIDs()) {
-            assignedForcesModel.addElement(campaign.getForce(forceID));
-        }
+        //for(int forceID : campaignState.getTrack(currentTrackIndex).getAssignedForceIDs()) {
+        //    assignedForcesModel.addElement(campaign.getForce(forceID));
+        //}
         
-        assignedForceList.setModel(assignedForcesModel);
+        //assignedForceList.setModel(assignedForcesModel);
         
         this.currentCampaignState = campaignState;
         this.currentTrackIndex = currentTrackIndex;
@@ -125,26 +89,14 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         switch(e.getActionCommand()) {
-        case CMD_MOVE_RIGHT:
-            if(!availableForceList.isSelectionEmpty()) {
-                ((DefaultListModel<Force>) assignedForceList.getModel()).addElement(availableForceList.getSelectedValue());
-                ((DefaultListModel<Force>) availableForceList.getModel()).remove(availableForceList.getSelectedIndex());
-            }
-            break;
-        case CMD_MOVE_LEFT:
-            if(!assignedForceList.isSelectionEmpty()) {
-                ((DefaultListModel<Force>) availableForceList.getModel()).addElement(assignedForceList.getSelectedValue());
-                ((DefaultListModel<Force>) assignedForceList.getModel()).remove(assignedForceList.getSelectedIndex());
-            }
-            break;
-        case CMD_CONFIRM:
-            DefaultListModel<Force> assignedListModel = (DefaultListModel<Force>) assignedForceList.getModel();
+                case CMD_CONFIRM:
+          //  DefaultListModel<Force> assignedListModel = (DefaultListModel<Force>) assignedForceList.getModel();
             Set<Integer> forceIDs = new HashSet<>(); 
-            for(int x = 0; x < assignedListModel.size(); x++) {
-                forceIDs.add(assignedListModel.get(x).getId());
-            }
+            //for(int x = 0; x < assignedListModel.size(); x++) {
+            //    forceIDs.add(assignedListModel.get(x).getId());
+            //}
             
-            currentCampaignState.getTrack(currentTrackIndex).setAssignedForceIDs(forceIDs);
+        //    currentCampaignState.getTrack(currentTrackIndex).setAssignedForceIDs(forceIDs);
             setVisible(false);
             break;
         }
