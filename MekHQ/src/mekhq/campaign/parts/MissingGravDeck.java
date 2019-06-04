@@ -37,19 +37,19 @@ import mekhq.campaign.Campaign;
  * @author MKerensky
  */
 public class MissingGravDeck extends MissingPart {
-    
+
     /**
      * 
      */
     private static final long serialVersionUID = -6034090299851704878L;
-    
+
     private int deckType;
     private int deckNumber;
-	
-	public MissingGravDeck() {
-    	this(0, 0, null, GravDeck.GRAV_DECK_TYPE_STANDARD);
+
+    public MissingGravDeck() {
+        this(0, 0, null, GravDeck.GRAV_DECK_TYPE_STANDARD);
     }
-    
+
     public MissingGravDeck(int tonnage, int deckNumber, Campaign c, int deckType) {
         super(tonnage, c);
         this.deckNumber = deckNumber;
@@ -63,46 +63,45 @@ public class MissingGravDeck extends MissingPart {
             name += " (Huge)";
         }
     }
-    
+
     public int getDeckNumber() {
         return deckNumber;
     }
-    
+
     public int getDeckType() {
         return deckType;
     }
-    
-    @Override 
-	public int getBaseTime() {
-		return 4800;
-	}
-	
-	@Override
-	public int getDifficulty() {
-		return 3;
-	}
 
-	@Override
-	public void updateConditionFromPart() {
-	    if (null != unit && unit.getEntity() instanceof Jumpship) {
+    @Override 
+    public int getBaseTime() {
+        return 4800;
+    }
+
+    @Override
+    public int getDifficulty() {
+        return 3;
+    }
+
+    @Override
+    public void updateConditionFromPart() {
+        if (null != unit && unit.getEntity() instanceof Jumpship) {
             ((Jumpship) unit.getEntity()).setGravDeckDamageFlag(deckNumber, hits);
         }
-	}
+    }
 
-	@Override
-	public Part getNewPart() {
-		return new GravDeck(0, 0, campaign, deckType);
-	}
+    @Override
+    public Part getNewPart() {
+        return new GravDeck(0, 0, campaign, deckType);
+    }
 
-	@Override
-	public String checkFixable() {
-		return null;
-	}
+    @Override
+    public String checkFixable() {
+        return null;
+    }
 
-	
-	@Override
-	public double getTonnage() {
-	    //TO tables p 407
+    @Override
+    public double getTonnage() {
+        //TO tables p 407
         if (deckType == GravDeck.GRAV_DECK_TYPE_STANDARD) {
             return 50;
         } else if (deckType == GravDeck.GRAV_DECK_TYPE_LARGE) {
@@ -110,18 +109,18 @@ public class MissingGravDeck extends MissingPart {
         } else {
             return 500;
         }
-	}
+    }
 
-	@Override
-	public void writeToXml(PrintWriter pw1, int indent) {
-		writeToXmlBegin(pw1, indent);
+    @Override
+    public void writeToXml(PrintWriter pw1, int indent) {
+        writeToXmlBegin(pw1, indent);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "deckType", deckType);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "deckNumber", deckNumber);
-		writeToXmlEnd(pw1, indent);
-	}
+        writeToXmlEnd(pw1, indent);
+    }
 
-	@Override
-	protected void loadFieldsFromXmlNode(Node wn) {
+    @Override
+    protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
         for (int x=0; x<nl.getLength(); x++) {
@@ -132,28 +131,27 @@ public class MissingGravDeck extends MissingPart {
                 deckNumber = Integer.parseInt(wn2.getTextContent());
             }
         }
-	}
+    }
 
-	@Override
-	public boolean isAcceptableReplacement(Part part, boolean refit) {
-		return (part instanceof GravDeck)
-		        && (refit || (((GravDeck) part).getDeckType() == deckType));
-	}
+    @Override
+    public boolean isAcceptableReplacement(Part part, boolean refit) {
+        return (part instanceof GravDeck)
+                && (refit || (((GravDeck) part).getDeckType() == deckType));
+    }
 
-	@Override
-	public String getLocationName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public String getLocationName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public int getLocation() {
-		return Entity.LOC_NONE;
-	}
-	
-	@Override
+    @Override
+    public int getLocation() {
+        return Entity.LOC_NONE;
+    }
+
+    @Override
     public TechAdvancement getTechAdvancement() {
         return GravDeck.TA_GRAV_DECK;
     }
-	
 }

@@ -39,22 +39,22 @@ import mekhq.campaign.Campaign;
  */
 public class MissingAvionics extends MissingPart {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 2806921577150714477L;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 2806921577150714477L;
 
-	public MissingAvionics() {
-    	this(0, null);
+    public MissingAvionics() {
+        this(0, null);
     }
-    
+
     public MissingAvionics(int tonnage, Campaign c) {
-    	super(0, c);
-    	this.name = "Avionics";
+        super(0, c);
+        this.name = "Avionics";
     }
-    
+
     @Override 
-	public int getBaseTime() {
+    public int getBaseTime() {
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
             int time = 0;
             //Test of proposed errata for repair times
@@ -65,53 +65,53 @@ public class MissingAvionics extends MissingPart {
             }
             return time;
         }
-		return 4800;
-	}
-	
-	@Override
-	public int getDifficulty() {
-		return 1;
-	}
-    
-	@Override
-	public String checkFixable() {
-		return null;
-	}
+        return 4800;
+    }
 
-	@Override
-	public Part getNewPart() {
-		return new Avionics(getUnitTonnage(), campaign);
-	}
+    @Override
+    public int getDifficulty() {
+        return 1;
+    }
 
-	@Override
-	public boolean isAcceptableReplacement(Part part, boolean refit) {
-		return part instanceof Avionics;
-	}
+    @Override
+    public String checkFixable() {
+        return null;
+    }
 
-	@Override
-	public double getTonnage() {
-		return 0;
-	}
+    @Override
+    public Part getNewPart() {
+        return new Avionics(getUnitTonnage(), campaign);
+    }
 
-	@Override
-	public int getTechRating() {
-		//go with conventional fighter avionics
-		return EquipmentType.RATING_B;
-	}
+    @Override
+    public boolean isAcceptableReplacement(Part part, boolean refit) {
+        return part instanceof Avionics;
+    }
 
-	@Override
-	public void updateConditionFromPart() {
-		if(null != unit && unit.getEntity() instanceof Aero) {
-			((Aero)unit.getEntity()).setAvionicsHits(3);
-		} else if (null != unit && unit.getEntity() instanceof LandAirMech) {
-		    unit.damageSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_AVIONICS, 3);
-		}
-	}
-	
-	@Override
-	protected void loadFieldsFromXmlNode(Node wn) {
-		//nothing to load
-	}
+    @Override
+    public double getTonnage() {
+        return 0;
+    }
+
+    @Override
+    public int getTechRating() {
+        //go with conventional fighter avionics
+        return EquipmentType.RATING_B;
+    }
+
+    @Override
+    public void updateConditionFromPart() {
+        if(null != unit && unit.getEntity() instanceof Aero) {
+            ((Aero)unit.getEntity()).setAvionicsHits(3);
+        } else if (null != unit && unit.getEntity() instanceof LandAirMech) {
+            unit.damageSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_AVIONICS, 3);
+        }
+    }
+
+    @Override
+    protected void loadFieldsFromXmlNode(Node wn) {
+        //nothing to load
+    }
 
     @Override
     public String getLocationName() {
@@ -128,10 +128,9 @@ public class MissingAvionics extends MissingPart {
         }
         return Entity.LOC_NONE;
     }
-    
-	@Override
-	public TechAdvancement getTechAdvancement() {
-	    return TA_GENERIC;
-	}
-	
+
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return TA_GENERIC;
+    }
 }

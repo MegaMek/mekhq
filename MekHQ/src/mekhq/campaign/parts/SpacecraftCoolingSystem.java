@@ -49,23 +49,23 @@ import mekhq.campaign.personnel.SkillType;
  * @author MKerensky
  */
 public class SpacecraftCoolingSystem extends Part {
-    
+
     /**
      * 
      */
     private static final long serialVersionUID = -5530683467894875423L;
-    
+
     private int sinkType;
     private int sinksNeeded;
     private int currentSinks;
     private int engineSinks;
     private int removeableSinks;
     private int totalSinks;
-	
-	public SpacecraftCoolingSystem() {
-    	this(0, 0, 0, null);
+
+    public SpacecraftCoolingSystem() {
+        this(0, 0, 0, null);
     }
-    
+
     public SpacecraftCoolingSystem(int tonnage, int totalSinks, int sinkType, Campaign c) {
         super(tonnage, c);
         this.name = "Spacecraft Cooling System";
@@ -76,30 +76,29 @@ public class SpacecraftCoolingSystem extends Part {
         }
         this.sinksNeeded = 0;
     }
-        
+
     public SpacecraftCoolingSystem clone() {
-    	SpacecraftCoolingSystem clone = new SpacecraftCoolingSystem(0, totalSinks, sinkType, campaign);
+        SpacecraftCoolingSystem clone = new SpacecraftCoolingSystem(0, totalSinks, sinkType, campaign);
         clone.copyBaseData(this);
-    	return clone;
+        return clone;
     }
-    
+
     //Getters for our various internal values
     public int getSinkType() {
         return sinkType;
     }
-    
+
     public int getTotalSinks() {
         return totalSinks;
     }
-    
+
     public int getRemoveableSinks() {
         return removeableSinks;
     }
-    
-    
-	@Override
-	public void updateConditionFromEntity(boolean checkForDestruction) {
-	    if(null != unit && unit.getEntity() instanceof Aero) {
+
+    @Override
+    public void updateConditionFromEntity(boolean checkForDestruction) {
+        if(null != unit && unit.getEntity() instanceof Aero) {
             totalSinks = ((Aero) unit.getEntity()).getOHeatSinks();
             currentSinks = ((Aero) unit.getEntity()).getHeatSinks();
             setEngineHeatSinks();
@@ -107,38 +106,38 @@ public class SpacecraftCoolingSystem extends Part {
             //You shouldn't be able to replace or remove heatsinks built into the vessel's engine
             sinksNeeded = Math.min(removeableSinks, (totalSinks - currentSinks));
         }
-	}
-	
-	@Override 
-	public int getBaseTime() {
-	    if (isSalvaging()) {
+    }
+
+    @Override 
+    public int getBaseTime() {
+        if (isSalvaging()) {
             return 120;
         }
-	    return 90;
-	}
-	
-	@Override
-	public int getDifficulty() {
-	    if(isSalvaging()) {
+        return 90;
+    }
+
+    @Override
+    public int getDifficulty() {
+        if(isSalvaging()) {
             return -2;
         }
         return -1;
-	}
+    }
 
-	@Override
-	public void updateConditionFromPart() {
-		if(null != unit && unit.getEntity() instanceof Aero) {
-			((Aero)unit.getEntity()).setHeatSinks(currentSinks);
-		}
-		
-	}
+    @Override
+    public void updateConditionFromPart() {
+        if(null != unit && unit.getEntity() instanceof Aero) {
+            ((Aero)unit.getEntity()).setHeatSinks(currentSinks);
+        }
+        
+    }
 
-	@Override
-	public void fix() {
-	    replaceHeatSink();
-	}
-	
-	@Override
+    @Override
+    public void fix() {
+        replaceHeatSink();
+    }
+
+    @Override
     public String succeed() {
         if(isSalvaging()) {
             remove(true);
@@ -148,25 +147,25 @@ public class SpacecraftCoolingSystem extends Part {
             return " <font color='green'><b> replaced.</b></font>";
         }
     }
-	
-	/**
-	 * Pulls a heatsink of the appropriate type from the warehouse and adds it to the cooling system
-	 * 
-	 */
-	public void replaceHeatSink() {
-	    if (unit != null && unit.getEntity() instanceof Aero) {
-	        //Spare part is usually 'this', but we're looking for spare heatsinks here...
-	        Part spareHeatSink = new AeroHeatSink(0, sinkType, false, campaign);
-	        Part spare = campaign.checkForExistingSparePart(spareHeatSink);
-	       if (null != spare) {
+
+    /**
+     * Pulls a heatsink of the appropriate type from the warehouse and adds it to the cooling system
+     * 
+     */
+    public void replaceHeatSink() {
+        if (unit != null && unit.getEntity() instanceof Aero) {
+            //Spare part is usually 'this', but we're looking for spare heatsinks here...
+            Part spareHeatSink = new AeroHeatSink(0, sinkType, false, campaign);
+            Part spare = campaign.checkForExistingSparePart(spareHeatSink);
+           if (null != spare) {
                 spare.decrementQuantity();
                 ((Aero)unit.getEntity()).setHeatSinks(((Aero)unit.getEntity()).getHeatSinks() + 1);
            }
-	    }
-	    updateConditionFromEntity(false);
-	}
-	
-	/**
+        }
+        updateConditionFromEntity(false);
+    }
+
+    /**
      * Calculates 'weight free' heatsinks included with this spacecraft's engine. You can't remove or replace these
      * 
      */
@@ -182,17 +181,17 @@ public class SpacecraftCoolingSystem extends Part {
         }
     }
 
-	@Override
-	public void remove(boolean salvage) {
-		removeHeatSink(salvage);
-	}
-	
-	/**
+    @Override
+    public void remove(boolean salvage) {
+        removeHeatSink(salvage);
+    }
+
+    /**
      * Pulls a heatsink of the appropriate type from the cooling system and adds it to the warehouse
      * 
      */
-	public void removeHeatSink(boolean salvage) {
-	    if (unit != null && unit.getEntity() instanceof Aero) {
+    public void removeHeatSink(boolean salvage) {
+        if (unit != null && unit.getEntity() instanceof Aero) {
             //Spare part is usually 'this', but we're looking for spare heatsinks here...
             Part spareHeatSink = new AeroHeatSink(0, sinkType, false, campaign);
             Part spare = campaign.checkForExistingSparePart(spareHeatSink);
@@ -208,40 +207,40 @@ public class SpacecraftCoolingSystem extends Part {
            }
            ((Aero)unit.getEntity()).setHeatSinks(((Aero)unit.getEntity()).getHeatSinks() - 1);
         }
-	    updateConditionFromEntity(false);
-	}
+        updateConditionFromEntity(false);
+    }
 
-	@Override
-	public MissingPart getMissingPart() {
-	    //No missing part for this. Just heatsinks to go inside it.
-		return null;
-	}
+    @Override
+    public MissingPart getMissingPart() {
+        //No missing part for this. Just heatsinks to go inside it.
+        return null;
+    }
 
-	@Override
-	public String checkFixable() {
-	    if(isSalvaging() && (engineSinks >= currentSinks)) {
+    @Override
+    public String checkFixable() {
+        if(isSalvaging() && (engineSinks >= currentSinks)) {
             return "All remaining heat sinks are built-in and cannot be salvaged.";
         }
-	    Part spareHeatSink = new AeroHeatSink(0, sinkType, false, campaign);
+        Part spareHeatSink = new AeroHeatSink(0, sinkType, false, campaign);
         Part spare = campaign.checkForExistingSparePart(spareHeatSink);
         if (!isSalvaging() && spare == null) {
             return "No compatible heat sinks in warehouse!";
         }
-		return null;
-	}
+        return null;
+    }
 
-	@Override
-	public boolean needsFixing() {
-		return sinksNeeded > 0;
-	}
+    @Override
+    public boolean needsFixing() {
+        return sinksNeeded > 0;
+    }
 
-	@Override
-	public Money getStickerPrice() {
-	    //Cooling system itself has no price
-		return Money.zero();
-	}
-	
-	@Override
+    @Override
+    public Money getStickerPrice() {
+        //Cooling system itself has no price
+        return Money.zero();
+    }
+
+    @Override
     public String checkScrappable() {
         return "Spacecraft Cooling System cannot be scrapped";
     }
@@ -250,70 +249,70 @@ public class SpacecraftCoolingSystem extends Part {
     public boolean canNeverScrap() {
         return true;
     }
-	
-	@Override
-	public double getTonnage() {
-	    //1 ton for each non-weight-free heatsink
-		return getRemoveableSinks();
-	}
 
-	@Override
-	public boolean isSamePartType(Part part) {
-	    //You don't ever replace or remove the whole cooling system, just modify it
-		return false;
-	}
-	
-	@Override
-	public boolean isRightTechType(String skillType) {
-	    return skillType.equals(SkillType.S_TECH_VESSEL);
-	}
-	
-	@Override
-	public void writeToXml(PrintWriter pw1, int indent) {
-		writeToXmlBegin(pw1, indent);
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<sinkType>"
-				+sinkType
-				+"</sinkType>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+    @Override
+    public double getTonnage() {
+        //1 ton for each non-weight-free heatsink
+        return getRemoveableSinks();
+    }
+
+    @Override
+    public boolean isSamePartType(Part part) {
+        //You don't ever replace or remove the whole cooling system, just modify it
+        return false;
+    }
+
+    @Override
+    public boolean isRightTechType(String skillType) {
+        return skillType.equals(SkillType.S_TECH_VESSEL);
+    }
+
+    @Override
+    public void writeToXml(PrintWriter pw1, int indent) {
+        writeToXmlBegin(pw1, indent);
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<sinkType>"
+                +sinkType
+                +"</sinkType>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<sinksNeeded>"
                 +sinksNeeded
                 +"</sinksNeeded>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<currentSinks>"
                 +currentSinks
                 +"</currentSinks>");
-		writeToXmlEnd(pw1, indent);
-	}
+        writeToXmlEnd(pw1, indent);
+    }
 
-	@Override
-	protected void loadFieldsFromXmlNode(Node wn) {
-		NodeList nl = wn.getChildNodes();
-		
-		for (int x=0; x<nl.getLength(); x++) {
-			Node wn2 = nl.item(x);		
-			if (wn2.getNodeName().equalsIgnoreCase("sinkType")) {
-				sinkType = Integer.parseInt(wn2.getTextContent());
-			} else if (wn2.getNodeName().equalsIgnoreCase("sinksNeeded")) {
-			    sinksNeeded = Integer.parseInt(wn2.getTextContent());
+    @Override
+    protected void loadFieldsFromXmlNode(Node wn) {
+        NodeList nl = wn.getChildNodes();
+
+        for (int x=0; x<nl.getLength(); x++) {
+            Node wn2 = nl.item(x);        
+            if (wn2.getNodeName().equalsIgnoreCase("sinkType")) {
+                sinkType = Integer.parseInt(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("sinksNeeded")) {
+                sinksNeeded = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("currentSinks")) {
                 currentSinks = Integer.parseInt(wn2.getTextContent());
             }
-		}
-	}
+        }
+    }
 
-	@Override
-	public String getLocationName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public String getLocationName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public int getLocation() {
-		return Entity.LOC_NONE;
-	}
-	
-	@Override
+    @Override
+    public int getLocation() {
+        return Entity.LOC_NONE;
+    }
+
+    @Override
     public TechAdvancement getTechAdvancement() {
         if (sinkType == Aero.HEAT_SINGLE) {
             return AeroHeatSink.TA_SINGLE;
@@ -321,6 +320,4 @@ public class SpacecraftCoolingSystem extends Part {
             return AeroHeatSink.TA_IS_DOUBLE;
         }
     }
-	
-	
 }

@@ -319,7 +319,7 @@ public class SpacecraftEngine extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return (skillType.equals(SkillType.S_TECH_AERO) || skillType.equals(SkillType.S_TECH_VESSEL));	
+        return (skillType.equals(SkillType.S_TECH_AERO) || skillType.equals(SkillType.S_TECH_VESSEL));
     }
 
     @Override

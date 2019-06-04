@@ -36,57 +36,57 @@ import mekhq.campaign.Campaign;
  */
 public class MissingLFBattery extends MissingPart {
 
-	/**
+    /**
      * 
      */
     private static final long serialVersionUID = 2689179523700764374L;
-    
+
     //Standard, primitive, compact, subcompact...
     private int coreType;
-    
+
     public int getCoreType() {
         return coreType;
     }
-    
+
     //How many docking collars does this drive support?
     private int docks;
-    
+
     public int getDocks() {
         return docks;
     }
-	
-	public MissingLFBattery() {
-	    this(0, Jumpship.DRIVE_CORE_STANDARD, 0, null);
+
+    public MissingLFBattery() {
+        this(0, Jumpship.DRIVE_CORE_STANDARD, 0, null);
     }
-    
+
     public MissingLFBattery(int tonnage, int coreType, int docks, Campaign c) {
-    	super(0, c);
-    	this.coreType = coreType;
-    	this.docks = docks;
+        super(0, c);
+        this.coreType = coreType;
+        this.docks = docks;
         this.name = "L-F Battery";
     }
-    
-    @Override 
-	public int getBaseTime() {
-        return 28800;
-	}
-	
-	@Override
-	public int getDifficulty() {
-		return 2;
-	}
-    
-	@Override
-	public String checkFixable() {
-		return null;
-	}
 
-	@Override
-	public Part getNewPart() {
-		return new LFBattery(getUnitTonnage(), coreType, docks, campaign);
-	}
-	
-	@Override 
+    @Override 
+    public int getBaseTime() {
+        return 28800;
+    }
+
+    @Override
+    public int getDifficulty() {
+        return 2;
+    }
+
+    @Override
+    public String checkFixable() {
+        return null;
+    }
+
+    @Override
+    public Part getNewPart() {
+        return new LFBattery(getUnitTonnage(), coreType, docks, campaign);
+    }
+
+    @Override 
     public void fix() {
         Part replacement = findReplacement(false);
         if(null != replacement) {
@@ -110,26 +110,26 @@ public class MissingLFBattery extends MissingPart {
         }
     }
 
-	@Override
-	public boolean isAcceptableReplacement(Part part, boolean refit) {
-	    return part instanceof LFBattery 
+    @Override
+    public boolean isAcceptableReplacement(Part part, boolean refit) {
+        return part instanceof LFBattery 
                 && coreType == ((LFBattery)part).getCoreType()
                 && docks == ((LFBattery)part).getDocks();
-	}
-
-	@Override
-	public double getTonnage() {
-		return 0;
-	}
-
-	@Override
-	public void updateConditionFromPart() {
-	    if(null != unit && unit.getEntity() instanceof Jumpship) {
-            ((Jumpship)unit.getEntity()).setLFBatteryHit(true);
     }
-	}
-	
-	@Override
+
+    @Override
+    public double getTonnage() {
+        return 0;
+    }
+
+    @Override
+    public void updateConditionFromPart() {
+        if(null != unit && unit.getEntity() instanceof Jumpship) {
+            ((Jumpship)unit.getEntity()).setLFBatteryHit(true);
+        }
+    }
+
+    @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
@@ -148,7 +148,7 @@ public class MissingLFBattery extends MissingPart {
         NodeList nl = wn.getChildNodes();
         for (int x=0; x<nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            
+
             if (wn2.getNodeName().equalsIgnoreCase("coreType")) {
                 coreType = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("docks")) {
@@ -157,20 +157,19 @@ public class MissingLFBattery extends MissingPart {
         }
     }
 
-	@Override
-	public String getLocationName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public String getLocationName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public int getLocation() {
-		return Jumpship.LOC_HULL;
-	}
-	
-	@Override
-	public TechAdvancement getTechAdvancement() {
-	    return LFBattery.TA_LF_BATTERY;
-	}
-	
+    @Override
+    public int getLocation() {
+        return Jumpship.LOC_HULL;
+    }
+
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return LFBattery.TA_LF_BATTERY;
+    }
 }

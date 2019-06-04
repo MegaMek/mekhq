@@ -38,17 +38,17 @@ import mekhq.campaign.Campaign;
  */
 public class MissingKFBoom extends MissingPart {
 
-	/**
+    /**
      * 
      */
     private static final long serialVersionUID = 8782809786871433915L;
-    
+
     private int boomType;
-	
-	public MissingKFBoom() {
-    	this(0, null, Dropship.BOOM_STANDARD);
+
+    public MissingKFBoom() {
+        this(0, null, Dropship.BOOM_STANDARD);
     }
-    
+
     public MissingKFBoom(int tonnage, Campaign c, int boomType) {
         super(tonnage, c);
         this.boomType = boomType;
@@ -57,50 +57,48 @@ public class MissingKFBoom extends MissingPart {
             name += " (Prototype)";
         }
     }
-    
+
     @Override 
-	public int getBaseTime() {
-		return 3600;
-	}
-	
-	@Override
-	public int getDifficulty() {
-		return 0;
-	}
+    public int getBaseTime() {
+        return 3600;
+    }
 
-	@Override
-	public void updateConditionFromPart() {
-		if(null != unit && unit.getEntity() instanceof Dropship) {
+    @Override
+    public int getDifficulty() {
+        return 0;
+    }
+
+    @Override
+    public void updateConditionFromPart() {
+        if(null != unit && unit.getEntity() instanceof Dropship) {
             ((Dropship)unit.getEntity()).setDamageKFBoom(true);
-		}	
-		
-	}
+        }
+    }
 
-	@Override
-	public Part getNewPart() {
-		return new KfBoom(getUnitTonnage(), campaign, boomType);
-	}
+    @Override
+    public Part getNewPart() {
+        return new KfBoom(getUnitTonnage(), campaign, boomType);
+    }
 
-	@Override
-	public String checkFixable() {
-		return null;
-	}
+    @Override
+    public String checkFixable() {
+        return null;
+    }
 
-	
-	@Override
-	public double getTonnage() {
-		return 0;
-	}
+    @Override
+    public double getTonnage() {
+        return 0;
+    }
 
-	@Override
-	public void writeToXml(PrintWriter pw1, int indent) {
-		writeToXmlBegin(pw1, indent);
+    @Override
+    public void writeToXml(PrintWriter pw1, int indent) {
+        writeToXmlBegin(pw1, indent);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "boomType", boomType);
-		writeToXmlEnd(pw1, indent);
-	}
+        writeToXmlEnd(pw1, indent);
+    }
 
-	@Override
-	protected void loadFieldsFromXmlNode(Node wn) {
+    @Override
+    protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
         for (int x=0; x<nl.getLength(); x++) {
@@ -109,32 +107,31 @@ public class MissingKFBoom extends MissingPart {
                 boomType = Integer.parseInt(wn2.getTextContent());
             }
         }
-	}
+    }
 
-	@Override
-	public boolean isAcceptableReplacement(Part part, boolean refit) {
-		return (part instanceof KfBoom)
-		        && (refit || (((KfBoom) part).getBoomType() == boomType));
-	}
+    @Override
+    public boolean isAcceptableReplacement(Part part, boolean refit) {
+        return (part instanceof KfBoom)
+                && (refit || (((KfBoom) part).getBoomType() == boomType));
+    }
 
-	@Override
-	public String getLocationName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public String getLocationName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public int getLocation() {
-		return Entity.LOC_NONE;
-	}
-	
-	@Override
-	public TechAdvancement getTechAdvancement() {
-	    if (boomType != Dropship.BOOM_STANDARD) {
+    @Override
+    public int getLocation() {
+        return Entity.LOC_NONE;
+    }
+
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        if (boomType != Dropship.BOOM_STANDARD) {
             return KfBoom.TA_PROTOTYPE_KF_BOOM;
         } else {
             return KfBoom.TA_KFBOOM;
         }
-	}
-	
+    }
 }

@@ -41,25 +41,25 @@ import mekhq.campaign.Campaign;
  */
 public class MissingFireControlSystem extends MissingPart {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 2806921577150714477L;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 2806921577150714477L;
 
-	private Money cost;
-	
-	public MissingFireControlSystem() {
-    	this(0, Money.zero(), null);
+    private Money cost;
+
+    public MissingFireControlSystem() {
+        this(0, Money.zero(), null);
     }
-    
+
     public MissingFireControlSystem(int tonnage, Money cost, Campaign c) {
-    	super(0, c);
-    	this.cost = cost;
-    	this.name = "Fire Control System";
+        super(0, c);
+        this.cost = cost;
+        this.name = "Fire Control System";
     }
-    
+
     @Override 
-	public int getBaseTime() {
+    public int getBaseTime() {
         int time = 0;
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair times
@@ -69,80 +69,79 @@ public class MissingFireControlSystem extends MissingPart {
                     time *= 2;
                 }
             } else {
-                time = 600; 
+                time = 600;
             }
         }
-		return time;
-	}
-	
-	@Override
-	public int getDifficulty() {
-		return 0;
-	}
-    
-	@Override
-	public String checkFixable() {
-		return null;
-	}
+        return time;
+    }
 
-	@Override
-	public Part getNewPart() {
-		return new FireControlSystem(getUnitTonnage(), cost, campaign);
-	}
+    @Override
+    public int getDifficulty() {
+        return 0;
+    }
 
-	@Override
-	public boolean isAcceptableReplacement(Part part, boolean refit) {
-		return part instanceof FireControlSystem && cost == part.getStickerPrice();
-	}
+    @Override
+    public String checkFixable() {
+        return null;
+    }
 
-	@Override
-	public double getTonnage() {
-		return 0;
-	}
+    @Override
+    public Part getNewPart() {
+        return new FireControlSystem(getUnitTonnage(), cost, campaign);
+    }
 
-	@Override
-	public void updateConditionFromPart() {
-		if(null != unit && unit.getEntity() instanceof Aero) {
-			((Aero)unit.getEntity()).setFCSHits(3);
-		}
-	}
-	
-	@Override
-	public void writeToXml(PrintWriter pw1, int indent) {
-		writeToXmlBegin(pw1, indent);
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<cost>"
-				+ cost.toXmlString()
-				+"</cost>");
-		writeToXmlEnd(pw1, indent);
-	}
+    @Override
+    public boolean isAcceptableReplacement(Part part, boolean refit) {
+        return part instanceof FireControlSystem && cost == part.getStickerPrice();
+    }
 
-	@Override
-	protected void loadFieldsFromXmlNode(Node wn) {
-		NodeList nl = wn.getChildNodes();
-		
-		for (int x=0; x<nl.getLength(); x++) {
-			Node wn2 = nl.item(x);		
-			if (wn2.getNodeName().equalsIgnoreCase("cost")) {
-				cost = Money.fromXmlString(wn2.getTextContent().trim());
-			} 
-		}
-	}
+    @Override
+    public double getTonnage() {
+        return 0;
+    }
 
-	@Override
-	public String getLocationName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public void updateConditionFromPart() {
+        if(null != unit && unit.getEntity() instanceof Aero) {
+            ((Aero)unit.getEntity()).setFCSHits(3);
+        }
+    }
 
-	@Override
-	public int getLocation() {
-		return Entity.LOC_NONE;
-	}
-	
-	@Override
-	public TechAdvancement getTechAdvancement() {
-	    return TA_GENERIC;
-	}
-	
+    @Override
+    public void writeToXml(PrintWriter pw1, int indent) {
+        writeToXmlBegin(pw1, indent);
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<cost>"
+                + cost.toXmlString()
+                +"</cost>");
+        writeToXmlEnd(pw1, indent);
+    }
+
+    @Override
+    protected void loadFieldsFromXmlNode(Node wn) {
+        NodeList nl = wn.getChildNodes();
+
+        for (int x=0; x<nl.getLength(); x++) {
+            Node wn2 = nl.item(x);        
+            if (wn2.getNodeName().equalsIgnoreCase("cost")) {
+                cost = Money.fromXmlString(wn2.getTextContent().trim());
+            }
+        }
+    }
+
+    @Override
+    public String getLocationName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public int getLocation() {
+        return Entity.LOC_NONE;
+    }
+
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return TA_GENERIC;
+    }
 }

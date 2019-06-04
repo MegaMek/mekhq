@@ -96,9 +96,9 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
         }
         if (command.equalsIgnoreCase("REMOVE_ALL_PERSONNEL")) {
             for (Unit unit : units) {
-            	if (unit.isDeployed()) {
-            		continue;
-            	}
+                if (unit.isDeployed()) {
+                    continue;
+                }
 
                 for (Person p : unit.getCrew()) {
                     unit.remove(p, true);
@@ -109,7 +109,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 Person engineer = unit.getEngineer();
 
                 if (null != engineer) {
-                	unit.remove(engineer, true);
+                    unit.remove(engineer, true);
                 }
             }
         }/* else if (command.contains("QUIRK")) {
@@ -356,10 +356,10 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             }
         } else if (command.contains("CUSTOMIZE")
                 && !command.contains("CANCEL")) {
-        	if (gui.hasTab(GuiTabType.MEKLAB)) {
-        		((MekLabTab)gui.getTab(GuiTabType.MEKLAB))
-        			.loadUnit(selectedUnit);
-        	}
+            if (gui.hasTab(GuiTabType.MEKLAB)) {
+                ((MekLabTab)gui.getTab(GuiTabType.MEKLAB))
+                    .loadUnit(selectedUnit);
+            }
             gui.getTabMain().setSelectedIndex(8);
         } else if (command.contains("CANCEL_CUSTOMIZE")) {
             if (selectedUnit.isRefitting()) {
@@ -881,18 +881,18 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                                 || unit.getEntity() instanceof megamek.common.Protomech));
                 menu.add(menuItem);
                 if (gui.hasTab(GuiTabType.MEKLAB)) {
-	                menuItem = new JMenuItem("Customize in Mek Lab...");
-	                menuItem.setActionCommand("CUSTOMIZE");
-	                menuItem.addActionListener(this);
-	                menuItem.setEnabled(unit.isAvailable()
-	                        && ((unit.getEntity().getEntityType() &
-	                                (Entity.ETYPE_FIXED_WING_SUPPORT
-	                                        | Entity.ETYPE_JUMPSHIP
-	                                        | Entity.ETYPE_SUPPORT_TANK
-	                                        | Entity.ETYPE_SUPPORT_VTOL
-	                                        | Entity.ETYPE_PROTOMECH
-	                                        | Entity.ETYPE_GUN_EMPLACEMENT)) == 0));
-	                menu.add(menuItem);
+                    menuItem = new JMenuItem("Customize in Mek Lab...");
+                    menuItem.setActionCommand("CUSTOMIZE");
+                    menuItem.addActionListener(this);
+                    menuItem.setEnabled(unit.isAvailable()
+                            && ((unit.getEntity().getEntityType() &
+                                    (Entity.ETYPE_FIXED_WING_SUPPORT
+                                            | Entity.ETYPE_JUMPSHIP
+                                            | Entity.ETYPE_SUPPORT_TANK
+                                            | Entity.ETYPE_SUPPORT_VTOL
+                                            | Entity.ETYPE_PROTOMECH
+                                            | Entity.ETYPE_GUN_EMPLACEMENT)) == 0));
+                    menu.add(menuItem);
                 }
                 if (unit.isRefitting()) {
                     menuItem = new JMenuItem("Cancel Customization");
