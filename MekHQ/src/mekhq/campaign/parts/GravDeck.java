@@ -40,29 +40,29 @@ import mekhq.campaign.personnel.SkillType;
  * @author MKerensky
  */
 public class GravDeck extends Part {
-    
+
     /**
      * 
      */
     private static final long serialVersionUID = -3387290388135852860L;
-    
+
     static final TechAdvancement TA_GRAV_DECK = new TechAdvancement(TECH_BASE_ALL)
             .setAdvancement(DATE_ES, DATE_ES, DATE_ES)
             .setTechRating(RATING_B)
             .setAvailability(RATING_C, RATING_C, RATING_C, RATING_C)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
-    
+
     private int deckType;
     private int deckNumber;
-    
+
     public static final int GRAV_DECK_TYPE_STANDARD = 0;
     public static final int GRAV_DECK_TYPE_LARGE = 1;
     public static final int GRAV_DECK_TYPE_HUGE = 2;
-	
-	public GravDeck() {
-    	this(0, 0, null, GRAV_DECK_TYPE_STANDARD);
+
+    public GravDeck() {
+        this(0, 0, null, GRAV_DECK_TYPE_STANDARD);
     }
-    
+
     public GravDeck(int tonnage, int deckNumber, Campaign c, int deckType) {
         super(tonnage, c);
         this.deckNumber = deckNumber;
@@ -76,141 +76,141 @@ public class GravDeck extends Part {
             name += " (Huge)";
         }
     }
-    
+
     public int getDeckNumber() {
         return deckNumber;
     }
-    
+
     public GravDeck clone() {
-    	GravDeck clone = new GravDeck(0, deckNumber, campaign, deckType);
+        GravDeck clone = new GravDeck(0, deckNumber, campaign, deckType);
         clone.copyBaseData(this);
-    	return clone;
+        return clone;
     }
-    
+
     public int getDeckType() {
         return deckType;
     }
-        
-	@Override
-	public void updateConditionFromEntity(boolean checkForDestruction) {
-		int priorHits = hits;
-		if (null != unit && unit.getEntity() instanceof Jumpship) {
-		    hits = ((Jumpship) unit.getEntity()).getGravDeckDamageFlag(deckNumber);
-		    
-			if (checkForDestruction 
-					&& hits > priorHits
-					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
-				remove(false);
-			}
-		}
-	}
-	
-	@Override 
-	public int getBaseTime() {
-		if(isSalvaging()) {
-			return 4800;
-		}
-		return 1440;
-	}
-	
-	@Override
-	public int getDifficulty() {
-		if(isSalvaging()) {
-			return 3;
-		}
-		return 2;
-	}
 
-	@Override
-	public void updateConditionFromPart() {
-	    if (null != unit && unit.getEntity() instanceof Jumpship) {
-	        ((Jumpship) unit.getEntity()).setGravDeckDamageFlag(deckNumber, hits);
-		}
-	}
-
-	@Override
-	public void fix() {
-		super.fix();
-		if (null != unit && unit.getEntity() instanceof Jumpship) {
-		    ((Jumpship) unit.getEntity()).setGravDeckDamageFlag(deckNumber, 0);
+    @Override
+    public void updateConditionFromEntity(boolean checkForDestruction) {
+        int priorHits = hits;
+        if (null != unit && unit.getEntity() instanceof Jumpship) {
+            hits = ((Jumpship) unit.getEntity()).getGravDeckDamageFlag(deckNumber);
+            
+            if (checkForDestruction 
+                    && hits > priorHits
+                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                remove(false);
+            }
         }
-	}
+    }
 
-	@Override
-	public void remove(boolean salvage) {
-	    if (unit.getEntity() instanceof Jumpship) {
-	        ((Jumpship) unit.getEntity()).setGravDeckDamageFlag(deckNumber, 1);
-	        
-			Part spare = campaign.checkForExistingSparePart(this);
-			if(!salvage) {
-				campaign.removePart(this);
-			} else if(null != spare) {
-				spare.incrementQuantity();
-				campaign.removePart(this);
-			}
-			unit.removePart(this);
-			Part missing = getMissingPart();
-			unit.addPart(missing);
-			campaign.addPart(missing, 0);
-		}
-		setUnit(null);
-		updateConditionFromEntity(false);
-	}
+    @Override 
+    public int getBaseTime() {
+        if(isSalvaging()) {
+            return 4800;
+        }
+        return 1440;
+    }
 
-	@Override
-	public MissingPart getMissingPart() {
-		return new MissingGravDeck(0, deckNumber, campaign, deckType);
-	}
+    @Override
+    public int getDifficulty() {
+        if(isSalvaging()) {
+            return 3;
+        }
+        return 2;
+    }
 
-	@Override
-	public String checkFixable() {
-		return null;
-	}
+    @Override
+    public void updateConditionFromPart() {
+        if (null != unit && unit.getEntity() instanceof Jumpship) {
+            ((Jumpship) unit.getEntity()).setGravDeckDamageFlag(deckNumber, hits);
+        }
+    }
 
-	@Override
-	public boolean needsFixing() {
-		return (hits > 0);
-	}
+    @Override
+    public void fix() {
+        super.fix();
+        if (null != unit && unit.getEntity() instanceof Jumpship) {
+            ((Jumpship) unit.getEntity()).setGravDeckDamageFlag(deckNumber, 0);
+        }
+    }
 
-	@Override
-	public Money getStickerPrice() {
-	    if (deckType == GRAV_DECK_TYPE_STANDARD) {
-	        return Money.of(5000000);
-	    } else if (deckType == GRAV_DECK_TYPE_LARGE) {
-	        return Money.of(10000000);
-	    } else {
-	        return Money.of(40000000);
-	    }
-	}
-	
-	@Override
-	public double getTonnage() {
-	    //TO tables p 407
-	    if (deckType == GRAV_DECK_TYPE_STANDARD) {
+    @Override
+    public void remove(boolean salvage) {
+        if (unit.getEntity() instanceof Jumpship) {
+            ((Jumpship) unit.getEntity()).setGravDeckDamageFlag(deckNumber, 1);
+            
+            Part spare = campaign.checkForExistingSparePart(this);
+            if(!salvage) {
+                campaign.removePart(this);
+            } else if(null != spare) {
+                spare.incrementQuantity();
+                campaign.removePart(this);
+            }
+            unit.removePart(this);
+            Part missing = getMissingPart();
+            unit.addPart(missing);
+            campaign.addPart(missing, 0);
+        }
+        setUnit(null);
+        updateConditionFromEntity(false);
+    }
+
+    @Override
+    public MissingPart getMissingPart() {
+        return new MissingGravDeck(0, deckNumber, campaign, deckType);
+    }
+
+    @Override
+    public String checkFixable() {
+        return null;
+    }
+
+    @Override
+    public boolean needsFixing() {
+        return (hits > 0);
+    }
+
+    @Override
+    public Money getStickerPrice() {
+        if (deckType == GRAV_DECK_TYPE_STANDARD) {
+            return Money.of(5000000);
+        } else if (deckType == GRAV_DECK_TYPE_LARGE) {
+            return Money.of(10000000);
+        } else {
+            return Money.of(40000000);
+        }
+    }
+
+    @Override
+    public double getTonnage() {
+        //TO tables p 407
+        if (deckType == GRAV_DECK_TYPE_STANDARD) {
             return 50;
         } else if (deckType == GRAV_DECK_TYPE_LARGE) {
             return 100;
         } else {
             return 500;
         }
-	}
+    }
 
-	@Override
-	public boolean isSamePartType(Part part) {
-		return (part instanceof GravDeck)
-		        && (deckType == ((GravDeck)part).deckType);
-	}
-	
-	@Override
-	public void writeToXml(PrintWriter pw1, int indent) {
-		writeToXmlBegin(pw1, indent);
+    @Override
+    public boolean isSamePartType(Part part) {
+        return (part instanceof GravDeck)
+                && (deckType == ((GravDeck)part).deckType);
+    }
+
+    @Override
+    public void writeToXml(PrintWriter pw1, int indent) {
+        writeToXmlBegin(pw1, indent);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "deckType", deckType);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "deckNumber", deckNumber);
-		writeToXmlEnd(pw1, indent);
-	}
+        writeToXmlEnd(pw1, indent);
+    }
 
-	@Override
-	protected void loadFieldsFromXmlNode(Node wn) {
+    @Override
+    protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
         for (int x=0; x<nl.getLength(); x++) {
@@ -221,26 +221,26 @@ public class GravDeck extends Part {
                 deckNumber = Integer.parseInt(wn2.getTextContent());
             }
         }
-	}
-	
-	@Override
-	public boolean isRightTechType(String skillType) {
-		return skillType.equals(SkillType.S_TECH_VESSEL);
-	}
+    }
 
-	@Override
-	public String getLocationName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public boolean isRightTechType(String skillType) {
+        return skillType.equals(SkillType.S_TECH_VESSEL);
+    }
 
-	@Override
-	public int getLocation() {
-		return Entity.LOC_NONE;
-	}
-	
-	@Override
-	public TechAdvancement getTechAdvancement() {
-	    return TA_GRAV_DECK;
-	}
+    @Override
+    public String getLocationName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public int getLocation() {
+        return Entity.LOC_NONE;
+    }
+
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return TA_GRAV_DECK;
+    }
 }
