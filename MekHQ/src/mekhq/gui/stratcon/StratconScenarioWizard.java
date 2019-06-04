@@ -170,6 +170,7 @@ public class StratconScenarioWizard extends JDialog {
             forcePanel.add(selectedForceInfo, localGbc);
             
             getContentPane().add(forcePanel, gbc);
+            gbc.gridy++;
         }
     }
 
@@ -218,7 +219,8 @@ public class StratconScenarioWizard extends JDialog {
         
         // if we're waiting to assign primary forces, we can only do so from the current track 
         lanceModel = new ScenarioWizardLanceModel(campaign, 
-                StratconRulesManager.getAvailableForceIDs(forceTemplate.getAllowedUnitType(), campaign));
+                StratconRulesManager.getAvailableForceIDs(forceTemplate.getAllowedUnitType(), 
+                        campaign, forceTemplate.getArrivalTurn() == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS));
         
         JList<Force> availableForceList = new JList<>();
         availableForceList.setModel(lanceModel);
@@ -428,11 +430,14 @@ public class StratconScenarioWizard extends JDialog {
         
         // scenarios that haven't had primary forces committed yet get those committed now
         // and the scenario gets published to the campaign and may be played immediately from the briefing room
+        // that being said, give the player a chance to commit reinforcements too
         if(currentScenario.getCurrentState() == ScenarioState.UNRESOLVED) {
             currentScenario.commitPrimaryForces(campaign, currentCampaignState.getContract());
+            setCurrentScenario(currentScenario, currentTrackState, currentCampaignState);
+        // if we've just committed reinforcements then simply close it down
+        } else {
+            setVisible(false);
         }
-        
-        setVisible(false);
     }
     
     /**

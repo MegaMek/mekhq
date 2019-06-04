@@ -345,9 +345,7 @@ public class StratconRulesManager {
      * @param campaign The working campaign.
      * @return Whether or not the unit types match.
      */
-    public static boolean forceCompositionMatchesDeclaredUnitType(Force force, int unitType, Campaign campaign) {
-        int primaryUnitType = force.getPrimaryUnitType(campaign);
-        
+    public static boolean forceCompositionMatchesDeclaredUnitType(int primaryUnitType, int unitType, boolean reinforcements) {        
         // special cases are "ATB_MIX" and "ATB_AERO_MIX", which encompass multiple unit types
         if(unitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX) {
             // "AtB mix" is usually ground units, but air units can sub in
@@ -357,8 +355,8 @@ public class StratconRulesManager {
                     primaryUnitType == UnitType.BATTLE_ARMOR ||
                     primaryUnitType == UnitType.PROTOMEK || 
                     primaryUnitType == UnitType.VTOL ||
-                    primaryUnitType == UnitType.AERO ||
-                    primaryUnitType == UnitType.CONV_FIGHTER;
+                    (primaryUnitType == UnitType.AERO) && reinforcements ||
+                    (primaryUnitType == UnitType.CONV_FIGHTER) && reinforcements;
         } else if (unitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX) {
             return primaryUnitType == UnitType.AERO ||
                     primaryUnitType == UnitType.CONV_FIGHTER;
@@ -407,7 +405,7 @@ public class StratconRulesManager {
      * c) are not deployed to a scenario
      * @return
      */
-    public static List<Integer> getAvailableForceIDs(int unitType, Campaign campaign) {
+    public static List<Integer> getAvailableForceIDs(int unitType, Campaign campaign, boolean reinforcements) {
         List<Integer> retVal = new ArrayList<>();
         
         Set<Integer> forcesInTracks = new HashSet<>();
@@ -421,12 +419,13 @@ public class StratconRulesManager {
         
         for(int key : campaign.getLances().keySet()) {
             Force force = campaign.getForce(key);
+            int primaryUnitType = force.getPrimaryUnitType(campaign);
             if(force != null && 
                     !force.isDeployed() && 
                     (force.getScenarioId() <= 0) &&
                     !force.getUnits().isEmpty() &&
                     !forcesInTracks.contains(force.getId()) &&
-                    forceCompositionMatchesDeclaredUnitType(force, unitType, campaign)) {
+                    forceCompositionMatchesDeclaredUnitType(primaryUnitType, unitType, reinforcements)) {
                 retVal.add(force.getId());
             }
         }

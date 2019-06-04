@@ -166,7 +166,7 @@ public class StratconScenario implements IStratconDisplayable {
     public void commitPrimaryForces(Campaign campaign, AtBContract contract) {
         currentState = ScenarioState.PRIMARY_FORCES_COMMITTED;
 
-        AtBDynamicScenarioFactory.finalizeScenario(backingScenario, contract, campaign);
+        //AtBDynamicScenarioFactory.finalizeScenario(backingScenario, contract, campaign);
     }
 
     /**
