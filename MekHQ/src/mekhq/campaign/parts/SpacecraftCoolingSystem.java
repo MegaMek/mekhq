@@ -110,10 +110,8 @@ public class SpacecraftCoolingSystem extends Part {
 
     @Override 
     public int getBaseTime() {
-        if (isSalvaging()) {
-            return 120;
-        }
-        return 90;
+        //60m per 50 heatsinks, per 6-2019 SO errata
+        return 60;
     }
 
     @Override
@@ -134,7 +132,7 @@ public class SpacecraftCoolingSystem extends Part {
 
     @Override
     public void fix() {
-        replaceHeatSink();
+        replaceHeatSinks();
     }
 
     @Override
@@ -149,17 +147,17 @@ public class SpacecraftCoolingSystem extends Part {
     }
 
     /**
-     * Pulls a heatsink of the appropriate type from the warehouse and adds it to the cooling system
+     * Pulls up to 50 heatsinks of the appropriate type from the warehouse and adds them to the cooling system
      * 
      */
-    public void replaceHeatSink() {
+    public void replaceHeatSinks() {
         if (unit != null && unit.getEntity() instanceof Aero) {
             //Spare part is usually 'this', but we're looking for spare heatsinks here...
             Part spareHeatSink = new AeroHeatSink(0, sinkType, false, campaign);
             Part spare = campaign.checkForExistingSparePart(spareHeatSink);
            if (null != spare) {
-                spare.decrementQuantity();
-                ((Aero)unit.getEntity()).setHeatSinks(((Aero)unit.getEntity()).getHeatSinks() + 1);
+                spare.setQuantity(spare.getQuantity() - Math.min(sinksNeeded, 50));
+                ((Aero)unit.getEntity()).setHeatSinks(((Aero)unit.getEntity()).getHeatSinks() + Math.min(sinksNeeded, 50));
            }
         }
         updateConditionFromEntity(false);
@@ -183,29 +181,32 @@ public class SpacecraftCoolingSystem extends Part {
 
     @Override
     public void remove(boolean salvage) {
-        removeHeatSink(salvage);
+        removeHeatSinks(salvage);
     }
 
     /**
-     * Pulls a heatsink of the appropriate type from the cooling system and adds it to the warehouse
+     * Pulls up to 50 heatsinks of the appropriate type from the cooling system and adds them to the warehouse
      * 
      */
-    public void removeHeatSink(boolean salvage) {
+    public void removeHeatSinks(boolean salvage) {
         if (unit != null && unit.getEntity() instanceof Aero) {
             //Spare part is usually 'this', but we're looking for spare heatsinks here...
             Part spareHeatSink = new AeroHeatSink(0, sinkType, false, campaign);
             Part spare = campaign.checkForExistingSparePart(spareHeatSink);
+            //How many sinks are we trying to remove? It'll be between 0 and 50.
+            int sinkBatch = Math.max(0, Math.min((currentSinks - engineSinks), 50));
             if(!salvage) {
                 //Scrapping. Shouldn't be able to get here, but don't do anything just in case.
             } else if (null != spare) {
-                //Add one to our spare stocks
-                spare.incrementQuantity();
+                //Add some to our spare stocks, but make sure we don't pull them out of the engine
+                spare.setQuantity(spare.getQuantity() + Math.min(removeableSinks, sinkBatch));
                 spare.setUnit(null);
            } else {
-               //Start a new collection
+               //Start a new collection, but make sure we don't pull them out of the engine
+               spareHeatSink.setQuantity(Math.min(removeableSinks, sinkBatch));
                campaign.addPart(spareHeatSink, 0);
            }
-           ((Aero)unit.getEntity()).setHeatSinks(((Aero)unit.getEntity()).getHeatSinks() - 1);
+           ((Aero)unit.getEntity()).setHeatSinks(((Aero)unit.getEntity()).getHeatSinks() - Math.min(removeableSinks, sinkBatch));
         }
         updateConditionFromEntity(false);
     }
@@ -225,6 +226,8 @@ public class SpacecraftCoolingSystem extends Part {
         Part spare = campaign.checkForExistingSparePart(spareHeatSink);
         if (!isSalvaging() && spare == null) {
             return "No compatible heat sinks in warehouse!";
+        } else if (!isSalvaging() && spare.getQuantity() < Math.min(sinksNeeded, 50)) {
+            return "Insufficient compatible heat sinks in warehouse!";
         }
         return null;
     }
