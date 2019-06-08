@@ -137,6 +137,10 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
     private Armor newArmorSupplies;
     private int newArmorSuppliesId;
     private boolean sameArmorType;
+    
+    private int oldLargeCraftHeatSinks;
+    private int oldLargeCraftSinkType;
+    private int newLargeCraftHeatSinks;
 
     private UUID assignedTechId;
     private int oldTechId = -1;
@@ -274,6 +278,10 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         //Step 1: put all of the parts from the current unit into a new arraylist so they can
         //be removed when we find a match.
         for(Part p : oldUnit.getParts()) {
+            if (p instanceof SpacecraftCoolingSystem) {
+                oldLargeCraftHeatSinks = ((SpacecraftCoolingSystem)p).getTotalSinks();
+                oldLargeCraftSinkType = ((SpacecraftCoolingSystem)p).getSinkType();
+            }
             if ((!isOmniRefit || p.isOmniPodded())
                     || (p instanceof TransportBayPart)) {
                 oldUnitParts.add(p.getId());
@@ -520,9 +528,15 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                     }
                 }
             } else if (nPart instanceof SpacecraftCoolingSystem) {
-                Part replacement = new AeroHeatSink(0, ((SpacecraftCoolingSystem)nPart).getSinkType(), false, campaign);
-                //For now, replace all the heatsinks. Worst case this adds a week or two to the refit
-                int sinksToReplace = ((SpacecraftCoolingSystem)nPart).getTotalSinks();
+                int sinkType = ((SpacecraftCoolingSystem)nPart).getSinkType();
+                int sinksToReplace = 0;
+                Part replacement = new AeroHeatSink(0, sinkType, false, campaign);
+                newLargeCraftHeatSinks = ((SpacecraftCoolingSystem)nPart).getTotalSinks();
+                if (sinkType != oldLargeCraftSinkType) {
+                    sinksToReplace = newLargeCraftHeatSinks;
+                } else {
+                    sinksToReplace = Math.max((newLargeCraftHeatSinks - oldLargeCraftHeatSinks), 0);
+                }
                 time += (60 * (sinksToReplace / 50));
                 if (replacement != null) {
                     while (sinksToReplace > 0) {
