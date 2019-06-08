@@ -422,8 +422,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             } else {
                 //its a new part
                 //dont actually add the part iself but rather its missing equivalent
-                //except in the case of armor
-                if(part instanceof Armor || part instanceof AmmoBin) {
+                //except in the case of armor, ammobins and the spacecraft cooling system
+                if(part instanceof Armor || part instanceof AmmoBin || part instanceof SpacecraftCoolingSystem) {
                     newPartList.add(part);
                 } else {
                     Part mPart = part.getMissingPart();
@@ -494,9 +494,12 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 AmmoType type = (AmmoType)((AmmoBin)nPart).getType();
                 ammoNeeded.merge(type, type.getShots(), Integer::sum);
                 if (nPart instanceof LargeCraftAmmoBin) {
-                    // Adding ammo requires base 15 minutes per ton of ammo. Putting in a new
-                    // capital missile bay can take weeks.
-                    time += 15 * Math.max(1, nPart.getTonnage());
+                    // Adding ammo requires base 15 minutes per ton of ammo or 60 minutes per capital missile
+                    if (type.hasFlag(AmmoType.F_CAP_MISSILE) || type.hasFlag(AmmoType.F_CRUISE_MISSILE) || type.hasFlag(AmmoType.F_SCREEN)) {
+                        time += 60 * ((LargeCraftAmmoBin)nPart).getFullShots();
+                    } else {
+                        time += 15 * Math.max(1, nPart.getTonnage());
+                    }
                     shoppingList.add(nPart);
                 } else {
                     time += 120;
@@ -514,6 +517,17 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                         partQuantity.put(replacement.getId(), partQuantity.get(replacement.getId())-1);
                     } else {
                         shoppingList.add(nPart);
+                    }
+                }
+            } else if (nPart instanceof SpacecraftCoolingSystem) {
+                Part replacement = new AeroHeatSink(0, ((SpacecraftCoolingSystem)nPart).getSinkType(), false, campaign);
+                //For now, replace all the heatsinks. Worst case this adds a week or two to the refit
+                int sinksToReplace = ((SpacecraftCoolingSystem)nPart).getTotalSinks();
+                time += (60 * (sinksToReplace / 50));
+                if (replacement != null) {
+                    while (sinksToReplace > 0) {
+                        shoppingList.add(replacement);
+                        sinksToReplace--;
                     }
                 }
             }
