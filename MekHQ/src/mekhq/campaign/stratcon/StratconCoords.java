@@ -3,36 +3,15 @@ package mekhq.campaign.stratcon;
 import megamek.common.Coords;
 import megamek.common.util.HashCodeUtil;
 
-public class StratconCoords {
-    private int x;
-    private int y;
-    
+public class StratconCoords extends Coords {
     public StratconCoords(int x, int y) {
-        this.setX(x);
-        this.setY(y);
+        super(x, y);
     }
     
     public StratconCoords() {
-        setX(0);
-        setY(0);
+        super(0, 0);
     }
 
-    public int getY() {
-        return y;
-    }
-
-    public void setY(int y) {
-        this.y = y;
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    public void setX(int x) {
-        this.x = x;
-    }
-    
     /**
      * Get the hash code for these coords.
      * 
@@ -40,7 +19,7 @@ public class StratconCoords {
      */
     @Override
     public int hashCode() {
-        return (HashCodeUtil.hash1(x + 1337) ^ HashCodeUtil.hash1(y + 97331)) & 0x7FFFFFFF;
+        return (HashCodeUtil.hash1(getX() + 1337) ^ HashCodeUtil.hash1(getY() + 97331)) & 0x7FFFFFFF;
     }
     
     /**

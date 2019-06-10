@@ -76,7 +76,7 @@ public class StratconPanel extends JPanel implements ActionListener {
         
         buildRightClickMenu(null);
         
-        assignmentUI = new TrackForceAssignmentUI(campaign);
+        assignmentUI = new TrackForceAssignmentUI(this);
         assignmentUI.setVisible(false);
         
         addMouseListener(new MouseAdapter() {
@@ -368,13 +368,15 @@ public class StratconPanel extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        StratconCoords selectedCoords = new StratconCoords(boardState.selectedX, boardState.selectedY);
+        
         switch(e.getActionCommand()) {
         case RCLICK_COMMAND_MANAGE_FORCES:
-            assignmentUI.display(campaignState, 0);
+            assignmentUI.display(campaign, campaignState, 0, selectedCoords);
             assignmentUI.setVisible(true);
             break;
         case RCLICK_COMMAND_MANAGE_SCENARIO:
-            scenarioWizard.setCurrentScenario(currentTrack.getScenario(new StratconCoords(boardState.selectedX, boardState.selectedY)),
+            scenarioWizard.setCurrentScenario(currentTrack.getScenario(selectedCoords),
                     currentTrack,
                     campaignState);
             scenarioWizard.toFront();

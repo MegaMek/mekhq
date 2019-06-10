@@ -155,32 +155,8 @@ public class StratconRulesManager {
                     continue;
                 }
                 
-                StratconScenario scenario = new StratconScenario();
-                scenario.initializeScenario(campaign, contract, campaign.getForce(randomForceID).getPrimaryUnitType(campaign));
-                
-                // set up deployment day, battle day, return day here
-                // safety code to prevent attempts to generate random int with upper bound of 0 which is apparently illegal
-                int deploymentDay = track.getDeploymentTime() < 7 ? Compute.randomInt(7 - track.getDeploymentTime()) : 0;
-                int battleDay = deploymentDay + (track.getDeploymentTime() > 0 ? Compute.randomInt(track.getDeploymentTime()) : 0);
-                int returnDay = deploymentDay + track.getDeploymentTime();
-                
-                GregorianCalendar deploymentDate = (GregorianCalendar) campaign.getCalendar().clone();
-                deploymentDate.add(Calendar.DAY_OF_MONTH, deploymentDay);
-                GregorianCalendar battleDate = (GregorianCalendar) campaign.getCalendar().clone();
-                battleDate.add(Calendar.DAY_OF_MONTH, battleDay);
-                GregorianCalendar returnDate = (GregorianCalendar) campaign.getCalendar().clone();
-                returnDate.add(Calendar.DAY_OF_MONTH, returnDay);
-                
-                scenario.setDeploymentDate(deploymentDate.getTime());
-                scenario.setActionDate(battleDate.getTime());
-                scenario.setReturnDate(returnDate.getTime());
-                
-                // register the scenario with the campaign and the track it's generated on
-                track.getScenarios().put(scenarioCoords, scenario);
-                generatedScenarios.add(scenario);
-                scenario.addPrimaryForce(randomForceID);
-                campaign.addScenario(scenario.getBackingScenario(), contract);
-                scenario.setBackingScenarioID(scenario.getBackingScenario().getId());
+                StratconScenario scenario = generateScenario(campaign, contract,track, randomForceID, scenarioCoords);
+                generatedScenarios.add(scenario);        
             }
         }
         
@@ -210,6 +186,49 @@ public class StratconRulesManager {
         }
     }
 
+    /**
+     * Deploys a force to the given coordinates on the given track.
+     * @param coords
+     * @param campaign
+     * @param contract
+     * @param track
+     */
+    public static void deployForceToCoords(StratconCoords coords, int forceID, Campaign campaign, AtBContract contract, StratconTrackState track) {
+        // the following things should happen:
+        // 1. call to "process force deployment", which reveals fog of war in or around the coords, depending on force role
+        // 2. if coords are a hostile facility, we get a facility mission
+        // 3. if coords are empty, we *may* get a mission
+        
+        processForceDeployment(coords, forceID, campaign, track);
+        
+        if(track.getFacilities().containsKey(coords)) {
+            // TODO: let's ensure that this is a facility scenario and the objective is set appropriately
+            generateScenario(campaign, contract, track, forceID, coords);
+        } else if(Compute.randomInt(100) > track.getScenarioOdds()) {
+            StratconScenario scenario = generateScenario(campaign, contract, track, forceID, coords);
+            scenario.commitPrimaryForces(campaign, contract);
+        }
+    }
+    
+    /**
+     * Process the deployment of a force to the given coordinates on the given track.
+     * @param coords
+     * @param forceID
+     * @param campaign
+     * @param track
+     */
+    public static void processForceDeployment(StratconCoords coords, int forceID, Campaign campaign, StratconTrackState track) {
+        track.getRevealedCoords().add(coords);
+        
+        if(campaign.getLances().get(forceID).getRole() == Lance.ROLE_SCOUT) {
+            for(int direction = 0; direction < 6; direction++) {
+                track.getRevealedCoords().add((StratconCoords) coords.translated(direction));
+            }
+        }
+        
+        track.assignForce(forceID, coords);
+    }
+    
     /**
      * Assigns a force to the scenario such that the majority of the force can be deployed
      * @param scenario
@@ -336,6 +355,56 @@ public class StratconRulesManager {
         }*/
         
         return sb.toString();
+    }
+    
+    /**
+     * Worker function that generates stratcon scenario at the given coords, for the given force, on the given track.
+     * Also registers it with the track and campaign.
+     * @param campaign
+     * @param contract
+     * @param track
+     * @param forceID
+     * @param coords
+     * @return
+     */
+    private static StratconScenario generateScenario(Campaign campaign, AtBContract contract, StratconTrackState track, 
+            int forceID, StratconCoords coords) {
+        StratconScenario scenario = new StratconScenario();
+        scenario.initializeScenario(campaign, contract, campaign.getForce(forceID).getPrimaryUnitType(campaign));
+        setScenarioDates(track, campaign, scenario);                
+        
+        // register the scenario with the campaign and the track it's generated on
+        track.getScenarios().put(coords, scenario);
+        scenario.addPrimaryForce(forceID);
+        campaign.addScenario(scenario.getBackingScenario(), contract);
+        scenario.setBackingScenarioID(scenario.getBackingScenario().getId());
+        
+        return scenario;
+    }
+    
+    /**
+     * Worker function that sets scenario deploy/battle/return dates based on the track's properties and current campaign date
+     * @param track
+     * @param campaign
+     * @param scenario
+     */
+    private static void setScenarioDates(StratconTrackState track, Campaign campaign, StratconScenario scenario) {
+     // set up deployment day, battle day, return day here
+        // safety code to prevent attempts to generate random int with upper bound of 0 which is apparently illegal
+        int deploymentDay = track.getDeploymentTime() < 7 ? Compute.randomInt(7 - track.getDeploymentTime()) : 0;
+        int battleDay = deploymentDay + (track.getDeploymentTime() > 0 ? Compute.randomInt(track.getDeploymentTime()) : 0);
+        int returnDay = deploymentDay + track.getDeploymentTime();
+        
+        GregorianCalendar deploymentDate = (GregorianCalendar) campaign.getCalendar().clone();
+        deploymentDate.add(Calendar.DAY_OF_MONTH, deploymentDay);
+        GregorianCalendar battleDate = (GregorianCalendar) campaign.getCalendar().clone();
+        battleDate.add(Calendar.DAY_OF_MONTH, battleDay);
+        GregorianCalendar returnDate = (GregorianCalendar) campaign.getCalendar().clone();
+        returnDate.add(Calendar.DAY_OF_MONTH, returnDay);
+        
+        scenario.setDeploymentDate(deploymentDate.getTime());
+        scenario.setActionDate(battleDate.getTime());
+        scenario.setReturnDate(returnDate.getTime());
     }
     
     /**
