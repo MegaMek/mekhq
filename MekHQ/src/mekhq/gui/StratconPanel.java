@@ -64,7 +64,7 @@ public class StratconPanel extends JPanel implements ActionListener {
 
     private Point clickedPoint;
     private JPopupMenu rightClickMenu;
-    private JMenuItem menuItemInitiateScenario;
+    private JMenuItem menuItemManageForceAssignments;
     private JMenuItem menuItemManageScenario;
     
     private StratconScenarioWizard scenarioWizard;
@@ -97,11 +97,11 @@ public class StratconPanel extends JPanel implements ActionListener {
     private void buildRightClickMenu(StratconScenario scenario) {
         rightClickMenu = new JPopupMenu();
         
-        JMenuItem itemManageForceAssignments = new JMenuItem();
-        itemManageForceAssignments.setText("Manage Force Assignments");
-        itemManageForceAssignments.setActionCommand(RCLICK_COMMAND_MANAGE_FORCES);
-        itemManageForceAssignments.addActionListener(this);
-        rightClickMenu.add(itemManageForceAssignments);
+        menuItemManageForceAssignments = new JMenuItem();
+        menuItemManageForceAssignments.setText("Manage Force Assignments");
+        menuItemManageForceAssignments.setActionCommand(RCLICK_COMMAND_MANAGE_FORCES);
+        menuItemManageForceAssignments.addActionListener(this);
+        rightClickMenu.add(menuItemManageForceAssignments);
         
         //if(scenario != null) {
             menuItemManageScenario = new JMenuItem();
@@ -349,6 +349,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                 selectedScenario = currentTrack.getScenario(new StratconCoords(boardState.selectedX, boardState.selectedY));
             }
              
+            menuItemManageForceAssignments.setEnabled(selectedScenario == null);
             menuItemManageScenario.setEnabled(selectedScenario != null);
             repaint();
             rightClickMenu.show(this, e.getX(), e.getY());
