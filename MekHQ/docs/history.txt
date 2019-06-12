@@ -12,6 +12,7 @@ v0.45.5-SNAPSHOT
 + Issue #1128: Player can now view stats for enemy personnel when resolving a scenario.
 + Issue #1197: Fix bug where personnel could not be assigned to Battle Armor after repair.
 + Issue #1185: Player can acquire ammo bins via parts acquisition dialog.
++ Issue #1205: Improve purchase parts dialog performance when sorting.
 
 v0.45.4 (2019-03-24 1700 UTC)
 + PR #1067: Switch to Joda Money library internally for financial math
