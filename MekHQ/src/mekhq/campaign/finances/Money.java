@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
  * @author Vicente Cartas Espinel <vicente.cartas at outlook.com>
  *
  */
-public class Money {
+public class Money implements Comparable<Money> {
     private BigMoney wrapped;
 
     private Money(BigMoney money) {
@@ -180,5 +180,13 @@ public class Money {
     @Override
     public int hashCode() {
         return this.wrapped.hashCode();
+    }
+
+    @Override
+    public int compareTo(Money o) {
+        if (null == o) {
+            return -1;
+        }
+        return wrapped.compareTo(o.wrapped);
     }
 }
