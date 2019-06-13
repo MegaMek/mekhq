@@ -356,6 +356,18 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
     }
     
     /**
+     * Clears out an individual entirely from this tracker.
+     * @param person
+     */
+    public void removePerson(Person person) {
+        payouts.remove(person.getId());
+        
+        for(int contractID : unresolvedPersonnel.keySet()) {
+            unresolvedPersonnel.get(contractID).remove(person.getId());
+        }
+    }
+    
+    /**
      * Worker function that clears out any orphan retirement/defection records
      * @param id ID of the person in question
      * @param contract Contract in question, if any
