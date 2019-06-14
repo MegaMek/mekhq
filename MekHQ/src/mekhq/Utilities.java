@@ -282,7 +282,7 @@ public class Utilities {
             //TODO: clan/IS limitations?
 
             if ((entity instanceof Aero)
-                    && !atype.canAeroUse()) {
+                    && !atype.canAeroUse(entity.getGame().getOptions().booleanOption(OptionsConstants.ADVAERORULES_AERO_ARTILLERY_MUNITIONS))) {
                 continue;
             }
 
