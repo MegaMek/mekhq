@@ -52,9 +52,6 @@ public class AtBDynamicScenario extends AtBScenario {
     
     private List<AtBScenarioModifier> scenarioModifiers;
     
-    // key-value pairs linking transports and the units loaded onto them.
-    private Map<String, List<String>> transportLinkages;
-    
     private Map<String, Entity> externalIDLookup;
     
     public AtBDynamicScenario() {
@@ -64,7 +61,6 @@ public class AtBDynamicScenario extends AtBScenario {
         playerForceTemplates = new HashMap<>();
         playerUnitTemplates = new HashMap<>();
         scenarioModifiers = new ArrayList<>();
-        setTransportLinkages(new HashMap<>());
         externalIDLookup = new HashMap<>();
     }
 
@@ -344,27 +340,6 @@ public class AtBDynamicScenario extends AtBScenario {
     @Override
     public void setTerrain() {
         AtBDynamicScenarioFactory.setTerrain(this);
-    }
-
-    public Map<String, List<String>> getTransportLinkages() {
-        return transportLinkages;
-    }
-
-    public void setTransportLinkages(HashMap<String, List<String>> transportLinkages) {
-        this.transportLinkages = transportLinkages;
-    }
-    
-    /**
-     * Adds a transport-cargo pair to the internal transport relationship store.
-     * @param transport
-     * @param cargo
-     */
-    public void addTransportRelationship(String transport, String cargo) {
-        if(!transportLinkages.containsKey(transport)) {
-            transportLinkages.put(transport, new ArrayList<>());
-        }
-        
-        transportLinkages.get(transport).add(cargo);
     }
 
     public Map<String, Entity> getExternalIDLookup() {

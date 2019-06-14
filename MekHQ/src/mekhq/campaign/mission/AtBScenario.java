@@ -29,6 +29,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.UUID;
@@ -223,6 +224,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     HashMap<UUID, Entity> entityIds;
 
+    // key-value pairs linking transports and the units loaded onto them.
+    private Map<String, List<String>> transportLinkages;
+    
     private static ResourceBundle defaultResourceBundle = ResourceBundle.getBundle("mekhq.resources.AtBScenarioBuiltIn", new EncodeControl()); //$NON-NLS-1$
     
     public AtBScenario () {
@@ -236,6 +240,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         attachedUnitIds = new ArrayList<UUID>();
         survivalBonus = new ArrayList<UUID>();
         entityIds = new HashMap<UUID, Entity>();
+        setTransportLinkages(new HashMap<>());
 
         light = PlanetaryConditions.L_DAY;
         weather = PlanetaryConditions.WE_NONE;
@@ -2186,5 +2191,26 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     public void setEnemyHome(int enemyHome) {
         this.enemyHome = enemyHome;
+    }
+    
+    public Map<String, List<String>> getTransportLinkages() {
+        return transportLinkages;
+    }
+
+    public void setTransportLinkages(HashMap<String, List<String>> transportLinkages) {
+        this.transportLinkages = transportLinkages;
+    }
+    
+    /**
+     * Adds a transport-cargo pair to the internal transport relationship store.
+     * @param transport
+     * @param cargo
+     */
+    public void addTransportRelationship(String transport, String cargo) {
+        if(!transportLinkages.containsKey(transport)) {
+            transportLinkages.put(transport, new ArrayList<>());
+        }
+        
+        transportLinkages.get(transport).add(cargo);
     }
 }

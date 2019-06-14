@@ -794,7 +794,7 @@ public class AtBDynamicScenarioFactory {
      * @param skill
      * @param campaign
      */
-    public static List<Entity> fillTransport(AtBDynamicScenario scenario, Entity transport, UnitGeneratorParameters params, int skill, Campaign campaign) {
+    private static List<Entity> fillTransport(AtBScenario scenario, Entity transport, UnitGeneratorParameters params, int skill, Campaign campaign) {
         List<Entity> transportedUnits = new ArrayList<>();
         
         for(Transporter bay : transport.getTransports()) {
@@ -850,7 +850,7 @@ public class AtBDynamicScenarioFactory {
      * @param campaign
      * @return
      */
-    private static List<Entity> fillTransports(AtBDynamicScenario scenario, List<Entity> transports, String factionCode, int skill, int quality, int year, Campaign campaign) {
+    public static List<Entity> fillTransports(AtBScenario scenario, List<Entity> transports, String factionCode, int skill, int quality, int year, Campaign campaign) {
         List<Entity> transportedUnits = new ArrayList<>();
         
         UnitGeneratorParameters params = new UnitGeneratorParameters();
@@ -1813,7 +1813,7 @@ public class AtBDynamicScenarioFactory {
      * @param campaign Campaign object. In the future, may be used to check list of bombs
      * for technological availability.
      */
-    private static void populateAeroBombs(List<Entity> entityList, Campaign campaign) {
+    public static void populateAeroBombs(List<Entity> entityList, Campaign campaign) {
         int maxBombers = Compute.randomInt(entityList.size()) + 1;
         int numBombers = 0;
         
