@@ -35,6 +35,11 @@ import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.Vector;
 
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -1666,10 +1671,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             
             for(String key : transportLinkages.keySet()) {
                 pw1.println(MekHqXmlUtil.indentStr(indent+2) + "<transportLinkage>");
-                pw1.println(MekHqXmlUtil.indentStr(indent+3) + "<transportID>" + key + "</transportID>");
-                pw1.println(MekHqXmlUtil.indentStr(indent+3) + "<transportedUnits>" +
-                        String.join(",", transportLinkages.get(key)) + "</transportedUnits>");
-                
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "transportID", key);
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "transportedUnits", String.join(",", transportLinkages.get(key)));                
                 pw1.println(MekHqXmlUtil.indentStr(indent+2) + "</transportLinkage>");
             }
             
@@ -1888,7 +1891,13 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                     survivalBonus.add(UUID.fromString(s));
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("transportLinkages")) {
-                loadTransportLinkages(wn2);
+                try {
+                    loadTransportLinkages(wn2);
+                } catch (Exception e) {
+                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                            "Error loading transport linkages in scenario"); //$NON-NLS-1$
+                    MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
+                }
             }
         }
         /* In the event a discrepancy occurs between a RAT entry and the unit lookup name,
@@ -1904,12 +1913,16 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         survivalBonus.removeAll(toRemove);
     }
 
-    private void loadTransportLinkages(Node wn) {
-        for(int x = 0; x < wn.getChildNodes().getLength(); x++) {
-            String transportID = wn.getChildNodes().item(x).getChildNodes().item(0).getNodeValue();
-            List<String> transporteeIDs = Arrays.asList(wn.getChildNodes().item(x).getChildNodes().item(1).getNodeValue().split(","));
+    private void loadTransportLinkages(Node wn) throws XPathExpressionException {
+        XPath xp = MekHqXmlUtil.getXPathInstance();
+        NodeList transportIDs = (NodeList) xp.evaluate("transportLinkage/transportID", wn, XPathConstants.NODESET);
+        NodeList transporteeIDs = (NodeList) xp.evaluate("transportLinkage/transportedUnits", wn, XPathConstants.NODESET);
+        
+        for(int x = 0; x < transportIDs.getLength(); x++) {
+            String transportID = transportIDs.item(x).getTextContent();
+            List<String> transportedUnitIDs = Arrays.asList(transporteeIDs.item(x).getTextContent().split(","));
             
-            transportLinkages.put(transportID, transporteeIDs);
+            transportLinkages.put(transportID, transportedUnitIDs);
         }
     }
     

@@ -19,6 +19,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.text.StringEscapeUtils;
 import org.w3c.dom.Element;
@@ -48,7 +50,17 @@ public class MekHqXmlUtil {
     private static DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY;
     private static DocumentBuilderFactory UNSAFE_DOCUMENT_BUILDER_FACTORY;
     private static SAXParserFactory SAX_PARSER_FACTORY;
+    private static XPath XPATH_INSTANCE;
 
+    public static XPath getXPathInstance() {
+        if(XPATH_INSTANCE == null) {
+            XPathFactory xpf = XPathFactory.newInstance();
+            XPATH_INSTANCE = xpf.newXPath();
+        }
+        
+        return XPATH_INSTANCE;
+    }
+    
     /**
      * Creates a DocumentBuilder safe from XML external entities
      * attacks, and XML entity expansion attacks.

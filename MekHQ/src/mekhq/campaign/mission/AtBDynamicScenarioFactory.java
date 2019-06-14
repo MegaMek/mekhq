@@ -873,7 +873,9 @@ public class AtBDynamicScenarioFactory {
         Map<String, Integer> idMap = new HashMap<>();
         // this is a bit inefficient, should really give the client/game the ability to look up an entity by external ID
         for(Entity entity : client.getEntitiesVector()) {
-            idMap.put(entity.getExternalIdAsString(), entity.getId());
+            if(entity.getOwnerId() == client.getLocalPlayerNumber()) {
+                idMap.put(entity.getExternalIdAsString(), entity.getId());
+            }
         }
         
         for(int x = 0; x < scenario.getNumBots(); x++) {
