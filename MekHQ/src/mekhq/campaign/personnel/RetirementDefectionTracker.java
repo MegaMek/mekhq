@@ -357,7 +357,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
     
     /**
      * Clears out an individual entirely from this tracker.
-     * @param person
+     * @param person The person to remove
      */
     public void removePerson(Person person) {
         payouts.remove(person.getId());
@@ -369,8 +369,6 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
     
     /**
      * Worker function that clears out any orphan retirement/defection records
-     * @param id ID of the person in question
-     * @param contract Contract in question, if any
      */
     public void cleanupOrphans(Campaign campaign) {
         Iterator<UUID> payoutIterator = payouts.keySet().iterator();
@@ -773,9 +771,11 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
             MekHQ.getLogger().error(RetirementDefectionTracker.class, METHOD_NAME, ex);
         }
 
-        // sometimes, a campaign may be loaded with orphan records in the retirement/defection tracker
-        // let's clean those up here.
-        retVal.cleanupOrphans(c);
+        if(retVal != null) {
+            // sometimes, a campaign may be loaded with orphan records in the retirement/defection tracker
+            // let's clean those up here.
+            retVal.cleanupOrphans(c);
+        }
         
         return retVal;
     }
