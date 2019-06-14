@@ -3,7 +3,9 @@ package mekhq.campaign.mission.atb;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -48,6 +50,7 @@ public class AtBScenarioModifier {
     private Integer unitRemovalCount = null;
     private List<MapLocation> allowedMapLocations = null;
     private Boolean useAmbushLogic = null; 
+    private Boolean switchSides = null;
     
     /**
      * Process this scenario modifier for a particular scenario, given a particular timing indicator.
@@ -88,6 +91,10 @@ public class AtBScenarioModifier {
             if(getUseAmbushLogic() != null && getEventRecipient() != null) {
                 AtBScenarioModifierApplicator.setupAmbush(scenario, campaign, getEventRecipient());
             }
+            
+            if(getSwitchSides() != null && getEventRecipient() != null) {
+                AtBScenarioModifierApplicator.switchSides(scenario, getEventRecipient());
+            }
         }
     }
     
@@ -100,10 +107,19 @@ public class AtBScenarioModifier {
         return scenarioModifierManifest.fileNameList;
     }
     
-    private static List<AtBScenarioModifier> scenarioModifiers;
+    private static Map<String, AtBScenarioModifier> scenarioModifiers;
     
-    public static List<AtBScenarioModifier> getScenarioModifiers() {
+    public static Map<String, AtBScenarioModifier> getScenarioModifiers() {
         return scenarioModifiers;
+    }
+    
+    /**
+     * Convenience method to get a scenario modifier with the specified key.
+     * @param key The key
+     * @return The scenario modifier, if any.
+     */
+    public static AtBScenarioModifier getScenarioModifier(String key) {
+        return scenarioModifiers.get(key);
     }
     
     static {
@@ -133,7 +149,7 @@ public class AtBScenarioModifier {
      * Loads the defined scenario modifiers from the manifest.
      */
     private static void loadScenarioModifiers() {
-        scenarioModifiers = new ArrayList<>();
+        scenarioModifiers = new HashMap<>();
         
         for(String fileName : scenarioModifierManifest.fileNameList) {
             String filePath = String.format("./data/scenariomodifiers/%s", fileName);
@@ -143,11 +159,10 @@ public class AtBScenarioModifier {
                 
                 if(modifier != null) {
                     if(modifier.getModifierName() == null) {
-                        modifier.setModifierName(String.format("%s (%s)", fileName,
-                                modifier.getEventTiming() == EventTiming.PreForceGeneration ? "Pre" : "Post"));
+                        modifier.setModifierName(fileName);
                     }
                     
-                    scenarioModifiers.add(modifier);
+                    scenarioModifiers.put(modifier.getModifierName(), modifier);
                 }
             }
             catch(Exception e) {
@@ -301,6 +316,14 @@ public class AtBScenarioModifier {
 
     public void setUseAmbushLogic(Boolean useAmbushLogic) {
         this.useAmbushLogic = useAmbushLogic;
+    }
+    
+    public Boolean getSwitchSides() {
+        return switchSides;
+    }
+    
+    public void setSwitchSides(Boolean switchSides) {
+        this.switchSides = switchSides;
     }
 }
 

@@ -35,6 +35,34 @@ public class UnitGeneratorParameters {
     }
     
     /**
+     * Thorough deep clone of this generator parameters object.
+     */
+    @Override
+    public UnitGeneratorParameters clone() {
+        UnitGeneratorParameters newParams = new UnitGeneratorParameters();
+        
+        newParams.setFaction(faction);
+        newParams.setUnitType(unitType);
+        newParams.setWeightClass(weightClass);
+        newParams.setYear(year);
+        newParams.setQuality(quality);
+        newParams.setFilter(filter);
+        
+        Collection<EntityMovementMode> newModes = new ArrayList<>();
+        for(EntityMovementMode movementMode : movementModes) {
+            newModes.add(movementMode);
+        }
+        
+        newParams.setMovementModes(newModes);
+        
+        for(MissionRole missionRole : missionRoles) {
+            newParams.addMissionRole(missionRole);
+        }
+        
+        return newParams;
+    }
+    
+    /**
      * Translate the contents of this data structure into a megamek.client.ratgenerator.Parameters object
      * @return
      */

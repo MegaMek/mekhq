@@ -11,22 +11,29 @@ import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
 
+import megamek.client.Client;
 import megamek.client.RandomNameGenerator;
 import megamek.client.RandomSkillsGenerator;
 import megamek.client.RandomUnitGenerator;
 import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.ratgenerator.MissionRole;
+import megamek.common.Bay;
 import megamek.common.Board;
 import megamek.common.BombType;
 import megamek.common.Compute;
 import megamek.common.Crew;
 import megamek.common.Entity;
+import megamek.common.EntityMovementMode;
 import megamek.common.EntityWeightClass;
+import megamek.common.Infantry;
+import megamek.common.InfantryBay;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.OffBoardDirection;
 import megamek.common.PlanetaryConditions;
+import megamek.common.Transporter;
+import megamek.common.TroopSpace;
 import megamek.common.UnitType;
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
@@ -85,6 +92,14 @@ public class AtBDynamicScenarioFactory {
         scenario.setScenarioTemplate(template);
         scenario.setEffectiveOpforSkill(contract.getEnemySkill());
         scenario.setEffectiveOpforQuality(contract.getEnemyQuality());
+        scenario.setMissionId(contract.getId());
+        
+        // apply any fixed modifiers
+        for(String modifierName : template.scenarioModifiers) {
+            if(AtBScenarioModifier.getScenarioModifiers().containsKey(modifierName)) {
+                scenario.getScenarioModifiers().add(AtBScenarioModifier.getScenarioModifiers().get(modifierName));
+            }
+        }
         
         boolean planetsideScenario = template.mapParameters.getMapLocation() == MapLocation.AllGroundTerrain ||
                 template.mapParameters.getMapLocation() == MapLocation.SpecificGroundTerrain;
@@ -124,6 +139,8 @@ public class AtBDynamicScenarioFactory {
         for(int x = scenario.getNumBots() - 1; x >= 0; x--) {
             scenario.removeBotForce(x);
         }
+        
+        scenario.getExternalIDLookup().clear();
         
         // fix the player force weight class and unit count at the current time.
         int playerForceWeightClass = calculatePlayerForceWeightClass(scenario, campaign);
@@ -205,6 +222,11 @@ public class AtBDynamicScenarioFactory {
     */
     public static int generateForce(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign,
             int effectiveBV, int effectiveUnitCount, int weightClass, ScenarioForceTemplate forceTemplate) {
+        // don't generate forces flagged as player-supplied
+        if(forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal()) {
+            return 0;
+        }        
+        
         String factionCode = "";
         int skill = 0;
         int quality = 0;
@@ -244,13 +266,8 @@ public class AtBDynamicScenarioFactory {
                                     forceTemplate.getAllowedUnitType() == UnitType.AERO;
         
         // here we determine the "lance size". Aircraft almost always come in pairs, mechs and tanks, not so much.
-        int lanceSize = usingAerospace ? 2 : getLanceSize(factionCode);
-        
-        
-        // don't generate forces flagged as player-supplied
-        if(forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal()) {
-            return 0;
-        }
+        int lanceSize = usingAerospace ? getAeroLanceSize(forceTemplate.getAllowedUnitType(), isPlanetOwner, factionCode) : 
+                                        getLanceSize(factionCode);
     
         // determine generation parameters
         int forceBV = 0;
@@ -283,8 +300,10 @@ public class AtBDynamicScenarioFactory {
             }
             
             // if we are using the 'atb aero mix', let's decide now whether it's aero or conventional fighter
+            // if we are in space, let's not put conventional fighters there
             int actualUnitType = forceTemplate.getAllowedUnitType();
-            if(isPlanetOwner && actualUnitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX) {
+            if(isPlanetOwner && actualUnitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX &&
+                    scenario.getTemplate().mapParameters.getMapLocation() != MapLocation.Space) {
                 actualUnitType = Compute.d6() > 3 ? UnitType.AERO : UnitType.CONV_FIGHTER;
             } else if(actualUnitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX) {
                 actualUnitType = UnitType.AERO;
@@ -351,7 +370,12 @@ public class AtBDynamicScenarioFactory {
             
             // terminate force generation if we've gone over our unit count or bv budget
             if(forceTemplate.getGenerationMethod() == ForceGenerationMethod.BVScaled.ordinal()) {
-                stopGenerating = forceBV > forceBVBudget;
+                // for bv-scaled forces, we check whether to stop generating after every lance
+                // the target number is the percentage of the bv budget generated so far
+                // if we roll below it, we stop
+                int roll = Compute.randomInt(100);
+                double rollTarget = ((double) forceBV / forceBVBudget) * 100;
+                stopGenerating = roll < rollTarget;
             } else {
                 stopGenerating = generatedEntities.size() >= forceUnitBudget; 
             }
@@ -363,6 +387,10 @@ public class AtBDynamicScenarioFactory {
         while(forceUnitBudget > 0 && generatedEntities.size() > forceUnitBudget) {
             generatedEntities.remove(Compute.randomInt(generatedEntities.size()));
         }
+        
+        // "flavor" feature - fill up APCs with infantry
+        List<Entity> transportedEntities = fillTransports(scenario, generatedEntities, factionCode, skill, quality, campaign);
+        generatedEntities.addAll(transportedEntities);
         
         BotForce generatedForce = new BotForce();
         generatedForce.setEntityList(generatedEntities);
@@ -616,12 +644,12 @@ public class AtBDynamicScenarioFactory {
     public static void setScenarioModifiers(AtBDynamicScenario scenario) {
         // this is hardcoded for now, but the eventual plan is to let the user configure how many modifiers
         // they want applied
-        int numMods = 2;//Compute.randomInt(2);
+        int numMods = Compute.randomInt(2);
         
         for(int x = 0; x < numMods; x++) {
             int scenarioIndex = Compute.randomInt(AtBScenarioModifier.getScenarioModifiers().size());
             
-            AtBScenarioModifier scenarioMod = AtBScenarioModifier.getScenarioModifiers().get(scenarioIndex);
+            AtBScenarioModifier scenarioMod = (AtBScenarioModifier) AtBScenarioModifier.getScenarioModifiers().values().toArray()[scenarioIndex];
          
             if((scenarioMod.getAllowedMapLocations() == null) ||
                     scenarioMod.getAllowedMapLocations().contains(scenario.getTemplate().mapParameters.getMapLocation())) {
@@ -640,7 +668,7 @@ public class AtBDynamicScenarioFactory {
      * @param campaign The campaign
      * @param when Before or after force generation
      */
-    private static void applyScenarioModifiers(AtBDynamicScenario scenario, Campaign campaign, EventTiming when) {
+    public static void applyScenarioModifiers(AtBDynamicScenario scenario, Campaign campaign, EventTiming when) {
         for(AtBScenarioModifier scenarioMod : scenario.getScenarioModifiers()) {
             scenarioMod.processModifier(scenario, campaign, when);
         }
@@ -759,13 +787,121 @@ public class AtBDynamicScenarioFactory {
     }
     
     /**
+     * Fill the given transport entity with a bunch of units that it can carry.
+     * Currently only works for infantry transports.
+     * @param transport
+     * @param params
+     * @param skill
+     * @param campaign
+     */
+    private static List<Entity> fillTransport(AtBScenario scenario, Entity transport, UnitGeneratorParameters params, int skill, Campaign campaign) {
+        List<Entity> transportedUnits = new ArrayList<>();
+        
+        for(Transporter bay : transport.getTransports()) {
+            if(bay instanceof TroopSpace) {
+                double bayCapacity = ((TroopSpace) bay).getUnused();
+                
+                UnitGeneratorParameters newParams = params.clone();
+                newParams.clearMovementModes();
+                newParams.setUnitType(UnitType.INFANTRY);
+                newParams.setWeightClass(AtBDynamicScenarioFactory.UNIT_WEIGHT_UNSPECIFIED);
+                
+                // to save ourselves having to re-generate a bunch of infantry for smaller bays (3 tons and lower)
+                // we will limit ourselves to generating low-weight foot platoons
+                if(bayCapacity <= IUnitGenerator.FOOT_PLATOON_INFANTRY_WEIGHT) {
+                    newParams.getMovementModes().add(EntityMovementMode.INF_LEG);
+                    newParams.setFilter(inf -> inf.getTons() <= IUnitGenerator.FOOT_PLATOON_INFANTRY_WEIGHT);
+                } else {
+                    newParams.getMovementModes().addAll(IUnitGenerator.ALL_INFANTRY_MODES);
+                    newParams.setFilter(inf -> inf.getTons() <= bayCapacity);
+                }
+                
+                MechSummary ms = campaign.getUnitGenerator().generate(newParams);
+                
+                if (ms == null) {
+                    continue;
+                }
+                
+                Entity infantry = createEntityWithCrew(params.getFaction(), skill, campaign, ms);
+                
+                // if we're dealing with a *really* small bay, drop the # squads down until we can fit it in
+                while(infantry.getWeight() > bayCapacity) {
+                    ((Infantry) infantry).setSquadN(((Infantry) infantry).getSquadN() - 1);
+                    infantry.autoSetInternal();
+                }
+                
+                scenario.addTransportRelationship(transport.getExternalIdAsString(), infantry.getExternalIdAsString());
+                
+                transportedUnits.add(infantry);
+            }
+        }
+        
+        return transportedUnits;
+    }
+    
+    /**
+     * Fill the provided transports with randomly generated units that
+     * can fit into their bays.
+     * @param transports
+     * @param factionCode
+     * @param skill
+     * @param quality
+     * @param year
+     * @param campaign
+     * @return
+     */
+    public static List<Entity> fillTransports(AtBScenario scenario, List<Entity> transports, String factionCode, int skill, int quality, Campaign campaign) {
+        List<Entity> transportedUnits = new ArrayList<>();
+        
+        UnitGeneratorParameters params = new UnitGeneratorParameters();
+        params.setFaction(factionCode);
+        params.setQuality(quality);
+        params.setYear(campaign.getGameYear());
+        
+        for(Entity transport : transports) {
+            transportedUnits.addAll(fillTransport(scenario, transport, params, skill, campaign));
+        }
+        
+        return transportedUnits;
+    }
+    
+    /**
+     * Handles loading transported units onto their transports once a megamek scenario has actually started;
+     * @param scenario
+     */
+    public static void loadTransports(AtBScenario scenario, Client client) {
+        Map<String, Integer> idMap = new HashMap<>();
+        // this is a bit inefficient, should really give the client/game the ability to look up an entity by external ID
+        for(Entity entity : client.getEntitiesVector()) {
+            idMap.put(entity.getExternalIdAsString(), entity.getId());
+        }
+        
+        for(int x = 0; x < scenario.getNumBots(); x++) {
+            BotForce currentBotForce = scenario.getBotForce(x);
+            for(Entity potentialTransport : currentBotForce.getEntityList()) {
+                if(scenario.getTransportLinkages().containsKey(potentialTransport.getExternalIdAsString())) {
+                    for(String cargoID : scenario.getTransportLinkages().get(potentialTransport.getExternalIdAsString())) {
+                        Entity cargo = scenario.getExternalIDLookup().get(cargoID);
+                        
+                        if(idMap.containsKey(cargo.getExternalIdAsString())) {
+                            // send load command to the server
+                            client.sendLoadEntity(idMap.get(cargo.getExternalIdAsString()), 
+                                    idMap.get(potentialTransport.getExternalIdAsString()), -1);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    /**
      * @param faction Faction to use for name generation
      * @param skill Skill rating of the crew
      * @param campaign The campaign instance
      * @param ms Which entity to generate
      * @return An crewed entity
      */
-    private static Entity createEntityWithCrew(String faction, int skill, Campaign campaign, MechSummary ms) {
+    public static Entity createEntityWithCrew(String faction, int skill, Campaign campaign, MechSummary ms) {
         final String METHOD_NAME = "createEntityWithCrew(String,int,Campaign,MechSummary)"; //$NON-NLS-1$
         Entity en = null;
         try {
@@ -1226,31 +1362,18 @@ public class AtBDynamicScenarioFactory {
     }
     
     /**
-     * Worker method that sets deployment zones for the currently-existing forces in a scenario.
-     * Best called after primary player forces have been assigned to the scenario.
+     * Worker method that calculates the deployment zones for all templates in the given scenario
+     * and applies the results to the scenario's bot forces
      * @param scenario The scenario to process
      */
     private static void setDeploymentZones(AtBDynamicScenario scenario) {
-        // loop through all scenario player forces
-        //  for each one, look up the template. If none, random? If yes, calculateDeploymentZone
-        //  for 
-        // repeat for bot forces
-        
-        for(int forceID : scenario.getForceIDs()) {
-            ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
-            
-            if(forceTemplate != null) {
-                calculateDeploymentZone(forceTemplate, scenario, forceTemplate.getForceName());
-            }
+        for(ScenarioForceTemplate forceTemplate : scenario.getTemplate().scenarioForces.values()) {
+            calculateDeploymentZone(forceTemplate, scenario, forceTemplate.getForceName());
         }
         
         for(int botIndex = 0; botIndex < scenario.getNumBots(); botIndex++) {
             BotForce botForce = scenario.getBotForce(botIndex);
-            ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(botForce);
-            
-            if(forceTemplate != null) {
-                botForce.setStart(calculateDeploymentZone(forceTemplate, scenario, forceTemplate.getForceName()));
-            }
+            botForce.setStart(scenario.getBotForceTemplates().get(botForce).getActualDeploymentZone());
         }
     }
     
@@ -1489,6 +1612,11 @@ public class AtBDynamicScenarioFactory {
         
         // first, we figure out the slowest "atb speed" of this group.
         for(Entity entity : entityList) {
+            // don't include transported units in this calculation
+            if(entity.getTransportId() != Entity.NONE) {
+                continue;
+            }
+            
             int speed = calculateAtBSpeed(entity);
             
             // don't reduce minimum speed to 0, since dividing by zero further down is problematic
@@ -1577,7 +1705,7 @@ public class AtBDynamicScenarioFactory {
      * @param edge The starting edge
      * @return Opposite edge, as defined in Board.java
      */
-    private static int getOppositeEdge(int edge) {
+    static int getOppositeEdge(int edge) {
         switch(edge) {
         case Board.START_EDGE:
             return Board.START_CENTER;
@@ -1629,19 +1757,23 @@ public class AtBDynamicScenarioFactory {
      * @param isPlanetOwner
      * @return
      */
-    public static int getAeroLanceSize(int unitTypeCode, boolean isPlanetOwner) {
+    public static int getAeroLanceSize(int unitTypeCode, boolean isPlanetOwner, String factionCode) {
+        // capellans use units of three aircraft at a time, others use two
+        // TODO: except maybe clans?
+        int numFightersPerFlight = factionCode == "CC" ? 3 : 2;
+        
         if(unitTypeCode == UnitType.AERO) {
-            return 2;
+            return numFightersPerFlight;
         } else if(unitTypeCode == UnitType.CONV_FIGHTER) {
-            return (Compute.randomInt(3) + 1) * 2;
+            return (Compute.randomInt(3) + 1) * numFightersPerFlight;
         } else {
             int useASFRoll = isPlanetOwner ? Compute.d6() : 6;
-            int weightCountRoll = (Compute.randomInt(3) + 1 * 2); // # of conventional fighters, just in case
+            int weightCountRoll = (Compute.randomInt(3) * numFightersPerFlight); // # of conventional fighters, just in case
             
             // if we are the planet owner, we may use ASF or conventional fighters 
             boolean useASF = useASFRoll >= 4;
             // if we are using ASF, we "always" use 2 at a time, otherwise, use the # of conventional fighters 
-            int unitCount = useASF ? 2 : weightCountRoll;
+            int unitCount = useASF ? numFightersPerFlight : weightCountRoll;
             
             return unitCount;
         }
@@ -1683,7 +1815,7 @@ public class AtBDynamicScenarioFactory {
      * @param campaign Campaign object. In the future, may be used to check list of bombs
      * for technological availability.
      */
-    private static void populateAeroBombs(List<Entity> entityList, Campaign campaign) {
+    public static void populateAeroBombs(List<Entity> entityList, Campaign campaign) {
         int maxBombers = Compute.randomInt(entityList.size()) + 1;
         int numBombers = 0;
         
