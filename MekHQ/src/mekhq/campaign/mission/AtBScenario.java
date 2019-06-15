@@ -1787,10 +1787,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                         Entity en = null;
                         try {
                             en = MekHqXmlUtil.getEntityFromXmlString(wn3);
-                            /*if (wn3.getAttributes().getNamedItem("deployment") != null) {
-                                en.setDeployRound(Math.max(0,
-                                        Integer.parseInt(wn3.getAttributes().getNamedItem("deployment").getTextContent())));
-                            }*/
                         } catch (Exception e) {
                             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                                     "Error loading allied unit in scenario"); //$NON-NLS-1$
@@ -1811,10 +1807,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                         Entity en = null;
                         try {
                             en = MekHqXmlUtil.getEntityFromXmlString(wn3);
-                            if (wn3.getAttributes().getNamedItem("deployment") != null) {
-                                en.setDeployRound(Math.max(0,
-                                        Integer.parseInt(wn3.getAttributes().getNamedItem("deployment").getTextContent())));
-                            }
                         } catch (Exception e) {
                             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                                     "Error loading allied unit in scenario"); //$NON-NLS-1$
@@ -1843,10 +1835,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                                 Entity en = null;
                                 try {
                                     en = MekHqXmlUtil.getEntityFromXmlString(wn4);
-                                    if (wn4.getAttributes().getNamedItem("deployment") != null) {
-                                        en.setDeployRound(Math.max(0,
-                                                Integer.parseInt(wn4.getAttributes().getNamedItem("deployment").getTextContent())));
-                                    }
                                 } catch (Exception e) {
                                     MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                                             "Error loading allied unit in scenario"); //$NON-NLS-1$
