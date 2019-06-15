@@ -40,6 +40,7 @@ import megamek.common.EntityListFile;
 import megamek.common.FighterSquadron;
 import megamek.common.IBomber;
 import megamek.common.IPlayer;
+import megamek.common.Infantry;
 import megamek.common.Jumpship;
 import megamek.common.MULParser;
 import megamek.common.Tank;
@@ -312,6 +313,14 @@ public class MekHqXmlUtil {
                  && !tgtEnt.getCamoFileName().isEmpty()) {
              retVal += "\" camoFileName=\"";
              retVal += String.valueOf(escape(tgtEnt.getCamoFileName()));
+         }
+         
+         if(tgtEnt.getDeployRound() > 0) {
+             retVal += String.format("\" %s=\"%d", MULParser.DEPLOYMENT, tgtEnt.getDeployRound());
+         }
+         
+         if(tgtEnt instanceof Infantry) {
+             retVal += String.format("\" %s=\"%d", MULParser.INF_SQUAD_NUM, ((Infantry) tgtEnt).getSquadN());
          }
 
         retVal += "\">\n";

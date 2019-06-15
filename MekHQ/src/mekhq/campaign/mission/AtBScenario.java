@@ -748,10 +748,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             });
             
             if(campaign.getCampaignOptions().getAllowOpforLocalUnits()) {
-                AtBDynamicScenarioFactory.fillTransports(this, reinforcements, 
+                reinforcements.addAll(AtBDynamicScenarioFactory.fillTransports(this, reinforcements, 
                         getContract(campaign).getEnemyCode(),
                         getContract(campaign).getEnemySkill(), getContract(campaign).getEnemyQuality(), 
-                        campaign);
+                        campaign));
                 
             }
             
@@ -1733,8 +1733,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         }
         crew += MekHqXmlUtil.indentStr(indentLvl+1) + "</crew>\n";
         
-        return retVal.replaceFirst(">", " deployment=\"" +
-            tgtEnt.getDeployRound() + "\">\n" + crew + "\n");
+        return retVal.replaceFirst(">", ">\n" + crew + "\n");
     }
 
     @Override
@@ -1788,10 +1787,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                         Entity en = null;
                         try {
                             en = MekHqXmlUtil.getEntityFromXmlString(wn3);
-                            if (wn3.getAttributes().getNamedItem("deployment") != null) {
+                            /*if (wn3.getAttributes().getNamedItem("deployment") != null) {
                                 en.setDeployRound(Math.max(0,
                                         Integer.parseInt(wn3.getAttributes().getNamedItem("deployment").getTextContent())));
-                            }
+                            }*/
                         } catch (Exception e) {
                             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                                     "Error loading allied unit in scenario"); //$NON-NLS-1$

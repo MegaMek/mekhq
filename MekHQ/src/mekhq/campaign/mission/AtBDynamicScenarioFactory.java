@@ -797,6 +797,11 @@ public class AtBDynamicScenarioFactory {
     private static List<Entity> fillTransport(AtBScenario scenario, Entity transport, UnitGeneratorParameters params, int skill, Campaign campaign) {
         List<Entity> transportedUnits = new ArrayList<>();
         
+        // if we've already filled the transport, no need to do it again.
+        if(scenario.getTransportLinkages().containsKey(transport.getExternalIdAsString())) {
+            return transportedUnits;
+        }
+        
         for(Transporter bay : transport.getTransports()) {
             if(bay instanceof TroopSpace) {
                 double bayCapacity = ((TroopSpace) bay).getUnused();
@@ -830,6 +835,9 @@ public class AtBDynamicScenarioFactory {
                     infantry.autoSetInternal();
                 }
                 
+                // sometimes something crazy will happen and we will not be able to load the unit into the transport
+                // so let's at least not have it deploy right away.
+                infantry.setDeployRound(transport.getDeployRound());
                 scenario.addTransportRelationship(transport.getExternalIdAsString(), infantry.getExternalIdAsString());
                 
                 transportedUnits.add(infantry);
@@ -878,18 +886,19 @@ public class AtBDynamicScenarioFactory {
             }
         }
         
-        for(int x = 0; x < scenario.getNumBots(); x++) {
-            BotForce currentBotForce = scenario.getBotForce(x);
-            for(Entity potentialTransport : currentBotForce.getEntityList()) {
-                if(scenario.getTransportLinkages().containsKey(potentialTransport.getExternalIdAsString())) {
-                    for(String cargoID : scenario.getTransportLinkages().get(potentialTransport.getExternalIdAsString())) {
-                        Entity cargo = scenario.getExternalIDLookup().get(cargoID);
-                        
-                        if(idMap.containsKey(cargo.getExternalIdAsString())) {
-                            // send load command to the server
-                            client.sendLoadEntity(idMap.get(cargo.getExternalIdAsString()), 
-                                    idMap.get(potentialTransport.getExternalIdAsString()), -1);
-                        }
+        for(Entity potentialTransport : client.getEntitiesVector()) {
+            if((potentialTransport.getOwnerId() == client.getLocalPlayerNumber()) && 
+                    scenario.getTransportLinkages().containsKey(potentialTransport.getExternalIdAsString())) {
+                for(String cargoID : scenario.getTransportLinkages().get(potentialTransport.getExternalIdAsString())) {
+                    Entity cargo = scenario.getExternalIDLookup().get(cargoID);
+                    
+                    // if we've the game contains the potential cargo unit
+                    // and the potential transport can actually load it, send the load command to the server
+                    if((cargo != null) && 
+                            idMap.containsKey(cargo.getExternalIdAsString()) && 
+                            potentialTransport.canLoad(cargo)) {
+                        client.sendLoadEntity(idMap.get(cargo.getExternalIdAsString()), 
+                                idMap.get(potentialTransport.getExternalIdAsString()), -1);
                     }
                 }
             }
