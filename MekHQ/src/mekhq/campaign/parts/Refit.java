@@ -494,9 +494,12 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 AmmoType type = (AmmoType)((AmmoBin)nPart).getType();
                 ammoNeeded.merge(type, type.getShots(), Integer::sum);
                 if (nPart instanceof LargeCraftAmmoBin) {
-                    // Adding ammo requires base 15 minutes per ton of ammo. Putting in a new
-                    // capital missile bay can take weeks.
-                    time += 15 * Math.max(1, nPart.getTonnage());
+                    // Adding ammo requires base 15 minutes per ton of ammo or 60 minutes per capital missile
+                    if (type.hasFlag(AmmoType.F_CAP_MISSILE) || type.hasFlag(AmmoType.F_CRUISE_MISSILE) || type.hasFlag(AmmoType.F_SCREEN)) {
+                        time += 60 * ((LargeCraftAmmoBin)nPart).getFullShots();
+                    } else {
+                        time += 15 * Math.max(1, nPart.getTonnage());
+                    }
                     shoppingList.add(nPart);
                 } else {
                     time += 120;
@@ -1743,7 +1746,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         }
         pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "</shoppingList>");
         if(null != newArmorSupplies) {
-            if(newArmorSupplies.getId() == 0) {
+            if(newArmorSupplies.getId() <= 0) {
                 pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<newArmorSupplies>");
                 newArmorSupplies.writeToXml(pw1, indentLvl+2);
                 pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "</newArmorSupplies>");
@@ -1856,7 +1859,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				p.setUnit(u);
 				retVal.shoppingList.add(p);
 			} else {
-				MekHQ.getLogger().error(Refit.class, "processShoppingList()", 
+				MekHQ.getLogger().error(Refit.class, "processShoppingList()",
 					u != null ? String.format("Unit %s has invalid parts in its refit shopping list", u.getId()) : "Invalid parts in shopping list");
 			}
 		}
@@ -2028,6 +2031,9 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 
     public void setNewArmorSupplies(Armor a) {
         newArmorSupplies = a;
+        if (null != a) {
+            newArmorSuppliesId = a.getId();
+        }
     }
 
     public int getNewArmorSuppliesId() {
