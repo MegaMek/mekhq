@@ -611,7 +611,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     /**
-     * 
+     *
      * @return The date a ship search was started, or null if none is in progress.
      */
     public Calendar getShipSearchStart() {
@@ -626,15 +626,15 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     /**
-     * 
-     * @return The lookup name of the available ship, or null if none is available 
+     *
+     * @return The lookup name of the available ship, or null if none is available
      */
     public String getShipSearchResult() {
         return shipSearchResult;
     }
 
     /**
-     * 
+     *
      * @return The date the ship is no longer available, if there is one.
      */
     public Calendar getShipSearchExpiration() {
@@ -799,7 +799,7 @@ public class Campaign implements Serializable, ITechManager {
                 return false;
             }
         }
-        
+
         return true;
     }
 
@@ -1016,7 +1016,7 @@ public class Campaign implements Serializable, ITechManager {
 
     /**
      * Imports a {@link Unit} into a campaign.
-     * 
+     *
      * @param u A {@link Unit} to import into the campaign.
      */
     public void importUnit(Unit u) {
@@ -1270,7 +1270,7 @@ public class Campaign implements Serializable, ITechManager {
             astechPoolOvertime += 120;
         }
         String rankEntry = LogEntryController.generateRankEntryString(p);
-    
+
         p.setFreeMan();
         ServiceLogger.joined(p, getDate(), getName(), rankEntry);
         MekHQ.triggerEvent(new PersonNewEvent(p));
@@ -1416,6 +1416,7 @@ public class Campaign implements Serializable, ITechManager {
         // dont add missing parts if they dont have units or units with not id
         if (p instanceof MissingPart
                 && (null == p.getUnit() || null == p.getUnitId())) {
+            p.setId(-1);
             return;
         }
         if (null == p.getUnit()) {
@@ -1426,6 +1427,7 @@ public class Campaign implements Serializable, ITechManager {
                         ((Armor) spare).setAmount(((Armor) spare).getAmount()
                                 + ((Armor) p).getAmount());
                         MekHQ.triggerEvent(new PartChangedEvent(spare));
+                        p.setId(-1);
                         return;
                     }
                 } else if (p instanceof AmmoStorage) {
@@ -1433,16 +1435,18 @@ public class Campaign implements Serializable, ITechManager {
                         ((AmmoStorage) spare).changeShots(((AmmoStorage) p)
                                 .getShots());
                         MekHQ.triggerEvent(new PartChangedEvent(spare));
+                        p.setId(-1);
                         return;
                     }
                 } else {
                     spare.incrementQuantity();
                     MekHQ.triggerEvent(new PartChangedEvent(spare));
+                    p.setId(-1);
                     return;
                 }
             }
         }
-        parts.put(Integer.valueOf(id), p);
+        parts.put(id, p);
         lastPartId = id;
         MekHQ.triggerEvent(new PartNewEvent(p));
     }
@@ -1490,13 +1494,13 @@ public class Campaign implements Serializable, ITechManager {
             }
             MekHQ.triggerEvent(new PartArrivedEvent(spare));
         } else {
-            MekHQ.triggerEvent(new PartArrivedEvent(p));            
+            MekHQ.triggerEvent(new PartArrivedEvent(p));
         }
     }
 
     /**
      * Imports a {@link Part} into the campaign.
-     * 
+     *
      * @param p The {@link Part} to import into the campaign.
      */
     public void importPart(Part p) {
@@ -1517,6 +1521,7 @@ public class Campaign implements Serializable, ITechManager {
 
         // go ahead and check for existing parts because some version weren't
         // properly collecting parts
+        Part mergedWith = null;
         if (!(p instanceof MissingPart) && null == p.getUnitId()) {
             Part spare = checkForExistingSparePart(p);
             if (null != spare) {
@@ -1524,23 +1529,42 @@ public class Campaign implements Serializable, ITechManager {
                     if (spare instanceof Armor) {
                         ((Armor) spare).setAmount(((Armor) spare).getAmount()
                                 + ((Armor) p).getAmount());
-                        return;
+                        mergedWith = spare;
                     }
                 } else if (p instanceof AmmoStorage) {
                     if (spare instanceof AmmoStorage) {
                         ((AmmoStorage) spare).changeShots(((AmmoStorage) p)
                                 .getShots());
-                        return;
+                        mergedWith = spare;
                     }
                 } else {
                     spare.incrementQuantity();
-                    return;
+                    mergedWith = spare;
                 }
             }
         }
 
-        parts.put(p.getId(), p);
-        MekHQ.triggerEvent(new PartNewEvent(p));
+        // If we weren't merged we are being added
+        if (null == mergedWith) {
+            parts.put(p.getId(), p);
+            MekHQ.triggerEvent(new PartNewEvent(p));
+        } else {
+            // Go through each unit and its refits to see if the new armor ID should be updated
+            // CAW: I believe all other parts on a refit have a unit assigned to them.
+            for (Unit u : getUnits()) {
+                Refit r = u.getRefit();
+                // If there is a refit and this part matches the new armor, update the ID
+                if (null != r && r.getNewArmorSuppliesId() == p.getId()
+                    && mergedWith instanceof Armor) {
+                    MekHQ.getLogger().info(Campaign.class, "addPartWithoutId",
+                        String.format("%s (%d) was merged with %s (%d) used in a refit for %s", p.getName(),
+                            p.getId(), mergedWith.getName(), mergedWith.getId(), u.getName()));
+                    Armor mergedArmor = (Armor)mergedWith;
+                    r.setNewArmorSupplies(mergedArmor);
+                }
+            }
+            MekHQ.triggerEvent(new PartRemovedEvent(p));
+        }
     }
 
     /**
@@ -1808,7 +1832,7 @@ public class Campaign implements Serializable, ITechManager {
     public ArrayList<Person> getTechs() {
         return getTechs(false, null, true, false);
     }
-    
+
     /**
      * Gets a list of all techs of a specific role type
      * @param roleType The filter role type
@@ -1817,14 +1841,14 @@ public class Campaign implements Serializable, ITechManager {
     public List<Person> getTechsByRole(int roleType) {
         List<Person> techs = getTechs(false, null, false, false);
         List<Person> retval = new ArrayList<>();
-        
+
         for(Person tech : techs) {
             if((tech.getPrimaryRole() == roleType) ||
                (tech.getSecondaryRole() == roleType)) {
                 retval.add(tech);
-            }       
+            }
         }
-        
+
         return retval;
     }
 
@@ -1884,7 +1908,7 @@ public class Campaign implements Serializable, ITechManager {
      * toReturn = "<html><font size='2'"; if (unit.isDeployed()) { toReturn +=
      * " color='white'"; } toReturn += ">"; toReturn += unit.getDescHTML(); int
      * totalMin = 0; int total = 0; // int cost = unit.getRepairCost();
-     * 
+     *
      * if (total > 0) { toReturn += "Total tasks: " + total + " (" + totalMin +
      * " minutes)<br/>"; } /* if (cost > 0) { NumberFormat numberFormat =
      * DecimalFormat.getIntegerInstance(); String text = numberFormat.format(cost) +
@@ -2026,7 +2050,7 @@ public class Campaign implements Serializable, ITechManager {
      * This is the main function for getting stuff (parts, units, etc.) All non-GM
      * acquisition should go through this function to ensure the campaign rules for
      * acquisition are followed.
-     * 
+     *
      * @param sList - A <code>ShoppingList</code> object including items that need
      *              to be purchased
      * @return A <code>ShoppingList</code> object that includes all items that were
@@ -2147,33 +2171,33 @@ public class Campaign implements Serializable, ITechManager {
     /***
      * Checks whether the campaign can pay for a given <code>IAcquisitionWork</code> item. This will check
      * both whether the campaign is required to pay for a given type of acquisition by the options and
-     * if so whether it has enough money to afford it. 
+     * if so whether it has enough money to afford it.
      * @param acquisition - An <code>IAcquisitionWork<code> object
-     * @return true if the campaign can pay for the acquisition; false if it cannot. 
+     * @return true if the campaign can pay for the acquisition; false if it cannot.
      */
     public boolean canPayFor(IAcquisitionWork acquisition) {
     	//SHOULD we check to see if this acquisition needs to be paid for
-        if( (acquisition instanceof UnitOrder && getCampaignOptions().payForUnits()) 
+        if( (acquisition instanceof UnitOrder && getCampaignOptions().payForUnits())
                 ||(acquisition instanceof Part && getCampaignOptions().payForParts()) ) {
         	//CAN the acquisition actually be paid for
             return getFunds().isGreaterOrEqualThan(acquisition.getBuyCost());
         }
         return true;
     }
-    
+
     /**
      * Make an acquisition roll for a given planet to see if you can identify a contact. Used for planetary based acquisition.
      * @param acquisition - The <code> IAcquisitionWork</code> being acquired.
-     * @param person - The <code>Person</code> object attempting to do the acquiring.  may be null if no one on the force has the skill or the user is using automatic acquisition. 
-     * @param planet - The <code>Planet</code> object where the acquisition is being attempted. This may be null if the user is not using planetary acquisition. 
-     * @return true if your target roll succeeded. 
+     * @param person - The <code>Person</code> object attempting to do the acquiring.  may be null if no one on the force has the skill or the user is using automatic acquisition.
+     * @param planet - The <code>Planet</code> object where the acquisition is being attempted. This may be null if the user is not using planetary acquisition.
+     * @return true if your target roll succeeded.
      */
     public boolean findContactForAcquisition(IAcquisitionWork acquisition, Person person, Planet planet) {
         DateTime currentDate = Utilities.getDateTimeDay(getCalendar());
         TargetRoll target = getTargetForAcquisition(acquisition, person, false);
         target = planet.getAcquisitionMods(target, getDate(), getCampaignOptions(), getFaction(),
                 acquisition.getTechBase() == Part.T_CLAN);
-        
+
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             if(getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
                 addReport("<font color='red'><b>Can't search for " + acquisition.getAcquisitionName() + " on " + planet.getName(currentDate) + " because:</b></font> " + target.getDesc());
@@ -2188,53 +2212,53 @@ public class Campaign implements Serializable, ITechManager {
             return false;
         } else {
             if(getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
-                addReport("<font color='green'>Possible contact for " + acquisition.getAcquisitionName() + " on " + planet.getName(currentDate) + "</font>");     	
+                addReport("<font color='green'>Possible contact for " + acquisition.getAcquisitionName() + " on " + planet.getName(currentDate) + "</font>");
             }
             return true;
         }
     }
-    
+
     /***
-     * Attempt to acquire a given <code>IAcquisitionWork</code> object. 
-     * This is the default method used by for non-planetary based acquisition. 
+     * Attempt to acquire a given <code>IAcquisitionWork</code> object.
+     * This is the default method used by for non-planetary based acquisition.
      * @param acquisition  - The <code> IAcquisitionWork</code> being acquired.
-     * @param person - The <code>Person</code> object attempting to do the acquiring.  may be null if no one on the force has the skill or the user is using automatic acquisition. 
-     * @return a boolean indicating whether the attempt to acquire equipment was successful. 
+     * @param person - The <code>Person</code> object attempting to do the acquiring.  may be null if no one on the force has the skill or the user is using automatic acquisition.
+     * @return a boolean indicating whether the attempt to acquire equipment was successful.
      */
     public boolean acquireEquipment(IAcquisitionWork acquisition, Person person) {
         return acquireEquipment(acquisition, person, null, -1);
     }
-    
+
     /***
-     * Attempt to acquire a given <code>IAcquisitionWork</code> object. 
+     * Attempt to acquire a given <code>IAcquisitionWork</code> object.
      * @param acquisition - The <code> IAcquisitionWork</code> being acquired.
-     * @param person - The <code>Person</code> object attempting to do the acquiring.  may be null if no one on the force has the skill or the user is using automatic acquisition. 
-     * @param planet - The <code>Planet</code> object where the acquisition is being attempted. This may be null if the user is not using planetary acquisition. 
-     * @param transitDays - The number of days that the part should take to be delivered. If this value is entered as -1, then this method will determine transit time based on the users campaign options. 
-     * @return a boolean indicating whether the attempt to acquire equipment was successful. 
+     * @param person - The <code>Person</code> object attempting to do the acquiring.  may be null if no one on the force has the skill or the user is using automatic acquisition.
+     * @param planet - The <code>Planet</code> object where the acquisition is being attempted. This may be null if the user is not using planetary acquisition.
+     * @param transitDays - The number of days that the part should take to be delivered. If this value is entered as -1, then this method will determine transit time based on the users campaign options.
+     * @return a boolean indicating whether the attempt to acquire equipment was successful.
      */
     private boolean acquireEquipment(IAcquisitionWork acquisition, Person person, Planet planet, int transitDays) {
         boolean found = false;
         String report = "";
-        
+
         if (null != person) {
             report += person.getHyperlinkedFullTitle() + " ";
         }
-        
+
         TargetRoll target = getTargetForAcquisition(acquisition, person, false);
-        
+
         //check on funds
         if(!canPayFor(acquisition)) {
             target.addModifier(TargetRoll.IMPOSSIBLE, "Cannot afford this purchase");
         }
-        
+
         if(null != planet) {
             target = planet.getAcquisitionMods(target, getDate(), getCampaignOptions(), getFaction(),
                     acquisition.getTechBase() == Part.T_CLAN);
-        }     
-        
+        }
+
         report += "attempts to find " + acquisition.getAcquisitionName();
-        
+
         //if impossible then return
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             report += ":<font color='red'><b> " + target.getDesc() + "</b></font>";
@@ -2243,14 +2267,14 @@ public class Campaign implements Serializable, ITechManager {
             }
             return false;
         }
-        
-        
+
+
         int roll = Compute.d6(2);
         report += "  needs " + target.getValueAsString();
         report += " and rolls " + roll + ":";
         //Edge reroll, if applicable
         if (roll < target.getValue()
-                && getCampaignOptions().useSupportEdge() 
+                && getCampaignOptions().useSupportEdge()
                 && null != person
                 && person.getOptions().booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL)
                 && person.getCurrentEdge() > 0) {
@@ -2563,7 +2587,7 @@ public class Campaign implements Serializable, ITechManager {
                 + " and rolls " + roll + ":";
         int xpGained = 0;
         //if we fail and would break a part, here's a chance to use Edge for a reroll...
-        if (getCampaignOptions().useSupportEdge() 
+        if (getCampaignOptions().useSupportEdge()
                 && tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART)
                 && tech.getCurrentEdge() > 0
                 && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
@@ -2582,7 +2606,7 @@ public class Campaign implements Serializable, ITechManager {
                 if (tech.isEngineer()) {
                     tech.setEdgeUsed(tech.getEdgeUsed() + 1);
                 }
-                report += " <b>failed!</b> and would destroy the part, but uses Edge to reroll...getting a " + roll + ":";                
+                report += " <b>failed!</b> and would destroy the part, but uses Edge to reroll...getting a " + roll + ":";
             }
         }
         if (roll >= target.getValue()) {
@@ -2673,7 +2697,7 @@ public class Campaign implements Serializable, ITechManager {
             // had time to assign forces to the contract yet
             return 0;
         }
-        
+
         int total = -contract.getRequiredLances();
         int role = -Math.max(1, contract.getRequiredLances() / 2);
 
@@ -2691,7 +2715,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         return Math.abs(Math.min(total, role));
     }
-    
+
     private void processNewDayATBScenarios() {
         for (Mission m : getMissions()) {
             if (!m.isActive() || !(m instanceof AtBContract) || getDate().before(((Contract) m).getStartDate())) {
@@ -2704,7 +2728,7 @@ public class Campaign implements Serializable, ITechManager {
              * unit is actually on route to the planet in case the user is using a custom
              * system for transport or splitting the unit, etc.
              */
-            if (!getLocation().isOnPlanet() && 
+            if (!getLocation().isOnPlanet() &&
                     getLocation().getJumpPath().getLastPlanet().getId().equals(m.getPlanetId())) {
                 /*
                  * transitTime is measured in days; round up to the next whole day, then convert
@@ -2732,7 +2756,7 @@ public class Campaign implements Serializable, ITechManager {
                 if (!s.isCurrent() || !(s instanceof AtBScenario)) {
                     continue;
                 }
-                if (s.getDate() != null && 
+                if (s.getDate() != null &&
                         s.getDate().before(calendar.getTime())) {
                     s.setStatus(Scenario.S_DEFEAT);
                     s.clearAllForcesAndPersonnel(this);
@@ -2943,7 +2967,7 @@ public class Campaign implements Serializable, ITechManager {
                     u.resetPilotAndEntity();
                 }
             }
-            
+
             // Reset edge points to the purchased value each week. This should only
             // apply for support personnel - combat troops reset with each new mm game
             if ((p.isAdmin() || p.isDoctor() || p.isEngineer() || p.isTech())
@@ -3111,7 +3135,7 @@ public class Campaign implements Serializable, ITechManager {
         processNewDayUnits();
 
         shoppingList = goShopping(shoppingList);
-        
+
         // check for anything in finances
         finances.newDay(this);
 
@@ -3268,7 +3292,7 @@ public class Campaign implements Serializable, ITechManager {
             astechPoolMinutes = Math.max(0, astechPoolMinutes - 240);
             astechPoolOvertime = Math.max(0, astechPoolOvertime - 120);
         }
-        MekHQ.triggerEvent(new PersonRemovedEvent(person));        
+        MekHQ.triggerEvent(new PersonRemovedEvent(person));
     }
 
     public void awardTrainingXP(Lance l) {
@@ -4135,7 +4159,7 @@ public class Campaign implements Serializable, ITechManager {
 
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</" + tag + ">");
     }
-    
+
     /**
      * A helper function to encapsulate writing the map entries out to XML.
      *
@@ -4223,7 +4247,7 @@ public class Campaign implements Serializable, ITechManager {
     public Person newPerson(int type, int secondary) {
         return newPerson(type, secondary, getFactionCode());
     }
-    
+
     public Person newPerson(int type, String factionCode) {
         return newPerson(type, Person.T_NONE, factionCode);
     }
@@ -4496,19 +4520,19 @@ public class Campaign implements Serializable, ITechManager {
      * If the person does not already have a bloodname, assigns a chance of having one based on
      * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
      * appropriate to the person's phenotype and the player's faction.
-     * 
+     *
      * @param person       The Bloodname candidate
      * @param type         The phenotype index
      */
     public void checkBloodnameAdd(Person person, int type) {
         checkBloodnameAdd(person, type, false, this.factionCode);
     }
-    
+
     /**
      * If the person does not already have a bloodname, assigns a chance of having one based on
      * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
      * appropriate to Clan and phenotype.
-     * 
+     *
      * @param person       The Bloodname candidate
      * @param type         The phenotype index
      * @param factionCode  The shortName of the faction the person belongs to. Note that there
@@ -4518,12 +4542,12 @@ public class Campaign implements Serializable, ITechManager {
     public void checkBloodnameAdd(Person person, int type, String factionCode) {
         checkBloodnameAdd(person, type, false, factionCode);
     }
-    
+
     /**
      * If the person does not already have a bloodname, assigns a chance of having one based on
      * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
      * appropriate to the person's phenotype and the player's faction.
-     * 
+     *
      * @param person       The Bloodname candidate
      * @param type         The phenotype index
      * @param ignoreDice   If true, skips the random roll and assigns a Bloodname automatically
@@ -4536,7 +4560,7 @@ public class Campaign implements Serializable, ITechManager {
      * If the person does not already have a bloodname, assigns a chance of having one based on
      * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
      * appropriate to Clan and phenotype.
-     * 
+     *
      * @param person       The Bloodname candidate
      * @param type         The phenotype index
      * @param ignoreDice   If true, skips the random roll and assigns a Bloodname automatically
@@ -4903,7 +4927,7 @@ public class Campaign implements Serializable, ITechManager {
                 // We're done - probably failed to find anything
                 break;
             }
-            
+
             closed.add(current);
             open.remove(current);
             if (current.equals(endKey)) {
@@ -5622,7 +5646,7 @@ public class Campaign implements Serializable, ITechManager {
     public int getPossibleAstechPoolOvertime() {
         return 240 * getNumberPrimaryAstechs() + 120 * getNumberSecondaryAstechs();
     }
-    
+
     public void setAstechPool(int size) {
         astechPool = size;
     }
@@ -6004,7 +6028,7 @@ public class Campaign implements Serializable, ITechManager {
                         e.generateDisplayName();
                     }
                 }
-                duplicateNameHash.put(entity.getShortNameRaw(), 
+                duplicateNameHash.put(entity.getShortNameRaw(),
                     Integer.valueOf(count - 1));
             } else {
                 duplicateNameHash.remove(entity.getShortNameRaw());
@@ -6658,11 +6682,11 @@ public class Campaign implements Serializable, ITechManager {
     /***
      * Calculate transit time for supplies based on what planet they are shipping from. To prevent extra
      * computation. This method does not calculate an exact jump path but rather determines the number of jumps
-     * crudely by dividing distance in light years by 30 and then rounding up. Total part time is determined by 
+     * crudely by dividing distance in light years by 30 and then rounding up. Total part time is determined by
      * several by adding the following:
-     * - (number of jumps - 1)*7 days with a minimum value of zero. 
+     * - (number of jumps - 1)*7 days with a minimum value of zero.
      * - transit times from current planet and planet of supply origins in cases where the supply planet is not the same as current planet.
-     * - a random 1d6 days for each jump plus 1d6 to simulate all of the other logistics of delivery. 
+     * - a random 1d6 days for each jump plus 1d6 to simulate all of the other logistics of delivery.
      * @param planet - A <code>Planet</code> object where the supplies are shipping from
      * @return the number of days that supplies will take to arrive.
      */
@@ -6671,7 +6695,7 @@ public class Campaign implements Serializable, ITechManager {
         //the basic formula assumes 7 days per jump + system transit time on each side + random days equal
         //to (1+number of jumps)d6
         double distance = planet.getDistanceTo(getCurrentPlanet());
-        //calculate number of jumps by dividing by 30 
+        //calculate number of jumps by dividing by 30
         int jumps = (int)Math.ceil(distance/30.0);
         //you need a recharge except for the first jump
         int recharges = Math.max(jumps - 1, 0);
@@ -6681,15 +6705,15 @@ public class Campaign implements Serializable, ITechManager {
         int amazonFreeShipping = Compute.d6(1+jumps);
         return recharges*7+currentTransitTime+originTransitTime+amazonFreeShipping;
     }
-    
+
     /***
      * Calculate transit times based on the margin of success from an acquisition roll. The values here are
-     * all based on what the user entered for the campaign options. 
+     * all based on what the user entered for the campaign options.
      * @param mos - an integer of the margin of success of an acquisition roll
      * @return the number of days that supplies will take to arrive.
      */
-    public int calculatePartTransitTime(int mos) {    	
-    
+    public int calculatePartTransitTime(int mos) {
+
         int nDice = getCampaignOptions().getNDiceTransitTime();
         int time = getCampaignOptions().getConstantTransitTime();
         if (nDice > 0) {
@@ -6812,7 +6836,7 @@ public class Campaign implements Serializable, ITechManager {
         if (part instanceof AmmoStorage) {
             countModifier = "shots";
         }
-        
+
         inventory.setCountModifier(countModifier);
         return inventory;
     }
@@ -8095,7 +8119,7 @@ public class Campaign implements Serializable, ITechManager {
         getUnitMarket().generateUnitOffers(this);
         setAtBEventProcessor(new AtBEventProcessor(this));
     }
-    
+
     /**
      * Stop processing AtB events and release memory.
      */
