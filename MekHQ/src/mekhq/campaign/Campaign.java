@@ -1549,13 +1549,36 @@ public class Campaign implements Serializable, ITechManager {
             for (Unit u : getUnits()) {
                 Refit r = u.getRefit();
                 // If there is a refit and this part matches the new armor, update the ID
-                if (null != r && r.getNewArmorSuppliesId() == p.getId()
-                    && mergedWith instanceof Armor) {
-                    MekHQ.getLogger().info(Campaign.class, "addPartWithoutId",
-                        String.format("%s (%d) was merged with %s (%d) used in a refit for %s", p.getName(),
-                            p.getId(), mergedWith.getName(), mergedWith.getId(), u.getName()));
-                    Armor mergedArmor = (Armor)mergedWith;
-                    r.setNewArmorSupplies(mergedArmor);
+                if (null != r) {
+                    if (mergedWith instanceof Armor
+                        && r.getNewArmorSuppliesId() == p.getId()) {
+                        MekHQ.getLogger().info(Campaign.class, "addPartWithoutId",
+                            String.format("%s (%d) was merged with %s (%d) used in a refit for %s", p.getName(),
+                                p.getId(), mergedWith.getName(), mergedWith.getId(), u.getName()));
+                        Armor mergedArmor = (Armor)mergedWith;
+                        r.setNewArmorSupplies(mergedArmor);
+                    } else {
+                        List<Integer> ids = r.getOldUnitPartIds();
+                        for (int ii = 0; ii < ids.size(); ++ii) {
+                            int oid = (int)ids.get(ii);
+                            if (p.getId() == oid) {
+                                MekHQ.getLogger().info(Campaign.class, "addPartWithoutId",
+                                String.format("%s (%d) was merged with %s (%d) used in the old unit in a refit for %s", p.getName(),
+                                    p.getId(), mergedWith.getName(), mergedWith.getId(), u.getName()));
+                                ids.set(ii, mergedWith.getId());
+                            }
+                        }
+                        ids = r.getNewUnitPartIds();
+                        for (int ii = 0; ii < ids.size(); ++ii) {
+                            int nid = (int)ids.get(ii);
+                            if (p.getId() == nid) {
+                                MekHQ.getLogger().info(Campaign.class, "addPartWithoutId",
+                                String.format("%s (%d) was merged with %s (%d) used in the new unit in a refit for %s", p.getName(),
+                                    p.getId(), mergedWith.getName(), mergedWith.getId(), u.getName()));
+                                ids.set(ii, mergedWith.getId());
+                            }
+                        }
+                    }
                 }
             }
             MekHQ.triggerEvent(new PartRemovedEvent(p));

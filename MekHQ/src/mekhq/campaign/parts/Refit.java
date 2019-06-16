@@ -206,6 +206,26 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         return cost;
     }
 
+    /**
+     * Returns a mutable list of part IDs for the old unit in the refit.
+     * This is intended to be mutated only be {@link Campaign} when merging
+     * parts.
+     * @return A mutable {@link List} of old part IDs in the refit.
+     */
+    public List<Integer> getOldUnitPartIds() {
+        return oldUnitParts;
+    }
+
+    /**
+     * Returns a mutable list of part IDs for the new unit in the refit.
+     * This is intended to be mutated only be {@link Campaign} when merging
+     * parts.
+     * @return A mutable {@link List} of new part IDs in the refit.
+     */
+    public List<Integer> getNewUnitPartIds() {
+        return newUnitParts;
+    }
+
     public List<Part> getShoppingList() {
         return shoppingList;
     }
