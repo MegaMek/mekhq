@@ -137,7 +137,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
     private Armor newArmorSupplies;
     private int newArmorSuppliesId;
     private boolean sameArmorType;
-    
+
     private int oldLargeCraftHeatSinks;
     private int oldLargeCraftSinkType;
     private int newLargeCraftHeatSinks;
@@ -1771,7 +1771,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         }
         pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "</shoppingList>");
         if(null != newArmorSupplies) {
-            if(newArmorSupplies.getId() == 0) {
+            if(newArmorSupplies.getId() <= 0) {
                 pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<newArmorSupplies>");
                 newArmorSupplies.writeToXml(pw1, indentLvl+2);
                 pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "</newArmorSupplies>");
@@ -1876,19 +1876,19 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 // Errr, what should we do here?
                 MekHQ.getLogger().log(Refit.class, "processShoppingList(Refit,Node,Unit,Version)", LogLevel.ERROR, //$NON-NLS-1$
                         "Unknown node type not loaded in Part nodes: " + wn2.getNodeName()); //$NON-NLS-1$
-                continue;
-            }
+				continue;
+			}
 
-            Part p = Part.generateInstanceFromXML(wn2, version);
-            if (p != null) {
-                p.setUnit(u);
-                retVal.shoppingList.add(p);
-            } else {
-                MekHQ.getLogger().error(Refit.class, "processShoppingList()", 
-                    u != null ? String.format("Unit %s has invalid parts in its refit shopping list", u.getId()) : "Invalid parts in shopping list");
-            }
-        }
-    }
+			Part p = Part.generateInstanceFromXML(wn2, version);
+			if (p != null) {
+				p.setUnit(u);
+				retVal.shoppingList.add(p);
+			} else {
+				MekHQ.getLogger().error(Refit.class, "processShoppingList()",
+					u != null ? String.format("Unit %s has invalid parts in its refit shopping list", u.getId()) : "Invalid parts in shopping list");
+			}
+		}
+	}
 
     private static void processArmorSupplies(Refit retVal, Node wn, Version version) {
 
@@ -2056,6 +2056,9 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 
     public void setNewArmorSupplies(Armor a) {
         newArmorSupplies = a;
+        if (null != a) {
+            newArmorSuppliesId = a.getId();
+        }
     }
 
     public int getNewArmorSuppliesId() {
