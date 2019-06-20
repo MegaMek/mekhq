@@ -1,3 +1,24 @@
+/*
+ * ScenarioTemplateEditorDialog.java
+ *
+ * Copyright (c) 2019 The Megamek Team. All rights reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package mekhq.gui.dialog;
 
 import java.awt.Color;
@@ -33,6 +54,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.LineBorder;
@@ -47,6 +69,7 @@ import mekhq.campaign.mission.ScenarioMapParameters;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
+import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.preferences.JWindowPreference;
@@ -114,6 +137,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     JRadioButton btnUseSpaceMap;
     JRadioButton btnUseSpecificMapTypes;
     JRadioButton btnUseLowAtmosphereMap;
+    JComboBox<AtBScenarioModifier> modifierBox;
+    JList<String> selectedModifiersList;
     
     JPanel globalPanel;
     
@@ -157,7 +182,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         globalPanel.setLayout(new GridBagLayout());
         
         JScrollPane globalScrollPane = new JScrollPane(globalPanel);
-        globalScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        globalScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         globalScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         getContentPane().add(globalScrollPane);        
         
@@ -413,6 +438,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         forcedPanel.add(lstDeployZones, gbc);
         
         JLabel lblAllowedUnitTypes = new JLabel("Unit Type:");
+        lblAllowedUnitTypes.setToolTipText("The type of unit. If player-supplied, indicates a limitation on the type of unit the player can deploy.");
         gbc.gridx = 3;
         gbc.gridy = 1;
         gbc.gridheight = 1;
@@ -439,17 +465,18 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         cboUnitType.addItemListener(unitTypeChangeListener);
         
         JLabel lblArrivalTurn = new JLabel("Arrival Turn:");
-        lblArrivalTurn.setToolTipText("The turn on which this force arrives. Enter -1 for staggered arrival, -2 for staggered arrival by lance.");
+        lblArrivalTurn.setToolTipText("The turn on which this force arrives. Enter -1 for staggered arrival, -2 for staggered arrival by lance, -3 for 'as reinforcements' arrival time.");
         gbc.gridy++;
         gbc.gridx--;
         forcedPanel.add(lblArrivalTurn, gbc);
         
-        spnArrivalTurn = new JSpinner(new SpinnerNumberModel(0, -2, 100, 1));
+        spnArrivalTurn = new JSpinner(new SpinnerNumberModel(0, ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS, 100, 1));
         gbc.gridx++;
         forcedPanel.add(spnArrivalTurn, gbc);
         
         JLabel lblFixedUnitCount = new JLabel("Fixed Unit Count:");
-        lblFixedUnitCount.setToolTipText("How many units in the force, if using the fixed unit count generation method. -1 indicates a lance, appropriate to the owner's faction.");
+        lblFixedUnitCount.setToolTipText("How many units in the force, if using the fixed unit count generation method. -1 indicates a lance, appropriate to the owner's faction.\n" +
+                        "If player-supplied, indicates an upper bound on the number of units the player can deploy.");
         gbc.gridy++;
         gbc.gridx--;
         forcedPanel.add(lblFixedUnitCount, gbc);
@@ -600,13 +627,12 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      */
     private void setupMapParameters(GridBagConstraints gbc) {
         gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
-        gbc.gridheight = 1;
-        
+        int currentGridY = gbc.gridy;
+                
         JLabel lblMapParameters = new JLabel("Scenario Map Parameters");
         globalPanel.add(lblMapParameters, gbc);
         
+        // the first two columns
         gbc.gridy++;
         gbc.gridwidth = 1;
         JLabel lblBaseWidth = new JLabel("Base Width:");
@@ -617,13 +643,76 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         txtBaseWidth.setText(String.valueOf(scenarioTemplate.mapParameters.getBaseWidth()));
         globalPanel.add(txtBaseWidth, gbc);
         
+        gbc.gridx = 0;
+        gbc.gridy++;
+        JLabel lblBaseHeight = new JLabel("Base Height:");
+        globalPanel.add(lblBaseHeight, gbc);
+        
         gbc.gridx++;
+        txtBaseHeight = new JTextField(4);
+        txtBaseHeight.setText(String.valueOf(scenarioTemplate.mapParameters.getBaseHeight()));
+        globalPanel.add(txtBaseHeight, gbc);
+
+        gbc.gridy++;
+        gbc.gridx = 0;
+        JLabel lblXIncrement = new JLabel("Scaled Width Increment:");
+        globalPanel.add(lblXIncrement, gbc);
+        
+        gbc.gridx++;
+        txtXIncrement = new JTextField(4);
+        txtXIncrement.setText(String.valueOf(scenarioTemplate.mapParameters.getWidthScalingIncrement()));
+        globalPanel.add(txtXIncrement, gbc);
+        
+        gbc.gridy++;
+        gbc.gridx = 0;
+        JLabel lblYIncrement = new JLabel("Scaled Height Increment:");
+        globalPanel.add(lblYIncrement, gbc);
+        
+        gbc.gridx++;
+        txtYIncrement = new JTextField(4);
+        txtYIncrement.setText(String.valueOf(scenarioTemplate.mapParameters.getHeightScalingIncrement()));
+        globalPanel.add(txtYIncrement, gbc);
+        
+        gbc.gridy++;
+        gbc.gridx = 0;
+        JLabel lblAllowRotation = new JLabel("Allow 90 Degree Rotation:");
+        globalPanel.add(lblAllowRotation, gbc);
+        
+        gbc.gridx++;
+        chkAllowRotation = new JCheckBox();
+        chkAllowRotation.setSelected(scenarioTemplate.mapParameters.isAllowRotation());
+        globalPanel.add(chkAllowRotation, gbc);
+        
+        gbc.gridy++;
+        gbc.gridx = 0;
+        JLabel lblUseAtBSizing = new JLabel("Use AtB Base Dimensions:");
+        lblUseAtBSizing.setToolTipText("Use the AtB Map Sizes table to determine the base width and height of the map.");
+        globalPanel.add(lblUseAtBSizing, gbc);
+        
+        gbc.gridx++;
+        chkUseAtBSizing = new JCheckBox();
+        chkUseAtBSizing.addItemListener(new ItemListener() {
+
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                atbSizingCheckboxChangeHandler();
+            }
+            
+        });
+        chkUseAtBSizing.setSelected(scenarioTemplate.mapParameters.isUseStandardAtBSizing());
+        globalPanel.add(chkUseAtBSizing, gbc);
+        int bottomGridY = gbc.gridy;
+        
+        gbc.gridy = currentGridY;
+        gbc.gridx = 2;
+        
+        // the allowed map types columns
         JLabel lblAllowedTerrainTypes = new JLabel("Allowed Map Types:");
         globalPanel.add(lblAllowedTerrainTypes, gbc);
         
         gbc.gridy++;
         btnAllowAllMapTypes = new JRadioButton();
-        btnAllowAllMapTypes.setText("Allow All");
+        btnAllowAllMapTypes.setText("Any Ground Map");
         btnAllowAllMapTypes.addItemListener(new ItemListener() {
 
             @Override
@@ -696,14 +785,11 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             }
         }
         
-        gbc.gridy--;
-        gbc.gridy--;
-        gbc.gridy--;
-        
         gbc.gridx++;
+        gbc.gridy = currentGridY + 1;
         gbc.gridheight = GridBagConstraints.RELATIVE;
         lstAllowedTerrainTypes = new JList<>();
-        DefaultListModel<String> terrainTypeModel = new DefaultListModel<String>();
+        DefaultListModel<String> terrainTypeModel = new DefaultListModel<>();
         for(String terrainType : AtBScenario.terrainTypes) {
             terrainTypeModel.addElement(terrainType);
         }
@@ -712,65 +798,53 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         mapTypeChangeHandler();
         globalPanel.add(lstAllowedTerrainTypes, gbc);
         
-        gbc.gridy++;
-        gbc.gridx = 0;
+        // the fixed events columns
+        gbc.gridy = currentGridY;
+        gbc.gridx++;
         gbc.gridheight = 1;
-        JLabel lblBaseHeight = new JLabel("Base Height:");
-        globalPanel.add(lblBaseHeight, gbc);
-        
-        gbc.gridx++;
-        txtBaseHeight = new JTextField(4);
-        txtBaseHeight.setText(String.valueOf(scenarioTemplate.mapParameters.getBaseHeight()));
-        globalPanel.add(txtBaseHeight, gbc);
+        globalPanel.add(new JLabel("Fixed Modifiers"), gbc);
         
         gbc.gridy++;
-        gbc.gridx = 0;
-        JLabel lblXIncrement = new JLabel("Scaled Width Increment:");
-        globalPanel.add(lblXIncrement, gbc);
+        modifierBox = new JComboBox<>();
+        for(AtBScenarioModifier modifier : AtBScenarioModifier.getScenarioModifiers().values()) {
+            modifierBox.addItem(modifier);
+        }
+        globalPanel.add(modifierBox, gbc);
         
         gbc.gridx++;
-        txtXIncrement = new JTextField(4);
-        txtXIncrement.setText(String.valueOf(scenarioTemplate.mapParameters.getWidthScalingIncrement()));
-        globalPanel.add(txtXIncrement, gbc);
-        
-        gbc.gridy++;
-        gbc.gridx = 0;
-        JLabel lblYIncrement = new JLabel("Scaled Height Increment:");
-        globalPanel.add(lblYIncrement, gbc);
-        
-        gbc.gridx++;
-        txtYIncrement = new JTextField(4);
-        txtYIncrement.setText(String.valueOf(scenarioTemplate.mapParameters.getHeightScalingIncrement()));
-        globalPanel.add(txtYIncrement, gbc);
-        
-        gbc.gridy++;
-        gbc.gridx = 0;
-        JLabel lblAllowRotation = new JLabel("Allow 90 Degree Rotation:");
-        globalPanel.add(lblAllowRotation, gbc);
-        
-        gbc.gridx++;
-        chkAllowRotation = new JCheckBox();
-        chkAllowRotation.setSelected(scenarioTemplate.mapParameters.isAllowRotation());
-        globalPanel.add(chkAllowRotation, gbc);
-        
-        gbc.gridy++;
-        gbc.gridx = 0;
-        JLabel lblUseAtBSizing = new JLabel("Use AtB Base Dimensions:");
-        lblUseAtBSizing.setToolTipText("Use the AtB Map Sizes table to determine the base width and height of the map.");
-        globalPanel.add(lblUseAtBSizing, gbc);
-        
-        gbc.gridx++;
-        chkUseAtBSizing = new JCheckBox();
-        chkUseAtBSizing.addItemListener(new ItemListener() {
-
+        JButton btnAddModifier = new JButton("Add");
+        btnAddModifier.addActionListener(new ActionListener() {
             @Override
-            public void itemStateChanged(ItemEvent e) {
-                atbSizingCheckboxChangeHandler();
-            }
-            
+            public void actionPerformed(ActionEvent e) {
+                addModifierHandler();
+            } 
         });
-        chkUseAtBSizing.setSelected(scenarioTemplate.mapParameters.isUseStandardAtBSizing());
-        globalPanel.add(chkUseAtBSizing, gbc);
+        globalPanel.add(btnAddModifier, gbc);
+        
+        gbc.gridx--;
+        gbc.gridy++;
+        gbc.gridheight = 3;
+        
+        selectedModifiersList = new JList<>();
+        selectedModifiersList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        reloadSelectedModifiers();
+        
+        JScrollPane modifierScrollPane = new JScrollPane(selectedModifiersList);
+        modifierScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        globalPanel.add(modifierScrollPane, gbc);
+
+        gbc.gridx++;
+        JButton btnRemoveModifier = new JButton("Remove");
+        btnRemoveModifier.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                removeModifierHandler();
+            } 
+        });
+        globalPanel.add(btnRemoveModifier, gbc);
+        
+        gbc.gridheight = 1;
+        gbc.gridy = bottomGridY + 1;
     }
     
     /**
@@ -779,7 +853,6 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      */
     private void setupBottomButtons(GridBagConstraints gbc) {
         gbc.gridx = 0;
-        gbc.gridy += 2;
         
         JButton btnSave = new JButton("Save");
         btnSave.setActionCommand(SAVE_TEMPLATE_COMMAND);
@@ -1198,7 +1271,6 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         spnMultiplier.setEnabled(!isPlayerForce);
         spnRetreatThreshold.setEnabled(!isPlayerForce);
         cboMaxWeightClass.setEnabled(!isPlayerForce);
-        cboUnitType.setEnabled(!isPlayerForce);
         chkContributesToBV.setEnabled(!isEnemyForce);
         chkContributesToBV.setSelected(!isEnemyForce);
         chkContributesToUnitCount.setEnabled(!isEnemyForce);
@@ -1206,7 +1278,6 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         chkContributesToMapSize.setSelected(true);
         
         spnMultiplier.setEnabled(cboGenerationMethod.getSelectedIndex() != ForceGenerationMethod.FixedUnitCount.ordinal());
-        spnFixedUnitCount.setEnabled(cboGenerationMethod.getSelectedIndex() == ForceGenerationMethod.FixedUnitCount.ordinal());
     }
     
     /**
@@ -1313,6 +1384,35 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         } else if(e.getActionCommand() == LOAD_TEMPLATE_COMMAND) {
             loadTemplateButtonHandler();
         }
+    }
+    
+    /**
+     * Event handler for the "Add" button next to the fixed modifier dropdown.
+     */
+    public void addModifierHandler() {
+        scenarioTemplate.scenarioModifiers.add(modifierBox.getSelectedItem().toString());
+        reloadSelectedModifiers();
+    }
+    
+    /**
+     * Event handler for the "Remove" button next to the "selected modifiers" list.
+     */
+    public void removeModifierHandler() {
+        for(String selectedModifier : selectedModifiersList.getSelectedValuesList()) {
+            scenarioTemplate.scenarioModifiers.remove(selectedModifier);
+        }
+        reloadSelectedModifiers();
+    }
+    
+    /**
+     * Re-reads the data source for the "selected modifiers" list.
+     */
+    public void reloadSelectedModifiers() {
+        DefaultListModel<String> selectedModifierModel = new DefaultListModel<>();
+        for(String selectedModifier : scenarioTemplate.scenarioModifiers) {
+            selectedModifierModel.addElement(selectedModifier);
+        }
+        selectedModifiersList.setModel(selectedModifierModel);
     }
     
     /**

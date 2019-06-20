@@ -52,6 +52,10 @@ public interface IUnitGenerator {
             EntityMovementMode.INF_LEG, EntityMovementMode.INF_MOTORIZED, EntityMovementMode.INF_UMU,
             EntityMovementMode.TRACKED, EntityMovementMode.WHEELED, EntityMovementMode.HOVER);
 
+    /**
+     * For convenience in generating infantry units, the maximum tonnage of a foot infantry platoon.
+     */
+    final static double FOOT_PLATOON_INFANTRY_WEIGHT = 3.0;
 
     /**
      * Convenience function to let us know whether a unit type supports weight class selection.

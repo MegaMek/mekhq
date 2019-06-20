@@ -3,6 +3,7 @@ package mekhq.campaign.mission;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,26 +34,29 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 @XmlRootElement(name="ScenarioTemplate")
 public class ScenarioTemplate {
     public static final String ROOT_XML_ELEMENT_NAME = "ScenarioTemplate";
-    
+    public static final String PRIMARY_PLAYER_FORCE_ID = "Player";
     
     public String name;
     public String shortBriefing;
     public String detailedBriefing;
     
     public ScenarioMapParameters mapParameters = new ScenarioMapParameters();
+    public List<String> scenarioModifiers = new ArrayList<>(); 
     
     @XmlElementWrapper(name="scenarioForces")
     @XmlElement(name="scenarioForce")
     public Map<String, ScenarioForceTemplate> scenarioForces = new HashMap<>();
     
-    public List<ScenarioForceTemplate> getAllScenarioForces() {
-        return scenarioForces.values().stream().collect(Collectors.toList());
+    /**
+     * Returns the "primary" player force. This is always the force with the name "Player".
+     * @return Primary player force.
+     */
+    public ScenarioForceTemplate getPrimaryPlayerForce() {
+        return scenarioForces.get(PRIMARY_PLAYER_FORCE_ID);
     }
     
-    public List<ScenarioForceTemplate> getAllPlayerControlledAllies() {
-        return scenarioForces.values().stream().filter(forceTemplate -> 
-            (forceTemplate.getForceAlignment() == ForceAlignment.Player.ordinal()))
-                .collect(Collectors.toList());
+    public List<ScenarioForceTemplate> getAllScenarioForces() {
+        return scenarioForces.values().stream().collect(Collectors.toList());
     }
     
     public List<ScenarioForceTemplate> getAllBotControlledAllies() {
@@ -67,6 +71,38 @@ public class ScenarioTemplate {
             (forceTemplate.getForceAlignment() == ForceAlignment.Opposing.ordinal()) ||
             (forceTemplate.getForceAlignment() == ForceAlignment.Third.ordinal()))
                 .collect(Collectors.toList());
+    }
+    
+    /**
+     * All force templates that are controlled and supplied, or potentially supplied, by the player, that are not reinforcements
+     * @return List of scenario force templates
+     */
+    public List<ScenarioForceTemplate> getAllPrimaryPlayerForces() {
+        return scenarioForces.values().stream().filter(forceTemplate -> 
+            (forceTemplate.getForceAlignment() == ForceAlignment.Player.ordinal()) &&
+            (forceTemplate.getArrivalTurn() != ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) &&
+                ((forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal()) ||
+                 (forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerOrFixedUnitCount.ordinal())))  
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * All force templates that are controlled and supplied, or potentially supplied, by the player, that are not reinforcements
+     * @return List of scenario force templates
+     */
+    public List<ScenarioForceTemplate> getAllPlayerReinforcementForces() {
+        List<ScenarioForceTemplate> retVal = new ArrayList<>();
+        
+        for(ScenarioForceTemplate forceTemplate : scenarioForces.values()) {
+            if((forceTemplate.getForceAlignment() == ForceAlignment.Player.ordinal()) &&
+                    (forceTemplate.getArrivalTurn() == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) &&
+                    ((forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal()) ||
+                     (forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerOrFixedUnitCount.ordinal()))) {
+                retVal.add(forceTemplate);
+            }
+        }
+        
+        return retVal;
     }
     
     /**
@@ -100,6 +136,21 @@ public class ScenarioTemplate {
         } catch(Exception e) {
             MekHQ.getLogger().error(ScenarioTemplate.class, "Serialize", e.getMessage());
         }
+    }
+    
+    /**
+     * Attempt to deserialize a file at the given path.
+     * @param filePath The location of the file
+     * @return Possibly an instance of a scenario template.
+     */
+    public static ScenarioTemplate Deserialize(String filePath) {
+        File inputFile = new File(filePath);
+        if(!inputFile.exists()) {
+            MekHQ.getLogger().error(ScenarioTemplate.class, "Deserialize", String.format("Cannot deserialize file %s, does not exist", filePath));
+            return null;
+        }
+        
+        return Deserialize(inputFile);
     }
     
     /**

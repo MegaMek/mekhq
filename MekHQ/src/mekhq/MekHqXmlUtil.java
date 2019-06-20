@@ -19,6 +19,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.text.StringEscapeUtils;
 import org.w3c.dom.Element;
@@ -38,6 +40,7 @@ import megamek.common.EntityListFile;
 import megamek.common.FighterSquadron;
 import megamek.common.IBomber;
 import megamek.common.IPlayer;
+import megamek.common.Infantry;
 import megamek.common.Jumpship;
 import megamek.common.MULParser;
 import megamek.common.Tank;
@@ -48,7 +51,17 @@ public class MekHqXmlUtil {
     private static DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY;
     private static DocumentBuilderFactory UNSAFE_DOCUMENT_BUILDER_FACTORY;
     private static SAXParserFactory SAX_PARSER_FACTORY;
+    private static XPath XPATH_INSTANCE;
 
+    public static XPath getXPathInstance() {
+        if(XPATH_INSTANCE == null) {
+            XPathFactory xpf = XPathFactory.newInstance();
+            XPATH_INSTANCE = xpf.newXPath();
+        }
+        
+        return XPATH_INSTANCE;
+    }
+    
     /**
      * Creates a DocumentBuilder safe from XML external entities
      * attacks, and XML entity expansion attacks.
@@ -300,6 +313,14 @@ public class MekHqXmlUtil {
                  && !tgtEnt.getCamoFileName().isEmpty()) {
              retVal += "\" camoFileName=\"";
              retVal += String.valueOf(escape(tgtEnt.getCamoFileName()));
+         }
+         
+         if(tgtEnt.getDeployRound() > 0) {
+             retVal += String.format("\" %s=\"%d", MULParser.DEPLOYMENT, tgtEnt.getDeployRound());
+         }
+         
+         if(tgtEnt instanceof Infantry) {
+             retVal += String.format("\" %s=\"%d", MULParser.INF_SQUAD_NUM, ((Infantry) tgtEnt).getSquadN());
          }
 
         retVal += "\">\n";

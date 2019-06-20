@@ -7,10 +7,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
@@ -30,6 +33,9 @@ public class AtBDynamicScenario extends AtBScenario {
      */
     private static final long serialVersionUID = 4671466413188687036L;
 
+    // by convention, this is the ID specified in the template for the primary player force
+    public static final String PRIMARY_PLAYER_FORCE_ID = "Player";
+    
     // derived fields used for various calculations
     private int effectivePlayerUnitCount;
     private int effectivePlayerBV;
@@ -42,6 +48,7 @@ public class AtBDynamicScenario extends AtBScenario {
     
     private Map<BotForce, ScenarioForceTemplate> botForceTemplates;
     private Map<Integer, ScenarioForceTemplate> playerForceTemplates;
+    private Map<UUID, ScenarioForceTemplate> playerUnitTemplates;
     
     private List<AtBScenarioModifier> scenarioModifiers;
     
@@ -50,6 +57,7 @@ public class AtBDynamicScenario extends AtBScenario {
         
         botForceTemplates = new HashMap<>();
         playerForceTemplates = new HashMap<>();
+        playerUnitTemplates = new HashMap<>();
         scenarioModifiers = new ArrayList<>();
     }
 
@@ -72,10 +80,40 @@ public class AtBDynamicScenario extends AtBScenario {
         playerForceTemplates.put(forceID, null);
     }
     
+    /**
+     * Add a force to the scenario, explicitly linked to the given template.
+     * @param forceID ID of the force to add.
+     * @param templateName Name of the force template.
+     */
+    public void addForce(int forceID, String templateName) {
+        // if we're not supplied a template name, fall back to trying to automatically place the force
+        if(StringUtils.isEmpty(templateName)) {
+            addForces(forceID);
+            return;
+        }
+        
+        super.addForces(forceID);
+        
+        ScenarioForceTemplate forceTemplate = template.scenarioForces.get(templateName);        
+        playerForceTemplates.put(forceID, forceTemplate);
+    }
+    
+    public void addUnit(UUID unitID, String templateName) {
+        super.addUnit(unitID);
+        ScenarioForceTemplate forceTemplate = template.scenarioForces.get(templateName);
+        playerUnitTemplates.put(unitID, forceTemplate);
+    }
+    
     @Override
     public void removeForce(int fid) {
         super.removeForce(fid);
         playerForceTemplates.remove(fid);
+    }
+    
+    @Override
+    public void removeUnit(UUID unitID) {
+        super.removeUnit(unitID);
+        playerUnitTemplates.remove(unitID);
     }
     
     @Override
@@ -111,9 +149,28 @@ public class AtBDynamicScenario extends AtBScenario {
         return getMapSizeY();
     }
     
+    /**
+     * Adds a bot force to this dynamic scenario.
+     * @param botForce
+     * @param forceTemplate
+     */
     public void addBotForce(BotForce botForce, ScenarioForceTemplate forceTemplate) {
         super.addBotForce(botForce);        
         botForceTemplates.put(botForce, forceTemplate);
+    }
+    
+    /**
+     * Removes a bot force from this dynamic scenario, and its associated template as well.
+     */
+    public void removeBotForce(int x) {
+        // safety check, just in case
+        if((x >= 0) && (x < botForces.size())) {
+            BotForce botToRemove = botForces.get(x);
+            
+            botForceTemplates.remove(botToRemove);
+        }
+        
+        super.removeBotForce(x);
     }
     
     public int getEffectivePlayerUnitCount() {
@@ -144,6 +201,10 @@ public class AtBDynamicScenario extends AtBScenario {
         return playerForceTemplates;
     }
     
+    public Map<UUID, ScenarioForceTemplate> getPlayerUnitTemplates() {
+        return playerUnitTemplates;
+    }
+    
     public Map<BotForce, ScenarioForceTemplate> getBotForceTemplates() {
         return botForceTemplates;
     }
@@ -162,6 +223,22 @@ public class AtBDynamicScenario extends AtBScenario {
     
     public void setEffectiveOpforQuality(int qualityLevel) {
         effectiveOpforQuality = qualityLevel;
+    }
+    
+    /**
+     * A list of all the force IDs associated with pre-defined scenario templates
+     * @return
+     */
+    public List<Integer> getPrimaryPlayerForceIDs() {
+        List<Integer> retval = new ArrayList<>();
+        
+        for(int forceID : getForceIDs()) {
+            if(getPlayerForceTemplates().containsKey(forceID)) {
+                retval.add(forceID);
+            }
+        }
+        
+        return retval;
     }
     
     /**
@@ -208,6 +285,10 @@ public class AtBDynamicScenario extends AtBScenario {
     
     public List<AtBScenarioModifier> getScenarioModifiers() {
         return scenarioModifiers;
+    }
+    
+    public void addScenarioModifier(AtBScenarioModifier modifier) {
+        scenarioModifiers.add(modifier);
     }
     
     @Override
