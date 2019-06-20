@@ -66,7 +66,7 @@ import mekhq.campaign.parts.Avionics;
 import mekhq.campaign.parts.BattleArmorSuit;
 import mekhq.campaign.parts.BayDoor;
 import mekhq.campaign.parts.Cubicle;
-import mekhq.campaign.parts.DropshipDockingCollar;
+ import mekhq.campaign.parts.DropshipDockingCollar;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.FireControlSystem;
 import mekhq.campaign.parts.GravDeck;
