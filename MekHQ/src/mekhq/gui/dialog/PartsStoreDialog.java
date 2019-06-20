@@ -29,6 +29,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 import javax.swing.DefaultComboBoxModel;
@@ -561,19 +562,34 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         public final static int COL_QUEUE     =  8;
         public final static int N_COL          = 9;
 
+        /**
+         * Provides a lazy view to a {@link TargetRoll} for use in a UI (e.g. sorting in a table).
+         */
         public class TargetProxy implements Comparable<TargetProxy> {
             private TargetRoll target;
             private String details;
             private String description;
 
+            /**
+             * Creates a new proxy object for a {@link TargetRoll}.
+             * @param t The {@link TargetRoll} to be proxied. May be null.
+             */
             public TargetProxy(@Nullable TargetRoll t) {
                 target = t;
             }
 
+            /**
+             * Gets the target roll.
+             * @return The target roll.
+             */
             public TargetRoll getTargetRoll() {
                 return target;
             }
 
+            /**
+             * Gets a description of the target roll.
+             * @return A description of the target roll.
+             */
             @Nullable
             public String getDescription() {
                 if (null == target) {
@@ -585,6 +601,10 @@ public class PartsStoreDialog extends javax.swing.JDialog {
                 return description;
             }
 
+            /**
+             * Gets a string representation of a {@link TargetRoll}.
+             * @return A string representation of a {@link TargetRoll}.
+             */
             @Override
             public String toString() {
                 if (null == target) {
@@ -603,6 +623,10 @@ public class PartsStoreDialog extends javax.swing.JDialog {
                 return details;
             }
 
+            /**
+             * Converts a {@link TargetRoll} into an integer for comparisons.
+             * @return An integer representation of the {@link TargetRoll}.
+             */
             private int coerceTargetRoll() {
                 int r = target.getValue();
                 if (r == TargetRoll.IMPOSSIBLE) {
@@ -617,30 +641,55 @@ public class PartsStoreDialog extends javax.swing.JDialog {
                 return r;
             }
 
+            /**
+             * {@inheritDoc}
+             * @param o The {@link TargetProxy} to compare this instance to.
+             * @return {@inheritDoc}
+             */
             @Override
             public int compareTo(TargetProxy o) {
                 return Integer.compare(coerceTargetRoll(), o.coerceTargetRoll());
             }
         }
 
+        /**
+         * Provides a container for a value formatted for display and the
+         * value itself for sorting.
+         */
         public class FormattedValue<T extends Comparable<T>> implements Comparable<FormattedValue<T>> {
             private T value;
             private String formatted;
 
+            /** 
+             * Creates a wrapper around a value and a
+             * formatted string representing the value.
+             */
             public FormattedValue(T v, String f) {
                 value = v;
                 formatted = f;
             }
 
+            /**
+             * Gets the wrapped value.
+             * @return The value.
+             */
             public T getValue() {
                 return value;
             }
 
+            /**
+             * Gets the formatted value.
+             * @return The formatted value.
+             */
             @Override
             public String toString() {
                 return formatted;
             }
 
+            /**
+             * {@inheritDoc}
+             * @return {@inheritDoc}
+             */
             @Override
             public int compareTo(FormattedValue<T> o) {
                 if (null == o) {
@@ -650,6 +699,9 @@ public class PartsStoreDialog extends javax.swing.JDialog {
             }
         }
 
+        /**
+         * Provides a lazy view to a {@link Part} for use in a UI (e.g. sorting in a table).
+         */
         public class PartProxy {
             private Part part;
             private String details;
@@ -660,10 +712,19 @@ public class PartsStoreDialog extends javax.swing.JDialog {
             private FormattedValue<Integer> supply;
             private FormattedValue<Integer> transit;
 
+            /**
+             * Initializes a new of the class to provide a proxy view into
+             * a part.
+             * @param p The part to proxy. Must not be null.
+             */
             public PartProxy(Part p) {
-                part = p;
+                part = Objects.requireNonNull(p);
             }
 
+            /**
+             * Updates the proxied view of the properties which
+             * changed outside the proxy.
+             */
             public void updateTargetAndInventories() {
                 targetProxy = null;
                 inventories = null;
@@ -672,14 +733,26 @@ public class PartsStoreDialog extends javax.swing.JDialog {
                 transit = null;
             }
 
+            /**
+             * Gets the part being proxied.
+             * @return The part being proxied.
+             */
             public Part getPart() {
                 return part;
             }
 
+            /**
+             * Gets the part's name.
+             * @return The part's name.
+             */
             public String getName() {
                 return part.getName();
             }
 
+            /**
+             * Gets the part's details.
+             * @return The part's detailed.
+             */
             public String getDetails() {
                 if (null == details) {
                     details = part.getDetails();
@@ -688,6 +761,11 @@ public class PartsStoreDialog extends javax.swing.JDialog {
                 return details;
             }
 
+            /**
+             * Gets the part's cost, suitable for use in a UI element
+             * which requires both a display value and a sortable value.
+             * @return The part's cost as a {@link FormattedValue}
+             */
             public FormattedValue<Money> getCost() {
                 if (null == cost) {
                     Money actualValue = part.getActualValue();
@@ -696,14 +774,27 @@ public class PartsStoreDialog extends javax.swing.JDialog {
                 return cost;
             }
 
+            /**
+             * Gets the part's tonnage.
+             * @return The part's tonnage.
+             */
             public double getTonnage() {
                 return Math.round(part.getTonnage() * 100) / 100.0;
             }
 
+            /**
+             * Gets the part's tech base.
+             * @return The part's tech base.
+             */
             public String getTechBase() {
                 return part.getTechBaseName();
             }
 
+            /**
+             * Gets the part's {@link TargetRoll}.
+             * @return A {@link TargetProxy} representing the target
+             * roll for the part.
+             */
             public TargetProxy getTarget() {
                 if (null == targetProxy) {
                     IAcquisitionWork shoppingItem = (MissingPart)part.getMissingPart();
@@ -722,6 +813,11 @@ public class PartsStoreDialog extends javax.swing.JDialog {
                 return targetProxy;
             }
 
+            /**
+             * Gets the part's quantity on order, suitable for use in a UI element
+             * which requires both a display value and a sortable value.
+             * @return The part's quantity on order as a {@link FormattedValue}
+             */
             public FormattedValue<Integer> getOrdered() {
                 if (null == inventories) {
                     inventories = campaign.getPartInventory(part);
@@ -732,6 +828,11 @@ public class PartsStoreDialog extends javax.swing.JDialog {
                 return ordered;
             }
 
+            /**
+             * Gets the part's quantity on hand, suitable for use in a UI element
+             * which requires both a display value and a sortable value.
+             * @return The part's quantity on hand as a {@link FormattedValue}
+             */
             public FormattedValue<Integer> getSupply() {
                 if (null == inventories) {
                     inventories = campaign.getPartInventory(part);
@@ -742,6 +843,11 @@ public class PartsStoreDialog extends javax.swing.JDialog {
                 return supply;
             }
 
+            /**
+             * Gets the part's quantity in transit, suitable for use in a UI element
+             * which requires both a display value and a sortable value.
+             * @return The part's quantity in transit as a {@link FormattedValue}
+             */
             public FormattedValue<Integer> getTransit() {
                 if (null == inventories) {
                     inventories = campaign.getPartInventory(part);
