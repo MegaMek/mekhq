@@ -207,10 +207,32 @@ public class FireControlSystem extends Part {
         }
     }
 
+<<<<<<< HEAD
     @Override
     public double getTonnage() {
         return 0;
     }
+=======
+	@Override
+	public boolean isSamePartType(Part part) {
+		return part instanceof FireControlSystem && cost.equals(part.getStickerPrice());
+	}
+	
+	@Override
+	public boolean isRightTechType(String skillType) {
+		return skillType.equals(SkillType.S_TECH_AERO);
+	}
+	
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent) {
+		writeToXmlBegin(pw1, indent);
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<cost>"
+				+cost.toXmlString()
+				+"</cost>");
+		writeToXmlEnd(pw1, indent);
+	}
+>>>>>>> branch 'master' of https://github.com/MegaMek/mekhq
 
     @Override
     public boolean isSamePartType(Part part) {

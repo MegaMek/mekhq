@@ -34,8 +34,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import megamek.client.ui.Messages;
 import megamek.client.ui.swing.UnitEditorDialog;
@@ -54,7 +52,6 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.preferences.JWindowPreference;
@@ -409,8 +406,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
             miaCheck = new JCheckBox("");
             miaBtns.add(miaCheck);
             kiaCheck = new JCheckBox("");
-            kiaCheck.addItemListener(new CheckBoxKIAListener());
             kiaBtns.add(kiaCheck);
+            
             hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 5, Math.min(status.getHits(),5));
             hitSlider.setMajorTickSpacing(1);
             hitSlider.setPaintTicks(true);
@@ -443,6 +440,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.weightx = 1.0;
             pnlPilotStatus.add(kiaCheck, gridBagConstraints);
             i++;
+            
+            kiaCheck.addItemListener(new CheckBoxKIAListener(hitSlider, miaCheck, null));
         }
         pnlMain.add(pnlPilotStatus, PILOTPANEL);
 
@@ -513,9 +512,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             prisonerCheck.setSelected(status.isCaptured());
             pnlPrisonerStatus.add(prisonerCheck, gridBagConstraints);
             kiaCheck = new JCheckBox("");
-            kiaCheck.addItemListener(new CheckBoxKIAListener());
             prisonerKiaBtns.add(kiaCheck);
-            kiaCheck.setSelected(status.getHits() > 5 || status.isDead());
             gridBagConstraints.gridx = 3;
             pnlPrisonerStatus.add(kiaCheck, gridBagConstraints);
             btnViewPrisoner = new JButton("View Personnel");
@@ -525,7 +522,13 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.weightx = 1.0;
             pnlPrisonerStatus.add(btnViewPrisoner, gridBagConstraints);
             i++;
-            if (status.isCaptured() &&
+            
+            kiaCheck.addItemListener(new CheckBoxKIAListener(hitSlider, prisonerCheck, btnViewPrisoner));
+            
+            // if the person is dead, set the checkbox and skip all this captured stuff
+            if(status.getHits() > 5 || status.isDead()) {
+                kiaCheck.setSelected(true);
+            } else if (status.isCaptured() &&
                     tracker.getCampaign().getCampaignOptions().getUseAtB() &&
                     tracker.getCampaign().getCampaignOptions().getUseAtBCapture()) {
                 boolean wasCaptured = false;
@@ -541,12 +544,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 }
                 prisonerCheck.setSelected(wasCaptured);
             }
-            //if the person is dead then ignore them
-            if(status.isDead()) {
-                prisonerCheck.setSelected(false);
-                prisonerCheck.setEnabled(false);
-            }
-            hitSlider.addChangeListener(new CheckDeadPrisonerListener());
         }
         pnlMain.add(pnlPrisonerStatus, PRISONERPANEL);
 
@@ -1554,49 +1551,38 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
     }
 
-    private class CheckDeadPrisonerListener implements ChangeListener {
-
-        @Override
-        public void stateChanged(ChangeEvent evt) {
-            JSlider hitslider = (JSlider)evt.getSource();
-            if(hitslider.getValueIsAdjusting()) {
-                return;
-            }
-            int idx = Integer.parseInt(hitslider.getName());
-            JCheckBox captured = prisonerBtns.get(idx);
-            if(null == captured) {
-                return;
-            }
-            int hits = hitslider.getValue();
-            if(hits >= 6) {
-                captured.setSelected(false);
-                captured.setEnabled(false);
-            } else if(!captured.isEnabled()) {
-                captured.setEnabled(true);
-            }
-        }
-    }
-
+    /**
+     * Event handler for a KIA checkbox
+     * Manipulates other associated controls
+     * @author NickAragua
+     *
+     */
     private class CheckBoxKIAListener implements ItemListener {
-
+        private JSlider slider;
+        private JCheckBox checkbox;
+        private JButton button;
+        
+        public CheckBoxKIAListener(JSlider slider, JCheckBox checkBox, JButton button) {
+            this.slider = slider;
+            this.checkbox = checkBox;
+            this.button = button;
+        }
+        
         @Override
         public void itemStateChanged(ItemEvent e) {
             JCheckBox kiaChk = (JCheckBox)e.getSource();
-            int idx = kiaBtns.indexOf(kiaChk);
             boolean enable = !kiaChk.isSelected();
-            if (idx == -1) {    // not found in pilot kiaBtns
-                idx = prisonerKiaBtns.indexOf(kiaChk);   // find it in prisoners' instead
-                JSlider hitSlider = pr_hitSliders.get(idx);
-                JCheckBox capturedCheck = prisonerBtns.get(idx);
-                JButton viewPersonellbtn = btnsViewPrisoner.get(idx);
-                hitSlider.setEnabled(enable);
-                capturedCheck.setEnabled(enable);
-                viewPersonellbtn.setEnabled(enable);
-            } else {
-                JSlider hitSlider = hitSliders.get(idx);
-                JCheckBox miaChk = miaBtns.get(idx);
-                hitSlider.setEnabled(enable);
-                miaChk.setEnabled(enable);
+            
+            if(slider != null) {
+                slider.setEnabled(enable);
+            }
+            
+            if(checkbox != null) {
+                checkbox.setEnabled(enable);
+            }
+            
+            if(button != null) {
+                button.setEnabled(enable);
             }
         }
     }

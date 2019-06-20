@@ -28,7 +28,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     // 6) Allowed unit types - This is a set of unit types of which the force may consist
     
     public static final String[] FORCE_ALIGNMENTS = { "Player", "Allied", "Opposing", "Third", "Planet Owner" };
-    public static final String[] FORCE_GENERATION_METHODS = { "Player Supplied", "BV Scaled", "Unit Count Scaled", "Fixed Unit Count" };
+    public static final String[] FORCE_GENERATION_METHODS = { "Player Supplied", "BV Scaled", "Unit Count Scaled", "Fixed Unit Count", "Player/Fixed Unit Count" };
     public static final String[] FORCE_DEPLOYMENT_SYNC_TYPES = { "None", "Same Edge", "Same Arc", "Opposite Edge", "Opposite Arc" };
     public static final String[] DEPLOYMENT_ZONES = { "Any", "Northwest", "North", "Northeast", "East", "Southeast", "South", "Southwest", "West", "Edge", "Center", "Narrow Edge" };
     public static final String[] BOT_DESTINATION_ZONES = { "North", "East", "South", "West", "None", "Opposite Deployment Edge", "Random" };
@@ -40,21 +40,24 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     public static final Map<Integer, Integer> TEAM_IDS;
     public static final Map<Integer, String> SPECIAL_ARRIVAL_TURNS;
     
-    public static int SPECIAL_UNIT_TYPE_ATB_AERO_MIX = -3;
-    public static int SPECIAL_UNIT_TYPE_ATB_MIX = -2;
-    public static int SPECIAL_UNIT_TYPE_ATB_CIVILIANS = -1;
+    public static final int SPECIAL_UNIT_TYPE_ATB_AERO_MIX = -3;
+    public static final int SPECIAL_UNIT_TYPE_ATB_MIX = -2;
+    public static final int SPECIAL_UNIT_TYPE_ATB_CIVILIANS = -1;
     
-    public static int ARRIVAL_TURN_STAGGERED = -1;
-    public static int ARRIVAL_TURN_STAGGERED_BY_LANCE = -2;
-    public static int ARRIVAL_TURN_AS_REINFORCEMENTS = -3;
+    public static final int ARRIVAL_TURN_STAGGERED = -1;
+    public static final int ARRIVAL_TURN_STAGGERED_BY_LANCE = -2;
+    public static final int ARRIVAL_TURN_AS_REINFORCEMENTS = -3;
     
-    public static int DEPLOYMENT_ZONE_NARROW_EDGE = DEPLOYMENT_ZONES.length - 1;
+    public static final int DEPLOYMENT_ZONE_NARROW_EDGE = DEPLOYMENT_ZONES.length - 1;
     
-    public static int DESTINATION_EDGE_OPPOSITE_DEPLOYMENT = 5;
-    public static int DESTINATION_EDGE_RANDOM = 6;    
+    public static final int DESTINATION_EDGE_OPPOSITE_DEPLOYMENT = 5;
+    public static final int DESTINATION_EDGE_RANDOM = 6;    
     
     // this is used to indicate that a "fixed" size unit should deploy as a lance 
-    public static int FIXED_UNIT_SIZE_LANCE = -1;
+    public static final int FIXED_UNIT_SIZE_LANCE = -1;
+    
+    public static final String PRIMARY_FORCE_TEMPLATE_ID = "Player";
+    public static final String REINFORCEMENT_TEMPLATE_ID = "Reinforcements";
     
     public enum ForceAlignment {
         Player,
@@ -77,7 +80,8 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         PlayerSupplied,
         BVScaled,
         UnitCountScaled,
-        FixedUnitCount
+        FixedUnitCount,
+        PlayerOrFixedUnitCount
     }
     
     public enum SynchronizedDeploymentType {
@@ -97,6 +101,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         SPECIAL_ARRIVAL_TURNS = new HashMap<>();
         SPECIAL_ARRIVAL_TURNS.put(ARRIVAL_TURN_STAGGERED, "Staggered");
         SPECIAL_ARRIVAL_TURNS.put(ARRIVAL_TURN_STAGGERED_BY_LANCE, "Staggered By Lance");
+        SPECIAL_ARRIVAL_TURNS.put(ARRIVAL_TURN_AS_REINFORCEMENTS, "Reinforcements");
         
         TEAM_IDS = new HashMap<>();
         TEAM_IDS.put(ForceAlignment.Player.ordinal(), 1);
