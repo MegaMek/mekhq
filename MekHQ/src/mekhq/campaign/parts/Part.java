@@ -1250,6 +1250,23 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             campaign.removePart(this);
         }
     }
+    
+    /**
+     * A method to set the number of parts en masse
+     * @param number The new number of spares in the pile
+     */
+    public void setQuantity(int number) {
+        quantity = number;
+        if(quantity <= 0) {
+            for(int childId : childPartIds) {
+                Part p = campaign.getPart(childId);
+                if(null != p) {
+                    campaign.removePart(p);
+                }
+            }
+            campaign.removePart(this);
+        }
+    }
 
     public boolean isSpare() {
         return null == unitId && parentPartId == -1;
