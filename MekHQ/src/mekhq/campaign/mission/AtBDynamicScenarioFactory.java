@@ -895,7 +895,7 @@ public class AtBDynamicScenarioFactory {
                 for(String cargoID : scenario.getTransportLinkages().get(potentialTransport.getExternalIdAsString())) {
                     Entity cargo = scenario.getExternalIDLookup().get(cargoID);
                     
-                    // if we've the game contains the potential cargo unit
+                    // if the game contains the potential cargo unit
                     // and the potential transport can actually load it, send the load command to the server
                     if((cargo != null) && 
                             idMap.containsKey(cargo.getExternalIdAsString()) && 
