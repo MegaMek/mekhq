@@ -163,9 +163,12 @@ public class AtBDynamicScenario extends AtBScenario {
      * Removes a bot force from this dynamic scenario, and its associated template as well.
      */
     public void removeBotForce(int x) {
-        BotForce botToRemove = botForces.get(x);
-        
-        botForceTemplates.remove(botToRemove);
+        // safety check, just in case
+        if((x >= 0) && (x < botForces.size())) {
+            BotForce botToRemove = botForces.get(x);
+            
+            botForceTemplates.remove(botToRemove);
+        }
         
         super.removeBotForce(x);
     }

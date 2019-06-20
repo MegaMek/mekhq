@@ -647,9 +647,7 @@ public class AtBDynamicScenarioFactory {
         int numMods = Compute.randomInt(2);
         
         for(int x = 0; x < numMods; x++) {
-            int scenarioIndex = Compute.randomInt(AtBScenarioModifier.getScenarioModifiers().size());
-            
-            AtBScenarioModifier scenarioMod = (AtBScenarioModifier) AtBScenarioModifier.getScenarioModifiers().values().toArray()[scenarioIndex];
+            AtBScenarioModifier scenarioMod = AtBScenarioModifier.getRandomScenarioModifier();
          
             if((scenarioMod.getAllowedMapLocations() == null) ||
                     scenarioMod.getAllowedMapLocations().contains(scenario.getTemplate().mapParameters.getMapLocation())) {
@@ -833,6 +831,11 @@ public class AtBDynamicScenarioFactory {
                 while(infantry.getWeight() > bayCapacity) {
                     ((Infantry) infantry).setSquadN(((Infantry) infantry).getSquadN() - 1);
                     infantry.autoSetInternal();
+                }
+                
+                // unlikely but theoretically possible
+                if(((Infantry) infantry).getSquadN() == 0) {
+                    continue;
                 }
                 
                 // sometimes something crazy will happen and we will not be able to load the unit into the transport

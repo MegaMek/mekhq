@@ -3,6 +3,7 @@ package mekhq.campaign.mission.atb;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.transform.Source;
 
+import megamek.common.Compute;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -108,9 +110,15 @@ public class AtBScenarioModifier {
     }
     
     private static Map<String, AtBScenarioModifier> scenarioModifiers;
+    private static List<String> scenarioModifierKeys;
     
     public static Map<String, AtBScenarioModifier> getScenarioModifiers() {
         return scenarioModifiers;
+    }
+    
+    public static AtBScenarioModifier getRandomScenarioModifier() {
+        int modIndex = Compute.randomInt(scenarioModifierKeys.size());
+        return scenarioModifiers.get(scenarioModifierKeys.get(modIndex));
     }
     
     /**
@@ -150,6 +158,7 @@ public class AtBScenarioModifier {
      */
     private static void loadScenarioModifiers() {
         scenarioModifiers = new HashMap<>();
+        scenarioModifierKeys = new ArrayList<String>();
         
         for(String fileName : scenarioModifierManifest.fileNameList) {
             String filePath = String.format("./data/scenariomodifiers/%s", fileName);
@@ -163,6 +172,7 @@ public class AtBScenarioModifier {
                     }
                     
                     scenarioModifiers.put(modifier.getModifierName(), modifier);
+                    scenarioModifierKeys.add(modifier.getModifierName());
                 }
             }
             catch(Exception e) {

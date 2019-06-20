@@ -778,8 +778,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                             getContract(campaign).getAllyQuality(), 
                             UnitType.DROPSHIP, AtBDynamicScenarioFactory.UNIT_WEIGHT_UNSPECIFIED, campaign);
                     
-                    alliesPlayer.add(dropship);
-                    attachedUnitIds.add(UUID.fromString(dropship.getExternalIdAsString()));
+                    if(dropship != null) {
+                        alliesPlayer.add(dropship);
+                        attachedUnitIds.add(UUID.fromString(dropship.getExternalIdAsString()));
+                    }
                 }
                 for (int i = 0; i < Compute.d6() - 3; i++) {
                     addLance(enemyEntities, getContract(campaign).getEnemyCode(),

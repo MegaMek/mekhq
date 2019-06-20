@@ -103,12 +103,6 @@ public class ScenarioTemplate {
         }
         
         return retVal;
-        /*return scenarioForces.values().stream().filter(forceTemplate -> 
-            (forceTemplate.getForceAlignment() == ForceAlignment.Player.ordinal()) &&
-            (forceTemplate.getArrivalTurn() == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) &&
-                ((forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal()) ||
-                 (forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerOrFixedUnitCount.ordinal())))  
-                .collect(Collectors.toList());*/
     }
     
     /**
