@@ -20,6 +20,7 @@ v0.45.5-SNAPSHOT
 	- opfor aircraft may have bombs
 	- allied dropships may now be non-Leopards
 	- VTOLs are always on as the bot can handle them fairly well
++ PR #1210: Adds all remaining unimplemented Large Craft parts - CIC, Grav Decks, K-F Drive, K-F Boom and the like
 
 v0.45.4 (2019-03-24 1700 UTC)
 + PR #1067: Switch to Joda Money library internally for financial math
