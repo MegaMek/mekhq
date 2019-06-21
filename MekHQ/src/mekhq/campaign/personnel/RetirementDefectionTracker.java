@@ -25,10 +25,12 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -351,6 +353,44 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
     
     public void removePayout(Person person) {
         payouts.remove(person.getId());
+    }
+    
+    /**
+     * Clears out an individual entirely from this tracker.
+     * @param person The person to remove
+     */
+    public void removePerson(Person person) {
+        payouts.remove(person.getId());
+        
+        for(int contractID : unresolvedPersonnel.keySet()) {
+            unresolvedPersonnel.get(contractID).remove(person.getId());
+        }
+    }
+    
+    /**
+     * Worker function that clears out any orphan retirement/defection records
+     */
+    public void cleanupOrphans(Campaign campaign) {
+        Iterator<UUID> payoutIterator = payouts.keySet().iterator();
+        
+        while(payoutIterator.hasNext()) {
+            UUID personID = payoutIterator.next();
+            if(campaign.getPerson(personID) == null) {
+                payoutIterator.remove();
+            }
+        }
+        
+        for(int contractID : unresolvedPersonnel.keySet()) {
+            Iterator<UUID> personIterator = unresolvedPersonnel.get(contractID).iterator();
+            
+            while(personIterator.hasNext()) {
+                UUID personID = personIterator.next();
+                
+                if(campaign.getPerson(personID) == null) {
+                    personIterator.remove();
+                }
+            }
+        }
     }
     
     public boolean isOutstanding(AtBContract contract) {
@@ -731,6 +771,12 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
             MekHQ.getLogger().error(RetirementDefectionTracker.class, METHOD_NAME, ex);
         }
 
+        if(retVal != null) {
+            // sometimes, a campaign may be loaded with orphan records in the retirement/defection tracker
+            // let's clean those up here.
+            retVal.cleanupOrphans(c);
+        }
+        
         return retVal;
     }
 }

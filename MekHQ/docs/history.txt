@@ -13,6 +13,13 @@ v0.45.5-SNAPSHOT
 + Issue #1197: Fix bug where personnel could not be assigned to Battle Armor after repair.
 + Issue #1185: Player can acquire ammo bins via parts acquisition dialog.
 + Issue #1205: Improve purchase parts dialog performance when sorting.
++ PR #1217: Fix error preventing scenario resolution involving KIA personnel
++ PR #1215: Minor updates to AtB:
+	- opfor infantry transports now come loaded with infantry (if you have infantry turned on)
+	- opfor infantry may now be field gunners
+	- opfor aircraft may have bombs
+	- allied dropships may now be non-Leopards
+	- VTOLs are always on as the bot can handle them fairly well
 
 v0.45.4 (2019-03-24 1700 UTC)
 + PR #1067: Switch to Joda Money library internally for financial math

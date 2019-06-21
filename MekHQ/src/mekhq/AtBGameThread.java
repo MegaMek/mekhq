@@ -268,8 +268,8 @@ public class AtBGameThread extends GameThread {
                     configureBot(botClient, bf);
                     
                     // we need to wait until the game has actually started to do transport loading
-                    if(scenario instanceof AtBDynamicScenario) {
-                        AtBDynamicScenarioFactory.loadTransports((AtBDynamicScenario) scenario, botClient);
+                    if(scenario instanceof AtBScenario) {
+                        AtBDynamicScenarioFactory.loadTransports((AtBScenario) scenario, botClient);
                     }
                 }
             }

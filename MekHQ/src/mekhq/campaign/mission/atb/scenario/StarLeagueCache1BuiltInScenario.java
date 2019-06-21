@@ -10,6 +10,7 @@ import megamek.common.MechSummary;
 import megamek.common.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.market.UnitMarket;
+import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.Loot;
@@ -105,7 +106,7 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
 					(roll == 6) ? IUnitRating.DRAGOON_A : IUnitRating.DRAGOON_D);
 		}
 		Entity en = (ms == null) ? null
-				: createEntityWithCrew(campaign.getFactionCode(), RandomSkillsGenerator.L_GREEN, campaign, ms);
+				: AtBDynamicScenarioFactory.createEntityWithCrew(campaign.getFactionCode(), RandomSkillsGenerator.L_GREEN, campaign, ms);
 		otherForce.add(en);
 
 		// TODO: During SW offer a choice between an employer exchange or a

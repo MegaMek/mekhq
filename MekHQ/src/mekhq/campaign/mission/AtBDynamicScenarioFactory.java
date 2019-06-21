@@ -387,9 +387,9 @@ public class AtBDynamicScenarioFactory {
         while(forceUnitBudget > 0 && generatedEntities.size() > forceUnitBudget) {
             generatedEntities.remove(Compute.randomInt(generatedEntities.size()));
         }
-        
+                
         // "flavor" feature - fill up APCs with infantry
-        List<Entity> transportedEntities = fillTransports(scenario, generatedEntities, factionCode, skill, quality, currentDate.getYear(), campaign);
+        List<Entity> transportedEntities = fillTransports(scenario, generatedEntities, factionCode, skill, quality, campaign);
         generatedEntities.addAll(transportedEntities);
         
         BotForce generatedForce = new BotForce();
@@ -647,10 +647,8 @@ public class AtBDynamicScenarioFactory {
         int numMods = Compute.randomInt(2);
         
         for(int x = 0; x < numMods; x++) {
-            int scenarioIndex = Compute.randomInt(AtBScenarioModifier.getScenarioModifiers().size());
-            
-            AtBScenarioModifier scenarioMod = (AtBScenarioModifier) AtBScenarioModifier.getScenarioModifiers().values().toArray()[scenarioIndex];
-         
+            AtBScenarioModifier scenarioMod = AtBScenarioModifier.getRandomScenarioModifier();
+
             if((scenarioMod.getAllowedMapLocations() == null) ||
                     scenarioMod.getAllowedMapLocations().contains(scenario.getTemplate().mapParameters.getMapLocation())) {
                 scenario.getScenarioModifiers().add(scenarioMod);
@@ -797,6 +795,11 @@ public class AtBDynamicScenarioFactory {
     private static List<Entity> fillTransport(AtBScenario scenario, Entity transport, UnitGeneratorParameters params, int skill, Campaign campaign) {
         List<Entity> transportedUnits = new ArrayList<>();
         
+        // if we've already filled the transport, no need to do it again.
+        if(scenario.getTransportLinkages().containsKey(transport.getExternalIdAsString())) {
+            return transportedUnits;
+        }
+        
         for(Transporter bay : transport.getTransports()) {
             if(bay instanceof TroopSpace) {
                 double bayCapacity = ((TroopSpace) bay).getUnused();
@@ -830,6 +833,14 @@ public class AtBDynamicScenarioFactory {
                     infantry.autoSetInternal();
                 }
                 
+                // unlikely but theoretically possible
+                if(((Infantry) infantry).getSquadN() == 0) {
+                    continue;
+                }
+                
+                // sometimes something crazy will happen and we will not be able to load the unit into the transport
+                // so let's at least not have it deploy right away.
+                infantry.setDeployRound(transport.getDeployRound());
                 scenario.addTransportRelationship(transport.getExternalIdAsString(), infantry.getExternalIdAsString());
                 
                 transportedUnits.add(infantry);
@@ -850,13 +861,13 @@ public class AtBDynamicScenarioFactory {
      * @param campaign
      * @return
      */
-    public static List<Entity> fillTransports(AtBScenario scenario, List<Entity> transports, String factionCode, int skill, int quality, int year, Campaign campaign) {
+    public static List<Entity> fillTransports(AtBScenario scenario, List<Entity> transports, String factionCode, int skill, int quality, Campaign campaign) {
         List<Entity> transportedUnits = new ArrayList<>();
         
         UnitGeneratorParameters params = new UnitGeneratorParameters();
         params.setFaction(factionCode);
         params.setQuality(quality);
-        params.setYear(year);
+        params.setYear(campaign.getGameYear());
         
         for(Entity transport : transports) {
             transportedUnits.addAll(fillTransport(scenario, transport, params, skill, campaign));
@@ -869,21 +880,26 @@ public class AtBDynamicScenarioFactory {
      * Handles loading transported units onto their transports once a megamek scenario has actually started;
      * @param scenario
      */
-    public static void loadTransports(AtBDynamicScenario scenario, Client client) {
+    public static void loadTransports(AtBScenario scenario, Client client) {
         Map<String, Integer> idMap = new HashMap<>();
         // this is a bit inefficient, should really give the client/game the ability to look up an entity by external ID
         for(Entity entity : client.getEntitiesVector()) {
-            idMap.put(entity.getExternalIdAsString(), entity.getId());
+            if(entity.getOwnerId() == client.getLocalPlayerNumber()) {
+                idMap.put(entity.getExternalIdAsString(), entity.getId());
+            }
         }
         
-        for(int x = 0; x < scenario.getNumBots(); x++) {
-            BotForce currentBotForce = scenario.getBotForce(x);
-            for(Entity potentialTransport : currentBotForce.getEntityList()) {
-                if(scenario.getTransportLinkages().containsKey(potentialTransport.getExternalIdAsString())) {
-                    for(String cargoID : scenario.getTransportLinkages().get(potentialTransport.getExternalIdAsString())) {
-                        Entity cargo = scenario.getExternalIDLookup().get(cargoID);
-                        
-                        // send load command to the server
+        for(Entity potentialTransport : client.getEntitiesVector()) {
+            if((potentialTransport.getOwnerId() == client.getLocalPlayerNumber()) && 
+                    scenario.getTransportLinkages().containsKey(potentialTransport.getExternalIdAsString())) {
+                for(String cargoID : scenario.getTransportLinkages().get(potentialTransport.getExternalIdAsString())) {
+                    Entity cargo = scenario.getExternalIDLookup().get(cargoID);
+                    
+                    // if the game contains the potential cargo unit
+                    // and the potential transport can actually load it, send the load command to the server
+                    if((cargo != null) && 
+                            idMap.containsKey(cargo.getExternalIdAsString()) && 
+                            potentialTransport.canLoad(cargo)) {
                         client.sendLoadEntity(idMap.get(cargo.getExternalIdAsString()), 
                                 idMap.get(potentialTransport.getExternalIdAsString()), -1);
                     }
@@ -899,7 +915,7 @@ public class AtBDynamicScenarioFactory {
      * @param ms Which entity to generate
      * @return An crewed entity
      */
-    private static Entity createEntityWithCrew(String faction, int skill, Campaign campaign, MechSummary ms) {
+    public static Entity createEntityWithCrew(String faction, int skill, Campaign campaign, MechSummary ms) {
         final String METHOD_NAME = "createEntityWithCrew(String,int,Campaign,MechSummary)"; //$NON-NLS-1$
         Entity en = null;
         try {

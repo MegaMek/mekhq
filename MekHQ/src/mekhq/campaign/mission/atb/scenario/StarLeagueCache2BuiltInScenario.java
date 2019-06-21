@@ -9,6 +9,7 @@ import megamek.common.EntityWeightClass;
 import megamek.common.MechSummary;
 import megamek.common.UnitType;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 import mekhq.campaign.rating.IUnitRating;
 
@@ -43,7 +44,7 @@ public class StarLeagueCache2BuiltInScenario extends StarLeagueCache1BuiltInScen
 					(Compute.d6() == 6) ? IUnitRating.DRAGOON_A : IUnitRating.DRAGOON_D);
 
 			if (ms != null) {
-				enemyEntities.add(createEntityWithCrew(getContract(campaign).getEnemyCode(),
+				enemyEntities.add(AtBDynamicScenarioFactory.createEntityWithCrew(getContract(campaign).getEnemyCode(),
 						getContract(campaign).getEnemySkill(), campaign, ms));
 			} else {
 				enemyEntities.add(null);

@@ -3289,6 +3289,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         removeAllPatientsFor(person);
         removeAllTechJobsFor(person);
+        getRetirementDefectionTracker().removePerson(person);
 
         if (log) {
             addReport(person.getFullTitle()
