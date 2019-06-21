@@ -50,6 +50,9 @@ public class AeroHeatSink extends Part {
     static final TechAdvancement TA_IS_DOUBLE = EquipmentType.get("ISDoubleHeatSink").getTechAdvancement();
     static final TechAdvancement TA_CLAN_DOUBLE = EquipmentType.get("CLDoubleHeatSink").getTechAdvancement();
     
+    //To differentiate Clan double heatsinks, which aren't defined in Aero
+    public static final int CLAN_HEAT_DOUBLE = 2;
+    
     public AeroHeatSink() {
         this(0, Aero.HEAT_SINGLE, false, null);
     }
@@ -58,6 +61,9 @@ public class AeroHeatSink extends Part {
         super(tonnage, omniPodded, c);
         this.name = "Aero Heat Sink";
         this.type = type;
+        if(type == CLAN_HEAT_DOUBLE) {
+            this.name = "Aero Double Heat Sink (Clan)";
+        }
         if(type == Aero.HEAT_DOUBLE) {
             this.name = "Aero Double Heat Sink";
         }
@@ -100,10 +106,11 @@ public class AeroHeatSink extends Part {
     
     @Override 
     public int getBaseTime() {
-        if (isSalvaging() && isOmniPodded()) {
-            return 30;
+        if (isOmniPodded()) {
+            return 10;
         }
-        return 90;
+        //New SO errata 6-2019
+        return 20;
     }
     
     @Override
@@ -187,7 +194,9 @@ public class AeroHeatSink extends Part {
 
     @Override
     public int getTechRating() {
-        if(type == Aero.HEAT_DOUBLE) {
+        if(type == CLAN_HEAT_DOUBLE) {
+            return EquipmentType.RATING_F;
+        } else if(type == Aero.HEAT_DOUBLE) {
             return EquipmentType.RATING_E;
         } else {
             return EquipmentType.RATING_C;
@@ -196,6 +205,9 @@ public class AeroHeatSink extends Part {
 
     @Override
     public int getTechLevel() {
+        if(type == CLAN_HEAT_DOUBLE) {
+            return TechConstants.T_ALL_CLAN;
+        }
         return TechConstants.T_ALLOWED_ALL;
     }
 
@@ -228,6 +240,9 @@ public class AeroHeatSink extends Part {
             
             if (wn2.getNodeName().equalsIgnoreCase("type")) {
                 type = Integer.parseInt(wn2.getTextContent());
+                if(type == CLAN_HEAT_DOUBLE) {
+                    this.name = "Clan Aero Double Heat Sink";
+                }
                 if(type == Aero.HEAT_DOUBLE) {
                     this.name = "Aero Double Heat Sink";
                 } 
@@ -260,7 +275,7 @@ public class AeroHeatSink extends Part {
     public TechAdvancement getTechAdvancement() {
         if (type == Aero.HEAT_SINGLE) {
             return TA_SINGLE;
-        } else if (campaign.getFaction().isClan()) {
+        } else if (type == CLAN_HEAT_DOUBLE) {
             return TA_CLAN_DOUBLE;
         } else {
             return TA_IS_DOUBLE;

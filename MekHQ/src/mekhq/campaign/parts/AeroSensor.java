@@ -29,7 +29,9 @@ import org.w3c.dom.NodeList;
 
 import megamek.common.Aero;
 import megamek.common.Compute;
+import megamek.common.Dropship;
 import megamek.common.Entity;
+import megamek.common.Jumpship;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
@@ -89,10 +91,9 @@ public class AeroSensor extends Part {
     @Override
     public int getBaseTime() {
         int time = 0;
-        Entity e = unit.getEntity();
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair times
-            if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+            if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
                 time = 120;
             } else {
                 time = 75;
@@ -103,10 +104,17 @@ public class AeroSensor extends Part {
             if (hits == 2) {
                 time *= 2;
             }
+            if (isSalvaging()) {
+                if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
+                    time = 1200;
+                } else {
+                    time = 260;
+                }
+            }
             return time;
         }
         if (isSalvaging()) {
-            if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+            if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
                 time = 1200;
             } else {
                 time = 260;
@@ -204,11 +212,11 @@ public class AeroSensor extends Part {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return part instanceof AeroSensor && largeCraft == ((AeroSensor)part).isForDropShip()
+        return part instanceof AeroSensor && largeCraft == ((AeroSensor)part).isForSpaceCraft()
                 && (largeCraft || getUnitTonnage() == part.getUnitTonnage());
     }
 
-    public boolean isForDropShip() {
+    public boolean isForSpaceCraft() {
         return largeCraft;
     }
 
@@ -238,14 +246,14 @@ public class AeroSensor extends Part {
     public String getDetails() {
         String dropper = "";
         if(largeCraft) {
-            dropper = " (dropship)";
+            dropper = " (spacecraft)";
         }
         return super.getDetails() + ", " + getUnitTonnage() + " tons" + dropper;
     }
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return skillType.equals(SkillType.S_TECH_AERO);
+        return (skillType.equals(SkillType.S_TECH_AERO) || skillType.equals(SkillType.S_TECH_VESSEL));
     }
 
     @Override

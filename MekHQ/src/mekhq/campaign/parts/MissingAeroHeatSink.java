@@ -34,66 +34,72 @@ import mekhq.campaign.Campaign;
  */
 public class MissingAeroHeatSink extends MissingPart {
 
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 2806921577150714477L;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 2806921577150714477L;
 
-	private int type;
+    private int type;
 
-	public MissingAeroHeatSink() {
-    	this(0, Aero.HEAT_SINGLE, false, null);
+    public MissingAeroHeatSink() {
+        this(0, Aero.HEAT_SINGLE, false, null);
     }
 
     public MissingAeroHeatSink(int tonnage, int type, boolean omniPodded, Campaign c) {
-    	super(tonnage, omniPodded, c);
-    	this.type = type;
-    	this.name = "Aero Heat Sink";
+        super(tonnage, omniPodded, c);
+        this.type = type;
+        this.name = "Aero Heat Sink";
+        if(type == AeroHeatSink.CLAN_HEAT_DOUBLE) {
+            this.name = "Aero Double Heat Sink (Clan)";
+        }
+        if(type == Aero.HEAT_DOUBLE) {
+            this.name = "Aero Double Heat Sink";
+        }
     }
-    
+
     @Override 
-	public int getBaseTime() {
-		return isOmniPodded()? 30 : 90;
-	}
-	
-	@Override
-	public int getDifficulty() {
-		return -2;
-	}
+    public int getBaseTime() {
+        return isOmniPodded()? 30 : 90;
+    }
 
-	@Override
-	public String checkFixable() {
-		return null;
-	}
+    @Override
+    public int getDifficulty() {
+        return -2;
+    }
 
-	@Override
-	public Part getNewPart() {
-		return new AeroHeatSink(getUnitTonnage(), type, omniPodded, campaign);
-	}
+    @Override
+    public String checkFixable() {
+        return null;
+    }
 
-	@Override
-	public boolean isAcceptableReplacement(Part part, boolean refit) {
-		return part instanceof AeroHeatSink && type == ((AeroHeatSink)part).getType();
-	}
+    @Override
+    public Part getNewPart() {
+        return new AeroHeatSink(getUnitTonnage(), type, omniPodded, campaign);
+    }
 
-	@Override
-	public double getTonnage() {
-		return 1;
-	}
+    @Override
+    public boolean isAcceptableReplacement(Part part, boolean refit) {
+        return part instanceof AeroHeatSink && type == ((AeroHeatSink)part).getType();
+    }
 
-	@Override
-	public void updateConditionFromPart() {
-		if(null != unit && unit.getEntity() instanceof Aero) {
-			if(hits == 0) {
-				((Aero)unit.getEntity()).setHeatSinks(((Aero)unit.getEntity()).getHeatSinks()-1);
-			}
-		}
-	}
+    @Override
+    public double getTonnage() {
+        return 1;
+    }
 
-	@Override
-	protected void loadFieldsFromXmlNode(Node wn) {
-		//nothing to load
-	}
+    @Override
+    public void updateConditionFromPart() {
+        if(null != unit && unit.getEntity() instanceof Aero) {
+            if(hits == 0) {
+                ((Aero)unit.getEntity()).setHeatSinks(((Aero)unit.getEntity()).getHeatSinks()-1);
+            }
+        }
+    }
+
+    @Override
+    protected void loadFieldsFromXmlNode(Node wn) {
+        //nothing to load
+    }
 
     @Override
     public String getLocationName() {
@@ -110,12 +116,12 @@ public class MissingAeroHeatSink extends MissingPart {
         }
         return Entity.LOC_NONE;
     }
-    
+
     @Override
     public TechAdvancement getTechAdvancement() {
         if (type == Aero.HEAT_SINGLE) {
             return AeroHeatSink.TA_SINGLE;
-        } else if (campaign.getFaction().isClan()) {
+        } else if (type == AeroHeatSink.CLAN_HEAT_DOUBLE) {
             return AeroHeatSink.TA_CLAN_DOUBLE;
         } else {
             return AeroHeatSink.TA_IS_DOUBLE;
@@ -123,7 +129,7 @@ public class MissingAeroHeatSink extends MissingPart {
     }
 
     @Override
-	public boolean isOmniPoddable() {
-	    return true;
-	}
+    public boolean isOmniPoddable() {
+        return true;
+    }
 }

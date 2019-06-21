@@ -1,7 +1,7 @@
 /*
- * MissingDropshipDockingCollar.java
+ * MissingKFBoom.java
  * 
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2019 MegaMek Team
  * 
  * This file is part of MekHQ.
  * 
@@ -34,54 +34,50 @@ import mekhq.campaign.Campaign;
 
 /**
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author MKerensky
  */
-public class MissingDropshipDockingCollar extends MissingPart {
+public class MissingKFBoom extends MissingPart {
 
     /**
      * 
      */
-    private static final long serialVersionUID = -717866644605314883L;
+    private static final long serialVersionUID = 8782809786871433915L;
 
-    private int collarType;
+    private int boomType;
 
-    public MissingDropshipDockingCollar() {
-        this(0, null, Dropship.COLLAR_STANDARD);
+    public MissingKFBoom() {
+        this(0, null, Dropship.BOOM_STANDARD);
     }
 
-    public MissingDropshipDockingCollar(int tonnage, Campaign c, int collarType) {
+    public MissingKFBoom(int tonnage, Campaign c, int boomType) {
         super(tonnage, c);
-        this.collarType = collarType;
-        this.name = "Dropship Docking Collar";
-        if (collarType == Dropship.COLLAR_NO_BOOM) {
-            name += " (No Boom)";
-        } else if (collarType == Dropship.COLLAR_PROTOTYPE) {
+        this.boomType = boomType;
+        this.name = "Dropship K-F Boom";
+        if (boomType == Dropship.BOOM_PROTOTYPE) {
             name += " (Prototype)";
         }
     }
 
     @Override 
     public int getBaseTime() {
-        return 2880;
+        return 3600;
     }
 
     @Override
     public int getDifficulty() {
-        return -2;
+        return 0;
     }
 
     @Override
     public void updateConditionFromPart() {
         if(null != unit && unit.getEntity() instanceof Dropship) {
-            ((Dropship)unit.getEntity()).setDamageDockCollar(true);
             ((Dropship)unit.getEntity()).setDamageKFBoom(true);
-        }    
-        
+        }
     }
 
     @Override
     public Part getNewPart() {
-        return new DropshipDockingCollar(getUnitTonnage(), campaign, collarType);
+        return new KfBoom(getUnitTonnage(), campaign, boomType);
     }
 
     @Override
@@ -97,7 +93,7 @@ public class MissingDropshipDockingCollar extends MissingPart {
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "collarType", collarType);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "boomType", boomType);
         writeToXmlEnd(pw1, indent);
     }
 
@@ -107,16 +103,16 @@ public class MissingDropshipDockingCollar extends MissingPart {
 
         for (int x=0; x<nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            if (wn2.getNodeName().equalsIgnoreCase("collarType")) {
-                collarType = Integer.parseInt(wn2.getTextContent());
+            if (wn2.getNodeName().equalsIgnoreCase("boomType")) {
+                boomType = Integer.parseInt(wn2.getTextContent());
             }
         }
     }
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        return (part instanceof DropshipDockingCollar)
-                && (refit || (((DropshipDockingCollar) part).getCollarType() == collarType));
+        return (part instanceof KfBoom)
+                && (refit || (((KfBoom) part).getBoomType() == boomType));
     }
 
     @Override
@@ -132,10 +128,10 @@ public class MissingDropshipDockingCollar extends MissingPart {
 
     @Override
     public TechAdvancement getTechAdvancement() {
-        if (collarType != Dropship.COLLAR_NO_BOOM) {
-            return DropshipDockingCollar.TA_BOOM;
+        if (boomType != Dropship.BOOM_STANDARD) {
+            return KfBoom.TA_PROTOTYPE_KF_BOOM;
         } else {
-            return DropshipDockingCollar.TA_NO_BOOM;
+            return KfBoom.TA_KFBOOM;
         }
     }
 }

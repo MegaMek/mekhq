@@ -1,7 +1,7 @@
 /*
- * MissingDropshipDockingCollar.java
+ * MissingGravDeck.java
  * 
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2019 by The MegaMek Team
  * 
  * This file is part of MekHQ.
  * 
@@ -26,62 +26,72 @@ import java.io.PrintWriter;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.Dropship;
 import megamek.common.Entity;
+import megamek.common.Jumpship;
 import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 
 /**
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author MKerensky
  */
-public class MissingDropshipDockingCollar extends MissingPart {
+public class MissingGravDeck extends MissingPart {
 
     /**
      * 
      */
-    private static final long serialVersionUID = -717866644605314883L;
+    private static final long serialVersionUID = -6034090299851704878L;
 
-    private int collarType;
+    private int deckType;
+    private int deckNumber;
 
-    public MissingDropshipDockingCollar() {
-        this(0, null, Dropship.COLLAR_STANDARD);
+    public MissingGravDeck() {
+        this(0, 0, null, GravDeck.GRAV_DECK_TYPE_STANDARD);
     }
 
-    public MissingDropshipDockingCollar(int tonnage, Campaign c, int collarType) {
+    public MissingGravDeck(int tonnage, int deckNumber, Campaign c, int deckType) {
         super(tonnage, c);
-        this.collarType = collarType;
-        this.name = "Dropship Docking Collar";
-        if (collarType == Dropship.COLLAR_NO_BOOM) {
-            name += " (No Boom)";
-        } else if (collarType == Dropship.COLLAR_PROTOTYPE) {
-            name += " (Prototype)";
+        this.deckNumber = deckNumber;
+        this.deckType = deckType;
+        this.name = "Grav Deck";
+        if (deckType == GravDeck.GRAV_DECK_TYPE_STANDARD) {
+            name += " (Standard)";
+        } else if (deckType == GravDeck.GRAV_DECK_TYPE_LARGE) {
+            name += " (Large)";
+        } else if (deckType == GravDeck.GRAV_DECK_TYPE_HUGE) {
+            name += " (Huge)";
         }
+    }
+
+    public int getDeckNumber() {
+        return deckNumber;
+    }
+
+    public int getDeckType() {
+        return deckType;
     }
 
     @Override 
     public int getBaseTime() {
-        return 2880;
+        return 4800;
     }
 
     @Override
     public int getDifficulty() {
-        return -2;
+        return 3;
     }
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit && unit.getEntity() instanceof Dropship) {
-            ((Dropship)unit.getEntity()).setDamageDockCollar(true);
-            ((Dropship)unit.getEntity()).setDamageKFBoom(true);
-        }    
-        
+        if (null != unit && unit.getEntity() instanceof Jumpship) {
+            ((Jumpship) unit.getEntity()).setGravDeckDamageFlag(deckNumber, hits);
+        }
     }
 
     @Override
     public Part getNewPart() {
-        return new DropshipDockingCollar(getUnitTonnage(), campaign, collarType);
+        return new GravDeck(0, 0, campaign, deckType);
     }
 
     @Override
@@ -91,13 +101,21 @@ public class MissingDropshipDockingCollar extends MissingPart {
 
     @Override
     public double getTonnage() {
-        return 0;
+        //TO tables p 407
+        if (deckType == GravDeck.GRAV_DECK_TYPE_STANDARD) {
+            return 50;
+        } else if (deckType == GravDeck.GRAV_DECK_TYPE_LARGE) {
+            return 100;
+        } else {
+            return 500;
+        }
     }
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "collarType", collarType);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "deckType", deckType);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "deckNumber", deckNumber);
         writeToXmlEnd(pw1, indent);
     }
 
@@ -107,16 +125,18 @@ public class MissingDropshipDockingCollar extends MissingPart {
 
         for (int x=0; x<nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            if (wn2.getNodeName().equalsIgnoreCase("collarType")) {
-                collarType = Integer.parseInt(wn2.getTextContent());
+            if (wn2.getNodeName().equalsIgnoreCase("deckType")) {
+                deckType = Integer.parseInt(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("deckNumber")) {
+                deckNumber = Integer.parseInt(wn2.getTextContent());
             }
         }
     }
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        return (part instanceof DropshipDockingCollar)
-                && (refit || (((DropshipDockingCollar) part).getCollarType() == collarType));
+        return (part instanceof GravDeck)
+                && (refit || (((GravDeck) part).getDeckType() == deckType));
     }
 
     @Override
@@ -132,10 +152,6 @@ public class MissingDropshipDockingCollar extends MissingPart {
 
     @Override
     public TechAdvancement getTechAdvancement() {
-        if (collarType != Dropship.COLLAR_NO_BOOM) {
-            return DropshipDockingCollar.TA_BOOM;
-        } else {
-            return DropshipDockingCollar.TA_NO_BOOM;
-        }
+        return GravDeck.TA_GRAV_DECK;
     }
 }

@@ -19,7 +19,6 @@
 package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
-import java.math.RoundingMode;
 
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
@@ -291,7 +290,10 @@ public class LargeCraftAmmoBin extends AmmoBin {
             return 120;
         } else {
             //Capital Missiles take a flat 60m per missile per errata
-            if (type.hasFlag(AmmoType.F_CAP_MISSILE)) {
+            //Better set this for cruise missiles and screen launchers too.
+            if (type.hasFlag(AmmoType.F_CAP_MISSILE)
+                    || type.hasFlag(AmmoType.F_CRUISE_MISSILE)
+                    || type.hasFlag(AmmoType.F_SCREEN)) {
                 return 60;
             }
             return (int) Math.ceil(15 * type.getTonnage(null));

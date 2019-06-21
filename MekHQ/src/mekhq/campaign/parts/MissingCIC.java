@@ -1,7 +1,7 @@
 /*
- * MissingLandingGear.java
+ * MissingCIC.java
  * 
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2019 MegaMek Team
  * 
  * This file is part of MekHQ.
  * 
@@ -21,56 +21,59 @@
 
 package mekhq.campaign.parts;
 
-import megamek.common.Aero;
-import megamek.common.CriticalSlot;
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.Jumpship;
-import megamek.common.LandAirMech;
-import megamek.common.TechAdvancement;
-import mekhq.campaign.Campaign;
+import java.io.PrintWriter;
 
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.common.Aero;
+import megamek.common.Entity;
+import megamek.common.TechAdvancement;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
 
 /**
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author MKerensky
  */
-public class MissingLandingGear extends MissingPart {
+public class MissingCIC extends MissingPart {
 
     /**
      * 
      */
-    private static final long serialVersionUID = 2806921577150714477L;
+    private static final long serialVersionUID = -3097651263236108565L;
 
-    public MissingLandingGear() {
-        this(0, null);
+    private Money cost;
+
+    public MissingCIC() {
+        this(0, Money.zero(), null);
     }
 
-    public MissingLandingGear(int tonnage, Campaign c) {
+    public MissingCIC(int tonnage, Money cost, Campaign c) {
         super(0, c);
-        this.name = "Landing Gear";
+        this.cost = cost;
+        this.name = "Combat Information Center";
     }
 
     @Override 
     public int getBaseTime() {
+        int time = 0;
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
-            int time = 0;
             //Test of proposed errata for repair times
-            if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
-                time = 1200;
-            } else {
-                time = 600;
+            time = 1200;
+            if (unit != null && unit.getEntity().hasNavalC3()) {
+                time *= 2;
             }
-            return time;
+        } else {
+            time = 1440;
         }
-        return 1200;
+        return time;
     }
 
     @Override
     public int getDifficulty() {
-        return 2;
+        return 0;
     }
 
     @Override
@@ -80,12 +83,12 @@ public class MissingLandingGear extends MissingPart {
 
     @Override
     public Part getNewPart() {
-        return new LandingGear(getUnitTonnage(), campaign);
+        return new CombatInformationCenter(getUnitTonnage(), cost, campaign);
     }
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        return part instanceof LandingGear;
+        return part instanceof CombatInformationCenter && cost == part.getStickerPrice();
     }
 
     @Override
@@ -94,38 +97,42 @@ public class MissingLandingGear extends MissingPart {
     }
 
     @Override
-    public int getTechRating() {
-        //go with conventional fighter avionics
-        return EquipmentType.RATING_B;
+    public void updateConditionFromPart() {
+        if(null != unit && unit.getEntity() instanceof Aero) {
+            ((Aero)unit.getEntity()).setCICHits(3);
+        }
     }
 
     @Override
-    public void updateConditionFromPart() {
-        if(null != unit && unit.getEntity() instanceof Aero) {
-            ((Aero)unit.getEntity()).setGearHit(true);
-        } else if (null != unit && unit.getEntity() instanceof LandAirMech) {
-            unit.damageSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_LANDING_GEAR, 3);
-        }
+    public void writeToXml(PrintWriter pw1, int indent) {
+        writeToXmlBegin(pw1, indent);
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<cost>"
+                + cost.toXmlString()
+                +"</cost>");
+        writeToXmlEnd(pw1, indent);
     }
 
     @Override
     protected void loadFieldsFromXmlNode(Node wn) {
-        //nothing to load
+        NodeList nl = wn.getChildNodes();
+
+        for (int x=0; x<nl.getLength(); x++) {
+            Node wn2 = nl.item(x);        
+            if (wn2.getNodeName().equalsIgnoreCase("cost")) {
+                cost = Money.fromXmlString(wn2.getTextContent().trim());
+            } 
+        }
     }
 
     @Override
     public String getLocationName() {
-        if (null != unit) {
-            return unit.getEntity().getLocationName(unit.getEntity().getBodyLocation());
-        }
+        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public int getLocation() {
-        if (null != unit) {
-            return unit.getEntity().getBodyLocation();
-        }
         return Entity.LOC_NONE;
     }
 

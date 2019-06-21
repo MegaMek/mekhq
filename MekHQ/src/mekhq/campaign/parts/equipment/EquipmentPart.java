@@ -554,6 +554,8 @@ public class EquipmentPart extends Part {
                 varCost = Money.of(getUnitTonnage() * 200);
             } else if (type.hasFlag(MiscType.F_CLUB) && (type.hasSubType(MiscType.S_LANCE))) {
                 varCost = Money.of(getUnitTonnage() * 150);
+            } else if (type.hasFlag(MiscType.F_NAVAL_C3)) {
+                varCost = Money.of(getUnitTonnage() * 100000);
             }
         }
         if (varCost.isZero()) {

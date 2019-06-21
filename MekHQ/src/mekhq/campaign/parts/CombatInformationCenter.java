@@ -1,7 +1,7 @@
 /*
- * FireControlSystem.java
+ * CombatInformationCenter.java
  * 
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (C) 2019, MegaMek team
  * 
  * This file is part of MekHQ.
  * 
@@ -29,10 +29,8 @@ import org.w3c.dom.NodeList;
 
 import megamek.common.Aero;
 import megamek.common.Compute;
-import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.Jumpship;
-import megamek.common.SmallCraft;
 import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -40,29 +38,29 @@ import mekhq.campaign.personnel.SkillType;
 
 /**
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author MKerensky
  */
-public class FireControlSystem extends Part {
+public class CombatInformationCenter extends Part {
 
     /**
      * 
      */
-    private static final long serialVersionUID = -717866644605314883L;
+    private static final long serialVersionUID = 7069129053879581753L;
 
     private Money cost;
 
-    public FireControlSystem() {
+    public CombatInformationCenter() {
         this(0, Money.zero(), null);
     }
 
-    public FireControlSystem(int tonnage, Money cost, Campaign c) {
+    public CombatInformationCenter(int tonnage, Money cost, Campaign c) {
         super(tonnage, c);
         this.cost = cost;
-        this.name = "Fire Control System";
+        this.name = "Combat Information Center";
     }
-
-    public FireControlSystem clone() {
-        FireControlSystem clone = new FireControlSystem(0, cost, campaign);
+    
+    public CombatInformationCenter clone() {
+        CombatInformationCenter clone = new CombatInformationCenter(0, cost, campaign);
         clone.copyBaseData(this);
         return clone;
     }
@@ -71,7 +69,7 @@ public class FireControlSystem extends Part {
     public void updateConditionFromEntity(boolean checkForDestruction) {
         int priorHits = hits;
         if(null != unit && unit.getEntity() instanceof Aero) {
-            hits = ((Aero)unit.getEntity()).getFCSHits();
+            hits = ((Aero)unit.getEntity()).getCICHits();
             if(checkForDestruction 
                     && hits > priorHits 
                     && (hits < 3 && !campaign.getCampaignOptions().useAeroSystemHits())
@@ -88,19 +86,11 @@ public class FireControlSystem extends Part {
         int time = 0;
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair times
-            if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship))  {
-                time = 120;
-                if (unit.getEntity().hasNavalC3()) {
-                    time *= 2;
-                }
-            } else {
-                time = 60; 
+            time = 120;
+            if (unit != null && unit.getEntity().hasNavalC3()) {
+                time *= 2;
             }
-            if (isSalvaging()) {
-                time *= 10;
-            } else if (hits == 1) {
-                time *= 1;
-            } else if (hits == 2) {
+            if (hits == 2) {
                 time *= 2;
             }
             return time;
@@ -117,9 +107,6 @@ public class FireControlSystem extends Part {
     public int getDifficulty() {
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair time and difficulty
-            if(isSalvaging()) {
-                return 0;
-            }
             if (hits == 1) {
                 return 1;
             } 
@@ -136,23 +123,22 @@ public class FireControlSystem extends Part {
     @Override
     public void updateConditionFromPart() {
         if(null != unit && unit.getEntity() instanceof Aero) {
-            ((Aero)unit.getEntity()).setFCSHits(hits);
+            ((Aero)unit.getEntity()).setCICHits(hits);
         }
-        
     }
 
     @Override
     public void fix() {
         super.fix();
         if(null != unit && unit.getEntity() instanceof Aero) {
-            ((Aero)unit.getEntity()).setFCSHits(0);
+            ((Aero)unit.getEntity()).setCICHits(0);
         }
     }
 
     @Override
     public void remove(boolean salvage) {
         if(null != unit && unit.getEntity() instanceof Aero) {
-            ((Aero)unit.getEntity()).setFCSHits(3);
+            ((Aero)unit.getEntity()).setCICHits(3);
             Part spare = campaign.checkForExistingSparePart(this);
             if(!salvage) {
                 campaign.removePart(this);
@@ -171,16 +157,14 @@ public class FireControlSystem extends Part {
 
     @Override
     public MissingPart getMissingPart() {
-        return new MissingFireControlSystem(getUnitTonnage(), cost, campaign);
+        return new MissingCIC(getUnitTonnage(), cost, campaign);
     }
 
     @Override
     public String checkFixable() {
         if (isSalvaging()) {
-            if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
-                // FCS/CIC computers are designed for and built into the ship. Can't salvage and use somewhere else
-                return "You cannot salvage a spacecraft FCS. You must scrap it instead.";
-            }
+            // FCS/CIC computers are designed for and built into the ship. Can't salvage and use somewhere else
+            return "You cannot salvage a spacecraft CIC. You must scrap it instead.";
         }
         return null;
     }
@@ -198,12 +182,9 @@ public class FireControlSystem extends Part {
 
     public void calculateCost() {
         if(null != unit) {
-            if(unit.getEntity() instanceof SmallCraft) {
-                cost = Money.of(100000 + 10000 * ((SmallCraft)unit.getEntity()).getArcswGuns());
-            }
-            else if(unit.getEntity() instanceof Jumpship) {
-                cost = Money.of(100000 + 10000 * ((Jumpship)unit.getEntity()).getArcswGuns());
-            }
+            // There's more to CIC than just Fire Control
+            // Use Bridge + Computer + FC Computer + Gunnery Control System costs, p158 SO.
+            cost = Money.of(200000 + (10 * unit.getEntity().getWeight()) + 200000 + 100000 + (10000 * ((Jumpship)unit.getEntity()).getArcswGuns()));
         }
     }
 
@@ -215,12 +196,12 @@ public class FireControlSystem extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         calculateCost();
-        return part instanceof FireControlSystem && getStickerPrice().equals(part.getStickerPrice());
+        return part instanceof CombatInformationCenter && getStickerPrice().equals(part.getStickerPrice());
     }
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return (skillType.equals(SkillType.S_TECH_AERO) || skillType.equals(SkillType.S_TECH_VESSEL));
+        return skillType.equals(SkillType.S_TECH_VESSEL);
     }
 
     @Override
@@ -255,7 +236,7 @@ public class FireControlSystem extends Part {
     public int getLocation() {
         return Entity.LOC_NONE;
     }
-    
+
     @Override
     public TechAdvancement getTechAdvancement() {
         return TA_GENERIC;

@@ -29,6 +29,7 @@ import org.w3c.dom.NodeList;
 
 import megamek.common.Aero;
 import megamek.common.CriticalSlot;
+import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.Jumpship;
 import megamek.common.Mech;
@@ -53,7 +54,7 @@ public class SpacecraftEngine extends Part {
             .setAvailability(RATING_C, RATING_D, RATING_C, RATING_C)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
-    double engineTonnage;  
+    double engineTonnage;
     boolean clan;
 
     public SpacecraftEngine() {
@@ -101,6 +102,21 @@ public class SpacecraftEngine extends Part {
 
     @Override 
     public Money getStickerPrice() {
+        //Add engine cost from SO p158 for advanced aerospace
+        //Drive Unit + Engine + Engine Control Unit
+        if (unit != null) {
+            if(unit.getEntity() instanceof Warship) {
+                return Money.of((500 * unit.getEntity().getOriginalWalkMP() * (unit.getEntity().getWeight() / 100)) 
+                        + (engineTonnage * 1000)
+                        + 1000);
+            } else if(unit.getEntity() instanceof Jumpship) {
+                // If we're a space station or jumpship, need the station keeping thrust, which is always 0.2
+                return Money.of((500 * 0.2 * (unit.getEntity().getWeight() / 100)) 
+                            + (engineTonnage * 1000)
+                            + 1000);
+            }
+        }
+        // Small craft and dropships, TM p283
         return Money.of(engineTonnage * 1000);
     }
 
@@ -197,7 +213,7 @@ public class SpacecraftEngine extends Part {
             int engineCrits = 0;
             if(unit.getEntity() instanceof Aero) {
                 engineHits = ((Aero)unit.getEntity()).getEngineHits();
-                engineCrits = 3;
+                engineCrits = 6;
             }
             if(engineHits >= engineCrits) {
                 remove(false);
@@ -212,14 +228,62 @@ public class SpacecraftEngine extends Part {
 
     @Override 
     public int getBaseTime() {
-        if(isSalvaging()) {
-            return 43200;
+        int time = 0;
+        //Per errata, small craft now use fighter engine times but still have the
+        //large craft engine part
+        if (null != unit && (unit.getEntity() instanceof SmallCraft && !(unit.getEntity() instanceof Dropship))) {
+            if (isSalvaging()) {
+                return 360;
+            }
+            if (hits == 1) {
+                time = 100;
+            } else if (hits == 2) {
+                time = 200;
+            } else if (hits > 2) {
+                time = 300;
+            }
+            return time;
         }
+        if (campaign.getCampaignOptions().useAeroSystemHits()) {
+            //Test of proposed errata for repair times
+            time = 300; 
+            //Light Damage
+            if (hits > 0 && hits < 3) {
+                time *= (1 * hits);
+            //Moderate damage
+            } else if (hits > 2 && hits < 5) {
+                time *= (2 * hits);
+            //Heavy damage
+            } else if (hits > 4) {
+                time *= (4 * hits);
+            }
+            return time;
+        }
+        //Removed time for isSalvaging. Can't salvage an engine.
+        //Return the base 5 hours from SO if not using the improved times option
         return 300;
     }
 
     @Override
     public int getDifficulty() {
+        //Per errata, small craft now use fighter engine difficulty table
+        if (null != unit && (unit.getEntity() instanceof SmallCraft && !(unit.getEntity() instanceof Dropship))) {
+            return -1;
+        }
+        if (campaign.getCampaignOptions().useAeroSystemHits()) {
+            //Test of proposed errata for repair times and difficulty
+            //Light Damage
+            if (hits > 0 && hits < 3) {
+                return 1;
+            //Moderate damage
+            } else if (hits > 2 && hits < 5) {
+                return 2;
+            //Heavy damage
+            } else if (hits > 4) {
+                return 3;
+            }
+        }
+        //Otherwise, use the listed +1 difficulty from SO
         return 1;
     }
 
@@ -239,6 +303,12 @@ public class SpacecraftEngine extends Part {
 
     @Override
     public String checkFixable() {
+        if (isSalvaging()) {
+            if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
+                // Assuming it wasn't completely integrated into the ship it was built for, where are you going to keep this?
+                return "You cannot salvage a spacecraft engine. You must scrap it instead.";
+            }
+        }
         return null;
     }
 
@@ -249,7 +319,7 @@ public class SpacecraftEngine extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return skillType.equals(SkillType.S_TECH_AERO);	
+        return (skillType.equals(SkillType.S_TECH_AERO) || skillType.equals(SkillType.S_TECH_VESSEL));
     }
 
     @Override

@@ -64,8 +64,14 @@ import mekhq.campaign.parts.AeroSensor;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Avionics;
 import mekhq.campaign.parts.BattleArmorSuit;
+import mekhq.campaign.parts.BayDoor;
+import mekhq.campaign.parts.Cubicle;
+import mekhq.campaign.parts.DropshipDockingCollar;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.FireControlSystem;
+import mekhq.campaign.parts.GravDeck;
+import mekhq.campaign.parts.JumpshipDockingCollar;
+import mekhq.campaign.parts.KfBoom;
 import mekhq.campaign.parts.LandingGear;
 import mekhq.campaign.parts.MekActuator;
 import mekhq.campaign.parts.MekCockpit;
@@ -421,6 +427,12 @@ public class PartsStoreDialog extends javax.swing.JDialog {
                         || part instanceof Avionics
                         || part instanceof FireControlSystem
                         || part instanceof AeroSensor
+                        || part instanceof KfBoom
+                        || part instanceof DropshipDockingCollar
+                        || part instanceof JumpshipDockingCollar
+                        || part instanceof BayDoor
+                        || part instanceof Cubicle
+                        || part instanceof GravDeck
                         || part instanceof VeeSensor
                         || part instanceof VeeStabiliser
                         || part instanceof ProtomekSensor;

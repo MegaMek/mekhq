@@ -45,6 +45,7 @@ import megamek.common.CargoBay;
 import megamek.common.Compute;
 import megamek.common.ConvFighter;
 import megamek.common.CriticalSlot;
+import megamek.common.DockingCollar;
 import megamek.common.Dropship;
 import megamek.common.Engine;
 import megamek.common.Entity;
@@ -116,12 +117,22 @@ import mekhq.campaign.parts.Avionics;
 import mekhq.campaign.parts.BaArmor;
 import mekhq.campaign.parts.BattleArmorSuit;
 import mekhq.campaign.parts.BayDoor;
+import mekhq.campaign.parts.CombatInformationCenter;
 import mekhq.campaign.parts.Cubicle;
 import mekhq.campaign.parts.DropshipDockingCollar;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.FireControlSystem;
+import mekhq.campaign.parts.GravDeck;
 import mekhq.campaign.parts.InfantryArmorPart;
 import mekhq.campaign.parts.InfantryMotiveType;
+import mekhq.campaign.parts.JumpshipDockingCollar;
+import mekhq.campaign.parts.KFChargingSystem;
+import mekhq.campaign.parts.KFDriveCoil;
+import mekhq.campaign.parts.KFDriveController;
+import mekhq.campaign.parts.KFFieldInitiator;
+import mekhq.campaign.parts.KFHeliumTank;
+import mekhq.campaign.parts.KfBoom;
+import mekhq.campaign.parts.LFBattery;
 import mekhq.campaign.parts.LandingGear;
 import mekhq.campaign.parts.MekActuator;
 import mekhq.campaign.parts.MekCockpit;
@@ -135,10 +146,18 @@ import mekhq.campaign.parts.MissingAeroSensor;
 import mekhq.campaign.parts.MissingAvionics;
 import mekhq.campaign.parts.MissingBattleArmorSuit;
 import mekhq.campaign.parts.MissingBayDoor;
+import mekhq.campaign.parts.MissingCIC;
 import mekhq.campaign.parts.MissingCubicle;
 import mekhq.campaign.parts.MissingDropshipDockingCollar;
 import mekhq.campaign.parts.MissingEnginePart;
 import mekhq.campaign.parts.MissingFireControlSystem;
+import mekhq.campaign.parts.MissingKFBoom;
+import mekhq.campaign.parts.MissingKFChargingSystem;
+import mekhq.campaign.parts.MissingKFDriveCoil;
+import mekhq.campaign.parts.MissingKFDriveController;
+import mekhq.campaign.parts.MissingKFFieldInitiator;
+import mekhq.campaign.parts.MissingKFHeliumTank;
+import mekhq.campaign.parts.MissingLFBattery;
 import mekhq.campaign.parts.MissingLandingGear;
 import mekhq.campaign.parts.MissingMekActuator;
 import mekhq.campaign.parts.MissingMekCockpit;
@@ -171,6 +190,7 @@ import mekhq.campaign.parts.ProtomekSensor;
 import mekhq.campaign.parts.QuadVeeGear;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.Rotor;
+import mekhq.campaign.parts.SpacecraftCoolingSystem;
 import mekhq.campaign.parts.SpacecraftEngine;
 import mekhq.campaign.parts.StructuralIntegrity;
 import mekhq.campaign.parts.TankLocation;
@@ -1124,37 +1144,31 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     .map(x -> x.getActualValue().multipliedBy(x.getQuality()))
                     .collect(Collectors.toList()));
 
-        //TODO: we need to adjust this for equipment that doesn't show up as parts
-        //Spacecraft need: drive unit, computer, and bridge
+        //We need to adjust this for equipment that doesn't show up as parts
+        //Docking collars, Grav decks, KF Drive - Now parts
+        //Drive unit - see SpacecraftEngine
         if(entity instanceof SmallCraft || entity instanceof Jumpship) {
-            //bridge
-            partsValue = partsValue.plus(200000.0 + 10.0 * entity.getWeight());
-            //computer
-            partsValue = partsValue.plus(200000.0);
-            //drive unit
-            partsValue = partsValue.plus(500.0 * entity.getOriginalWalkMP() * entity.getWeight() / 100.0);
-            // KF Drive, Docking Collars, etc...
+            if (entity instanceof SmallCraft) {
+                //JS/SS/WS Bridge, Computer - see CombatInformationCenter
+                //bridge
+                partsValue = partsValue.plus(200000.0 + 10.0 * entity.getWeight());
+                //computer
+                partsValue = partsValue.plus(200000.0);
+            }
+            // Jump sail and KF drive support systems
             if ((entity instanceof Jumpship) && !(entity instanceof SpaceStation)) {
                 Jumpship js = (Jumpship) entity;
                 Money driveCost = Money.zero();
-                // coil
-                driveCost = driveCost.plus(60000000.0 + (75000000.0 * js.getDocks()));
-                // initiator
-                driveCost = driveCost.plus(25000000.0 + (5000000.0 * js.getDocks()));
-                // controller
-                driveCost = driveCost.plus(50000000.0);
-                // tankage
-                driveCost = driveCost.plus(50000.0 * js.getKFIntegrity());
                 // sail
                 driveCost = driveCost.plus(50000.0 * (30.0 + (js.getWeight() / 7500.0)));
-                // charging system
-                driveCost = driveCost.plus(500000.0 + (200000.0 * js.getDocks()));
-                // compact core
-                if (js instanceof Warship) {
+                // lithium fusion and compact core?
+                if (js.getDriveCoreType() == Jumpship.DRIVE_CORE_COMPACT && js.hasLF()) {
+                    driveCost = driveCost.multipliedBy(15);
+                } else if (js.getDriveCoreType() == Jumpship.DRIVE_CORE_COMPACT) {
+                    // just a compact core?
                     driveCost = driveCost.multipliedBy(5);
-                }
-                // lithium fusion?
-                if (js.hasLF()) {
+                } else if (js.hasLF()) {
+                    // lithium fusion?
                     driveCost = driveCost.multipliedBy(3);
                 }
                 // Drive Support Systems
@@ -1165,8 +1179,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 }
                 partsValue = partsValue.plus(driveCost);
 
-                // Docking Collars
-                partsValue = partsValue.plus(100000.0 * js.getDocks());
                 // HPG
                 if (js.hasHPG()) {
                     partsValue = partsValue.plus(1000000000.0);
@@ -1180,12 +1192,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
                 // heat sinks
                 Money sinkCost = Money.of(2000.0 + 4000.0 * js.getHeatType());// == HEAT_DOUBLE ? 6000 : 2000
-                partsValue = partsValue.plus(sinkCost.multipliedBy(js.getHeatSinks()));
-
-                // grav deck
-                partsValue = partsValue.plus(5000000.0 * js.getGravDeck());
-                partsValue = partsValue.plus(10000000.0 * js.getGravDeckLarge());
-                    partsValue = partsValue.plus(40000000.0 * js.getGravDeckHuge());
+                partsValue = partsValue.plus(sinkCost.multipliedBy(js.getOHeatSinks()));
 
                 // get bays
                 int baydoors = 0;
@@ -1785,11 +1792,18 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     public void initializeParts(boolean addParts) {
 
         int erating = 0;
+        int builtInHeatSinks = 0;
         if(!(entity instanceof FighterSquadron) && (null != entity.getEngine())) {
             erating = entity.getEngine().getRating();
+            if (entity.getEngine().isFusion()) {
+                //10 weight-free heatsinks for fusion engines.
+                //Used for fighters to prevent adding extra parts
+                builtInHeatSinks = 10;
+            }
         }
 
         ArrayList<Part> partsToAdd = new ArrayList<>();
+        ArrayList<Part> partsToRemove = new ArrayList<>();
 
         Part gyro = null;
         Part engine = null;
@@ -1828,6 +1842,13 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         Part motiveSystem = null;
         Part avionics = null;
         Part fcs = null;
+        Part cic = null;
+        Part chargingSystem = null;
+        Part driveCoil = null;
+        Part driveController = null;
+        Part fieldInitiator = null;
+        Part heliumTank = null;
+        Part lfBattery = null;
         Part landingGear = null;
         Part turretLock = null;
         ArrayList<Part> aeroHeatSinks = new ArrayList<>();
@@ -1837,14 +1858,18 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         Part secondaryW = null;
         Part infantryArmor = null;
         Part dropCollar = null;
+        Part kfBoom = null;
         Part protoLeftArmActuator = null;
         Part protoRightArmActuator = null;
         Part protoLegsActuator = null;
         ArrayList<Part> protoJumpJets = new ArrayList<>();
         Part aeroThrustersLeft = null;
         Part aeroThrustersRight = null;
+        Part coolingSystem = null;
         Map<Integer, Part> bays = new HashMap<>();
         Map<Integer, List<Part>> bayPartsToAdd = new HashMap<>();
+        Map<Integer, Part> jumpCollars = new HashMap<>();
+        Map<Integer, Part> gravDecks = new HashMap<>();
 
         for(Part part : parts) {
             if(part instanceof MekGyro || part instanceof MissingMekGyro) {
@@ -2001,20 +2026,71 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 qvGear = part;
             } else if(part instanceof Avionics || part instanceof MissingAvionics) {
                 avionics = part;
+            //Don't initialize FCS for JS/WS/SS, use CIC for these instead
             } else if(part instanceof FireControlSystem || part instanceof MissingFireControlSystem) {
                 fcs = part;
                 //for reverse compatability, calculate costs
                 if(part instanceof FireControlSystem) {
                     ((FireControlSystem)fcs).calculateCost();
                 }
+                // If a JS/WS/SS already has an FCS, remove it
+                if (entity instanceof Jumpship) {
+                    partsToRemove.add(part);
+                }
+            //Don't initialize CIC for any ASF/SC/DS, use FCS for these instead
+            } else if((part instanceof CombatInformationCenter || part instanceof MissingCIC)
+                    && (entity instanceof Jumpship)) {
+                cic = part;
+                //for reverse compatability, calculate costs
+                if(part instanceof CombatInformationCenter) {
+                    ((CombatInformationCenter)cic).calculateCost();
+                }
+            //Only Jumpships and Warships have these
+            } else if((part instanceof LFBattery || part instanceof MissingLFBattery)
+                    && ((entity instanceof Jumpship) && !(entity instanceof SpaceStation)
+                            && ((Jumpship)entity).hasLF())) {
+                lfBattery = part;
+            } else if((part instanceof KFHeliumTank || part instanceof MissingKFHeliumTank)
+                    && ((entity instanceof Jumpship) && !(entity instanceof SpaceStation))) {
+                heliumTank = part;
+            } else if((part instanceof KFChargingSystem || part instanceof MissingKFChargingSystem)
+                    && ((entity instanceof Jumpship) && !(entity instanceof SpaceStation))) {
+                chargingSystem = part;
+            } else if((part instanceof KFFieldInitiator || part instanceof MissingKFFieldInitiator)
+                    && ((entity instanceof Jumpship) && !(entity instanceof SpaceStation))) {
+                fieldInitiator = part;
+            } else if((part instanceof KFDriveController || part instanceof MissingKFDriveController)
+                    && ((entity instanceof Jumpship) && !(entity instanceof SpaceStation))) {
+                driveController = part;
+            } else if((part instanceof KFDriveCoil || part instanceof MissingKFDriveCoil)
+                    && ((entity instanceof Jumpship) && !(entity instanceof SpaceStation))) {
+                driveCoil = part;
+            //For Small Craft and larger, add this as a container for all their heatsinks instead of adding hundreds
+            //of individual heatsink parts.
+            } else if(part instanceof SpacecraftCoolingSystem 
+                    && (entity instanceof SmallCraft || entity instanceof Jumpship)) {
+                coolingSystem = part;
             } else if(part instanceof AeroSensor || part instanceof MissingAeroSensor) {
                 sensor = part;
             } else if(part instanceof LandingGear || part instanceof MissingLandingGear) {
                 landingGear = part;
+                // If a JS/WS/SS already has Landing Gear, remove it
+                if (entity instanceof Jumpship) {
+                    partsToRemove.add(part);
+                }
             } else if(part instanceof AeroHeatSink || part instanceof MissingAeroHeatSink) {
-                aeroHeatSinks.add(part);
-                if (part.isOmniPodded()) {
-                    podAeroHeatSinks++;
+                // If a SC/DS/JS/WS/SS already has heatsinks, remove them. We're using the spacecraft cooling system instead
+                if (entity instanceof SmallCraft || entity instanceof Jumpship) {
+                    partsToRemove.add(part);
+                } else if (entity.getEngine().isFusion() && builtInHeatSinks > 0) {
+                    //Don't add parts for the 10 heatsinks included with a fusion engine
+                    partsToRemove.add(part);
+                    builtInHeatSinks--;
+                } else {
+                    aeroHeatSinks.add(part);
+                    if (part.isOmniPodded()) {
+                        podAeroHeatSinks++;
+                    }
                 }
             } else if(part instanceof MotiveSystem) {
                 motiveSystem = part;
@@ -2022,6 +2098,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 turretLock = part;
             } else if(part instanceof DropshipDockingCollar || part instanceof MissingDropshipDockingCollar) {
                 dropCollar = part;
+            } else if(part instanceof KfBoom || part instanceof MissingKFBoom) {
+                kfBoom = part;
             } else if(part instanceof ProtomekArmActuator || part instanceof MissingProtomekArmActuator) {
                 int loc;
                 if(part instanceof ProtomekArmActuator) {
@@ -2040,14 +2118,14 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             } else if(part instanceof ProtomekJumpJet || part instanceof MissingProtomekJumpJet) {
                 protoJumpJets.add(part);
             } else if ((part instanceof Thrusters)
-                    && (entity.isLargeCraft() || entity.hasETypeFlag(Entity.ETYPE_SMALL_CRAFT))) {
+                    && (entity instanceof SmallCraft || entity instanceof Jumpship)) {
                 if (((Thrusters) part).isLeftThrusters()) {
                     aeroThrustersLeft = part;
                 } else {
                     aeroThrustersRight = part;
                 }
             } else if ((part instanceof MissingThrusters)
-                    && (entity.isLargeCraft() || entity.hasETypeFlag(Entity.ETYPE_SMALL_CRAFT))) {
+                    && (entity instanceof SmallCraft || entity instanceof Jumpship)) {
                 if (((MissingThrusters) part).isLeftThrusters()) {
                     aeroThrustersLeft = part;
                 } else {
@@ -2055,9 +2133,17 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 }
             } else if (part instanceof TransportBayPart) {
                 bays.put(((TransportBayPart) part).getBayNumber(), part);
+            } else if (part instanceof JumpshipDockingCollar) {
+                jumpCollars.put(((JumpshipDockingCollar) part).getCollarNumber(), part);
+            } else if (part instanceof GravDeck) {
+                gravDecks.put(((GravDeck) part).getDeckNumber(), part);
             }
 
             part.updateConditionFromPart();
+        }
+        // Remove invalid Aero parts due to changes after 0.45.4
+        for (Part part : partsToRemove) {
+            removePart(part);
         }
         //now check to see what is null
         for(int i = 0; i<locations.length; i++) {
@@ -2280,7 +2366,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 partsToAdd.add(engine);
             }
         }
-
+        
+        // Transport Bays
         for (Bay bay : entity.getTransportBays()) {
             bayPartsToAdd.put(bay.getBayNumber(), new ArrayList<>());
             BayType btype = BayType.getTypeForBay(bay);
@@ -2465,18 +2552,64 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 addPart(avionics);
                 partsToAdd.add(avionics);
             }
-            if(null == fcs) {
+            if(null == cic && entity instanceof Jumpship) {
+                cic = new CombatInformationCenter((int)entity.getWeight(), Money.zero(), getCampaign());
+                addPart(cic);
+                partsToAdd.add(cic);
+                ((CombatInformationCenter)cic).calculateCost();
+            }
+            if(null == driveCoil && (entity instanceof Jumpship) && !(entity instanceof SpaceStation)) {
+                driveCoil = new KFDriveCoil((int)entity.getWeight(), ((Jumpship)entity).getDriveCoreType(), entity.getDocks(), getCampaign());
+                addPart(driveCoil);
+                partsToAdd.add(driveCoil);
+            }
+            if(null == driveController && (entity instanceof Jumpship) && !(entity instanceof SpaceStation)) {
+                driveController = new KFDriveController((int)entity.getWeight(), ((Jumpship)entity).getDriveCoreType(), entity.getDocks(), getCampaign());
+                addPart(driveController);
+                partsToAdd.add(driveController);
+            }
+            if(null == fieldInitiator && (entity instanceof Jumpship) && !(entity instanceof SpaceStation)) {
+                fieldInitiator = new KFFieldInitiator((int)entity.getWeight(), ((Jumpship)entity).getDriveCoreType(), entity.getDocks(), getCampaign());
+                addPart(fieldInitiator);
+                partsToAdd.add(fieldInitiator);
+            }
+            if(null == chargingSystem && (entity instanceof Jumpship) && !(entity instanceof SpaceStation)) {
+                chargingSystem = new KFChargingSystem((int)entity.getWeight(), ((Jumpship)entity).getDriveCoreType(), entity.getDocks(), getCampaign());
+                addPart(chargingSystem);
+                partsToAdd.add(chargingSystem);
+            }
+            if(null == heliumTank && (entity instanceof Jumpship) && !(entity instanceof SpaceStation)) {
+                heliumTank = new KFHeliumTank((int)entity.getWeight(), ((Jumpship)entity).getDriveCoreType(), entity.getDocks(), getCampaign());
+                addPart(heliumTank);
+                partsToAdd.add(heliumTank);
+            }
+            if(null == lfBattery 
+                    && (entity instanceof Jumpship) && !(entity instanceof SpaceStation) && ((Jumpship) entity).hasLF()) {
+                lfBattery = new LFBattery((int)entity.getWeight(), ((Jumpship)entity).getDriveCoreType(), entity.getDocks(), getCampaign());
+                addPart(lfBattery);
+                partsToAdd.add(lfBattery);
+            }
+            if(null == fcs && !(entity instanceof Jumpship)) {
                 fcs = new FireControlSystem((int)entity.getWeight(), Money.zero(), getCampaign());
                 addPart(fcs);
                 partsToAdd.add(fcs);
                 ((FireControlSystem)fcs).calculateCost();
+            }
+            if(null == coolingSystem && (entity instanceof SmallCraft || entity instanceof Jumpship)) {
+                int sinkType = ((Aero)entity).getHeatType();
+                if (sinkType == Aero.HEAT_DOUBLE && entity.isClan()) {
+                    sinkType = AeroHeatSink.CLAN_HEAT_DOUBLE;
+                }
+                coolingSystem = new SpacecraftCoolingSystem((int)entity.getWeight(), ((Aero)entity).getOHeatSinks(), sinkType, getCampaign());
+                addPart(coolingSystem);
+                partsToAdd.add(coolingSystem);
             }
             if(null == sensor) {
                 sensor = new AeroSensor((int) entity.getWeight(), entity instanceof Dropship || entity instanceof Jumpship, getCampaign());
                 addPart(sensor);
                 partsToAdd.add(sensor);
             }
-            if(null == landingGear) {
+            if(null == landingGear && !(entity instanceof Jumpship)) {
                 landingGear = new LandingGear((int) entity.getWeight(), getCampaign());
                 addPart(landingGear);
                 partsToAdd.add(landingGear);
@@ -2493,19 +2626,59 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 addPart(dropCollar);
                 partsToAdd.add(dropCollar);
             }
-            int hsinks = ((Aero)entity).getOHeatSinks() - aeroHeatSinks.size();
-            int podhsinks = ((Aero)entity).getPodHeatSinks() - podAeroHeatSinks;
-            while(hsinks > 0) {
-                AeroHeatSink aHeatSink = new AeroHeatSink((int)entity.getWeight(),
-                        ((Aero)entity).getHeatType(), podhsinks > 0, getCampaign());
-                addPart(aHeatSink);
-                partsToAdd.add(aHeatSink);
-                hsinks--;
-                if (podhsinks > 0) {
-                    podhsinks--;
+            if(null == kfBoom && entity instanceof Dropship) {
+                kfBoom = new KfBoom((int) entity.getWeight(), getCampaign(),
+                        ((Dropship) entity).getBoomType());
+                addPart(kfBoom);
+                partsToAdd.add(kfBoom);
+            }
+            if (jumpCollars.isEmpty() && entity instanceof Jumpship) {
+                for (DockingCollar collar : entity.getDockingCollars()) {
+                    Part collarPart = new JumpshipDockingCollar (0, collar.getCollarNumber(), getCampaign(), ((Jumpship)entity).getDockingCollarType());
+                    jumpCollars.put(collar.getCollarNumber(), collarPart);
+                    addPart(collarPart);
+                    partsToAdd.add(collarPart);
                 }
             }
-            if (entity.isLargeCraft() || entity.hasETypeFlag(Entity.ETYPE_SMALL_CRAFT)) {
+            if (gravDecks.isEmpty() && entity instanceof Jumpship) {
+                for (int deck : ((Jumpship) entity).getGravDecks()) {
+                    int deckNumber = ((Jumpship) entity).getGravDecks().indexOf(deck);
+                    //Default to standard size
+                    int deckType = GravDeck.GRAV_DECK_TYPE_STANDARD;
+                    if (deck > Jumpship.GRAV_DECK_STANDARD_MAX && deck <= Jumpship.GRAV_DECK_LARGE_MAX) {
+                        deckType = GravDeck.GRAV_DECK_TYPE_LARGE;
+                    } else if (deck > Jumpship.GRAV_DECK_LARGE_MAX) {
+                        deckType = GravDeck.GRAV_DECK_TYPE_HUGE;
+                    }
+                    Part gravDeckPart = new GravDeck (0, deckNumber, getCampaign(), deckType);
+                    gravDecks.put(deckNumber, gravDeckPart);
+                    addPart(gravDeckPart);
+                    partsToAdd.add(gravDeckPart);
+                }
+            }
+            //Only add heatsink parts to fighters. Larger craft get a cooling system instead.
+            if (!(entity instanceof SmallCraft) && !(entity instanceof Jumpship)) {
+                int hsinks = ((Aero)entity).getOHeatSinks()
+                        - aeroHeatSinks.size()
+                        //Ignore the 10 free heatsinks we took out for fusion powered fighters
+                        - ((entity.getEngine() != null && entity.getEngine().isFusion()) ? 10 : 0);
+                int podhsinks = ((Aero)entity).getPodHeatSinks() - podAeroHeatSinks;
+                int sinkType = ((Aero)entity).getHeatType();
+                if (sinkType == Aero.HEAT_DOUBLE && entity.isClan()) {
+                    sinkType = AeroHeatSink.CLAN_HEAT_DOUBLE;
+                }
+                while(hsinks > 0) {
+                    AeroHeatSink aHeatSink = new AeroHeatSink((int)entity.getWeight(),
+                            sinkType, podhsinks > 0, getCampaign());
+                    addPart(aHeatSink);
+                    partsToAdd.add(aHeatSink);
+                    hsinks--;
+                    if (podhsinks > 0) {
+                        podhsinks--;
+                    }
+                }
+            }
+            if (entity instanceof SmallCraft || entity instanceof Jumpship) {
                 if (aeroThrustersLeft == null) {
                     aeroThrustersLeft = new Thrusters(0, getCampaign(), true);
                     addPart(aeroThrustersLeft);

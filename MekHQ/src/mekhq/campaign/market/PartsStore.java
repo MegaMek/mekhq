@@ -32,9 +32,11 @@ import java.util.regex.Pattern;
 import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.BayType;
+import megamek.common.Dropship;
 import megamek.common.Engine;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.Jumpship;
 import megamek.common.Mech;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
@@ -59,8 +61,12 @@ import mekhq.campaign.parts.BaArmor;
 import mekhq.campaign.parts.BattleArmorSuit;
 import mekhq.campaign.parts.BayDoor;
 import mekhq.campaign.parts.Cubicle;
+import mekhq.campaign.parts.DropshipDockingCollar;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.FireControlSystem;
+import mekhq.campaign.parts.GravDeck;
+import mekhq.campaign.parts.JumpshipDockingCollar;
+import mekhq.campaign.parts.KfBoom;
 import mekhq.campaign.parts.LandingGear;
 import mekhq.campaign.parts.MekActuator;
 import mekhq.campaign.parts.MekCockpit;
@@ -299,6 +305,11 @@ public class PartsStore implements Serializable {
         parts.add(hs);
         parts.add(new OmniPod(hs, c));
         parts.add(new AeroHeatSink(0, Aero.HEAT_DOUBLE, true, c));
+        
+        hs = new AeroHeatSink(0, AeroHeatSink.CLAN_HEAT_DOUBLE, false, c);
+        parts.add(hs);
+        parts.add(new OmniPod(hs, c));
+        parts.add(new AeroHeatSink(0, AeroHeatSink.CLAN_HEAT_DOUBLE, true, c));
 	}
 
 	private void stockMekActuators(Campaign c) {
@@ -436,12 +447,22 @@ public class PartsStore implements Serializable {
 	private void stockAeroComponents(Campaign c) {
 		parts.add(new AeroHeatSink(0, Aero.HEAT_SINGLE, false, c));
 		parts.add(new AeroHeatSink(0, Aero.HEAT_DOUBLE, false, c));
+		parts.add(new AeroHeatSink(0, AeroHeatSink.CLAN_HEAT_DOUBLE, false, c));
 		for(int ton = 5; ton <= 200; ton += 5) {
 			parts.add(new AeroSensor(ton, false, c));
 		}
 		parts.add(new AeroSensor(0, true, c));
 		parts.add(new Avionics(0, c));
 		parts.add(new FireControlSystem(0, Money.zero(), c));
+		parts.add(new DropshipDockingCollar(0, c, Dropship.COLLAR_STANDARD));
+		parts.add(new DropshipDockingCollar(0, c, Dropship.COLLAR_NO_BOOM));
+		parts.add(new KfBoom(0, c, Dropship.BOOM_STANDARD));
+		parts.add(new KfBoom(0, c, Dropship.BOOM_PROTOTYPE));
+		parts.add(new JumpshipDockingCollar(0, 0, c, Jumpship.COLLAR_STANDARD));
+        parts.add(new JumpshipDockingCollar(0, 0, c, Jumpship.COLLAR_NO_BOOM));
+        parts.add(new GravDeck(0, 0, c, GravDeck.GRAV_DECK_TYPE_STANDARD));
+        parts.add(new GravDeck(0, 0, c, GravDeck.GRAV_DECK_TYPE_LARGE));
+        parts.add(new GravDeck(0, 0, c, GravDeck.GRAV_DECK_TYPE_HUGE));
 		parts.add(new LandingGear(0, c));
 		parts.add(new BayDoor(0, c));
 		for (BayType btype : BayType.values()) {

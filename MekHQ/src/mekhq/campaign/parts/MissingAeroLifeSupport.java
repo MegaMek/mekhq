@@ -28,7 +28,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.Aero;
+import megamek.common.Dropship;
 import megamek.common.Entity;
+import megamek.common.Jumpship;
 import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -64,10 +66,9 @@ public class MissingAeroLifeSupport extends MissingPart {
      @Override
      public int getBaseTime() {
          int time = 0;
-         Entity e = unit.getEntity();
          if (campaign.getCampaignOptions().useAeroSystemHits()) {
              //Test of proposed errata for repair times
-             if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+             if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
                  time = 1200;
              } else {
                  time = 180;
@@ -76,7 +77,7 @@ public class MissingAeroLifeSupport extends MissingPart {
          }
 
          //Published errata for replacement times of small aero vs large craft
-         if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+         if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
              time = 6720;
          } else {
              time = 180;
@@ -86,9 +87,8 @@ public class MissingAeroLifeSupport extends MissingPart {
 
     @Override
     public int getDifficulty() {
-        Entity e = unit.getEntity();
         //Published errata for replacement times of small aero vs large craft
-        if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+        if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
             return 0;
         } else {
             return -1;

@@ -21,6 +21,7 @@ package mekhq.campaign.parts;
 import org.w3c.dom.Node;
 
 import megamek.common.Entity;
+import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
 
@@ -122,8 +123,10 @@ public class MissingBayDoor extends MissingPart {
 
     @Override
     public TechAdvancement getTechAdvancement() {
-        return new TechAdvancement().setTechRating(RATING_A)
-                .setAvailability(RATING_A, RATING_A, RATING_A, RATING_A);
+        return new TechAdvancement(TECH_BASE_ALL).setAdvancement(DATE_PS, DATE_PS, DATE_PS)
+                .setTechRating(RATING_A)
+                .setAvailability(RATING_A, RATING_A, RATING_A, RATING_A)
+                .setStaticTechLevel(SimpleTechLevel.STANDARD);
     }
 
 }

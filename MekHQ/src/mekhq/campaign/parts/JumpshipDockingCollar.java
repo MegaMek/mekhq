@@ -1,8 +1,7 @@
 /*
- * DropshipDockingCollar.java
+ * JumpshipDockingCollar.java
  * 
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ * Copyright (c) 2019, MegaMek team
  * This file is part of MekHQ.
  * 
  * MekHQ is free software: you can redistribute it and/or modify
@@ -28,8 +27,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.Compute;
-import megamek.common.Dropship;
+import megamek.common.DockingCollar;
 import megamek.common.Entity;
+import megamek.common.Jumpship;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
@@ -38,15 +38,15 @@ import mekhq.campaign.personnel.SkillType;
 
 /**
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author MKerensky
  */
-public class DropshipDockingCollar extends Part {
+public class JumpshipDockingCollar extends Part {
 
     /**
      * 
      */
-    private static final long serialVersionUID = -717866644605314883L;
-    
+    private static final long serialVersionUID = -7060162354112320241L;
+
     static final TechAdvancement TA_BOOM = new TechAdvancement(TECH_BASE_ALL)
             .setAdvancement(2458, 2470, 2500).setPrototypeFactions(F_TH)
             .setProductionFactions(F_TH).setTechRating(RATING_C)
@@ -57,51 +57,56 @@ public class DropshipDockingCollar extends Part {
             .setProductionFactions(F_TH).setTechRating(RATING_B)
             .setAvailability(RATING_C, RATING_X, RATING_X, RATING_X)
             .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+
+    private int collarType;
+    private int collarNumber;
     
-    private int collarType = Dropship.COLLAR_STANDARD;
-    
-    public DropshipDockingCollar() {
-        this(0, null, Dropship.COLLAR_STANDARD);
+    public JumpshipDockingCollar() {
+        this(0, 0, null, Jumpship.COLLAR_STANDARD);
     }
-    
-    public DropshipDockingCollar(int tonnage, Campaign c, int collarType) {
+
+    public JumpshipDockingCollar(int tonnage, int collarNumber, Campaign c, int collarType) {
         super(tonnage, c);
+        this.collarNumber = collarNumber;
         this.collarType = collarType;
-        this.name = "Dropship Docking Collar";
-        if (collarType == Dropship.COLLAR_NO_BOOM) {
-            name += " (No Boom)";
-        } else if (collarType == Dropship.COLLAR_PROTOTYPE) {
-            name += " (Prototype)";
+        this.name = "Jumpship Docking Collar";
+        if (collarType == Jumpship.COLLAR_NO_BOOM) {
+            name += " (Pre Boom)";
         }
     }
-    
-    public DropshipDockingCollar clone() {
-        DropshipDockingCollar clone = new DropshipDockingCollar(getUnitTonnage(), campaign, collarType);
+
+    public int getCollarNumber() {
+        return collarNumber;
+    }
+
+    public JumpshipDockingCollar clone() {
+        JumpshipDockingCollar clone = new JumpshipDockingCollar(0, collarNumber, campaign, collarType);
         clone.copyBaseData(this);
         return clone;
     }
-    
+
     public int getCollarType() {
         return collarType;
     }
-        
+
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
         int priorHits = hits;
-        if(null != unit && unit.getEntity() instanceof Dropship) {
-             if(((Dropship)unit.getEntity()).isDockCollarDamaged()) {
-                 hits = 1;
-             } else { 
-                 hits = 0;
-             }
-             if(checkForDestruction 
-                     && hits > priorHits
-                     && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
-                 remove(false);
-             }
+        if (null != unit && unit.getEntity() instanceof Jumpship) {
+            DockingCollar collar = unit.getEntity().getCollarById(collarNumber);
+            if (collar != null && collar.isDamaged()) {
+                hits = 1;
+            } else { 
+                hits = 0;
+            }
+            if (checkForDestruction 
+                    && hits > priorHits
+                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                remove(false);
+            }
         }
     }
-    
+
     @Override 
     public int getBaseTime() {
         if(isSalvaging()) {
@@ -109,7 +114,7 @@ public class DropshipDockingCollar extends Part {
         }
         return 120;
     }
-    
+
     @Override
     public int getDifficulty() {
         if(isSalvaging()) {
@@ -120,23 +125,32 @@ public class DropshipDockingCollar extends Part {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit && unit.getEntity() instanceof Dropship) {
-            ((Dropship) unit.getEntity()).setDamageDockCollar(hits > 0);
+        if (null != unit && unit.getEntity() instanceof Jumpship) {
+            DockingCollar collar = unit.getEntity().getCollarById(collarNumber);
+            if (collar != null) {
+                collar.setDamaged(hits > 0);
+            }
         }
     }
 
     @Override
     public void fix() {
         super.fix();
-        if(null != unit && unit.getEntity() instanceof Dropship) {
-            ((Dropship)unit.getEntity()).setDamageDockCollar(false);
+        if (null != unit && unit.getEntity() instanceof Jumpship) {
+            DockingCollar collar = unit.getEntity().getCollarById(collarNumber);
+            if (collar != null) {
+                collar.setDamaged(false);
+            }
         }
     }
 
     @Override
     public void remove(boolean salvage) {
-        if(null != unit && unit.getEntity() instanceof Dropship) {
-            ((Dropship)unit.getEntity()).setDamageDockCollar(true);
+        if (unit.getEntity() instanceof Jumpship) {
+            DockingCollar collar = unit.getEntity().getCollarById(collarNumber);
+            if (collar != null) {
+                collar.setDamaged(true);
+            }
             Part spare = campaign.checkForExistingSparePart(this);
             if(!salvage) {
                 campaign.removePart(this);
@@ -155,7 +169,7 @@ public class DropshipDockingCollar extends Part {
 
     @Override
     public MissingPart getMissingPart() {
-        return new MissingDropshipDockingCollar(getUnitTonnage(), campaign, collarType);
+        return new MissingJumpshipDockingCollar(0, collarNumber, campaign, collarType);
     }
 
     @Override
@@ -170,28 +184,29 @@ public class DropshipDockingCollar extends Part {
 
     @Override
     public Money getStickerPrice() {
-        if (collarType == Dropship.COLLAR_STANDARD) {
-            return Money.of(10000);
+        if (collarType == Jumpship.COLLAR_STANDARD) {
+            return Money.of(100000);
         } else {
-            return Money.of(1010000) ;
+            return Money.of(500000) ;
         }
     }
-    
+
     @Override
     public double getTonnage() {
-        return 0;
+        return 1000;
     }
 
     @Override
     public boolean isSamePartType(Part part) {
-        return (part instanceof DropshipDockingCollar)
-                && (collarType == ((DropshipDockingCollar)part).collarType);
+        return (part instanceof JumpshipDockingCollar)
+                && (collarType == ((JumpshipDockingCollar)part).collarType);
     }
-    
+
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "collarType", collarType);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "collarNumber", collarNumber);
         writeToXmlEnd(pw1, indent);
     }
 
@@ -203,10 +218,12 @@ public class DropshipDockingCollar extends Part {
             Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("collarType")) {
                 collarType = Integer.parseInt(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("collarNumber")) {
+                collarNumber = Integer.parseInt(wn2.getTextContent());
             }
         }
     }
-    
+
     @Override
     public boolean isRightTechType(String skillType) {
         return skillType.equals(SkillType.S_TECH_VESSEL);
@@ -222,10 +239,10 @@ public class DropshipDockingCollar extends Part {
     public int getLocation() {
         return Entity.LOC_NONE;
     }
-    
+
     @Override
     public TechAdvancement getTechAdvancement() {
-        if (collarType != Dropship.COLLAR_NO_BOOM) {
+        if (collarType != Jumpship.COLLAR_NO_BOOM) {
             return TA_BOOM;
         } else {
             return TA_NO_BOOM;

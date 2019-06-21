@@ -306,8 +306,13 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public void fix() {
+        if (unit.getEntity().isCapitalScale()) {
+            amountNeeded *= 10;
+        }
         int amountFound = Math.min(getAmountAvailable(), amountNeeded);
-        int fixAmount = Math.min(amount + amountFound, unit.getEntity().getOArmor(location, rear));
+        int fixAmount = Math.min(amount + 
+                // Make sure that we handle the capital scale conversion when setting the fix amount
+                (unit.getEntity().isCapitalScale() ? (amountFound / 10) : amountFound), unit.getEntity().getOArmor(location, rear));
         unit.getEntity().setArmor(fixAmount, location, rear);
         changeAmountAvailable(-1 * amountFound);
         updateConditionFromEntity(false);
@@ -353,6 +358,10 @@ public class Armor extends Part implements IAcquisitionWork {
     public void remove(boolean salvage) {
         unit.getEntity().setArmor(IArmorState.ARMOR_DESTROYED, location, rear);
         if(salvage) {
+            // Account for capital-scale units when warehouse armor is stored at standard scale.
+            if (unit.getEntity().isCapitalScale()) {
+                amount *= 10;
+            }
             changeAmountAvailable(amount);
         }
         updateConditionFromEntity(false);
@@ -572,7 +581,7 @@ public class Armor extends Part implements IAcquisitionWork {
                 remove(false);
             } else {
                 skillMin = SkillType.EXP_GREEN;
-                changeAmountAvailable(-1 * Math.min(amountNeeded, getAmountAvailable()));
+                changeAmountAvailable(-1 * Math.min((unit.getEntity().isCapitalScale() ? (amountNeeded * 10) : amountNeeded), getAmountAvailable()));
             }
         }
         return " <font color='red'><b> failed." + scrap + "</b></font>";

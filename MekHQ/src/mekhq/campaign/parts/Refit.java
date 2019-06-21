@@ -137,6 +137,10 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
     private Armor newArmorSupplies;
     private int newArmorSuppliesId;
     private boolean sameArmorType;
+    
+    private int oldLargeCraftHeatSinks;
+    private int oldLargeCraftSinkType;
+    private int newLargeCraftHeatSinks;
 
     private UUID assignedTechId;
     private int oldTechId = -1;
@@ -274,6 +278,10 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         //Step 1: put all of the parts from the current unit into a new arraylist so they can
         //be removed when we find a match.
         for(Part p : oldUnit.getParts()) {
+            if (p instanceof SpacecraftCoolingSystem) {
+                oldLargeCraftHeatSinks = ((SpacecraftCoolingSystem)p).getTotalSinks();
+                oldLargeCraftSinkType = ((SpacecraftCoolingSystem)p).getSinkType();
+            }
             if ((!isOmniRefit || p.isOmniPodded())
                     || (p instanceof TransportBayPart)) {
                 oldUnitParts.add(p.getId());
@@ -422,8 +430,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             } else {
                 //its a new part
                 //dont actually add the part iself but rather its missing equivalent
-                //except in the case of armor
-                if(part instanceof Armor || part instanceof AmmoBin) {
+                //except in the case of armor, ammobins and the spacecraft cooling system
+                if(part instanceof Armor || part instanceof AmmoBin || part instanceof SpacecraftCoolingSystem) {
                     newPartList.add(part);
                 } else {
                     Part mPart = part.getMissingPart();
@@ -494,9 +502,12 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 AmmoType type = (AmmoType)((AmmoBin)nPart).getType();
                 ammoNeeded.merge(type, type.getShots(), Integer::sum);
                 if (nPart instanceof LargeCraftAmmoBin) {
-                    // Adding ammo requires base 15 minutes per ton of ammo. Putting in a new
-                    // capital missile bay can take weeks.
-                    time += 15 * Math.max(1, nPart.getTonnage());
+                    // Adding ammo requires base 15 minutes per ton of ammo or 60 minutes per capital missile
+                    if (type.hasFlag(AmmoType.F_CAP_MISSILE) || type.hasFlag(AmmoType.F_CRUISE_MISSILE) || type.hasFlag(AmmoType.F_SCREEN)) {
+                        time += 60 * ((LargeCraftAmmoBin)nPart).getFullShots();
+                    } else {
+                        time += 15 * Math.max(1, nPart.getTonnage());
+                    }
                     shoppingList.add(nPart);
                 } else {
                     time += 120;
@@ -514,6 +525,23 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                         partQuantity.put(replacement.getId(), partQuantity.get(replacement.getId())-1);
                     } else {
                         shoppingList.add(nPart);
+                    }
+                }
+            } else if (nPart instanceof SpacecraftCoolingSystem) {
+                int sinkType = ((SpacecraftCoolingSystem)nPart).getSinkType();
+                int sinksToReplace = 0;
+                Part replacement = new AeroHeatSink(0, sinkType, false, campaign);
+                newLargeCraftHeatSinks = ((SpacecraftCoolingSystem)nPart).getTotalSinks();
+                if (sinkType != oldLargeCraftSinkType) {
+                    sinksToReplace = newLargeCraftHeatSinks;
+                } else {
+                    sinksToReplace = Math.max((newLargeCraftHeatSinks - oldLargeCraftHeatSinks), 0);
+                }
+                time += (60 * (sinksToReplace / 50));
+                if (replacement != null) {
+                    while (sinksToReplace > 0) {
+                        shoppingList.add(replacement);
+                        sinksToReplace--;
                     }
                 }
             }
@@ -1848,19 +1876,19 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 // Errr, what should we do here?
                 MekHQ.getLogger().log(Refit.class, "processShoppingList(Refit,Node,Unit,Version)", LogLevel.ERROR, //$NON-NLS-1$
                         "Unknown node type not loaded in Part nodes: " + wn2.getNodeName()); //$NON-NLS-1$
-				continue;
-			}
+                continue;
+            }
 
-			Part p = Part.generateInstanceFromXML(wn2, version);
-			if (p != null) {
-				p.setUnit(u);
-				retVal.shoppingList.add(p);
-			} else {
-				MekHQ.getLogger().error(Refit.class, "processShoppingList()", 
-					u != null ? String.format("Unit %s has invalid parts in its refit shopping list", u.getId()) : "Invalid parts in shopping list");
-			}
-		}
-	}
+            Part p = Part.generateInstanceFromXML(wn2, version);
+            if (p != null) {
+                p.setUnit(u);
+                retVal.shoppingList.add(p);
+            } else {
+                MekHQ.getLogger().error(Refit.class, "processShoppingList()", 
+                    u != null ? String.format("Unit %s has invalid parts in its refit shopping list", u.getId()) : "Invalid parts in shopping list");
+            }
+        }
+    }
 
     private static void processArmorSupplies(Refit retVal, Node wn, Version version) {
 
@@ -2296,6 +2324,9 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
      */
     private Part heatSinkPart(Entity entity) {
         if (entity instanceof Aero) {
+            if (((Aero) entity).getHeatType() == Aero.HEAT_DOUBLE && entity.isClan()) {
+                return new AeroHeatSink(0, AeroHeatSink.CLAN_HEAT_DOUBLE, false, campaign);
+            }
             return new AeroHeatSink(0, ((Aero) entity).getHeatType(), false, campaign);
         } else if (entity instanceof Mech) {
             Optional<Mounted> mount = entity.getMisc().stream()
