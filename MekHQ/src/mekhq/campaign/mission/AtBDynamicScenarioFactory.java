@@ -1783,7 +1783,7 @@ public class AtBDynamicScenarioFactory {
             return (Compute.randomInt(3) + 1) * numFightersPerFlight;
         } else {
             int useASFRoll = isPlanetOwner ? Compute.d6() : 6;
-            int weightCountRoll = (Compute.randomInt(3) * numFightersPerFlight); // # of conventional fighters, just in case
+            int weightCountRoll = (Compute.randomInt(3) + 1) * numFightersPerFlight; // # of conventional fighters, just in case
             
             // if we are the planet owner, we may use ASF or conventional fighters 
             boolean useASF = useASFRoll >= 4;
