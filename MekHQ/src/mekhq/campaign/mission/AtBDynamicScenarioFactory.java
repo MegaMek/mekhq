@@ -17,7 +17,6 @@ import megamek.client.RandomSkillsGenerator;
 import megamek.client.RandomUnitGenerator;
 import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.ratgenerator.MissionRole;
-import megamek.common.Bay;
 import megamek.common.Board;
 import megamek.common.BombType;
 import megamek.common.Compute;
@@ -26,7 +25,6 @@ import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
 import megamek.common.EntityWeightClass;
 import megamek.common.Infantry;
-import megamek.common.InfantryBay;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
@@ -70,6 +68,8 @@ public class AtBDynamicScenarioFactory {
     public static int UNIT_WEIGHT_UNSPECIFIED = -1;
     
     private static int[] validBotBombs = { BombType.B_HE, BombType.B_CLUSTER, BombType.B_RL, BombType.B_INFERNO, BombType.B_THUNDER };
+    
+    private static int[] minimumBVPercentage = { 50, 60, 70, 80, 90, 100 };
     
     private static int IS_LANCE_SIZE = 4;
     private static int CLAN_MH_LANCE_SIZE = 5;
@@ -375,7 +375,8 @@ public class AtBDynamicScenarioFactory {
                 // if we roll below it, we stop
                 int roll = Compute.randomInt(100);
                 double rollTarget = ((double) forceBV / forceBVBudget) * 100;
-                stopGenerating = roll < rollTarget;
+                stopGenerating = rollTarget > minimumBVPercentage[campaign.getUnitRating().getUnitRatingAsInteger()] 
+                        && roll < rollTarget;
             } else {
                 stopGenerating = generatedEntities.size() >= forceUnitBudget; 
             }
