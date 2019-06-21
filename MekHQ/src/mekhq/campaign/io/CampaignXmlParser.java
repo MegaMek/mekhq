@@ -1,18 +1,18 @@
 /*
  * Copyright (c) 2018 - The MegaMek Team
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -587,11 +587,17 @@ public class CampaignXmlParser {
                 unit.getRefit().reCalc();
                 if (null == unit.getRefit().getNewArmorSupplies()
                         && unit.getRefit().getNewArmorSuppliesId() > 0) {
-                    Armor armorSupplies = (Armor) retVal.getPart(
-                            unit.getRefit().getNewArmorSuppliesId());
-                    unit.getRefit().setNewArmorSupplies(armorSupplies);
-                    if (null == armorSupplies.getUnit()) {
-                        armorSupplies.setUnit(unit);
+                    Part armorPart = retVal.getPart(unit.getRefit().getNewArmorSuppliesId());
+                    if (armorPart instanceof Armor) {
+                        Armor armorSupplies = (Armor) armorPart;
+                        unit.getRefit().setNewArmorSupplies(armorSupplies);
+                        if (null == armorSupplies.getUnit()) {
+                            armorSupplies.setUnit(unit);
+                        }
+                    } else {
+                        MekHQ.getLogger().error(CampaignXmlParser.class, METHOD_NAME,
+                            String.format("[Campain Load] Refit for unit %s (%s) references armor supplies that are incorrect; ignoring.",
+                                unit.getName(), unit.getId().toString()));
                     }
                 }
                 if (!unit.getRefit().isCustomJob()
@@ -667,7 +673,7 @@ public class CampaignXmlParser {
         List<Unit> removeUnits = new ArrayList<>();
         for (Unit unit : retVal.getUnits()) {
             // just in case parts are missing (i.e. because they weren't tracked
-            // in previous versions)            
+            // in previous versions)
             unit.initializeParts(true);
             unit.runDiagnostic(false);
             if (!unit.isRepairable()) {
@@ -1767,7 +1773,7 @@ public class CampaignXmlParser {
         MekHQ.getLogger().log(CampaignXmlParser.class, METHOD_NAME, LogLevel.INFO,
                 "Load Part Nodes Complete!"); //$NON-NLS-1$
     }
-    
+
     /**
      * Determines if the supplied part is a MASC from an older save. This means that it needs to be converted
      * to an actual MASC part.
@@ -1775,12 +1781,12 @@ public class CampaignXmlParser {
      * @return Whether it's an old MASC.
      */
     private static boolean isLegacyMASC(Part p) {
-        return (p instanceof EquipmentPart) && 
+        return (p instanceof EquipmentPart) &&
                 !(p instanceof MASC) &&
-                ((EquipmentPart) p).getType().hasFlag(MiscType.F_MASC) && 
+                ((EquipmentPart) p).getType().hasFlag(MiscType.F_MASC) &&
                 (((EquipmentPart) p).getType() instanceof MiscType);
     }
-    
+
     /**
      * Determines if the supplied part is a "missing" MASC from an older save. This means that it needs to be converted
      * to an actual "missing" MASC part.
@@ -1788,12 +1794,12 @@ public class CampaignXmlParser {
      * @return Whether it's an old "missing" MASC.
      */
     private static boolean isLegacyMissingMASC(Part p) {
-        return (p instanceof MissingEquipmentPart) && 
+        return (p instanceof MissingEquipmentPart) &&
                 !(p instanceof MissingMASC) &&
-                ((MissingEquipmentPart) p).getType().hasFlag(MiscType.F_MASC) && 
+                ((MissingEquipmentPart) p).getType().hasFlag(MiscType.F_MASC) &&
                 (((MissingEquipmentPart) p).getType() instanceof MiscType);
     }
-    
+
     private static void updatePlanetaryEventsFromXML(Node wn) {
         // TODO: make Planets a member of Campaign
         Planets.reload(true);
