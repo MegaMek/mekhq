@@ -1,11 +1,13 @@
 package mekhq.gui;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Polygon;
+import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -25,6 +27,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconCoords;
+import mekhq.campaign.stratcon.StratconFacility;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconTrackState;
@@ -192,16 +195,26 @@ public class StratconPanel extends JPanel implements ActionListener {
                     g2D.setColor(new Color(0, 0, 0));
                     g2D.drawPolygon(graphHex);                    
                 } else if(drawHexType == DrawHexType.Hex) {
-                    if(translatedClickedPoint != null && graphHex.contains(translatedClickedPoint)) {
-                        g2D.setColor(Color.WHITE);
-                        boardState.selectedX = x;
-                        boardState.selectedY = y;
-                        pointFound = true;
+                    
+                    if(currentTrack.coordsRevealed(x, y)) {
+                        g2D.setColor(Color.LIGHT_GRAY);
                     } else {
                         g2D.setColor(Color.DARK_GRAY);
                     }
-
                     g2D.fillPolygon(graphHex);
+                    
+                    if(translatedClickedPoint != null && graphHex.contains(translatedClickedPoint)) {
+                        g2D.setColor(Color.WHITE);
+                        BasicStroke s = new BasicStroke((float) 8.0);
+                        Stroke push = g2D.getStroke();
+                        g2D.setStroke(s);
+                        g2D.drawPolygon(graphHex);
+                        
+                        boardState.selectedX = x;
+                        boardState.selectedY = y;
+                        pointFound = true;
+                        g2D.setStroke(push);
+                    }
                 } else if(drawHexType == DrawHexType.Dryrun) {
                     if(translatedClickedPoint != null && graphHex.contains(translatedClickedPoint)) {
                         boardState.selectedX = x;
@@ -264,7 +277,9 @@ public class StratconPanel extends JPanel implements ActionListener {
 
         for(int x = 0; x < currentTrack.getWidth(); x++) {            
             for(int y = 0; y < currentTrack.getHeight(); y++) {
-                if(currentTrack.getFacility(new StratconCoords(x, y)) != null) {
+                StratconFacility facility = currentTrack.getFacility(new StratconCoords(x, y));
+                
+                if((facility != null) && facility.isVisible()) {
                     g2D.setColor(Color.GREEN);
                     g2D.drawPolygon(facilityMarker);
                 }

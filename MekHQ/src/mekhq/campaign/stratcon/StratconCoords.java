@@ -12,6 +12,19 @@ public class StratconCoords extends Coords {
         super(0, 0);
     }
 
+    public StratconCoords translate(int direction) {
+        Coords coords = translated(direction);
+        int y = coords.getY();
+        
+        if(isXOdd() && coords.getX() != getX()) {
+            y--;
+        } else if (!isXOdd() && coords.getX() != getX()) {
+            y++;
+        }
+        
+        return new StratconCoords(coords.getX(), y);
+    }
+    
     /**
      * Get the hash code for these coords.
      * 

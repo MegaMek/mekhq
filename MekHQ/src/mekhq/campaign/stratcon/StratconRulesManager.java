@@ -219,10 +219,21 @@ public class StratconRulesManager {
      */
     public static void processForceDeployment(StratconCoords coords, int forceID, Campaign campaign, StratconTrackState track) {
         track.getRevealedCoords().add(coords);
+        StratconFacility facility = track.getFacility(coords);
+        if(facility != null) {
+            facility.setVisible(true);
+        }
         
         if(campaign.getLances().get(forceID).getRole() == Lance.ROLE_SCOUT) {
             for(int direction = 0; direction < 6; direction++) {
-                track.getRevealedCoords().add((StratconCoords) coords.translated(direction));
+                StratconCoords checkCoords = coords.translate(direction);
+                
+                facility = track.getFacility(checkCoords);
+                if(facility != null) {
+                    facility.setVisible(true);
+                }
+                
+                track.getRevealedCoords().add(coords.translate(direction));
             }
         }
         

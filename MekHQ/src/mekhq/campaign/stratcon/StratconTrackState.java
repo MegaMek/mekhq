@@ -157,6 +157,10 @@ public class StratconTrackState {
         this.assignedForceCoords = assignedForceCoords;
     }
 
+    public boolean coordsRevealed(int x, int y) {
+        return revealedCoords.contains(new StratconCoords(x, y));
+    }
+    
     public Set<StratconCoords> getRevealedCoords() {
         return revealedCoords;
     }
