@@ -66,54 +66,38 @@
 	</entry>
 	<entry>
 		<key>16</key>
-		<value>Facility - Destroy.xml</value>
+		<value>Hostile Facility.xml</value>
 	</entry>
 	<entry>
 		<key>17</key>
-		<value>Facility - Engage.xml</value>
+		<value>Allied Facility.xml</value>
 	</entry>
 	<entry>
 		<key>18</key>
-		<value>Facility - Capture.xml</value>
-	</entry>
-	<entry>
-		<key>19</key>
-		<value>Facility - Extract.xml</value>
-	</entry>
-	<entry>
-		<key>20</key>
-		<value>Facility - Defend.xml</value>
-	</entry>
-	<entry>
-		<key>21</key>
-		<value>Facility - Recon.xml</value>
-	</entry>	
-	<entry>
-		<key>22</key>
 		<value>Low Atmo - Interception.xml</value>
 	</entry>
 	<entry>
-		<key>23</key>
+		<key>19</key>
 		<value>Low Atmo - Escort Dropship.xml</value>
 	</entry>
 	<entry>
-		<key>24</key>
+		<key>20</key>
 		<value>Low Atmo - Destroy Dropship.xml</value>
 	</entry>
 	<entry>
-		<key>25</key>
+		<key>21</key>
 		<value>Air Support.xml</value>
 	</entry>
 	<entry>
-		<key>26</key>
+		<key>22</key>
 		<value>Space - Interception.xml</value>
 	</entry>
 	<entry>
-		<key>27</key>
+		<key>23</key>
 		<value>Space - Blockade Run Escort.xml</value>
 	</entry>
 	<entry>
-		<key>28</key>
+		<key>24</key>
 		<value>Space - Blockade Run.xml</value>
 	</entry>
 	</scenarioFileNames>

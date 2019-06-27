@@ -5,8 +5,10 @@ import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -17,6 +19,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.transform.Source;
 
 import megamek.common.Compute;
+import megamek.common.MovePath;
+import megamek.common.MoveStep;
+import megamek.server.commands.ListSavesCommand;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -26,8 +31,27 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 
 @XmlRootElement(name="AtBScenarioModifier")
-public class AtBScenarioModifier {
+public class AtBScenarioModifier implements Cloneable {
 
+    public static final String SCENARIO_MODIFIER_ALLIED_GROUND_UNITS = "PrimaryAlliesGround.xml";
+    public static final String SCENARIO_MODIFIER_ALLIED_AIR_UNITS = "PrimaryAlliesAir.xml";
+    public static final String SCENARIO_MODIFIER_LIAISON_GROUND = "LiaisonGround.xml";
+    public static final String SCENARIO_MODIFIER_HOUSE_CO_GROUND = "HouseOfficerGround.xml";
+    public static final String SCENARIO_MODIFIER_INTEGRATED_UNITS_GROUND = "IntegratedAlliesGround.xml";
+    public static final String SCENARIO_MODIFIER_LIAISON_AIR = "LiaisonAir.xml";
+    public static final String SCENARIO_MODIFIER_HOUSE_CO_AIR = "HouseOfficerAir.xml";
+    public static final String SCENARIO_MODIFIER_INTEGRATED_UNITS_AIR = "IntegratedAlliesAir.xml";
+    public static final String SCENARIO_MODIFIER_TRAINEES_AIR = "AlliedTraineesAir.xml";
+    public static final String SCENARIO_MODIFIER_TRAINEES_GROUND = "AlliedTraineesGround.xml";
+    public static final String SCENARIO_MODIFIER_ALLIED_GROUND_SUPPORT = "AlliedGroundSupportImmediate.xml";
+    public static final String SCENARIO_MODIFIER_ALLIED_AIR_SUPPORT = "AlliedAirSupportImmediate.xml";
+    public static final String SCENARIO_MODIFIER_ALLIED_ARTY_SUPPORT = "AlliedArtillerySupportImmediate.xml";
+    
+    public static final String SCENARIO_MODIFIER_TANK_LANCE = "TankGarrison.xml";
+    public static final String SCENARIO_MODIFIER_MECH_LANCE = "MechGarrison.xml";
+    public static final String SCENARIO_MODIFIER_AIR_FLIGHT = "AirGarrison.xml";
+    public static final String SCENARIO_MODIFIER_ARTY_LANCE = "ArtilleryGarrison.xml";
+    
     /**
      * Possible values for when a scenario modifier may occur: before or after primary force generation.
      * @author NickAragua
@@ -116,9 +140,16 @@ public class AtBScenarioModifier {
         return scenarioModifiers;
     }
     
+    /**
+     * Retrieves a randomly selected scenario modifier.
+     * @return
+     */
     public static AtBScenarioModifier getRandomScenarioModifier() {
         int modIndex = Compute.randomInt(scenarioModifierKeys.size());
-        return scenarioModifiers.get(scenarioModifierKeys.get(modIndex));
+        
+        // because we load a static set of modifiers, if a modifier gets changed we don't want to change the 
+        // underlying template, so we clone it.
+        return (AtBScenarioModifier) scenarioModifiers.get(scenarioModifierKeys.get(modIndex)).clone();
     }
     
     /**
@@ -127,7 +158,8 @@ public class AtBScenarioModifier {
      * @return The scenario modifier, if any.
      */
     public static AtBScenarioModifier getScenarioModifier(String key) {
-        return scenarioModifiers.get(key);
+        // clone it to avoid calling code changing the modifier
+        return (AtBScenarioModifier) scenarioModifiers.get(key).clone();
     }
     
     static {
@@ -215,6 +247,27 @@ public class AtBScenarioModifier {
     @Override
     public String toString() {
         return getModifierName();
+    }
+    
+    @Override
+    public Object clone() {
+        final AtBScenarioModifier copy = new AtBScenarioModifier();
+        copy.additionalBriefingText = additionalBriefingText;
+        copy.allowedMapLocations = allowedMapLocations == null ? new ArrayList<>() : new ArrayList<>(allowedMapLocations);
+        copy.ammoExpenditureIntensity = ammoExpenditureIntensity;
+        copy.battleDamageIntensity = battleDamageIntensity;
+        copy.benefitsPlayer = benefitsPlayer;
+        copy.blockFurtherEvents = blockFurtherEvents;
+        copy.eventRecipient = eventRecipient;
+        copy.eventTiming = eventTiming;
+        copy.forceDefinition = new ScenarioForceTemplate(forceDefinition);
+        copy.modifierName = modifierName;
+        copy.qualityAdjustment = qualityAdjustment;
+        copy.skillAdjustment = skillAdjustment;
+        copy.switchSides = switchSides;
+        copy.unitRemovalCount = unitRemovalCount;
+        copy.useAmbushLogic = useAmbushLogic;
+        return copy;
     }
 
     public String getModifierName() {

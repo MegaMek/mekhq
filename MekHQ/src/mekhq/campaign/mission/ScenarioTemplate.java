@@ -32,7 +32,7 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
  *
  */
 @XmlRootElement(name="ScenarioTemplate")
-public class ScenarioTemplate {
+public class ScenarioTemplate implements Cloneable {
     public static final String ROOT_XML_ELEMENT_NAME = "ScenarioTemplate";
     public static final String PRIMARY_PLAYER_FORCE_ID = "Player";
     
@@ -46,6 +46,19 @@ public class ScenarioTemplate {
     @XmlElementWrapper(name="scenarioForces")
     @XmlElement(name="scenarioForce")
     public Map<String, ScenarioForceTemplate> scenarioForces = new HashMap<>();
+    
+    public Object clone() {
+        ScenarioTemplate clone = new ScenarioTemplate();
+        
+        clone.name = name;
+        clone.shortBriefing = shortBriefing;
+        clone.detailedBriefing = detailedBriefing;
+        clone.mapParameters = (ScenarioMapParameters) mapParameters.clone();
+        clone.scenarioForces = new HashMap<>(scenarioForces);
+        clone.scenarioModifiers = new ArrayList<>(scenarioModifiers);
+        
+        return clone;
+    }
     
     /**
      * Returns the "primary" player force. This is always the force with the name "Player".

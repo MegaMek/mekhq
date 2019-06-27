@@ -256,6 +256,33 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         
     }
     
+    public ScenarioForceTemplate(ScenarioForceTemplate forceTemplate) {
+        this.actualDeploymentZone = forceTemplate.actualDeploymentZone;
+        this.allowAeroBombs = forceTemplate.allowAeroBombs;
+        this.allowedUnitType = forceTemplate.allowedUnitType;
+        this.arrivalTurn = forceTemplate.arrivalTurn;
+        this.canReinforceLinked = forceTemplate.canReinforceLinked;
+        this.contributesToBV = forceTemplate.contributesToBV;
+        this.contributesToMapSize = forceTemplate.contributesToMapSize;
+        this.contributesToUnitCount = forceTemplate.contributesToUnitCount;
+        this.deploymentZones = new ArrayList<>(forceTemplate.deploymentZones);
+        this.deployOffBoard = forceTemplate.deployOffBoard;
+        this.destinationZone = forceTemplate.destinationZone;
+        this.fixedUnitCount = forceTemplate.fixedUnitCount;
+        this.forceAlignment = forceTemplate.forceAlignment;
+        this.forceMultiplier = forceTemplate.forceMultiplier;
+        this.forceName = forceTemplate.forceName;
+        this.generationMethod = forceTemplate.generationMethod;
+        this.generationOrder = forceTemplate.generationOrder;
+        this.retreatThreshold = forceTemplate.retreatThreshold;
+        this.maxWeightClass = forceTemplate.maxWeightClass;
+        this.startingAltitude = forceTemplate.startingAltitude;
+        this.syncDeploymentType = forceTemplate.syncDeploymentType;
+        this.syncedForceName = forceTemplate.syncedForceName;
+        this.syncRetreatThreshold = forceTemplate.syncRetreatThreshold;
+        this.useArtillery = forceTemplate.useArtillery;
+    }
+    
     public ScenarioForceTemplate(int forceAlignment, int generationMethod, double forceMultiplier, List<Integer> deploymentZones,
             int destinationZone, int retreatThreshold, int allowedUnitType) {
         this.forceAlignment = forceAlignment;

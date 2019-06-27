@@ -37,8 +37,13 @@ public class StratconScenarioFactory {
         // load user-specified scenario list
         AtBScenarioManifest userManifest = AtBScenarioManifest.Deserialize("./data/scenariotemplates/UserScenarioManifest.xml");
         
-        loadScenariosFromManifest(scenarioManifest);
-        loadScenariosFromManifest(userManifest);
+        if(scenarioManifest != null) {
+            loadScenariosFromManifest(scenarioManifest);
+        }
+        
+        if(userManifest != null) {
+            loadScenariosFromManifest(userManifest);
+        }
     }
     
     /**
@@ -88,7 +93,7 @@ public class StratconScenarioFactory {
      */
     public static ScenarioTemplate getRandomScenario(MapLocation location) {
         int scenarioIndex = Compute.randomInt(dynamicScenarioLocationMap.get(location).size());
-        return dynamicScenarioLocationMap.get(location).get(scenarioIndex);
+        return (ScenarioTemplate) dynamicScenarioLocationMap.get(location).get(scenarioIndex).clone();
     }
     
     /**
@@ -112,7 +117,7 @@ public class StratconScenarioFactory {
         }
         
         int scenarioIndex = 2;//Compute.randomInt(dynamicScenarioUnitTypeMap.get(actualUnitType).size());
-        return dynamicScenarioUnitTypeMap.get(actualUnitType).get(scenarioIndex);
+        return (ScenarioTemplate) dynamicScenarioUnitTypeMap.get(actualUnitType).get(scenarioIndex).clone();
     }
     
     /**

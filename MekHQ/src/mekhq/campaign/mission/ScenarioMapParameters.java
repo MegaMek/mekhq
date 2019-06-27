@@ -11,12 +11,26 @@ import javax.xml.bind.annotation.XmlElementWrapper;
  * @author NickAragua
  *
  */
-public class ScenarioMapParameters {
+public class ScenarioMapParameters implements Cloneable {
     public enum MapLocation {
         AllGroundTerrain,
         SpecificGroundTerrain,
         Space,
         LowAtmosphere
+    }
+    
+    public Object clone() {
+        ScenarioMapParameters clone = new ScenarioMapParameters();
+        clone.allowedTerrainTypes = new ArrayList<>(allowedTerrainTypes);
+        clone.allowRotation = allowRotation;
+        clone.baseHeight = baseHeight;
+        clone.baseWidth = baseWidth;
+        clone.heightScalingIncrement = heightScalingIncrement;
+        clone.mapLocation = mapLocation;
+        clone.useStandardAtBSizing = useStandardAtBSizing;
+        clone.widthScalingIncrement = widthScalingIncrement;
+        
+        return clone;
     }
     
     /**

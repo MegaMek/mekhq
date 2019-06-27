@@ -1,5 +1,8 @@
 package mekhq.campaign.stratcon;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 
 /**
@@ -7,7 +10,7 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
  * @author NickAragua
  *
  */
-public class StratconFacility {
+public class StratconFacility implements Cloneable {
     public enum FacilityType {
         MekBase,
         TankBase,
@@ -26,7 +29,31 @@ public class StratconFacility {
     private String displayableName;
     private FacilityType facilityType;
     private boolean visible;
+    private List<String> sharedModifiers = new ArrayList<>();
+    private List<String> localModifiers = new ArrayList<>();
     // we'll want to store a garrison here as well eventually
+    
+    public static StratconFacility createTestFacility() {
+        StratconFacility test = new StratconFacility();
+        test.displayableName = "test facility";
+        test.facilityType = FacilityType.TankBase;
+        test.sharedModifiers.add("AlliedTankGarrison.xml");
+        test.localModifiers.add("AlliedTankGarrison.xml");
+        test.localModifiers.add("AlliedTankGarrison.xml");
+        test.owner = ForceAlignment.Opposing;
+        return test;
+    }
+    
+    public Object clone() {
+        StratconFacility clone = new StratconFacility();
+        clone.owner = owner;
+        clone.displayableName = displayableName;
+        clone.facilityType = facilityType;
+        clone.visible = visible;
+        clone.sharedModifiers = new ArrayList<>(sharedModifiers);
+        clone.localModifiers = new ArrayList<>(localModifiers);
+        return clone;
+    }
     
     public ForceAlignment getOwner() {
         return owner;
@@ -62,5 +89,27 @@ public class StratconFacility {
     
     public boolean isVisible() {
         return (owner == ForceAlignment.Allied) || visible;
+    }
+
+    /**
+     * This is a list of scenario modifier IDs that affect scenarios in the same track as this facility.
+     */
+    public List<String> getSharedModifiers() {
+        return sharedModifiers;
+    }
+
+    public void setSharedModifiers(List<String> sharedModifiers) {
+        this.sharedModifiers = sharedModifiers;
+    }
+
+    /**
+     * This is a list of scenario modifier IDs that affect scenarios involving this facility directly. 
+     */
+    public List<String> getLocalModifiers() {
+        return localModifiers;
+    }
+
+    public void setLocalModifiers(List<String> localModifiers) {
+        this.localModifiers = localModifiers;
     }
 }

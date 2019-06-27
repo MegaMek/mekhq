@@ -115,7 +115,7 @@ public class AtBDynamicScenarioFactory {
             setWeather(scenario);
         }
         
-        if(campaign.getCampaignOptions().getUsePlanetaryConditions()) {
+        if(campaign.getCampaignOptions().getUsePlanetaryConditions() && planetsideScenario) {
             setPlanetaryConditions(scenario, contract, campaign);
         }
         

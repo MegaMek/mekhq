@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Coords;
 import megamek.common.UnitType;
@@ -20,11 +21,15 @@ import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
+import mekhq.campaign.mission.ScenarioTemplate;
+import mekhq.campaign.mission.atb.AtBScenarioModifier;
+import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.stratcon.StratconFacility.FacilityType;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
@@ -86,9 +91,8 @@ public class StratconRulesManager {
         retVal.setHeight(height);
         
         // generate the facilities
-        for(int fCount = 0; fCount < numLances; fCount++) {
-            StratconFacility sf = new StratconFacility();
-            sf.setOwner(ForceAlignment.Opposing);
+        //for(int fCount = 0; fCount < numLances; fCount++) {
+            StratconFacility sf = StratconFacility.createTestFacility();
             
             int fIndex = Compute.randomInt(StratconFacility.FacilityType.values().length);
             sf.setFacilityType(FacilityType.values()[fIndex]);
@@ -98,8 +102,8 @@ public class StratconRulesManager {
             
             sf.setDisplayableName(String.format("Facility %d,%d", x, y));
             
-            retVal.addFacility(new StratconCoords(x, y), sf);
-        }
+            retVal.addFacility(new StratconCoords(4, 4), sf);
+        //}
         
         return retVal;
     }
@@ -182,7 +186,7 @@ public class StratconRulesManager {
         if(contract.getCommandRights() == AtBContract.COM_LIAISON) {
             int scenarioIndex = Compute.randomInt(generatedScenarios.size() - 1);
             generatedScenarios.get(scenarioIndex).setRequiredScenario(true);
-            generatedScenarios.get(scenarioIndex).setAttachedUnitsModifier(contract);
+            setAttachedUnitsModifier(generatedScenarios.get(scenarioIndex), contract);
         }
     }
 
@@ -203,10 +207,13 @@ public class StratconRulesManager {
         
         if(track.getFacilities().containsKey(coords)) {
             // TODO: let's ensure that this is a facility scenario and the objective is set appropriately
-            generateScenario(campaign, contract, track, forceID, coords);
+            StratconScenario scenario = generateScenario(campaign, contract, track, forceID, coords);
+            scenario.commitPrimaryForces(campaign, contract);
+            AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
         } else if(Compute.randomInt(100) > track.getScenarioOdds()) {
             StratconScenario scenario = generateScenario(campaign, contract, track, forceID, coords);
             scenario.commitPrimaryForces(campaign, contract);
+            AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
         }
     }
     
@@ -340,35 +347,6 @@ public class StratconRulesManager {
     }
     
     /**
-     * Determine whether the user should be nagged about insufficient forces assigned to StratCon tracks
-     * @param campaign Campaign to check.
-     * @return An informative string containing the reasons the user was nagged.
-     */
-    public static String nagInsufficientTrackForces(Campaign campaign) {
-        if(campaign.getCalendar().get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
-            return "";
-        }
-        
-        StringBuilder sb = new StringBuilder();
-        
-        // check every track attached to an active contract for unresolved scenarios
-        // to which the player must deploy forces today
-        /*for(Contract contract : campaign.getActiveContracts()) {
-            if(contract instanceof AtBContract) {
-                for(StratconTrackState track : ((AtBContract) contract).getStratconCampaignState().getTracks()) {
-                    if(track.getAssignedForceIDs().size() < track.getRequiredLanceCount()) {
-                        // "track name, x/y lances"
-                        sb.append(String.format("%s, %d/%d lances\n", track.getDisplayableName(), 
-                                track.getAssignedForceIDs().size(), track.getRequiredLanceCount()));
-                    }
-                }
-            }
-        }*/
-        
-        return sb.toString();
-    }
-    
-    /**
      * Worker function that generates stratcon scenario at the given coords, for the given force, on the given track.
      * Also registers it with the track and campaign.
      * @param campaign
@@ -381,7 +359,24 @@ public class StratconRulesManager {
     private static StratconScenario generateScenario(Campaign campaign, AtBContract contract, StratconTrackState track, 
             int forceID, StratconCoords coords) {
         StratconScenario scenario = new StratconScenario();
-        scenario.initializeScenario(campaign, contract, campaign.getForce(forceID).getPrimaryUnitType(campaign));
+        int unitType = campaign.getForce(forceID).getPrimaryUnitType(campaign);
+        ScenarioTemplate template = StratconScenarioFactory.getRandomScenario(unitType);
+        scenario.setBackingScenario(AtBDynamicScenarioFactory.initializeScenarioFromTemplate(template, contract, campaign));
+        
+        // do an appropriate allied force if the contract calls for it
+        // do any attached or integrated units
+        setAlliedForceModifier(scenario, contract);
+        setAttachedUnitsModifier(scenario, contract);
+        applyFacilityModifiers(scenario, track, coords);
+        
+        if((contract.getCommandRights() == AtBContract.COM_HOUSE) ||
+                (contract.getCommandRights() == AtBContract.COM_INTEGRATED)) {
+            scenario.setRequiredScenario(true);
+        }
+        
+        AtBDynamicScenarioFactory.setScenarioModifiers(scenario.getBackingScenario());
+        AtBDynamicScenarioFactory.applyScenarioModifiers(scenario.getBackingScenario(), campaign, EventTiming.PreForceGeneration);
+        scenario.setCurrentState(ScenarioState.UNRESOLVED);
         setScenarioDates(track, campaign, scenario);                
         
         // register the scenario with the campaign and the track it's generated on
@@ -391,6 +386,150 @@ public class StratconRulesManager {
         scenario.setBackingScenarioID(scenario.getBackingScenario().getId());
         
         return scenario;
+    }
+    
+    /**
+     * Applies scenario modifiers from the current track to the given scenario.
+     * @param scenario
+     * @param track
+     */
+    private static void applyFacilityModifiers(StratconScenario scenario, StratconTrackState track, StratconCoords coords) {
+        // loop through all the facilities on the track
+        // if a facility has been revealed, then it has a 100% chance to apply its effect
+        // if a facility has not been revealed, then it has a x% chance to apply its effect, and a cumulative y% chance to reveal itself
+        // if a facility is on the the scenario coordinates the it applies the local effects in
+        for(StratconCoords facilityCoords : track.getFacilities().keySet()) {
+            boolean scenarioAtFacility = facilityCoords.equals(coords);
+            StratconFacility facility = track.getFacilities().get(facilityCoords);
+            List<String> modifierIDs;
+            
+            if(scenarioAtFacility) {
+                modifierIDs = facility.getLocalModifiers();
+            } else {
+                modifierIDs = facility.getSharedModifiers();
+            }
+            
+            for(String modifierID : modifierIDs) {
+                AtBScenarioModifier modifier = AtBScenarioModifier.getScenarioModifier(modifierID);
+                if(modifier == null) {
+                    MekHQ.getLogger().error(StratconRulesManager.class, "applyFacilityModifiers", 
+                            String.format("Modifier %s not found for facility %s", modifierID, facility.getDisplayableName()));
+                    continue;
+                }
+                
+                // if the modifier is some kind of force, we need to perform a few programmatic overrides
+                // of the template. Ideally this is kept to a minimum.
+                if(modifier.getForceDefinition() != null) {
+                    // figure out deployment zones here
+                    // aero units will always deploy at the edge
+                    // ground units will deploy in the center if scenario at facility, at edge otherwise
+                    // artillery will deploy off board additionally if scenario not at facility
+                    
+                    // HACK: the default deployment zone for these modifiers is expected to be a randomly selected edge
+                    // so we only need to override it when the scenario takes place at this facility
+                    if(scenarioAtFacility) {
+                        modifier.getForceDefinition().getDeploymentZones().clear();
+                        modifier.getForceDefinition().getDeploymentZones().add(Board.START_CENTER);
+                    }
+                    
+                    if(modifier.getForceDefinition().getUseArtillery()) {
+                        modifier.getForceDefinition().setDeployOffboard(!scenarioAtFacility);
+                    }
+                    
+                    // figure out actual force alignment here 
+                    modifier.getForceDefinition().setForceAlignment(facility.getOwner().ordinal());
+                }
+                
+                scenario.getBackingScenario().addScenarioModifier(modifier);
+            }
+        }
+        
+    }
+    
+    /**
+     * Set up the appropriate primary allied force modifier, if any 
+     * @param contract The scenario's contract.
+     */
+    private static void setAlliedForceModifier(StratconScenario scenario, AtBContract contract) {
+        int alliedUnitOdds = 0;
+        
+        // first, we determine the odds of having an allied unit present
+        if(contract.getMissionType() == AtBContract.MT_RELIEFDUTY) {
+            alliedUnitOdds = 50;
+        } else {
+            switch(contract.getCommandRights()) {
+            case AtBContract.COM_INTEGRATED:
+                alliedUnitOdds = 50;
+                break;
+            case AtBContract.COM_HOUSE:
+                alliedUnitOdds = 30;
+                break;
+            case AtBContract.COM_LIAISON:
+                alliedUnitOdds = 10;
+                break;
+            }
+        }
+        
+        AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+        
+        // if an allied unit is present, then we want to make sure that it's ground units
+        // for ground battles
+        if(Compute.randomInt(100) <= alliedUnitOdds) {
+            if((backingScenario.getTemplate().mapParameters.getMapLocation() == MapLocation.LowAtmosphere) ||
+               (backingScenario.getTemplate().mapParameters.getMapLocation() == MapLocation.Space)) {
+                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_ALLIED_AIR_UNITS));
+            } else {
+                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_ALLIED_GROUND_UNITS));
+            }
+        }
+    }
+
+    /**
+     * Set the 'attached' units modifier for the current scenario (integrated, house, liaison),
+     * and make sure we're not deploying ground units to an air scenario
+     * @param contract The scenario's contract
+     */
+    public static void setAttachedUnitsModifier(StratconScenario scenario, AtBContract contract) {
+        AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+        boolean airBattle = (backingScenario.getTemplate().mapParameters.getMapLocation() == MapLocation.LowAtmosphere) ||
+                (backingScenario.getTemplate().mapParameters.getMapLocation() == MapLocation.Space);
+        
+        // if we're on cadre duty, we're getting three trainees, period
+        if(contract.getMissionType() == AtBContract.MT_CADREDUTY) {
+            if(airBattle) {
+                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_TRAINEES_AIR));                
+            } else {
+                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_TRAINEES_GROUND));
+            }
+            return;
+        }
+        
+        // if we're under non-independent command rights, a supervisor may come along
+        switch(contract.getCommandRights()) {
+        case AtBContract.COM_INTEGRATED:
+            if(airBattle) {
+                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_INTEGRATED_UNITS_AIR));                
+            } else {
+                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_INTEGRATED_UNITS_GROUND));
+            }
+            break;
+        case AtBContract.COM_HOUSE:
+            if(airBattle) {
+                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_HOUSE_CO_AIR));
+            } else {
+                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_HOUSE_CO_GROUND));
+            }            
+            break;
+        case AtBContract.COM_LIAISON:
+            if(scenario.isRequiredScenario()) {
+                if(airBattle) {
+                    backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_LIAISON_AIR));
+                } else {
+                    backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(AtBScenarioModifier.SCENARIO_MODIFIER_LIAISON_GROUND));
+                } 
+            }
+            break;
+        }
     }
     
     /**
@@ -416,6 +555,22 @@ public class StratconRulesManager {
         scenario.setDeploymentDate(deploymentDate.getTime());
         scenario.setActionDate(battleDate.getTime());
         scenario.setReturnDate(returnDate.getTime());
+    }
+    
+    /**
+     * Helper function that determines if the unit type specified in the given scenario force template
+     * would start out airborne on a ground map (hot dropped units aside)
+     * @param template
+     * @return
+     */
+    private static boolean unitTypeIsAirborne(ScenarioForceTemplate template) {
+        int unitType = template.getAllowedUnitType();
+        
+        return (unitType == UnitType.AERO ||
+                unitType == UnitType.CONV_FIGHTER ||
+                unitType == UnitType.DROPSHIP ||
+                unitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX) &&
+                template.getStartingAltitude() > 0;
     }
     
     /**

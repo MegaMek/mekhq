@@ -1,9 +1,7 @@
 package mekhq.gui;
 
-import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
@@ -14,7 +12,6 @@ import javax.swing.JScrollPane;
 
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
-import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconTrackState;
 
 public class StratconTab extends CampaignGuiTab {
