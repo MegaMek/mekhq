@@ -515,7 +515,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 ammoNeeded.merge(type, type.getShots(), Integer::sum);
                 if (nPart instanceof LargeCraftAmmoBin) {
                     // Adding ammo requires base 15 minutes per ton of ammo or 60 minutes per capital missile
-                    if (type.hasFlag(AmmoType.F_CAP_MISSILE) || type.hasFlag(AmmoType.F_CRUISE_MISSILE) || type.hasFlag(AmmoType.F_SCREEN)) {
+                    if (type.hasFlag(AmmoType.F_CAP_MISSILE) || (type.getAmmoType() == AmmoType.T_CRUISE_MISSILE)
+                            || (type.getAmmoType() == AmmoType.T_SCREEN_LAUNCHER)) {
                         time += 60 * ((LargeCraftAmmoBin)nPart).getFullShots();
                     } else {
                         time += 15 * Math.max(1, nPart.getTonnage());
