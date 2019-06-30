@@ -174,10 +174,7 @@ public class CampaignGUI extends JPanel {
 
     ReportHyperlinkListener reportHLL;
 
-    private HistoricalDailyReportDialog histDailyReportDialog;
     private DailyReportLogDialog logDialog;
-    private AdvanceDaysDialog advanceDaysDialog;
-    private BloodnameDialog bloodnameDialog;
 
     public CampaignGUI(MekHQ app) {
         this.app = app;
@@ -192,10 +189,11 @@ public class CampaignGUI extends JPanel {
         MekHQAboutBox aboutBox = new MekHQAboutBox(getFrame());
         aboutBox.setLocationRelativeTo(getFrame());
         aboutBox.setVisible(true);
+        aboutBox.dispose();
     }
 
     private void showHistoricalDailyReportDialog() {
-        histDailyReportDialog = new HistoricalDailyReportDialog(getFrame(), this);
+        HistoricalDailyReportDialog histDailyReportDialog = new HistoricalDailyReportDialog(getFrame(), this);
         histDailyReportDialog.setVisible(true);
         histDailyReportDialog.dispose();
     }
@@ -262,7 +260,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public void showAdvanceDaysDialog() {
-        advanceDaysDialog = new AdvanceDaysDialog(getFrame(), this, reportHLL);
+        AdvanceDaysDialog advanceDaysDialog = new AdvanceDaysDialog(getFrame(), this, reportHLL);
         advanceDaysDialog.setVisible(true);
         advanceDaysDialog.dispose();
     }
@@ -287,6 +285,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public void showBloodnameDialog() {
+        BloodnameDialog bloodnameDialog = new BloodnameDialog(getFrame());
         bloodnameDialog.setFaction(getCampaign().getFactionCode());
         bloodnameDialog.setYear(getCampaign().getCalendar().get(
                 java.util.Calendar.YEAR));
@@ -1153,7 +1152,6 @@ public class CampaignGUI extends JPanel {
         panLog = new DailyReportLogPanel(reportHLL);
         panLog.setMinimumSize(new java.awt.Dimension(150, 100));
         logDialog = new DailyReportLogDialog(getFrame(), this, reportHLL);
-        bloodnameDialog = new BloodnameDialog(getFrame());
 
         mainPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tabMain, panLog);
         mainPanel.setOneTouchExpandable(true);
