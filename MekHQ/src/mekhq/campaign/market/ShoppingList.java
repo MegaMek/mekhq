@@ -115,6 +115,11 @@ public class ShoppingList implements MekHqXmlSerializable {
     }
 
     public void addShoppingItem(IAcquisitionWork newWork, int quantity, Campaign campaign) {
+        //ammo bins need a little extra work here
+        if(newWork instanceof AmmoBin) {
+            newWork = ((AmmoBin) newWork).getAcquisitionWork();
+        }
+        
         //check to see if this is already on the shopping list. If so, then add quantity to the list
         //and return
         for(IAcquisitionWork shoppingItem : shoppingList) {
