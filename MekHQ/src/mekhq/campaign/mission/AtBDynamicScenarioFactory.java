@@ -17,7 +17,6 @@ import megamek.client.RandomSkillsGenerator;
 import megamek.client.RandomUnitGenerator;
 import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.ratgenerator.MissionRole;
-import megamek.common.Bay;
 import megamek.common.Board;
 import megamek.common.BombType;
 import megamek.common.Compute;
@@ -26,7 +25,6 @@ import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
 import megamek.common.EntityWeightClass;
 import megamek.common.Infantry;
-import megamek.common.InfantryBay;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
@@ -70,6 +68,8 @@ public class AtBDynamicScenarioFactory {
     public static int UNIT_WEIGHT_UNSPECIFIED = -1;
     
     private static int[] validBotBombs = { BombType.B_HE, BombType.B_CLUSTER, BombType.B_RL, BombType.B_INFERNO, BombType.B_THUNDER };
+    
+    private static int[] minimumBVPercentage = { 50, 60, 70, 80, 90, 100 };
     
     private static int IS_LANCE_SIZE = 4;
     private static int CLAN_MH_LANCE_SIZE = 5;
@@ -115,7 +115,7 @@ public class AtBDynamicScenarioFactory {
             setWeather(scenario);
         }
         
-        if(campaign.getCampaignOptions().getUsePlanetaryConditions()) {
+        if(campaign.getCampaignOptions().getUsePlanetaryConditions() && planetsideScenario) {
             setPlanetaryConditions(scenario, contract, campaign);
         }
         
@@ -375,7 +375,8 @@ public class AtBDynamicScenarioFactory {
                 // if we roll below it, we stop
                 int roll = Compute.randomInt(100);
                 double rollTarget = ((double) forceBV / forceBVBudget) * 100;
-                stopGenerating = roll < rollTarget;
+                stopGenerating = rollTarget > minimumBVPercentage[campaign.getUnitRating().getUnitRatingAsInteger()] 
+                        && roll < rollTarget;
             } else {
                 stopGenerating = generatedEntities.size() >= forceUnitBudget; 
             }
@@ -387,7 +388,7 @@ public class AtBDynamicScenarioFactory {
         while(forceUnitBudget > 0 && generatedEntities.size() > forceUnitBudget) {
             generatedEntities.remove(Compute.randomInt(generatedEntities.size()));
         }
-        
+                
         // "flavor" feature - fill up APCs with infantry
         List<Entity> transportedEntities = fillTransports(scenario, generatedEntities, factionCode, skill, quality, campaign);
         generatedEntities.addAll(transportedEntities);
@@ -648,7 +649,7 @@ public class AtBDynamicScenarioFactory {
         
         for(int x = 0; x < numMods; x++) {
             AtBScenarioModifier scenarioMod = AtBScenarioModifier.getRandomScenarioModifier();
-         
+
             if((scenarioMod.getAllowedMapLocations() == null) ||
                     scenarioMod.getAllowedMapLocations().contains(scenario.getTemplate().mapParameters.getMapLocation())) {
                 scenario.getScenarioModifiers().add(scenarioMod);
@@ -1782,7 +1783,7 @@ public class AtBDynamicScenarioFactory {
             return (Compute.randomInt(3) + 1) * numFightersPerFlight;
         } else {
             int useASFRoll = isPlanetOwner ? Compute.d6() : 6;
-            int weightCountRoll = (Compute.randomInt(3) * numFightersPerFlight); // # of conventional fighters, just in case
+            int weightCountRoll = (Compute.randomInt(3) + 1) * numFightersPerFlight; // # of conventional fighters, just in case
             
             // if we are the planet owner, we may use ASF or conventional fighters 
             boolean useASF = useASFRoll >= 4;
