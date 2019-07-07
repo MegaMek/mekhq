@@ -1,36 +1,35 @@
 package mekhq.gui.dialog;
 
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 
+import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignFactory;
 import mekhq.campaign.Kill;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
@@ -39,14 +38,20 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.FileDialogs;
 
 public class CampaignExportWizard extends JDialog {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -7171621116865584010L;
+    
     private JList<Force> forceList;
     private JList<Person> personList;
     private JList<Unit> unitList;
     private JList<Part> partList;
-    private JList<AtBContract> contractOfferList;
-    private JCheckBox chkExportSettings = new JCheckBox("Export Campaign Settings");
-    private JCheckBox chkExportContractOffers = new JCheckBox("Export Current Contract Offers");
-    private JCheckBox chkDestructiveExport = new JCheckBox("Destructive Export");
+    private JCheckBox chkExportSettings = new JCheckBox();
+    private JCheckBox chkExportContractOffers = new JCheckBox();
+    private JCheckBox chkDestructiveExport = new JCheckBox();
+    //private JCheckBox chkExportAssignedTechs = new JCheckBox();
+    private ResourceBundle resourceMap;
     
     private Campaign sourceCampaign;
     private Campaign destinationCampaign;
@@ -63,12 +68,18 @@ public class CampaignExportWizard extends JDialog {
     }
     
     public CampaignExportWizard(Campaign c) {
+        resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignExportWizard", new EncodeControl());
+        chkExportSettings.setText(resourceMap.getString("chkExportSettings.text"));
+        chkExportContractOffers.setText(resourceMap.getString("chkExportContractOffers.text"));
+        chkDestructiveExport.setText(resourceMap.getString("chkDestructiveExport.text"));
+        //chkExportAssignedTechs.setText(resourceMap.getString("chkExportAssignedTechs.text"));
+        
         sourceCampaign = c;
         setupForceList();
         setupPersonList();
         setupUnitList();
         setupPartList();
-        chkDestructiveExport.setToolTipText("Personnel, units and parts selected will be removed from current campaign.");
+        chkDestructiveExport.setToolTipText(resourceMap.getString("chkDestructiveExport.tooltip"));
     }
     
     public void display(CampaignExportWizardState state) {
@@ -78,7 +89,7 @@ public class CampaignExportWizard extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = 0;
         
-        JLabel lblInstructions = new JLabel(state.toString());
+        JLabel lblInstructions = new JLabel();
         getContentPane().add(lblInstructions, gbc);
         
         gbc.gridy++;
@@ -86,59 +97,59 @@ public class CampaignExportWizard extends JDialog {
         JScrollPane scrollPane = new JScrollPane();
         switch(state) {
         case ForceSelection:
+            lblInstructions.setText(resourceMap.getString("lblInstructions.ForceSelection.text"));
             scrollPane.setViewportView(forceList);
             getContentPane().add(scrollPane, gbc);
             break;
         case PersonSelection:
+            lblInstructions.setText(resourceMap.getString("lblInstructions.PersonSelection.text"));
             scrollPane.setViewportView(personList);
             getContentPane().add(scrollPane, gbc);
             break;
         case UnitSelection:
+            lblInstructions.setText(resourceMap.getString("lblInstructions.UnitSelection.text"));
             scrollPane.setViewportView(unitList);
             getContentPane().add(scrollPane, gbc);
             break;
         case PartSelection:
+            lblInstructions.setText(resourceMap.getString("lblInstructions.PartSelection.text"));
             scrollPane.setViewportView(partList);
             getContentPane().add(scrollPane, gbc);
             break;
         case MiscellaneousSelection:
+            lblInstructions.setText(resourceMap.getString("lblInstructions.MiscSelection.text"));
             getContentPane().add(chkExportSettings, gbc);
             gbc.gridy++;
             getContentPane().add(chkExportContractOffers, gbc);
             gbc.gridy++;
             getContentPane().add(chkDestructiveExport, gbc);
-            // then:
-            // chkExportAssignedTechs
+            //gbc.gridy++;
+            //getContentPane().add(chkExportAssignedTechs, gbc);
             break;
         case DestinationFileSelection:
-            JTextArea txtDestinationCampaignFile = new JTextArea();
-            txtDestinationCampaignFile.setEditable(false);
-            
-            getContentPane().add(txtDestinationCampaignFile, gbc);
-            gbc.gridy++;
-            
-            JButton btnNewCampaign = new JButton("Export to New Campaign");
+            lblInstructions.setText(resourceMap.getString("lblInstructions.Finalize.text"));
+            JButton btnNewCampaign = new JButton(resourceMap.getString("btnNewCampaign.text"));
             btnNewCampaign.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     destinationCampaignFile = FileDialogs.saveCampaign(null, sourceCampaign);
                     if(destinationCampaignFile.isPresent()) {
                         exportToCampaign(destinationCampaignFile.get());
-                        //setVisible(false);
+                        setVisible(false);
                     }
                 }
             });
             getContentPane().add(btnNewCampaign, gbc);
             gbc.gridx++;
             
-            JButton btnExistingCampaign = new JButton("Export to Existing Campaign");
+            JButton btnExistingCampaign = new JButton(resourceMap.getString("btnExistingCampaign.text"));
             btnExistingCampaign.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     destinationCampaignFile = FileDialogs.openCampaign(null);
                     if(destinationCampaignFile.isPresent()) {
                         exportToCampaign(destinationCampaignFile.get());
-                        //setVisible(false);
+                        setVisible(false);
                     }
                 }
             });
@@ -149,13 +160,11 @@ public class CampaignExportWizard extends JDialog {
         gbc.gridy++;
         
         if(state != CampaignExportWizardState.DestinationFileSelection) {
-            JButton btnNext = new JButton("Next");
+            JButton btnNext = new JButton(resourceMap.getString("btnNext.text"));
             btnNext.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    updatePersonList();
-                    updateUnitList();
-                    display(CampaignExportWizardState.values()[state.ordinal() + 1]);
+                    nextButtonHandler(state);
                 }
             });
             
@@ -184,7 +193,8 @@ public class CampaignExportWizard extends JDialog {
         for(Person person : sourceCampaign.getActivePersonnel()) {
             personListModel.addElement(person);
         }
-        personList.setModel(personListModel);    
+        personList.setModel(personListModel);
+        personList.setCellRenderer(new PersonListCellRenderer());
     }
     
     private void setupUnitList() {
@@ -194,13 +204,20 @@ public class CampaignExportWizard extends JDialog {
             unitListModel.addElement(unit);
         }
         unitList.setModel(unitListModel);    
+        unitList.setCellRenderer(new UnitListCellRenderer());
     }
     
     private void setupPartList() {
         partList = new JList<>();
         DefaultListModel<Part> partListModel = new DefaultListModel<>();
         for(Part part : sourceCampaign.getSpareParts()) {
-            partListModel.addElement(part);
+            // if the part isn't part of some other activity
+            if(!part.isReservedForRefit() &&
+                    !part.isReservedForReplacement() &&
+                    !part.isBeingWorkedOn() &&
+                    part.isPresent()) {
+                partListModel.addElement(part);
+            }
         }
         partList.setModel(partListModel);    
     }
@@ -219,6 +236,8 @@ public class CampaignExportWizard extends JDialog {
                 Unit unit = sourceCampaign.getUnit(unitID);
                 
                 for(Person person : unit.getActiveCrew()) {
+                    // this approach recurs throughout the class, and I
+                    // couldn't find any better way to select multiple items in a JList
                     personList.setSelectedValue(person, false);
                     selectedIndices.add(personList.getSelectedIndex());
                 }
@@ -227,6 +246,11 @@ public class CampaignExportWizard extends JDialog {
                     personList.setSelectedValue(unit.getTech(), false);
                     selectedIndices.add(personList.getSelectedIndex());
                 }
+            }
+            
+            if(force.getTechID() != null) {
+                personList.setSelectedValue(sourceCampaign.getPerson(force.getTechID()), false);
+                selectedIndices.add(personList.getSelectedIndex());
             }
         }
         
@@ -279,6 +303,28 @@ public class CampaignExportWizard extends JDialog {
         unitList.setSelectedIndices(selectedIndices.stream().mapToInt(i->i).toArray());
     }
     
+    private void nextButtonHandler(CampaignExportWizardState state) {
+        switch(state) {
+        case ForceSelection:
+            updatePersonList();
+            updateUnitList();
+            break;
+        case PersonSelection:
+            updateUnitList();
+            break;
+        case UnitSelection:
+            updatePersonList();
+            break;
+        }
+        
+        display(CampaignExportWizardState.values()[state.ordinal() + 1]);
+    }
+    
+    /**
+     * Carry out the campaign export.
+     * @param file Destination file.
+     * @return Whether or not the operation succeeded.
+     */
     private boolean exportToCampaign(File file) {
         boolean newCampaign = !file.exists();
         
@@ -321,6 +367,14 @@ public class CampaignExportWizard extends JDialog {
         // forces aren't moved/copied over, we just use the force selection to pre-populate the list of people and units 
         // to be exported
         
+        for(Unit unit : unitList.getSelectedValuesList()) {
+            if(destinationCampaign.getUnit(unit.getId()) != null) {
+                destinationCampaign.removeUnit(unit.getId());
+            }
+            
+            destinationCampaign.importUnit(unit);
+        }
+        
         // overwrite any people with the same ID.
         for(Person person : personList.getSelectedValuesList()) {
             if(destinationCampaign.getPerson(person.getId()) != null) {
@@ -330,22 +384,6 @@ public class CampaignExportWizard extends JDialog {
             destinationCampaign.importPerson(person);
             for(Kill kill : sourceCampaign.getKillsFor(person.getId())) {
                 destinationCampaign.importKill(kill);
-            }
-            
-            if(chkDestructiveExport.isSelected()) {
-                sourceCampaign.removePerson(person.getId(), true);
-            }
-        }
-        
-        for(Unit unit : unitList.getSelectedValuesList()) {
-            if(destinationCampaign.getUnit(unit.getId()) != null) {
-                destinationCampaign.removeUnit(unit.getId());
-            }
-            
-            destinationCampaign.importUnit(unit);
-            
-            if(chkDestructiveExport.isSelected()) {
-                sourceCampaign.removeUnit(unit.getId());
             }
         }
         
@@ -358,6 +396,45 @@ public class CampaignExportWizard extends JDialog {
             }
         }
         
-        return CampaignGUI.saveCampaign(null, destinationCampaign, file);
+        boolean saved = CampaignGUI.saveCampaign(null, destinationCampaign, file);
+        
+        // having saved the destination campaign, we can now get rid of stuff in the source
+        // campaign, if we're doing a destructive export
+        // don't do it if we failed to save for some reason.
+        if(saved && chkDestructiveExport.isSelected()) {
+            for(Unit unit : unitList.getSelectedValuesList()) {            
+                sourceCampaign.removeUnit(unit.getId());
+            }
+            
+            for(Person person : personList.getSelectedValuesList()) {
+                sourceCampaign.removePerson(person.getId(), true);
+            }
+            
+            for(Part part : partList.getSelectedValuesList()) {
+                sourceCampaign.removePart(part);
+            }
+        }
+
+        return saved;
+    }
+    
+    private class UnitListCellRenderer extends DefaultListCellRenderer {
+        @Override
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            Component cmp = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            ((JLabel) cmp).setText(((Unit) value).getName());
+            return cmp;
+        }
+    }
+    
+    private class PersonListCellRenderer extends DefaultListCellRenderer {
+        @Override
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            Component cmp = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            Person person = (Person) value;
+            String cellValue = String.format("%s (%s)", person.getFullName(), person.getPrimaryRoleDesc());
+            ((JLabel) cmp).setText(cellValue);
+            return cmp;
+        }
     }
 }
