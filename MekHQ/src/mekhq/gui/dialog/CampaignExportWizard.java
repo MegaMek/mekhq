@@ -7,8 +7,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
+import java.text.NumberFormat;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.UUID;
@@ -22,7 +26,13 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
+import megamek.common.AmmoType;
+import megamek.common.UnitType;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
@@ -31,7 +41,10 @@ import mekhq.campaign.CampaignFactory;
 import mekhq.campaign.Kill;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.Contract;
+import mekhq.campaign.parts.AmmoStorage;
+import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
@@ -47,10 +60,16 @@ public class CampaignExportWizard extends JDialog {
     private JList<Person> personList;
     private JList<Unit> unitList;
     private JList<Part> partList;
+    private JList<PartCount> partCountList;
+    
+    private JTextField txtPartCount = new JTextField();
+    private JButton btnUpdatePartCount = new JButton();
+    
     private JCheckBox chkExportSettings = new JCheckBox();
     private JCheckBox chkExportContractOffers = new JCheckBox();
     private JCheckBox chkDestructiveExport = new JCheckBox();
     //private JCheckBox chkExportAssignedTechs = new JCheckBox();
+    private JLabel lblStatus;
     private ResourceBundle resourceMap;
     
     private Campaign sourceCampaign;
@@ -63,6 +82,7 @@ public class CampaignExportWizard extends JDialog {
         PersonSelection,
         UnitSelection,
         PartSelection,
+        PartCountSelection,
         MiscellaneousSelection,
         DestinationFileSelection // this should always be last
     }
@@ -80,6 +100,7 @@ public class CampaignExportWizard extends JDialog {
         setupUnitList();
         setupPartList();
         chkDestructiveExport.setToolTipText(resourceMap.getString("chkDestructiveExport.tooltip"));
+        btnUpdatePartCount.setText(resourceMap.getString("btnUpdatePartCount.text"));
     }
     
     public void display(CampaignExportWizardState state) {
@@ -94,6 +115,11 @@ public class CampaignExportWizard extends JDialog {
         
         gbc.gridy++;
         
+        lblStatus = new JLabel();
+        getContentPane().add(lblStatus, gbc);
+        
+        gbc.gridy++;
+        
         JScrollPane scrollPane = new JScrollPane();
         switch(state) {
         case ForceSelection:
@@ -103,11 +129,13 @@ public class CampaignExportWizard extends JDialog {
             break;
         case PersonSelection:
             lblInstructions.setText(resourceMap.getString("lblInstructions.PersonSelection.text"));
+            lblStatus.setText(getPersonSelectionStatus());
             scrollPane.setViewportView(personList);
             getContentPane().add(scrollPane, gbc);
             break;
         case UnitSelection:
             lblInstructions.setText(resourceMap.getString("lblInstructions.UnitSelection.text"));
+            lblStatus.setText(getUnitSelectionStatus());
             scrollPane.setViewportView(unitList);
             getContentPane().add(scrollPane, gbc);
             break;
@@ -115,6 +143,23 @@ public class CampaignExportWizard extends JDialog {
             lblInstructions.setText(resourceMap.getString("lblInstructions.PartSelection.text"));
             scrollPane.setViewportView(partList);
             getContentPane().add(scrollPane, gbc);
+            break;
+        case PartCountSelection:
+            lblInstructions.setText(resourceMap.getString("lblInstructions.PartCountSelection.text"));
+            setupPartCountList();
+            scrollPane.setViewportView(partCountList);
+            getContentPane().add(scrollPane, gbc);
+            
+            gbc.gridx++;
+            txtPartCount.setText("0");
+            txtPartCount.setColumns(5);
+            getContentPane().add(txtPartCount, gbc);
+            
+            gbc.gridx++;
+            getContentPane().add(btnUpdatePartCount, gbc);
+            gbc.gridx -= 2;
+            
+            lblStatus.setText(getPartCountSelectionStatus());
             break;
         case MiscellaneousSelection:
             lblInstructions.setText(resourceMap.getString("lblInstructions.MiscSelection.text"));
@@ -184,7 +229,8 @@ public class CampaignExportWizard extends JDialog {
         for(Force force : sourceCampaign.getAllForces()) {
             forceListModel.addElement(force);
         }
-        forceList.setModel(forceListModel);    
+        forceList.setModel(forceListModel);
+        forceList.setCellRenderer(new ForceListCellRenderer());
     }
     
     private void setupPersonList() {
@@ -194,6 +240,13 @@ public class CampaignExportWizard extends JDialog {
             personListModel.addElement(person);
         }
         personList.setModel(personListModel);
+        personList.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                lblStatus.setText(getPersonSelectionStatus());
+                pack();
+            }
+        });
         personList.setCellRenderer(new PersonListCellRenderer());
     }
     
@@ -203,14 +256,29 @@ public class CampaignExportWizard extends JDialog {
         for(Unit unit : sourceCampaign.getUnits()) {
             unitListModel.addElement(unit);
         }
-        unitList.setModel(unitListModel);    
+        unitList.setModel(unitListModel);
+        unitList.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                lblStatus.setText(getUnitSelectionStatus());
+                pack();
+            }
+        });
         unitList.setCellRenderer(new UnitListCellRenderer());
     }
     
     private void setupPartList() {
         partList = new JList<>();
         DefaultListModel<Part> partListModel = new DefaultListModel<>();
-        for(Part part : sourceCampaign.getSpareParts()) {
+        List<Part> parts = sourceCampaign.getSpareParts();
+        parts.sort(new Comparator<Part>() {
+            @Override
+            public int compare(Part o1, Part o2) {
+                return o1.getName().compareTo(o2.getName());
+            }
+        });
+        
+        for(Part part : parts) {
             // if the part isn't part of some other activity
             if(!part.isReservedForRefit() &&
                     !part.isReservedForReplacement() &&
@@ -220,6 +288,45 @@ public class CampaignExportWizard extends JDialog {
             }
         }
         partList.setModel(partListModel);    
+    }
+    
+    private void setupPartCountList() {
+        partCountList = new JList<>();
+        partCountList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        DefaultListModel<PartCount> partCountListModel = new DefaultListModel<>();
+        for(Part part : partList.getSelectedValuesList()) {
+            partCountListModel.addElement(new PartCount(part));
+        }
+        
+        partCountList.setModel(partCountListModel);
+        
+        partCountList.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                txtPartCount.setText(Integer.toString(partCountList.getSelectedValue().count));
+            } 
+        });
+        
+        btnUpdatePartCount.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    int updatedPartCount = Integer.parseInt(txtPartCount.getText());
+                    
+                    PartCount partCount = partCountList.getSelectedValue();
+                    if(updatedPartCount > 0 && updatedPartCount <= partCount.getMaxPartCount()) {
+                        partCountList.getModel().getElementAt(partCountList.getSelectedIndex()).count = updatedPartCount;
+                        partCountList.updateUI();
+                        lblStatus.setText(getPartCountSelectionStatus());
+                        pack();
+                    }
+                } catch(Exception exception) {
+                    lblStatus.setText(resourceMap.getString("lblStatus.Error.text"));
+                }
+            }
+            
+        });
     }
     
     /**
@@ -356,6 +463,8 @@ public class CampaignExportWizard extends JDialog {
         
         if(chkExportSettings.isSelected()) {
             destinationCampaign.setCampaignOptions(sourceCampaign.getCampaignOptions());
+            destinationCampaign.getCalendar().setTime(sourceCampaign.getDate());
+            destinationCampaign.setLocation(sourceCampaign.getLocation());
         }
         
         if(chkExportContractOffers.isSelected()) {
@@ -388,11 +497,26 @@ public class CampaignExportWizard extends JDialog {
         }
         
         // there's just no way to overwrite parts
-        for(Part part : partList.getSelectedValuesList()) {
-            destinationCampaign.importPart(part);
+        // so we simply add them to the destination
+        for(int partcIndex = 0; partcIndex < partCountList.getModel().getSize(); partcIndex++) {
+            PartCount partCount = partCountList.getModel().getElementAt(partcIndex);
             
-            if(chkDestructiveExport.isSelected()) {
-                sourceCampaign.removePart(part);
+            // make a copy of the part so we don't mess with the existing part
+            // ammo and armor require special handling
+            Part newPart = partCount.part.clone();
+            if(newPart instanceof AmmoStorage) {
+                ((AmmoStorage) newPart).setShots(partCount.count);
+                destinationCampaign.addPart(newPart, 0);
+            } else if (newPart instanceof Armor) {
+                ((Armor) newPart).setAmount(partCount.count);
+                destinationCampaign.addPart(newPart, 0);
+            } else {
+                // addPart only increments count by one and folds the part
+                // into an existing part, making it impossible to modify the part
+                // once it's inside the destination campaign, so we just add the part repeatedly
+                for(int x = 0; x < partCount.count; x++) {
+                    destinationCampaign.addPart(newPart, 0);
+                }
             }
         }
         
@@ -410,12 +534,90 @@ public class CampaignExportWizard extends JDialog {
                 sourceCampaign.removePerson(person.getId(), true);
             }
             
-            for(Part part : partList.getSelectedValuesList()) {
-                sourceCampaign.removePart(part);
+            // here, we update the quantity of the relevant part in the source campaign
+            // and remove it if we reach 0. ammo and armor require special handling as usual.            
+            for(int partcIndex = 0; partcIndex < partCountList.getModel().getSize(); partcIndex++) {
+                PartCount partCount = partCountList.getModel().getElementAt(partcIndex);
+                
+                if(partCount.part instanceof AmmoStorage) {
+                    AmmoStorage sourceAmmo = (AmmoStorage) partCount.part;
+                    sourceAmmo.changeShots(-partCount.count);
+                    
+                    if(sourceAmmo.getShots() <= 0) {
+                        sourceCampaign.removePart(partCount.part);
+                    }
+                } else if (partCount.part instanceof Armor) {
+                    Armor sourceArmor = (Armor) partCount.part;
+                    sourceArmor.setAmount(sourceArmor.getAmount() - partCount.count);
+                    
+                    if(sourceArmor.getAmount() <= 0) {
+                        sourceCampaign.removePart(partCount.part);
+                    }
+                } else {
+                    partCount.part.setQuantity(partCount.part.getQuantity() - partCount.count);
+                    
+                    if(partCount.part.getQuantity() <= 0) {
+                        sourceCampaign.removePart(partCount.part);
+                    }
+                }
             }
         }
 
         return saved;
+    }
+    
+    private String getPersonSelectionStatus() {
+        Map<String, Integer> roleCounts = new HashMap<>();
+        for(Person person : personList.getSelectedValuesList()) {
+            if(!roleCounts.containsKey(person.getPrimaryRoleDesc())) {
+                roleCounts.put(person.getPrimaryRoleDesc(), 0);
+            }
+            
+            roleCounts.put(person.getPrimaryRoleDesc(), roleCounts.get(person.getPrimaryRoleDesc()) + 1);
+        }
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append("<html>");
+        
+        for(String key : roleCounts.keySet()) {
+            sb.append(String.format("%s (%d)<br/>", key, roleCounts.get(key)));
+        }
+        
+        sb.append("</html>");
+        return sb.toString();
+    }
+    
+    private String getUnitSelectionStatus() {
+        Map<Integer, Integer> typeCounts = new HashMap<>();
+        for(Unit unit : unitList.getSelectedValuesList()) {
+            if(!typeCounts.containsKey(unit.getEntity().getUnitType())) {
+                typeCounts.put(unit.getEntity().getUnitType(), 0);
+            }
+            
+            typeCounts.put(unit.getEntity().getUnitType(), typeCounts.get(unit.getEntity().getUnitType()) + 1);
+        }
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append("<html>");
+        
+        for(Integer key : typeCounts.keySet()) {
+            sb.append(String.format("%s (%d)<br/>", UnitType.getTypeName(key), typeCounts.get(key)));
+        }
+        
+        sb.append("</html>");
+        return sb.toString();
+    }
+    
+    private String getPartCountSelectionStatus() {
+        double totalTonnage = 0;
+        for(int partIndex = 0; partIndex < partCountList.getModel().getSize(); partIndex++) {
+            PartCount partCount = partCountList.getModel().getElementAt(partIndex);
+            totalTonnage += partCount.getCurrentTonnage();
+        }
+        
+        NumberFormat nf = NumberFormat.getInstance();
+        nf.setMaximumFractionDigits(2);
+        return String.format("%s tons selected", nf.format(totalTonnage));
     }
     
     private class UnitListCellRenderer extends DefaultListCellRenderer {
@@ -435,6 +637,61 @@ public class CampaignExportWizard extends JDialog {
             String cellValue = String.format("%s (%s)", person.getFullName(), person.getPrimaryRoleDesc());
             ((JLabel) cmp).setText(cellValue);
             return cmp;
+        }
+    }
+    
+    private class ForceListCellRenderer extends DefaultListCellRenderer {
+        @Override
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            Component cmp = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            Force force = (Force) value;
+            String cellValue = force.getFullName();
+            ((JLabel) cmp).setText(cellValue);
+            return cmp;
+        }
+    }
+    
+    private class PartCount {
+        Part part;
+        int count;
+        
+        public PartCount(Part part) {
+            this.part = part;
+            
+            if(part instanceof Armor) {
+                this.count = ((Armor) part).getAmount();
+            } else if (part instanceof AmmoStorage) {
+                this.count = ((AmmoStorage) part).getShots();
+            } else {
+                this.count = part.getQuantity();
+            }
+        }
+        
+        public int getMaxPartCount() {
+            if(part instanceof Armor) {
+                return ((Armor) part).getAmount();
+            } else if (part instanceof AmmoStorage) {
+                return ((AmmoStorage) part).getShots();
+            } else {
+                return part.getQuantity();
+            }
+        }
+        
+        public double getCurrentTonnage() {
+            if(part instanceof Armor) {
+                return ((Armor) part).getArmorWeight(count);
+            } else if (part instanceof AmmoStorage) {
+                AmmoStorage ammoPart = (AmmoStorage) part;
+                AmmoType ammoType = (AmmoType) ammoPart.getType();
+                return ammoType.getKgPerShot() * count / 1000.0;
+            } else {
+                return count * part.getTonnage() * 1.0;
+            }
+        }
+        
+        @Override
+        public String toString() {
+            return String.format("%s (%d)", part.getPartName(), count);
         }
     }
 }
