@@ -283,7 +283,7 @@ public class MekHqXmlUtil {
                 .getEntity(tgtEnt.getC3Master().getId())
                 .getC3UUIDAsString();
         }
-        if (tgtEnt.hasC3() || tgtEnt.hasC3i()) {
+        if (tgtEnt.hasC3() || tgtEnt.hasC3i() || tgtEnt.hasNavalC3()) {
             retVal += "\" c3UUID=\"";
             retVal += tgtEnt.getC3UUIDAsString();
         }
