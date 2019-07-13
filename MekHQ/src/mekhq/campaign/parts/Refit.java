@@ -1336,7 +1336,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             }
         }
         oldUnit.setParts(newParts);
-        Utilities.unscrambleEquipmentNumbers(oldUnit);
+        Utilities.unscrambleEquipmentNumbers(oldUnit, true);
         assignArmActuators();
         assignBayParts();
         for (Part p : newParts) {
