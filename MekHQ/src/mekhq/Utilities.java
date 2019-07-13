@@ -1097,7 +1097,7 @@ public class Utilities {
         }
     }
 
-    public static void unscrambleEquipmentNumbers(Unit unit) {
+    public static void unscrambleEquipmentNumbers(Unit unit, boolean refit) {
         //BA has one part per equipment entry per suit and may need to have trooper fields set following
         //a refit
         if (unit.getEntity() instanceof BattleArmor) {
@@ -1128,8 +1128,10 @@ public class Utilities {
                 }
             }
         }
-        // For ammo types we want to match the same munition type if possible to avoid the possibility
+        // For ammo types we want to match the same munition type if possible to avoid 
         // imposing unnecessary ammo swaps.
+        // However, if we've just done a refit we may very well have changed ammo types, 
+        // so we need to set the equipment numbers in this case.
         List<Part> notFound = new ArrayList<>();
         for(Part part : remaining) {
             boolean found = false;
@@ -1140,17 +1142,39 @@ public class Utilities {
                 for (int equipNum : equipNums) {
                     i++;
                     Mounted m = unit.getEntity().getEquipment(equipNum);
-                    if (part instanceof AmmoBin
-                            && (!(m.getType() instanceof AmmoType)
-                            || (((AmmoType) epart.getType()).getMunitionType()
-                            != ((AmmoType) m.getType()).getMunitionType()))) {
-                        continue;
-                    }
-                    if (m.getType().equals(epart.getType())
-                            && !m.isDestroyed()) {
-                        epart.setEquipmentNum(equipNum);
-                        found = true;
-                        break;
+                    if (part instanceof AmmoBin) {
+                        //If this is a refit, we want to update our ammo bin parts to match
+                        //the munitions specified in the refit, then reassign the equip number
+                        if (refit) {
+                            if (m.getType().equals(epart.getType())
+                                    && !m.isDestroyed()) {
+                                epart.setEquipmentNum(equipNum);
+                                ((AmmoBin) epart).changeMunition(((AmmoType) m.getType()));
+                                found = true;
+                                break;
+                            }
+                        } else {
+                            //If this is not a refit, make sure the munitions match
+                            if (m.getType() instanceof AmmoType) {
+                                if (((AmmoType) epart.getType()).getMunitionType()
+                                        != ((AmmoType) m.getType()).getMunitionType()) {
+                                    continue;
+                                }
+                                if (m.getType().equals(epart.getType())
+                                        && !m.isDestroyed()) {
+                                    epart.setEquipmentNum(equipNum);
+                                    found = true;
+                                    break;
+                                }
+                            }
+                        }
+                    } else {
+                        if (m.getType().equals(epart.getType())
+                                && !m.isDestroyed()) {
+                            epart.setEquipmentNum(equipNum);
+                            found = true;
+                            break;
+                        }
                     }
                 }
             } else if (part instanceof MissingEquipmentPart) {
