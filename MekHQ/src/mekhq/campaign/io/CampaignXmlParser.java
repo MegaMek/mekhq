@@ -619,7 +619,8 @@ public class CampaignXmlParser {
             // possible that these might have changed if changes were made to
             // the
             // ordering of equipment in the underlying data file for the unit
-            Utilities.unscrambleEquipmentNumbers(unit);
+            // We're not checking for refit here.
+            Utilities.unscrambleEquipmentNumbers(unit, false);
 
             // some units might need to be assigned to scenarios
             Scenario s = retVal.getScenario(unit.getScenarioId());
