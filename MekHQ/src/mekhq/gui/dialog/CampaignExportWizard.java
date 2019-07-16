@@ -3,6 +3,7 @@ package mekhq.gui.dialog;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -25,6 +26,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
@@ -39,8 +41,11 @@ import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignFactory;
 import mekhq.campaign.Kill;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.Mission;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
@@ -67,8 +72,10 @@ public class CampaignExportWizard extends JDialog {
     
     private JCheckBox chkExportSettings = new JCheckBox();
     private JCheckBox chkExportContractOffers = new JCheckBox();
+    private JCheckBox chkExportCompletedContracts = new JCheckBox();
     private JCheckBox chkDestructiveExport = new JCheckBox();
-    //private JCheckBox chkExportAssignedTechs = new JCheckBox();
+    private JTextField txtExportMoney = new JTextField();
+    private JLabel lblMoney = new JLabel();
     private JLabel lblStatus;
     private ResourceBundle resourceMap;
     
@@ -91,8 +98,9 @@ public class CampaignExportWizard extends JDialog {
         resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignExportWizard", new EncodeControl());
         chkExportSettings.setText(resourceMap.getString("chkExportSettings.text"));
         chkExportContractOffers.setText(resourceMap.getString("chkExportContractOffers.text"));
-        chkDestructiveExport.setText(resourceMap.getString("chkDestructiveExport.text"));
-        //chkExportAssignedTechs.setText(resourceMap.getString("chkExportAssignedTechs.text"));
+        chkExportCompletedContracts.setText(resourceMap.getString("chkExportCompletedContracts.text"));
+        lblMoney.setText(resourceMap.getString("lblMoney.text"));
+        chkDestructiveExport.setText(resourceMap.getString("chkDestructiveExport.text"));        
         
         sourceCampaign = c;
         setupForceList();
@@ -153,6 +161,7 @@ public class CampaignExportWizard extends JDialog {
             gbc.gridx++;
             txtPartCount.setText("0");
             txtPartCount.setColumns(5);
+            gbc.insets = new Insets(1, 1, 1, 1);
             getContentPane().add(txtPartCount, gbc);
             
             gbc.gridx++;
@@ -163,13 +172,31 @@ public class CampaignExportWizard extends JDialog {
             break;
         case MiscellaneousSelection:
             lblInstructions.setText(resourceMap.getString("lblInstructions.MiscSelection.text"));
+            gbc.anchor = GridBagConstraints.WEST;
             getContentPane().add(chkExportSettings, gbc);
             gbc.gridy++;
             getContentPane().add(chkExportContractOffers, gbc);
             gbc.gridy++;
+            getContentPane().add(chkExportCompletedContracts, gbc);
+            gbc.gridy++;
+                        
+            JPanel pnlMoney = new JPanel();
+            pnlMoney.setLayout(new GridBagLayout());
+            GridBagConstraints mgbc = new GridBagConstraints();
+            mgbc.fill = GridBagConstraints.REMAINDER;
+            mgbc.insets = new Insets(1, 1, 1, 1);
+            mgbc.gridy = 0;
+            mgbc.gridx = 0;
+            
+            txtExportMoney.setText("0");
+            txtExportMoney.setColumns(5);
+            pnlMoney.add(txtExportMoney, mgbc);
+            mgbc.gridx++;
+            pnlMoney.add(lblMoney, mgbc);
+            getContentPane().add(pnlMoney, gbc);
+            
+            gbc.gridy++;
             getContentPane().add(chkDestructiveExport, gbc);
-            //gbc.gridy++;
-            //getContentPane().add(chkExportAssignedTechs, gbc);
             break;
         case DestinationFileSelection:
             lblInstructions.setText(resourceMap.getString("lblInstructions.Finalize.text"));
@@ -463,6 +490,7 @@ public class CampaignExportWizard extends JDialog {
         
         if(chkExportSettings.isSelected()) {
             destinationCampaign.setCampaignOptions(sourceCampaign.getCampaignOptions());
+            destinationCampaign.setGameOptions(sourceCampaign.getGameOptionsVector());
             destinationCampaign.getCalendar().setTime(sourceCampaign.getDate());
             destinationCampaign.setLocation(sourceCampaign.getLocation());
         }
@@ -471,6 +499,23 @@ public class CampaignExportWizard extends JDialog {
             for(Contract contract : sourceCampaign.getContractMarket().getContracts()) {
                 destinationCampaign.getContractMarket().getContracts().add(contract);
             }
+        }
+        
+        if(chkExportCompletedContracts.isSelected()) {
+            for(Mission mission : sourceCampaign.getMissions()) {
+                if(!mission.isActive()) {
+                    destinationCampaign.importMission(mission);
+                }
+            }
+        }
+        
+        int money = 0;
+        
+        try {
+            money = Integer.parseInt(txtExportMoney.getText());
+            destinationCampaign.addFunds(Money.of(money), String.format("Transfer from %s", sourceCampaign.getName()), Transaction.C_START);
+        } catch(Exception e) {
+            
         }
         
         // forces aren't moved/copied over, we just use the force selection to pre-populate the list of people and units 
@@ -532,6 +577,10 @@ public class CampaignExportWizard extends JDialog {
             
             for(Person person : personList.getSelectedValuesList()) {
                 sourceCampaign.removePerson(person.getId(), true);
+            }
+            
+            if(money > 0) {
+                sourceCampaign.addFunds(Money.of(-money), "Transfer to exported campaign", Transaction.C_START);
             }
             
             // here, we update the quantity of the relevant part in the source campaign
