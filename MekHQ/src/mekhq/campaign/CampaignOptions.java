@@ -474,6 +474,7 @@ public class CampaignOptions implements Serializable {
         personnelMarketRandomUltraGreenRemoval = 4;
         personnelMarketDylansWeight = 0.3;
         salaryTypeBase = new Money[Person.T_NUM];
+        salaryTypeBase[Person.T_NONE] = Money.of(0);
         salaryTypeBase[Person.T_MECHWARRIOR] = Money.of(1500);
         salaryTypeBase[Person.T_AERO_PILOT] = Money.of(1500);
         salaryTypeBase[Person.T_VEE_GUNNER] = Money.of(900);
@@ -488,6 +489,7 @@ public class CampaignOptions implements Serializable {
         salaryTypeBase[Person.T_SPACE_CREW] = Money.of(1000);
         salaryTypeBase[Person.T_NAVIGATOR] = Money.of( 1000);
         salaryTypeBase[Person.T_DOCTOR] = Money.of(1500);
+        salaryTypeBase[Person.T_ADMIN_COM] = Money.of(500);
         salaryTypeBase[Person.T_ADMIN_HR] = Money.of(500);
         salaryTypeBase[Person.T_ADMIN_LOG] = Money.of(500);
         salaryTypeBase[Person.T_ADMIN_TRA] = Money.of(500);
@@ -498,6 +500,7 @@ public class CampaignOptions implements Serializable {
         salaryTypeBase[Person.T_ASTECH] = Money.of(400);
         salaryTypeBase[Person.T_MEDIC] = Money.of(400);
         salaryTypeBase[Person.T_PROTO_PILOT] = Money.of(960);
+        salaryTypeBase[Person.T_LAM_PILOT] = Money.of(1500);
         salaryXpMultiplier = new double[5];
         salaryXpMultiplier[SkillType.EXP_ULTRA_GREEN] = 0.6;
         salaryXpMultiplier[SkillType.EXP_GREEN] = 0.6;

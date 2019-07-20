@@ -644,6 +644,16 @@ public class CampaignGUI extends JPanel {
         });
         miExportCSVFile.add(miExportFinancesCSV);
 
+        JMenuItem miExportCampaignSubset = new JMenuItem("Export Campaign Subset");
+        miExportCampaignSubset.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CampaignExportWizard cew = new CampaignExportWizard(getCampaign());
+                cew.display(CampaignExportWizard.CampaignExportWizardState.ForceSelection);
+            }
+        });
+        menuExport.add(miExportCampaignSubset);
+        
         JMenuItem miImportOptions = new JMenuItem(
                 resourceMap.getString("miImportOptions.text")); // NOI18N
         miImportOptions.addActionListener(new ActionListener() {
@@ -1552,12 +1562,22 @@ public class CampaignGUI extends JPanel {
             // I want a file, y'know!
             return;
         }
+        
+        saveCampaign(getFrame(), getCampaign(), file);
+    }
+    
+    /**
+     * Attempts to saves the given campaign to the given file.
+     * @param frame The parent frame in which to display the error message. May be null.
+     */
+    public static boolean saveCampaign(JFrame frame, Campaign campaign, File file) {
+        final String METHOD_NAME = "saveCampaign(Campaign campaign, File file)";
         String path = file.getPath();
         if (!path.endsWith(".cpnx") && !path.endsWith(".cpnx.gz")) {
             path += ".cpnx";
             file = new File(path);
         }
-
+        
         // check for existing file and make a back-up if found
         String path2 = path + "_backup";
         File backupFile = new File(path2);
@@ -1577,7 +1597,7 @@ public class CampaignGUI extends JPanel {
             }
 
             pw = new PrintWriter(new OutputStreamWriter(os, "UTF-8"));
-            getCampaign().writeToXml(pw);
+            campaign.writeToXml(pw);
             pw.flush();
             pw.close();
             fos.close();
@@ -1585,13 +1605,13 @@ public class CampaignGUI extends JPanel {
             if (backupFile.exists()) {
                 backupFile.delete();
             }
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
+            MekHQ.getLogger().log(CampaignGUI.class, METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                     "Campaign saved to " + file); //$NON-NLS-1$
         } catch (Exception ex) {
-            MekHQ.getLogger().error(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
+            MekHQ.getLogger().error(CampaignGUI.class, METHOD_NAME, ex); //$NON-NLS-1$
             JOptionPane
                     .showMessageDialog(
-                            getFrame(),
+                            frame,
                             "Oh no! The program was unable to correctly save your game. We know this\n"
                                     + "is annoying and apologize. Please help us out and submit a bug with the\n"
                                     + "mekhqlog.txt file from this game so we can prevent this from happening in\n"
@@ -1603,7 +1623,11 @@ public class CampaignGUI extends JPanel {
                 Utilities.copyfile(backupFile, file);
                 backupFile.delete();
             }
+            
+            return false;
         }
+        
+        return true;
     }
 
     private File selectSaveCampaignFile() {

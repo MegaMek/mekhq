@@ -149,6 +149,10 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     	shots = Math.max(0, shots + s);
     }
     
+    public void setShots(int s) {
+        shots = Math.max(0, s);
+    }
+    
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);		
