@@ -49,7 +49,6 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
@@ -70,7 +69,7 @@ public class CampaignExportWizard extends JDialog {
     private JTextField txtPartCount = new JTextField();
     private JButton btnUpdatePartCount = new JButton();
     
-    private JCheckBox chkExportSettings = new JCheckBox();
+    private JCheckBox chkExportState = new JCheckBox();
     private JCheckBox chkExportContractOffers = new JCheckBox();
     private JCheckBox chkExportCompletedContracts = new JCheckBox();
     private JCheckBox chkDestructiveExport = new JCheckBox();
@@ -96,7 +95,8 @@ public class CampaignExportWizard extends JDialog {
     
     public CampaignExportWizard(Campaign c) {
         resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignExportWizard", new EncodeControl());
-        chkExportSettings.setText(resourceMap.getString("chkExportSettings.text"));
+        chkExportState.setText(resourceMap.getString("chkExportSettings.text"));
+        chkExportState.setToolTipText(resourceMap.getString("chkExportSettings.tooltip"));
         chkExportContractOffers.setText(resourceMap.getString("chkExportContractOffers.text"));
         chkExportCompletedContracts.setText(resourceMap.getString("chkExportCompletedContracts.text"));
         lblMoney.setText(resourceMap.getString("lblMoney.text"));
@@ -173,7 +173,7 @@ public class CampaignExportWizard extends JDialog {
         case MiscellaneousSelection:
             lblInstructions.setText(resourceMap.getString("lblInstructions.MiscSelection.text"));
             gbc.anchor = GridBagConstraints.WEST;
-            getContentPane().add(chkExportSettings, gbc);
+            getContentPane().add(chkExportState, gbc);
             gbc.gridy++;
             getContentPane().add(chkExportContractOffers, gbc);
             gbc.gridy++;
@@ -488,9 +488,10 @@ public class CampaignExportWizard extends JDialog {
             }
         }
         
-        if(chkExportSettings.isSelected()) {
-            destinationCampaign.setCampaignOptions(sourceCampaign.getCampaignOptions());
-            destinationCampaign.setGameOptions(sourceCampaign.getGameOptionsVector());
+        if(chkExportState.isSelected()) {
+            destinationCampaign.setFactionCode(sourceCampaign.getFactionCode());
+            destinationCampaign.setCamoCategory(sourceCampaign.getCamoCategory());
+            destinationCampaign.setCamoFileName(sourceCampaign.getCamoFileName());
             destinationCampaign.getCalendar().setTime(sourceCampaign.getDate());
             destinationCampaign.setLocation(sourceCampaign.getLocation());
         }
