@@ -2959,6 +2959,10 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     || entity.hasETypeFlag(Entity.ETYPE_TRIPOD_MECH)) {
                 //Find the unit commander
                 Person commander = getCommander();
+                // If there is no crew, there's nothing left to do here.
+                if (null == commander) {
+                    return;
+                }
                 //Combine drivers and gunners into a single list
                 List<UUID> combatCrew = new ArrayList<UUID>();
 
