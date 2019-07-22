@@ -169,6 +169,7 @@ task stageFiles(type: Copy) {
     from projectDir
     include "${conf}/**"
     include "${docs}/**"
+    include "${data}/fonts/"
     include "${data}/universe/"
     include "${data}/mapgen/"
     include "${data}/names/bloodnames/"
@@ -270,9 +271,6 @@ distributions {
             }
             from (mmJar)
             from (mmlJar)
-            from ("${mmlDir}/build/files/data/fonts") {
-                into "data/fonts"
-            }
             from ("${mmlDir}/build/files/data/images") {
                 into "data/images"
             }
@@ -305,9 +303,6 @@ distributions {
                 into 'docs'
             }
             from ("${mmDir}/megamek/build/files")
-            from ("${mmlDir}/build/files/data/fonts") {
-                into "data/fonts"
-            }
             from ("${mmlDir}/build/files/data/images") {
                 into "data/images"
             }
@@ -341,9 +336,6 @@ distributions {
             from ("${mmDir}/docs/history.txt") {
                 rename 'history.txt', 'mml-history.txt'
                 into 'docs'
-            }
-            from ("${mmlDir}/build/files/data/fonts") {
-                into "data/fonts"
             }
             from ("${mmlDir}/build/files/data/images") {
                 into "data/images"
