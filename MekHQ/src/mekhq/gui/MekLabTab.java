@@ -114,8 +114,8 @@ public class MekLabTab extends CampaignGuiTab {
     @Override
     public void initTab() {
         entityVerifier = EntityVerifier.getInstance(new File("data/mechfiles/UnitVerifierOptions.xml"));
-        UnitUtil.loadFonts();
         new CConfig();
+        UnitUtil.loadFonts();
         MekHQ.getLogger().log(getClass(), "initTab()", LogLevel.INFO, //$NON-NLS-1$
                 "Starting MegaMekLab version: " + MegaMekLab.VERSION); //$NON-NLS-1$
         btnRefit = new JButton("Begin Refit");
