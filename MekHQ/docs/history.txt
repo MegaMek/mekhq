@@ -1,5 +1,7 @@
 VERSION HISTORY:
 ----------------
+v0.46.0-SNAPSHOT
+
 v0.46.0-rc.1 (2019-07-23 0300 UTC)
 + PR #1163: Fix vast overvaluing of opfor BV in the briefing tab
 + Issue #1161: don't cast non-Infantry to Infantry during peacetime cost calculations
