@@ -528,6 +528,7 @@ public class CampaignExportWizard extends JDialog {
             }
             
             destinationCampaign.importUnit(unit);
+            destinationCampaign.getUnit(unit.getId()).setForceId(Force.FORCE_NONE);
         }
         
         // overwrite any people with the same ID.
@@ -537,6 +538,7 @@ public class CampaignExportWizard extends JDialog {
             }
             
             destinationCampaign.importPerson(person);
+
             for(Kill kill : sourceCampaign.getKillsFor(person.getId())) {
                 destinationCampaign.importKill(kill);
             }

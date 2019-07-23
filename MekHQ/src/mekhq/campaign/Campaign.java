@@ -199,7 +199,8 @@ public class Campaign implements Serializable, ITechManager {
     private TreeMap<Integer, Force> forceIds = new TreeMap<>();
     private TreeMap<Integer, Mission> missions = new TreeMap<>();
     private TreeMap<Integer, Scenario> scenarios = new TreeMap<>();
-    private List<Kill> kills = new ArrayList<>();
+    //private List<Kill> kills = new ArrayList<>();
+    private Map<UUID, ArrayList<Kill>> kills = new HashMap<>();
 
     private Map<String, Integer> duplicateNameHash = new HashMap<>();
 
@@ -3299,6 +3300,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         removeAllPatientsFor(person);
         removeAllTechJobsFor(person);
+        removeKillsFor(person.getId());
         getRetirementDefectionTracker().removePerson(person);
 
         if (log) {
@@ -3442,7 +3444,13 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void removeKill(Kill k) {
-        kills.remove(k);
+        if(kills.containsKey(k.getPilotId())) {
+            kills.get(k.getPilotId()).remove(k);
+        }
+    }
+    
+    public void removeKillsFor(UUID personID) {
+        kills.remove(personID);
     }
 
     public void removeForce(Force force) {
@@ -4035,8 +4043,10 @@ public class Campaign implements Serializable, ITechManager {
         location.writeToXml(pw1, 1);
         shoppingList.writeToXml(pw1, 1);
         pw1.println("\t<kills>");
-        for (Kill k : kills) {
-            k.writeToXml(pw1, 2);
+        for (ArrayList<Kill> kills : kills.values()) {
+            for(Kill k : kills) {
+                k.writeToXml(pw1, 2);
+            }
         }
         pw1.println("\t</kills>");
         pw1.println("\t<skillTypes>");
@@ -5965,11 +5975,16 @@ public class Campaign implements Serializable, ITechManager {
      * @param k A {@link Kill} to import into the campaign.
      */
     public void importKill(Kill k) {
-        kills.add(k);
+        if(!kills.containsKey(k.getPilotId())) {
+            kills.put(k.getPilotId(), new ArrayList<>());
+        }
+        
+        kills.get(k.getPilotId()).add(k);
     }
 
     public void addKill(Kill k) {
-        kills.add(k);
+        importKill(k);
+        
         if (getCampaignOptions().getKillsForXP() > 0
                 && getCampaignOptions().getKillXPAward() > 0) {
             if ((getKillsFor(k.getPilotId()).size() % getCampaignOptions()
@@ -5984,16 +5999,21 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public List<Kill> getKills() {
-        return Collections.unmodifiableList(kills);
+        List<Kill> flattenedKills = new ArrayList<Kill>();
+        for(ArrayList<Kill> personKills : kills.values()) {
+            flattenedKills.addAll(personKills);
+        }
+        
+        return Collections.unmodifiableList(flattenedKills);
     }
 
     public ArrayList<Kill> getKillsFor(UUID pid) {
-        ArrayList<Kill> personalKills = new ArrayList<Kill>();
-        for (Kill k : kills) {
-            if (k.getPilotId().equals(pid)) {
-                personalKills.add(k);
-            }
+        ArrayList<Kill> personalKills = kills.get(pid);
+        
+        if(personalKills == null) {
+            return new ArrayList<Kill>();
         }
+        
         Collections.sort(personalKills, new Comparator<Kill>() {
             @Override
             public int compare(final Kill u1, final Kill u2) {
