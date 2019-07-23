@@ -395,18 +395,16 @@ public class MekLocation extends Part {
 			}
         }
 
-        int time = getRepairOrSalvageTime();
-
 		if (isBreached()) {
             // StratOps p177 - 'Mech Hull Breach
             // "Once this time is spent [fixing the breach], the components
             // in the damaged location work normally. Other damage suffered
             // by that location prior to and after the breach must be
             // repaired normally."
-			return time + 60;
+			return 60;
         }
 
-		return time;
+		return getRepairOrSalvageTime();
     }
 
     /**
@@ -455,14 +453,12 @@ public class MekLocation extends Part {
 			}
         }
 
-        int difficulty = getRepairOrSalvageDifficulty();
 		if (isBreached()) {
-            // 'Mech hull breach is at least +0, but may be higher
-            // if there are also other repairs needed.
-			return Math.max(0, difficulty);
+            // 'Mech hull breach is +0
+			return 0;
 		}
 
-		return difficulty;
+		return getRepairOrSalvageDifficulty();
     }
 
     /**
