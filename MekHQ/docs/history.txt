@@ -15,6 +15,7 @@ v0.46.0-rc1
 + PR #1217: Fix error preventing scenario resolution involving KIA personnel
 + PR #1216: Track part ID moves during campaign loads that may affect refits (may fix some outstanding refit bugs)
 + Issue #1110: Badger / Bandit vehicles can't be customized prior to 3047
++ Issue #1230: Tripod mech breaking campaign save
 
 v0.45.4 (2019-03-24 1700 UTC)
 + PR #1067: Switch to Joda Money library internally for financial math
