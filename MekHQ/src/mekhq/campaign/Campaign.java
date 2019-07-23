@@ -199,7 +199,6 @@ public class Campaign implements Serializable, ITechManager {
     private TreeMap<Integer, Force> forceIds = new TreeMap<>();
     private TreeMap<Integer, Mission> missions = new TreeMap<>();
     private TreeMap<Integer, Scenario> scenarios = new TreeMap<>();
-    //private List<Kill> kills = new ArrayList<>();
     private Map<UUID, ArrayList<Kill>> kills = new HashMap<>();
 
     private Map<String, Integer> duplicateNameHash = new HashMap<>();
