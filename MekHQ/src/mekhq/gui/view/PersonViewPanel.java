@@ -1063,7 +1063,7 @@ public class PersonViewPanel extends JPanel {
     }
 
     private void fillKillRecord() {
-        ArrayList<Kill> kills = campaign.getKillsFor(person.getId());
+        List<Kill> kills = campaign.getKillsFor(person.getId());
         pnlKills.setLayout(new GridBagLayout());
 
         JLabel lblRecord = new JLabel(String.format(resourceMap.getString("format.kills"), kills.size())); //$NON-NLS-1$
