@@ -199,7 +199,7 @@ public class Campaign implements Serializable, ITechManager {
     private TreeMap<Integer, Force> forceIds = new TreeMap<>();
     private TreeMap<Integer, Mission> missions = new TreeMap<>();
     private TreeMap<Integer, Scenario> scenarios = new TreeMap<>();
-    private Map<UUID, ArrayList<Kill>> kills = new HashMap<>();
+    private Map<UUID, List<Kill>> kills = new HashMap<>();
 
     private Map<String, Integer> duplicateNameHash = new HashMap<>();
 
@@ -4042,7 +4042,7 @@ public class Campaign implements Serializable, ITechManager {
         location.writeToXml(pw1, 1);
         shoppingList.writeToXml(pw1, 1);
         pw1.println("\t<kills>");
-        for (ArrayList<Kill> kills : kills.values()) {
+        for (List<Kill> kills : kills.values()) {
             for(Kill k : kills) {
                 k.writeToXml(pw1, 2);
             }
@@ -5998,19 +5998,19 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public List<Kill> getKills() {
-        List<Kill> flattenedKills = new ArrayList<Kill>();
-        for(ArrayList<Kill> personKills : kills.values()) {
+        List<Kill> flattenedKills = new ArrayList<>();
+        for(List<Kill> personKills : kills.values()) {
             flattenedKills.addAll(personKills);
         }
         
         return Collections.unmodifiableList(flattenedKills);
     }
 
-    public ArrayList<Kill> getKillsFor(UUID pid) {
-        ArrayList<Kill> personalKills = kills.get(pid);
+    public List<Kill> getKillsFor(UUID pid) {
+        List<Kill> personalKills = kills.get(pid);
         
         if(personalKills == null) {
-            return new ArrayList<Kill>();
+            return Collections.emptyList();
         }
         
         Collections.sort(personalKills, new Comparator<Kill>() {
