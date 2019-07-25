@@ -420,12 +420,10 @@ public class MekLocation extends Part {
 			return 180;
 		} else if (percent < 0.75) {
 			return 135;
-		} else if (percent < 1.0) {
+		} else {
+            // <25% damage
             return 90;
         }
-
-        // No damage, may just have been breached.
-        return 0;
     }
 
 	@Override
@@ -474,8 +472,10 @@ public class MekLocation extends Part {
 			return 1;
 		} else if (percent < 0.75) {
 			return 0;
+        } else {
+            // <25% damage
+            return -1;
         }
-		return -1;
     }
 
 	public boolean isBreached() {
