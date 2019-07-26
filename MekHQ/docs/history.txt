@@ -26,6 +26,7 @@ v0.45.5-SNAPSHOT
 + PR #1227: Dropships can now load alternate munitions into artillery base if the game is configured for it
 + PR #1226: [Feature] Campaign Subset Export: export a subset of your current campaign into another, either new or existing, campaign file. Overwrites units and personnel with the same guid. Option to remove exported personnel from source campaign. Obviously make backups before using on an existing campaign.
 + Issue #1230: Tripod mech breaking campaign save
++ Issue #1075: Fix 'Mech location repair and salvage times to match StratOps
 
 v0.45.4 (2019-03-24 1700 UTC)
 + PR #1067: Switch to Joda Money library internally for financial math
