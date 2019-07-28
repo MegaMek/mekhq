@@ -32,6 +32,9 @@ import mekhq.MekHqXmlUtil;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.Entity;
+import megamek.common.UnitType;
+
 /**
  * This object tracks a specific skill prerequisite for a special ability. This object can list more 
  * than one skill and we will track these skills in a hashmap where the value gives the minimum skill
@@ -80,6 +83,55 @@ public class SkillPrereq implements MekHqXmlSerializable {
             }
         }
         return false;
+    }
+    
+    /**
+     * Determines if the given unit type "qualifies" for this skill pre-requisite.
+     * For now, we simply check whether the pre-requisite skills are required for the unit type
+     * @param e
+     * @return
+     */
+    public boolean qualifies(int unitType) {
+        switch(unitType) {
+        case UnitType.AERO:
+            return skillset.containsKey(SkillType.S_PILOT_AERO) ||
+                    skillset.containsKey(SkillType.S_GUN_AERO);
+        case UnitType.BATTLE_ARMOR:
+            return skillset.containsKey(SkillType.S_GUN_BA) ||
+                    skillset.containsKey(SkillType.S_ANTI_MECH);
+        case UnitType.CONV_FIGHTER:
+            return skillset.containsKey(SkillType.S_GUN_JET) ||
+                    skillset.containsKey(SkillType.S_PILOT_JET);
+        case UnitType.DROPSHIP:
+        case UnitType.JUMPSHIP:
+        case UnitType.WARSHIP:
+        case UnitType.SPACE_STATION:
+        case UnitType.SMALL_CRAFT:
+            return skillset.containsKey(SkillType.S_PILOT_SPACE) ||
+                    skillset.containsKey(SkillType.S_GUN_SPACE) ||
+                    skillset.containsKey(SkillType.S_TECH_VESSEL) ||
+                    skillset.containsKey(SkillType.S_NAV);
+        case UnitType.GUN_EMPLACEMENT:
+        case UnitType.TANK:
+            return skillset.containsKey(SkillType.S_PILOT_GVEE) ||
+                    skillset.containsKey(SkillType.S_GUN_VEE);
+        case UnitType.INFANTRY:
+            return skillset.containsKey(SkillType.S_SMALL_ARMS) ||
+                    skillset.containsKey(SkillType.S_ANTI_MECH);
+        case UnitType.NAVAL:
+            return skillset.containsKey(SkillType.S_PILOT_NVEE) ||
+                    skillset.containsKey(SkillType.S_GUN_VEE);
+        case UnitType.PROTOMEK:
+            return skillset.containsKey(SkillType.S_GUN_PROTO);
+        case UnitType.VTOL:
+            return skillset.containsKey(SkillType.S_PILOT_VTOL) ||
+                    skillset.containsKey(SkillType.S_GUN_VEE);
+        case UnitType.MEK:
+            return skillset.containsKey(SkillType.S_PILOT_MECH) ||
+                    skillset.containsKey(SkillType.S_GUN_MECH);
+        default:
+            return false;
+        }
     }
     
     public int getSkillLevel(String skillName) {

@@ -160,6 +160,7 @@ public class AtBDynamicScenarioFactory {
         
         setDeploymentTurns(scenario, campaign);
         translatePlayerNPCsToAttached(scenario, campaign);
+        upgradeBotCrews(scenario);
     }
     
     /**
@@ -1893,5 +1894,24 @@ public class AtBDynamicScenarioFactory {
         } 
         
         return ForceAlignment.Third;
+    }
+    
+    /**
+     * Runs all the bot-controlled entities in the scenario through a skill upgrader,
+     * potentially giving the SPAs.
+     * @param scenario The scenario to process.
+     */
+    public static void upgradeBotCrews(AtBScenario scenario) {
+        CrewSkillUpgrader csu = new CrewSkillUpgrader();
+        
+        for(int forceIndex = 0; forceIndex < scenario.getNumBots(); forceIndex++) {
+            for(Entity entity : scenario.getBotForce(forceIndex).getEntityList()) {
+                csu.upgradeCrew(entity);
+            }
+        }
+        
+        for(Entity entity : scenario.getAlliesPlayer()) {
+            csu.upgradeCrew(entity);
+        }
     }
 }

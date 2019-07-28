@@ -2033,7 +2033,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             if (specialistMenu.getMenuComponentCount() > 0) {
                                 abMenu.add(specialistMenu);
                             }
-                        } else if (spa.getName().equals("specialist")
+                        } else if (spa.getName().equals(OptionsConstants.GUNNERY_SPECIALIST)
                                 && !person.getOptions().booleanOption(OptionsConstants.GUNNERY_SPECIALIST)) { //$NON-NLS-1$
                             JMenu specialistMenu = new JMenu(resourceMap.getString("specialist.text")); //$NON-NLS-1$
                             menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("laserSpecialist.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
