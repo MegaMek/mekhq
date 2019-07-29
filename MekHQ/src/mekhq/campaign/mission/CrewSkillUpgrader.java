@@ -36,6 +36,11 @@ import mekhq.campaign.personnel.SpecialAbility;
  */
 public class CrewSkillUpgrader {
     private Map<Integer, List<SpecialAbility>> specialAbilitiesByUnitType;
+    private double maxAbilityXPCost = 0;
+    private double twoThirdsXPCost = 0;
+    private double oneThirdXPCost = 0;
+    private double minAbilityCost = Double.MAX_VALUE;
+    
     
     /**
      * Constructor. Initializes updated SPA list, broken down by unit type.
@@ -44,6 +49,14 @@ public class CrewSkillUpgrader {
         specialAbilitiesByUnitType = new HashMap<>();
         
         for(SpecialAbility spa : SpecialAbility.getWeightedSpecialAbilities()) {
+            if(spa.getCost() > maxAbilityXPCost) {
+                maxAbilityXPCost = spa.getCost();
+            }
+            
+            if(spa.getCost() < minAbilityCost) {
+                minAbilityCost = spa.getCost();
+            }
+            
             for(int unitType = 0; unitType < UnitType.SIZE; unitType++) {
                 specialAbilitiesByUnitType.putIfAbsent(unitType, new ArrayList<>());
                 if(spa.isEligible(unitType)) {
@@ -52,6 +65,8 @@ public class CrewSkillUpgrader {
             }
         }
         
+        twoThirdsXPCost = maxAbilityXPCost / 3.0 * 2.0;
+        oneThirdXPCost = maxAbilityXPCost / 3.0;
     }
     
     /**
@@ -69,33 +84,40 @@ public class CrewSkillUpgrader {
         }
         
         double skillAvg = (entity.getCrew().getGunnery() + entity.getCrew().getPiloting()) / 2;
-        int weightCap = 0;
+        double xpCap = 0;
         int spaCap = 0;
         
         // elite
         if(skillAvg < 3) {
-            weightCap = 6;
+            xpCap = maxAbilityXPCost;
             spaCap = 3;
         // veteran
         } else if(skillAvg < 4) {
-            weightCap = 4;
+            xpCap = twoThirdsXPCost;
             spaCap = 2;
         // regular
         } else if(skillAvg < 5) {
-            weightCap = 2;
+            xpCap = oneThirdXPCost;
             spaCap = 1;
         }
         
-        for(int x = 0; x < spaCap; x++) {
-            addSingleSPA(entity, weightCap);
+        // algorithm: 
+        // we want a maximum # of SPAs, capped, in total at a max XP cost
+        // every time we generate an SPA, we reduce the max available XP
+        // this logic also prevents attempting to assign an SPA when there are no SPAs
+        // that cost less XP than rthe remaining cap
+        for(int x = 0; (x < spaCap) && (xpCap > minAbilityCost); x++) {
+            int spaCost = addSingleSPA(entity, xpCap);
+            xpCap -= spaCost;
         }
     }
     
     /**
      * Upgrade an entity with a single SPA
      * @param entity
+     * @return the xp cost of the added SPA
      */
-    public void addSingleSPA(Entity entity, int weightLimit) {
+    public int addSingleSPA(Entity entity, double xpCap) {
         int unitType = entity.getUnitType();
         
         int spaIndex = Compute.randomInt(specialAbilitiesByUnitType.get(unitType).size());
@@ -107,7 +129,7 @@ public class CrewSkillUpgrader {
         // then try to generate another one
         while(!extraEligibilityCheck(spa, entity) ||
                 entity.hasAbility(spa.getName()) ||
-                spa.getWeight() > weightLimit) {
+                spa.getCost() > xpCap) {
             spaIndex = Compute.randomInt(specialAbilitiesByUnitType.get(unitType).size());
             spa = specialAbilitiesByUnitType.get(unitType).get(spaIndex);
         }
@@ -129,10 +151,11 @@ public class CrewSkillUpgrader {
             break;
         default:
             entity.getCrew().getOptions().getOption(spa.getName()).setValue(true);
-            return;
+            return spa.getCost();
         }
         
         entity.getCrew().getOptions().getOption(spa.getName()).setValue(spaValue);
+        return spa.getCost();
     }
     
     /**
