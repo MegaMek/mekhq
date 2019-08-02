@@ -81,6 +81,7 @@ import megamek.common.options.GameOptions;
 import megamek.common.options.IBasicOption;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
+import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.BuildingBlock;
 import megamek.common.util.DirectoryItems;
@@ -4723,22 +4724,16 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public String rollSPA(int type, Person person) {
-        ArrayList<SpecialAbility> abilityList = person.getEligibleSPAs(true);
+        List<SpecialAbility> abilityList = person.getEligibleSPAs(true);
         if (abilityList.isEmpty()) {
             return null;
         }
 
         // create a weighted list based on XP
-        ArrayList<String> weightedList = new ArrayList<String>();
-        for (SpecialAbility spa : abilityList) {
-            int weight = spa.getWeight();
-            while (weight > 0) {
-                weightedList.add(spa.getName());
-                weight--;
-            }
-        }
-        String name = Utilities.getRandomItem(weightedList);
-        if (name.equals("specialist")) {
+        List<SpecialAbility> weightedList = SpecialAbility.getWeightedSpecialAbilities(abilityList);
+        
+        String name = Utilities.getRandomItem(weightedList).getName();
+        if (name.equals(OptionsConstants.GUNNERY_SPECIALIST)) {
             String special = Crew.SPECIAL_NONE;
             switch (Compute.randomInt(2)) {
                 case 0:
@@ -4752,7 +4747,7 @@ public class Campaign implements Serializable, ITechManager {
                     break;
             }
             person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name, special);
-        } else if (name.equals("range_master")) {
+        } else if (name.equals(OptionsConstants.GUNNERY_RANGE_MASTER)) {
             String special = Crew.RANGEMASTER_NONE;
             switch (Compute.randomInt(2)) {
                 case 0:
@@ -4767,7 +4762,7 @@ public class Campaign implements Serializable, ITechManager {
             }
             person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
                     special);
-        } else if (name.equals("human_tro")) {
+        } else if (name.equals(OptionsConstants.MISC_HUMAN_TRO)) {
             String special = Crew.HUMANTRO_NONE;
             switch (Compute.randomInt(3)) {
                 case 0:
@@ -4785,7 +4780,7 @@ public class Campaign implements Serializable, ITechManager {
             }
             person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
                     special);
-        } else if (name.equals("weapon_specialist")) {
+        } else if (name.equals(OptionsConstants.GUNNERY_WEAPON_SPECIALIST)) {
             person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
                     SpecialAbility.chooseWeaponSpecialization(type, getFaction().isClan(),
                             getCampaignOptions().getTechLevel(), getCalendar().get(GregorianCalendar.YEAR)));

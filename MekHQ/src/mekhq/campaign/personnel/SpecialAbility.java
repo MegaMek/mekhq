@@ -24,9 +24,11 @@ package mekhq.campaign.personnel;
 import java.io.FileInputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -37,6 +39,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
 import megamek.common.WeaponType;
@@ -156,6 +159,16 @@ public class SpecialAbility implements MekHqXmlSerializable {
                 && (p.isClanner() != Boolean.parseBoolean(prereqMisc.get(PREREQ_MISC_CLANNER)))) {
             return false;
         }
+        return true;
+    }
+    
+    public boolean isEligible(int unitType) {
+        for(SkillPrereq sp : prereqSkills) {
+            if(!sp.qualifies(unitType)) {
+                return false;
+            }
+        }
+        
         return true;
     }
 
@@ -685,6 +698,24 @@ public class SpecialAbility implements MekHqXmlSerializable {
 
     public static void setSpecialAbilities(Hashtable<String, SpecialAbility> spHash) {
     	specialAbilities = spHash;
+    }
+    
+    public static List<SpecialAbility> getWeightedSpecialAbilities() {
+        return getWeightedSpecialAbilities(getAllSpecialAbilities().values());
+    }
+    
+    public static List<SpecialAbility> getWeightedSpecialAbilities(Collection<SpecialAbility> source) {
+        List<SpecialAbility> retVal = new ArrayList<>();
+        
+        for (SpecialAbility spa : source) {
+            int weight = spa.getWeight();
+            while (weight > 0) {
+                retVal.add(spa);
+                weight--;
+            }
+        }
+        
+        return retVal;
     }
 
     //TODO: also put some static methods here that return the available options for a given SPA, so
