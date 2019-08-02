@@ -320,7 +320,7 @@ public class AtBDynamicScenarioFactory {
             // meks, asf and tanks support weight class specification, as does the "standard atb mix"
             } else if(IUnitGenerator.unitTypeSupportsWeightClass(actualUnitType) ||
                     (actualUnitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX)) { 
-                List<Integer> unitTypes = generateUnitTypes(actualUnitType, lanceSize, campaign);
+                List<Integer> unitTypes = generateUnitTypes(actualUnitType, lanceSize, factionCode, campaign);
                 
                 // special case: if we're generating artillery, there's not a lot of variety
                 // in artillery unit weight classes, so we ignore that specification
@@ -336,7 +336,7 @@ public class AtBDynamicScenarioFactory {
                 }
             // everything else doesn't support weight class specification
             } else {
-                List<Integer> unitTypes = generateUnitTypes(actualUnitType, lanceSize, campaign);
+                List<Integer> unitTypes = generateUnitTypes(actualUnitType, lanceSize, factionCode, campaign);
                 generatedLance = generateLance(factionCode, skill, quality, unitTypes, forceTemplate.getUseArtillery(), campaign);
             }
             
@@ -1092,13 +1092,19 @@ public class AtBDynamicScenarioFactory {
      * @param campaign Current campaign
      * @return Array list of unit type integers.
      */
-    private static List<Integer> generateUnitTypes(int unitTypeCode, int unitCount, Campaign campaign) {
+    private static List<Integer> generateUnitTypes(int unitTypeCode, int unitCount, String factionCode, Campaign campaign) {
         List<Integer> unitTypes = new ArrayList<>(unitCount);
         int actualUnitType = unitTypeCode; 
         
         if(unitTypeCode == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX) {
+            Faction faction = Faction.getFaction(factionCode);
+            // "AtB Mix" will skip vehicles if the "use vehicles" checkbox is turned off
+            // or if the faction is clan and "clan opfors use vehicles" is turned off
+            boolean useVehicles = campaign.getCampaignOptions().getUseVehicles() &&
+                    (!faction.isClan() || (faction.isClan() && campaign.getCampaignOptions().getClanVehicles()));
+            
             // logic mostly lifted from AtBScenario.java, uses campaign config to determine tank/mech mixture
-            if (campaign.getCampaignOptions().getUseVehicles()) {
+            if (useVehicles) {
                 int totalWeight = campaign.getCampaignOptions().getOpforLanceTypeMechs() +
                         campaign.getCampaignOptions().getOpforLanceTypeMixed() +
                         campaign.getCampaignOptions().getOpforLanceTypeVehicles();
@@ -1125,6 +1131,9 @@ public class AtBDynamicScenarioFactory {
                         actualUnitType = UnitType.MEK;
                     }
                 }
+            // if we're not using vehicles, just generate meks
+            } else {
+                actualUnitType = UnitType.MEK;
             }
         }
         
