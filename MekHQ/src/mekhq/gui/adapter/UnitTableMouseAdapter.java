@@ -50,6 +50,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.StripUnitAction;
 import mekhq.campaign.unit.actions.ActivateUnitAction;
+import mekhq.campaign.unit.actions.CancelMothballUnitAction;
 import mekhq.campaign.unit.actions.IUnitAction;
 import mekhq.campaign.unit.actions.MothballUnitAction;
 import mekhq.gui.CampaignGUI;
@@ -74,6 +75,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
 
     public final static String COMMAND_MOTHBALL = "MOTHBALL";
     public final static String COMMAND_ACTIVATE = "ACTIVATE";
+    public final static String COMMAND_CANCEL_MOTHBALL = "CANCEL_MOTHBALL";
     public final static String COMMAND_GM_MOTHBALL = "GM_MOTHBALL";
     public final static String COMMAND_GM_ACTIVATE = "GM_ACTIVATE";
 
@@ -445,9 +447,10 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 activateUnitAction.Execute(gui.getCampaign(), selectedUnit);
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
-        } else if (command.equalsIgnoreCase("CANCEL_MOTHBALL")) {
+        } else if (command.equalsIgnoreCase(COMMAND_CANCEL_MOTHBALL)) {
             if (null != selectedUnit) {
-                selectedUnit.setMothballTime(0);
+                CancelMothballUnitAction cancelAction = new CancelMothballUnitAction();
+                cancelAction.Execute(gui.getCampaign(), selectedUnit);
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
         } else if (command.equalsIgnoreCase("BOMBS")) {
@@ -733,7 +736,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 if (unit.isMothballing()) {
                     menuItem = new JMenuItem(
                             "Cancel Mothballing/Activation");
-                    menuItem.setActionCommand("CANCEL_MOTHBALL");
+                    menuItem.setActionCommand(COMMAND_CANCEL_MOTHBALL);
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(true);
                     popup.add(menuItem);
@@ -741,8 +744,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                     menuItem = new JMenuItem("Activate Unit");
                     menuItem.setActionCommand(COMMAND_ACTIVATE);
                     menuItem.addActionListener(this);
-                    menuItem.setEnabled(!unit.isSelfCrewed()
-                            || null != unit.getEngineer());
+                    menuItem.setEnabled(true);
                     popup.add(menuItem);
                 } else {
                     menuItem = new JMenuItem("Mothball Unit");
