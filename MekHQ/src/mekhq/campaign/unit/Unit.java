@@ -4071,12 +4071,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         } else {
             //start maintenance cycle over again
             resetDaysSinceMaintenance();
-
-            // if we previously mothballed this unit, attempt to restore its pre-mothball state
-            if(mothballInfo != null) {
-                mothballInfo.restorePreMothballInfo(this, getCampaign());
-                mothballInfo = null;
-            }
         }
     }
 
@@ -4144,6 +4138,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             return;
         }
 
+        // if we previously mothballed this unit, attempt to restore its pre-mothball state
+        if(mothballInfo != null) {
+            mothballInfo.restorePreMothballInfo(this, getCampaign());
+            mothballInfo = null;
+        }
+
         //set this person as tech
         if(!isSelfCrewed() && null != tech && !tech.equals(id)) {
             if(null != getTech()) {
@@ -4176,6 +4176,25 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         } else {
             return TECH_WORK_DAY * 2;
         }
+    }
+
+    /**
+     * Cancels a pending mothball or activation work order.
+     */
+    public void cancelMothballOrActivation() {
+        if (!isMothballing()) {
+            return;
+        }
+
+        setMothballTime(0);
+
+        // ...if we were activating, save our crew
+        if (isMothballed()) {
+            mothballInfo = new MothballInfo(this);
+        }
+
+        // reset our mothball status
+        setMothballed(isMothballed());
     }
 
     public ArrayList<Person> getActiveCrew() {
