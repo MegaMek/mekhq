@@ -2352,45 +2352,127 @@ public class Campaign implements Serializable, ITechManager {
         return found;
     }
 
+    /**
+     * Performs work to either mothball or activate a unit.
+     * @param u The unit to either work towards mothballing or activation.
+     */
+    public void workOnMothballingOrActivation(Unit u) {
+        if (u.isMothballed()) {
+            activate(u);
+        } else {
+            mothball(u);
+        }
+    }
+
+    /**
+     * Performs work to mothball a unit.
+     * @param u The unit on which to perform mothball work.
+     */
     public void mothball(Unit u) {
+        if (u.isMothballed()) {
+            MekHQ.getLogger().warning(Campaign.class, "mothball(Unit)", "Unit is already mothballed, cannot mothball.");
+            return;
+        }
+
         Person tech = u.getTech();
         if (null == tech) {
             //uh-oh
-            //TODO: report someting
             addReport("No tech assigned to the mothballing of " + u.getHyperlinkedName());
             return;
         }
+
         //don't allow overtime minutes for mothballing because its cheating
         //since you don't roll
         int minutes = Math.min(tech.getMinutesLeft(), u.getMothballTime());
+
         //check astech time
         if (!u.isSelfCrewed() && astechPoolMinutes < minutes * 6) {
             //uh-oh
             addReport("Not enough astechs to work on mothballing of " + u.getHyperlinkedName());
             return;
         }
+
         u.setMothballTime(u.getMothballTime() - minutes);
-        String action = " mothballing ";
-        if (u.isMothballed()) {
-            action = " activating ";
-        }
-        String report = tech.getHyperlinkedFullTitle() + " spent " + minutes + " minutes" + action + u.getHyperlinkedName();
+
+        String report = tech.getHyperlinkedFullTitle() + " spent " + minutes + " minutes mothballing " + u.getHyperlinkedName();
         if (!u.isMothballing()) {
-            if (u.isMothballed()) {
-                u.setMothballed(false);
-                report += ". Activation complete.";
-            } else {
-                u.setMothballed(true);
-                report += ". Mothballing complete.";
-            }
+            completeMothball(u);
+            report += ". Mothballing complete.";
         } else {
             report += ". " + u.getMothballTime() + " minutes remaining.";
         }
+
+        tech.setMinutesLeft(tech.getMinutesLeft() - minutes);
+
+        if (!u.isSelfCrewed()) {
+            astechPoolMinutes -= 6 * minutes;
+        }
+
+        addReport(report);
+    }
+
+    /**
+     * Completes the mothballing of a unit.
+     * @param u The unit which should now be mothballed.
+     */
+    public void completeMothball(Unit u) {
+        u.setMothballTime(0);
+        u.setMothballed(true);
+    }
+
+    /**
+     * Performs work to activate a unit.
+     * @param u The unit on which to perform activation work.
+     */
+    public void activate(Unit u) {
+        if (!u.isMothballed()) {
+            MekHQ.getLogger().warning(Campaign.class, "activate(Unit)", "Unit is already activated, cannot activate.");
+            return;
+        }
+
+        Person tech = u.getTech();
+        if (null == tech) {
+            //uh-oh
+            addReport("No tech assigned to the activation of " + u.getHyperlinkedName());
+            return;
+        }
+
+        //don't allow overtime minutes for activation because its cheating
+        //since you don't roll
+        int minutes = Math.min(tech.getMinutesLeft(), u.getMothballTime());
+
+        //check astech time
+        if (!u.isSelfCrewed() && astechPoolMinutes < minutes * 6) {
+            //uh-oh
+            addReport("Not enough astechs to work on activation of " + u.getHyperlinkedName());
+            return;
+        }
+
+        u.setMothballTime(u.getMothballTime() - minutes);
+
+        String report = tech.getHyperlinkedFullTitle() + " spent " + minutes + " minutes activating " + u.getHyperlinkedName();
+        if (!u.isMothballing()) {
+            completeActivation(u);
+            report += ". Activation complete.";
+        } else {
+            report += ". " + u.getMothballTime() + " minutes remaining.";
+        }
+
         tech.setMinutesLeft(tech.getMinutesLeft() - minutes);
         if (!u.isSelfCrewed()) {
             astechPoolMinutes -= 6 * minutes;
         }
+
         addReport(report);
+    }
+
+    /**
+     * Completes the activation of a unit.
+     * @param u The unit which should now be activated.
+     */
+    public void completeActivation(Unit u) {
+        u.setMothballTime(0);
+        u.setMothballed(false);
     }
 
     public void refit(Refit r) {
@@ -2514,9 +2596,6 @@ public class Campaign implements Serializable, ITechManager {
                 return;
             }
         }
-        report += tech.getHyperlinkedFullTitle() + " attempts to" + action
-                + partWork.getPartName();
-
         if (null != partWork.getUnit()) {
             report += " on " + partWork.getUnit().getName();
         }
@@ -3094,7 +3173,7 @@ public class Campaign implements Serializable, ITechManager {
                 refit(u.getRefit());
             }
             if (u.isMothballing()) {
-                mothball(u);
+                workOnMothballingOrActivation(u);
             }
             if (!u.isPresent()) {
                 u.checkArrival();
