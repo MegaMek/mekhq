@@ -48,7 +48,7 @@ public class MothballUnitAction implements IUnitAction {
     }
 
     @Override
-	public void Execute(Campaign campaign, Unit unit) {
+    public void Execute(Campaign campaign, Unit unit) {
         if (isGM) {
             unit.startMothballing(null, true);
         }
@@ -59,5 +59,5 @@ public class MothballUnitAction implements IUnitAction {
 
             unit.startMothballing(techId);
         }
-	}
+    }
 }
