@@ -2067,7 +2067,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 driveCoil = part;
             //For Small Craft and larger, add this as a container for all their heatsinks instead of adding hundreds
             //of individual heatsink parts.
-            } else if(part instanceof SpacecraftCoolingSystem 
+            } else if(part instanceof SpacecraftCoolingSystem
                     && (entity instanceof SmallCraft || entity instanceof Jumpship)) {
                 coolingSystem = part;
             } else if(part instanceof AeroSensor || part instanceof MissingAeroSensor) {
@@ -2366,7 +2366,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 partsToAdd.add(engine);
             }
         }
-        
+
         // Transport Bays
         for (Bay bay : entity.getTransportBays()) {
             bayPartsToAdd.put(bay.getBayNumber(), new ArrayList<>());
@@ -2583,7 +2583,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 addPart(heliumTank);
                 partsToAdd.add(heliumTank);
             }
-            if(null == lfBattery 
+            if(null == lfBattery
                     && (entity instanceof Jumpship) && !(entity instanceof SpaceStation) && ((Jumpship) entity).hasLF()) {
                 lfBattery = new LFBattery((int)entity.getWeight(), ((Jumpship)entity).getDriveCoreType(), entity.getDocks(), getCampaign());
                 addPart(lfBattery);
@@ -4014,22 +4014,48 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return null;
     }
 
+    /**
+     * Gets a value indicating whether or not the unit is being mothballed
+     * or activated.
+     * @return True if the unit is undergoing mothballing or activation,
+     *         otherwise false.
+     */
     public boolean isMothballing() {
         return mothballTime > 0;
     }
 
+    /**
+     * Gets the time (in minutes) remaining to mothball or activate the unit.
+     * @return The time (in minutes) remaining to mothboll or activate the unit.
+     */
     public int getMothballTime() {
         return mothballTime;
     }
 
+    /**
+     * Sets the time (in minutes) remaining to mothball or activate the unit.
+     * @param t The time (in minutes) remaining to mothboll or activate the unit.
+     */
     public void setMothballTime(int t) {
-        mothballTime = t;
+        mothballTime = Math.max(t, 0);
     }
 
+    /**
+     * Gets a value indicating whether or not this unit is mothballed.
+     * @return True if the unit is mothballed, otherwise false.
+     */
     public boolean isMothballed() {
         return mothballed;
     }
 
+    /**
+     * Sets a value indicating whether or not this unit is mothballed.
+     *
+     * If the unit is being mothballed, all of its personnel will be removed.
+     * If the unit is being activated, all of its personnel will be restored (if applicable)
+     * and its maintenance cycle will be reset.
+     * @param b True if the unit is now mothballed, or false if the unit is now activated.
+     */
     public void setMothballed(boolean b) {
         this.mothballed = b;
         // Tech gets removed either way bug [#488]
@@ -4045,16 +4071,24 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         } else {
             //start maintenance cycle over again
             resetDaysSinceMaintenance();
-
-            // if we previously mothballed this unit, attempt to restore its pre-mothball state
-            if(mothballInfo != null) {
-                mothballInfo.restorePreMothballInfo(this, getCampaign());
-                mothballInfo = null;
-            }
         }
     }
 
+    /**
+     * Begins mothballing a unit.
+     * @param id The ID of the tech performing the mothball.
+     */
     public void startMothballing(UUID id) {
+        startMothballing(id, false);
+    }
+
+    /**
+     * Begins mothballing a unit, optionally as a GM action.
+     * @param id The ID of the tech performing the mothball.
+     * @param isGM A value indicating if the mothball action should
+     *             be performed immediately by the GM.
+     */
+    public void startMothballing(UUID id, boolean isGM) {
         if(!isMothballed()) {
             mothballInfo = new MothballInfo(this);
         }
@@ -4066,26 +4100,101 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
         }
         tech = id;
+
         //dont remove personnel yet, because self crewed units need their crews to mothball
         getCampaign().removeUnitFromForce(this);
+
         //clear any assigned tasks
         for(Part p : getParts()) {
             p.cancelAssignment();
         }
-        //set mothballing time
-        if(getEntity() instanceof Infantry) {
-            mothballTime = TECH_WORK_DAY;
-        }
-        else if(getEntity() instanceof Dropship || getEntity() instanceof Jumpship) {
-            mothballTime = TECH_WORK_DAY * (int)Math.ceil(getEntity().getWeight()/500.0);
+
+        if (!isGM) {
+            setMothballTime(getMothballOrActivationTime());
+            getCampaign().mothball(this);
         } else {
-            if(isMothballed()) {
-                mothballTime = TECH_WORK_DAY;
-            } else {
-                mothballTime = TECH_WORK_DAY * 2;
+            getCampaign().completeMothball(this);
+            getCampaign().addReport(getHyperlinkedName() + " has been mothballed (GM)");
+        }
+    }
+
+    /**
+     * Begins activating a unit which has been mothballed.
+     * @param id The ID of the tech performing the activation.
+     */
+    public void startActivating(UUID id) {
+        startActivating(id, false);
+    }
+
+    /**
+     * Begins activating a unit which has been mothballed,
+     * optionally as a GM action.
+     * @param id The ID of the tech performing the activation.
+     * @param isGM A value indicating if the activation action should
+     *             be performed immediately by the GM.
+     */
+    public void startActivating(UUID id, boolean isGM) {
+        if (!isMothballed()) {
+            return;
+        }
+
+        // if we previously mothballed this unit, attempt to restore its pre-mothball state
+        if(mothballInfo != null) {
+            mothballInfo.restorePreMothballInfo(this, getCampaign());
+            mothballInfo = null;
+        }
+
+        //set this person as tech
+        if(!isSelfCrewed() && null != tech && !tech.equals(id)) {
+            if(null != getTech()) {
+                remove(getTech(), true);
             }
         }
-        getCampaign().mothball(this);
+        tech = id;
+
+        if (!isGM) {
+            setMothballTime(getMothballOrActivationTime());
+            getCampaign().activate(this);
+        } else {
+            getCampaign().completeActivation(this);
+            getCampaign().addReport(getHyperlinkedName() + " has been activated (GM)");
+        }
+    }
+
+    /**
+     * Gets the time required to mothball or activate this unit.
+     * @return The time in minutes required to mothball or activate this unit.
+     */
+    private int getMothballOrActivationTime() {
+        //set mothballing time
+        if(getEntity() instanceof Infantry) {
+            return TECH_WORK_DAY;
+        } else if(getEntity() instanceof Dropship || getEntity() instanceof Jumpship) {
+            return TECH_WORK_DAY * (int)Math.ceil(getEntity().getWeight()/500.0);
+        } else if(isMothballed()) {
+            return TECH_WORK_DAY;
+        } else {
+            return TECH_WORK_DAY * 2;
+        }
+    }
+
+    /**
+     * Cancels a pending mothball or activation work order.
+     */
+    public void cancelMothballOrActivation() {
+        if (!isMothballing()) {
+            return;
+        }
+
+        setMothballTime(0);
+
+        // ...if we were activating, save our crew
+        if (isMothballed()) {
+            mothballInfo = new MothballInfo(this);
+        }
+
+        // reset our mothball status
+        setMothballed(isMothballed());
     }
 
     public ArrayList<Person> getActiveCrew() {
