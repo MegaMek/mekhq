@@ -1,6 +1,10 @@
 VERSION HISTORY:
 ----------------
 v0.46.0-SNAPSHOT
++ Issue #1075: Fix 'Mech location repair and salvage times to match StratOps
++ Issue #1224: Scenario templates no longer fail to generate forces when the 'use vehicles' AtB setting is turned off
++ Issue #1238: Fix bug where self crewed units could not be activated after being mothballed
++ PR #1239: Add GM Mothball/Activate to unit menu in hangar
 
 v0.46.0-rc.1 (2019-07-23 0300 UTC)
 + PR #1163: Fix vast overvaluing of opfor BV in the briefing tab
