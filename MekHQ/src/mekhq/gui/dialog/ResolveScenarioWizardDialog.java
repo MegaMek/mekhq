@@ -407,7 +407,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             miaBtns.add(miaCheck);
             kiaCheck = new JCheckBox("");
             kiaBtns.add(kiaCheck);
-            
+
             hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 5, Math.min(status.getHits(),5));
             hitSlider.setMajorTickSpacing(1);
             hitSlider.setPaintTicks(true);
@@ -440,7 +440,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.weightx = 1.0;
             pnlPilotStatus.add(kiaCheck, gridBagConstraints);
             i++;
-            
+
             kiaCheck.addItemListener(new CheckBoxKIAListener(hitSlider, miaCheck, null));
         }
         pnlMain.add(pnlPilotStatus, PILOTPANEL);
@@ -522,9 +522,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.weightx = 1.0;
             pnlPrisonerStatus.add(btnViewPrisoner, gridBagConstraints);
             i++;
-            
+
             kiaCheck.addItemListener(new CheckBoxKIAListener(hitSlider, prisonerCheck, btnViewPrisoner));
-            
+
             // if the person is dead, set the checkbox and skip all this captured stuff
             if(status.getHits() > 5 || status.isDead()) {
                 kiaCheck.setSelected(true);
@@ -1345,20 +1345,14 @@ public class ResolveScenarioWizardDialog extends JDialog {
             }
         }
 
-        currentSalvagePct = 0;
-        if (salvageUnit.plus(salvageEmployer).isPositive()) {
-            currentSalvagePct = salvageUnit
-                    .multipliedBy(100)
-                    .dividedBy(salvageUnit.plus(salvageEmployer))
-                    .getAmount().intValue();
-        }
-
-        for(JCheckBox box : salvageBoxes) {
-            if(!box.isSelected() && currentSalvagePct >= maxSalvagePct) {
-                box.setEnabled(false);
-            } else {
-                box.setEnabled(true);
-            }
+        currentSalvagePct = salvagePct(salvageUnit, salvageEmployer);
+        assert(salvageables.size() == salvageBoxes.size());
+        assert(salvageables.size() == escapeBoxes.size());
+        for (int i = 0; i < salvageables.size(); i++) {
+            final Money current = salvageables.get(i).getSellValue();
+            salvageBoxes.get(i).setEnabled(!escapeBoxes.get(i).isSelected()
+                    && salvagePct(salvageUnit.plus(current),
+                    salvageEmployer.minus(current)) < maxSalvagePct);
         }
         lblSalvageValueUnit2.setText(salvageUnit.toAmountAndSymbolString());
         lblSalvageValueEmployer2.setText(salvageEmployer.toAmountAndSymbolString());
@@ -1368,6 +1362,15 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
         lblSalvagePct2.setText(lead + currentSalvagePct + "%</font> <font color='black'>(max " + maxSalvagePct + "%)</font></html>");
 
+    }
+
+    private int salvagePct(Money salvageUnit, Money salvageFaction) {
+        if (salvageUnit.plus(salvageFaction).isPositive()) {
+            return salvageUnit.multipliedBy(100)
+                    .dividedBy(salvageUnit.plus(salvageEmployer))
+                    .getAmount().intValue();
+        }
+        return 0;
     }
 
     private void updatePreviewPanel() {
@@ -1561,26 +1564,26 @@ public class ResolveScenarioWizardDialog extends JDialog {
         private JSlider slider;
         private JCheckBox checkbox;
         private JButton button;
-        
+
         public CheckBoxKIAListener(JSlider slider, JCheckBox checkBox, JButton button) {
             this.slider = slider;
             this.checkbox = checkBox;
             this.button = button;
         }
-        
+
         @Override
         public void itemStateChanged(ItemEvent e) {
             JCheckBox kiaChk = (JCheckBox)e.getSource();
             boolean enable = !kiaChk.isSelected();
-            
+
             if(slider != null) {
                 slider.setEnabled(enable);
             }
-            
+
             if(checkbox != null) {
                 checkbox.setEnabled(enable);
             }
-            
+
             if(button != null) {
                 button.setEnabled(enable);
             }
