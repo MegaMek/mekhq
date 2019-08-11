@@ -820,7 +820,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         }
         
         // aaand for fun, run everyone through the crew upgrader
-        AtBDynamicScenarioFactory.upgradeBotCrews(this);
+        if(campaign.getCampaignOptions().useAbilities()) {
+        	AtBDynamicScenarioFactory.upgradeBotCrews(this);
+        }
     }
 
     @Override

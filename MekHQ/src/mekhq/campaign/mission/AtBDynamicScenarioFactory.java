@@ -160,7 +160,10 @@ public class AtBDynamicScenarioFactory {
         
         setDeploymentTurns(scenario, campaign);
         translatePlayerNPCsToAttached(scenario, campaign);
-        upgradeBotCrews(scenario);
+        
+        if(campaign.getCampaignOptions().useAbilities()) {
+        	upgradeBotCrews(scenario);
+        }
     }
     
     /**

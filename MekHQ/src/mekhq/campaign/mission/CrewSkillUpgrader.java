@@ -35,7 +35,10 @@ import mekhq.campaign.personnel.SpecialAbility;
  *
  */
 public class CrewSkillUpgrader {
-    private Map<Integer, List<SpecialAbility>> specialAbilitiesByUnitType;
+	// complex data structure
+	// first key is the unit type as in Megamek.common.UnitType
+	// second key is the XP cost of the SPA
+    private Map<Integer, Map<Integer, List<SpecialAbility>>> specialAbilitiesByUnitType;
     private double maxAbilityXPCost = 0;
     private double twoThirdsXPCost = 0;
     private double oneThirdXPCost = 0;
@@ -58,9 +61,10 @@ public class CrewSkillUpgrader {
             }
             
             for(int unitType = 0; unitType < UnitType.SIZE; unitType++) {
-                specialAbilitiesByUnitType.putIfAbsent(unitType, new ArrayList<>());
+                specialAbilitiesByUnitType.putIfAbsent(unitType, new HashMap<>());
                 if(spa.isEligible(unitType)) {
-                    specialAbilitiesByUnitType.get(unitType).add(spa);
+                    specialAbilitiesByUnitType.get(unitType).putIfAbsent(spa.getCost(), new ArrayList<>());
+                    specialAbilitiesByUnitType.get(unitType).get(spa.getCost()).add(spa);
                 }
             }
         }
@@ -105,7 +109,7 @@ public class CrewSkillUpgrader {
         // we want a maximum # of SPAs, capped, in total at a max XP cost
         // every time we generate an SPA, we reduce the max available XP
         // this logic also prevents attempting to assign an SPA when there are no SPAs
-        // that cost less XP than rthe remaining cap
+        // that cost less XP than the remaining cap
         for(int x = 0; (x < spaCap) && (xpCap > minAbilityCost); x++) {
             int spaCost = addSingleSPA(entity, xpCap);
             xpCap -= spaCost;
@@ -120,20 +124,35 @@ public class CrewSkillUpgrader {
     public int addSingleSPA(Entity entity, double xpCap) {
         int unitType = entity.getUnitType();
         
-        int spaIndex = Compute.randomInt(specialAbilitiesByUnitType.get(unitType).size());
-        SpecialAbility spa = specialAbilitiesByUnitType.get(unitType).get(spaIndex);
+        List<SpecialAbility> choices = coalescedSPAList(unitType, xpCap);
+        if(choices.size() == 0) {
+        	return 0;
+        }
+        
+        int spaIndex;
+        SpecialAbility spa = null;
         
         // if the ability is disqualified by some weird circumstances,
         // because the entity already has it
         // or because it exceeds the weight limit 
         // then try to generate another one
-        while(!extraEligibilityCheck(spa, entity) ||
-                entity.hasAbility(spa.getName()) ||
-                spa.getCost() > xpCap) {
-            spaIndex = Compute.randomInt(specialAbilitiesByUnitType.get(unitType).size());
-            spa = specialAbilitiesByUnitType.get(unitType).get(spaIndex);
+        while(choices.size() > 0) {
+        	spaIndex = Compute.randomInt(choices.size());
+        	spa = choices.get(spaIndex);
+        	
+        	if(entity.hasAbility(spa.getName()) ||
+        			!extraEligibilityCheck(spa, entity)) {
+        		choices.remove(spaIndex);
+        		spa = null;
+        	} else {
+        		break;
+        	}
         }
         
+        if(spa == null) {
+        	return 0;
+        }
+
         String spaValue;
         
         switch(spa.getName()) {
@@ -156,6 +175,24 @@ public class CrewSkillUpgrader {
         
         entity.getCrew().getOptions().getOption(spa.getName()).setValue(spaValue);
         return spa.getCost();
+    }
+    
+    /**
+     * Utility function that returns all the SPAs for the given unit type at or below the given cap
+     * @param unitType Unit type
+     * @param xpCap maximum xp cost
+     * @return coalesced list
+     */
+    private List<SpecialAbility> coalescedSPAList(int unitType, double xpCap) {
+    	List<SpecialAbility> coalescedList = new ArrayList<>();
+    	
+    	for(int cost : specialAbilitiesByUnitType.get(unitType).keySet()) {
+    		if(cost <= xpCap) {
+    			coalescedList.addAll(specialAbilitiesByUnitType.get(unitType).get(cost));
+    		}
+    	}
+    	
+    	return coalescedList;
     }
     
     /**
