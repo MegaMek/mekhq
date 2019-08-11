@@ -1,6 +1,6 @@
 VERSION HISTORY:
 ----------------
-v0.46.0-SNAPSHOT
+0.46.0-rc.2 (2019-08-12 0100 UTC)
 + Issue #1075: Fix 'Mech location repair and salvage times to match StratOps
 + Issue #1224: Scenario templates no longer fail to generate forces when the 'use vehicles' AtB setting is turned off
 + Issue #1238: Fix bug where self crewed units could not be activated after being mothballed
