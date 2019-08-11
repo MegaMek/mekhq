@@ -30,6 +30,7 @@ v0.45.5-SNAPSHOT
 + Issue #1224: Scenario templates no longer fail to generate forces when the 'use vehicles' AtB setting is turned off
 + Issue #1238: Fix bug where self crewed units could not be activated after being mothballed
 + PR #1239: Add GM Mothball/Activate to unit menu in hangar
++ Issue #1240: Cannot Salvage at 100%
 
 v0.45.4 (2019-03-24 1700 UTC)
 + PR #1067: Switch to Joda Money library internally for financial math
