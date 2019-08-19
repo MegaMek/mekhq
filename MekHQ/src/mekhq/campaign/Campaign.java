@@ -2596,6 +2596,8 @@ public class Campaign implements Serializable, ITechManager {
                 return;
             }
         }
+        report += tech.getHyperlinkedFullTitle() + " attempts to" + action
+                    + partWork.getPartName();
         if (null != partWork.getUnit()) {
             report += " on " + partWork.getUnit().getName();
         }
