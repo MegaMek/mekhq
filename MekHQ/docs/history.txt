@@ -1,5 +1,7 @@
 VERSION HISTORY:
 ----------------
+v0.47.1-SNAPSHOT
+
 v0.47.0 (2019-08-21 0300 UTC)
 + Issue #1171: Adds autosave feature (daily or weekly, and/or before missions).
 + PR #1215: Minor updates to AtB:
