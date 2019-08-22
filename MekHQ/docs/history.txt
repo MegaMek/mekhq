@@ -1,6 +1,7 @@
 VERSION HISTORY:
 ----------------
 v0.47.1-SNAPSHOT
++ PR #1259: Fix map size display for AtB scenarios in the briefing tab (cosmetic issue only)
 
 v0.47.0 (2019-08-21 0300 UTC)
 + Issue #1171: Adds autosave feature (daily or weekly, and/or before missions).
