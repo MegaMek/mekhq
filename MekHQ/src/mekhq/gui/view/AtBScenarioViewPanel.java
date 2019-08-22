@@ -543,7 +543,7 @@ public class AtBScenarioViewPanel extends JPanel {
             chkReroll[REROLL_MAPSIZE].addItemListener(checkBoxListener);
         }
 
-        lblMapSizeDesc.setText(scenario.getMapSizeX() + "x" + scenario.getMapSizeY());
+        lblMapSizeDesc.setText(scenario.getMapX() + "x" + scenario.getMapY());
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblMapSizeDesc, gridBagConstraints);
