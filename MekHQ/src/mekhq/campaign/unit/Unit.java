@@ -24,6 +24,7 @@ package mekhq.campaign.unit;
 
 import java.io.PrintWriter;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -263,9 +264,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     private int mothballTime;
     private boolean mothballed;
 
+    private LocalDate dateAcquired;
+
     private int daysSinceMaintenance;
     private int daysActivelyMaintained;
     private int astechDaysMaintained;
+    private LocalDate lastMaintenanceDate;
 
     //old ids for reverse compatibility
     private ArrayList<Integer> oldDrivers;
@@ -1498,10 +1502,22 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 +"<daysToArrival>"
                 +daysToArrival
                 +"</daysToArrival>");
+        if (null != dateAcquired) {
+            pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
+                    +"<dateAcquired>"
+                    +dateAcquired
+                    +"</dateAcquired>");
+        }
         pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
                 +"<daysSinceMaintenance>"
                 +daysSinceMaintenance
                 +"</daysSinceMaintenance>");
+        if (null != lastMaintenanceDate) {
+            pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
+                    +"<lastMaintenanceDate>"
+                    +lastMaintenanceDate
+                    +"</lastMaintenanceDate>");
+        }
         pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
                 +"<daysActivelyMaintained>"
                 +daysActivelyMaintained
@@ -1566,12 +1582,16 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     retVal.site = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("pilotId")) {
                     retVal.pilotId = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("dateAcquired")) {
+                    retVal.dateAcquired = LocalDate.parse(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysToArrival")) {
                     retVal.daysToArrival = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysActivelyMaintained")) {
                     retVal.daysActivelyMaintained = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysSinceMaintenance")) {
                     retVal.daysSinceMaintenance = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("lastMaintenanceDate")) {
+                    retVal.lastMaintenanceDate = LocalDate.parse(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("mothballTime")) {
                     retVal.mothballTime = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("astechDaysMaintained")) {
@@ -4396,6 +4416,22 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return availability;
     }
 
+    /**
+     * Gets the date the unit was acquired.
+     * @return The date the unit was acquired.
+     */
+    public @Nullable LocalDate getDateAcquired() {
+        return dateAcquired;
+    }
+
+    /**
+     * Sets the date the unit was acquired.
+     * @param date The date the unit was acquired.
+     */
+    public void setDateAcquired(LocalDate date) {
+        dateAcquired = date;
+    }
+
     public void setDaysToArrival(int days) {
         daysToArrival = days;
     }
@@ -4506,6 +4542,24 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
     public int getDaysSinceMaintenance() {
         return daysSinceMaintenance;
+    }
+
+    /**
+     * Gets the last day the unit was maintained, or null if the unit
+     * has never had maintenance performed.
+     * @return The last day the unit was maintained, otherwise null if the
+     *         unit has never had maintenance.
+     */
+    public @Nullable LocalDate getLastMaintenanceDate() {
+        return lastMaintenanceDate;
+    }
+
+    /**
+     * Sets the last date the unit was maintained.
+     * @param date The last day the unit was maintained.
+     */
+    public void setLastMaintenanceDate(LocalDate date) {
+        lastMaintenanceDate = date;
     }
 
     //there are no official rules about partial maintenance

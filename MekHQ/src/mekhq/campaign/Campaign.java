@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -237,6 +238,7 @@ public class Campaign implements Serializable, ITechManager {
     private GregorianCalendar calendar;
     private String dateFormat;
     private String shortDateFormat;
+    private LocalDate today;
 
     private String factionCode;
     private int techFactionCode;
@@ -297,6 +299,7 @@ public class Campaign implements Serializable, ITechManager {
         player = new Player(0, "self");
         game.addPlayer(0, player);
         calendar = new GregorianCalendar(3067, Calendar.JANUARY, 1);
+        today = LocalDate.of(3067, 1, 1);
         CurrencyManager.getInstance().setCampaign(this);
         campaignOptions = new CampaignOptions();
         currentReport = new ArrayList<>();
@@ -429,6 +432,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public void setCalendar(GregorianCalendar c) {
         calendar = c;
+        today = LocalDate.of(c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH));
     }
 
     public GregorianCalendar getCalendar() {
@@ -1080,9 +1084,10 @@ public class Campaign implements Serializable, ITechManager {
         }
         game.addEntity(unit.getEntity().getId(), unit.getEntity());
 
+        unit.setDateAcquired(getLocalDate());
+
         checkDuplicateNamesDuringAdd(unit.getEntity());
         addReport(unit.getHyperlinkedName() + " has been added to the unit roster.");
-
     }
 
     /**
@@ -1113,6 +1118,9 @@ public class Campaign implements Serializable, ITechManager {
             unit.setSalvage(true);
         }
         unit.setDaysToArrival(days);
+        if (days == 0) {
+            unit.setDateAcquired(getLocalDate());
+        }
 
         if (allowNewPilots) {
             Map<CrewType, Collection<Person>> newCrew = Utilities.genRandomCrewWithCombinedSkill(this, unit, getFactionCode());
@@ -1324,6 +1332,14 @@ public class Campaign implements Serializable, ITechManager {
 
     public Date getDate() {
         return calendar.getTime();
+    }
+
+    /**
+     * Gets the current date of the campaign.
+     * @return The current date of the campaign.
+     */
+    public LocalDate getLocalDate() {
+        return today;
     }
 
     public Collection<Person> getPersonnel() {
@@ -3181,6 +3197,7 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         // ok now we can check for other stuff we might need to do to units
+        LocalDate today = getLocalDate();
         List<UUID> unitsToRemove = new ArrayList<>();
         for (Unit u : getUnits()) {
             if (u.isRefitting()) {
@@ -3190,7 +3207,9 @@ public class Campaign implements Serializable, ITechManager {
                 workOnMothballingOrActivation(u);
             }
             if (!u.isPresent()) {
-                u.checkArrival();
+                if (u.checkArrival()) {
+                    u.setDateAcquired(today);
+                }
             }
             if (!u.isRepairable() && !u.hasSalvageableParts()) {
                 unitsToRemove.add(u.getId());
@@ -3209,6 +3228,8 @@ public class Campaign implements Serializable, ITechManager {
         this.autosaveService.requestDayAdvanceAutosave(this, this.calendar.get(Calendar.DAY_OF_WEEK));
 
         calendar.add(Calendar.DAY_OF_MONTH, 1);
+        today = today.plusDays(1);
+
         currentReport.clear();
         currentReportHTML = "";
         newReports.clear();
@@ -3311,8 +3332,7 @@ public class Campaign implements Serializable, ITechManager {
     public Money getMaintenanceCosts() {
         Money costs = Money.zero();
         if(campaignOptions.payForMaintain()) {
-            for (Map.Entry<UUID, Unit> mu : units.entrySet()) {
-                Unit u = mu.getValue();
+            for (Unit u : units.values()) {
                 if (u.requiresMaintenance() && null != u.getTech()) {
                     costs = costs.plus(u.getMaintenanceCost());
                 }
@@ -3323,8 +3343,8 @@ public class Campaign implements Serializable, ITechManager {
 
     public Money getWeeklyMaintenanceCosts() {
         Money costs = Money.zero();
-        for (Map.Entry<UUID, Unit> u : units.entrySet()) {
-            costs = costs.plus(u.getValue().getWeeklyMaintenanceCost());
+        for (Unit u : units.values()) {
+            costs = costs.plus(u.getWeeklyMaintenanceCost());
         }
         return costs;
     }
@@ -8125,6 +8145,7 @@ public class Campaign implements Serializable, ITechManager {
                         + "'>Get details</a>]");
             }
             u.resetDaysSinceMaintenance();
+            u.setLastMaintenanceDate(getLocalDate());
         }
     }
 
@@ -8385,7 +8406,7 @@ public class Campaign implements Serializable, ITechManager {
 
     @Override
     public int getGameYear() {
-        return calendar.get(Calendar.YEAR);
+        return today.getYear();
     }
 
     @Override
