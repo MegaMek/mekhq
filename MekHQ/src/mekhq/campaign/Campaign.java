@@ -8298,12 +8298,33 @@ public class Campaign implements Serializable, ITechManager {
         return unitRating;
     }
 
+    /**
+     * Gets peacetime costs including salaries.
+     * @return The peacetime costs of the campaign including salaries.
+     */
     public Money getPeacetimeCost() {
-        return Money.zero()
-                .plus(getPayRoll(getCampaignOptions().useInfantryDontCount()))
-                .plus(getMonthlySpareParts())
-                .plus(getMonthlyFuel())
-                .plus(getMonthlyAmmo());
+        return getPeacetimeCost(true);
+    }
+
+    /**
+     * Gets peacetime costs, optionally including salaries.
+     *
+     * This can be used to ensure salaries are not double counted.
+     *
+     * @param includeSalaries A value indicating whether or not salaries
+     *                        should be included in peacetime cost calculations.
+     * @return The peacetime costs of the campaign, optionally including salaries.
+     */
+    public Money getPeacetimeCost(boolean includeSalaries) {
+        Money peaceTimeCosts = Money.zero()
+                                .plus(getMonthlySpareParts())
+                                .plus(getMonthlyFuel())
+                                .plus(getMonthlyAmmo());
+        if (includeSalaries) {
+            peaceTimeCosts = peaceTimeCosts.plus(getPayRoll(getCampaignOptions().useInfantryDontCount()));
+        }
+
+        return peaceTimeCosts;
     }
 
     public Money getMonthlySpareParts() {
