@@ -301,8 +301,9 @@ public class Finances implements Serializable {
         if (calendar.get(Calendar.DAY_OF_MONTH) == 1) {
             if (campaignOptions.usePeacetimeCost()) {
                 if (!campaignOptions.showPeacetimeCost()) {
-                    Money peacetimeCost = campaign.getPeacetimeCost();
-                    
+                    // Do not include salaries as that will be tracked below
+                    Money peacetimeCost = campaign.getPeacetimeCost(/*includeSalaries:*/false);
+
                     if (debit(peacetimeCost, Transaction.C_MAINTAIN,
                             resourceMap.getString("PeacetimeCosts.title"), calendar.getTime())) {
                         campaign.addReport(String.format(
@@ -316,7 +317,7 @@ public class Finances implements Serializable {
                     Money sparePartsCost = campaign.getMonthlySpareParts();
                     Money ammoCost = campaign.getMonthlyAmmo();
                     Money fuelCost = campaign.getMonthlyFuel();
-                    
+
                     if (debit(sparePartsCost, Transaction.C_MAINTAIN,
                             resourceMap.getString("PeacetimeCostsParts.title"), calendar.getTime())) {
                         campaign.addReport(String.format(
@@ -345,9 +346,10 @@ public class Finances implements Serializable {
                     }
                 }
             }
+
             if (campaignOptions.payForSalaries()) {
                 Money payrollCost = campaign.getPayRoll();
-                
+
                 if (debit(payrollCost, Transaction.C_SALARY, resourceMap.getString("Salaries.title"),
                         calendar.getTime())) {
                     campaign.addReport(
@@ -362,7 +364,7 @@ public class Finances implements Serializable {
             // Handle overhead expenses
             if (campaignOptions.payForOverhead()) {
                 Money overheadCost = campaign.getOverheadExpenses();
-                
+
                 if (debit(overheadCost, Transaction.C_OVERHEAD,
                         resourceMap.getString("Overhead.title"),
                         calendar.getTime())) {
@@ -479,7 +481,7 @@ public class Finances implements Serializable {
                 .plus(getTotalAssetValue())
                 .minus(getTotalLoanCollateral());
     }
-    
+
     public String exportFinances(String path, String format) {
         String report;
 
