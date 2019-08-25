@@ -6,6 +6,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -61,6 +62,7 @@ import mekhq.gui.MekLabTab;
 import mekhq.gui.dialog.BombsDialog;
 import mekhq.gui.dialog.CamoChoiceDialog;
 import mekhq.gui.dialog.ChooseRefitDialog;
+import mekhq.gui.dialog.DateChooser;
 import mekhq.gui.dialog.LargeCraftAmmoSwapDialog;
 import mekhq.gui.dialog.QuirksDialog;
 import mekhq.gui.dialog.TextAreaDialog;
@@ -80,6 +82,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
     public final static String COMMAND_CANCEL_MOTHBALL = "CANCEL_MOTHBALL";
     public final static String COMMAND_GM_MOTHBALL = "GM_MOTHBALL";
     public final static String COMMAND_GM_ACTIVATE = "GM_ACTIVATE";
+    public final static String COMMAND_SET_DATE_ACQUIRED = "SET_DATE_ACQUIRED";
 
     public UnitTableMouseAdapter(CampaignGUI gui, JTable unitTable,
             UnitTableModel unitModel) {
@@ -580,6 +583,26 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 activateUnitAction.Execute(gui.getCampaign(), selectedUnit);
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
+        } else if (command.equalsIgnoreCase(COMMAND_SET_DATE_ACQUIRED)) {
+            LocalDate today = gui.getCampaign().getLocalDate();
+            LocalDate dateAcquired = selectedUnit.getDateAcquired();
+            if (null == dateAcquired) {
+                dateAcquired = today;
+            }
+
+            // show the date chooser
+            DateChooser dc = new DateChooser(gui.getFrame(), dateAcquired);
+
+            // user can either choose a date or cancel by closing
+            if (dc.showDateChooser() == DateChooser.OK_OPTION) {
+                LocalDate newDate = dc.getLocalDate();
+                if (newDate.isAfter(today)) {
+                    newDate = today;
+                }
+                for (Unit unit : units) {
+                    unit.setDateAcquired(newDate);
+                }
+            }
         }
     }
 
@@ -960,6 +983,12 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 menuItem.setEnabled(true);
                 popup.add(menuItem);
             }
+
+            menuItem = new JMenuItem("Set Date Acquired...");
+            menuItem.setActionCommand(COMMAND_SET_DATE_ACQUIRED);
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(true);
+            popup.add(menuItem);
 
             // remove all personnel
             popup.addSeparator();
