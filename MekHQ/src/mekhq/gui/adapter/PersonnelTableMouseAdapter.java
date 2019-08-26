@@ -125,12 +125,12 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String CMD_ADD_PREGNANCY = "ADD_PREGNANCY"; //$NON-NLS-1$
     private static final String CMD_REMOVE_PREGNANCY = "PREGNANCY_SPOUSE"; //$NON-NLS-1$
     private static final String CMD_ADD_TECH = "ADD_TECH"; //$NON-NLS-1$
-    
+
     private static final String CMD_IMPRISON = "IMPRISON"; //$NON-NLS-1$
     private static final String CMD_FREE = "FREE"; //$NON-NLS-1$
     private static final String CMD_RECRUIT = "RECRUIT"; //$NON-NLS-1$
     private static final String CMD_RANSOM = "RANSOM";
-    
+
     private static final String SEPARATOR = "@"; //$NON-NLS-1$
     private static final String SPACE = " "; //$NON-NLS-1$
     private static final String HYPHEN = "-"; //$NON-NLS-1$
@@ -164,7 +164,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String OPT_EDGE_KO = "edge_when_ko"; //$NON-NLS-1$
     private static final String OPT_EDGE_TAC = "edge_when_tac"; //$NON-NLS-1$
     private static final String OPT_EDGE_HEADHIT = "edge_when_headhit"; //$NON-NLS-1$
-    
+
     //Aero Edge Options
     private static final String OPT_EDGE_WHEN_AERO_ALT_LOSS= "edge_when_aero_alt_loss"; //$NON-NLS-1$
     private static final String OPT_EDGE_WHEN_AERO_EXPLOSION= "edge_when_aero_explosion"; //$NON-NLS-1$
@@ -172,7 +172,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String OPT_EDGE_WHEN_AERO_LUCKY_CRIT= "edge_when_aero_lucky_crit"; //$NON-NLS-1$
     private static final String OPT_EDGE_WHEN_AERO_NUKE_CRIT= "edge_when_aero_nuke_crit"; //$NON-NLS-1$
     private static final String OPT_EDGE_WHEN_AERO_UNIT_CARGO_LOST= "edge_when_aero_unit_cargo_lost"; //$NON-NLS-1$
-    
+
     private static final String OPT_PRISONER_FREE = "free"; //$NON-NLS-1$
     private static final String OPT_PRISONER_IMPRISONED = "imprisoned"; //$NON-NLS-1$
     private static final String OPT_PRISONER_IMPRISONED_DEFECTING = "imprisoned_defecting"; //$NON-NLS-1$
@@ -187,7 +187,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     @Override
     public void actionPerformed(ActionEvent action) {
         final String METHOD_NAME = "actionPerformed(ActionEvent)"; //$NON-NLS-1$
-        
+
         int row = personnelTable.getSelectedRow();
         if (row < 0) {
             return;
@@ -288,7 +288,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                          * Incase there's still some assignments for this tech,
                          * clear them out. This can happen if the target unit
                          * above is null. The tech will still have the pointer
-                         * but to a null unit and it will never go away 
+                         * but to a null unit and it will never go away
                          * otherwise.
                          */
                         person.clearTechUnitIDs();
@@ -745,14 +745,14 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 // ask the user if they want to sell off their prisoners. If yes, then add a daily report entry, add the money and remove them all.
                 Money total = Money.zero();
                 total = total.plus(Arrays.stream(people).map(Person::getRansomValue).collect(Collectors.toList()));
-                
+
                 if (0 == JOptionPane.showConfirmDialog(
                         null,
-                        String.format(resourceMap.getString("ransomQ.format"), people.length, total), //$NON-NLS-1$
+                        String.format(resourceMap.getString("ransomQ.format"), people.length, total.toAmountAndSymbolString()), //$NON-NLS-1$
                         resourceMap.getString("ransom.text"), //$NON-NLS-1$
                         JOptionPane.YES_NO_OPTION)) {
-                    
-                    gui.getCampaign().addReport(String.format(resourceMap.getString("ransomReport.format"), people.length, total));
+
+                    gui.getCampaign().addReport(String.format(resourceMap.getString("ransomReport.format"), people.length, total.toAmountAndSymbolString()));
                     gui.getCampaign().addFunds(total, resourceMap.getString("ransom.text"), Transaction.C_MISC);
                     for (Person person : people) {
                         gui.getCampaign().removePerson(person.getId(), false);
@@ -1380,7 +1380,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 popup.add(newMenuItem(resourceMap.getString("imprison.text"), CMD_IMPRISON, person.isFree())); //$NON-NLS-1$
                 popup.add(newMenuItem(resourceMap.getString("free.text"), CMD_FREE, !person.isFree())); //$NON-NLS-1$
             }
-            
+
             if(gui.getCampaign().getCampaignOptions().getUseAtB()
                     && (gui.getCampaign().getCampaignOptions().getUseAtBCapture()
                         || gui.getCampaign().getCampaignOptions().capturePrisoners())
@@ -1856,7 +1856,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     menuItem.addActionListener(this);
                     popup.add(menuItem);
                 }
-                
+
                 JMenu awardMenu = new JMenu(resourceMap.getString("award.text"));
                 List<String> setNames = AwardsFactory.getInstance().getAllSetNames();
                 Collections.sort(setNames);
@@ -1923,7 +1923,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
                 awardMenu.add(removeAwardMenu);
                 popup.add(awardMenu);
-                
+
                 menu = new JMenu(resourceMap.getString("spendXP.text")); //$NON-NLS-1$
                 JMenu currentMenu = new JMenu(resourceMap.getString("spendOnCurrentSkills.text")); //$NON-NLS-1$
                 JMenu newMenu = new JMenu(resourceMap.getString("spendOnNewSkills.text")); //$NON-NLS-1$
@@ -2125,14 +2125,14 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     JMenu edgeMenu = new JMenu(resourceMap.getString("edge.text")); //$NON-NLS-1$
                     int cost = gui.getCampaign().getCampaignOptions().getEdgeCost();
                     boolean available = (cost >= 0) && (person.getXp() >= cost);
-                                        
+
                     menuItem = new JMenuItem(String.format(resourceMap.getString("spendOnEdge.text"), cost)); //$NON-NLS-1$
                     menuItem.setActionCommand(makeCommand(CMD_BUY_EDGE, String.valueOf(cost)));
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(available);
                     edgeMenu.add(menuItem);
-                    menu.add(edgeMenu); 
-                }        
+                    menu.add(edgeMenu);
+                }
                 popup.add(menu);
             }
             if (oneSelected && person.isActive()) {
@@ -2281,9 +2281,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             cbMenuItem.setForeground(new Color(150, 150, 150));
                         }
                         cbMenuItem.addActionListener(this);
-                        menu.add(cbMenuItem);                        
-                    } 
-                    
+                        menu.add(cbMenuItem);
+                    }
+
                     popup.add(menu);
                 }
                 menu = new JMenu(resourceMap.getString("specialFlags.text")); //$NON-NLS-1$
@@ -2617,7 +2617,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             popup.show(e.getComponent(), e.getX(), e.getY());
         }
     }
-    
+
     private JMenuItem newMenuItem(String text, String command) {
         return newMenuItem(text, command, true);
     }
