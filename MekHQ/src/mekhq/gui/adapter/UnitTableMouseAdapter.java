@@ -97,6 +97,10 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
         String command = action.getActionCommand();
         Unit selectedUnit = unitModel.getUnit(unitTable
                 .convertRowIndexToModel(unitTable.getSelectedRow()));
+        if (selectedUnit == null) {
+            return;
+        }
+
         int[] rows = unitTable.getSelectedRows();
         Unit[] units = new Unit[rows.length];
         for (int i = 0; i < rows.length; i++) {
@@ -384,14 +388,12 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                     gui.getCampaign(), selectedUnit, gui);
             crd.setVisible(true);
         } else if (command.contains("CHANGE_HISTORY")) {
-            if (null != selectedUnit) {
-                TextAreaDialog tad = new TextAreaDialog(gui.getFrame(), true,
-                        "Edit Unit History", selectedUnit.getHistory());
-                tad.setVisible(true);
-                if (tad.wasChanged()) {
-                    selectedUnit.setHistory(tad.getText());
-                    MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
-                }
+            TextAreaDialog tad = new TextAreaDialog(gui.getFrame(), true,
+                    "Edit Unit History", selectedUnit.getHistory());
+            tad.setVisible(true);
+            if (tad.wasChanged()) {
+                selectedUnit.setHistory(tad.getText());
+                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
         } else if (command.contains("REMOVE_INDI_CAMO")) {
             selectedUnit.getEntity().setCamoCategory(null);
@@ -415,52 +417,41 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
         } else if (command.equalsIgnoreCase("CANCEL_ORDER")) {
             double refund = gui.getCampaign().getCampaignOptions()
                     .GetCanceledOrderReimbursement();
-            if (null != selectedUnit) {
-                Money refundAmount = selectedUnit.getBuyCost().multipliedBy(refund);
-                gui.getCampaign().removeUnit(selectedUnit.getId());
-                gui.getCampaign().getFinances().credit(
-                        refundAmount,
-                        Transaction.C_EQUIP,
-                        "refund for cancelled equipment sale",
-                        gui.getCampaign().getDate());
-            }
+            Money refundAmount = selectedUnit.getBuyCost().multipliedBy(refund);
+            gui.getCampaign().removeUnit(selectedUnit.getId());
+            gui.getCampaign().getFinances().credit(
+                    refundAmount,
+                    Transaction.C_EQUIP,
+                    "refund for cancelled equipment sale",
+                    gui.getCampaign().getDate());
         } else if (command.equalsIgnoreCase("ARRIVE")) {
-            if (null != selectedUnit) {
-                selectedUnit.setDaysToArrival(0);
-            }
+            selectedUnit.setDaysToArrival(0);
         } else if (command.equalsIgnoreCase(COMMAND_MOTHBALL)) {
             if(units.length > 1) {
                 gui.showMassMothballDialog(units, false);
                 return;
             }
 
-            if (null != selectedUnit) {
-                UUID techId = pickTechForMothballOrActivation(selectedUnit);
-                MothballUnitAction mothballUnitAction = new MothballUnitAction(techId, false);
-                mothballUnitAction.Execute(gui.getCampaign(), selectedUnit);
-                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
-            }
+            UUID techId = pickTechForMothballOrActivation(selectedUnit);
+            MothballUnitAction mothballUnitAction = new MothballUnitAction(techId, false);
+            mothballUnitAction.Execute(gui.getCampaign(), selectedUnit);
+            MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
         } else if (command.equalsIgnoreCase(COMMAND_ACTIVATE)) {
             if(units.length > 1) {
                 gui.showMassMothballDialog(units, true);
                 return;
             }
 
-            if (null != selectedUnit) {
-                UUID techId = pickTechForMothballOrActivation(selectedUnit);
-                ActivateUnitAction activateUnitAction = new ActivateUnitAction(techId, false);
-                activateUnitAction.Execute(gui.getCampaign(), selectedUnit);
-                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
-            }
+            UUID techId = pickTechForMothballOrActivation(selectedUnit);
+            ActivateUnitAction activateUnitAction = new ActivateUnitAction(techId, false);
+            activateUnitAction.Execute(gui.getCampaign(), selectedUnit);
+            MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
         } else if (command.equalsIgnoreCase(COMMAND_CANCEL_MOTHBALL)) {
-            if (null != selectedUnit) {
-                CancelMothballUnitAction cancelAction = new CancelMothballUnitAction();
-                cancelAction.Execute(gui.getCampaign(), selectedUnit);
-                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
-            }
+            CancelMothballUnitAction cancelAction = new CancelMothballUnitAction();
+            cancelAction.Execute(gui.getCampaign(), selectedUnit);
+            MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
         } else if (command.equalsIgnoreCase("BOMBS")) {
-            if (null != selectedUnit
-                    && selectedUnit.getEntity().isBomber()) {
+            if (selectedUnit.getEntity().isBomber()) {
                 BombsDialog dialog = new BombsDialog(
                         (IBomber)selectedUnit.getEntity(), gui.getCampaign(),
                         gui.getFrame());
@@ -468,30 +459,24 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
         } else if (command.equalsIgnoreCase("QUIRKS")) {
-            if (null != selectedUnit) {
-                QuirksDialog dialog = new QuirksDialog(
-                        selectedUnit.getEntity(), gui.getFrame());
-                dialog.setVisible(true);
-                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
-            }
+            QuirksDialog dialog = new QuirksDialog(
+                    selectedUnit.getEntity(), gui.getFrame());
+            dialog.setVisible(true);
+            MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
         } else if (command.equalsIgnoreCase("EDIT_DAMAGE")) {
-            if (null != selectedUnit) {
-                Entity entity = selectedUnit.getEntity();
-                UnitEditorDialog med = new UnitEditorDialog(gui.getFrame(), entity);
-                med.setVisible(true);
-                selectedUnit.runDiagnostic(false);
-                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
-            }
+            Entity entity = selectedUnit.getEntity();
+            UnitEditorDialog med = new UnitEditorDialog(gui.getFrame(), entity);
+            med.setVisible(true);
+            selectedUnit.runDiagnostic(false);
+            MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
         } else if (command.equalsIgnoreCase("FLUFF_NAME")) {
-            if (selectedUnit != null) {
-                String fluffName = (String) JOptionPane.showInputDialog(
-                        gui.getFrame(), "Name for this unit?", "Unit Name",
-                        JOptionPane.QUESTION_MESSAGE, null, null,
-                        selectedUnit.getFluffName() == null ? ""
-                                : selectedUnit.getFluffName());
-                selectedUnit.setFluffName(fluffName);
-                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
-            }
+            String fluffName = (String) JOptionPane.showInputDialog(
+                    gui.getFrame(), "Name for this unit?", "Unit Name",
+                    JOptionPane.QUESTION_MESSAGE, null, null,
+                    selectedUnit.getFluffName() == null ? ""
+                            : selectedUnit.getFluffName());
+            selectedUnit.setFluffName(fluffName);
+            MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
         } else if(command.equalsIgnoreCase("RESTORE_UNIT")) {
             for (Unit unit : units) {
                 unit.setSalvage(false);
@@ -572,17 +557,13 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 stripUnitAction.Execute(gui.getCampaign(), unit);
             }
         } else if (command.equalsIgnoreCase(COMMAND_GM_MOTHBALL)) {
-            if (null != selectedUnit) {
-                MothballUnitAction mothballUnitAction = new MothballUnitAction(null, true);
-                mothballUnitAction.Execute(gui.getCampaign(), selectedUnit);
-                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
-            }
+            MothballUnitAction mothballUnitAction = new MothballUnitAction(null, true);
+            mothballUnitAction.Execute(gui.getCampaign(), selectedUnit);
+            MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
         } else if (command.equalsIgnoreCase(COMMAND_GM_ACTIVATE)) {
-            if (null != selectedUnit) {
-                ActivateUnitAction activateUnitAction = new ActivateUnitAction(null, true);
-                activateUnitAction.Execute(gui.getCampaign(), selectedUnit);
-                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
-            }
+            ActivateUnitAction activateUnitAction = new ActivateUnitAction(null, true);
+            activateUnitAction.Execute(gui.getCampaign(), selectedUnit);
+            MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
         } else if (command.equalsIgnoreCase(COMMAND_SET_DATE_ACQUIRED)) {
             LocalDate today = gui.getCampaign().getLocalDate();
             LocalDate dateAcquired = selectedUnit.getDateAcquired();
