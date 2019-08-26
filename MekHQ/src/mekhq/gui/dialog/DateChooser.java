@@ -324,7 +324,9 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
     /**
      * Updates the dialog's controls with the passed in date.
      *
-     * @param cal The date to be displayed.
+     * @param d The date to be displayed.
+     * @param fromDateField A value indicating whether the date is being change
+     *                      from the date text field itself.
      */
     private void setDate(LocalDate d, boolean fromDateField) {
         date = workingDate = d;
