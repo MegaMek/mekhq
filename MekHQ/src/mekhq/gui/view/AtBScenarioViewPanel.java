@@ -72,6 +72,7 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForceStub;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.ScenarioForceTemplate;
+import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.gui.dialog.PrincessBehaviorDialog;
 
 /**
@@ -390,7 +391,27 @@ public class AtBScenarioViewPanel extends JPanel {
         txtDetails.setWrapStyleWord(true);
         txtDetails.setEditable(false);
         
-        if (scenario.isSpecialMission()) {
+        StringBuilder objectiveBuilder = new StringBuilder();
+        for(ScenarioObjective objective : scenario.getObjectives()) {
+            objectiveBuilder.append(objective.getDescription());
+            objectiveBuilder.append("\n");
+            for(String forceName : objective.getAssociatedForceNames()) {
+                objectiveBuilder.append("\t");
+                objectiveBuilder.append(forceName);
+                objectiveBuilder.append("\n");
+            }
+            
+            for(String associatedUnitID : objective.getAssociatedUnitIDs()) {
+                objectiveBuilder.append("\t");
+                objectiveBuilder.append(scenario.getExternalIDLookup().get(associatedUnitID).getShortName());
+                objectiveBuilder.append("\n");
+            }
+            
+            objectiveBuilder.append("\n");
+        }
+        txtDetails.setText(objectiveBuilder.toString());
+        
+        /*if (scenario.isSpecialMission()) {
             txtDetails.setText("Details:\n" +
                     scenario.getResourceBundle().getString("battleDetails." +
                     scenario.getResourceKey() +
@@ -424,7 +445,7 @@ public class AtBScenarioViewPanel extends JPanel {
                     (scenario.isAttacker()?
                             ".attacker.observations":
                                 ".defender.observations")));
-        }
+        }*/
 
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y++;

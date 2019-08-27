@@ -319,7 +319,12 @@ public class Lance implements Serializable, MekHqXmlSerializable {
         //thresholds are coded from charts with 1-100 range, so we add 1 to mod to adjust 0-based random int
         int battleTypeMod = 1 + (AtBContract.MORALE_NORMAL - getContract(c).getMoraleLevel()) * 5;
         battleTypeMod += getContract(c).getBattleTypeMod();
-        switch (role) {
+        
+        return AtBScenarioFactory.createScenario(c, this,
+                AtBScenario.STANDUP, true,
+                getBattleDate(c.getCalendar()));
+        
+        /*switch (role) {
         case ROLE_FIGHT:
             noBattle = (int)(60.0 / intensity + 0.5);
             roll = Compute.randomInt(40 + noBattle) + battleTypeMod;
@@ -450,7 +455,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
             }
         default:
             return null;
-        }
+        }*/
     }
 
     @Override

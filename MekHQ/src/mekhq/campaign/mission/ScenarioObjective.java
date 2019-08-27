@@ -1,10 +1,12 @@
 package mekhq.campaign.mission;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import megamek.common.OffBoardDirection;
 
@@ -30,7 +32,10 @@ public class ScenarioObjective {
     private String description;
     private OffBoardDirection destinationEdge;
     private int percentage;
-    private Set<String> associatedForceNames = new HashSet<>(); 
+    private Set<String> associatedForceNames = new HashSet<>();
+    private Set<String> associatedUnitIDs = new HashSet<>();
+    private List<ObjectiveEffect> successEffects = new ArrayList<>();
+    private List<ObjectiveEffect> failureEffects = new ArrayList<>();
     
     /**
      * Types of automatically tracked scenario objectives
@@ -85,6 +90,34 @@ public class ScenarioObjective {
     public Set<String> getAssociatedForceNames() {
         return new HashSet<String>(associatedForceNames);
     }
+    
+    public void addUnit(String id) {
+        associatedUnitIDs.add(id);
+    }
+    
+    public void removeUnit(String id) {
+        associatedUnitIDs.remove(id);
+    }
+    
+    public Set<String> getAssociatedUnitIDs() {
+        return associatedUnitIDs;
+    }
+
+    public void addSuccessEffect(ObjectiveEffect successEffect) {
+        successEffects.add(successEffect);
+    }
+    
+    public List<ObjectiveEffect> getSuccessEffects() {
+        return successEffects;
+    }
+    
+    public void addFailureEffect(ObjectiveEffect failureEffect) {
+        failureEffects.add(failureEffect);
+    }
+    
+    public List<ObjectiveEffect> getFailureEffects() {
+        return failureEffects;
+    }
 
     public OffBoardDirection getDestinationEdge() {
         return destinationEdge;
@@ -119,11 +152,33 @@ public class ScenarioObjective {
         sb.append(percentage);
         sb.append("%% ");
         
-        sb.append("\nForces:");
+        if(associatedForceNames.size() > 0) {
+            sb.append("\nForces:");        
+            for(String forceName : associatedForceNames) {
+                sb.append("\n");
+                sb.append(forceName);
+            }
+        }
         
-        for(String forceName : associatedForceNames) {
-            sb.append("\n");
-            sb.append(forceName);
+        if(associatedUnitIDs.size() > 0) {
+            for(String unitID : associatedUnitIDs) {
+                sb.append("\n");
+                sb.append(unitID.toString());
+            }
+        }
+        
+        if(successEffects.size() > 0) {
+            for(ObjectiveEffect effect : successEffects) {
+                sb.append("\n");
+                sb.append(effect.toString());
+            }
+        }
+        
+        if(failureEffects.size() > 0) {
+            for(ObjectiveEffect effect : failureEffects) {
+                sb.append("\n");
+                sb.append(effect.toString());
+            }
         }
         
         return sb.toString();
