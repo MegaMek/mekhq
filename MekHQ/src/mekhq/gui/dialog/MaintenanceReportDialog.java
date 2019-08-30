@@ -30,9 +30,13 @@ public class MaintenanceReportDialog extends javax.swing.JDialog {
         super(parent, false);
         setTitle("Maintenance Report for " + unit.getName());
         initComponents();     
+        
         txtReport.setText(unit.getLastMaintenanceReport());
         txtReport.setCaretPosition(0);
+        
         setPreferredSize(new Dimension(700, 500));
+        pack();
+
         setLocationRelativeTo(parent);
         setUserPreferences();
     }
