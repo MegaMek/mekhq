@@ -7,6 +7,7 @@ v0.47.1-SNAPSHOT
 + PR #1268: Fix money formatting in prisoner ransom messages
 + Issue #1274: Fix About window closing immediately
 + Issue #1275: Fix zero sized dialogs (Edit Biography, etc)
++ Issue #1273: Updated edge cost for AtB to match current rules
 
 v0.47.0 (2019-08-21 0300 UTC)
 + Issue #1171: Adds autosave feature (daily or weekly, and/or before missions).
