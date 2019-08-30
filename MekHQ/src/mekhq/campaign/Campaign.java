@@ -5013,7 +5013,7 @@ public class Campaign implements Serializable, ITechManager {
                     parent.put(neighborKey.getId(), localCurrent);
                     open.add(neighborKey.getId());
                 }
-            });
+            };
 
             String bestMatch = null;
             double bestF = Double.POSITIVE_INFINITY;
