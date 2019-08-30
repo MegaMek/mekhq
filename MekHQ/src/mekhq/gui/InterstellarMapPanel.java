@@ -77,7 +77,6 @@ import javax.vecmath.Vector2d;
 
 import org.joda.time.DateTime;
 
-import megamek.common.Compute;
 import megamek.common.EquipmentType;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -87,7 +86,6 @@ import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.SocioIndustrialData;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
-import mekhq.gui.dialog.NewPlanetaryEventDialog;
 
 /**
  * This is not functional yet. Just testing things out.

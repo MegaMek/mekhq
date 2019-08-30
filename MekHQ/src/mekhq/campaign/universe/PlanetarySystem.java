@@ -1,7 +1,7 @@
 /*
- * Planet.java
+ * PlanetarySystem.java
  *
- * Copyright (C) 2011-2016 MegaMek team
+ * Copyright (C) 2011-2016, 2019 MegaMek team
  * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  *
  * This file is part of MekHQ.
@@ -25,14 +25,9 @@ package mekhq.campaign.universe;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;

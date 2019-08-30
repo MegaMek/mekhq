@@ -25,7 +25,6 @@ import java.util.Map;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import megamek.common.EquipmentType;
-import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.SocioIndustrialData;
 
 public class SocioIndustrialDataAdapter extends XmlAdapter<String, SocioIndustrialData> {

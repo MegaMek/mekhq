@@ -7,7 +7,6 @@
 package mekhq.gui.view;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
@@ -26,18 +25,14 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
-import javax.swing.border.Border;
-import javax.swing.border.TitledBorder;
 import javax.swing.text.DefaultCaret;
 
 import org.joda.time.DateTime;
 
 import megamek.common.util.EncodeControl;
-import megamek.common.util.ImageUtil;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.StarUtil;
 import mekhq.campaign.universe.SocioIndustrialData;
 import mekhq.campaign.universe.PlanetarySystem;
 

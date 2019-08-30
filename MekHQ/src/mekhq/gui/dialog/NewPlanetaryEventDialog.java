@@ -51,10 +51,8 @@ import mekhq.adapter.SocioIndustrialDataAdapter;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Climate;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.LifeForm;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Planet.PlanetaryEvent;
-import mekhq.campaign.universe.StarUtil;
 
 public class NewPlanetaryEventDialog extends JDialog {
     private static final long serialVersionUID = 6025304629282204159L;

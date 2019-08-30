@@ -18,15 +18,10 @@
  */
 package mekhq.campaign.universe;
 
-import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.Writer;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,7 +34,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -54,15 +48,12 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import org.joda.time.DateTime;
 import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
 
 import megamek.common.EquipmentType;
 import megamek.common.logging.LogLevel;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
-import mekhq.campaign.universe.Planet.PlanetaryEvent;
 
 /** 
  * This will eventually replace the Planets object as our source of system/planetary information
@@ -108,8 +99,6 @@ public class Systems {
             systems.loader.setPriority(Thread.NORM_PRIORITY - 1);
             systems.loader.start();
         }
-        //TODO: For debugging, delete later 
-        Systems temp_systems = systems;
         return systems;
     }
     
@@ -208,10 +197,10 @@ public class Systems {
         //remove dead planets
         Iterator<PlanetarySystem> iter = shoppingSystems.iterator();
         while (iter.hasNext()) {
-          PlanetarySystem s = iter.next();
-          if (null == s.getPrimaryPlanet() || s.getPrimaryPlanet().isEmpty(when)) {
-              iter.remove();
-          }
+        	PlanetarySystem s = iter.next();
+        	if (null == s.getPrimaryPlanet() || s.getPrimaryPlanet().isEmpty(when)) {
+        		iter.remove();
+        	}
         }
         
         Collections.sort(shoppingSystems, new Comparator<PlanetarySystem>() {

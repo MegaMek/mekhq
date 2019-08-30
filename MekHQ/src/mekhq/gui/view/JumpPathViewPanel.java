@@ -17,7 +17,6 @@ import megamek.common.util.EncodeControl;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
-import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 
 /**

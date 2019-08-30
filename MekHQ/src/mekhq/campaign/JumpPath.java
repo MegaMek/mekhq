@@ -24,6 +24,7 @@ package mekhq.campaign;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.joda.time.DateTime;
 import org.w3c.dom.Node;
@@ -32,7 +33,6 @@ import org.w3c.dom.NodeList;
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 
 /**
@@ -126,7 +126,7 @@ public class JumpPath implements Serializable {
 		path.add(s);
 	}
 	
-	public void addSystems(ArrayList<PlanetarySystem> systems) {
+	public void addSystems(List<PlanetarySystem> systems) {
 		path.addAll(systems);
 	}
 	
