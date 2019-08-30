@@ -5,6 +5,8 @@ v0.47.1-SNAPSHOT
 + Data - Updating the AtB Starter Guide to v3, thanks CampaignAnon
 + Issue #1257: Don't double up salaries when charging for peacetime costs
 + PR #1268: Fix money formatting in prisoner ransom messages
++ Issue #1274: Fix About window closing immediately
++ Issue #1275: Fix zero sized dialogs (Edit Biography, etc)
 
 v0.47.0 (2019-08-21 0300 UTC)
 + Issue #1171: Adds autosave feature (daily or weekly, and/or before missions).
