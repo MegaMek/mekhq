@@ -73,6 +73,9 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.Systems;
 
 /**
  * @author Neoancient
@@ -405,14 +408,13 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     public void setPlanetaryConditions(Mission mission, Campaign campaign) {
         if (null != mission) {
-            /*
-             * TODO: fix this once we have a way of identifying planet within a system
-            PlanetarySystem p = Systems.getInstance().getSystem().get(mission.getSystemId());
+            PlanetarySystem psystem = Systems.getInstance().getSystemById(mission.getSystemId());
+            //assume primary planet for now
+            Planet p = psystem.getPrimaryPlanet();
             if (null != p) {
                 atmosphere = Utilities.nonNull(p.getPressure(Utilities.getDateTimeDay(campaign.getCalendar())), atmosphere);
                 gravity = Utilities.nonNull(p.getGravity(), gravity).floatValue();
             }
-            */
         }
     }
 
