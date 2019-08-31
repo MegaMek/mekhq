@@ -789,22 +789,7 @@ public class Planet implements Serializable {
     private void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
         if( null == id ) {
             id = name;
-        }
-        
-        /*
-        // Spectral classification: use spectralType if available, else the separate values
-        if( null != spectralType ) {
-            setSpectralType(spectralType);
-        } else {
-            spectralType = StarUtil.getSpectralType(spectralClass, subtype, luminosity);
-        }
-        nadirCharge = Utilities.nonNull(nadirCharge, Boolean.FALSE);
-        zenithCharge = Utilities.nonNull(zenithCharge, Boolean.FALSE);
-        // Generate a bunch of data if we still don't have it
-        if( null == spectralType ) {
-            setSpectralType(StarUtil.generateSpectralType(
-                new Random(id.hashCode() + 133773), true, (null != spectralClass) ? spectralClass.intValue() : -1));
-        }*/        
+        }      
         
         // Fill up events
         events = new TreeMap<DateTime, PlanetaryEvent>(DateTimeComparator.getDateOnlyInstance());
