@@ -1,6 +1,11 @@
 VERSION HISTORY:
 ----------------
 0.46.1-SNAPSHOT
++ PR #1259: Fix map size display for AtB scenarios in the briefing tab (cosmetic issue only)
++ Issue #1257: Don't double up salaries when charging for peacetime costs
++ PR #1268: Fix money formatting in prisoner ransom messages
++ Issue #1275: Fix zero sized dialogs (Edit Biography, etc)
++ Issue #1273: Updated edge cost for AtB to match current rules
 
 0.46.0 (2019-08-12 1900 UTC)
 + Issue 1249: Tech Names Missing in Event Log
