@@ -4180,9 +4180,9 @@ public class Campaign implements Serializable, ITechManager {
         pw1.println("\t<customPlanetaryEvents>");
         for(PlanetarySystem p : Systems.getInstance().getSystems().values()) {
             List<Planet.PlanetaryEvent> customEvents = new ArrayList<>();
-            for(Planet.PlanetaryEvent event : p.getEvents()) {
+            for(PlanetarySystem.PlanetarySystemEvent event : p.getEvents()) {
                 if(event.custom) {
-                    customEvents.add(event);
+                    //customEvents.add(event);
                 }
             }
             if(!customEvents.isEmpty()) {

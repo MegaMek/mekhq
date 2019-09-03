@@ -229,14 +229,7 @@ public class Systems {
         List<NewsItem> news = new ArrayList<>();
         for(PlanetarySystem system : systemList.values()) {
             if(null != system) {
-                Planet.PlanetaryEvent event = system.getEvent(when);
-                if((null != event) && (null != event.message)) {
-                    NewsItem item = new NewsItem();
-                    item.setHeadline(event.message);
-                    item.setDate(event.date);
-                    item.setLocation(system.getPrintableName(when));
-                    news.add(item);
-                }
+                Planet.PlanetaryEvent event;
                 for(Planet p : system.getPlanets()) {
                     event = p.getEvent(when);
                     if((null != event) && (null != event.message)) {

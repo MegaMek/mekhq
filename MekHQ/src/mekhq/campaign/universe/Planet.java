@@ -1012,8 +1012,6 @@ public class Planet implements Serializable {
         public String atmosphere;
         public String composition;
         public Long population;
-        public Boolean nadirCharge;
-        public Boolean zenithCharge;
         // Events marked as "custom" are saved to scenario files and loaded from there
         public transient boolean custom = false;
         
@@ -1032,8 +1030,6 @@ public class Planet implements Serializable {
             atmosphere = Utilities.nonNull(other.atmosphere, atmosphere);
             composition = Utilities.nonNull(other.composition, composition);
             population = Utilities.nonNull(other.population, population);
-            nadirCharge = Utilities.nonNull(other.nadirCharge, nadirCharge);
-            zenithCharge = Utilities.nonNull(other.zenithCharge, zenithCharge);
             custom = (other.custom || custom);
         }
         
@@ -1052,8 +1048,6 @@ public class Planet implements Serializable {
             atmosphere = other.atmosphere;
             composition = other.composition;
             population = other.population;
-            nadirCharge = other.nadirCharge;
-            zenithCharge = other.zenithCharge;
             custom = (other.custom || custom);
         }
         
@@ -1062,8 +1056,7 @@ public class Planet implements Serializable {
             return (null == climate) && (null == faction) && (null == hpg) && (null == lifeForm)
                 && (null == message) && (null == name) && (null == shortName) && (null == socioIndustrial)
                 && (null == temperature) && (null == pressure) && (null == atmosphere) 
-                && (null == composition) && (null == population) && (null == nadirCharge) 
-                && (null == zenithCharge);
+                && (null == composition) && (null == population);
         }
     }
     

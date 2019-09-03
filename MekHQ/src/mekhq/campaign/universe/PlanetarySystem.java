@@ -47,8 +47,13 @@ import org.joda.time.DateTimeComparator;
 import megamek.common.EquipmentType;
 import mekhq.Utilities;
 import mekhq.adapter.BooleanValueAdapter;
+import mekhq.adapter.ClimateAdapter;
+import mekhq.adapter.DateAdapter;
+import mekhq.adapter.HPGRatingAdapter;
+import mekhq.adapter.LifeFormAdapter;
+import mekhq.adapter.SocioIndustrialDataAdapter;
 import mekhq.adapter.SpectralClassAdapter;
-import mekhq.campaign.universe.Planet.PlanetaryEvent;
+import mekhq.adapter.StringListAdapter;
 import mekhq.campaign.universe.SocioIndustrialData;
 
 
@@ -151,11 +156,11 @@ public class PlanetarySystem implements Serializable {
      * Package-private so that Planets can access it
      */
     @XmlTransient
-    TreeMap<DateTime, PlanetaryEvent> events;
+    TreeMap<DateTime, PlanetarySystemEvent> events;
     
     // For export and import only (lists are easier than maps) */
     @XmlElement(name = "event")
-    private List<Planet.PlanetaryEvent> eventList;
+    private List<PlanetarySystemEvent> eventList;
     
     public PlanetarySystem() {
     }
@@ -283,23 +288,16 @@ public class PlanetarySystem implements Serializable {
     }
     
     public Boolean isNadirCharge(DateTime when) {
-        //TODO: add event stuff to system so I can get this information
-        /*
         return getEventData(when, nadirCharge, new EventGetter<Boolean>() {
-            @Override public Boolean get(PlanetaryEvent e) { return e.nadirCharge; }
+            @Override 
+            public Boolean get(PlanetarySystemEvent e) { return e.nadirCharge; }
         });
-        */
-        return nadirCharge;
     }
 
     public boolean isZenithCharge(DateTime when) {
-        //TODO: add event stuff to system so I can get this information
-        /*
         return getEventData(when, zenithCharge, new EventGetter<Boolean>() {
-            @Override public Boolean get(PlanetaryEvent e) { return e.zenithCharge; }
+            @Override public Boolean get(PlanetarySystemEvent e) { return e.zenithCharge; }
         });
-        */
-        return zenithCharge;
     }
 
     public String getRechargeStationsText(DateTime when) {
@@ -433,34 +431,48 @@ public class PlanetarySystem implements Serializable {
     }
     
     @SuppressWarnings("unchecked")
-    public PlanetaryEvent getOrCreateEvent(DateTime when) {
+    public PlanetarySystemEvent getOrCreateEvent(DateTime when) {
         if(null == when) {
             return null;
         }
         if(null == events) {
-            events = new TreeMap<DateTime, PlanetaryEvent>(DateTimeComparator.getDateOnlyInstance());
+            events = new TreeMap<DateTime, PlanetarySystemEvent>(DateTimeComparator.getDateOnlyInstance());
         }
-        PlanetaryEvent event = events.get(when);
+        PlanetarySystemEvent event = events.get(when);
         if(null == event) {
-            event = new PlanetaryEvent();
+            event = new PlanetarySystemEvent();
             event.date = when;
             events.put(when, event);
         }
         return event;
     }
     
-    public PlanetaryEvent getEvent(DateTime when) {
+    public PlanetarySystemEvent getEvent(DateTime when) {
         if((null == when) || (null == events)) {
             return null;
         }
         return events.get(when);
     }
     
-    public List<PlanetaryEvent> getEvents() {
+    protected <T> T getEventData(DateTime when, T defaultValue, EventGetter<T> getter) {
+        if( null == when || null == events || null == getter ) {
+            return defaultValue;
+        }
+        T result = defaultValue;
+        for( DateTime date : events.navigableKeySet() ) {
+            if( date.isAfter(when) ) {
+                break;
+            }
+            result = Utilities.nonNull(getter.get(events.get(date)), result);
+        }
+        return result;
+    }
+    
+    public List<PlanetarySystemEvent> getEvents() {
         if( null == events ) {
             return null;
         }
-        return new ArrayList<PlanetaryEvent>(events.values());
+        return new ArrayList<PlanetarySystemEvent>(events.values());
     }
     
     /** Includes a parser for spectral type strings */
@@ -504,9 +516,9 @@ public class PlanetarySystem implements Serializable {
         }
         planetList = null;
         // Fill up events
-        events = new TreeMap<DateTime, PlanetaryEvent>(DateTimeComparator.getDateOnlyInstance());
+        events = new TreeMap<DateTime, PlanetarySystemEvent>(DateTimeComparator.getDateOnlyInstance());
         if( null != eventList ) {
-            for( PlanetaryEvent event : eventList ) {
+            for( PlanetarySystemEvent event : eventList ) {
                 if( null != event && null != event.date ) {
                     events.put(event.date, event);
                 }
@@ -519,7 +531,7 @@ public class PlanetarySystem implements Serializable {
     @SuppressWarnings("unused")
     private boolean beforeMarshal(Marshaller marshaller) {
         // Fill up our event list from the internal data type
-        eventList = new ArrayList<PlanetaryEvent>(events.values());
+        eventList = new ArrayList<PlanetarySystemEvent>(events.values());
         //same for planet list
         planetList = new ArrayList<Planet>(planets.values());
         return true;
@@ -532,12 +544,14 @@ public class PlanetarySystem implements Serializable {
             shortName = Utilities.nonNull(other.shortName, shortName);
             x = Utilities.nonNull(other.x, x);
             y = Utilities.nonNull(other.y, y);
+            nadirCharge = Utilities.nonNull(other.nadirCharge, nadirCharge);
+            zenithCharge = Utilities.nonNull(other.zenithCharge, zenithCharge);
             //TODO: some other changes should be possible
             // Merge (not replace!) events
             if(null != other.events) {
-                for(PlanetaryEvent event : other.getEvents()) {
+                for(PlanetarySystemEvent event : other.getEvents()) {
                     if( null != event && null != event.date ) {
-                        PlanetaryEvent myEvent = getOrCreateEvent(event.date);
+                    	PlanetarySystemEvent myEvent = getOrCreateEvent(event.date);
                         myEvent.copyDataFrom(event);
                     }
                 }
@@ -570,4 +584,39 @@ public class PlanetarySystem implements Serializable {
             this.luminosity = Objects.requireNonNull(luminosity);
         }
     }
+    
+ // @FunctionalInterface in Java 8, or just use Function<PlanetaryEvent, T>
+    private static interface EventGetter<T> {
+        T get(PlanetarySystemEvent e);
+    }
+    
+    /** A class representing some event, possibly changing planetary information */
+    @XmlRootElement(name="event")
+    public static final class PlanetarySystemEvent {
+    	@XmlJavaTypeAdapter(DateAdapter.class)
+        public DateTime date;
+        public Boolean nadirCharge;
+        public Boolean zenithCharge;
+        // Events marked as "custom" are saved to scenario files and loaded from there
+        public transient boolean custom = false;
+        
+        public void copyDataFrom(PlanetarySystemEvent other) {
+            nadirCharge = Utilities.nonNull(other.nadirCharge, nadirCharge);
+            zenithCharge = Utilities.nonNull(other.zenithCharge, zenithCharge);
+            custom = (other.custom || custom);
+        }
+        
+        public void replaceDataFrom(PlanetarySystemEvent other) {
+            nadirCharge = other.nadirCharge;
+            zenithCharge = other.zenithCharge;
+            custom = (other.custom || custom);
+        }
+        
+        /** @return <code>true</code> if the event doesn't contain any change */
+        public boolean isEmpty() {
+            return (null == nadirCharge) 
+                && (null == zenithCharge);
+        }
+    }
+    
 }
