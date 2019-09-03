@@ -161,7 +161,7 @@ public class AtBScenarioFactory {
 					
 					AtBScenario atbScen = (AtBScenario)s;
 					
-					if (atbScen.getLanceForceId() == -1) {
+					if (atbScen.getLanceForceId() == AtBScenario.NO_LANCE) {
 						continue;
 					}
 					

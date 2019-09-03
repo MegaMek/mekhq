@@ -8,6 +8,7 @@ import megamek.common.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.CommonObjectiveFactory;
 import mekhq.campaign.mission.ObjectiveEffect;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.ScenarioObjective;
@@ -57,44 +58,18 @@ public class StandUpBuiltInScenario extends AtBScenario {
 
 	@Override
 	public boolean canAddDropShips() {
-	    return true;
-		//return Compute.d6() <= 2;
+	    return Compute.d6() <= 2;
 	}
 	
 	@Override
 	public void setObjectives(Campaign campaign, AtBContract contract) {
-	    ScenarioObjective destroyHostiles = new ScenarioObjective();
-	    destroyHostiles.setDescription("Destroy, cripple or force the withdrawal of at least 50% of the following enemy force(s):");
-	    destroyHostiles.setObjectiveCriterion(ObjectiveCriterion.ForceWithdraw);
-	    destroyHostiles.setPercentage(50);
-	    destroyHostiles.addForce(contract.getEnemyBotName());
-	    
-	    ObjectiveEffect successEffect = new ObjectiveEffect();
-	    successEffect.effectType = ObjectiveEffectType.ContractScoreUpdate;
-	    successEffect.howMuch = 1;
-	    
-	    ScenarioObjective keepFriendliesAlive = new ScenarioObjective();
-	    keepFriendliesAlive.setDescription("Ensure that at least 50% of the following force(s) and unit(s) survive:");
-	    keepFriendliesAlive.setObjectiveCriterion(ObjectiveCriterion.Preserve);
-	    keepFriendliesAlive.setPercentage(50);
-	    keepFriendliesAlive.addForce(campaign.getForce(getLanceForceId()).getName());
-	    for(int botForceID = 0; botForceID < getNumBots(); botForceID++) {
-	        // kind of hack-ish:
-	        // if there's an allied bot that shares employer name, then add it to the survival objective
-	        // we know there's only one of those, so break out of the loop when we see it
-	        if(getBotForce(botForceID).getName().equals(contract.getAllyBotName())) {
-	            keepFriendliesAlive.addForce(contract.getAllyBotName());
-	            break;
-	        }
-	    }
-	    
-	    for(UUID attachedAlly : this.getAttachedUnitIds()) {
-	        keepFriendliesAlive.addUnit(attachedAlly.toString());
-	    }
+	    ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 50);
+	    ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 50); 
+        ScenarioObjective keepAttachedUnitsAlive = CommonObjectiveFactory.getKeepAttachedGroundUnitsAlive(contract, this);
         
-        ObjectiveEffect friendlyFailureEffect = new ObjectiveEffect();
-        friendlyFailureEffect.effectType = ObjectiveEffectType.ContractScoreUpdate;
-        friendlyFailureEffect.howMuch = -1;
+        if(keepAttachedUnitsAlive != null) {
+            getObjectives().add(keepAttachedUnitsAlive);
+        }
         
         getObjectives().add(destroyHostiles);
         getObjectives().add(keepFriendliesAlive);

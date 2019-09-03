@@ -3,15 +3,19 @@ package mekhq.campaign.mission.atb.scenario;
 import java.util.ArrayList;
 
 import megamek.client.bot.princess.BehaviorSettingsFactory;
-import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.bot.princess.PrincessException;
 import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
+import megamek.common.OffBoardDirection;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.mission.CommonObjectiveFactory;
+import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 
 @AtBScenarioEnabled
@@ -35,7 +39,7 @@ public class ChaseBuiltInScenario extends AtBScenario {
 
 	@Override
 	public int getMapX() {
-		return 18;
+		return 18 + getLanceCount();
 	}
 
 	@Override
@@ -122,4 +126,20 @@ public class ChaseBuiltInScenario extends AtBScenario {
 			en.setDeployRound(Math.max(0, 12 - speed));
 		}
 	}
+	
+	@Override
+    public void setObjectives(Campaign campaign, AtBContract contract) {
+        ScenarioObjective destroyHostiles = isAttacker() ?
+                CommonObjectiveFactory.getBreakthrough(contract, this, campaign, 50, 
+                        OffBoardDirection.translateBoardStart(AtBDynamicScenarioFactory.getOppositeEdge(getStart()))) :
+                CommonObjectiveFactory.getPreventEnemyBreakthrough(contract, 50, 
+                        OffBoardDirection.translateBoardStart(getEnemyHome()));
+        ScenarioObjective keepAttachedUnitsAlive = CommonObjectiveFactory.getKeepAttachedGroundUnitsAlive(contract, this);
+        
+        if(keepAttachedUnitsAlive != null) {
+            getObjectives().add(keepAttachedUnitsAlive);
+        }
+        
+        getObjectives().add(destroyHostiles);
+    }
 }

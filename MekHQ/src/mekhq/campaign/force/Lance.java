@@ -321,7 +321,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
         battleTypeMod += getContract(c).getBattleTypeMod();
         
         return AtBScenarioFactory.createScenario(c, this,
-                AtBScenario.STANDUP, true,
+                AtBScenario.CIVILIANHELP, false,
                 getBattleDate(c.getCalendar()));
         
         /*switch (role) {

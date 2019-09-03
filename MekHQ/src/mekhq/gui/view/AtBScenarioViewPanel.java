@@ -402,6 +402,9 @@ public class AtBScenarioViewPanel extends JPanel {
             }
             
             for(String associatedUnitID : objective.getAssociatedUnitIDs()) {
+                if(!scenario.getExternalIDLookup().containsKey(associatedUnitID)) {
+                    continue;
+                }
                 objectiveBuilder.append("\t");
                 objectiveBuilder.append(scenario.getExternalIDLookup().get(associatedUnitID).getShortName());
                 objectiveBuilder.append("\n");

@@ -9,12 +9,15 @@ package mekhq.campaign.mission;
 public class ObjectiveEffect {
     
     public enum ObjectiveEffectType {
+        ScenarioVictory,
+        ScenarioDefeat,
         ContractScoreUpdate,
         SupportPointUpdate,
         ContractMoraleUpdate,
         ContractVictory,
         ContractDefeat,
-        BVBudgetUpdate
+        BVBudgetUpdate,
+        AtBBonus
     }        
     
     public ObjectiveEffectType effectType;
@@ -22,6 +25,10 @@ public class ObjectiveEffect {
     public boolean scaledEffect;
     // how much of the effect per unit, or how much of the effect fixed
     public int howMuch;
+    
+    public int getEffect() {
+        return scaledEffect ? howMuch : 1;
+    }
     
     @Override
     public String toString() {

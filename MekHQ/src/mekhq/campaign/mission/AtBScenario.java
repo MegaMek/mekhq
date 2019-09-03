@@ -170,6 +170,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             EntityWeightClass.WEIGHT_HEAVY
     };
 
+    public static final int NO_LANCE = -1;
+    
     private boolean attacker;
     private int lanceForceId; // -1 if scenario is not generated for a specific lance (special mission, big battle)
     private int lanceRole; /* set when scenario is created in case it is changed for the next week before the scenario is resolved;
@@ -190,8 +192,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     private int lanceCount;
     private int rerollsRemaining;
     private int enemyHome;
-    
-    List<ScenarioObjective> scenarioObjectives;
     
     ArrayList<Entity> alliesPlayer;
     ArrayList<BotForce> botForces;
@@ -242,7 +242,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         entityIds = new HashMap<UUID, Entity>();
         transportLinkages = new HashMap<>();
         externalIDLookup = new HashMap<>();
-        scenarioObjectives = new ArrayList<>();
+        setScenarioObjectives(new ArrayList<>());
 
         light = PlanetaryConditions.L_DAY;
         weather = PlanetaryConditions.WE_NONE;
@@ -660,6 +660,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         } else {
             setBigBattleForces(campaign);
         }
+        
+        setObjectives(campaign, getContract(campaign));
     }
 
     /**
@@ -810,8 +812,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 });
             }
         }
-        
-        setObjectives(campaign, getContract(campaign));
     }
 
     @Override
@@ -1462,12 +1462,12 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             failureEffect.howMuch = -5;
             
             dropshipObjective.addFailureEffect(failureEffect);
-            scenarioObjectives.add(dropshipObjective);
+            getScenarioObjectives().add(dropshipObjective);
         }
     }
     
     public List<ScenarioObjective> getObjectives() {
-        return scenarioObjectives;
+        return getScenarioObjectives();
     }
     
     /* Convenience methods for frequently-used arguments */

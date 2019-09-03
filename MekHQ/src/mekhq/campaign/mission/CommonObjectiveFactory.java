@@ -1,0 +1,197 @@
+package mekhq.campaign.mission;
+
+import java.util.UUID;
+
+import megamek.common.Dropship;
+import megamek.common.Entity;
+import megamek.common.OffBoardDirection;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
+import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
+
+/**
+ * This class contains code for the creation of some common objectives for an AtB scenario
+ * @author NickAragua
+ *
+ */
+public class CommonObjectiveFactory {
+    /**
+     * Generates a "keep the attached units alive" objective that applies to 
+     * attached liaisons, trainees, house units and integrated units, giving a -1 contract score penalty for each
+     * one that gets totaled. Does not include dropships.
+     */
+    public static ScenarioObjective getKeepAttachedGroundUnitsAlive(AtBContract contract, AtBScenario scenario) {
+        ScenarioObjective keepAttachedUnitsAlive = new ScenarioObjective();
+        keepAttachedUnitsAlive.setDescription("The following unit(s) deployed by your employer must survive. Each one destroyed results in a 1 point penalty to your contract score:");
+        keepAttachedUnitsAlive.setObjectiveCriterion(ObjectiveCriterion.Preserve);
+        keepAttachedUnitsAlive.setPercentage(100);
+
+        for(int botForceID = 0; botForceID < scenario.getNumBots(); botForceID++) {
+            // kind of hack-ish:
+            // if there's an allied bot that shares employer name, then add it to the objective
+            // we know there's only one of those, so break out of the loop when we see it
+            if(scenario.getBotForce(botForceID).getName().equals(contract.getAllyBotName())) {
+                keepAttachedUnitsAlive.addForce(contract.getAllyBotName());
+                break;
+            }
+        }
+        
+        for(Entity attachedAlly : scenario.getAlliesPlayer()) {
+            // only attach non-dropship units
+            if(!(attachedAlly instanceof Dropship)) {
+                keepAttachedUnitsAlive.addUnit(attachedAlly.getExternalIdAsString());
+            }
+        }
+        
+        if(keepAttachedUnitsAlive.getAssociatedForceNames().size() == 0 && 
+                keepAttachedUnitsAlive.getAssociatedUnitIDs().size() == 0) {
+            return null;
+        }
+        
+        ObjectiveEffect failureEffect = new ObjectiveEffect();
+        failureEffect.effectType = ObjectiveEffectType.ContractScoreUpdate;
+        failureEffect.scaledEffect = true;
+        failureEffect.howMuch = -1;
+        
+        keepAttachedUnitsAlive.addFailureEffect(failureEffect);
+        
+        return keepAttachedUnitsAlive;
+    }
+
+    /**
+     * Generates a "keep at least X% of all units" objective from the primary player force,
+     * as well as any attached allies, alive
+     * @param campaign
+     * @param contract
+     * @param scenario
+     * @return
+     */
+    public static ScenarioObjective getKeepFriendliesAlive(Campaign campaign, AtBContract contract, AtBScenario scenario, int percentage) {
+        ScenarioObjective keepFriendliesAlive = new ScenarioObjective();
+        keepFriendliesAlive.setDescription(String.format("Ensure that at least %d%% of the following force(s) and unit(s) survive:", percentage));
+        keepFriendliesAlive.setObjectiveCriterion(ObjectiveCriterion.Preserve);
+        keepFriendliesAlive.setPercentage(percentage);
+        // some scenarios have a lance assigned
+        // some scenarios have individual units assigned
+        if(scenario.getLanceForceId() != AtBScenario.NO_LANCE) {
+            keepFriendliesAlive.addForce(campaign.getForce(scenario.getLanceForceId()).getName());
+        } else {
+            for(UUID unitID : scenario.getForces(campaign).getUnits()) {
+                keepFriendliesAlive.addUnit(unitID.toString());
+            }
+        }
+        for(int botForceID = 0; botForceID < scenario.getNumBots(); botForceID++) {
+            // kind of hack-ish:
+            // if there's an allied bot that shares employer name, then add it to the survival objective
+            // we know there's only one of those, so break out of the loop when we see it
+            if(scenario.getBotForce(botForceID).getName().equals(contract.getAllyBotName())) {
+                keepFriendliesAlive.addForce(contract.getAllyBotName());
+                break;
+            }
+        }
+        
+        for(Entity attachedAlly : scenario.getAlliesPlayer()) {
+            // only attach non-dropship units
+            if(!(attachedAlly instanceof Dropship)) {
+                keepFriendliesAlive.addUnit(attachedAlly.getExternalIdAsString());
+            }
+        }
+        
+        ObjectiveEffect friendlyFailureEffect = new ObjectiveEffect();
+        friendlyFailureEffect.effectType = ObjectiveEffectType.ScenarioDefeat;
+        keepFriendliesAlive.addFailureEffect(friendlyFailureEffect);  
+        
+        return keepFriendliesAlive;
+    }
+
+    /** 
+     * Generates a "destroy x% of all units" from the primary opposing force objective
+     * @param contract
+     * @param percentage
+     * @return
+     */
+    public static ScenarioObjective getDestroyEnemies(AtBContract contract, int percentage) {
+        ScenarioObjective destroyHostiles = new ScenarioObjective();
+        destroyHostiles.setDescription(String.format("Destroy, cripple or force the withdrawal of at least %d%% of the following enemy force(s):", percentage));
+        destroyHostiles.setObjectiveCriterion(ObjectiveCriterion.ForceWithdraw);
+        destroyHostiles.setPercentage(percentage);
+        destroyHostiles.addForce(contract.getEnemyBotName());
+        
+        ObjectiveEffect successEffect = new ObjectiveEffect();
+        successEffect.effectType = ObjectiveEffectType.ScenarioVictory;
+        destroyHostiles.addSuccessEffect(successEffect);
+        
+        return destroyHostiles;
+    }
+    
+    /** 
+     * Generates a "destroy x% of all units" from the primary opposing force objective
+     * @param contract
+     * @param percentage
+     * @return
+     */
+    public static ScenarioObjective getPreventEnemyBreakthrough(AtBContract contract, int percentage, OffBoardDirection direction) {
+        ScenarioObjective destroyHostiles = new ScenarioObjective();
+        destroyHostiles.setDescription(
+                String.format("Prevent at least %d%% of the following enemy force(s) from reaching the %s edge:", percentage, direction));
+        destroyHostiles.setObjectiveCriterion(ObjectiveCriterion.PreventReachMapEdge);
+        destroyHostiles.setPercentage(percentage);
+        destroyHostiles.setDestinationEdge(direction);
+        destroyHostiles.addForce(contract.getEnemyBotName());
+        
+        ObjectiveEffect successEffect = new ObjectiveEffect();
+        successEffect.effectType = ObjectiveEffectType.ScenarioVictory;
+        destroyHostiles.addSuccessEffect(successEffect);
+        
+        return destroyHostiles;
+    }
+    
+    /** 
+     * Generates a "reach X edge with x% of all allied + player units" objective
+     */
+    public static ScenarioObjective getBreakthrough(AtBContract contract, AtBScenario scenario, Campaign campaign, 
+            int percentage, OffBoardDirection direction) {
+        ScenarioObjective breakthrough = new ScenarioObjective();
+        breakthrough.setDescription(
+                String.format("Reach the %s edge with at least %d%% of the following player and attached units and allied force(s):", direction, percentage));
+        breakthrough.setObjectiveCriterion(ObjectiveCriterion.PreventReachMapEdge);
+        breakthrough.setPercentage(percentage);
+        breakthrough.setDestinationEdge(direction);
+     
+        // some scenarios have a lance assigned
+        // some scenarios have individual units assigned
+        if(scenario.getLanceForceId() != AtBScenario.NO_LANCE) {
+            breakthrough.addForce(campaign.getForce(scenario.getLanceForceId()).getName());
+        } else {
+            for(UUID unitID : scenario.getForces(campaign).getUnits()) {
+                breakthrough.addUnit(unitID.toString());
+            }
+        }
+        for(int botForceID = 0; botForceID < scenario.getNumBots(); botForceID++) {
+            // kind of hack-ish:
+            // if there's an allied bot that shares employer name, then add it to the survival objective
+            // we know there's only one of those, so break out of the loop when we see it
+            if(scenario.getBotForce(botForceID).getName().equals(contract.getAllyBotName())) {
+                breakthrough.addForce(contract.getAllyBotName());
+                break;
+            }
+        }
+        
+        for(Entity attachedAlly : scenario.getAlliesPlayer()) {
+            // only attach non-dropship units
+            if(!(attachedAlly instanceof Dropship)) {
+                breakthrough.addUnit(attachedAlly.getExternalIdAsString());
+            }
+        }
+        
+        ObjectiveEffect successEffect = new ObjectiveEffect();
+        successEffect.effectType = ObjectiveEffectType.ScenarioVictory;
+        breakthrough.addSuccessEffect(successEffect);
+        
+        ObjectiveEffect failureEffect = new ObjectiveEffect();
+        failureEffect.effectType = ObjectiveEffectType.ScenarioDefeat;
+        breakthrough.addFailureEffect(failureEffect);
+        
+        return breakthrough;
+    }
+}

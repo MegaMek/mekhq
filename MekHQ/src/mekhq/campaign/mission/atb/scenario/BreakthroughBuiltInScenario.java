@@ -7,9 +7,14 @@ import megamek.client.bot.princess.PrincessException;
 import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Entity;
+import megamek.common.OffBoardDirection;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.mission.CommonObjectiveFactory;
+import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 
 @AtBScenarioEnabled
@@ -33,7 +38,8 @@ public class BreakthroughBuiltInScenario extends AtBScenario {
 
 	@Override
 	public int getMapX() {
-		return 18;
+	    // make it a little wider for bigger scenarios
+		return 18 + this.getLanceCount();
 	}
 
 	@Override
@@ -53,17 +59,17 @@ public class BreakthroughBuiltInScenario extends AtBScenario {
 		int playerHome;
 
 		if (isAttacker()) {
-			playerHome = Board.START_S;
+			playerHome = Compute.d6() > 3 ? Board.START_S : Board.START_N;
 			setStart(playerHome);
 
 			enemyStart = Board.START_CENTER;
-			setEnemyHome(Board.START_N);
+			setEnemyHome(AtBDynamicScenarioFactory.getOppositeEdge(playerHome));
 		} else {
 			setStart(Board.START_CENTER);
 			playerHome = Board.START_N;
-			enemyStart = Board.START_S;
+			enemyStart = Compute.d6() > 3 ? Board.START_S : Board.START_N;
 
-			setEnemyHome(enemyStart);
+			setEnemyHome(AtBDynamicScenarioFactory.getOppositeEdge(enemyStart));
 		}
 
 		BotForce allyEntitiesForce = null;
@@ -81,9 +87,11 @@ public class BreakthroughBuiltInScenario extends AtBScenario {
 				if (null != allyEntitiesForce) {
 					allyEntitiesForce
 							.setBehaviorSettings(BehaviorSettingsFactory.getInstance().ESCAPE_BEHAVIOR.getCopy());
+					allyEntitiesForce.setDestinationEdge(AtBDynamicScenarioFactory.getOppositeEdge(getStart()));
 				}
 			} else {
 				botForce.setBehaviorSettings(BehaviorSettingsFactory.getInstance().ESCAPE_BEHAVIOR.getCopy());
+				botForce.setDestinationEdge(getEnemyHome());
 			}
 		} catch (PrincessException e) {
 			e.printStackTrace();
@@ -96,4 +104,18 @@ public class BreakthroughBuiltInScenario extends AtBScenario {
 	public boolean canAddDropShips() {
 		return !isAttacker() && (Compute.d6() == 1);
 	}
+	
+	@Override
+    public void setObjectives(Campaign campaign, AtBContract contract) {
+        ScenarioObjective destroyHostiles = isAttacker() ?
+                CommonObjectiveFactory.getBreakthrough(contract, this, campaign, 66, OffBoardDirection.translateBoardStart(getStart())) :
+                CommonObjectiveFactory.getPreventEnemyBreakthrough(contract, 50, OffBoardDirection.translateBoardStart(getEnemyHome()));
+        ScenarioObjective keepAttachedUnitsAlive = CommonObjectiveFactory.getKeepAttachedGroundUnitsAlive(contract, this);
+        
+        if(keepAttachedUnitsAlive != null) {
+            getObjectives().add(keepAttachedUnitsAlive);
+        }
+        
+        getObjectives().add(destroyHostiles);
+    }
 }

@@ -7,8 +7,14 @@ import megamek.common.Entity;
 import megamek.common.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.market.UnitMarket;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.mission.CommonObjectiveFactory;
+import mekhq.campaign.mission.ObjectiveEffect;
+import mekhq.campaign.mission.ScenarioObjective;
+import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
+import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 
 @AtBScenarioEnabled
@@ -97,4 +103,25 @@ public class AllyRescueBuiltInScenario extends AtBScenario {
 		
 		addBotForce(getEnemyBotForce(getContract(campaign), Board.START_N, enemyEntities));
 	}
+	
+	@Override
+    public void setObjectives(Campaign campaign, AtBContract contract) {
+        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 50);
+        ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 50);
+        
+        // in addition to the standard destroy 50/preserve 50, you need to keep at least 3/8 of the "allied" units alive.
+        ScenarioObjective keepAlliesAlive = new ScenarioObjective();
+        keepFriendliesAlive.setDescription("Ensure that at least 37% of the following force(s) and unit(s) survive:");
+        keepFriendliesAlive.setObjectiveCriterion(ObjectiveCriterion.Preserve);
+        keepFriendliesAlive.setPercentage(37);
+        keepFriendliesAlive.addForce(contract.getAllyBotName());
+        
+        ObjectiveEffect friendlyFailureEffect = new ObjectiveEffect();
+        friendlyFailureEffect.effectType = ObjectiveEffectType.ScenarioDefeat;
+        keepFriendliesAlive.addFailureEffect(friendlyFailureEffect); 
+        
+        getObjectives().add(destroyHostiles);
+        getObjectives().add(keepFriendliesAlive);
+        getObjectives().add(keepAlliesAlive);
+    }
 }

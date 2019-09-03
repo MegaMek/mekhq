@@ -75,6 +75,8 @@ public class Scenario implements Serializable {
     
     //allow multiple loot objects for meeting different mission objectives
     private ArrayList<Loot> loots;
+
+    private List<ScenarioObjective> scenarioObjectives;
     
     public Scenario() {
         this(null);
@@ -153,6 +155,14 @@ public class Scenario implements Serializable {
         return date;
     }
     
+    public List<ScenarioObjective> getScenarioObjectives() {
+        return scenarioObjectives;
+    }
+
+    public void setScenarioObjectives(List<ScenarioObjective> scenarioObjectives) {
+        this.scenarioObjectives = scenarioObjectives;
+    }
+
     public int getId() {
         return id;
     }
@@ -292,6 +302,11 @@ public class Scenario implements Serializable {
                 +"</id>");
         if(null != stub) {
             stub.writeToXml(pw1, indent+1);
+        } else {
+            // only bother writing out objectives for active scenarios
+            for(ScenarioObjective objective : this.scenarioObjectives) {
+                objective.Serialize(pw1);
+            }
         }
         if(loots.size() > 0 && status == S_CURRENT) {
             pw1.println(MekHqXmlUtil.indentStr(indent+1)+"<loots>");
@@ -363,6 +378,7 @@ public class Scenario implements Serializable {
         	}
         	            
             retVal.loadFieldsFromXmlNode(wn);
+            retVal.scenarioObjectives = new ArrayList<>();
             
             // Okay, now load Part-specific fields!
             NodeList nl = wn.getChildNodes();
@@ -402,6 +418,8 @@ public class Scenario implements Serializable {
                         Loot loot = Loot.generateInstanceFromXML(wn3, c, version);
                         retVal.loots.add(loot);
                     }
+                } else if (wn2.getNodeName().equalsIgnoreCase(ScenarioObjective.ROOT_XML_ELEMENT_NAME)) {
+                    retVal.getScenarioObjectives().add(ScenarioObjective.Deserialize(wn2));
                 }
             }
         } catch (Exception ex) {

@@ -41,6 +41,7 @@ import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Mission;
@@ -59,7 +60,7 @@ import mekhq.gui.FileDialogs;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class ResolveScenarioTracker {
-    //Hashtable<UUID, Entity> entities;
+    Map<UUID, Entity> entities;
     Hashtable<UUID, UnitStatus> unitsStatus;
     Hashtable<UUID, UnitStatus> salvageStatus;
     Hashtable<UUID, Crew> pilots;
@@ -110,6 +111,7 @@ public class ResolveScenarioTracker {
         killCredits = new Hashtable<>();
         ejections = new Hashtable<>();
         enemyEjections = new Hashtable<>();
+        entities = new HashMap<>();
         for(UUID uid : scenario.getForces(campaign).getAllUnits()) {
             Unit u = campaign.getUnit(uid);
             if(null != u && null == u.checkDeployment()) {
@@ -180,6 +182,9 @@ public class ResolveScenarioTracker {
                 // Sub-entities have their own entry in the VictoryEvent data
                 continue;
             }
+            
+            entities.put(UUID.fromString(e.getExternalIdAsString()), e);
+            
             checkForLostLimbs(e, control);
             if(e.getOwnerId() == pid) {
                 if(!e.getExternalIdAsString().equals("-1")) {
@@ -871,6 +876,7 @@ public class ResolveScenarioTracker {
             killCredits = parser.getKills();
 
             for (Entity e : parser.getSurvivors()) {
+                entities.put(UUID.fromString(e.getExternalIdAsString()), e);
                 checkForLostLimbs(e, control);
                 if(!e.getExternalIdAsString().equals("-1")) {
                     UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
@@ -899,6 +905,7 @@ public class ResolveScenarioTracker {
             }
 
             for (Entity e : parser.getAllies()) {
+                entities.put(UUID.fromString(e.getExternalIdAsString()), e);
                 checkForLostLimbs(e, control);
                 if(!e.getExternalIdAsString().equals("-1")) {
                     UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
@@ -927,6 +934,7 @@ public class ResolveScenarioTracker {
 
             // Utterly destroyed entities
             for (Entity e : parser.getDevastated()) {
+                entities.put(UUID.fromString(e.getExternalIdAsString()), e);
                 UnitStatus status = null;
                 if(!e.getExternalIdAsString().equals("-1")) {
                     status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
@@ -944,6 +952,7 @@ public class ResolveScenarioTracker {
             }
 
             for(Entity e : parser.getSalvage()) {
+                entities.put(UUID.fromString(e.getExternalIdAsString()), e);
                 checkForLostLimbs(e, control);
                 UnitStatus status = null;
                 if(!e.getExternalIdAsString().equals("-1") && e.isSalvage()) {
@@ -979,6 +988,10 @@ public class ResolveScenarioTracker {
                     }
                 }
             }
+            
+            for(Entity e : parser.getRetreated()) {
+                entities.put(UUID.fromString(e.getExternalIdAsString()), e);
+            }
         }
     }
     
@@ -994,7 +1007,26 @@ public class ResolveScenarioTracker {
     		Crew crew = u.getEntity().getCrew();
             if(null != crew && !crew.getExternalIdAsString().equals("-1")) {
             	pilots.put(UUID.fromString(crew.getExternalIdAsString()), crew);
-            }    		
+            }
+            
+            entities.put(UUID.fromString(u.getEntity().getExternalIdAsString()), u.getEntity());
+    	}
+    	
+    	// if it's an AtB scenario, load up all the bot units into the entities collection
+    	// for objective processing
+    	if(scenario instanceof AtBScenario) {
+    	    AtBScenario atbScenario = (AtBScenario) scenario;
+    	    for(Entity e : atbScenario.getAlliesPlayer()) {
+    	        entities.put(UUID.fromString(e.getExternalIdAsString()), e);
+    	    }
+    	    
+    	    for(int x = 0; x < atbScenario.getNumBots(); x++) {
+    	        BotForce botForce = atbScenario.getBotForce(x);
+    	        
+    	        for(Entity e : botForce.getEntityList()) {
+                    entities.put(UUID.fromString(e.getExternalIdAsString()), e);
+                }
+    	    }
     	}
     }
 
@@ -1330,6 +1362,10 @@ public class ResolveScenarioTracker {
 
     public Hashtable<UUID, UnitStatus> getSalvageStatus() {
         return salvageStatus;
+    }
+    
+    public Map<UUID, Entity> getAllInvolvedUnits() {
+        return entities;
     }
 
     public ArrayList<Loot> getPotentialLoot() {

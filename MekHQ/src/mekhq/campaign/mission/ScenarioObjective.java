@@ -1,5 +1,6 @@
 package mekhq.campaign.mission;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,13 +9,25 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.namespace.QName;
+
+import org.w3c.dom.Node;
+
 import megamek.common.OffBoardDirection;
+import mekhq.MekHQ;
 
 /**
  * Contains metadata used to describe a scenario objective
  * @author NickAragua
  */
 public class ScenarioObjective {
+    public static final String ROOT_XML_ELEMENT_NAME = "ScenarioObjective";
     private static Map<ObjectiveCriterion, String> objectiveTypeMapping;
     
     static {
@@ -32,9 +45,21 @@ public class ScenarioObjective {
     private String description;
     private OffBoardDirection destinationEdge;
     private int percentage;
+    
+    @XmlElementWrapper(name="associatedForceNames")
+    @XmlElement(name="associatedForceName")
     private Set<String> associatedForceNames = new HashSet<>();
+    
+    @XmlElementWrapper(name="associatedUnitIDs")
+    @XmlElement(name="associatedUnitID")
     private Set<String> associatedUnitIDs = new HashSet<>();
+    
+    @XmlElementWrapper(name="successEffects")
+    @XmlElement(name="successEffect")
     private List<ObjectiveEffect> successEffects = new ArrayList<>();
+    
+    @XmlElementWrapper(name="failureEffects")
+    @XmlElement(name="failureEffect")
     private List<ObjectiveEffect> failureEffects = new ArrayList<>();
     
     /**
@@ -135,6 +160,10 @@ public class ScenarioObjective {
         this.percentage = percentage;
     }
 
+    public String toShortString() {
+        return String.format("%s %d%%", objectiveCriterion.toString(), percentage);
+    }
+    
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -182,5 +211,42 @@ public class ScenarioObjective {
         }
         
         return sb.toString();
+    }
+
+    /**
+     * Serialize this instance of a ScenarioObjective to a PrintWriter
+     * Omits initial xml declaration
+     * @param pw The destination print writer
+     */
+    public void Serialize(PrintWriter pw) {
+        try {
+            JAXBContext context = JAXBContext.newInstance(ScenarioObjective.class);
+            JAXBElement<ScenarioObjective> templateElement = new JAXBElement<>(new QName(ROOT_XML_ELEMENT_NAME), ScenarioObjective.class, this);
+            Marshaller m = context.createMarshaller();
+            m.setProperty("jaxb.fragment", true);
+            m.marshal(templateElement, pw);
+        } catch(Exception e) {
+            MekHQ.getLogger().error(ScenarioTemplate.class, "Serialize", e.getMessage());
+        }
+    }
+    
+    /**
+     * Attempt to deserialize an instance of a ScenarioObjective from the passed-in XML Node
+     * @param xmlNode The node with the scenario template
+     * @return Possibly an instance of a ScenarioTemplate
+     */
+    public static ScenarioObjective Deserialize(Node xmlNode) {
+        ScenarioObjective resultingObjective = null;
+        
+        try {
+            JAXBContext context = JAXBContext.newInstance(ScenarioObjective.class);
+            Unmarshaller um = context.createUnmarshaller();
+            JAXBElement<ScenarioObjective> templateElement = um.unmarshal(xmlNode, ScenarioObjective.class);
+            resultingObjective = templateElement.getValue();
+        } catch(Exception e) {
+            MekHQ.getLogger().error(ScenarioTemplate.class, "Deserialize", "Error Deserializing Scenario Objective", e);
+        }
+        
+        return resultingObjective;
     }
 }
