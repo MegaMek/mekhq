@@ -644,7 +644,11 @@ public class Planet implements Serializable {
     }
 
     public String getFactionDesc(DateTime when) {
-        return Faction.getFactionNames(getFactionSet(when), when.getYear());
+    	String toReturn = Faction.getFactionNames(getFactionSet(when), when.getYear());
+    	if(toReturn.isEmpty()) {
+    		toReturn = "Uncolonized"; //$NON-NLS-1$ $NON-NLS-2$
+    	}
+        return toReturn;
     }
     
     /** @return the distance to another planet in light years (0 if both are in the same system) */
