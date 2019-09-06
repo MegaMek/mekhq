@@ -422,9 +422,9 @@ public class Planet implements Serializable {
     	}
     	Integer pos = 0;
     	for(int i = 1; i <= sysPos; i++) {
-    		if(getParentSystem().getPlanet(i).getPlanetType().equals("Asteroid Belt")) {
-    			continue;
-    		}
+    		//if(getParentSystem().getPlanet(i).getPlanetType().equals("Asteroid Belt")) {
+    		//	continue;
+    		//}
     		pos++;
     	}
         return pos.toString(); //$NON-NLS-1$

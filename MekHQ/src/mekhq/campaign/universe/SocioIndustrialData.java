@@ -122,7 +122,7 @@ public class SocioIndustrialData {
             sb.append("F: No industrialization<br>");
             break;
         default:
-            sb.append("X: Industrialization level unknown<br>");
+            sb.append("X: None<br>");
             break;
         }
         switch(rawMaterials) {
@@ -145,7 +145,7 @@ public class SocioIndustrialData {
             sb.append("F: No economically viable local raw material production<br>");
             break;
         default:
-            sb.append("X: Raw material dependence unknown<br>");
+            sb.append("X: None<br>");
             break;
         }
         switch(output) {
@@ -165,10 +165,10 @@ public class SocioIndustrialData {
             sb.append("E: Negligable industrial output<br>");
             break;
         case EquipmentType.RATING_F:
-            sb.append("F: No industrial output<br>"); // Good for Ferengi
+            sb.append("F: None<br>"); // Good for Ferengi
             break;
         default:
-            sb.append("X: Industrial output unknown<br>");
+            sb.append("X: None<br>");
             break;
         }
         switch(agriculture) {
@@ -191,7 +191,7 @@ public class SocioIndustrialData {
             sb.append("F: Barren world<br>");
             break;
         default:
-            sb.append("X: Agricultural level unknown<br>");
+            sb.append("X: None<br>");
             break;
         }
 

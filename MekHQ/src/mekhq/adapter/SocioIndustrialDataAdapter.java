@@ -35,16 +35,15 @@ public class SocioIndustrialDataAdapter extends XmlAdapter<String, SocioIndustri
         stringToEquipmentTypeMap.put("B", EquipmentType.RATING_B); //$NON-NLS-1$
         stringToEquipmentTypeMap.put("C", EquipmentType.RATING_C); //$NON-NLS-1$
         stringToEquipmentTypeMap.put("D", EquipmentType.RATING_D); //$NON-NLS-1$
-        stringToEquipmentTypeMap.put("E", EquipmentType.RATING_E); //$NON-NLS-1$
         stringToEquipmentTypeMap.put("F", EquipmentType.RATING_F); //$NON-NLS-1$
+        stringToEquipmentTypeMap.put("X", EquipmentType.RATING_X); //$NON-NLS-1$
         equipmentTypeToStringMap.put(-1, "ADV"); //$NON-NLS-1$
         equipmentTypeToStringMap.put(EquipmentType.RATING_A, "A"); //$NON-NLS-1$
         equipmentTypeToStringMap.put(EquipmentType.RATING_B, "B"); //$NON-NLS-1$
         equipmentTypeToStringMap.put(EquipmentType.RATING_C, "C"); //$NON-NLS-1$
         equipmentTypeToStringMap.put(EquipmentType.RATING_D, "D"); //$NON-NLS-1$
-        equipmentTypeToStringMap.put(EquipmentType.RATING_E, "E"); //$NON-NLS-1$
         equipmentTypeToStringMap.put(EquipmentType.RATING_F, "F"); //$NON-NLS-1$
-        equipmentTypeToStringMap.put(EquipmentType.RATING_X, "R"); //$NON-NLS-1$
+        equipmentTypeToStringMap.put(EquipmentType.RATING_X, "X"); //$NON-NLS-1$
     }
     private final String SEPARATOR = "-"; //$NON-NLS-1$
     
