@@ -159,12 +159,17 @@ public class PlanetViewPanel extends JPanel {
             JLabel lblPosition = new JLabel(resourceMap.getString("lblPosition.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblPosition, gbcLabel);            
-            String text;
+            String text = "?";
             if(null != planet.getOrbitRadius()) {
-                text = String.format("%s (%.3f AU)", //$NON-NLS-1$
-                    planet.getSystemPositionText(), planet.getOrbitRadius());
+            	if(planet.getPlanetType().equals("Asteroid Belt")) {
+            		text = String.format("%.3f AU", //$NON-NLS-1$
+            				planet.getOrbitRadius());
+            	} else {
+            		text = String.format("%s (%.3f AU)", //$NON-NLS-1$
+            				planet.getDiplayableSystemPosition(), planet.getOrbitRadius());
+            	}
             } else {
-                text = planet.getSystemPositionText();
+                text = planet.getDiplayableSystemPosition();
             }
             JTextArea txtPosition = new JTextArea(text);
             txtPosition.setEditable(false);

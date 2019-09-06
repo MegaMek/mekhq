@@ -409,8 +409,25 @@ public class Planet implements Serializable {
         return sysPos;
     }
     
-    public String getSystemPositionText() {
-        return null != sysPos ? sysPos.toString() : "?"; //$NON-NLS-1$
+    /**
+     * This function returns a system position for the planet that does not account for asteroid belts. Therefore
+     * this result may be different than that actual sysPos variable.
+     * @return String of system position after removing asteroid belts
+     */
+    public String getDiplayableSystemPosition() {
+    	//We won't give the actual system position here, because we don't want asteroid belts to count
+    	//for system position
+    	if(null == getParentSystem()) {
+    		return null != sysPos ? sysPos.toString() : "?"; //$NON-NLS-1$
+    	}
+    	Integer pos = 0;
+    	for(int i = 1; i <= sysPos; i++) {
+    		if(getParentSystem().getPlanet(i).getPlanetType().equals("Asteroid Belt")) {
+    			continue;
+    		}
+    		pos++;
+    	}
+        return pos.toString(); //$NON-NLS-1$
     }
     
     public String getDescription() {
