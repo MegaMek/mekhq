@@ -1699,4 +1699,8 @@ public class ResolveScenarioTracker {
     public void setEvent(GameVictoryEvent gve) {
         victoryEvent = gve;
     }
+    
+    public boolean playerHasBattlefieldControl() {
+        return control;
+    }
 }

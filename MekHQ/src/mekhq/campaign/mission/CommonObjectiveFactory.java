@@ -121,6 +121,10 @@ public class CommonObjectiveFactory {
         successEffect.effectType = ObjectiveEffectType.ScenarioVictory;
         destroyHostiles.addSuccessEffect(successEffect);
         
+        ObjectiveEffect failureEffect = new ObjectiveEffect();
+        failureEffect.effectType = ObjectiveEffectType.ScenarioDefeat;
+        destroyHostiles.addFailureEffect(failureEffect);
+        
         return destroyHostiles;
     }
     
@@ -154,7 +158,7 @@ public class CommonObjectiveFactory {
         ScenarioObjective breakthrough = new ScenarioObjective();
         breakthrough.setDescription(
                 String.format("Reach the %s edge with at least %d%% of the following player and attached units and allied force(s):", direction, percentage));
-        breakthrough.setObjectiveCriterion(ObjectiveCriterion.PreventReachMapEdge);
+        breakthrough.setObjectiveCriterion(ObjectiveCriterion.ReachMapEdge);
         breakthrough.setPercentage(percentage);
         breakthrough.setDestinationEdge(direction);
      

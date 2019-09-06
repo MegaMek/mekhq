@@ -118,6 +118,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private ArrayList<UnitStatus> ustatuses;
     private ArrayList<JLabel> lblsUnitName;
 
+    // maps objectives to list of associated entity checkboxes
     private Map<ScenarioObjective, List<JCheckBox>> objectiveCheckboxes;
 
     /*
@@ -609,6 +610,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             escaped.setSelected(!status.isLikelyCaptured());
             escaped.setEnabled(!(u.getEntity().isDestroyed() || u.getEntity().isDoomed()));
             escaped.addItemListener(evt -> checkSalvageRights());
+            escaped.setActionCommand(u.getEntity().getExternalIdAsString());
             escapeBoxes.add(escaped);
             btnSalvageViewUnit = new JButton("View Unit");
             btnSalvageViewUnit.setEnabled(true);
@@ -1066,6 +1068,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
                     
                     JCheckBox chkItemState = new JCheckBox(tracker.getAllInvolvedUnits().get(uuid).getShortName());
                     chkItemState.setSelected(qualifyingObjectiveUnits.get(objective).contains(unitID));
+                    chkItemState.setActionCommand(unitID);
                     chkItemState.addItemListener(new ItemListener() {
                         @Override
                         public void itemStateChanged(ItemEvent e) {
@@ -1148,8 +1151,40 @@ public class ResolveScenarioWizardDialog extends JDialog {
         btnFinish.setEnabled(false);
         boolean passedCurrent = false;
         boolean switchMade = false;
-        if (currentPanel.equals(ResolveScenarioWizardDialog.SALVAGEPANEL)) {
+        
+        // if we're done with the units panel, update the objectives state based on selection status
+        // and damaged editing results
+        if (currentPanel.equals(ResolveScenarioWizardDialog.UNITSPANEL)) {
+            for(int x = 0; x < chksTotaled.size(); x++) {
+                JCheckBox box = chksTotaled.get(x);
+                UUID id = UUID.fromString(box.getActionCommand());
+                objectiveProcessor.updateObjectiveEntityState(tracker.getAllInvolvedUnits().get(id), 
+                        false, box.isSelected(), !tracker.playerHasBattlefieldControl());
+            }
         }
+        
+        // if we're done with the salvage panel, update the objectives state based on selection status
+        // and damaged editing results
+        if (currentPanel.equals(ResolveScenarioWizardDialog.SALVAGEPANEL)) {
+            for(int x = 0; x < escapeBoxes.size(); x++) {
+                JCheckBox box = escapeBoxes.get(x);
+                UUID id = UUID.fromString(box.getActionCommand());
+                objectiveProcessor.updateObjectiveEntityState(tracker.getAllInvolvedUnits().get(id), 
+                        box.isSelected(), false, tracker.playerHasBattlefieldControl());
+            }
+        }
+        
+        // now update the objective panel if we updated objective state
+        if(currentPanel.equals(ResolveScenarioWizardDialog.UNITSPANEL) ||
+                currentPanel.equals(ResolveScenarioWizardDialog.SALVAGEPANEL)) {
+            for(ScenarioObjective objective : objectiveCheckboxes.keySet()) {
+                for(JCheckBox checkBox : objectiveCheckboxes.get(objective)) {
+                    checkBox.setSelected(objectiveProcessor.getQualifyingObjectiveUnits()
+                            .get(objective).contains(checkBox.getActionCommand()));
+                }
+            }
+        }
+        
         for(int i = 0; i < panelOrder.length; i++) {
             String name = panelOrder[i];
             if(passedCurrent) {

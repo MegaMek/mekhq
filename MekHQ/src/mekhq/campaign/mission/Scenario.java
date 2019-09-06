@@ -34,6 +34,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.Entity;
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
@@ -444,4 +445,10 @@ public class Scenario implements Serializable {
         loots = new ArrayList<Loot>();
     }
     
+    public boolean isFriendlyUnit(Entity entity, Campaign campaign) {
+        int alpha = 1;
+        
+        return getForces(campaign).getUnits().stream().
+                anyMatch(unitID -> unitID.equals(UUID.fromString(entity.getExternalIdAsString())));
+    }
 }

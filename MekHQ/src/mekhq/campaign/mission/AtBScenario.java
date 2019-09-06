@@ -2140,4 +2140,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     public void setExternalIDLookup(HashMap<String, Entity> externalIDLookup) {
         this.externalIDLookup = externalIDLookup;
     }
+    
+    public boolean isFriendlyUnit(Entity entity, Campaign campaign) {
+        return getAlliesPlayer().stream().anyMatch(unit -> unit.getExternalIdAsString().equals(entity.getExternalIdAsString())) ||
+                super.isFriendlyUnit(entity, campaign);
+    }
 }

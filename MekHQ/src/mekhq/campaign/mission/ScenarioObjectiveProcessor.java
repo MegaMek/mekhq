@@ -40,7 +40,8 @@ public class ScenarioObjectiveProcessor {
             
             potentialObjectiveUnits.put(objective, currentObjectiveUnitIDs);
             
-            Set<String> qualifyingUnits = evaluateObjective(objective, currentObjectiveUnitIDs, tracker.getAllInvolvedUnits().values());
+            Set<String> qualifyingUnits = evaluateObjective(objective, currentObjectiveUnitIDs, 
+                    tracker.getAllInvolvedUnits().values(), tracker);
             qualifyingObjectiveUnits.put(objective, qualifyingUnits);
         }
     }
@@ -95,16 +96,78 @@ public class ScenarioObjectiveProcessor {
      * Evaluates whether the given list of units meets the given objective.
      * @return The list of units that qualify for the given objective.
      */
-    private Set<String> evaluateObjective(ScenarioObjective objective, Set<String> objectiveUnitIDs,  Collection<Entity> units) {
+    private Set<String> evaluateObjective(ScenarioObjective objective, Set<String> objectiveUnitIDs, 
+            Collection<Entity> units, ResolveScenarioTracker tracker) {
         Set<String> qualifyingUnits = new HashSet<>();
         
         for(Entity unit : units) {
-            if(entityMeetsObjective(unit, objective, objectiveUnitIDs, true)) {
+            // the "opponent" depends on whether the given unit was opposed to the player or not
+            boolean isFriendlyUnit =
+                    tracker.getScenario().isFriendlyUnit(unit, tracker.getCampaign());
+            
+            boolean opponentHasBattlefieldControl = 
+                    isFriendlyUnit ?
+                            !tracker.playerHasBattlefieldControl() :
+                            tracker.playerHasBattlefieldControl();
+            
+            if(entityMeetsObjective(unit, objective, objectiveUnitIDs, opponentHasBattlefieldControl)) {
                 qualifyingUnits.add(unit.getExternalIdAsString());
             }
         }
         
         return qualifyingUnits;
+    }
+    
+    /**
+     * Update the objective qualification status of a given entity based on its current state and
+     * on whether or not it has "escaped". Assumes that the entity is potentially eligible for the objective.
+     * @param entity
+     * @param forceEntityEscape Whether the entity was marked as 'escaped', regardless of entity status
+     * @param forceEntityDestruction Whether the entity was marked as 'destroyed', regardless of entity status
+     * @param opponentHasBattlefieldControl
+     */
+    public void updateObjectiveEntityState(Entity entity, boolean forceEntityEscape, 
+            boolean forceEntityDestruction, boolean opponentHasBattlefieldControl) {
+        for(ScenarioObjective objective : potentialObjectiveUnits.keySet()) {
+            boolean entityMeetsObjective = false;
+            
+            if(potentialObjectiveUnits.get(objective).contains(entity.getExternalIdAsString())) {
+                switch(objective.getObjectiveCriterion()) {
+                case Destroy:
+                    entityMeetsObjective = forceEntityDestruction || 
+                        !forceEntityEscape && entityIsDestroyed(entity, opponentHasBattlefieldControl);
+                    break;
+                case ForceWithdraw:
+                    entityMeetsObjective = forceEntityDestruction ||
+                        !forceEntityEscape && entityIsForcedWithdrawal(entity);
+                    break;
+                case Capture:
+                    entityMeetsObjective = !forceEntityEscape && entityIsCaptured(entity, opponentHasBattlefieldControl);
+                    break;
+                case PreventReachMapEdge:
+                    entityMeetsObjective = forceEntityDestruction ||
+                        !entityHasReachedDestinationEdge(entity, objective, opponentHasBattlefieldControl);
+                    break;
+                case Preserve:
+                    entityMeetsObjective = forceEntityEscape || 
+                        !forceEntityDestruction && !entityIsDestroyed(entity, opponentHasBattlefieldControl);
+                    break;
+                case ReachMapEdge:
+                    entityMeetsObjective = forceEntityEscape ||
+                        !forceEntityDestruction && entityHasReachedDestinationEdge(entity, objective, opponentHasBattlefieldControl);
+                    break;
+                // criteria that we have no way of tracking will not be doing any updates
+                default:
+                    continue;
+                }
+            }
+            
+            if(entityMeetsObjective) {
+                qualifyingObjectiveUnits.get(objective).add(entity.getExternalIdAsString());
+            } else {
+                qualifyingObjectiveUnits.get(objective).remove(entity.getExternalIdAsString());
+            }
+        }
     }
     
     /**
@@ -118,30 +181,61 @@ public class ScenarioObjectiveProcessor {
         if(objectiveUnitIDs.contains(entity.getExternalIdAsString())) {
             switch(objective.getObjectiveCriterion()) {
             case Destroy:
-                // we consider an entity destroyed if its crew has been killed or it's... uh... destroyed.
-                // also, if it's immobilized and the opponent has battlefield control
-                return entity.isDestroyed() || entity.getCrew().isDead() || entity.isImmobile() && opponentHasBattlefieldControl;
+                return entityIsDestroyed(entity, opponentHasBattlefieldControl);
             case ForceWithdraw:
-                // we consider an entity force-withdrawn if it's destroyed, crippled, or run off the field
-                return entity.isDestroyed() || entity.isCrippled(true) || entity.getRetreatedDirection() != OffBoardDirection.NONE;
+                return entityIsForcedWithdrawal(entity);
             case Capture:
-                // we consider an entity captured if it's been immobilized but not destroyed and hasn't left the field
-                return entity.isImmobile() && !entity.isDestroyed() && entity.getRetreatedDirection() == OffBoardDirection.NONE;
+                return entityIsCaptured(entity, !opponentHasBattlefieldControl);
             case PreventReachMapEdge:
-                // we've prevented the entity from reaching the edge if... 
-                return entity.getRetreatedDirection() != objective.getDestinationEdge();
+                return !entityHasReachedDestinationEdge(entity, objective, opponentHasBattlefieldControl);
             case Preserve:
-                // the entity is considered preserved if it hasn't been blown up
-                // also if it's immobilized but we've retained battlefield control
-                return !(entity.isDestroyed() || (entity.isImmobile() && !opponentHasBattlefieldControl));
+                return !entityIsDestroyed(entity, opponentHasBattlefieldControl);
             case ReachMapEdge:
-                return entity.getRetreatedDirection() == objective.getDestinationEdge();
+                return entityHasReachedDestinationEdge(entity, objective, opponentHasBattlefieldControl);
             default:
-                return false;                    
+                return false;
             }
         }
         
         return false;
+    }
+    
+    /**
+     * Check whether we should consider an entity as being destroyed for the purposes of a Destroy objective.
+     */
+    private boolean entityIsDestroyed(Entity entity, boolean opponentHasBattlefieldControl) {
+        // "destroy" is a kill
+        // it's destroyed if it's destroyed, or if it's been disabled and the enemy has no chance to recover it
+        return entity.isDestroyed() || (entity.getCrew().isDead() || entity.isImmobile()) && !opponentHasBattlefieldControl;
+    }
+    
+    /**
+     * Check whether we should consider an entity as being forced to withdraw for the purposes of a ForceWithdraw objective
+     */
+    private boolean entityIsForcedWithdrawal(Entity entity) {
+        // we consider an entity force-withdrawn if it's destroyed, crippled, or run off the field
+        // note: immobility and having a dead crew are captured within 'crippled'
+        return entity.isDestroyed() || entity.isCrippled(true) || entity.getRetreatedDirection() != OffBoardDirection.NONE;
+    }
+    
+    /**
+     * Check whether we should consider an entity as being captured for the purposes of a Capture objective.
+     */
+    private boolean entityIsCaptured(Entity entity, boolean opponentHasBattlefieldControl) {
+        // we consider an entity captured if it's been immobilized but not destroyed and hasn't left the field
+        // obviously can't capture it if we don't control the battlefield
+        return entity.isImmobile() && !entity.isDestroyed() && 
+                entity.getRetreatedDirection() == OffBoardDirection.NONE && !opponentHasBattlefieldControl;
+    }
+    
+    /**
+     * Check whether or not the entity can be considered as having reached the destination edge in the given objective
+     */
+    private boolean entityHasReachedDestinationEdge(Entity entity, ScenarioObjective objective, boolean opponentHasBattlefieldControl) {
+        // we've reached the edge if it hasn't gotten to the destination edge
+        // or the opponent has been routed and the entity hasn't been shot to hell
+        return entity.getRetreatedDirection() == objective.getDestinationEdge() ||
+                (!entity.isCrippled() && !entity.isDestroyed() && !opponentHasBattlefieldControl);
     }
     
     /**
