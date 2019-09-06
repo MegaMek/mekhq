@@ -96,10 +96,11 @@ public class Planet implements Serializable {
     private Double orbitRadius;
     
     // Stellar neighbourhood
-    @XmlElement(name="satellites")
-    private Integer numSatellites;
-    @XmlElement(name="satellite")
-    private List<String> satellites;
+  //for reading in because lists are easier
+    @XmlElement(name = "satellite")
+    private List<Satellite> satellites;
+    @XmlElement(name = "smallMoons")
+    private int smallMoons;
     
     // Global physical characteristics
     @XmlElement(name = "type")
@@ -352,16 +353,29 @@ public class Planet implements Serializable {
     }
 
 
-    public List<String> getSatellites() {
-        return null != satellites ? new ArrayList<String>(satellites) : null;
+    public ArrayList<Satellite> getSatellites() {
+        return null != satellites ? new ArrayList<Satellite>(satellites) : null;
     }
 
     public String getSatelliteDescription() {
-        if(null == satellites || satellites.isEmpty()) {
-            return "0"; //$NON-NLS-1$
-        }
-        return satellites.size() + " (" + Utilities.combineString(satellites, ", ") + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    	String desc = "";
+    	if(null != satellites) {
+    		List<String> satNames = new ArrayList<String>();
+    		for(Satellite satellite : satellites) {
+    			satNames.add(satellite.getDescription());
+    		}
+    		desc = Utilities.combineString(satNames, ", "); //$NON-NLS-1$ //$NON-NLS-2$
+    	}
+    	if(smallMoons > 0) {
+    		String smallDesc = smallMoons + " small moons"; //$NON-NLS-1$ //$NON-NLS-2$
+    		if(desc.length()==0) {
+    			return smallDesc;
+    		}
+    		desc = desc + ", " + smallDesc;
+    	}
+    	return desc;
     }
+
 
     public List<String> getLandMasses() {
         return null != landMasses ? new ArrayList<String>(landMasses) : null;
@@ -929,7 +943,8 @@ public class Planet implements Serializable {
             tectonicActivity = Utilities.nonNull(other.tectonicActivity, tectonicActivity);
             population = Utilities.nonNull(other.population, population);
             dayLength = Utilities.nonNull(other.dayLength, dayLength);
-            satellites = Utilities.nonNull(other.satellites, satellites);
+            smallMoons = Utilities.nonNull(other.smallMoons, smallMoons);
+            satellites = Utilities.nonNull(other.satellites, satellites); 
             sysPos = Utilities.nonNull(other.sysPos, sysPos);
             temperature = Utilities.nonNull(other.temperature, temperature);
             socioIndustrial = Utilities.nonNull(other.socioIndustrial, socioIndustrial);

@@ -215,34 +215,6 @@ public class PlanetViewPanel extends JPanel {
             ++ infoRow;
         }
         
-        /*
-           * TODO: fix satelllite information
-        lblSatellite.setName("lblSatellite"); // NOI18N
-        lblSatellite.setText(resourceMap.getString("lblSatellite1.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = infoRow;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblSatellite, gridBagConstraints);
-        
-        txtSatellite.setName("lblSatellite2"); // NOI18N
-        txtSatellite.setText(planet.getSatelliteDescription());
-        txtSatellite.setEditable(false);
-        txtSatellite.setLineWrap(true);
-        txtSatellite.setWrapStyleWord(true);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = infoRow;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtSatellite, gridBagConstraints);
-        
-        ++ infoRow;
-        */
-        
         //Gravity
         if(null != planet.getGravity()) {
             JLabel lblGravity = new JLabel(resourceMap.getString("lblGravity1.text"));
@@ -310,6 +282,20 @@ public class PlanetViewPanel extends JPanel {
             txtAnimal.setWrapStyleWord(true);
             gbcText.gridy = infoRow;
             panel.add(txtAnimal, gbcText);
+            ++ infoRow;
+        }
+        
+        
+        if(null != planet.getSatellites()) {  
+        	JLabel lblSatellite = new JLabel(resourceMap.getString("lblSatellite1.text"));
+            gbcLabel.gridy = infoRow;
+            panel.add(lblSatellite, gbcLabel);        
+            JTextArea txtSatellite = new JTextArea(planet.getSatelliteDescription());
+            txtSatellite.setEditable(false);
+            txtSatellite.setLineWrap(true);
+            txtSatellite.setWrapStyleWord(true);
+            gbcText.gridy = infoRow;
+            panel.add(txtSatellite, gbcText);
             ++ infoRow;
         }
         
