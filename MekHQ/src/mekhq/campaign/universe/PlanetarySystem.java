@@ -397,8 +397,15 @@ public class PlanetarySystem implements Serializable {
         this.subtype = subtype;
     }
     
+    /**
+     * 
+     * @return the planet object identified by the primary slot. If no primary slot is given then this function will return the first planet
+     * 
+     */
     public Planet getPrimaryPlanet() {
-        //TODO: safety checks please, a lot depends on this
+    	if(primarySlot<1) {
+    		return planets.get(1);
+    	}
         return planets.get(primarySlot);
     }
     
