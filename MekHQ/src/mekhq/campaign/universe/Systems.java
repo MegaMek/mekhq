@@ -136,10 +136,6 @@ public class Systems {
                 if((null != systemName) && systemName.toLowerCase(Locale.ROOT).equals(name)) {
                     return system;
                 }
-                systemName = system.getShortName(when);
-                if((null != systemName) && systemName.toLowerCase(Locale.ROOT).equals(name)) {
-                    return system;
-                }
             }
         }
         return null;
@@ -336,7 +332,7 @@ public class Systems {
     private void generateSystems() throws DOMException, ParseException {
         generateSystems("data/universe/planets", "data/universe/systems.xml");
     }
-    
+     
     private void generateSystems(String planetsPath, String defaultFilePath) throws DOMException, ParseException {
         final String METHOD_NAME = "generateSystems()"; //NON-NLS-1$
         

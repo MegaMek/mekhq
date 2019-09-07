@@ -119,7 +119,6 @@ public class PlanetarySystem implements Serializable {
     private UUID uniqueIdentifier;
     private String id;
     private String name;
-    private String shortName;
 
     //Star data (to be factored out)
     private String spectralType;
@@ -182,18 +181,16 @@ public class PlanetarySystem implements Serializable {
     }
     
     public String getName(DateTime when) {
+    	if(primarySlot<1) {
+    		//if no primary slot, then just return the id
+    		if(null != id) {
+    			return id;
+    		}
+    	}
         if(null != getPrimaryPlanet()) {
             return getPrimaryPlanet().getName(when);
         }
-        return "Unknown";
-        
-    }
-
-    public String getShortName(DateTime when) {
-        if(null != getPrimaryPlanet()) {
-            return getPrimaryPlanet().getName(when);
-        }
-        return "Unknown";
+        return "Unknown";     
     }
     
     public List<String> getFactions(DateTime when) {
@@ -262,11 +259,13 @@ public class PlanetarySystem implements Serializable {
     
     /** @return short name if set, else full name, else "unnamed" */
     public String getPrintableName(DateTime when) {
-        String result = getPrimaryPlanet().getPrintableName(when);
+        String result = getName(when);
         if(null == result) {
-            return "Unnamed";
+            return "Unknown";
         }
         //remove numbers or roman numerals from name
+        //not doing this anymore because connectors may have numeric endings
+        /*
         String new_result = "";
         for(String str : result.split("\\s+")) {
             if(str.matches("\\d+") || str.matches("(I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII|XIII|XIV|XV)")) {
@@ -275,6 +274,8 @@ public class PlanetarySystem implements Serializable {
             new_result = new_result + " " + str;
         }
         return new_result; //$NON-NLS-1$
+        */
+        return result; //$NON-NLS-1$
     }
     
     /** @return the distance to a point in space in light years */
@@ -548,7 +549,6 @@ public class PlanetarySystem implements Serializable {
         if( null != other ) {
             // We don't change the ID
             name = Utilities.nonNull(other.name, name);
-            shortName = Utilities.nonNull(other.shortName, shortName);
             x = Utilities.nonNull(other.x, x);
             y = Utilities.nonNull(other.y, y);
             nadirCharge = Utilities.nonNull(other.nadirCharge, nadirCharge);
