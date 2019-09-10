@@ -261,7 +261,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
     public void remove(boolean salvage) {
         // The bin represents capacity rather than an actual part, and cannot be
         // removed or damaged.
-        unload();
+        unloadSingle();
     }
 
     @Override
