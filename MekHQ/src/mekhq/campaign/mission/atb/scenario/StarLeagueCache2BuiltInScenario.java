@@ -9,7 +9,10 @@ import megamek.common.EntityWeightClass;
 import megamek.common.MechSummary;
 import megamek.common.UnitType;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
+import mekhq.campaign.mission.CommonObjectiveFactory;
+import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 import mekhq.campaign.rating.IUnitRating;
 
@@ -55,4 +58,15 @@ public class StarLeagueCache2BuiltInScenario extends StarLeagueCache1BuiltInScen
 
 		addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecMissionEnemies().get(0)));
 	}
+	
+	@Override
+    public void setObjectives(Campaign campaign, AtBContract contract) {
+        super.setObjectives(campaign, contract);
+        
+        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 100);
+        ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 100, false);
+        
+        getObjectives().add(destroyHostiles);
+        getObjectives().add(keepFriendliesAlive);
+    }
 }

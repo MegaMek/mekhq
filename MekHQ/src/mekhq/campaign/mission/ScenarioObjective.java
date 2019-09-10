@@ -45,6 +45,8 @@ public class ScenarioObjective {
     private String description;
     private OffBoardDirection destinationEdge;
     private int percentage;
+    private Integer fixedAmount = null;
+    private Integer timeLimit = null;
     
     @XmlElementWrapper(name="associatedForceNames")
     @XmlElement(name="associatedForceName")
@@ -61,6 +63,10 @@ public class ScenarioObjective {
     @XmlElementWrapper(name="failureEffects")
     @XmlElement(name="failureEffect")
     private List<ObjectiveEffect> failureEffects = new ArrayList<>();
+    
+    @XmlElementWrapper(name="additionalDetails")
+    @XmlElement(name="additionalDetail")
+    private List<String> additionalDetails = new ArrayList<>();
     
     /**
      * Types of automatically tracked scenario objectives
@@ -112,6 +118,14 @@ public class ScenarioObjective {
         associatedForceNames.remove(name);
     }
     
+    public void addDetail(String detail) {
+        additionalDetails.add(detail);
+    }
+    
+    public List<String> getDetails() {
+        return additionalDetails;
+    }
+    
     public Set<String> getAssociatedForceNames() {
         return new HashSet<String>(associatedForceNames);
     }
@@ -159,9 +173,29 @@ public class ScenarioObjective {
     public void setPercentage(int percentage) {
         this.percentage = percentage;
     }
+    
+    public Integer getFixedAmount() {
+        return fixedAmount;
+    }
+
+    public void setFixedAmount(int fixedAmount) {
+        this.fixedAmount = fixedAmount;
+    }
+
+    public Integer getTimeLimit() {
+        return timeLimit;
+    }
+
+    public void setTimeLimit(Integer timeLimit) {
+        this.timeLimit = timeLimit;
+    }
 
     public String toShortString() {
-        return String.format("%s %d%%", objectiveCriterion.toString(), percentage);
+        if(fixedAmount != null) {
+            return String.format("%s %d", objectiveCriterion.toString(), fixedAmount);
+        } else {
+            return String.format("%s %d%%", objectiveCriterion.toString(), percentage);
+        }
     }
     
     @Override
@@ -178,8 +212,12 @@ public class ScenarioObjective {
             sb.append(" edge");
         }
         
-        sb.append(percentage);
-        sb.append("%% ");
+        if(fixedAmount != null) {
+            sb.append(fixedAmount);
+        } else {
+            sb.append(percentage);
+            sb.append("% ");
+        }
         
         if(associatedForceNames.size() > 0) {
             sb.append("\nForces:");        

@@ -106,20 +106,22 @@ public class AllyRescueBuiltInScenario extends AtBScenario {
 	
 	@Override
     public void setObjectives(Campaign campaign, AtBContract contract) {
+	    super.setObjectives(campaign, contract);
+	    
         ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 50);
-        ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 50);
+        ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 50, false);
         
         // in addition to the standard destroy 50/preserve 50, you need to keep at least 3/8 of the "allied" units alive.
         ScenarioObjective keepAlliesAlive = new ScenarioObjective();
-        keepFriendliesAlive.setDescription("Ensure that at least 37% of the following force(s) and unit(s) survive:");
-        keepFriendliesAlive.setObjectiveCriterion(ObjectiveCriterion.Preserve);
-        keepFriendliesAlive.setPercentage(37);
-        keepFriendliesAlive.addForce(contract.getAllyBotName());
+        keepAlliesAlive.setDescription("Ensure that at least 3 of the following force(s) and unit(s) survive:");
+        keepAlliesAlive.setObjectiveCriterion(ObjectiveCriterion.Preserve);
+        keepAlliesAlive.setFixedAmount(3);
+        keepAlliesAlive.addForce(contract.getAllyBotName());
         
         ObjectiveEffect friendlyFailureEffect = new ObjectiveEffect();
         friendlyFailureEffect.effectType = ObjectiveEffectType.ScenarioDefeat;
-        keepFriendliesAlive.addFailureEffect(friendlyFailureEffect); 
-        
+        keepAlliesAlive.addFailureEffect(friendlyFailureEffect); 
+
         getObjectives().add(destroyHostiles);
         getObjectives().add(keepFriendliesAlive);
         getObjectives().add(keepAlliesAlive);

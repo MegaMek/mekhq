@@ -80,18 +80,22 @@ public class CivilianHelpBuiltInScenario extends AtBScenario {
 	
 	@Override
     public void setObjectives(Campaign campaign, AtBContract contract) {
+	    super.setObjectives(campaign, contract);
+	    
         ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 66);
-        ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 40);
-        keepFriendliesAlive.addForce(CIVILIAN_FORCE_ID);
+        ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 1, true);
+        ScenarioObjective keepCiviliansAlive = CommonObjectiveFactory.getPreserveSpecificFriendlies(CIVILIAN_FORCE_ID, 1, true);
         
         // not losing the scenario also gets you a "bonus"
         ObjectiveEffect bonusEffect = new ObjectiveEffect();
         bonusEffect.effectType = ObjectiveEffectType.AtBBonus;
         bonusEffect.scaledEffect = true;
         bonusEffect.howMuch = 1;
-        keepFriendliesAlive.addSuccessEffect(bonusEffect);
+        keepCiviliansAlive.addSuccessEffect(bonusEffect);
+        keepCiviliansAlive.addDetail("(1 bonus roll per surviving unit)");
         
         getObjectives().add(destroyHostiles);
         getObjectives().add(keepFriendliesAlive);
+        getObjectives().add(keepCiviliansAlive);
     }
 }

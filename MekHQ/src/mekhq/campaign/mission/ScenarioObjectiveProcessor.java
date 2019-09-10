@@ -289,10 +289,10 @@ public class ScenarioObjectiveProcessor {
         int numUnitsMetObjective = qualifyingUnitCount;
         
         // in some cases, the "qualifying unit count" needs to be inverted.
-        if(objective.getObjectiveCriterion() == ObjectiveCriterion.Preserve ||
-                objective.getObjectiveCriterion() == ObjectiveCriterion.PreventReachMapEdge) {
+        /*if(!objective.getObjectiveCriterion().equals(ObjectiveCriterion.Preserve) &&
+                !objective.getObjectiveCriterion().equals(ObjectiveCriterion.PreventReachMapEdge)) {
             numUnitsMetObjective = potentialObjectiveUnits.get(objective).size() - qualifyingUnitCount;
-        }
+        }*/
         
         for(ObjectiveEffect effect : objectiveEffects) {
             processObjectiveEffect(effect, numUnitsMetObjective, tracker);
@@ -342,7 +342,14 @@ public class ScenarioObjectiveProcessor {
         }
     }
     
+    /**
+     * Determines if the given objective will be met with the given number of units.
+     */
     public boolean objectiveMet(ScenarioObjective objective, int qualifyingUnitCount) {
+        if(objective.getFixedAmount() != null) {
+            return qualifyingUnitCount >= objective.getFixedAmount();
+        }
+        
         double potentialObjectiveUnitCount = (double) getPotentialObjectiveUnits().get(objective).size();
         
         return qualifyingUnitCount / potentialObjectiveUnitCount>= (double) objective.getPercentage() / 100;

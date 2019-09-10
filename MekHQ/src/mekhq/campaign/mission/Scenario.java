@@ -206,6 +206,10 @@ public class Scenario implements Serializable {
         unitIds.add(uid);
     }
     
+    public boolean containsPlayerUnit(UUID uid) {
+        return unitIds.contains(uid);
+    }
+    
     public void removeUnit(UUID uid) {
         int idx = -1;
         for(int i = 0; i < unitIds.size(); i++) {
@@ -446,8 +450,6 @@ public class Scenario implements Serializable {
     }
     
     public boolean isFriendlyUnit(Entity entity, Campaign campaign) {
-        int alpha = 1;
-        
         return getForces(campaign).getUnits().stream().
                 anyMatch(unitID -> unitID.equals(UUID.fromString(entity.getExternalIdAsString())));
     }

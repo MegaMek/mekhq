@@ -9,13 +9,20 @@ import megamek.common.EntityWeightClass;
 import megamek.common.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.market.UnitMarket;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.mission.CommonObjectiveFactory;
+import mekhq.campaign.mission.ObjectiveEffect;
+import mekhq.campaign.mission.ScenarioObjective;
+import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 
 @AtBScenarioEnabled
 public class ConvoyRescueBuiltInScenario extends AtBScenario {
 	private static final long serialVersionUID = 8487647534085152088L;
+	
+	private static String CONVOY_FORCE_ID = "Convoy";
 
 	@Override
 	public boolean isBigBattle() {
@@ -82,7 +89,7 @@ public class ConvoyRescueBuiltInScenario extends AtBScenario {
             getSurvivalBonusIds().add(UUID.fromString(e.getExternalIdAsString()));
         }
         
-        addBotForce(new BotForce("Convoy", 1, Board.START_CENTER, otherForce));
+        addBotForce(new BotForce(CONVOY_FORCE_ID, 1, Board.START_CENTER, otherForce));
 
         for (int i = 0; i < 12; i++) {
             enemyEntities.add(getEntity(getContract(campaign).getEnemyCode(),
@@ -95,4 +102,25 @@ public class ConvoyRescueBuiltInScenario extends AtBScenario {
         
         addBotForce(getEnemyBotForce(getContract(campaign), Board.START_S, enemyEntities));
 	}
+	
+	@Override
+    public void setObjectives(Campaign campaign, AtBContract contract) {
+        super.setObjectives(campaign, contract);
+        
+        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 50);
+        ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 50, false);
+        ScenarioObjective keepConvoyAlive = CommonObjectiveFactory.getPreserveSpecificFriendlies(CONVOY_FORCE_ID, 1, true);
+        keepConvoyAlive.addDetail("(1 bonus roll per surviving unit)");
+        
+        // not losing the scenario also gets you a "bonus"
+        ObjectiveEffect bonusEffect = new ObjectiveEffect();
+        bonusEffect.effectType = ObjectiveEffectType.AtBBonus;
+        bonusEffect.scaledEffect = true;
+        bonusEffect.howMuch = 1;
+        keepConvoyAlive.addSuccessEffect(bonusEffect);
+        
+        getObjectives().add(destroyHostiles);
+        getObjectives().add(keepFriendliesAlive);
+        getObjectives().add(keepConvoyAlive);
+    }
 }

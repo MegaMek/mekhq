@@ -9,13 +9,20 @@ import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.mission.CommonObjectiveFactory;
+import mekhq.campaign.mission.ObjectiveEffect;
+import mekhq.campaign.mission.ScenarioObjective;
+import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 
 @AtBScenarioEnabled
 public class ExtractionBuiltInScenario extends AtBScenario {
 	private static final long serialVersionUID = 2669891555728754709L;
+	
+	private static final String CIVILIAN_FORCE_ID = "Civilians";
 
 	@Override
 	public int getScenarioType() {
@@ -83,7 +90,7 @@ public class ExtractionBuiltInScenario extends AtBScenario {
 
 		try {
 			if (isAttacker()) {
-				BotForce bf = new BotForce("Civilians", 1, otherStart, playerHome, otherForce);
+				BotForce bf = new BotForce(CIVILIAN_FORCE_ID, 1, otherStart, playerHome, otherForce);
 				bf.setBehaviorSettings(BehaviorSettingsFactory.getInstance().ESCAPE_BEHAVIOR.getCopy());
 				bf.setDestinationEdge(otherHome);
 				
@@ -93,7 +100,7 @@ public class ExtractionBuiltInScenario extends AtBScenario {
 					getSurvivalBonusIds().add(UUID.fromString(en.getExternalIdAsString()));
 				}
 			} else {
-				BotForce bf = new BotForce("Civilians", 2, otherStart, enemyStart, otherForce);
+				BotForce bf = new BotForce(CIVILIAN_FORCE_ID, 2, otherStart, enemyStart, otherForce);
 				bf.setBehaviorSettings(BehaviorSettingsFactory.getInstance().ESCAPE_BEHAVIOR.getCopy());
 				bf.setDestinationEdge(otherHome);
 				
@@ -103,4 +110,45 @@ public class ExtractionBuiltInScenario extends AtBScenario {
 			e.printStackTrace();
 		}
 	}
+	
+	@Override
+    public void setObjectives(Campaign campaign, AtBContract contract) {
+        super.setObjectives(campaign, contract);
+        
+        ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 50, false);
+        ScenarioObjective keepAttachedUnitsAlive = CommonObjectiveFactory.getKeepAttachedGroundUnitsAlive(contract, this);
+        ScenarioObjective destroyHostiles = null;
+        ScenarioObjective civilianObjective;
+        
+        
+        if(isAttacker()) {
+            civilianObjective = CommonObjectiveFactory.getPreserveSpecificFriendlies(CIVILIAN_FORCE_ID, 66, false);
+            civilianObjective.addDetail("1 bonus roll per surviving unit");
+            
+            // not losing the scenario also gets you a "bonus"
+            ObjectiveEffect bonusEffect = new ObjectiveEffect();
+            bonusEffect.effectType = ObjectiveEffectType.AtBBonus;
+            bonusEffect.scaledEffect = true;
+            bonusEffect.howMuch = 1;
+            civilianObjective.addSuccessEffect(bonusEffect);
+        } else {
+            civilianObjective = CommonObjectiveFactory.getDestroyEnemies(CIVILIAN_FORCE_ID, 100);
+            civilianObjective.addDetail("Time limit: 10 turns");
+            civilianObjective.setTimeLimit(10);
+            destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 33);
+            destroyHostiles.addDetail("Time limit: 10 turns");
+            destroyHostiles.setTimeLimit(10);
+        }
+        
+        if(destroyHostiles != null) {       
+            getObjectives().add(destroyHostiles);
+        }
+        
+        if(keepAttachedUnitsAlive != null) {
+            getObjectives().add(keepAttachedUnitsAlive);
+        }
+        
+        getObjectives().add(keepFriendliesAlive);
+        getObjectives().add(civilianObjective);
+    }
 }

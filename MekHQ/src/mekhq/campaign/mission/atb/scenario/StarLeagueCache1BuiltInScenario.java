@@ -10,10 +10,15 @@ import megamek.common.MechSummary;
 import megamek.common.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.market.UnitMarket;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.mission.CommonObjectiveFactory;
 import mekhq.campaign.mission.Loot;
+import mekhq.campaign.mission.ObjectiveEffect;
+import mekhq.campaign.mission.ScenarioObjective;
+import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 import mekhq.campaign.rating.IUnitRating;
 
@@ -22,6 +27,8 @@ import java.util.ArrayList;
 @AtBScenarioEnabled
 public class StarLeagueCache1BuiltInScenario extends AtBScenario {
 	private static final long serialVersionUID = 1994382390878571793L;
+	
+	private static String TECH_FORCE_ID = "Tech";
 
 	@Override
 	public boolean isSpecialMission() {
@@ -115,6 +122,26 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
 		loot.setName("Star League Mek");
 		loot.addUnit(en);
 		getLoot().add(loot);
-		addBotForce(new BotForce("Tech", 1, getStart(), otherForce));
+		addBotForce(new BotForce(TECH_FORCE_ID, 1, getStart(), otherForce));
 	}
+	
+	@Override
+    public void setObjectives(Campaign campaign, AtBContract contract) {
+        super.setObjectives(campaign, contract);
+        
+        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 100);
+        ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 1, true);
+        ScenarioObjective keepTechAlive = CommonObjectiveFactory.getPreserveSpecificFriendlies(TECH_FORCE_ID, 1, true);
+        
+        // not losing the scenario also gets you a "bonus"
+        ObjectiveEffect bonusEffect = new ObjectiveEffect();
+        bonusEffect.effectType = ObjectiveEffectType.AtBBonus;
+        bonusEffect.scaledEffect = true;
+        bonusEffect.howMuch = 1;
+        keepTechAlive.addSuccessEffect(bonusEffect);
+        
+        getObjectives().add(destroyHostiles);
+        getObjectives().add(keepFriendliesAlive);
+        getObjectives().add(keepTechAlive);
+    }
 }

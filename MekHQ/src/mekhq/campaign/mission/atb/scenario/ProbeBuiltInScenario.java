@@ -64,8 +64,10 @@ public class ProbeBuiltInScenario extends AtBScenario {
 	
 	@Override
     public void setObjectives(Campaign campaign, AtBContract contract) {
-        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 33);
-        ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 33); 
+	    super.setObjectives(campaign, contract);
+	    
+        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 25);
+        ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 25, false); 
         ScenarioObjective keepAttachedUnitsAlive = CommonObjectiveFactory.getKeepAttachedGroundUnitsAlive(contract, this);
         
         if(keepAttachedUnitsAlive != null) {

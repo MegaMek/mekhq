@@ -9,14 +9,22 @@ import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import megamek.common.UnitType;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.mission.CommonObjectiveFactory;
+import mekhq.campaign.mission.ObjectiveEffect;
+import mekhq.campaign.mission.ScenarioObjective;
+import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 import mekhq.campaign.unit.Unit;
 
 @AtBScenarioEnabled
 public class PrisonBreakBuiltInScenario extends AtBScenario {
 	private static final long serialVersionUID = -2079887460549545045L;
+	
+	private static String GUARD_FORCE_ID = "Guards";
+	private static String PRISONER_FORCE_ID = "Prisoners";
 
 	@Override
 	public boolean isSpecialMission() {
@@ -72,7 +80,7 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
 			getSpecMissionEnemies().add(enemyEntities);
 		}
 
-		addBotForce(new BotForce("Guards", 2, enemyStart, getSpecMissionEnemies().get(0)));
+		addBotForce(new BotForce(GUARD_FORCE_ID, 2, enemyStart, getSpecMissionEnemies().get(0)));
 
 		ArrayList<Entity> otherForce = new ArrayList<Entity>();
 
@@ -82,6 +90,27 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
 			getSurvivalBonusIds().add(UUID.fromString(e.getExternalIdAsString()));
 		}
 		
-		addBotForce(new BotForce("Prisoners", 1, getStart(), otherForce));
+		addBotForce(new BotForce(PRISONER_FORCE_ID, 1, getStart(), otherForce));
 	}
+	
+	@Override
+    public void setObjectives(Campaign campaign, AtBContract contract) {
+        super.setObjectives(campaign, contract);
+        
+        //ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 66);
+        ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 1, true);
+        ScenarioObjective keepPrisonersAlive = CommonObjectiveFactory.getPreserveSpecificFriendlies(PRISONER_FORCE_ID, 1, true);
+        
+        // not losing the scenario also gets you a "bonus"
+        ObjectiveEffect bonusEffect = new ObjectiveEffect();
+        bonusEffect.effectType = ObjectiveEffectType.AtBBonus;
+        bonusEffect.scaledEffect = true;
+        bonusEffect.howMuch = 1;
+        keepPrisonersAlive.addSuccessEffect(bonusEffect);
+        keepPrisonersAlive.addDetail("1 bonus roll per surviving unit");
+        
+        //getObjectives().add(destroyHostiles);
+        getObjectives().add(keepFriendliesAlive);
+        getObjectives().add(keepPrisonersAlive);
+    }
 }

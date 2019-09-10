@@ -8,7 +8,10 @@ import megamek.common.EntityWeightClass;
 import megamek.common.PlanetaryConditions;
 import megamek.common.UnitType;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.CommonObjectiveFactory;
+import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 import mekhq.campaign.unit.Unit;
 
@@ -100,4 +103,15 @@ public class OfficerDualBuiltInScenario extends AtBScenario {
 
 		addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecMissionEnemies().get(0)));
 	}
+	
+	@Override
+    public void setObjectives(Campaign campaign, AtBContract contract) {
+        super.setObjectives(campaign, contract);
+        
+        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 100);
+        ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 100, false);
+        
+        getObjectives().add(destroyHostiles);
+        getObjectives().add(keepFriendliesAlive);
+    }
 }

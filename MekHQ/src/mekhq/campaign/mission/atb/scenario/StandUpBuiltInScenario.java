@@ -63,8 +63,10 @@ public class StandUpBuiltInScenario extends AtBScenario {
 	
 	@Override
 	public void setObjectives(Campaign campaign, AtBContract contract) {
+	    super.setObjectives(campaign, contract);
+	    
 	    ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 50);
-	    ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 50); 
+	    ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 50, false); 
         ScenarioObjective keepAttachedUnitsAlive = CommonObjectiveFactory.getKeepAttachedGroundUnitsAlive(contract, this);
         
         if(keepAttachedUnitsAlive != null) {

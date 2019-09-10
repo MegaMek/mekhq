@@ -7,7 +7,10 @@ import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.CommonObjectiveFactory;
+import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 
 @AtBScenarioEnabled
@@ -88,4 +91,26 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
 
 		addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getEnemyHome(), enemyEntities));
 	}
+	
+    @Override
+    public void setObjectives(Campaign campaign, AtBContract contract) {
+        super.setObjectives(campaign, contract);
+        
+        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 33);
+        ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 50, false); 
+        ScenarioObjective keepAttachedUnitsAlive = CommonObjectiveFactory.getKeepAttachedGroundUnitsAlive(contract, this);
+        
+        // attacker must destroy 50%
+        if(!isAttacker()) {
+            destroyHostiles.setPercentage(50);
+            keepFriendliesAlive.setPercentage(33);
+        }
+        
+        if(keepAttachedUnitsAlive != null) {
+            getObjectives().add(keepAttachedUnitsAlive);
+        }
+        
+        getObjectives().add(destroyHostiles);
+        getObjectives().add(keepFriendliesAlive);
+    }
 }

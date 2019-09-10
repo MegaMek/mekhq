@@ -35,6 +35,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.ResourceBundle;
+import java.util.UUID;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -395,6 +396,7 @@ public class AtBScenarioViewPanel extends JPanel {
         for(ScenarioObjective objective : scenario.getObjectives()) {
             objectiveBuilder.append(objective.getDescription());
             objectiveBuilder.append("\n");
+            
             for(String forceName : objective.getAssociatedForceNames()) {
                 objectiveBuilder.append("\t");
                 objectiveBuilder.append(forceName);
@@ -402,11 +404,28 @@ public class AtBScenarioViewPanel extends JPanel {
             }
             
             for(String associatedUnitID : objective.getAssociatedUnitIDs()) {
-                if(!scenario.getExternalIDLookup().containsKey(associatedUnitID)) {
+                String associatedUnitName = "";
+                UUID uid = UUID.fromString(associatedUnitID);
+                
+                // "logic": try to get a hold of the unit with the given UUID, 
+                // either from the list of bot units or from the list of player units
+                if(scenario.getExternalIDLookup().containsKey(associatedUnitID)) {
+                    associatedUnitName = scenario.getExternalIDLookup().get(associatedUnitID).getShortName();
+                } else if(scenario.getForces(campaign).getAllUnits().contains(uid)) {
+                    associatedUnitName = campaign.getUnit(uid).getEntity().getShortName();
+                }
+
+                if(associatedUnitName.length() == 0) {
                     continue;
                 }
                 objectiveBuilder.append("\t");
-                objectiveBuilder.append(scenario.getExternalIDLookup().get(associatedUnitID).getShortName());
+                objectiveBuilder.append(associatedUnitName);
+                objectiveBuilder.append("\n");
+            }
+            
+            for(String detail : objective.getDetails()) {
+                objectiveBuilder.append("\t");
+                objectiveBuilder.append(detail);
                 objectiveBuilder.append("\n");
             }
             

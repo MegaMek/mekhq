@@ -7,7 +7,13 @@ import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.CommonObjectiveFactory;
+import mekhq.campaign.mission.ObjectiveEffect;
+import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
+import mekhq.campaign.mission.ScenarioObjective;
+import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 
 @AtBScenarioEnabled
@@ -70,4 +76,40 @@ public class ReconRaidBuiltInScenario extends AtBScenario {
 	public boolean canAddDropShips() {
 		return isAttacker() && (Compute.d6() <= 3);
 	}
+	
+	@Override
+    public void setObjectives(Campaign campaign, AtBContract contract) {
+	    super.setObjectives(campaign, contract);
+	    
+        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 50);
+        ScenarioObjective keepAttachedUnitsAlive = CommonObjectiveFactory.getKeepAttachedGroundUnitsAlive(contract, this);
+        
+        if(keepAttachedUnitsAlive != null) {
+            getObjectives().add(keepAttachedUnitsAlive);
+        }
+        
+        if(isAttacker()) {
+            ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 75, false);
+            getObjectives().add(keepFriendliesAlive);
+            
+            ScenarioObjective raidObjective = new ScenarioObjective();
+            raidObjective.setObjectiveCriterion(ObjectiveCriterion.Custom);
+            raidObjective.setDescription("Recon Raid:");
+            raidObjective.addDetail("Move one unit to opposite map edge from starting edge.");
+            raidObjective.addDetail("Remain stationary for 2 turns.");
+            raidObjective.addDetail("Return to starting edge.");
+            raidObjective.addDetail("1d6-2 bonus rolls if victorious.");
+            
+            ObjectiveEffect victoryEffect = new ObjectiveEffect();
+            victoryEffect.effectType = ObjectiveEffectType.AtBBonus;
+            victoryEffect.howMuch = Compute.d6() - 2;
+            raidObjective.addSuccessEffect(victoryEffect);
+            
+            getObjectives().add(raidObjective);
+        } else {
+            destroyHostiles.addDetail("Time limit: 10 turns");
+            destroyHostiles.setTimeLimit(10);
+            getObjectives().add(destroyHostiles);
+        }
+    }
 }

@@ -108,8 +108,10 @@ public class AceDuelBuiltInScenario extends AtBScenario {
 	
 	@Override
     public void setObjectives(Campaign campaign, AtBContract contract) {
+	    super.setObjectives(campaign, contract);
+	    
         ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 100);
-        ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 100);
+        ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 100, false);
         
         getObjectives().add(destroyHostiles);
         getObjectives().add(keepFriendliesAlive);

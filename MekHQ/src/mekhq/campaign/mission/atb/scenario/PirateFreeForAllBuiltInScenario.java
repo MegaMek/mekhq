@@ -8,8 +8,11 @@ import megamek.common.Entity;
 import megamek.common.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.market.UnitMarket;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.mission.CommonObjectiveFactory;
+import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 import mekhq.campaign.rating.IUnitRating;
 
@@ -17,6 +20,8 @@ import mekhq.campaign.rating.IUnitRating;
 public class PirateFreeForAllBuiltInScenario extends AtBScenario {
 	private static final long serialVersionUID = 6410090692095923096L;
 
+	private static final String PIRATE_FORCE_ID = "Pirates"; 
+	
 	@Override
 	public boolean isBigBattle() {
 		return true;
@@ -85,6 +90,19 @@ public class PirateFreeForAllBuiltInScenario extends AtBScenario {
                             campaign));
         }
         
-        addBotForce(new BotForce("Pirates", 3, Board.START_S, otherForce));
+        addBotForce(new BotForce(PIRATE_FORCE_ID, 3, Board.START_S, otherForce));
 	}
+	
+	@Override
+    public void setObjectives(Campaign campaign, AtBContract contract) {
+	    super.setObjectives(campaign, contract);
+	    
+        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 50);
+        ScenarioObjective destroyPirates = CommonObjectiveFactory.getDestroyEnemies(PIRATE_FORCE_ID, 50);
+        ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 50, false); 
+        
+        getObjectives().add(destroyHostiles);
+        getObjectives().add(destroyPirates);
+        getObjectives().add(keepFriendliesAlive);
+    }
 }

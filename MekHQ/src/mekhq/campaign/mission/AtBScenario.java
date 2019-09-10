@@ -610,6 +610,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      */
     public void refresh(Campaign campaign) {
         if (isStandardMission()) {
+            setObjectives(campaign, getContract(campaign));
             return;
         }
         Vector<UUID> deployed = getForces(campaign).getAllUnits();
@@ -618,7 +619,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             alliesPlayer.clear();
             for (int i = 0; i < numAllies; i++) {
                 alliesPlayer.add(bigBattleAllies.get(i));
+                externalIDLookup.put(bigBattleAllies.get(i).getExternalIdAsString(), bigBattleAllies.get(i));
             }
+            
+            setObjectives(campaign, getContract(campaign));
         } else {
             if (deployed.size() == 0) {
                 return;
@@ -1548,7 +1552,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
     
     protected void setObjectives(Campaign c, AtBContract contract) {
-        
+        getScenarioObjectives().clear();
     }
 
     @Override
@@ -1770,6 +1774,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                         if (en != null) {
                             alliesPlayer.add(en);
                             entityIds.put(UUID.fromString(en.getExternalIdAsString()), en);
+                            getExternalIDLookup().put(en.getExternalIdAsString(), en);
                         }
                     }
                 }
@@ -1790,6 +1795,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                         if (en != null) {
                             bigBattleAllies.add(en);
                             entityIds.put(UUID.fromString(en.getExternalIdAsString()), en);
+                            getExternalIDLookup().put(en.getExternalIdAsString(), en);
                         }
                     }
                 }
@@ -1818,6 +1824,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                                 if (null != en) {
                                     specMissionEnemies.get(weightClass).add(en);
                                     entityIds.put(UUID.fromString(en.getExternalIdAsString()), en);
+                                    getExternalIDLookup().put(en.getExternalIdAsString(), en);
                                 }
                             }
                         }

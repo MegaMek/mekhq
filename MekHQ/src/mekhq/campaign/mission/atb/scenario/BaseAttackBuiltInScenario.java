@@ -8,13 +8,23 @@ import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Lance;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.mission.CommonObjectiveFactory;
+import mekhq.campaign.mission.ObjectiveEffect;
+import mekhq.campaign.mission.ScenarioObjective;
+import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 
 @AtBScenarioEnabled
 public class BaseAttackBuiltInScenario extends AtBScenario {
 	private static final long serialVersionUID = -873528230365616996L;
+	
+	private static final String BASE_CIVILIAN_FORCE_ID = "Base Civilian Units";
+	private static final String BASE_TURRET_FORCE_ID = "Base Turrets";
+	private static final String SECOND_ENEMY_FORCE_SUFFIX = " Force #2";
 
 	@Override
 	public int getScenarioType() {
@@ -92,12 +102,12 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
 		// set the civilians to "cowardly" behavior by default so they don't run out and get killed. As much. 
 		ArrayList<Entity> otherForce = new ArrayList<>();
 		addCivilianUnits(otherForce, 8, campaign);
-		BotForce civilianForce = new BotForce("Base Civilian Units", isAttacker() ? 2 : 1, defenderStart, defenderHome, otherForce);
+		BotForce civilianForce = new BotForce(BASE_CIVILIAN_FORCE_ID, isAttacker() ? 2 : 1, defenderStart, defenderHome, otherForce);
 		civilianForce.setBehaviorSettings(BehaviorSettingsFactory.getInstance().COWARDLY_BEHAVIOR);
 		addBotForce(civilianForce);
 
 		ArrayList<Entity> turretForce = new ArrayList<>();
-		addBotForce(new BotForce("Base Turrets", isAttacker() ? 2 : 1, defenderStart, defenderHome, turretForce));
+		addBotForce(new BotForce(BASE_TURRET_FORCE_ID, isAttacker() ? 2 : 1, defenderStart, defenderHome, turretForce));
 		if(isAttacker()) {
 			addTurrets(turretForce, 6, getContract(campaign).getEnemySkill(), getContract(campaign).getEnemyQuality(), campaign);
 		} else {
@@ -114,7 +124,52 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
         addEnemyForce(secondBotEntities, getLance(campaign).getWeightClass(campaign), campaign);
         BotForce secondBotForce = getEnemyBotForce(getContract(campaign), isAttacker() ? enemyStart : secondAttackerForceStart, 
                 isAttacker() ? getEnemyHome() : secondAttackerForceStart, secondBotEntities);
-        secondBotForce.setName(secondBotForce.getName() + " Force #2");
+        secondBotForce.setName(String.format("%s%s", secondBotForce.getName(), SECOND_ENEMY_FORCE_SUFFIX));
         addBotForce(secondBotForce);
 	}
+	
+	@Override
+    public void setObjectives(Campaign campaign, AtBContract contract) {
+	    super.setObjectives(campaign, contract);
+	    
+        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 50);
+        destroyHostiles.addForce(String.format("%s%s", contract.getEnemyBotName(), SECOND_ENEMY_FORCE_SUFFIX));
+        ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 50, false); 
+        ScenarioObjective keepAttachedUnitsAlive = CommonObjectiveFactory.getKeepAttachedGroundUnitsAlive(contract, this);
+        
+        ScenarioObjective preserveBaseUnits = null;
+        if(!isAttacker()) {
+            preserveBaseUnits = CommonObjectiveFactory.getPreserveSpecificFriendlies(BASE_CIVILIAN_FORCE_ID, 3, true);
+            preserveBaseUnits.addForce(BASE_TURRET_FORCE_ID);
+            
+            ObjectiveEffect defeatEffect = new ObjectiveEffect();
+            defeatEffect.effectType = ObjectiveEffectType.ContractDefeat;
+            preserveBaseUnits.addFailureEffect(defeatEffect);
+        } else {
+            destroyHostiles.addForce(BASE_CIVILIAN_FORCE_ID);
+            destroyHostiles.addForce(BASE_TURRET_FORCE_ID);
+            
+            // per AtB rules, completing this scenario on some contracts is an outright victory
+            // while completing this scenario on others just puts the morale to Rout for a while
+            ObjectiveEffect victoryEffect = new ObjectiveEffect();
+            if(contract.getRequiredLanceType() == Lance.ROLE_FIGHT ||
+                    contract.getRequiredLanceType() == Lance.ROLE_SCOUT) {
+                victoryEffect.effectType = ObjectiveEffectType.ContractVictory;
+            } else {
+                victoryEffect.effectType = ObjectiveEffectType.ContractMoraleUpdate;
+                victoryEffect.howMuch = -3;
+            }
+            destroyHostiles.addSuccessEffect(victoryEffect);
+        }
+        
+        if(preserveBaseUnits != null) {
+            getObjectives().add(preserveBaseUnits);
+        }
+        
+        if(keepAttachedUnitsAlive != null) {
+            getObjectives().add(keepAttachedUnitsAlive);
+        }
+        getObjectives().add(destroyHostiles);
+        getObjectives().add(keepFriendliesAlive);
+    }
 }
