@@ -306,7 +306,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
                 }
             });
             panBtn.add(btnLoad);
-        } else if (mission instanceof AtBContract) {
+        } else if (mission instanceof AtBContract && scenario instanceof AtBDynamicScenario) {
             JButton btnFinalize = new JButton("Finalize");
             btnFinalize.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(ActionEvent evt) {
