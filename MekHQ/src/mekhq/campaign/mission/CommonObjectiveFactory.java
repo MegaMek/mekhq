@@ -6,6 +6,7 @@ import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.OffBoardDirection;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
 
@@ -35,7 +36,7 @@ public class CommonObjectiveFactory {
         
         ObjectiveEffect failureEffect = new ObjectiveEffect();
         failureEffect.effectType = ObjectiveEffectType.ContractScoreUpdate;
-        failureEffect.scaledEffect = true;
+        failureEffect.effectScaling = EffectScalingType.Inverted;
         failureEffect.howMuch = -1;
         
         keepAttachedUnitsAlive.addFailureEffect(failureEffect);

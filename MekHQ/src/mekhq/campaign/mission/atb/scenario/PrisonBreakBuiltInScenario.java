@@ -15,6 +15,7 @@ import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.CommonObjectiveFactory;
 import mekhq.campaign.mission.ObjectiveEffect;
 import mekhq.campaign.mission.ScenarioObjective;
+import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 import mekhq.campaign.unit.Unit;
@@ -104,7 +105,7 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
         // not losing the scenario also gets you a "bonus"
         ObjectiveEffect bonusEffect = new ObjectiveEffect();
         bonusEffect.effectType = ObjectiveEffectType.AtBBonus;
-        bonusEffect.scaledEffect = true;
+        bonusEffect.effectScaling = EffectScalingType.Linear;
         bonusEffect.howMuch = 1;
         keepPrisonersAlive.addSuccessEffect(bonusEffect);
         keepPrisonersAlive.addDetail("1 bonus roll per surviving unit");

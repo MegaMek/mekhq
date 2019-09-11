@@ -12,8 +12,8 @@ import megamek.common.Entity;
 import megamek.common.OffBoardDirection;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
-import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
 
 public class ScenarioObjectiveProcessor {
     
@@ -130,7 +130,7 @@ public class ScenarioObjectiveProcessor {
             boolean forceEntityDestruction, boolean opponentHasBattlefieldControl) {
         for(ScenarioObjective objective : potentialObjectiveUnits.keySet()) {
             boolean entityMeetsObjective = false;
-            
+
             if(potentialObjectiveUnits.get(objective).contains(entity.getExternalIdAsString())) {
                 switch(objective.getObjectiveCriterion()) {
                 case Destroy:
@@ -249,7 +249,13 @@ public class ScenarioObjectiveProcessor {
         int victoryScore = 0;
         
         for(ScenarioObjective objective : scenario.getScenarioObjectives()) {
-            boolean objectiveMet = objectiveOverrides.containsKey(objective) && objectiveOverrides.get(objective) != null ?
+            // some objectives aren't associated with units and their completion is set manually
+            // in that case, we continue on
+            if(!objectiveUnitCounts.containsKey(objective)) {
+                continue;
+            }
+            
+            boolean objectiveMet = (objectiveOverrides.containsKey(objective) && objectiveOverrides.get(objective) != null) ?
                 objectiveOverrides.get(objective) : objectiveMet(objective, objectiveUnitCounts.get(objective));
                 
             List<ObjectiveEffect> objectiveEffects = objectiveMet ? objective.getSuccessEffects() : objective.getFailureEffects();
@@ -278,25 +284,35 @@ public class ScenarioObjectiveProcessor {
      * @param objective The objective to process.
      * @param qualifyingUnitCount How many units qualified for the objective, used to scale the objective effect if necessary
      * @param completionOverride If null, objective completion is calculated dynamically, otherwise a fixed objective completion state.
+     * @param tracker The tracker from which to draw unit data
+     * @param dryRun Whether we're actually applying the objectives or just generating a report.
      */
-    public void processObjective(ScenarioObjective objective, int qualifyingUnitCount, Boolean completionOverride,
-            ResolveScenarioTracker tracker) {
+    public String processObjective(ScenarioObjective objective, int qualifyingUnitCount, Boolean completionOverride,
+            ResolveScenarioTracker tracker, boolean dryRun) {
         // if we've overriden the objective completion flag, great, otherwise, calculate it here
         boolean objectiveMet = completionOverride == null ? objectiveMet(objective, qualifyingUnitCount) : completionOverride;
         
         List<ObjectiveEffect> objectiveEffects = objectiveMet ? objective.getSuccessEffects() : objective.getFailureEffects();
         
         int numUnitsMetObjective = qualifyingUnitCount;
+        int numUnitsFailedObjective = potentialObjectiveUnits.get(objective).size() - qualifyingUnitCount;
         
-        // in some cases, the "qualifying unit count" needs to be inverted.
-        /*if(!objective.getObjectiveCriterion().equals(ObjectiveCriterion.Preserve) &&
-                !objective.getObjectiveCriterion().equals(ObjectiveCriterion.PreventReachMapEdge)) {
-            numUnitsMetObjective = potentialObjectiveUnits.get(objective).size() - qualifyingUnitCount;
-        }*/
+        StringBuilder sb = new StringBuilder();
+        if(dryRun) {
+            sb.append(objective.getDescription());
+            sb.append("\n\t");
+            sb.append(objectiveMet ? "Completed" : "Failed");
+            sb.append("\n\t");
+        }
         
         for(ObjectiveEffect effect : objectiveEffects) {
-            processObjectiveEffect(effect, numUnitsMetObjective, tracker);
+            sb.append(processObjectiveEffect(effect, 
+                    effect.effectScaling == EffectScalingType.Inverted ? numUnitsFailedObjective : numUnitsMetObjective, 
+                    tracker, dryRun));
+            sb.append("\n\t");
         }
+        
+        return sb.toString();
     }
     
     /**
@@ -305,19 +321,31 @@ public class ScenarioObjectiveProcessor {
      * @param scaleFactor If it's scaled, how much to scale it by
      * @param tracker
      */
-    private void processObjectiveEffect(ObjectiveEffect effect, int scaleFactor, ResolveScenarioTracker tracker) {
+    private String processObjectiveEffect(ObjectiveEffect effect, int scaleFactor, ResolveScenarioTracker tracker, boolean dryRun) {
         switch(effect.effectType) {
         case ScenarioVictory:
+            if(dryRun) {
+                return "+1 scenario victory point";
+            }
+            break;
         case ScenarioDefeat:
-            // these do not require any additional effects to the campaign
+            if(dryRun) {
+                return "-1 scenario victory point";
+            }
             break;
         case ContractScoreUpdate:
             // if atb contract, update contract score by how many units met criterion * scaling
             if(tracker.getMission() instanceof AtBContract) {
                 AtBContract contract = (AtBContract) tracker.getMission();
                 
-                int scoreEffect = effect.getEffect() * scaleFactor;
-                contract.setContractScoreArbitraryModifier(contract.getContractScoreArbitraryModifier() + scoreEffect);
+                int effectMultiplier = effect.effectScaling == EffectScalingType.None ? 1 : scaleFactor;
+                int scoreEffect = effect.howMuch * effectMultiplier;
+                
+                if(dryRun) {
+                    return String.format("%d contract score", scoreEffect);
+                } else {
+                    contract.setContractScoreArbitraryModifier(contract.getContractScoreArbitraryModifier() + scoreEffect);
+                }
             }
             break;
         case SupportPointUpdate:
@@ -325,21 +353,40 @@ public class ScenarioObjectiveProcessor {
         case ContractMoraleUpdate:
             break;
         case ContractVictory:
+            if(dryRun) {
+                return "Contract ends with victory";
+            } else {
+                tracker.getCampaign().addReport(
+                        String.format("Victory in scenario %s ends the contract with a victory", tracker.getScenario().getDescription()));
+            }
             break;
         case ContractDefeat:
-            break;
+            if(dryRun) {
+                return "Contract ends with loss";
+            } else {
+                tracker.getCampaign().addReport(
+                        String.format("Defeat in scenario %s ends the contract with a defeat", tracker.getScenario().getDescription()));
+            }
+            break; 
         case BVBudgetUpdate:
             break;
         case AtBBonus:
             if(tracker.getMission() instanceof AtBContract) {
                 AtBContract contract = (AtBContract) tracker.getMission();
                 
-                int numBonuses = effect.getEffect() * scaleFactor;
-                for(int x = 0; x < numBonuses; x++) {
-                    contract.doBonusRoll(tracker.getCampaign());
+                int effectMultiplier = effect.effectScaling == EffectScalingType.None ? 1 : scaleFactor;
+                int numBonuses = effect.howMuch * effectMultiplier;
+                if(dryRun) {
+                    return String.format("%d AtB bonus rolls", numBonuses);
+                } else {
+                    for(int x = 0; x < numBonuses; x++) {
+                        contract.doBonusRoll(tracker.getCampaign());
+                    }
                 }
             }
         }
+        
+        return "";
     }
     
     /**
@@ -350,9 +397,13 @@ public class ScenarioObjectiveProcessor {
             return qualifyingUnitCount >= objective.getFixedAmount();
         }
         
+        if(!getPotentialObjectiveUnits().containsKey(objective)) {
+            return false;
+        }
+        
         double potentialObjectiveUnitCount = (double) getPotentialObjectiveUnits().get(objective).size();
         
-        return qualifyingUnitCount / potentialObjectiveUnitCount>= (double) objective.getPercentage() / 100;
+        return qualifyingUnitCount / potentialObjectiveUnitCount >= (double) objective.getPercentage() / 100;
     }
     
     public Map<ScenarioObjective, Set<String>> getQualifyingObjectiveUnits() {

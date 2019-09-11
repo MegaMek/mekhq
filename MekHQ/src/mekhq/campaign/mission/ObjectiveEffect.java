@@ -8,6 +8,12 @@ package mekhq.campaign.mission;
  */
 public class ObjectiveEffect {
     
+    public enum EffectScalingType {
+        None,
+        Linear,
+        Inverted
+    }
+    
     public enum ObjectiveEffectType {
         ScenarioVictory,
         ScenarioDefeat,
@@ -22,19 +28,17 @@ public class ObjectiveEffect {
     
     public ObjectiveEffectType effectType;
     // whether the effect is scaled to the # of units or fixed in nature
-    public boolean scaledEffect;
+    public EffectScalingType effectScaling = EffectScalingType.None;
     // how much of the effect per unit, or how much of the effect fixed
     public int howMuch;
-    
-    public int getEffect() {
-        return scaledEffect ? howMuch : 1;
-    }
     
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(effectType.toString());
-        sb.append(scaledEffect ? " - scaled -" : " - fixed -");
+        sb.append(" - ");
+        sb.append(effectScaling.toString());
+        sb.append(" - ");
         sb.append(howMuch);
         return sb.toString();
     }

@@ -1462,7 +1462,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             // update the contract score by -5 if the objective is failed.
             ObjectiveEffect failureEffect = new ObjectiveEffect();
             failureEffect.effectType = ObjectiveEffectType.ContractScoreUpdate;
-            failureEffect.scaledEffect = true;
             failureEffect.howMuch = -5;
             
             dropshipObjective.addFailureEffect(failureEffect);
@@ -1535,20 +1534,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         if (null != specMissionEnemies) {
             specMissionEnemies.clear();
         }
-    }
-
-    public void doPostResolution(Campaign c, int contractBreaches, int bonusRolls) {
-            getContract(c).addPlayerMinorBreaches(contractBreaches);
-            for (int i = 0; i < bonusRolls; i++) {
-                getContract(c).doBonusRoll(c);
-            }
-            
-            if (RECONRAID == getScenarioType() && attacker &&
-                    (getStatus() == S_VICTORY || getStatus() == S_MVICTORY)) {
-                for (int i = 0; i < Compute.d6() - 2; i++) {
-                    getContract(c).doBonusRoll(c);
-                }
-            }
     }
     
     protected void setObjectives(Campaign c, AtBContract contract) {

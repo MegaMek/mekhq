@@ -1300,9 +1300,6 @@ public class ResolveScenarioTracker {
         campaign.reloadGameEntities();
         campaign.refreshNetworks();
         scenario.setDate(campaign.getCalendar().getTime());
-        if (campaign.getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario) {
-            ((AtBScenario)scenario).doPostResolution(campaign, contractBreaches, bonusRolls);
-        }
         client = null;
     }
 

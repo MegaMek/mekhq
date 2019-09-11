@@ -133,13 +133,6 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 1, true);
         ScenarioObjective keepTechAlive = CommonObjectiveFactory.getPreserveSpecificFriendlies(TECH_FORCE_ID, 1, true);
         
-        // not losing the scenario also gets you a "bonus"
-        ObjectiveEffect bonusEffect = new ObjectiveEffect();
-        bonusEffect.effectType = ObjectiveEffectType.AtBBonus;
-        bonusEffect.scaledEffect = true;
-        bonusEffect.howMuch = 1;
-        keepTechAlive.addSuccessEffect(bonusEffect);
-        
         getObjectives().add(destroyHostiles);
         getObjectives().add(keepFriendliesAlive);
         getObjectives().add(keepTechAlive);
