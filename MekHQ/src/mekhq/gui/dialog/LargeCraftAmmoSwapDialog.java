@@ -29,6 +29,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import megamek.client.ui.swing.BayMunitionsChoicePanel;
+import megamek.common.AmmoType;
 import megamek.common.Mounted;
 import mekhq.MekHQ;
 import mekhq.campaign.parts.Part;
@@ -104,9 +105,14 @@ public class LargeCraftAmmoSwapDialog extends JDialog {
             if (p instanceof LargeCraftAmmoBin) {
                 LargeCraftAmmoBin bin = (LargeCraftAmmoBin) p;
                 bin.updateConditionFromEntity(false);
+                int oldShots = shotsByBay.get(bin.getBay()).getOrDefault(bin.getType().getInternalName(), 0);
+                // If we're using the swap dialog to unload some ammo, make sure it gets added to the warehouse
+                int shotsToRemove = oldShots - unit.getEntity().getEquipment(bin.getEquipmentNum()).getBaseShotsLeft();
+                if (shotsToRemove > 0) {
+                    bin.changeAmountAvailable(shotsToRemove, (AmmoType) bin.getType()); 
+                }
                 if (shotsByBay.containsKey(bin.getBay())) {
-                    bin.setShotsNeeded(bin.getFullShots()
-                            - shotsByBay.get(bin.getBay()).getOrDefault(bin.getType().getInternalName(), 0));
+                    bin.setShotsNeeded(bin.getShotsNeeded());
                 } else {
                     bin.setShotsNeeded(bin.getFullShots());
                 }
