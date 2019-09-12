@@ -35,7 +35,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 
 import megamek.client.ui.Messages;
 import megamek.client.ui.swing.UnitEditorDialog;
@@ -1123,8 +1122,36 @@ public class ResolveScenarioWizardDialog extends JDialog {
         currentPanel = name;
         setTitle(currentPanel);
         cardLayout.show(pnlMain, currentPanel);
-        pnlObjectiveStatus.setPreferredSize(pnlMain.getPreferredSize());
         switchInstructions();
+
+        switch(name) {
+        case PILOTPANEL:
+            pnlMain.setPreferredSize(pnlPilotStatus.getLayout().preferredLayoutSize(pnlMain));
+            break;
+        case UNITSPANEL:
+            pnlMain.setPreferredSize(pnlUnitStatus.getLayout().preferredLayoutSize(pnlMain));
+            break;
+        case SALVAGEPANEL:
+            pnlMain.setPreferredSize(pnlSalvage.getLayout().preferredLayoutSize(pnlMain));
+            break;
+        case KILLPANEL:
+            pnlMain.setPreferredSize(pnlKills.getLayout().preferredLayoutSize(pnlMain));
+            break;
+        case REWARDPANEL:
+            pnlMain.setPreferredSize(pnlRewards.getLayout().preferredLayoutSize(pnlMain));
+            break;
+        case PREVIEWPANEL:
+            pnlMain.setPreferredSize(pnlPreview.getLayout().preferredLayoutSize(pnlMain));
+            break;
+        case OBJECTIVEPANEL:
+            pnlMain.setPreferredSize(pnlObjectiveStatus.getLayout().preferredLayoutSize(pnlMain));
+            break;
+        case PRISONERPANEL:
+            pnlMain.setPreferredSize(pnlPrisonerStatus.getLayout().preferredLayoutSize(pnlMain));
+            break;
+        }
+        
+
         javax.swing.SwingUtilities.invokeLater(() -> scrMain.getVerticalScrollBar().setValue(0));
         pack();
     }
@@ -1144,7 +1171,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             txtInstructions.setText(resourceMap.getString("txtInstructions.text.kills"));
         }
         else if(currentPanel.equals(PRISONERPANEL)) {
-            txtInstructions.setText(resourceMap.getString("txtInstructions.text.personnel"));
+            txtInstructions.setText(resourceMap.getString("txtInstructions.text.prisoners"));
         }
         else if(currentPanel.equals(PREVIEWPANEL)) {
             txtInstructions.setText(resourceMap.getString("txtInstructions.text.preview"));
