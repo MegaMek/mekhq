@@ -433,42 +433,6 @@ public class AtBScenarioViewPanel extends JPanel {
         }
         txtDetails.setText(objectiveBuilder.toString());
         
-        /*if (scenario.isSpecialMission()) {
-            txtDetails.setText("Details:\n" +
-                    scenario.getResourceBundle().getString("battleDetails." +
-                    scenario.getResourceKey() +
-                    ".description"));
-        } else if (scenario.isBigBattle()) {
-            txtDetails.setText("Special Conditions:\n" +
-            		scenario.getResourceBundle().getString("battleDetails." +
-                    scenario.getResourceKey() +
-                    ".specialConditions") + "\n\n" +
-
-                    "Victory Conditions:\n" +
-                    scenario.getResourceBundle().getString("battleDetails." +
-                    scenario.getResourceKey() +
-                    ".victory") + "\n\n" +
-
-                    "Observations:\n" +
-                    scenario.getResourceBundle().getString("battleDetails." +
-                    scenario.getResourceKey() +
-                    ".observations"));
-        } else if(!(scenario instanceof AtBDynamicScenario)) {
-            txtDetails.setText("Victory Conditions:\n" +
-            		scenario.getResourceBundle().getString("battleDetails." +
-                    scenario.getResourceKey() +
-                    (scenario.isAttacker()?
-                            ".attacker.victory":
-                                ".defender.victory")) + "\n\n" +
-
-                    "Observations:\n" +
-                    scenario.getResourceBundle().getString("battleDetails." +
-                    scenario.getResourceKey() +
-                    (scenario.isAttacker()?
-                            ".attacker.observations":
-                                ".defender.observations")));
-        }*/
-
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y++;
         gridBagConstraints.gridwidth = 3;

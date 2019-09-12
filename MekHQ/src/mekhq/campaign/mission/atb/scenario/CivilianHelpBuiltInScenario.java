@@ -93,7 +93,7 @@ public class CivilianHelpBuiltInScenario extends AtBScenario {
         bonusEffect.effectScaling = EffectScalingType.Linear;
         bonusEffect.howMuch = 1;
         keepCiviliansAlive.addSuccessEffect(bonusEffect);
-        keepCiviliansAlive.addDetail("(1 bonus roll per surviving unit)");
+        keepCiviliansAlive.addDetail(String.format(defaultResourceBundle.getString("commonObjectives.bonusRolls.text"), bonusEffect.howMuch));
         
         getObjectives().add(destroyHostiles);
         getObjectives().add(keepFriendliesAlive);

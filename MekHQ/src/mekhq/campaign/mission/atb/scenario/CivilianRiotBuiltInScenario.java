@@ -131,7 +131,6 @@ public class CivilianRiotBuiltInScenario extends AtBScenario {
         ScenarioObjective destroyRebels = CommonObjectiveFactory.getDestroyEnemies(REBEL_FORCE_ID, 50);
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 50, false);
         ScenarioObjective keepLoyalistsAlive = CommonObjectiveFactory.getPreserveSpecificFriendlies(LOYALIST_FORCE_ID, 1, true);
-        keepLoyalistsAlive.addDetail("(1 bonus roll per surviving unit)");
         
         // not losing the scenario also gets you a "bonus"
         ObjectiveEffect bonusEffect = new ObjectiveEffect();
@@ -139,6 +138,7 @@ public class CivilianRiotBuiltInScenario extends AtBScenario {
         bonusEffect.effectScaling = EffectScalingType.Linear;
         bonusEffect.howMuch = 1;
         keepLoyalistsAlive.addSuccessEffect(bonusEffect);
+        keepLoyalistsAlive.addDetail(String.format(defaultResourceBundle.getString("commonObjectives.bonusRolls.text"), bonusEffect.howMuch));
         
         getObjectives().add(destroyRioters);
         getObjectives().add(destroyRebels);

@@ -113,9 +113,11 @@ public class AllyRescueBuiltInScenario extends AtBScenario {
         
         // in addition to the standard destroy 50/preserve 50, you need to keep at least 3/8 of the "allied" units alive.
         ScenarioObjective keepAlliesAlive = new ScenarioObjective();
-        keepAlliesAlive.setDescription("Ensure that at least 3 of the following force(s) and unit(s) survive:");
-        keepAlliesAlive.setObjectiveCriterion(ObjectiveCriterion.Preserve);
         keepAlliesAlive.setFixedAmount(3);
+        keepAlliesAlive.setDescription(String.format(defaultResourceBundle.getString("commonObjectives.preserveFriendlyUnits.text"), 
+                keepAlliesAlive.getFixedAmount(), ""));
+        keepAlliesAlive.setObjectiveCriterion(ObjectiveCriterion.Preserve);
+        
         keepAlliesAlive.addForce(contract.getAllyBotName());
         
         ObjectiveEffect friendlyFailureEffect = new ObjectiveEffect();

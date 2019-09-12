@@ -111,7 +111,6 @@ public class ConvoyRescueBuiltInScenario extends AtBScenario {
         ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 50);
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 50, false);
         ScenarioObjective keepConvoyAlive = CommonObjectiveFactory.getPreserveSpecificFriendlies(CONVOY_FORCE_ID, 1, true);
-        keepConvoyAlive.addDetail("(1 bonus roll per surviving unit)");
         
         // not losing the scenario also gets you a "bonus"
         ObjectiveEffect bonusEffect = new ObjectiveEffect();
@@ -119,6 +118,7 @@ public class ConvoyRescueBuiltInScenario extends AtBScenario {
         bonusEffect.effectScaling = EffectScalingType.Linear;
         bonusEffect.howMuch = 1;
         keepConvoyAlive.addSuccessEffect(bonusEffect);
+        keepConvoyAlive.addDetail(String.format(defaultResourceBundle.getString("commonObjectives.bonusRolls.text"), bonusEffect.howMuch));
         
         getObjectives().add(destroyHostiles);
         getObjectives().add(keepFriendliesAlive);

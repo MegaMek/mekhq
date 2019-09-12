@@ -124,7 +124,6 @@ public class ExtractionBuiltInScenario extends AtBScenario {
         
         if(isAttacker()) {
             civilianObjective = CommonObjectiveFactory.getPreserveSpecificFriendlies(CIVILIAN_FORCE_ID, 66, false);
-            civilianObjective.addDetail("1 bonus roll per surviving unit");
             
             // not losing the scenario also gets you a "bonus"
             ObjectiveEffect bonusEffect = new ObjectiveEffect();
@@ -132,13 +131,14 @@ public class ExtractionBuiltInScenario extends AtBScenario {
             bonusEffect.effectScaling = EffectScalingType.Linear;
             bonusEffect.howMuch = 1;
             civilianObjective.addSuccessEffect(bonusEffect);
+            civilianObjective.addDetail(String.format(defaultResourceBundle.getString("commonObjectives.bonusRolls.text"), bonusEffect.howMuch));
         } else {
             civilianObjective = CommonObjectiveFactory.getDestroyEnemies(CIVILIAN_FORCE_ID, 100);
-            civilianObjective.addDetail("Time limit: 10 turns");
             civilianObjective.setTimeLimit(10);
+            civilianObjective.addDetail(String.format(defaultResourceBundle.getString("commonObjectives.timeLimit.text"), civilianObjective.getTimeLimit()));
             destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 33);
-            destroyHostiles.addDetail("Time limit: 10 turns");
             destroyHostiles.setTimeLimit(10);
+            destroyHostiles.addDetail(String.format(defaultResourceBundle.getString("commonObjectives.timeLimit.text"), destroyHostiles.getTimeLimit()));
         }
         
         if(destroyHostiles != null) {       

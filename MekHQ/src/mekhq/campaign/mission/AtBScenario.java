@@ -227,7 +227,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     private Map<String, List<String>> transportLinkages;
     private Map<String, Entity> externalIDLookup;
     
-    private static ResourceBundle defaultResourceBundle = ResourceBundle.getBundle("mekhq.resources.AtBScenarioBuiltIn", new EncodeControl()); //$NON-NLS-1$
+    protected static ResourceBundle defaultResourceBundle = ResourceBundle.getBundle("mekhq.resources.AtBScenarioBuiltIn", new EncodeControl()); //$NON-NLS-1$
     
     public AtBScenario () {
         super();

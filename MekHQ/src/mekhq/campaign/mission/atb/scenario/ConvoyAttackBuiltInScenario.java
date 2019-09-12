@@ -12,9 +12,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.CommonObjectiveFactory;
-import mekhq.campaign.mission.ObjectiveEffect;
 import mekhq.campaign.mission.ScenarioObjective;
-import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 
 @AtBScenarioEnabled

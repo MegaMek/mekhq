@@ -1,10 +1,12 @@
 package mekhq.campaign.mission;
 
+import java.util.ResourceBundle;
 import java.util.UUID;
 
 import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.OffBoardDirection;
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
@@ -16,6 +18,8 @@ import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
  *
  */
 public class CommonObjectiveFactory {
+    private static ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AtBScenarioBuiltIn", new EncodeControl());
+    
     /**
      * Generates a "keep the attached units alive" objective that applies to 
      * attached liaisons, trainees, house units and integrated units, giving a -1 contract score penalty for each
@@ -23,7 +27,7 @@ public class CommonObjectiveFactory {
      */
     public static ScenarioObjective getKeepAttachedGroundUnitsAlive(AtBContract contract, AtBScenario scenario) {
         ScenarioObjective keepAttachedUnitsAlive = new ScenarioObjective();
-        keepAttachedUnitsAlive.setDescription("The following unit(s) deployed by your employer must survive. Each one destroyed results in a 1 point penalty to your contract score:");
+        keepAttachedUnitsAlive.setDescription(resourceMap.getString("commonObjectives.preserveEmployerUnits.text"));
         keepAttachedUnitsAlive.setObjectiveCriterion(ObjectiveCriterion.Preserve);
         keepAttachedUnitsAlive.setPercentage(100);
 
@@ -50,10 +54,10 @@ public class CommonObjectiveFactory {
     public static ScenarioObjective getPreserveSpecificFriendlies(String forceName, int number, boolean fixedAmount) {
         ScenarioObjective keepFriendliesAlive = new ScenarioObjective();
         if(fixedAmount) {
-            keepFriendliesAlive.setDescription(String.format("Ensure that at least %d unit of the following force(s) and unit(s) survive:", number));
+            keepFriendliesAlive.setDescription(String.format(resourceMap.getString("commonObjectives.preserveFriendlyUnits.text"), number, ""));
             keepFriendliesAlive.setFixedAmount(number);
         } else {
-            keepFriendliesAlive.setDescription(String.format("Ensure that at least %d%% of the following force(s) and unit(s) survive:", number));
+            keepFriendliesAlive.setDescription(String.format(resourceMap.getString("commonObjectives.preserveFriendlyUnits.text"), number, "%"));
             keepFriendliesAlive.setPercentage(number);
         }
         keepFriendliesAlive.setObjectiveCriterion(ObjectiveCriterion.Preserve);
@@ -73,19 +77,15 @@ public class CommonObjectiveFactory {
     /**
      * Generates a "keep at least X% of all units" objective from the primary player force,
      * as well as any attached allies, alive
-     * @param campaign
-     * @param contract
-     * @param scenario
-     * @return
      */
     public static ScenarioObjective getKeepFriendliesAlive(Campaign campaign, AtBContract contract, AtBScenario scenario, 
             int number, boolean fixedAmount) {
         ScenarioObjective keepFriendliesAlive = new ScenarioObjective();
         if(fixedAmount) {
-            keepFriendliesAlive.setDescription(String.format("Ensure that at least %d unit of the following force(s) and unit(s) survive:", number));
+            keepFriendliesAlive.setDescription(String.format(resourceMap.getString("commonObjectives.preserveFriendlyUnits.text"), number, ""));
             keepFriendliesAlive.setFixedAmount(number);
         } else {
-            keepFriendliesAlive.setDescription(String.format("Ensure that at least %d%% of the following force(s) and unit(s) survive:", number));
+            keepFriendliesAlive.setDescription(String.format(resourceMap.getString("commonObjectives.preserveFriendlyUnits.text"), number, "%"));
             keepFriendliesAlive.setPercentage(number);
         }
         
@@ -108,11 +108,10 @@ public class CommonObjectiveFactory {
     /**
      * Generates a "destroy x% of all units" from the given force name objective
      * @param forcename Explicit enemy force name
-     * @return
      */
     public static ScenarioObjective getDestroyEnemies(String forcename, int percentage) {
         ScenarioObjective destroyHostiles = new ScenarioObjective();
-        destroyHostiles.setDescription(String.format("Destroy, cripple or force the withdrawal of at least %d%% of the following enemy force(s):", percentage));
+        destroyHostiles.setDescription(String.format(resourceMap.getString("commonObjectives.forceWithdraw.text"), percentage));
         destroyHostiles.setObjectiveCriterion(ObjectiveCriterion.ForceWithdraw);
         destroyHostiles.setPercentage(percentage);
         destroyHostiles.addForce(forcename);
@@ -138,14 +137,11 @@ public class CommonObjectiveFactory {
     
     /** 
      * Generates a "destroy x% of all units" from the primary opposing force objective
-     * @param contract
-     * @param percentage
-     * @return
      */
     public static ScenarioObjective getPreventEnemyBreakthrough(AtBContract contract, int percentage, OffBoardDirection direction) {
         ScenarioObjective destroyHostiles = new ScenarioObjective();
         destroyHostiles.setDescription(
-                String.format("Prevent at least %d%% of the following enemy force(s) from reaching the %s edge:", percentage, direction));
+                String.format(resourceMap.getString("commonObjectives.preventBreakthrough.text"), percentage, direction));
         destroyHostiles.setObjectiveCriterion(ObjectiveCriterion.PreventReachMapEdge);
         destroyHostiles.setPercentage(percentage);
         destroyHostiles.setDestinationEdge(direction);
@@ -165,7 +161,7 @@ public class CommonObjectiveFactory {
             int percentage, OffBoardDirection direction) {
         ScenarioObjective breakthrough = new ScenarioObjective();
         breakthrough.setDescription(
-                String.format("Reach the %s edge with at least %d%% of the following player and attached units and allied force(s):", direction, percentage));
+                String.format(resourceMap.getString("commonObjectives.breakthrough.text"), direction, percentage));
         breakthrough.setObjectiveCriterion(ObjectiveCriterion.ReachMapEdge);
         breakthrough.setPercentage(percentage);
         breakthrough.setDestinationEdge(direction);
@@ -215,6 +211,10 @@ public class CommonObjectiveFactory {
         }
     }
     
+    /**
+     * Worker function that adds all employer units in the given scenario (as specified in the contract)
+     * to the given objective, with the exception of dropships.
+     */
     private static void addEmployerUnitsToObjective(AtBScenario scenario, AtBContract contract, ScenarioObjective objective) {
         for(int botForceID = 0; botForceID < scenario.getNumBots(); botForceID++) {
             // kind of hack-ish:

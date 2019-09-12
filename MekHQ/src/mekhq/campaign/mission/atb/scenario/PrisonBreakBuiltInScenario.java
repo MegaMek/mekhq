@@ -108,7 +108,7 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
         bonusEffect.effectScaling = EffectScalingType.Linear;
         bonusEffect.howMuch = 1;
         keepPrisonersAlive.addSuccessEffect(bonusEffect);
-        keepPrisonersAlive.addDetail("1 bonus roll per surviving unit");
+        keepPrisonersAlive.addDetail(String.format(defaultResourceBundle.getString("commonObjectives.bonusRolls.text"), bonusEffect.howMuch));
         
         //getObjectives().add(destroyHostiles);
         getObjectives().add(keepFriendliesAlive);

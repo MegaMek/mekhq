@@ -6,8 +6,10 @@ import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
+import megamek.common.OffBoardDirection;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.CommonObjectiveFactory;
 import mekhq.campaign.mission.ObjectiveEffect;
@@ -27,7 +29,7 @@ public class ReconRaidBuiltInScenario extends AtBScenario {
 
 	@Override
 	public String getScenarioTypeDescription() {
-		return "Recon Raid";
+		return defaultResourceBundle.getString("battleDetails.reconRaid.name");
 	}
 
 	@Override
@@ -94,11 +96,13 @@ public class ReconRaidBuiltInScenario extends AtBScenario {
             
             ScenarioObjective raidObjective = new ScenarioObjective();
             raidObjective.setObjectiveCriterion(ObjectiveCriterion.Custom);
-            raidObjective.setDescription("Recon Raid:");
-            raidObjective.addDetail("Move one unit to opposite map edge from starting edge.");
-            raidObjective.addDetail("Remain stationary for 2 turns.");
-            raidObjective.addDetail("Return to starting edge.");
-            raidObjective.addDetail("1d6-2 bonus rolls if victorious.");
+            raidObjective.setDescription(String.format("%s:", defaultResourceBundle.getString("battleDetails.reconRaid.name")));
+            raidObjective.addDetail(String.format(defaultResourceBundle.getString("battleDetails.reconRaid.instructions.oppositeEdge"),
+                    OffBoardDirection.translateBoardStart(AtBDynamicScenarioFactory.getOppositeEdge(getStart()))));
+            raidObjective.addDetail(defaultResourceBundle.getString("battleDetails.reconRaid.instructions.stayStill"));
+            raidObjective.addDetail(String.format(defaultResourceBundle.getString("battleDetails.reconRaid.instructions.returnEdge"),
+                    OffBoardDirection.translateBoardStart(getStart())));
+            raidObjective.addDetail(defaultResourceBundle.getString("battleDetails.reconRaid.instructions.reward"));
             
             ObjectiveEffect victoryEffect = new ObjectiveEffect();
             victoryEffect.effectType = ObjectiveEffectType.AtBBonus;
@@ -107,8 +111,8 @@ public class ReconRaidBuiltInScenario extends AtBScenario {
             
             getObjectives().add(raidObjective);
         } else {
-            destroyHostiles.addDetail("Time limit: 10 turns");
             destroyHostiles.setTimeLimit(10);
+            destroyHostiles.addDetail(String.format(defaultResourceBundle.getString("commonObjectives.timeLimit.text"), destroyHostiles.getTimeLimit()));
             getObjectives().add(destroyHostiles);
         }
     }

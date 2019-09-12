@@ -16,9 +16,7 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.CommonObjectiveFactory;
 import mekhq.campaign.mission.Loot;
-import mekhq.campaign.mission.ObjectiveEffect;
 import mekhq.campaign.mission.ScenarioObjective;
-import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 import mekhq.campaign.rating.IUnitRating;
 
@@ -119,7 +117,7 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
 		// TODO: During SW offer a choice between an employer exchange or a
 		// contract breach
 		Loot loot = new Loot();
-		loot.setName("Star League Mek");
+		loot.setName(defaultResourceBundle.getString("battleDetails.starLeagueCache.Mek"));
 		loot.addUnit(en);
 		getLoot().add(loot);
 		addBotForce(new BotForce(TECH_FORCE_ID, 1, getStart(), otherForce));

@@ -1,7 +1,6 @@
 package mekhq.campaign.mission.atb.scenario;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
 import megamek.common.Compute;
 import megamek.common.Entity;
@@ -9,10 +8,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.CommonObjectiveFactory;
-import mekhq.campaign.mission.ObjectiveEffect;
-import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.ScenarioObjective;
-import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 
 @AtBScenarioEnabled
