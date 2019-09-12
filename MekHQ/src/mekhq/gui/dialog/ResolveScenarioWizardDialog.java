@@ -365,7 +365,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             miaBtns.add(miaCheck);
             kiaCheck = new JCheckBox("");
             kiaBtns.add(kiaCheck);
-            
+
             hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 5, Math.min(status.getHits(),5));
             hitSlider.setMajorTickSpacing(1);
             hitSlider.setPaintTicks(true);
@@ -376,9 +376,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
             if(status.isMissing()) {
                 miaCheck.setSelected(true);
             }
+
+            kiaCheck.addItemListener(new CheckBoxKIAListener(hitSlider, miaCheck, null));
             if(status.isDead()) {
                 kiaCheck.setSelected(true);
             }
+
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
@@ -398,8 +401,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.weightx = 1.0;
             pnlPilotStatus.add(kiaCheck, gridBagConstraints);
             i++;
-            
-            kiaCheck.addItemListener(new CheckBoxKIAListener(hitSlider, miaCheck, null));
         }
         pnlMain.add(pnlPilotStatus, PILOTPANEL);
 
@@ -438,7 +439,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             j++;
             prstatuses.add(status);
             nameLbl = new JLabel("<html>" + status.getName() + "<br><i> " + status.getUnitName() + "</i></html>");
-            miaCheck = new JCheckBox("");
+
             hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 5, Math.min(status.getHits(),5));
             hitSlider.setMajorTickSpacing(1);
             hitSlider.setPaintTicks(true);
@@ -450,7 +451,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 hitSlider.setEnabled(false);
             }
             pr_hitSliders.add(hitSlider);
-            miaCheck.setSelected(status.isMissing());
+
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
@@ -480,9 +481,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.weightx = 1.0;
             pnlPrisonerStatus.add(btnViewPrisoner, gridBagConstraints);
             i++;
-            
+
             kiaCheck.addItemListener(new CheckBoxKIAListener(hitSlider, prisonerCheck, btnViewPrisoner));
-            
+
             // if the person is dead, set the checkbox and skip all this captured stuff
             if(status.getHits() > 5 || status.isDead()) {
                 kiaCheck.setSelected(true);
@@ -1297,21 +1298,23 @@ public class ResolveScenarioWizardDialog extends JDialog {
         //now personnel
         for(int i = 0; i < pstatuses.size(); i++) {
             PersonStatus status = pstatuses.get(i);
-            status.setMissing(miaBtns.get(i).isSelected());
-            status.setDead(kiaBtns.get(i).isSelected());
+
             if (hitSliders.get(i).isEnabled()) {
                 status.setHits(hitSliders.get(i).getValue());
             }
+            status.setMissing(miaBtns.get(i).isSelected());
+            status.setDead(kiaBtns.get(i).isSelected());
         }
 
         //now prisoners
         for(int i = 0; i < prstatuses.size(); i++) {
             PrisonerStatus status = prstatuses.get(i);
-            status.setDead(prisonerKiaBtns.get(i).isSelected());
+
             if (pr_hitSliders.get(i).isEnabled()) {
                 status.setHits(pr_hitSliders.get(i).getValue());
             }
             status.setCaptured(prisonerBtns.get(i).isSelected());
+            status.setDead(prisonerKiaBtns.get(i).isSelected());
         }
 
         //now salvage
@@ -1472,7 +1475,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
 
         for(JCheckBox box : salvageBoxes) {
-            if(!box.isSelected() && currentSalvagePct >= maxSalvagePct) {
+
+            if(!box.isSelected() && currentSalvagePct >= maxSalvagePct
+                    // always eligible with 100% salvage rights even when current == max
+                    && maxSalvagePct < 100) {
                 box.setEnabled(false);
             } else {
                 box.setEnabled(true);
@@ -1733,26 +1739,26 @@ public class ResolveScenarioWizardDialog extends JDialog {
         private JSlider slider;
         private JCheckBox checkbox;
         private JButton button;
-        
+
         public CheckBoxKIAListener(JSlider slider, JCheckBox checkBox, JButton button) {
             this.slider = slider;
             this.checkbox = checkBox;
             this.button = button;
         }
-        
+
         @Override
         public void itemStateChanged(ItemEvent e) {
             JCheckBox kiaChk = (JCheckBox)e.getSource();
             boolean enable = !kiaChk.isSelected();
-            
+
             if(slider != null) {
                 slider.setEnabled(enable);
             }
-            
+
             if(checkbox != null) {
                 checkbox.setEnabled(enable);
             }
-            
+
             if(button != null) {
                 button.setEnabled(enable);
             }

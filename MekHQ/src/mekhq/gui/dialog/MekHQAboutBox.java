@@ -171,7 +171,6 @@ public class MekHQAboutBox extends javax.swing.JDialog {
     private void setUserPreferences() {
         PreferencesNode preferences = MekHQ.getPreferences().forClass(MekHQAboutBox.class);
 
-        this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
     }
 }

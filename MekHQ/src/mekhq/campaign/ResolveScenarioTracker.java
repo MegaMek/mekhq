@@ -1100,6 +1100,7 @@ public class ResolveScenarioTracker {
             if(null == person || null == status) {
                 continue;
             }
+            
             MekHQ.triggerEvent(new PersonBattleFinishedEvent(person, status));
             if(status.getHits() > person.getHits()) {
                 person.setHits(status.getHits());

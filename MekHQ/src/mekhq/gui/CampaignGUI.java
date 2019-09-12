@@ -188,12 +188,14 @@ public class CampaignGUI extends JPanel {
     public void showAboutBox() {
         MekHQAboutBox aboutBox = new MekHQAboutBox(getFrame());
         aboutBox.setLocationRelativeTo(getFrame());
+        aboutBox.setModal(true);
         aboutBox.setVisible(true);
         aboutBox.dispose();
     }
 
     private void showHistoricalDailyReportDialog() {
         HistoricalDailyReportDialog histDailyReportDialog = new HistoricalDailyReportDialog(getFrame(), this);
+        histDailyReportDialog.setModal(true);
         histDailyReportDialog.setVisible(true);
         histDailyReportDialog.dispose();
     }
@@ -261,6 +263,7 @@ public class CampaignGUI extends JPanel {
 
     public void showAdvanceDaysDialog() {
         AdvanceDaysDialog advanceDaysDialog = new AdvanceDaysDialog(getFrame(), this, reportHLL);
+        advanceDaysDialog.setModal(true);
         advanceDaysDialog.setVisible(true);
         advanceDaysDialog.dispose();
     }

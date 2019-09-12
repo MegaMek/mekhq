@@ -81,6 +81,7 @@ import megamek.common.options.GameOptions;
 import megamek.common.options.IBasicOption;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
+import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.BuildingBlock;
 import megamek.common.util.DirectoryItems;
@@ -2357,45 +2358,127 @@ public class Campaign implements Serializable, ITechManager {
         return found;
     }
 
+    /**
+     * Performs work to either mothball or activate a unit.
+     * @param u The unit to either work towards mothballing or activation.
+     */
+    public void workOnMothballingOrActivation(Unit u) {
+        if (u.isMothballed()) {
+            activate(u);
+        } else {
+            mothball(u);
+        }
+    }
+
+    /**
+     * Performs work to mothball a unit.
+     * @param u The unit on which to perform mothball work.
+     */
     public void mothball(Unit u) {
+        if (u.isMothballed()) {
+            MekHQ.getLogger().warning(Campaign.class, "mothball(Unit)", "Unit is already mothballed, cannot mothball.");
+            return;
+        }
+
         Person tech = u.getTech();
         if (null == tech) {
             //uh-oh
-            //TODO: report someting
             addReport("No tech assigned to the mothballing of " + u.getHyperlinkedName());
             return;
         }
+
         //don't allow overtime minutes for mothballing because its cheating
         //since you don't roll
         int minutes = Math.min(tech.getMinutesLeft(), u.getMothballTime());
+
         //check astech time
         if (!u.isSelfCrewed() && astechPoolMinutes < minutes * 6) {
             //uh-oh
             addReport("Not enough astechs to work on mothballing of " + u.getHyperlinkedName());
             return;
         }
+
         u.setMothballTime(u.getMothballTime() - minutes);
-        String action = " mothballing ";
-        if (u.isMothballed()) {
-            action = " activating ";
-        }
-        String report = tech.getHyperlinkedFullTitle() + " spent " + minutes + " minutes" + action + u.getHyperlinkedName();
+
+        String report = tech.getHyperlinkedFullTitle() + " spent " + minutes + " minutes mothballing " + u.getHyperlinkedName();
         if (!u.isMothballing()) {
-            if (u.isMothballed()) {
-                u.setMothballed(false);
-                report += ". Activation complete.";
-            } else {
-                u.setMothballed(true);
-                report += ". Mothballing complete.";
-            }
+            completeMothball(u);
+            report += ". Mothballing complete.";
         } else {
             report += ". " + u.getMothballTime() + " minutes remaining.";
         }
+
+        tech.setMinutesLeft(tech.getMinutesLeft() - minutes);
+
+        if (!u.isSelfCrewed()) {
+            astechPoolMinutes -= 6 * minutes;
+        }
+
+        addReport(report);
+    }
+
+    /**
+     * Completes the mothballing of a unit.
+     * @param u The unit which should now be mothballed.
+     */
+    public void completeMothball(Unit u) {
+        u.setMothballTime(0);
+        u.setMothballed(true);
+    }
+
+    /**
+     * Performs work to activate a unit.
+     * @param u The unit on which to perform activation work.
+     */
+    public void activate(Unit u) {
+        if (!u.isMothballed()) {
+            MekHQ.getLogger().warning(Campaign.class, "activate(Unit)", "Unit is already activated, cannot activate.");
+            return;
+        }
+
+        Person tech = u.getTech();
+        if (null == tech) {
+            //uh-oh
+            addReport("No tech assigned to the activation of " + u.getHyperlinkedName());
+            return;
+        }
+
+        //don't allow overtime minutes for activation because its cheating
+        //since you don't roll
+        int minutes = Math.min(tech.getMinutesLeft(), u.getMothballTime());
+
+        //check astech time
+        if (!u.isSelfCrewed() && astechPoolMinutes < minutes * 6) {
+            //uh-oh
+            addReport("Not enough astechs to work on activation of " + u.getHyperlinkedName());
+            return;
+        }
+
+        u.setMothballTime(u.getMothballTime() - minutes);
+
+        String report = tech.getHyperlinkedFullTitle() + " spent " + minutes + " minutes activating " + u.getHyperlinkedName();
+        if (!u.isMothballing()) {
+            completeActivation(u);
+            report += ". Activation complete.";
+        } else {
+            report += ". " + u.getMothballTime() + " minutes remaining.";
+        }
+
         tech.setMinutesLeft(tech.getMinutesLeft() - minutes);
         if (!u.isSelfCrewed()) {
             astechPoolMinutes -= 6 * minutes;
         }
+
         addReport(report);
+    }
+
+    /**
+     * Completes the activation of a unit.
+     * @param u The unit which should now be activated.
+     */
+    public void completeActivation(Unit u) {
+        u.setMothballTime(0);
+        u.setMothballed(false);
     }
 
     public void refit(Refit r) {
@@ -3104,7 +3187,7 @@ public class Campaign implements Serializable, ITechManager {
                 refit(u.getRefit());
             }
             if (u.isMothballing()) {
-                mothball(u);
+                workOnMothballingOrActivation(u);
             }
             if (!u.isPresent()) {
                 u.checkArrival();
@@ -3447,7 +3530,7 @@ public class Campaign implements Serializable, ITechManager {
             kills.get(k.getPilotId()).remove(k);
         }
     }
-    
+
     public void removeKillsFor(UUID personID) {
         kills.remove(personID);
     }
@@ -3574,7 +3657,7 @@ public class Campaign implements Serializable, ITechManager {
                 unit.getEntity().setOwner(player);
                 unit.getEntity().setGame(game);
                 unit.getEntity().restore();
-                
+
                 // Aerospace parts have changed after 0.45.4. Reinitialize parts for Small Craft and up
                 if (unit.getEntity().hasETypeFlag(Entity.ETYPE_JUMPSHIP)
                         || unit.getEntity().hasETypeFlag(Entity.ETYPE_SMALL_CRAFT)) {
@@ -4723,22 +4806,16 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public String rollSPA(int type, Person person) {
-        ArrayList<SpecialAbility> abilityList = person.getEligibleSPAs(true);
+        List<SpecialAbility> abilityList = person.getEligibleSPAs(true);
         if (abilityList.isEmpty()) {
             return null;
         }
 
         // create a weighted list based on XP
-        ArrayList<String> weightedList = new ArrayList<String>();
-        for (SpecialAbility spa : abilityList) {
-            int weight = spa.getWeight();
-            while (weight > 0) {
-                weightedList.add(spa.getName());
-                weight--;
-            }
-        }
-        String name = Utilities.getRandomItem(weightedList);
-        if (name.equals("specialist")) {
+        List<SpecialAbility> weightedList = SpecialAbility.getWeightedSpecialAbilities(abilityList);
+
+        String name = Utilities.getRandomItem(weightedList).getName();
+        if (name.equals(OptionsConstants.GUNNERY_SPECIALIST)) {
             String special = Crew.SPECIAL_NONE;
             switch (Compute.randomInt(2)) {
                 case 0:
@@ -4752,7 +4829,7 @@ public class Campaign implements Serializable, ITechManager {
                     break;
             }
             person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name, special);
-        } else if (name.equals("range_master")) {
+        } else if (name.equals(OptionsConstants.GUNNERY_RANGE_MASTER)) {
             String special = Crew.RANGEMASTER_NONE;
             switch (Compute.randomInt(2)) {
                 case 0:
@@ -4767,7 +4844,7 @@ public class Campaign implements Serializable, ITechManager {
             }
             person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
                     special);
-        } else if (name.equals("human_tro")) {
+        } else if (name.equals(OptionsConstants.MISC_HUMAN_TRO)) {
             String special = Crew.HUMANTRO_NONE;
             switch (Compute.randomInt(3)) {
                 case 0:
@@ -4785,7 +4862,7 @@ public class Campaign implements Serializable, ITechManager {
             }
             person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
                     special);
-        } else if (name.equals("weapon_specialist")) {
+        } else if (name.equals(OptionsConstants.GUNNERY_WEAPON_SPECIALIST)) {
             person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
                     SpecialAbility.chooseWeaponSpecialization(type, getFaction().isClan(),
                             getCampaignOptions().getTechLevel(), getCalendar().get(GregorianCalendar.YEAR)));
@@ -5977,13 +6054,13 @@ public class Campaign implements Serializable, ITechManager {
         if(!kills.containsKey(k.getPilotId())) {
             kills.put(k.getPilotId(), new ArrayList<>());
         }
-        
+
         kills.get(k.getPilotId()).add(k);
     }
 
     public void addKill(Kill k) {
         importKill(k);
-        
+
         if (getCampaignOptions().getKillsForXP() > 0
                 && getCampaignOptions().getKillXPAward() > 0) {
             if ((getKillsFor(k.getPilotId()).size() % getCampaignOptions()
@@ -6002,17 +6079,17 @@ public class Campaign implements Serializable, ITechManager {
         for(List<Kill> personKills : kills.values()) {
             flattenedKills.addAll(personKills);
         }
-        
+
         return Collections.unmodifiableList(flattenedKills);
     }
 
     public List<Kill> getKillsFor(UUID pid) {
         List<Kill> personalKills = kills.get(pid);
-        
+
         if(personalKills == null) {
             return Collections.emptyList();
         }
-        
+
         Collections.sort(personalKills, new Comparator<Kill>() {
             @Override
             public int compare(final Kill u1, final Kill u2) {
@@ -8253,12 +8330,33 @@ public class Campaign implements Serializable, ITechManager {
         return unitRating;
     }
 
+    /**
+     * Gets peacetime costs including salaries.
+     * @return The peacetime costs of the campaign including salaries.
+     */
     public Money getPeacetimeCost() {
-        return Money.zero()
-                .plus(getPayRoll(getCampaignOptions().useInfantryDontCount()))
-                .plus(getMonthlySpareParts())
-                .plus(getMonthlyFuel())
-                .plus(getMonthlyAmmo());
+        return getPeacetimeCost(true);
+    }
+
+    /**
+     * Gets peacetime costs, optionally including salaries.
+     *
+     * This can be used to ensure salaries are not double counted.
+     *
+     * @param includeSalaries A value indicating whether or not salaries
+     *                        should be included in peacetime cost calculations.
+     * @return The peacetime costs of the campaign, optionally including salaries.
+     */
+    public Money getPeacetimeCost(boolean includeSalaries) {
+        Money peaceTimeCosts = Money.zero()
+                                .plus(getMonthlySpareParts())
+                                .plus(getMonthlyFuel())
+                                .plus(getMonthlyAmmo());
+        if (includeSalaries) {
+            peaceTimeCosts = peaceTimeCosts.plus(getPayRoll(getCampaignOptions().useInfantryDontCount()));
+        }
+
+        return peaceTimeCosts;
     }
 
     public Money getMonthlySpareParts() {

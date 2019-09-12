@@ -26,12 +26,18 @@ public class TextAreaDialog extends javax.swing.JDialog {
 
 	public TextAreaDialog(java.awt.Frame parent, boolean modal, String title, String text) {
         super(parent, modal);
-        setTitle(title);
-        initComponents();     
+		setTitle(title);
+		
+		initComponents();
+		
+		setPreferredSize(new Dimension(400, 500));
+
+		pack();
+
+		setLocationRelativeTo(parent);
+
         txtDesc.setText(text);
-        changed = false;
-        setPreferredSize(new Dimension(400, 500));
-        setLocationRelativeTo(parent);
+		changed = false;
     }
 	
 	private void initComponents() {

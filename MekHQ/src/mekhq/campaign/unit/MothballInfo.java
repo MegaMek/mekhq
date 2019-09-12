@@ -1,3 +1,24 @@
+/*
+ * MothballInfo.java
+ *
+ * Copyright (c) 2018 Megamek Team. All rights reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package mekhq.campaign.unit;
 
 import java.io.PrintWriter;
@@ -13,7 +34,6 @@ import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Person;
 
 /**
@@ -40,7 +60,7 @@ public class MothballInfo implements MekHqXmlSerializable {
         gunnerIDs = new ArrayList<>();
         vesselCrewIDs = new ArrayList<>();
     }
-    
+
     /**
      * Creates a set of mothball info for a given unit
      * @param unit The unit to work with
@@ -48,65 +68,67 @@ public class MothballInfo implements MekHqXmlSerializable {
     public MothballInfo(Unit unit) {
         techID = unit.getTechId();
         forceID = unit.getForceId();
-        driverIDs = (List<UUID>) unit.getDriverIDs().clone();
-        gunnerIDs = (List<UUID>) unit.getGunnerIDs().clone();
-        vesselCrewIDs = (List<UUID>) unit.getVesselCrewIDs().clone();
+        driverIDs = new ArrayList<>(unit.getDriverIDs());
+        gunnerIDs = new ArrayList<>(unit.getGunnerIDs());
+        vesselCrewIDs = new ArrayList<>(unit.getVesselCrewIDs());
         techOfficerID = unit.getTechOfficerID();
         navigatorID = unit.getNavigatorID();
     }
-    
+
     /**
      * Restore a unit's pilot, assigned tech and force, to the best of our ability
      * @param unit The unit to restore
      * @param campaign The campaign in which this is happening
      */
-    public void restorePreMothballInfo(Unit unit, Campaign campaign) 
+    public void restorePreMothballInfo(Unit unit, Campaign campaign)
     {
         Person tech = campaign.getPerson(techID);
         if(tech != null) {
             unit.setTech(tech);
         }
-        
+
         for(UUID driverID : driverIDs) {
             Person driver = campaign.getPerson(driverID);
-            
+
             if(driver != null && driver.isActive() && driver.getUnitId() == null) {
                 unit.addDriver(driver);
             }
         }
-        
+
         for(UUID gunnerID : gunnerIDs) {
             Person gunner = campaign.getPerson(gunnerID);
-            
+
             // add the gunner if they exist, aren't dead/retired/etc and aren't already assigned to some
             // other unit. Caveat: single-person units have the same driver and gunner.
-            if(gunner != null && gunner.isActive() && 
+            if(gunner != null && gunner.isActive() &&
                     ((gunner.getUnitId() == null) || (gunner.getUnitId() == unit.getId()))) {
                 unit.addGunner(gunner);
             }
         }
-        
+
         for(UUID vesselCrewID : vesselCrewIDs) {
             Person vesselCrew = campaign.getPerson(vesselCrewID);
-            
+
             if(vesselCrew != null && vesselCrew.isActive() && vesselCrew.getUnitId() == null) {
                 unit.addVesselCrew(vesselCrew);
             }
         }
-        
+
         Person techOfficer = campaign.getPerson(techOfficerID);
         if(techOfficer != null && techOfficer.isActive() && techOfficer.getUnitId() == null) {
             unit.setTechOfficer(techOfficer);
         }
-        
+
         Person navigator = campaign.getPerson(navigatorID);
         if(navigator != null && navigator.isActive() && navigator.getUnitId() == null) {
             unit.setNavigator(navigator);
         }
-        
+
         if(campaign.getForce(forceID) != null) {
             campaign.addUnitToForce(unit, forceID);
         }
+
+        unit.resetEngineer();
     }
 
     /**
@@ -115,53 +137,53 @@ public class MothballInfo implements MekHqXmlSerializable {
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<mothballInfo>");
-        
+
         if(techID != null) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<techID>" + techID.toString() + "</techID>");
         }
-        
+
         if(forceID > 0) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<forceID>" + forceID + "</forceID>");
         }
-        
+
         if(driverIDs.size() > 0) {
             for(UUID driverID : driverIDs) {
                 pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<driverID>" + driverID.toString() + "</driverID>");
             }
         }
-        
+
         if(gunnerIDs.size() > 0) {
             for(UUID gunnerID : gunnerIDs) {
                 pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<gunnerID>" + gunnerID.toString() + "</gunnerID>");
             }
         }
-        
+
         if(vesselCrewIDs.size() > 0) {
             for(UUID vesselCrewID : vesselCrewIDs) {
                 pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<vesselCrewID>" + vesselCrewID.toString() + "</vesselCrewID>");
             }
         }
-        
+
         if(techOfficerID != null) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<techOfficerID>" + techOfficerID.toString() + "</techOfficerID>");
         }
-        
+
         if(navigatorID != null) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<navigatorID>" + navigatorID.toString() + "</navigatorID>");
         }
-        
+
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</mothballInfo>");
     }
-    
+
     /**
      * Deserializer method implemented in standard MekHQ pattern.
      * @return Instance of MothballInfo
      */
     public static MothballInfo generateInstanceFromXML(Node wn, Version version) {
         final String METHOD_NAME = "generateInstanceFromXML(Node,Version)";
-        
+
         MothballInfo retVal = new MothballInfo();
-        
+
         NodeList nl = wn.getChildNodes();
 
         try {
@@ -188,7 +210,7 @@ public class MothballInfo implements MekHqXmlSerializable {
             // Doh!
             MekHQ.getLogger().error(Unit.class, METHOD_NAME, ex);
         }
-        
+
         return retVal;
     }
 }

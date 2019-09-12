@@ -17,6 +17,7 @@
 		<useArtillery>true</useArtillery>
 		<useAbilities>true</useAbilities>
 		<useEdge>true</useEdge>
+		<edgeCost>10</edgeCost>
 		<useImplants>true</useImplants>
 		<altQualityAveraging>true</altQualityAveraging>
 		<useAdvancedMedical>true</useAdvancedMedical>
