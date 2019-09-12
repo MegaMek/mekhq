@@ -101,6 +101,8 @@ public class Planet implements Serializable {
     private List<Satellite> satellites;
     @XmlElement(name = "smallMoons")
     private int smallMoons;
+    @XmlElement(name = "ring")
+    private boolean ring;
     
     // Global physical characteristics
     @XmlElement(name = "type")
@@ -373,7 +375,14 @@ public class Planet implements Serializable {
     		}
     		desc = desc + ", " + smallDesc;
     	}
+    	if(hasRing()) {
+    		desc = desc + ", and a dust ring"; //$NON-NLS-1$ //$NON-NLS-2$
+    	}
     	return desc;
+    }
+    
+    public boolean hasRing() {
+    	return ring;
     }
 
 
