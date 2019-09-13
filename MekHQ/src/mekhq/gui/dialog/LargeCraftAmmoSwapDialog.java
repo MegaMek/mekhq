@@ -85,18 +85,20 @@ public class LargeCraftAmmoSwapDialog extends JDialog {
     }
     
     private void apply() {
-        mainPanel.apply();
         // Save the current number of shots by bay and ammo type
         Map<Mounted, Map<String, Integer>> shotsByBay = new HashMap<>();
         for (Part p : unit.getParts()) {
             if (p instanceof LargeCraftAmmoBin) {
                 LargeCraftAmmoBin bin = (LargeCraftAmmoBin) p;
+                Mounted m = unit.getEntity().getEquipment(bin.getEquipmentNum());
                 shotsByBay.putIfAbsent(bin.getBay(), new HashMap<>());
                 shotsByBay.get(bin.getBay()).merge(bin.getType().getInternalName(),
-                        bin.getFullShots() - bin.getShotsNeeded(),
+                        m.getBaseShotsLeft(),
                         Integer::sum);
             }
         }
+        // Actually apply the ammo change
+        mainPanel.apply();
         // Rebuild bin parts as necessary
         unit.adjustLargeCraftAmmo();
         // Update the parts and set the number of shots needed based on the current size and the number
