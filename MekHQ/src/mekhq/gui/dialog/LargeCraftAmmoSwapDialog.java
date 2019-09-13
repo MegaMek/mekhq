@@ -114,8 +114,17 @@ public class LargeCraftAmmoSwapDialog extends JDialog {
                     bin.changeAmountAvailable(shotsToRemove, (AmmoType) bin.getType()); 
                 }
                 if (shotsByBay.containsKey(bin.getBay())) {
-                    bin.setShotsNeeded(bin.getShotsNeeded());
+                    Map<String,Integer> oldAmmo = shotsByBay.get(bin.getBay());
+                    if (oldAmmo.containsKey(bin.getType().getInternalName())) {
+                        //We've found the matching ammo bin, even though they've moved around.
+                        //Don't do anything else.
+                        continue;
+                    } else {
+                        //We've got a new bin for a new ammo type. It needs loading.
+                        bin.setShotsNeeded(bin.getFullShots());
+                    }
                 } else {
+                    //This bin isn't on our original ammo list at all. It needs loading.
                     bin.setShotsNeeded(bin.getFullShots());
                 }
                 bin.updateConditionFromPart();
