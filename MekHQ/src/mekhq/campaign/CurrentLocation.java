@@ -133,6 +133,13 @@ public class CurrentLocation implements Serializable {
         jumpPath = path;
     }
 
+    public void setRecharged(Campaign campaign) {
+        DateTime currentDate = Utilities.getDateTimeDay(campaign.getCalendar());
+        double neededRechargeTime = currentPlanet.getRechargeTime(currentDate);
+        rechargeTime = neededRechargeTime;
+        campaign.addReport("Jumpship drives fully charged");
+    }
+
     /**
      * Check for a jump path and if found, do whatever needs to be done to move
      * forward

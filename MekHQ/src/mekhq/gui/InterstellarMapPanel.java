@@ -356,6 +356,17 @@ public class InterstellarMapPanel extends JPanel {
                         });
                     }
                     menuGM.add(item);
+                    item = new JMenuItem("Recharge Jumpdrive");
+                    item.setEnabled(selectedPlanet != null && campaign.isGM());
+                    if (selectedPlanet != null) {
+                        item.addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent ae) {
+                                campaign.getLocation().setRecharged(campaign);
+                            }
+                        });
+                    }
+                    menuGM.add(item);
                     popup.add(menuGM);
                     popup.show(e.getComponent(), e.getX() + 10, e.getY() + 10);
                 }
