@@ -8,6 +8,7 @@ v0.47.1-SNAPSHOT
 + Issue #1274: Fix About window closing immediately
 + Issue #1275: Fix zero sized dialogs (Edit Biography, etc)
 + Issue #1273: Updated edge cost for AtB to match current rules
++ PR #1288: Allow the large craft ammo swap dialog to switch AR10, missile and artillery munitions properly
 
 v0.47.0 (2019-08-21 0300 UTC)
 + Issue #1171: Adds autosave feature (daily or weekly, and/or before missions).
