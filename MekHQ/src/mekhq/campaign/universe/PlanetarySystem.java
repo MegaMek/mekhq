@@ -300,9 +300,9 @@ public class PlanetarySystem implements Serializable {
     
     /** Recharge time in hours (assuming the usage of the fastest charing method available) */
     public double getRechargeTime(DateTime when) {
-        if((isZenithCharge(when) || isNadirCharge(when)) &&
-        		(null != spectralClass && null != subtype)) {
-            return Math.min(176.0, 141 + 10*spectralClass + subtype);
+        if(isZenithCharge(when) || isNadirCharge(when)) {
+        	//The 150 value comes from pg. 34 of Dropships and Jumpships, Ship Operations
+            return Math.min(150.0, getSolarRechargeTime());
         } else {
             return getSolarRechargeTime();
         }
@@ -311,7 +311,8 @@ public class PlanetarySystem implements Serializable {
     /** Recharge time in hours using solar radiation alone (at jump point and 100% efficiency) */
     public double getSolarRechargeTime() {
         if( null == spectralClass || null == subtype ) {
-            return 183;
+        	//176 is the average recharge time across all spectral classes and subtypes
+            return 176;
         }
         return StarUtil.getSolarRechargeTime(spectralClass, subtype);
     }
@@ -327,7 +328,8 @@ public class PlanetarySystem implements Serializable {
     
     public double getStarDistanceToJumpPoint() {
         if( null == spectralClass || null == subtype ) {
-            return StarUtil.getDistanceToJumpPoint(42);
+        	//40 is close to the midpoint value across all star types
+            return StarUtil.getDistanceToJumpPoint(40);
         }
         return StarUtil.getDistanceToJumpPoint(spectralClass, subtype);
     }
