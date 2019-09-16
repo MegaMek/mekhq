@@ -111,6 +111,10 @@ public class LargeCraftAmmoSwapDialog extends JDialog {
                 int oldShots = shotsByBay.get(bin.getBay()).getOrDefault(bin.getType().getInternalName(), 0);
                 // If we're removing ammo, add it the warehouse
                 int shotsToChange = oldShots - ammo.getBaseShotsLeft();
+                if (bin.getCapacity() == 0) {
+                    // Then we've got a valid bin for which the ammo's out
+                    shotsToChange = oldShots;
+                }
                 if (shotsToChange > 0) {
                     bin.changeAmountAvailable(shotsToChange, (AmmoType) bin.getType()); 
                 }
