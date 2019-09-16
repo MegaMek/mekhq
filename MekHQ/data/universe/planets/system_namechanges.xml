@@ -3,7 +3,7 @@
   <system>
     <id>Adhara (Trip 3040+)</id>
     <planet>
-      <sysPos>2</sysPos>
+      <sysPos>1</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Adhara</name>
@@ -48,7 +48,7 @@
   <system>
     <id>Anatolia (Pillory 3130+)</id>
     <planet>
-      <sysPos>4</sysPos>
+      <sysPos>3</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Anatolia</name>
@@ -78,7 +78,7 @@
   <system>
     <id>Arn (Jia Tian 3130+)</id>
     <planet>
-      <sysPos>2</sysPos>
+      <sysPos>1</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Arn</name>
@@ -93,7 +93,7 @@
   <system>
     <id>Austerlitz (Scauld 3130+)</id>
     <planet>
-      <sysPos>2</sysPos>
+      <sysPos>3</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Austerlitz</name>
@@ -108,7 +108,7 @@
   <system>
     <id>Baltazar III (Himmels 3025-)</id>
     <planet>
-      <sysPos>2</sysPos>
+      <sysPos>3</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Helbrent</name>
@@ -127,73 +127,59 @@
       </event>
     </planet>
     <planet>
-      <sysPos>3</sysPos>
+      <sysPos>2</sysPos>
       <event>
         <date>3025-01-01</date>
-        <name source="noncanon">Baltazar III</name>
-      </event>
-    </planet>
-    <planet>
-      <sysPos>4</sysPos>
-      <event>
-        <date>3025-01-01</date>
-        <name source="noncanon">Baltazar IV</name>
+        <name source="noncanon">Baltazar II</name>
       </event>
     </planet>
     <planet>
       <sysPos>5</sysPos>
       <event>
         <date>3025-01-01</date>
-        <name source="noncanon">Baltazar V</name>
+        <name source="noncanon">Baltazar IV</name>
       </event>
     </planet>
     <planet>
       <sysPos>6</sysPos>
       <event>
         <date>3025-01-01</date>
-        <name source="noncanon">Baltazar VI</name>
+        <name source="noncanon">Baltazar V</name>
       </event>
     </planet>
     <planet>
       <sysPos>7</sysPos>
       <event>
         <date>3025-01-01</date>
-        <name source="noncanon">Baltazar VII</name>
+        <name source="noncanon">Baltazar VI</name>
       </event>
     </planet>
     <planet>
       <sysPos>8</sysPos>
       <event>
         <date>3025-01-01</date>
-        <name source="noncanon">Baltazar VIII</name>
+        <name source="noncanon">Baltazar VII</name>
       </event>
     </planet>
     <planet>
       <sysPos>9</sysPos>
       <event>
         <date>3025-01-01</date>
-        <name source="noncanon">Baltazar IX</name>
+        <name source="noncanon">Baltazar VIII</name>
       </event>
     </planet>
     <planet>
       <sysPos>10</sysPos>
       <event>
         <date>3025-01-01</date>
-        <name source="noncanon">Baltazar X</name>
-      </event>
-    </planet>
-    <planet>
-      <sysPos>11</sysPos>
-      <event>
-        <date>3025-01-01</date>
-        <name source="noncanon">Baltazar XI</name>
+        <name source="noncanon">Baltazar IX</name>
       </event>
     </planet>
   </system>
   <system>
     <id>Barlow's Folly (Cussar 2864-)</id>
     <planet>
-      <sysPos>1</sysPos>
+      <sysPos>3</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Cussar</name>
@@ -223,7 +209,7 @@
   <system>
     <id>Blantleff (Dersidatz 3025-)</id>
     <planet>
-      <sysPos>1</sysPos>
+      <sysPos>4</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Dersidatz</name>
@@ -312,6 +298,13 @@
         <name source="noncanon">Carver X</name>
       </event>
     </planet>
+    <planet>
+      <sysPos>12</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name source="noncanon">Carver XI</name>
+      </event>
+    </planet>
   </system>
   <system>
     <id>Clayborne II (Green Stone 3025-)</id>
@@ -369,11 +362,46 @@
         <name source="noncanon">Clayborne VII</name>
       </event>
     </planet>
+    <planet>
+      <sysPos>8</sysPos>
+      <event>
+        <date>3025-01-01</date>
+        <name source="noncanon">Clayborne VIII</name>
+      </event>
+    </planet>
+    <planet>
+      <sysPos>9</sysPos>
+      <event>
+        <date>3025-01-01</date>
+        <name source="noncanon">Clayborne IX</name>
+      </event>
+    </planet>
+    <planet>
+      <sysPos>10</sysPos>
+      <event>
+        <date>3025-01-01</date>
+        <name source="noncanon">Clayborne X</name>
+      </event>
+    </planet>
+    <planet>
+      <sysPos>11</sysPos>
+      <event>
+        <date>3025-01-01</date>
+        <name source="noncanon">Clayborne XI</name>
+      </event>
+    </planet>
+    <planet>
+      <sysPos>12</sysPos>
+      <event>
+        <date>3025-01-01</date>
+        <name source="noncanon">Clayborne XII</name>
+      </event>
+    </planet>
   </system>
   <system>
     <id>Diedre's Den (Iolas 3025-)</id>
     <planet>
-      <sysPos>3</sysPos>
+      <sysPos>2</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Iolas</name>
@@ -403,7 +431,7 @@
   <system>
     <id>Edirne (Brank 3130+)</id>
     <planet>
-      <sysPos>2</sysPos>
+      <sysPos>1</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Edirne</name>
@@ -472,11 +500,60 @@
         <name source="noncanon">Commonwealth Mining Outpost 4</name>
       </event>
     </planet>
+    <planet>
+      <sysPos>6</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name source="noncanon">Commonwealth Mining Outpost 6</name>
+      </event>
+    </planet>
+    <planet>
+      <sysPos>7</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name source="noncanon">Commonwealth Mining Outpost 7</name>
+      </event>
+    </planet>
+    <planet>
+      <sysPos>8</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name source="noncanon">Commonwealth Mining Outpost 8</name>
+      </event>
+    </planet>
+    <planet>
+      <sysPos>9</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name source="noncanon">Commonwealth Mining Outpost 9</name>
+      </event>
+    </planet>
+    <planet>
+      <sysPos>10</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name source="noncanon">Commonwealth Mining Outpost 10</name>
+      </event>
+    </planet>
+    <planet>
+      <sysPos>11</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name source="noncanon">Commonwealth Mining Outpost 11</name>
+      </event>
+    </planet>
+    <planet>
+      <sysPos>12</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name source="noncanon">Commonwealth Mining Outpost 12</name>
+      </event>
+    </planet>
   </system>
   <system>
     <id>Hansii (Itsbur 2822+)</id>
     <planet>
-      <sysPos>2</sysPos>
+      <sysPos>3</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Hansii</name>
@@ -521,7 +598,7 @@
   <system>
     <id>Ildrong (Sanurcha 2750-)</id>
     <planet>
-      <sysPos>1</sysPos>
+      <sysPos>3</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Sanurcha</name>
@@ -536,7 +613,7 @@
   <system>
     <id>Jardine (Herakleion 2822+)</id>
     <planet>
-      <sysPos>4</sysPos>
+      <sysPos>1</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Jardine</name>
@@ -551,7 +628,7 @@
   <system>
     <id>Kirkvåg (Toch Zu 2822+)</id>
     <planet>
-      <sysPos>2</sysPos>
+      <sysPos>3</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Kirkvåg</name>
@@ -566,7 +643,7 @@
   <system>
     <id>Lamu (Tunlmar 2822+)</id>
     <planet>
-      <sysPos>1</sysPos>
+      <sysPos>4</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Lamu</name>
@@ -596,7 +673,7 @@
   <system>
     <id>Lushun (Jibbet 3130+)</id>
     <planet>
-      <sysPos>1</sysPos>
+      <sysPos>3</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Lushun</name>
@@ -611,7 +688,7 @@
   <system>
     <id>Lywick (Ferreusvirgo 3130+)</id>
     <planet>
-      <sysPos>2</sysPos>
+      <sysPos>4</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Lywick</name>
@@ -641,7 +718,7 @@
   <system>
     <id>Murris (Kalindam 2822+)</id>
     <planet>
-      <sysPos>4</sysPos>
+      <sysPos>1</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Murris</name>
@@ -686,7 +763,7 @@
   <system>
     <id>Oporto (Veil 3075+)</id>
     <planet>
-      <sysPos>2</sysPos>
+      <sysPos>1</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Oporto</name>
@@ -731,7 +808,7 @@
   <system>
     <id>Pirates Haven (50) (Badlands Cluster 3025-)</id>
     <planet>
-      <sysPos>4</sysPos>
+      <sysPos>1</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Badlands Cluster (50)</name>
@@ -746,7 +823,7 @@
   <system>
     <id>Qualip (Kerensky's Vision 3130+)</id>
     <planet>
-      <sysPos>2</sysPos>
+      <sysPos>1</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Qualip</name>
@@ -761,7 +838,7 @@
   <system>
     <id>Quimper (Chirac 3130+)</id>
     <planet>
-      <sysPos>1</sysPos>
+      <sysPos>2</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Quimper</name>
@@ -844,6 +921,13 @@
       </event>
     </planet>
     <planet>
+      <sysPos>11</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name source="noncanon">Hope X</name>
+      </event>
+    </planet>
+    <planet>
       <sysPos>1</sysPos>
       <event>
         <date>2988-01-01</date>
@@ -899,11 +983,18 @@
         <name source="noncanon">Randis IX</name>
       </event>
     </planet>
+    <planet>
+      <sysPos>11</sysPos>
+      <event>
+        <date>2988-01-01</date>
+        <name source="noncanon">Randis X</name>
+      </event>
+    </planet>
   </system>
   <system>
     <id>Rhodos (Runrig 2822+)</id>
     <planet>
-      <sysPos>1</sysPos>
+      <sysPos>2</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Rhodos</name>
@@ -918,7 +1009,7 @@
   <system>
     <id>Sartu (Bastille 3130+)</id>
     <planet>
-      <sysPos>4</sysPos>
+      <sysPos>2</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Sartu</name>
@@ -933,7 +1024,7 @@
   <system>
     <id>Seven Lands (Garotte 3130+)</id>
     <planet>
-      <sysPos>4</sysPos>
+      <sysPos>3</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Seven Lands</name>
@@ -948,7 +1039,7 @@
   <system>
     <id>Shaobuon (Liu's Memory 3130+)</id>
     <planet>
-      <sysPos>1</sysPos>
+      <sysPos>2</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Shaobuon</name>
@@ -1053,7 +1144,7 @@
   <system>
     <id>Thamel (Wyeth's Glory 3130+)</id>
     <planet>
-      <sysPos>4</sysPos>
+      <sysPos>1</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Thamel</name>
@@ -1068,7 +1159,7 @@
   <system>
     <id>The Rack (Port Vail 3050-)</id>
     <planet>
-      <sysPos>1</sysPos>
+      <sysPos>2</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Port Vail</name>
@@ -1083,7 +1174,7 @@
   <system>
     <id>Untran (Achtur 2822+)</id>
     <planet>
-      <sysPos>2</sysPos>
+      <sysPos>4</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Untran</name>
@@ -1098,7 +1189,7 @@
   <system>
     <id>Versailles (Taussen 2822+)</id>
     <planet>
-      <sysPos>1</sysPos>
+      <sysPos>2</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Versailles</name>
@@ -1113,7 +1204,7 @@
   <system>
     <id>Victoria (Meglan 2537-)</id>
     <planet>
-      <sysPos>1</sysPos>
+      <sysPos>4</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Meglan</name>
@@ -1158,7 +1249,7 @@
   <system>
     <id>Zhaomaon (Cluff's Stand 3130+)</id>
     <planet>
-      <sysPos>4</sysPos>
+      <sysPos>3</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Zhaomaon</name>

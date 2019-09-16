@@ -47,13 +47,8 @@ import org.joda.time.DateTimeComparator;
 import megamek.common.EquipmentType;
 import mekhq.Utilities;
 import mekhq.adapter.BooleanValueAdapter;
-import mekhq.adapter.ClimateAdapter;
 import mekhq.adapter.DateAdapter;
-import mekhq.adapter.HPGRatingAdapter;
-import mekhq.adapter.LifeFormAdapter;
-import mekhq.adapter.SocioIndustrialDataAdapter;
 import mekhq.adapter.SpectralClassAdapter;
-import mekhq.adapter.StringListAdapter;
 import mekhq.campaign.universe.SocioIndustrialData;
 
 

@@ -68,7 +68,6 @@ public class CurrentLocation implements Serializable {
     }
 
     public CurrentLocation(PlanetarySystem system, double time) {
-        //FIXME: just for testing
         this.currentSystem = system;
         this.transitTime = time;
         this.rechargeTime = 0.0;
