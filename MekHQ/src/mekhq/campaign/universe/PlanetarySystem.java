@@ -256,20 +256,8 @@ public class PlanetarySystem implements Serializable {
     public String getPrintableName(DateTime when) {
         String result = getName(when);
         if(null == result) {
-            return "Unknown";
+            return "Unknown System"; //$NON-NLS-1$ $NON-NLS-2$
         }
-        //remove numbers or roman numerals from name
-        //not doing this anymore because connectors may have numeric endings
-        /*
-        String new_result = "";
-        for(String str : result.split("\\s+")) {
-            if(str.matches("\\d+") || str.matches("(I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII|XIII|XIV|XV)")) {
-                continue;
-            }
-            new_result = new_result + " " + str;
-        }
-        return new_result; //$NON-NLS-1$
-        */
         return result; //$NON-NLS-1$
     }
     
