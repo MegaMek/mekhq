@@ -433,7 +433,7 @@ public final class StarUtil {
         if( subtypeValue % 100 == 0 ) { subtypeFormat = "%.0f"; } //$NON-NLS-1$
         else if( subtypeValue % 10 == 0 ) { subtypeFormat = "%.1f"; } //$NON-NLS-1$
         
-        if( luminosity.equals(PlanetarySystem.LUM_VI) ) {
+        if( null != luminosity && luminosity.equals(PlanetarySystem.LUM_VI) ) {
             // subdwarfs
             return "sd" + getSpectralClassName(spectralClass) + String.format(subtypeFormat, subtypeValue / 100.0); //$NON-NLS-1$
         } else if( luminosity.equals(PlanetarySystem.LUM_VI_PLUS) ) {
