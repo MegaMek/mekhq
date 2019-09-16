@@ -727,26 +727,6 @@ public class Planet implements Serializable {
         return true;
     }
     
-    public String getSpectralTypeText() {
-        //TODO: eventually this will come from the PlanetarySystem object
-        return "Nothing";
-    }
-    
-    public String getRechargeTimeText(DateTime when) {
-        //TODO: eventually this will come from the PlanetarySystem object
-        return "Nothing";
-    }
-    
-    public String getRechargeStationsText(DateTime when) {
-        //TODO: eventually this will come from the PlanetarySystem object
-        return "Nothing";
-    }
-    
-    public double getRechargeTime(DateTime when) {
-      //TODO: eventually this will come from the PlanetarySystem object
-        return 0;
-    }
-    
     /**
      * A function to return any planetary related modifiers to a target roll for acquiring 
      * parts. Feeds in the campaign options because this will include important information
