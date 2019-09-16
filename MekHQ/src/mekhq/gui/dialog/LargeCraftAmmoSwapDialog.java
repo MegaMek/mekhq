@@ -29,6 +29,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import megamek.client.ui.swing.BayMunitionsChoicePanel;
+import megamek.common.AmmoType;
 import megamek.common.Mounted;
 import mekhq.MekHQ;
 import mekhq.campaign.parts.Part;
@@ -84,18 +85,20 @@ public class LargeCraftAmmoSwapDialog extends JDialog {
     }
     
     private void apply() {
-        mainPanel.apply();
         // Save the current number of shots by bay and ammo type
         Map<Mounted, Map<String, Integer>> shotsByBay = new HashMap<>();
         for (Part p : unit.getParts()) {
             if (p instanceof LargeCraftAmmoBin) {
                 LargeCraftAmmoBin bin = (LargeCraftAmmoBin) p;
+                Mounted m = unit.getEntity().getEquipment(bin.getEquipmentNum());
                 shotsByBay.putIfAbsent(bin.getBay(), new HashMap<>());
                 shotsByBay.get(bin.getBay()).merge(bin.getType().getInternalName(),
-                        bin.getFullShots() - bin.getShotsNeeded(),
+                        m.getBaseShotsLeft(),
                         Integer::sum);
             }
         }
+        // Actually apply the ammo change
+        mainPanel.apply();
         // Rebuild bin parts as necessary
         unit.adjustLargeCraftAmmo();
         // Update the parts and set the number of shots needed based on the current size and the number
@@ -104,10 +107,31 @@ public class LargeCraftAmmoSwapDialog extends JDialog {
             if (p instanceof LargeCraftAmmoBin) {
                 LargeCraftAmmoBin bin = (LargeCraftAmmoBin) p;
                 bin.updateConditionFromEntity(false);
+                Mounted ammo = unit.getEntity().getEquipment(bin.getEquipmentNum());
+                int oldShots = shotsByBay.get(bin.getBay()).getOrDefault(bin.getType().getInternalName(), 0);
+                // If we're removing ammo, add it the warehouse
+                int shotsToChange = oldShots - ammo.getBaseShotsLeft();
+                if (shotsToChange > 0) {
+                    bin.changeAmountAvailable(shotsToChange, (AmmoType) bin.getType()); 
+                }
                 if (shotsByBay.containsKey(bin.getBay())) {
-                    bin.setShotsNeeded(bin.getFullShots()
-                            - shotsByBay.get(bin.getBay()).getOrDefault(bin.getType().getInternalName(), 0));
+                    Map<String,Integer> oldAmmo = shotsByBay.get(bin.getBay());
+                    if (oldAmmo.containsKey(bin.getType().getInternalName())) {
+                        //We've found the matching ammo bin, even though they've moved around.
+                        if (shotsToChange < 0) {
+                            // We need to load some extra ammo, but part of the bin is already loaded
+                            bin.setShotsNeeded(Math.abs(shotsToChange));
+                        } else {
+                            //If we've just removed ammo, don't do anything else.
+                            continue;
+                        }
+                    } else {
+                        //We've got a new bin for a new ammo type. It needs loading.
+                        bin.setShotsNeeded(bin.getFullShots());
+                    }
                 } else {
+                    //This bin isn't on our original ammo list at all. It needs loading.
+                    //This shouldn't ever happen - it would mean we've created a totally new bay.
                     bin.setShotsNeeded(bin.getFullShots());
                 }
                 bin.updateConditionFromPart();
