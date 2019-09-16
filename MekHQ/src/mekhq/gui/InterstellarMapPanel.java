@@ -1048,16 +1048,6 @@ public class InterstellarMapPanel extends JPanel {
     	//color shading is from https://colorbrewer2.org and should be color-blind safe
     	
     	SocioIndustrialData socio = p.getSocioIndustrial(Utilities.getDateTimeDay(campaign.getCalendar()));
-
-    	//just for testing lets randomly fill in missing values
-    	/*if(null == socio) {
-    		socio = new SocioIndustrialData();
-    		socio.tech = Compute.d6(1)-1;
-    		socio.industry = Compute.d6(1)-1;
-    		socio.rawMaterials = Compute.d6(1)-1;
-    		socio.output = Compute.d6(1)-1;
-    		socio.agriculture = Compute.d6(1)-1;
-    	}*/
     	
     	if(null != socio && optTech.isSelected()) {
 	    	switch(socio.tech) {
@@ -1074,7 +1064,7 @@ public class InterstellarMapPanel extends JPanel {
 	    		case EquipmentType.RATING_A:
 	    			return new Color(8,81,156);
 	    		default: 
-	    			return Color.WHITE;
+	    			return Color.BLACK;
 	    	}
     	}
     	if(null != socio && optIndustry.isSelected()) {
@@ -1092,7 +1082,7 @@ public class InterstellarMapPanel extends JPanel {
 	    		case EquipmentType.RATING_A:
 	    			return new Color(84,39,143);
 	    		default: 
-	    			return Color.WHITE;
+	    			return Color.BLACK;
 	    	}
     	}
     	if(null != socio && optRawMaterials.isSelected()) {
@@ -1110,7 +1100,7 @@ public class InterstellarMapPanel extends JPanel {
 	    		case EquipmentType.RATING_A:
 	    			return new Color(166,54,3);
 	    		default: 
-	    			return Color.WHITE;
+	    			return Color.BLACK;
 	    	}
     	}
     	if(null != socio && optOutput.isSelected()) {
@@ -1128,7 +1118,7 @@ public class InterstellarMapPanel extends JPanel {
 	    		case EquipmentType.RATING_A:
 	    			return new Color(165,15,21);
 	    		default: 
-	    			return Color.WHITE;
+	    			return Color.BLACK;
 	    	}
     	}
     	if(null != socio && optAgriculture.isSelected()) {
@@ -1146,7 +1136,7 @@ public class InterstellarMapPanel extends JPanel {
 	    		case EquipmentType.RATING_A:
 	    			return new Color(0,109,44);
 	    		default: 
-	    			return Color.WHITE;
+	    			return Color.BLACK;
 	    	}
     	}
     	
