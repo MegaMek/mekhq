@@ -234,6 +234,20 @@ public class PlanetViewPanel extends JPanel {
             ++ infoRow;
         }
         
+        //Atmosphere
+        if(null != planet.getAtmosphere(currentDate)) {
+            JLabel lblAtmosphere = new JLabel(resourceMap.getString("lblAtmosphere.text"));
+            gbcLabel.gridy = infoRow;
+            panel.add(lblAtmosphere, gbcLabel);        
+            JTextArea txtAtmosphere = new JTextArea(planet.getAtmosphereName(currentDate));
+            txtAtmosphere.setEditable(false);
+            txtAtmosphere.setLineWrap(true);
+            txtAtmosphere.setWrapStyleWord(true);
+            gbcText.gridy = infoRow;
+            panel.add(txtAtmosphere, gbcText);
+            ++ infoRow;
+        }
+        
         //Atmospheric Pressure
         if(null != planet.getPressure(currentDate)) {
             JLabel lblPressure = new JLabel(resourceMap.getString("lblPressure1.text"));
@@ -245,6 +259,20 @@ public class PlanetViewPanel extends JPanel {
             txtPressure.setWrapStyleWord(true);
             gbcText.gridy = infoRow;
             panel.add(txtPressure, gbcText);
+            ++ infoRow;
+        }
+        
+        //Atmospheric composition
+        if(null != planet.getComposition(currentDate)) {
+            JLabel lblComposition = new JLabel(resourceMap.getString("lblComposition.text"));
+            gbcLabel.gridy = infoRow;
+            panel.add(lblComposition, gbcLabel);        
+            JTextArea txtComposition = new JTextArea(planet.getComposition(currentDate));
+            txtComposition.setEditable(false);
+            txtComposition.setLineWrap(true);
+            txtComposition.setWrapStyleWord(true);
+            gbcText.gridy = infoRow;
+            panel.add(txtComposition, gbcText);
             ++ infoRow;
         }
         
@@ -288,9 +316,9 @@ public class PlanetViewPanel extends JPanel {
             gbcText.gridy = infoRow;
             panel.add(txtAnimal, gbcText);
             ++ infoRow;
-        }
+        }    
         
-        
+        //satellites
         if(null != planet.getSatellites()) {  
         	JLabel lblSatellite = new JLabel(resourceMap.getString("lblSatellite1.text"));
             gbcLabel.gridy = infoRow;

@@ -53,6 +53,7 @@ import megamek.common.ITechnology;
 import megamek.common.PlanetaryConditions;
 import megamek.common.TargetRoll;
 import mekhq.Utilities;
+import mekhq.adapter.AtmosphereAdapter;
 import mekhq.adapter.BooleanValueAdapter;
 import mekhq.adapter.ClimateAdapter;
 import mekhq.adapter.DateAdapter;
@@ -132,9 +133,8 @@ public class Planet implements Serializable {
     /** Pressure classification */
     @XmlJavaTypeAdapter(PressureAdapter.class)
     private Integer pressure;
-    /** Atmospheric classification */
-    //TODO: convert this into an integer code
-    private String atmosphere;
+    @XmlJavaTypeAdapter(AtmosphereAdapter.class)
+    private Atmosphere atmosphere;
     private String composition;
     private Integer temperature;
     
@@ -617,9 +617,19 @@ public class Planet implements Serializable {
         return null != currentPressure ? PlanetaryConditions.getAtmosphereDisplayableName(currentPressure) : "unknown";
     }
 
-    public String getAtmosphere(DateTime when) {
-        return getEventData(when, atmosphere, new EventGetter<String>() {
-            @Override public String get(PlanetaryEvent e) { return e.atmosphere; }
+    public Atmosphere getAtmosphere(DateTime when) {
+        return getEventData(when, null != atmosphere ? atmosphere : Atmosphere.NONE, new EventGetter<Atmosphere>() {
+            @Override public Atmosphere get(PlanetaryEvent e) { return e.atmosphere; }
+        });
+    }
+
+    public String getAtmosphereName(DateTime when) {
+        return getAtmosphere(when).name;
+    }
+    
+    public String getComposition(DateTime when) {
+        return getEventData(when, composition, new EventGetter<String>() {
+            @Override public String get(PlanetaryEvent e) { return e.composition; }
         });
     }
 
@@ -1054,7 +1064,7 @@ public class Planet implements Serializable {
         @XmlJavaTypeAdapter(HPGRatingAdapter.class)
         public Integer hpg;
         public Integer pressure;
-        public String atmosphere;
+        public Atmosphere atmosphere;
         public String composition;
         public Long population;
         // Events marked as "custom" are saved to scenario files and loaded from there
