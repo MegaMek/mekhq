@@ -512,10 +512,13 @@ public final class StarUtil {
             if( type.length() > 1 + subTypeString.length() && null == parsedLuminosity ) {
                 // We might have a luminosity, try to parse it
                 parsedLuminosity = validateLuminosity(type.substring(1 + subTypeString.length()));
-                if( null != parsedLuminosity && parsedLuminosity.equals(PlanetarySystem.LUM_VII) ) {
+                //Taharqa: This was code from akjosch, trying to be all realistic. However, the
+                //code in Campaign Ops conflicts with this which causes null values and NPE bugs, so 
+                //I don't really care how white dwarfs really work
+                //if( null != parsedLuminosity && parsedLuminosity.equals(PlanetarySystem.LUM_VII) ) {
                     // That's not how white dwarfs work
-                    return null;
-                }
+                //    return null;
+                //}
             }
         }
 

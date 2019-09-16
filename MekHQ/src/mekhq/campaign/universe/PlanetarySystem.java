@@ -317,7 +317,8 @@ public class PlanetarySystem implements Serializable {
     
     /** Recharge time in hours (assuming the usage of the fastest charing method available) */
     public double getRechargeTime(DateTime when) {
-        if(isZenithCharge(when) || isNadirCharge(when)) {
+        if((isZenithCharge(when) || isNadirCharge(when)) &&
+        		(null != spectralClass && null != subtype)) {
             return Math.min(176.0, 141 + 10*spectralClass + subtype);
         } else {
             return getSolarRechargeTime();
