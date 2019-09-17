@@ -353,6 +353,15 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                             && (oPart.getLocation() != part.getLocation())) {
                         continue;
                     }
+                    // If we're changing the size but not type of an LC ammo bin, we want to ensure that the ammo
+                    // gets tracked appropriately - it should unload to the warehouse later in the process and then
+                    // reload in the correct quantity. For that we must make sure the bin doesn't get dropped off
+                    // the old parts list here.
+                    if (oPart instanceof LargeCraftAmmoBin
+                            && part instanceof LargeCraftAmmoBin
+                            && ((LargeCraftAmmoBin)oPart).getCapacity() == ((LargeCraftAmmoBin)part).getCapacity()) {
+                        continue;
+                    }
                     if(part instanceof EquipmentPart) {
                         //check the location to see if this moved. If so, then don't break, but
                         //save this in case we fail to find equipment in the same location.
