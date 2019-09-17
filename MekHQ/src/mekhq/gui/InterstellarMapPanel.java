@@ -1045,24 +1045,23 @@ public class InterstellarMapPanel extends JPanel {
      */
     public Color getSystemColor(PlanetarySystem p) {
     	
-    	//color shading is from https://colorbrewer2.org and should be color-blind safe
+    	//color shading is from the Viridis color palettes
     	
     	SocioIndustrialData socio = p.getSocioIndustrial(Utilities.getDateTimeDay(campaign.getCalendar()));
     	
     	if(null != socio && optTech.isSelected()) {
 	    	switch(socio.tech) {
 	    		case EquipmentType.RATING_F:
-	    			return new Color(239,243,255);
 	    		case EquipmentType.RATING_E:
-	    			return new Color(198,219,239);
+	    			return new Color(68,1,84);
 	    		case EquipmentType.RATING_D:
-	    			return new Color(158,202,225);
+	    			return new Color(59,82,139);
 	    		case EquipmentType.RATING_C:
-	    			return new Color(107,174,214);
+	    			return new Color(33,144,140);
 	    		case EquipmentType.RATING_B:
-	    			return new Color(49,130,189);
+	    			return new Color(93,200,99);
 	    		case EquipmentType.RATING_A:
-	    			return new Color(8,81,156);
+	    			return new Color(253,231,37);
 	    		default: 
 	    			return Color.BLACK;
 	    	}
@@ -1070,17 +1069,16 @@ public class InterstellarMapPanel extends JPanel {
     	if(null != socio && optIndustry.isSelected()) {
 	    	switch(socio.industry) {
 	    		case EquipmentType.RATING_F:
-	    			return new Color(242,240,247);
 	    		case EquipmentType.RATING_E:
-	    			return new Color(218,218,235);
+	    			return new Color(0,0,4);
 	    		case EquipmentType.RATING_D:
-	    			return new Color(188,189,220);
+	    			return new Color(81,18,124);
 	    		case EquipmentType.RATING_C:
-	    			return new Color(158,154,200);
+	    			return new Color(182,54,121);
 	    		case EquipmentType.RATING_B:
-	    			return new Color(117,107,177);
+	    			return new Color(251,136,97);
 	    		case EquipmentType.RATING_A:
-	    			return new Color(84,39,143);
+	    			return new Color(252,253,191);
 	    		default: 
 	    			return Color.BLACK;
 	    	}
@@ -1088,17 +1086,16 @@ public class InterstellarMapPanel extends JPanel {
     	if(null != socio && optRawMaterials.isSelected()) {
 	    	switch(socio.rawMaterials) {
 	    		case EquipmentType.RATING_F:
-	    			return new Color(254,237,222);
 	    		case EquipmentType.RATING_E:
-	    			return new Color(253,208,162);
+	    			return new Color(13,8,135);
 	    		case EquipmentType.RATING_D:
-	    			return new Color(253,174,107);
+	    			return new Color(126,3,168);
 	    		case EquipmentType.RATING_C:
-	    			return new Color(253,141,60);
+	    			return new Color(204,70,120);
 	    		case EquipmentType.RATING_B:
-	    			return new Color(230,85,13);
+	    			return new Color(248,148,65);
 	    		case EquipmentType.RATING_A:
-	    			return new Color(166,54,3);
+	    			return new Color(240,249,33);
 	    		default: 
 	    			return Color.BLACK;
 	    	}
@@ -1106,17 +1103,16 @@ public class InterstellarMapPanel extends JPanel {
     	if(null != socio && optOutput.isSelected()) {
 	    	switch(socio.output) {
 	    		case EquipmentType.RATING_F:
-	    			return new Color(254,229,217);
 	    		case EquipmentType.RATING_E:
-	    			return new Color(252,187,161);
+	    			return new Color(0,0,4);
 	    		case EquipmentType.RATING_D:
-	    			return new Color(252,146,114);
+	    			return new Color(86,15,110);
 	    		case EquipmentType.RATING_C:
-	    			return new Color(251,106,74);
+	    			return new Color(187,55,84);
 	    		case EquipmentType.RATING_B:
-	    			return new Color(222,45,38);
+	    			return new Color(249,140,10);
 	    		case EquipmentType.RATING_A:
-	    			return new Color(165,15,21);
+	    			return new Color(252,255,164);
 	    		default: 
 	    			return Color.BLACK;
 	    	}
@@ -1124,17 +1120,16 @@ public class InterstellarMapPanel extends JPanel {
     	if(null != socio && optAgriculture.isSelected()) {
 	    	switch(socio.agriculture) {
 	    		case EquipmentType.RATING_F:
-	    			return new Color(237,248,233);
 	    		case EquipmentType.RATING_E:
-	    			return new Color(199,233,192);
+	    			return new Color(0,32,77);
 	    		case EquipmentType.RATING_D:
-	    			return new Color(161,217,155);
+	    			return new Color(66,77,107);
 	    		case EquipmentType.RATING_C:
-	    			return new Color(116,196,118);
+	    			return new Color(124,123,120);
 	    		case EquipmentType.RATING_B:
-	    			return new Color(49,163,84);
+	    			return new Color(188,175,111);
 	    		case EquipmentType.RATING_A:
-	    			return new Color(0,109,44);
+	    			return new Color(255,234,70);
 	    		default: 
 	    			return Color.BLACK;
 	    	}
