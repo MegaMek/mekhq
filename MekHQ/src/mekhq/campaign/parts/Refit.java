@@ -517,11 +517,10 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 aclan = ((Armor)nPart).isClanTechBase();
                 //armor always gets added to the shopping list - it will be checked for differently
                 //NOT ANYMORE - I think this is overkill, lets just reuse existing armor parts
-                //shoppingList.add(nPart);
             } else if (nPart instanceof AmmoBin) {
                 AmmoType type = (AmmoType)((AmmoBin)nPart).getType();
-                ammoNeeded.merge(type, type.getShots(), Integer::sum);
                 if (nPart instanceof LargeCraftAmmoBin) {
+                    ammoNeeded.merge(type, ((LargeCraftAmmoBin)nPart).getFullShots(), Integer::sum);
                     // Adding ammo requires base 15 minutes per ton of ammo or 60 minutes per capital missile
                     if (type.hasFlag(AmmoType.F_CAP_MISSILE) || type.hasFlag(AmmoType.F_CRUISE_MISSILE) || type.hasFlag(AmmoType.F_SCREEN)) {
                         time += 60 * ((LargeCraftAmmoBin)nPart).getFullShots();
@@ -531,6 +530,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                     shoppingList.add(nPart);
                 } else {
                     time += 120;
+                    ammoNeeded.merge(type, type.getShots(), Integer::sum);
                     //check for ammo bins in storage to avoid the proliferation of infinite ammo bins
                     MissingAmmoBin mab = (MissingAmmoBin)nPart.getMissingPart();
                     Part replacement = mab.findReplacement(true);
@@ -766,9 +766,18 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             }
             if(oPart instanceof AmmoBin) {
                 int remainingShots = ((AmmoBin)oPart).getFullShots() - ((AmmoBin)oPart).getShotsNeeded();
+                AmmoType type = (AmmoType)((AmmoBin)oPart).getType();
                 if(remainingShots > 0) {
-                    time += 120;
-                    ammoRemoved.merge((AmmoType)((AmmoBin)oPart).getType(), remainingShots,
+                    if (oPart instanceof LargeCraftAmmoBin) {
+                        if (type.hasFlag(AmmoType.F_CAP_MISSILE) || type.hasFlag(AmmoType.F_CRUISE_MISSILE) || type.hasFlag(AmmoType.F_SCREEN)) {
+                            time += 60 * ((LargeCraftAmmoBin)oPart).getFullShots();
+                        } else {
+                            time += 15 * Math.max(1, oPart.getTonnage());
+                        }
+                    } else {
+                        time += 120;
+                    }
+                    ammoRemoved.merge(type, remainingShots,
                             (a, b) -> a + b);
                 }
                 continue;
