@@ -132,6 +132,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
     private List<Part> shoppingList;
     private List<Part> oldIntegratedHS;
     private List<Part> newIntegratedHS;
+    private List<Part> lcBinsToChange;
 
     private int armorNeeded;
     private Armor newArmorSupplies;
@@ -333,6 +334,15 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 if (isOmniRefit && !oPart.isOmniPodded()) {
                     continue;
                 }
+                // If we're changing the size but not type of an LC ammo bin, we want to ensure that the ammo
+                // gets tracked appropriately - it should unload to the warehouse later in the process and then
+                // reload in the correct quantity. For that we must make sure the bin doesn't get dropped off
+                // the old parts list here.
+                if (oPart instanceof LargeCraftAmmoBin
+                        && part instanceof LargeCraftAmmoBin
+                        && ((LargeCraftAmmoBin)oPart).getCapacity() == ((LargeCraftAmmoBin)part).getCapacity()) {
+                    lcBinsToChange.add(oPart);
+                }
                 //FIXME: There have been instances of null oParts here. Save/load will fix these, but
                 //I would like to figure out the source. From experimentation, I think it has to do with
                 //cancelling a prior refit.
@@ -351,15 +361,6 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                     }
                     if ((oPart instanceof VeeStabiliser)
                             && (oPart.getLocation() != part.getLocation())) {
-                        continue;
-                    }
-                    // If we're changing the size but not type of an LC ammo bin, we want to ensure that the ammo
-                    // gets tracked appropriately - it should unload to the warehouse later in the process and then
-                    // reload in the correct quantity. For that we must make sure the bin doesn't get dropped off
-                    // the old parts list here.
-                    if (oPart instanceof LargeCraftAmmoBin
-                            && part instanceof LargeCraftAmmoBin
-                            && ((LargeCraftAmmoBin)oPart).getCapacity() == ((LargeCraftAmmoBin)part).getCapacity()) {
                         continue;
                     }
                     if(part instanceof EquipmentPart) {
@@ -1343,6 +1344,10 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 }
             }
             part.setUnit(null);
+        }
+        // Unload any large craft ammo bins where we're changing the amount but not the type of ammo
+        for (Part bin : lcBinsToChange) {
+            ((AmmoBin) bin).unload();
         }
         // add leftover untracked heat sinks to the warehouse
         for(Part part : oldIntegratedHS) {
