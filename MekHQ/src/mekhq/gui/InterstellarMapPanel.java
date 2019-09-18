@@ -118,6 +118,7 @@ public class InterstellarMapPanel extends JPanel {
     private JRadioButton optOutput;
     private JRadioButton optAgriculture;
     private JRadioButton optPopulation;
+    private JRadioButton optHPG;
 
     private JCheckBox optEmptySystems;
     private JCheckBox optHPGNetwork;
@@ -788,6 +789,8 @@ public class InterstellarMapPanel extends JPanel {
         optionPanel.add(optAgriculture);
         optPopulation = createOptionRadioButton("Population", checkboxIcon, checkboxSelectedIcon);
         optionPanel.add(optPopulation);
+        optHPG = createOptionRadioButton("HPG", checkboxIcon, checkboxSelectedIcon);
+        optionPanel.add(optHPG);
 
         ButtonGroup colorChoice = new ButtonGroup();
         colorChoice.add(optFactions);
@@ -797,6 +800,7 @@ public class InterstellarMapPanel extends JPanel {
         colorChoice.add(optOutput);
         colorChoice.add(optAgriculture);
         colorChoice.add(optPopulation);
+        colorChoice.add(optHPG);
         
         //factions by default
         optFactions.setSelected(true);
@@ -1166,6 +1170,26 @@ public class InterstellarMapPanel extends JPanel {
     		} else {
     			return Color.BLACK;
     		}
+    	}
+    	
+    	if(optHPG.isSelected()) {
+    		Integer hpg = p.getHPG(Utilities.getDateTimeDay(campaign.getCalendar()));
+    		if(null == hpg) {
+    			return Color.BLACK;
+    		}
+    		//use two shades of grey for C and D as this is pony express
+    		switch(hpg) {
+    		case EquipmentType.RATING_D:
+    			return new Color(84,84,84);
+    		case EquipmentType.RATING_C:
+    			return new Color(168,168,168);
+    		case EquipmentType.RATING_B:
+    			return new Color(34,168,132);
+    		case EquipmentType.RATING_A:
+    			return new Color(253,231,37);
+    		default: 
+    			return Color.BLACK;
+    	}
     	}
     	
 		return Color.GRAY;
