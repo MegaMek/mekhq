@@ -210,6 +210,16 @@ public class PlanetarySystem implements Serializable {
         return factions;
     }
 
+    public Long getPopulation(DateTime when) {
+    	Long pop = 0l;
+    	for(Planet planet : planets.values()) {
+    		if(null != planet.getPopulation(when)) {
+    			pop += planet.getPopulation(when);
+    		}
+    	}
+    	return pop;
+    }
+    
     /** highest socio-industrial ratings among all planets in system for the map **/
     public SocioIndustrialData getSocioIndustrial(DateTime when) {
         int tech = EquipmentType.RATING_X;

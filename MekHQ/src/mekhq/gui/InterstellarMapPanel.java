@@ -117,6 +117,7 @@ public class InterstellarMapPanel extends JPanel {
     private JRadioButton optRawMaterials;
     private JRadioButton optOutput;
     private JRadioButton optAgriculture;
+    private JRadioButton optPopulation;
 
     private JCheckBox optEmptySystems;
     private JCheckBox optHPGNetwork;
@@ -785,6 +786,8 @@ public class InterstellarMapPanel extends JPanel {
         optionPanel.add(optOutput);
         optAgriculture = createOptionRadioButton("Agriculture", checkboxIcon, checkboxSelectedIcon);
         optionPanel.add(optAgriculture);
+        optPopulation = createOptionRadioButton("Population", checkboxIcon, checkboxSelectedIcon);
+        optionPanel.add(optPopulation);
 
         ButtonGroup colorChoice = new ButtonGroup();
         colorChoice.add(optFactions);
@@ -793,6 +796,7 @@ public class InterstellarMapPanel extends JPanel {
         colorChoice.add(optRawMaterials);
         colorChoice.add(optOutput);
         colorChoice.add(optAgriculture);
+        colorChoice.add(optPopulation);
         
         //factions by default
         optFactions.setSelected(true);
@@ -1133,6 +1137,35 @@ public class InterstellarMapPanel extends JPanel {
 	    		default: 
 	    			return Color.BLACK;
 	    	}
+    	}
+    	
+    	if(optPopulation.isSelected()) {
+    		Long pop = p.getPopulation(Utilities.getDateTimeDay(campaign.getCalendar()));
+    		//numbers based roughly on deciles of population distribution
+    		//in 2750
+    		if(pop>=3000000000l) {
+    			return new Color(253,231, 37);
+    		} else if(pop>=1500000000l) {
+    			return new Color(180,222,44);
+    		} else if(pop>=1000000000l) {
+    			return new Color(109,205,89);
+    		} else if(pop>=500000000l) {
+    			return new Color(53,183,121);	
+    		} else if(pop>=300000000l) {
+    			return new Color(31,158,137);
+    		} else if(pop>=200000000l) {
+    			return new Color(38,130,142);
+    		} else if(pop>=100000000l) {
+    			return new Color(49,104,142);
+    		} else if(pop>=25000000l) {
+    			return new Color(62,74,137);
+    		} else if(pop>=1000000l) {
+    			return new Color(72,40,120);
+    		} else if(pop>0l) {
+    			return new Color(68,1,84);
+    		} else {
+    			return Color.BLACK;
+    		}
     	}
     	
 		return Color.GRAY;
