@@ -119,6 +119,7 @@ public class InterstellarMapPanel extends JPanel {
     private JRadioButton optAgriculture;
     private JRadioButton optPopulation;
     private JRadioButton optHPG;
+    private JRadioButton optRecharge;
 
     private JCheckBox optEmptySystems;
     private JCheckBox optHPGNetwork;
@@ -791,6 +792,8 @@ public class InterstellarMapPanel extends JPanel {
         optionPanel.add(optPopulation);
         optHPG = createOptionRadioButton("HPG", checkboxIcon, checkboxSelectedIcon);
         optionPanel.add(optHPG);
+        optRecharge = createOptionRadioButton("Recharge Stations", checkboxIcon, checkboxSelectedIcon);
+        optionPanel.add(optRecharge);
 
         ButtonGroup colorChoice = new ButtonGroup();
         colorChoice.add(optFactions);
@@ -801,6 +804,7 @@ public class InterstellarMapPanel extends JPanel {
         colorChoice.add(optAgriculture);
         colorChoice.add(optPopulation);
         colorChoice.add(optHPG);
+        colorChoice.add(optRecharge);
         
         //factions by default
         optFactions.setSelected(true);
@@ -1055,6 +1059,13 @@ public class InterstellarMapPanel extends JPanel {
     	
     	//color shading is from the Viridis color palettes
     	
+		Long pop = p.getPopulation(Utilities.getDateTimeDay(campaign.getCalendar()));
+
+		//if no population, then just return black no matter what we asked for
+		if(pop==0l) {
+			return Color.BLACK;
+		}
+		
     	SocioIndustrialData socio = p.getSocioIndustrial(Utilities.getDateTimeDay(campaign.getCalendar()));
     	
     	if(null != socio && optTech.isSelected()) {
@@ -1144,7 +1155,6 @@ public class InterstellarMapPanel extends JPanel {
     	}
     	
     	if(optPopulation.isSelected()) {
-    		Long pop = p.getPopulation(Utilities.getDateTimeDay(campaign.getCalendar()));
     		//numbers based roughly on deciles of population distribution
     		//in 2750
     		if(pop>=3000000000l) {
@@ -1168,7 +1178,7 @@ public class InterstellarMapPanel extends JPanel {
     		} else if(pop>0l) {
     			return new Color(68,1,84);
     		} else {
-    			return Color.BLACK;
+    			return Color.GRAY;
     		}
     	}
     	
@@ -1184,12 +1194,27 @@ public class InterstellarMapPanel extends JPanel {
     		case EquipmentType.RATING_C:
     			return new Color(168,168,168);
     		case EquipmentType.RATING_B:
-    			return new Color(34,168,132);
+    			return new Color(222,73,104);
     		case EquipmentType.RATING_A:
-    			return new Color(253,231,37);
+    			return new Color(252,253,191);
     		default: 
     			return Color.BLACK;
+    		}
     	}
+    	
+    	if(optRecharge.isSelected()) {
+    		
+    		//use two shades of grey for C and D as this is pony express
+    		switch(p.getNumberRechargeStations(Utilities.getDateTimeDay(campaign.getCalendar()))) {
+    		case 2:
+    			return new Color(240,249,33);
+    		case 1:
+    			return new Color(225,100,98);
+    		case 0:
+    			return new Color(128,128,128);
+    		default: 
+    			return Color.BLACK;
+    		}
     	}
     	
 		return Color.GRAY;

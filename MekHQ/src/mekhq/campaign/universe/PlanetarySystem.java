@@ -294,6 +294,10 @@ public class PlanetarySystem implements Serializable {
         });
     }
 
+    public int getNumberRechargeStations(DateTime when) {
+    	return (isNadirCharge(when) ? 1 : 0) + (isZenithCharge(when) ? 1 : 0);
+    }
+    
     public String getRechargeStationsText(DateTime when) {
         Boolean nadir = isNadirCharge(when);
         Boolean zenith = isZenithCharge(when);
