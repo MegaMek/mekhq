@@ -608,8 +608,8 @@ public final class StarUtil {
         switch(hpg.intValue()) {
             case EquipmentType.RATING_A: return "A-rated HPG";
             case EquipmentType.RATING_B: return "B-rated HPG";
-            case EquipmentType.RATING_C: return "C-rated Service";
-            case EquipmentType.RATING_D: return "D-rated Service";
+            case EquipmentType.RATING_C: return "C-rated Service (pony express)";
+            case EquipmentType.RATING_D: return "D-rated Service (pony express)";
             case EquipmentType.RATING_X: return "none";
             default: return "unknown";
         }
