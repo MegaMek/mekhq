@@ -696,16 +696,6 @@ public class CampaignGUI extends JPanel {
         });
         // miLoadForces.setEnabled(false);
         menuImport.add(miLoadForces);
-        
-        JMenuItem miLoadPlanets = new JMenuItem(
-                resourceMap.getString("miImportPlanets.text"));
-        miLoadPlanets.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                miLoadPlanetsActionPerformed(evt);
-            }
-        });
-        menuImport.add(miLoadPlanets);
 
         menuFile.add(menuImport);
         menuFile.add(menuExport);
@@ -1757,14 +1747,6 @@ public class CampaignGUI extends JPanel {
             MekHQ.getLogger().error(getClass(), "miLoadForcesActionPerformed(ActionEvent)", ex);
         }
     }// GEN-LAST:event_miLoadForcesActionPerformed
-
-    private void miLoadPlanetsActionPerformed(java.awt.event.ActionEvent evt) {
-        try {
-            loadPlanetTSVFile();
-        } catch (Exception ex) {
-            MekHQ.getLogger().error(getClass(), "miLoadPlanetsActionPerformed", ex);
-        }
-    }
     
     private void miImportPersonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miImportPersonActionPerformed
         try {
@@ -2061,14 +2043,6 @@ public class CampaignGUI extends JPanel {
 
     public Part getPartByNameAndDetails(String pnd) {
         return getCampaign().getPartsStore().getByNameAndDetails(pnd);
-    }
-
-    protected void loadPlanetTSVFile() {
-        //TODO: fix this
-       /* FileDialogs.openPlanetsTsv(frame).ifPresent(tsvFile -> {
-            String report = Planets.getInstance().importPlanetsFromTSV(tsvFile.getAbsolutePath());
-            JOptionPane.showMessageDialog(mainPanel, report);
-        });*/
     }
     
     /**
