@@ -28,11 +28,13 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -132,7 +134,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
     private List<Part> shoppingList;
     private List<Part> oldIntegratedHS;
     private List<Part> newIntegratedHS;
-    private List<Part> lcBinsToChange;
+    private Set<Part> lcBinsToChange;
 
     private int armorNeeded;
     private Armor newArmorSupplies;
@@ -152,7 +154,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         shoppingList = new ArrayList<>();
         oldIntegratedHS = new ArrayList<>();
         newIntegratedHS = new ArrayList<>();
-        lcBinsToChange = new ArrayList<>();
+        lcBinsToChange = new HashSet<>();
         fixableString = null;
         cost = Money.zero();
     }
@@ -341,7 +343,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 // the old parts list here.
                 if (oPart instanceof LargeCraftAmmoBin
                         && part instanceof LargeCraftAmmoBin
-                        && ((LargeCraftAmmoBin)oPart).getCapacity() == ((LargeCraftAmmoBin)part).getCapacity()) {
+                        && ((LargeCraftAmmoBin)oPart).getCapacity() != ((LargeCraftAmmoBin)part).getCapacity()) {
                     lcBinsToChange.add(oPart);
                 }
                 //FIXME: There have been instances of null oParts here. Save/load will fix these, but
@@ -1346,7 +1348,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             }
             part.setUnit(null);
         }
-        // Unload any large craft ammo bins where we're changing the amount but not the type of ammo
+        // Unload any large craft ammo bins to ensure ammo isn't lost
+        // when we're changing the amount but not the type of ammo
         for (Part bin : lcBinsToChange) {
             ((AmmoBin) bin).unload();
         }
@@ -1388,7 +1391,12 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         assignArmActuators();
         assignBayParts();
         for (Part p : newParts) {
-            if (p instanceof AmmoBin) {
+            if (p instanceof LargeCraftAmmoBin) {
+                //All large craft ammo got unloaded into the warehouse earlier, though the part IDs have now changed.
+                //Consider all LC ammobins empty and load them back up.
+                ((AmmoBin) p).setShotsNeeded(((AmmoBin) p).getFullShots());
+                ((AmmoBin) p).loadBin();
+            } else if (p instanceof AmmoBin) {
                 ((AmmoBin) p).loadBin();
             }
         }
