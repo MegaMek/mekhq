@@ -37,6 +37,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Consumer;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -142,29 +143,17 @@ public class Systems {
     }
     
     public List<PlanetarySystem> getNearbySystems(final double centerX, final double centerY, int distance) {
-        List<PlanetarySystem> neighbors = new ArrayList<>();
-        int gridRadius = (int)Math.ceil(distance / 30.0);
-        int gridX = (int)(centerX / 30.0);
-        int gridY = (int)(centerY / 30.0);
-        for (int x = gridX - gridRadius; x <= gridX + gridRadius; x++) {
-            for (int y = gridY - gridRadius; y <= gridY + gridRadius; y++) {
-                Set<PlanetarySystem> grid = getSystemGrid(x, y);
-                if(null != grid) {
-                    for(PlanetarySystem s : grid) {
-                        if(s.getDistanceTo(centerX, centerY) <= distance) {
-                            neighbors.add(s);
-                        }
-                    }
-                }
-            }
-        }
-        Collections.sort(neighbors, new Comparator<PlanetarySystem>() {
-            @Override
-            public int compare(PlanetarySystem o1, PlanetarySystem o2) {
-                return Double.compare(o1.getDistanceTo(centerX, centerY), o2.getDistanceTo(centerX, centerY));
-            }
-        });
-        return neighbors;
+    	 List<PlanetarySystem> neighbors = new ArrayList<>();
+
+         visitNearbySystems(centerX, centerY, distance, neighbors::add);
+
+         Collections.sort(neighbors, new Comparator<PlanetarySystem>() {
+             @Override
+             public int compare(PlanetarySystem o1, PlanetarySystem o2) {
+                 return Double.compare(o1.getDistanceTo(centerX, centerY), o2.getDistanceTo(centerX, centerY));
+             }
+         });
+         return neighbors;
     }
     
     public List<PlanetarySystem> getNearbySystems(final PlanetarySystem system, int distance) {
@@ -475,4 +464,27 @@ public class Systems {
                 && (rating == other.rating);
         }
     }
+
+    public void visitNearbySystems(final double centerX, final double centerY, final int distance, Consumer<PlanetarySystem> visitor) {
+        int gridRadius = (int)Math.ceil(distance / 30.0);
+        int gridX = (int)(centerX / 30.0);
+        int gridY = (int)(centerY / 30.0);
+        for (int x = gridX - gridRadius; x <= gridX + gridRadius; x++) {
+            for (int y = gridY - gridRadius; y <= gridY + gridRadius; y++) {
+                Set<PlanetarySystem> grid = getSystemGrid(x, y);
+                if (null != grid) {
+                    for (PlanetarySystem p : grid) {
+                        if (p.getDistanceTo(centerX, centerY) <= distance) {
+                            visitor.accept(p);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    public void visitNearbySystems(final PlanetarySystem system, final int distance, Consumer<PlanetarySystem> visitor) {
+        visitNearbySystems(system.getX(), system.getY(), distance, visitor);
+    }
+     
 }

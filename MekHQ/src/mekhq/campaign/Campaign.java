@@ -4954,110 +4954,110 @@ public class Campaign implements Serializable, ITechManager {
      * @return
      */
     public JumpPath calculateJumpPath(PlanetarySystem start, PlanetarySystem end) {
-        if(null == start) {
-            return null;
-        }
-        if ((null == end) || start.getId().equals(end.getId())) {
-            JumpPath jpath = new JumpPath();
-            jpath.addSystem(start);
-            return jpath;
-        }
+    	if (null == start) {
+    		return null;
+    	}
+    	if ((null == end) || start.getId().equals(end.getId())) {
+    		JumpPath jpath = new JumpPath();
+    		jpath.addSystem(start);
+    		return jpath;
+    	}
 
-        String startKey = start.getId();
-        String endKey = end.getId();
+    	String startKey = start.getId();
+    	String endKey = end.getId();
 
-        final DateTime now = Utilities.getDateTimeDay(calendar);
-        String current = startKey;
-        Set<String> closed = new HashSet<>();
-        Set<String> open = new HashSet<>();
-        boolean found = false;
-        int jumps = 0;
+    	final DateTime now = Utilities.getDateTimeDay(calendar);
+    	String current = startKey;
+    	Set<String> closed = new HashSet<>();
+    	Set<String> open = new HashSet<>();
+    	boolean found = false;
+    	int jumps = 0;
 
-        // we are going to through and set up some hashes that will make our
-        // work easier
-        // hash of parent key
-        Map<String, String> parent = new HashMap<>();
-        // hash of H for each planet which will not change
-        Map<String, Double> scoreH = new HashMap<>();
-        // hash of G for each planet which might change
-        Map<String, Double> scoreG = new HashMap<>();
+    	// we are going to through and set up some hashes that will make our
+    	// work easier
+    	// hash of parent key
+    	Map<String, String> parent = new HashMap<>();
+    	// hash of H for each planet which will not change
+    	Map<String, Double> scoreH = new HashMap<>();
+    	// hash of G for each planet which might change
+    	Map<String, Double> scoreG = new HashMap<>();
 
-        for (String key : Systems.getInstance().getSystems().keySet()) {
-            scoreH.put(
-                    key,
-                    end.getDistanceTo(Systems.getInstance().getSystems()
-                            .get(key)));
-        }
-        scoreG.put(current, 0.0);
-        closed.add(current);
+    	for (String key : Systems.getInstance().getSystems().keySet()) {
+    		scoreH.put(
+    				key,
+    				end.getDistanceTo(Systems.getInstance().getSystems()
+    						.get(key)));
+    	}
+    	scoreG.put(current, 0.0);
+    	closed.add(current);
+    	        
+    	while (!found && jumps < 10000) {
+    		jumps++;
+    		double currentG = scoreG.get(current) + Systems.getInstance().getSystemById(current).getRechargeTime(now);
 
-        while (!found && jumps < 10000) {
-            jumps++;
-            final String localCurrent = current;
-            double currentG = scoreG.get(current) + Systems.getInstance().getSystemById(current).getRechargeTime(now);
-            List<PlanetarySystem> neighborKeys = Systems.getInstance().getNearbySystems(Systems.getInstance().getSystemById(current), 30);
-            for (PlanetarySystem neighborKey : neighborKeys) {
-                if (closed.contains(neighborKey.getId())) {
-                    continue;
-                } else if (open.contains(neighborKey.getId())) {
-                    // is the current G better than the existing G
-                    if (currentG < scoreG.get(neighborKey.getId())) {
-                        // then change G and parent
-                        scoreG.put(neighborKey.getId(), currentG);
-                        parent.put(neighborKey.getId(), localCurrent);
-                    }
-                } else {
-                    // put the current G for this one in memory
-                    scoreG.put(neighborKey.getId(), currentG);
-                    // put the parent in memory
-                    parent.put(neighborKey.getId(), localCurrent);
-                    open.add(neighborKey.getId());
-                }
-            };
+    		final String localCurrent = current;
+    		Systems.getInstance().visitNearbySystems(Systems.getInstance().getSystemById(current), 30, p -> {
+    			if (closed.contains(p.getId())) {
+    				return;
+    			} else if (open.contains(p.getId())) {
+    				// is the current G better than the existing G
+    				if (currentG < scoreG.get(p.getId())) {
+    					// then change G and parent
+    					scoreG.put(p.getId(), currentG);
+    					parent.put(p.getId(), localCurrent);
+    				}
+    			} else {
+    				// put the current G for this one in memory
+    				scoreG.put(p.getId(), currentG);
+    				// put the parent in memory
+    				parent.put(p.getId(), localCurrent);
+    				open.add(p.getId());
+    			}
+    		});
 
-            String bestMatch = null;
-            double bestF = Double.POSITIVE_INFINITY;
-            for (String possible : open) {
-                // calculate F
-                double currentF = scoreG.get(possible) + scoreH.get(possible);
-                if (currentF < bestF) {
-                    bestMatch = possible;
-                    bestF = currentF;
-                }
-            }
+    		String bestMatch = null;
+    		double bestF = Double.POSITIVE_INFINITY;
+    		for (String possible : open) {
+    			// calculate F
+    			double currentF = scoreG.get(possible) + scoreH.get(possible);
+    			if (currentF < bestF) {
+    				bestMatch = possible;
+    				bestF = currentF;
+    			}
+    		}
 
-            current = bestMatch;
-            if(null == current) {
-                // We're done - probably failed to find anything
-                break;
-            }
+    		current = bestMatch;
+    		if(null == current) {
+    			// We're done - probably failed to find anything
+    			break;
+    		}
+    	            
+    		closed.add(current);
+    		open.remove(current);
+    		if (current.equals(endKey)) {
+    			found = true;
+    		}
+    	}
 
-            closed.add(current);
-            open.remove(current);
-            if (current.equals(endKey)) {
-                found = true;
-            }
-        }
+    	// now we just need to back up from the last current by parents until we
+    	// hit null
+    	List<PlanetarySystem> path = new ArrayList<>();
+    	String nextKey = current;
+    	while (null != nextKey) {
+    		path.add(Systems.getInstance().getSystemById(nextKey));
+    		// MekHQApp.logMessage(nextKey);
+    		nextKey = parent.get(nextKey);
+    	}
 
-        // now we just need to back up from the last current by parents until we
-        // hit null
-        ArrayList<PlanetarySystem> path = new ArrayList<PlanetarySystem>();
-        String nextKey = current;
-        while (null != nextKey) {
-            path.add(Systems.getInstance().getSystems().get(nextKey));
-            // MekHQApp.logMessage(nextKey);
-            nextKey = parent.get(nextKey);
-        }
+    	// now reverse the direaction
+    	JumpPath finalPath = new JumpPath();
+    	for (int i = (path.size() - 1); i >= 0; i--) {
+    		finalPath.addSystem(path.get(i));
+    	}
 
-        // now reverse the direaction
-        JumpPath finalPath = new JumpPath();
-        for (int i = (path.size() - 1); i >= 0; i--) {
-            finalPath.addSystem(path.get(i));
-        }
-
-        return finalPath;
+    	return finalPath;
     }
-
+    	   
     public List<PlanetarySystem> getAllReachableSystemsFrom(PlanetarySystem system) {
         return Systems.getInstance().getNearbySystems(system, 30);
     }
