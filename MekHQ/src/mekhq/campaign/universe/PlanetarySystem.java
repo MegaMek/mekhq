@@ -438,6 +438,11 @@ public class PlanetarySystem implements Serializable {
         return Objects.equals(id, other.id);
     }
     
+    @Override
+    public int hashCode() {
+       return Objects.hash(id);
+    }
+    
     @SuppressWarnings("unchecked")
     public PlanetarySystemEvent getOrCreateEvent(DateTime when) {
         if(null == when) {
