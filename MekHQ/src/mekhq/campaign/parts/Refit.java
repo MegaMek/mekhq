@@ -152,6 +152,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         shoppingList = new ArrayList<>();
         oldIntegratedHS = new ArrayList<>();
         newIntegratedHS = new ArrayList<>();
+        lcBinsToChange = new ArrayList<>();
         fixableString = null;
         cost = Money.zero();
     }
