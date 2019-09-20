@@ -134,7 +134,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
     private List<Part> shoppingList;
     private List<Part> oldIntegratedHS;
     private List<Part> newIntegratedHS;
-    private Set<Part> lcBinsToChange;
+    private Set<Integer> lcBinsToChange;
 
     private int armorNeeded;
     private Armor newArmorSupplies;
@@ -343,8 +343,9 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 // the old parts list here.
                 if (oPart instanceof LargeCraftAmmoBin
                         && part instanceof LargeCraftAmmoBin
+                        && ((LargeCraftAmmoBin)oPart).getType() == ((LargeCraftAmmoBin)part).getType()
                         && ((LargeCraftAmmoBin)oPart).getCapacity() != ((LargeCraftAmmoBin)part).getCapacity()) {
-                    lcBinsToChange.add(oPart);
+                    lcBinsToChange.add(oPart.getId());
                 }
                 //FIXME: There have been instances of null oParts here. Save/load will fix these, but
                 //I would like to figure out the source. From experimentation, I think it has to do with
@@ -1350,8 +1351,12 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         }
         // Unload any large craft ammo bins to ensure ammo isn't lost
         // when we're changing the amount but not the type of ammo
-        for (Part bin : lcBinsToChange) {
-            ((AmmoBin) bin).unload();
+        for (int pid : lcBinsToChange) {
+            Part part = oldUnit.getCampaign().getPart(pid);
+            if (part instanceof AmmoBin) {
+                ((AmmoBin)part).unload();
+            }
+            
         }
         // add leftover untracked heat sinks to the warehouse
         for(Part part : oldIntegratedHS) {
