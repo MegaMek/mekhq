@@ -1141,7 +1141,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
         partsValue = partsValue
                 .plus(parts.stream()
-                    .map(x -> x.getActualValue().multipliedBy(x.getQuality()))
+                    .map(x -> x.getActualValue().multipliedBy(x.getQuantity()))
                     .collect(Collectors.toList()));
 
         //We need to adjust this for equipment that doesn't show up as parts
