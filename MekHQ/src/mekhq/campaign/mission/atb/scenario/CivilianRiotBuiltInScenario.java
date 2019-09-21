@@ -85,7 +85,7 @@ public class CivilianRiotBuiltInScenario extends AtBScenario {
 	@Override
 	public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities,
 			ArrayList<Entity> enemyEntities) {
-	    // notrh, south, east, west
+	    // north, south, east, west
 	    int boardEdge = (Compute.randomInt(4) + 1) * 2; 
 	    setStart(boardEdge);
         
