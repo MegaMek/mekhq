@@ -1,3 +1,22 @@
+/*
+ * Copyright (c) 2019 The Megamek Team. All rights reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package mekhq.campaign.mission.atb.scenario;
 
 import java.util.ArrayList;
@@ -21,80 +40,83 @@ import mekhq.campaign.unit.Unit;
 
 @AtBScenarioEnabled
 public class CivilianHelpBuiltInScenario extends AtBScenario {
-	private static final long serialVersionUID = 1757542171960038919L;
-	private static final String CIVILIAN_FORCE_ID = "Civilians";
-	
-	@Override
-	public boolean isSpecialMission() {
-		return true;
-	}
+    private static final long serialVersionUID = 1757542171960038919L;
+    private static final String CIVILIAN_FORCE_ID = "Civilians";
 
-	@Override
-	public int getScenarioType() {
-		return CIVILIANHELP;
-	}
+    @Override
+    public boolean isSpecialMission() {
+        return true;
+    }
 
-	@Override
-	public String getScenarioTypeDescription() {
-		return "Special Mission: Civilian Help";
-	}
+    @Override
+    public int getScenarioType() {
+        return CIVILIANHELP;
+    }
 
-	@Override
-	public String getResourceKey() {
-		return "civilianHelp";
-	}
+    @Override
+    public String getScenarioTypeDescription() {
+        return "Special Mission: Civilian Help";
+    }
 
-	@Override
-	public boolean canDeploy(Unit unit, Campaign campaign) {
-		return unit.getCommander().getRank().isOfficer();
-	}
+    @Override
+    public String getResourceKey() {
+        return "civilianHelp";
+    }
 
-	@Override
-	public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities,
-			ArrayList<Entity> enemyEntities) {
-		setStart(startPos[Compute.randomInt(4)]);
-		int enemyStart = getStart() + 4;
+    @Override
+    public boolean canDeploy(Unit unit, Campaign campaign) {
+        return unit.getCommander().getRank().isOfficer();
+    }
 
-		if (enemyStart > 8) {
-			enemyStart -= 8;
-		}
+    @Override
+    public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities,
+            ArrayList<Entity> enemyEntities) {
+        setStart(startPos[Compute.randomInt(4)]);
+        int enemyStart = getStart() + 4;
 
-		for (int weight = EntityWeightClass.WEIGHT_LIGHT; weight <= EntityWeightClass.WEIGHT_ASSAULT; weight++) {
-			enemyEntities = new ArrayList<Entity>();
-			for (int i = 0; i < 3; i++)
-				enemyEntities.add(getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
-						getContract(campaign).getEnemyQuality(), UnitType.MEK, weight, campaign));
-			getSpecMissionEnemies().add(enemyEntities);
-		}
+        if (enemyStart > 8) {
+            enemyStart -= 8;
+        }
 
-		addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecMissionEnemies().get(0)));
+        for (int weight = EntityWeightClass.WEIGHT_LIGHT; weight <= EntityWeightClass.WEIGHT_ASSAULT; weight++) {
+            enemyEntities = new ArrayList<Entity>();
+            for (int i = 0; i < 3; i++)
+                enemyEntities.add(getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
+                        getContract(campaign).getEnemyQuality(), UnitType.MEK, weight, campaign));
+            getSpecMissionEnemies().add(enemyEntities);
+        }
 
-		ArrayList<Entity> otherForce = new ArrayList<Entity>();
-		addCivilianUnits(otherForce, 4, campaign);
+        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecMissionEnemies().get(0)));
 
-		for (Entity e : otherForce) {
-			getSurvivalBonusIds().add(UUID.fromString(e.getExternalIdAsString()));
-		}
+        ArrayList<Entity> otherForce = new ArrayList<Entity>();
+        addCivilianUnits(otherForce, 4, campaign);
 
-		addBotForce(new BotForce(CIVILIAN_FORCE_ID, 1, getStart(), otherForce));
-	}
-	
-	@Override
+        for (Entity e : otherForce) {
+            getSurvivalBonusIds().add(UUID.fromString(e.getExternalIdAsString()));
+        }
+
+        addBotForce(new BotForce(CIVILIAN_FORCE_ID, 1, getStart(), otherForce));
+    }
+
+    @Override
     public void setObjectives(Campaign campaign, AtBContract contract) {
-	    super.setObjectives(campaign, contract);
-	    
+        super.setObjectives(campaign, contract);
+
         ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 66);
-        ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 1, true);
-        ScenarioObjective keepCiviliansAlive = CommonObjectiveFactory.getPreserveSpecificFriendlies(CIVILIAN_FORCE_ID, 1, true);
-        
+        ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this,
+                1, true);
+        ScenarioObjective keepCiviliansAlive = CommonObjectiveFactory.getPreserveSpecificFriendlies(CIVILIAN_FORCE_ID,
+                1, true);
+
         // not losing the scenario also gets you a "bonus"
         ObjectiveEffect bonusEffect = new ObjectiveEffect();
         bonusEffect.effectType = ObjectiveEffectType.AtBBonus;
         bonusEffect.effectScaling = EffectScalingType.Linear;
         bonusEffect.howMuch = 1;
         keepCiviliansAlive.addSuccessEffect(bonusEffect);
-        keepCiviliansAlive.addDetail(String.format(defaultResourceBundle.getString("commonObjectives.bonusRolls.text"), bonusEffect.howMuch));
-        
+        keepCiviliansAlive.addDetail(String.format(defaultResourceBundle.getString("commonObjectives.bonusRolls.text"),
+                bonusEffect.howMuch));
+
         getObjectives().add(destroyHostiles);
         getObjectives().add(keepFriendliesAlive);
         getObjectives().add(keepCiviliansAlive);
