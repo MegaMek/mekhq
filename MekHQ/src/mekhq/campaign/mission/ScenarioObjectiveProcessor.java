@@ -48,7 +48,6 @@ public class ScenarioObjectiveProcessor {
      * Given a ResolveScenarioTracker, evaluate the units contained therein
      * in an effort to determine the units associated and units that meet each objective in the scenario played.
      * @param tracker Tracker to process
-     * @param objectiveUnitIDs Map to populate with all units potentially eligible for the objective
      * @return Map containing all units that are eligible for the objective
      */
     public void evaluateScenarioObjectives(ResolveScenarioTracker tracker) {
@@ -258,11 +257,11 @@ public class ScenarioObjectiveProcessor {
     }
     
     /**
-     * Processes a particular scenario objective, applying its effects to the 
-     * current mission and campaign as necessary
-     * @param objective The objective to process.
-     * @param qualifyingUnitCount How many units qualified for the objective, used to scale the objective effect if necessary
-     * @param completionOverride If null, objective completion is calculated dynamically, otherwise a fixed objective completion state.
+     * Processes the given scenario and its objectives scenario objective, applying objective effects to the campaign
+     * as necessary
+     * @param scenario The scenario to process.
+     * @param objectiveOverrides Map containing user overrides of objective completion state
+     * @param objectiveUnitCounts Map containing objectives and the number of units that qualified for each.
      */
     public int determineScenarioStatus(Scenario scenario, Map<ScenarioObjective, Boolean> objectiveOverrides, Map<ScenarioObjective, Integer> objectiveUnitCounts) {
         int victoryScore = 0;

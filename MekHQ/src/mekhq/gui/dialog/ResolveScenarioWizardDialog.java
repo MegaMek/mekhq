@@ -1693,7 +1693,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
     /**
      * Event handler for when the user clicks on an objective unit checkbox
      * @param objective The objective to check
-     * @param objectiveUnitCount The units potentially qualifying for the objective
      * @param label label to update
      */
     private void updateObjectiveDisplay(ScenarioObjective objective, JLabel label) {
