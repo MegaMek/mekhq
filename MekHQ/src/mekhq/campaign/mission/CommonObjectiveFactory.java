@@ -1,3 +1,22 @@
+/*
+ * Copyright (c) 2019 The Megamek Team. All rights reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package mekhq.campaign.mission;
 
 import java.util.ResourceBundle;
@@ -128,7 +147,7 @@ public class CommonObjectiveFactory {
     }
     
     /** 
-     * Generates a "destroy x% of all units" from the primary opposing force objective
+     * Generates a "destroy x% of all units" objective from the primary opposing force 
      * @param contract Contract to examine for enemy force name.
      */
     public static ScenarioObjective getDestroyEnemies(AtBContract contract, int percentage) {
@@ -136,7 +155,7 @@ public class CommonObjectiveFactory {
     }
     
     /** 
-     * Generates a "destroy x% of all units" from the primary opposing force objective
+     * Generates a "prevent x% of all units from reaching given edge" objective from the primary opposing force 
      */
     public static ScenarioObjective getPreventEnemyBreakthrough(AtBContract contract, int percentage, OffBoardDirection direction) {
         ScenarioObjective destroyHostiles = new ScenarioObjective();

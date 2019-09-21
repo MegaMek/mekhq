@@ -1,3 +1,22 @@
+/*
+ * Copyright (c) 2019 The Megamek Team. All rights reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package mekhq.campaign.mission;
 
 import java.io.PrintWriter;
@@ -72,20 +91,34 @@ public class ScenarioObjective {
      * Types of automatically tracked scenario objectives
      */
     public enum ObjectiveCriterion {
-        // entity must be destroyed:
-        // center torso/structure gone, crew killed, immobilized + battlefield control
+        /* 
+        * entity must be destroyed:
+        * center torso/structure gone, crew killed, immobilized + battlefield control
+        */
         Destroy,
-        // entity must be crippled, destroyed or withdrawn off the wrong edge of the map        
+        /*
+         *  entity must be crippled, destroyed or withdrawn off the wrong edge of the map        
+         */
         ForceWithdraw,
-        // entity must be immobilized but not destroyed
+        /*
+         *  entity must be immobilized but not destroyed
+         */
         Capture,
-        // entity must be prevented from reaching a particular map edge
+        /*
+         *  entity must be prevented from reaching a particular map edge
+         */
         PreventReachMapEdge,
-        // entity must be intact (can be crippled, immobilized, crew-killed)
+        /*
+         *  entity must be intact (can be crippled, immobilized, crew-killed)
+         */
         Preserve,
-        // if an entity crossed a particular map edge without getting messed up en route
+        /*
+         *  if an entity crossed a particular map edge without getting messed up en route
+         */
         ReachMapEdge,
-        // this must be tracked manually by the player
+        /*
+         *  this must be tracked manually by the player
+         */
         Custom;
         
         @Override

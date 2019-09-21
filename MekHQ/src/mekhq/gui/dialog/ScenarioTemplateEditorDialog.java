@@ -22,6 +22,7 @@
 package mekhq.gui.dialog;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -190,6 +191,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.gridx = 0;
         gbc.gridy = 0;
         setupTopFluff(gbc);
+        setupObjectiveEditLink(gbc);
         setupForceEditorHeaders(gbc);
         setupForceEditor(gbc);
         initializeForceList(gbc);
@@ -252,6 +254,27 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         JScrollPane scrLongBriefing = new JScrollPane(txtLongBriefing);
         gbc.gridy++;
         globalPanel.add(scrLongBriefing, gbc);
+    }
+    
+    private void setupObjectiveEditLink(GridBagConstraints gbc) {
+        gbc.gridy++;
+        gbc.gridwidth = 1;
+        gbc.gridheight = 1;
+        
+        Component parent = this;
+        
+        JButton btnEditObjectives = new JButton("Edit Objectives");
+        btnEditObjectives.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ObjectiveEditPanel oep = new ObjectiveEditPanel(scenarioTemplate, parent);
+                oep.setAlwaysOnTop(true);
+                oep.setVisible(true);
+            }
+        
+        });
+        globalPanel.add(btnEditObjectives);
     }
     
     /**

@@ -1,3 +1,22 @@
+/*
+ * Copyright (c) 2019 The Megamek Team. All rights reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package mekhq.campaign.mission;
 
 /**
@@ -8,21 +27,64 @@ package mekhq.campaign.mission;
  */
 public class ObjectiveEffect {
     
+    /**
+     * The possible type of effect scaling effects, 
+     * aka what you multiply the effect by.
+     */
     public enum EffectScalingType {
+        /*
+         *  no scaling, effect is just applied "howMuch" times
+         */
         None,
+        /*
+         *  linear scaling, effect is applied based on how many units qualified for the objective
+         */
         Linear,
+        /*
+         *  inverted scaling, effect is applied based on how many units did not qualify for the objective
+         */
         Inverted
     }
     
+    /**
+     * The behavior of the application when the objective effect is applied
+     */
     public enum ObjectiveEffectType {
+        /*
+         *  contributes a "victory point" towards the scenario's victory/defeat state
+         */
         ScenarioVictory,
+        /*
+         *  contributes a "negative victory point" towards the scenario's victory/defeat state
+         */
         ScenarioDefeat,
+        /*
+         *  changes the contract score
+         */
         ContractScoreUpdate,
+        /* changes the number of support points (not implemented yet)
+         * 
+         */
         SupportPointUpdate,
+        /*
+         *  changes the contract morale up or down
+         */
         ContractMoraleUpdate,
+        /*
+         *  insta-win the contract (player still has to manually complete it)
+         */
         ContractVictory,
+        /*
+         *  insta-lose the contract (player still has to manually complete it)
+         */
         ContractDefeat,
+        /*
+         *  update the BV budget multiplier for template scenarios (not implemented yet)
+         */
         BVBudgetUpdate,
+        /*
+         *  roll an AtB-style "bonus"
+         */
         AtBBonus
     }        
     

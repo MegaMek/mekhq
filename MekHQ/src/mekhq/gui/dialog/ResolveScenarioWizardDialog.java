@@ -1092,12 +1092,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
                     JCheckBox chkItemState = new JCheckBox(tracker.getAllInvolvedUnits().get(uuid).getShortName());
                     chkItemState.setSelected(qualifyingObjectiveUnits.get(objective).contains(unitID));
                     chkItemState.setActionCommand(unitID);
-                    chkItemState.addItemListener(new ItemListener() {
-                        @Override
-                        public void itemStateChanged(ItemEvent e) {
-                            updateObjectiveDisplay(objective, lblObjective);
-                        }
-                    });
+                    chkItemState.addItemListener(e -> updateObjectiveDisplay(objective, lblObjective));
                     gbc.gridy++;
                     pnlObjectiveStatus.add(chkItemState, gbc);
                     objectiveCheckboxes.get(objective).add(chkItemState);
