@@ -1821,6 +1821,12 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                     + "</pid>");
         }
         pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "</newUnitParts>");
+        pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<lcBinsToChange>");
+        for(int pid : lcBinsToChange) {
+            pw1.println(MekHqXmlUtil.indentStr(indentLvl + 2) + "<pid>" + pid
+                    + "</pid>");
+        }
+        pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "</lcBinsToChange>");
         pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<shoppingList>");
         for(Part p : shoppingList) {
             p.writeToXml(pw1, indentLvl+2);
@@ -1899,6 +1905,14 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                         Node wn3 = nl2.item(y);
                         if (wn3.getNodeName().equalsIgnoreCase("pid")) {
                             retVal.newUnitParts.add(Integer.parseInt(wn3.getTextContent()));
+                        }
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("lcBinsToChange")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y=0; y<nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        if (wn3.getNodeName().equalsIgnoreCase("pid")) {
+                            retVal.lcBinsToChange.add(Integer.parseInt(wn3.getTextContent()));
                         }
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("shoppingList")) {
