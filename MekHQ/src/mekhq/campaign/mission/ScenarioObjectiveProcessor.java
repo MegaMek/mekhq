@@ -356,7 +356,7 @@ public class ScenarioObjectiveProcessor {
             if(tracker.getMission() instanceof AtBContract) {
                 AtBContract contract = (AtBContract) tracker.getMission();
                 
-                int effectMultiplier = effect.effectScaling == EffectScalingType.None ? 1 : scaleFactor;
+                int effectMultiplier = effect.effectScaling == EffectScalingType.Fixed ? 1 : scaleFactor;
                 int scoreEffect = effect.howMuch * effectMultiplier;
                 
                 if(dryRun) {
@@ -392,7 +392,7 @@ public class ScenarioObjectiveProcessor {
             if(tracker.getMission() instanceof AtBContract) {
                 AtBContract contract = (AtBContract) tracker.getMission();
                 
-                int effectMultiplier = effect.effectScaling == EffectScalingType.None ? 1 : scaleFactor;
+                int effectMultiplier = effect.effectScaling == EffectScalingType.Fixed ? 1 : scaleFactor;
                 int numBonuses = effect.howMuch * effectMultiplier;
                 if(dryRun) {
                     return String.format("%d AtB bonus rolls", numBonuses);

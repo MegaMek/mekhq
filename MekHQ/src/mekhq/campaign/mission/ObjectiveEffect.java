@@ -35,7 +35,7 @@ public class ObjectiveEffect {
         /*
          *  no scaling, effect is just applied "howMuch" times
          */
-        None,
+        Fixed,
         /*
          *  linear scaling, effect is applied based on how many units qualified for the objective
          */
@@ -90,7 +90,7 @@ public class ObjectiveEffect {
     
     public ObjectiveEffectType effectType;
     // whether the effect is scaled to the # of units or fixed in nature
-    public EffectScalingType effectScaling = EffectScalingType.None;
+    public EffectScalingType effectScaling = EffectScalingType.Fixed;
     // how much of the effect per unit, or how much of the effect fixed
     public int howMuch;
     

@@ -269,7 +269,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             @Override
             public void actionPerformed(ActionEvent e) {
                 ObjectiveEditPanel oep = new ObjectiveEditPanel(scenarioTemplate, parent);
-                oep.setAlwaysOnTop(true);
+                oep.setModal(true);
+                oep.requestFocus();
                 oep.setVisible(true);
             }
         
