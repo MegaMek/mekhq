@@ -785,7 +785,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                         if (type.hasFlag(AmmoType.F_CAP_MISSILE) || type.hasFlag(AmmoType.F_CRUISE_MISSILE) || type.hasFlag(AmmoType.F_SCREEN)) {
                             time += 60 * ((LargeCraftAmmoBin)oPart).getFullShots();
                         } else {
-                            time += 15 * Math.max(1, oPart.getTonnage());
+                            time += 15 * Math.max(1, (int) oPart.getTonnage());
                         }
                     } else {
                         time += 120;
