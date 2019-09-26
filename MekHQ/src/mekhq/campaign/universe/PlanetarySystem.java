@@ -516,7 +516,7 @@ public class PlanetarySystem implements Serializable {
     }
     
     // JAXB marshalling support
-    @SuppressWarnings({ "unused", "unchecked" })
+    @SuppressWarnings({ "unused" })
     private void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
         if( null == id ) {
             id = name;
