@@ -65,8 +65,10 @@ import megamek.common.EntityWeightClass;
 import megamek.common.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.ObjectiveEffect;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioMapParameters;
+import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
@@ -140,6 +142,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     JRadioButton btnUseLowAtmosphereMap;
     JComboBox<AtBScenarioModifier> modifierBox;
     JList<String> selectedModifiersList;
+    JList<ScenarioObjective> objectiveList;
+    JButton btnRemoveObjective;
     
     JPanel globalPanel;
     
@@ -261,7 +265,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.gridwidth = 1;
         gbc.gridheight = 1;
         
-        Component parent = this;
+        ScenarioTemplateEditorDialog parent = this;
         
         JButton btnEditObjectives = new JButton("Edit Objectives");
         btnEditObjectives.addActionListener(new ActionListener() {
@@ -275,7 +279,20 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             }
         
         });
-        globalPanel.add(btnEditObjectives);
+        globalPanel.add(btnEditObjectives, gbc);
+        
+        objectiveList = new JList<>();
+        objectiveList.addListSelectionListener(e -> btnRemoveObjective.setEnabled(objectiveList.getSelectedValuesList().size() > 0));
+        gbc.gridy++;
+        globalPanel.add(objectiveList, gbc);
+        
+        gbc.gridx++;
+        btnRemoveObjective = new JButton("Remove");
+        btnRemoveObjective.addActionListener(e -> this.removeObjective());
+        globalPanel.add(btnRemoveObjective, gbc);
+        
+        gbc.gridx = 0;
+        gbc.gridy++;
     }
     
     /**
@@ -1442,8 +1459,28 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     /**
      * Helper method that hides or reveals the force editor section.
      */
-    public void toggleForcePanelVisibility() {
+    private void toggleForcePanelVisibility() {
         forcedPanel.setVisible(!forcedPanel.isVisible());
         forceScrollPane.setVisible(!forceScrollPane.isVisible() && !scenarioTemplate.scenarioForces.isEmpty());
+    }
+    
+    private void removeObjective() {
+        for(ScenarioObjective objective : objectiveList.getSelectedValuesList()) {
+            scenarioTemplate.scenarioObjectives.remove(objective);
+        }
+        
+        btnRemoveObjective.setEnabled(false);
+        updateObjectiveList();
+    }
+    
+    public void updateObjectiveList() {
+        DefaultListModel<ScenarioObjective> objectiveModel = new DefaultListModel<>();
+        for(ScenarioObjective currentObjective : scenarioTemplate.scenarioObjectives) {
+            objectiveModel.addElement(currentObjective);
+        }
+        
+        objectiveList.setModel(objectiveModel);
+        validate();
+        pack();
     }
 }

@@ -24,32 +24,30 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.ListModel;
+import javax.swing.border.LineBorder;
 
 import megamek.common.OffBoardDirection;
-import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.ObjectiveEffect;
 import mekhq.campaign.mission.ObjectiveEffect.*;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
 import mekhq.campaign.mission.ScenarioTemplate;
-import mekhq.gui.utilities.Java2sAutoTextField;
 
+/**
+ * UI for creating or editing a single scenario objective
+ *
+ */
 public class ObjectiveEditPanel extends JDialog {
     private JLabel lblShortDescription;
     private JTextArea txtShortDescription;
@@ -59,25 +57,30 @@ public class ObjectiveEditPanel extends JDialog {
     private JComboBox<OffBoardDirection> cboDirection;
     private JTextField txtPercentage;
     private JComboBox<String> cboCountType;
-    private JLabel forceName;
     private JTextField txtForceName;
     
     private JLabel lblMagnitude;
     private JTextField txtAmount;
     private JComboBox<EffectScalingType> cboScalingType;
     private JComboBox<ObjectiveEffectType> cboEffectType;
-    private JComboBox<String> cboEffectCondition;
+    private JComboBox<ObjectiveEffectConditionType> cboEffectCondition;
     
     private JList<ObjectiveEffect> successEffects;
     private JList<ObjectiveEffect> failureEffects;
+    private JButton btnRemoveSuccess;
+    private JButton btnRemoveFailure;
+    
     private JList<String> forceNames;
+    JButton btnRemove;
         
     private ScenarioTemplate currentScenarioTemplate;
     private ScenarioObjective objective;
+    private ScenarioTemplateEditorDialog parent;
     
-    public ObjectiveEditPanel(ScenarioTemplate template, Component parent) {
+    public ObjectiveEditPanel(ScenarioTemplate template, ScenarioTemplateEditorDialog parent) {
         currentScenarioTemplate = template;
         objective = new ScenarioObjective();
+        this.parent = parent;
         
         initGUI();
         validate();
@@ -97,6 +100,7 @@ public class ObjectiveEditPanel extends JDialog {
         gbc.gridheight = 1;
         gbc.gridx = 0;
         gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
         
         getContentPane().setLayout(new GridBagLayout());
         
@@ -118,22 +122,18 @@ public class ObjectiveEditPanel extends JDialog {
         gbc.gridx = 0;
         gbc.gridy++;
         
-        JLabel lblSuccessEffects = new JLabel("Effects on completion:");
-        JLabel lblFailureEffects = new JLabel("Effects on failure:");
-        
-        successEffects = new JList<>();
-        failureEffects = new JList<>();
-        
-        getContentPane().add(lblSuccessEffects, gbc);
-        gbc.gridx++;
-        getContentPane().add(successEffects, gbc);
-        gbc.gridx++;
-        getContentPane().add(lblFailureEffects, gbc);
-        gbc.gridx++;
-        getContentPane().add(failureEffects, gbc);
+        addObjectiveEffectUI(gbc);
         
         gbc.gridx = 0;
         gbc.gridy++;
+        
+        JButton btnCancel = new JButton("Cancel");
+        btnCancel.addActionListener(e -> this.setVisible(false));
+        JButton btnSaveAndClose = new JButton("Save and Close");
+        btnSaveAndClose.addActionListener(e -> this.saveObjectiveAndClose());
+        
+        getContentPane().add(btnCancel);
+        getContentPane().add(btnSaveAndClose);
     }
     
     /**
@@ -179,6 +179,53 @@ public class ObjectiveEditPanel extends JDialog {
         getContentPane().add(objectivePanel, gbc);
     }
     
+    /**
+     * Handles the UI for adding objective effects
+     */
+    private void addObjectiveEffectUI(GridBagConstraints gbc) {
+        JPanel effectPanel = new JPanel();
+        
+        
+        JLabel lblSuccessEffects = new JLabel("Effects on completion:");
+        JLabel lblFailureEffects = new JLabel("Effects on failure:");
+        
+        successEffects = new JList<>();
+        successEffects.addListSelectionListener(e -> btnRemoveSuccess.setEnabled(successEffects.getSelectedValuesList().size() > 0));
+        failureEffects = new JList<>();
+        failureEffects.addListSelectionListener(e -> btnRemoveFailure.setEnabled(failureEffects.getSelectedValuesList().size() > 0));
+        
+        btnRemoveSuccess = new JButton("Remove");
+        btnRemoveSuccess.addActionListener(e -> this.removeEffect(ObjectiveEffectConditionType.ObjectiveSuccess));
+        btnRemoveSuccess.setEnabled(false);
+        
+        btnRemoveFailure = new JButton("Remove");
+        btnRemoveFailure.addActionListener(e -> this.removeEffect(ObjectiveEffectConditionType.ObjectiveFailure));
+        btnRemoveFailure.setEnabled(false);
+        
+        GridBagConstraints localGbc = new GridBagConstraints();
+        effectPanel.setLayout(new GridBagLayout());
+        localGbc.gridx = 0;
+        localGbc.gridy = 0;
+        localGbc.insets = new Insets(0, 0, 0, 5);
+        
+        effectPanel.add(lblSuccessEffects, localGbc);
+        localGbc.gridx++;
+        effectPanel.add(successEffects, localGbc);
+        localGbc.gridx++;
+        effectPanel.add(btnRemoveSuccess, localGbc);
+        localGbc.gridx++;
+        effectPanel.add(lblFailureEffects, localGbc);
+        localGbc.gridx++;
+        effectPanel.add(failureEffects, localGbc);
+        localGbc.gridx++;
+        effectPanel.add(btnRemoveFailure, localGbc);
+        
+        getContentPane().add(effectPanel, gbc);
+    }
+    
+    /**
+     * Handles the UI for adding/removing forces relevant to this objective
+     */
     private void addSubjectForce(GridBagConstraints gbc) {
         JPanel forcePanel = new JPanel();
         
@@ -188,9 +235,15 @@ public class ObjectiveEditPanel extends JDialog {
         txtForceName.setColumns(40);
         
         forceNames = new JList<String>();
+        forceNames.setVisibleRowCount(5);
+        forceNames.addListSelectionListener(e -> btnRemove.setEnabled(forceNames.getSelectedValuesList().size() > 0));
         
         JButton btnAdd = new JButton("Add");
         btnAdd.addActionListener(e -> this.addForce());
+        
+        btnRemove = new JButton("Remove");
+        btnRemove.addActionListener(e -> this.removeForce());
+        btnRemove.setEnabled(false);
         
         GridBagConstraints localGbc = new GridBagConstraints();
         localGbc.gridx = 0;
@@ -201,9 +254,13 @@ public class ObjectiveEditPanel extends JDialog {
         localGbc.gridx++;
         forcePanel.add(txtForceName, localGbc);
         localGbc.gridx++;
+        forcePanel.add(btnAdd, localGbc);
+        localGbc.gridx--;
+        localGbc.gridy++;
         forcePanel.add(forceNames, localGbc);
         localGbc.gridx++;
-        forcePanel.add(btnAdd, localGbc);
+        forcePanel.add(btnRemove, localGbc);
+        
         
         getContentPane().add(forcePanel, gbc);
     }
@@ -232,8 +289,8 @@ public class ObjectiveEditPanel extends JDialog {
         
         JLabel lblEffectCondition = new JLabel("Effect Condition:");
         cboEffectCondition = new JComboBox<>();
-        cboEffectCondition.addItem("Victory");
-        cboEffectCondition.addItem("Defeat");
+        cboEffectCondition.addItem(ObjectiveEffectConditionType.ObjectiveSuccess);
+        cboEffectCondition.addItem(ObjectiveEffectConditionType.ObjectiveFailure);
         
         JButton btnAdd = new JButton("Add");
         btnAdd.addActionListener(e -> this.addEffect());
@@ -265,18 +322,6 @@ public class ObjectiveEditPanel extends JDialog {
         getContentPane().add(effectPanel, gbc);
     }
     
-    
-    
-    private List<String> getAvailableForceNames() {
-        List<String> retVal = new ArrayList<>();
-        
-        for(ScenarioForceTemplate forceTemplate : currentScenarioTemplate.getAllScenarioForces()) {
-            retVal.add(forceTemplate.getForceName());
-        }
-        
-        return retVal;
-    }
-    
     /**
      * Event handler for the 'add' button for scenario effects
      */
@@ -295,7 +340,7 @@ public class ObjectiveEditPanel extends JDialog {
         effect.effectScaling = (EffectScalingType) cboScalingType.getSelectedItem();
         effect.effectType = (ObjectiveEffectType) cboEffectType.getSelectedItem();
 
-        if(cboEffectCondition.getSelectedIndex() == 0) {
+        if(cboEffectCondition.getSelectedItem() == ObjectiveEffectConditionType.ObjectiveSuccess) {
             objective.addSuccessEffect(effect);
             
             updateEffectList(successEffects, objective.getSuccessEffects());
@@ -320,19 +365,74 @@ public class ObjectiveEditPanel extends JDialog {
         listToUpdate.setModel(effectModel);
     }
     
-    private void removeEffect() {
+    private void removeEffect(ObjectiveEffectConditionType conditionType) {
+        JList<ObjectiveEffect> listToUpdate;
+        List<ObjectiveEffect> objectiveEffects;
         
+        if(conditionType == ObjectiveEffectConditionType.ObjectiveSuccess) {
+            listToUpdate = successEffects;
+            objectiveEffects = objective.getSuccessEffects();
+            btnRemoveSuccess.setEnabled(false);
+        } else {
+            listToUpdate = failureEffects;
+            objectiveEffects = objective.getFailureEffects();
+            btnRemoveFailure.setEnabled(false);
+        }
+        
+        for(ObjectiveEffect effectToRemove : listToUpdate.getSelectedValuesList()) {
+            objectiveEffects.remove(effectToRemove);
+        }
+        
+        updateEffectList(listToUpdate, objectiveEffects);
     }
     
     private void addForce() {
         objective.addForce(txtForceName.getText());
         
+        updateForceList();        
+        pack();
+    }
+    
+    private void removeForce() {
+        for(String forceName : forceNames.getSelectedValuesList()) {
+            objective.removeForce(forceName);
+        }
+        
+        updateForceList();
+        btnRemove.setEnabled(false);
+        pack();
+    }
+    
+    private void updateForceList() {
         DefaultListModel<String> forceModel = new DefaultListModel<>();
         for(String forceName : objective.getAssociatedForceNames()) {
             forceModel.addElement(forceName);
         }
         
         forceNames.setModel(forceModel);
-        pack();
+    }
+    
+    private void saveObjectiveAndClose() {
+        int number = 0;
+        
+        try {
+            number = Integer.parseInt(txtPercentage.getText());
+            txtPercentage.setBorder(null);
+        } catch(Exception e) {
+            txtPercentage.setBorder(new LineBorder(Color.red));
+            return;
+        }
+        
+        objective.setObjectiveCriterion((ObjectiveCriterion) cboObjectiveType.getSelectedItem());
+        objective.setDescription(txtShortDescription.getText());
+        if(this.cboCountType.getSelectedIndex() == 0) {
+            objective.setPercentage(number);
+        } else {
+            objective.setFixedAmount(number);
+        }
+        
+        currentScenarioTemplate.scenarioObjectives.add(objective);
+        parent.updateObjectiveList();
+        setVisible(false);
     }
 }

@@ -88,6 +88,21 @@ public class ObjectiveEffect {
         AtBBonus
     }        
     
+    /**
+     * Possible conditions under which an objective effect may be triggered
+     */
+    public enum ObjectiveEffectConditionType {
+        /**
+         * An effect triggered when the associated objective is fulfilled
+         */
+        ObjectiveSuccess,
+        
+        /**
+         * An effect triggered when the associated objective is not fulfilled
+         */
+        ObjectiveFailure
+    }
+    
     public ObjectiveEffectType effectType;
     // whether the effect is scaled to the # of units or fixed in nature
     public EffectScalingType effectScaling = EffectScalingType.Fixed;
