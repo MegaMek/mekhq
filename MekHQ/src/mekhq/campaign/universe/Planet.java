@@ -139,6 +139,7 @@ public class Planet implements Serializable {
     private Integer temperature;
     
     // Ecosphere
+    @XmlElement(name="lifeForm")
     @XmlJavaTypeAdapter(LifeFormAdapter.class)
     private LifeForm life;
     
@@ -463,7 +464,6 @@ public class Planet implements Serializable {
 
     // Date-dependant data
     
-    @SuppressWarnings("unchecked")
     public PlanetaryEvent getOrCreateEvent(DateTime when) {
         if(null == when) {
             return null;

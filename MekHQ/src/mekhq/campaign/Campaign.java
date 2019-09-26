@@ -4176,22 +4176,49 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         // Customised planetary events
-        //TODO: fix this to work with new XML structure
         pw1.println("\t<customPlanetaryEvents>");
-        for(PlanetarySystem p : Systems.getInstance().getSystems().values()) {
-            List<Planet.PlanetaryEvent> customEvents = new ArrayList<>();
-            for(PlanetarySystem.PlanetarySystemEvent event : p.getEvents()) {
-                if(event.custom) {
-                    //customEvents.add(event);
+        for(PlanetarySystem psystem : Systems.getInstance().getSystems().values()) {
+        	//first check for system-wide events
+            List<PlanetarySystem.PlanetarySystemEvent> customSysEvents = new ArrayList<>();
+            for(PlanetarySystem.PlanetarySystemEvent event : psystem.getEvents()) {
+            	if(event.custom) {
+                    customSysEvents.add(event);
                 }
             }
-            if(!customEvents.isEmpty()) {
-                pw1.println("\t\t<planet><id>" + p.getId() + "</id>");
-                for(Planet.PlanetaryEvent event : customEvents) {
-                    //Systems.getInstance().writePlanetaryEvent(pw1, event);
+            boolean startedSystem = false;
+            if(!customSysEvents.isEmpty()) {
+                pw1.println("\t\t<system><id>" + psystem.getId() + "</id>");
+                for(PlanetarySystem.PlanetarySystemEvent event : customSysEvents) {
+                    Systems.getInstance().writePlanetarySystemEvent(pw1, event);
                     pw1.println();
                 }
-                pw1.println("\t\t</planet>");
+                startedSystem = true;
+            }
+        	//now check for planetary events
+            for(Planet p : psystem.getPlanets()) {
+                List<Planet.PlanetaryEvent> customEvents = new ArrayList<>();
+	            for(Planet.PlanetaryEvent event : p.getEvents()) {
+	                if(event.custom) {
+	                    customEvents.add(event);
+	                }
+	            }
+	            if(!customEvents.isEmpty()) {
+	            	if(!startedSystem) {
+	            		//only write this if we haven't already started the system
+	            		pw1.println("\t\t<system><id>" + psystem.getId() + "</id>");
+	            	}
+	                pw1.println("\t\t\t<planet><sysPos>" + p.getSystemPosition() + "</sysPos>");
+	                for(Planet.PlanetaryEvent event : customEvents) {
+	                    Systems.getInstance().writePlanetaryEvent(pw1, event);
+	                    pw1.println();
+	                }
+	                pw1.println("\t\t\t</planet>");
+	                startedSystem = true;
+	            }
+            }
+            if(startedSystem) {
+            	//close the system
+                pw1.println("\t\t</system>");
             }
         }
         pw1.println("\t</customPlanetaryEvents>");

@@ -22,6 +22,8 @@ import java.io.FileInputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Writer;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -49,6 +51,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import org.joda.time.DateTime;
 import org.w3c.dom.DOMException;
+import org.w3c.dom.Node;
 
 import megamek.common.EquipmentType;
 import megamek.common.logging.LogLevel;
@@ -83,6 +86,21 @@ public class Systems {
         } catch(JAXBException e) {
             MekHQ.getLogger().error(Systems.class, "<init>", e); //$NON-NLS-1$
         }
+    }
+    
+    private static Marshaller planetMarshaller;
+    private static Unmarshaller planetUnmarshaller;
+    static {
+    	try{
+    		//creating the JAXB context
+    		JAXBContext jContext = JAXBContext.newInstance(Planet.class);
+    		planetMarshaller = jContext.createMarshaller();
+    		planetMarshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+    		planetMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+	        planetUnmarshaller = jContext.createUnmarshaller();
+	    }catch(Exception e){
+	        e.printStackTrace();
+	    }
     }
     
     public static Systems getInstance() {
@@ -485,6 +503,156 @@ public class Systems {
     
     public void visitNearbySystems(final PlanetarySystem system, final int distance, Consumer<PlanetarySystem> visitor) {
         visitNearbySystems(system.getX(), system.getY(), distance, visitor);
+    }
+    
+    /**
+     * Write out a planetary event to XML
+     * @param out - the <code>Writer</code>
+     * @param event - the <code>PlanetaryEvent</code> to write
+     */
+    public void writePlanetaryEvent(Writer out, Planet.PlanetaryEvent event) {
+        try {
+            planetMarshaller.marshal(event, out);
+        } catch (Exception e) {
+            MekHQ.getLogger().error(getClass(), "writePlanet(Writer,Planet.PlanetaryEvent)", e); //$NON-NLS-1$
+        }
+    }
+    
+    /**
+     * Write out planetary system-wide event to XML
+     * @param out - the <code>Writer</code>
+     * @param event - the <code>PlanetarySystemEvent</code> to write
+     */
+    public void writePlanetarySystemEvent(Writer out, PlanetarySystem.PlanetarySystemEvent event) {
+        try {
+            marshaller.marshal(event, out);
+        } catch (Exception e) {
+            MekHQ.getLogger().error(getClass(), "writePlanet(Writer,Planet.PlanetaryEvent)", e); //$NON-NLS-1$
+        }
+    }
+    
+    /**
+     * This is a legacy function to read custom planetary events from before the switch
+     * to PlanetarySystems
+     * @param node - xml node
+     * @return PlanetaryEvent class from Planet
+     */
+    public Planet.PlanetaryEvent readPlanetaryEvent(Node node) {
+        try {
+            return (Planet.PlanetaryEvent) planetUnmarshaller.unmarshal(node);
+        } catch (JAXBException e) {
+            MekHQ.getLogger().error(getClass(), "readPlanetaryEvent(Node)", e); //$NON-NLS-1$
+        }
+        return null;
+    }
+    
+    /**
+     * This function will read in system wide events from XML and apply them. It is designed
+     * for allowind custom events
+     * @param node - xml node
+     * @return PlanetaryEvent class from Planet
+     */
+    public PlanetarySystem.PlanetarySystemEvent readPlanetarySystemEvent(Node node) {
+        try {
+            return (PlanetarySystem.PlanetarySystemEvent) unmarshaller.unmarshal(node);
+        } catch (JAXBException e) {
+            MekHQ.getLogger().error(getClass(), "readPlanetarySystemEvent(Node)", e); //$NON-NLS-1$
+        }
+        return null;
+    }
+    
+    public static void reload(boolean waitForFinish) {
+        systems = null;
+        getInstance();
+        if(waitForFinish) {
+            try {
+                while(!systems.isInitialized()) {
+                    Thread.sleep(10);
+                }
+            } catch(InterruptedException iex) {
+                MekHQ.getLogger().error(Systems.class, "reload(boolean)", iex); //$NON-NLS-1$
+            }
+        }
+    }
+    
+    /** @return <code>true</code> if the planet was known and got updated, <code>false</code> otherwise */
+    /*public boolean updatePlanetaryEvents(String id, Collection<Planet.PlanetaryEvent> events) {
+        return updatePlanetaryEvents(id, events, false);
+    }*/
+    
+    /**
+     * This is a legacy function for updating planetary events before PlanetarySystem. it will
+     * assume that the planet's events to be updated is the primary planet
+     * @param id
+     * @param events
+     * @param replace
+     * @return
+     */
+    public boolean updatePlanetaryEvents(String id, Collection<Planet.PlanetaryEvent> events, boolean replace) {
+    	//assume the primary planet
+    	PlanetarySystem system = getSystemById(id);
+        if(null == system) {
+            return false;
+        }
+        int pos = system.getPrimaryPlanetPosition();
+        if(pos == 0) {
+        	return false;
+        }
+        return(updatePlanetaryEvents(id, events, replace, pos));
+    }
+    
+    /** @return <code>true</code> if the planet was known and got updated, <code>false</code> otherwise */
+    public boolean updatePlanetaryEvents(String id, Collection<Planet.PlanetaryEvent> events, boolean replace, int position) {
+        PlanetarySystem system = getSystemById(id);
+        if(null == system || position<1) {
+            return false;
+        }
+        if(null != events) {
+            for(Planet.PlanetaryEvent event : events) {
+                if(null != event.date) {
+                    Planet.PlanetaryEvent planetaryEvent = system.getOrCreateEvent(event.date, position);
+                    if(null == planetaryEvent) {
+                    	continue;
+                    }
+                    if(replace) {
+                        planetaryEvent.replaceDataFrom(event);
+                    } else {
+                        planetaryEvent.copyDataFrom(event);
+                    }
+                }
+            }
+        }
+        return true;
+    }
+    
+    /**
+     * updates system wide events from a collection of events
+     * @param id - system id
+     * @param events - collection of PlanetarySystemEvents
+     * @param replace - should we replace existing events
+     * @return <code>true</code> if the system was known and got updated, <code>false</code> otherwise 
+     */
+    public boolean updatePlanetarySystemEvents(String id, Collection<PlanetarySystem.PlanetarySystemEvent> events, boolean replace) {
+        PlanetarySystem system = getSystemById(id);
+        if(null == system) {
+            return false;
+        }
+        if(null != events) {
+            for(PlanetarySystem.PlanetarySystemEvent event : events) {
+                if(null != event.date) {
+                    PlanetarySystem.PlanetarySystemEvent systemEvent = system.getOrCreateEvent(event.date);
+                    if(null == systemEvent) {
+                    	continue;
+                    }
+                    if(replace) {
+                    	systemEvent.replaceDataFrom(event);
+                    } else {
+                    	systemEvent.copyDataFrom(event);
+                    }
+                }
+            }
+        }
+        return true;
     }
      
 }

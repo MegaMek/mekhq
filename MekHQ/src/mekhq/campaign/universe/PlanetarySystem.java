@@ -49,6 +49,7 @@ import mekhq.Utilities;
 import mekhq.adapter.BooleanValueAdapter;
 import mekhq.adapter.DateAdapter;
 import mekhq.adapter.SpectralClassAdapter;
+import mekhq.campaign.universe.Planet.PlanetaryEvent;
 import mekhq.campaign.universe.SocioIndustrialData;
 
 
@@ -443,7 +444,6 @@ public class PlanetarySystem implements Serializable {
        return Objects.hash(id);
     }
     
-    @SuppressWarnings("unchecked")
     public PlanetarySystemEvent getOrCreateEvent(DateTime when) {
         if(null == when) {
             return null;
@@ -458,6 +458,14 @@ public class PlanetarySystem implements Serializable {
             events.put(when, event);
         }
         return event;
+    }
+    
+    public PlanetaryEvent getOrCreateEvent(DateTime when, int position) {
+        Planet p = getPlanet(position);
+        if(null == p) {
+        	return null;
+        }
+        return(p.getOrCreateEvent(when));       
     }
     
     public PlanetarySystemEvent getEvent(DateTime when) {
@@ -629,6 +637,5 @@ public class PlanetarySystem implements Serializable {
             return (null == nadirCharge) 
                 && (null == zenithCharge);
         }
-    }
-    
+    }  
 }
