@@ -207,11 +207,11 @@ public class PlanetViewPanel extends JPanel {
         }
         
         //day length
-        if(null != planet.getDayLength()) {
+        if(null != planet.getDayLength(currentDate)) {
             JLabel lblDay = new JLabel(resourceMap.getString("lblDay1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblDay, gbcLabel);        
-            JTextArea txtDay = new JTextArea(Double.toString(planet.getDayLength()) + " hours");
+            JTextArea txtDay = new JTextArea(Double.toString(planet.getDayLength(currentDate)) + " hours");
             txtDay.setEditable(false);
             txtDay.setLineWrap(true);
             txtDay.setWrapStyleWord(true);

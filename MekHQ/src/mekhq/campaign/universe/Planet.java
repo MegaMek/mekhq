@@ -403,8 +403,11 @@ public class Planet implements Serializable {
         return tectonicActivity;
     }
 
-    public Double getDayLength() {
-        return dayLength;
+    public Double getDayLength(DateTime when) {
+    	//yes day length can change because Venus
+        return getEventData(when, dayLength, new EventGetter<Double>() {
+            @Override public Double get(PlanetaryEvent e) { return e.dayLength; }
+        });
     }
     
     public Double getYearLength() {
@@ -1037,16 +1040,20 @@ public class Planet implements Serializable {
         public LifeForm lifeForm;
         @XmlJavaTypeAdapter(ClimateAdapter.class)
         public Climate climate;
+        @XmlElement(name = "water")
         public Integer percentWater;
         public Integer temperature;
         @XmlJavaTypeAdapter(SocioIndustrialDataAdapter.class)
         public SocioIndustrialData socioIndustrial;
         @XmlJavaTypeAdapter(HPGRatingAdapter.class)
         public Integer hpg;
-        public Integer pressure;
-        public Atmosphere atmosphere;
+        @XmlJavaTypeAdapter(PressureAdapter.class)
+        private Integer pressure;
+        @XmlJavaTypeAdapter(AtmosphereAdapter.class)
+        private Atmosphere atmosphere;
         public String composition;
         public Long population;
+        public Double dayLength;
         // Events marked as "custom" are saved to scenario files and loaded from there
         public transient boolean custom = false;
         
@@ -1065,6 +1072,7 @@ public class Planet implements Serializable {
             atmosphere = Utilities.nonNull(other.atmosphere, atmosphere);
             composition = Utilities.nonNull(other.composition, composition);
             population = Utilities.nonNull(other.population, population);
+            dayLength = Utilities.nonNull(other.dayLength, dayLength);
             custom = (other.custom || custom);
         }
         
@@ -1083,6 +1091,7 @@ public class Planet implements Serializable {
             atmosphere = other.atmosphere;
             composition = other.composition;
             population = other.population;
+            dayLength = other.dayLength;
             custom = (other.custom || custom);
         }
         
@@ -1091,7 +1100,7 @@ public class Planet implements Serializable {
             return (null == climate) && (null == faction) && (null == hpg) && (null == lifeForm)
                 && (null == message) && (null == name) && (null == shortName) && (null == socioIndustrial)
                 && (null == temperature) && (null == pressure) && (null == atmosphere) 
-                && (null == composition) && (null == population);
+                && (null == composition) && (null == population) && (null == dayLength);
         }
     }
     
