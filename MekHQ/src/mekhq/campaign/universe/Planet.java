@@ -52,6 +52,7 @@ import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.PlanetaryConditions;
 import megamek.common.TargetRoll;
+import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.adapter.AtmosphereAdapter;
 import mekhq.adapter.BooleanValueAdapter;
@@ -63,6 +64,7 @@ import mekhq.adapter.PressureAdapter;
 import mekhq.adapter.SocioIndustrialDataAdapter;
 import mekhq.adapter.StringListAdapter;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.io.CampaignXmlParser;
 import mekhq.campaign.universe.Faction.Tag;
 
 
@@ -694,7 +696,8 @@ public class Planet implements Serializable {
     /** @return the average distance to the system's jump point in km */
     public double getDistanceToJumpPoint() {
         if(null == parentSystem) {
-            //TODO: shouldnt happen, produce error in log
+        	MekHQ.getLogger().error(Planet.class, "getDistanceToJumpPoint",
+        			"reference to planet with no parent system");
             return 0;
         }
         return Math.sqrt(Math.pow(getOrbitRadiusKm(), 2) + Math.pow(parentSystem.getStarDistanceToJumpPoint(), 2));
