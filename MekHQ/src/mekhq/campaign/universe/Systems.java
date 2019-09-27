@@ -337,7 +337,7 @@ public class Systems {
     }
     
     private void generateSystems() throws DOMException, ParseException {
-        generateSystems("data/universe/planets", "data/universe/systems.xml");
+        generateSystems("data/universe/planetary_systems", "data/universe/systems.xml");
     }
      
     private void generateSystems(String planetsPath, String defaultFilePath) throws DOMException, ParseException {
