@@ -216,8 +216,8 @@ public class PlanetarySystem implements Serializable {
         return factions;
     }
 
-    public Long getPopulation(DateTime when) {
-    	Long pop = 0l;
+    public long getPopulation(DateTime when) {
+    	long pop = 0l;
     	for(Planet planet : planets.values()) {
     		if(null != planet.getPopulation(when)) {
     			pop += planet.getPopulation(when);

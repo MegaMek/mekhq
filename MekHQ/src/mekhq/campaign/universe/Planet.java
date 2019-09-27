@@ -435,14 +435,14 @@ public class Planet implements Serializable {
     	if(null == getParentSystem() || null == sysPos) {
     		return "?";
     	}
-    	Integer pos = 0;
+    	int pos = 0;
     	for(int i = 1; i <= sysPos; i++) {
     		if(getParentSystem().getPlanet(i).getPlanetType().equals("Asteroid Belt")) {
     			continue;
     		}
     		pos++;
     	}
-        return pos.toString(); //$NON-NLS-1$
+        return Integer.toString(pos); //$NON-NLS-1$
     }
     
     public String getDescription() {
