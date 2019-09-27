@@ -79,7 +79,7 @@ public class FactionBorders {
      * the galaxy.
      * 
      * @param when    The date for testing faction ownership.
-     * @param planets The set of planets to include in the region.
+     * @param systems The set of <code>planetarySystem</code>'s to include in the region.
      */
     public void calculateRegion(DateTime when, Collection<PlanetarySystem> systems) {
         this.systems = systems.stream()

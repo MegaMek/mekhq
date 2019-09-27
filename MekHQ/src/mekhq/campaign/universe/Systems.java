@@ -187,10 +187,10 @@ public class Systems {
     }
     
     /**
-     * Get a list of planets within a certain jump radius (30ly per jump) that 
+     * Get a list of planetary systems within a certain jump radius (30ly per jump) that 
      * you can shop on, sorted by number of jumps and in system transit time
-     * @param planet
-     * @param jumps
+     * @param system - current <code>PlanetarySystem</code>
+     * @param jumps - number of jumps out to look as an integer
      * @return a list of planets where you can go shopping
      */
     public List<PlanetarySystem> getShoppingSystems(final PlanetarySystem system, int jumps, DateTime when) {

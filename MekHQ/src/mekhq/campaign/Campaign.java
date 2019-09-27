@@ -2206,7 +2206,7 @@ public class Campaign implements Serializable, ITechManager {
      * Make an acquisition roll for a given planet to see if you can identify a contact. Used for planetary based acquisition.
      * @param acquisition - The <code> IAcquisitionWork</code> being acquired.
      * @param person - The <code>Person</code> object attempting to do the acquiring.  may be null if no one on the force has the skill or the user is using automatic acquisition.
-     * @param planet - The <code>Planet</code> object where the acquisition is being attempted. This may be null if the user is not using planetary acquisition.
+     * @param system - The <code>PlanetarySystem</code> object where the acquisition is being attempted. This may be null if the user is not using planetary acquisition.
      * @return true if your target roll succeeded.
      */
     public boolean findContactForAcquisition(IAcquisitionWork acquisition, Person person, PlanetarySystem system) {
@@ -2251,7 +2251,7 @@ public class Campaign implements Serializable, ITechManager {
      * Attempt to acquire a given <code>IAcquisitionWork</code> object.
      * @param acquisition - The <code> IAcquisitionWork</code> being acquired.
      * @param person - The <code>Person</code> object attempting to do the acquiring.  may be null if no one on the force has the skill or the user is using automatic acquisition.
-     * @param planet - The <code>Planet</code> object where the acquisition is being attempted. This may be null if the user is not using planetary acquisition.
+     * @param system - The <code>PlanetarySystem</code> object where the acquisition is being attempted. This may be null if the user is not using planetary acquisition.
      * @param transitDays - The number of days that the part should take to be delivered. If this value is entered as -1, then this method will determine transit time based on the users campaign options.
      * @return a boolean indicating whether the attempt to acquire equipment was successful.
      */
@@ -6828,7 +6828,7 @@ public class Campaign implements Serializable, ITechManager {
      * - (number of jumps - 1)*7 days with a minimum value of zero.
      * - transit times from current planet and planet of supply origins in cases where the supply planet is not the same as current planet.
      * - a random 1d6 days for each jump plus 1d6 to simulate all of the other logistics of delivery.
-     * @param planet - A <code>Planet</code> object where the supplies are shipping from
+     * @param system - A <code>PlanetarySystem</code> object where the supplies are shipping from
      * @return the number of days that supplies will take to arrive.
      */
     public int calculatePartTransitTime(PlanetarySystem system) {

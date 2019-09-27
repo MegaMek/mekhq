@@ -432,14 +432,14 @@ public class Planet implements Serializable {
     public String getDiplayableSystemPosition() {
     	//We won't give the actual system position here, because we don't want asteroid belts to count
     	//for system position
-    	if(null == getParentSystem()) {
-    		return null != sysPos ? sysPos.toString() : "?"; //$NON-NLS-1$
+    	if(null == getParentSystem() || null == sysPos) {
+    		return "?";
     	}
     	Integer pos = 0;
     	for(int i = 1; i <= sysPos; i++) {
-    		//if(getParentSystem().getPlanet(i).getPlanetType().equals("Asteroid Belt")) {
-    		//	continue;
-    		//}
+    		if(getParentSystem().getPlanet(i).getPlanetType().equals("Asteroid Belt")) {
+    			continue;
+    		}
     		pos++;
     	}
         return pos.toString(); //$NON-NLS-1$

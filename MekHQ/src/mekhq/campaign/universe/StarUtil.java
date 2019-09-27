@@ -436,10 +436,10 @@ public final class StarUtil {
         if( null != luminosity && luminosity.equals(PlanetarySystem.LUM_VI) ) {
             // subdwarfs
             return "sd" + getSpectralClassName(spectralClass) + String.format(subtypeFormat, subtypeValue / 100.0); //$NON-NLS-1$
-        } else if( luminosity.equals(PlanetarySystem.LUM_VI_PLUS) ) {
+        } else if( null != luminosity && luminosity.equals(PlanetarySystem.LUM_VI_PLUS) ) {
             // extreme subdwarfs
             return "esd" + getSpectralClassName(spectralClass) + String.format(subtypeFormat, subtypeValue / 100.0); //$NON-NLS-1$
-        } else if( luminosity.equals(PlanetarySystem.LUM_VII) ) {
+        } else if( null != luminosity && luminosity.equals(PlanetarySystem.LUM_VII) ) {
             // white dwarfs
             return String.format(Locale.ROOT, "D" + subtypeFormat, subtypeValue / 100.0); //$NON-NLS-1$
         } else {

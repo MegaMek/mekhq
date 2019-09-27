@@ -46,7 +46,7 @@ public class RegionPerimeter {
     /**
      * Calculates the border polygon for the list of Planets provided.
      * 
-     * @param planets A list of planets that define the region.
+     * @param systems A list of <code>PlanetarySystem</code>'s that define the region.
      */
     public RegionPerimeter(Collection<PlanetarySystem> systems) {
         if (!systems.isEmpty()) {
