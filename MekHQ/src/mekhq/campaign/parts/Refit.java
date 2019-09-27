@@ -28,11 +28,13 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -132,6 +134,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
     private List<Part> shoppingList;
     private List<Part> oldIntegratedHS;
     private List<Part> newIntegratedHS;
+    private Set<Integer> lcBinsToChange;
 
     private int armorNeeded;
     private Armor newArmorSupplies;
@@ -151,6 +154,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         shoppingList = new ArrayList<>();
         oldIntegratedHS = new ArrayList<>();
         newIntegratedHS = new ArrayList<>();
+        lcBinsToChange = new HashSet<>();
         fixableString = null;
         cost = Money.zero();
     }
@@ -332,6 +336,15 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 Part oPart = oldUnit.getCampaign().getPart(pid);
                 if (isOmniRefit && !oPart.isOmniPodded()) {
                     continue;
+                }
+                // If we're changing the size but not type of an LC ammo bin, we want to ensure that the ammo
+                // gets tracked appropriately - it should unload to the warehouse later in the process and then
+                // reload in the correct quantity. For that we must make sure the bin doesn't get dropped off
+                // the old parts list here.
+                if (oPart instanceof LargeCraftAmmoBin
+                        && part instanceof LargeCraftAmmoBin
+                        && ((LargeCraftAmmoBin)oPart).getType() == ((LargeCraftAmmoBin)part).getType()) {
+                    lcBinsToChange.add(oPart.getId());
                 }
                 //FIXME: There have been instances of null oParts here. Save/load will fix these, but
                 //I would like to figure out the source. From experimentation, I think it has to do with
@@ -517,11 +530,10 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 aclan = ((Armor)nPart).isClanTechBase();
                 //armor always gets added to the shopping list - it will be checked for differently
                 //NOT ANYMORE - I think this is overkill, lets just reuse existing armor parts
-                //shoppingList.add(nPart);
             } else if (nPart instanceof AmmoBin) {
                 AmmoType type = (AmmoType)((AmmoBin)nPart).getType();
-                ammoNeeded.merge(type, type.getShots(), Integer::sum);
                 if (nPart instanceof LargeCraftAmmoBin) {
+                    ammoNeeded.merge(type, ((LargeCraftAmmoBin)nPart).getFullShots(), Integer::sum);
                     // Adding ammo requires base 15 minutes per ton of ammo or 60 minutes per capital missile
                     if (type.hasFlag(AmmoType.F_CAP_MISSILE) || type.hasFlag(AmmoType.F_CRUISE_MISSILE) || type.hasFlag(AmmoType.F_SCREEN)) {
                         time += 60 * ((LargeCraftAmmoBin)nPart).getFullShots();
@@ -531,6 +543,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                     shoppingList.add(nPart);
                 } else {
                     time += 120;
+                    ammoNeeded.merge(type, type.getShots(), Integer::sum);
                     //check for ammo bins in storage to avoid the proliferation of infinite ammo bins
                     MissingAmmoBin mab = (MissingAmmoBin)nPart.getMissingPart();
                     Part replacement = mab.findReplacement(true);
@@ -766,9 +779,18 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             }
             if(oPart instanceof AmmoBin) {
                 int remainingShots = ((AmmoBin)oPart).getFullShots() - ((AmmoBin)oPart).getShotsNeeded();
+                AmmoType type = (AmmoType)((AmmoBin)oPart).getType();
                 if(remainingShots > 0) {
-                    time += 120;
-                    ammoRemoved.merge((AmmoType)((AmmoBin)oPart).getType(), remainingShots,
+                    if (oPart instanceof LargeCraftAmmoBin) {
+                        if (type.hasFlag(AmmoType.F_CAP_MISSILE) || type.hasFlag(AmmoType.F_CRUISE_MISSILE) || type.hasFlag(AmmoType.F_SCREEN)) {
+                            time += 60 * ((LargeCraftAmmoBin)oPart).getFullShots();
+                        } else {
+                            time += 15 * Math.max(1, (int) oPart.getTonnage());
+                        }
+                    } else {
+                        time += 120;
+                    }
+                    ammoRemoved.merge(type, remainingShots,
                             (a, b) -> a + b);
                 }
                 continue;
@@ -1326,6 +1348,15 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             }
             part.setUnit(null);
         }
+        // Unload any large craft ammo bins to ensure ammo isn't lost
+        // when we're changing the amount but not the type of ammo
+        for (int pid : lcBinsToChange) {
+            Part part = oldUnit.getCampaign().getPart(pid);
+            if (part instanceof AmmoBin) {
+                ((AmmoBin)part).unload();
+            }
+            
+        }
         // add leftover untracked heat sinks to the warehouse
         for(Part part : oldIntegratedHS) {
             campaign.addPart(part, 0);
@@ -1364,7 +1395,12 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         assignArmActuators();
         assignBayParts();
         for (Part p : newParts) {
-            if (p instanceof AmmoBin) {
+            if (p instanceof LargeCraftAmmoBin) {
+                //All large craft ammo got unloaded into the warehouse earlier, though the part IDs have now changed.
+                //Consider all LC ammobins empty and load them back up.
+                ((AmmoBin) p).setShotsNeeded(((AmmoBin) p).getFullShots());
+                ((AmmoBin) p).loadBin();
+            } else if (p instanceof AmmoBin) {
                 ((AmmoBin) p).loadBin();
             }
         }
@@ -1785,6 +1821,12 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                     + "</pid>");
         }
         pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "</newUnitParts>");
+        pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<lcBinsToChange>");
+        for(int pid : lcBinsToChange) {
+            pw1.println(MekHqXmlUtil.indentStr(indentLvl + 2) + "<pid>" + pid
+                    + "</pid>");
+        }
+        pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "</lcBinsToChange>");
         pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<shoppingList>");
         for(Part p : shoppingList) {
             p.writeToXml(pw1, indentLvl+2);
@@ -1863,6 +1905,14 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                         Node wn3 = nl2.item(y);
                         if (wn3.getNodeName().equalsIgnoreCase("pid")) {
                             retVal.newUnitParts.add(Integer.parseInt(wn3.getTextContent()));
+                        }
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("lcBinsToChange")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y=0; y<nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        if (wn3.getNodeName().equalsIgnoreCase("pid")) {
+                            retVal.lcBinsToChange.add(Integer.parseInt(wn3.getTextContent()));
                         }
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("shoppingList")) {
