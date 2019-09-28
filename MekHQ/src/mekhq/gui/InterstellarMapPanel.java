@@ -1059,7 +1059,7 @@ public class InterstellarMapPanel extends JPanel {
     	
     	//color shading is from the Viridis color palettes
     	
-		Long pop = p.getPopulation(Utilities.getDateTimeDay(campaign.getCalendar()));
+		long pop = p.getPopulation(Utilities.getDateTimeDay(campaign.getCalendar()));
 
 		//if no population, then just return black no matter what we asked for
 		if(pop==0l) {
