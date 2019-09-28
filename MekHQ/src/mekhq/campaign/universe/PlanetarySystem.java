@@ -356,7 +356,7 @@ public class PlanetarySystem implements Serializable {
     
     /** @return the average travel time from low orbit to the jump point at 1g, in Terran days for a given planetary position*/
     public double getTimeToJumpPoint(double acceleration) {
-        return getTimeToJumpPoint(acceleration, primarySlot);
+        return getTimeToJumpPoint(acceleration, getPrimaryPlanetPosition());
     }
     
     /** @return the average travel time from low orbit to the jump point at 1g, in Terran days for a given planetary position*/
@@ -410,13 +410,15 @@ public class PlanetarySystem implements Serializable {
      * 
      */
     public Planet getPrimaryPlanet() {
-    	if(primarySlot<1) {
-    		return planets.get(1);
-    	}
-        return planets.get(primarySlot);
+        return planets.get(getPrimaryPlanetPosition());
     }
     
     public int getPrimaryPlanetPosition() {
+    	if(primarySlot<1) {
+    		//if no primary slot (uninhabited system)
+    		//just return first planet
+    		return(1);
+    	}
         return primarySlot;
     }
     
