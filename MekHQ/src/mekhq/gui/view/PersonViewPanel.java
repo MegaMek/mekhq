@@ -905,33 +905,17 @@ public class PersonViewPanel extends JPanel {
 
         secondy++;
         if(campaign.getCampaignOptions().useAdvancedMedical()) {
+        	
+        	JPanel panAdvancedMedical = new JPanel(new BorderLayout(10, 0));
+        	panAdvancedMedical.setBackground(Color.WHITE);
 	        lblAdvancedMedical1.setName("lblAdvancedMedical1"); // NOI18N
 	        lblAdvancedMedical1.setText(resourceMap.getString("lblAdvancedMedical1.text")); //$NON-NLS-1$
-	        gridBagConstraints = new GridBagConstraints();
-	        gridBagConstraints.gridx = 0;
-	        gridBagConstraints.gridy = secondy;
-	        gridBagConstraints.fill = GridBagConstraints.NONE;
-	        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-	        pnlStats.add(lblAdvancedMedical1, gridBagConstraints);
-	
+	        panAdvancedMedical.add(lblAdvancedMedical1, BorderLayout.WEST);
+	        
 	        lblAdvancedMedical2.setName("lblAdvancedMedical2"); // NOI18N
 	        lblAdvancedMedical2.setText(person.getEffectString());
-	        gridBagConstraints = new GridBagConstraints();
-	        gridBagConstraints.gridx = 1;
-	        gridBagConstraints.gridy = secondy;
-	        gridBagConstraints.gridwidth = 2;
-	        gridBagConstraints.weightx = 1.0;
-	        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-	        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-	        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-	        pnlStats.add(lblAdvancedMedical2, gridBagConstraints);
+	        panAdvancedMedical.add(lblAdvancedMedical2, BorderLayout.CENTER);
 	        
-	        gridBagConstraints = new GridBagConstraints();
-	        gridBagConstraints.gridx = 3;
-	        gridBagConstraints.gridy = secondy;
-	        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-	        gridBagConstraints.fill = GridBagConstraints.NONE;
-	        gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
 	        JButton medicalButton = new JButton(new ImageIcon("data/images/misc/medical.png")); //$NON-NLS-1$
 	        medicalButton.addActionListener(event -> {
 	            MedicalViewDialog medDialog = new MedicalViewDialog(SwingUtilities.getWindowAncestor(this), campaign, person, ip);
@@ -948,7 +932,16 @@ public class PersonViewPanel extends JPanel {
 	        medicalButton.setMaximumSize(new Dimension(32, 32));
 	        medicalButton.setMargin(new Insets(0, 0, 0, 0));
 	        medicalButton.setToolTipText(resourceMap.getString("btnMedical.tooltip")); //$NON-NLS-1$
-	        pnlStats.add(medicalButton, gridBagConstraints);
+	        panAdvancedMedical.add(medicalButton, BorderLayout.EAST);
+	        
+	        gridBagConstraints = new GridBagConstraints();
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = secondy;
+	        gridBagConstraints.gridwidth = 4;
+	        gridBagConstraints.weightx = 1.0;
+	        gridBagConstraints.fill = GridBagConstraints.NONE;
+	        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+	        pnlStats.add(panAdvancedMedical, gridBagConstraints);
         }
     }
 
