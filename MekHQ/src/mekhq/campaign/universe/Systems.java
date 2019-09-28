@@ -386,6 +386,13 @@ public class Systems {
                     toRemove.add(system);
                     continue;
                 }
+                //make sure the primary slot is not larger than the number of planets
+                if(system.getPrimaryPlanetPosition() > system.getPlanets().size()) {
+                	MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                            String.format("System \"%s\" has a primary slot greater than the number of planets", system.getId())); //$NON-NLS-1$
+                    toRemove.add(system);
+                    continue;
+                }
                 int x = (int)(system.getX()/30.0);
                 int y = (int)(system.getY()/30.0);
                 if (systemGrid.get(x) == null) {
