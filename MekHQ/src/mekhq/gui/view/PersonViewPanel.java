@@ -49,7 +49,7 @@ import mekhq.gui.utilities.WrapLayout;
  * A custom panel that gets filled in with goodies from a Person record
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class PersonViewPanel extends JPanel {
+public class PersonViewPanel extends ScrollablePanel {
     private static final long serialVersionUID = 7004741688464105277L;
 
     private static final int MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW = 4;
@@ -129,9 +129,9 @@ public class PersonViewPanel extends JPanel {
 
         lblPortrait = new JLabel();
         pnlPortrait = new JPanel();
-        txtDesc = new JTextArea();
         pnlKills = new JPanel();
         pnlLog = new JPanel();
+        txtDesc = new JTextArea();
         pnlMissionsLog = new JPanel();
         setLayout(new GridBagLayout());
         setBackground(Color.WHITE);
@@ -265,8 +265,8 @@ public class PersonViewPanel extends JPanel {
         }
         
         if(person.getBiography().length() > 0) {
-            txtDesc.setName("txtDesc"); //$NON-NLS-1$
-            txtDesc.setText(person.getBiography());
+            txtDesc = new JTextArea();
+        	txtDesc.setName("txtDesc"); //$NON-NLS-1$
             txtDesc.setBackground(Color.WHITE);
             txtDesc.setEditable(false);
             txtDesc.setLineWrap(true);
@@ -274,6 +274,7 @@ public class PersonViewPanel extends JPanel {
             txtDesc.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createTitledBorder(resourceMap.getString("pnlDescription.title")), //$NON-NLS-1$
                     BorderFactory.createEmptyBorder(5,5,5,5)));
+            txtDesc.setText(person.getBiography());
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridy;
@@ -1179,3 +1180,5 @@ public class PersonViewPanel extends JPanel {
         pnlKills.add(killTable, gridBagConstraints);
     }
 }
+
+
