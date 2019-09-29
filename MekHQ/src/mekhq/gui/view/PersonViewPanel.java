@@ -339,20 +339,15 @@ public class PersonViewPanel extends JPanel {
             gridy++;
         }
 
-        //just to flush something to the bottom of the page
-        //Taharqa: I don't think this needs to be here and it looks ugly with some
-        //themes that show more detail on text areas
-        /*JTextArea txtFiller = new JTextArea(""); //$NON-NLS-1$
-        txtFiller.setEditable(false);
+        //use glue to fill up the remaining space so everything is aligned to the top
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = gridy;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        add(txtFiller, gridBagConstraints);*/
+        add(javax.swing.Box.createGlue(), gridBagConstraints);
     }
 
     /**
