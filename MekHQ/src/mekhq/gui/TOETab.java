@@ -183,13 +183,24 @@ public final class TOETab extends CampaignGuiTab {
                 }
                 scrollPerson.setPreferredSize(crewList.getPreferredScrollableViewportSize());
                 tabUnit.add(name, crewPanel);
+                javax.swing.SwingUtilities.invokeLater(() -> {
+            		scrollPerson.getVerticalScrollBar().setValue(0);
+                });
             }
-            tabUnit.add("Unit", new JScrollPane(new UnitViewPanel(u, getCampaign(), getIconPackage().getCamos(), getIconPackage().getMechTiles())));
+            final JScrollPane scrollUnit = new JScrollPane(new UnitViewPanel(u, getCampaign(), getIconPackage().getCamos(), getIconPackage().getMechTiles()));
+            tabUnit.add("Unit", scrollUnit);
             panForceView.add(tabUnit, BorderLayout.CENTER);
+            javax.swing.SwingUtilities.invokeLater(() -> {
+            	scrollUnit.getVerticalScrollBar().setValue(0);
+            });
         } else if (node instanceof Force) {
-            panForceView.add(new JScrollPane(new ForceViewPanel((Force) node, getCampaign(), getIconPackage())), BorderLayout.CENTER);
+        	final JScrollPane scrollForce = new JScrollPane(new ForceViewPanel((Force) node, getCampaign(), getIconPackage()));
+            panForceView.add(scrollForce, BorderLayout.CENTER);
+            javax.swing.SwingUtilities.invokeLater(() -> {
+        		scrollForce.getVerticalScrollBar().setValue(0);
+            });
         }
-        //panForceView.repaint();
+        panForceView.updateUI();
     }
     
     private ActionScheduler orgRefreshScheduler = new ActionScheduler(this::refreshOrganization);
