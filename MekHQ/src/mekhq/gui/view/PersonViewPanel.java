@@ -187,7 +187,7 @@ public class PersonViewPanel extends JPanel {
         add(pnlSkills, gridBagConstraints);
         gridy++;
 
-        if(campaign.getCampaignOptions().useAdvancedMedical() && person.hasInjuries(false)) {
+        if(campaign.getCampaignOptions().useAdvancedMedical()) {
             fillInjuries();
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -1063,10 +1063,12 @@ public class PersonViewPanel extends JPanel {
         medicalButton.setMaximumSize(new Dimension(32, 32));
         medicalButton.setMargin(new Insets(0, 0, 0, 0));
         medicalButton.setToolTipText(resourceMap.getString("btnMedical.tooltip")); //$NON-NLS-1$
+        medicalButton.setAlignmentY(Component.TOP_ALIGNMENT);
         pnlInjuries.add(medicalButton, BorderLayout.LINE_START);
         
         JPanel pnlInjuryDetails = new JPanel(new GridBagLayout());
         pnlInjuryDetails.setBackground(Color.WHITE);
+        pnlInjuryDetails.setAlignmentY(Component.TOP_ALIGNMENT);
 
         
         lblAdvancedMedical1 = new JLabel();
@@ -1083,12 +1085,18 @@ public class PersonViewPanel extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlInjuryDetails.add(lblAdvancedMedical1, gridBagConstraints);
         
+        double vweight = 1.0;
+        if(person.hasInjuries(false)) {
+        	vweight = 0.0;
+        }
+        
         lblAdvancedMedical2.setName("lblAdvancedMedical2"); // NOI18N
         lblAdvancedMedical2.setText(person.getEffectString());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = vweight;
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;

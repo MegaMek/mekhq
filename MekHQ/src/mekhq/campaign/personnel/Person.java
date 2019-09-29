@@ -3659,6 +3659,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
         } else if(gunneryMod == Integer.MAX_VALUE) {
             sb.append("  Gunnery: <i>Impossible</i>  <br>");
         }
+        if(gunneryMod == 0 && pilotingMod == 0) {
+        	sb.append("None");
+        }
         return sb.append("</html>").toString();
     }
 
