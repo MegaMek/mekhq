@@ -267,6 +267,7 @@ public class PersonViewPanel extends JPanel {
         if(person.getBiography().length() > 0) {
             txtDesc.setName("txtDesc"); //$NON-NLS-1$
             txtDesc.setText(person.getBiography());
+            txtDesc.setBackground(Color.WHITE);
             txtDesc.setEditable(false);
             txtDesc.setLineWrap(true);
             txtDesc.setWrapStyleWord(true);
@@ -1062,6 +1063,7 @@ public class PersonViewPanel extends JPanel {
             MekHQ.triggerEvent(new PersonChangedEvent(person));
         });
         medicalButton.setMaximumSize(new Dimension(32, 32));
+        medicalButton.setBackground(Color.WHITE);
         medicalButton.setMargin(new Insets(0, 0, 0, 0));
         medicalButton.setToolTipText(resourceMap.getString("btnMedical.tooltip")); //$NON-NLS-1$
         medicalButton.setAlignmentY(Component.TOP_ALIGNMENT);
