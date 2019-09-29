@@ -2660,6 +2660,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
     
+    public int getSkillNumber() {
+    	return skills.size();
+    }
+    
     /**
      * Remove all skills
      */
@@ -3882,6 +3886,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return "<html>" + Utilities.combineString(children, "<br/>") + "</html>";
     }
 
+    public boolean hasAnyFamily() {
+    	return hasChildren() || hasSpouse();
+    }
+    
     public boolean hasChildren() {
         boolean hasKids = false;
         if (getId() != null) {
