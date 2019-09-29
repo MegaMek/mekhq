@@ -137,7 +137,6 @@ public class CurrentLocation implements Serializable {
         DateTime currentDate = Utilities.getDateTimeDay(campaign.getCalendar());
         double neededRechargeTime = currentPlanet.getRechargeTime(currentDate);
         rechargeTime = neededRechargeTime;
-        campaign.addReport("Jumpship drives fully charged");
     }
 
     /**
@@ -155,7 +154,7 @@ public class CurrentLocation implements Serializable {
             campaign.addReport("Jumpships spent " + (Math.round(100.0 * usedRechargeTime)/100.0) + " hours recharging drives");
             rechargeTime += usedRechargeTime;
             if(rechargeTime >= neededRechargeTime) {
-                campaign.addReport("Jumpship drives full charged");
+                campaign.addReport("Jumpship drives fully charged");
             }
         }
         if((null == jumpPath) || jumpPath.isEmpty()) {
@@ -195,7 +194,7 @@ public class CurrentLocation implements Serializable {
                     campaign.addReport("Jumpships spent " + (Math.round(100.0 * usedRechargeTime)/100.0) + " hours recharging drives");
                     rechargeTime += usedRechargeTime;
                     if(rechargeTime >= neededRechargeTime) {
-                        campaign.addReport("Jumpship drives full charged");
+                        campaign.addReport("Jumpship drives fully charged");
                     }
                 }
             }
