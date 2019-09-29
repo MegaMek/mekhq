@@ -703,7 +703,7 @@ public class PersonViewPanel extends JPanel {
                 pnlInfo.add(lblTimeServed1, gridBagConstraints);
 
                 lblTimeServed2.setName("lblTimeServed2"); // NOI18N
-                lblTimeServed2.setText(Integer.toString(person.getTimeInService(campaign.getCalendar())) + "yrs");
+                lblTimeServed2.setText(Integer.toString(person.getTimeInService(campaign.getCalendar())) + " years");
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 3;
                 gridBagConstraints.gridy = firsty;
