@@ -173,6 +173,18 @@ public class PersonViewPanel extends JPanel {
 
         int gridy = 1;
         
+        fillSkills();
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        add(pnlSkills, gridBagConstraints);
+        gridy++;
+        
         if(person.awardController.hasAwards()) {
             if(person.awardController.hasAwardsWithRibbons()){
                 boxRibbons = Box.createVerticalBox();
@@ -224,18 +236,6 @@ public class PersonViewPanel extends JPanel {
                 gridy++;
             }
         }
-        
-        fillSkills();
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = gridy;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        add(pnlSkills, gridBagConstraints);
-        gridy++;
 
         if(campaign.getCampaignOptions().useAdvancedMedical() && person.hasInjuries(false)) {
             fillInjuries();
@@ -718,7 +718,7 @@ public class PersonViewPanel extends JPanel {
 
     private void fillFamily() {
     	pnlFamily = new JPanel(new GridBagLayout());
-    	pnlFamily.setBorder(BorderFactory.createTitledBorder("Family Information"));
+    	pnlFamily.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlFamily.title")));
     	pnlFamily.setBackground(Color.WHITE);
 
         //family panel
@@ -784,7 +784,7 @@ public class PersonViewPanel extends JPanel {
     	
     	//skill panel
         pnlSkills = new JPanel(new GridBagLayout());
-        pnlSkills.setBorder(BorderFactory.createTitledBorder("Skills and Abilities"));
+        pnlSkills.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlSkills.title")));
         pnlSkills.setBackground(Color.WHITE);
              
         //abilities and implants
