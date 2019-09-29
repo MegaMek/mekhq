@@ -109,7 +109,6 @@ public class PersonViewPanel extends JPanel {
     private JPanel pnlAllAwards;
     private JPanel pnlMedals;
     private JPanel pnlMiscAwards;
-    private JPanel pnlAwards;
     private Box boxRibbons;
 
     ResourceBundle resourceMap = null;
@@ -340,7 +339,9 @@ public class PersonViewPanel extends JPanel {
         }
 
         //just to flush something to the bottom of the page
-        JTextArea txtFiller = new JTextArea(""); //$NON-NLS-1$
+        //Taharqa: I don't think this needs to be here and it looks ugly with some
+        //themes that show more detail on text areas
+        /*JTextArea txtFiller = new JTextArea(""); //$NON-NLS-1$
         txtFiller.setEditable(false);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -350,7 +351,7 @@ public class PersonViewPanel extends JPanel {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        add(txtFiller, gridBagConstraints);
+        add(txtFiller, gridBagConstraints);*/
     }
 
     /**
