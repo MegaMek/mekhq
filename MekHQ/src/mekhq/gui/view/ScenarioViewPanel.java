@@ -49,7 +49,7 @@ import mekhq.campaign.mission.Scenario;
  * A custom panel that gets filled in with goodies from a scenario object
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class ScenarioViewPanel extends javax.swing.JPanel {
+public class ScenarioViewPanel extends ScrollablePanel {
     private static final long serialVersionUID = 7004741688464105277L;
 
     private Scenario scenario;

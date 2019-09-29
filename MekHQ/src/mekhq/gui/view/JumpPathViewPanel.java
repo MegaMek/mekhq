@@ -23,7 +23,7 @@ import mekhq.campaign.universe.Planet;
  * A custom panel that gets filled in with goodies from a JumpPath record
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class JumpPathViewPanel extends javax.swing.JPanel {
+public class JumpPathViewPanel extends ScrollablePanel {
     private static final long serialVersionUID = 7004741688464105277L;
 
     private JumpPath path;
