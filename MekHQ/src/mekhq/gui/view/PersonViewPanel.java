@@ -106,8 +106,10 @@ public class PersonViewPanel extends JPanel {
     private JLabel lblSpouse2;
     private JLabel lblChildren1;
     private JLabel lblChildren2;
+    private JPanel pnlAllAwards;
     private JPanel pnlMedals;
     private JPanel pnlMiscAwards;
+    private JPanel pnlAwards;
     private Box boxRibbons;
 
     ResourceBundle resourceMap = null;
@@ -184,58 +186,6 @@ public class PersonViewPanel extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(pnlSkills, gridBagConstraints);
         gridy++;
-        
-        if(person.awardController.hasAwards()) {
-            if(person.awardController.hasAwardsWithRibbons()){
-                boxRibbons = Box.createVerticalBox();
-                boxRibbons.add(Box.createRigidArea(new Dimension(100,0)));
-                drawRibbons();
-
-                GridBagConstraints gbc_pnlAllRibbons = new GridBagConstraints();
-                gbc_pnlAllRibbons.gridx = 0;
-                gbc_pnlAllRibbons.gridy = 1;
-                gbc_pnlAllRibbons.fill = GridBagConstraints.NONE;
-                gbc_pnlAllRibbons.anchor = GridBagConstraints.NORTHWEST;
-                gbc_pnlAllRibbons.insets = new Insets(0,0,0,0);
-                pnlPortrait.add(boxRibbons, gbc_pnlAllRibbons);
-            }
-
-            if(person.awardController.hasAwardsWithMedals()){
-                pnlMedals = new JPanel();
-                pnlMedals.setName("pnlMedals");
-                pnlMedals.setBackground(Color.WHITE);
-                drawMedals();
-
-                GridBagConstraints gbc_pnlMedals = new GridBagConstraints();
-                gbc_pnlMedals.fill = GridBagConstraints.BOTH;
-                gbc_pnlMedals.gridwidth = 2;
-                gbc_pnlMedals.insets = new Insets(5, 5, 5, 5);
-                gbc_pnlMedals.gridx = 0;
-                gbc_pnlMedals.gridy = gridy;
-                gbc_pnlMedals.anchor = GridBagConstraints.NORTHWEST;
-                add(pnlMedals, gbc_pnlMedals);
-                pnlMedals.setLayout(new WrapLayout(FlowLayout.LEFT));
-                gridy++;
-            }
-
-            if(person.awardController.hasAwardsWithMiscs()){
-                pnlMiscAwards = new JPanel();
-                pnlMiscAwards.setName("pnlMiscAwards");
-                pnlMiscAwards.setBackground(Color.WHITE);
-                drawMiscAwards();
-
-                GridBagConstraints gbc_pnlMiscAwards = new GridBagConstraints();
-                gbc_pnlMiscAwards.fill = GridBagConstraints.BOTH;
-                gbc_pnlMiscAwards.gridwidth = 2;
-                gbc_pnlMiscAwards.insets = new Insets(5, 5, 5, 5);
-                gbc_pnlMiscAwards.gridx = 0;
-                gbc_pnlMiscAwards.gridy = gridy;
-                gbc_pnlMiscAwards.anchor = GridBagConstraints.NORTHWEST;
-                add(pnlMiscAwards, gbc_pnlMiscAwards);
-                pnlMiscAwards.setLayout(new WrapLayout(FlowLayout.LEFT));
-                gridy++;
-            }
-        }
 
         if(campaign.getCampaignOptions().useAdvancedMedical() && person.hasInjuries(false)) {
             fillInjuries();
@@ -262,6 +212,57 @@ public class PersonViewPanel extends JPanel {
 	        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 	        add(pnlFamily, gridBagConstraints);
 	        gridy++;
+        }
+        
+        if(person.awardController.hasAwards()) {
+            if(person.awardController.hasAwardsWithRibbons()){
+                boxRibbons = Box.createVerticalBox();
+                boxRibbons.add(Box.createRigidArea(new Dimension(100,0)));
+                drawRibbons();
+
+                GridBagConstraints gbc_pnlAllRibbons = new GridBagConstraints();
+                gbc_pnlAllRibbons.gridx = 0;
+                gbc_pnlAllRibbons.gridy = 1;
+                gbc_pnlAllRibbons.fill = GridBagConstraints.NONE;
+                gbc_pnlAllRibbons.anchor = GridBagConstraints.NORTHWEST;
+                gbc_pnlAllRibbons.insets = new Insets(0,0,0,0);
+                pnlPortrait.add(boxRibbons, gbc_pnlAllRibbons);
+            }
+
+            pnlAllAwards = new JPanel();
+            pnlAllAwards.setLayout(new BoxLayout(pnlAllAwards, BoxLayout.PAGE_AXIS));
+            pnlAllAwards.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlAwards.title")));
+            pnlAllAwards.setBackground(Color.WHITE);
+            
+            if(person.awardController.hasAwardsWithMedals()){
+                pnlMedals = new JPanel();
+                pnlMedals.setName("pnlMedals");
+                pnlMedals.setBackground(Color.WHITE);
+                drawMedals();
+                pnlAllAwards.add(pnlMedals);
+                pnlMedals.setLayout(new WrapLayout(FlowLayout.LEFT));
+            }
+
+            if(person.awardController.hasAwardsWithMiscs()){
+                pnlMiscAwards = new JPanel();
+                pnlMiscAwards.setName("pnlMiscAwards");
+                pnlMiscAwards.setBackground(Color.WHITE);
+                drawMiscAwards();
+                pnlAllAwards.add(pnlMiscAwards);
+                pnlMiscAwards.setLayout(new WrapLayout(FlowLayout.LEFT));
+            }
+            
+            if(person.awardController.hasAwardsWithMedals() || person.awardController.hasAwardsWithMiscs()) {
+	            gridBagConstraints = new GridBagConstraints();
+	            gridBagConstraints.fill = GridBagConstraints.BOTH;
+	            gridBagConstraints.gridwidth = 2;
+	            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+	            gridBagConstraints.gridx = 0;
+	            gridBagConstraints.gridy = gridy;
+	            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+	            add(pnlAllAwards, gridBagConstraints);
+	            gridy++;
+            }
         }
         
         if(person.getBiography().length() > 0) {
