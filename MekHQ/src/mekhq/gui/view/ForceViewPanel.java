@@ -21,6 +21,7 @@ import java.util.Vector;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.text.html.HTMLEditorKit;
 
 import megamek.client.ui.Messages;
 import megamek.client.ui.swing.util.PlayerColors;
@@ -35,12 +36,17 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.EntityImage;
+import mekhq.gui.utilities.WrappedHtmlEditorKit;
+
+import org.commonmark.node.*;
+import org.commonmark.parser.Parser;
+import org.commonmark.renderer.html.HtmlRenderer;
 
 /**
  * A custom panel that gets filled in with goodies from a Force record
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class ForceViewPanel extends javax.swing.JPanel {
+public class ForceViewPanel extends ScrollablePanel {
 	
 	/**
 	 * 
@@ -55,7 +61,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 	private javax.swing.JLabel lblIcon;
 	private javax.swing.JPanel pnlStats;
 	private javax.swing.JPanel pnlSubUnits;
-	private javax.swing.JTextArea txtDesc;
+	private javax.swing.JTextPane txtDesc;
 	
 	private javax.swing.JLabel lblType;
 	private javax.swing.JLabel lblAssign1;
@@ -71,6 +77,8 @@ public class ForceViewPanel extends javax.swing.JPanel {
 	private javax.swing.JLabel lblTech1;
 	private javax.swing.JLabel lblTech2;
 	
+	private static Parser parser = Parser.builder().build();
+    private static HtmlRenderer renderer = HtmlRenderer.builder().build();
 	
 	public ForceViewPanel(Force f, Campaign c, IconPackage icons) {
 		this.force = f;
@@ -85,7 +93,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		lblIcon = new javax.swing.JLabel();
 		pnlStats = new javax.swing.JPanel();
 		pnlSubUnits = new javax.swing.JPanel();
-		txtDesc = new javax.swing.JTextArea();
+		txtDesc = new javax.swing.JTextPane();
 		       
 		setLayout(new java.awt.GridBagLayout());
 
@@ -129,11 +137,13 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;	
 		add(pnlSubUnits, gridBagConstraints);
 		
-		txtDesc.setName("txtDesc");
-		txtDesc.setText(force.getDescription());
+		//txtDesc.setName("txtDesc");
 		txtDesc.setEditable(false);
-		txtDesc.setLineWrap(true);
-		txtDesc.setWrapStyleWord(true);
+		//render the markdown enabled text
+		Node document = parser.parse(force.getDescription());
+		txtDesc.setContentType("text/html");
+		//txtDesc.setEditorKit(new WrappedHtmlEditorKit());
+	    txtDesc.setText("<html>" + renderer.render(document));
 		txtDesc.setBorder(BorderFactory.createCompoundBorder(
 				BorderFactory.createTitledBorder("Description"),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
