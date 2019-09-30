@@ -21,7 +21,7 @@ import java.util.Vector;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.JPanel;
 
 import megamek.client.ui.Messages;
 import megamek.client.ui.swing.util.PlayerColors;
@@ -36,7 +36,6 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.EntityImage;
-import mekhq.gui.utilities.WrappedHtmlEditorKit;
 
 import org.commonmark.node.*;
 import org.commonmark.parser.Parser;
@@ -46,7 +45,7 @@ import org.commonmark.renderer.html.HtmlRenderer;
  * A custom panel that gets filled in with goodies from a Force record
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class ForceViewPanel extends ScrollablePanel {
+public class ForceViewPanel extends JPanel {
 	
 	/**
 	 * 
@@ -142,7 +141,6 @@ public class ForceViewPanel extends ScrollablePanel {
 		//render the markdown enabled text
 		Node document = parser.parse(force.getDescription());
 		txtDesc.setContentType("text/html");
-		//txtDesc.setEditorKit(new WrappedHtmlEditorKit());
 	    txtDesc.setText("<html>" + renderer.render(document));
 		txtDesc.setBorder(BorderFactory.createCompoundBorder(
 				BorderFactory.createTitledBorder("Description"),
