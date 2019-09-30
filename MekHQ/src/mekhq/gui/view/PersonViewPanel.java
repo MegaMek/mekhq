@@ -44,11 +44,8 @@ import mekhq.gui.dialog.MedicalViewDialog;
 import mekhq.gui.model.PersonnelEventLogModel;
 import mekhq.gui.model.PersonnelKillLogModel;
 import mekhq.gui.utilities.ImageHelpers;
+import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.gui.utilities.WrapLayout;
-
-import org.commonmark.node.*;
-import org.commonmark.parser.Parser;
-import org.commonmark.renderer.html.HtmlRenderer;
 
 /**
  * A custom panel that gets filled in with goodies from a Person record
@@ -114,9 +111,6 @@ public class PersonViewPanel extends ScrollablePanel {
     private JPanel pnlMedals;
     private JPanel pnlMiscAwards;
     private Box boxRibbons;
-    
-    private static Parser parser = Parser.builder().build();
-    private static HtmlRenderer renderer = HtmlRenderer.builder().build();
 
     ResourceBundle resourceMap = null;
 
@@ -275,9 +269,8 @@ public class PersonViewPanel extends ScrollablePanel {
             txtDesc.setName("txtDesc"); //$NON-NLS-1$
             txtDesc.setBackground(Color.WHITE);
             txtDesc.setEditable(false);
-            Node document = parser.parse(person.getBiography());
             txtDesc.setContentType("text/html");
-            txtDesc.setText("<html>" + renderer.render(document));
+            txtDesc.setText(MarkdownRenderer.getRenderedHtml(person.getBiography()));
             txtDesc.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createTitledBorder(resourceMap.getString("pnlDescription.title")), //$NON-NLS-1$
                     BorderFactory.createEmptyBorder(5,5,5,5)));

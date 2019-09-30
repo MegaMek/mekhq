@@ -21,7 +21,6 @@ import java.util.Vector;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 import megamek.client.ui.Messages;
 import megamek.client.ui.swing.util.PlayerColors;
@@ -36,10 +35,7 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.EntityImage;
-
-import org.commonmark.node.*;
-import org.commonmark.parser.Parser;
-import org.commonmark.renderer.html.HtmlRenderer;
+import mekhq.gui.utilities.MarkdownRenderer;
 
 /**
  * A custom panel that gets filled in with goodies from a Force record
@@ -75,9 +71,6 @@ public class ForceViewPanel extends ScrollablePanel {
 	private javax.swing.JLabel lblCost2;
 	private javax.swing.JLabel lblTech1;
 	private javax.swing.JLabel lblTech2;
-	
-	private static Parser parser = Parser.builder().build();
-    private static HtmlRenderer renderer = HtmlRenderer.builder().build();
 	
 	public ForceViewPanel(Force f, Campaign c, IconPackage icons) {
 		this.force = f;
@@ -138,13 +131,11 @@ public class ForceViewPanel extends ScrollablePanel {
 		
 		txtDesc.setName("txtDesc");
 		txtDesc.setEditable(false);
-		//render the markdown enabled text
-		Node document = parser.parse(force.getDescription());
 		txtDesc.setContentType("text/html");
-	    txtDesc.setText("<html>" + renderer.render(document));
+		txtDesc.setText(MarkdownRenderer.getRenderedHtml(force.getDescription()));
 		txtDesc.setBorder(BorderFactory.createCompoundBorder(
 				BorderFactory.createTitledBorder("Description"),
-                BorderFactory.createEmptyBorder(5,5,5,5)));
+				BorderFactory.createEmptyBorder(5,5,5,5)));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 2;

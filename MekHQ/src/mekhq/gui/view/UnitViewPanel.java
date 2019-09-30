@@ -15,7 +15,6 @@ import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JTextArea;
 
 import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.util.FluffImageHelper;
@@ -29,10 +28,7 @@ import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.EntityImage;
-
-import org.commonmark.node.*;
-import org.commonmark.parser.Parser;
-import org.commonmark.renderer.html.HtmlRenderer;
+import mekhq.gui.utilities.MarkdownRenderer;
 
 /**
  * A custom panel that gets filled in with goodies from a unit record
@@ -69,9 +65,6 @@ public class UnitViewPanel extends ScrollablePanel {
 	private javax.swing.JTextArea txtCost;
 	private javax.swing.JLabel lblQuirk;
 	private javax.swing.JTextArea txtQuirk;
-	
-    private static Parser parser = Parser.builder().build();
-    private static HtmlRenderer renderer = HtmlRenderer.builder().build();
 	
 	public UnitViewPanel(Unit u, Campaign c, DirectoryItems camos, MechTileset mt) {
 		unit = u;
@@ -157,13 +150,11 @@ public class UnitViewPanel extends ScrollablePanel {
 		if(unit.getHistory().length() > 0) {
 			txtFluff.setName("txtFluff");
 			txtFluff.setEditable(false);
-			//render the markdown enabled text
-	        Node document = parser.parse(unit.getHistory());
-	        txtFluff.setContentType("text/html");
-	        txtFluff.setText("<html>" + renderer.render(document));
+			txtFluff.setContentType("text/html");
+			txtFluff.setText(MarkdownRenderer.getRenderedHtml(unit.getHistory()));
 			txtFluff.setBorder(BorderFactory.createCompoundBorder(
 					BorderFactory.createTitledBorder("Unit History"),
-	                BorderFactory.createEmptyBorder(5,5,5,5)));
+					BorderFactory.createEmptyBorder(5,5,5,5)));
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;
 			gridBagConstraints.gridy = 2;

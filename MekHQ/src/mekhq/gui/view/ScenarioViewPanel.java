@@ -44,10 +44,7 @@ import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.force.UnitStub;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Scenario;
-
-import org.commonmark.node.*;
-import org.commonmark.parser.Parser;
-import org.commonmark.renderer.html.HtmlRenderer;
+import mekhq.gui.utilities.MarkdownRenderer;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object
@@ -68,9 +65,6 @@ public class ScenarioViewPanel extends ScrollablePanel {
     private javax.swing.JLabel lblStatus;
     
     private StubTreeModel forceModel;
-    
-    private static Parser parser = Parser.builder().build();
-    private static HtmlRenderer renderer = HtmlRenderer.builder().build();
     
     public ScenarioViewPanel(Scenario s, Campaign c, IconPackage i) {
         this.scenario = s;
@@ -128,10 +122,8 @@ public class ScenarioViewPanel extends ScrollablePanel {
         
         txtReport.setName("txtReport");
         txtReport.setEditable(false);
-        //render the markdown enabled text
-        Node document = parser.parse(scenario.getReport());
         txtReport.setContentType("text/html");
-        txtReport.setText("<html>" + renderer.render(document));
+        txtReport.setText(MarkdownRenderer.getRenderedHtml(scenario.getReport()));
         txtReport.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder("After-Action Report"),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
@@ -169,10 +161,8 @@ public class ScenarioViewPanel extends ScrollablePanel {
         
         txtDesc.setName("txtDesc");
         txtDesc.setEditable(false);
-        //render the markdown enabled text
-        Node document = parser.parse(scenario.getDescription());
         txtDesc.setContentType("text/html");
-        txtDesc.setText("<html>" + renderer.render(document));
+        txtDesc.setText(MarkdownRenderer.getRenderedHtml(scenario.getDescription()));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;

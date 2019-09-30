@@ -20,10 +20,7 @@ import javax.swing.JTextPane;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.mission.Mission;
-
-import org.commonmark.node.*;
-import org.commonmark.parser.Parser;
-import org.commonmark.renderer.html.HtmlRenderer;
+import mekhq.gui.utilities.MarkdownRenderer;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object
@@ -46,9 +43,6 @@ public class MissionViewPanel extends ScrollablePanel {
 	private JTextArea txtLocation;
 	private JLabel lblType;
 	private JTextArea txtType;
-	
-	private static Parser parser = Parser.builder().build();
-    private static HtmlRenderer renderer = HtmlRenderer.builder().build();
 	
 	public MissionViewPanel(Mission m) {
 		this.mission = m;
@@ -156,10 +150,8 @@ public class MissionViewPanel extends ScrollablePanel {
 		
 		txtDesc.setName("txtDesc");
 		txtDesc.setEditable(false);
-		//render the markdown enabled text
-        Node document = parser.parse(mission.getDescription());
-        txtDesc.setContentType("text/html");
-        txtDesc.setText("<html>" + renderer.render(document));
+		txtDesc.setContentType("text/html");
+		txtDesc.setText(MarkdownRenderer.getRenderedHtml(mission.getDescription()));
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 3;
