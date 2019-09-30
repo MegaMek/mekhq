@@ -45,7 +45,7 @@ import org.commonmark.renderer.html.HtmlRenderer;
  * A custom panel that gets filled in with goodies from a Force record
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class ForceViewPanel extends JPanel {
+public class ForceViewPanel extends ScrollablePanel {
 	
 	/**
 	 * 

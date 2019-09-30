@@ -38,7 +38,7 @@ import org.commonmark.renderer.html.HtmlRenderer;
  * A custom panel that gets filled in with goodies from a unit record
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class UnitViewPanel extends javax.swing.JPanel {
+public class UnitViewPanel extends ScrollablePanel {
 	
 	/**
 	 * 
