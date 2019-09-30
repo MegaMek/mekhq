@@ -29,7 +29,7 @@ import org.commonmark.renderer.html.HtmlRenderer;
  * A custom panel that gets filled in with goodies from a scenario object
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class MissionViewPanel extends ScrollablePanel {
+public class MissionViewPanel extends JPanel {
 	
 	/**
 	 * 
