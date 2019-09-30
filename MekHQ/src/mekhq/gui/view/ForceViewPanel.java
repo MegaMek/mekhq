@@ -40,7 +40,7 @@ import mekhq.gui.EntityImage;
  * A custom panel that gets filled in with goodies from a Force record
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class ForceViewPanel extends javax.swing.JPanel {
+public class ForceViewPanel extends ScrollablePanel {
 	
 	/**
 	 * 

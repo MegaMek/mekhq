@@ -40,7 +40,7 @@ import mekhq.campaign.universe.Planet.SocioIndustrialData;
  * A custom panel that gets filled in with goodies from a Planet record
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class PlanetViewPanel extends JPanel {
+public class PlanetViewPanel extends ScrollablePanel {
     private static final long serialVersionUID = 7004741688464105277L;
 
     private Planet planet;

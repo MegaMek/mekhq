@@ -2660,6 +2660,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
     
+    public int getSkillNumber() {
+        return skills.size();
+    }
+    
     /**
      * Remove all skills
      */
@@ -3655,6 +3659,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
         } else if(gunneryMod == Integer.MAX_VALUE) {
             sb.append("  Gunnery: <i>Impossible</i>  <br>");
         }
+        if(gunneryMod == 0 && pilotingMod == 0) {
+            sb.append("None");
+        }
         return sb.append("</html>").toString();
     }
 
@@ -3882,6 +3889,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return "<html>" + Utilities.combineString(children, "<br/>") + "</html>";
     }
 
+    public boolean hasAnyFamily() {
+        return hasChildren() || hasSpouse();
+    }
+    
     public boolean hasChildren() {
         boolean hasKids = false;
         if (getId() != null) {
