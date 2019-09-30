@@ -1180,4 +1180,3 @@ public class PersonViewPanel extends ScrollablePanel {
         pnlKills.add(killTable, gridBagConstraints);
     }
 }
-

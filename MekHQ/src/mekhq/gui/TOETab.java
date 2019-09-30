@@ -183,20 +183,20 @@ public final class TOETab extends CampaignGuiTab {
                 scrollPerson.setPreferredSize(crewList.getPreferredScrollableViewportSize());
                 tabUnit.add(name, crewPanel);
                 javax.swing.SwingUtilities.invokeLater(() -> {
-            		scrollPerson.getVerticalScrollBar().setValue(0);
+                    scrollPerson.getVerticalScrollBar().setValue(0);
                 });
             }
             final JScrollPane scrollUnit = new JScrollPane(new UnitViewPanel(u, getCampaign(), getIconPackage().getCamos(), getIconPackage().getMechTiles()));
             tabUnit.add("Unit", scrollUnit);
             panForceView.add(tabUnit, BorderLayout.CENTER);
             javax.swing.SwingUtilities.invokeLater(() -> {
-            	scrollUnit.getVerticalScrollBar().setValue(0);
+                scrollUnit.getVerticalScrollBar().setValue(0);
             });
         } else if (node instanceof Force) {
-        	final JScrollPane scrollForce = new JScrollPane(new ForceViewPanel((Force) node, getCampaign(), getIconPackage()));
+            final JScrollPane scrollForce = new JScrollPane(new ForceViewPanel((Force) node, getCampaign(), getIconPackage()));
             panForceView.add(scrollForce, BorderLayout.CENTER);
             javax.swing.SwingUtilities.invokeLater(() -> {
-            scrollForce.getVerticalScrollBar().setValue(0);
+                scrollForce.getVerticalScrollBar().setValue(0);
             });
         }
         panForceView.updateUI();
