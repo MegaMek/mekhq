@@ -8,6 +8,7 @@ package mekhq.gui.view;
 
 import java.awt.*;
 import java.awt.Dialog.ModalityType;
+import java.awt.Image;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
@@ -21,6 +22,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 
@@ -44,11 +46,15 @@ import mekhq.gui.model.PersonnelKillLogModel;
 import mekhq.gui.utilities.ImageHelpers;
 import mekhq.gui.utilities.WrapLayout;
 
+import org.commonmark.node.*;
+import org.commonmark.parser.Parser;
+import org.commonmark.renderer.html.HtmlRenderer;
+
 /**
  * A custom panel that gets filled in with goodies from a Person record
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class PersonViewPanel extends JPanel {
+public class PersonViewPanel extends ScrollablePanel {
     private static final long serialVersionUID = 7004741688464105277L;
 
     private static final int MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW = 4;
@@ -63,7 +69,7 @@ public class PersonViewPanel extends JPanel {
     private JPanel pnlPortrait;
     private JLabel lblPortrait;
     private JPanel pnlStats;
-    private JTextArea txtDesc;
+    private JTextPane txtDesc;
     private JPanel pnlKills;
     private JPanel pnlLog;
     private JPanel pnlMissionsLog;
@@ -105,6 +111,9 @@ public class PersonViewPanel extends JPanel {
     private JPanel pnlMedals;
     private JPanel pnlMiscAwards;
     private Box boxRibbons;
+    
+    private static Parser parser = Parser.builder().build();
+    private static HtmlRenderer renderer = HtmlRenderer.builder().build();
 
     ResourceBundle resourceMap = null;
 
@@ -125,7 +134,7 @@ public class PersonViewPanel extends JPanel {
         lblPortrait = new JLabel();
         pnlStats = new JPanel();
         pnlPortrait = new JPanel();
-        txtDesc = new JTextArea();
+        txtDesc = new JTextPane();
         pnlKills = new JPanel();
         pnlLog = new JPanel();
         pnlMissionsLog = new JPanel();
@@ -244,10 +253,10 @@ public class PersonViewPanel extends JPanel {
 
         if(person.getBiography().length() > 0) {
             txtDesc.setName("txtDesc"); //$NON-NLS-1$
-            txtDesc.setText(person.getBiography());
             txtDesc.setEditable(false);
-            txtDesc.setLineWrap(true);
-            txtDesc.setWrapStyleWord(true);
+            Node document = parser.parse(person.getBiography());
+            txtDesc.setContentType("text/html");
+            txtDesc.setText("<html>" + renderer.render(document));
             txtDesc.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createTitledBorder(resourceMap.getString("pnlDescription.title")), //$NON-NLS-1$
                     BorderFactory.createEmptyBorder(5,5,5,5)));

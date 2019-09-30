@@ -136,7 +136,7 @@ public class ForceViewPanel extends JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;	
 		add(pnlSubUnits, gridBagConstraints);
 		
-		//txtDesc.setName("txtDesc");
+		txtDesc.setName("txtDesc");
 		txtDesc.setEditable(false);
 		//render the markdown enabled text
 		Node document = parser.parse(force.getDescription());

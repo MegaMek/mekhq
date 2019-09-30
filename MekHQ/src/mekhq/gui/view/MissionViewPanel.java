@@ -16,15 +16,20 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.mission.Mission;
+
+import org.commonmark.node.*;
+import org.commonmark.parser.Parser;
+import org.commonmark.renderer.html.HtmlRenderer;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class MissionViewPanel extends JPanel {
+public class MissionViewPanel extends ScrollablePanel {
 	
 	/**
 	 * 
@@ -34,13 +39,16 @@ public class MissionViewPanel extends JPanel {
 	private Mission mission;
 	
 	private JPanel pnlStats;
-	private JTextArea txtDesc;
+	private JTextPane txtDesc;
 	
 	private JLabel lblStatus;
 	private JLabel lblLocation;
 	private JTextArea txtLocation;
 	private JLabel lblType;
 	private JTextArea txtType;
+	
+	private static Parser parser = Parser.builder().build();
+    private static HtmlRenderer renderer = HtmlRenderer.builder().build();
 	
 	public MissionViewPanel(Mission m) {
 		this.mission = m;
@@ -51,7 +59,7 @@ public class MissionViewPanel extends JPanel {
 		GridBagConstraints gridBagConstraints;
 
 		pnlStats = new JPanel();
-		txtDesc = new JTextArea();
+		txtDesc = new JTextPane();
 		       
 		setLayout(new GridBagLayout());
 
@@ -147,10 +155,11 @@ public class MissionViewPanel extends JPanel {
 		pnlStats.add(txtType, gridBagConstraints);
 		
 		txtDesc.setName("txtDesc");
-		txtDesc.setText(mission.getDescription());
 		txtDesc.setEditable(false);
-		txtDesc.setLineWrap(true);
-		txtDesc.setWrapStyleWord(true);
+		//render the markdown enabled text
+        Node document = parser.parse(mission.getDescription());
+        txtDesc.setContentType("text/html");
+        txtDesc.setText("<html>" + renderer.render(document));
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 3;

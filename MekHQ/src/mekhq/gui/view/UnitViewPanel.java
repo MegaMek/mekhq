@@ -30,6 +30,10 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.EntityImage;
 
+import org.commonmark.node.*;
+import org.commonmark.parser.Parser;
+import org.commonmark.renderer.html.HtmlRenderer;
+
 /**
  * A custom panel that gets filled in with goodies from a unit record
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
@@ -51,7 +55,7 @@ public class UnitViewPanel extends javax.swing.JPanel {
 	private javax.swing.JLabel lblImage;
 	//private javax.swing.JPanel pnlStats;
 	private javax.swing.JTextPane txtReadout;
-	private JTextArea txtFluff;	
+	private javax.swing.JTextPane txtFluff;	
 	private javax.swing.JPanel pnlStats;
 	
 	private javax.swing.JLabel lblType;
@@ -65,6 +69,9 @@ public class UnitViewPanel extends javax.swing.JPanel {
 	private javax.swing.JTextArea txtCost;
 	private javax.swing.JLabel lblQuirk;
 	private javax.swing.JTextArea txtQuirk;
+	
+    private static Parser parser = Parser.builder().build();
+    private static HtmlRenderer renderer = HtmlRenderer.builder().build();
 	
 	public UnitViewPanel(Unit u, Campaign c, DirectoryItems camos, MechTileset mt) {
 		unit = u;
@@ -81,7 +88,7 @@ public class UnitViewPanel extends javax.swing.JPanel {
 
 		lblImage = new javax.swing.JLabel();
 		txtReadout = new javax.swing.JTextPane();
-		txtFluff = new javax.swing.JTextArea();
+		txtFluff = new javax.swing.JTextPane();
 		pnlStats = new javax.swing.JPanel();
 		
     	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitViewPanel", new EncodeControl()); //$NON-NLS-1$
@@ -150,9 +157,10 @@ public class UnitViewPanel extends javax.swing.JPanel {
 		if(unit.getHistory().length() > 0) {
 			txtFluff.setName("txtFluff");
 			txtFluff.setEditable(false);
-			txtFluff.setLineWrap(true);
-			txtFluff.setWrapStyleWord(true);
-			txtFluff.setText(unit.getHistory());
+			//render the markdown enabled text
+	        Node document = parser.parse(unit.getHistory());
+	        txtFluff.setContentType("text/html");
+	        txtFluff.setText("<html>" + renderer.render(document));
 			txtFluff.setBorder(BorderFactory.createCompoundBorder(
 					BorderFactory.createTitledBorder("Unit History"),
 	                BorderFactory.createEmptyBorder(5,5,5,5)));

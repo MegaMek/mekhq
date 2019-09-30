@@ -45,6 +45,10 @@ import mekhq.campaign.force.UnitStub;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Scenario;
 
+import org.commonmark.node.*;
+import org.commonmark.parser.Parser;
+import org.commonmark.renderer.html.HtmlRenderer;
+
 /**
  * A custom panel that gets filled in with goodies from a scenario object
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
@@ -58,12 +62,15 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
     private IconPackage icons;
     
     private javax.swing.JPanel pnlStats;
-    private javax.swing.JTextArea txtDesc;
-    private javax.swing.JTextArea txtReport;
+    private javax.swing.JTextPane txtDesc;
+    private javax.swing.JTextPane txtReport;
     private javax.swing.JTree forceTree;
     private javax.swing.JLabel lblStatus;
     
     private StubTreeModel forceModel;
+    
+    private static Parser parser = Parser.builder().build();
+    private static HtmlRenderer renderer = HtmlRenderer.builder().build();
     
     public ScenarioViewPanel(Scenario s, Campaign c, IconPackage i) {
         this.scenario = s;
@@ -82,8 +89,8 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
         java.awt.GridBagConstraints gridBagConstraints;
 
         pnlStats = new javax.swing.JPanel();
-        txtDesc = new javax.swing.JTextArea();
-        txtReport = new javax.swing.JTextArea();
+        txtDesc = new javax.swing.JTextPane();
+        txtReport = new javax.swing.JTextPane();
         forceTree = new javax.swing.JTree();
                
         setLayout(new java.awt.GridBagLayout());
@@ -120,10 +127,11 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
         add(forceTree, gridBagConstraints);
         
         txtReport.setName("txtReport");
-        txtReport.setText(scenario.getReport());
         txtReport.setEditable(false);
-        txtReport.setLineWrap(true);
-        txtReport.setWrapStyleWord(true);
+        //render the markdown enabled text
+        Node document = parser.parse(scenario.getReport());
+        txtReport.setContentType("text/html");
+        txtReport.setText("<html>" + renderer.render(document));
         txtReport.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder("After-Action Report"),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
@@ -160,10 +168,11 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
         pnlStats.add(lblStatus, gridBagConstraints);
         
         txtDesc.setName("txtDesc");
-        txtDesc.setText(scenario.getDescription());
         txtDesc.setEditable(false);
-        txtDesc.setLineWrap(true);
-        txtDesc.setWrapStyleWord(true);
+        //render the markdown enabled text
+        Node document = parser.parse(scenario.getDescription());
+        txtDesc.setContentType("text/html");
+        txtDesc.setText("<html>" + renderer.render(document));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
