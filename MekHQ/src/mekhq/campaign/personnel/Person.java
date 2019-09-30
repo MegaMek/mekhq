@@ -2661,7 +2661,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
     
     public int getSkillNumber() {
-    	return skills.size();
+        return skills.size();
     }
     
     /**
@@ -3660,7 +3660,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             sb.append("  Gunnery: <i>Impossible</i>  <br>");
         }
         if(gunneryMod == 0 && pilotingMod == 0) {
-        	sb.append("None");
+            sb.append("None");
         }
         return sb.append("</html>").toString();
     }
@@ -3890,7 +3890,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public boolean hasAnyFamily() {
-    	return hasChildren() || hasSpouse();
+        return hasChildren() || hasSpouse();
     }
     
     public boolean hasChildren() {

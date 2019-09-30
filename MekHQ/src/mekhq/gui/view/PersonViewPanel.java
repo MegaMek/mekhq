@@ -212,7 +212,7 @@ public class PersonViewPanel extends ScrollablePanel {
 	        add(pnlFamily, gridBagConstraints);
 	        gridy++;
         }
-        
+
         if(person.awardController.hasAwards()) {
             if(person.awardController.hasAwardsWithRibbons()){
                 boxRibbons = Box.createVerticalBox();
@@ -266,7 +266,7 @@ public class PersonViewPanel extends ScrollablePanel {
         
         if(person.getBiography().length() > 0) {
             txtDesc = new JTextArea();
-        	txtDesc.setName("txtDesc"); //$NON-NLS-1$
+            txtDesc.setName("txtDesc"); //$NON-NLS-1$
             txtDesc.setBackground(Color.WHITE);
             txtDesc.setEditable(false);
             txtDesc.setLineWrap(true);
@@ -494,7 +494,7 @@ public class PersonViewPanel extends ScrollablePanel {
 
     private void fillInfo() {	
         
-    	pnlInfo = new JPanel(new GridBagLayout());
+        pnlInfo = new JPanel(new GridBagLayout());
         pnlInfo.setBorder(BorderFactory.createTitledBorder(person.getFullTitle()));
         pnlInfo.setBackground(Color.WHITE);
         lblType = new JLabel();
@@ -600,7 +600,7 @@ public class PersonViewPanel extends ScrollablePanel {
             pnlInfo.add(lblCall2, gridBagConstraints);
             firsty++;
         }
-        
+
         //report either due date or age
         if (person.getDueDate() != null) {
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
@@ -626,28 +626,28 @@ public class PersonViewPanel extends ScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlFamily.add(lblDuedate2, gridBagConstraints);
         } else {  
-	        lblAge1.setName("lblAge1"); // NOI18N
-	        lblAge1.setText(resourceMap.getString("lblAge1.text")); //$NON-NLS-1$
-	        gridBagConstraints = new GridBagConstraints();
-	        gridBagConstraints.gridx = 0;
-	        gridBagConstraints.gridy = firsty;
-	        gridBagConstraints.fill = GridBagConstraints.NONE;
-	        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-	        pnlInfo.add(lblAge1, gridBagConstraints);
-	
-	        lblAge2.setName("lblAge2"); // NOI18N
-	        lblAge2.setText(Integer.toString(person.getAge(campaign.getCalendar())));
-	        gridBagConstraints = new GridBagConstraints();
-	        gridBagConstraints.gridx = 1;
-	        gridBagConstraints.gridy = firsty;
-	        gridBagConstraints.weightx = 0.5;
-	        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-	        gridBagConstraints.fill = GridBagConstraints.NONE;
-	        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-	        pnlInfo.add(lblAge2, gridBagConstraints);
-        }       
+            lblAge1.setName("lblAge1"); // NOI18N
+            lblAge1.setText(resourceMap.getString("lblAge1.text")); //$NON-NLS-1$
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlInfo.add(lblAge1, gridBagConstraints);
+
+            lblAge2.setName("lblAge2"); // NOI18N
+            lblAge2.setText(Integer.toString(person.getAge(campaign.getCalendar())));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.weightx = 0.5;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlInfo.add(lblAge2, gridBagConstraints);
+        }
         firsty++;
-        
+
         lblGender1.setName("lblGender1"); // NOI18N
         lblGender1.setText(resourceMap.getString("lblGender1.text")); //$NON-NLS-1$
         gridBagConstraints = new GridBagConstraints();
@@ -716,9 +716,9 @@ public class PersonViewPanel extends ScrollablePanel {
     }
 
     private void fillFamily() {
-    	pnlFamily = new JPanel(new GridBagLayout());
-    	pnlFamily.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlFamily.title")));
-    	pnlFamily.setBackground(Color.WHITE);
+        pnlFamily = new JPanel(new GridBagLayout());
+        pnlFamily.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlFamily.title")));
+        pnlFamily.setBackground(Color.WHITE);
 
         //family panel
         lblSpouse1 = new JLabel();
@@ -776,16 +776,16 @@ public class PersonViewPanel extends ScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlFamily.add(lblChildren2, gridBagConstraints);
             firsty++;
-        }        
+        }
     }
     
     private void fillSkills() {
-    	
-    	//skill panel
+
+        //skill panel
         pnlSkills = new JPanel(new GridBagLayout());
         pnlSkills.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlSkills.title")));
         pnlSkills.setBackground(Color.WHITE);
-             
+
         //abilities and implants
         lblAbility1 = new JLabel();
         lblAbility2 = new JLabel();
@@ -797,26 +797,26 @@ public class PersonViewPanel extends ScrollablePanel {
         lblEdge2 = new JLabel();
         lblEdgeAvail1 = new JLabel();
         lblEdgeAvail2 = new JLabel();
-        
+
         GridBagConstraints gridBagConstraints;
-        
+
         JLabel lblName;
         JLabel lblValue;
-        
+
         int firsty=0;
         int colBreak = Math.max((int) Math.ceil(person.getSkillNumber() / 2.0)+1, 3);
         int addition = 0;
         double weight = 0.5;
-        
+
         int j = 0;
         for(int i = 0; i < SkillType.getSkillList().length; i++) {      	
             if(person.hasSkill(SkillType.getSkillList()[i])) {
-            	j++;
-            	if(j == colBreak) {
-            		addition = 2;
-            		firsty = 0;
-            		weight = 1.0;
-            	}
+                j++;
+                if(j == colBreak) {
+                    addition = 2;
+                    firsty = 0;
+                    weight = 1.0;
+                }
                 lblName = new JLabel(
                     String.format(resourceMap.getString("format.itemHeader"), SkillType.getSkillList()[i])); //$NON-NLS-1$
                 lblValue = new JLabel(person.getSkill(SkillType.getSkillList()[i]).toString());
@@ -837,10 +837,10 @@ public class PersonViewPanel extends ScrollablePanel {
                 firsty++;
             }
         }
-        
+
         //reset firsty
         firsty = colBreak;
-        
+
         if(campaign.getCampaignOptions().useAbilities() && person.countOptions(PilotOptions.LVL3_ADVANTAGES) > 0) {
             lblAbility1.setName("lblAbility1"); // NOI18N //$NON-NLS-1$
             lblAbility1.setText(resourceMap.getString("lblAbility1.text")); //$NON-NLS-1$
@@ -888,7 +888,7 @@ public class PersonViewPanel extends ScrollablePanel {
             pnlSkills.add(lblImplants2, gridBagConstraints);
             firsty++;
         }
-        
+
         if(campaign.getCampaignOptions().useEdge() && person.getEdge()>0) {
             lblEdge1.setName("lblEdge1"); // NOI18N //$NON-NLS-1$
             lblEdge1.setText(resourceMap.getString("lblEdge1.text")); //$NON-NLS-1$
@@ -937,7 +937,7 @@ public class PersonViewPanel extends ScrollablePanel {
             }
             firsty++;
         }
-        
+ 
         if(campaign.getCampaignOptions().useToughness()) {
             lblTough1.setName("lblTough1"); // NOI18N
             lblTough1.setText(resourceMap.getString("lblTough1.text")); //$NON-NLS-1$
@@ -963,7 +963,7 @@ public class PersonViewPanel extends ScrollablePanel {
         }
         
     }
-    
+ 
     private void fillLog() {
         ArrayList<LogEntry> logs = person.getPersonnelLog();
         pnlLog.setLayout(new GridBagLayout());
@@ -1180,5 +1180,4 @@ public class PersonViewPanel extends ScrollablePanel {
         pnlKills.add(killTable, gridBagConstraints);
     }
 }
-
 

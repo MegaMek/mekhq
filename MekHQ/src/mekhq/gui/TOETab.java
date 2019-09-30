@@ -100,7 +100,6 @@ public final class TOETab extends CampaignGuiTab {
         panForceView.setMinimumSize(new java.awt.Dimension(550, 600));
         panForceView.setPreferredSize(new java.awt.Dimension(550, 600));
         panForceView.setLayout(new BorderLayout());
-        //panForceView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
         splitOrg = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(orgTree), panForceView);
         splitOrg.setOneTouchExpandable(true);
@@ -197,7 +196,7 @@ public final class TOETab extends CampaignGuiTab {
         	final JScrollPane scrollForce = new JScrollPane(new ForceViewPanel((Force) node, getCampaign(), getIconPackage()));
             panForceView.add(scrollForce, BorderLayout.CENTER);
             javax.swing.SwingUtilities.invokeLater(() -> {
-        		scrollForce.getVerticalScrollBar().setValue(0);
+            scrollForce.getVerticalScrollBar().setValue(0);
             });
         }
         panForceView.updateUI();
