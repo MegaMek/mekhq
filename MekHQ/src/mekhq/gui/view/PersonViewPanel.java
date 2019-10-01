@@ -8,6 +8,7 @@ package mekhq.gui.view;
 
 import java.awt.*;
 import java.awt.Dialog.ModalityType;
+import java.awt.Image;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
@@ -21,7 +22,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 
@@ -43,6 +44,7 @@ import mekhq.gui.dialog.MedicalViewDialog;
 import mekhq.gui.model.PersonnelEventLogModel;
 import mekhq.gui.model.PersonnelKillLogModel;
 import mekhq.gui.utilities.ImageHelpers;
+import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.gui.utilities.WrapLayout;
 
 /**
@@ -66,8 +68,7 @@ public class PersonViewPanel extends ScrollablePanel {
     private JPanel pnlInfo;
     private JPanel pnlSkills;
     private JPanel pnlFamily;
-
-    private JTextArea txtDesc;
+    private JTextPane txtDesc;
     private JPanel pnlKills;
     private JPanel pnlLog;
     private JPanel pnlMissionsLog;
@@ -129,9 +130,9 @@ public class PersonViewPanel extends ScrollablePanel {
 
         lblPortrait = new JLabel();
         pnlPortrait = new JPanel();
+        txtDesc = new JTextPane();
         pnlKills = new JPanel();
         pnlLog = new JPanel();
-        txtDesc = new JTextArea();
         pnlMissionsLog = new JPanel();
         setLayout(new GridBagLayout());
         setBackground(Color.WHITE);
@@ -265,16 +266,14 @@ public class PersonViewPanel extends ScrollablePanel {
         }
         
         if(person.getBiography().length() > 0) {
-            txtDesc = new JTextArea();
             txtDesc.setName("txtDesc"); //$NON-NLS-1$
             txtDesc.setBackground(Color.WHITE);
             txtDesc.setEditable(false);
-            txtDesc.setLineWrap(true);
-            txtDesc.setWrapStyleWord(true);
+            txtDesc.setContentType("text/html");
+            txtDesc.setText(MarkdownRenderer.getRenderedHtml(person.getBiography()));
             txtDesc.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createTitledBorder(resourceMap.getString("pnlDescription.title")), //$NON-NLS-1$
                     BorderFactory.createEmptyBorder(5,5,5,5)));
-            txtDesc.setText(person.getBiography());
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridy;

@@ -15,7 +15,6 @@ import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JTextArea;
 
 import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.util.FluffImageHelper;
@@ -29,6 +28,7 @@ import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.EntityImage;
+import mekhq.gui.utilities.MarkdownRenderer;
 
 /**
  * A custom panel that gets filled in with goodies from a unit record
@@ -51,7 +51,7 @@ public class UnitViewPanel extends ScrollablePanel {
 	private javax.swing.JLabel lblImage;
 	//private javax.swing.JPanel pnlStats;
 	private javax.swing.JTextPane txtReadout;
-	private JTextArea txtFluff;	
+	private javax.swing.JTextPane txtFluff;	
 	private javax.swing.JPanel pnlStats;
 	
 	private javax.swing.JLabel lblType;
@@ -81,7 +81,7 @@ public class UnitViewPanel extends ScrollablePanel {
 
 		lblImage = new javax.swing.JLabel();
 		txtReadout = new javax.swing.JTextPane();
-		txtFluff = new javax.swing.JTextArea();
+		txtFluff = new javax.swing.JTextPane();
 		pnlStats = new javax.swing.JPanel();
 		
     	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitViewPanel", new EncodeControl()); //$NON-NLS-1$
@@ -150,12 +150,11 @@ public class UnitViewPanel extends ScrollablePanel {
 		if(unit.getHistory().length() > 0) {
 			txtFluff.setName("txtFluff");
 			txtFluff.setEditable(false);
-			txtFluff.setLineWrap(true);
-			txtFluff.setWrapStyleWord(true);
-			txtFluff.setText(unit.getHistory());
+			txtFluff.setContentType("text/html");
+			txtFluff.setText(MarkdownRenderer.getRenderedHtml(unit.getHistory()));
 			txtFluff.setBorder(BorderFactory.createCompoundBorder(
 					BorderFactory.createTitledBorder("Unit History"),
-	                BorderFactory.createEmptyBorder(5,5,5,5)));
+					BorderFactory.createEmptyBorder(5,5,5,5)));
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;
 			gridBagConstraints.gridy = 2;

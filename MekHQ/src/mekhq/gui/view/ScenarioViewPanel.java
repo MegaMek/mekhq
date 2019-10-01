@@ -44,6 +44,7 @@ import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.force.UnitStub;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Scenario;
+import mekhq.gui.utilities.MarkdownRenderer;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object
@@ -58,8 +59,8 @@ public class ScenarioViewPanel extends ScrollablePanel {
     private IconPackage icons;
     
     private javax.swing.JPanel pnlStats;
-    private javax.swing.JTextArea txtDesc;
-    private javax.swing.JTextArea txtReport;
+    private javax.swing.JTextPane txtDesc;
+    private javax.swing.JTextPane txtReport;
     private javax.swing.JTree forceTree;
     private javax.swing.JLabel lblStatus;
     
@@ -82,8 +83,8 @@ public class ScenarioViewPanel extends ScrollablePanel {
         java.awt.GridBagConstraints gridBagConstraints;
 
         pnlStats = new javax.swing.JPanel();
-        txtDesc = new javax.swing.JTextArea();
-        txtReport = new javax.swing.JTextArea();
+        txtDesc = new javax.swing.JTextPane();
+        txtReport = new javax.swing.JTextPane();
         forceTree = new javax.swing.JTree();
                
         setLayout(new java.awt.GridBagLayout());
@@ -120,10 +121,9 @@ public class ScenarioViewPanel extends ScrollablePanel {
         add(forceTree, gridBagConstraints);
         
         txtReport.setName("txtReport");
-        txtReport.setText(scenario.getReport());
         txtReport.setEditable(false);
-        txtReport.setLineWrap(true);
-        txtReport.setWrapStyleWord(true);
+        txtReport.setContentType("text/html");
+        txtReport.setText(MarkdownRenderer.getRenderedHtml(scenario.getReport()));
         txtReport.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder("After-Action Report"),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
@@ -160,10 +160,9 @@ public class ScenarioViewPanel extends ScrollablePanel {
         pnlStats.add(lblStatus, gridBagConstraints);
         
         txtDesc.setName("txtDesc");
-        txtDesc.setText(scenario.getDescription());
         txtDesc.setEditable(false);
-        txtDesc.setLineWrap(true);
-        txtDesc.setWrapStyleWord(true);
+        txtDesc.setContentType("text/html");
+        txtDesc.setText(MarkdownRenderer.getRenderedHtml(scenario.getDescription()));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;

@@ -16,9 +16,11 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.mission.Mission;
+import mekhq.gui.utilities.MarkdownRenderer;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object
@@ -34,7 +36,7 @@ public class MissionViewPanel extends ScrollablePanel {
 	private Mission mission;
 	
 	private JPanel pnlStats;
-	private JTextArea txtDesc;
+	private JTextPane txtDesc;
 	
 	private JLabel lblStatus;
 	private JLabel lblLocation;
@@ -51,7 +53,7 @@ public class MissionViewPanel extends ScrollablePanel {
 		GridBagConstraints gridBagConstraints;
 
 		pnlStats = new JPanel();
-		txtDesc = new JTextArea();
+		txtDesc = new JTextPane();
 		       
 		setLayout(new GridBagLayout());
 
@@ -147,10 +149,9 @@ public class MissionViewPanel extends ScrollablePanel {
 		pnlStats.add(txtType, gridBagConstraints);
 		
 		txtDesc.setName("txtDesc");
-		txtDesc.setText(mission.getDescription());
 		txtDesc.setEditable(false);
-		txtDesc.setLineWrap(true);
-		txtDesc.setWrapStyleWord(true);
+		txtDesc.setContentType("text/html");
+		txtDesc.setText(MarkdownRenderer.getRenderedHtml(mission.getDescription()));
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 3;

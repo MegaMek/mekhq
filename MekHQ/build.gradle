@@ -49,6 +49,8 @@ dependencies {
     implementation 'org.apache.commons:commons-csv:1.4'
     implementation 'javax.vecmath:vecmath:1.5.2'
 
+    implementation 'com.atlassian.commonmark:commonmark:0.13.0'
+
     implementation 'log4j:log4j:1.2.17'
     implementation 'javax.xml.bind:jaxb-api:2.3.0'
     implementation 'com.fasterxml.jackson.core:jackson-core:2.9.8'
