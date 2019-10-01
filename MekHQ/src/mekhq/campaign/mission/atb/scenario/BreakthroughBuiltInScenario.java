@@ -137,9 +137,9 @@ public class BreakthroughBuiltInScenario extends AtBScenario {
                 this);
 
         if (keepAttachedUnitsAlive != null) {
-            getObjectives().add(keepAttachedUnitsAlive);
+            getScenarioObjectives().add(keepAttachedUnitsAlive);
         }
 
-        getObjectives().add(destroyHostiles);
+        getScenarioObjectives().add(destroyHostiles);
     }
 }

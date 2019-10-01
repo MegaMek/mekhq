@@ -202,6 +202,11 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     private int maxWeightClass;
     
     /**
+     * Minimum weight class of this force.
+     */
+    private int minWeightClass;
+    
+    /**
      * Whether or not this force contributes to scaling map size.
      */
     private boolean contributesToMapSize;
@@ -430,6 +435,14 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         this.maxWeightClass = maxWeightClass;
     }
     
+    public int getMinWeightClass() {
+        return minWeightClass;
+    }
+
+    public void setMinWeightClass(int minWeightClass) {
+        this.minWeightClass = minWeightClass;
+    }
+
     public void setContributesToMapSize(boolean contributesToMapSize) {
         this.contributesToMapSize = contributesToMapSize;
     }

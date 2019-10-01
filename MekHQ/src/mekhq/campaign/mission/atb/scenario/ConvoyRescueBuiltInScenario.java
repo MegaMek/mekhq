@@ -141,8 +141,8 @@ public class ConvoyRescueBuiltInScenario extends AtBScenario {
         keepConvoyAlive.addDetail(String.format(defaultResourceBundle.getString("commonObjectives.bonusRolls.text"),
                 bonusEffect.howMuch));
 
-        getObjectives().add(destroyHostiles);
-        getObjectives().add(keepFriendliesAlive);
-        getObjectives().add(keepConvoyAlive);
+        getScenarioObjectives().add(destroyHostiles);
+        getScenarioObjectives().add(keepFriendliesAlive);
+        getScenarioObjectives().add(keepConvoyAlive);
     }
 }

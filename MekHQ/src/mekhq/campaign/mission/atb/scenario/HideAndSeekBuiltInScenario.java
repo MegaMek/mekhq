@@ -128,10 +128,10 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
         }
 
         if (keepAttachedUnitsAlive != null) {
-            getObjectives().add(keepAttachedUnitsAlive);
+            getScenarioObjectives().add(keepAttachedUnitsAlive);
         }
 
-        getObjectives().add(destroyHostiles);
-        getObjectives().add(keepFriendliesAlive);
+        getScenarioObjectives().add(destroyHostiles);
+        getScenarioObjectives().add(keepFriendliesAlive);
     }
 }

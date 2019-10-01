@@ -107,13 +107,13 @@ public class ReconRaidBuiltInScenario extends AtBScenario {
                 this);
 
         if (keepAttachedUnitsAlive != null) {
-            getObjectives().add(keepAttachedUnitsAlive);
+            getScenarioObjectives().add(keepAttachedUnitsAlive);
         }
 
         if (isAttacker()) {
             ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract,
                     this, 75, false);
-            getObjectives().add(keepFriendliesAlive);
+            getScenarioObjectives().add(keepFriendliesAlive);
 
             ScenarioObjective raidObjective = new ScenarioObjective();
             raidObjective.setObjectiveCriterion(ObjectiveCriterion.Custom);
@@ -133,12 +133,12 @@ public class ReconRaidBuiltInScenario extends AtBScenario {
             victoryEffect.howMuch = Compute.d6() - 2;
             raidObjective.addSuccessEffect(victoryEffect);
 
-            getObjectives().add(raidObjective);
+            getScenarioObjectives().add(raidObjective);
         } else {
             destroyHostiles.setTimeLimit(10);
             destroyHostiles.addDetail(String.format(defaultResourceBundle.getString("commonObjectives.timeLimit.text"),
                     destroyHostiles.getTimeLimit()));
-            getObjectives().add(destroyHostiles);
+            getScenarioObjectives().add(destroyHostiles);
         }
     }
 }

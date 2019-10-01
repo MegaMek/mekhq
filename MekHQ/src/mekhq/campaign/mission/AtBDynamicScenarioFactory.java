@@ -160,6 +160,7 @@ public class AtBDynamicScenarioFactory {
         
         setDeploymentTurns(scenario, campaign);
         translatePlayerNPCsToAttached(scenario, campaign);
+        translateTemplateObjectives(scenario, campaign);
         
         if(campaign.getCampaignOptions().useAbilities()) {
         	upgradeBotCrews(scenario);
@@ -463,6 +464,68 @@ public class AtBDynamicScenarioFactory {
                 scenario.botForces.remove(botIndex);
                 botIndex--;
             }
+        }
+    }
+    
+    private static void translateTemplateObjectives(AtBDynamicScenario scenario, Campaign campaign) {
+        scenario.getScenarioObjectives().clear();
+        
+        for(ScenarioObjective templateObjective : scenario.getTemplate().scenarioObjectives) {
+            ScenarioObjective actualObjective = new ScenarioObjective(templateObjective);
+            actualObjective.getAssociatedForceNames().clear();
+            
+            List<String> objectiveForceNames = new ArrayList<>();
+            List<String> objectiveUnitIDs = new ArrayList<>();
+                        
+            //for each of the objective's force names loop through all of the following: 
+            // bot forces
+            // assigned player forces
+            // assigned player units
+            // for each one, if the item is associated with a template that has the template objective's force name
+            // add it to the list of actual objective force names
+            // this needs to happen because template force names aren't the same as the generated force names
+            
+            for(int x = 0; x < scenario.getNumBots(); x++) {
+                BotForce botForce = scenario.getBotForce(x);
+                ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(botForce);
+                boolean botForceIsHostile = botForce.getTeam() == ForceAlignment.Opposing.ordinal() ||
+                        botForce.getTeam() == ForceAlignment.Third.ordinal();
+                
+                // if the bot force's force template's name is included in the objective's force names
+                // or if the bot force is hostile and we're including all enemy forces
+                if(forceTemplate != null && templateObjective.getAssociatedForceNames().contains(forceTemplate.getForceName()) ||
+                        (botForceIsHostile && templateObjective.getAssociatedForceNames().contains(ScenarioObjective.FORCE_SHORTCUT_ALL_ENEMY_FORCES))) {
+                    objectiveForceNames.add(botForce.getName());
+                }
+            }
+            
+            for(int forceID : scenario.getPlayerForceTemplates().keySet()) {
+                ScenarioForceTemplate playerForceTemplate = scenario.getPlayerForceTemplates().get(forceID);
+                
+                if(templateObjective.getAssociatedForceNames().contains(playerForceTemplate.getForceName()) ||
+                        templateObjective.getAssociatedForceNames().contains(ScenarioObjective.FORCE_SHORTCUT_ALL_PRIMARY_PLAYER_FORCES)) {
+                    objectiveForceNames.add(campaign.getForce(forceID).getName());
+                }
+            }
+            
+            for(UUID unitID : scenario.getPlayerUnitTemplates().keySet()) {
+                ScenarioForceTemplate playerForceTemplate = scenario.getPlayerForceTemplates().get(unitID);
+                
+                if(templateObjective.getAssociatedForceNames().contains(playerForceTemplate.getForceName()) ||
+                        templateObjective.getAssociatedForceNames().contains(ScenarioObjective.FORCE_SHORTCUT_ALL_PRIMARY_PLAYER_FORCES)) {
+                    objectiveUnitIDs.add(unitID.toString());
+                }
+            }
+            
+            for(String forceName : objectiveForceNames) {
+                actualObjective.addForce(forceName);
+            }
+            
+            for(String unitID : objectiveUnitIDs) {
+                actualObjective.addUnit(unitID);
+            }
+            
+            scenario.getScenarioObjectives().add(actualObjective);
         }
     }
     

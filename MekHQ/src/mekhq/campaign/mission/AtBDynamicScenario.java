@@ -336,4 +336,9 @@ public class AtBDynamicScenario extends AtBScenario {
     public void setTerrain() {
         AtBDynamicScenarioFactory.setTerrain(this);
     }
+    
+    @Override
+    public void refresh(Campaign campaign) {
+        
+    }
 }

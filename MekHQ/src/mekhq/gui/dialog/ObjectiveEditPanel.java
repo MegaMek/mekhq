@@ -20,7 +20,6 @@
 package mekhq.gui.dialog;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -53,8 +52,7 @@ public class ObjectiveEditPanel extends JDialog {
     private JTextArea txtShortDescription;
     private JLabel lblObjectiveType;
     private JComboBox<ObjectiveCriterion> cboObjectiveType;
-    private JLabel lblDirection;
-    private JComboBox<OffBoardDirection> cboDirection;
+    private JComboBox<String> cboDirection;
     private JTextField txtPercentage;
     private JComboBox<String> cboCountType;
     private JTextField txtForceName;
@@ -83,6 +81,30 @@ public class ObjectiveEditPanel extends JDialog {
         this.parent = parent;
         
         initGUI();
+        validate();
+        pack();
+        setLocationRelativeTo(parent);
+    }
+    
+    public ObjectiveEditPanel(ScenarioTemplate template, ScenarioObjective objective, ScenarioTemplateEditorDialog parent) {
+        currentScenarioTemplate = template;
+        this.objective = objective;
+        this.parent = parent;
+        
+        initGUI();
+        updateForceList();
+        
+        txtShortDescription.setText(objective.getDescription());
+        cboObjectiveType.setSelectedItem(objective.getObjectiveCriterion());
+        cboCountType.setSelectedItem(objective.getAmountType());
+        txtPercentage.setText(Integer.toString(objective.getAmount()));
+        setDirectionDropdownVisibility();
+        
+        cboDirection.setSelectedIndex(objective.getDestinationEdge().ordinal());
+        
+        updateEffectList(successEffects, objective.getSuccessEffects());
+        updateEffectList(failureEffects, objective.getFailureEffects());
+        
         validate();
         pack();
         setLocationRelativeTo(parent);
@@ -147,6 +169,7 @@ public class ObjectiveEditPanel extends JDialog {
         for(ObjectiveCriterion objectiveType : ObjectiveCriterion.values()) {
             cboObjectiveType.addItem(objectiveType);
         }
+        cboObjectiveType.addActionListener(e -> this.setDirectionDropdownVisibility());
         
         txtPercentage = new JTextField();
         txtPercentage.setColumns(4);
@@ -157,9 +180,11 @@ public class ObjectiveEditPanel extends JDialog {
         
         
         cboDirection = new JComboBox<>();
-        for(OffBoardDirection direction : OffBoardDirection.values()) {
-            cboDirection.addItem(direction);
+        cboDirection.addItem("Force Destination Edge");
+        for(int x = 1; x < OffBoardDirection.values().length; x++) {
+            cboDirection.addItem(OffBoardDirection.values()[x].toString());
         }
+        cboDirection.setVisible(false);
         
         objectivePanel.setLayout(new GridBagLayout());
         GridBagConstraints localGbc = new GridBagConstraints();
@@ -171,6 +196,8 @@ public class ObjectiveEditPanel extends JDialog {
         objectivePanel.add(lblObjectiveType, localGbc);
         localGbc.gridx++;
         objectivePanel.add(cboObjectiveType, localGbc);
+        localGbc.gridx++;
+        objectivePanel.add(cboDirection, localGbc);
         localGbc.gridx++;
         objectivePanel.add(txtPercentage, localGbc);
         localGbc.gridx++;
@@ -412,6 +439,18 @@ public class ObjectiveEditPanel extends JDialog {
         forceNames.setModel(forceModel);
     }
     
+    private void setDirectionDropdownVisibility() {
+        switch((ObjectiveCriterion) cboObjectiveType.getSelectedItem()) {
+        case PreventReachMapEdge:
+        case ReachMapEdge:
+            cboDirection.setVisible(true);
+            break;            
+        default:
+            cboDirection.setVisible(false);
+            break;
+        }
+    }
+    
     private void saveObjectiveAndClose() {
         int number = 0;
         
@@ -431,7 +470,17 @@ public class ObjectiveEditPanel extends JDialog {
             objective.setFixedAmount(number);
         }
         
-        currentScenarioTemplate.scenarioObjectives.add(objective);
+        if(cboDirection.isVisible() && cboDirection.getSelectedIndex() > 0) {
+            objective.setDestinationEdge(OffBoardDirection.getDirection(cboDirection.getSelectedIndex() - 1));
+        } else {
+            objective.setDestinationEdge(OffBoardDirection.NONE);
+        }
+             
+            
+        if(!currentScenarioTemplate.scenarioObjectives.contains(objective)) {
+            currentScenarioTemplate.scenarioObjectives.add(objective);
+        }
+        
         parent.updateObjectiveList();
         setVisible(false);
     }

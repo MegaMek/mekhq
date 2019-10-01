@@ -118,8 +118,8 @@ public class PirateFreeForAllBuiltInScenario extends AtBScenario {
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this,
                 50, false);
 
-        getObjectives().add(destroyHostiles);
-        getObjectives().add(destroyPirates);
-        getObjectives().add(keepFriendliesAlive);
+        getScenarioObjectives().add(destroyHostiles);
+        getScenarioObjectives().add(destroyPirates);
+        getScenarioObjectives().add(keepFriendliesAlive);
     }
 }

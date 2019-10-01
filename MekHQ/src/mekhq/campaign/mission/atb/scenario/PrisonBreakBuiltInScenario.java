@@ -117,8 +117,6 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
     public void setObjectives(Campaign campaign, AtBContract contract) {
         super.setObjectives(campaign, contract);
 
-        // ScenarioObjective destroyHostiles =
-        // CommonObjectiveFactory.getDestroyEnemies(contract, 66);
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this,
                 1, true);
         ScenarioObjective keepPrisonersAlive = CommonObjectiveFactory.getPreserveSpecificFriendlies(PRISONER_FORCE_ID,
@@ -133,8 +131,7 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
         keepPrisonersAlive.addDetail(String.format(defaultResourceBundle.getString("commonObjectives.bonusRolls.text"),
                 bonusEffect.howMuch));
 
-        // getObjectives().add(destroyHostiles);
-        getObjectives().add(keepFriendliesAlive);
-        getObjectives().add(keepPrisonersAlive);
+        getScenarioObjectives().add(keepFriendliesAlive);
+        getScenarioObjectives().add(keepPrisonersAlive);
     }
 }

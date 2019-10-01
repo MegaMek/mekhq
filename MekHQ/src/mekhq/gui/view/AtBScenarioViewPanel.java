@@ -393,7 +393,7 @@ public class AtBScenarioViewPanel extends JPanel {
         txtDetails.setEditable(false);
         
         StringBuilder objectiveBuilder = new StringBuilder();
-        for(ScenarioObjective objective : scenario.getObjectives()) {
+        for(ScenarioObjective objective : scenario.getScenarioObjectives()) {
             objectiveBuilder.append(objective.getDescription());
             objectiveBuilder.append("\n");
             
