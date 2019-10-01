@@ -182,7 +182,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
         gridBagConstraints.gridy = y++;
         gridBagConstraints.gridheight = 1;
         gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         add(panStats, gridBagConstraints);
@@ -243,7 +243,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
         gridBagConstraints.gridheight = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panStats.add(playerForceTree, gridBagConstraints);
@@ -261,7 +261,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
             gridBagConstraints.gridheight = 1;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.weighty = 1.0;
-            gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
+            gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
             gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
             panStats.add(tree, gridBagConstraints);
@@ -287,7 +287,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
             gridBagConstraints.gridheight = 1;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.weighty = 1.0;
-            gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
+            gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
             gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
             panStats.add(tree, gridBagConstraints);
@@ -431,7 +431,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panStats.add(txtDetails, gridBagConstraints);
@@ -447,7 +447,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panStats.add(txtDesc, gridBagConstraints);
