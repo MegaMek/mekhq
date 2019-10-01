@@ -1810,7 +1810,7 @@ public class CampaignXmlParser {
         Systems.reload(true);
 
         List<Planet.PlanetaryEvent> events;
-        Map<Integer, List<Planet.PlanetaryEvent>> eventsMap = new HashMap<Integer, List<Planet.PlanetaryEvent>>();; 
+        Map<Integer, List<Planet.PlanetaryEvent>> eventsMap = new HashMap<>();; 
 
         NodeList wList = wn.getChildNodes();
         for (int x = 0; x < wList.getLength(); x++) {

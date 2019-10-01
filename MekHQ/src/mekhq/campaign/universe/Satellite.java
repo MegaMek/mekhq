@@ -48,6 +48,6 @@ public class Satellite implements Serializable {
     private String name;
     
     public String getDescription() {
-    	return name + " (" + size + ")";
+        return name + " (" + size + ")";
     }
 }

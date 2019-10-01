@@ -417,7 +417,7 @@ public class PlanetarySystem implements Serializable {
     	if(primarySlot<1) {
     		//if no primary slot (uninhabited system)
     		//just return first planet
-    		return(1);
+    		return 1;
     	}
         return primarySlot;
     }
