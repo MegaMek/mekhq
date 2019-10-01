@@ -12,6 +12,7 @@ v0.47.1-SNAPSHOT
 + PR #1282: Fix erroneously high unit values
 + PR #1294: Improve ammo swaps and refits of Large Craft ammo bins
 + PR #1298: Restructuring of person view panel, double scroll issue, and other scrolling issues
++ PR #1300: Markdown for descriptions 
 
 v0.47.0 (2019-08-21 0300 UTC)
 + Issue #1171: Adds autosave feature (daily or weekly, and/or before missions).
