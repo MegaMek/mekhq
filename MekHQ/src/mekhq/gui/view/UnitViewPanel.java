@@ -133,7 +133,7 @@ public class UnitViewPanel extends ScrollablePanel {
 		txtReadout.setText("<div style='font: 12pt monospaced'>" + mview.getMechReadoutBasic() + "<br>" + mview.getMechReadoutLoadout() + "</div>");
 		txtReadout.setBorder(BorderFactory.createCompoundBorder(
 				BorderFactory.createTitledBorder("Technical Readout"),
-                BorderFactory.createEmptyBorder(5,5,5,5)));
+                BorderFactory.createEmptyBorder(0,2,2,2)));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 1;
@@ -154,7 +154,7 @@ public class UnitViewPanel extends ScrollablePanel {
 			txtFluff.setText(MarkdownRenderer.getRenderedHtml(unit.getHistory()));
 			txtFluff.setBorder(BorderFactory.createCompoundBorder(
 					BorderFactory.createTitledBorder("Unit History"),
-					BorderFactory.createEmptyBorder(5,5,5,5)));
+					BorderFactory.createEmptyBorder(0,2,2,2)));
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;
 			gridBagConstraints.gridy = 2;

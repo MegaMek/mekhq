@@ -273,7 +273,7 @@ public class PersonViewPanel extends ScrollablePanel {
             txtDesc.setText(MarkdownRenderer.getRenderedHtml(person.getBiography()));
             txtDesc.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createTitledBorder(resourceMap.getString("pnlDescription.title")), //$NON-NLS-1$
-                    BorderFactory.createEmptyBorder(5,5,5,5)));
+                    BorderFactory.createEmptyBorder(0,2,2,2)));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridy;

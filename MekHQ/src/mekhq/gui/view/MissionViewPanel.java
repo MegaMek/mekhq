@@ -158,7 +158,7 @@ public class MissionViewPanel extends ScrollablePanel {
 		gridBagConstraints.gridwidth = 2;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
-		gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+		gridBagConstraints.insets = new Insets(0, 0, 5, 0);
 		gridBagConstraints.fill = GridBagConstraints.BOTH;
 		gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 		pnlStats.add(txtDesc, gridBagConstraints);

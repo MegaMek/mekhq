@@ -135,7 +135,7 @@ public class ForceViewPanel extends ScrollablePanel {
 		txtDesc.setText(MarkdownRenderer.getRenderedHtml(force.getDescription()));
 		txtDesc.setBorder(BorderFactory.createCompoundBorder(
 				BorderFactory.createTitledBorder("Description"),
-				BorderFactory.createEmptyBorder(5,5,5,5)));
+				BorderFactory.createEmptyBorder(0,2,2,2)));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 2;

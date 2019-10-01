@@ -126,7 +126,7 @@ public class ScenarioViewPanel extends ScrollablePanel {
         txtReport.setText(MarkdownRenderer.getRenderedHtml(scenario.getReport()));
         txtReport.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder("After-Action Report"),
-                BorderFactory.createEmptyBorder(5,5,5,5)));
+                BorderFactory.createEmptyBorder(0,2,2,2)));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -169,7 +169,7 @@ public class ScenarioViewPanel extends ScrollablePanel {
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(txtDesc, gridBagConstraints);
