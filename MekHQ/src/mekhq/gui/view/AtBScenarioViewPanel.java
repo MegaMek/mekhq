@@ -78,7 +78,7 @@ import mekhq.gui.dialog.PrincessBehaviorDialog;
  * @author Neoancient
  *
  */
-public class AtBScenarioViewPanel extends JPanel {
+public class AtBScenarioViewPanel extends ScrollablePanel {
     private static final long serialVersionUID = -3104784717190158181L;
 
     private AtBScenario scenario;

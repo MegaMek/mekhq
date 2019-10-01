@@ -46,7 +46,7 @@ import mekhq.campaign.mission.Contract;
  * Against the Bot
  *
  */
-public class AtBContractViewPanel extends JPanel {
+public class AtBContractViewPanel extends ScrollablePanel {
     private static final long serialVersionUID = -9190665158803529105L;
     private Campaign campaign;
     private AtBContract contract;
