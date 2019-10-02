@@ -72,7 +72,7 @@ public class SocioIndustrialData {
         // TODO: Some way to encode "advanced" ultra-tech worlds (rating "AA" for technological sophistication)
         // TODO: Some way to encode "regressed" worlds
         // Note that rating "E" isn't used in official USILR codes, but we add them for completeness
-        StringBuilder sb = new StringBuilder("<html><body style='width: 50px; font: 10px sans-serif'>");
+        StringBuilder sb = new StringBuilder("<html>");
         switch(tech) {
         case -1:
             sb.append("Advanced: Ultra high-tech world<br>");
@@ -195,6 +195,6 @@ public class SocioIndustrialData {
             break;
         }
 
-        return sb.append("</body></html>").toString();
+        return sb.append("</html>").toString();
     }
 }

@@ -1672,7 +1672,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         if(first) {
                             first = false;
                         } else {
-                            quirkString += "\n";
+                            quirkString += "<br>";
                         }
                         quirkString += quirk.getDisplayableNameWithValue();
                     }
@@ -1682,7 +1682,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         if(quirkString.equals("")) {
             return null;
         }
-        return quirkString;
+        return "<html>" + quirkString + "</html>";
     }
 
     public void acquireQuirk(String name, Object value) {

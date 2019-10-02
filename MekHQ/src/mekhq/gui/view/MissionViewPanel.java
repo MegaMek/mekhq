@@ -40,9 +40,9 @@ public class MissionViewPanel extends ScrollablePanel {
 	
 	private JLabel lblStatus;
 	private JLabel lblLocation;
-	private JTextArea txtLocation;
+	private JLabel txtLocation;
 	private JLabel lblType;
-	private JTextArea txtType;
+	private JLabel txtType;
 	
 	public MissionViewPanel(Mission m) {
 		this.mission = m;
@@ -82,9 +82,9 @@ public class MissionViewPanel extends ScrollablePanel {
     	
     	lblStatus = new JLabel();
     	lblLocation = new JLabel();
-    	txtLocation = new JTextArea();
+    	txtLocation = new JLabel();
     	lblType = new JLabel();
-    	txtType = new JTextArea();
+    	txtType = new JLabel();
 
     	GridBagConstraints gridBagConstraints;
 		pnlStats.setLayout(new GridBagLayout());
@@ -113,9 +113,6 @@ public class MissionViewPanel extends ScrollablePanel {
 		
 		txtLocation.setName("txtLocation"); // NOI18N
         txtLocation.setText(mission.getSystemName(null));
-		txtLocation.setEditable(false);
-		txtLocation.setLineWrap(true);
-		txtLocation.setWrapStyleWord(true);
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 1;
@@ -136,9 +133,6 @@ public class MissionViewPanel extends ScrollablePanel {
 		
 		txtType.setName("txtType"); // NOI18N
 		txtType.setText(mission.getType());
-		txtType.setEditable(false);
-		txtType.setLineWrap(true);
-		txtType.setWrapStyleWord(true);
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 2;
