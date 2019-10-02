@@ -32,6 +32,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
@@ -39,6 +40,7 @@ import javax.swing.border.LineBorder;
 import megamek.common.OffBoardDirection;
 import mekhq.campaign.mission.ObjectiveEffect;
 import mekhq.campaign.mission.ObjectiveEffect.*;
+import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
 import mekhq.campaign.mission.ScenarioTemplate;
@@ -55,7 +57,7 @@ public class ObjectiveEditPanel extends JDialog {
     private JComboBox<String> cboDirection;
     private JTextField txtPercentage;
     private JComboBox<String> cboCountType;
-    private JTextField txtForceName;
+    private JComboBox<String> cboForceName;
     
     private JLabel lblMagnitude;
     private JTextField txtAmount;
@@ -111,12 +113,6 @@ public class ObjectiveEditPanel extends JDialog {
     }
     
     private void initGUI() {
-        lblShortDescription = new JLabel("Short Description:");
-                
-        txtShortDescription = new JTextArea();
-        txtShortDescription.setColumns(40);
-        txtShortDescription.setRows(5);
-        
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridwidth = 1;
         gbc.gridheight = 1;
@@ -126,9 +122,7 @@ public class ObjectiveEditPanel extends JDialog {
         
         getContentPane().setLayout(new GridBagLayout());
         
-        getContentPane().add(lblShortDescription, gbc);
-        gbc.gridx++;
-        getContentPane().add(txtShortDescription, gbc);
+        addDescriptionUI(gbc);
         gbc.gridx = 0;
         gbc.gridy++;
 
@@ -149,13 +143,57 @@ public class ObjectiveEditPanel extends JDialog {
         gbc.gridx = 0;
         gbc.gridy++;
         
+        addSaveCloseButtons(gbc);
+    }
+    
+    /**
+     * Handles the save/close buttons row.
+     */
+    private void addSaveCloseButtons(GridBagConstraints gbc) {
+        JPanel saveClosePanel = new JPanel();
+        saveClosePanel.setLayout(new GridBagLayout());
+        GridBagConstraints localGbc = new GridBagConstraints();
+        localGbc.gridx = 0;
+        localGbc.gridy = 0;
+        localGbc.insets = new Insets(0, 0, 0, 5);
+        
         JButton btnCancel = new JButton("Cancel");
         btnCancel.addActionListener(e -> this.setVisible(false));
         JButton btnSaveAndClose = new JButton("Save and Close");
         btnSaveAndClose.addActionListener(e -> this.saveObjectiveAndClose());
         
-        getContentPane().add(btnCancel);
-        getContentPane().add(btnSaveAndClose);
+        saveClosePanel.add(btnCancel);
+        saveClosePanel.add(btnSaveAndClose);
+        
+        getContentPane().add(saveClosePanel, gbc);
+    }
+    
+    /**
+     * Handles the "description" row.
+     */
+    private void addDescriptionUI(GridBagConstraints gbc) {
+        lblShortDescription = new JLabel("Short Description:");
+        
+        JScrollPane txtScroll = new JScrollPane();
+        txtShortDescription = new JTextArea();
+        txtShortDescription.setColumns(40);
+        txtShortDescription.setRows(5);
+        txtShortDescription.setLineWrap(true);
+        txtShortDescription.setWrapStyleWord(true);
+        txtScroll.setViewportView(txtShortDescription);
+        
+        JPanel descriptionPanel = new JPanel();
+        descriptionPanel.setLayout(new GridBagLayout());
+        GridBagConstraints localGbc = new GridBagConstraints();
+        localGbc.gridx = 0;
+        localGbc.gridy = 0;
+        localGbc.insets = new Insets(5, 0, 5, 5);
+        
+        descriptionPanel.add(lblShortDescription, localGbc);
+        localGbc.gridx++;
+        descriptionPanel.add(txtScroll, localGbc);
+        
+        getContentPane().add(descriptionPanel, gbc);
     }
     
     /**
@@ -258,8 +296,10 @@ public class ObjectiveEditPanel extends JDialog {
         
         JLabel forcesLabel = new JLabel("Force Names:");
         
-        txtForceName = new JTextField();
-        txtForceName.setColumns(40);
+        cboForceName = new JComboBox<String>();
+        for(ScenarioForceTemplate forceTemplate : currentScenarioTemplate.getAllScenarioForces()) {
+            cboForceName.addItem(forceTemplate.getForceName());
+        }
         
         forceNames = new JList<String>();
         forceNames.setVisibleRowCount(5);
@@ -279,7 +319,7 @@ public class ObjectiveEditPanel extends JDialog {
         
         forcePanel.add(forcesLabel, localGbc);
         localGbc.gridx++;
-        forcePanel.add(txtForceName, localGbc);
+        forcePanel.add(cboForceName, localGbc);
         localGbc.gridx++;
         forcePanel.add(btnAdd, localGbc);
         localGbc.gridx--;
@@ -414,7 +454,7 @@ public class ObjectiveEditPanel extends JDialog {
     }
     
     private void addForce() {
-        objective.addForce(txtForceName.getText());
+        objective.addForce(cboForceName.getSelectedItem().toString());
         
         updateForceList();        
         pack();

@@ -153,6 +153,7 @@ public class AtBDynamicScenarioFactory {
         scenario.setLanceCount(generatedLanceCount + (playerForceUnitCount / 4));
         setScenarioMapSize(scenario);
         setDeploymentZones(scenario);
+        setDestinationZones(scenario);
         
         applyScenarioModifiers(scenario, campaign, EventTiming.PostForceGeneration);
         
@@ -472,7 +473,8 @@ public class AtBDynamicScenarioFactory {
         
         for(ScenarioObjective templateObjective : scenario.getTemplate().scenarioObjectives) {
             ScenarioObjective actualObjective = new ScenarioObjective(templateObjective);
-            actualObjective.getAssociatedForceNames().clear();
+            actualObjective.clearAssociatedUnits();
+            actualObjective.clearForces();
             
             List<String> objectiveForceNames = new ArrayList<>();
             List<String> objectiveUnitIDs = new ArrayList<>();
@@ -1449,7 +1451,18 @@ public class AtBDynamicScenarioFactory {
         }
         
         generatedForce.setTeam(ScenarioForceTemplate.TEAM_IDS.get(forceAlignment.ordinal()));
-        setDestinationZone(generatedForce, forceTemplate);
+    }
+    
+    /**
+     * Worker method that calculates the destination zones for all the bot forces in a given scenario.
+     * Note that it is advisable to call it only after setDeploymentZones has been called on the scenario, 
+     * as otherwise you'll have "unpredictable" destination zones.
+     * @param scenario
+     */
+    private static void setDestinationZones(AtBDynamicScenario scenario) {
+        for(BotForce generatedForce : scenario.getBotForceTemplates().keySet()) {
+            setDestinationZone(generatedForce, scenario.getBotForceTemplates().get(generatedForce));
+        }
     }
     
     /**

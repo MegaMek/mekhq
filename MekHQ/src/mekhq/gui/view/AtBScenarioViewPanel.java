@@ -388,6 +388,21 @@ public class AtBScenarioViewPanel extends JPanel {
             });
         }
 
+        txtDesc.setName("txtDesc");
+        txtDesc.setText(scenario.getDescription());
+        txtDesc.setEditable(false);
+        txtDesc.setLineWrap(true);
+        txtDesc.setWrapStyleWord(true);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y++;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panStats.add(txtDesc, gridBagConstraints);
+        
         txtDetails.setLineWrap(true);
         txtDetails.setWrapStyleWord(true);
         txtDetails.setEditable(false);
@@ -442,22 +457,6 @@ public class AtBScenarioViewPanel extends JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panStats.add(txtDetails, gridBagConstraints);
-
-
-        txtDesc.setName("txtDesc");
-        txtDesc.setText(scenario.getDescription());
-        txtDesc.setEditable(false);
-        txtDesc.setLineWrap(true);
-        txtDesc.setWrapStyleWord(true);
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panStats.add(txtDesc, gridBagConstraints);
 
         if(scenario.getLoot().size() > 0) {
             gridBagConstraints.gridx = 0;

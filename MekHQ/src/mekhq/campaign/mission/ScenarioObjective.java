@@ -183,6 +183,10 @@ public class ScenarioObjective {
         associatedForceNames.remove(name);
     }
     
+    public void clearForces() {
+        associatedForceNames.clear();
+    }
+    
     public void addDetail(String detail) {
         additionalDetails.add(detail);
     }
@@ -204,7 +208,11 @@ public class ScenarioObjective {
     }
     
     public Set<String> getAssociatedUnitIDs() {
-        return associatedUnitIDs;
+        return new HashSet<String>(associatedUnitIDs);
+    }
+    
+    public void clearAssociatedUnits() {
+        associatedUnitIDs.clear();
     }
 
     public void addSuccessEffect(ObjectiveEffect successEffect) {
@@ -289,7 +297,12 @@ public class ScenarioObjective {
         if(objectiveCriterion == ObjectiveCriterion.ReachMapEdge || 
                 objectiveCriterion == ObjectiveCriterion.PreventReachMapEdge) {
             sb.append("\n");
-            sb.append(destinationEdge.toString());
+            
+            if(destinationEdge != OffBoardDirection.NONE) {
+                sb.append(destinationEdge.toString());
+            } else {
+                sb.append("opposite deployment");
+            }
             sb.append(" edge");
         }
         
