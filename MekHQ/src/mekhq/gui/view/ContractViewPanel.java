@@ -138,66 +138,71 @@ public class ContractViewPanel extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblStatus, gridBagConstraints);
         
+        if(null != contract.getSystemName(null) && !contract.getSystemName(null).isEmpty()) {
+            lblLocation.setName("lblLocation"); // NOI18N
+            lblLocation.setText(resourceMap.getString("lblLocation.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 1;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(lblLocation, gridBagConstraints);
 
-        lblLocation.setName("lblLocation"); // NOI18N
-        lblLocation.setText(resourceMap.getString("lblLocation.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblLocation, gridBagConstraints);
+            txtLocation.setName("txtLocation"); // NOI18N
+            txtLocation.setText(contract.getSystemName(null));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = 1;
+            gridBagConstraints.weightx = 0.5;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(txtLocation, gridBagConstraints);
+        }
         
-        txtLocation.setName("txtLocation"); // NOI18N
-        txtLocation.setText(contract.getSystemName(null));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtLocation, gridBagConstraints);
+        if(null != contract.getEmployer() && !contract.getEmployer().isEmpty()) {
+            lblEmployer.setName("lblEmployer"); // NOI18N
+            lblEmployer.setText(resourceMap.getString("lblEmployer.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 2;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(lblEmployer, gridBagConstraints);
+            
+            txtEmployer.setName("txtEmployer"); // NOI18N
+            txtEmployer.setText(contract.getEmployer());
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = 2;
+            gridBagConstraints.weightx = 0.5;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(txtEmployer, gridBagConstraints);
+        }
         
-        lblEmployer.setName("lblEmployer"); // NOI18N
-        lblEmployer.setText(resourceMap.getString("lblEmployer.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblEmployer, gridBagConstraints);
-        
-        txtEmployer.setName("txtEmployer"); // NOI18N
-        txtEmployer.setText(contract.getEmployer());
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtEmployer, gridBagConstraints);
-        
-        lblType.setName("lblType"); // NOI18N
-        lblType.setText(resourceMap.getString("lblType.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblType, gridBagConstraints);
-        
-        txtType.setName("txtType"); // NOI18N
-        txtType.setText(contract.getType());;
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtType, gridBagConstraints);
+        if(null != contract.getType() && !contract.getType().isEmpty()) {
+            lblType.setName("lblType"); // NOI18N
+            lblType.setText(resourceMap.getString("lblType.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 3;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(lblType, gridBagConstraints);
+            
+            txtType.setName("txtType"); // NOI18N
+            txtType.setText(contract.getType());;
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = 3;
+            gridBagConstraints.weightx = 0.5;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(txtType, gridBagConstraints);
+        }
         
         lblStartDate.setName("lblStartDate"); // NOI18N
         lblStartDate.setText(resourceMap.getString("lblStartDate.text"));
