@@ -117,7 +117,7 @@ public class PlanetViewPanel extends ScrollablePanel {
         panel.setLayout(new GridBagLayout());
         DateTime currentDate = Utilities.getDateTimeDay(campaign.getCalendar());
         
-        JLabel lblOwner = new JLabel("<html><i>" + planet.getFactionDesc(currentDate) + "</i></html>");
+        JLabel lblOwner = new JLabel("<html><nobr><i>" + planet.getFactionDesc(currentDate) + "</i></nobr></html>");
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
