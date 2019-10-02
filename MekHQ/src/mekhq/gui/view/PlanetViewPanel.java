@@ -23,7 +23,6 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.text.DefaultCaret;
 
@@ -34,6 +33,7 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.SocioIndustrialData;
+import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.campaign.universe.PlanetarySystem;
 
 /**
@@ -340,18 +340,18 @@ public class PlanetViewPanel extends ScrollablePanel {
         }
 
         if(null != planet.getDescription()) {
-            JTextArea txtDesc = new JTextArea(planet.getDescription());
-            ((DefaultCaret) txtDesc.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
+            JTextPane txtDesc = new JTextPane();
             txtDesc.setEditable(false);
-            txtDesc.setLineWrap(true);
-            txtDesc.setWrapStyleWord(true);
+            txtDesc.setContentType("text/html");
+            txtDesc.setText(MarkdownRenderer.getRenderedHtml(planet.getDescription()));
+            ((DefaultCaret) txtDesc.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = infoRow;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.weighty = 1.0;
-            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+            gridBagConstraints.insets = new Insets(0, 0, 5, 0);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             panel.add(txtDesc, gridBagConstraints);

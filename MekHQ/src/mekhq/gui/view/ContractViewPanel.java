@@ -28,22 +28,23 @@ import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.mission.Contract;
+import mekhq.gui.utilities.MarkdownRenderer;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class ContractViewPanel extends JPanel {
+public class ContractViewPanel extends ScrollablePanel {
     private static final long serialVersionUID = 7004741688464105277L;
 
     private Contract contract;
     
     private JPanel pnlStats;
-    private JTextArea txtDesc;
+    private JTextPane txtDesc;
     
     private JLabel lblStatus;
     private JLabel lblLocation;
@@ -78,7 +79,7 @@ public class ContractViewPanel extends JPanel {
         GridBagConstraints gridBagConstraints;
 
         pnlStats = new JPanel();
-        txtDesc = new JTextArea();
+        txtDesc = new JTextPane();
                
         setLayout(new GridBagLayout());
 
@@ -386,17 +387,16 @@ public class ContractViewPanel extends JPanel {
         pnlStats.add(lblSalvagePct2, gridBagConstraints);
         i++;
         txtDesc.setName("txtDesc");
-        txtDesc.setText(contract.getDescription());
         txtDesc.setEditable(false);
-        txtDesc.setLineWrap(true);
-        txtDesc.setWrapStyleWord(true);
+        txtDesc.setContentType("text/html");
+        txtDesc.setText(MarkdownRenderer.getRenderedHtml(contract.getDescription()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = i;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.insets = new Insets(0, 0, 5, 0);
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtDesc, gridBagConstraints);

@@ -32,12 +32,14 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 
 import megamek.common.util.EncodeControl;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
+import mekhq.gui.utilities.MarkdownRenderer;
 
 /**
  * @author Neoancient
@@ -52,7 +54,7 @@ public class AtBContractViewPanel extends ScrollablePanel {
     private AtBContract contract;
     
     private JPanel pnlStats;
-    private JTextArea txtDesc;
+    private JTextPane txtDesc;
     
     private JLabel lblStatus;
     private JLabel lblLocation;
@@ -100,7 +102,7 @@ public class AtBContractViewPanel extends ScrollablePanel {
         GridBagConstraints gridBagConstraints;
 
         pnlStats = new JPanel();
-        txtDesc = new JTextArea();
+        txtDesc = new JTextPane();
                
         setLayout(new GridBagLayout());
 
@@ -540,17 +542,16 @@ public class AtBContractViewPanel extends ScrollablePanel {
         pnlStats.add(txtScore, gridBagConstraints);
 
         txtDesc.setName("txtDesc");
-        txtDesc.setText(contract.getDescription());
         txtDesc.setEditable(false);
-        txtDesc.setLineWrap(true);
-        txtDesc.setWrapStyleWord(true);
+        txtDesc.setContentType("text/html");
+        txtDesc.setText(MarkdownRenderer.getRenderedHtml(contract.getDescription()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y++;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.insets = new Insets(0, 0, 5, 0);
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtDesc, gridBagConstraints);
