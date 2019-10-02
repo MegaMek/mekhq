@@ -44,9 +44,9 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.rating.IUnitRating;
-import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.Planets;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
+import mekhq.campaign.universe.Systems;
 import mekhq.gui.FactionComboBox;
 import mekhq.gui.model.SortedComboBoxModel;
 import mekhq.gui.preferences.JWindowPreference;
@@ -119,10 +119,10 @@ public class NewAtBContractDialog extends NewContractDialog {
         
         
         if(cbPlanets.getSelectedItem() != null) {
-            ((AtBContract) contract).setPlanetId((Planets.getInstance().getPlanetByName((String) cbPlanets.getSelectedItem(),
+            ((AtBContract) contract)
+                .setSystemId((Systems.getInstance().getSystemByName((String) cbPlanets.getSelectedItem(),
                     Utilities.getDateTimeDay(campaign.getCalendar()))).getId());
         }
-        
         
         spnMultiplier.setModel(new SpinnerNumberModel(contract.getMultiplier(), 0.1, 10.0, 0.1));
         updatePaymentMultiplier();
@@ -256,7 +256,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(lblPlanetName, gbc);
         
-        suggestPlanet = new JSuggestField(this, campaign.getPlanetNames());       
+        suggestPlanet = new JSuggestField(this, campaign.getSystemNames());       
         gbc.gridx = 1;
         gbc.gridy = y++;
         gbc.gridwidth = 2;
@@ -490,26 +490,26 @@ public class NewAtBContractDialog extends NewContractDialog {
 			return;
 		}
 		AtBContract contract = (AtBContract)this.contract;
-		HashSet<String> planets = new HashSet<String>();
+		HashSet<String> systems = new HashSet<String>();
 		if (contract.getMissionType() >= AtBContract.MT_PLANETARYASSAULT ||
 				getCurrentEnemyCode().equals("REB") ||
 				getCurrentEnemyCode().equals("PIR")) {
-			for (Planet p : RandomFactionGenerator.getInstance().
+			for (PlanetarySystem p : RandomFactionGenerator.getInstance().
 					getMissionTargetList(getCurrentEmployerCode(), getCurrentEnemyCode())) {
-				planets.add(p.getName(Utilities.getDateTimeDay(campaign.getCalendar())));
+			    systems.add(p.getName(Utilities.getDateTimeDay(campaign.getCalendar())));
 			}
 		}
 		if ((contract.getMissionType() < AtBContract.MT_PLANETARYASSAULT ||
 				contract.getMissionType() == AtBContract.MT_RELIEFDUTY) &&
 				!contract.getEnemyCode().equals("REB")) {
-			for (Planet p : RandomFactionGenerator.getInstance().
+			for (PlanetarySystem p : RandomFactionGenerator.getInstance().
 					getMissionTargetList(getCurrentEnemyCode(), getCurrentEmployerCode())) {
-				planets.add(p.getName(Utilities.getDateTimeDay(campaign.getCalendar())));
+				systems.add(p.getName(Utilities.getDateTimeDay(campaign.getCalendar())));
 			}
 		}
 		cbPlanets.removeAllItems();
-		for (String planet : planets) {
-			cbPlanets.addItem(planet);
+		for (String system : systems) {
+			cbPlanets.addItem(system);
 		}
 	}
 
@@ -533,7 +533,7 @@ public class NewAtBContractDialog extends NewContractDialog {
 		if (chkShowAllPlanets.isSelected()) {
 	    	//contract.setPlanetName(suggestPlanet.getText());
 		} else {
-            contract.setPlanetId((Planets.getInstance().getPlanetByName((String) cbPlanets.getSelectedItem(),
+            contract.setSystemId((Systems.getInstance().getSystemByName((String) cbPlanets.getSelectedItem(),
                     Utilities.getDateTimeDay(campaign.getCalendar()))).getId());
 		}
     	contract.setEmployerCode(getCurrentEmployerCode(), campaign.getGameYear());
@@ -564,7 +564,7 @@ public class NewAtBContractDialog extends NewContractDialog {
 		boolean needUpdatePayment = false;
     	AtBContract contract = (AtBContract)this.contract;
         if (cbPlanets.equals(source) && null != cbPlanets.getSelectedItem()) {
-            contract.setPlanetId((Planets.getInstance().getPlanetByName((String) cbPlanets.getSelectedItem(),
+            contract.setSystemId((Systems.getInstance().getSystemByName((String) cbPlanets.getSelectedItem(),
                     Utilities.getDateTimeDay(campaign.getCalendar()))).getId());
             //reset the start date as null so we recalculate travel time
             contract.setStartDate(null);

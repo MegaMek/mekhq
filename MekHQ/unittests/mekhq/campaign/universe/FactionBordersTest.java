@@ -49,33 +49,33 @@ public class FactionBordersTest {
         return faction;
     }
     
-    private Planet createPlanet(final double x, final double y, Faction owner) {
-        Planet planet = mock(Planet.class);
-        when(planet.getX()).thenReturn(x);
-        when(planet.getY()).thenReturn(y);
+    private PlanetarySystem createSystem(final double x, final double y, Faction owner) {
+        PlanetarySystem system = mock(PlanetarySystem.class);
+        when(system.getX()).thenReturn(x);
+        when(system.getY()).thenReturn(y);
         String id = String.format("%f, %f", x, y);
-        when(planet.getId()).thenReturn(id);
-        when(planet.getFactionSet(any())).thenReturn(Collections.singleton(owner));
-        return planet;
+        when(system.getId()).thenReturn(id);
+        when(system.getFactionSet(any())).thenReturn(Collections.singleton(owner));
+        return system;
     }
 
     @Test
     public void testGetBorderPlanetsFactionBorders() {
         DateTime when = new DateTime();
-        List<Planet> planets = new ArrayList<>();
+        List<PlanetarySystem> systems = new ArrayList<>();
         for (int x = -3; x <= 3; x += 2) {
             for (int y = -2; y <= 2; y += 2) {
-                planets.add(createPlanet(x, y, factionThem));
+                systems.add(createSystem(x, y, factionThem));
             }
         }
-        planets.add(createPlanet(0, 0, factionUs));
-        FactionBorders us = new FactionBorders(factionUs, when, planets);
-        FactionBorders them = new FactionBorders(factionThem, when, planets);
+        systems.add(createSystem(0, 0, factionUs));
+        FactionBorders us = new FactionBorders(factionUs, when, systems);
+        FactionBorders them = new FactionBorders(factionThem, when, systems);
         
-        List<Planet> border = us.getBorderPlanets(them, 1.1);
+        List<PlanetarySystem> border = us.getBorderSystems(them, 1.1);
         
         assertEquals(border.size(), 2);
-        for (Planet p : border) {
+        for (PlanetarySystem p : border) {
             assertEquals(Math.abs(p.getX()), 1, RegionPerimeter.EPSILON);
             assertEquals(p.getY(), 0, RegionPerimeter.EPSILON);
         }

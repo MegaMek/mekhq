@@ -25,9 +25,9 @@ import java.util.Map;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import megamek.common.EquipmentType;
-import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.SocioIndustrialData;
 
-public class SocioIndustrialDataAdapter extends XmlAdapter<String, Planet.SocioIndustrialData> {
+public class SocioIndustrialDataAdapter extends XmlAdapter<String, SocioIndustrialData> {
     private final static Map<String, Integer> stringToEquipmentTypeMap = new HashMap<String, Integer>(6);
     private final static Map<Integer, String> equipmentTypeToStringMap = new HashMap<Integer, String>(6);
     static {
@@ -35,16 +35,15 @@ public class SocioIndustrialDataAdapter extends XmlAdapter<String, Planet.SocioI
         stringToEquipmentTypeMap.put("B", EquipmentType.RATING_B); //$NON-NLS-1$
         stringToEquipmentTypeMap.put("C", EquipmentType.RATING_C); //$NON-NLS-1$
         stringToEquipmentTypeMap.put("D", EquipmentType.RATING_D); //$NON-NLS-1$
-        stringToEquipmentTypeMap.put("E", EquipmentType.RATING_E); //$NON-NLS-1$
         stringToEquipmentTypeMap.put("F", EquipmentType.RATING_F); //$NON-NLS-1$
+        stringToEquipmentTypeMap.put("X", EquipmentType.RATING_X); //$NON-NLS-1$
         equipmentTypeToStringMap.put(-1, "ADV"); //$NON-NLS-1$
         equipmentTypeToStringMap.put(EquipmentType.RATING_A, "A"); //$NON-NLS-1$
         equipmentTypeToStringMap.put(EquipmentType.RATING_B, "B"); //$NON-NLS-1$
         equipmentTypeToStringMap.put(EquipmentType.RATING_C, "C"); //$NON-NLS-1$
         equipmentTypeToStringMap.put(EquipmentType.RATING_D, "D"); //$NON-NLS-1$
-        equipmentTypeToStringMap.put(EquipmentType.RATING_E, "E"); //$NON-NLS-1$
         equipmentTypeToStringMap.put(EquipmentType.RATING_F, "F"); //$NON-NLS-1$
-        equipmentTypeToStringMap.put(EquipmentType.RATING_X, "R"); //$NON-NLS-1$
+        equipmentTypeToStringMap.put(EquipmentType.RATING_X, "X"); //$NON-NLS-1$
     }
     private final String SEPARATOR = "-"; //$NON-NLS-1$
     
@@ -59,9 +58,9 @@ public class SocioIndustrialDataAdapter extends XmlAdapter<String, Planet.SocioI
     }
     
     @Override
-    public Planet.SocioIndustrialData unmarshal(String v) throws Exception {
+    public SocioIndustrialData unmarshal(String v) throws Exception {
         String[] socio = v.split(SEPARATOR);
-        Planet.SocioIndustrialData result = new Planet.SocioIndustrialData();
+        SocioIndustrialData result = new SocioIndustrialData();
         if(socio.length >= 5) {
             result.tech = convertRatingToCode(socio[0]);
             if(result.tech == EquipmentType.RATING_C) {
@@ -82,7 +81,7 @@ public class SocioIndustrialDataAdapter extends XmlAdapter<String, Planet.SocioI
     }
 
     @Override
-    public String marshal(Planet.SocioIndustrialData v) throws Exception {
+    public String marshal(SocioIndustrialData v) throws Exception {
         StringBuilder sb = new StringBuilder();
         sb.append(convertCodeToRating(v.tech)).append(SEPARATOR);
         sb.append(convertCodeToRating(v.industry)).append(SEPARATOR);

@@ -54,8 +54,8 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.universe.Planets;
 import mekhq.gui.preferences.JWindowPreference;
+import mekhq.campaign.universe.Systems;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.view.ContractPaymentBreakdown;
 import mekhq.preferences.PreferencesNode;
@@ -225,7 +225,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(lblPlanetName, gridBagConstraints);
         
-        suggestPlanet = new JSuggestField(this, campaign.getPlanetNames());
+        suggestPlanet = new JSuggestField(this, campaign.getSystemNames());
         /*suggestPlanet.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				contract.setPlanetName(suggestPlanet.getText());
@@ -776,7 +776,7 @@ public class NewContractDialog extends javax.swing.JDialog {
 
     protected void doUpdateContract(Object source) {
         if (suggestPlanet.equals(source)) {
-            contract.setPlanetId((Planets.getInstance().getPlanetByName(suggestPlanet.getText(),
+            contract.setSystemId((Systems.getInstance().getSystemByName(suggestPlanet.getText(),
                     Utilities.getDateTimeDay(campaign.getCalendar()))).getId());
             //reset the start date as null so we recalculate travel time
             contract.setStartDate(null);
