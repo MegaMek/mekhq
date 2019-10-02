@@ -50,23 +50,23 @@ public class RandomFactionGeneratorTest {
         peripheryFaction = createTestFaction("Periphery", true, false);
         innerISFaction = createTestFaction("IS2", false, false);
         
-        List<Planet> planets = new ArrayList<>();
+        List<PlanetarySystem> systems = new ArrayList<>();
         for (int x = -2; x < 3; x++) {
             for (int y = -2; y < 3; y++) {
                 if (x < 0) {
-                    planets.add(createTestPlanet(x, y, isFaction));
+                    systems.add(createTestSystem(x, y, isFaction));
                 }
                 if (x > 0) {
-                    planets.add(createTestPlanet(x, y, clanFaction));
+                    systems.add(createTestSystem(x, y, clanFaction));
                 }
-                planets.add(createTestPlanet(x, y + 10, peripheryFaction));
+                systems.add(createTestSystem(x, y + 10, peripheryFaction));
             }
         }
         
         FactionBorderTracker tracker = new FactionBorderTracker(0, 0, -1) {
             @Override
-            protected Collection<Planet> getPlanetList() {
-                return planets;
+            protected Collection<PlanetarySystem> getSystemList() {
+                return systems;
             }
         };
         tracker.setDefaultBorderSize(2.5, 10, 2.5);
@@ -81,8 +81,8 @@ public class RandomFactionGeneratorTest {
         return f;
     }
     
-    private static Planet createTestPlanet(final double x, final double y, final Faction f) {
-        Planet p = mock(Planet.class);
+    private static PlanetarySystem createTestSystem(final double x, final double y, final Faction f) {
+        PlanetarySystem p = mock(PlanetarySystem.class);
         when(p.getX()).thenReturn(x);
         when(p.getY()).thenReturn(y);
         when(p.getFactionSet(any())).thenReturn(Collections.singleton(f));

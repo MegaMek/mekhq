@@ -17,7 +17,7 @@ import megamek.common.util.EncodeControl;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
-import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
 
 /**
  * A custom panel that gets filled in with goodies from a JumpPath record
@@ -97,14 +97,14 @@ public class JumpPathViewPanel extends ScrollablePanel {
         int i = 0;
         javax.swing.JLabel lblPlanet;
         DateTime currentDate = Utilities.getDateTimeDay(campaign.getCalendar());
-        for(Planet planet : path.getPlanets()) {
-            lblPlanet = new javax.swing.JLabel(planet.getPrintableName(currentDate) + " (" + planet.getRechargeTimeText(currentDate) + ")");
+        for(PlanetarySystem system : path.getSystems()) {
+            lblPlanet = new javax.swing.JLabel(system.getPrintableName(currentDate) + " (" + system.getRechargeTimeText(currentDate) + ")");
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
             gridBagConstraints.gridwidth = 1;
             gridBagConstraints.weightx = 1.0;
-            if(i >= (path.getPlanets().size()-1)) {
+            if(i >= (path.getSystems().size()-1)) {
                 gridBagConstraints.weighty = 1.0;
             }        
             gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
@@ -133,8 +133,8 @@ public class JumpPathViewPanel extends ScrollablePanel {
         txtCost = new javax.swing.JTextArea();
         
         DateTime currentDate = Utilities.getDateTimeDay(campaign.getCalendar());
-        String startName = (path.getFirstPlanet() == null) ? "?" : path.getFirstPlanet().getPrintableName(currentDate);
-        String endName = (path.getLastPlanet() == null) ? "?" : path.getLastPlanet().getPrintableName(currentDate);
+        String startName = (path.getFirstSystem() == null) ? "?" : path.getFirstSystem().getPrintableName(currentDate);
+        String endName = (path.getLastSystem() == null) ? "?" : path.getLastSystem().getPrintableName(currentDate);
         
         java.awt.GridBagConstraints gridBagConstraints;
         pnlStats.setLayout(new java.awt.GridBagLayout());

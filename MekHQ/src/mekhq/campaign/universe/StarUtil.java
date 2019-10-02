@@ -34,7 +34,7 @@ import java.util.TreeSet;
 import megamek.common.EquipmentType;
 import mekhq.MekHQ;
 import mekhq.Utilities;
-import mekhq.campaign.universe.Planet.SpectralDefinition;
+import mekhq.campaign.universe.PlanetarySystem.SpectralDefinition;
 
 /** Static method only helper class for stars */
 public final class StarUtil {
@@ -143,17 +143,17 @@ public final class StarUtil {
 
     // Slightly modified IO Beta table
     private static final int[] REALISTIC_SPECTRAL_TYPE = {
-            Planet.SPECTRAL_F, Planet.SPECTRAL_M, Planet.SPECTRAL_G, Planet.SPECTRAL_K, Planet.SPECTRAL_M,
-            Planet.SPECTRAL_M, Planet.SPECTRAL_M, Planet.SPECTRAL_M, Planet.SPECTRAL_M, Planet.SPECTRAL_L, -1};
+            PlanetarySystem.SPECTRAL_F, PlanetarySystem.SPECTRAL_M, PlanetarySystem.SPECTRAL_G, PlanetarySystem.SPECTRAL_K, PlanetarySystem.SPECTRAL_M,
+            PlanetarySystem.SPECTRAL_M, PlanetarySystem.SPECTRAL_M, PlanetarySystem.SPECTRAL_M, PlanetarySystem.SPECTRAL_M, PlanetarySystem.SPECTRAL_L, -1};
 
     private static final int[] HOT_SPECTRAL_TYPE = {
-        Planet.SPECTRAL_B, Planet.SPECTRAL_B, Planet.SPECTRAL_A, Planet.SPECTRAL_A, Planet.SPECTRAL_A,
-        Planet.SPECTRAL_F, Planet.SPECTRAL_F, Planet.SPECTRAL_F, Planet.SPECTRAL_F, Planet.SPECTRAL_F, Planet.SPECTRAL_F};
-
+            PlanetarySystem.SPECTRAL_B, PlanetarySystem.SPECTRAL_B, PlanetarySystem.SPECTRAL_A, PlanetarySystem.SPECTRAL_A, PlanetarySystem.SPECTRAL_A,
+            PlanetarySystem.SPECTRAL_F, PlanetarySystem.SPECTRAL_F, PlanetarySystem.SPECTRAL_F, PlanetarySystem.SPECTRAL_F, PlanetarySystem.SPECTRAL_F, PlanetarySystem.SPECTRAL_F};
+    
     private static final int[] LIFEFRIENDLY_SPECTRAL_TYPE = new int[]{
-        Planet.SPECTRAL_M, Planet.SPECTRAL_M, Planet.SPECTRAL_M, Planet.SPECTRAL_K, Planet.SPECTRAL_K,
-        Planet.SPECTRAL_G, Planet.SPECTRAL_G, Planet.SPECTRAL_F, Planet.SPECTRAL_F, Planet.SPECTRAL_F, Planet.SPECTRAL_F};
-
+            PlanetarySystem.SPECTRAL_M, PlanetarySystem.SPECTRAL_M, PlanetarySystem.SPECTRAL_M, PlanetarySystem.SPECTRAL_K, PlanetarySystem.SPECTRAL_K,
+            PlanetarySystem.SPECTRAL_G, PlanetarySystem.SPECTRAL_G, PlanetarySystem.SPECTRAL_F, PlanetarySystem.SPECTRAL_F, PlanetarySystem.SPECTRAL_F, PlanetarySystem.SPECTRAL_F};
+    
     private static final double[] MIN_LIFE_ZONE = {
         Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
         Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
@@ -234,7 +234,7 @@ public final class StarUtil {
         }
         // Slightly weighted towards the higher numbers
         int subType = (int)Math.floor(Utilities.lerp(0.0, 10.0, Math.pow(rnd.nextDouble(), 0.8)));
-        return getSpectralType(spectralType, subType * 1.0, Planet.LUM_V);
+        return getSpectralType(spectralType, subType * 1.0, PlanetarySystem.LUM_V);
     }
 
     public static double generateTemperature(Random rnd, int spectral, double subtype) {
@@ -366,15 +366,15 @@ public final class StarUtil {
     }
 
     public static double getSolarRechargeTime(int spectralClass, double subtype) {
-        if(spectralClass == Planet.SPECTRAL_Q) {
+        if(spectralClass == PlanetarySystem.SPECTRAL_Q) {
             // Not a star, can't recharge here
             return Double.POSITIVE_INFINITY;
         }
         int intSubtype = (int)subtype;
-        if(spectralClass == Planet.SPECTRAL_T) {
+        if(spectralClass == PlanetarySystem.SPECTRAL_T) {
             // months!
             return Utilities.lerp(RECHARGE_HOURS_CLASS_T[intSubtype], RECHARGE_HOURS_CLASS_T[intSubtype + 1], subtype - intSubtype);
-        } else if(spectralClass == Planet.SPECTRAL_L) {
+        } else if(spectralClass == PlanetarySystem.SPECTRAL_L) {
             // weeks!
             return Utilities.lerp(RECHARGE_HOURS_CLASS_L[intSubtype], RECHARGE_HOURS_CLASS_L[intSubtype + 1], subtype - intSubtype);
         } else {
@@ -384,32 +384,32 @@ public final class StarUtil {
 
     public static int getSpectralClassFrom(String spectral) {
         switch(spectral.trim().toUpperCase(Locale.ROOT)) {
-            case "O": return Planet.SPECTRAL_O; //$NON-NLS-1$
-            case "B": return Planet.SPECTRAL_B; //$NON-NLS-1$
-            case "A": return Planet.SPECTRAL_A; //$NON-NLS-1$
-            case "F": return Planet.SPECTRAL_F; //$NON-NLS-1$
-            case "G": return Planet.SPECTRAL_G; //$NON-NLS-1$
-            case "K": return Planet.SPECTRAL_K; //$NON-NLS-1$
-            case "M": return Planet.SPECTRAL_M; //$NON-NLS-1$
-            case "L": return Planet.SPECTRAL_L; //$NON-NLS-1$
-            case "T": return Planet.SPECTRAL_T; //$NON-NLS-1$
-            case "Y": return Planet.SPECTRAL_Y; //$NON-NLS-1$
+            case "O": return PlanetarySystem.SPECTRAL_O; //$NON-NLS-1$
+            case "B": return PlanetarySystem.SPECTRAL_B; //$NON-NLS-1$
+            case "A": return PlanetarySystem.SPECTRAL_A; //$NON-NLS-1$
+            case "F": return PlanetarySystem.SPECTRAL_F; //$NON-NLS-1$
+            case "G": return PlanetarySystem.SPECTRAL_G; //$NON-NLS-1$
+            case "K": return PlanetarySystem.SPECTRAL_K; //$NON-NLS-1$
+            case "M": return PlanetarySystem.SPECTRAL_M; //$NON-NLS-1$
+            case "L": return PlanetarySystem.SPECTRAL_L; //$NON-NLS-1$
+            case "T": return PlanetarySystem.SPECTRAL_T; //$NON-NLS-1$
+            case "Y": return PlanetarySystem.SPECTRAL_Y; //$NON-NLS-1$
             default: return -1;
         }
     }
 
     public static String getSpectralClassName(int spectral) {
         switch(spectral) {
-            case Planet.SPECTRAL_O: return "O"; //$NON-NLS-1$
-            case Planet.SPECTRAL_B: return "B"; //$NON-NLS-1$
-            case Planet.SPECTRAL_A: return "A"; //$NON-NLS-1$
-            case Planet.SPECTRAL_F: return "F"; //$NON-NLS-1$
-            case Planet.SPECTRAL_G: return "G"; //$NON-NLS-1$
-            case Planet.SPECTRAL_K: return "K"; //$NON-NLS-1$
-            case Planet.SPECTRAL_M: return "M"; //$NON-NLS-1$
-            case Planet.SPECTRAL_L: return "L"; //$NON-NLS-1$
-            case Planet.SPECTRAL_T: return "T"; //$NON-NLS-1$
-            case Planet.SPECTRAL_Y: return "Y"; //$NON-NLS-1$
+            case PlanetarySystem.SPECTRAL_O: return "O"; //$NON-NLS-1$
+            case PlanetarySystem.SPECTRAL_B: return "B"; //$NON-NLS-1$
+            case PlanetarySystem.SPECTRAL_A: return "A"; //$NON-NLS-1$
+            case PlanetarySystem.SPECTRAL_F: return "F"; //$NON-NLS-1$
+            case PlanetarySystem.SPECTRAL_G: return "G"; //$NON-NLS-1$
+            case PlanetarySystem.SPECTRAL_K: return "K"; //$NON-NLS-1$
+            case PlanetarySystem.SPECTRAL_M: return "M"; //$NON-NLS-1$
+            case PlanetarySystem.SPECTRAL_L: return "L"; //$NON-NLS-1$
+            case PlanetarySystem.SPECTRAL_T: return "T"; //$NON-NLS-1$
+            case PlanetarySystem.SPECTRAL_Y: return "Y"; //$NON-NLS-1$
             default: return "?"; //$NON-NLS-1$
         }
     }
@@ -419,8 +419,8 @@ public final class StarUtil {
         if( null == spectralClass || null == subtype ) {
             return null;
         }
-
-        if(spectralClass == Planet.SPECTRAL_Q) {
+        
+        if(spectralClass == PlanetarySystem.SPECTRAL_Q) {
             return (null != luminosity) ? "Q" + luminosity : "Q"; //$NON-NLS-1$ //$NON-NLS-2$
         }
 
@@ -432,23 +432,22 @@ public final class StarUtil {
         String subtypeFormat = "%.2f"; //$NON-NLS-1$
         if( subtypeValue % 100 == 0 ) { subtypeFormat = "%.0f"; } //$NON-NLS-1$
         else if( subtypeValue % 10 == 0 ) { subtypeFormat = "%.1f"; } //$NON-NLS-1$
-
-        if (null != luminosity) {
-            if (luminosity.equals(Planet.LUM_VI)) {
-                // subdwarfs
-                return "sd" + getSpectralClassName(spectralClass) + String.format(subtypeFormat, subtypeValue / 100.0); //$NON-NLS-1$
-            } else if(luminosity.equals(Planet.LUM_VI_PLUS)) {
-                // extreme subdwarfs
-                return "esd" + getSpectralClassName(spectralClass) + String.format(subtypeFormat, subtypeValue / 100.0); //$NON-NLS-1$
-            } else if(luminosity.equals(Planet.LUM_VII)) {
-                // white dwarfs
-                return String.format(Locale.ROOT, "D" + subtypeFormat, subtypeValue / 100.0); //$NON-NLS-1$
-            }
+        
+        if( null != luminosity && luminosity.equals(PlanetarySystem.LUM_VI) ) {
+            // subdwarfs
+            return "sd" + getSpectralClassName(spectralClass) + String.format(subtypeFormat, subtypeValue / 100.0); //$NON-NLS-1$
+        } else if( null != luminosity && luminosity.equals(PlanetarySystem.LUM_VI_PLUS) ) {
+            // extreme subdwarfs
+            return "esd" + getSpectralClassName(spectralClass) + String.format(subtypeFormat, subtypeValue / 100.0); //$NON-NLS-1$
+        } else if( null != luminosity && luminosity.equals(PlanetarySystem.LUM_VII) ) {
+            // white dwarfs
+            return String.format(Locale.ROOT, "D" + subtypeFormat, subtypeValue / 100.0); //$NON-NLS-1$
+        } else {
+            // main class
+            return String.format(Locale.ROOT, "%s" + subtypeFormat + "%s", //$NON-NLS-1$ //$NON-NLS-2$
+                    getSpectralClassName(spectralClass),
+                    subtypeValue / 100.0, (null != luminosity ? luminosity : PlanetarySystem.LUM_V));
         }
-        // main class
-        return String.format(Locale.ROOT, "%s" + subtypeFormat + "%s", //$NON-NLS-1$ //$NON-NLS-2$
-                getSpectralClassName(spectralClass),
-                subtypeValue / 100.0, (null != luminosity ? luminosity : Planet.LUM_V));
     }
 
     /** Parser for spectral type strings */
@@ -465,18 +464,18 @@ public final class StarUtil {
 
         // Non-stellar objects
         if(type.startsWith("Q")) {
-            return new SpectralDefinition(type, Planet.SPECTRAL_Q, 0.0, type.substring(1));
+            return new SpectralDefinition(type, PlanetarySystem.SPECTRAL_Q, 0.0, type.substring(1));
         }
 
         // Subdwarf prefix parsing
         if( type.length() > 2 && type.startsWith("sd") ) { //$NON-NLS-1$
             // subdwarf
-            parsedLuminosity = Planet.LUM_VI;
+            parsedLuminosity = PlanetarySystem.LUM_VI;
             type = type.substring(2);
         }
         else if( type.length() > 3 && type.startsWith("esd") ) { //$NON-NLS-1$
             // extreme subdwarf
-            parsedLuminosity = Planet.LUM_VI_PLUS;
+            parsedLuminosity = PlanetarySystem.LUM_VI_PLUS;
             type = type.substring(3);
         }
 
@@ -488,7 +487,7 @@ public final class StarUtil {
 
         if( mainClass.equals("D") && type.length() > 1 && null == parsedLuminosity /* prevent "sdD..." */ ) { //$NON-NLS-1$
             // white dwarf
-            parsedLuminosity = Planet.LUM_VII;
+            parsedLuminosity = PlanetarySystem.LUM_VII;
             String whiteDwarfVariant = type.substring(1).replaceAll("([A-Z]*).*?$", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
             if( !VALID_WHITE_DWARF_SUBCLASSES.contains(whiteDwarfVariant) ) {
                 // Don't just make up D-class variants, that's silly ...
@@ -501,7 +500,7 @@ public final class StarUtil {
                 return null;
             }
             // We're done here, white dwarfs have a special spectral class
-            parsedSpectralClass = Planet.SPECTRAL_D;
+            parsedSpectralClass = PlanetarySystem.SPECTRAL_D;
         } else if( getSpectralClassFrom(mainClass) >= 0 ) {
             parsedSpectralClass = getSpectralClassFrom(mainClass);
             String subTypeString = type.length() > 1 ? type.substring(1).replaceAll("^([0-9\\.]*).*?$", "$1") : "5" /* default */; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -513,10 +512,13 @@ public final class StarUtil {
             if( type.length() > 1 + subTypeString.length() && null == parsedLuminosity ) {
                 // We might have a luminosity, try to parse it
                 parsedLuminosity = validateLuminosity(type.substring(1 + subTypeString.length()));
-                if( null != parsedLuminosity && parsedLuminosity.equals(Planet.LUM_VII) ) {
+                //Taharqa: This was code from akjosch, trying to be all realistic. However, the
+                //code in Campaign Ops conflicts with this which causes null values and NPE bugs, so 
+                //I don't really care how white dwarfs really work
+                //if( null != parsedLuminosity && parsedLuminosity.equals(PlanetarySystem.LUM_VII) ) {
                     // That's not how white dwarfs work
-                    return null;
-                }
+                //    return null;
+                //}
             }
         }
 
@@ -533,31 +535,31 @@ public final class StarUtil {
      */
     protected static String validateLuminosity(String lc) {
         // The order of entries here is important
-        if( lc.startsWith("I/II") ) { return Planet.LUM_II_EVOLVED; } //$NON-NLS-1$
-        if( lc.startsWith("I-II") ) { return Planet.LUM_II_EVOLVED; } //$NON-NLS-1$
-        if( lc.startsWith("Ib/II") ) { return Planet.LUM_II_EVOLVED; } //$NON-NLS-1$
-        if( lc.startsWith("Ib-II") ) { return Planet.LUM_II_EVOLVED; } //$NON-NLS-1$
-        if( lc.startsWith("II/III") ) { return Planet.LUM_III_EVOLVED; } //$NON-NLS-1$
-        if( lc.startsWith("II-III") ) { return Planet.LUM_III_EVOLVED; } //$NON-NLS-1$
-        if( lc.startsWith("III/IV") ) { return Planet.LUM_IV_EVOLVED; } //$NON-NLS-1$
-        if( lc.startsWith("III-IV") ) { return Planet.LUM_IV_EVOLVED; } //$NON-NLS-1$
-        if( lc.startsWith("IV/V") ) { return Planet.LUM_V_EVOLVED; } //$NON-NLS-1$
-        if( lc.startsWith("IV-V") ) { return Planet.LUM_V_EVOLVED; } //$NON-NLS-1$
-        if( lc.startsWith("III") ) { return Planet.LUM_III; } //$NON-NLS-1$
-        if( lc.startsWith("II") ) { return Planet.LUM_II; } //$NON-NLS-1$
-        if( lc.startsWith("IV") ) { return Planet.LUM_IV; } //$NON-NLS-1$
-        if( lc.startsWith("Ia-0") ) { return Planet.LUM_0; } // Alias //$NON-NLS-1$
-        if( lc.startsWith("Ia0") ) { return Planet.LUM_0; } // Alias //$NON-NLS-1$
-        if( lc.startsWith("Ia+") ) { return Planet.LUM_0; } // Alias //$NON-NLS-1$
-        if( lc.startsWith("Iab") ) { return Planet.LUM_IAB; } //$NON-NLS-1$
-        if( lc.startsWith("Ia") ) { return Planet.LUM_IA; } //$NON-NLS-1$
-        if( lc.startsWith("Ib") ) { return Planet.LUM_IB; } //$NON-NLS-1$
-        if( lc.startsWith("I") ) { return Planet.LUM_I; } // includes Ia, Iab and Ib //$NON-NLS-1$
-        if( lc.startsWith("O") ) { return Planet.LUM_0; } //$NON-NLS-1$
-        if( lc.startsWith("VII") ) { return Planet.LUM_VII; } //$NON-NLS-1$
-        if( lc.startsWith("VI+") ) { return Planet.LUM_VI_PLUS; } //$NON-NLS-1$
-        if( lc.startsWith("VI") ) { return Planet.LUM_VI; } //$NON-NLS-1$
-        if( lc.startsWith("V") ) { return Planet.LUM_V; } //$NON-NLS-1$
+        if( lc.startsWith("I/II") ) { return PlanetarySystem.LUM_II_EVOLVED; } //$NON-NLS-1$
+        if( lc.startsWith("I-II") ) { return PlanetarySystem.LUM_II_EVOLVED; } //$NON-NLS-1$
+        if( lc.startsWith("Ib/II") ) { return PlanetarySystem.LUM_II_EVOLVED; } //$NON-NLS-1$
+        if( lc.startsWith("Ib-II") ) { return PlanetarySystem.LUM_II_EVOLVED; } //$NON-NLS-1$
+        if( lc.startsWith("II/III") ) { return PlanetarySystem.LUM_III_EVOLVED; } //$NON-NLS-1$
+        if( lc.startsWith("II-III") ) { return PlanetarySystem.LUM_III_EVOLVED; } //$NON-NLS-1$
+        if( lc.startsWith("III/IV") ) { return PlanetarySystem.LUM_IV_EVOLVED; } //$NON-NLS-1$
+        if( lc.startsWith("III-IV") ) { return PlanetarySystem.LUM_IV_EVOLVED; } //$NON-NLS-1$
+        if( lc.startsWith("IV/V") ) { return PlanetarySystem.LUM_V_EVOLVED; } //$NON-NLS-1$
+        if( lc.startsWith("IV-V") ) { return PlanetarySystem.LUM_V_EVOLVED; } //$NON-NLS-1$
+        if( lc.startsWith("III") ) { return PlanetarySystem.LUM_III; } //$NON-NLS-1$
+        if( lc.startsWith("II") ) { return PlanetarySystem.LUM_II; } //$NON-NLS-1$
+        if( lc.startsWith("IV") ) { return PlanetarySystem.LUM_IV; } //$NON-NLS-1$
+        if( lc.startsWith("Ia-0") ) { return PlanetarySystem.LUM_0; } // Alias //$NON-NLS-1$
+        if( lc.startsWith("Ia0") ) { return PlanetarySystem.LUM_0; } // Alias //$NON-NLS-1$
+        if( lc.startsWith("Ia+") ) { return PlanetarySystem.LUM_0; } // Alias //$NON-NLS-1$
+        if( lc.startsWith("Iab") ) { return PlanetarySystem.LUM_IAB; } //$NON-NLS-1$
+        if( lc.startsWith("Ia") ) { return PlanetarySystem.LUM_IA; } //$NON-NLS-1$
+        if( lc.startsWith("Ib") ) { return PlanetarySystem.LUM_IB; } //$NON-NLS-1$
+        if( lc.startsWith("I") ) { return PlanetarySystem.LUM_I; } // includes Ia, Iab and Ib //$NON-NLS-1$
+        if( lc.startsWith("O") ) { return PlanetarySystem.LUM_0; } //$NON-NLS-1$
+        if( lc.startsWith("VII") ) { return PlanetarySystem.LUM_VII; } //$NON-NLS-1$
+        if( lc.startsWith("VI+") ) { return PlanetarySystem.LUM_VI_PLUS; } //$NON-NLS-1$
+        if( lc.startsWith("VI") ) { return PlanetarySystem.LUM_VI; } //$NON-NLS-1$
+        if( lc.startsWith("V") ) { return PlanetarySystem.LUM_V; } //$NON-NLS-1$
         return null;
     }
 
@@ -606,8 +608,8 @@ public final class StarUtil {
         switch(hpg.intValue()) {
             case EquipmentType.RATING_A: return "A-rated HPG";
             case EquipmentType.RATING_B: return "B-rated HPG";
-            case EquipmentType.RATING_C: return "C-rated Service";
-            case EquipmentType.RATING_D: return "D-rated Service";
+            case EquipmentType.RATING_C: return "C-rated Service (pony express)";
+            case EquipmentType.RATING_D: return "D-rated Service (pony express)";
             case EquipmentType.RATING_X: return "none";
             default: return "unknown";
         }

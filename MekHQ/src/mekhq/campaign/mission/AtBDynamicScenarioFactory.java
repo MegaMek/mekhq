@@ -53,7 +53,8 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.Planets;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.UnitGeneratorParameters;
 
 /**
@@ -264,7 +265,7 @@ public class AtBDynamicScenarioFactory {
         }
         
         String parentFactionType = AtBConfiguration.getParentFactionType(factionCode);
-        boolean isPlanetOwner = contract.getPlanet().getFactions(currentDate).contains(factionCode);
+        boolean isPlanetOwner = contract.getSystem().getFactions(currentDate).contains(factionCode);
         boolean usingAerospace = forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX ||
                                     forceTemplate.getAllowedUnitType() == UnitType.CONV_FIGHTER ||
                                     forceTemplate.getAllowedUnitType() == UnitType.AERO;
@@ -573,7 +574,8 @@ public class AtBDynamicScenarioFactory {
         }
         
         if (null != mission) {
-            Planet p = Planets.getInstance().getPlanets().get(mission.getPlanetId());
+            PlanetarySystem psystem = Systems.getInstance().getSystemById(mission.getSystemId());
+            Planet p = psystem.getPrimaryPlanet();
             if (null != p) {
                 int atmosphere = Utilities.nonNull(p.getPressure(Utilities.getDateTimeDay(campaign.getCalendar())), scenario.getAtmosphere());
                 float gravity = Utilities.nonNull(p.getGravity(), scenario.getGravity()).floatValue();
@@ -1875,7 +1877,7 @@ public class AtBDynamicScenarioFactory {
         
         // planet owner is the first of the factions that owns the current planet.
         // if there's no such thing, then mercenaries.
-        List<String> planetFactions = contract.getPlanet().getFactions(currentDate);
+        List<String> planetFactions = contract.getSystem().getFactions(currentDate);
         if(planetFactions != null && !planetFactions.isEmpty()) {
             factionCode = planetFactions.get(0);
             Faction ownerFaction = Faction.getFaction(factionCode);
@@ -1897,7 +1899,7 @@ public class AtBDynamicScenarioFactory {
      */
     private static ForceAlignment getPlanetOwnerAlignment(AtBContract contract, String factionCode, DateTime currentDate) {
         // if the faction is one of the planet owners, see if it's either the employer or opfor. If it's not, third-party.
-        if(contract.getPlanet().getFactions(currentDate).contains(factionCode)) {
+        if(contract.getSystem().getFactions(currentDate).contains(factionCode)) {
             if(factionCode.equals(contract.getEmployerCode())) {
                 return ForceAlignment.Allied;
             } else if(factionCode.equals(contract.getEnemyCode())) {
