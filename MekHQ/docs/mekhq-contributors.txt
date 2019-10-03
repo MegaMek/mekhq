@@ -57,6 +57,7 @@
 		CampaignAnon 
 		
 	
+  Icons for MarkdownEditorPanel by icons (https://icons8.com)
 
   And Of Course...
      FASA, WizKids, FanPro and Catalyst Game Labs for creating and publishing the original game of
