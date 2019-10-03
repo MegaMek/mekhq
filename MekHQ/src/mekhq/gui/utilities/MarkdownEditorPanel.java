@@ -51,7 +51,7 @@ public class MarkdownEditorPanel extends JPanel {
         scrollEditor.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         
         //set up buttons
-        JPanel pnlButtons = new JPanel(new FlowLayout());
+        JPanel pnlButtons = new JPanel(new WrapLayout(FlowLayout.LEFT));
         btnH1 = new JButton("H1");
         btnH1.addActionListener(ev -> {
             insertHeader(1);
@@ -101,7 +101,7 @@ public class MarkdownEditorPanel extends JPanel {
         pnlButtons.add(btnOL);
         
         JPanel editorPanel = new JPanel(new BorderLayout());
-        editorPanel.add(pnlButtons, BorderLayout.PAGE_START);
+        editorPanel.add(pnlButtons, BorderLayout.NORTH);
         editorPanel.add(scrollEditor, BorderLayout.CENTER);        
         tabPane.add("Write", editorPanel);
 
