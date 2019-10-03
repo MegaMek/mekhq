@@ -894,7 +894,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
                 break;
             case CMD_EDIT_BIOGRAPHY:
-                TextAreaDialog tad = new TextAreaDialog(gui.getFrame(), true,
+                MarkdownEditorDialog tad = new MarkdownEditorDialog(gui.getFrame(), true,
                         resourceMap.getString("editBiography.text"), selectedPerson.getBiography()); //$NON-NLS-1$
                 tad.setVisible(true);
                 if (tad.wasChanged()) {
