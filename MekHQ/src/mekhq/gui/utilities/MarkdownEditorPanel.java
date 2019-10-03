@@ -14,6 +14,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import megameklab.com.util.StringUtils;
 import mekhq.gui.dialog.MassRepairSalvageDialog;
 
 
@@ -30,8 +31,15 @@ public class MarkdownEditorPanel extends JPanel {
     private JScrollPane scrollViewer;
     private JTextPane viewer;
     
+    private JButton btnH1;
+    private JButton btnH2;
+    private JButton btnH3;
     private JButton btnBold;
     private JButton btnItalic;
+    private JButton btnHR;
+    private JButton btnUL;
+    private JButton btnOL;
+
     
     public MarkdownEditorPanel() {
       
@@ -67,6 +75,24 @@ public class MarkdownEditorPanel extends JPanel {
         
         //set up buttons
         JPanel pnlButtons = new JPanel(new FlowLayout());
+        btnH1 = new JButton("H1");
+        btnH1.addActionListener(ev -> {
+            insertHeader(1);
+        });
+        pnlButtons.add(btnH1);
+        
+        btnH2 = new JButton("H2");
+        btnH2.addActionListener(ev -> {
+            insertHeader(2);
+        });
+        pnlButtons.add(btnH2);
+        
+        btnH3 = new JButton("H3");
+        btnH3.addActionListener(ev -> {
+            insertHeader(3);
+        });
+        pnlButtons.add(btnH3);
+        
         btnBold = new JButton("B");
         btnBold.addActionListener(ev -> {
             boldText();
@@ -78,6 +104,25 @@ public class MarkdownEditorPanel extends JPanel {
             italicizeText();
         });
         pnlButtons.add(btnItalic);
+        
+        btnHR = new JButton("HR");
+        btnHR.addActionListener(ev -> {
+            insertHR();
+        });
+        pnlButtons.add(btnHR);
+        
+        btnUL = new JButton("UL");
+        btnUL.addActionListener(ev -> {
+            insertBullet(false);
+        });
+        pnlButtons.add(btnUL);
+        
+        btnOL = new JButton("OL");
+        btnOL.addActionListener(ev -> {
+            insertBullet(true);
+        });
+        pnlButtons.add(btnOL);
+        
         add(pnlButtons, BorderLayout.PAGE_START);
         
     }
@@ -93,29 +138,64 @@ public class MarkdownEditorPanel extends JPanel {
         return editor.getText();
     }
     
-    public void boldText() {
+    private void boldText() {
         int start = editor.getSelectionStart();
-        int end = editor.getSelectionEnd()+2;
+        int end = editor.getSelectionEnd();
         editor.insert("**", start);
-        editor.insert("**", end);
+        editor.insert("**", end+2);
         if(start==end) {
             editor.setCaretPosition(start+2); 
+        } else {
+            editor.setCaretPosition(end+4);
+        }
+        editor.requestFocusInWindow();
+    }
+    
+    private void italicizeText() {
+        int start = editor.getSelectionStart();
+        int end = editor.getSelectionEnd();
+        editor.insert("*", start);
+        editor.insert("*", end+1);
+        if(start==end) {
+            editor.setCaretPosition(start+1); 
         } else {
             editor.setCaretPosition(end+2);
         }
         editor.requestFocusInWindow();
     }
     
-    public void italicizeText() {
-        int start = editor.getSelectionStart();
-        int end = editor.getSelectionEnd()+1;
-        editor.insert("*", start);
-        editor.insert("*", end);
-        if(start==end) {
-            editor.setCaretPosition(start+1); 
-        } else {
-            editor.setCaretPosition(end+1);
+    private void insertHeader(int level) {
+        String toInsert = "";
+        for(int i = 0; i < level; i++) {
+            toInsert = toInsert + "#";
         }
+        toInsert = toInsert + " ";
+        int start = editor.getSelectionStart();
+        editor.insert(toInsert, start);
+        editor.setCaretPosition(start+toInsert.length());
+        editor.requestFocusInWindow();
+    }
+    
+    private void insertHR() {
+        String toInsert = "\n---\n";
+        int start = editor.getSelectionStart();
+        editor.insert(toInsert, start);
+        editor.setCaretPosition(start+toInsert.length());
+        editor.requestFocusInWindow();
+    }
+    
+    private void insertBullet(boolean ordered) {
+        String toInsert = "\n\n- ";
+        if(ordered) {
+            toInsert = "\n\n1. ";
+        }
+        int start = editor.getSelectionStart();
+        int end = editor.getSelectionEnd();
+        editor.insert(toInsert, start);
+        if(start!=end) {
+            editor.insert("\n\n", end+toInsert.length());
+        }
+        editor.setCaretPosition(start+toInsert.length());
         editor.requestFocusInWindow();
     }
 }
