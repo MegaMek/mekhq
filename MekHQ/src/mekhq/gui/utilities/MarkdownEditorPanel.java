@@ -14,10 +14,6 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import megameklab.com.util.StringUtils;
-import mekhq.gui.dialog.MassRepairSalvageDialog;
-
-
 public class MarkdownEditorPanel extends JPanel {
     
     /**
@@ -53,25 +49,6 @@ public class MarkdownEditorPanel extends JPanel {
         editor.setWrapStyleWord(true);
         scrollEditor = new JScrollPane(editor);
         scrollEditor.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        tabPane.add("Write", scrollEditor);
-
-        viewer = new JTextPane();
-        viewer.setBackground(Color.WHITE);
-        viewer.setEditable(false);
-        viewer.setContentType("text/html");
-        scrollViewer = new JScrollPane(viewer);
-        scrollViewer.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        tabPane.add("Preview", scrollViewer);
-        
-        tabPane.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                viewer.setText(MarkdownRenderer.getRenderedHtml(editor.getText()));
-                javax.swing.SwingUtilities.invokeLater(() -> {
-                    scrollViewer.getVerticalScrollBar().setValue(0);
-                });
-            }
-        });
-        add(tabPane, BorderLayout.CENTER);
         
         //set up buttons
         JPanel pnlButtons = new JPanel(new FlowLayout());
@@ -123,7 +100,31 @@ public class MarkdownEditorPanel extends JPanel {
         });
         pnlButtons.add(btnOL);
         
-        add(pnlButtons, BorderLayout.PAGE_START);
+        JPanel editorPanel = new JPanel(new BorderLayout());
+        editorPanel.add(pnlButtons, BorderLayout.PAGE_START);
+        editorPanel.add(scrollEditor, BorderLayout.CENTER);        
+        tabPane.add("Write", editorPanel);
+
+        viewer = new JTextPane();
+        viewer.setBackground(Color.WHITE);
+        viewer.setEditable(false);
+        viewer.setContentType("text/html");
+        scrollViewer = new JScrollPane(viewer);
+        scrollViewer.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        tabPane.add("Preview", scrollViewer);
+        
+        tabPane.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                if(tabPane.getSelectedIndex()==1) {
+                viewer.setText(MarkdownRenderer.getRenderedHtml(editor.getText()));
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+                        scrollViewer.getVerticalScrollBar().setValue(0);
+                    });
+                }
+            }
+        });
+        add(tabPane, BorderLayout.CENTER);
+        
         
     }
     
