@@ -49,7 +49,7 @@ public class MarkdownEditorPanel extends JPanel {
 
     
     public MarkdownEditorPanel() {
-        new MarkdownEditorPanel(null);
+        this(null);
     }
     
     public MarkdownEditorPanel(String title) {
