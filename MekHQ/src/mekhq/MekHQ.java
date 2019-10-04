@@ -22,6 +22,7 @@
 package mekhq;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedOutputStream;
@@ -35,6 +36,7 @@ import java.util.Date;
 import java.util.ResourceBundle;
 
 import javax.swing.*;
+import javax.swing.text.DefaultEditorKit;
 
 import megamek.MegaMek;
 import megamek.client.Client;
@@ -728,6 +730,14 @@ public class MekHQ implements GameListener {
         Runnable runnable = () -> {
             try {
                 UIManager.setLookAndFeel(themeName);
+                if (System.getProperty("os.name", "").startsWith("Mac OS X")) {
+                    // Ensure OSX key bindings are used for copy, paste etc
+                    addOSXKeyStrokes((InputMap) UIManager.get("EditorPane.focusInputMap"));
+                    addOSXKeyStrokes((InputMap) UIManager.get("FormattedTextField.focusInputMap"));
+                    addOSXKeyStrokes((InputMap) UIManager.get("TextField.focusInputMap"));
+                    addOSXKeyStrokes((InputMap) UIManager.get("TextPane.focusInputMap"));
+                    addOSXKeyStrokes((InputMap) UIManager.get("TextArea.focusInputMap"));
+                  }
                 if (window != null) {
                     SwingUtilities.updateComponentTreeUI(window);
                 }
@@ -750,5 +760,12 @@ public class MekHQ implements GameListener {
                 setLookAndFeel((String)evt.getNewValue(), window);
             }
         }
+    }
+    
+    private static void addOSXKeyStrokes(InputMap inputMap) {
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.META_DOWN_MASK), DefaultEditorKit.copyAction);
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, KeyEvent.META_DOWN_MASK), DefaultEditorKit.cutAction);
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.META_DOWN_MASK), DefaultEditorKit.pasteAction);
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.META_DOWN_MASK), DefaultEditorKit.selectAllAction);
     }
 }
