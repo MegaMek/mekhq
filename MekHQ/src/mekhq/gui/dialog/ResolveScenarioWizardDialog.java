@@ -55,6 +55,7 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.preferences.JWindowPreference;
+import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.view.PersonViewPanel;
 import mekhq.preferences.PreferencesNode;
 
@@ -169,14 +170,13 @@ public class ResolveScenarioWizardDialog extends JDialog {
      * Preview Panel components
      */
     private javax.swing.JComboBox<String> choiceStatus;
-    private javax.swing.JScrollPane scrReport;
     private javax.swing.JScrollPane scrRecoveredUnits;
     private javax.swing.JScrollPane scrRecoveredPilots;
     private javax.swing.JScrollPane scrMissingUnits;
     private javax.swing.JScrollPane scrMissingPilots;
     private javax.swing.JScrollPane scrDeadPilots;
     private javax.swing.JScrollPane scrSalvage;
-    private javax.swing.JTextArea txtReport;
+    private MarkdownEditorPanel txtReport;
     private javax.swing.JTextArea txtRecoveredUnits;
     private javax.swing.JTextArea txtRecoveredPilots;
     private javax.swing.JTextArea txtMissingUnits;
@@ -209,6 +209,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         initComponents();
         setLocationRelativeTo(parent);
         setUserPreferences();
+        pack();
     }
 
     private void initComponents() {
@@ -786,7 +787,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
          */
         pnlPreview = new JPanel();
         choiceStatus = new javax.swing.JComboBox<>();
-        scrReport = new javax.swing.JScrollPane();
         scrRecoveredUnits = new javax.swing.JScrollPane();
         scrRecoveredPilots = new javax.swing.JScrollPane();
         scrMissingUnits = new javax.swing.JScrollPane();
@@ -794,7 +794,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         scrDeadPilots = new javax.swing.JScrollPane();
         scrSalvage = new javax.swing.JScrollPane();
         txtInstructions = new javax.swing.JTextArea();
-        txtReport = new javax.swing.JTextArea();
+        txtReport = new MarkdownEditorPanel("After-Action Report");
         txtRecoveredUnits = new javax.swing.JTextArea();
         txtRecoveredPilots = new javax.swing.JTextArea();
         txtMissingUnits = new javax.swing.JTextArea();
@@ -849,16 +849,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         pnlPreview.add(new JScrollPane(txtRewards), gridBagConstraints);
 
         txtReport.setText("");
-        txtReport.setName("txtReport");
-        txtReport.setEditable(true);
-        txtReport.setLineWrap(true);
-        txtReport.setWrapStyleWord(true);
-        txtReport.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(resourceMap.getString("txtReport.title")),
-                BorderFactory.createEmptyBorder(5,5,5,5)));
-        scrReport.setViewportView(txtReport);
-        scrReport.setPreferredSize(new Dimension(500,200));
-        scrReport.setMinimumSize(new Dimension(500,200));
+        txtReport.setPreferredSize(new Dimension(500,300));
+        txtReport.setMinimumSize(new Dimension(500,300));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -867,8 +859,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        pnlPreview.add(scrReport, gridBagConstraints);
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        pnlPreview.add(txtReport, gridBagConstraints);
 
         txtRecoveredUnits.setName("txtRecoveredUnits");
         txtRecoveredUnits.setText(resourceMap.getString("none"));

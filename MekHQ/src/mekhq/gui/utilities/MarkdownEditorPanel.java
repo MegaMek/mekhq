@@ -11,6 +11,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -48,6 +49,10 @@ public class MarkdownEditorPanel extends JPanel {
 
     
     public MarkdownEditorPanel() {
+        new MarkdownEditorPanel(null);
+    }
+    
+    public MarkdownEditorPanel(String title) {
       
         tabPane = new JTabbedPane();
         
@@ -161,6 +166,9 @@ public class MarkdownEditorPanel extends JPanel {
             }
         });
         add(tabPane, BorderLayout.CENTER);
+        if(null != title) {
+            add(new JLabel("<html><h4>" + title + "</h4></html>"), BorderLayout.NORTH);
+        }
         
         //set up key bindings
         editor.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_DOWN_MASK), "bold");

@@ -24,8 +24,6 @@ package mekhq.gui.dialog;
 import java.awt.Dimension;
 import java.util.ResourceBundle;
 
-import javax.swing.BorderFactory;
-
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -35,6 +33,7 @@ import mekhq.gui.preferences.JWindowPreference;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.utilities.JSuggestField;
+import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.preferences.PreferencesNode;
 
 /**
@@ -61,6 +60,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         initComponents();
         setLocationRelativeTo(parent);
         setUserPreferences();
+        pack();
     }
 
     private void initComponents() {
@@ -72,8 +72,6 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         lblType = new javax.swing.JLabel();
         btnOK = new javax.swing.JButton();
         btnClose = new javax.swing.JButton();
-        scrDesc = new javax.swing.JScrollPane();
-        txtDesc = new javax.swing.JTextArea();
         lblPlanetName = new javax.swing.JLabel();
 
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizeMissionDialog", new EncodeControl()); //$NON-NLS-1$
@@ -152,17 +150,10 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(suggestPlanet, gridBagConstraints);
 
+        txtDesc = new MarkdownEditorPanel(resourceMap.getString("txtDesc.title"));
         txtDesc.setText(mission.getDescription());
-        txtDesc.setName("txtDesc");
-        txtDesc.setEditable(true);
-        txtDesc.setLineWrap(true);
-        txtDesc.setWrapStyleWord(true);
-        txtDesc.setBorder(BorderFactory.createCompoundBorder(
-	   			 BorderFactory.createTitledBorder("Description"),
-	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
-        scrDesc.setViewportView(txtDesc);
-        scrDesc.setPreferredSize(new Dimension(400,200));
-        scrDesc.setMinimumSize(new Dimension(400,200));
+        txtDesc.setMinimumSize(new Dimension(400, 100));
+        txtDesc.setPreferredSize(new Dimension(400, 250));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
@@ -171,8 +162,8 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        getContentPane().add(scrDesc, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        getContentPane().add(txtDesc, gridBagConstraints);
 
         btnOK.setText(resourceMap.getString("btnOkay.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
@@ -252,8 +243,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
     private javax.swing.JTextField txtName;
     private javax.swing.JLabel lblType;
     private javax.swing.JTextField txtType;
-    private javax.swing.JTextArea txtDesc;
-    private javax.swing.JScrollPane scrDesc;
+    private MarkdownEditorPanel txtDesc;
     private javax.swing.JLabel lblPlanetName;
 	private JSuggestField suggestPlanet;
 

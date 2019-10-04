@@ -6,6 +6,7 @@
 
 package mekhq.gui.dialog;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -32,6 +33,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
@@ -171,7 +173,6 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         panOptions = new javax.swing.JPanel();
         scrSkills = new javax.swing.JScrollPane();
         panSkills = new javax.swing.JPanel();
-        txtBio = new MarkdownEditorPanel();
         panButtons = new javax.swing.JPanel();
         btnOk = new javax.swing.JButton();
         
@@ -616,9 +617,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
 
         y++;
 
+        txtBio = new MarkdownEditorPanel("Biography");
         txtBio.setText(person.getBiography());
-        txtBio.setBorder(BorderFactory.createTitledBorder("Biography"));
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
@@ -627,7 +627,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panDemog.add(txtBio, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();

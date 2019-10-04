@@ -65,6 +65,7 @@ import mekhq.campaign.universe.Systems;
 import mekhq.gui.FactionComboBox;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.utilities.JSuggestField;
+import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.preferences.PreferencesNode;
 
 /**
@@ -94,7 +95,7 @@ public class CustomizeAtBContractDialog extends JDialog {
 	protected JCheckBox chkShowAllFactions;
 
 	protected JComboBox<String> cbMissionType;
-    protected JTextArea txtDesc;
+    protected MarkdownEditorPanel txtDesc;
     protected JSuggestField suggestPlanet;
 	protected JComboBox<String> cbAllySkill;
 	protected JComboBox<String> cbAllyQuality;
@@ -173,7 +174,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         btnOK = new JButton();
         btnClose = new JButton();
         JScrollPane scrDesc = new JScrollPane();
-        txtDesc = new JTextArea();
+        txtDesc = new MarkdownEditorPanel("Contract Description");
         JLabel lblPlanetName = new JLabel();
         String[] skillNames = {"Green", "Regular", "Veteran", "Elite"};
         String[] ratingNames = {"F", "D", "C", "B", "A"};
@@ -409,17 +410,8 @@ public class CustomizeAtBContractDialog extends JDialog {
         leftPanel.add(spnContractScoreArbitraryModifier, gbc);
 
         txtDesc.setText(contract.getDescription());
-        txtDesc.setName("txtDesc");
-        txtDesc.setEditable(true);
-        txtDesc.setLineWrap(true);
-        txtDesc.setWrapStyleWord(true);
-        txtDesc.setBorder(BorderFactory.createCompoundBorder(
-	   			 BorderFactory.createTitledBorder(resourceMap.getString("txtDesc.title")),
-	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
-        scrDesc.setViewportView(txtDesc);
-        scrDesc.setPreferredSize(new Dimension(400, 200));
-        scrDesc.setMinimumSize(new Dimension(400, 200));
-        
+        txtDesc.setPreferredSize(new Dimension(400, 200));
+        txtDesc.setMinimumSize(new Dimension(400, 200));
         gbc.gridx = 0;
         gbc.gridy = y++;
         gbc.gridwidth = 3;
@@ -427,8 +419,8 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.weighty = 1.0;
         gbc.fill = java.awt.GridBagConstraints.BOTH;
         gbc.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gbc.insets = new java.awt.Insets(5, 5, 0, 0);
-        leftPanel.add(scrDesc, gbc);
+        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        leftPanel.add(txtDesc, gbc);
 
         y = 0;
         

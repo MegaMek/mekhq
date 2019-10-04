@@ -51,6 +51,7 @@ import mekhq.gui.FactionComboBox;
 import mekhq.gui.model.SortedComboBoxModel;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.utilities.JSuggestField;
+import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.preferences.PreferencesNode;
 
 /**
@@ -152,8 +153,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         JLabel lblType = new JLabel();
         btnOK = new javax.swing.JButton();
         btnClose = new javax.swing.JButton();
-        JScrollPane scrDesc = new JScrollPane();
-        txtDesc = new javax.swing.JTextArea();
+        txtDesc = new MarkdownEditorPanel();
         JLabel lblPlanetName = new JLabel();
         String[] skillNames = {"Green", "Regular", "Veteran", "Elite"};
         String[] ratingNames = {"F", "D", "C", "B", "A"};
@@ -382,18 +382,9 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(spnShares, gbc);
          
-        txtDesc.setText(contract.getDescription());
-        txtDesc.setName("txtDesc");
-        txtDesc.setEditable(true);
-        txtDesc.setLineWrap(true);
-        txtDesc.setWrapStyleWord(true);
-        txtDesc.setBorder(BorderFactory.createCompoundBorder(
-	   			 BorderFactory.createTitledBorder(resourceMap.getString("txtDesc.title")),
-	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
-        scrDesc.setViewportView(txtDesc);
-        scrDesc.setPreferredSize(new Dimension(400, 200));
-        scrDesc.setMinimumSize(new Dimension(400, 200));
-        
+        txtDesc.setText(contract.getDescription());;;
+        txtDesc.setPreferredSize(new Dimension(400, 200));
+        txtDesc.setMinimumSize(new Dimension(400, 200));
         gbc.gridx = 0;
         gbc.gridy = y++;
         gbc.gridwidth = 3;
@@ -401,8 +392,8 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.weighty = 1.0;
         gbc.fill = java.awt.GridBagConstraints.BOTH;
         gbc.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gbc.insets = new java.awt.Insets(5, 5, 0, 0);
-        descPanel.add(scrDesc, gbc);
+        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        descPanel.add(txtDesc, gbc);
 	}
 	
 	private void addAllListeners() {

@@ -64,6 +64,7 @@ import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.model.LootTableModel;
 import mekhq.gui.preferences.JWindowPreference;
+import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.preferences.PreferencesNode;
 
 /**
@@ -97,10 +98,8 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
     private javax.swing.JButton btnOK;
     private javax.swing.JLabel lblName;
     private javax.swing.JTextField txtName;
-    private javax.swing.JTextArea txtDesc;
-    private javax.swing.JScrollPane scrDesc;
-    private javax.swing.JTextArea txtReport;
-    private javax.swing.JScrollPane scrReport;
+    private MarkdownEditorPanel txtDesc;
+    private MarkdownEditorPanel txtReport;
     private javax.swing.JComboBox<String> choiceStatus;
     private javax.swing.JLabel lblStatus;
     private javax.swing.JButton btnDate;
@@ -130,23 +129,20 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         initComponents();
         setLocationRelativeTo(parent);
         setUserPreferences();
+        pack();
     }
 
     private void initComponents() {
     	 java.awt.GridBagConstraints gridBagConstraints;
 
         txtName = new javax.swing.JTextField();
-        txtDesc = new javax.swing.JTextArea();
-        txtReport = new javax.swing.JTextArea();
         lblName = new javax.swing.JLabel();
         btnOK = new javax.swing.JButton();
         btnClose = new javax.swing.JButton();
-        scrDesc = new javax.swing.JScrollPane();
-        scrReport = new javax.swing.JScrollPane();
-        choiceStatus = new javax.swing.JComboBox<String>();
         lblStatus = new javax.swing.JLabel();  
         panMain = new javax.swing.JPanel();
         panBtn = new javax.swing.JPanel();
+        choiceStatus = new javax.swing.JComboBox<String>();
         
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizeScenarioDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -233,17 +229,10 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
             
         }
         
+        txtDesc = new MarkdownEditorPanel("Description");
         txtDesc.setText(scenario.getDescription());
-        txtDesc.setName("txtDesc");
-        txtDesc.setEditable(true);
-        txtDesc.setLineWrap(true);
-        txtDesc.setWrapStyleWord(true);
-        txtDesc.setBorder(BorderFactory.createCompoundBorder(
-	   			 BorderFactory.createTitledBorder("Description"),
-	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
-        scrDesc.setViewportView(txtDesc);
-        scrDesc.setPreferredSize(new Dimension(400,200));
-        scrDesc.setMinimumSize(new Dimension(400,200));
+        txtDesc.setMinimumSize(new Dimension(400, 100));
+        txtDesc.setPreferredSize(new Dimension(400, 250));
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy++;
         gridBagConstraints.gridwidth = 2;
@@ -251,8 +240,8 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        panMain.add(scrDesc, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panMain.add(txtDesc, gridBagConstraints);
         
         if(scenario instanceof AtBDynamicScenario && scenario.isCurrent()) {
             gridBagConstraints.gridx = 0;
@@ -276,26 +265,19 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         }
         
         if(!scenario.isCurrent()) {
-	        txtReport.setText(scenario.getReport());
-	        txtReport.setName("txtReport");
-	        txtReport.setEditable(true);
-	        txtReport.setLineWrap(true);
-	        txtReport.setWrapStyleWord(true);
-	        txtReport.setBorder(BorderFactory.createCompoundBorder(
-		   			 BorderFactory.createTitledBorder("After-Action Report"),
-		   			 BorderFactory.createEmptyBorder(5,5,5,5)));
-	        scrReport.setViewportView(txtReport);
-	        scrReport.setPreferredSize(new Dimension(400,200));
-	        scrReport.setMinimumSize(new Dimension(400,200));
-	        gridBagConstraints.gridx = 0;
-	        gridBagConstraints.gridy++;
-	        gridBagConstraints.gridwidth = 2;
-	        gridBagConstraints.weightx = 1.0;
-	        gridBagConstraints.weighty = 1.0;
-	        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-	        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-	        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-	        panMain.add(scrReport, gridBagConstraints);
+            txtReport = new MarkdownEditorPanel("After-Action Report");
+            txtReport.setText(scenario.getReport());
+            txtReport.setMinimumSize(new Dimension(400, 100));
+            txtReport.setPreferredSize(new Dimension(400, 250));
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 1.0;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+            panMain.add(txtReport, gridBagConstraints);
         }
         
         if(newScenario && (mission instanceof AtBContract)) {
