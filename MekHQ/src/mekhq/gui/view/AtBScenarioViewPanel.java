@@ -35,6 +35,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.ResourceBundle;
+import java.util.UUID;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -72,6 +73,7 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForceStub;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.ScenarioForceTemplate;
+import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.gui.dialog.PrincessBehaviorDialog;
 
 /**
@@ -390,42 +392,47 @@ public class AtBScenarioViewPanel extends JPanel {
         txtDetails.setWrapStyleWord(true);
         txtDetails.setEditable(false);
         
-        if (scenario.isSpecialMission()) {
-            txtDetails.setText("Details:\n" +
-                    scenario.getResourceBundle().getString("battleDetails." +
-                    scenario.getResourceKey() +
-                    ".description"));
-        } else if (scenario.isBigBattle()) {
-            txtDetails.setText("Special Conditions:\n" +
-            		scenario.getResourceBundle().getString("battleDetails." +
-                    scenario.getResourceKey() +
-                    ".specialConditions") + "\n\n" +
+        StringBuilder objectiveBuilder = new StringBuilder();
+        for(ScenarioObjective objective : scenario.getObjectives()) {
+            objectiveBuilder.append(objective.getDescription());
+            objectiveBuilder.append("\n");
+            
+            for(String forceName : objective.getAssociatedForceNames()) {
+                objectiveBuilder.append("\t");
+                objectiveBuilder.append(forceName);
+                objectiveBuilder.append("\n");
+            }
+            
+            for(String associatedUnitID : objective.getAssociatedUnitIDs()) {
+                String associatedUnitName = "";
+                UUID uid = UUID.fromString(associatedUnitID);
+                
+                // "logic": try to get a hold of the unit with the given UUID, 
+                // either from the list of bot units or from the list of player units
+                if(scenario.getExternalIDLookup().containsKey(associatedUnitID)) {
+                    associatedUnitName = scenario.getExternalIDLookup().get(associatedUnitID).getShortName();
+                } else if(scenario.getForces(campaign).getAllUnits().contains(uid)) {
+                    associatedUnitName = campaign.getUnit(uid).getEntity().getShortName();
+                }
 
-                    "Victory Conditions:\n" +
-                    scenario.getResourceBundle().getString("battleDetails." +
-                    scenario.getResourceKey() +
-                    ".victory") + "\n\n" +
-
-                    "Observations:\n" +
-                    scenario.getResourceBundle().getString("battleDetails." +
-                    scenario.getResourceKey() +
-                    ".observations"));
-        } else if(!(scenario instanceof AtBDynamicScenario)) {
-            txtDetails.setText("Victory Conditions:\n" +
-            		scenario.getResourceBundle().getString("battleDetails." +
-                    scenario.getResourceKey() +
-                    (scenario.isAttacker()?
-                            ".attacker.victory":
-                                ".defender.victory")) + "\n\n" +
-
-                    "Observations:\n" +
-                    scenario.getResourceBundle().getString("battleDetails." +
-                    scenario.getResourceKey() +
-                    (scenario.isAttacker()?
-                            ".attacker.observations":
-                                ".defender.observations")));
+                if(associatedUnitName.length() == 0) {
+                    continue;
+                }
+                objectiveBuilder.append("\t");
+                objectiveBuilder.append(associatedUnitName);
+                objectiveBuilder.append("\n");
+            }
+            
+            for(String detail : objective.getDetails()) {
+                objectiveBuilder.append("\t");
+                objectiveBuilder.append(detail);
+                objectiveBuilder.append("\n");
+            }
+            
+            objectiveBuilder.append("\n");
         }
-
+        txtDetails.setText(objectiveBuilder.toString());
+        
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y++;
         gridBagConstraints.gridwidth = 3;

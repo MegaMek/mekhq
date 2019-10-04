@@ -1735,7 +1735,7 @@ public class AtBDynamicScenarioFactory {
      * @param edge The starting edge
      * @return Opposite edge, as defined in Board.java
      */
-    static int getOppositeEdge(int edge) {
+    public static int getOppositeEdge(int edge) {
         switch(edge) {
         case Board.START_EDGE:
             return Board.START_CENTER;

@@ -38,13 +38,10 @@ import java.util.Vector;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.client.RandomNameGenerator;
-import megamek.client.RandomSkillsGenerator;
 import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Crew;
@@ -52,9 +49,6 @@ import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import megamek.common.IStartingPositions;
 import megamek.common.Mech;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
-import megamek.common.MechSummaryCache;
 import megamek.common.PlanetaryConditions;
 import megamek.common.UnitType;
 import megamek.common.logging.LogLevel;
@@ -68,6 +62,8 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.market.UnitMarket;
+import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
+import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
 import mekhq.campaign.mission.atb.IAtBScenario;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
@@ -175,6 +171,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             EntityWeightClass.WEIGHT_HEAVY
     };
 
+    public static final int NO_LANCE = -1;
+    
     private boolean attacker;
     private int lanceForceId; // -1 if scenario is not generated for a specific lance (special mission, big battle)
     private int lanceRole; /* set when scenario is created in case it is changed for the next week before the scenario is resolved;
@@ -230,7 +228,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     private Map<String, List<String>> transportLinkages;
     private Map<String, Entity> externalIDLookup;
     
-    private static ResourceBundle defaultResourceBundle = ResourceBundle.getBundle("mekhq.resources.AtBScenarioBuiltIn", new EncodeControl()); //$NON-NLS-1$
+    protected static ResourceBundle defaultResourceBundle = ResourceBundle.getBundle("mekhq.resources.AtBScenarioBuiltIn", new EncodeControl()); //$NON-NLS-1$
     
     public AtBScenario () {
         super();
@@ -245,6 +243,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         entityIds = new HashMap<UUID, Entity>();
         transportLinkages = new HashMap<>();
         externalIDLookup = new HashMap<>();
+        setScenarioObjectives(new ArrayList<>());
 
         light = PlanetaryConditions.L_DAY;
         weather = PlanetaryConditions.WE_NONE;
@@ -614,6 +613,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      */
     public void refresh(Campaign campaign) {
         if (isStandardMission()) {
+            setObjectives(campaign, getContract(campaign));
             return;
         }
         Vector<UUID> deployed = getForces(campaign).getAllUnits();
@@ -622,7 +622,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             alliesPlayer.clear();
             for (int i = 0; i < numAllies; i++) {
                 alliesPlayer.add(bigBattleAllies.get(i));
+                externalIDLookup.put(bigBattleAllies.get(i).getExternalIdAsString(), bigBattleAllies.get(i));
             }
+            
+            setObjectives(campaign, getContract(campaign));
         } else {
             if (deployed.size() == 0) {
                 return;
@@ -664,6 +667,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         } else {
             setBigBattleForces(campaign);
         }
+        
+        setObjectives(campaign, getContract(campaign));
     }
 
     /**
@@ -704,6 +709,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             if (null != en) {
                 alliesPlayer.add(en);
                 attachedUnitIds.add(UUID.fromString(en.getExternalIdAsString()));
+                externalIDLookup.put(en.getExternalIdAsString(), en);
             } else {
                 MekHQ.getLogger().error(AtBScenario.class, "setStandardMissionForces", "Entity for player-controlled allies is null");
             }
@@ -776,15 +782,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                     }
                 }
                 if (!dropshipFound) {
-                    Entity dropship = AtBDynamicScenarioFactory.getEntity(getContract(campaign).getEmployerCode(), 
-                            getContract(campaign).getAllySkill(), 
-                            getContract(campaign).getAllyQuality(), 
-                            UnitType.DROPSHIP, AtBDynamicScenarioFactory.UNIT_WEIGHT_UNSPECIFIED, campaign);
-                    
-                    if(dropship != null) {
-                        alliesPlayer.add(dropship);
-                        attachedUnitIds.add(UUID.fromString(dropship.getExternalIdAsString()));
-                    }
+                    addDropship(campaign);
                 }
                 for (int i = 0; i < Compute.d6() - 3; i++) {
                     addLance(enemyEntities, getContract(campaign).getEnemyCode(),
@@ -964,67 +962,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      */
     protected Entity getEntity(String faction, int skill, int quality, int unitType, int weightClass, Campaign campaign) {
         return AtBDynamicScenarioFactory.getEntity(faction, skill, quality, unitType, weightClass, false, campaign);
-    }
-
-    /**
-     * Generates a new Entity without using a RAT. Used for turrets and employer-assigned
-     * Leopard Dropships.
-     *
-     * @param name            Full name (chassis + model) of the entity to generate.
-     * @param fName            Faction code to use for crew name generation
-     * @param skill            RandomSkillsGenerator.L_* constant for the average force skill level.
-     * @param campaign
-     * @return                A new Entity
-     */
-    protected Entity getEntityByName(String name, String fName, int skill, Campaign campaign) {
-        final String METHOD_NAME = "getEntityByName(String,String,int,Campaign"; //$NON-NLS-1$
-        
-        MechSummary mechSummary = MechSummaryCache.getInstance().getMech(
-                name);
-        if (mechSummary == null) {
-            return null;
-        }
-
-        MechFileParser mechFileParser = null;
-        try {
-            mechFileParser = new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName());
-        } catch (Exception ex) {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                    "Unable to load unit: " + name); //$NON-NLS-1$
-            MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
-        }
-        if (mechFileParser == null) {
-            return null;
-        }
-
-        Entity en = mechFileParser.getEntity();
-
-        en.setOwner(campaign.getPlayer());
-        en.setGame(campaign.getGame());
-
-        Faction faction = Faction.getFaction(fName);
-
-        RandomNameGenerator rng = RandomNameGenerator.getInstance();
-        rng.setChosenFaction(faction.getNameGenerator());
-
-        RandomSkillsGenerator rsg = new RandomSkillsGenerator();
-        rsg.setMethod(RandomSkillsGenerator.M_TAHARQA);
-        rsg.setLevel(skill);
-
-        if (faction.isClan()) rsg.setType(RandomSkillsGenerator.T_CLAN);
-        int[] skills = rsg.getRandomSkills(en);
-        en.setCrew(new Crew(en.getCrew().getCrewType(), rng.generate(),
-                            Compute.getFullCrewSize(en),
-                            skills[0], skills[1]));
-
-        UUID id = UUID.randomUUID();
-        while (null != entityIds.get(id)) {
-            id = UUID.randomUUID();
-        }
-        en.setExternalIdAsString(id.toString());
-        entityIds.put(id, en);
-
-        return en;
     }
 
     /**
@@ -1509,6 +1446,41 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         }
     }
     
+    /**
+     * Worker method that adds a dropship and related objective to the scenario.
+     * @param campaign
+     */
+    protected void addDropship(Campaign campaign) {
+        Entity dropship = AtBDynamicScenarioFactory.getEntity(getContract(campaign).getEmployerCode(), 
+                getContract(campaign).getAllySkill(), 
+                getContract(campaign).getAllyQuality(), 
+                UnitType.DROPSHIP, AtBDynamicScenarioFactory.UNIT_WEIGHT_UNSPECIFIED, campaign);
+        
+        if(dropship != null) {
+            alliesPlayer.add(dropship);
+            attachedUnitIds.add(UUID.fromString(dropship.getExternalIdAsString()));
+            externalIDLookup.put(dropship.getExternalIdAsString(), dropship);
+            
+            ScenarioObjective dropshipObjective = new ScenarioObjective();
+            dropshipObjective.setDescription("The employer has provided a dropship for your use in this battle. Ensure it survives. Losing it will result in a 5 point penalty to your contract score.");
+            dropshipObjective.setObjectiveCriterion(ObjectiveCriterion.Preserve);
+            dropshipObjective.setPercentage(100);
+            dropshipObjective.addUnit(dropship.getExternalIdAsString());
+            
+            // update the contract score by -5 if the objective is failed.
+            ObjectiveEffect failureEffect = new ObjectiveEffect();
+            failureEffect.effectType = ObjectiveEffectType.ContractScoreUpdate;
+            failureEffect.howMuch = -5;
+            
+            dropshipObjective.addFailureEffect(failureEffect);
+            getScenarioObjectives().add(dropshipObjective);
+        }
+    }
+    
+    public List<ScenarioObjective> getObjectives() {
+        return getScenarioObjectives();
+    }
+    
     /* Convenience methods for frequently-used arguments */
     protected BotForce getAllyBotForce(AtBContract c, int start, int home, ArrayList<Entity> entities) {
         return new BotForce(c.getAllyBotName(), 1, start, home, entities,
@@ -1571,19 +1543,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             specMissionEnemies.clear();
         }
     }
-
-    public void doPostResolution(Campaign c, int contractBreaches, int bonusRolls) {
-            getContract(c).addPlayerMinorBreaches(contractBreaches);
-            for (int i = 0; i < bonusRolls; i++) {
-                getContract(c).doBonusRoll(c);
-            }
-            
-            if (RECONRAID == getScenarioType() && attacker &&
-                    (getStatus() == S_VICTORY || getStatus() == S_MVICTORY)) {
-                for (int i = 0; i < Compute.d6() - 2; i++) {
-                    getContract(c).doBonusRoll(c);
-                }
-            }
+    
+    protected void setObjectives(Campaign c, AtBContract contract) {
+        getScenarioObjectives().clear();
     }
 
     @Override
@@ -1805,6 +1767,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                         if (en != null) {
                             alliesPlayer.add(en);
                             entityIds.put(UUID.fromString(en.getExternalIdAsString()), en);
+                            getExternalIDLookup().put(en.getExternalIdAsString(), en);
                         }
                     }
                 }
@@ -1825,6 +1788,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                         if (en != null) {
                             bigBattleAllies.add(en);
                             entityIds.put(UUID.fromString(en.getExternalIdAsString()), en);
+                            getExternalIDLookup().put(en.getExternalIdAsString(), en);
                         }
                     }
                 }
@@ -1853,6 +1817,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                                 if (null != en) {
                                     specMissionEnemies.get(weightClass).add(en);
                                     entityIds.put(UUID.fromString(en.getExternalIdAsString()), en);
+                                    getExternalIDLookup().put(en.getExternalIdAsString(), en);
                                 }
                             }
                         }
@@ -2174,5 +2139,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     public void setExternalIDLookup(HashMap<String, Entity> externalIDLookup) {
         this.externalIDLookup = externalIDLookup;
+    }
+    
+    public boolean isFriendlyUnit(Entity entity, Campaign campaign) {
+        return getAlliesPlayer().stream().anyMatch(unit -> unit.getExternalIdAsString().equals(entity.getExternalIdAsString())) ||
+                super.isFriendlyUnit(entity, campaign);
     }
 }
