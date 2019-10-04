@@ -11,6 +11,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -129,7 +130,8 @@ public class MarkdownEditorPanel extends JPanel {
         btnQuestion.setToolTipText("More information");
         btnQuestion.setPreferredSize(new Dimension(36, 36));
         btnQuestion.addActionListener(ev -> {
-            //nothing yet
+            JOptionPane.showMessageDialog(null,
+                    "<html>You can use the CommonMark markdown syntax to add rich text features such as bolding, heading, and italicizing.<br>To learn more about all of the features available go to https://commonmark.org/help/</html>");
         });
         pnlButtons.add(btnQuestion);
         
@@ -137,7 +139,7 @@ public class MarkdownEditorPanel extends JPanel {
         
         JPanel editorPanel = new JPanel(new BorderLayout());
         editorPanel.add(pnlButtons, BorderLayout.NORTH);
-        editorPanel.add(scrollEditor, BorderLayout.CENTER);        
+        editorPanel.add(scrollEditor, BorderLayout.CENTER);
         tabPane.add("Write", editorPanel);
 
         viewer = new JTextPane();
@@ -168,7 +170,7 @@ public class MarkdownEditorPanel extends JPanel {
             }
         });
         
-        editor.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_I, KeyEvent.CTRL_DOWN_MASK), "bold");
+        editor.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_I, KeyEvent.CTRL_DOWN_MASK), "italic");
         editor.getActionMap().put("italic", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 italicizeText();
