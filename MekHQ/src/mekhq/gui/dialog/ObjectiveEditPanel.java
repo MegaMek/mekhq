@@ -35,6 +35,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.border.LineBorder;
 
 import megamek.common.OffBoardDirection;
@@ -43,6 +44,7 @@ import mekhq.campaign.mission.ObjectiveEffect.*;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
+import mekhq.campaign.mission.ScenarioObjective.TimeLimitType;
 import mekhq.campaign.mission.ScenarioTemplate;
 
 /**
@@ -70,8 +72,14 @@ public class ObjectiveEditPanel extends JDialog {
     private JButton btnRemoveSuccess;
     private JButton btnRemoveFailure;
     
+    private JComboBox<String> cboTimeLimitDirection;
+    private JComboBox<TimeLimitType> cboTimeScaling;
+    private JTextField txtTimeLimit;
+    
     private JList<String> forceNames;
     JButton btnRemove;
+    
+    private JList<String> lstDetails;
         
     private ScenarioTemplate currentScenarioTemplate;
     private ScenarioObjective objective;
@@ -104,8 +112,18 @@ public class ObjectiveEditPanel extends JDialog {
         
         cboDirection.setSelectedIndex(objective.getDestinationEdge().ordinal());
         
+        cboTimeScaling.setSelectedItem(objective.getTimeLimitType());
+        updateTimeLimitUI();
+        cboTimeLimitDirection.setSelectedIndex(objective.isTimeLimitAtMost() ? 0 : 1);
+        if(objective.getTimeLimitType() == TimeLimitType.ScaledToPrimaryUnitCount) {
+            txtTimeLimit.setText(objective.getTimeLimitScaleFactor().toString());
+        } else {
+            txtTimeLimit.setText(objective.getTimeLimit().toString());
+        }
+        
         updateEffectList(successEffects, objective.getSuccessEffects());
         updateEffectList(failureEffects, objective.getFailureEffects());
+        updateDetailList();
         
         validate();
         pack();
@@ -131,6 +149,10 @@ public class ObjectiveEditPanel extends JDialog {
         gbc.gridy++;
         
         addSubjectForce(gbc);
+        gbc.gridx = 0;
+        gbc.gridy++;
+        
+        addTimeLimitUI(gbc);
         gbc.gridx = 0;
         gbc.gridy++;
         
@@ -182,6 +204,18 @@ public class ObjectiveEditPanel extends JDialog {
         txtShortDescription.setWrapStyleWord(true);
         txtScroll.setViewportView(txtShortDescription);
         
+        JTextField txtDetail = new JTextField();
+        txtDetail.setColumns(40);
+        JLabel lblDetail = new JLabel("Details (shows up after force/unit list):");
+        lstDetails = new JList<>();
+        JButton btnAddDetail = new JButton("Add");
+        JButton btnRemoveDetail = new JButton("Remove");
+        
+        lstDetails.addListSelectionListener(e -> btnRemoveDetail.setEnabled(lstDetails.getSelectedValuesList().size() > 0));
+        lstDetails.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        btnRemoveDetail.addActionListener(e -> this.removeDetails());
+        btnAddDetail.addActionListener(e -> this.addDetail(txtDetail));
+        
         JPanel descriptionPanel = new JPanel();
         descriptionPanel.setLayout(new GridBagLayout());
         GridBagConstraints localGbc = new GridBagConstraints();
@@ -192,6 +226,17 @@ public class ObjectiveEditPanel extends JDialog {
         descriptionPanel.add(lblShortDescription, localGbc);
         localGbc.gridx++;
         descriptionPanel.add(txtScroll, localGbc);
+        localGbc.gridx = 0;
+        localGbc.gridy++;
+        descriptionPanel.add(lblDetail, localGbc);
+        localGbc.gridx++;
+        descriptionPanel.add(txtDetail, localGbc);
+        localGbc.gridx++;
+        descriptionPanel.add(btnAddDetail, localGbc);
+        localGbc.gridx++;
+        descriptionPanel.add(lstDetails, localGbc);
+        localGbc.gridx++;
+        descriptionPanel.add(btnRemoveDetail, localGbc);
         
         getContentPane().add(descriptionPanel, gbc);
     }
@@ -332,6 +377,39 @@ public class ObjectiveEditPanel extends JDialog {
         getContentPane().add(forcePanel, gbc);
     }
     
+    private void addTimeLimitUI(GridBagConstraints gbc) {
+        JPanel timeLimitPanel = new JPanel();
+        
+        JLabel timeLimitLabel = new JLabel("Time Limit:");
+        
+        cboTimeLimitDirection = new JComboBox<>();
+        cboTimeLimitDirection.addItem("at most");
+        cboTimeLimitDirection.addItem("at least");
+        
+        cboTimeScaling = new JComboBox<>();
+        for(TimeLimitType timeLimitType : TimeLimitType.values()) {
+            cboTimeScaling.addItem(timeLimitType);
+        }
+        cboTimeScaling.addActionListener(e -> this.updateTimeLimitUI());
+        
+        txtTimeLimit = new JTextField();
+        txtTimeLimit.setColumns(5);
+        
+        GridBagConstraints localGbc = new GridBagConstraints();
+        localGbc.gridx = 0;
+        localGbc.gridy = 0;
+        localGbc.insets = new Insets(0, 0, 0, 5);
+        
+        timeLimitPanel.add(cboTimeLimitDirection, localGbc);
+        localGbc.gridx++;
+        timeLimitPanel.add(cboTimeScaling, localGbc);
+        localGbc.gridx++;
+        timeLimitPanel.add(txtTimeLimit, localGbc);
+        
+        
+        getContentPane().add(timeLimitPanel, gbc);
+    }
+    
     /**
      * Handles the "add objective effect" row
      */
@@ -470,6 +548,27 @@ public class ObjectiveEditPanel extends JDialog {
         pack();
     }
     
+    private void addDetail(JTextField field) {
+        objective.addDetail(field.getText());
+        updateDetailList();
+    }
+    
+    private void removeDetails() {
+        for(int index : lstDetails.getSelectedIndices()) {
+            objective.getDetails().remove(index);
+        }
+        updateDetailList();
+    }
+    
+    private void updateDetailList() {
+        DefaultListModel<String> detailModel = new DefaultListModel<>();
+        for(String detail : objective.getDetails()) {
+            detailModel.addElement(detail);
+        }
+        
+        lstDetails.setModel(detailModel);
+    }
+    
     private void updateForceList() {
         DefaultListModel<String> forceModel = new DefaultListModel<>();
         for(String forceName : objective.getAssociatedForceNames()) {
@@ -491,14 +590,32 @@ public class ObjectiveEditPanel extends JDialog {
         }
     }
     
+    private void updateTimeLimitUI() {
+        boolean enable = !cboTimeScaling.getSelectedItem().equals(TimeLimitType.None);
+        
+        txtTimeLimit.setEnabled(enable);
+        cboTimeLimitDirection.setEnabled(enable);
+    }
+    
     private void saveObjectiveAndClose() {
         int number = 0;
+        int timeLimit = 0;
         
         try {
             number = Integer.parseInt(txtPercentage.getText());
             txtPercentage.setBorder(null);
         } catch(Exception e) {
             txtPercentage.setBorder(new LineBorder(Color.red));
+            return;
+        }
+        
+        try {
+            if(txtTimeLimit.isEnabled()) {
+                timeLimit = Integer.parseInt(txtTimeLimit.getText());
+                txtTimeLimit.setBorder(null);
+            }
+        } catch(Exception e) {
+            txtTimeLimit.setBorder(new LineBorder(Color.red));
             return;
         }
         
@@ -516,6 +633,18 @@ public class ObjectiveEditPanel extends JDialog {
             objective.setDestinationEdge(OffBoardDirection.NONE);
         }
              
+        objective.setTimeLimitType((TimeLimitType) cboTimeScaling.getSelectedItem());
+        if(txtTimeLimit.isEnabled()) {
+            if(objective.getTimeLimitType() == TimeLimitType.ScaledToPrimaryUnitCount) {
+                objective.setTimeLimitScaleFactor(timeLimit);
+            } else {
+                objective.setTimeLimit(timeLimit);
+            }
+        }
+        
+        if(cboTimeLimitDirection.isEnabled()) {
+            objective.setTimeLimitAtMost(cboTimeLimitDirection.getSelectedIndex() == 0);
+        }
             
         if(!currentScenarioTemplate.scenarioObjectives.contains(objective)) {
             currentScenarioTemplate.scenarioObjectives.add(objective);

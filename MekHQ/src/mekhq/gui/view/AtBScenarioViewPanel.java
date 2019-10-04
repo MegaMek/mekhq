@@ -444,6 +444,10 @@ public class AtBScenarioViewPanel extends JPanel {
                 objectiveBuilder.append("\n");
             }
             
+            objectiveBuilder.append("\t");
+            objectiveBuilder.append(objective.getTimeLimitString());
+            objectiveBuilder.append("\n");
+            
             objectiveBuilder.append("\n");
         }
         txtDetails.setText(objectiveBuilder.toString());

@@ -44,6 +44,7 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
+import mekhq.campaign.mission.ScenarioObjective.TimeLimitType;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.personnel.Bloodname;
@@ -162,6 +163,7 @@ public class AtBDynamicScenarioFactory {
         setDeploymentTurns(scenario, campaign);
         translatePlayerNPCsToAttached(scenario, campaign);
         translateTemplateObjectives(scenario, campaign);
+        scaleObjectiveTimeLimits(scenario, campaign);
         
         if(campaign.getCampaignOptions().useAbilities()) {
         	upgradeBotCrews(scenario);
@@ -468,6 +470,9 @@ public class AtBDynamicScenarioFactory {
         }
     }
     
+    /**
+     * Translates the template's objectives, filling them in with actual forces from the scenario.
+     */
     private static void translateTemplateObjectives(AtBDynamicScenario scenario, Campaign campaign) {
         scenario.getScenarioObjectives().clear();
         
@@ -528,6 +533,32 @@ public class AtBDynamicScenarioFactory {
             }
             
             scenario.getScenarioObjectives().add(actualObjective);
+        }
+    }
+    
+    /**
+     * Scale the scenario's objective time limits, if called for, by the number of units
+     * that have associated force templates that "contribute to the unit count".
+     */
+    private static void scaleObjectiveTimeLimits(AtBDynamicScenario scenario, Campaign campaign) {
+        int primaryUnitCount = 0;
+        
+        for(int forceID : scenario.getPlayerForceTemplates().keySet()) {
+            if(scenario.getPlayerForceTemplates().get(forceID).getContributesToUnitCount()) {
+                primaryUnitCount += campaign.getForce(forceID).getAllUnits().size();
+            }
+        }
+        
+        for(BotForce botForce : scenario.getBotForceTemplates().keySet()) {
+            if(scenario.getBotForceTemplates().get(botForce).getContributesToUnitCount()) {
+                primaryUnitCount += botForce.getEntityList().size();
+            }
+        }
+        
+        for(ScenarioObjective objective : scenario.getScenarioObjectives()) {
+            if(objective.getTimeLimitType() == TimeLimitType.ScaledToPrimaryUnitCount) {
+                objective.setTimeLimit(primaryUnitCount * objective.getTimeLimitScaleFactor());
+            }
         }
     }
     

@@ -63,12 +63,21 @@ public class ScenarioObjective {
         objectiveTypeMapping.put(ObjectiveCriterion.Custom, "Custom");
     }
     
+    public enum TimeLimitType {
+        None,
+        Fixed,
+        ScaledToPrimaryUnitCount
+    }
+    
     private ObjectiveCriterion objectiveCriterion;
     private String description;
     private OffBoardDirection destinationEdge;
     private int percentage;
     private Integer fixedAmount = null;
+    private TimeLimitType timeLimitType = TimeLimitType.None;
+    private boolean timeLimitAtMost = true;
     private Integer timeLimit = null;
+    private Integer timeLimitScaleFactor = null;
     
     @XmlElementWrapper(name="associatedForceNames")
     @XmlElement(name="associatedForceName")
@@ -157,6 +166,9 @@ public class ScenarioObjective {
         this.failureEffects = new ArrayList<>(other.getFailureEffects());
         this.successEffects = new ArrayList<>(other.getSuccessEffects());
         this.additionalDetails = new ArrayList<>(other.getDetails());
+        this.setTimeLimitAtMost(other.isTimeLimitAtMost());
+        this.setTimeLimitType(other.getTimeLimitType());
+        this.setTimeLimitScaleFactor(other.getTimeLimitScaleFactor());
     }
     
     public ObjectiveCriterion getObjectiveCriterion() {
@@ -263,11 +275,46 @@ public class ScenarioObjective {
         this.timeLimit = timeLimit;
     }
 
+    public Integer getTimeLimitScaleFactor() {
+        return timeLimitScaleFactor;
+    }
+
+    public void setTimeLimitScaleFactor(Integer timeLimitScaleFactor) {
+        this.timeLimitScaleFactor = timeLimitScaleFactor;
+    }
+
+    public boolean isTimeLimitAtMost() {
+        return timeLimitAtMost;
+    }
+
+    public void setTimeLimitAtMost(boolean timeLimitAtMost) {
+        this.timeLimitAtMost = timeLimitAtMost;
+    }
+
+    public TimeLimitType getTimeLimitType() {
+        return timeLimitType;
+    }
+
+    public void setTimeLimitType(TimeLimitType timeLimitType) {
+        this.timeLimitType = timeLimitType;
+    }
+
+    public String getTimeLimitString() {
+        String timeLimitString = 
+                timeLimitType == TimeLimitType.None ? 
+                    "" :
+                    String.format("%s %d turns", isTimeLimitAtMost() ? "within at most" : "for at least", getTimeLimit());
+        
+        return timeLimitString;
+    }
+    
     public String toShortString() {
+        String timeLimitString = getTimeLimitString();
+        
         if(fixedAmount != null) {
-            return String.format("%s %d", objectiveCriterion.toString(), fixedAmount);
+            return String.format("%s %d %s", objectiveCriterion.toString(), fixedAmount, timeLimitString);
         } else {
-            return String.format("%s %d%%", objectiveCriterion.toString(), percentage);
+            return String.format("%s %d%% %s", objectiveCriterion.toString(), percentage, timeLimitString);
         }
     }
     

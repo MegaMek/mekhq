@@ -143,6 +143,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     JComboBox<AtBScenarioModifier> modifierBox;
     JList<String> selectedModifiersList;
     JList<ScenarioObjective> objectiveList;
+    JScrollPane objectiveScrollPane;
     JButton btnRemoveObjective;
     
     JPanel globalPanel;
@@ -188,7 +189,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         
         JScrollPane globalScrollPane = new JScrollPane(globalPanel);
         globalScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        globalScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        globalScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         getContentPane().add(globalScrollPane);        
         
         GridBagConstraints gbc = new GridBagConstraints();
@@ -206,8 +207,6 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         updateForceSyncList();
         renderForceList();
         updateObjectiveList();
-        
-        globalScrollPane.setPreferredSize(new Dimension((int) globalPanel.getPreferredSize().getWidth() + 10, (int) globalPanel.getPreferredSize().getHeight()));
     }
 
     /**
@@ -295,8 +294,10 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         objectiveList = new JList<>();
         objectiveList.addListSelectionListener(e -> btnRemoveObjective.setEnabled(objectiveList.getSelectedValuesList().size() > 0));
         objectiveList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        JScrollPane listPane = new JScrollPane();
-        listPane.setViewportView(objectiveList);
+        objectiveList.setVisibleRowCount(5);
+        objectiveList.setFixedCellWidth(400);
+        objectiveScrollPane = new JScrollPane();
+        objectiveScrollPane.setViewportView(objectiveList);
         
         btnRemoveObjective = new JButton("Remove");
         btnRemoveObjective.addActionListener(e -> this.removeObjective());
@@ -310,7 +311,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         localGbc.gridx = 1;
         localGbc.gridy = 1;
         localGbc.gridheight = GridBagConstraints.REMAINDER;
-        pnlObjectiveEdit.add(listPane, localGbc);
+        pnlObjectiveEdit.add(objectiveScrollPane, localGbc);
         
         localGbc.gridx = 2;
         localGbc.gridy = 2;
@@ -350,7 +351,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         
         gbc.gridx++;
         int previousAnchor = gbc.anchor;
-        gbc.anchor = GridBagConstraints.EAST;
+        gbc.anchor = GridBagConstraints.WEST;
         globalPanel.add(btnHideShow, gbc);
         gbc.anchor = previousAnchor;
     }
@@ -1459,6 +1460,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         initComponents();
         pack();
         validate();
+        setUserPreferences();
     }
 
     /**
@@ -1533,6 +1535,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         }
         
         objectiveList.setModel(objectiveModel);
+        
         validate();
         pack();
     }
