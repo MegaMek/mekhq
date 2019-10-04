@@ -4,7 +4,11 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -12,9 +16,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
+import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.text.DefaultEditorKit;
 
 public class MarkdownEditorPanel extends JPanel {
     
@@ -154,7 +160,20 @@ public class MarkdownEditorPanel extends JPanel {
         });
         add(tabPane, BorderLayout.CENTER);
         
+        //set up key bindings
+        editor.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_DOWN_MASK), "bold");
+        editor.getActionMap().put("bold", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                boldText();
+            }
+        });
         
+        editor.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_I, KeyEvent.CTRL_DOWN_MASK), "bold");
+        editor.getActionMap().put("italic", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                italicizeText();
+            }
+        });
     }
     
     public void setText(String text) {
