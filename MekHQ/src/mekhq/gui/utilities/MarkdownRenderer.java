@@ -18,6 +18,9 @@
 
 package mekhq.gui.utilities;
 
+import java.util.Arrays;
+import java.util.HashSet;
+
 import org.commonmark.node.*;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
@@ -36,7 +39,8 @@ public class MarkdownRenderer {
     private HtmlRenderer htmlRenderer; 
     
     private MarkdownRenderer() {
-        parser = Parser.builder().build();
+        //only enable certain block types
+        parser = Parser.builder().enabledBlockTypes(new HashSet<>(Arrays.asList(Heading.class, ListBlock.class, ThematicBreak.class, BlockQuote.class))).build();
         htmlRenderer = HtmlRenderer.builder().build();
     }
     
@@ -55,19 +59,7 @@ public class MarkdownRenderer {
     public static String getRenderedHtml(String input) {
         if(null == input) {
             return "";
-        }
-        /*
-         * Tabs will cause problems here because Markdown thinks
-         * of them as block quotes. However, many users will probably
-         * use them to identify beginning of paragraphs. So replace all
-         * tabs with line returns. Ultimately, if we ever get up a markdown
-         * editor we should also check for tabs there and correct them in the 
-         * input
-         */
-        input = input.replaceAll("\\t+", "\n\n");
-        //This is also going to happen if indentation is used with spaces
-        input = input.replaceAll("\\s\\s\\s\\s+", "\n\n");
-        
+        }       
         Node document = getInstance().parser.parse(input);
         return getInstance().htmlRenderer.render(document);
         
