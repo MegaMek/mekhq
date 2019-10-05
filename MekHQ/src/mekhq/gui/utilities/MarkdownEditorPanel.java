@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -22,8 +21,13 @@ import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.text.DefaultEditorKit;
 
+/**
+ * This class implements a markdown editor that comes with buttons for common markup as well as a preview
+ * tab for seeing what the results look like. It can be embedded as a panel in other components.
+ * @author Taharqa (Aaron Gullickson)
+ *
+ */
 public class MarkdownEditorPanel extends JPanel {
     
     /**
@@ -47,11 +51,16 @@ public class MarkdownEditorPanel extends JPanel {
     private JButton btnOL;
     private JButton btnQuestion;
 
-    
+    /**
+     * Constructor for new MarkdownEditorPanel
+     */
     public MarkdownEditorPanel() {
         this(null);
     }
-    
+    /**
+     * Constructor for new MarkdownEditorPanel
+     * @param title - a <code>String</code> to show up as the title of the editor at the top
+     */
     public MarkdownEditorPanel(String title) {
       
         tabPane = new JTabbedPane();
@@ -158,7 +167,7 @@ public class MarkdownEditorPanel extends JPanel {
         tabPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 if(tabPane.getSelectedIndex()==1) {
-                viewer.setText(MarkdownRenderer.getRenderedHtml(editor.getText()));
+                    viewer.setText(MarkdownRenderer.getRenderedHtml(editor.getText()));
                     javax.swing.SwingUtilities.invokeLater(() -> {
                         scrollViewer.getVerticalScrollBar().setValue(0);
                     });
@@ -186,6 +195,11 @@ public class MarkdownEditorPanel extends JPanel {
         });
     }
     
+    /**
+     * Set the text for the editor. This can be used when called up on existing text to initially
+     * fill the editor.
+     * @param text - a <code>String</code> of text to fill the editor with
+     */
     public void setText(String text) {
         editor.setText(text);
         javax.swing.SwingUtilities.invokeLater(() -> {
@@ -193,10 +207,18 @@ public class MarkdownEditorPanel extends JPanel {
         });
     }
     
+    /**
+     * Get the text of the editor
+     * @return <code>String</code> of the text in the editor
+     */
     public String getText() {
         return editor.getText();
     }
     
+    /**
+     * Insert bold (**) markup on the selection. If an existing word or phrase is highlighted, this will put 
+     * the markup at either ends. Otherwise it will put an empty markup (****) with the cursor in the middle.
+     */
     private void boldText() {
         int start = editor.getSelectionStart();
         int end = editor.getSelectionEnd();
@@ -210,6 +232,10 @@ public class MarkdownEditorPanel extends JPanel {
         editor.requestFocusInWindow();
     }
     
+    /**
+     * Insert italic (*) markup on the selection. If an existing word or phrase is highlighted, this will put 
+     * the markup at either ends. Otherwise it will put an empty markup (**) with the cursor in the middle.
+     */
     private void italicizeText() {
         int start = editor.getSelectionStart();
         int end = editor.getSelectionEnd();
@@ -223,6 +249,10 @@ public class MarkdownEditorPanel extends JPanel {
         editor.requestFocusInWindow();
     }
     
+    /**
+     * Insert a header (#) into the text at the currently selected start
+     * @param level - the level of heading
+     */
     private void insertHeader(int level) {
         String toInsert = "";
         for(int i = 0; i < level; i++) {
@@ -235,6 +265,9 @@ public class MarkdownEditorPanel extends JPanel {
         editor.requestFocusInWindow();
     }
     
+    /**
+     * Insert a horizontal rule (---) into the text at the currently selected start
+     */
     private void insertHR() {
         String toInsert = "\n---\n";
         int start = editor.getSelectionStart();
@@ -243,6 +276,11 @@ public class MarkdownEditorPanel extends JPanel {
         editor.requestFocusInWindow();
     }
     
+    /**
+     * Insert a bullet point into the text. To ensure it looks correct, the bullet point is surrounded
+     * by two carriage returns on either side.
+     * @param ordered - a <code>boolean</code> for whether the bullet point should be ordered or not. 
+     */
     private void insertBullet(boolean ordered) {
         String toInsert = "\n\n- ";
         if(ordered) {
