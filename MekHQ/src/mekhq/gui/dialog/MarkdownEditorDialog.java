@@ -1,6 +1,20 @@
 /*
- * TextAreaDialog.java
+ * Copyright (c) 2019 The MegaMek Team. All rights reserved.
  *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package mekhq.gui.dialog;
@@ -12,8 +26,8 @@ import megamek.common.util.EncodeControl;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 
 /**
- *
- * @author Jay Lason
+ * This dialog contains a MarkdownEditorPanel that the user can use to write markdown flavored text.
+ * @author Taharqa (Aaron Gullickson)
  */
 public class MarkdownEditorDialog extends javax.swing.JDialog {
     
@@ -24,6 +38,13 @@ public class MarkdownEditorDialog extends javax.swing.JDialog {
     private javax.swing.JButton btnCancel;
     private boolean changed;
 
+    /**
+     * Constructor
+     * @param parent
+     * @param modal
+     * @param title - a <code>String</code> for the title of the dialog
+     * @param text - a <code>String</code> for existing text to be placed in the editor when created.
+     */
     public MarkdownEditorDialog(java.awt.Frame parent, boolean modal, String title, String text) {
         super(parent, modal);
         setTitle(title);
@@ -92,6 +113,10 @@ public class MarkdownEditorDialog extends javax.swing.JDialog {
         add(btnCancel, gridBagConstraints);     
     }
     
+    /**
+     * Get the text currently in the editor
+     * @return <code>String</code> of the current text in the editor
+     */
     public String getText() {
         return mkEditor.getText();
     }
@@ -101,6 +126,10 @@ public class MarkdownEditorDialog extends javax.swing.JDialog {
         setVisible(false);
     }
     
+    /**
+     * Was anything changed. Used to determine whether the user canceled the dialog of hit ok
+     * @return a <code>boolean</code> indicating whether anything was changed
+     */
     public boolean wasChanged() {
         return changed;
     }
