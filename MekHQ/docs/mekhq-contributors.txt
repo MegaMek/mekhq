@@ -57,7 +57,12 @@
 		CampaignAnon 
 		
 	
-  Icons for MarkdownEditorPanel by icons (https://icons8.com)
+  Icons for MarkdownEditorPanel
+    Bold, italic, ordered list, unordered list, horizontal rule, and question mark icons provided
+    by Google in Google Material Design Icons and distributed under the Creative Commons ShareAlike 4.0 
+    International License (https://creativecommons.org/licenses/by-sa/4.0/).
+    
+    Header icons provided by Font Awesome by Dave Gandy - http://fontawesome.io
 
   And Of Course...
      FASA, WizKids, FanPro and Catalyst Game Labs for creating and publishing the original game of
