@@ -312,7 +312,6 @@ public final class BriefingTab extends CampaignGuiTab {
         scrollScenarioView = new JScrollPane();
         scrollScenarioView.getViewport().setBackground(Color.WHITE);
         scrollScenarioView.setViewportView(null);
-        //scrollScenarioView.setPreferredSize(new java.awt.Dimension(450, 600));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
