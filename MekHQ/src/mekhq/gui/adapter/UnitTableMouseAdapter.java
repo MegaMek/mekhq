@@ -62,8 +62,8 @@ import mekhq.gui.dialog.BombsDialog;
 import mekhq.gui.dialog.CamoChoiceDialog;
 import mekhq.gui.dialog.ChooseRefitDialog;
 import mekhq.gui.dialog.LargeCraftAmmoSwapDialog;
+import mekhq.gui.dialog.MarkdownEditorDialog;
 import mekhq.gui.dialog.QuirksDialog;
-import mekhq.gui.dialog.TextAreaDialog;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.StaticChecks;
 
@@ -382,7 +382,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             crd.setVisible(true);
         } else if (command.contains("CHANGE_HISTORY")) {
             if (null != selectedUnit) {
-                TextAreaDialog tad = new TextAreaDialog(gui.getFrame(), true,
+                MarkdownEditorDialog tad = new MarkdownEditorDialog(gui.getFrame(), true,
                         "Edit Unit History", selectedUnit.getHistory());
                 tad.setVisible(true);
                 if (tad.wasChanged()) {
