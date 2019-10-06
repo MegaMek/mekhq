@@ -15,7 +15,7 @@ v0.47.1-SNAPSHOT
 + PR #1300: Markdown for descriptions 
 + PR #1280: planetary system refactor
 + PR #1305: Mac OSX key bindings on non-standard look and feel
-+ PR 1304: Markdown Editor
++ PR #1304: Markdown Editor
 
 v0.47.0 (2019-08-21 0300 UTC)
 + Issue #1171: Adds autosave feature (daily or weekly, and/or before missions).
