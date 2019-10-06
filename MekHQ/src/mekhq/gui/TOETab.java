@@ -20,6 +20,7 @@
 package mekhq.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -32,7 +33,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.tree.TreeSelectionModel;
 
 import megamek.common.event.Subscribe;
@@ -100,8 +100,10 @@ public final class TOETab extends CampaignGuiTab {
         panForceView.setMinimumSize(new java.awt.Dimension(550, 600));
         panForceView.setPreferredSize(new java.awt.Dimension(550, 600));
         panForceView.setLayout(new BorderLayout());
-
-        splitOrg = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(orgTree), panForceView);
+        
+        JScrollPane scrollOrg = new JScrollPane(orgTree);
+        scrollOrg.getViewport().setBackground(Color.WHITE);
+        splitOrg = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollOrg, panForceView);
         splitOrg.setOneTouchExpandable(true);
         splitOrg.setResizeWeight(1.0);
         splitOrg.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, ev -> refreshForceView());
@@ -146,6 +148,7 @@ public final class TOETab extends CampaignGuiTab {
             if (crewSize > 0) {
                 JPanel crewPanel = new JPanel(new BorderLayout());
                 final JScrollPane scrollPerson = new JScrollPane();
+                scrollPerson.getViewport().setBackground(Color.WHITE);
                 crewPanel.add(scrollPerson, BorderLayout.CENTER);
                 CrewListModel model = new CrewListModel();
                 model.setData(u);
@@ -187,6 +190,7 @@ public final class TOETab extends CampaignGuiTab {
                 });
             }
             final JScrollPane scrollUnit = new JScrollPane(new UnitViewPanel(u, getCampaign(), getIconPackage().getCamos(), getIconPackage().getMechTiles()));
+            scrollUnit.getViewport().setBackground(Color.WHITE);
             tabUnit.add("Unit", scrollUnit);
             panForceView.add(tabUnit, BorderLayout.CENTER);
             javax.swing.SwingUtilities.invokeLater(() -> {
@@ -194,6 +198,7 @@ public final class TOETab extends CampaignGuiTab {
             });
         } else if (node instanceof Force) {
             final JScrollPane scrollForce = new JScrollPane(new ForceViewPanel((Force) node, getCampaign(), getIconPackage()));
+            scrollForce.getViewport().setBackground(Color.WHITE);
             panForceView.add(scrollForce, BorderLayout.CENTER);
             javax.swing.SwingUtilities.invokeLater(() -> {
                 scrollForce.getVerticalScrollBar().setValue(0);

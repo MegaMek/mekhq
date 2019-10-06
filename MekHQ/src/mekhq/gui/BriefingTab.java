@@ -20,6 +20,7 @@
 package mekhq.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -224,6 +225,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
         scrollMissionView = new JScrollPane();
         scrollMissionView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollMissionView.getViewport().setBackground(Color.WHITE);
         scrollMissionView.setViewportView(null);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -246,6 +248,7 @@ public final class BriefingTab extends CampaignGuiTab {
         JScrollPane scrollScenarioTable = new JScrollPane(scenarioTable);
         scrollScenarioTable.setMinimumSize(new java.awt.Dimension(200, 200));
         scrollScenarioTable.setPreferredSize(new java.awt.Dimension(200, 200));
+        scrollScenarioTable.getViewport().setBackground(Color.WHITE);
 
         splitMission = new JSplitPane(JSplitPane.VERTICAL_SPLIT, panBriefing, scrollScenarioTable);
         splitMission.setOneTouchExpandable(true);
@@ -307,6 +310,7 @@ public final class BriefingTab extends CampaignGuiTab {
         panScenarioButtons.add(btnClearAssignedUnits);
 
         scrollScenarioView = new JScrollPane();
+        scrollScenarioView.getViewport().setBackground(Color.WHITE);
         scrollScenarioView.setViewportView(null);
         //scrollScenarioView.setPreferredSize(new java.awt.Dimension(450, 600));
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -324,6 +328,7 @@ public final class BriefingTab extends CampaignGuiTab {
         paneLanceDeployment.setMinimumSize(new java.awt.Dimension(200, 300));
         paneLanceDeployment.setPreferredSize(new java.awt.Dimension(200, 300));
         paneLanceDeployment.setVisible(getCampaign().getCampaignOptions().getUseAtB());
+        paneLanceDeployment.getViewport().setBackground(Color.WHITE);
         splitScenario = new javax.swing.JSplitPane(javax.swing.JSplitPane.VERTICAL_SPLIT, panScenario,
                 paneLanceDeployment);
         splitScenario.setOneTouchExpandable(true);
