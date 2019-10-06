@@ -18,6 +18,9 @@
 
 package mekhq.gui.utilities;
 
+import java.util.Arrays;
+import java.util.HashSet;
+
 import org.commonmark.node.*;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
@@ -36,7 +39,8 @@ public class MarkdownRenderer {
     private HtmlRenderer htmlRenderer; 
     
     private MarkdownRenderer() {
-        parser = Parser.builder().build();
+        //only enable certain block types
+        parser = Parser.builder().enabledBlockTypes(new HashSet<>(Arrays.asList(Heading.class, ListBlock.class, ThematicBreak.class, BlockQuote.class))).build();
         htmlRenderer = HtmlRenderer.builder().build();
     }
     
@@ -55,7 +59,7 @@ public class MarkdownRenderer {
     public static String getRenderedHtml(String input) {
         if(null == input) {
             return "";
-        }
+        }       
         Node document = getInstance().parser.parse(input);
         return getInstance().htmlRenderer.render(document);
         

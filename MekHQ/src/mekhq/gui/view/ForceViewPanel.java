@@ -111,7 +111,7 @@ public class ForceViewPanel extends ScrollablePanel {
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.gridheight = 1;
 		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
+		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;	
 		add(pnlStats, gridBagConstraints);
@@ -124,27 +124,29 @@ public class ForceViewPanel extends ScrollablePanel {
 		gridBagConstraints.gridy = 1;
 		gridBagConstraints.gridwidth = 2;
 		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
+		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;	
 		add(pnlSubUnits, gridBagConstraints);
 		
-		txtDesc.setName("txtDesc");
-		txtDesc.setEditable(false);
-		txtDesc.setContentType("text/html");
-		txtDesc.setText(MarkdownRenderer.getRenderedHtml(force.getDescription()));
-		txtDesc.setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createTitledBorder("Description"),
-				BorderFactory.createEmptyBorder(5,5,5,5)));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 2;
-		gridBagConstraints.gridwidth = 2;
-		gridBagConstraints.weighty = 1.0;
-		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		add(txtDesc, gridBagConstraints);
+        if(null != force.getDescription() && !force.getDescription().isEmpty()) {
+            txtDesc.setName("txtDesc");
+            txtDesc.setEditable(false);
+            txtDesc.setContentType("text/html");
+            txtDesc.setText(MarkdownRenderer.getRenderedHtml(force.getDescription()));
+            txtDesc.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createTitledBorder("Description"),
+                    BorderFactory.createEmptyBorder(0,2,2,2)));
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 2;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.weighty = 1.0;
+            gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            add(txtDesc, gridBagConstraints);
+        }
 	}
 	
 	private void setIcon(Force force, JLabel lbl, int scale) {

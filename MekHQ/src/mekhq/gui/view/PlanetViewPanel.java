@@ -23,7 +23,6 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.text.DefaultCaret;
 
@@ -34,6 +33,7 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.SocioIndustrialData;
+import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.campaign.universe.PlanetarySystem;
 
 /**
@@ -117,7 +117,7 @@ public class PlanetViewPanel extends ScrollablePanel {
         panel.setLayout(new GridBagLayout());
         DateTime currentDate = Utilities.getDateTimeDay(campaign.getCalendar());
         
-        JLabel lblOwner = new JLabel("<html><i>" + planet.getFactionDesc(currentDate) + "</i></html>");
+        JLabel lblOwner = new JLabel("<html><nobr><i>" + planet.getFactionDesc(currentDate) + "</i></nobr></html>");
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -132,24 +132,21 @@ public class PlanetViewPanel extends ScrollablePanel {
         //Set up grid bag constraints
         GridBagConstraints gbcLabel = new GridBagConstraints();
         gbcLabel.gridx = 0;
-        gbcLabel.fill = GridBagConstraints.NONE;
+        gbcLabel.fill = GridBagConstraints.HORIZONTAL;
         gbcLabel.anchor = GridBagConstraints.NORTHWEST;        
         GridBagConstraints gbcText = new GridBagConstraints();
         gbcText.gridx = 1;
-        gbcText.weightx = 0.5;
+        gbcText.weightx = 1.0;
         gbcText.insets = new Insets(0, 10, 0, 0);
-        gbcText.fill = GridBagConstraints.HORIZONTAL;
-        gbcText.anchor = GridBagConstraints.WEST;  
+        gbcText.fill = GridBagConstraints.BOTH;
+        gbcText.anchor = GridBagConstraints.NORTHWEST;  
         int infoRow = 1;
         
         //Planet type
         JLabel lblPlanetType = new JLabel(resourceMap.getString("lblPlanetaryType1.text"));
         gbcLabel.gridy = infoRow;
         panel.add(lblPlanetType, gbcLabel);        
-        JTextArea txtPlanetType = new JTextArea(planet.getPlanetType());
-        txtPlanetType.setEditable(false);
-        txtPlanetType.setLineWrap(true);
-        txtPlanetType.setWrapStyleWord(true);
+        JLabel txtPlanetType = new JLabel(planet.getPlanetType());
         gbcText.gridy = infoRow;
         panel.add(txtPlanetType, gbcText);
         ++ infoRow;
@@ -171,10 +168,7 @@ public class PlanetViewPanel extends ScrollablePanel {
             } else {
                 text = planet.getDiplayableSystemPosition();
             }
-            JTextArea txtPosition = new JTextArea(text);
-            txtPosition.setEditable(false);
-            txtPosition.setLineWrap(true);
-            txtPosition.setWrapStyleWord(true);
+            JLabel txtPosition = new JLabel(text);
             gbcText.gridy = infoRow;
             panel.add(txtPosition, gbcText);
             ++ infoRow;
@@ -184,10 +178,7 @@ public class PlanetViewPanel extends ScrollablePanel {
         JLabel lblJumpPoint = new JLabel(resourceMap.getString("lblJumpPoint1.text"));
         gbcLabel.gridy = infoRow;
         panel.add(lblJumpPoint, gbcLabel);        
-        JTextArea txtJumpPoint = new JTextArea(Double.toString(Math.round(100 * planet.getTimeToJumpPoint(1))/100.0) + " days");
-        txtJumpPoint.setEditable(false);
-        txtJumpPoint.setLineWrap(true);
-        txtJumpPoint.setWrapStyleWord(true);
+        JLabel txtJumpPoint = new JLabel(Double.toString(Math.round(100 * planet.getTimeToJumpPoint(1))/100.0) + " days");
         gbcText.gridy = infoRow;
         panel.add(txtJumpPoint, gbcText);
         ++ infoRow;
@@ -197,10 +188,7 @@ public class PlanetViewPanel extends ScrollablePanel {
             JLabel lblYear = new JLabel(resourceMap.getString("lblYear1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblYear, gbcLabel);        
-            JTextArea txtYear = new JTextArea(Double.toString(planet.getYearLength()) + " Terran years");
-            txtYear.setEditable(false);
-            txtYear.setLineWrap(true);
-            txtYear.setWrapStyleWord(true);
+            JLabel txtYear = new JLabel(Double.toString(planet.getYearLength()) + " Terran years");
             gbcText.gridy = infoRow;
             panel.add(txtYear, gbcText);
             ++ infoRow;
@@ -211,10 +199,7 @@ public class PlanetViewPanel extends ScrollablePanel {
             JLabel lblDay = new JLabel(resourceMap.getString("lblDay1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblDay, gbcLabel);        
-            JTextArea txtDay = new JTextArea(Double.toString(planet.getDayLength(currentDate)) + " hours");
-            txtDay.setEditable(false);
-            txtDay.setLineWrap(true);
-            txtDay.setWrapStyleWord(true);
+            JLabel txtDay = new JLabel(Double.toString(planet.getDayLength(currentDate)) + " hours");
             gbcText.gridy = infoRow;
             panel.add(txtDay, gbcText);
             ++ infoRow;
@@ -225,10 +210,7 @@ public class PlanetViewPanel extends ScrollablePanel {
             JLabel lblGravity = new JLabel(resourceMap.getString("lblGravity1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblGravity, gbcLabel);        
-            JTextArea txtGravity = new JTextArea(planet.getGravityText());
-            txtGravity.setEditable(false);
-            txtGravity.setLineWrap(true);
-            txtGravity.setWrapStyleWord(true);
+            JLabel txtGravity = new JLabel(planet.getGravityText());
             gbcText.gridy = infoRow;
             panel.add(txtGravity, gbcText);
             ++ infoRow;
@@ -239,10 +221,7 @@ public class PlanetViewPanel extends ScrollablePanel {
             JLabel lblAtmosphere = new JLabel(resourceMap.getString("lblAtmosphere.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblAtmosphere, gbcLabel);        
-            JTextArea txtAtmosphere = new JTextArea(planet.getAtmosphereName(currentDate));
-            txtAtmosphere.setEditable(false);
-            txtAtmosphere.setLineWrap(true);
-            txtAtmosphere.setWrapStyleWord(true);
+            JLabel txtAtmosphere = new JLabel(planet.getAtmosphereName(currentDate));
             gbcText.gridy = infoRow;
             panel.add(txtAtmosphere, gbcText);
             ++ infoRow;
@@ -253,10 +232,7 @@ public class PlanetViewPanel extends ScrollablePanel {
             JLabel lblPressure = new JLabel(resourceMap.getString("lblPressure1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblPressure, gbcLabel);        
-            JTextArea txtPressure = new JTextArea(planet.getPressureName(currentDate));
-            txtPressure.setEditable(false);
-            txtPressure.setLineWrap(true);
-            txtPressure.setWrapStyleWord(true);
+            JLabel txtPressure = new JLabel(planet.getPressureName(currentDate));
             gbcText.gridy = infoRow;
             panel.add(txtPressure, gbcText);
             ++ infoRow;
@@ -267,10 +243,7 @@ public class PlanetViewPanel extends ScrollablePanel {
             JLabel lblComposition = new JLabel(resourceMap.getString("lblComposition.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblComposition, gbcLabel);        
-            JTextArea txtComposition = new JTextArea(planet.getComposition(currentDate));
-            txtComposition.setEditable(false);
-            txtComposition.setLineWrap(true);
-            txtComposition.setWrapStyleWord(true);
+            JLabel txtComposition = new JLabel("<html>" + planet.getComposition(currentDate) + "</html>");
             gbcText.gridy = infoRow;
             panel.add(txtComposition, gbcText);
             ++ infoRow;
@@ -281,10 +254,7 @@ public class PlanetViewPanel extends ScrollablePanel {
             JLabel lblTemp = new JLabel(resourceMap.getString("lblTemp1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblTemp, gbcLabel);        
-            JTextArea txtTemp = new JTextArea(planet.getTemperature(currentDate) + "°C");
-            txtTemp.setEditable(false);
-            txtTemp.setLineWrap(true);
-            txtTemp.setWrapStyleWord(true);
+            JLabel txtTemp = new JLabel(planet.getTemperature(currentDate) + "°C");
             gbcText.gridy = infoRow;
             panel.add(txtTemp, gbcText);
             ++ infoRow;
@@ -295,10 +265,7 @@ public class PlanetViewPanel extends ScrollablePanel {
             JLabel lblWater = new JLabel(resourceMap.getString("lblWater1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblWater, gbcLabel);        
-            JTextArea txtWater = new JTextArea(planet.getPercentWater(currentDate) + " percent");
-            txtWater.setEditable(false);
-            txtWater.setLineWrap(true);
-            txtWater.setWrapStyleWord(true);
+            JLabel txtWater = new JLabel(planet.getPercentWater(currentDate) + " percent");
             gbcText.gridy = infoRow;
             panel.add(txtWater, gbcText);
             ++ infoRow;
@@ -309,10 +276,7 @@ public class PlanetViewPanel extends ScrollablePanel {
             JLabel lblAnimal = new JLabel(resourceMap.getString("lblAnimal1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblAnimal, gbcLabel);        
-            JTextArea txtAnimal = new JTextArea(planet.getLifeFormName(currentDate));
-            txtAnimal.setEditable(false);
-            txtAnimal.setLineWrap(true);
-            txtAnimal.setWrapStyleWord(true);
+            JLabel txtAnimal = new JLabel(planet.getLifeFormName(currentDate));
             gbcText.gridy = infoRow;
             panel.add(txtAnimal, gbcText);
             ++ infoRow;
@@ -323,10 +287,7 @@ public class PlanetViewPanel extends ScrollablePanel {
         	JLabel lblSatellite = new JLabel(resourceMap.getString("lblSatellite1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblSatellite, gbcLabel);        
-            JTextArea txtSatellite = new JTextArea(planet.getSatelliteDescription());
-            txtSatellite.setEditable(false);
-            txtSatellite.setLineWrap(true);
-            txtSatellite.setWrapStyleWord(true);
+            JLabel txtSatellite = new JLabel("<html>" + planet.getSatelliteDescription() + "</html>");
             gbcText.gridy = infoRow;
             panel.add(txtSatellite, gbcText);
             ++ infoRow;
@@ -337,10 +298,7 @@ public class PlanetViewPanel extends ScrollablePanel {
             JLabel lblLandMass = new JLabel(resourceMap.getString("lblLandMass1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblLandMass, gbcLabel);        
-            JTextArea txtLandMass = new JTextArea(planet.getLandMassDescription());
-            txtLandMass.setEditable(false);
-            txtLandMass.setLineWrap(true);
-            txtLandMass.setWrapStyleWord(true);
+            JLabel txtLandMass = new JLabel("<html>" + planet.getLandMassDescription() + "</html>");
             gbcText.gridy = infoRow;
             panel.add(txtLandMass, gbcText);
             ++ infoRow;
@@ -351,10 +309,7 @@ public class PlanetViewPanel extends ScrollablePanel {
             JLabel lblPopulation = new JLabel(resourceMap.getString("lblPopulation.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblPopulation, gbcLabel);
-            JTextArea txtPopulation = new JTextArea(NumberFormat.getNumberInstance(Locale.getDefault()).format(planet.getPopulation(currentDate)));
-            txtPopulation.setEditable(false);
-            txtPopulation.setLineWrap(true);
-            txtPopulation.setWrapStyleWord(true);
+            JLabel txtPopulation = new JLabel(NumberFormat.getNumberInstance(Locale.getDefault()).format(planet.getPopulation(currentDate)));
             gbcText.gridy = infoRow;
             panel.add(txtPopulation, gbcText);
             ++ infoRow;
@@ -367,10 +322,7 @@ public class PlanetViewPanel extends ScrollablePanel {
             panel.add(lblSocioIndustrial, gbcLabel);      
             SocioIndustrialData sid = planet.getSocioIndustrial(currentDate);
             String sidText = (null == sid) ? "" : sid.getHTMLDescription();
-            JTextPane txtSocioIndustrial = new JTextPane();
-            txtSocioIndustrial.setContentType("text/html");
-            txtSocioIndustrial.setText(sidText);
-            txtSocioIndustrial.setEditable(false);
+            JLabel txtSocioIndustrial = new JLabel(sidText);
             gbcText.gridy = infoRow;
             panel.add(txtSocioIndustrial, gbcText);
             ++ infoRow;
@@ -381,28 +333,25 @@ public class PlanetViewPanel extends ScrollablePanel {
             JLabel lblHPG = new JLabel(resourceMap.getString("lblHPG1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblHPG, gbcLabel);        
-            JTextArea txtHPG = new JTextArea(planet.getHPGClass(currentDate));
-            txtHPG.setEditable(false);
-            txtHPG.setLineWrap(true);
-            txtHPG.setWrapStyleWord(true);
+            JLabel txtHPG = new JLabel(planet.getHPGClass(currentDate));
             gbcText.gridy = infoRow;
             panel.add(txtHPG, gbcText);
             ++ infoRow;
         }
 
         if(null != planet.getDescription()) {
-            JTextArea txtDesc = new JTextArea(planet.getDescription());
-            ((DefaultCaret) txtDesc.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
+            JTextPane txtDesc = new JTextPane();
             txtDesc.setEditable(false);
-            txtDesc.setLineWrap(true);
-            txtDesc.setWrapStyleWord(true);
+            txtDesc.setContentType("text/html");
+            txtDesc.setText(MarkdownRenderer.getRenderedHtml(planet.getDescription()));
+            ((DefaultCaret) txtDesc.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = infoRow;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.weighty = 1.0;
-            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+            gridBagConstraints.insets = new Insets(0, 0, 5, 0);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             panel.add(txtDesc, gridBagConstraints);
@@ -435,10 +384,7 @@ public class PlanetViewPanel extends ScrollablePanel {
         JLabel lblStarType = new JLabel(resourceMap.getString("lblStarType1.text"));        
         gbcLabel.gridy = infoRow;       
         panel.add(lblStarType, gbcLabel);        
-        JTextArea txtStarType = new JTextArea(system.getSpectralTypeText() + " (" + system.getRechargeTimeText(currentDate) + ")");
-        txtStarType.setEditable(false);
-        txtStarType.setLineWrap(true);
-        txtStarType.setWrapStyleWord(true);
+        JLabel txtStarType = new JLabel(system.getSpectralTypeText() + " (" + system.getRechargeTimeText(currentDate) + ")");
         gbcText.gridy = infoRow;
         panel.add(txtStarType, gbcText);        
         ++ infoRow;
@@ -447,10 +393,7 @@ public class PlanetViewPanel extends ScrollablePanel {
         JLabel lblRecharge = new JLabel(resourceMap.getString("lblRecharge1.text"));
         gbcLabel.gridy = infoRow;
         panel.add(lblRecharge, gbcLabel);        
-        JTextArea txtRecharge = new JTextArea(system.getRechargeStationsText(currentDate));
-        txtRecharge.setEditable(false);
-        txtRecharge.setLineWrap(true);
-        txtRecharge.setWrapStyleWord(true);
+        JLabel txtRecharge = new JLabel(system.getRechargeStationsText(currentDate));
         gbcText.gridy = infoRow;
         panel.add(txtRecharge, gbcText);
         

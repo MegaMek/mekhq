@@ -146,7 +146,7 @@ public class ContractSummaryPanel extends JPanel {
 		gbc.gridheight = 1;
 		gbc.weightx = 1.0;
 		gbc.weighty = 1.0;
-		gbc.insets = new java.awt.Insets(5, 5, 5, 20);
+		gbc.insets = new java.awt.Insets(5, 5, 5, 5);
 		gbc.fill = java.awt.GridBagConstraints.BOTH;
 		gbc.anchor = java.awt.GridBagConstraints.NORTHWEST;	
 		add(mainPanel, gbc);

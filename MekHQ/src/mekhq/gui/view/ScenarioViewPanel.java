@@ -100,7 +100,8 @@ public class ScenarioViewPanel extends ScrollablePanel {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridheight = 1;
         gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;    
         add(pnlStats, gridBagConstraints);
@@ -115,28 +116,30 @@ public class ScenarioViewPanel extends ScrollablePanel {
         gridBagConstraints.gridheight = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;    
         add(forceTree, gridBagConstraints);
         
-        txtReport.setName("txtReport");
-        txtReport.setEditable(false);
-        txtReport.setContentType("text/html");
-        txtReport.setText(MarkdownRenderer.getRenderedHtml(scenario.getReport()));
-        txtReport.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("After-Action Report"),
-                BorderFactory.createEmptyBorder(5,5,5,5)));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        add(txtReport, gridBagConstraints);
+        if(null != scenario.getReport() && !scenario.getReport().isEmpty()) {
+            txtReport.setName("txtReport");
+            txtReport.setEditable(false);
+            txtReport.setContentType("text/html");
+            txtReport.setText(MarkdownRenderer.getRenderedHtml(scenario.getReport()));
+            txtReport.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createTitledBorder("After-Action Report"),
+                    BorderFactory.createEmptyBorder(0,2,2,2)));
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 2;
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 1.0;
+            gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            add(txtReport, gridBagConstraints);
+        }
     }
 
     private void fillStats() {
@@ -159,20 +162,22 @@ public class ScenarioViewPanel extends ScrollablePanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(lblStatus, gridBagConstraints);
         
-        txtDesc.setName("txtDesc");
-        txtDesc.setEditable(false);
-        txtDesc.setContentType("text/html");
-        txtDesc.setText(MarkdownRenderer.getRenderedHtml(scenario.getDescription()));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtDesc, gridBagConstraints);
+        if(null != scenario.getDescription() && !scenario.getDescription().isEmpty()) {
+            txtDesc.setName("txtDesc");
+            txtDesc.setEditable(false);
+            txtDesc.setContentType("text/html");
+            txtDesc.setText(MarkdownRenderer.getRenderedHtml(scenario.getDescription()));
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 2;
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 1.0;
+            gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            pnlStats.add(txtDesc, gridBagConstraints);
+        }
         
         if(scenario.getLoot().size() > 0) {
             gridBagConstraints = new java.awt.GridBagConstraints();
@@ -191,7 +196,7 @@ public class ScenarioViewPanel extends ScrollablePanel {
                 gridBagConstraints.gridy++;
                 gridBagConstraints.gridwidth = 2;
                 gridBagConstraints.weightx = 1.0;
-                gridBagConstraints.weighty = 0.0;
+                gridBagConstraints.weighty = 1.0;
                 gridBagConstraints.insets = new java.awt.Insets(0, 10, 5, 0);
                 gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
                 gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;

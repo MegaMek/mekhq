@@ -28,44 +28,45 @@ import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.mission.Contract;
+import mekhq.gui.utilities.MarkdownRenderer;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class ContractViewPanel extends JPanel {
+public class ContractViewPanel extends ScrollablePanel {
     private static final long serialVersionUID = 7004741688464105277L;
 
     private Contract contract;
     
     private JPanel pnlStats;
-    private JTextArea txtDesc;
+    private JTextPane txtDesc;
     
     private JLabel lblStatus;
     private JLabel lblLocation;
-    private JTextArea txtLocation;
+    private JLabel txtLocation;
     private JLabel lblType;
-    private JTextArea txtType;
+    private JLabel txtType;
     private JLabel lblEmployer;
-    private JTextArea txtEmployer;
+    private JLabel txtEmployer;
     private JLabel lblStartDate;
-    private JTextArea txtStartDate;
+    private JLabel txtStartDate;
     private JLabel lblEndDate;
-    private JTextArea txtEndDate;
+    private JLabel txtEndDate;
     private JLabel lblPayout;
-    private JTextArea txtPayout;
+    private JLabel txtPayout;
     private JLabel lblCommand;
-    private JTextArea txtCommand;
+    private JLabel txtCommand;
     private JLabel lblBLC;
-    private JTextArea txtBLC;
+    private JLabel txtBLC;
     private JLabel lblSalvageValueMerc;
-    private JTextArea txtSalvageValueMerc;
+    private JLabel txtSalvageValueMerc;
     private JLabel lblSalvageValueEmployer;
-    private JTextArea txtSalvageValueEmployer;
+    private JLabel txtSalvageValueEmployer;
     private JLabel lblSalvagePct1;
     private JLabel lblSalvagePct2;
     
@@ -78,7 +79,7 @@ public class ContractViewPanel extends JPanel {
         GridBagConstraints gridBagConstraints;
 
         pnlStats = new JPanel();
-        txtDesc = new JTextArea();
+        txtDesc = new JTextPane();
                
         setLayout(new GridBagLayout());
 
@@ -94,7 +95,7 @@ public class ContractViewPanel extends JPanel {
         gridBagConstraints.gridheight = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 20);
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;    
         add(pnlStats, gridBagConstraints);
@@ -103,21 +104,21 @@ public class ContractViewPanel extends JPanel {
     private void fillStats() {
         lblStatus = new JLabel();
         lblLocation = new JLabel();
-        txtLocation = new JTextArea();
+        txtLocation = new JLabel();
         lblEmployer = new JLabel();
-        txtEmployer = new JTextArea();
+        txtEmployer = new JLabel();
         lblType = new JLabel();
-        txtType = new JTextArea();
+        txtType = new JLabel();
         lblStartDate = new JLabel();
-        txtStartDate = new JTextArea();
+        txtStartDate = new JLabel();
         lblEndDate = new JLabel();
-        txtEndDate = new JTextArea();
+        txtEndDate = new JLabel();
         lblPayout = new JLabel();
-        txtPayout = new JTextArea();
+        txtPayout = new JLabel();
         lblCommand = new JLabel();
-        txtCommand = new JTextArea();
+        txtCommand = new JLabel();
         lblBLC = new JLabel();
-        txtBLC = new JTextArea();
+        txtBLC = new JLabel();
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractViewPanel", new EncodeControl()); //$NON-NLS-1$
 
         GridBagConstraints gridBagConstraints;
@@ -138,75 +139,71 @@ public class ContractViewPanel extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblStatus, gridBagConstraints);
         
+        if(null != contract.getSystemName(null) && !contract.getSystemName(null).isEmpty()) {
+            lblLocation.setName("lblLocation"); // NOI18N
+            lblLocation.setText(resourceMap.getString("lblLocation.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 1;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(lblLocation, gridBagConstraints);
 
-        lblLocation.setName("lblLocation"); // NOI18N
-        lblLocation.setText(resourceMap.getString("lblLocation.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblLocation, gridBagConstraints);
+            txtLocation.setName("txtLocation"); // NOI18N
+            txtLocation.setText(contract.getSystemName(null));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = 1;
+            gridBagConstraints.weightx = 0.5;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(txtLocation, gridBagConstraints);
+        }
         
-        txtLocation.setName("txtLocation"); // NOI18N
-        txtLocation.setText(contract.getSystemName(null));
-        txtLocation.setEditable(false);
-        txtLocation.setLineWrap(true);
-        txtLocation.setWrapStyleWord(true);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtLocation, gridBagConstraints);
+        if(null != contract.getEmployer() && !contract.getEmployer().isEmpty()) {
+            lblEmployer.setName("lblEmployer"); // NOI18N
+            lblEmployer.setText(resourceMap.getString("lblEmployer.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 2;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(lblEmployer, gridBagConstraints);
+            
+            txtEmployer.setName("txtEmployer"); // NOI18N
+            txtEmployer.setText(contract.getEmployer());
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = 2;
+            gridBagConstraints.weightx = 0.5;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(txtEmployer, gridBagConstraints);
+        }
         
-        lblEmployer.setName("lblEmployer"); // NOI18N
-        lblEmployer.setText(resourceMap.getString("lblEmployer.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblEmployer, gridBagConstraints);
-        
-        txtEmployer.setName("txtEmployer"); // NOI18N
-        txtEmployer.setText(contract.getEmployer());
-        txtEmployer.setEditable(false);
-        txtEmployer.setLineWrap(true);
-        txtEmployer.setWrapStyleWord(true);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtEmployer, gridBagConstraints);
-        
-        lblType.setName("lblType"); // NOI18N
-        lblType.setText(resourceMap.getString("lblType.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblType, gridBagConstraints);
-        
-        txtType.setName("txtType"); // NOI18N
-        txtType.setText(contract.getType());
-        txtType.setEditable(false);
-        txtType.setLineWrap(true);
-        txtType.setWrapStyleWord(true);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtType, gridBagConstraints);
+        if(null != contract.getType() && !contract.getType().isEmpty()) {
+            lblType.setName("lblType"); // NOI18N
+            lblType.setText(resourceMap.getString("lblType.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 3;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(lblType, gridBagConstraints);
+            
+            txtType.setName("txtType"); // NOI18N
+            txtType.setText(contract.getType());;
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = 3;
+            gridBagConstraints.weightx = 0.5;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(txtType, gridBagConstraints);
+        }
         
         lblStartDate.setName("lblStartDate"); // NOI18N
         lblStartDate.setText(resourceMap.getString("lblStartDate.text"));
@@ -219,9 +216,6 @@ public class ContractViewPanel extends JPanel {
         
         txtStartDate.setName("txtStartDate"); // NOI18N
         txtStartDate.setText(shortDateFormat.format(contract.getStartDate()));
-        txtStartDate.setEditable(false);
-        txtStartDate.setLineWrap(true);
-        txtStartDate.setWrapStyleWord(true);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
@@ -242,9 +236,6 @@ public class ContractViewPanel extends JPanel {
         
         txtEndDate.setName("txtEndDate"); // NOI18N
         txtEndDate.setText(shortDateFormat.format(contract.getEndingDate()));
-        txtEndDate.setEditable(false);
-        txtEndDate.setLineWrap(true);
-        txtEndDate.setWrapStyleWord(true);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 5;
@@ -265,9 +256,6 @@ public class ContractViewPanel extends JPanel {
 
         txtPayout.setName("txtPayout"); // NOI18N
         txtPayout.setText(contract.getMonthlyPayOut().toAmountAndSymbolString());
-        txtPayout.setEditable(false);
-        txtPayout.setLineWrap(true);
-        txtPayout.setWrapStyleWord(true);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 6;
@@ -288,9 +276,6 @@ public class ContractViewPanel extends JPanel {
         
         txtCommand.setName("txtCommand"); // NOI18N
         txtCommand.setText(Contract.getCommandRightsName(contract.getCommandRights()));
-        txtCommand.setEditable(false);
-        txtCommand.setLineWrap(true);
-        txtCommand.setWrapStyleWord(true);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 7;
@@ -311,9 +296,6 @@ public class ContractViewPanel extends JPanel {
         
         txtBLC.setName("txtBLC"); // NOI18N
         txtBLC.setText(contract.getBattleLossComp() + "%");
-        txtBLC.setEditable(false);
-        txtBLC.setLineWrap(true);
-        txtBLC.setWrapStyleWord(true);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 8;
@@ -332,11 +314,8 @@ public class ContractViewPanel extends JPanel {
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblSalvageValueMerc, gridBagConstraints);
-            txtSalvageValueMerc = new JTextArea();
+            txtSalvageValueMerc = new JLabel();
             txtSalvageValueMerc.setText(contract.getSalvagedByUnit().toAmountAndSymbolString());
-            txtSalvageValueMerc.setEditable(false);
-            txtSalvageValueMerc.setLineWrap(true);
-            txtSalvageValueMerc.setWrapStyleWord(true);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = i;
@@ -353,11 +332,8 @@ public class ContractViewPanel extends JPanel {
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblSalvageValueEmployer, gridBagConstraints);
-            txtSalvageValueEmployer = new JTextArea();
+            txtSalvageValueEmployer = new JLabel();
             txtSalvageValueEmployer.setText(contract.getSalvagedByEmployer().toAmountAndSymbolString());
-            txtSalvageValueEmployer.setEditable(false);
-            txtSalvageValueEmployer.setLineWrap(true);
-            txtSalvageValueEmployer.setWrapStyleWord(true);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = i;
@@ -411,17 +387,16 @@ public class ContractViewPanel extends JPanel {
         pnlStats.add(lblSalvagePct2, gridBagConstraints);
         i++;
         txtDesc.setName("txtDesc");
-        txtDesc.setText(contract.getDescription());
         txtDesc.setEditable(false);
-        txtDesc.setLineWrap(true);
-        txtDesc.setWrapStyleWord(true);
+        txtDesc.setContentType("text/html");
+        txtDesc.setText(MarkdownRenderer.getRenderedHtml(contract.getDescription()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = i;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 20);
+        gridBagConstraints.insets = new Insets(0, 0, 5, 0);
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtDesc, gridBagConstraints);
