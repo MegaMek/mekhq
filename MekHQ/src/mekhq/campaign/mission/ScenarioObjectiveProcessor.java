@@ -280,9 +280,9 @@ public class ScenarioObjectiveProcessor {
             
             for(ObjectiveEffect effect : objectiveEffects) {
                 if(effect.effectType == ObjectiveEffectType.ScenarioVictory) {
-                    victoryScore++;
+                    victoryScore += effect.howMuch;
                 } else if(effect.effectType == ObjectiveEffectType.ScenarioDefeat) {
-                    victoryScore--;
+                    victoryScore -= effect.howMuch;
                 }
             }
         }
@@ -343,12 +343,12 @@ public class ScenarioObjectiveProcessor {
         switch(effect.effectType) {
         case ScenarioVictory:
             if(dryRun) {
-                return "+1 scenario victory point";
+                return String.format("%d scenario victory point", effect.howMuch);
             }
             break;
         case ScenarioDefeat:
             if(dryRun) {
-                return "-1 scenario victory point";
+                return String.format("%d scenario victory point", -effect.howMuch);
             }
             break;
         case ContractScoreUpdate:

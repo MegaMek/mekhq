@@ -118,7 +118,9 @@ public class ObjectiveEditPanel extends JDialog {
         if(objective.getTimeLimitType() == TimeLimitType.ScaledToPrimaryUnitCount) {
             txtTimeLimit.setText(objective.getTimeLimitScaleFactor().toString());
         } else {
-            txtTimeLimit.setText(objective.getTimeLimit().toString());
+            if(objective.getTimeLimit() != null) { 
+                txtTimeLimit.setText(objective.getTimeLimit().toString());
+            }
         }
         
         updateEffectList(successEffects, objective.getSuccessEffects());

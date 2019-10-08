@@ -303,18 +303,34 @@ public class ScenarioObjective {
         String timeLimitString = 
                 timeLimitType == TimeLimitType.None ? 
                     "" :
-                    String.format("%s %d turns", isTimeLimitAtMost() ? "within at most" : "for at least", getTimeLimit());
+                    String.format("%s %d turns", isTimeLimitAtMost() ? " within at most" : " for at least", getTimeLimit());
         
         return timeLimitString;
     }
     
+    /**
+     * Generates a "short" string that describes the objective in a manner suitable for display in
+     * the objective resolution screen.
+     */
     public String toShortString() {
         String timeLimitString = getTimeLimitString();
+        String edgeString = getDestinationEdge() != OffBoardDirection.NONE ? getDestinationEdge().toString() : "";
+        String amountString = fixedAmount != null ? fixedAmount.toString() : String.format("%d%%", percentage);
         
-        if(fixedAmount != null) {
-            return String.format("%s %d %s", objectiveCriterion.toString(), fixedAmount, timeLimitString);
-        } else {
-            return String.format("%s %d%% %s", objectiveCriterion.toString(), percentage, timeLimitString);
+        switch(getObjectiveCriterion()) {
+        case Destroy:
+        case ForceWithdraw:
+        case Capture:
+        case Preserve:
+            return String.format("%s %s%s", getObjectiveCriterion().toString(), amountString, timeLimitString);
+        case ReachMapEdge:
+            return String.format("Reach %s edge with %s%s", edgeString, amountString, timeLimitString);
+        case PreventReachMapEdge:
+            return String.format("Prevent %s from reaching %s%s", amountString, edgeString, timeLimitString);
+        case Custom:
+            return String.format("%s%s", getDescription(), amountString, timeLimitString);
+        default:
+                return "?";
         }
     }
     
