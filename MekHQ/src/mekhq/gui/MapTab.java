@@ -54,6 +54,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
 
     private JPanel panMapView;
     InterstellarMapPanel panMap;
+    PlanetarySystemMapPanel panSystem;
     private JSplitPane splitMap;
     private JScrollPane scrollPlanetView;
     JSuggestField suggestPlanet;
@@ -134,6 +135,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         panMap = new InterstellarMapPanel(getCampaign(), getCampaignGui());
         // lets go ahead and zoom in on the current location
         panMap.setSelectedSystem(getCampaign().getLocation().getCurrentSystem());
+        panSystem = new PlanetarySystemMapPanel(getCampaign());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -141,7 +143,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        panMapView.add(panMap, gridBagConstraints);
+        panMapView.add(panSystem, gridBagConstraints);
 
         scrollPlanetView = new JScrollPane();
         scrollPlanetView.setMinimumSize(new java.awt.Dimension(400, 600));
@@ -156,6 +158,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
 
         panMap.setCampaign(getCampaign());
         panMap.addActionListener(this);
+        panSystem.addActionListener(this);
 
         setLayout(new BorderLayout());
         add(splitMap, BorderLayout.CENTER);
@@ -190,7 +193,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         panMap.repaint();
     }
 
-    protected void refreshPlanetView() {
+    protected void refreshSystemView() {
         JumpPath path = panMap.getJumpPath();
         if (null != path && !path.isEmpty()) {
             scrollPlanetView.setViewportView(new JumpPathViewPanel(path, getCampaign()));
@@ -201,10 +204,20 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
             scrollPlanetView.setViewportView(new PlanetViewPanel(system, getCampaign()));
         }
     }
+    
+    protected void refreshPlanetView() {
+        int pos = panSystem.getSelectedPlanetPosition();
+        PlanetarySystem system = panMap.getSelectedSystem();
+        if (null != system) {
+            scrollPlanetView.setViewportView(new PlanetViewPanel(system, getCampaign(), pos));
+        }
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == panMap) {
+            refreshSystemView();
+        } else if(e.getSource() == panSystem) {
             refreshPlanetView();
         }
     }

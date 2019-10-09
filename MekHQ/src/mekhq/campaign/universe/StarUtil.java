@@ -638,7 +638,7 @@ public final class StarUtil {
                 MekHQ.getLogger().error(StarUtil.class, METHOD_NAME, e);
             }
         }
-        return ICON_DATA.get(Utilities.nonNull(planet.getIcon(), "default"));
+        return ICON_DATA.get(Utilities.nonNull(planet.getIcon(), "earth"));
     }
 
     private StarUtil() {}

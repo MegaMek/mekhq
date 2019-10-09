@@ -14,6 +14,8 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
@@ -21,9 +23,11 @@ import java.awt.geom.Arc2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.ImageIcon;
@@ -159,18 +163,15 @@ public class PlanetarySystemMapPanel extends JPanel {
         g.drawString(text, x, y);
     }
     
-    public Planet getSelectedPlanet() {
-        return system.getPlanet(selectedPlanet);
+    public int getSelectedPlanetPosition() {
+        return selectedPlanet;
     }
     
     private void changeSelectedPlanet(int pos) {
         selectedPlanet = pos;
-        //notifyListeners();
+        notifyListeners();
     }
     
-    /**
-     * Calculate the nearest neighbour for the given point If anyone has a better algorithm than this stupid kind of shit, please, feel free to exchange my brute force thing... An good idea would be an voronoi diagram and the sweep algorithm from Steven Fortune.
-     */
     private int nearestNeighbour(double x, double y) {
         int n = system.getPlanets().size();
         int rectWidth = getWidth() / (n+1);
@@ -189,5 +190,22 @@ public class PlanetarySystemMapPanel extends JPanel {
             }
         }
         return 0;
+    }
+    
+    private transient List<ActionListener> listeners = new ArrayList<>();
+    
+    public void addActionListener(ActionListener l) {
+        if (!listeners.contains(l)) {
+            listeners.add(l);
+        }
+    }
+    
+    public void removeActionListener(ActionListener l) {
+        listeners.remove(l);
+    }
+    
+    private void notifyListeners() {
+        ActionEvent ev = new ActionEvent(this, ActionEvent.ACTION_FIRST, "refresh");
+        listeners.forEach(l -> l.actionPerformed(ev));
     }
 }
