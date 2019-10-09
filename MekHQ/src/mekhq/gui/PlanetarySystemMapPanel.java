@@ -56,14 +56,17 @@ public class PlanetarySystemMapPanel extends JPanel {
     private Campaign campaign;
     private PlanetarySystem system;
     private int selectedPlanet = 0;
-    int diameter;
+    private int[] diameters;
+    
+    private static int minDiameter = 16;
+    private static int maxDiameter = 128;
 
     public PlanetarySystemMapPanel(Campaign c) {
         
         this.campaign = c;
-        this.system = campaign.getCurrentSystem();
+        this.system = Systems.getInstance().getSystemById("Terra");
         selectedPlanet = system.getPrimaryPlanetPosition();
-        diameter = 64;
+        diameters = new int[system.getPlanets().size()];
         
         mapPanel = new JPanel() {
             private static final long serialVersionUID = -6666762147393179909L;
@@ -71,6 +74,7 @@ public class PlanetarySystemMapPanel extends JPanel {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g;
+                Arc2D.Double arc = new Arc2D.Double();
                 g2.setFont(new Font("Helvetica", Font.PLAIN, 18));
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(Color.BLACK);
@@ -84,28 +88,39 @@ public class PlanetarySystemMapPanel extends JPanel {
                 int y = getHeight() / 2;
                 int x = 0;
                 
-                //adjust diameter based on rectangle width but only up to some maximum and minimum
-                diameter = rectWidth-32;
-                if(diameter < 64) {
-                    diameter = 64;
-                } else if(diameter > 128) {
-                    diameter = 128;
+                //get the biggest diameter allowed within this space for a planet
+                int biggestDiameterPixels = rectWidth-32;
+                if(biggestDiameterPixels < minDiameter) {
+                    biggestDiameterPixels = minDiameter;
+                } else if(biggestDiameterPixels > maxDiameter) {
+                    biggestDiameterPixels = maxDiameter;
                 }
-                int radius = diameter / 2;
                 
-                Color[] colors = new Color[] {Color.PINK, Color.GREEN, Color.BLUE, Color.CYAN, Color.MAGENTA, Color.ORANGE, Color.YELLOW};
+                //find the biggest diameter among all planets
+                double biggestDiameter = 0;
+                for(Planet p : system.getPlanets()) {
+                    if(p.getDiameter() > biggestDiameter) {
+                        biggestDiameter = p.getDiameter();
+                    }
+                }
                 
-                Arc2D.Double arc = new Arc2D.Double();
-
                 for(int i = 0; i < (n+1); i++) {
                     x = rectWidth*i+midpoint;
-                    //for testing
-                    //g2.setColor(colors[i]);
-                    //g2.fillRect(rectWidth*i, 0, rectWidth, getHeight());
                     Planet p = system.getPlanet(i);
-                    if(null != p) {
+                    if(i > 0 & null != p) {
+                        //calculate planetary diameter by taking the ratio of natural logs
+                        //relative to the largest planet in the system
+                        int diameter = (int) ((biggestDiameterPixels) * (Math.log(p.getDiameter())/Math.log(biggestDiameter)));
+                        if(diameter < minDiameter) {
+                            diameter = minDiameter;
+                        } else if(diameter > maxDiameter) {
+                            diameter = maxDiameter;
+                        }
+                        diameters[i-1] = diameter;
+                        int radius = diameter / 2;
+                        
+                        //add ring for selected planet
                         if(i > 0 & selectedPlanet==i) {
-                            //lest try rings
                             g2.setPaint(Color.ORANGE);
                             arc.setArcByCenter(x, y, radius+6, 0, 360, Arc2D.OPEN);
                             g2.fill(arc);
@@ -119,9 +134,13 @@ public class PlanetarySystemMapPanel extends JPanel {
                             arc.setArcByCenter(x, y, radius+2, 0, 360, Arc2D.OPEN);
                             g2.fill(arc);
                         }
+                        
+                        //draw the planet icon
                         Image planetIcon = ImageUtil.loadImageFromFile("data/" + StarUtil.getIconImage(p));
                         g2.drawImage(planetIcon, x-radius, y-radius, diameter, diameter, null);
                         final String planetName = p.getPrintableName(Utilities.getDateTimeDay(campaign.getCalendar()));
+                        
+                        //planet name
                         g2.setColor(Color.WHITE);
                         drawCenteredString(g2, planetName, x, y+radius+12+g.getFontMetrics().getHeight());
                     }
@@ -178,12 +197,12 @@ public class PlanetarySystemMapPanel extends JPanel {
         int midpoint = rectWidth / 2;
         int xTarget = 0;
         int yTarget = getHeight() / 2;
-        //add a little wiggle room to radius
-        int radius = (diameter / 2)+2;
         
         for(int i = 1; i < (n+1); i++) {
             xTarget = rectWidth*i+midpoint;
             //must be within radius
+            //add a little wiggle room to radius
+            int radius = (diameters[i-1] / 2)+2;
             if(x <= (xTarget+radius) & x >= (xTarget-radius) &
                     y <= (yTarget+radius) & y >= (yTarget-radius)) {
                 return i;
