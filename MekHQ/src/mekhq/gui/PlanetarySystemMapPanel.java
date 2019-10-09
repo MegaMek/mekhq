@@ -15,6 +15,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -24,6 +25,9 @@ import java.awt.geom.Arc2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -31,6 +35,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLayeredPane;
@@ -63,6 +68,7 @@ public class PlanetarySystemMapPanel extends JPanel {
     private PlanetarySystem system;
     private int selectedPlanet = 0;
     private int[] diameters;
+    private BufferedImage spaceImage;
     
     private static int minDiameter = 16;
     private static int maxDiameter = 128;
@@ -74,6 +80,13 @@ public class PlanetarySystemMapPanel extends JPanel {
         this.system = campaign.getCurrentSystem();
         selectedPlanet = system.getPrimaryPlanetPosition();
         diameters = new int[system.getPlanets().size()];
+        try {
+            spaceImage = ImageIO.read(new File("data/images/universe/space.png"));
+        } catch (IOException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        //spaceImage = Toolkit.getDefaultToolkit().createImage("data/images/universe/space.jpg");
         
         pane = new JLayeredPane();
         
@@ -84,10 +97,19 @@ public class PlanetarySystemMapPanel extends JPanel {
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g;
                 Arc2D.Double arc = new Arc2D.Double();
-                g2.setFont(new Font("Helvetica", Font.PLAIN, 18));
+                g2.setFont(new Font("Helvetica", Font.PLAIN, 14));
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(Color.BLACK);
-                g2.fillRect(0, 0, getWidth(), getHeight());
+                //g2.fillRect(0, 0, getWidth(), getHeight());
+                //tile the space image
+                int tileWidth = spaceImage.getWidth();
+                int tileHeight = spaceImage.getHeight();
+                for (int y = 0; y < getHeight(); y += tileHeight) {
+                    for (int x = 0; x < getWidth(); x += tileWidth) {
+                        g2.drawImage(spaceImage, x, y, this);
+                    }
+                }
+
 
                 //split canvas into n+1 equal rectangles where n is the number of planetary systems.
                 //the first rectangle is for the star
@@ -119,7 +141,8 @@ public class PlanetarySystemMapPanel extends JPanel {
                     if(i > 0 & null != p) {
                         //calculate planetary diameter by taking the ratio of natural logs
                         //relative to the largest planet in the system
-                        int diameter = (int) ((biggestDiameterPixels) * (Math.log(p.getDiameter())/Math.log(biggestDiameter)));
+                        //int diameter = (int) ((biggestDiameterPixels) * (Math.log(p.getDiameter())/Math.log(biggestDiameter)));
+                        int diameter = (int) ((biggestDiameterPixels) * (Math.cbrt(p.getDiameter())/Math.cbrt(biggestDiameter)));
                         if(diameter < minDiameter) {
                             diameter = minDiameter;
                         } else if(diameter > maxDiameter) {
@@ -151,7 +174,7 @@ public class PlanetarySystemMapPanel extends JPanel {
                         
                         //planet name
                         g2.setColor(Color.WHITE);
-                        drawCenteredString(g2, planetName, x, y+radius+12+g.getFontMetrics().getHeight());
+                        drawCenteredString(g2, planetName, x, y+(biggestDiameterPixels/2)+12+g.getFontMetrics().getHeight());
                     }
                 }
             }
