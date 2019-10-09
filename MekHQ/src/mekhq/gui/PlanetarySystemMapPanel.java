@@ -1,6 +1,7 @@
 package mekhq.gui;
 
 import java.awt.BasicStroke;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -31,6 +32,8 @@ import java.util.List;
 import java.util.Set;
 
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 
 import megamek.common.EquipmentType;
@@ -51,9 +54,12 @@ public class PlanetarySystemMapPanel extends JPanel {
      */
     private static final long serialVersionUID = 2756160214370516878L;
     
+    private JLayeredPane pane;
     private JPanel mapPanel;
+    private JButton btnBack;
     
     private Campaign campaign;
+    private CampaignGUI hqview;
     private PlanetarySystem system;
     private int selectedPlanet = 0;
     private int[] diameters;
@@ -61,12 +67,15 @@ public class PlanetarySystemMapPanel extends JPanel {
     private static int minDiameter = 16;
     private static int maxDiameter = 128;
 
-    public PlanetarySystemMapPanel(Campaign c) {
+    public PlanetarySystemMapPanel(Campaign c, CampaignGUI view) {
         
+        this.hqview = view;
         this.campaign = c;
-        this.system = Systems.getInstance().getSystemById("Terra");
+        this.system = campaign.getCurrentSystem();
         selectedPlanet = system.getPrimaryPlanetPosition();
         diameters = new int[system.getPlanets().size()];
+        
+        pane = new JLayeredPane();
         
         mapPanel = new JPanel() {
             private static final long serialVersionUID = -6666762147393179909L;
@@ -147,7 +156,9 @@ public class PlanetarySystemMapPanel extends JPanel {
                 }
             }
         };
-        add(mapPanel);
+        
+        btnBack = new JButton("< Back"); // NOI18N
+        btnBack.addActionListener(ev -> back());
         
         addMouseListener(new MouseAdapter() {
             
@@ -164,6 +175,11 @@ public class PlanetarySystemMapPanel extends JPanel {
             }
         });
         
+        pane.add(mapPanel, Integer.valueOf(1));
+        pane.add(btnBack, Integer.valueOf(10));
+        
+        add(pane);
+        
         repaint();
     }
     
@@ -171,7 +187,9 @@ public class PlanetarySystemMapPanel extends JPanel {
     protected void paintComponent(Graphics g) {
         int width = getWidth();
         int height = getHeight();
+        pane.setBounds(0, 0, width, height);
         mapPanel.setBounds(0, 0, width, height);
+        btnBack.setBounds(0, 0, 100, 50);
         super.paintComponent(g);
     }
     
@@ -180,6 +198,13 @@ public class PlanetarySystemMapPanel extends JPanel {
         x = x - (metrics.stringWidth(text) / 2);
         y = y - (metrics.getHeight() / 2);
         g.drawString(text, x, y);
+    }
+    
+    public void updatePlanetarySystem(PlanetarySystem s) {
+        this.system = s;
+        selectedPlanet = system.getPrimaryPlanetPosition();
+        diameters = new int[system.getPlanets().size()];
+        mapPanel.repaint();
     }
     
     public int getSelectedPlanetPosition() {
@@ -226,5 +251,9 @@ public class PlanetarySystemMapPanel extends JPanel {
     private void notifyListeners() {
         ActionEvent ev = new ActionEvent(this, ActionEvent.ACTION_FIRST, "refresh");
         listeners.forEach(l -> l.actionPerformed(ev));
+    }
+    
+    private void back() {
+        ((MapTab)hqview.getTab(GuiTabType.MAP)).switchSystemsMap();
     }
 }

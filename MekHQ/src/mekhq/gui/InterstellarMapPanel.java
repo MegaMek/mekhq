@@ -369,12 +369,17 @@ public class InterstellarMapPanel extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON1) {
                     if (e.getClickCount() >= 2) {
-                        //center and zoom
+                      //center and zoom
                         changeSelectedSystem(nearestNeighbour(scr2mapX(e.getX()), scr2mapY(e.getY())));
                         if(conf.scale < 4.0) {
                             conf.scale = 4.0;
                         }
                         center(selectedSystem);
+                        //bring up planetary system map
+                        ((MapTab)hqview.getTab(GuiTabType.MAP)).switchPlanetaryMap(selectedSystem);
+                        /*
+                        
+                        */
                     } else {
                         PlanetarySystem target = nearestNeighbour(scr2mapX(e.getX()), scr2mapY(e.getY()));
                         if(null == target) {
