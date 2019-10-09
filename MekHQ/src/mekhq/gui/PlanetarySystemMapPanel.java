@@ -60,20 +60,33 @@ public class PlanetarySystemMapPanel extends JPanel {
                 int fullWidth = getWidth();
                 int fullHeight = getHeight();
                 Graphics2D g2 = (Graphics2D) g;
+                g2.setFont(new Font("Helvetica", Font.PLAIN, 18));
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(Color.BLACK);
                 g2.fillRect(0, 0, getWidth(), getHeight());
 
-                double y = fullHeight / 2.0;
-                int nPlanets = system.getPlanets().size();
+                //split canvas into n+1 equal rectangles where n is the number of planetary systems.
+                //the first rectangle is for the star
                 
-                for(Planet p : system.getPlanets()) {
-                    double x = fullWidth * p.getSystemPosition()/(nPlanets * 1.0);
-                    Image planetIcon = ImageUtil.loadImageFromFile("data/" + StarUtil.getIconImage(p));
-                    g2.drawImage(planetIcon, (int) x, (int) y, 64, 64, null);
-                    final String planetName = p.getPrintableName(Utilities.getDateTimeDay(campaign.getCalendar()));
-                    g2.setPaint(Color.WHITE);
-                    drawCenteredString(g2, planetName, new Rectangle((int) x, (int) (y+64), 64, 30), new Font("Helvetica", Font.PLAIN, 18));
+                int n = system.getPlanets().size();
+                int rectWidth = getWidth() / (n+1);
+                int midpoint = rectWidth / 2;
+                int y = getHeight() / 2;
+                
+                Color[] colors = new Color[] {Color.PINK, Color.GREEN, Color.BLUE, Color.CYAN, Color.MAGENTA, Color.ORANGE, Color.YELLOW};
+                
+                for(int i = 0; i < (n+1); i++) {
+                    //for testing
+                    //g2.setColor(colors[i]);
+                    //g2.fillRect(rectWidth*i, 0, rectWidth, getHeight());
+                    Planet p = system.getPlanet(i);
+                    if(null != p) {
+                        Image planetIcon = ImageUtil.loadImageFromFile("data/" + StarUtil.getIconImage(p));
+                        g2.drawImage(planetIcon, rectWidth*i+midpoint-32, y-32, 64, 64, null);
+                        final String planetName = p.getPrintableName(Utilities.getDateTimeDay(campaign.getCalendar()));
+                        g2.setColor(Color.WHITE);
+                        drawCenteredString(g2, planetName, rectWidth*i+midpoint, y+32+12+g.getFontMetrics().getHeight());
+                    }
                 }
             }
         };
@@ -89,16 +102,10 @@ public class PlanetarySystemMapPanel extends JPanel {
         super.paintComponent(g);
     }
     
-    public void drawCenteredString(Graphics g, String text, Rectangle rect, Font font) {
-        // Get the FontMetrics
-        FontMetrics metrics = g.getFontMetrics(font);
-        // Determine the X coordinate for the text
-        int x = rect.x + (rect.width - metrics.stringWidth(text)) / 2;
-        // Determine the Y coordinate for the text (note we add the ascent, as in java 2d 0 is top of the screen)
-        int y = rect.y + ((rect.height - metrics.getHeight()) / 2) + metrics.getAscent();
-        // Set the font
-        //g.setFont(font);
-        // Draw the String
+    public void drawCenteredString(Graphics g, String text, int x, int y) {
+        FontMetrics metrics = g.getFontMetrics();
+        x = x - (metrics.stringWidth(text) / 2);
+        y = y - (metrics.getHeight() / 2);
         g.drawString(text, x, y);
     }
 }
