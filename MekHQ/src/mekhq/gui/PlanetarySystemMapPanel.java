@@ -139,9 +139,9 @@ public class PlanetarySystemMapPanel extends JPanel {
                     x = rectWidth*i+midpoint;
                     Planet p = system.getPlanet(i);
                     if(i > 0 & null != p) {
-                        //calculate planetary diameter by taking the ratio of natural logs
-                        //relative to the largest planet in the system
-                        //int diameter = (int) ((biggestDiameterPixels) * (Math.log(p.getDiameter())/Math.log(biggestDiameter)));
+                        //diameters need to be scaled relative to largest planet, but linear 
+                        //scale will make all but gas/ice giants tiny. log scale made sizes too close,
+                        //but cubic root scale seems to work pretty well.
                         int diameter = (int) ((biggestDiameterPixels) * (Math.cbrt(p.getDiameter())/Math.cbrt(biggestDiameter)));
                         if(diameter < minDiameter) {
                             diameter = minDiameter;
