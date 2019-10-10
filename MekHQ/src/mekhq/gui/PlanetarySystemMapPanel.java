@@ -81,7 +81,7 @@ public class PlanetarySystemMapPanel extends JPanel {
         selectedPlanet = system.getPrimaryPlanetPosition();
         diameters = new int[system.getPlanets().size()];
         try {
-            spaceImage = ImageIO.read(new File("data/images/universe/space.png"));
+            spaceImage = ImageIO.read(new File("data/images/universe/space.jpg"));
         } catch (IOException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
@@ -119,6 +119,15 @@ public class PlanetarySystemMapPanel extends JPanel {
                 int y = getHeight() / 2;
                 int x = 0;
                 
+                //place the sun first
+                Image sunIcon = ImageUtil.loadImageFromFile("data/" + StarUtil.getIconImage(system));
+                int sunHeight = sunIcon.getHeight(null);
+                int sunWidth = sunIcon.getWidth(null);
+                double sunRatio = sunHeight/sunWidth;
+                int maxSunWidth = (int) Math.round(rectWidth * 0.9);
+                int maxSunHeight =  (int) Math.round(maxSunWidth * sunRatio);
+                g2.drawImage(sunIcon, x, y-150, maxSunWidth, 300, null);
+
                 //get the biggest diameter allowed within this space for a planet
                 int biggestDiameterPixels = rectWidth-32;
                 if(biggestDiameterPixels < minDiameter) {
