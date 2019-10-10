@@ -50,7 +50,6 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextArea;
 import javax.swing.JTree;
-import javax.swing.border.LineBorder;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -173,6 +172,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
         setLayout(new GridBagLayout());
 
         setBackground(Color.WHITE);
+        setScrollableTracksViewportWidth(false);
 
         int y = 0;
 
@@ -239,7 +239,6 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
         playerForceTree.setCellRenderer(new ForceStubRenderer());
         playerForceTree.setRowHeight(50);
         playerForceTree.setRootVisible(false);
-        playerForceTree.setBorder(new LineBorder(Color.RED));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y++;
@@ -389,7 +388,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
                 }
             });
         }
-
+        
         txtDesc.setName("txtDesc");
         txtDesc.setText(scenario.getDescription());
         txtDesc.setEditable(false);
@@ -448,7 +447,11 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
             
             objectiveBuilder.append("\n");
         }
+        
         txtDetails.setText(objectiveBuilder.toString());
+        txtDetails.setLineWrap(true);
+        txtDetails.setWrapStyleWord(true);
+        txtDetails.setEditable(false);
         
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y++;
