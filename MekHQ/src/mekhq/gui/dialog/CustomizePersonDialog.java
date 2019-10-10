@@ -6,6 +6,7 @@
 
 package mekhq.gui.dialog;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -32,6 +33,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
@@ -61,6 +63,7 @@ import mekhq.gui.control.EditKillLogControl;
 import mekhq.gui.control.EditMissionLogControl;
 import mekhq.gui.control.EditPersonnelLogControl;
 import mekhq.gui.preferences.JWindowPreference;
+import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.preferences.PreferencesNode;
 
 /**
@@ -94,7 +97,6 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private javax.swing.JButton btnServiceDate;
     private javax.swing.JComboBox<String> choiceGender;
     private javax.swing.JScrollPane scrOptions;
-    private javax.swing.JScrollPane scrBio;
     private javax.swing.JScrollPane scrSkills;
     private javax.swing.JLabel lblToughness;
     private javax.swing.JLabel lblName;
@@ -113,7 +115,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private javax.swing.JTextField textName;
     private javax.swing.JTextField textNickname;
     private javax.swing.JTextField textBloodname;
-    private javax.swing.JTextPane txtBio;
+    private MarkdownEditorPanel txtBio;
     private JComboBox<Faction> choiceFaction;
     private JCheckBox chkClan;
     private JComboBox<String> choicePheno;
@@ -171,8 +173,6 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         panOptions = new javax.swing.JPanel();
         scrSkills = new javax.swing.JScrollPane();
         panSkills = new javax.swing.JPanel();
-        scrBio = new javax.swing.JScrollPane();
-        txtBio = new javax.swing.JTextPane();
         panButtons = new javax.swing.JPanel();
         btnOk = new javax.swing.JButton();
         
@@ -617,15 +617,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
 
         y++;
 
-        scrBio.setName("scrBio"); // NOI18N
-
-        txtBio.setName("txtBio"); // NOI18N
+        txtBio = new MarkdownEditorPanel("Biography");
         txtBio.setText(person.getBiography());
-		txtBio.setBorder(BorderFactory.createTitledBorder("Biography"));
-		scrBio.setMinimumSize(new java.awt.Dimension(300, 300));
-		scrBio.setPreferredSize(new java.awt.Dimension(300, 300));
-        scrBio.setViewportView(txtBio);
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
@@ -635,7 +628,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        panDemog.add(scrBio, gridBagConstraints);
+        panDemog.add(txtBio, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
     	gridBagConstraints.gridx = 0;

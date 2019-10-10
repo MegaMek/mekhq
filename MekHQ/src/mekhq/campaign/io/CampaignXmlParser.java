@@ -32,8 +32,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -110,7 +112,9 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.Planets;
+import mekhq.campaign.universe.Planet.PlanetaryEvent;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.Systems;
 import mekhq.module.atb.AtBEventProcessor;
 
 public class CampaignXmlParser {
@@ -1802,8 +1806,11 @@ public class CampaignXmlParser {
     }
 
     private static void updatePlanetaryEventsFromXML(Node wn) {
-        // TODO: make Planets a member of Campaign
-        Planets.reload(true);
+    	
+        Systems.reload(true);
+
+        List<Planet.PlanetaryEvent> events;
+        Map<Integer, List<Planet.PlanetaryEvent>> eventsMap = new HashMap<>();; 
 
         NodeList wList = wn.getChildNodes();
         for (int x = 0; x < wList.getLength(); x++) {
@@ -1814,10 +1821,67 @@ public class CampaignXmlParser {
                 continue;
             }
 
+            if (wn2.getNodeName().equalsIgnoreCase("system")) {
+                NodeList systemNodes = wn2.getChildNodes();
+                String systemId = null;
+                List<PlanetarySystem.PlanetarySystemEvent> sysEvents = new ArrayList<>();
+                eventsMap.clear(); 
+                for(int n = 0; n < systemNodes.getLength(); ++n) {
+                    Node systemNode = systemNodes.item(n);
+                    if(systemNode.getNodeType() != Node.ELEMENT_NODE) {
+                        continue;
+                    }
+                    if(systemNode.getNodeName().equalsIgnoreCase("id")) {
+                        systemId = systemNode.getTextContent();
+                    } else if(systemNode.getNodeName().equalsIgnoreCase("event")) {
+                        PlanetarySystem.PlanetarySystemEvent event = Systems.getInstance().readPlanetarySystemEvent(systemNode);
+                        if(null != event) {
+                        	event.custom = true;
+                        	sysEvents.add(event);
+                        }
+                    } else if(systemNode.getNodeName().equalsIgnoreCase("planet")) {
+                    	NodeList planetNodes = systemNode.getChildNodes();
+                        int sysPos = 0;
+                        events = new ArrayList<>();
+                        for(int j = 0; j < planetNodes.getLength(); ++j) {
+                        	Node planetNode = planetNodes.item(j);
+                            if(planetNode.getNodeType() != Node.ELEMENT_NODE) {
+                                continue;
+                            }
+                            if(planetNode.getNodeName().equalsIgnoreCase("sysPos")) {
+                                sysPos = Integer.parseInt(planetNode.getTextContent());
+                            } else if(planetNode.getNodeName().equalsIgnoreCase("event")) {
+                                Planet.PlanetaryEvent event = Systems.getInstance().readPlanetaryEvent(planetNode);
+                                if(null != event) {
+                                    event.custom = true;
+                                    events.add(event);
+                                }
+                            } 
+                        }
+                        if(sysPos>0 & !events.isEmpty()) {
+                        	eventsMap.put(sysPos, events);
+                        }
+                    }
+                }
+                if(null != systemId) {
+                	//iterate through events hash and assign events to planets
+                	Iterator<Map.Entry<Integer, List<PlanetaryEvent>>> it = eventsMap.entrySet().iterator();           
+                    while (it.hasNext()) { 
+                        Map.Entry<Integer, List<PlanetaryEvent>> pair = it.next(); 
+                        Systems.getInstance().updatePlanetaryEvents(systemId, pair.getValue(), true, pair.getKey());
+                    } 
+                    //check for system-wide events
+                    if(!sysEvents.isEmpty()) {
+                    	Systems.getInstance().updatePlanetarySystemEvents(systemId, sysEvents, true);
+                    }
+                }
+            }
+            
+            //legacy code for before switch to planetary systems if planet is at top level
             if (wn2.getNodeName().equalsIgnoreCase("planet")) {
                 NodeList planetNodes = wn2.getChildNodes();
                 String planetId = null;
-                List<Planet.PlanetaryEvent> events = new ArrayList<>();
+                events = new ArrayList<>();
                 for(int n = 0; n < planetNodes.getLength(); ++n) {
                     Node planetNode = planetNodes.item(n);
                     if(planetNode.getNodeType() != Node.ELEMENT_NODE) {
@@ -1826,7 +1890,7 @@ public class CampaignXmlParser {
                     if(planetNode.getNodeName().equalsIgnoreCase("id")) {
                         planetId = planetNode.getTextContent();
                     } else if(planetNode.getNodeName().equalsIgnoreCase("event")) {
-                        Planet.PlanetaryEvent event = Planets.getInstance().readPlanetaryEvent(planetNode);
+                        Planet.PlanetaryEvent event = Systems.getInstance().readPlanetaryEvent(planetNode);
                         if(null != event) {
                             event.custom = true;
                             events.add(event);
@@ -1834,7 +1898,7 @@ public class CampaignXmlParser {
                     }
                 }
                 if(null != planetId) {
-                    Planets.getInstance().updatePlanetaryEvents(planetId, events, true);
+                    Systems.getInstance().updatePlanetaryEvents(planetId, events, true);
                 }
             }
         }

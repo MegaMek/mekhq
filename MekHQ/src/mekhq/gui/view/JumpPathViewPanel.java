@@ -17,13 +17,13 @@ import megamek.common.util.EncodeControl;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
-import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
 
 /**
  * A custom panel that gets filled in with goodies from a JumpPath record
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class JumpPathViewPanel extends javax.swing.JPanel {
+public class JumpPathViewPanel extends ScrollablePanel {
     private static final long serialVersionUID = 7004741688464105277L;
 
     private JumpPath path;
@@ -33,17 +33,17 @@ public class JumpPathViewPanel extends javax.swing.JPanel {
     private javax.swing.JPanel pnlStats;
 
     private javax.swing.JLabel lblJumps;
-    private javax.swing.JTextArea txtJumps;
+    private javax.swing.JLabel txtJumps;
     private javax.swing.JLabel lblTimeStart;
-    private javax.swing.JTextArea txtTimeStart;
+    private javax.swing.JLabel txtTimeStart;
     private javax.swing.JLabel lblTimeEnd;
-    private javax.swing.JTextArea txtTimeEnd;
+    private javax.swing.JLabel txtTimeEnd;
     private javax.swing.JLabel lblRechargeTime;
-    private javax.swing.JTextArea txtRechargeTime;
+    private javax.swing.JLabel txtRechargeTime;
     private javax.swing.JLabel lblTotalTime;
-    private javax.swing.JTextArea txtTotalTime;
+    private javax.swing.JLabel txtTotalTime;
     private javax.swing.JLabel lblCost;
-    private javax.swing.JTextArea txtCost;
+    private javax.swing.JLabel txtCost;
 
     public JumpPathViewPanel(JumpPath p, Campaign c) {
         this.path = p;
@@ -97,14 +97,14 @@ public class JumpPathViewPanel extends javax.swing.JPanel {
         int i = 0;
         javax.swing.JLabel lblPlanet;
         DateTime currentDate = Utilities.getDateTimeDay(campaign.getCalendar());
-        for(Planet planet : path.getPlanets()) {
-            lblPlanet = new javax.swing.JLabel(planet.getPrintableName(currentDate) + " (" + planet.getRechargeTimeText(currentDate) + ")");
+        for(PlanetarySystem system : path.getSystems()) {
+            lblPlanet = new javax.swing.JLabel(system.getPrintableName(currentDate) + " (" + system.getRechargeTimeText(currentDate) + ")");
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
             gridBagConstraints.gridwidth = 1;
             gridBagConstraints.weightx = 1.0;
-            if(i >= (path.getPlanets().size()-1)) {
+            if(i >= (path.getSystems().size()-1)) {
                 gridBagConstraints.weighty = 1.0;
             }        
             gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
@@ -120,21 +120,21 @@ public class JumpPathViewPanel extends javax.swing.JPanel {
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.JumpPathViewPanel", new EncodeControl()); //$NON-NLS-1$
         
         lblJumps = new javax.swing.JLabel();
-        txtJumps = new javax.swing.JTextArea();
+        txtJumps = new javax.swing.JLabel();
         lblTimeStart = new javax.swing.JLabel();
-        txtTimeStart = new javax.swing.JTextArea();
+        txtTimeStart = new javax.swing.JLabel();
         lblTimeEnd = new javax.swing.JLabel();
-        txtTimeEnd = new javax.swing.JTextArea();
+        txtTimeEnd = new javax.swing.JLabel();
         lblRechargeTime = new javax.swing.JLabel();
-        txtRechargeTime = new javax.swing.JTextArea();
+        txtRechargeTime = new javax.swing.JLabel();
         lblTotalTime = new javax.swing.JLabel();
-        txtTotalTime = new javax.swing.JTextArea();
+        txtTotalTime = new javax.swing.JLabel();
         lblCost = new javax.swing.JLabel();
-        txtCost = new javax.swing.JTextArea();
+        txtCost = new javax.swing.JLabel();
         
         DateTime currentDate = Utilities.getDateTimeDay(campaign.getCalendar());
-        String startName = (path.getFirstPlanet() == null) ? "?" : path.getFirstPlanet().getPrintableName(currentDate);
-        String endName = (path.getLastPlanet() == null) ? "?" : path.getLastPlanet().getPrintableName(currentDate);
+        String startName = (path.getFirstSystem() == null) ? "?" : path.getFirstSystem().getPrintableName(currentDate);
+        String endName = (path.getLastSystem() == null) ? "?" : path.getLastSystem().getPrintableName(currentDate);
         
         java.awt.GridBagConstraints gridBagConstraints;
         pnlStats.setLayout(new java.awt.GridBagLayout());
@@ -149,10 +149,7 @@ public class JumpPathViewPanel extends javax.swing.JPanel {
         pnlStats.add(lblJumps, gridBagConstraints);
         
         txtJumps.setName("lblJumps2"); // NOI18N
-        txtJumps.setText(path.getJumps() + " jumps");
-        txtJumps.setEditable(false);
-        txtJumps.setLineWrap(true);
-        txtJumps.setWrapStyleWord(true);
+        txtJumps.setText("<html>" + path.getJumps() + " jumps" + "</html>");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -172,10 +169,7 @@ public class JumpPathViewPanel extends javax.swing.JPanel {
         pnlStats.add(lblTimeStart, gridBagConstraints);
         
         txtTimeStart.setName("lblTimeStart2"); // NOI18N
-        txtTimeStart.setText(Math.round(path.getStartTime(campaign.getLocation().getTransitTime())*100.0)/100.0 + " days from "+ startName + " to jump point");
-        txtTimeStart.setEditable(false);
-        txtTimeStart.setLineWrap(true);
-        txtTimeStart.setWrapStyleWord(true);
+        txtTimeStart.setText("<html>" + Math.round(path.getStartTime(campaign.getLocation().getTransitTime())*100.0)/100.0 + " days from "+ startName + " to jump point" + "</html>");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
@@ -195,10 +189,7 @@ public class JumpPathViewPanel extends javax.swing.JPanel {
         pnlStats.add(lblTimeEnd, gridBagConstraints);
         
         txtTimeEnd.setName("lblTimeEnd2"); // NOI18N
-        txtTimeEnd.setText(Math.round(path.getEndTime()*100.0)/100.0 + " days from final jump point to " + endName);
-        txtTimeEnd.setEditable(false);
-        txtTimeEnd.setLineWrap(true);
-        txtTimeEnd.setWrapStyleWord(true);
+        txtTimeEnd.setText("<html>" + Math.round(path.getEndTime()*100.0)/100.0 + " days from final jump point to " + endName + "</html>");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
@@ -218,10 +209,7 @@ public class JumpPathViewPanel extends javax.swing.JPanel {
         pnlStats.add(lblRechargeTime, gridBagConstraints);
         
         txtRechargeTime.setName("lblRechargeTime2"); // NOI18N
-        txtRechargeTime.setText(Math.round(path.getTotalRechargeTime(currentDate)*100.0)/100.0 + " days");
-        txtRechargeTime.setEditable(false);
-        txtRechargeTime.setLineWrap(true);
-        txtRechargeTime.setWrapStyleWord(true);
+        txtRechargeTime.setText("<html>" + Math.round(path.getTotalRechargeTime(currentDate)*100.0)/100.0 + " days" + "</html>");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
@@ -241,10 +229,7 @@ public class JumpPathViewPanel extends javax.swing.JPanel {
         pnlStats.add(lblTotalTime, gridBagConstraints);
         
         txtTotalTime.setName("lblTotalTime2"); // NOI18N
-        txtTotalTime.setText(Math.round(path.getTotalTime(currentDate, campaign.getLocation().getTransitTime())*100.0)/100.0 + " days");
-        txtTotalTime.setEditable(false);
-        txtTotalTime.setLineWrap(true);
-        txtTotalTime.setWrapStyleWord(true);
+        txtTotalTime.setText("<html>" + Math.round(path.getTotalTime(currentDate, campaign.getLocation().getTransitTime())*100.0)/100.0 + " days" + "</html>");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 5;
@@ -265,15 +250,12 @@ public class JumpPathViewPanel extends javax.swing.JPanel {
             pnlStats.add(lblCost, gridBagConstraints);
 
             txtCost.setName("lblCost2"); // NOI18N
-            txtCost.setText(
+            txtCost.setText("<html>" + 
                     campaign.calculateCostPerJump(
                                 true,
                                 campaign.getCampaignOptions().useEquipmentContractBase())
                             .multipliedBy(path.getJumps())
-                                .toAmountAndSymbolString());
-            txtCost.setEditable(false);
-            txtCost.setLineWrap(true);
-            txtCost.setWrapStyleWord(true);
+                                .toAmountAndSymbolString() + "</html>");
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = 6;

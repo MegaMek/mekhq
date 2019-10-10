@@ -63,7 +63,7 @@ public class FactionBorderTracker {
     private DateTime now;
     
     private Map<Faction, FactionBorders> borders;
-    private Map<Faction, Map<Faction, List<Planet>>> borderPlanets;
+    private Map<Faction, Map<Faction, List<PlanetarySystem>>> borderSystems;
     
     private double isBorderSize = 60;
     private double peripheryBorderSize = 90;
@@ -97,7 +97,7 @@ public class FactionBorderTracker {
         lastUpdate = now;
         
         borders = new ConcurrentHashMap<>();
-        borderPlanets = new ConcurrentHashMap<>();
+        borderSystems = new ConcurrentHashMap<>();
         recalculate();
     }
     
@@ -280,7 +280,7 @@ public class FactionBorderTracker {
      * @see #setDayThreshold(int)
      * @see #setDistanceThreshold(double)
      */
-    public synchronized List<Planet> getBorderPlanets(Faction self, Faction other) {
+    public synchronized List<PlanetarySystem> getBorderSystems(Faction self, Faction other) {
         while (invalid) {
             try {
                 wait();
@@ -288,9 +288,9 @@ public class FactionBorderTracker {
                 Thread.currentThread().interrupt();
             }
         }
-        if (borderPlanets.containsKey(self)
-                && borderPlanets.get(self).containsKey(other)) {
-            return borderPlanets.get(self).get(other);
+        if (borderSystems.containsKey(self)
+                && borderSystems.get(self).containsKey(other)) {
+            return borderSystems.get(self).get(other);
         }
         return Collections.emptyList();
     }
@@ -421,8 +421,8 @@ public class FactionBorderTracker {
      * 
      * @return A collection of all available planets.
      */
-    protected Collection<Planet> getPlanetList() {
-        return Planets.getInstance().getPlanets().values();
+    protected Collection<PlanetarySystem> getSystemList() {
+        return Systems.getInstance().getSystems().values();
     }
     
     /**
@@ -432,40 +432,40 @@ public class FactionBorderTracker {
     private synchronized void rebuildBorderData() {
         cancelTask = false;
         try {
-            List<Planet> planetList = new ArrayList<>();
+            List<PlanetarySystem> systemList = new ArrayList<>();
             Set<Faction> factionSet = new HashSet<>();
             Set<Faction> oldFactions = new HashSet<>(borders.keySet());
-            for (Planet planet : getPlanetList()) {
+            for (PlanetarySystem system : getSystemList()) {
                 if ((regionHex.radius < 0)
-                        || regionHex.contains(planet.getX(), planet.getY())) {
-                    planetList.add(planet);
-                    factionSet.addAll(planet.getFactionSet(now));
+                        || regionHex.contains(system.getX(), system.getY())) {
+                    systemList.add(system);
+                    factionSet.addAll(system.getFactionSet(now));
                 }
                 if (cancelTask) {
                     return;
                 }
             }
             for (Faction f : factionSet) {
-                borders.put(f, new FactionBorders(f, now, planetList));
+                borders.put(f, new FactionBorders(f, now, systemList));
                 oldFactions.remove(f);
             }
             for (Faction f : oldFactions) {
                 borders.remove(f);
-                borderPlanets.remove(f);
+                borderSystems.remove(f);
             }
             if (cancelTask) {
                 return;
             }
             for (Faction us : factionSet) {
-                Map<Faction, List<Planet>> borderMap = new HashMap<>();
+                Map<Faction, List<PlanetarySystem>> borderMap = new HashMap<>();
                 for (Faction them : factionSet) {
                     if (!us.equals(them)) {
                         double borderSize = Math.max(getBorderSize(us), getBorderSize(them));
-                        List<Planet> planets = borders.get(us).getBorderPlanets(borders.get(them), borderSize);
-                        borderMap.put(them, planets);
+                        List<PlanetarySystem> systems = borders.get(us).getBorderSystems(borders.get(them), borderSize);
+                        borderMap.put(them, systems);
                     }
                 }
-                borderPlanets.put(us, borderMap);
+                borderSystems.put(us, borderMap);
                 if (cancelTask) {
                     return;
                 }
@@ -494,7 +494,7 @@ public class FactionBorderTracker {
         invalid |= now.minusDays(dayThreshold).isAfter(lastUpdate)
                 || now.plusDays(dayThreshold).isBefore(lastUpdate);
 
-        Planet loc = event.getCampaign().getLocation().getCurrentPlanet();
+        PlanetarySystem loc = event.getCampaign().getLocation().getCurrentSystem();
         if (!regionHex.isCenter(loc.getX(), loc.getY())) {
             invalid |= (distanceThreshold > 0)
                     && (regionHex.distanceTo(loc.getX(), loc.getY()) > distanceThreshold);
@@ -512,7 +512,7 @@ public class FactionBorderTracker {
     @Subscribe
     public synchronized void handleLocationChangedEvent(LocationChangedEvent ev) {
         if (!ev.isKFJump()) {
-            Planet loc = ev.getLocation().getCurrentPlanet();
+            PlanetarySystem loc = ev.getLocation().getCurrentSystem();
             if (!regionHex.isCenter(loc.getX(), loc.getY())) {
                 invalid |= (distanceThreshold > 0)
                         && (regionHex.distanceTo(loc.getX(), loc.getY()) > distanceThreshold);

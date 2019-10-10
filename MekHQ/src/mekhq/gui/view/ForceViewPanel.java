@@ -35,12 +35,13 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.EntityImage;
+import mekhq.gui.utilities.MarkdownRenderer;
 
 /**
  * A custom panel that gets filled in with goodies from a Force record
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class ForceViewPanel extends javax.swing.JPanel {
+public class ForceViewPanel extends ScrollablePanel {
 	
 	/**
 	 * 
@@ -55,7 +56,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 	private javax.swing.JLabel lblIcon;
 	private javax.swing.JPanel pnlStats;
 	private javax.swing.JPanel pnlSubUnits;
-	private javax.swing.JTextArea txtDesc;
+	private javax.swing.JTextPane txtDesc;
 	
 	private javax.swing.JLabel lblType;
 	private javax.swing.JLabel lblAssign1;
@@ -71,7 +72,6 @@ public class ForceViewPanel extends javax.swing.JPanel {
 	private javax.swing.JLabel lblTech1;
 	private javax.swing.JLabel lblTech2;
 	
-	
 	public ForceViewPanel(Force f, Campaign c, IconPackage icons) {
 		this.force = f;
 		this.campaign = c;
@@ -85,7 +85,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		lblIcon = new javax.swing.JLabel();
 		pnlStats = new javax.swing.JPanel();
 		pnlSubUnits = new javax.swing.JPanel();
-		txtDesc = new javax.swing.JTextArea();
+		txtDesc = new javax.swing.JTextPane();
 		       
 		setLayout(new java.awt.GridBagLayout());
 
@@ -111,7 +111,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.gridheight = 1;
 		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
+		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;	
 		add(pnlStats, gridBagConstraints);
@@ -124,28 +124,29 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.gridy = 1;
 		gridBagConstraints.gridwidth = 2;
 		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
+		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;	
 		add(pnlSubUnits, gridBagConstraints);
 		
-		txtDesc.setName("txtDesc");
-		txtDesc.setText(force.getDescription());
-		txtDesc.setEditable(false);
-		txtDesc.setLineWrap(true);
-		txtDesc.setWrapStyleWord(true);
-		txtDesc.setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createTitledBorder("Description"),
-                BorderFactory.createEmptyBorder(5,5,5,5)));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 2;
-		gridBagConstraints.gridwidth = 2;
-		gridBagConstraints.weighty = 1.0;
-		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		add(txtDesc, gridBagConstraints);
+        if(null != force.getDescription() && !force.getDescription().isEmpty()) {
+            txtDesc.setName("txtDesc");
+            txtDesc.setEditable(false);
+            txtDesc.setContentType("text/html");
+            txtDesc.setText(MarkdownRenderer.getRenderedHtml(force.getDescription()));
+            txtDesc.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createTitledBorder("Description"),
+                    BorderFactory.createEmptyBorder(0,2,2,2)));
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 2;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.weighty = 1.0;
+            gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            add(txtDesc, gridBagConstraints);
+        }
 	}
 	
 	private void setIcon(Force force, JLabel lbl, int scale) {

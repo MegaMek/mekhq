@@ -112,6 +112,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     private JLabel astechPoolLabel;
     private JComboBox<String> choiceLocation;
     private JButton btnAcquisitions;
+    private JScrollPane scrollServicedUnitView;
     
     private UnitTableModel servicedUnitModel;
     private TaskTableModel taskModel;
@@ -263,7 +264,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         txtServicedUnitView = new JTextPane();
         txtServicedUnitView.setEditable(false);
         txtServicedUnitView.setContentType("text/html");
-        JScrollPane scrollServicedUnitView = new JScrollPane(txtServicedUnitView);
+        scrollServicedUnitView = new JScrollPane(txtServicedUnitView);
         scrollServicedUnitView.setMinimumSize(new java.awt.Dimension(350, 400));
         scrollServicedUnitView.setPreferredSize(new java.awt.Dimension(350, 400));
 
@@ -581,7 +582,9 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 MechView mv = new MechView(unit.getEntity(), true, true);
                 txtServicedUnitView.setText("<div style='font: 12pt monospaced'>" + mv.getMechReadoutBasic() + "<br>"
                         + mv.getMechReadoutLoadout() + "</div>");
-
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                    scrollServicedUnitView.getVerticalScrollBar().setValue(0);
+                });
                 if (!unit.equals(selectedUnit)) {
                     choiceLocation.setSelectedIndex(0);
                 }

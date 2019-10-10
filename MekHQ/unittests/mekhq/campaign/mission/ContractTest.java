@@ -25,7 +25,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -137,7 +138,7 @@ public class ContractTest {
         contract.setMRBCFee(true);
         contract.setAdvancePct(10);
 
-        Mockito.when(contract.getPlanet()).thenReturn(new Planet());
+        Mockito.when(contract.getSystem()).thenReturn(new PlanetarySystem());
     }
 
     private void initCampaign() {
@@ -155,7 +156,7 @@ public class ContractTest {
         Money overHeadExpenses = Money.of(1);
         Money peacetimeCost = Money.of(1);
 
-        Mockito.when(mockCampaign.calculateJumpPath(Mockito.nullable(Planet.class), Mockito.nullable(Planet.class))).thenReturn(mockJumpPath);
+        Mockito.when(mockCampaign.calculateJumpPath(Mockito.nullable(PlanetarySystem.class), Mockito.nullable(PlanetarySystem.class))).thenReturn(mockJumpPath);
         Mockito.when(mockCampaign.calculateCostPerJump(Mockito.anyBoolean(), Mockito.anyBoolean())).thenReturn(jumpCost);
         Mockito.when(mockCampaign.getUnitRatingMod()).thenReturn(10);
         Mockito.when(mockCampaign.getOverheadExpenses()).thenReturn(overHeadExpenses);

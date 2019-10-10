@@ -41,7 +41,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.CamoChoiceDialog;
 import mekhq.gui.dialog.ImageChoiceDialog;
-import mekhq.gui.dialog.TextAreaDialog;
+import mekhq.gui.dialog.MarkdownEditorDialog;
 import mekhq.gui.utilities.StaticChecks;
 
 public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener {
@@ -229,7 +229,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
             }
         } else if (command.contains("CHANGE_DESC")) {
             if (null != singleForce) {
-                TextAreaDialog tad = new TextAreaDialog(gui.getFrame(), true,
+                MarkdownEditorDialog tad = new MarkdownEditorDialog(gui.getFrame(), true,
                         "Edit Force Description",
                         singleForce.getDescription());
                 tad.setVisible(true);

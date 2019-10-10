@@ -10,6 +10,13 @@ v0.47.1-SNAPSHOT
 + Issue #1273: Updated edge cost for AtB to match current rules
 + PR #1288: Allow the large craft ammo swap dialog to switch AR10, missile and artillery munitions properly
 + PR #1282: Fix erroneously high unit values
++ PR #1294: Improve ammo swaps and refits of Large Craft ammo bins
++ PR #1298: Restructuring of person view panel, double scroll issue, and other scrolling issues
++ PR #1300: Markdown for descriptions 
++ PR #1280: planetary system refactor
++ PR #1305: Mac OSX key bindings on non-standard look and feel
++ PR #1304: Markdown Editor
++ PR #1303: Various GUI fixes
 
 v0.47.0 (2019-08-21 0300 UTC)
 + Issue #1171: Adds autosave feature (daily or weekly, and/or before missions).

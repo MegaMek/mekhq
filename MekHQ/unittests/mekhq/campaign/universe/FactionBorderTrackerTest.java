@@ -46,18 +46,18 @@ public class FactionBorderTrackerTest {
     // Builds a sample universe with a faction "us" with one planet at (0, 0) and faction
     // "them" with planets on a 4x3 grid with 2 ly distance between adjacent planets
     private FactionBorderTracker buildTestTracker() {
-        List<Planet> planets = new ArrayList<>();
+        List<PlanetarySystem> systems = new ArrayList<>();
         for (int x = -3; x <= 3; x += 2) {
             for (int y = -2; y <= 2; y += 2) {
-                planets.add(createPlanet(x, y, factionThem));
+                systems.add(createSystem(x, y, factionThem));
             }
         }
-        planets.add(createPlanet(0, 0, factionUs));
+        systems.add(createSystem(0, 0, factionUs));
         
         FactionBorderTracker tracker = new FactionBorderTracker() {
             @Override
-            protected Collection<Planet> getPlanetList() {
-                return planets;
+            protected Collection<PlanetarySystem> getSystemList() {
+                return systems;
             }
         };
         return tracker;
@@ -71,14 +71,14 @@ public class FactionBorderTrackerTest {
         return faction;
     }
     
-    private Planet createPlanet(final double x, final double y, Faction owner) {
-        Planet planet = mock(Planet.class);
-        when(planet.getX()).thenReturn(x);
-        when(planet.getY()).thenReturn(y);
+    private PlanetarySystem createSystem(final double x, final double y, Faction owner) {
+        PlanetarySystem system = mock(PlanetarySystem.class);
+        when(system.getX()).thenReturn(x);
+        when(system.getY()).thenReturn(y);
         String id = String.format("%f, %f", x, y);
-        when(planet.getId()).thenReturn(id);
-        when(planet.getFactionSet(any())).thenReturn(Collections.singleton(owner));
-        return planet;
+        when(system.getId()).thenReturn(id);
+        when(system.getFactionSet(any())).thenReturn(Collections.singleton(owner));
+        return system;
     }
 
     @Test
@@ -86,12 +86,12 @@ public class FactionBorderTrackerTest {
         FactionBorderTracker tracker = buildTestTracker();
         tracker.setDefaultBorderSize(1, 1, 1);
         
-        List<Planet> border = tracker.getBorderPlanets(factionUs, factionThem);
+        List<PlanetarySystem> border = tracker.getBorderSystems(factionUs, factionThem);
         
-        assertEquals(tracker.getBorders(factionUs).getPlanets().size(), 1);
-        assertEquals(tracker.getBorders(factionThem).getPlanets().size(), 12);
+        assertEquals(tracker.getBorders(factionUs).getSystems().size(), 1);
+        assertEquals(tracker.getBorders(factionThem).getSystems().size(), 12);
         assertEquals(border.size(), 2);
-        for (Planet p : border) {
+        for (PlanetarySystem p : border) {
             assertEquals(Math.abs(p.getX()), 1, RegionPerimeter.EPSILON);
             assertEquals(p.getY(), 0, RegionPerimeter.EPSILON);
         }
@@ -103,10 +103,10 @@ public class FactionBorderTrackerTest {
         tracker.setDefaultBorderSize(1, 1, 1);
         tracker.setRegionRadius(1.1);
         
-        List<Planet> border = tracker.getBorderPlanets(factionUs, factionThem);
+        List<PlanetarySystem> border = tracker.getBorderSystems(factionUs, factionThem);
         
-        assertEquals(tracker.getBorders(factionUs).getPlanets().size(), 1);
-        assertEquals(tracker.getBorders(factionThem).getPlanets().size(), 2);
+        assertEquals(tracker.getBorders(factionUs).getSystems().size(), 1);
+        assertEquals(tracker.getBorders(factionThem).getSystems().size(), 2);
         assertEquals(border.size(), 2);
     }
 
@@ -117,7 +117,7 @@ public class FactionBorderTrackerTest {
         tracker.setRegionRadius(10);
         tracker.setRegionCenter(50, 0);
         
-        List<Planet> border = tracker.getBorderPlanets(factionUs, factionThem);
+        List<PlanetarySystem> border = tracker.getBorderSystems(factionUs, factionThem);
         
         assertEquals(tracker.getBorders(factionUs), null);
         assertEquals(tracker.getBorders(factionThem), null);

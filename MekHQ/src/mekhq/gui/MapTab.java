@@ -19,6 +19,7 @@
 package mekhq.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -38,7 +39,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
-import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.view.JumpPathViewPanel;
 import mekhq.gui.view.PlanetViewPanel;
@@ -89,11 +90,11 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         panMapView.add(new JLabel(resourceMap.getString("lblFindPlanet.text")), //$NON-NLS-1$ ;
                 gridBagConstraints);
 
-        suggestPlanet = new JSuggestField(getFrame(), getCampaign().getPlanetNames());
+        suggestPlanet = new JSuggestField(getFrame(), getCampaign().getSystemNames());
         suggestPlanet.addActionListener(ev -> {
-            Planet p = getCampaign().getPlanetByName(suggestPlanet.getText());
+            PlanetarySystem p = getCampaign().getSystemByName(suggestPlanet.getText());
             if (null != p) {
-                panMap.setSelectedPlanet(p);
+                panMap.setSelectedSystem(p);
                 refreshPlanetView();
             }
         });
@@ -132,7 +133,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
 
         panMap = new InterstellarMapPanel(getCampaign(), getCampaignGui());
         // lets go ahead and zoom in on the current location
-        panMap.setSelectedPlanet(getCampaign().getLocation().getCurrentPlanet());
+        panMap.setSelectedSystem(getCampaign().getLocation().getCurrentSystem());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -146,6 +147,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         scrollPlanetView.setMinimumSize(new java.awt.Dimension(400, 600));
         scrollPlanetView.setPreferredSize(new java.awt.Dimension(400, 600));
         scrollPlanetView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPlanetView.getViewport().setBackground(Color.WHITE);
         scrollPlanetView.setViewportView(null);
         splitMap = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panMapView, scrollPlanetView);
         splitMap.setOneTouchExpandable(true);
@@ -170,9 +172,9 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
     }
 
     private void calculateJumpPath() {
-        if (null != panMap.getSelectedPlanet()) {
+        if (null != panMap.getSelectedSystem()) {
             panMap.setJumpPath(
-                    getCampaign().calculateJumpPath(getCampaign().getCurrentPlanet(), panMap.getSelectedPlanet()));
+                    getCampaign().calculateJumpPath(getCampaign().getCurrentSystem(), panMap.getSelectedSystem()));
             refreshPlanetView();
         }
     }
@@ -194,9 +196,9 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
             scrollPlanetView.setViewportView(new JumpPathViewPanel(path, getCampaign()));
             return;
         }
-        Planet planet = panMap.getSelectedPlanet();
-        if (null != planet) {
-            scrollPlanetView.setViewportView(new PlanetViewPanel(planet, getCampaign()));
+        PlanetarySystem system = panMap.getSelectedSystem();
+        if (null != system) {
+            scrollPlanetView.setViewportView(new PlanetViewPanel(system, getCampaign()));
         }
     }
 
@@ -210,7 +212,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
     @Subscribe
     public void handle(NewDayEvent ev) {
         panMap.repaint();
-        suggestPlanet.setSuggestData(getCampaign().getPlanetNames());
+        suggestPlanet.setSuggestData(getCampaign().getSystemNames());
     }
 
     @Subscribe

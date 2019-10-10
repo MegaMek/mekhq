@@ -31,7 +31,6 @@ import java.awt.event.ItemListener;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
-import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -54,9 +53,10 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.universe.Planets;
 import mekhq.gui.preferences.JWindowPreference;
+import mekhq.campaign.universe.Systems;
 import mekhq.gui.utilities.JSuggestField;
+import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.view.ContractPaymentBreakdown;
 import mekhq.preferences.PreferencesNode;
 
@@ -190,8 +190,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         JLabel lblType = new JLabel();
         btnOK = new javax.swing.JButton();
         btnClose = new javax.swing.JButton();
-        JScrollPane scrDesc = new JScrollPane();
-        txtDesc = new javax.swing.JTextArea();
+        txtDesc = new MarkdownEditorPanel("Contract Description");
         JLabel lblPlanetName = new JLabel();
           
         lblName.setText(resourceMap.getString("lblName.text")); // NOI18N
@@ -225,7 +224,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(lblPlanetName, gridBagConstraints);
         
-        suggestPlanet = new JSuggestField(this, campaign.getPlanetNames());
+        suggestPlanet = new JSuggestField(this, campaign.getSystemNames());
         /*suggestPlanet.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				contract.setPlanetName(suggestPlanet.getText());
@@ -317,16 +316,8 @@ public class NewContractDialog extends javax.swing.JDialog {
         descPanel.add(cboNegotiator, gridBagConstraints);
  
         txtDesc.setText(contract.getDescription());
-        txtDesc.setName("txtDesc");
-        txtDesc.setEditable(true);
-        txtDesc.setLineWrap(true);
-        txtDesc.setWrapStyleWord(true);
-        txtDesc.setBorder(BorderFactory.createCompoundBorder(
-	   			 BorderFactory.createTitledBorder(resourceMap.getString("txtDesc.title")),
-	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
-        scrDesc.setViewportView(txtDesc);
-        scrDesc.setPreferredSize(new Dimension(400, 200));
-        scrDesc.setMinimumSize(new Dimension(400, 200));
+        txtDesc.setPreferredSize(new Dimension(400, 200));
+        txtDesc.setMinimumSize(new Dimension(400, 200));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
@@ -335,8 +326,8 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        descPanel.add(scrDesc, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        descPanel.add(txtDesc, gridBagConstraints);
 	}
     
 	protected void initPaymentBreakdownPanel(JPanel totalsPanel) {
@@ -739,7 +730,7 @@ public class NewContractDialog extends javax.swing.JDialog {
     protected javax.swing.JTextField txtName;
     protected javax.swing.JTextField txtEmployer;
     protected javax.swing.JTextField txtType;
-    protected javax.swing.JTextArea txtDesc;
+    protected MarkdownEditorPanel txtDesc;
     protected JSuggestField suggestPlanet;
 
     protected javax.swing.JButton btnDate;
@@ -776,7 +767,7 @@ public class NewContractDialog extends javax.swing.JDialog {
 
     protected void doUpdateContract(Object source) {
         if (suggestPlanet.equals(source)) {
-            contract.setPlanetId((Planets.getInstance().getPlanetByName(suggestPlanet.getText(),
+            contract.setSystemId((Systems.getInstance().getSystemByName(suggestPlanet.getText(),
                     Utilities.getDateTimeDay(campaign.getCalendar()))).getId());
             //reset the start date as null so we recalculate travel time
             contract.setStartDate(null);

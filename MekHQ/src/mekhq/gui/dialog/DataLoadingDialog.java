@@ -55,11 +55,11 @@ import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.mod.am.InjuryTypes;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Planets;
 import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
+import mekhq.campaign.universe.Systems;
 
 public class DataLoadingDialog extends JDialog implements PropertyChangeListener {
 
@@ -139,9 +139,9 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             //Initialize progress property.
             setProgress(0);
             try {
-            	Faction.generateFactions();
+                Faction.generateFactions();
             } catch (Exception ex) {
-    			ex.printStackTrace();
+                ex.printStackTrace();
             }
             try{
                 CurrencyManager.getInstance().loadCurrencies();
@@ -149,17 +149,17 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 MekHQ.getLogger().error(DataLoadingDialog.class, METHOD_NAME, ex);
             }
             try {
-            	Bloodname.loadBloodnameData();
+                Bloodname.loadBloodnameData();
             } catch (Exception ex) {
-    			ex.printStackTrace();
+                ex.printStackTrace();
             }
             try {
-            	//Load values needed for CampaignOptionsDialog
-            	RATManager.populateCollectionNames();
+                //Load values needed for CampaignOptionsDialog
+                RATManager.populateCollectionNames();
             } catch (Exception ex) {
-    			ex.printStackTrace();
+                ex.printStackTrace();
             }
-            while (!Planets.getInstance().isInitialized()) {
+            while (!Systems.getInstance().isInitialized()) {
                 //Sleep for up to one second.
                 try {
                     Thread.sleep(50);
@@ -168,7 +168,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 }
             }
             RandomNameGenerator.getInstance();
-           setProgress(1);
+            setProgress(1);
             try {
                 QuirksHandler.initQuirksList();
             } catch (IOException e) {
@@ -281,7 +281,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         			cancelled = true;
         			cancel(true);
         		} else {
-        			campaign.setStartingPlanet();
+        			campaign.setStartingSystem();
         			campaign.generateNewPersonnelMarket();
         			campaign.reloadNews();
         			campaign.readNews();

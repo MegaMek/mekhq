@@ -115,7 +115,6 @@ import mekhq.campaign.report.Report;
 import mekhq.campaign.report.TransportReport;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.NewsItem;
-import mekhq.campaign.universe.Planets;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.io.FileType;
@@ -697,16 +696,6 @@ public class CampaignGUI extends JPanel {
         });
         // miLoadForces.setEnabled(false);
         menuImport.add(miLoadForces);
-        
-        JMenuItem miLoadPlanets = new JMenuItem(
-                resourceMap.getString("miImportPlanets.text"));
-        miLoadPlanets.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                miLoadPlanetsActionPerformed(evt);
-            }
-        });
-        menuImport.add(miLoadPlanets);
 
         menuFile.add(menuImport);
         menuFile.add(menuExport);
@@ -1758,14 +1747,6 @@ public class CampaignGUI extends JPanel {
             MekHQ.getLogger().error(getClass(), "miLoadForcesActionPerformed(ActionEvent)", ex);
         }
     }// GEN-LAST:event_miLoadForcesActionPerformed
-
-    private void miLoadPlanetsActionPerformed(java.awt.event.ActionEvent evt) {
-        try {
-            loadPlanetTSVFile();
-        } catch (Exception ex) {
-            MekHQ.getLogger().error(getClass(), "miLoadPlanetsActionPerformed", ex);
-        }
-    }
     
     private void miImportPersonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miImportPersonActionPerformed
         try {
@@ -2063,13 +2044,6 @@ public class CampaignGUI extends JPanel {
     public Part getPartByNameAndDetails(String pnd) {
         return getCampaign().getPartsStore().getByNameAndDetails(pnd);
     }
-
-    protected void loadPlanetTSVFile() {
-        FileDialogs.openPlanetsTsv(frame).ifPresent(tsvFile -> {
-            String report = Planets.getInstance().importPlanetsFromTSV(tsvFile.getAbsolutePath());
-            JOptionPane.showMessageDialog(mainPanel, report);
-        });
-    }
     
     /**
      * Exports Planets to a file (CSV, XML, etc.)
@@ -2078,6 +2052,8 @@ public class CampaignGUI extends JPanel {
      * @param filename
      */
     protected void exportPlanets(FileType format, String dialogTitle, String filename) {
+        //TODO: Fix this
+        /*
         GUI.fileDialogSave(
                 frame,
                 dialogTitle,
@@ -2091,6 +2067,14 @@ public class CampaignGUI extends JPanel {
                     String report = Planets.getInstance().exportPlanets(file.getPath(), format.getRecommendedExtension());
                     JOptionPane.showMessageDialog(mainPanel, report);
                 });
+
+        GUI.fileDialogSave(frame, dialogTitle, new File(".", "planets." + format.getRecommendedExtension()), format).ifPresent(f -> {
+            File file = checkFileEnding(f, format.getRecommendedExtension());
+            checkToBackupFile(file, file.getPath());
+            String report = Planets.getInstance().exportPlanets(file.getPath(), format.getRecommendedExtension());
+            JOptionPane.showMessageDialog(mainPanel, report);
+        });
+        */
     }
     
     /**

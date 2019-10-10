@@ -50,6 +50,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextArea;
 import javax.swing.JTree;
+import javax.swing.border.LineBorder;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -80,7 +81,7 @@ import mekhq.gui.dialog.PrincessBehaviorDialog;
  * @author Neoancient
  *
  */
-public class AtBScenarioViewPanel extends JPanel {
+public class AtBScenarioViewPanel extends ScrollablePanel {
     private static final long serialVersionUID = -3104784717190158181L;
 
     private AtBScenario scenario;
@@ -184,7 +185,7 @@ public class AtBScenarioViewPanel extends JPanel {
         gridBagConstraints.gridy = y++;
         gridBagConstraints.gridheight = 1;
         gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         add(panStats, gridBagConstraints);
@@ -238,6 +239,7 @@ public class AtBScenarioViewPanel extends JPanel {
         playerForceTree.setCellRenderer(new ForceStubRenderer());
         playerForceTree.setRowHeight(50);
         playerForceTree.setRootVisible(false);
+        playerForceTree.setBorder(new LineBorder(Color.RED));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y++;
@@ -245,7 +247,7 @@ public class AtBScenarioViewPanel extends JPanel {
         gridBagConstraints.gridheight = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panStats.add(playerForceTree, gridBagConstraints);
@@ -263,7 +265,7 @@ public class AtBScenarioViewPanel extends JPanel {
             gridBagConstraints.gridheight = 1;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.weighty = 1.0;
-            gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
+            gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
             gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
             panStats.add(tree, gridBagConstraints);
@@ -289,7 +291,7 @@ public class AtBScenarioViewPanel extends JPanel {
             gridBagConstraints.gridheight = 1;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.weighty = 1.0;
-            gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
+            gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
             gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
             panStats.add(tree, gridBagConstraints);
@@ -398,14 +400,10 @@ public class AtBScenarioViewPanel extends JPanel {
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panStats.add(txtDesc, gridBagConstraints);
-        
-        txtDetails.setLineWrap(true);
-        txtDetails.setWrapStyleWord(true);
-        txtDetails.setEditable(false);
         
         StringBuilder objectiveBuilder = new StringBuilder();
         for(ScenarioObjective objective : scenario.getScenarioObjectives()) {
@@ -457,7 +455,7 @@ public class AtBScenarioViewPanel extends JPanel {
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panStats.add(txtDetails, gridBagConstraints);

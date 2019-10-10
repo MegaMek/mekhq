@@ -20,6 +20,7 @@
 package mekhq.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -32,7 +33,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.tree.TreeSelectionModel;
 
 import megamek.common.event.Subscribe;
@@ -66,7 +66,7 @@ public final class TOETab extends CampaignGuiTab {
 
     private JTree orgTree;
     private JSplitPane splitOrg;
-    private JScrollPane scrollForceView;
+    private JPanel panForceView;
 
     private OrgTreeModel orgModel;
 
@@ -96,12 +96,14 @@ public final class TOETab extends CampaignGuiTab {
         orgTree.setDropMode(DropMode.ON);
         orgTree.setTransferHandler(new TOETransferHandler(getCampaignGui()));
 
-        scrollForceView = new JScrollPane();
-        scrollForceView.setMinimumSize(new java.awt.Dimension(550, 600));
-        scrollForceView.setPreferredSize(new java.awt.Dimension(550, 600));
-        scrollForceView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-
-        splitOrg = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(orgTree), scrollForceView);
+        panForceView = new JPanel();
+        panForceView.setMinimumSize(new java.awt.Dimension(550, 600));
+        panForceView.setPreferredSize(new java.awt.Dimension(550, 600));
+        panForceView.setLayout(new BorderLayout());
+        
+        JScrollPane scrollOrg = new JScrollPane(orgTree);
+        scrollOrg.getViewport().setBackground(Color.WHITE);
+        splitOrg = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollOrg, panForceView);
         splitOrg.setOneTouchExpandable(true);
         splitOrg.setResizeWeight(1.0);
         splitOrg.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, ev -> refreshForceView());
@@ -134,9 +136,9 @@ public final class TOETab extends CampaignGuiTab {
     }
 
     public void refreshForceView() {
+    	panForceView.removeAll();
         Object node = orgTree.getLastSelectedPathComponent();
         if (null == node || -1 == orgTree.getRowForPath(orgTree.getSelectionPath())) {
-            scrollForceView.setViewportView(null);
             return;
         }
         if (node instanceof Unit) {
@@ -146,6 +148,7 @@ public final class TOETab extends CampaignGuiTab {
             if (crewSize > 0) {
                 JPanel crewPanel = new JPanel(new BorderLayout());
                 final JScrollPane scrollPerson = new JScrollPane();
+                scrollPerson.getViewport().setBackground(Color.WHITE);
                 crewPanel.add(scrollPerson, BorderLayout.CENTER);
                 CrewListModel model = new CrewListModel();
                 model.setData(u);
@@ -182,18 +185,26 @@ public final class TOETab extends CampaignGuiTab {
                 }
                 scrollPerson.setPreferredSize(crewList.getPreferredScrollableViewportSize());
                 tabUnit.add(name, crewPanel);
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                    scrollPerson.getVerticalScrollBar().setValue(0);
+                });
             }
-            tabUnit.add("Unit",
-                    new UnitViewPanel(u, getCampaign(), getIconPackage().getCamos(), getIconPackage().getMechTiles()));
-            scrollForceView.setViewportView(tabUnit);
-            // This odd code is to make sure that the scrollbar stays at the top
-            // I can't just call it here, because it ends up getting reset
-            // somewhere later
-            javax.swing.SwingUtilities.invokeLater(() -> scrollForceView.getVerticalScrollBar().setValue(0));
+            final JScrollPane scrollUnit = new JScrollPane(new UnitViewPanel(u, getCampaign(), getIconPackage().getCamos(), getIconPackage().getMechTiles()));
+            scrollUnit.getViewport().setBackground(Color.WHITE);
+            tabUnit.add("Unit", scrollUnit);
+            panForceView.add(tabUnit, BorderLayout.CENTER);
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                scrollUnit.getVerticalScrollBar().setValue(0);
+            });
         } else if (node instanceof Force) {
-            scrollForceView.setViewportView(new ForceViewPanel((Force) node, getCampaign(), getIconPackage()));
-            javax.swing.SwingUtilities.invokeLater(() -> scrollForceView.getVerticalScrollBar().setValue(0));
+            final JScrollPane scrollForce = new JScrollPane(new ForceViewPanel((Force) node, getCampaign(), getIconPackage()));
+            scrollForce.getViewport().setBackground(Color.WHITE);
+            panForceView.add(scrollForce, BorderLayout.CENTER);
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                scrollForce.getVerticalScrollBar().setValue(0);
+            });
         }
+        panForceView.updateUI();
     }
     
     private ActionScheduler orgRefreshScheduler = new ActionScheduler(this::refreshOrganization);
