@@ -91,6 +91,7 @@ public class ObjectiveEditPanel extends JDialog {
         this.parent = parent;
         
         initGUI();
+        updateTimeLimitUI();
         validate();
         pack();
         setLocationRelativeTo(parent);
