@@ -507,8 +507,9 @@ public class AtBDynamicScenarioFactory {
                 
                 // if the bot force's force template's name is included in the objective's force names
                 // or if the bot force is hostile and we're including all enemy forces
-                if(forceTemplate != null && templateObjective.getAssociatedForceNames().contains(forceTemplate.getForceName()) ||
-                        (botForceIsHostile && templateObjective.getAssociatedForceNames().contains(ScenarioObjective.FORCE_SHORTCUT_ALL_ENEMY_FORCES))) {
+                if(forceTemplate != null && 
+                        (templateObjective.getAssociatedForceNames().contains(forceTemplate.getForceName()) ||
+                        (botForceIsHostile && templateObjective.getAssociatedForceNames().contains(ScenarioObjective.FORCE_SHORTCUT_ALL_ENEMY_FORCES)))) {
                     objectiveForceNames.add(botForce.getName());
                     calculatedDestinationZone = OffBoardDirection.translateBoardStart(getOppositeEdge(forceTemplate.getActualDeploymentZone()));
                 }
@@ -525,7 +526,7 @@ public class AtBDynamicScenarioFactory {
             }
             
             for(UUID unitID : scenario.getPlayerUnitTemplates().keySet()) {
-                ScenarioForceTemplate playerForceTemplate = scenario.getPlayerForceTemplates().get(unitID);
+                ScenarioForceTemplate playerForceTemplate = scenario.getPlayerUnitTemplates().get(unitID);
                 
                 if(templateObjective.getAssociatedForceNames().contains(playerForceTemplate.getForceName()) ||
                         templateObjective.getAssociatedForceNames().contains(ScenarioObjective.FORCE_SHORTCUT_ALL_PRIMARY_PLAYER_FORCES)) {

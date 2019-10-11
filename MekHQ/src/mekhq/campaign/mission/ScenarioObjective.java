@@ -328,7 +328,7 @@ public class ScenarioObjective {
         case PreventReachMapEdge:
             return String.format("Prevent %s from reaching %s%s", amountString, edgeString, timeLimitString);
         case Custom:
-            return String.format("%s%s", getDescription(), amountString, timeLimitString);
+            return String.format("%s%s%s", getDescription(), amountString, timeLimitString);
         default:
                 return "?";
         }
