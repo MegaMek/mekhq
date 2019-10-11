@@ -91,6 +91,7 @@ public class PlanetarySystemMapPanel extends JPanel {
         this.campaign = c;
         this.system = campaign.getCurrentSystem();
         selectedPlanet = system.getPrimaryPlanetPosition();
+        
         try {
             spaceImage = ImageIO.read(new File("data/images/universe/space.jpg"));
         } catch (IOException e1) {
@@ -149,7 +150,6 @@ public class PlanetarySystemMapPanel extends JPanel {
                 g2.fill(arc);
                 arc.setArcByCenter(rectWidth / 2, getHeight()-60, 10, 0, 360, Arc2D.OPEN);
                 g2.fill(arc);
-
                 
                 //get the biggest diameter allowed within this space for a planet
                 int biggestDiameterPixels = rectWidth-32;
@@ -206,9 +206,33 @@ public class PlanetarySystemMapPanel extends JPanel {
                         //planet name
                         g2.setColor(Color.WHITE);
                         drawCenteredString(g2, planetName, x, y+(biggestDiameterPixels/2)+12+g.getFontMetrics().getHeight(), rectWidth-6);
-                       
+                        
+                        //check for current location - we assume you are on primary planet for now
+                        if(campaign.getLocation().getCurrentSystem().equals(system) && i==system.getPrimaryPlanetPosition()) {
+                            g2.setColor(Color.WHITE);
+                            JumpPath jp = campaign.getLocation().getJumpPath();
+                            if(null != jp && (!campaign.getLocation().isAtJumpPoint() || jp.getLastSystem().equals(system))) {
+                                //the unit has a flight plan in this system so draw the line
+                                //in transit so draw a path
+                                Stroke dashed = new BasicStroke(3, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{9}, 0);
+                                g2.setStroke(dashed);
+                                g2.drawLine(x, y-radius, rectWidth / 2, 60);
+                            }
+                            if(campaign.getLocation().isAtJumpPoint()) {
+                                //draw at jump point
+                                arc.setArcByCenter((rectWidth / 2) + 12, 60, 10, 0, 360, Arc2D.OPEN);
+                                g2.fill(arc);
+                            } else if(campaign.getLocation().isOnPlanet()) {
+                                arc.setArcByCenter(x-radius, y-radius+12, 10, 0, 360, Arc2D.OPEN);
+                                g2.fill(arc);
+                            } else {                       
+                                arc.setArcByCenter((x-(rectWidth / 2))*campaign.getLocation().getPercentageTransit()+(rectWidth / 2), (y-radius-60)*campaign.getLocation().getPercentageTransit()+60, 10, 0, 360, Arc2D.OPEN);
+                                g2.fill(arc);
+                            }
+                        }
                     }
                 }
+                
             }
         };
         
