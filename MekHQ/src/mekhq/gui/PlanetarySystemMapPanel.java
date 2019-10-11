@@ -3,11 +3,13 @@ package mekhq.gui;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.LinearGradientPaint;
 import java.awt.MultipleGradientPaint;
 import java.awt.Paint;
@@ -18,6 +20,8 @@ import java.awt.Stroke;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
@@ -36,10 +40,16 @@ import java.util.List;
 import java.util.Set;
 
 import javax.imageio.ImageIO;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.InputMap;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -205,8 +215,57 @@ public class PlanetarySystemMapPanel extends JPanel {
             }
         };
         
-        btnBack = new JButton("< Back"); // NOI18N
+        btnBack = new JButton(); // NOI18N
+        btnBack.setFocusable(false);
+        btnBack.setPreferredSize(new Dimension(36, 36));
+        btnBack.setMargin(new Insets(0, 0, 0, 0));
+        btnBack.setBorder(BorderFactory.createEmptyBorder());
+        btnBack.setToolTipText("Back to Interstellar Map");
+        btnBack.setBackground(Color.DARK_GRAY);
+        btnBack.setIcon(new ImageIcon("data/images/misc/back_button.png"));
         btnBack.addActionListener(ev -> back());
+        
+        //set up key bindings
+        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "back");
+        getActionMap().put("back", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                back();
+            }
+        });
+        
+        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0), "left");
+        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0), "left");
+        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), "left");
+        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, 0), "left");
+        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "left");
+        getActionMap().put("left", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                int target_pos = selectedPlanet-1;
+                if(target_pos<1) {
+                    return;
+                }
+                changeSelectedPlanet(target_pos);
+                repaint();
+            }
+        });
+        
+        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0), "right");
+        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0), "right");
+        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), "right");
+        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_KP_RIGHT, 0), "right");
+        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "right");
+        getActionMap().put("right", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                int target_pos = selectedPlanet+1;
+                if(target_pos>(system.getPlanets().size())) {
+                    return;
+                }
+                changeSelectedPlanet(target_pos);
+                repaint();
+            }
+        });
+
+        
         
         addMouseListener(new MouseAdapter() {
             
@@ -229,6 +288,7 @@ public class PlanetarySystemMapPanel extends JPanel {
         add(pane);
         
         repaint();
+        
     }
     
     @Override
@@ -237,7 +297,7 @@ public class PlanetarySystemMapPanel extends JPanel {
         int height = getHeight();
         pane.setBounds(0, 0, width, height);
         mapPanel.setBounds(0, 0, width, height);
-        btnBack.setBounds(0, 0, 100, 50);
+        btnBack.setBounds(4, 4, 40, 40);
         super.paintComponent(g);
     }
     
