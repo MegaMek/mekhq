@@ -91,6 +91,10 @@ public class CurrentLocation implements Serializable {
         return transitTime >= currentSystem.getTimeToJumpPoint(1.0);
     }
 
+    public double getPercentageTransit() {
+        return 1- transitTime / currentSystem.getTimeToJumpPoint(1.0);
+    }
+    
     public boolean isInTransit() {
         return !isOnPlanet() && !isAtJumpPoint();
     }

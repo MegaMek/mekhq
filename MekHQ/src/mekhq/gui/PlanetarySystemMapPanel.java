@@ -71,7 +71,7 @@ public class PlanetarySystemMapPanel extends JPanel {
     private BufferedImage spaceImage;
     
     private static int minDiameter = 16;
-    private static int maxDiameter = 128;
+    private static int maxDiameter = 64;
 
     public PlanetarySystemMapPanel(Campaign c, CampaignGUI view) {
         
@@ -100,13 +100,15 @@ public class PlanetarySystemMapPanel extends JPanel {
                 g2.setFont(new Font("Helvetica", Font.PLAIN, 14));
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(Color.BLACK);
-                //g2.fillRect(0, 0, getWidth(), getHeight());
+                g2.fillRect(0, 0, getWidth(), getHeight());
                 //tile the space image
-                int tileWidth = spaceImage.getWidth();
-                int tileHeight = spaceImage.getHeight();
-                for (int y = 0; y < getHeight(); y += tileHeight) {
-                    for (int x = 0; x < getWidth(); x += tileWidth) {
-                        g2.drawImage(spaceImage, x, y, this);
+                if(null != spaceImage) {
+                    int tileWidth = spaceImage.getWidth();
+                    int tileHeight = spaceImage.getHeight();
+                    for (int y = 0; y < getHeight(); y += tileHeight) {
+                        for (int x = 0; x < getWidth(); x += tileWidth) {
+                            g2.drawImage(spaceImage, x, y, this);
+                        }
                     }
                 }
 
@@ -128,6 +130,14 @@ public class PlanetarySystemMapPanel extends JPanel {
                 int maxSunHeight =  (int) Math.round(maxSunWidth * sunRatio);
                 g2.drawImage(sunIcon, x, y-150, maxSunWidth, 300, null);
 
+                //draw nadir and zenith points
+                g2.setPaint(Color.WHITE);
+                arc.setArcByCenter(rectWidth / 2, 60, 10, 0, 360, Arc2D.OPEN);
+                g2.fill(arc);
+                arc.setArcByCenter(rectWidth / 2, getHeight()-60, 10, 0, 360, Arc2D.OPEN);
+                g2.fill(arc);
+
+                
                 //get the biggest diameter allowed within this space for a planet
                 int biggestDiameterPixels = rectWidth-32;
                 if(biggestDiameterPixels < minDiameter) {
@@ -184,6 +194,7 @@ public class PlanetarySystemMapPanel extends JPanel {
                         //planet name
                         g2.setColor(Color.WHITE);
                         drawCenteredString(g2, planetName, x, y+(biggestDiameterPixels/2)+12+g.getFontMetrics().getHeight());
+                        
                     }
                 }
             }
