@@ -143,6 +143,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         panMapView.add(panMap, BorderLayout.CENTER);
 
         mapView = new JViewport();
+        mapView.setMinimumSize(new java.awt.Dimension(600,600));
         mapView.setView(panMapView);
         
         scrollPlanetView = new JScrollPane();
