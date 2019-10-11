@@ -41,6 +41,9 @@ import javax.swing.JButton;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 
+import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
+
 import megamek.common.EquipmentType;
 import megamek.common.util.ImageUtil;
 import mekhq.Utilities;
@@ -95,9 +98,10 @@ public class PlanetarySystemMapPanel extends JPanel {
     
             @Override
             protected void paintComponent(Graphics g) {
+                int n = system.getPlanets().size();
+                
                 Graphics2D g2 = (Graphics2D) g;
                 Arc2D.Double arc = new Arc2D.Double();
-                g2.setFont(new Font("Helvetica", Font.PLAIN, 14));
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(Color.BLACK);
                 g2.fillRect(0, 0, getWidth(), getHeight());
@@ -112,14 +116,15 @@ public class PlanetarySystemMapPanel extends JPanel {
                     }
                 }
 
-
-                //split canvas into n+1 equal rectangles where n is the number of planetary systems.
-                //the first rectangle is for the star
-                int n = system.getPlanets().size();
                 int rectWidth = getWidth() / (n+1);
                 int midpoint = rectWidth / 2;
                 int y = getHeight() / 2;
                 int x = 0;
+                chooseFont(g2, system, campaign, rectWidth-6);
+                
+                //split canvas into n+1 equal rectangles where n is the number of planetary systems.
+                //the first rectangle is for the star
+                
                 
                 //place the sun first
                 Image sunIcon = ImageUtil.loadImageFromFile("data/" + StarUtil.getIconImage(system));
@@ -193,8 +198,8 @@ public class PlanetarySystemMapPanel extends JPanel {
                         
                         //planet name
                         g2.setColor(Color.WHITE);
-                        drawCenteredString(g2, planetName, x, y+(biggestDiameterPixels/2)+12+g.getFontMetrics().getHeight());
-                        
+                        drawCenteredString(g2, planetName, x, y+(biggestDiameterPixels/2)+12+g.getFontMetrics().getHeight(), rectWidth-6);
+                       
                     }
                 }
             }
@@ -236,11 +241,64 @@ public class PlanetarySystemMapPanel extends JPanel {
         super.paintComponent(g);
     }
     
-    private void drawCenteredString(Graphics g, String text, int x, int y) {
+    private void chooseFont(Graphics g, PlanetarySystem system, Campaign c, int limit) {
+        //start with 16
+        int fontSize = 16;
+        g.setFont(new Font("Helvetica", Font.PLAIN, fontSize));
+        while(areNamesTooBig(g, system, Utilities.getDateTimeDay(campaign.getCalendar()), limit) && fontSize>=10) {
+            fontSize--;
+            g.setFont(new Font("Helvetica", Font.PLAIN, fontSize));
+        }
+    }
+    
+    private boolean areNamesTooBig(Graphics g, PlanetarySystem system, DateTime when, int limit) {
+        for(Planet p : system.getPlanets()) {
+            String name = p.getName(when);
+            if(g.getFontMetrics().stringWidth(name) > limit) {
+                //try splitting
+                if(name.contains(" ")) {
+                    for (String line : name.split("\\s+")) {
+                        if(g.getFontMetrics().stringWidth(line) > limit) {
+                            return true;
+                        }
+                    }
+                } else if(name.contains("-")) {
+                    for (String line : name.split("-")) {
+                        if(g.getFontMetrics().stringWidth(line) > limit) {
+                            return true;
+                        }
+                    }
+                }else {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    private void drawCenteredString(Graphics2D g, String text, int x, int y, int limit) {
         FontMetrics metrics = g.getFontMetrics();
-        x = x - (metrics.stringWidth(text) / 2);
         y = y - (metrics.getHeight() / 2);
-        g.drawString(text, x, y);
+        if(metrics.stringWidth(text) > limit && (text.contains(" ") || text.contains("-"))) {
+            if(text.contains(" ")) {
+                //try spaces first
+                for (String line : text.split("\\s+")) {
+                    g.drawString(line, x- (metrics.stringWidth(line) / 2), y += g.getFontMetrics().getHeight());
+                }
+            } else {
+                //otherwise break on the hyphen
+                String[] lines = text.split("-");
+                for (int i = 0; i < lines.length; i++) {
+                    String line = lines[i];
+                    if(i != (lines.length-1)) {
+                        line = line + "-";
+                    }
+                    g.drawString(line, x- (metrics.stringWidth(line) / 2), y += g.getFontMetrics().getHeight());
+                }
+            }
+        } else {
+            g.drawString(text, x- (metrics.stringWidth(text) / 2), y += g.getFontMetrics().getHeight());
+        }
     }
     
     public void updatePlanetarySystem(PlanetarySystem s) {
