@@ -80,7 +80,6 @@ public class PlanetarySystemMapPanel extends JPanel {
     private CampaignGUI hqview;
     private PlanetarySystem system;
     private int selectedPlanet = 0;
-    private int[] diameters;
     private BufferedImage spaceImage;
     
     private static int minDiameter = 16;
@@ -92,7 +91,6 @@ public class PlanetarySystemMapPanel extends JPanel {
         this.campaign = c;
         this.system = campaign.getCurrentSystem();
         selectedPlanet = system.getPrimaryPlanetPosition();
-        diameters = new int[system.getPlanets().size()];
         try {
             spaceImage = ImageIO.read(new File("data/images/universe/space.jpg"));
         } catch (IOException e1) {
@@ -182,7 +180,6 @@ public class PlanetarySystemMapPanel extends JPanel {
                         } else if(diameter > maxDiameter) {
                             diameter = maxDiameter;
                         }
-                        diameters[i-1] = diameter;
                         int radius = diameter / 2;
                         
                         //add ring for selected planet
@@ -267,7 +264,7 @@ public class PlanetarySystemMapPanel extends JPanel {
 
         
         
-        addMouseListener(new MouseAdapter() {
+        mapPanel.addMouseListener(new MouseAdapter() {
             
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -364,7 +361,6 @@ public class PlanetarySystemMapPanel extends JPanel {
     public void updatePlanetarySystem(PlanetarySystem s) {
         this.system = s;
         selectedPlanet = system.getPrimaryPlanetPosition();
-        diameters = new int[system.getPlanets().size()];
         mapPanel.repaint();
     }
     
@@ -386,9 +382,8 @@ public class PlanetarySystemMapPanel extends JPanel {
         
         for(int i = 1; i < (n+1); i++) {
             xTarget = rectWidth*i+midpoint;
-            //must be within radius
-            //add a little wiggle room to radius
-            int radius = (diameters[i-1] / 2)+2;
+            //must be within total possible radius
+            int radius = 32;
             if(x <= (xTarget+radius) & x >= (xTarget-radius) &
                     y <= (yTarget+radius) & y >= (yTarget-radius)) {
                 return i;
