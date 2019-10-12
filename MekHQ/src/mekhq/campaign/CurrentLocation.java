@@ -30,6 +30,7 @@ import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.Compute;
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
@@ -62,6 +63,8 @@ public class CurrentLocation implements Serializable {
     private double rechargeTime;
     //I would like to keep track of distance, but I ain't too good with fyziks
     private double transitTime;
+    //jumpship at nadir or zenith
+    private boolean jumpZenith;
 
     public CurrentLocation() {
         this(null,0);
@@ -72,6 +75,7 @@ public class CurrentLocation implements Serializable {
         this.transitTime = time;
         this.rechargeTime = 0.0;
         this.transitTime = 0.0;
+        this.jumpZenith = true;
     }
     
     public void setCurrentSystem(PlanetarySystem s) {
@@ -105,6 +109,21 @@ public class CurrentLocation implements Serializable {
 
     public double getTransitTime() {
         return transitTime;
+    }
+    
+    public boolean isJumpZenith() {
+        return jumpZenith;
+    }
+    
+    private boolean pickJumpPoint(DateTime now) {
+        if(currentSystem.isZenithCharge(now) && !currentSystem.isNadirCharge(now)) {
+            return true;
+        }
+        if(!currentSystem.isZenithCharge(now) && currentSystem.isNadirCharge(now)) {
+            return false;
+        }
+        //otherwise both recharge stations or none so choose randomly
+        return Compute.randomInt(1)==1;
     }
 
     public String getReport(Date date) {
@@ -180,6 +199,7 @@ public class CurrentLocation implements Serializable {
                 }
                 campaign.addReport("Jumping to " + jumpPath.get(1).getPrintableName(currentDate));
                 currentSystem = jumpPath.get(1);
+                jumpZenith = pickJumpPoint(currentDate);
                 jumpPath.removeFirstSystem();
                 MekHQ.triggerEvent(new LocationChangedEvent(this, true));
                 //reduce remaining hours by usedRechargeTime or usedTransitTime, whichever is greater
@@ -225,6 +245,10 @@ public class CurrentLocation implements Serializable {
                 +"<rechargeTime>"
                 +rechargeTime
                 +"</rechargeTime>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<jumpZenith>"
+                +jumpZenith
+                +"</jumpZenith>");
         if(null != jumpPath) {
             jumpPath.writeToXml(pw1, indent+1);
         }
@@ -262,6 +286,8 @@ public class CurrentLocation implements Serializable {
                     retVal.transitTime = Double.parseDouble(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rechargeTime")) {
                     retVal.rechargeTime = Double.parseDouble(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("jumpZenith")) {
+                    retVal.jumpZenith = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("jumpPath")) {
                     retVal.jumpPath = JumpPath.generateInstanceFromXML(wn2, c);
                 }

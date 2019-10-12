@@ -188,6 +188,14 @@ public class PlanetarySystemMapPanel extends JPanel {
                 int zenithX = midpoint;
                 int zenithY = 60;
                 
+                //where is jumpship
+                int jumpshipX = zenithX+jumpPointImgSize+8;
+                int jumpshipY = zenithY+(jumpPointImgSize/2)-(shipImgSize/2);
+                if(!campaign.getLocation().isJumpZenith()) {
+                    jumpshipX = nadirX+jumpPointImgSize+8;;
+                    jumpshipY = nadirY+(jumpPointImgSize/2)-(shipImgSize/2);
+                }
+                
                 chooseFont(g2, system, campaign, rectWidth-6);
                 
                 //split canvas into n+1 equal rectangles where n is the number of planetary systems.
@@ -257,8 +265,11 @@ public class PlanetarySystemMapPanel extends JPanel {
                             JumpPath jp = campaign.getLocation().getJumpPath();
                             int lineX1 = x;
                             int lineY1 = y-radius;
-                            int lineX2 = zenithX+jumpPointImgSize+8+shipImgSize;
-                            int lineY2 = zenithY+jumpPointImgSize-(shipImgSize/2);
+                            int lineX2 = jumpshipX+shipImgSize;
+                            int lineY2 = jumpshipY+shipImgSize;
+                            if(!campaign.getLocation().isJumpZenith()) {
+                                lineY2 = jumpshipY-shipImgSize;
+                            }
                             if(null != jp && (!campaign.getLocation().isAtJumpPoint() || jp.getLastSystem().equals(system))) {
                                 //the unit has a flight plan in this system so draw the line
                                 //in transit so draw a path
@@ -269,9 +280,9 @@ public class PlanetarySystemMapPanel extends JPanel {
                             }
                             if(campaign.getLocation().isAtJumpPoint()) {
                                 //draw a ring around jumpship
-                                drawRing(g2, zenithX + jumpPointImgSize+8+(shipImgSize/2), zenithY+(jumpPointImgSize/2), shipImgSize/2, Color.ORANGE);
+                                drawRing(g2, jumpshipX+(shipImgSize/2), jumpshipY+(shipImgSize/2), shipImgSize/2, Color.ORANGE);
                                 if(null != imgJumpshipFleet) {
-                                    drawRotatedImage(g2, imgJumpshipFleet, 90, zenithX + jumpPointImgSize+8, zenithY+(jumpPointImgSize/2) - (shipImgSize/2), shipImgSize, shipImgSize);
+                                    drawRotatedImage(g2, imgJumpshipFleet, 90, jumpshipX, jumpshipY, shipImgSize, shipImgSize);
                                 }
                             } else if(campaign.getLocation().isOnPlanet()) {
                                 drawRing(g2, x, y, radius, Color.ORANGE);
@@ -280,25 +291,21 @@ public class PlanetarySystemMapPanel extends JPanel {
                                 }
                                 //draw jumpship too
                                 if(null != imgJumpshipFleet) {
-                                    drawRotatedImage(g2, imgJumpshipFleet, 90, zenithX + jumpPointImgSize+8, zenithY+(jumpPointImgSize/2) - (shipImgSize/2), shipImgSize, shipImgSize);
+                                    drawRotatedImage(g2, imgJumpshipFleet, 90, jumpshipX, jumpshipY, shipImgSize, shipImgSize);
                                 }
                             } else { 
                                 if(null != imgDropshipFleet) {
                                     int lengthX = lineX1-lineX2;
                                     int lengthY = lineY1-lineY2;
-                                    double rotationRequired = (-1) * Math.toDegrees(Math.atan(lengthX / ((1.0 * lengthY))));
-                                    if(null != jp && jp.getLastSystem().equals(system)) {
-                                        //inbound
-                                        rotationRequired = 180+rotationRequired;
-                                    }                                   
+                                    double rotationRequired = getFlightRotation(lengthX, lengthY, null != jp && jp.getLastSystem().equals(system), campaign.getLocation().isJumpZenith());
                                     int partialX = lineX2 + (int) Math.round((lengthX)*campaign.getLocation().getPercentageTransit());
                                     int partialY = lineY2 + (int) Math.round((lengthY)*campaign.getLocation().getPercentageTransit());
-                                    drawRing(g2, partialX+(shipImgSize/2), partialY+(shipImgSize/2), shipImgSize/2, Color.ORANGE);
-                                    drawRotatedImage(g2, imgDropshipFleet, rotationRequired, partialX, partialY, shipImgSize, shipImgSize);
+                                    drawRing(g2, partialX, partialY, shipImgSize/2, Color.ORANGE);
+                                    drawRotatedImage(g2, imgDropshipFleet, rotationRequired, partialX-(shipImgSize/2), partialY-(shipImgSize/2), shipImgSize, shipImgSize);
                                 }
                                 //draw jumpship too
                                 if(null != imgJumpshipFleet) {
-                                    drawRotatedImage(g2, imgJumpshipFleet, 90, zenithX + jumpPointImgSize+8, zenithY+(jumpPointImgSize/2) - (shipImgSize/2), shipImgSize, shipImgSize);
+                                    drawRotatedImage(g2, imgJumpshipFleet, 90, jumpshipX, jumpshipY, shipImgSize, shipImgSize);
                                 }
                             }
                         }
@@ -573,6 +580,16 @@ public class PlanetarySystemMapPanel extends JPanel {
         arc.setArcByCenter(x, y, radius+2, 0, 360, Arc2D.OPEN);
         g.fill(arc);
     };
+    
+    private double getFlightRotation(int lengthX, int lengthY, boolean inbound, boolean zenithJump) {
+        double rotation = Math.toDegrees(Math.atan(lengthX / ((1.0 * lengthY))));
+        //rotation depends on inbound or outbound
+        if((zenithJump && !inbound) || (!zenithJump && inbound)) {
+            return 0 - rotation;
+        } else  {
+            return 180-rotation;
+        }
+    }
     
     private Unit getBestDropship() {
         Unit bestUnit = null;
