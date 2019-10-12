@@ -196,11 +196,7 @@ public class PlanetarySystemMapPanel extends JPanel {
                 
                 //place the sun first
                 Image sunIcon = ImageUtil.loadImageFromFile("data/" + StarUtil.getIconImage(system));
-                //int sunHeight = sunIcon.getHeight(null);
-                //int sunWidth = sunIcon.getWidth(null);
-                //double sunRatio = sunHeight/sunWidth;
                 int maxSunWidth = (int) Math.round(rectWidth * 0.9);
-                //int maxSunHeight =  (int) Math.round(maxSunWidth * sunRatio);
                 g2.drawImage(sunIcon, x, y-150, maxSunWidth, 300, null);
 
                 //draw nadir and zenith points
@@ -261,7 +257,7 @@ public class PlanetarySystemMapPanel extends JPanel {
                             JumpPath jp = campaign.getLocation().getJumpPath();
                             int lineX1 = x;
                             int lineY1 = y-radius;
-                            int lineX2 = zenithX+jumpPointImgSize+8+(shipImgSize/2);
+                            int lineX2 = zenithX+jumpPointImgSize+8+shipImgSize;
                             int lineY2 = zenithY+jumpPointImgSize-(shipImgSize/2);
                             if(null != jp && (!campaign.getLocation().isAtJumpPoint() || jp.getLastSystem().equals(system))) {
                                 //the unit has a flight plan in this system so draw the line
@@ -275,7 +271,7 @@ public class PlanetarySystemMapPanel extends JPanel {
                                 //draw a ring around jumpship
                                 drawRing(g2, zenithX + jumpPointImgSize+8+(shipImgSize/2), zenithY+(jumpPointImgSize/2), shipImgSize/2, Color.ORANGE);
                                 if(null != imgJumpshipFleet) {
-                                    g2.drawImage(imgJumpshipFleet, zenithX + jumpPointImgSize+8, zenithY+(jumpPointImgSize/2) - (shipImgSize/2), shipImgSize, shipImgSize, null);
+                                    drawRotatedImage(g2, imgJumpshipFleet, 90, zenithX + jumpPointImgSize+8, zenithY+(jumpPointImgSize/2) - (shipImgSize/2), shipImgSize, shipImgSize);
                                 }
                             } else if(campaign.getLocation().isOnPlanet()) {
                                 drawRing(g2, x, y, radius, Color.ORANGE);
@@ -284,7 +280,7 @@ public class PlanetarySystemMapPanel extends JPanel {
                                 }
                                 //draw jumpship too
                                 if(null != imgJumpshipFleet) {
-                                    g2.drawImage(imgJumpshipFleet, zenithX + jumpPointImgSize+8, zenithY+(jumpPointImgSize/2) - (shipImgSize/2), shipImgSize, shipImgSize, null);
+                                    drawRotatedImage(g2, imgJumpshipFleet, 90, zenithX + jumpPointImgSize+8, zenithY+(jumpPointImgSize/2) - (shipImgSize/2), shipImgSize, shipImgSize);
                                 }
                             } else { 
                                 if(null != imgDropshipFleet) {
@@ -302,7 +298,7 @@ public class PlanetarySystemMapPanel extends JPanel {
                                 }
                                 //draw jumpship too
                                 if(null != imgJumpshipFleet) {
-                                    g2.drawImage(imgJumpshipFleet, zenithX + jumpPointImgSize+8, zenithY+(jumpPointImgSize/2) - (shipImgSize/2), shipImgSize, shipImgSize, null);
+                                    drawRotatedImage(g2, imgJumpshipFleet, 90, zenithX + jumpPointImgSize+8, zenithY+(jumpPointImgSize/2) - (shipImgSize/2), shipImgSize, shipImgSize);
                                 }
                             }
                         }
