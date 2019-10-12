@@ -1,7 +1,6 @@
 package mekhq.gui;
 
 import java.awt.BasicStroke;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -10,72 +9,52 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Insets;
-import java.awt.LinearGradientPaint;
-import java.awt.MultipleGradientPaint;
-import java.awt.Paint;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.Shape;
 import java.awt.Stroke;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
-import javax.swing.InputMap;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
-import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
 import megamek.common.Jumpship;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
-import megamek.common.MechSummaryCache;
-import megamek.common.loaders.EntityLoadingException;
 import megamek.common.util.DirectoryItems;
 import megamek.common.util.ImageUtil;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.StarUtil;
-import mekhq.campaign.universe.Systems;
 
+/**
+ * This panel displays a particular star system with suns and planets and information about
+ * the player's unit's position if in the system
+ * @author Taharqa (Aaron Gullickson)
+ *
+ */
 public class PlanetarySystemMapPanel extends JPanel {
 
     /**
@@ -97,6 +76,7 @@ public class PlanetarySystemMapPanel extends JPanel {
     private Unit dropship;
     private Unit jumpship;
     
+    //various images to paint
     private BufferedImage imgJumpPoint;
     private BufferedImage imgRechargeStation;
     private BufferedImage imgDefaultDropshipFleet;
@@ -108,8 +88,7 @@ public class PlanetarySystemMapPanel extends JPanel {
     private static int minDiameter = 16;
     private static int maxDiameter = 64;
 
-    public PlanetarySystemMapPanel(Campaign c, CampaignGUI view) {
-        
+    public PlanetarySystemMapPanel(Campaign c, CampaignGUI view) {        
         this.hqview = view;
         this.campaign = c;
         this.system = campaign.getCurrentSystem();
@@ -149,8 +128,6 @@ public class PlanetarySystemMapPanel extends JPanel {
             imgDefaultJumpshipFleet = null;
             e.printStackTrace();
         }
-        //TODO: need to update this on new day
-        updateShipImages();
         
         pane = new JLayeredPane();
         
@@ -165,6 +142,7 @@ public class PlanetarySystemMapPanel extends JPanel {
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(Color.BLACK);
                 g2.fillRect(0, 0, getWidth(), getHeight());
+                
                 //tile the space image
                 if(null != imgSpace) {
                     int tileWidth = imgSpace.getWidth();
@@ -176,6 +154,7 @@ public class PlanetarySystemMapPanel extends JPanel {
                     }
                 }
 
+                //set up some numbers
                 int rectWidth = getWidth() / (n+1);
                 int midpoint = rectWidth / 2;
                 int y = getHeight() / 2;
@@ -196,11 +175,8 @@ public class PlanetarySystemMapPanel extends JPanel {
                     jumpshipY = nadirY+(jumpPointImgSize/2)-(shipImgSize/2);
                 }
                 
+                //choose the font based on sizes
                 chooseFont(g2, system, campaign, rectWidth-6);
-                
-                //split canvas into n+1 equal rectangles where n is the number of planetary systems.
-                //the first rectangle is for the star
-                
                 
                 //place the sun first
                 Image sunIcon = ImageUtil.loadImageFromFile("data/" + StarUtil.getIconImage(system));
@@ -262,6 +238,8 @@ public class PlanetarySystemMapPanel extends JPanel {
                         
                         //check for current location - we assume you are on primary planet for now
                         if(campaign.getLocation().getCurrentSystem().equals(system) && i==system.getPrimaryPlanetPosition()) {
+                            updateShipImages();
+                            
                             JumpPath jp = campaign.getLocation().getJumpPath();
                             int lineX1 = x;
                             int lineY1 = y-radius;
@@ -381,8 +359,7 @@ public class PlanetarySystemMapPanel extends JPanel {
 
         
         
-        mapPanel.addMouseListener(new MouseAdapter() {
-            
+        mapPanel.addMouseListener(new MouseAdapter() {            
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON1) {
@@ -415,6 +392,13 @@ public class PlanetarySystemMapPanel extends JPanel {
         super.paintComponent(g);
     }
     
+    /**
+     * Choose a font size based on how large it needs to be to fit within the space
+     * @param g - a <code>Graphics</code> device
+     * @param system - a <code>PlanetarySystem</code>
+     * @param c - a <code>Campaign</code>
+     * @param limit - an integer indicating how large the text can be
+     */
     private void chooseFont(Graphics g, PlanetarySystem system, Campaign c, int limit) {
         //start with 16
         int fontSize = 16;
@@ -425,6 +409,14 @@ public class PlanetarySystemMapPanel extends JPanel {
         }
     }
     
+    /**
+     * Determin if planet names are too big for the display at current font size
+     * @param g - a <code>Graphics</code> device
+     * @param system - a <code>PlanetarySystem</code>
+     * @param when - <code>DateTime</code> object
+     * @param limit - an integer indicating how large the text can be
+     * @return
+     */
     private boolean areNamesTooBig(Graphics g, PlanetarySystem system, DateTime when, int limit) {
         for(Planet p : system.getPlanets()) {
             String name = p.getName(when);
@@ -450,6 +442,15 @@ public class PlanetarySystemMapPanel extends JPanel {
         return false;
     }
     
+    /**
+     * Draw a string that is centered on x and y. It will wrap text by spaces of hyphens
+     * if too large.
+     * @param g - a <code>Graphics2D</code> device to draw on
+     * @param text - a <code>String</code> of text to be drawn
+     * @param x - an <code>int</code> for the x-axis position
+     * @param y - an <code>int</code> for the y-axis position
+     * @param limit - an <code>int</coce> for how big the text can be
+     */
     private void drawCenteredString(Graphics2D g, String text, int x, int y, int limit) {
         FontMetrics metrics = g.getFontMetrics();
         y = y - (metrics.getHeight() / 2);
@@ -475,21 +476,40 @@ public class PlanetarySystemMapPanel extends JPanel {
         }
     }
     
+    /**
+     * update and repaint the panel for a new planetary system
+     * @param s - a <code>PlanetarySystem</code> to paint
+     */
     public void updatePlanetarySystem(PlanetarySystem s) {
         this.system = s;
         selectedPlanet = system.getPrimaryPlanetPosition();
         mapPanel.repaint();
     }
     
+    /**
+     * 
+     * @return the currently selected planet
+     */
     public int getSelectedPlanetPosition() {
         return selectedPlanet;
     }
     
+    /**
+     * Change the selected planets and notify listeners so view is changed
+     * @param pos - an <code>int</code> giving the position of the newly selected planet
+     */
     private void changeSelectedPlanet(int pos) {
         selectedPlanet = pos;
         notifyListeners();
     }
     
+    /**
+     * Find any planet in the display that contains the x and y parameters. Used to identify if planets
+     * were selected by the cursor.
+     * @param x - the x-value of the selection
+     * @param y - the y-value of the selection
+     * @return - a planet position
+     */
     private int nearestNeighbour(double x, double y) {
         int n = system.getPlanets().size();
         int rectWidth = getWidth() / (n+1);
@@ -500,7 +520,7 @@ public class PlanetarySystemMapPanel extends JPanel {
         for(int i = 1; i < (n+1); i++) {
             xTarget = rectWidth*i+midpoint;
             //must be within total possible radius
-            int radius = 32;
+            int radius = maxDiameter/2;
             if(x <= (xTarget+radius) & x >= (xTarget-radius) &
                     y <= (yTarget+radius) & y >= (yTarget-radius)) {
                 return i;
@@ -509,30 +529,11 @@ public class PlanetarySystemMapPanel extends JPanel {
         return 0;
     }
     
-    private BufferedImage getEntityImage(String name) {
-        MechSummary ms = MechSummaryCache.getInstance().getMech(name);
-        if(ms==null) {
-            return null;
-        }
-        Entity e;
-        Image img = null;
-        try {
-            e = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
-            if(null == e) {
-                return null;
-            }
-            img = hqview.getIconPackage().getMechTiles().imageFor(e, this, -1);
-            int tint = PlayerColors.getColorRGB(campaign.getColorIndex());
-            EntityImage entityImage = new EntityImage(img, tint, getCamo(), this);
-            img = entityImage.loadPreviewImage();
-            return Utilities.toBufferedImage(img);
-        } catch (EntityLoadingException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-            return null;
-        }
-    }
-    
+    /**
+     * Get an image for a unit. Camo will be applied to this image if relevant.
+     * @param u a <code>Unit</code>
+     * @return a <code>BufferedImage</code?
+     */
     private BufferedImage getEntityImage(Unit u) {
         Image img = null;
         img = hqview.getIconPackage().getMechTiles().imageFor(u.getEntity(), this, -1);
@@ -545,6 +546,10 @@ public class PlanetarySystemMapPanel extends JPanel {
         return Utilities.toBufferedImage(img);
     }
     
+    /**
+     * Get the camo image for the campaign if it exists
+     * @return An <code>Image</code> of the camo
+     */
     private Image getCamo() {
         Image camo = null;
         try {
@@ -555,6 +560,16 @@ public class PlanetarySystemMapPanel extends JPanel {
         return camo;
     }
     
+    /**
+     * Draw and image with the given rotation
+     * @param g - the <code>Graphics2D</code> device to draw on
+     * @param image - a <code>BufferedImage</code> to be drawn
+     * @param degrees - A <code>double</code> giving the rotation to apply
+     * @param x - the x position for placement
+     * @param y - the y position for placement
+     * @param width - the width to draw the image to
+     * @param height - the height to draw the image to
+     */
     private void drawRotatedImage(Graphics2D g, BufferedImage image, double degrees, int x, int y, int width, int height) {
         double rotationRequired = Math.toRadians(degrees);
         double locationX = image.getWidth() / 2;
@@ -565,6 +580,15 @@ public class PlanetarySystemMapPanel extends JPanel {
         g.drawImage(op.filter(image, null), x, y, width, height, null);
     }
     
+    /**
+     * Draw a selection ring of the given color around some point. This will draw over everything in the ring with a black background, so
+     * should be placed before anything selected.
+     * @param g - the <code>Graphics2D</code> device to draw on
+     * @param x - an <code>int</code> giving the x-position of the center of the ring
+     * @param y - an <code>int</code> giving the y-position of the center of the ring
+     * @param radius - an <code>int</code> giving the radius of the ring
+     * @param c - the <code>Color</code> of the ring
+     */
     private void drawRing(Graphics2D g, int x, int y, int radius, Color c) {
         Arc2D.Double arc = new Arc2D.Double();
         g.setPaint(c);
@@ -581,6 +605,14 @@ public class PlanetarySystemMapPanel extends JPanel {
         g.fill(arc);
     };
     
+    /**
+     * Determine the degree of rotation for a ship in flight to to the planet or jump point
+     * @param lengthX - An <code>int</code> giving the length of the x-axis by the triangle formed between the planet and the jump point
+     * @param lengthY - An <code>int</code> giving the length of the y-axis by the triangle formed between the planet and the jump point
+     * @param inbound - A <code>boolean</code> for whether the flight is inbound.
+     * @param zenithJump - A <code>boolean</code> for whether the the zenith point is the jump point (false if nadir).
+     * @return a <code>double</code> giving the proper rotation.
+     */
     private double getFlightRotation(int lengthX, int lengthY, boolean inbound, boolean zenithJump) {
         double rotation = Math.toDegrees(Math.atan(lengthX / ((1.0 * lengthY))));
         //rotation depends on inbound or outbound
@@ -591,6 +623,11 @@ public class PlanetarySystemMapPanel extends JPanel {
         }
     }
     
+    /**
+     * Get the best dropship among the player's units. For choosing which one to display on screen for transit. This is 
+     * determined by weight.
+     * @return a <code>Unit</code> for the best dropship.
+     */
     private Unit getBestDropship() {
         Unit bestUnit = null;
         double bestWeight = 0.0;
@@ -603,6 +640,11 @@ public class PlanetarySystemMapPanel extends JPanel {
         return bestUnit;
     }
     
+    /**
+     * Get the best jumpship among the player's units. For choosing which one to display on screen for transit. This is 
+     * determined by weight.
+     * @return a <code>Unit</code> for the best jumpship.
+     */
     private Unit getBestJumpship() {
         Unit bestUnit = null;
         double bestWeight = 0.0;
@@ -615,6 +657,10 @@ public class PlanetarySystemMapPanel extends JPanel {
         return bestUnit;
     }
     
+    /**
+     * update the dropship and jumpship fleet images by the player's campaign's best dropship and jumpships, respectively. 
+     * If the campaign has none, then it returns the default.
+     */
     public void updateShipImages() {
         dropship = getBestDropship();
         imgDropshipFleet = imgDefaultDropshipFleet;
@@ -646,6 +692,9 @@ public class PlanetarySystemMapPanel extends JPanel {
         listeners.forEach(l -> l.actionPerformed(ev));
     }
     
+    /**
+     * Switch back to the interstellar map
+     */
     private void back() {
         ((MapTab)hqview.getTab(GuiTabType.MAP)).switchSystemsMap();
     }

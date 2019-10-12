@@ -111,10 +111,20 @@ public class CurrentLocation implements Serializable {
         return transitTime;
     }
     
+    /**
+     * 
+     * @return a <code>boolean</code> indicating whether the jumpship is at the zenith or not (nadir if false).
+     */
     public boolean isJumpZenith() {
         return jumpZenith;
     }
     
+    /**
+     * pick the best jump point (nadir of zenith). Chooses the one with a recharge station or randomly selects if both have a 
+     * recharge station or neither does.
+     * @param now - a <code>DateTime</code> object for the present time
+     * @return a <code> boolean indicating whethe the zenith position was chosen or not.
+     */
     private boolean pickJumpPoint(DateTime now) {
         if(currentSystem.isZenithCharge(now) && !currentSystem.isNadirCharge(now)) {
             return true;
