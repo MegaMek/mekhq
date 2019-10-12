@@ -150,7 +150,6 @@ public class PlanetarySystemMapPanel extends JPanel {
                 int n = system.getPlanets().size();
                 
                 Graphics2D g2 = (Graphics2D) g;
-                Arc2D.Double arc = new Arc2D.Double();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(Color.BLACK);
                 g2.fillRect(0, 0, getWidth(), getHeight());
@@ -196,20 +195,20 @@ public class PlanetarySystemMapPanel extends JPanel {
                 g2.setPaint(Color.WHITE);
                 if(system.isZenithCharge(Utilities.getDateTimeDay(campaign.getCalendar()))) {
                     if(null != imgRechargeStation) {
-                        drawRotatedImage(g2, imgRechargeStation, 90, zenithX, zenithY, jumpPointImgSize, jumpPointImgSize);
+                        drawRotatedImage(g2, imgRechargeStation, 90.0, zenithX, zenithY, jumpPointImgSize, jumpPointImgSize);
                     }
                 } else {
                     if(null != imgJumpPoint) {
-                        drawRotatedImage(g2, imgJumpPoint, 90, zenithX, zenithY, jumpPointImgSize, jumpPointImgSize);
+                        drawRotatedImage(g2, imgJumpPoint, 90.0, zenithX, zenithY, jumpPointImgSize, jumpPointImgSize);
                     }
                 }
                 if(system.isNadirCharge(Utilities.getDateTimeDay(campaign.getCalendar()))) {
                     if(null != imgRechargeStation) {
-                        drawRotatedImage(g2, imgRechargeStation, 90, nadirX, nadirY, jumpPointImgSize, jumpPointImgSize);
+                        drawRotatedImage(g2, imgRechargeStation, 90.0, nadirX, nadirY, jumpPointImgSize, jumpPointImgSize);
                     }
                 } else {
                     if(null != imgJumpPoint) {
-                        drawRotatedImage(g2, imgJumpPoint, 90, nadirX, nadirY, jumpPointImgSize, jumpPointImgSize);
+                        drawRotatedImage(g2, imgJumpPoint, 90.0, nadirX, nadirY, jumpPointImgSize, jumpPointImgSize);
                     }
                 }
 
@@ -259,8 +258,9 @@ public class PlanetarySystemMapPanel extends JPanel {
                             }
                             if(campaign.getLocation().isAtJumpPoint()) {
                                 //draw at jump point
+                                drawRing(g2, zenithX + jumpPointImgSize+8+(shipImgSize/2), zenithY+(jumpPointImgSize/2), shipImgSize/2, Color.ORANGE);
                                 if(null != imgDropshipFleet) {
-                                    g2.drawImage(imgDropshipFleet, zenithX + jumpPointImgSize + shipImgSize, zenithY+(jumpPointImgSize/2) - (shipImgSize/2), shipImgSize, shipImgSize, null);
+                                    g2.drawImage(imgDropshipFleet, zenithX + jumpPointImgSize+8, zenithY+(jumpPointImgSize/2) - (shipImgSize/2), shipImgSize, shipImgSize, null);
                                 }
                             } else if(campaign.getLocation().isOnPlanet()) {
                                 drawRing(g2, x, y, radius, Color.ORANGE);
@@ -270,13 +270,16 @@ public class PlanetarySystemMapPanel extends JPanel {
                             } else { 
                                 if(null != imgDropshipFleet) {
                                     //TODO: figure out correct angles
-                                    int rotationRequired = 315;
+                                    int lengthX = x-zenithX-jumpPointImgSize;
+                                    int lengthY = y-radius-zenithY-jumpPointImgSize;
+                                    double rotationRequired = (-1) * Math.toDegrees(Math.atan(lengthX / ((1.0 * lengthY))));
                                     if(null != jp && jp.getLastSystem().equals(system)) {
                                         //inbound
-                                        rotationRequired = 135;
+                                        rotationRequired = 180+rotationRequired;
                                     }                                   
-                                    int partialX = (int) Math.round((x-zenithX-jumpPointImgSize)*campaign.getLocation().getPercentageTransit()+zenithX+jumpPointImgSize);
-                                    int partialY = (int) Math.round((y-radius-zenithY-jumpPointImgSize)*campaign.getLocation().getPercentageTransit()+zenithY+jumpPointImgSize);
+                                    int partialX = (int) Math.round((lengthX)*campaign.getLocation().getPercentageTransit()+zenithX+jumpPointImgSize);
+                                    int partialY = (int) Math.round((lengthY)*campaign.getLocation().getPercentageTransit()+zenithY+jumpPointImgSize);
+                                    drawRing(g2, partialX+(shipImgSize/2), partialY+(shipImgSize/2), shipImgSize/2, Color.ORANGE);
                                     drawRotatedImage(g2, imgDropshipFleet, rotationRequired, partialX, partialY, shipImgSize, shipImgSize);
                                 }
                             }
@@ -527,7 +530,7 @@ public class PlanetarySystemMapPanel extends JPanel {
         return camo;
     }
     
-    private void drawRotatedImage(Graphics2D g, BufferedImage image, int degrees, int x, int y, int width, int height) {
+    private void drawRotatedImage(Graphics2D g, BufferedImage image, double degrees, int x, int y, int width, int height) {
         double rotationRequired = Math.toRadians(degrees);
         double locationX = image.getWidth() / 2;
         double locationY = image.getHeight() / 2;
