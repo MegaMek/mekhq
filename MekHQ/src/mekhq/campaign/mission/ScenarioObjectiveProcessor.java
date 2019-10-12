@@ -146,6 +146,10 @@ public class ScenarioObjectiveProcessor {
      */
     public void updateObjectiveEntityState(Entity entity, boolean forceEntityEscape, 
             boolean forceEntityDestruction, boolean opponentHasBattlefieldControl) {
+        if(entity == null) {
+            return;
+        }
+        
         for(ScenarioObjective objective : potentialObjectiveUnits.keySet()) {
             boolean entityMeetsObjective = false;
 

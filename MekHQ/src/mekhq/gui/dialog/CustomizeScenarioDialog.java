@@ -337,7 +337,10 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
     	scenario.setName(txtName.getText());
     	scenario.setDesc(txtDesc.getText());
     	if(!scenario.isCurrent() || (campaign.getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario)) {
-    		scenario.setReport(txtReport.getText());
+    	    if(txtReport != null) {
+    	        scenario.setReport(txtReport.getText());
+    	    }
+    	    
     		scenario.setStatus(choiceStatus.getSelectedIndex()+1);
     		scenario.setDate(date);
     	}
