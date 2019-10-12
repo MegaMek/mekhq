@@ -99,6 +99,8 @@ public class PlanetarySystemMapPanel extends JPanel {
     
     private BufferedImage imgJumpPoint;
     private BufferedImage imgRechargeStation;
+    private BufferedImage imgDefaultDropshipFleet;
+    private BufferedImage imgDefaultJumpshipFleet;
     private BufferedImage imgDropshipFleet;
     private BufferedImage imgJumpshipFleet;
     private BufferedImage imgSpace;
@@ -112,13 +114,7 @@ public class PlanetarySystemMapPanel extends JPanel {
         this.campaign = c;
         this.system = campaign.getCurrentSystem();
         selectedPlanet = system.getPrimaryPlanetPosition();
-        camos = hqview.getIconPackage().getCamos();
-        //TODO: need to update this on new day
-        dropship = getBestDropship();
-        imgDropshipFleet = getEntityImage("Union (3055)");
-        if(null != dropship) {
-            imgDropshipFleet = getEntityImage(dropship);
-        }
+        camos = hqview.getIconPackage().getCamos();        
         
         try {
             imgSpace = ImageIO.read(new File("data/images/universe/space.jpg"));
@@ -127,18 +123,34 @@ public class PlanetarySystemMapPanel extends JPanel {
             e1.printStackTrace();
         }
         try {
-            imgJumpPoint = ImageIO.read(new File("data/images/units/jumpships/invader.png"));
+            imgJumpPoint = ImageIO.read(new File("data/images/universe/default_jumppoint.png"));
         } catch (IOException e) {
             imgJumpPoint = null;
             e.printStackTrace();
         }
         
         try {
-            imgRechargeStation = ImageIO.read(new File("data/images/units/Space Stations/Olympus.png"));
+            imgRechargeStation = ImageIO.read(new File("data/images/universe/default_recharge_station.png"));
         } catch (IOException e) {
             imgRechargeStation = null;
             e.printStackTrace();
         }
+        
+        try {
+            imgDefaultDropshipFleet = ImageIO.read(new File("data/images/universe/default_dropship_fleet.png"));
+        } catch (IOException e) {
+            imgDefaultDropshipFleet = null;
+            e.printStackTrace();
+        }
+        
+        try {
+            imgDefaultJumpshipFleet = ImageIO.read(new File("data/images/universe/default_jumpship_fleet.png"));
+        } catch (IOException e) {
+            imgDefaultJumpshipFleet = null;
+            e.printStackTrace();
+        }
+        //TODO: need to update this on new day
+        updateShipImages();
         
         pane = new JLayeredPane();
         
@@ -247,40 +259,50 @@ public class PlanetarySystemMapPanel extends JPanel {
                         //check for current location - we assume you are on primary planet for now
                         if(campaign.getLocation().getCurrentSystem().equals(system) && i==system.getPrimaryPlanetPosition()) {
                             JumpPath jp = campaign.getLocation().getJumpPath();
-                            
+                            int lineX1 = x;
+                            int lineY1 = y-radius;
+                            int lineX2 = zenithX+jumpPointImgSize+8+(shipImgSize/2);
+                            int lineY2 = zenithY+jumpPointImgSize-(shipImgSize/2);
                             if(null != jp && (!campaign.getLocation().isAtJumpPoint() || jp.getLastSystem().equals(system))) {
                                 //the unit has a flight plan in this system so draw the line
                                 //in transit so draw a path
                                 g2.setColor(Color.YELLOW);
                                 Stroke dashed = new BasicStroke(3, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{9}, 0);
                                 g2.setStroke(dashed);
-                                g2.drawLine(x, y-radius, zenithX+jumpPointImgSize, zenithY+jumpPointImgSize);
+                                g2.drawLine(lineX1, lineY1, lineX2, lineY2);
                             }
                             if(campaign.getLocation().isAtJumpPoint()) {
-                                //draw at jump point
+                                //draw a ring around jumpship
                                 drawRing(g2, zenithX + jumpPointImgSize+8+(shipImgSize/2), zenithY+(jumpPointImgSize/2), shipImgSize/2, Color.ORANGE);
-                                if(null != imgDropshipFleet) {
-                                    g2.drawImage(imgDropshipFleet, zenithX + jumpPointImgSize+8, zenithY+(jumpPointImgSize/2) - (shipImgSize/2), shipImgSize, shipImgSize, null);
+                                if(null != imgJumpshipFleet) {
+                                    g2.drawImage(imgJumpshipFleet, zenithX + jumpPointImgSize+8, zenithY+(jumpPointImgSize/2) - (shipImgSize/2), shipImgSize, shipImgSize, null);
                                 }
                             } else if(campaign.getLocation().isOnPlanet()) {
                                 drawRing(g2, x, y, radius, Color.ORANGE);
                                 if(null != imgDropshipFleet) {
                                     g2.drawImage(imgDropshipFleet, x-radius-shipImgSize, y-radius-shipImgSize, shipImgSize, shipImgSize, null);
                                 }
+                                //draw jumpship too
+                                if(null != imgJumpshipFleet) {
+                                    g2.drawImage(imgJumpshipFleet, zenithX + jumpPointImgSize+8, zenithY+(jumpPointImgSize/2) - (shipImgSize/2), shipImgSize, shipImgSize, null);
+                                }
                             } else { 
                                 if(null != imgDropshipFleet) {
-                                    //TODO: figure out correct angles
-                                    int lengthX = x-zenithX-jumpPointImgSize;
-                                    int lengthY = y-radius-zenithY-jumpPointImgSize;
+                                    int lengthX = lineX1-lineX2;
+                                    int lengthY = lineY1-lineY2;
                                     double rotationRequired = (-1) * Math.toDegrees(Math.atan(lengthX / ((1.0 * lengthY))));
                                     if(null != jp && jp.getLastSystem().equals(system)) {
                                         //inbound
                                         rotationRequired = 180+rotationRequired;
                                     }                                   
-                                    int partialX = (int) Math.round((lengthX)*campaign.getLocation().getPercentageTransit()+zenithX+jumpPointImgSize);
-                                    int partialY = (int) Math.round((lengthY)*campaign.getLocation().getPercentageTransit()+zenithY+jumpPointImgSize);
+                                    int partialX = lineX2 + (int) Math.round((lengthX)*campaign.getLocation().getPercentageTransit());
+                                    int partialY = lineY2 + (int) Math.round((lengthY)*campaign.getLocation().getPercentageTransit());
                                     drawRing(g2, partialX+(shipImgSize/2), partialY+(shipImgSize/2), shipImgSize/2, Color.ORANGE);
                                     drawRotatedImage(g2, imgDropshipFleet, rotationRequired, partialX, partialY, shipImgSize, shipImgSize);
+                                }
+                                //draw jumpship too
+                                if(null != imgJumpshipFleet) {
+                                    g2.drawImage(imgJumpshipFleet, zenithX + jumpPointImgSize+8, zenithY+(jumpPointImgSize/2) - (shipImgSize/2), shipImgSize, shipImgSize, null);
                                 }
                             }
                         }
@@ -578,6 +600,20 @@ public class PlanetarySystemMapPanel extends JPanel {
             }
         }
         return bestUnit;
+    }
+    
+    public void updateShipImages() {
+        dropship = getBestDropship();
+        imgDropshipFleet = imgDefaultDropshipFleet;
+        if(null != dropship) {
+            imgDropshipFleet = getEntityImage(dropship);
+        }
+        
+        jumpship = getBestJumpship();
+        imgJumpshipFleet = imgDefaultJumpshipFleet;
+        if(null != jumpship) {
+            imgJumpshipFleet = getEntityImage(jumpship);
+        }
     }
     
     private transient List<ActionListener> listeners = new ArrayList<>();
