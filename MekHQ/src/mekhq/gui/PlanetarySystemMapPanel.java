@@ -181,7 +181,7 @@ public class PlanetarySystemMapPanel extends JPanel {
                 //place the sun first
                 Image sunIcon = ImageUtil.loadImageFromFile("data/" + StarUtil.getIconImage(system));
                 int maxSunWidth = (int) Math.round(rectWidth * 0.9);
-                g2.drawImage(sunIcon, x, y-150, maxSunWidth, 300, null);
+                g2.drawImage(sunIcon, maxSunWidth-355, y-178, 355, 355, null);
 
                 //draw nadir and zenith points
                 g2.setPaint(Color.WHITE);

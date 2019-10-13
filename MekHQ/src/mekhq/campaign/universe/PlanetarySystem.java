@@ -451,8 +451,6 @@ public class PlanetarySystem implements Serializable {
             return "kstar";
         case(SPECTRAL_M):
             return "mstar";
-        case(SPECTRAL_L):
-            return "lstar";
         case(SPECTRAL_T):
             return "tstar";
         default:
