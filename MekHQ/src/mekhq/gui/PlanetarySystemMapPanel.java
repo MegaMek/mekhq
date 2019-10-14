@@ -77,7 +77,8 @@ public class PlanetarySystemMapPanel extends JPanel {
     private Unit jumpship;
     
     //various images to paint
-    private BufferedImage imgJumpPoint;
+    private BufferedImage imgZenithPoint;
+    private BufferedImage imgNadirPoint;
     private BufferedImage imgRechargeStation;
     private BufferedImage imgDefaultDropshipFleet;
     private BufferedImage imgDefaultJumpshipFleet;
@@ -102,9 +103,16 @@ public class PlanetarySystemMapPanel extends JPanel {
             e1.printStackTrace();
         }
         try {
-            imgJumpPoint = ImageIO.read(new File("data/images/universe/default_jumppoint.png"));
+            imgZenithPoint = ImageIO.read(new File("data/images/universe/default_zenithpoint.png"));
         } catch (IOException e) {
-            imgJumpPoint = null;
+            imgZenithPoint = null;
+            e.printStackTrace();
+        }
+        
+        try {
+            imgNadirPoint = ImageIO.read(new File("data/images/universe/default_nadirpoint.png"));
+        } catch (IOException e) {
+            imgNadirPoint = null;
             e.printStackTrace();
         }
         
@@ -160,19 +168,21 @@ public class PlanetarySystemMapPanel extends JPanel {
                 int y = getHeight() / 2;
                 int x = 0;
                 
-                int jumpPointImgSize = 64;
+                int jumpPointImgWidth = 84;
+                int jumpPointImgHeight = 72;
+                int rechargeImgSize = 64;
                 int shipImgSize = 24;
                 int nadirX = midpoint;
-                int nadirY = getHeight()-60-jumpPointImgSize;
+                int nadirY = getHeight()-60-jumpPointImgHeight;
                 int zenithX = midpoint;
                 int zenithY = 60;
                 
                 //where is jumpship
-                int jumpshipX = zenithX+jumpPointImgSize+8;
-                int jumpshipY = zenithY+(jumpPointImgSize/2)-(shipImgSize/2);
+                int jumpshipX = zenithX+jumpPointImgWidth+8;
+                int jumpshipY = zenithY+(jumpPointImgHeight/2)-(shipImgSize/2);
                 if(!campaign.getLocation().isJumpZenith()) {
-                    jumpshipX = nadirX+jumpPointImgSize+8;;
-                    jumpshipY = nadirY+(jumpPointImgSize/2)-(shipImgSize/2);
+                    jumpshipX = nadirX+jumpPointImgWidth+8;;
+                    jumpshipY = nadirY+(jumpPointImgHeight/2)-(shipImgSize/2);
                 }
                 
                 //choose the font based on sizes
@@ -184,24 +194,17 @@ public class PlanetarySystemMapPanel extends JPanel {
                 g2.drawImage(sunIcon, maxSunWidth-355, y-178, 355, 355, null);
 
                 //draw nadir and zenith points
-                g2.setPaint(Color.WHITE);
-                if(system.isZenithCharge(Utilities.getDateTimeDay(campaign.getCalendar()))) {
-                    if(null != imgRechargeStation) {
-                        drawRotatedImage(g2, imgRechargeStation, 90.0, zenithX, zenithY, jumpPointImgSize, jumpPointImgSize);
-                    }
-                } else {
-                    if(null != imgJumpPoint) {
-                        drawRotatedImage(g2, imgJumpPoint, 90.0, zenithX, zenithY, jumpPointImgSize, jumpPointImgSize);
-                    }
+                if(null != imgZenithPoint) {
+                    g2.drawImage(imgZenithPoint, zenithX, zenithY, jumpPointImgWidth, jumpPointImgHeight, null);
                 }
-                if(system.isNadirCharge(Utilities.getDateTimeDay(campaign.getCalendar()))) {
-                    if(null != imgRechargeStation) {
-                        drawRotatedImage(g2, imgRechargeStation, 90.0, nadirX, nadirY, jumpPointImgSize, jumpPointImgSize);
-                    }
-                } else {
-                    if(null != imgJumpPoint) {
-                        drawRotatedImage(g2, imgJumpPoint, 90.0, nadirX, nadirY, jumpPointImgSize, jumpPointImgSize);
-                    }
+                if(system.isZenithCharge(Utilities.getDateTimeDay(campaign.getCalendar())) && null != imgRechargeStation) {
+                    drawRotatedImage(g2, imgRechargeStation, 90.0, zenithX, zenithY+12, rechargeImgSize, rechargeImgSize);    
+                }
+                if(null != imgNadirPoint) {
+                    g2.drawImage(imgNadirPoint, nadirX, nadirY, jumpPointImgWidth, jumpPointImgHeight, null);
+                }
+                if(system.isNadirCharge(Utilities.getDateTimeDay(campaign.getCalendar())) && null != imgRechargeStation) {
+                    drawRotatedImage(g2, imgRechargeStation, 90.0, nadirX, nadirY+12, rechargeImgSize, rechargeImgSize);
                 }
 
                 //get the biggest diameter allowed within this space for a planet
