@@ -150,6 +150,18 @@ public class PlanetViewPanel extends ScrollablePanel {
         panel.add(txtPlanetType, gbcText);
         ++ infoRow;
         
+      //System Position
+        if(planet.getPlanetType() != "Asteroid Belt") {
+            JLabel lblDiameter = new JLabel(resourceMap.getString("lblDiameter.text"));
+            gbcLabel.gridy = infoRow;
+            panel.add(lblDiameter, gbcLabel);            
+            JLabel txtDiameter = new JLabel( String.format("%.1f km", //$NON-NLS-1$
+                    planet.getDiameter()));
+            gbcText.gridy = infoRow;
+            panel.add(txtDiameter, gbcText);
+            ++ infoRow;
+        }
+        
         //System Position
         if((null != planet.getSystemPosition()) || (null != planet.getOrbitRadius())) {
             JLabel lblPosition = new JLabel(resourceMap.getString("lblPosition.text"));
