@@ -1609,8 +1609,7 @@ public class Utilities {
      * @param img The Image to be converted
      * @return The converted BufferedImage
      */
-    public static BufferedImage toBufferedImage(Image img)
-    {
+    public static BufferedImage toBufferedImage(Image img) {
         if (img instanceof BufferedImage)
         {
             return (BufferedImage) img;

@@ -133,7 +133,7 @@ public class CurrentLocation implements Serializable {
             return false;
         }
         //otherwise both recharge stations or none so choose randomly
-        return Compute.randomInt(1)==1;
+        return Compute.randomInt(2)==1;
     }
 
     public String getReport(Date date) {

@@ -41,6 +41,7 @@ import megamek.common.Dropship;
 import megamek.common.Jumpship;
 import megamek.common.util.DirectoryItems;
 import megamek.common.util.ImageUtil;
+import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
@@ -96,45 +97,46 @@ public class PlanetarySystemMapPanel extends JPanel {
         selectedPlanet = system.getPrimaryPlanetPosition();
         camos = hqview.getIconPackage().getCamos();        
         
+        final String METHOD_NAME = "PlanetarySystemMapPanel()";
         try {
             imgSpace = ImageIO.read(new File("data/images/universe/space.jpg"));
         } catch (IOException e1) {
             imgSpace = null;
-            e1.printStackTrace();
+            MekHQ.getLogger().error(PlanetarySystemMapPanel.class, METHOD_NAME, "missing default space image");
         }
         try {
             imgZenithPoint = ImageIO.read(new File("data/images/universe/default_zenithpoint.png"));
         } catch (IOException e) {
             imgZenithPoint = null;
-            e.printStackTrace();
+            MekHQ.getLogger().error(PlanetarySystemMapPanel.class, METHOD_NAME, "missing default zenith point image");
         }
         
         try {
             imgNadirPoint = ImageIO.read(new File("data/images/universe/default_nadirpoint.png"));
         } catch (IOException e) {
             imgNadirPoint = null;
-            e.printStackTrace();
+            MekHQ.getLogger().error(PlanetarySystemMapPanel.class, METHOD_NAME, "missing default nadir point image");
         }
         
         try {
             imgRechargeStation = ImageIO.read(new File("data/images/universe/default_recharge_station.png"));
         } catch (IOException e) {
             imgRechargeStation = null;
-            e.printStackTrace();
+            MekHQ.getLogger().error(PlanetarySystemMapPanel.class, METHOD_NAME, "missing default recharge station image");
         }
         
         try {
             imgDefaultDropshipFleet = ImageIO.read(new File("data/images/universe/default_dropship_fleet.png"));
         } catch (IOException e) {
             imgDefaultDropshipFleet = null;
-            e.printStackTrace();
+            MekHQ.getLogger().error(PlanetarySystemMapPanel.class, METHOD_NAME, "missing default dropship fleet image");
         }
         
         try {
             imgDefaultJumpshipFleet = ImageIO.read(new File("data/images/universe/default_jumpship_fleet.png"));
         } catch (IOException e) {
             imgDefaultJumpshipFleet = null;
-            e.printStackTrace();
+            MekHQ.getLogger().error(PlanetarySystemMapPanel.class, METHOD_NAME, "missing default jumpship fleet image");
         }
         
         pane = new JLayeredPane();
@@ -292,7 +294,7 @@ public class PlanetarySystemMapPanel extends JPanel {
                         }
                         
                         //add ring for selected planet
-                        if(i > 0 & selectedPlanet==i) {
+                        if(selectedPlanet==i) {
                             drawRing(g2, x, y, radius, Color.WHITE);
                         }
                         
@@ -437,7 +439,7 @@ public class PlanetarySystemMapPanel extends JPanel {
                             return true;
                         }
                     }
-                }else {
+                } else {
                     return true;
                 }
             }
@@ -475,7 +477,7 @@ public class PlanetarySystemMapPanel extends JPanel {
                 }
             }
         } else {
-            g.drawString(text, x- (metrics.stringWidth(text) / 2), y += g.getFontMetrics().getHeight());
+            g.drawString(text, x- (metrics.stringWidth(text) / 2), y + g.getFontMetrics().getHeight());
         }
     }
     
@@ -484,6 +486,9 @@ public class PlanetarySystemMapPanel extends JPanel {
      * @param s - a <code>PlanetarySystem</code> to paint
      */
     public void updatePlanetarySystem(PlanetarySystem s) {
+        if(null == s) {
+            return;
+        }
         this.system = s;
         selectedPlanet = system.getPrimaryPlanetPosition();
         mapPanel.repaint();

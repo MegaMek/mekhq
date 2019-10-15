@@ -85,8 +85,6 @@ public class PlanetViewPanel extends ScrollablePanel {
             pnlPlanet.setBackground(Color.WHITE);
             add(pnlPlanet);
         };
-
-        //planetIcon = ImageUtil.loadImageFromFile("data/" + StarUtil.getIconImage(planet));
     }
     
     @Override
