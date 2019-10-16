@@ -3658,6 +3658,8 @@ public class Campaign implements Serializable, ITechManager {
                     unitsToCheck.add(unit.getId());
                 }
             }
+            
+            unit.resetEngineer();
         }
 
         for(UUID uid : unitsToCheck) {

@@ -12,6 +12,7 @@ import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -50,6 +51,8 @@ import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.FileDialogs;
@@ -310,7 +313,8 @@ public class CampaignExportWizard extends JDialog {
             if(!part.isReservedForRefit() &&
                     !part.isReservedForReplacement() &&
                     !part.isBeingWorkedOn() &&
-                    part.isPresent()) {
+                    part.isPresent() &&
+                    part.isSpare()) {
                 partListModel.addElement(part);
             }
         }
@@ -462,8 +466,12 @@ public class CampaignExportWizard extends JDialog {
     private boolean exportToCampaign(File file) {
         boolean newCampaign = !file.exists();
         
+        Hashtable<String, SkillType> skillPush = SkillType.getSkillHash();
+        Hashtable<String, SpecialAbility> spaPush = SpecialAbility.getAllSpecialAbilities();
+        
         if(newCampaign) {
             destinationCampaign = new Campaign();
+            
             destinationCampaign.setApp(sourceCampaign.getApp());
         } else {
             try {
@@ -514,13 +522,18 @@ public class CampaignExportWizard extends JDialog {
         
         try {
             money = Integer.parseInt(txtExportMoney.getText());
-            destinationCampaign.addFunds(Money.of(money), String.format("Transfer from %s", sourceCampaign.getName()), Transaction.C_START);
+            if(money > 0) {
+                destinationCampaign.addFunds(Money.of(money), String.format("Transfer from %s", sourceCampaign.getName()), Transaction.C_START);
+            }
         } catch(Exception e) {
             
         }
         
         // forces aren't moved/copied over, we just use the force selection to pre-populate the list of people and units 
         // to be exported
+        
+        // we keep track of "engineers" for self-maintained units, key is the person ID, value is the unit ID.
+        Map<UUID, UUID> selfMaintainedUnitTechMap = new HashMap<>();
         
         for(Unit unit : unitList.getSelectedValuesList()) {
             if(destinationCampaign.getUnit(unit.getId()) != null) {
@@ -529,6 +542,10 @@ public class CampaignExportWizard extends JDialog {
             
             destinationCampaign.importUnit(unit);
             destinationCampaign.getUnit(unit.getId()).setForceId(Force.FORCE_NONE);
+            
+            if(unit.getEngineer() != null) {
+                selfMaintainedUnitTechMap.put(unit.getEngineer().getId(), unit.getId());
+            }
         }
         
         // overwrite any people with the same ID.
@@ -538,10 +555,15 @@ public class CampaignExportWizard extends JDialog {
             }
             
             destinationCampaign.importPerson(person);
+            destinationCampaign.getPerson(person.getId()).resetMinutesLeft();
 
             for(Kill kill : sourceCampaign.getKillsFor(person.getId())) {
                 destinationCampaign.importKill(kill);
             }
+        }
+        
+        for(Unit unit : destinationCampaign.getUnits()) {
+            unit.resetEngineer();
         }
         
         // there's just no way to overwrite parts
@@ -552,6 +574,7 @@ public class CampaignExportWizard extends JDialog {
             // make a copy of the part so we don't mess with the existing part
             // ammo and armor require special handling
             Part newPart = partCount.part.clone();
+            newPart.setCampaign(destinationCampaign);
             if(newPart instanceof AmmoStorage) {
                 ((AmmoStorage) newPart).setShots(partCount.count);
                 destinationCampaign.addPart(newPart, 0);
@@ -559,11 +582,17 @@ public class CampaignExportWizard extends JDialog {
                 ((Armor) newPart).setAmount(partCount.count);
                 destinationCampaign.addPart(newPart, 0);
             } else {
-                // addPart only increments count by one and folds the part
-                // into an existing part, making it impossible to modify the part
-                // once it's inside the destination campaign, so we just add the part repeatedly
-                for(int x = 0; x < partCount.count; x++) {
+                // a work-around due to weirdness in "checkForExistingSparePart" - 
+                // it comes back as null if the part we're looking for is there but has the same ID,
+                // which is likely to happen when exporting to a brand new campaign
+                newPart.setId(-1);
+                Part existingPart = destinationCampaign.checkForExistingSparePart(newPart);
+                if(existingPart == null) {
+                    // addpart doesn't allow adding multiple parts, so we update it afterwards
                     destinationCampaign.addPart(newPart, 0);
+                    newPart.setQuantity(partCount.count);
+                } else {
+                    existingPart.setQuantity(existingPart.getQuantity() + partCount.count);
                 }
             }
         }
@@ -615,6 +644,11 @@ public class CampaignExportWizard extends JDialog {
             }
         }
 
+        // because SkillType and SpecialAbility costs are static, we now "pop" those off the stack so 
+        // that we don't clobber the original campaign's skill and SPA settings
+        SkillType.setSkillTypes(skillPush);
+        SpecialAbility.replaceSpecialAbilities(spaPush);
+        
         return saved;
     }
     
