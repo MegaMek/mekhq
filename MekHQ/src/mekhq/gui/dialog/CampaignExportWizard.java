@@ -532,9 +532,6 @@ public class CampaignExportWizard extends JDialog {
         // forces aren't moved/copied over, we just use the force selection to pre-populate the list of people and units 
         // to be exported
         
-        // we keep track of "engineers" for self-maintained units, key is the person ID, value is the unit ID.
-        Map<UUID, UUID> selfMaintainedUnitTechMap = new HashMap<>();
-        
         for(Unit unit : unitList.getSelectedValuesList()) {
             if(destinationCampaign.getUnit(unit.getId()) != null) {
                 destinationCampaign.removeUnit(unit.getId());
@@ -542,10 +539,6 @@ public class CampaignExportWizard extends JDialog {
             
             destinationCampaign.importUnit(unit);
             destinationCampaign.getUnit(unit.getId()).setForceId(Force.FORCE_NONE);
-            
-            if(unit.getEngineer() != null) {
-                selfMaintainedUnitTechMap.put(unit.getEngineer().getId(), unit.getId());
-            }
         }
         
         // overwrite any people with the same ID.
