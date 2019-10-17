@@ -132,6 +132,10 @@ public class SkillType implements Serializable {
         }
     }
     
+    public static Hashtable<String, SkillType> getSkillHash() {
+        return lookupHash;
+    }
+    
     public static String[] getSkillList() {
         return skillList;
     }    
@@ -304,26 +308,6 @@ public class SkillType implements Serializable {
         lookupHash.put(S_LEADER, createLeadership());
         lookupHash.put(S_NEG, createNegotiation());
         lookupHash.put(S_SCROUNGE, createScrounge());
-
-        /*
-        abilityCosts = new HashMap<String, Integer>();
-        abilityCosts.put("hot_dog", 4);
-        abilityCosts.put("jumping_jack", 12);
-        abilityCosts.put("melee_master", 12);
-        abilityCosts.put("multi_tasker", 4);
-        abilityCosts.put("oblique_attacker", 4);
-        abilityCosts.put("pain_resistance", 4);
-        abilityCosts.put("sniper", 12);
-        abilityCosts.put("weapon_specialist", 1);
-        abilityCosts.put("specialist", 4);
-        abilityCosts.put("tactical_genius", 12);
-        abilityCosts.put("aptitude_gunnery", 40);
-        abilityCosts.put("gunnery_laser", 4);
-        abilityCosts.put("gunnery_ballistic", 4);
-        abilityCosts.put("gunnery_missile", 4);
-        abilityCosts.put("ei_implant", 0);
-        abilityCosts.put("clan_pilot_training", 0);
-        */
     }
     
     public static SkillType getType(String t) {
