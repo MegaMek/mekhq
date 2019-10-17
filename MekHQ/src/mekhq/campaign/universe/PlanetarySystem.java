@@ -437,25 +437,22 @@ public class PlanetarySystem implements Serializable {
     
     public String getIcon() {
         switch(getSpectralClass()) {
-        case(SPECTRAL_O):
-            return "ostar";
         case(SPECTRAL_B):
-            return "bstar";
+            return "B_" + luminosity;
         case(SPECTRAL_A):
-            return "astar";
+            return  "A_" + luminosity;
         case(SPECTRAL_F):
-            return "fstar";
+            return "F_" + luminosity;
         case(SPECTRAL_G):
-            return "gstar";
+            return "G_" + luminosity;
         case(SPECTRAL_K):
-            return "kstar";
+            return "K_" + luminosity;
         case(SPECTRAL_M):
-            return "mstar";
-        case(SPECTRAL_T):
-            return "tstar";
+            return "M_" + luminosity;
         default:
             return "default";
         }
+        
     }
     
     @Override

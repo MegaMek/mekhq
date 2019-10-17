@@ -211,12 +211,12 @@ public final class StarUtil {
     }
 
     private static final String PLANET_ICON_DATA_FILE = "images/universe/planet_icons.txt";
-    private static final String SUN_ICON_DATA_FILE = "images/universe/sun_icons.txt";
+    private static final String STAR_ICON_DATA_FILE = "images/universe/star_icons.txt";
 
     private static final Map<String, String> PLANET_ICON_DATA = new HashMap<>();
-    private static final Map<String, String> SUN_ICON_DATA = new HashMap<>();
+    private static final Map<String, String> STAR_ICON_DATA = new HashMap<>();
     private static boolean planetIconDataLoaded = false;
-    private static boolean sunIconDataLoaded = false;
+    private static boolean starIconDataLoaded = false;
 
 
     // Generators
@@ -652,8 +652,8 @@ public final class StarUtil {
     public static String getIconImage(PlanetarySystem system) {
         final String METHOD_NAME = "getIconImage(PlanetarySystem)"; //$NON-NLS-1$
 
-        if(!sunIconDataLoaded) {
-            try(BufferedReader reader = new BufferedReader(new FileReader(new File("data", SUN_ICON_DATA_FILE)))) {
+        if(!starIconDataLoaded) {
+            try(BufferedReader reader = new BufferedReader(new FileReader(new File("data", STAR_ICON_DATA_FILE)))) {
                 String line;
                 while(null != (line = reader.readLine())) {
                     if(line.startsWith("#")) {
@@ -662,17 +662,17 @@ public final class StarUtil {
                     }
                     String[] parts = line.split("=", 2);
                     if((null != parts) && (parts.length == 2)) {
-                        SUN_ICON_DATA.put(parts[0], parts[1]);
+                        STAR_ICON_DATA.put(parts[0], parts[1]);
                     }
                 }
-                sunIconDataLoaded = true;
+                starIconDataLoaded = true;
             } catch (FileNotFoundException e) {
                 MekHQ.getLogger().error(StarUtil.class, METHOD_NAME, e);
             } catch (IOException e) {
                 MekHQ.getLogger().error(StarUtil.class, METHOD_NAME, e);
             }
         }
-        return SUN_ICON_DATA.get(Utilities.nonNull(system.getIcon(), "default"));
+        return STAR_ICON_DATA.get(Utilities.nonNull(system.getIcon(), "default"));
     }
 
     private StarUtil() {}

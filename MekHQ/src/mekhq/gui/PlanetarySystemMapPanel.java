@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2019 The MegaMek Team. All rights reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui;
 
 import java.awt.BasicStroke;
@@ -89,6 +107,8 @@ public class PlanetarySystemMapPanel extends JPanel {
     
     private static int minDiameter = 16;
     private static int maxDiameter = 64;
+    private static int maxStarWidth = 178;
+    private static int starImgSize = 356;
 
     public PlanetarySystemMapPanel(Campaign c, CampaignGUI view) {        
         this.hqview = view;
@@ -145,9 +165,7 @@ public class PlanetarySystemMapPanel extends JPanel {
             private static final long serialVersionUID = -6666762147393179909L;
     
             @Override
-            protected void paintComponent(Graphics g) {
-                int n = system.getPlanets().size();
-                
+            protected void paintComponent(Graphics g) {                
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(Color.BLACK);
@@ -165,7 +183,10 @@ public class PlanetarySystemMapPanel extends JPanel {
                 }
 
                 //set up some numbers
-                int rectWidth = getWidth() / (n+1);
+                int n = system.getPlanets().size();
+                //star size is minimum of half the image or 20% of total width
+                int starWidth = Math.min(maxStarWidth, (int) Math.round(0.2 * getWidth()));
+                int rectWidth = (getWidth()-starWidth) / n;
                 int midpoint = rectWidth / 2;
                 int y = getHeight() / 2;
                 int x = 0;
@@ -174,9 +195,9 @@ public class PlanetarySystemMapPanel extends JPanel {
                 int jumpPointImgHeight = 72;
                 int rechargeImgSize = 64;
                 int shipImgSize = 24;
-                int nadirX = midpoint;
+                int nadirX = 12;
                 int nadirY = getHeight()-60-jumpPointImgHeight;
-                int zenithX = midpoint;
+                int zenithX = 12;
                 int zenithY = 60;
                 
                 //where is jumpship
@@ -191,9 +212,8 @@ public class PlanetarySystemMapPanel extends JPanel {
                 chooseFont(g2, system, campaign, rectWidth-6);
                 
                 //place the sun first
-                Image sunIcon = ImageUtil.loadImageFromFile("data/" + StarUtil.getIconImage(system));
-                int maxSunWidth = (int) Math.round(rectWidth * 0.9);
-                g2.drawImage(sunIcon, maxSunWidth-355, y-178, 355, 355, null);
+                Image starIcon = ImageUtil.loadImageFromFile("data/" + StarUtil.getIconImage(system));
+                g2.drawImage(starIcon, starWidth-starImgSize, y-(starImgSize/2), starImgSize, starImgSize, null);
 
                 //draw nadir and zenith points
                 if(null != imgZenithPoint) {
@@ -225,11 +245,11 @@ public class PlanetarySystemMapPanel extends JPanel {
                     }
                 }
                 
-                for(int i = 0; i < (n+1); i++) {
-                    x = rectWidth*i+midpoint;
-                    Planet p = system.getPlanet(i);
+                for(int i = 0; i < n; i++) {
+                    x = starWidth+rectWidth*i+midpoint;
+                    Planet p = system.getPlanet(i+1);
                     
-                    if(i > 0 & null != p) {
+                    if(null != p) {
                         //diameters need to be scaled relative to largest planet, but linear 
                         //scale will make all but gas/ice giants tiny. log scale made sizes too close,
                         //but cubic root scale seems to work pretty well.
@@ -294,7 +314,7 @@ public class PlanetarySystemMapPanel extends JPanel {
                         }
                         
                         //add ring for selected planet
-                        if(selectedPlanet==i) {
+                        if(selectedPlanet==(i+1)) {
                             drawRing(g2, x, y, radius, Color.WHITE);
                         }
                         
@@ -520,18 +540,19 @@ public class PlanetarySystemMapPanel extends JPanel {
      */
     private int nearestNeighbour(double x, double y) {
         int n = system.getPlanets().size();
-        int rectWidth = getWidth() / (n+1);
+        int starWidth = Math.min(maxStarWidth, (int) Math.round(0.2 * getWidth()));
+        int rectWidth = (getWidth()-starWidth) / n;
         int midpoint = rectWidth / 2;
         int xTarget = 0;
         int yTarget = getHeight() / 2;
         
-        for(int i = 1; i < (n+1); i++) {
-            xTarget = rectWidth*i+midpoint;
+        for(int i = 0; i < n; i++) {
+            xTarget = starWidth+rectWidth*i+midpoint;
             //must be within total possible radius
             int radius = maxDiameter/2;
             if(x <= (xTarget+radius) & x >= (xTarget-radius) &
                     y <= (yTarget+radius) & y >= (yTarget-radius)) {
-                return i;
+                return i+1;
             }
         }
         return 0;

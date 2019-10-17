@@ -1,7 +1,0 @@
-default=images/universe/suns.png(904,28-91,171)
-bstar=images/universe/suns.png(718,718-344,344)
-astar=images/universe/suns.png(6,6-344,344)
-fstar=images/universe/suns.png(6,1430-344,344)
-gstar=images/universe/suns.png(1430,1430-344,344)
-kstar=images/universe/suns.png(1786,718-344,344)
-mstar=images/universe/suns.png(1430,2142-344,344)
