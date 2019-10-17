@@ -245,9 +245,9 @@ public class PlanetarySystemMapPanel extends JPanel {
                     }
                 }
                 
-                for(int i = 0; i < n; i++) {
-                    x = starWidth+rectWidth*i+midpoint;
-                    Planet p = system.getPlanet(i+1);
+                for(int i = 1; i <= n; i++) {
+                    x = starWidth+rectWidth*(i-1)+midpoint;
+                    Planet p = system.getPlanet(i);
                     
                     if(null != p) {
                         //diameters need to be scaled relative to largest planet, but linear 
@@ -314,7 +314,7 @@ public class PlanetarySystemMapPanel extends JPanel {
                         }
                         
                         //add ring for selected planet
-                        if(selectedPlanet==(i+1)) {
+                        if(selectedPlanet==i) {
                             drawRing(g2, x, y, radius, Color.WHITE);
                         }
                         
@@ -546,13 +546,13 @@ public class PlanetarySystemMapPanel extends JPanel {
         int xTarget = 0;
         int yTarget = getHeight() / 2;
         
-        for(int i = 0; i < n; i++) {
-            xTarget = starWidth+rectWidth*i+midpoint;
+        for(int i = 1; i <= n; i++) {
+            xTarget = starWidth+rectWidth*(i-1)+midpoint;
             //must be within total possible radius
             int radius = maxDiameter/2;
             if(x <= (xTarget+radius) & x >= (xTarget-radius) &
                     y <= (yTarget+radius) & y >= (yTarget-radius)) {
-                return i+1;
+                return i;
             }
         }
         return 0;
