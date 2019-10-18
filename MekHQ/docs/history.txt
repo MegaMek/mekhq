@@ -18,6 +18,7 @@ v0.47.1-SNAPSHOT
 + PR #1304: Markdown Editor
 + PR #1303: Various GUI fixes
 + Issue #1290: Fixes for issues with campaign subset export.
++ PR #1309: Planetary System Map
 
 v0.47.0 (2019-08-21 0300 UTC)
 + Issue #1171: Adds autosave feature (daily or weekly, and/or before missions).
