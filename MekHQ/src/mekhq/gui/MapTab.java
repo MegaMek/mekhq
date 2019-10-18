@@ -31,6 +31,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JViewport;
 import javax.swing.ScrollPaneConstants;
 
 import megamek.common.event.Subscribe;
@@ -52,8 +53,10 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
 
     private static final long serialVersionUID = 31953140144022679L;
 
+    private JViewport mapView;
     private JPanel panMapView;
-    InterstellarMapPanel panMap;
+    private InterstellarMapPanel panMap;
+    private PlanetarySystemMapPanel panSystem;
     private JSplitPane splitMap;
     private JScrollPane scrollPlanetView;
     JSuggestField suggestPlanet;
@@ -77,17 +80,17 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
     public void initTab() {
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", //$NON-NLS-1$ ;
                 new EncodeControl());
-        GridBagConstraints gridBagConstraints;
 
-        panMapView = new JPanel(new GridBagLayout());
+        panMapView = new JPanel(new BorderLayout());
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        JPanel panTopButtons = new JPanel(new GridBagLayout());
+        GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panMapView.add(new JLabel(resourceMap.getString("lblFindPlanet.text")), //$NON-NLS-1$ ;
+        panTopButtons.add(new JLabel(resourceMap.getString("lblFindPlanet.text")), //$NON-NLS-1$ ;
                 gridBagConstraints);
 
         suggestPlanet = new JSuggestField(getFrame(), getCampaign().getSystemNames());
@@ -105,7 +108,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
-        panMapView.add(suggestPlanet, gridBagConstraints);
+        panTopButtons.add(suggestPlanet, gridBagConstraints);
 
         JButton btnCalculateJumpPath = new JButton(resourceMap.getString("btnCalculateJumpPath.text")); // NOI18N
         btnCalculateJumpPath.setToolTipText(resourceMap.getString("btnCalculateJumpPath.toolTipText")); // NOI18N
@@ -117,7 +120,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.weighty = 0.0;
-        panMapView.add(btnCalculateJumpPath, gridBagConstraints);
+        panTopButtons.add(btnCalculateJumpPath, gridBagConstraints);
 
         JButton btnBeginTransit = new JButton(resourceMap.getString("btnBeginTransit.text")); // NOI18N
         btnBeginTransit.setToolTipText(resourceMap.getString("btnBeginTransit.toolTipText")); // NOI18N
@@ -129,33 +132,36 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.weighty = 0.0;
-        panMapView.add(btnBeginTransit, gridBagConstraints);
+        panTopButtons.add(btnBeginTransit, gridBagConstraints);
 
+        panMapView.add(panTopButtons, BorderLayout.PAGE_START);
+        
+        //the actual map
         panMap = new InterstellarMapPanel(getCampaign(), getCampaignGui());
         // lets go ahead and zoom in on the current location
         panMap.setSelectedSystem(getCampaign().getLocation().getCurrentSystem());
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        panMapView.add(panMap, gridBagConstraints);
+        panMapView.add(panMap, BorderLayout.CENTER);
 
+        mapView = new JViewport();
+        mapView.setMinimumSize(new java.awt.Dimension(600,600));
+        mapView.setView(panMapView);
+        
         scrollPlanetView = new JScrollPane();
         scrollPlanetView.setMinimumSize(new java.awt.Dimension(400, 600));
         scrollPlanetView.setPreferredSize(new java.awt.Dimension(400, 600));
         scrollPlanetView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPlanetView.getViewport().setBackground(Color.WHITE);
         scrollPlanetView.setViewportView(null);
-        splitMap = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panMapView, scrollPlanetView);
+        splitMap = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, mapView, scrollPlanetView);
         splitMap.setOneTouchExpandable(true);
         splitMap.setResizeWeight(1.0);
         splitMap.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, ev -> refreshPlanetView());
 
         panMap.setCampaign(getCampaign());
         panMap.addActionListener(this);
+        
+        panSystem = new PlanetarySystemMapPanel(getCampaign(), getCampaignGui());
+        panSystem.addActionListener(this);
 
         setLayout(new BorderLayout());
         add(splitMap, BorderLayout.CENTER);
@@ -168,7 +174,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
      */
     @Override
     public void refreshAll() {
-        refreshPlanetView();
+        refreshSystemView();
     }
 
     private void calculateJumpPath() {
@@ -190,21 +196,51 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         panMap.repaint();
     }
 
-    protected void refreshPlanetView() {
+    protected void refreshSystemView() {
         JumpPath path = panMap.getJumpPath();
         if (null != path && !path.isEmpty()) {
             scrollPlanetView.setViewportView(new JumpPathViewPanel(path, getCampaign()));
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                scrollPlanetView.getVerticalScrollBar().setValue(0);
+            });
             return;
         }
         PlanetarySystem system = panMap.getSelectedSystem();
         if (null != system) {
             scrollPlanetView.setViewportView(new PlanetViewPanel(system, getCampaign()));
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                scrollPlanetView.getVerticalScrollBar().setValue(0);
+            });
         }
+    }
+    
+    protected void refreshPlanetView() {
+        int pos = panSystem.getSelectedPlanetPosition();
+        PlanetarySystem system = panMap.getSelectedSystem();
+        if (null != system) {
+            scrollPlanetView.setViewportView(new PlanetViewPanel(system, getCampaign(), pos));
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                scrollPlanetView.getVerticalScrollBar().setValue(0);
+            });
+        }
+    }
+    
+    public void switchPlanetaryMap(PlanetarySystem s) {
+        panSystem.updatePlanetarySystem(s);
+        mapView.setView(panSystem);
+        refreshPlanetView();
+    }
+    
+    public void switchSystemsMap() {
+        mapView.setView(panMapView);
+        refreshSystemView();
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == panMap) {
+            refreshSystemView();
+        } else if(e.getSource() == panSystem) {
             refreshPlanetView();
         }
     }

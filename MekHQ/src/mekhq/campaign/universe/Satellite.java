@@ -26,8 +26,6 @@ import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlValue;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -41,13 +39,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Satellite implements Serializable {
 	private static final long serialVersionUID = 8910811489755566896L;
 	
-	@XmlAttribute(name="size")
-    private String size;
-
-    @XmlValue
     private String name;
+    private String size;
+    private String icon;
     
     public String getDescription() {
         return name + " (" + size + ")";
+    }
+    
+    public String getIcon() {
+        return icon;
     }
 }

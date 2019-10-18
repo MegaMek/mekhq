@@ -210,9 +210,14 @@ public final class StarUtil {
             + "BOZ,BQZ,OQZ,ABOQ,ABOZ,ABQZ,AOQZ,BOQZ,ABOQZ,C,X").split(","))); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
-    private static final String ICON_DATA_FILE = "images/universe/planet_icons.txt";
-    private static final Map<String, String> ICON_DATA = new HashMap<>();
-    private static boolean iconDataLoaded = false;
+    private static final String PLANET_ICON_DATA_FILE = "images/universe/planet_icons.txt";
+    private static final String STAR_ICON_DATA_FILE = "images/universe/star_icons.txt";
+
+    private static final Map<String, String> PLANET_ICON_DATA = new HashMap<>();
+    private static final Map<String, String> STAR_ICON_DATA = new HashMap<>();
+    private static boolean planetIconDataLoaded = false;
+    private static boolean starIconDataLoaded = false;
+
 
     // Generators
 
@@ -618,8 +623,8 @@ public final class StarUtil {
     public static String getIconImage(Planet planet) {
         final String METHOD_NAME = "getIconImage(Planet)"; //$NON-NLS-1$
 
-        if(!iconDataLoaded) {
-            try(BufferedReader reader = new BufferedReader(new FileReader(new File("data", ICON_DATA_FILE)))) {
+        if(!planetIconDataLoaded) {
+            try(BufferedReader reader = new BufferedReader(new FileReader(new File("data", PLANET_ICON_DATA_FILE)))) {
                 String line;
                 while(null != (line = reader.readLine())) {
                     if(line.startsWith("#")) {
@@ -628,17 +633,46 @@ public final class StarUtil {
                     }
                     String[] parts = line.split("=", 2);
                     if((null != parts) && (parts.length == 2)) {
-                        ICON_DATA.put(parts[0], parts[1]);
+                        PLANET_ICON_DATA.put(parts[0], parts[1]);
                     }
                 }
-                iconDataLoaded = true;
+                planetIconDataLoaded = true;
             } catch (FileNotFoundException e) {
                 MekHQ.getLogger().error(StarUtil.class, METHOD_NAME, e);
             } catch (IOException e) {
                 MekHQ.getLogger().error(StarUtil.class, METHOD_NAME, e);
             }
         }
-        return ICON_DATA.get(Utilities.nonNull(planet.getIcon(), "default"));
+        if(!PLANET_ICON_DATA.containsKey(Utilities.nonNull(planet.getIcon(), "default"))) {
+            MekHQ.getLogger().error(StarUtil.class, METHOD_NAME, "no planet icon " + planet.getIcon());
+        }
+        return PLANET_ICON_DATA.get(Utilities.nonNull(planet.getIcon(), "default"));
+    }
+    
+    public static String getIconImage(PlanetarySystem system) {
+        final String METHOD_NAME = "getIconImage(PlanetarySystem)"; //$NON-NLS-1$
+
+        if(!starIconDataLoaded) {
+            try(BufferedReader reader = new BufferedReader(new FileReader(new File("data", STAR_ICON_DATA_FILE)))) {
+                String line;
+                while(null != (line = reader.readLine())) {
+                    if(line.startsWith("#")) {
+                        // Ignore comments
+                        continue;
+                    }
+                    String[] parts = line.split("=", 2);
+                    if((null != parts) && (parts.length == 2)) {
+                        STAR_ICON_DATA.put(parts[0], parts[1]);
+                    }
+                }
+                starIconDataLoaded = true;
+            } catch (FileNotFoundException e) {
+                MekHQ.getLogger().error(StarUtil.class, METHOD_NAME, e);
+            } catch (IOException e) {
+                MekHQ.getLogger().error(StarUtil.class, METHOD_NAME, e);
+            }
+        }
+        return STAR_ICON_DATA.get(Utilities.nonNull(system.getIcon(), "default"));
     }
 
     private StarUtil() {}

@@ -45,15 +45,21 @@ public class PlanetViewPanel extends ScrollablePanel {
 
     private PlanetarySystem system;
     private Campaign campaign;
+    private int planetPos;
     
     private JPanel pnlSystem;
-    private JPanel pnlPrimary;
+    private JPanel pnlPlanet;
     
     private Image planetIcon = null;
     
     public PlanetViewPanel(PlanetarySystem s, Campaign c) {
+        this(s, c, 0);
+    }
+    
+    public PlanetViewPanel(PlanetarySystem s, Campaign c, int p) {
         this.system = s;
         this.campaign = c;
+        this.planetPos = p;
         initComponents();
     }
     
@@ -68,26 +74,17 @@ public class PlanetViewPanel extends ScrollablePanel {
         pnlSystem.setBackground(Color.WHITE);
         add(pnlSystem);
         
-        Planet primary = system.getPrimaryPlanet();
-        if(null != primary) {
-            pnlPrimary = getPlanetPanel(primary);
-            pnlPrimary.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK, 2),
-                    "<html><b>" + primary.getPrintableName(Utilities.getDateTimeDay(campaign.getCalendar()))  + " " + resourceMap.getString("primaryPlanet.text") + "</b></html>"));
-            pnlPrimary.setBackground(Color.WHITE);
-            add(pnlPrimary);
-        };
-        
-        for(int pos : system.getPlanetPositions()) {
-            if(pos == system.getPrimaryPlanetPosition()) {
-                continue;
-            }
-            Planet p = system.getPlanet(pos);
-            JPanel planetPanel = getPlanetPanel(p);
-            planetPanel.setBorder(BorderFactory.createTitledBorder(p.getPrintableName(Utilities.getDateTimeDay(campaign.getCalendar()))));
-            planetPanel.setBackground(Color.WHITE);
-            add(planetPanel);
+        Planet planet = system.getPlanet(planetPos);
+        if(null == planet) {
+            //try the primary - but still could be null
+            planet = system.getPrimaryPlanet();
         }
-        //planetIcon = ImageUtil.loadImageFromFile("data/" + StarUtil.getIconImage(planet));
+        if(null != planet) {
+            pnlPlanet = getPlanetPanel(planet);
+            pnlPlanet.setBorder(BorderFactory.createTitledBorder(planet.getPrintableName(Utilities.getDateTimeDay(campaign.getCalendar()))));
+            pnlPlanet.setBackground(Color.WHITE);
+            add(pnlPlanet);
+        };
     }
     
     @Override
@@ -150,6 +147,18 @@ public class PlanetViewPanel extends ScrollablePanel {
         gbcText.gridy = infoRow;
         panel.add(txtPlanetType, gbcText);
         ++ infoRow;
+        
+      //System Position
+        if(planet.getPlanetType() != "Asteroid Belt") {
+            JLabel lblDiameter = new JLabel(resourceMap.getString("lblDiameter.text"));
+            gbcLabel.gridy = infoRow;
+            panel.add(lblDiameter, gbcLabel);            
+            JLabel txtDiameter = new JLabel( String.format("%.1f km", //$NON-NLS-1$
+                    planet.getDiameter()));
+            gbcText.gridy = infoRow;
+            panel.add(txtDiameter, gbcText);
+            ++ infoRow;
+        }
         
         //System Position
         if((null != planet.getSystemPosition()) || (null != planet.getOrbitRadius())) {
