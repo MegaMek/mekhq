@@ -434,6 +434,27 @@ public class PlanetarySystem implements Serializable {
         return planets.values();
     }
     
+    
+    public String getIcon() {
+        switch(getSpectralClass()) {
+        case(SPECTRAL_B):
+            return "B_" + luminosity;
+        case(SPECTRAL_A):
+            return  "A_" + luminosity;
+        case(SPECTRAL_F):
+            return "F_" + luminosity;
+        case(SPECTRAL_G):
+            return "G_" + luminosity;
+        case(SPECTRAL_K):
+            return "K_" + luminosity;
+        case(SPECTRAL_M):
+            return "M_" + luminosity;
+        default:
+            return "default";
+        }
+        
+    }
+    
     @Override
     public boolean equals(Object object) {
         if(this == object) {

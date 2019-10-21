@@ -384,6 +384,42 @@ public class CampaignGUI extends JPanel {
         return standardTabs.get(tabType);
     }
     
+    public TOETab getTOETab() {
+        return (TOETab) getTab(GuiTabType.TOE);
+    }
+    
+    public BriefingTab getBriefingTab() {
+        return (BriefingTab) getTab(GuiTabType.BRIEFING);
+    }
+    
+    public MapTab getMapTab() {
+        return (MapTab) getTab(GuiTabType.MAP);
+    }
+    
+    public PersonnelTab getPersonnelTab() {
+        return (PersonnelTab) getTab(GuiTabType.PERSONNEL);
+    }
+    
+    public HangarTab getHangarTab() {
+        return (HangarTab) getTab(GuiTabType.HANGAR);
+    }
+    
+    public WarehouseTab getWarehouseTab() {
+        return (WarehouseTab) getTab(GuiTabType.WAREHOUSE);
+    }
+    
+    public RepairTab getRepairTab() {
+        return (RepairTab) getTab(GuiTabType.REPAIR);
+    }
+    
+    public MekLabTab getMekLabTab() {
+        return (MekLabTab) getTab(GuiTabType.MEKLAB);
+    }
+    
+    public InfirmaryTab getInfimaryTab() {
+        return (InfirmaryTab) getTab(GuiTabType.INFIRMARY);
+    }
+    
     public boolean hasTab(GuiTabType tabType) {
         return standardTabs.containsKey(tabType);
     }

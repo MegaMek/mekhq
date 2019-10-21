@@ -111,7 +111,7 @@ public class Planet implements Serializable {
     @XmlElement(name = "type")
     private String planetType;
     /** diameter in km */
-    private int diameter;
+    private double diameter;
     /** Density in g/m^3 */
     private Double density;
     private Double gravity;
@@ -341,7 +341,7 @@ public class Planet implements Serializable {
         return density;
     }
     
-    public Integer getDiameter() {
+    public double getDiameter() {
         return diameter;
     }
     
