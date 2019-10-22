@@ -299,6 +299,8 @@ public class Campaign implements Serializable, ITechManager {
         game.addPlayer(0, player);
         calendar = new GregorianCalendar(3067, Calendar.JANUARY, 1);
         CurrencyManager.getInstance().setCampaign(this);
+        location = new CurrentLocation(Systems.getInstance().getSystems()
+                .get("Outreach"), 0);
         campaignOptions = new CampaignOptions();
         currentReport = new ArrayList<>();
         currentReportHTML = "";
@@ -319,8 +321,6 @@ public class Campaign implements Serializable, ITechManager {
         forceIds.put(0, forces);
         lances = new Hashtable<>();
         finances = new Finances();
-        location = new CurrentLocation(Systems.getInstance().getSystems()
-                .get("Outreach"), 0);
         SkillType.initializeTypes();
         SpecialAbility.initializeSPA();
         astechPool = 0;
@@ -456,7 +456,7 @@ public class Campaign implements Serializable, ITechManager {
     public String getCurrentSystemName() {
         return location.getCurrentSystem().getPrintableName(Utilities.getDateTimeDay(calendar));
     }
-    
+
     public PlanetarySystem getCurrentSystem() {
         return location.getCurrentSystem();
     }
@@ -2127,27 +2127,27 @@ public class Campaign implements Serializable, ITechManager {
             if (null != person) {
                 personTitle = person.getHyperlinkedFullTitle() + " ";
             }
-            
+
             //find planets within a certain radius - the function will weed out dead planets
-            List<PlanetarySystem> systems = Systems.getInstance().getShoppingSystems(getCurrentSystem(), 
-                    getCampaignOptions().getMaxJumpsPlanetaryAcquisition(), 
+            List<PlanetarySystem> systems = Systems.getInstance().getShoppingSystems(getCurrentSystem(),
+                    getCampaignOptions().getMaxJumpsPlanetaryAcquisition(),
                     currentDate);
-           
+
             for(PlanetarySystem system: systems) {
                 ArrayList<IAcquisitionWork> remainingItems = new ArrayList<IAcquisitionWork>();
-                
+
                 //loop through shopping list. If its time to check, then check as appropriate. Items not
                 //found get added to the remaining item list
                 for(IAcquisitionWork shoppingItem : currentList) {
                     if(shoppingItem.getDaysToWait() <= 0) {
-                        if(findContactForAcquisition(shoppingItem, person, system)) {	                	
-                            int transitTime = calculatePartTransitTime(system);	           
+                        if(findContactForAcquisition(shoppingItem, person, system)) {
+                            int transitTime = calculatePartTransitTime(system);
                             int totalQuantity = 0;
                             while(shoppingItem.getQuantity() > 0 && acquireEquipment(shoppingItem, person, system, transitTime)) {
                                 totalQuantity++;
                             }
                             if(totalQuantity > 0) {
-                                addReport(personTitle + "<font color='green'><b> found " + shoppingItem.getQuantityName(totalQuantity) + " on " + system.getPrintableName(currentDate) + ". Delivery in " + transitTime + " days.</b></font>");	 
+                                addReport(personTitle + "<font color='green'><b> found " + shoppingItem.getQuantityName(totalQuantity) + " on " + system.getPrintableName(currentDate) + ". Delivery in " + transitTime + " days.</b></font>");
                             }
                         }
                     }
@@ -2230,7 +2230,7 @@ public class Campaign implements Serializable, ITechManager {
             return false;
         } else {
             if(getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
-                addReport("<font color='green'>Possible contact for " + acquisition.getAcquisitionName() + " on " + system.getPrintableName(currentDate) + "</font>");     	
+                addReport("<font color='green'>Possible contact for " + acquisition.getAcquisitionName() + " on " + system.getPrintableName(currentDate) + "</font>");
             }
             return true;
         }
@@ -2269,7 +2269,7 @@ public class Campaign implements Serializable, ITechManager {
         if(!canPayFor(acquisition)) {
             target.addModifier(TargetRoll.IMPOSSIBLE, "Cannot afford this purchase");
         }
-        
+
         if(null != system) {
             target = system.getPrimaryPlanet().getAcquisitionMods(target, getDate(), getCampaignOptions(), getFaction(),
                     acquisition.getTechBase() == Part.T_CLAN);
@@ -2828,7 +2828,7 @@ public class Campaign implements Serializable, ITechManager {
              * unit is actually on route to the planet in case the user is using a custom
              * system for transport or splitting the unit, etc.
              */
-            if (!getLocation().isOnPlanet() && 
+            if (!getLocation().isOnPlanet() &&
                     getLocation().getJumpPath().getLastSystem().getId().equals(m.getSystemId())) {
                 /*
                  * transitTime is measured in days; round up to the next whole day, then convert
@@ -3658,7 +3658,7 @@ public class Campaign implements Serializable, ITechManager {
                     unitsToCheck.add(unit.getId());
                 }
             }
-            
+
             unit.resetEngineer();
         }
 
@@ -4358,7 +4358,7 @@ public class Campaign implements Serializable, ITechManager {
             pw1.println("\t</custom>");
         }
     }
-    
+
     public ArrayList<PlanetarySystem> getSystems() {
         ArrayList<PlanetarySystem> systems = new ArrayList<PlanetarySystem>();
         for (String key : Systems.getInstance().getSystems().keySet()) {
@@ -4374,7 +4374,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         return systemNames;
     }
-    
+
     public PlanetarySystem getSystemByName(String name) {
         return Systems.getInstance().getSystemByName(name, Utilities.getDateTimeDay(calendar));
     }
@@ -5019,7 +5019,7 @@ public class Campaign implements Serializable, ITechManager {
     	}
     	scoreG.put(current, 0.0);
     	closed.add(current);
-    	        
+
     	while (!found && jumps < 10000) {
     		jumps++;
     		double currentG = scoreG.get(current) + Systems.getInstance().getSystemById(current).getRechargeTime(now);
@@ -5060,7 +5060,7 @@ public class Campaign implements Serializable, ITechManager {
     			// We're done - probably failed to find anything
     			break;
     		}
-    	            
+
     		closed.add(current);
     		open.remove(current);
     		if (current.equals(endKey)) {
@@ -5086,7 +5086,7 @@ public class Campaign implements Serializable, ITechManager {
 
     	return finalPath;
     }
-    	   
+
     public List<PlanetarySystem> getAllReachableSystemsFrom(PlanetarySystem system) {
         return Systems.getInstance().getNearbySystems(system, 30);
     }
@@ -6838,7 +6838,7 @@ public class Campaign implements Serializable, ITechManager {
         //the basic formula assumes 7 days per jump + system transit time on each side + random days equal
         //to (1+number of jumps)d6
         double distance = system.getDistanceTo(getCurrentSystem());
-        //calculate number of jumps by dividing by 30 
+        //calculate number of jumps by dividing by 30
         int jumps = (int)Math.ceil(distance/30.0);
         //you need a recharge except for the first jump
         int recharges = Math.max(jumps - 1, 0);
