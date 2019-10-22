@@ -292,7 +292,7 @@ public class PlanetViewPanel extends ScrollablePanel {
         }    
         
         //satellites
-        if(null != planet.getSatellites()) {  
+        if(null != planet.getSatellites() || planet.getSmallMoons()>0) {
         	JLabel lblSatellite = new JLabel(resourceMap.getString("lblSatellite1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblSatellite, gbcLabel);        

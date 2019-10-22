@@ -361,7 +361,11 @@ public class Planet implements Serializable {
     public ArrayList<Satellite> getSatellites() {
         return null != satellites ? new ArrayList<Satellite>(satellites) : null;
     }
-
+    
+    public int getSmallMoons() {
+        return smallMoons;
+    }
+ 
     public String getSatelliteDescription() {
     	String desc = "";
     	if(null != satellites) {
@@ -374,9 +378,10 @@ public class Planet implements Serializable {
     	if(smallMoons > 0) {
     		String smallDesc = smallMoons + " small moons"; //$NON-NLS-1$ //$NON-NLS-2$
     		if(desc.length()==0) {
-    			return smallDesc;
-    		}
-    		desc = desc + ", " + smallDesc;
+                desc = smallDesc;
+            } else {
+                desc = desc + ", " + smallDesc;
+            }
     	}
     	if(hasRing()) {
     		desc = desc + ", and a dust ring"; //$NON-NLS-1$ //$NON-NLS-2$
