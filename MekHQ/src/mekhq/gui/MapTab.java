@@ -215,6 +215,14 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
     }
     
     protected void refreshPlanetView() {
+        JumpPath path = panMap.getJumpPath();
+        if (null != path && !path.isEmpty()) {
+            scrollPlanetView.setViewportView(new JumpPathViewPanel(path, getCampaign()));
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                scrollPlanetView.getVerticalScrollBar().setValue(0);
+            });
+            return;
+        }
         int pos = panSystem.getSelectedPlanetPosition();
         PlanetarySystem system = panMap.getSelectedSystem();
         if (null != system) {
