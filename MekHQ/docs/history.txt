@@ -23,6 +23,7 @@ v0.47.1-SNAPSHOT
 + PR #1286,1307: Scenario Objectives - explicit objective management system for legacy AtB scenarios;
 	Ability to define objectives for scenario templates.
 + PR #1317: fix NPE that halts new day processing while applying training XP
++ PR #1318: player units given to other players now properly return to the campaign during scenario resolution.
 
 v0.47.0 (2019-08-21 0300 UTC)
 + Issue #1171: Adds autosave feature (daily or weekly, and/or before missions).
