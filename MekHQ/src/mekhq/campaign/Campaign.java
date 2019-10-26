@@ -3400,6 +3400,13 @@ public class Campaign implements Serializable, ITechManager {
      */
     private void awardTrainingXPByMaximumRole(Lance l) {
         for (UUID trainerId : forceIds.get(l.getForceId()).getAllUnits()) {
+            Unit trainerUnit = getUnit(trainerId);
+            
+            // not sure how this occurs, but it probably shouldn't halt processing of a new day.
+            if(trainerUnit == null) {
+                continue;
+            }
+            
             Person commander = getUnit(trainerId).getCommander();
             // AtB 2.31: Training lance – needs a officer with Veteran skill levels
             //           and adds 1xp point to every Green skilled unit.
