@@ -314,7 +314,8 @@ public class ScenarioObjective {
      */
     public String toShortString() {
         String timeLimitString = getTimeLimitString();
-        String edgeString = getDestinationEdge() != OffBoardDirection.NONE ? getDestinationEdge().toString() : "";
+        String edgeString = ((getDestinationEdge() != OffBoardDirection.NONE) &&
+                (getDestinationEdge() != null)) ? getDestinationEdge().toString() : "";
         String amountString = fixedAmount != null ? fixedAmount.toString() : String.format("%d%%", percentage);
         
         switch(getObjectiveCriterion()) {
