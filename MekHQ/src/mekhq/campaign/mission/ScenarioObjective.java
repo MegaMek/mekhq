@@ -46,6 +46,9 @@ import mekhq.MekHQ;
  * @author NickAragua
  */
 public class ScenarioObjective {
+    public static final String FORCE_SHORTCUT_ALL_PRIMARY_PLAYER_FORCES = "All Primary Player Forces";
+    public static final String FORCE_SHORTCUT_ALL_ENEMY_FORCES = "All Enemy Forces";
+    
     public static final String ROOT_XML_ELEMENT_NAME = "ScenarioObjective";
     private static Map<ObjectiveCriterion, String> objectiveTypeMapping;
     
@@ -60,12 +63,21 @@ public class ScenarioObjective {
         objectiveTypeMapping.put(ObjectiveCriterion.Custom, "Custom");
     }
     
+    public enum TimeLimitType {
+        None,
+        Fixed,
+        ScaledToPrimaryUnitCount
+    }
+    
     private ObjectiveCriterion objectiveCriterion;
     private String description;
     private OffBoardDirection destinationEdge;
     private int percentage;
     private Integer fixedAmount = null;
+    private TimeLimitType timeLimitType = TimeLimitType.None;
+    private boolean timeLimitAtMost = true;
     private Integer timeLimit = null;
+    private Integer timeLimitScaleFactor = null;
     
     @XmlElementWrapper(name="associatedForceNames")
     @XmlElement(name="associatedForceName")
@@ -127,6 +139,38 @@ public class ScenarioObjective {
         }
     }
 
+    /**
+     * Whether the objective is related to a fixed number or a percentage.
+     */
+    public enum ObjectiveAmountType {
+        Fixed,
+        Percentage
+    }
+    
+    public ScenarioObjective() {
+        
+    }
+    
+    /**
+     * Copy constructor
+     */
+    public ScenarioObjective(ScenarioObjective other) {
+        setObjectiveCriterion(other.getObjectiveCriterion());
+        setDescription(other.getDescription());
+        this.setDestinationEdge(other.getDestinationEdge());
+        this.setFixedAmount(other.getFixedAmount());
+        this.setPercentage(other.getPercentage());
+        this.setTimeLimit(other.getTimeLimit());
+        this.associatedForceNames = new HashSet<>(other.associatedForceNames);
+        this.associatedUnitIDs = new HashSet<>(other.associatedUnitIDs);
+        this.failureEffects = new ArrayList<>(other.getFailureEffects());
+        this.successEffects = new ArrayList<>(other.getSuccessEffects());
+        this.additionalDetails = new ArrayList<>(other.getDetails());
+        this.setTimeLimitAtMost(other.isTimeLimitAtMost());
+        this.setTimeLimitType(other.getTimeLimitType());
+        this.setTimeLimitScaleFactor(other.getTimeLimitScaleFactor());
+    }
+    
     public ObjectiveCriterion getObjectiveCriterion() {
         return objectiveCriterion;
     }
@@ -151,6 +195,10 @@ public class ScenarioObjective {
         associatedForceNames.remove(name);
     }
     
+    public void clearForces() {
+        associatedForceNames.clear();
+    }
+    
     public void addDetail(String detail) {
         additionalDetails.add(detail);
     }
@@ -172,7 +220,11 @@ public class ScenarioObjective {
     }
     
     public Set<String> getAssociatedUnitIDs() {
-        return associatedUnitIDs;
+        return new HashSet<String>(associatedUnitIDs);
+    }
+    
+    public void clearAssociatedUnits() {
+        associatedUnitIDs.clear();
     }
 
     public void addSuccessEffect(ObjectiveEffect successEffect) {
@@ -211,7 +263,7 @@ public class ScenarioObjective {
         return fixedAmount;
     }
 
-    public void setFixedAmount(int fixedAmount) {
+    public void setFixedAmount(Integer fixedAmount) {
         this.fixedAmount = fixedAmount;
     }
 
@@ -223,11 +275,78 @@ public class ScenarioObjective {
         this.timeLimit = timeLimit;
     }
 
+    public Integer getTimeLimitScaleFactor() {
+        return timeLimitScaleFactor;
+    }
+
+    public void setTimeLimitScaleFactor(Integer timeLimitScaleFactor) {
+        this.timeLimitScaleFactor = timeLimitScaleFactor;
+    }
+
+    public boolean isTimeLimitAtMost() {
+        return timeLimitAtMost;
+    }
+
+    public void setTimeLimitAtMost(boolean timeLimitAtMost) {
+        this.timeLimitAtMost = timeLimitAtMost;
+    }
+
+    public TimeLimitType getTimeLimitType() {
+        return timeLimitType;
+    }
+
+    public void setTimeLimitType(TimeLimitType timeLimitType) {
+        this.timeLimitType = timeLimitType;
+    }
+
+    public String getTimeLimitString() {
+        String timeLimitString = 
+                timeLimitType == TimeLimitType.None ? 
+                    "" :
+                    String.format("%s %d turns", isTimeLimitAtMost() ? " within at most" : " for at least", getTimeLimit());
+        
+        return timeLimitString;
+    }
+    
+    /**
+     * Generates a "short" string that describes the objective in a manner suitable for display in
+     * the objective resolution screen.
+     */
     public String toShortString() {
+        String timeLimitString = getTimeLimitString();
+        String edgeString = getDestinationEdge() != OffBoardDirection.NONE ? getDestinationEdge().toString() : "";
+        String amountString = fixedAmount != null ? fixedAmount.toString() : String.format("%d%%", percentage);
+        
+        switch(getObjectiveCriterion()) {
+        case Destroy:
+        case ForceWithdraw:
+        case Capture:
+        case Preserve:
+            return String.format("%s %s%s", getObjectiveCriterion().toString(), amountString, timeLimitString);
+        case ReachMapEdge:
+            return String.format("Reach %s edge with %s%s", edgeString, amountString, timeLimitString);
+        case PreventReachMapEdge:
+            return String.format("Prevent %s from reaching %s%s", amountString, edgeString, timeLimitString);
+        case Custom:
+            return String.format("%s%s%s", getDescription(), amountString, timeLimitString);
+        default:
+                return "?";
+        }
+    }
+    
+    public int getAmount() {
         if(fixedAmount != null) {
-            return String.format("%s %d", objectiveCriterion.toString(), fixedAmount);
+            return fixedAmount;
         } else {
-            return String.format("%s %d%%", objectiveCriterion.toString(), percentage);
+            return percentage;
+        }
+    }
+    
+    public ObjectiveAmountType getAmountType() {
+        if(fixedAmount != null) {
+            return ObjectiveAmountType.Fixed;
+        } else {
+            return ObjectiveAmountType.Percentage;
         }
     }
     
@@ -241,7 +360,12 @@ public class ScenarioObjective {
         if(objectiveCriterion == ObjectiveCriterion.ReachMapEdge || 
                 objectiveCriterion == ObjectiveCriterion.PreventReachMapEdge) {
             sb.append("\n");
-            sb.append(destinationEdge.toString());
+            
+            if(destinationEdge != OffBoardDirection.NONE) {
+                sb.append(destinationEdge.toString());
+            } else {
+                sb.append("opposite deployment");
+            }
             sb.append(" edge");
         }
         

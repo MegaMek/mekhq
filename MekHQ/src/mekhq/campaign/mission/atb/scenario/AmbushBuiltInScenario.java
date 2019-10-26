@@ -97,7 +97,7 @@ public class AmbushBuiltInScenario extends AtBScenario {
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this,
                 100, false);
 
-        getObjectives().add(destroyHostiles);
-        getObjectives().add(keepFriendliesAlive);
+        getScenarioObjectives().add(destroyHostiles);
+        getScenarioObjectives().add(keepFriendliesAlive);
     }
 }

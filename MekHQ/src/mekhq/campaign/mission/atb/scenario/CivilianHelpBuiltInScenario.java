@@ -117,8 +117,8 @@ public class CivilianHelpBuiltInScenario extends AtBScenario {
         keepCiviliansAlive.addDetail(String.format(defaultResourceBundle.getString("commonObjectives.bonusRolls.text"),
                 bonusEffect.howMuch));
 
-        getObjectives().add(destroyHostiles);
-        getObjectives().add(keepFriendliesAlive);
-        getObjectives().add(keepCiviliansAlive);
+        getScenarioObjectives().add(destroyHostiles);
+        getScenarioObjectives().add(keepFriendliesAlive);
+        getScenarioObjectives().add(keepCiviliansAlive);
     }
 }

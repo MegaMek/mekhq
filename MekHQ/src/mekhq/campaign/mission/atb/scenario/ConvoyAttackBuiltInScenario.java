@@ -120,7 +120,7 @@ public class ConvoyAttackBuiltInScenario extends AtBScenario {
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this,
                 50, false);
 
-        getObjectives().add(destroyConvoy);
-        getObjectives().add(keepFriendliesAlive);
+        getScenarioObjectives().add(destroyConvoy);
+        getScenarioObjectives().add(keepFriendliesAlive);
     }
 }

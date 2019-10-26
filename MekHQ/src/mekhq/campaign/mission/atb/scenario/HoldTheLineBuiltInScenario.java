@@ -112,14 +112,14 @@ public class HoldTheLineBuiltInScenario extends AtBScenario {
         // attacker must destroy 33%
         if (!isAttacker()) {
             destroyHostiles.setPercentage(50);
-            keepFriendliesAlive.setPercentage(33);
+            keepFriendliesAlive.setPercentage(66);
         }
 
         if (keepAttachedUnitsAlive != null) {
-            getObjectives().add(keepAttachedUnitsAlive);
+            getScenarioObjectives().add(keepAttachedUnitsAlive);
         }
 
-        getObjectives().add(destroyHostiles);
-        getObjectives().add(keepFriendliesAlive);
+        getScenarioObjectives().add(destroyHostiles);
+        getScenarioObjectives().add(keepFriendliesAlive);
     }
 }

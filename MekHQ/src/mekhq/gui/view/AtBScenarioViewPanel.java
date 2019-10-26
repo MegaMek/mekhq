@@ -172,6 +172,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
         setLayout(new GridBagLayout());
 
         setBackground(Color.WHITE);
+        setScrollableTracksViewportWidth(false);
 
         int y = 0;
 
@@ -387,13 +388,24 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
                 }
             });
         }
-
-        txtDetails.setLineWrap(true);
-        txtDetails.setWrapStyleWord(true);
-        txtDetails.setEditable(false);
+        
+        txtDesc.setName("txtDesc");
+        txtDesc.setText(scenario.getDescription());
+        txtDesc.setEditable(false);
+        txtDesc.setLineWrap(true);
+        txtDesc.setWrapStyleWord(true);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y++;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panStats.add(txtDesc, gridBagConstraints);
         
         StringBuilder objectiveBuilder = new StringBuilder();
-        for(ScenarioObjective objective : scenario.getObjectives()) {
+        for(ScenarioObjective objective : scenario.getScenarioObjectives()) {
             objectiveBuilder.append(objective.getDescription());
             objectiveBuilder.append("\n");
             
@@ -429,9 +441,17 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
                 objectiveBuilder.append("\n");
             }
             
+            objectiveBuilder.append("\t");
+            objectiveBuilder.append(objective.getTimeLimitString());
+            objectiveBuilder.append("\n");
+            
             objectiveBuilder.append("\n");
         }
+        
         txtDetails.setText(objectiveBuilder.toString());
+        txtDetails.setLineWrap(true);
+        txtDetails.setWrapStyleWord(true);
+        txtDetails.setEditable(false);
         
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y++;
@@ -442,22 +462,6 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panStats.add(txtDetails, gridBagConstraints);
-
-
-        txtDesc.setName("txtDesc");
-        txtDesc.setText(scenario.getDescription());
-        txtDesc.setEditable(false);
-        txtDesc.setLineWrap(true);
-        txtDesc.setWrapStyleWord(true);
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panStats.add(txtDesc, gridBagConstraints);
 
         if(scenario.getLoot().size() > 0) {
             gridBagConstraints.gridx = 0;

@@ -1477,10 +1477,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         }
     }
     
-    public List<ScenarioObjective> getObjectives() {
-        return getScenarioObjectives();
-    }
-    
     /* Convenience methods for frequently-used arguments */
     protected BotForce getAllyBotForce(AtBContract c, int start, int home, ArrayList<Entity> entities) {
         return new BotForce(c.getAllyBotName(), 1, start, home, entities,

@@ -249,6 +249,7 @@ public class ResolveScenarioTracker {
                 }
             }
         }
+        
         // Utterly destroyed entities
         for (Enumeration<Entity> iter = victoryEvent.getDevastatedEntities(); iter.hasMoreElements();) {
             Entity e = iter.nextElement();
@@ -256,6 +257,9 @@ public class ResolveScenarioTracker {
                 // Sub-entities have their own entry in the VictoryEvent data
                 continue;
             }
+
+            entities.put(UUID.fromString(e.getExternalIdAsString()), e);
+
             if(e.getOwnerId() == pid) {
                 if(!e.getExternalIdAsString().equals("-1")) {
                     UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
@@ -278,6 +282,7 @@ public class ResolveScenarioTracker {
                 }
             }
         }
+        
         //add retreated units
         for (Enumeration<Entity> iter = victoryEvent.getRetreatedEntities(); iter.hasMoreElements();) {
             Entity e = iter.nextElement();
@@ -285,6 +290,9 @@ public class ResolveScenarioTracker {
                 // Sub-entities have their own entry in the VictoryEvent data
                 continue;
             }
+            
+            entities.put(UUID.fromString(e.getExternalIdAsString()), e);
+            
             checkForLostLimbs(e, control);
             if(e.getOwnerId() == pid) {
                 if(!e.getExternalIdAsString().equals("-1")) {
@@ -322,6 +330,9 @@ public class ResolveScenarioTracker {
                 // Sub-entities have their own entry in the VictoryEvent data
                 continue;
             }
+            
+            entities.put(UUID.fromString(e.getExternalIdAsString()), e);
+            
             checkForLostLimbs(e, control);
             if(e.getOwnerId() == pid) {
                 if(!e.getExternalIdAsString().equals("-1")) {

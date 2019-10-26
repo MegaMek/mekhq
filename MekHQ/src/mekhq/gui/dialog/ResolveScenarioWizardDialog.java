@@ -1214,12 +1214,14 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
         
         // now update the objective panel if we updated objective state
-        if(currentPanel.equals(ResolveScenarioWizardDialog.UNITSPANEL) ||
-                currentPanel.equals(ResolveScenarioWizardDialog.SALVAGEPANEL)) {
-            for(ScenarioObjective objective : objectiveCheckboxes.keySet()) {
-                for(JCheckBox checkBox : objectiveCheckboxes.get(objective)) {
-                    checkBox.setSelected(objectiveProcessor.getQualifyingObjectiveUnits()
-                            .get(objective).contains(checkBox.getActionCommand()));
+        if(usePanel(ResolveScenarioWizardDialog.OBJECTIVEPANEL)) {
+            if(currentPanel.equals(ResolveScenarioWizardDialog.UNITSPANEL) ||
+                    currentPanel.equals(ResolveScenarioWizardDialog.SALVAGEPANEL)) {
+                for(ScenarioObjective objective : objectiveCheckboxes.keySet()) {
+                    for(JCheckBox checkBox : objectiveCheckboxes.get(objective)) {
+                        checkBox.setSelected(objectiveProcessor.getQualifyingObjectiveUnits()
+                                .get(objective).contains(checkBox.getActionCommand()));
+                    }
                 }
             }
         }
@@ -1339,7 +1341,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         tracker.resolveScenario(choiceStatus.getSelectedIndex()+1,txtReport.getText());
         
         // process objectives here
-        for(ScenarioObjective objective : tracker.getScenario().getScenarioObjectives()) {//objectiveCheckboxes
+        for(ScenarioObjective objective : tracker.getScenario().getScenarioObjectives()) {
             int qualifyingUnitCount = 0;
             
             if(objectiveCheckboxes.containsKey(objective)) {
@@ -1401,6 +1403,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
      */
     private Map<ScenarioObjective, Integer> getObjectiveUnitCounts() {
         Map<ScenarioObjective, Integer> objectiveUnitCounts = new HashMap<>();
+        
+        if(objectiveCheckboxes == null) {
+            return objectiveUnitCounts;
+        }
         
         for(ScenarioObjective objective : objectiveCheckboxes.keySet()) {
             int qualifyingUnitCount = 0;
@@ -1491,7 +1497,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
          // do a "dry run" of the scenario objectives to output a report
         StringBuilder sb = new StringBuilder();
         
-        for(ScenarioObjective objective : tracker.getScenario().getScenarioObjectives()) {//objectiveCheckboxes
+        for(ScenarioObjective objective : tracker.getScenario().getScenarioObjectives()) {
             int qualifyingUnitCount = 0;
             
             if(objectiveCheckboxes.containsKey(objective)) {

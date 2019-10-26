@@ -34,6 +34,9 @@ import javax.swing.Scrollable;
 public class ScrollablePanel extends JPanel implements Scrollable{
 
     private static final long serialVersionUID = -1422419969984249050L;
+    
+    //by default, track the width, and re-size as needed.
+    private boolean trackViewportWidth = true;
 
     public Dimension getPreferredScrollableViewportSize() {
         return super.getPreferredSize(); //tell the JScrollPane that we want to be our 'preferredSize' - but later, we'll say that vertically, it should scroll.
@@ -47,8 +50,12 @@ public class ScrollablePanel extends JPanel implements Scrollable{
         return 16;
     }
 
+    public void setScrollableTracksViewportWidth(boolean value) {
+        trackViewportWidth = false;
+    }
+    
     public boolean getScrollableTracksViewportWidth() {
-        return true;//track the width, and re-size as needed.
+        return trackViewportWidth;
     }
 
     public boolean getScrollableTracksViewportHeight() {

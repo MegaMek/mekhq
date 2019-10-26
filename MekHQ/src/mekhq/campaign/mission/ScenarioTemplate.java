@@ -47,6 +47,10 @@ public class ScenarioTemplate {
     @XmlElement(name="scenarioForce")
     public Map<String, ScenarioForceTemplate> scenarioForces = new HashMap<>();
     
+    @XmlElementWrapper(name="scenarioObjectives")
+    @XmlElement(name="scenarioObjective")
+    public List<ScenarioObjective> scenarioObjectives = new ArrayList<>();
+    
     /**
      * Returns the "primary" player force. This is always the force with the name "Player".
      * @return Primary player force.

@@ -166,14 +166,14 @@ public class ExtractionBuiltInScenario extends AtBScenario {
         }
 
         if (destroyHostiles != null) {
-            getObjectives().add(destroyHostiles);
+            getScenarioObjectives().add(destroyHostiles);
         }
 
         if (keepAttachedUnitsAlive != null) {
-            getObjectives().add(keepAttachedUnitsAlive);
+            getScenarioObjectives().add(keepAttachedUnitsAlive);
         }
 
-        getObjectives().add(keepFriendliesAlive);
-        getObjectives().add(civilianObjective);
+        getScenarioObjectives().add(keepFriendliesAlive);
+        getScenarioObjectives().add(civilianObjective);
     }
 }

@@ -160,9 +160,9 @@ public class CivilianRiotBuiltInScenario extends AtBScenario {
         keepLoyalistsAlive.addDetail(String.format(defaultResourceBundle.getString("commonObjectives.bonusRolls.text"),
                 bonusEffect.howMuch));
 
-        getObjectives().add(destroyRioters);
-        getObjectives().add(destroyRebels);
-        getObjectives().add(keepFriendliesAlive);
-        getObjectives().add(keepLoyalistsAlive);
+        getScenarioObjectives().add(destroyRioters);
+        getScenarioObjectives().add(destroyRebels);
+        getScenarioObjectives().add(keepFriendliesAlive);
+        getScenarioObjectives().add(keepLoyalistsAlive);
     }
 }

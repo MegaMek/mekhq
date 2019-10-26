@@ -35,7 +35,7 @@ public class ObjectiveEffect {
         /*
          *  no scaling, effect is just applied "howMuch" times
          */
-        None,
+        Fixed,
         /*
          *  linear scaling, effect is applied based on how many units qualified for the objective
          */
@@ -88,9 +88,24 @@ public class ObjectiveEffect {
         AtBBonus
     }        
     
+    /**
+     * Possible conditions under which an objective effect may be triggered
+     */
+    public enum ObjectiveEffectConditionType {
+        /**
+         * An effect triggered when the associated objective is fulfilled
+         */
+        ObjectiveSuccess,
+        
+        /**
+         * An effect triggered when the associated objective is not fulfilled
+         */
+        ObjectiveFailure
+    }
+    
     public ObjectiveEffectType effectType;
     // whether the effect is scaled to the # of units or fixed in nature
-    public EffectScalingType effectScaling = EffectScalingType.None;
+    public EffectScalingType effectScaling = EffectScalingType.Fixed;
     // how much of the effect per unit, or how much of the effect fixed
     public int howMuch;
     

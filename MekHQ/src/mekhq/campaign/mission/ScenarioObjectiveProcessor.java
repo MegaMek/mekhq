@@ -146,6 +146,10 @@ public class ScenarioObjectiveProcessor {
      */
     public void updateObjectiveEntityState(Entity entity, boolean forceEntityEscape, 
             boolean forceEntityDestruction, boolean opponentHasBattlefieldControl) {
+        if(entity == null) {
+            return;
+        }
+        
         for(ScenarioObjective objective : potentialObjectiveUnits.keySet()) {
             boolean entityMeetsObjective = false;
 
@@ -280,9 +284,9 @@ public class ScenarioObjectiveProcessor {
             
             for(ObjectiveEffect effect : objectiveEffects) {
                 if(effect.effectType == ObjectiveEffectType.ScenarioVictory) {
-                    victoryScore++;
+                    victoryScore += effect.howMuch;
                 } else if(effect.effectType == ObjectiveEffectType.ScenarioDefeat) {
-                    victoryScore--;
+                    victoryScore -= effect.howMuch;
                 }
             }
         }
@@ -343,12 +347,12 @@ public class ScenarioObjectiveProcessor {
         switch(effect.effectType) {
         case ScenarioVictory:
             if(dryRun) {
-                return "+1 scenario victory point";
+                return String.format("%d scenario victory point", effect.howMuch);
             }
             break;
         case ScenarioDefeat:
             if(dryRun) {
-                return "-1 scenario victory point";
+                return String.format("%d scenario victory point", -effect.howMuch);
             }
             break;
         case ContractScoreUpdate:
@@ -356,7 +360,7 @@ public class ScenarioObjectiveProcessor {
             if(tracker.getMission() instanceof AtBContract) {
                 AtBContract contract = (AtBContract) tracker.getMission();
                 
-                int effectMultiplier = effect.effectScaling == EffectScalingType.None ? 1 : scaleFactor;
+                int effectMultiplier = effect.effectScaling == EffectScalingType.Fixed ? 1 : scaleFactor;
                 int scoreEffect = effect.howMuch * effectMultiplier;
                 
                 if(dryRun) {
@@ -392,7 +396,7 @@ public class ScenarioObjectiveProcessor {
             if(tracker.getMission() instanceof AtBContract) {
                 AtBContract contract = (AtBContract) tracker.getMission();
                 
-                int effectMultiplier = effect.effectScaling == EffectScalingType.None ? 1 : scaleFactor;
+                int effectMultiplier = effect.effectScaling == EffectScalingType.Fixed ? 1 : scaleFactor;
                 int numBonuses = effect.howMuch * effectMultiplier;
                 if(dryRun) {
                     return String.format("%d AtB bonus rolls", numBonuses);

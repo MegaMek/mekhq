@@ -146,8 +146,8 @@ public class AllyRescueBuiltInScenario extends AtBScenario {
         friendlyFailureEffect.effectType = ObjectiveEffectType.ScenarioDefeat;
         keepAlliesAlive.addFailureEffect(friendlyFailureEffect);
 
-        getObjectives().add(destroyHostiles);
-        getObjectives().add(keepFriendliesAlive);
-        getObjectives().add(keepAlliesAlive);
+        getScenarioObjectives().add(destroyHostiles);
+        getScenarioObjectives().add(keepFriendliesAlive);
+        getScenarioObjectives().add(keepAlliesAlive);
     }
 }

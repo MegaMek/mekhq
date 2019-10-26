@@ -36,6 +36,7 @@ import mekhq.campaign.mission.ObjectiveEffect;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
+import mekhq.campaign.mission.ScenarioObjective.TimeLimitType;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 import mekhq.campaign.unit.Unit;
 
@@ -117,24 +118,28 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
     public void setObjectives(Campaign campaign, AtBContract contract) {
         super.setObjectives(campaign, contract);
 
-        // ScenarioObjective destroyHostiles =
-        // CommonObjectiveFactory.getDestroyEnemies(contract, 66);
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this,
                 1, true);
         ScenarioObjective keepPrisonersAlive = CommonObjectiveFactory.getPreserveSpecificFriendlies(PRISONER_FORCE_ID,
                 1, true);
 
+        keepFriendliesAlive.setTimeLimit(8);
+        keepFriendliesAlive.setTimeLimitAtMost(false);
+        keepFriendliesAlive.setTimeLimitType(TimeLimitType.Fixed);
+        
         // not losing the scenario also gets you a "bonus"
         ObjectiveEffect bonusEffect = new ObjectiveEffect();
         bonusEffect.effectType = ObjectiveEffectType.AtBBonus;
         bonusEffect.effectScaling = EffectScalingType.Linear;
         bonusEffect.howMuch = 1;
+        keepPrisonersAlive.setTimeLimit(8);
+        keepPrisonersAlive.setTimeLimitAtMost(false);
+        keepPrisonersAlive.setTimeLimitType(TimeLimitType.Fixed);
         keepPrisonersAlive.addSuccessEffect(bonusEffect);
         keepPrisonersAlive.addDetail(String.format(defaultResourceBundle.getString("commonObjectives.bonusRolls.text"),
                 bonusEffect.howMuch));
 
-        // getObjectives().add(destroyHostiles);
-        getObjectives().add(keepFriendliesAlive);
-        getObjectives().add(keepPrisonersAlive);
+        getScenarioObjectives().add(keepFriendliesAlive);
+        getScenarioObjectives().add(keepPrisonersAlive);
     }
 }
