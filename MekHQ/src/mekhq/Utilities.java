@@ -2,6 +2,7 @@
  * Utilities.java
  *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2019 The MekHQ Team.
  *
  * This file is part of MekHQ.
  *
@@ -73,7 +74,6 @@ import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
 import megamek.common.Compute;
 import megamek.common.ConvFighter;
-import megamek.common.Coords;
 import megamek.common.Crew;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
@@ -106,13 +106,9 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTechProgression;
 import org.w3c.dom.Node;
 
-/**
- *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
- */
 public class Utilities {
     private static final int MILLISECONDS_IN_DAY = 1000 * 60 * 60 * 24;
-    
+
     private static ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Utilities", new EncodeControl()); //$NON-NLS-1$
 
     // A couple of arrays for use in the getLevelName() method
@@ -151,10 +147,10 @@ public class Utilities {
      * <pre>
      * collection.get(Compute.randomInt(collection.size());
      * </pre>
-     * 
+     *
      * @return <i>null</i> if the collection itself is null or empty;
      * can return <i>null</i> if the collection contains <i>null</i> items.
-     * 
+     *
      */
     public static <T> T getRandomItem(Collection<? extends T> collection) {
         if((null == collection) || collection.isEmpty()) {
@@ -176,10 +172,10 @@ public class Utilities {
      * <pre>
      * list.get(Compute.randomInt(list.size());
      * </pre>
-     * 
+     *
      * @return <i>null</i> if the list itself is null or empty;
      * can return <i>null</i> if the list contains <i>null</i> items.
-     * 
+     *
      */
     public static <T> T getRandomItem(List<? extends T> list) {
         if((null == list) || list.isEmpty() ) {
@@ -188,7 +184,7 @@ public class Utilities {
         int index = Compute.randomInt(list.size());
         return list.get(index);
     }
-    
+
     /**
      * @return linear interpolation value between min and max
      */
@@ -196,44 +192,13 @@ public class Utilities {
         // The order of operations is important here, to not lose precision
         return min * (1.0 - f) + max * f;
     }
-    
+
     /**
      * @return linear interpolation value between min and max, rounded to the nearest integer
      */
     public static int lerp(int min, int max, double f) {
         // The order of operations is important here, to not lose precision
         return (int)Math.round(min * (1.0 - f) + max * f);
-    }
-    
-    /**
-     * @return linear interpolation value between min and max, rounded to the nearest coordinate
-     * <p>
-     * For theory behind the method used, see: http://www.redblobgames.com/grids/hexagons/
-     */
-    public static Coords lerp(Coords min, Coords max, double f) {
-        int minX = min.getX();
-        int minZ = min.getY() - (min.getX() - (min.getX() & 1)) / 2;
-        int minY = - minX - minZ;
-        int maxX = max.getX();
-        int maxZ = max.getY() - (max.getX() - (max.getX() & 1)) / 2;
-        int maxY = - maxX - maxZ;
-        double lerpX = lerp((double)minX, (double)maxX, f);
-        double lerpY = lerp((double)minY, (double)maxY, f);
-        double lerpZ = lerp((double)minZ, (double)maxZ, f);
-        int resultX = (int) Math.round(lerpX);
-        int resultY = (int) Math.round(lerpY);
-        int resultZ = (int) Math.round(lerpZ);
-        double diffX = Math.abs(resultX * 1.0 - lerpX);
-        double diffY = Math.abs(resultY * 1.0 - lerpY);
-        double diffZ = Math.abs(resultZ * 1.0 - lerpZ);
-        if((diffX > diffY) && (diffX > diffZ)) {
-            resultX = - resultY - resultZ;
-        } else if(diffY > diffZ) {
-            resultY = - resultX - resultZ;
-        } else {
-            resultZ = - resultX - resultY;
-        }
-        return new Coords(resultX, resultZ + (resultX - (resultX & 1)) / 2);
     }
 
     /**
@@ -246,16 +211,16 @@ public class Utilities {
      * it is needed or not. Since Java guarantees the order of evaluation for arguments to be
      * the same as the order in which they appear (JSR 15.7.4), this makes it more suitable
      * for re-playable procedural generation and similar method calls with side effects.
-     * 
+     *
      * @return the first argument if it's not <i>null</i>, else the second argument
      */
     public static <T> T nonNull(T first, T second) {
         return (null != first) ? first : second;
     }
-    
+
     /**
      * For details and caveats, see the two-argument method.
-     * 
+     *
      * @return the first non-<i>null</i> argument, else <i>null</i> if all are <i>null</i>
      */
     @SafeVarargs
@@ -299,18 +264,18 @@ public class Utilities {
 
             // Only Protos can use Proto-specific ammo
             if (atype.hasFlag(AmmoType.F_PROTOMECH)
-                            && !(entity instanceof Protomech)) {
+                    && !(entity instanceof Protomech)) {
                 continue;
             }
 
             // When dealing with machine guns, Protos can only
             // use proto-specific machine gun ammo
             if ((entity instanceof Protomech)
-                            && atype.hasFlag(AmmoType.F_MG)
-                            && !atype.hasFlag(AmmoType.F_PROTOMECH)) {
+                    && atype.hasFlag(AmmoType.F_MG)
+                    && !atype.hasFlag(AmmoType.F_PROTOMECH)) {
                 continue;
             }
-            
+
             if (atype.hasFlag(AmmoType.F_NUCLEAR) && atype.hasFlag(AmmoType.F_CAP_MISSILE)
                     && !entity.getGame().getOptions().booleanOption(OptionsConstants.ADVAERORULES_AT2_NUKES)) {
                 continue;
@@ -322,7 +287,7 @@ public class Utilities {
                     && (atype.hasFlag(AmmoType.F_BATTLEARMOR) == cur_atype.hasFlag(AmmoType.F_BATTLEARMOR))
                     && (atype.hasFlag(AmmoType.F_ENCUMBERING) == cur_atype.hasFlag(AmmoType.F_ENCUMBERING))
                     && ((atype.getTonnage(entity) == cur_atype.getTonnage(entity))
-                            || atype.hasFlag(AmmoType.F_CAP_MISSILE))) {
+                    || atype.hasFlag(AmmoType.F_CAP_MISSILE))) {
                 atypes.add(atype);
             }
         }
@@ -350,28 +315,35 @@ public class Utilities {
      */
     public static File lastFileModified(String dir, FilenameFilter filter) {
         File fl = new File(dir);
-        File[] files = fl.listFiles(filter);
         long lastMod = Long.MIN_VALUE;
         File choice = null;
+
+        File[] files = fl.listFiles(filter);
+        if (null == files) {
+            return null;
+        }
+
         for (File file : files) {
             if (file.lastModified() > lastMod) {
                 choice = file;
                 lastMod = file.lastModified();
             }
         }
-        //ok now we need to recursively search any subdirectories, so see if they
-        //contain more recent files
+        //ok now we need to recursively search any subdirectories,
+        //so see if they contain more recent files
         files = fl.listFiles();
         for(File file : files) {
             if(!file.isDirectory()) {
                 continue;
             }
+
             File subFile =  lastFileModified(file.getPath(), filter);
             if (null != subFile && subFile.lastModified() > lastMod) {
                 choice = subFile;
                 lastMod = subFile.lastModified();
             }
         }
+
         return choice;
     }
 
@@ -404,7 +376,7 @@ public class Utilities {
                 // In such a case we will log it and take the least restrictive action, which is to let it through.
                 MekHQ.getLogger().log(Utilities.class, METHOD_NAME, LogLevel.WARNING,
                         "Could not determine tech progression for " + summary.getName() // $NON-NLS-1$
-                        + ", including among available refits."); // $NON-NLS-1$
+                                + ", including among available refits."); // $NON-NLS-1$
             } else if (!campaign.isLegal(techProg)) {
                 continue;
             }
@@ -413,7 +385,7 @@ public class Utilities {
         }
         return variants;
     }
-    
+
     public static boolean isOmniVariant(Entity entity1, Entity entity2) {
         if (!entity1.isOmni() || !entity2.isOmni()) {
             return false;
@@ -482,7 +454,7 @@ public class Utilities {
                             return false;
                         }
                     }
-                }                
+                }
             }
             if (!fixedEquipment.isEmpty()) {
                 return false;
@@ -600,7 +572,7 @@ public class Utilities {
 
         return false;
     }
-    
+
     public static Map<CrewType, Collection<Person>> genRandomCrewWithCombinedSkill(Campaign c, Unit u, String factionCode) {
         Objects.requireNonNull(c);
         Objects.requireNonNull(u);
@@ -665,9 +637,9 @@ public class Utilities {
                 p.addSkill(SkillType.S_PILOT_GVEE, SkillType.getType(SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(), 0);
                 p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(), 0);
             }
-            
+
             populateOptionsFromCrew(p, oldCrew);
-            
+
             drivers.add(p);
         } else if (oldCrew.getSlotCount() > 1) {
             for (int slot = 0; slot < oldCrew.getSlotCount(); slot++) {
@@ -686,7 +658,7 @@ public class Utilities {
                     if (!oldCrew.getExternalIdAsString().equals("-1")) {
                         p.setId(UUID.fromString(oldCrew.getExternalIdAsString(slot)));
                     }
-                    
+
                     populateOptionsFromCrew(p, oldCrew);
                     drivers.add(p);
                 }
@@ -732,7 +704,7 @@ public class Utilities {
                     p.addSkill(SkillType.S_PILOT_GVEE, SkillType.getType(SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(), 0);
                     p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(), 0);
                 }
-                
+
                 // this will have the side effect of giving every driver on the crew
                 // the SPAs from the entity's crew.
                 // Not really any way around it 
@@ -792,7 +764,7 @@ public class Utilities {
                         p.addSkill(SkillType.S_GUN_VEE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery()), 0);
                         totalGunnery += p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue();
                     }
-                    
+
                     populateOptionsFromCrew(p, oldCrew);
                     gunners.add(p);
                 }
@@ -837,12 +809,12 @@ public class Utilities {
             Person p = c.newPerson(Person.T_NAVIGATOR, factionCode);
             navigator = p;
         }
-        
+
         if (u.canTakeTechOfficer()) {
             Person p = c.newPerson(Person.T_VEE_GUNNER, factionCode);
             consoleCmdr = p;
         }
-        
+
         for(Person p : drivers) {
             if (!nameset) {
                 p.setName(commanderName);
@@ -870,14 +842,14 @@ public class Utilities {
                 nameset = true;
             }
         }
-        
+
         if (null != consoleCmdr) {
             if (!nameset) {
                 consoleCmdr.setName(commanderName);
                 nameset = true;
             }
         }
-        
+
         // Gather the data
         Map<CrewType, Collection<Person>> result = new HashMap<>();
         if (!drivers.isEmpty()) {
@@ -903,7 +875,7 @@ public class Utilities {
         }
         return result;
     }
-    
+
     /**
      * Worker function that takes the PilotOptions (SPAs, in other words) from the given "old crew" and sets them for a person.
      * @param p The person whose SPAs to populate
@@ -952,15 +924,15 @@ public class Utilities {
         int baseage = 19;
         int ndice = 1;
         switch(expLevel) {
-        case(SkillType.EXP_REGULAR):
-            ndice = 2;
-            break;
-        case(SkillType.EXP_VETERAN):
-            ndice = 3;
-            break;
-        case(SkillType.EXP_ELITE):
-            ndice = 4;
-            break;
+            case(SkillType.EXP_REGULAR):
+                ndice = 2;
+                break;
+            case(SkillType.EXP_VETERAN):
+                ndice = 3;
+                break;
+            case(SkillType.EXP_ELITE):
+                ndice = 4;
+                break;
         }
 
         int age = baseage;
@@ -1045,27 +1017,27 @@ public class Utilities {
 
     public static int getSimpleTechLevel(int level) {
         switch(level) {
-        case TechConstants.T_ALLOWED_ALL:
-        case TechConstants.T_INTRO_BOXSET:
-            return CampaignOptions.TECH_INTRO;
-        case TechConstants.T_IS_TW_NON_BOX:
-        case TechConstants.T_CLAN_TW:
-        case TechConstants.T_IS_TW_ALL:
-        case TechConstants.T_TW_ALL:
-            return CampaignOptions.TECH_STANDARD;
-        case TechConstants.T_IS_ADVANCED:
-        case TechConstants.T_CLAN_ADVANCED:
-            return CampaignOptions.TECH_ADVANCED;
-        case TechConstants.T_IS_EXPERIMENTAL:
-        case TechConstants.T_CLAN_EXPERIMENTAL:
-            return CampaignOptions.TECH_EXPERIMENTAL;
-        case TechConstants.T_IS_UNOFFICIAL:
-        case TechConstants.T_CLAN_UNOFFICIAL:
-            return CampaignOptions.TECH_UNOFFICIAL;
-        case TechConstants.T_TECH_UNKNOWN:
-            return CampaignOptions.TECH_UNKNOWN;
-        default:
-            return CampaignOptions.TECH_INTRO;
+            case TechConstants.T_ALLOWED_ALL:
+            case TechConstants.T_INTRO_BOXSET:
+                return CampaignOptions.TECH_INTRO;
+            case TechConstants.T_IS_TW_NON_BOX:
+            case TechConstants.T_CLAN_TW:
+            case TechConstants.T_IS_TW_ALL:
+            case TechConstants.T_TW_ALL:
+                return CampaignOptions.TECH_STANDARD;
+            case TechConstants.T_IS_ADVANCED:
+            case TechConstants.T_CLAN_ADVANCED:
+                return CampaignOptions.TECH_ADVANCED;
+            case TechConstants.T_IS_EXPERIMENTAL:
+            case TechConstants.T_CLAN_EXPERIMENTAL:
+                return CampaignOptions.TECH_EXPERIMENTAL;
+            case TechConstants.T_IS_UNOFFICIAL:
+            case TechConstants.T_CLAN_UNOFFICIAL:
+                return CampaignOptions.TECH_UNOFFICIAL;
+            case TechConstants.T_TECH_UNKNOWN:
+                return CampaignOptions.TECH_UNKNOWN;
+            default:
+                return CampaignOptions.TECH_INTRO;
         }
     }
 
@@ -1228,18 +1200,18 @@ public class Utilities {
             MekHQ.getLogger().log(Utilities.class, "unscrambleEquipmentNumbers", LogLevel.WARNING, builder.toString());
         }
     }
-    
+
     public static void assignTroopersAndEquipmentNums(Unit unit) {
         if (!(unit.getEntity() instanceof BattleArmor)) {
             throw new IllegalArgumentException("Attempting to assign trooper values to parts for non-BA unit");
         }
-        
+
         //Create a list that we can remove parts from as we match them
         List<EquipmentPart> tempParts = unit.getParts().stream()
                 .filter(p -> p instanceof EquipmentPart)
                 .map(p -> (EquipmentPart)p)
                 .collect(Collectors.toList());
-        
+
         for (Mounted m : unit.getEntity().getEquipment()) {
             final int eqNum = unit.getEntity().getEquipmentNum(m);
             //Look for parts of the same type with the equipment number already set correctly
@@ -1332,7 +1304,7 @@ public class Utilities {
         a.setTime(date);
         int diff = b.get(GregorianCalendar.YEAR) - a.get(GregorianCalendar.YEAR);
         if (a.get(GregorianCalendar.MONTH) > b.get(GregorianCalendar.MONTH) ||
-            (a.get(GregorianCalendar.MONTH) == b.get(GregorianCalendar.MONTH) && a.get(GregorianCalendar.DATE) > b.get(GregorianCalendar.DATE))) {
+                (a.get(GregorianCalendar.MONTH) == b.get(GregorianCalendar.MONTH) && a.get(GregorianCalendar.DATE) > b.get(GregorianCalendar.DATE))) {
             diff--;
         }
         return diff;
@@ -1352,7 +1324,7 @@ public class Utilities {
     public static DateTime getDateTimeDay(Calendar cal) {
         return new LocalDateTime(cal).toDateTime(DateTimeZone.UTC);
     }
-    
+
     /** @return the current date as a DateTime time stamp for midnight in UTC time zone */
     public static DateTime getDateTimeDay(Date date) {
         return new LocalDateTime(date).toDateTime(DateTimeZone.UTC);
@@ -1439,7 +1411,7 @@ public class Utilities {
         }
         return new String(buffer);
     }
-    
+
     public static String getRomanNumeralsFromArabicNumber(int level, boolean checkZero) {
         // If we're 0, then we just return an empty string
         if (checkZero && level == 0) {
@@ -1464,13 +1436,13 @@ public class Utilities {
 
         // Convert Map to List
         List<Map.Entry<String, Integer>> list =
-            new LinkedList<>(unsortMap.entrySet());
+                new LinkedList<>(unsortMap.entrySet());
 
         // Sort list with comparator, to compare the Map values
         Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
             @Override
             public int compare(Map.Entry<String, Integer> o1,
-                                           Map.Entry<String, Integer> o2) {
+                               Map.Entry<String, Integer> o2) {
                 return (o1.getValue()).compareTo(o2.getValue());
             }
         });
@@ -1551,12 +1523,12 @@ public class Utilities {
                     }
                 }
             }
-            
+
             if( !recurse ) {
                 // We're done
                 return;
             }
-            
+
             // Get subdirectories too
             File[] dirs = dir.listFiles();
             if( null != dirs && dirs.length > 0 ) {
