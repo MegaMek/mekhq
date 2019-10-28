@@ -25,6 +25,7 @@ v0.47.1-SNAPSHOT
 + PR #1317: fix NPE that halts new day processing while applying training XP
 + PR #1318: player units given to other players now properly return to the campaign during scenario resolution.
 + Issue #1308: Fix NPE when the campaign folder is not present
++ PR #1315: Rescalable images for unit view panel when fluff image exists
 
 v0.47.0 (2019-08-21 0300 UTC)
 + Issue #1171: Adds autosave feature (daily or weekly, and/or before missions).
