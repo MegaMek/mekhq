@@ -347,48 +347,4 @@ public class UnitViewPanel extends ScrollablePanel {
         }
         return camo;
     }
-    
- /*   private class ImgLabel extends JLabel {
-        Image image;
-        
-        public ImgLabel(Image i)
-        {
-            super();
-            this.image = i;
-        }
-        
-        private Dimension getScaledDimension() {
-            int original_width = image.getWidth(this);
-            int original_height = image.getHeight(this);
-            int bound_width = getWidth();
-            int bound_height = getHeight();
-            int new_width = original_width;
-            int new_height = original_height;
-
-            // first check if we need to scale width
-            if (original_width > bound_width) {
-                //scale width to fit
-                new_width = bound_width;
-                //scale height to maintain aspect ratio
-                new_height = (new_width * original_height) / original_width;
-            }
-
-            // then check if we need to scale even with the new height
-            if (new_height > bound_height) {
-                //scale height to fit instead
-                new_height = bound_height;
-                //scale width to maintain aspect ratio
-                new_width = (new_height * original_width) / original_height;
-            }
-            return new Dimension(new_width, new_height);
-        }
-        
-        @Override
-        public void paintComponent(Graphics g)
-        {
-            super.paintComponent(g);
-            Dimension dims = getScaledDimension();
-            g.drawImage(image, 0, 0, (int) dims.getWidth(), (int) dims.getHeight(), this);
-        }
-    }*/
 }
