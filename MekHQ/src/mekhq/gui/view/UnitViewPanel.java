@@ -8,13 +8,15 @@ package mekhq.gui.view;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Image;
 import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 
 import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.util.FluffImageHelper;
@@ -28,6 +30,7 @@ import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.EntityImage;
+import mekhq.gui.utilities.ImgLabel;
 import mekhq.gui.utilities.MarkdownRenderer;
 
 /**
@@ -48,7 +51,7 @@ public class UnitViewPanel extends ScrollablePanel {
 	private MechTileset mt;
     private DirectoryItems camos;
 	
-	private javax.swing.JLabel lblImage;
+	private JLabel lblImage;
 	//private javax.swing.JPanel pnlStats;
 	private javax.swing.JTextPane txtReadout;
 	private javax.swing.JTextPane txtFluff;	
@@ -79,7 +82,6 @@ public class UnitViewPanel extends ScrollablePanel {
 	private void initComponents() {
 		java.awt.GridBagConstraints gridBagConstraints;
 
-		lblImage = new javax.swing.JLabel();
 		txtReadout = new javax.swing.JTextPane();
 		txtFluff = new javax.swing.JTextPane();
 		pnlStats = new javax.swing.JPanel();
@@ -89,36 +91,50 @@ public class UnitViewPanel extends ScrollablePanel {
 		setLayout(new java.awt.GridBagLayout());
 
 		setBackground(Color.WHITE);
-		
-		lblImage.setName("lblImage"); // NOI18N
-		lblImage.setBackground(Color.WHITE);
-		Image image = FluffImageHelper.getFluffImage(entity);
-		if(null == image) {
-			image = getImageFor(unit, lblImage);     
-		}
-        Icon icon;
-		if(null != image) {
-			if(image.getWidth(lblImage) > 200) {
-                image = image.getScaledInstance(200, -1, Image.SCALE_DEFAULT);               
+
+        int compWidth = 1;
+        Image image = FluffImageHelper.getFluffImage(entity);
+        if(null != image) {
+            //fluff image exists so use custom ImgLabel to get full mech porn
+            lblImage = new  ImgLabel(image);
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = 0;
+            gridBagConstraints.gridheight = 3;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            add(lblImage, gridBagConstraints);
+        } else {
+            //no fluff image, so just use image icon from top-down view
+            compWidth=2;
+            lblImage = new JLabel();
+            lblImage.setBackground(Color.WHITE);
+            image = getImageFor(unit, lblImage);
+            if(null != image) {
+                ImageIcon icon = new ImageIcon(image);
+                lblImage.setIcon(icon);
+                gridBagConstraints = new java.awt.GridBagConstraints();
+                gridBagConstraints.gridx = 1;
+                gridBagConstraints.gridy = 0;
+                gridBagConstraints.gridheight = 1;
+                gridBagConstraints.weightx = 1.0;
+                gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+                gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
+                add(lblImage, gridBagConstraints);
             }
-            icon = new ImageIcon(image);
-            lblImage.setIcon(icon);
         }
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
-		add(lblImage, gridBagConstraints);
-	
+        
 		pnlStats.setName("pnlBasic");
 		pnlStats.setBorder(BorderFactory.createTitledBorder(unit.getName()));
 		pnlStats.setBackground(Color.WHITE);
 		fillStats(resourceMap);
 		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
-		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weightx = 0.0;
+		gridBagConstraints.gridwidth = 1;
 		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;	
@@ -137,8 +153,8 @@ public class UnitViewPanel extends ScrollablePanel {
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 1;
-		gridBagConstraints.gridwidth = 2;
-		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weightx = 0.0;
+		gridBagConstraints.gridwidth = compWidth;
 		if(unit.getHistory().length() == 0) {
 			gridBagConstraints.weighty = 1.0;
 		}
@@ -158,9 +174,9 @@ public class UnitViewPanel extends ScrollablePanel {
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;
 			gridBagConstraints.gridy = 2;
-			gridBagConstraints.gridwidth = 2;
-			gridBagConstraints.weightx = 1.0;
+			gridBagConstraints.weightx = 0.0;
 			gridBagConstraints.weighty = 1.0;
+			gridBagConstraints.gridwidth = compWidth;
 			gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
 			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
