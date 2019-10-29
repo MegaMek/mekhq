@@ -1,0 +1,164 @@
+/*
+ * Copyright (c) 2019 The MegaMek Team
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package mekhq.campaign.parts;
+
+import megamek.common.Entity;
+import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
+import megamek.common.TechAdvancement;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.work.IAcquisitionWork;
+
+/**
+ * Standard support vehicle armor, which can differ by BAR and tech rating.
+ */
+public class SVArmor extends Armor {
+    private static final long serialVersionUID = -1357781149127410708L;
+
+    private int bar;
+    private int techRating;
+
+    @SuppressWarnings("unused")
+    private SVArmor() {
+        this(2, RATING_D, 0, Entity.LOC_NONE, null);
+    }
+
+    /**
+     * Create an instance of a support vehicle armor part
+     *
+     * @param bar          The Barrier Armor Rating for the armor
+     * @param techRating   The armor tech rating
+     * @param points       The number of points of armor
+     * @param loc          The location on the unit
+     * @param campaign     The campaign instance
+     */
+    public SVArmor(int bar, int techRating, int points, int loc, Campaign campaign) {
+        super(0, EquipmentType.T_ARMOR_STANDARD, points, loc, false, false, campaign);
+        this.bar = bar;
+        this.techRating = techRating;
+        this.name = String.format("BAR %d armor (%s)", bar, ITechnology.getRatingName(techRating));
+    }
+
+    public int getBAR() {
+        return bar;
+    }
+
+    @Override
+    public int getTechRating() {
+        return techRating;
+    }
+
+    @Override
+    public SVArmor clone() {
+        SVArmor clone = new SVArmor(getBAR(), getTechRating(), getAmount(), getLocation(), campaign);
+        clone.copyBaseData(this);
+        return clone;
+    }
+
+    @Override
+    public double getTonnage() {
+        return amount * EquipmentType.getSupportVehicleArmorWeightPerPoint(bar, techRating);
+    }
+
+    @Override
+    public Money getCurrentValue() {
+        return Money.of(amount * EquipmentType.getSupportVehicleArmorCostPerPoint(bar));
+    }
+
+    public double getTonnageNeeded() {
+        return amountNeeded * EquipmentType.getSupportVehicleArmorWeightPerPoint(bar, techRating);
+    }
+
+    public Money getValueNeeded() {
+        return adjustCostsForCampaignOptions(Money.of(amountNeeded * EquipmentType.getSupportVehicleArmorCostPerPoint(bar)));
+    }
+
+    @Override
+    public Money getStickerPrice() {
+        //always in 5-ton increments
+        return Money.of(5.0 / EquipmentType.getSupportVehicleArmorWeightPerPoint(bar, techRating)
+                * EquipmentType.getSupportVehicleArmorCostPerPoint(bar));
+    }
+
+    @Override
+    public Money getBuyCost() {
+        return getStickerPrice();
+    }
+
+    @Override
+    public boolean isSamePartType(Part part) {
+        return part instanceof SVArmor
+                && bar == ((SVArmor) part).bar
+                && techRating == ((SVArmor) part).techRating;
+    }
+
+    public double getArmorWeight(int points) {
+        return points * EquipmentType.getSupportVehicleArmorWeightPerPoint(bar, techRating);
+    }
+
+    @Override
+    public IAcquisitionWork getAcquisitionWork() {
+        return new SVArmor(bar, techRating, (int) Math.round(5.0 / getArmorPointsPerTon()), -1, campaign);
+    }
+
+    @Override
+    public int getDifficulty() {
+        return -2;
+    }
+
+    @Override
+    public double getArmorPointsPerTon() {
+        return 1.0 / EquipmentType.getSupportVehicleArmorWeightPerPoint(bar, techRating);
+    }
+
+    public Part getNewPart() {
+        return new SVArmor(bar, techRating, (int) Math.round(5 * getArmorPointsPerTon()), -1, campaign);
+    }
+
+    public int getAmountAvailable() {
+        for(Part part : campaign.getSpareParts()) {
+            if (isSamePartType(part) && !part.isReservedForRefit() && part.isPresent()) {
+                return ((SVArmor) part).getAmount();
+            }
+        }
+        return 0;
+    }
+
+    public void changeAmountAvailable(int amount) {
+        SVArmor a = null;
+        for(Part part : campaign.getSpareParts()) {
+            if (isSamePartType(part) && getRefitId() == part.getRefitId() && part.isPresent()) {
+                a = (SVArmor) part;
+                a.setAmount(a.getAmount() + amount);
+                break;
+            }
+        }
+        if(null != a && a.getAmount() <= 0) {
+            campaign.removePart(a);
+        } else if(null == a && amount > 0) {
+            campaign.addPart(new SVArmor(bar, techRating, amount, -1, campaign), 0);
+        }
+    }
+
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return EquipmentType.getSVArmorTechAdvancement(bar);
+    }
+}
