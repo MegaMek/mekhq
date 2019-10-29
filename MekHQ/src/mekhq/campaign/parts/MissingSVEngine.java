@@ -56,7 +56,9 @@ public class MissingSVEngine extends MissingPart {
         this.baseEngineFactor = baseEngineFactor;
         this.fuelType = fuelType;
 
-        techAdvancement = new Engine(10, etype, Engine.SUPPORT_VEE_ENGINE).getTechAdvancement();
+        Engine engine = new Engine(10, etype, Engine.SUPPORT_VEE_ENGINE);
+        techAdvancement = engine.getTechAdvancement();
+        name = String.format("%s (%s) Engine", engine.getEngineName(), ITechnology.getRatingName(techRating));
     }
 
     @Override

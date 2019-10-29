@@ -2238,7 +2238,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         fuel = ((Tank) entity).getICEFuelType();
                     }
                     engine = new SVEnginePart(entity.getWeight(), entity.getEngine().getEngineType(),
-                            entity.getTechRating(), mf, entity.getBaseEngineValue(),
+                            entity.getEngineTechRating(), mf, entity.getBaseEngineValue(),
                             fuel, getCampaign());
                     addPart(engine);
                     partsToAdd.add(engine);
