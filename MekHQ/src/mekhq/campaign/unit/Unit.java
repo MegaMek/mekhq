@@ -2220,25 +2220,15 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             } else if (entity.isSupportVehicle()) {
                 // Check for trailer with no engine
                 if (entity.hasEngine() && entity.getEngine().getEngineType() != Engine.NONE) {
-                    int mf;
-                    // Rail support gets a -2 mp boost to the move factor calculation
-                    if (entity.getMovementMode().equals(EntityMovementMode.RAIL)
-                            || entity.getMovementMode().equals(EntityMovementMode.MAGLEV)) {
-                        int mp = Math.max(0, entity.getOriginalWalkMP() - 2);
-                        mf = mp * mp + 4;
-                    } else if (entity.getMovementMode().equals(EntityMovementMode.STATION_KEEPING)) {
-                        // satellite support vees have a flat 1 for move factor
-                        mf = 1;
-                    } else {
-                        int mp = entity.getOriginalWalkMP();
-                        mf = mp * mp + 4;
-                    }
+                    // Surface vehicles (including vehicles) have to choose the fuel type for a combustion engine.
+                    // Fixed wing with an ICE will have the fuel type set to NONE, which is technically
+                    // not correct but does the job of distinguishing the turbine from other ICE types.
                     FuelType fuel = FuelType.NONE;
                     if (entity instanceof Tank) {
                         fuel = ((Tank) entity).getICEFuelType();
                     }
-                    engine = new SVEnginePart(entity.getWeight(), entity.getEngine().getEngineType(),
-                            entity.getEngineTechRating(), mf, entity.getBaseEngineValue(),
+                    engine = new SVEnginePart((int) entity.getWeight(), entity.getEngine().getWeightEngine(entity),
+                            entity.getEngine().getEngineType(), entity.getEngineTechRating(),
                             fuel, getCampaign());
                     addPart(engine);
                     partsToAdd.add(engine);

@@ -25,40 +25,76 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.util.GregorianCalendar;
 
 /**
  * Place holder for an engine that has been destroyed or removed from a support vehicle
  */
 public class MissingSVEngine extends MissingPart {
 
-    // Part stores unit tonnage as an int. Support vees can come in fractions of a ton.
-    private double actualTonnage;
+    private double engineTonnage;
     private int etype;
     private int techRating;
-    private int movementFactor;
-    private double baseEngineFactor;
     private FuelType fuelType;
 
     private TechAdvancement techAdvancement;
 
+    /**
+     * Constructor used during campaign deserialization
+     */
+    @SuppressWarnings("unused")
     public MissingSVEngine() {
-        this(0.0, Engine.COMBUSTION_ENGINE, RATING_D, 1, 0.0, FuelType.PETROCHEMICALS, null);
+        this(0, 0.0, Engine.COMBUSTION_ENGINE, RATING_D, FuelType.PETROCHEMICALS, null);
     }
 
-    public MissingSVEngine(double unitTonnage, int etype, int techRating, int movementFactor,
-                           double baseEngineFactor, FuelType fuelType, Campaign campaign) {
-        super((int) unitTonnage, campaign);
-        this.actualTonnage = unitTonnage;
+    /**
+     * Creates a support vehicle engine part.
+     *
+     * @param unitTonnage      The mass of the unit it is installed on/intended for, in tons.
+     * @param engineTonnage    The mass of the engine
+     * @param etype            An {@link Engine} type constant
+     * @param techRating       The engine's tech rating, {@code RATING_A} through {@code RATING_F}
+     * @param fuelType         Needed to distinguish different types of internal combustion engines.
+     * @param campaign         The campaign instance
+     */
+    public MissingSVEngine(int unitTonnage, double engineTonnage, int etype, int techRating,
+                           FuelType fuelType, Campaign campaign) {
+        super(unitTonnage, campaign);
+        this.engineTonnage = engineTonnage;
         this.etype = etype;
         this.techRating = techRating;
-        this.movementFactor = movementFactor;
-        this.baseEngineFactor = baseEngineFactor;
         this.fuelType = fuelType;
 
         Engine engine = new Engine(10, etype, Engine.SUPPORT_VEE_ENGINE);
         techAdvancement = engine.getTechAdvancement();
         name = String.format("%s (%s) Engine", engine.getEngineName(), ITechnology.getRatingName(techRating));
+    }
+
+    /**
+     * @return The weight of the engine
+     */
+    public double getEngineTonnage() {
+        return engineTonnage;
+    }
+
+    /**
+     * @return The {@link Engine} type flag
+     */
+    public int getEType() {
+        return etype;
+    }
+
+    @Override
+    public int getTechRating() {
+        return techRating;
+    }
+
+    /**
+     * Internal combustion engines differ by the type of fuel they are designed for.
+     *
+     * @return The type of fuel used by the engine.
+     */
+    public FuelType getFuelType() {
+        return fuelType;
     }
 
     @Override
@@ -73,29 +109,19 @@ public class MissingSVEngine extends MissingPart {
 
     @Override
     public double getTonnage() {
-        if (null != getUnit()) {
-            return RoundWeight.standard(actualTonnage * baseEngineFactor * movementFactor
-                    * Engine.getSVEngineFactor(etype, techRating), getUnit().getEntity());
-        } else {
-            return RoundWeight.nextKg(actualTonnage * baseEngineFactor * movementFactor
-                    * Engine.getSVEngineFactor(etype, techRating));
-        }
+        return engineTonnage;
     }
 
-    private static final String NODE_UNIT_TONNAGE = "actualUnitTonnage";
+    private static final String NODE_ENGINE_TONNAGE = "engineTonnage";
     private static final String NODE_ETYPE = "etype";
     private static final String NODE_TECH_RATING = "techRating";
-    private static final String NODE_MOVEMENT_FACTOR = "movementFactor";
-    private static final String NODE_BASE_ENGINE_FACTOR = "baseEngineFactor";
     private static final String NODE_FUEL_TYPE = "fuelType";
     @Override
     public void writeToXml(PrintWriter pw, int indent) {
         writeToXmlBegin(pw, indent);
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, NODE_UNIT_TONNAGE, actualTonnage);
+        MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, NODE_ENGINE_TONNAGE, engineTonnage);
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, NODE_ETYPE, etype);
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, NODE_TECH_RATING, ITechnology.getRatingName(techRating));
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, NODE_MOVEMENT_FACTOR, movementFactor);
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, NODE_BASE_ENGINE_FACTOR, baseEngineFactor);
         if (etype == Engine.COMBUSTION_ENGINE) {
             MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, NODE_FUEL_TYPE, fuelType.name());
         }
@@ -108,8 +134,8 @@ public class MissingSVEngine extends MissingPart {
         for (int x = 0; x < nl.getLength(); x++) {
             final Node wn = nl.item(x);
             switch (wn.getNodeName()) {
-                case NODE_UNIT_TONNAGE:
-                    actualTonnage = Double.parseDouble(wn.getTextContent());
+                case NODE_ENGINE_TONNAGE:
+                    engineTonnage = Double.parseDouble(wn.getTextContent());
                     break;
                 case NODE_ETYPE:
                     etype = Integer.parseInt(wn.getTextContent());
@@ -122,12 +148,6 @@ public class MissingSVEngine extends MissingPart {
                         }
                     }
                     break;
-                case NODE_MOVEMENT_FACTOR:
-                    movementFactor = Integer.parseInt(wn.getTextContent());
-                    break;
-                case NODE_BASE_ENGINE_FACTOR:
-                    baseEngineFactor = Double.parseDouble(wn.getTextContent());
-                    break;
                 case NODE_FUEL_TYPE:
                     fuelType = FuelType.valueOf(wn.getTextContent());
                     break;
@@ -138,10 +158,9 @@ public class MissingSVEngine extends MissingPart {
     @Override
     public boolean isAcceptableReplacement(Part other, boolean refit) {
         return other instanceof SVEnginePart
+                && (engineTonnage == ((SVEnginePart) other).getEngineTonnage())
                 && (etype == ((SVEnginePart) other).getEType())
-                && (techRating == ((SVEnginePart) other).getTechRating())
-                && (movementFactor == ((SVEnginePart) other).getMovementFactor())
-                && (baseEngineFactor == ((SVEnginePart) other).getBaseEngineFactor())
+                && (techRating == other.getTechRating())
                 && ((etype != Engine.COMBUSTION_ENGINE) || (fuelType == ((SVEnginePart) other).getFuelType()));
     }
 
@@ -153,8 +172,8 @@ public class MissingSVEngine extends MissingPart {
 
     @Override
     public Part getNewPart() {
-        return new SVEnginePart(actualTonnage, etype, techRating, movementFactor,
-                baseEngineFactor, fuelType, getCampaign());
+        return new SVEnginePart(getUnitTonnage(), engineTonnage, etype, techRating,
+                fuelType, getCampaign());
     }
 
     @Override

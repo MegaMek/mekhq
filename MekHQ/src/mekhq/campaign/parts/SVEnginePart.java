@@ -35,12 +35,9 @@ import java.io.PrintWriter;
  */
 public class SVEnginePart extends Part {
 
-    // Part stores unit tonnage as an int. Support vees can come in fractions of a ton.
-    private double actualTonnage;
+    private double engineTonnage;
     private int etype;
     private int techRating;
-    private int movementFactor;
-    private double baseEngineFactor;
     private FuelType fuelType;
 
     private TechAdvancement techAdvancement;
@@ -50,32 +47,25 @@ public class SVEnginePart extends Part {
      */
     @SuppressWarnings("unused")
     private SVEnginePart() {
-        this(0.0, Engine.COMBUSTION_ENGINE, RATING_D, 1, 0.0, FuelType.PETROCHEMICALS, null);
+        this(0, 0.0, Engine.COMBUSTION_ENGINE, RATING_D, FuelType.PETROCHEMICALS, null);
     }
 
     /**
      * Creates a support vehicle engine part.
      *
      * @param unitTonnage      The mass of the unit it is installed on/intended for, in tons.
+     * @param engineTonnage    The mass of the engine
      * @param etype            An {@link Engine} type constant
      * @param techRating       The engine's tech rating, {@code RATING_A} through {@code RATING_F}
-     * @param movementFactor   The movement factor of the unit this engine is installed on/intended for. The movement
-     *                         factor is the square of the cruise/safe thrust squared, plus four. Rail support
-     *                         vehicles subtract two from the cruise speed for use in this calculation. The rules
-     *                         don't say what to do with a theoretical mp of 1, but presumably it would not be
-     *                         larger than a unit with mp 2, despite the formula.
-     * @param baseEngineFactor A factor based on the vehicle size class and motive type. See {@link megamek.common.Entity#getBaseEngineValue()}
      * @param fuelType         Needed to distinguish different types of internal combustion engines.
      * @param campaign         The campaign instance
      */
-    public SVEnginePart(double unitTonnage, int etype, int techRating, int movementFactor, double baseEngineFactor,
+    public SVEnginePart(int unitTonnage, double engineTonnage, int etype, int techRating,
                         FuelType fuelType, Campaign campaign) {
-        super((int) unitTonnage, campaign);
-        this.actualTonnage = unitTonnage;
+        super(unitTonnage, campaign);
+        this.engineTonnage = unitTonnage;
         this.etype = etype;
         this.techRating = techRating;
-        this.movementFactor = movementFactor;
-        this.baseEngineFactor = baseEngineFactor;
         this.fuelType = fuelType;
 
         Engine engine = new Engine(10, etype, Engine.SUPPORT_VEE_ENGINE);
@@ -84,13 +74,10 @@ public class SVEnginePart extends Part {
     }
 
     /**
-     * {@link Part#getUnitTonnage()} returns an {@code int}. Support vehicle weights don't necessarily
-     * come in full tons.
-     *
-     * @return The weight of the support vehicle the engine belongs in.
+     * @return The weight of the engine
      */
-    public double getActualUnitTonnage() {
-        return actualTonnage;
+    public double getEngineTonnage() {
+        return engineTonnage;
     }
 
     /**
@@ -100,28 +87,9 @@ public class SVEnginePart extends Part {
         return etype;
     }
 
-    /**
-     * @return The engine tech rating (A-F)
-     */
+    @Override
     public int getTechRating() {
         return techRating;
-    }
-
-    /**
-     * @return The unit's movement factor, used to calculate engine weight.
-     */
-    public int getMovementFactor() {
-        return movementFactor;
-    }
-
-    /**
-     * The base engine factor is determined by motive type and size class.
-     *
-     * @return The base engine factor, used to calculate engine weight.
-     * @see Entity#getBaseEngineValue()
-     */
-    public double getBaseEngineFactor() {
-        return baseEngineFactor;
     }
 
     /**
@@ -135,21 +103,15 @@ public class SVEnginePart extends Part {
 
     @Override
     public SVEnginePart clone() {
-        SVEnginePart engine = new SVEnginePart(actualTonnage, etype, techRating, movementFactor,
-                baseEngineFactor, fuelType, getCampaign());
+        SVEnginePart engine = new SVEnginePart(getUnitTonnage(), engineTonnage, etype, techRating,
+                fuelType, getCampaign());
         engine.copyBaseData(this);
         return engine;
     }
 
     @Override
     public double getTonnage() {
-        if (null != getUnit()) {
-            return RoundWeight.standard(actualTonnage * baseEngineFactor * movementFactor
-                    * Engine.getSVEngineFactor(etype, techRating), getUnit().getEntity());
-        } else {
-            return RoundWeight.nextKg(actualTonnage * baseEngineFactor * movementFactor
-                    * Engine.getSVEngineFactor(etype, techRating));
-        }
+        return engineTonnage;
     }
 
     @Override
@@ -160,10 +122,9 @@ public class SVEnginePart extends Part {
     @Override
     public boolean isSamePartType(Part other) {
         return other instanceof SVEnginePart
+                && (engineTonnage == ((SVEnginePart) other).engineTonnage)
                 && (etype == ((SVEnginePart) other).etype)
                 && (techRating == ((SVEnginePart) other).techRating)
-                && (movementFactor == ((SVEnginePart) other).movementFactor)
-                && (baseEngineFactor == ((SVEnginePart) other).baseEngineFactor)
                 && ((etype != Engine.COMBUSTION_ENGINE) || (fuelType == ((SVEnginePart) other).fuelType));
     }
 
@@ -172,20 +133,16 @@ public class SVEnginePart extends Part {
         return TechConstants.T_IS_TW_NON_BOX;
     }
 
-    private static final String NODE_UNIT_TONNAGE = "actualUnitTonnage";
+    private static final String NODE_ENGINE_TONNAGE = "engineTonnage";
     private static final String NODE_ETYPE = "etype";
     private static final String NODE_TECH_RATING = "techRating";
-    private static final String NODE_MOVEMENT_FACTOR = "movementFactor";
-    private static final String NODE_BASE_ENGINE_FACTOR = "baseEngineFactor";
     private static final String NODE_FUEL_TYPE = "fuelType";
     @Override
     public void writeToXml(PrintWriter pw, int indent) {
         writeToXmlBegin(pw, indent);
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, NODE_UNIT_TONNAGE, actualTonnage);
+        MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, NODE_ENGINE_TONNAGE, engineTonnage);
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, NODE_ETYPE, etype);
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, NODE_TECH_RATING, ITechnology.getRatingName(techRating));
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, NODE_MOVEMENT_FACTOR, movementFactor);
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, NODE_BASE_ENGINE_FACTOR, baseEngineFactor);
         if (etype == Engine.COMBUSTION_ENGINE) {
             MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, NODE_FUEL_TYPE, fuelType.name());
         }
@@ -198,8 +155,8 @@ public class SVEnginePart extends Part {
         for (int x = 0; x < nl.getLength(); x++) {
             final Node wn = nl.item(x);
             switch (wn.getNodeName()) {
-                case NODE_UNIT_TONNAGE:
-                    actualTonnage = Double.parseDouble(wn.getTextContent());
+                case NODE_ENGINE_TONNAGE:
+                    engineTonnage = Double.parseDouble(wn.getTextContent());
                     break;
                 case NODE_ETYPE:
                     etype = Integer.parseInt(wn.getTextContent());
@@ -211,12 +168,6 @@ public class SVEnginePart extends Part {
                             break;
                         }
                     }
-                    break;
-                case NODE_MOVEMENT_FACTOR:
-                    movementFactor = Integer.parseInt(wn.getTextContent());
-                    break;
-                case NODE_BASE_ENGINE_FACTOR:
-                    baseEngineFactor = Double.parseDouble(wn.getTextContent());
                     break;
                 case NODE_FUEL_TYPE:
                     fuelType = FuelType.valueOf(wn.getTextContent());
@@ -239,8 +190,8 @@ public class SVEnginePart extends Part {
 
     @Override
     public MissingPart getMissingPart() {
-        return new MissingSVEngine(actualTonnage, etype, techRating, movementFactor,
-                baseEngineFactor, fuelType, getCampaign());
+        return new MissingSVEngine(getUnitTonnage(), engineTonnage, etype, techRating,
+                fuelType, getCampaign());
     }
 
     @Override
