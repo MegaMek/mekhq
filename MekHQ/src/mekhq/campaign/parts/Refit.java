@@ -216,7 +216,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 
     /**
      * Returns a mutable list of part IDs for the old unit in the refit.
-     * This is intended to be mutated only be {@link Campaign} when merging
+     * This is intended to be mutated only be {@link mekhq.campaign.Campaign Campaign} when merging
      * parts.
      * @return A mutable {@link List} of old part IDs in the refit.
      */
@@ -226,7 +226,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 
     /**
      * Returns a mutable list of part IDs for the new unit in the refit.
-     * This is intended to be mutated only be {@link Campaign} when merging
+     * This is intended to be mutated only be {@link mekhq.campaign.Campaign Campaign} when merging
      * parts.
      * @return A mutable {@link List} of new part IDs in the refit.
      */
@@ -812,7 +812,12 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             armorNeeded -= recycledArmorPoints;
         }
         if(armorNeeded > 0) {
-            newArmorSupplies = new Armor(0, atype, 0, 0, false, aclan, oldUnit.getCampaign());
+            if (newEntity.isSupportVehicle() && atype == EquipmentType.T_ARMOR_STANDARD) {
+                newArmorSupplies = new SVArmor(newEntity.getBARRating(newEntity.firstArmorIndex()),
+                        newEntity.getArmorTechRating(), 0, Entity.LOC_NONE, oldUnit.getCampaign());
+            } else {
+                newArmorSupplies = new Armor(0, atype, 0, 0, false, aclan, oldUnit.getCampaign());
+            }
             newArmorSupplies.setAmountNeeded(armorNeeded);
             newArmorSupplies.setRefitId(oldUnit.getId());
             //check existing supplies before determining cost
@@ -1355,7 +1360,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             if (part instanceof AmmoBin) {
                 ((AmmoBin)part).unload();
             }
-            
+
         }
         // add leftover untracked heat sinks to the warehouse
         for(Part part : oldIntegratedHS) {
@@ -1412,8 +1417,15 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 
         //FIXME: This doesn't deal properly with patchwork armor.
         if(sameArmorType && armorNeeded < 0) {
-            Armor a = new Armor(0, oldUnit.getEntity().getArmorType(1),
-                    -1 * armorNeeded, -1, false, aclan, oldUnit.getCampaign());
+            Armor a;
+            Entity en = oldUnit.getEntity();
+            if (en.isSupportVehicle() && en.getArmorType(en.firstArmorIndex()) == EquipmentType.T_ARMOR_STANDARD) {
+                a = new SVArmor(en.getBARRating(en.firstArmorIndex()), en.getArmorTechRating(),
+                        -armorNeeded, Entity.LOC_NONE, oldUnit.getCampaign());
+            } else{
+                a = new Armor(0, en.getArmorType(en.firstArmorIndex()),
+                        -1 * armorNeeded, -1, false, aclan, oldUnit.getCampaign());
+            }
             a.setUnit(oldUnit);
             a.changeAmountAvailable(a.getAmount());
         }

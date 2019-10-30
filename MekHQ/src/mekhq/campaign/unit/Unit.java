@@ -2079,8 +2079,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     BaArmor a = new BaArmor((int) getEntity().getWeight(), getEntity().getOArmor(i, false), entity.getArmorType(1), i, entity.isClan(), getCampaign());
                     addPart(a);
                     partsToAdd.add(a);
-                }
-                else {
+                } else if (entity.isSupportVehicle() && entity.getArmorType(i) == EquipmentType.T_ARMOR_STANDARD) {
+                    Armor a = new SVArmor(entity.getBARRating(i), entity.getArmorTechRating(),
+                            getEntity().getOArmor(i, false), i, getCampaign());
+                    addPart(a);
+                    partsToAdd.add(a);
+                } else {
                     Armor a = new Armor((int) getEntity().getWeight(), getEntity().getArmorType(i), getEntity().getOArmor(i, false), i, false, entity.isClanArmor(i), getCampaign());
                     addPart(a);
                     partsToAdd.add(a);
