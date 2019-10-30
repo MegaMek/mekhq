@@ -878,6 +878,7 @@ public class MekLabTab extends CampaignGuiTab {
             removeAll();
 
             structureTab = new megameklab.com.ui.Vehicle.tabs.StructureTab(this);
+            structureTab.setAsCustomization();
             equipmentTab = new megameklab.com.ui.Vehicle.tabs.EquipmentTab(this);
             buildTab = new megameklab.com.ui.Vehicle.tabs.BuildTab(this, equipmentTab.getEquipmentList());
             structureTab.addRefreshedListener(this);
@@ -999,6 +1000,7 @@ public class MekLabTab extends CampaignGuiTab {
             removeAll();
 
             structureTab = new megameklab.com.ui.supportvehicle.SVStructureTab(this);
+            structureTab.setAsCustomization();
             armorTab = new megameklab.com.ui.supportvehicle.SVArmorTab(this, getTechManager());
             equipmentTab = new megameklab.com.ui.tabs.EquipmentTab(this);
             buildTab = new megameklab.com.ui.supportvehicle.SVBuildTab(this, equipmentTab);
