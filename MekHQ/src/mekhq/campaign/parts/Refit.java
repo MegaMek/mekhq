@@ -290,7 +290,15 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             return;
         }
         time = 0;
-        sameArmorType = newEntity.getArmorType(0) == oldUnit.getEntity().getArmorType(0);
+        sameArmorType = newEntity.getArmorType(newEntity.firstArmorIndex())
+                == oldUnit.getEntity().getArmorType(oldUnit.getEntity().firstArmorIndex());
+        // SVs with standard SV armor need to check for change in BAR/tech rating
+        if (newEntity.isSupportVehicle()
+                && (newEntity.getArmorType(newEntity.firstArmorIndex()) == EquipmentType.T_ARMOR_STANDARD)) {
+            sameArmorType = newEntity.getBARRating(newEntity.firstArmorIndex())
+                        == oldUnit.getEntity().getArmorType(oldUnit.getEntity().firstArmorIndex())
+                    && (newEntity.getArmorTechRating() == oldUnit.getEntity().getArmorTechRating());
+        }
         int recycledArmorPoints = 0;
         boolean replacingLocations = false;
         boolean[] locationHasNewStuff = new boolean[Math.max(newEntity.locations(), oldUnit.getEntity().locations())];
