@@ -22,9 +22,13 @@ import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.TechAdvancement;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.work.IAcquisitionWork;
+import org.w3c.dom.Node;
+
+import java.io.PrintWriter;
 
 /**
  * Standard support vehicle armor, which can differ by BAR and tech rating.
@@ -98,11 +102,6 @@ public class SVArmor extends Armor {
     }
 
     @Override
-    public Money getBuyCost() {
-        return getStickerPrice();
-    }
-
-    @Override
     public boolean isSamePartType(Part part) {
         return part instanceof SVArmor
                 && bar == ((SVArmor) part).bar
@@ -116,11 +115,6 @@ public class SVArmor extends Armor {
     @Override
     public IAcquisitionWork getAcquisitionWork() {
         return new SVArmor(bar, techRating, (int) Math.round(5.0 / getArmorPointsPerTon()), -1, campaign);
-    }
-
-    @Override
-    public int getDifficulty() {
-        return -2;
     }
 
     @Override
@@ -154,6 +148,35 @@ public class SVArmor extends Armor {
             campaign.removePart(a);
         } else if(null == a && amount > 0) {
             campaign.addPart(new SVArmor(bar, techRating, amount, -1, campaign), 0);
+        }
+    }
+
+    private static final String NODE_BAR = "bar";
+    private static final String NODE_TECH_RATING = "techRating";
+
+    @Override
+    protected void writeAdditionalFields(PrintWriter pw, int indent) {
+        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, NODE_BAR, bar);
+        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, NODE_TECH_RATING, ITechnology.getRatingName(techRating));
+    }
+
+    @Override
+    protected void loadFieldsFromXmlNode(Node node) {
+        for (int x = 0; x < node.getChildNodes().getLength(); x++) {
+            final Node wn = node.getChildNodes().item(x);
+            switch (wn.getNodeName()) {
+                case NODE_BAR:
+                    bar = Integer.parseInt(wn.getTextContent());
+                    break;
+                case NODE_TECH_RATING:
+                    for (int r = 0; r < ratingNames.length; r++) {
+                        if (ratingNames[r].equals(wn.getTextContent())) {
+                            techRating = r;
+                            break;
+                        }
+                    }
+                    break;
+            }
         }
     }
 
