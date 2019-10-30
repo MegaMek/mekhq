@@ -140,7 +140,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     JRadioButton btnUseSpaceMap;
     JRadioButton btnUseSpecificMapTypes;
     JRadioButton btnUseLowAtmosphereMap;
-    JComboBox<AtBScenarioModifier> modifierBox;
+    JComboBox<String> modifierBox;
     JList<String> selectedModifiersList;
     JList<ScenarioObjective> objectiveList;
     JScrollPane objectiveScrollPane;
@@ -898,8 +898,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         
         localGbc.gridy++;
         modifierBox = new JComboBox<>();
-        for(AtBScenarioModifier modifier : AtBScenarioModifier.getScenarioModifiers().values()) {
-            modifierBox.addItem(modifier);
+        for(String modifierKey : AtBScenarioModifier.getOrderedModifierKeys()) {
+            modifierBox.addItem(modifierKey);
         }
         pnlMapParameters.add(modifierBox, localGbc);
         

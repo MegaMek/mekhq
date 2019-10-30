@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +26,7 @@ import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
+import mekhq.campaign.mission.ScenarioObjective;
 
 @XmlRootElement(name="AtBScenarioModifier")
 public class AtBScenarioModifier {
@@ -53,6 +56,7 @@ public class AtBScenarioModifier {
     private List<MapLocation> allowedMapLocations = null;
     private Boolean useAmbushLogic = null; 
     private Boolean switchSides = null;
+    private List<ScenarioObjective> objectives = null;
     
     /**
      * Process this scenario modifier for a particular scenario, given a particular timing indicator.
@@ -114,6 +118,10 @@ public class AtBScenarioModifier {
     
     public static Map<String, AtBScenarioModifier> getScenarioModifiers() {
         return scenarioModifiers;
+    }
+    
+    public static List<String> getOrderedModifierKeys() {
+        return scenarioModifierKeys;
     }
     
     public static AtBScenarioModifier getRandomScenarioModifier() {
@@ -180,6 +188,13 @@ public class AtBScenarioModifier {
                         String.format("Error Loading Scenario %s", filePath), e);
             }
         }
+        
+        scenarioModifierKeys.sort(new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                return o1.compareTo(o2);
+            }
+        });
     }
     
     /**
@@ -334,6 +349,10 @@ public class AtBScenarioModifier {
     
     public void setSwitchSides(Boolean switchSides) {
         this.switchSides = switchSides;
+    }
+    
+    public List<ScenarioObjective> getObjectives() {
+        return objectives;
     }
 }
 
