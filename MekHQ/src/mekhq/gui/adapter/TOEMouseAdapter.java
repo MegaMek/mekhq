@@ -32,6 +32,7 @@ import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.log.ServiceLogger;
+import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
@@ -40,6 +41,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.CamoChoiceDialog;
+import mekhq.gui.dialog.ForceTemplateAssignmentDialog;
 import mekhq.gui.dialog.ImageChoiceDialog;
 import mekhq.gui.dialog.MarkdownEditorDialog;
 import mekhq.gui.utilities.StaticChecks;
@@ -169,20 +171,26 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
         } else if (command.contains("DEPLOY_FORCE")) {
             int sid = Integer.parseInt(target);
             Scenario scenario = gui.getCampaign().getScenario(sid);
-            for (Force force : forces) {
-                gui.undeployForce(force);
-                force.clearScenarioIds(gui.getCampaign(), true);
-                if (null != scenario) {
-                    scenario.addForces(force.getId());
-                    force.setScenarioId(scenario.getId());
-                    for (UUID uid : force.getAllUnits()) {
-                        Unit u = gui.getCampaign().getUnit(uid);
-                        if (null != u) {
-                            u.setScenarioId(scenario.getId());
+            
+            if(scenario instanceof AtBDynamicScenario) {
+                ForceTemplateAssignmentDialog ftad = new ForceTemplateAssignmentDialog(gui, forces, (AtBDynamicScenario) scenario);
+                ftad.display();
+            } else {
+                for (Force force : forces) {
+                    gui.undeployForce(force);
+                    force.clearScenarioIds(gui.getCampaign(), true);
+                    if (null != scenario) {
+                        scenario.addForces(force.getId());
+                        force.setScenarioId(scenario.getId());
+                        for (UUID uid : force.getAllUnits()) {
+                            Unit u = gui.getCampaign().getUnit(uid);
+                            if (null != u) {
+                                u.setScenarioId(scenario.getId());
+                            }
                         }
                     }
+                    MekHQ.triggerEvent(new DeploymentChangedEvent(force, scenario));
                 }
-                MekHQ.triggerEvent(new DeploymentChangedEvent(force, scenario));
             }
         } else if (command.contains("CHANGE_ICON")) {
             if (null != singleForce) {
