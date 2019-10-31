@@ -28,69 +28,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import megamek.common.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.ServiceLogger;
+import mekhq.campaign.parts.*;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.ASFBay;
-import megamek.common.Aero;
-import megamek.common.AmmoType;
-import megamek.common.BattleArmor;
-import megamek.common.BattleArmorBay;
-import megamek.common.Bay;
-import megamek.common.BayType;
-import megamek.common.CargoBay;
-import megamek.common.Compute;
-import megamek.common.ConvFighter;
-import megamek.common.CriticalSlot;
-import megamek.common.DockingCollar;
-import megamek.common.Dropship;
-import megamek.common.Engine;
-import megamek.common.Entity;
-import megamek.common.EntityMovementMode;
-import megamek.common.EntityWeightClass;
-import megamek.common.EquipmentType;
-import megamek.common.FighterSquadron;
-import megamek.common.HeavyVehicleBay;
-import megamek.common.IArmorState;
-import megamek.common.ILocationExposureStatus;
-import megamek.common.IPlayer;
-import megamek.common.ITechnology;
-import megamek.common.Infantry;
-import megamek.common.InfantryBay;
-import megamek.common.InsulatedCargoBay;
-import megamek.common.Jumpship;
-import megamek.common.LAMPilot;
-import megamek.common.LandAirMech;
-import megamek.common.LightVehicleBay;
-import megamek.common.LiquidCargoBay;
-import megamek.common.LivestockCargoBay;
-import megamek.common.LocationFullException;
-import megamek.common.Mech;
-import megamek.common.MechBay;
-import megamek.common.MiscType;
-import megamek.common.Mounted;
-import megamek.common.PillionSeatCargoBay;
-import megamek.common.Player;
-import megamek.common.Protomech;
-import megamek.common.ProtomechBay;
-import megamek.common.QuadMech;
-import megamek.common.QuadVee;
-import megamek.common.RefrigeratedCargoBay;
-import megamek.common.SimpleTechLevel;
-import megamek.common.SmallCraft;
-import megamek.common.SmallCraftBay;
-import megamek.common.SpaceStation;
-import megamek.common.StandardSeatCargoBay;
-import megamek.common.SupportTank;
-import megamek.common.Tank;
-import megamek.common.TargetRoll;
-import megamek.common.TechConstants;
-import megamek.common.VTOL;
-import megamek.common.Warship;
-import megamek.common.WeaponType;
 import megamek.common.annotations.Nullable;
 import megamek.common.logging.LogLevel;
 import megamek.common.options.IOption;
@@ -109,97 +54,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.event.PersonCrewAssignmentEvent;
 import mekhq.campaign.event.PersonTechAssignmentEvent;
 import mekhq.campaign.event.UnitArrivedEvent;
-import mekhq.campaign.parts.AeroHeatSink;
-import mekhq.campaign.parts.AeroLifeSupport;
-import mekhq.campaign.parts.AeroSensor;
-import mekhq.campaign.parts.Armor;
-import mekhq.campaign.parts.Avionics;
-import mekhq.campaign.parts.BaArmor;
-import mekhq.campaign.parts.BattleArmorSuit;
-import mekhq.campaign.parts.BayDoor;
-import mekhq.campaign.parts.CombatInformationCenter;
-import mekhq.campaign.parts.Cubicle;
-import mekhq.campaign.parts.DropshipDockingCollar;
-import mekhq.campaign.parts.EnginePart;
-import mekhq.campaign.parts.FireControlSystem;
-import mekhq.campaign.parts.GravDeck;
-import mekhq.campaign.parts.InfantryArmorPart;
-import mekhq.campaign.parts.InfantryMotiveType;
-import mekhq.campaign.parts.JumpshipDockingCollar;
-import mekhq.campaign.parts.KFChargingSystem;
-import mekhq.campaign.parts.KFDriveCoil;
-import mekhq.campaign.parts.KFDriveController;
-import mekhq.campaign.parts.KFFieldInitiator;
-import mekhq.campaign.parts.KFHeliumTank;
-import mekhq.campaign.parts.KfBoom;
-import mekhq.campaign.parts.LFBattery;
-import mekhq.campaign.parts.LandingGear;
-import mekhq.campaign.parts.MekActuator;
-import mekhq.campaign.parts.MekCockpit;
-import mekhq.campaign.parts.MekGyro;
-import mekhq.campaign.parts.MekLifeSupport;
-import mekhq.campaign.parts.MekLocation;
-import mekhq.campaign.parts.MekSensor;
-import mekhq.campaign.parts.MissingAeroHeatSink;
-import mekhq.campaign.parts.MissingAeroLifeSupport;
-import mekhq.campaign.parts.MissingAeroSensor;
-import mekhq.campaign.parts.MissingAvionics;
-import mekhq.campaign.parts.MissingBattleArmorSuit;
-import mekhq.campaign.parts.MissingBayDoor;
-import mekhq.campaign.parts.MissingCIC;
-import mekhq.campaign.parts.MissingCubicle;
-import mekhq.campaign.parts.MissingDropshipDockingCollar;
-import mekhq.campaign.parts.MissingEnginePart;
-import mekhq.campaign.parts.MissingFireControlSystem;
-import mekhq.campaign.parts.MissingKFBoom;
-import mekhq.campaign.parts.MissingKFChargingSystem;
-import mekhq.campaign.parts.MissingKFDriveCoil;
-import mekhq.campaign.parts.MissingKFDriveController;
-import mekhq.campaign.parts.MissingKFFieldInitiator;
-import mekhq.campaign.parts.MissingKFHeliumTank;
-import mekhq.campaign.parts.MissingLFBattery;
-import mekhq.campaign.parts.MissingLandingGear;
-import mekhq.campaign.parts.MissingMekActuator;
-import mekhq.campaign.parts.MissingMekCockpit;
-import mekhq.campaign.parts.MissingMekGyro;
-import mekhq.campaign.parts.MissingMekLifeSupport;
-import mekhq.campaign.parts.MissingMekLocation;
-import mekhq.campaign.parts.MissingMekSensor;
-import mekhq.campaign.parts.MissingPart;
-import mekhq.campaign.parts.MissingProtomekArmActuator;
-import mekhq.campaign.parts.MissingProtomekJumpJet;
-import mekhq.campaign.parts.MissingProtomekLegActuator;
-import mekhq.campaign.parts.MissingProtomekLocation;
-import mekhq.campaign.parts.MissingProtomekSensor;
-import mekhq.campaign.parts.MissingQuadVeeGear;
-import mekhq.campaign.parts.MissingRotor;
-import mekhq.campaign.parts.MissingSpacecraftEngine;
-import mekhq.campaign.parts.MissingThrusters;
-import mekhq.campaign.parts.MissingTurret;
-import mekhq.campaign.parts.MissingVeeSensor;
-import mekhq.campaign.parts.MissingVeeStabiliser;
-import mekhq.campaign.parts.MotiveSystem;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.PodSpace;
-import mekhq.campaign.parts.ProtomekArmActuator;
-import mekhq.campaign.parts.ProtomekArmor;
-import mekhq.campaign.parts.ProtomekJumpJet;
-import mekhq.campaign.parts.ProtomekLegActuator;
-import mekhq.campaign.parts.ProtomekLocation;
-import mekhq.campaign.parts.ProtomekSensor;
-import mekhq.campaign.parts.QuadVeeGear;
-import mekhq.campaign.parts.Refit;
-import mekhq.campaign.parts.Rotor;
-import mekhq.campaign.parts.SpacecraftCoolingSystem;
-import mekhq.campaign.parts.SpacecraftEngine;
-import mekhq.campaign.parts.StructuralIntegrity;
-import mekhq.campaign.parts.TankLocation;
-import mekhq.campaign.parts.Thrusters;
-import mekhq.campaign.parts.TransportBayPart;
-import mekhq.campaign.parts.Turret;
-import mekhq.campaign.parts.TurretLock;
-import mekhq.campaign.parts.VeeSensor;
-import mekhq.campaign.parts.VeeStabiliser;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.BattleArmorAmmoBin;
 import mekhq.campaign.parts.equipment.BattleArmorEquipmentPart;
@@ -1879,7 +1733,10 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 if(!(entity instanceof SmallCraft || entity instanceof Jumpship)) {
                     engine = part;
                 }
-            } else if(part instanceof SpacecraftEngine || part instanceof MissingSpacecraftEngine) {
+            } else if (part instanceof SpacecraftEngine
+                    || part instanceof MissingSpacecraftEngine
+                    || part instanceof SVEnginePart
+                    || part instanceof MissingSVEngine) {
                 engine = part;
             } else if(part instanceof MekLifeSupport  || part instanceof MissingMekLifeSupport) {
                 lifeSupport = part;
@@ -2222,8 +2079,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     BaArmor a = new BaArmor((int) getEntity().getWeight(), getEntity().getOArmor(i, false), entity.getArmorType(1), i, entity.isClan(), getCampaign());
                     addPart(a);
                     partsToAdd.add(a);
-                }
-                else {
+                } else if (entity.isSupportVehicle() && entity.getArmorType(i) == EquipmentType.T_ARMOR_STANDARD) {
+                    Armor a = new SVArmor(entity.getBARRating(i), entity.getArmorTechRating(),
+                            getEntity().getOArmor(i, false), i, getCampaign());
+                    addPart(a);
+                    partsToAdd.add(a);
+                } else {
                     Armor a = new Armor((int) getEntity().getWeight(), getEntity().getArmorType(i), getEntity().getOArmor(i, false), i, false, entity.isClanArmor(i), getCampaign());
                     addPart(a);
                     partsToAdd.add(a);
@@ -2359,7 +2220,23 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 engine = new SpacecraftEngine((int) entity.getWeight(), 0, getCampaign(), entity.isClan());
                 addPart(engine);
                 partsToAdd.add(engine);
-                ((SpacecraftEngine)engine).calculateTonnage();
+                ((SpacecraftEngine) engine).calculateTonnage();
+            } else if (entity.isSupportVehicle()) {
+                // Check for trailer with no engine
+                if (entity.hasEngine() && entity.getEngine().getEngineType() != Engine.NONE) {
+                    // Surface vehicles (including vehicles) have to choose the fuel type for a combustion engine.
+                    // Fixed wing with an ICE will have the fuel type set to NONE, which is technically
+                    // not correct but does the job of distinguishing the turbine from other ICE types.
+                    FuelType fuel = FuelType.NONE;
+                    if (entity instanceof Tank) {
+                        fuel = ((Tank) entity).getICEFuelType();
+                    }
+                    engine = new SVEnginePart((int) entity.getWeight(), entity.getEngine().getWeightEngine(entity),
+                            entity.getEngine().getEngineType(), entity.getEngineTechRating(),
+                            fuel, getCampaign());
+                    addPart(engine);
+                    partsToAdd.add(engine);
+                }
             } else if(null != entity.getEngine()) {
                 engine = new EnginePart((int) entity.getWeight(), new Engine(entity.getEngine().getRating(), entity.getEngine().getEngineType(), entity.getEngine().getFlags()), getCampaign(), entity.getMovementMode() == EntityMovementMode.HOVER && entity instanceof Tank);
                 addPart(engine);

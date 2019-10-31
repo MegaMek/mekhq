@@ -234,7 +234,7 @@ public class Armor extends Part implements IAcquisitionWork {
     public TechAdvancement getTechAdvancement() {
         return EquipmentType.getArmorTechAdvancement(type, clan);
     }
-    
+
     public double getArmorWeight(int points) {
         // from megamek.common.Entity.getArmorWeight()
 
@@ -278,7 +278,18 @@ public class Armor extends Part implements IAcquisitionWork {
                 +"<clan>"
                 +clan
                 +"</clan>");
+        writeAdditionalFields(pw1, indent + 1);
         writeToXmlEnd(pw1, indent);
+    }
+
+    /**
+     * This should be overridden by subclasses that need to write additional fields
+     *
+     * @param pw      The writer instance
+     * @param indent  The amount to indent the xml output
+     */
+    protected void writeAdditionalFields(PrintWriter pw, int indent) {
+        // do nothing
     }
 
     @Override
@@ -310,7 +321,7 @@ public class Armor extends Part implements IAcquisitionWork {
             amountNeeded *= 10;
         }
         int amountFound = Math.min(getAmountAvailable(), amountNeeded);
-        int fixAmount = Math.min(amount + 
+        int fixAmount = Math.min(amount +
                 // Make sure that we handle the capital scale conversion when setting the fix amount
                 (unit.getEntity().isCapitalScale() ? (amountFound / 10) : amountFound), unit.getEntity().getOArmor(location, rear));
         unit.getEntity().setArmor(fixAmount, location, rear);
@@ -472,7 +483,7 @@ public class Armor extends Part implements IAcquisitionWork {
     @Override
     public String getAcquisitionDisplayName() {
         return getName();
-    }    
+    }
 
     @Override
     public String getAcquisitionExtraDesc() {

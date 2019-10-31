@@ -54,14 +54,7 @@ import megamek.common.Tank;
 import megamek.common.WeaponType;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.logging.LogLevel;
-import megamek.common.verifier.EntityVerifier;
-import megamek.common.verifier.TestAero;
-import megamek.common.verifier.TestBattleArmor;
-import megamek.common.verifier.TestEntity;
-import megamek.common.verifier.TestInfantry;
-import megamek.common.verifier.TestMech;
-import megamek.common.verifier.TestSmallCraft;
-import megamek.common.verifier.TestTank;
+import megamek.common.verifier.*;
 import megameklab.com.MegaMekLab;
 import megameklab.com.ui.EntitySource;
 import megameklab.com.util.CConfig;
@@ -261,7 +254,7 @@ public class MekLabTab extends CampaignGuiTab {
         add(labPanel, BorderLayout.CENTER);
         labPanel.refreshAll();
     }
-    
+
     public void refreshRefitSummary() {
         if (null == labPanel) {
             return;
@@ -274,6 +267,8 @@ public class MekLabTab extends CampaignGuiTab {
         testEntity = null;
         if (entity instanceof SmallCraft) {
             testEntity = new TestSmallCraft((SmallCraft) entity, entityVerifier.aeroOption, null);
+        } else if (entity.isSupportVehicle()) {
+            testEntity = new TestSupportVehicle(entity, entityVerifier.tankOption, null);
         } else if (entity instanceof Aero) {
             testEntity = new TestAero((Aero) entity, entityVerifier.aeroOption, null);
         } else if (entity instanceof Mech) {
@@ -435,6 +430,8 @@ public class MekLabTab extends CampaignGuiTab {
     private EntityPanel getCorrectLab(Entity en) {
         if (en instanceof SmallCraft) {
             return new DropshipPanel((SmallCraft) en);
+        } else if (en.isSupportVehicle()) {
+            return new SupportVehiclePanel(en);
         } else if (en instanceof Aero) {
             return new AeroPanel((Aero) en);
         } else if (en instanceof Mech) {
@@ -452,20 +449,20 @@ public class MekLabTab extends CampaignGuiTab {
     private abstract class EntityPanel extends JTabbedPane implements RefreshListener, EntitySource {
 
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = 6886946112861955446L;
 
         @Override
         public abstract Entity getEntity();
-        
+
         abstract void setTechFaction(int techFaction);
     }
 
     private class AeroPanel extends EntityPanel {
 
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = 6894731868670529166L;
 
@@ -574,7 +571,7 @@ public class MekLabTab extends CampaignGuiTab {
         @Override
         public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
             // TODO Auto-generated method stub
-            
+
         }
 
         @Override
@@ -584,26 +581,26 @@ public class MekLabTab extends CampaignGuiTab {
             }
             return null;
         }
-        
+
         @Override
         void setTechFaction(int techFaction) {
             structureTab.setTechFaction(techFaction);
         }
-        
+
     }
 
     private class DropshipPanel extends EntityPanel {
 
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = 4348862352101110686L;
-        
+
         private SmallCraft entity;
         private megameklab.com.ui.aerospace.DropshipStructureTab structureTab;
         private megameklab.com.ui.Aero.tabs.EquipmentTab equipmentTab;
         private megameklab.com.ui.Aero.tabs.BuildTab buildTab;
-        private megameklab.com.ui.aerospace.TransportTab transportTab;
+        private megameklab.com.ui.tabs.TransportTab transportTab;
         private megameklab.com.ui.tabs.PreviewTab previewTab;
 
         public DropshipPanel(SmallCraft a) {
@@ -624,7 +621,7 @@ public class MekLabTab extends CampaignGuiTab {
             previewTab = new megameklab.com.ui.tabs.PreviewTab(this);
             equipmentTab = new megameklab.com.ui.Aero.tabs.EquipmentTab(this);
             buildTab = new megameklab.com.ui.Aero.tabs.BuildTab(this, equipmentTab);
-            transportTab = new megameklab.com.ui.aerospace.TransportTab(this);
+            transportTab = new megameklab.com.ui.tabs.TransportTab(this);
             structureTab.addRefreshedListener(this);
             equipmentTab.addRefreshedListener(this);
             buildTab.addRefreshedListener(this);
@@ -709,7 +706,7 @@ public class MekLabTab extends CampaignGuiTab {
         @Override
         public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
             // TODO Auto-generated method stub
-            
+
         }
 
         @Override
@@ -719,18 +716,18 @@ public class MekLabTab extends CampaignGuiTab {
             }
             return null;
         }
-        
+
         @Override
         void setTechFaction(int techFaction) {
             structureTab.setTechFaction(techFaction);
         }
-        
+
     }
 
     private class MekPanel extends EntityPanel {
 
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = 6894731868670529166L;
 
@@ -838,7 +835,7 @@ public class MekLabTab extends CampaignGuiTab {
         @Override
         public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
             // TODO Auto-generated method stub
-            
+
         }
 
         @Override
@@ -858,7 +855,7 @@ public class MekLabTab extends CampaignGuiTab {
     private class TankPanel extends EntityPanel {
 
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = 6894731868670529166L;
 
@@ -881,8 +878,9 @@ public class MekLabTab extends CampaignGuiTab {
             removeAll();
 
             structureTab = new megameklab.com.ui.Vehicle.tabs.StructureTab(this);
+            structureTab.setAsCustomization();
             equipmentTab = new megameklab.com.ui.Vehicle.tabs.EquipmentTab(this);
-            buildTab = new megameklab.com.ui.Vehicle.tabs.BuildTab(this, equipmentTab);
+            buildTab = new megameklab.com.ui.Vehicle.tabs.BuildTab(this, equipmentTab.getEquipmentList());
             structureTab.addRefreshedListener(this);
             equipmentTab.addRefreshedListener(this);
             buildTab.addRefreshedListener(this);
@@ -960,7 +958,138 @@ public class MekLabTab extends CampaignGuiTab {
         @Override
         public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
             // TODO Auto-generated method stub
-            
+
+        }
+
+        @Override
+        public ITechManager getTechManager() {
+            if (null != structureTab) {
+                return structureTab.getTechManager();
+            }
+            return null;
+        }
+
+        @Override
+        void setTechFaction(int techFaction) {
+            structureTab.setTechFaction(techFaction);
+        }
+    }
+
+    private class SupportVehiclePanel extends EntityPanel {
+
+        private static final long serialVersionUID = -2209864752115049947L;
+
+        private Entity entity;
+        private megameklab.com.ui.supportvehicle.SVStructureTab structureTab;
+        private megameklab.com.ui.supportvehicle.SVArmorTab armorTab;
+        private megameklab.com.ui.tabs.EquipmentTab equipmentTab;
+        private megameklab.com.ui.supportvehicle.SVBuildTab buildTab;
+        private megameklab.com.ui.tabs.TransportTab transportTab;
+
+        SupportVehiclePanel(Entity en) {
+            entity = en;
+            reloadTabs();
+        }
+
+        @Override
+        public Entity getEntity() {
+            return entity;
+        }
+
+        void reloadTabs() {
+            removeAll();
+
+            structureTab = new megameklab.com.ui.supportvehicle.SVStructureTab(this);
+            structureTab.setAsCustomization();
+            armorTab = new megameklab.com.ui.supportvehicle.SVArmorTab(this, getTechManager());
+            equipmentTab = new megameklab.com.ui.tabs.EquipmentTab(this);
+            buildTab = new megameklab.com.ui.supportvehicle.SVBuildTab(this, equipmentTab);
+            transportTab = new megameklab.com.ui.tabs.TransportTab(this);
+            structureTab.addRefreshedListener(this);
+            armorTab.addRefreshedListener(this);
+            equipmentTab.addRefreshedListener(this);
+            buildTab.addRefreshedListener(this);
+            transportTab.addRefreshedListener(this);
+
+            addTab("Structure", new JScrollPane(structureTab));
+            addTab("Armor", new JScrollPane(armorTab));
+            addTab("Equipment", new JScrollPane(equipmentTab));
+            addTab("Build", new JScrollPane(buildTab));
+            addTab("Transport", new JScrollPane(transportTab));
+            this.repaint();
+        }
+
+        @Override
+        public void refreshAll() {
+            structureTab.refresh();
+            armorTab.refresh();
+            equipmentTab.refresh();
+            buildTab.refresh();
+            transportTab.refresh();
+            refreshSummary();
+        }
+
+        @Override
+        public void refreshArmor() {
+            armorTab.refresh();
+            refreshSummary();
+        }
+
+        @Override
+        public void refreshBuild() {
+            buildTab.refresh();
+            refreshSummary();
+        }
+
+        @Override
+        public void refreshEquipment() {
+            equipmentTab.refresh();
+            refreshSummary();
+        }
+
+        @Override
+        public void refreshTransport() {
+            transportTab.refresh();
+            refreshSummary();
+        }
+
+        @Override
+        public void refreshStatus() {
+            refreshRefitSummary();
+        }
+
+        @Override
+        public void refreshStructure() {
+            structureTab.refresh();
+            refreshSummary();
+        }
+
+        @Override
+        public void refreshWeapons() {
+            refreshSummary();
+        }
+
+        @Override
+        public void refreshHeader() {
+        }
+
+        @Override
+        public void refreshPreview() {
+        }
+
+        @Override
+        public void refreshSummary() {
+            structureTab.refreshSummary();
+        }
+
+        @Override
+        public void refreshEquipmentTable() {
+            equipmentTab.refreshTable();
+        }
+
+        @Override
+        public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
+            // not used by MekHQ
         }
 
         @Override
@@ -979,9 +1108,6 @@ public class MekLabTab extends CampaignGuiTab {
 
     private class BattleArmorPanel extends EntityPanel {
 
-        /**
-         * 
-         */
         private static final long serialVersionUID = 6894731868670529166L;
 
         private BattleArmor entity;
@@ -1074,7 +1200,7 @@ public class MekLabTab extends CampaignGuiTab {
         @Override
         public void refreshSummary() {
             // TODO Auto-generated method stub
-            
+
         }
 
         @Override
@@ -1085,7 +1211,7 @@ public class MekLabTab extends CampaignGuiTab {
         @Override
         public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
             // TODO Auto-generated method stub
-            
+
         }
 
         @Override
@@ -1105,7 +1231,7 @@ public class MekLabTab extends CampaignGuiTab {
     private class InfantryPanel extends EntityPanel {
 
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = 6894731868670529166L;
 
@@ -1191,19 +1317,19 @@ public class MekLabTab extends CampaignGuiTab {
         @Override
         public void refreshSummary() {
             // TODO Auto-generated method stub
-            
+
         }
 
         @Override
         public void refreshEquipmentTable() {
             // TODO Auto-generated method stub
-            
+
         }
 
         @Override
         public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
             // TODO Auto-generated method stub
-            
+
         }
 
         @Override
