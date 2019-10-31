@@ -198,6 +198,13 @@ public class Scenario implements Serializable {
         return force;
     }
     
+    /**
+     * Gets the IDs of units deployed to this scenario individually.
+     */
+    public List<UUID> getIndividualUnitIDs() {
+        return unitIds;
+    }
+    
     public void addForces(int fid) {
         subForceIds.add(fid);
     }

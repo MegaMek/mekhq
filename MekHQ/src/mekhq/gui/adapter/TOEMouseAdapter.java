@@ -173,8 +173,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
             Scenario scenario = gui.getCampaign().getScenario(sid);
             
             if(scenario instanceof AtBDynamicScenario) {
-                ForceTemplateAssignmentDialog ftad = new ForceTemplateAssignmentDialog(gui, forces, (AtBDynamicScenario) scenario);
-                ftad.display();
+                ForceTemplateAssignmentDialog ftad = new ForceTemplateAssignmentDialog(gui, forces, null, (AtBDynamicScenario) scenario);
             } else {
                 for (Force force : forces) {
                     gui.undeployForce(force);
@@ -305,11 +304,16 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
         } else if (command.contains("DEPLOY_UNIT")) {
             int sid = Integer.parseInt(target);
             Scenario scenario = gui.getCampaign().getScenario(sid);
-            for (Unit unit : units) {
-                if (null != unit && null != scenario) {
-                    scenario.addUnit(unit.getId());
-                    unit.setScenarioId(scenario.getId());
-                    MekHQ.triggerEvent(new DeploymentChangedEvent(unit, scenario));
+            
+            if(scenario instanceof AtBDynamicScenario) {
+                ForceTemplateAssignmentDialog ftad = new ForceTemplateAssignmentDialog(gui, null, units, (AtBDynamicScenario) scenario);
+            } else {
+                for (Unit unit : units) {
+                    if (null != unit && null != scenario) {
+                        scenario.addUnit(unit.getId());
+                        unit.setScenarioId(scenario.getId());
+                        MekHQ.triggerEvent(new DeploymentChangedEvent(unit, scenario));
+                    }
                 }
             }
         } else if (command.contains("C3I")) {

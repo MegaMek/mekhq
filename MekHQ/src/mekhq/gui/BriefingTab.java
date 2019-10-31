@@ -635,6 +635,7 @@ public final class BriefingTab extends CampaignGuiTab {
         if(scenario instanceof AtBDynamicScenario) {
             AtBDynamicScenarioFactory.setPlayerDeploymentTurns((AtBDynamicScenario) scenario, getCampaign());
             AtBDynamicScenarioFactory.finalizeStaggeredDeploymentTurns((AtBDynamicScenario) scenario, getCampaign());
+            AtBDynamicScenarioFactory.setPlayerDeploymentZones((AtBDynamicScenario) scenario, getCampaign());
         }
 
         if (undeployed.length() > 0) {

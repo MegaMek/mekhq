@@ -36,6 +36,7 @@ public class ForceTemplateAssignmentDialog extends JDialog {
     
     private JLabel lblInstructions = new JLabel();
     private JList<Force> forceList = new JList<>();
+    private JList<Unit> unitList = new JList<>();
     private JList<ScenarioForceTemplate> templateList = new JList<>();
     private JButton btnAssign = new JButton();
     private JButton btnOk = new JButton();
@@ -43,24 +44,26 @@ public class ForceTemplateAssignmentDialog extends JDialog {
     private ResourceBundle resourceMap;
     private AtBDynamicScenario currentScenario;
     private Vector<Force> currentForceVector;
+    private Vector<Unit> currentUnitVector;
     private CampaignGUI campaignGUI;
     
-    public ForceTemplateAssignmentDialog(CampaignGUI gui, Vector<Force> assignedForces, AtBDynamicScenario scenario) {
+    public ForceTemplateAssignmentDialog(CampaignGUI gui, Vector<Force> assignedForces, Vector<Unit> assignedUnits, AtBDynamicScenario scenario) {
+        currentForceVector = assignedForces;
+        currentUnitVector = assignedUnits;
+
         //resourceMap = ResourceBundle.getBundle("mekhq.resources.ForceTemplateAssignmentDialog", new EncodeControl());
         currentScenario = scenario;
-        currentForceVector = assignedForces;
         campaignGUI = gui;
         
         btnAssign.setText("Assign");//resourceMap.getString("chkExportSettings.text"));
         btnOk.setText("Ok");//resourceMap.getString("chkExportContractOffers.text"));
         lblInstructions.setText("Pick your force template assignments");//resourceMap.getString("lblMoney.text"));   
         
-        refreshForceList();
         setupTemplateList();
-        display();
+        display(currentForceVector == null);
     }
     
-    public void display() {
+    private void display(boolean individualUnits) {
         getContentPane().removeAll();
         getContentPane().setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -71,7 +74,13 @@ public class ForceTemplateAssignmentDialog extends JDialog {
         
         gbc.gridy++;
         
-        getContentPane().add(forceList, gbc);
+        if(individualUnits) {
+            getContentPane().add(unitList, gbc);
+            refreshUnitList();
+        } else {
+            getContentPane().add(forceList, gbc);
+            refreshForceList();
+        }
         gbc.gridx++;
         getContentPane().add(templateList, gbc);
         gbc.gridx++;
@@ -80,12 +89,21 @@ public class ForceTemplateAssignmentDialog extends JDialog {
         gbc.gridy++;
         getContentPane().add(btnOk, gbc);
         
-        btnAssign.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                assignForceToTemplate();
-            }
-        });
+        if(individualUnits) {
+            btnAssign.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    assignUnitToTemplate();
+                }
+            });
+        } else {
+            btnAssign.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    assignForceToTemplate();
+                }
+            });
+        }
         
         btnAssign.setEnabled(false);
         
@@ -101,6 +119,23 @@ public class ForceTemplateAssignmentDialog extends JDialog {
         setLocationRelativeTo(getParent());
         setModalityType(ModalityType.APPLICATION_MODAL);
         setVisible(true);
+    }
+    
+    private void refreshUnitList() {
+        DefaultListModel<Unit> unitListModel = new DefaultListModel<>();
+        for(Unit unit : currentUnitVector) {
+            unitListModel.addElement(unit);
+        }
+        unitList.setModel(unitListModel);
+        unitList.setCellRenderer(new UnitListCellRenderer());
+        unitList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        
+        unitList.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                updateAssignButtonState();
+            }
+        });
     }
     
     private void refreshForceList() {
@@ -129,10 +164,6 @@ public class ForceTemplateAssignmentDialog extends JDialog {
             }
         }
         
-        if(!currentScenario.getTemplate().scenarioForces.containsKey(ScenarioForceTemplate.REINFORCEMENT_TEMPLATE_ID)) {
-            templateListModel.addElement(ScenarioForceTemplate.getDefaultReinforcementsTemplate());
-        }
-        
         templateList.setModel(templateListModel);
         templateList.setCellRenderer(new TemplateListCellRenderer());
         templateList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -149,12 +180,27 @@ public class ForceTemplateAssignmentDialog extends JDialog {
      * Handles logic for updating the assign button state.
      */
     private void updateAssignButtonState() {
-        if(forceList.getSelectedIndex() >= 0 &&
-                templateList.getSelectedIndex() >= 0) {
+        if(((forceList.getSelectedIndex() >= 0) ||
+                (unitList.getSelectedIndex() >= 0)) &&
+                (templateList.getSelectedIndex() >= 0)) {
             btnAssign.setEnabled(true);
         } else {
             btnAssign.setEnabled(false);
         }
+    }
+    
+    /**
+     * Event handler for assigning a unit to a scenario and a specific template
+     */
+    private void assignUnitToTemplate() {
+        Unit unit = unitList.getSelectedValue();
+        
+        currentScenario.removeUnit(unit.getId());
+        currentScenario.addUnit(unit.getId(), templateList.getSelectedValue().getForceName());
+        unit.setScenarioId(currentScenario.getId());
+        MekHQ.triggerEvent(new DeploymentChangedEvent(unit, currentScenario));
+        
+        refreshUnitList();
     }
     
     /**
@@ -179,64 +225,19 @@ public class ForceTemplateAssignmentDialog extends JDialog {
         
         refreshForceList();
     }
-    
-    /*private void setupPersonList() {
-        personList = new JList<>();
-        DefaultListModel<Person> personListModel = new DefaultListModel<>();
-        for(Person person : sourceCampaign.getActivePersonnel()) {
-            personListModel.addElement(person);
-        }
-        personList.setModel(personListModel);
-        personList.addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                lblStatus.setText(getPersonSelectionStatus());
-                pack();
-            }
-        });
-        personList.setCellRenderer(new PersonListCellRenderer());
-    }
-    
-    private void setupUnitList() {
-        unitList = new JList<>();
-        DefaultListModel<Unit> unitListModel = new DefaultListModel<>();
-        for(Unit unit : sourceCampaign.getUnits()) {
-            unitListModel.addElement(unit);
-        }
-        unitList.setModel(unitListModel);
-        unitList.addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                lblStatus.setText(getUnitSelectionStatus());
-                pack();
-            }
-        });
-        unitList.setCellRenderer(new UnitListCellRenderer());
-    }
-    
-    private void setupPartList() {
-        partList = new JList<>();
-        DefaultListModel<Part> partListModel = new DefaultListModel<>();
-        List<Part> parts = sourceCampaign.getSpareParts();
-        parts.sort(new Comparator<Part>() {
-            @Override
-            public int compare(Part o1, Part o2) {
-                return o1.getName().compareTo(o2.getName());
-            }
-        });
         
-        for(Part part : parts) {
-            // if the part isn't part of some other activity
-            if(!part.isReservedForRefit() &&
-                    !part.isReservedForReplacement() &&
-                    !part.isBeingWorkedOn() &&
-                    part.isPresent() &&
-                    part.isSpare()) {
-                partListModel.addElement(part);
-            }
+    private class UnitListCellRenderer extends DefaultListCellRenderer {
+        @Override
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            Component cmp = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            Unit unit = (Unit) value;
+            String cellValue = currentScenario.getPlayerUnitTemplates().containsKey(unit.getId()) ?
+                    String.format("%s (%s)", unit.getName(), currentScenario.getPlayerUnitTemplates().get(unit.getId()).getForceName()) :
+                        unit.getName();
+            ((JLabel) cmp).setText(cellValue);
+            return cmp;
         }
-        partList.setModel(partListModel);    
-    }*/
+    }
     
     private class ForceListCellRenderer extends DefaultListCellRenderer {
         @Override
