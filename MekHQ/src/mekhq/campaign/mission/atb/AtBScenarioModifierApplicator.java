@@ -305,7 +305,6 @@ public class AtBScenarioModifierApplicator {
         }
     }
     
-    
     /**
      * Appends the given text to the scenario briefing.
      * @param scenario The scenario to modify.
@@ -314,8 +313,4 @@ public class AtBScenarioModifierApplicator {
     public static void appendScenarioBriefingText(AtBDynamicScenario scenario, String additionalBriefingText) {
         scenario.setDesc(String.format("%s\n\n%s", scenario.getDescription(), additionalBriefingText));
     }
-    
-    /*public static void appendObjectives(AtBDynamicScenario scenario, List<ScenarioObjective> objective) {
-        scenario.getScenarioObjectives().addAll
-    }*/
 }
