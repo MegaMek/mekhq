@@ -6,6 +6,11 @@ VERSION HISTORY:
 + PR #1268: Fix money formatting in prisoner ransom messages
 + Issue #1275: Fix zero sized dialogs (Edit Biography, etc)
 + Issue #1273: Updated edge cost for AtB to match current rules
++ PR #1288: Allow the large craft ammo swap dialog to switch AR10, missile and artillery munitions properly
++ PR #1292: Fix erroneously high unit values
++ PR #1305: Mac OSX key bindings on non-standard look and feel
++ PR #1317: fix NPE that halts new day processing while applying training XP
++ Issue #1308: Fix NPE when the campaign folder is not present
 
 0.46.0 (2019-08-12 1900 UTC)
 + Issue 1249: Tech Names Missing in Event Log
