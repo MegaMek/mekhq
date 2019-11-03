@@ -21,6 +21,7 @@
 package mekhq.gui.dialog;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -29,16 +30,19 @@ import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.Vector;
 
+import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.force.Force;
@@ -65,7 +69,7 @@ public class ForceTemplateAssignmentDialog extends JDialog {
     private JList<Unit> unitList = new JList<>();
     private JList<ScenarioForceTemplate> templateList = new JList<>();
     private JButton btnAssign = new JButton();
-    private JButton btnOk = new JButton();
+    private JButton btnClose = new JButton();
     
     private ResourceBundle resourceMap;
     private AtBDynamicScenario currentScenario;
@@ -77,13 +81,13 @@ public class ForceTemplateAssignmentDialog extends JDialog {
         currentForceVector = assignedForces;
         currentUnitVector = assignedUnits;
 
-        //resourceMap = ResourceBundle.getBundle("mekhq.resources.ForceTemplateAssignmentDialog", new EncodeControl());
+        resourceMap = ResourceBundle.getBundle("mekhq.resources.ForceTemplateAssignmentDialog", new EncodeControl());
         currentScenario = scenario;
         campaignGUI = gui;
         
-        btnAssign.setText("Assign");//resourceMap.getString("chkExportSettings.text"));
-        btnOk.setText("Ok");//resourceMap.getString("chkExportContractOffers.text"));
-        lblInstructions.setText("Pick your force template assignments");//resourceMap.getString("lblMoney.text"));   
+        btnAssign.setText(resourceMap.getString("btnAssign.text"));
+        btnClose.setText(resourceMap.getString("btnClose.text"));
+        lblInstructions.setText(String.format("<html>%s</html>", resourceMap.getString("lblInstructions.text")));   
         
         setupTemplateList();
         display(currentForceVector == null);
@@ -96,24 +100,35 @@ public class ForceTemplateAssignmentDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = 0;
         
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
         getContentPane().add(lblInstructions, gbc);
         
+        gbc.gridwidth = 1;
         gbc.gridy++;
         
+        JScrollPane itemListPane = new JScrollPane();
         if(individualUnits) {
-            getContentPane().add(unitList, gbc);
+            itemListPane.setViewportView(unitList);
             refreshUnitList();
         } else {
-            getContentPane().add(forceList, gbc);
+            itemListPane.setViewportView(forceList);
             refreshForceList();
         }
+        getContentPane().add(itemListPane, gbc);
         gbc.gridx++;
-        getContentPane().add(templateList, gbc);
+        
+        JScrollPane templateListPane = new JScrollPane();
+        templateListPane.setViewportView(templateList);
+        itemListPane.setPreferredSize(
+                new Dimension((int) itemListPane.getPreferredSize().getWidth() + (int) templateListPane.getPreferredSize().getWidth(), 
+                        (int) itemListPane.getPreferredSize().getHeight()));
+        
+        getContentPane().add(templateListPane, gbc);
         gbc.gridx++;
         getContentPane().add(btnAssign, gbc);
         gbc.gridx = 0;
         gbc.gridy++;
-        getContentPane().add(btnOk, gbc);
+        getContentPane().add(btnClose, gbc);
         
         if(individualUnits) {
             btnAssign.addActionListener(new ActionListener() {
@@ -133,7 +148,7 @@ public class ForceTemplateAssignmentDialog extends JDialog {
         
         btnAssign.setEnabled(false);
         
-        btnOk.addActionListener(new ActionListener() {
+        btnClose.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);
@@ -142,6 +157,7 @@ public class ForceTemplateAssignmentDialog extends JDialog {
         
         validate();
         pack();
+        setResizable(false);
         setLocationRelativeTo(getParent());
         setModalityType(ModalityType.APPLICATION_MODAL);
         setVisible(true);
@@ -278,7 +294,7 @@ public class ForceTemplateAssignmentDialog extends JDialog {
         }
     }
     
-    private class TemplateListCellRenderer extends DefaultListCellRenderer {
+    private static class TemplateListCellRenderer extends DefaultListCellRenderer {
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             Component cmp = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);

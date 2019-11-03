@@ -511,7 +511,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
      * @return
      */
     public String getAllowedUnitTypeName() {
-        if(getAllowedUnitType() > UnitType.SIZE || getAllowedUnitType() < 0) {
+        if(getAllowedUnitType() >= UnitType.SIZE || getAllowedUnitType() < 0) {
             return SPECIAL_UNIT_TYPES.get(getAllowedUnitType());
         } else {
             return UnitType.getTypeDisplayableName(getAllowedUnitType());
@@ -519,9 +519,9 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     }
     
     /**
-     * Attempt to deserialize an instance of a ScenarioTemplate from the passed-in XML Node
+     * Attempt to deserialize an instance of a ScenarioForceTemplate from the passed-in XML Node
      * @param inputFile The source file
-     * @return Possibly an instance of a ScenarioTemplate
+     * @return Possibly an instance of a ScenarioForceTemplate
      */
     public static ScenarioForceTemplate Deserialize(Node xmlNode) {
         ScenarioForceTemplate resultingTemplate = null;

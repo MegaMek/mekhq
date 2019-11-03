@@ -1738,9 +1738,9 @@ public class AtBDynamicScenarioFactory {
                 int deployRound = forceTemplate.getArrivalTurn();
                 
                 if(deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
-                    setDeploymentTurnsStaggeredByLance(Arrays.asList(entity));
+                    setDeploymentTurnsStaggeredByLance(Collections.singletonList(entity));
                 } else if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) {
-                    setDeploymentTurnsForReinforcements(Arrays.asList(entity), strategy);   
+                    setDeploymentTurnsForReinforcements(Collections.singletonList(entity), strategy);   
                 } else {
                     entity.setDeployRound(deployRound);
                 }

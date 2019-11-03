@@ -119,7 +119,7 @@ public class ScenarioTemplate {
             JAXBContext context = JAXBContext.newInstance(ScenarioTemplate.class);
             JAXBElement<ScenarioTemplate> templateElement = new JAXBElement<>(new QName(ROOT_XML_ELEMENT_NAME), ScenarioTemplate.class, this);
             Marshaller m = context.createMarshaller();
-            m.setProperty("jaxb.formatted.output", true);
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(templateElement, outputFile);
         } catch(Exception e) {
             MekHQ.getLogger().error(ScenarioTemplate.class, "Serialize", e.getMessage());
