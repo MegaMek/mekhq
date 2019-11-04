@@ -28,6 +28,7 @@ v0.47.1-SNAPSHOT
 + PR #1315: Rescalable images for unit view panel when fluff image exists
 + PR #1320: Customize support vehicles in the MekLab.
 + PR #1321: For scenarios generated from templates, the ability to explicitly assign forces/units to different player force templates.
++ PR #1324: corrected icon map
 
 v0.47.0 (2019-08-21 0300 UTC)
 + Issue #1171: Adds autosave feature (daily or weekly, and/or before missions).
