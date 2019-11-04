@@ -90,7 +90,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
     private JTable lootTable;
     private JPanel panLoot;
     
-    private JComboBox<AtBScenarioModifier> modifierBox;
+    private JComboBox<String> modifierBox;
     
     private javax.swing.JPanel panMain;
     private javax.swing.JPanel panBtn;
@@ -249,8 +249,8 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
             gridBagConstraints.gridwidth = 1;
             
             modifierBox = new JComboBox<>();
-            for(AtBScenarioModifier modifier : AtBScenarioModifier.getScenarioModifiers().values()) {
-                modifierBox.addItem(modifier);
+            for(String modifierKey : AtBScenarioModifier.getOrderedModifierKeys()) {
+                modifierBox.addItem(modifierKey);
             }
             panMain.add(modifierBox, gridBagConstraints);
             
@@ -535,7 +535,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
      */
     private void btnAddModifierActionPerformed(ActionEvent event) {
         AtBDynamicScenario scenarioPtr = (AtBDynamicScenario) scenario;
-        AtBScenarioModifier modifierPtr = (AtBScenarioModifier) modifierBox.getSelectedItem();
+        AtBScenarioModifier modifierPtr = AtBScenarioModifier.getScenarioModifier(modifierBox.getSelectedItem().toString());
         EventTiming timing = scenarioPtr.getNumBots() > 0 ? EventTiming.PostForceGeneration : EventTiming.PreForceGeneration;
         
         modifierPtr.processModifier(scenarioPtr, campaign, timing);

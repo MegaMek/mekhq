@@ -1,6 +1,7 @@
 package mekhq.campaign.mission;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +16,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import org.w3c.dom.Node;
 
 import megamek.common.Board;
+import megamek.common.UnitType;
 import mekhq.MekHQ;
 
 public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> {
@@ -505,9 +507,21 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     }
     
     /**
-     * Attempt to deserialize an instance of a ScenarioTemplate from the passed-in XML Node
+     * Convenience function that returns the displayable name of the selected unit type.
+     * @return
+     */
+    public String getAllowedUnitTypeName() {
+        if(getAllowedUnitType() >= UnitType.SIZE || getAllowedUnitType() < 0) {
+            return SPECIAL_UNIT_TYPES.get(getAllowedUnitType());
+        } else {
+            return UnitType.getTypeDisplayableName(getAllowedUnitType());
+        }
+    }
+    
+    /**
+     * Attempt to deserialize an instance of a ScenarioForceTemplate from the passed-in XML Node
      * @param inputFile The source file
-     * @return Possibly an instance of a ScenarioTemplate
+     * @return Possibly an instance of a ScenarioForceTemplate
      */
     public static ScenarioForceTemplate Deserialize(Node xmlNode) {
         ScenarioForceTemplate resultingTemplate = null;
@@ -533,5 +547,24 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         } else {
             return this.forceName.charAt(0) > o.forceName.charAt(0) ? 1 : -1;
         }
+    }
+    
+    /**
+     * Convenient factory method to return a default "Reinforcements" force template
+     * generally useful if the scenario does not have one specified
+     */
+    public static ScenarioForceTemplate getDefaultReinforcementsTemplate() {
+        final List<Integer> reinforcementDeploymentZones = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9);
+        ScenarioForceTemplate rft = new ScenarioForceTemplate();
+        rft.setAllowedUnitType(SPECIAL_UNIT_TYPE_ATB_MIX);
+        rft.setCanReinforceLinked(true);
+        rft.setDeploymentZones(reinforcementDeploymentZones);
+        rft.setArrivalTurn(ARRIVAL_TURN_AS_REINFORCEMENTS);
+        rft.setForceAlignment(ForceAlignment.Player.ordinal());
+        rft.setForceName(REINFORCEMENT_TEMPLATE_ID);
+        rft.setGenerationMethod(ForceGenerationMethod.PlayerSupplied.ordinal());
+        rft.setGenerationOrder(1);
+
+        return rft;
     }
 }

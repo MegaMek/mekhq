@@ -341,4 +341,11 @@ public class AtBDynamicScenario extends AtBScenario {
     public void refresh(Campaign campaign) {
         
     }
+    
+    @Override
+    public void clearAllForcesAndPersonnel(Campaign campaign) {
+        playerUnitTemplates.clear();
+        playerForceTemplates.clear();
+        super.clearAllForcesAndPersonnel(campaign);
+    }
 }

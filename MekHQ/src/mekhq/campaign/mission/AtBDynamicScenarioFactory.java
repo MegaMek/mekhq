@@ -1,6 +1,7 @@
 package mekhq.campaign.mission;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
@@ -125,6 +126,12 @@ public class AtBDynamicScenarioFactory {
         setTerrain(scenario);
         
         applyScenarioModifiers(scenario, campaign, EventTiming.PreForceGeneration);
+        
+        // apply a default "reinforcements" force template if a scenario-specific one does not already exist
+        if(!template.scenarioForces.containsKey(ScenarioForceTemplate.REINFORCEMENT_TEMPLATE_ID)) {
+            ScenarioForceTemplate defaultReinforcements = ScenarioForceTemplate.getDefaultReinforcementsTemplate();
+            template.scenarioForces.put(defaultReinforcements.getForceName(), defaultReinforcements);
+        }
         
         return scenario;
     }
@@ -1716,6 +1723,69 @@ public class AtBDynamicScenarioFactory {
                 }
             } else {
                 setDeploymentTurnsForReinforcements(forceEntities, strategy);
+            }
+        }
+        
+        // loop through individual units as well
+        for(UUID unitID : scenario.getIndividualUnitIDs()) {
+            ScenarioForceTemplate forceTemplate = scenario.getPlayerUnitTemplates().get(unitID);
+            Entity entity = campaign.getUnit(unitID).getEntity();
+            
+            // now, attempt to set deployment turns
+            // if the force has a template, then use the appropriate algorithm
+            // otherwise, treat it as reinforcements
+            if(forceTemplate != null) {
+                int deployRound = forceTemplate.getArrivalTurn();
+                
+                if(deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
+                    setDeploymentTurnsStaggeredByLance(Collections.singletonList(entity));
+                } else if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) {
+                    setDeploymentTurnsForReinforcements(Collections.singletonList(entity), strategy);   
+                } else {
+                    entity.setDeployRound(deployRound);
+                }
+            } else {
+                setDeploymentTurnsForReinforcements(Arrays.asList(entity), strategy);
+            }
+        }
+    }
+    
+    /**
+     * Given a dynamic scenario, sets the deployment zones of player units
+     */
+    public static void setPlayerDeploymentZones(AtBDynamicScenario scenario, Campaign campaign) {
+        // for player forces where there's an associated force template, we can set the deployment zone explicitly
+        for(int forceID : scenario.getForceIDs()) {
+            ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
+            List<Entity> forceEntities = new ArrayList<>();            
+            Force playerForce = campaign.getForce(forceID);
+            
+            for(UUID unitID : playerForce.getAllUnits()) {
+                Unit currentUnit = campaign.getUnit(unitID);
+                if(currentUnit != null) {
+                    forceEntities.add(currentUnit.getEntity());
+                }
+            }
+            
+            // now, attempt to set deployment turns
+            if(forceTemplate != null) {
+                for(Entity entity : forceEntities) {
+                    if(entity.getDeployRound() > 0) {
+                        entity.setStartingPos(forceTemplate.getActualDeploymentZone());
+                    }
+                }
+            }
+        }
+        
+        // loop through individual units as well
+        for(UUID unitID : scenario.getIndividualUnitIDs()) {
+            ScenarioForceTemplate forceTemplate = scenario.getPlayerUnitTemplates().get(unitID);
+            Entity entity = campaign.getUnit(unitID).getEntity();
+
+            if(forceTemplate != null) {
+                if(entity.getDeployRound() > 0) {
+                    entity.setStartingPos(forceTemplate.getActualDeploymentZone());
+                }
             }
         }
     }

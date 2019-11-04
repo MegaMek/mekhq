@@ -1,5 +1,6 @@
 package mekhq.campaign.mission.atb;
 
+import java.util.List;
 import java.util.UUID;
 
 import megamek.client.RandomSkillsGenerator;
@@ -18,6 +19,7 @@ import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
+import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
@@ -302,7 +304,6 @@ public class AtBScenarioModifierApplicator {
             }
         }
     }
-    
     
     /**
      * Appends the given text to the scenario briefing.

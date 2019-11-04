@@ -417,10 +417,11 @@ public class ScenarioObjective {
     public void Serialize(PrintWriter pw) {
         try {
             JAXBContext context = JAXBContext.newInstance(ScenarioObjective.class);
-            JAXBElement<ScenarioObjective> templateElement = new JAXBElement<>(new QName(ROOT_XML_ELEMENT_NAME), ScenarioObjective.class, this);
+            JAXBElement<ScenarioObjective> objectiveElement = new JAXBElement<>(new QName(ROOT_XML_ELEMENT_NAME), ScenarioObjective.class, this);
             Marshaller m = context.createMarshaller();
-            m.setProperty("jaxb.fragment", true);
-            m.marshal(templateElement, pw);
+            m.setProperty(Marshaller.JAXB_FRAGMENT, true);
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            m.marshal(objectiveElement, pw);
         } catch(Exception e) {
             MekHQ.getLogger().error(ScenarioTemplate.class, "Serialize", e.getMessage());
         }
