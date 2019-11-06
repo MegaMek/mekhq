@@ -110,7 +110,7 @@ public class PartsStore implements Serializable {
 	private static final long serialVersionUID = 1686222527383868364L;
 
 	private static int EXPECTED_SIZE = 50000;
-	
+
 	private ArrayList<Part> parts;
 	private Map<String, Part> nameAndDetailMap;
 
@@ -123,7 +123,7 @@ public class PartsStore implements Serializable {
 	public ArrayList<Part> getInventory() {
 		return parts;
 	}
-	
+
 	public Part getByNameAndDetails(String nameAndDetails) {
 		return nameAndDetailMap.get(nameAndDetails);
 	}
@@ -141,7 +141,7 @@ public class PartsStore implements Serializable {
 		stockProtomekLocations(c);
 		stockProtomekComponents(c);
 		stockBattleArmorSuits(c);
-		
+
 		Pattern cleanUp1 = Pattern.compile("\\d+\\shit\\(s\\),\\s"); //$NON-NLS-1$
 		Pattern cleanUp2 = Pattern.compile("\\d+\\shit\\(s\\)"); //$NON-NLS-1$
 		StringBuilder sb = new StringBuilder();
@@ -269,7 +269,7 @@ public class PartsStore implements Serializable {
 			        poddable &= (et.hasFlag(WeaponType.F_MECH_WEAPON)
 			                || et.hasFlag(Weapon.F_TANK_WEAPON)
 			                || et.hasFlag(WeaponType.F_AERO_WEAPON))
-			                && !((WeaponType) et).isCapital(); 
+			                && !((WeaponType) et).isCapital();
 			    }
 				if(EquipmentPart.hasVariableTonnage(et)) {
 					EquipmentPart epart;
@@ -300,12 +300,12 @@ public class PartsStore implements Serializable {
         parts.add(hs);
         parts.add(new OmniPod(hs, c));
         parts.add(new AeroHeatSink(0, Aero.HEAT_SINGLE, true, c));
-        
+
         hs = new AeroHeatSink(0, Aero.HEAT_DOUBLE, false, c);
         parts.add(hs);
         parts.add(new OmniPod(hs, c));
         parts.add(new AeroHeatSink(0, Aero.HEAT_DOUBLE, true, c));
-        
+
         hs = new AeroHeatSink(0, AeroHeatSink.CLAN_HEAT_DOUBLE, false, c);
         parts.add(hs);
         parts.add(new OmniPod(hs, c));
@@ -511,7 +511,8 @@ public class PartsStore implements Serializable {
 		/*
 		 * Protomek Armor
 		 */
-		parts.add(new ProtomekArmor(0, 100, -1, true, c));
+        parts.add(new ProtomekArmor(0, EquipmentType.T_ARMOR_STANDARD, 100, -1, true, c));
+        parts.add(new ProtomekArmor(0, EquipmentType.T_ARMOR_EDP, 66, -1, true, c));
 	}
 
 	private void stockMekLocations(Campaign c) {
