@@ -889,7 +889,6 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                     menuItem.setEnabled(unit.isAvailable()
                             && ((unit.getEntity().getEntityType() &
                                     (Entity.ETYPE_JUMPSHIP
-                                            | Entity.ETYPE_PROTOMECH
                                             | Entity.ETYPE_GUN_EMPLACEMENT)) == 0));
                     menu.add(menuItem);
                 }
