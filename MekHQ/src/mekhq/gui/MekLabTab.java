@@ -37,26 +37,13 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
-import megamek.common.Aero;
-import megamek.common.AmmoType;
-import megamek.common.BattleArmor;
-import megamek.common.Engine;
-import megamek.common.Entity;
-import megamek.common.ITechManager;
-import megamek.common.Infantry;
-import megamek.common.Mech;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
-import megamek.common.MechSummaryCache;
-import megamek.common.Mounted;
-import megamek.common.SmallCraft;
-import megamek.common.Tank;
-import megamek.common.WeaponType;
+import megamek.common.*;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.logging.LogLevel;
 import megamek.common.verifier.*;
 import megameklab.com.MegaMekLab;
 import megameklab.com.ui.EntitySource;
+import megameklab.com.ui.protomek.ProtomekBuildTab;
 import megameklab.com.util.CConfig;
 import megameklab.com.util.RefreshListener;
 import megameklab.com.util.UnitUtil;
@@ -277,6 +264,8 @@ public class MekLabTab extends CampaignGuiTab {
             testEntity = new TestBattleArmor((BattleArmor) entity, entityVerifier.baOption, null);
         } else if (entity instanceof Infantry) {
             testEntity = new TestInfantry((Infantry) entity, entityVerifier.tankOption, null);
+        } else if (entity instanceof Protomech) {
+            testEntity = new TestProtomech((Protomech) entity, entityVerifier.protomechOption, null);
         }
         if (null == testEntity) {
             return;
@@ -438,7 +427,8 @@ public class MekLabTab extends CampaignGuiTab {
             return new BattleArmorPanel((BattleArmor) en);
         } else if (en instanceof Infantry) {
             return new InfantryPanel((Infantry) en);
-        }
+        } else if (en instanceof Protomech)
+            return new ProtomechPanel((Protomech) en);
         return null;
     }
 
@@ -972,9 +962,6 @@ public class MekLabTab extends CampaignGuiTab {
 
     private class BattleArmorPanel extends EntityPanel {
 
-        /**
-         *
-         */
         private static final long serialVersionUID = 6894731868670529166L;
 
         private BattleArmor entity;
@@ -1197,6 +1184,132 @@ public class MekLabTab extends CampaignGuiTab {
         public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
             // TODO Auto-generated method stub
 
+        }
+
+        @Override
+        public ITechManager getTechManager() {
+            if (null != structureTab) {
+                return structureTab.getTechManager();
+            }
+            return null;
+        }
+
+        @Override
+        void setTechFaction(int techFaction) {
+            structureTab.setTechFaction(techFaction);
+        }
+    }
+
+    private class ProtomechPanel extends EntityPanel {
+
+        private static final long serialVersionUID = -4649180495358483182L;
+
+        private Protomech entity;
+        private megameklab.com.ui.protomek.ProtomekStructureTab structureTab;
+        private megameklab.com.ui.tabs.EquipmentTab equipmentTab;
+        private megameklab.com.ui.protomek.ProtomekBuildTab buildTab;
+        private megameklab.com.ui.tabs.PreviewTab previewTab;
+
+        ProtomechPanel(Protomech m) {
+            entity = m;
+            reloadTabs();
+        }
+
+        @Override
+        public Entity getEntity() {
+            return entity;
+        }
+
+        void reloadTabs() {
+            removeAll();
+
+            structureTab = new megameklab.com.ui.protomek.ProtomekStructureTab(this);
+            structureTab.setAsCustomization();
+            equipmentTab = new megameklab.com.ui.tabs.EquipmentTab(this);
+            previewTab = new megameklab.com.ui.tabs.PreviewTab(this);
+            buildTab = new megameklab.com.ui.protomek.ProtomekBuildTab(this, equipmentTab, this);
+            structureTab.addRefreshedListener(this);
+            equipmentTab.addRefreshedListener(this);
+            buildTab.addRefreshedListener(this);
+
+            addTab("Structure/Armor", new JScrollPane(structureTab));
+            addTab("Equipment", new JScrollPane(equipmentTab));
+            addTab("Assign Critical", new JScrollPane(buildTab));
+            addTab("Preview", new JScrollPane(previewTab));
+            this.repaint();
+        }
+
+        @Override
+        public void refreshAll() {
+            structureTab.refresh();
+            equipmentTab.refresh();
+            buildTab.refresh();
+            previewTab.refresh();
+            refreshSummary();
+        }
+
+        @Override
+        public void refreshArmor() {
+            refreshSummary();
+        }
+
+        @Override
+        public void refreshBuild() {
+            buildTab.refresh();
+            refreshSummary();
+            // trick to catch toggling the main gun location, which does not affect the status bar
+            refreshRefitSummary();
+        }
+
+        @Override
+        public void refreshEquipment() {
+            equipmentTab.refresh();
+            refreshSummary();
+        }
+
+        @Override
+        public void refreshTransport() {
+        }
+
+        @Override
+        public void refreshStatus() {
+            refreshRefitSummary();
+        }
+
+        @Override
+        public void refreshStructure() {
+            structureTab.refresh();
+            refreshSummary();
+        }
+
+        @Override
+        public void refreshWeapons() {
+            refreshSummary();
+        }
+
+        @Override
+        public void refreshHeader() {
+
+        }
+
+        @Override
+        public void refreshPreview() {
+            previewTab.refresh();
+        }
+
+        @Override
+        public void refreshSummary() {
+            structureTab.refreshSummary();
+        }
+
+        @Override
+        public void refreshEquipmentTable() {
+            equipmentTab.refreshTable();
+        }
+
+        @Override
+        public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
+            // Not needed for MekHQ
         }
 
         @Override
