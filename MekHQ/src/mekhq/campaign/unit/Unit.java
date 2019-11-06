@@ -2128,7 +2128,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
             if(null == armor[i]) {
                 if(entity instanceof Protomech) {
-                    ProtomekArmor a = new ProtomekArmor((int) getEntity().getWeight(), getEntity().getOArmor(i, false), i, true, getCampaign());
+                    ProtomekArmor a = new ProtomekArmor((int) getEntity().getWeight(), getEntity().getArmorType(i),
+                            getEntity().getOArmor(i, false), i, true, getCampaign());
                     addPart(a);
                     partsToAdd.add(a);
                 }
