@@ -1,6 +1,8 @@
 VERSION HISTORY:
 ----------------
-v0.47.1 (2019-11-05 0300 UTC) 
+v0.47.2-SNAPSHOT
+
+v0.47.1 (2019-11-05 0300 UTC)
 + PR #1259: Fix map size display for AtB scenarios in the briefing tab (cosmetic issue only)
 + Data - Updating the AtB Starter Guide to v3, thanks CampaignAnon
 + Issue #1257: Don't double up salaries when charging for peacetime costs
@@ -12,7 +14,7 @@ v0.47.1 (2019-11-05 0300 UTC)
 + PR #1282: Fix erroneously high unit values
 + PR #1294: Improve ammo swaps and refits of Large Craft ammo bins
 + PR #1298: Restructuring of person view panel, double scroll issue, and other scrolling issues
-+ PR #1300: Markdown for descriptions 
++ PR #1300: Markdown for descriptions
 + PR #1280: planetary system refactor
 + PR #1305: Mac OSX key bindings on non-standard look and feel
 + PR #1304: Markdown Editor
@@ -144,7 +146,7 @@ v0.45.2 (2018-11-18 0200 UTC)
 + Issue #852: Support for Award clusters if an award is given multiple times to a person.
 + Issue #905: Fixes NPE when a spouse is missing on campaign load or personnel menu click.
 + PR #882: Adds support for gzipped Campaign files (*.cpnx.gz).
-+ Planets: Reunification War data for Outworlds Alliance + start of RWR 
++ Planets: Reunification War data for Outworlds Alliance + start of RWR
 + PR #959: Fix for inability to repair damaged VTOL internal structure after loading campaign
 + Issue #967: Fix bug where acquired Units could never be bought
 + PR #971: Feature allowing grouping personnel by their unit on the Personnel tab
@@ -215,7 +217,7 @@ v0.45.0 (2018-08-02 0200 UTC)
 + Issue #729: Fix for 'adjust contract pay' calculating number of required lances at the wrong time.
 + PR #831: Fix two bugs in Edit Injuries dialog
 		Advanced medical: remove injury and change injury types choices when location changes.
-+ PR #823: Feature: Damage pilots from GM mode (non-advanced medical) 
++ PR #823: Feature: Damage pilots from GM mode (non-advanced medical)
 + PR #811: [Feature]: Mass mothball/reactivate. Reactivating now does its best to restore the unit's force/crew/tech assignments.
 + Issue #830: [Feature]: GM Mode "Strip Unit". Takes all parts off the given unit(s) and place them in the warehouse.
 + Issue #775: [Feature]: Daily Log History. Retains 'daily log' entries for up to 120 days when turned on. Entry history is cleared when the user exits the program.
@@ -243,7 +245,7 @@ v0.43.11-RC5 (2018-06-04 0100 UTC)
 + PR #712: Fix for issue #708 [0.43.10-RC4 : Bug] Old Contacts Appearing in Deployment Requirements
 	Fix for issue #706 ArrayIndexOutOfBoundsException in BaseAttackBuiltInScenario
 	Fix for most cases of issue #695 Base Attack (Defense) mission generate with no Allies or OpFor in AtB and
-	#674 AtB fails to generate opfor 
+	#674 AtB fails to generate opfor
 	The only exception being if the opfor has no RAT for the current contract date, which will be addressed in a separate PR.
 + PR #725: Fix for issue #714 0.43.2 Migration to 0.43.9 causes Phantom Personel in Unit Breakdown
 + PR #726: Fix issue #600 and #621 where inner sphere prisoners were being converted to trueborn warriors and clanners were being
@@ -331,7 +333,7 @@ v0.43.7-RC1 (2018-01-21 22:00 UTC)
 + Do not require waiting for a refit kit if the only needed parts are ammo or ammo bins.
 + Not having enough ammo in the warehouse to fill all the bins will not delay the start of a refit.
 + Issue #300: Comstar ranks do not take into account service years when determining the main "pilot" of a vehicle
-+ Issue #378: Thruster Maintenance on Conventional/Aerospace Fighters 
++ Issue #378: Thruster Maintenance on Conventional/Aerospace Fighters
 + Bug: NPE when attempting to refit unit that previously had a refit canceled.
 + Issue #454: News won't fire at campaign creation
 + Issue #500: Contract view text alignment
@@ -385,8 +387,8 @@ v0.43.5 (2017-12-17 11:00 UTC)
 + Customize Small Craft and Dropships in MekLab.
 + Track aerospace bays and doors as repairable parts.
 + Issue #554: Mass Repair/Salvage Button Broken during active campaign.
-+ Post-battle scenario resolution now features the ability to explicitly declare whether an individual was KIA, 
-	replacing the implicit determination from "number of hits". Personnel manually brought back from death will 
++ Post-battle scenario resolution now features the ability to explicitly declare whether an individual was KIA,
+	replacing the implicit determination from "number of hits". Personnel manually brought back from death will
 	no longer stay dead as a result.
 
 v0.43.4 (2017-10-01 11:00 UTC)
@@ -397,7 +399,7 @@ v0.43.4 (2017-10-01 11:00 UTC)
 + PR #398 Fix for no probe defender missions #413
 + Feature #363: Feature Request: Order from Warehouse
 + Support for LAM repairs and hiring/assigning LAM pilots.
-+ Refactor MR/MS/MRW and move much of the code to a service level class from the dialog. 
++ Refactor MR/MS/MRW and move much of the code to a service level class from the dialog.
 	o Fix multiple bugs related to 'impossible' fixes such as damaged hip/shoulders, missing parts, etc...
 	o Make the process much more efficient by not making checks that aren't necessary over and over.
 	o Add additional color-coded messaging when parts can't be fixed due to configuration or
@@ -412,8 +414,8 @@ v0.43.4 (2017-10-01 11:00 UTC)
 	o Updates all tech intro dates to the Universal Technology Advancement Table in Interstellar Operations.
 	o New options to vary part and unit tech level according to campaign year and/or faction.
 + Update Era.java to match MUL and add Dark Age information.
-+ PR #453: Overhaul much of the logic in MRMS to be better and faster. 
-    o Fix multiple bugs around rush jobs and repeated fixes 
++ PR #453: Overhaul much of the logic in MRMS to be better and faster.
+    o Fix multiple bugs around rush jobs and repeated fixes
 + Issue #455: Repair bay uses the wrong ammo bin.
 + PR #480: Faction.java redesign to fix issue with Eras. (More precise faction name and starting planet changes)
 
@@ -469,10 +471,10 @@ v0.43.1 (2017-03-31 01:15 UTC)
 	 to match MM repo as of March 31/2017
  + Updated MegaMek.jar to 0.43.1
  + Updated MegaMekLab.jar to 0.43.1
-	 
+
 v0.43.0 (2017-02-13 03:30 UTC)
 + Improve Mass Repair/Mass Salvage technician selection by providing additional configuration options
-+ Fix #313: Prisoners counting towards combatants total for defection rolls. 
++ Fix #313: Prisoners counting towards combatants total for defection rolls.
 + Fix #314: Purchasing aerospace sensors via 'purchase parts' are always 0 ton.
 + Planetary Data Update 39
 + Updated MegaMek.jar and MegaMekLab.jar to 0.43.0
@@ -510,7 +512,7 @@ v0.41.27 (2016-12-07 03:00 UTC)
 + Issue #247: GM Tools RAT Roller Will Not Add Dropships.
 + Overhaul of Mass Repair/Salvage and adding Mass Repair to warehouse
 + Issue #239: Be smarter about clearing assignments when removing personnel from units and vice versa.
-+ Issue #252: Enable 'remove all personnel' when selecting multiple units in the hangar 
++ Issue #252: Enable 'remove all personnel' when selecting multiple units in the hangar
 + Issue #239: Techs stuck on assignment (also #261).
 + Issue #231: IndexOutOfBoundsException in Layered Icon editor
 + Issue #224: Mechs with bad hip/shoulder do not show in repair bay if IS undamaged
@@ -602,7 +604,7 @@ v0.3.29 (2016-06-05 22:40 UTC)
 + Issue #96: Null Pointer Exception from Special Mission (Prison Break)
 + Issue #91: Can't assign patients to doctors
 + PR #92: Cleanup of the infirmary panel
-+ PR #94: Conception and Birth messages now have names hyperlinked. 
++ PR #94: Conception and Birth messages now have names hyperlinked.
 + Issue #88: Current location displayed as "null"
 + Fixed IO Reputation rating value for experience.
 + Fixed an NPE in hasChildren() when trying to hire new personnel
