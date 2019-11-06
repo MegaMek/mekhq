@@ -2121,8 +2121,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     continue;
                 }
                 if(!(m.getType().hasFlag(MiscType.F_BA_MANIPULATOR) ||
-                     m.getType().hasFlag(MiscType.F_BA_MEA) ||
-                     m.getType().hasFlag(MiscType.F_AP_MOUNT))) {
+                        m.getType().hasFlag(MiscType.F_BA_MEA) ||
+                        m.getType().hasFlag(MiscType.F_AP_MOUNT) ||
+                        m.getType().hasFlag(MiscType.F_MAGNETIC_CLAMP))) {
                     continue;
                 }
             }

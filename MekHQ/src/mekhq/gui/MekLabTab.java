@@ -1393,6 +1393,8 @@ public class MekLabTab extends CampaignGuiTab {
         public void refreshBuild() {
             buildTab.refresh();
             refreshSummary();
+            // trick to catch toggling the main gun location, which does not affect the status bar
+            refreshRefitSummary();
         }
 
         @Override
