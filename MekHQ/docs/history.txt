@@ -1,6 +1,6 @@
 VERSION HISTORY:
 ----------------
-v0.47.1-SNAPSHOT
+v0.47.1 (2019-11-05 0300 UTC) 
 + PR #1259: Fix map size display for AtB scenarios in the briefing tab (cosmetic issue only)
 + Data - Updating the AtB Starter Guide to v3, thanks CampaignAnon
 + Issue #1257: Don't double up salaries when charging for peacetime costs
