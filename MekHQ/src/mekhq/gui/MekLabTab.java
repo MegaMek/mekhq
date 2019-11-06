@@ -254,6 +254,8 @@ public class MekLabTab extends CampaignGuiTab {
         testEntity = null;
         if (entity instanceof SmallCraft) {
             testEntity = new TestSmallCraft((SmallCraft) entity, entityVerifier.aeroOption, null);
+        } else if (entity instanceof Jumpship) {
+            testEntity = new TestAdvancedAerospace((Jumpship) entity, entityVerifier.aeroOption, null);
         } else if (entity instanceof Aero) {
             testEntity = new TestAero((Aero) entity, entityVerifier.aeroOption, null);
         } else if (entity instanceof Mech) {
@@ -417,6 +419,8 @@ public class MekLabTab extends CampaignGuiTab {
     private EntityPanel getCorrectLab(Entity en) {
         if (en instanceof SmallCraft) {
             return new DropshipPanel((SmallCraft) en);
+        } else if (en instanceof Jumpship) {
+            return new AdvancedAeroPanel((Jumpship) en);
         } else if (en instanceof Aero) {
             return new AeroPanel((Aero) en);
         } else if (en instanceof Mech) {
@@ -1325,4 +1329,136 @@ public class MekLabTab extends CampaignGuiTab {
             structureTab.setTechFaction(techFaction);
         }
     }
+
+    private class AdvancedAeroPanel extends EntityPanel {
+
+        private static final long serialVersionUID = 4031380495472570820L;
+
+        private Jumpship entity;
+        private megameklab.com.ui.aerospace.AdvancedAeroStructureTab structureTab;
+        private megameklab.com.ui.Aero.tabs.EquipmentTab equipmentTab;
+        private megameklab.com.ui.Aero.tabs.BuildTab buildTab;
+        private megameklab.com.ui.aerospace.TransportTab transportTab;
+        private megameklab.com.ui.tabs.PreviewTab previewTab;
+
+        public AdvancedAeroPanel(Jumpship a) {
+            entity = a;
+            reloadTabs();
+        }
+
+        @Override
+        public Entity getEntity() {
+            return entity;
+        }
+
+        public void reloadTabs() {
+            removeAll();
+
+            structureTab = new megameklab.com.ui.aerospace.AdvancedAeroStructureTab(this);
+            structureTab.setAsCustomization();
+            previewTab = new megameklab.com.ui.tabs.PreviewTab(this);
+            equipmentTab = new megameklab.com.ui.Aero.tabs.EquipmentTab(this);
+            buildTab = new megameklab.com.ui.Aero.tabs.BuildTab(this, equipmentTab);
+            transportTab = new megameklab.com.ui.aerospace.TransportTab(this);
+            structureTab.addRefreshedListener(this);
+            equipmentTab.addRefreshedListener(this);
+            buildTab.addRefreshedListener(this);
+            transportTab.addRefreshedListener(this);
+
+            addTab("Structure/Armor", new JScrollPane(structureTab));
+            addTab("Equipment", new JScrollPane(equipmentTab));
+            addTab("Assign Criticals", new JScrollPane(buildTab));
+            addTab("Transport Bays", new JScrollPane(transportTab));
+            addTab("Preview", new JScrollPane(previewTab));
+            this.repaint();
+        }
+
+        @Override
+        public void refreshAll() {
+            structureTab.refresh();
+            equipmentTab.refresh();
+            buildTab.refresh();
+            transportTab.refresh();
+            previewTab.refresh();
+            refreshSummary();
+        }
+
+        @Override
+        public void refreshArmor() {
+            refreshSummary();
+        }
+
+        @Override
+        public void refreshBuild() {
+            buildTab.refresh();
+            refreshSummary();
+        }
+
+        @Override
+        public void refreshEquipment() {
+            equipmentTab.refresh();
+            refreshSummary();
+        }
+
+        @Override
+        public void refreshTransport() {
+            transportTab.refresh();
+        }
+
+        @Override
+        public void refreshStatus() {
+            refreshRefitSummary();
+        }
+
+        @Override
+        public void refreshStructure() {
+            structureTab.refresh();
+            refreshSummary();
+        }
+
+        @Override
+        public void refreshWeapons() {
+            refreshSummary();
+        }
+
+        @Override
+        public void refreshHeader() {
+
+        }
+
+        @Override
+        public void refreshPreview() {
+            previewTab.refresh();
+        }
+
+        @Override
+        public void refreshSummary() {
+            structureTab.refreshSummary();
+        }
+
+        @Override
+        public void refreshEquipmentTable() {
+            equipmentTab.refreshTable();
+        }
+
+        @Override
+        public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
+            // Not used by MekHQ
+        }
+
+        @Override
+        public ITechManager getTechManager() {
+            if (null != structureTab) {
+                return structureTab.getTechManager();
+            }
+            return null;
+        }
+
+        @Override
+        void setTechFaction(int techFaction) {
+            structureTab.setTechFaction(techFaction);
+        }
+
+    }
+
 }
