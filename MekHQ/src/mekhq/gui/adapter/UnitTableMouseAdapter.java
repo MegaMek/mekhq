@@ -885,7 +885,6 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
 	                                        | Entity.ETYPE_JUMPSHIP
 	                                        | Entity.ETYPE_SUPPORT_TANK
 	                                        | Entity.ETYPE_SUPPORT_VTOL
-	                                        | Entity.ETYPE_PROTOMECH
 	                                        | Entity.ETYPE_GUN_EMPLACEMENT)) == 0));
 	                menu.add(menuItem);
                 }
