@@ -22,17 +22,7 @@ import javax.swing.event.MouseInputAdapter;
 
 import megamek.client.ui.swing.UnitEditorDialog;
 import megamek.client.ui.swing.util.MenuScroller;
-import megamek.common.Aero;
-import megamek.common.AmmoType;
-import megamek.common.BattleArmor;
-import megamek.common.CriticalSlot;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.IBomber;
-import megamek.common.Infantry;
-import megamek.common.Mech;
-import megamek.common.MechSummaryCache;
-import megamek.common.Player;
+import megamek.common.*;
 import megamek.common.loaders.BLKFile;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
@@ -887,9 +877,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                     menuItem.setActionCommand("CUSTOMIZE");
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(unit.isAvailable()
-                            && ((unit.getEntity().getEntityType() &
-                                    (Entity.ETYPE_JUMPSHIP
-                                            | Entity.ETYPE_GUN_EMPLACEMENT)) == 0));
+                            && !(unit.getEntity() instanceof GunEmplacement));
                     menu.add(menuItem);
                 }
                 if (unit.isRefitting()) {
