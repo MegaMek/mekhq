@@ -2,6 +2,7 @@ VERSION HISTORY:
 ----------------
 v0.47.2-SNAPSHOT
 + PR #1325: Customize protomechs and advanced aero in MekLab
++ PR #1326: Fix another potential error preventing day advancement when giving training XP
 
 v0.47.1 (2019-11-05 0300 UTC)
 + PR #1259: Fix map size display for AtB scenarios in the briefing tab (cosmetic issue only)
