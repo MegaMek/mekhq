@@ -3419,6 +3419,12 @@ public class Campaign implements Serializable, ITechManager {
                     // ...and if the commander is better than a veteran, find all of
                     // the personnel under their command...
                     for (UUID traineeId : forceIds.get(l.getForceId()).getAllUnits()) {
+                        Unit traineeUnit = getUnit(traineeId);
+                        
+                        if(traineeUnit == null) {
+                            continue;
+                        }
+                        
                         for (Person p : getUnit(traineeId).getCrew()) {
                             if (p == commander) {
                                 continue;
