@@ -3433,7 +3433,7 @@ public class Campaign implements Serializable, ITechManager {
                             continue;
                         }
                         
-                        for (Person p : getUnit(traineeId).getCrew()) {
+                        for (Person p : traineeUnit.getCrew()) {
                             if (p == commander) {
                                 continue;
                             }
