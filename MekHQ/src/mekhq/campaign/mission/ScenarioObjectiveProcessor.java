@@ -270,6 +270,10 @@ public class ScenarioObjectiveProcessor {
     public int determineScenarioStatus(Scenario scenario, Map<ScenarioObjective, Boolean> objectiveOverrides, Map<ScenarioObjective, Integer> objectiveUnitCounts) {
         int victoryScore = 0;
         
+        if(!scenario.hasObjectives()) {
+            return Scenario.S_DRAW;
+        }
+        
         for(ScenarioObjective objective : scenario.getScenarioObjectives()) {
             // some objectives aren't associated with units and their completion is set manually
             // in that case, we continue on

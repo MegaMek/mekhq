@@ -1340,24 +1340,26 @@ public class ResolveScenarioWizardDialog extends JDialog {
         //now process
         tracker.resolveScenario(choiceStatus.getSelectedIndex()+1,txtReport.getText());
         
-        // process objectives here
-        for(ScenarioObjective objective : tracker.getScenario().getScenarioObjectives()) {
-            int qualifyingUnitCount = 0;
-            
-            if(objectiveCheckboxes.containsKey(objective)) {
-                for(JCheckBox box : objectiveCheckboxes.get(objective)) {
-                    if(box.isSelected()) {
-                        qualifyingUnitCount++;
+        if(tracker.getScenario().hasObjectives()) {
+            // process objectives here
+            for(ScenarioObjective objective : tracker.getScenario().getScenarioObjectives()) {
+                int qualifyingUnitCount = 0;
+                
+                if(objectiveCheckboxes.containsKey(objective)) {
+                    for(JCheckBox box : objectiveCheckboxes.get(objective)) {
+                        if(box.isSelected()) {
+                            qualifyingUnitCount++;
+                        }
                     }
                 }
+                
+                Boolean override = null;
+                if(objectiveOverrideCheckboxes.containsKey(objective)) {
+                    override = objectiveOverrideCheckboxes.get(objective).isSelected();
+                }
+                
+                objectiveProcessor.processObjective(objective, qualifyingUnitCount, override, tracker, false);
             }
-            
-            Boolean override = null;
-            if(objectiveOverrideCheckboxes.containsKey(objective)) {
-                override = objectiveOverrideCheckboxes.get(objective).isSelected();
-            }
-            
-            objectiveProcessor.processObjective(objective, qualifyingUnitCount, override, tracker, false);
         }
         
         this.setVisible(false);
@@ -1372,8 +1374,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             return tracker.getUnitsStatus().keySet().size() > 0;
         }
         else if (panelName.equals(OBJECTIVEPANEL)) {
-            return tracker.getScenario().getScenarioObjectives() != null &&
-                    tracker.getScenario().getScenarioObjectives().size() > 0;
+            return tracker.getScenario().hasObjectives();
         }
         else if(panelName.equals(PILOTPANEL)) {
             return tracker.getPeopleStatus().keySet().size() > 0;
@@ -1497,27 +1498,29 @@ public class ResolveScenarioWizardDialog extends JDialog {
          // do a "dry run" of the scenario objectives to output a report
         StringBuilder sb = new StringBuilder();
         
-        for(ScenarioObjective objective : tracker.getScenario().getScenarioObjectives()) {
-            int qualifyingUnitCount = 0;
-            
-            if(objectiveCheckboxes.containsKey(objective)) {
-                for(JCheckBox box : objectiveCheckboxes.get(objective)) {
-                    if(box.isSelected()) {
-                        qualifyingUnitCount++;
+        if(tracker.getScenario().hasObjectives()) {
+            for(ScenarioObjective objective : tracker.getScenario().getScenarioObjectives()) {
+                int qualifyingUnitCount = 0;
+                
+                if(objectiveCheckboxes.containsKey(objective)) {
+                    for(JCheckBox box : objectiveCheckboxes.get(objective)) {
+                        if(box.isSelected()) {
+                            qualifyingUnitCount++;
+                        }
                     }
                 }
+                
+                Boolean override = null;
+                if(objectiveOverrideCheckboxes.containsKey(objective)) {
+                    override = objectiveOverrideCheckboxes.get(objective).isSelected();
+                }
+                
+                sb.append(objectiveProcessor.processObjective(objective, qualifyingUnitCount, override, tracker, true));
+                sb.append("\n");
             }
             
-            Boolean override = null;
-            if(objectiveOverrideCheckboxes.containsKey(objective)) {
-                override = objectiveOverrideCheckboxes.get(objective).isSelected();
-            }
-            
-            sb.append(objectiveProcessor.processObjective(objective, qualifyingUnitCount, override, tracker, true));
-            sb.append("\n");
+            txtReport.setText(sb.toString());
         }
-        
-        txtReport.setText(sb.toString());
         
         //pilots first
         String missingNames = "";
