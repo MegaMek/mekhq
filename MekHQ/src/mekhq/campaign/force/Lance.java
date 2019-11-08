@@ -320,6 +320,15 @@ public class Lance implements Serializable, MekHqXmlSerializable {
         int battleTypeMod = 1 + (AtBContract.MORALE_NORMAL - getContract(c).getMoraleLevel()) * 5;
         battleTypeMod += getContract(c).getBattleTypeMod();
         
+        // debugging code that will allow you to force the generation of a particular scenario.
+        // when generating a lance-based scenario (Standup, Probe, etc), the second parameter in 
+        // createScenario is "this" (the lance). Otherwise, it should be null.
+        /*if(true) {
+            AtBScenario scenario = AtBScenarioFactory.createScenario(c, null, AtBScenario.CIVILIANHELP, true, getBattleDate(c.getCalendar()));
+            scenario.setMissionId(this.getMissionId());
+            return scenario;
+        }*/
+        
         switch (role) {
         case ROLE_FIGHT:
             noBattle = (int)(60.0 / intensity + 0.5);

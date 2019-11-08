@@ -89,9 +89,10 @@ public class Scenario implements Serializable {
         this.report = "";
         this.status = S_CURRENT;
         this.date = null;
-        this.subForceIds = new ArrayList<Integer>();
-        this.unitIds = new ArrayList<UUID>();
-        this.loots = new ArrayList<Loot>();
+        this.subForceIds = new ArrayList<>();
+        this.unitIds = new ArrayList<>();
+        this.loots = new ArrayList<>();
+        this.scenarioObjectives = new ArrayList<>();
     }
     
     public static String getStatusName(int s) {
@@ -154,6 +155,11 @@ public class Scenario implements Serializable {
     
     public Date getDate() {
         return date;
+    }
+    
+    public boolean hasObjectives() {
+        return scenarioObjectives != null &&
+                scenarioObjectives.size() > 0;
     }
     
     public List<ScenarioObjective> getScenarioObjectives() {
@@ -316,8 +322,10 @@ public class Scenario implements Serializable {
             stub.writeToXml(pw1, indent+1);
         } else {
             // only bother writing out objectives for active scenarios
-            for(ScenarioObjective objective : this.scenarioObjectives) {
-                objective.Serialize(pw1);
+            if(hasObjectives()) {
+                for(ScenarioObjective objective : this.scenarioObjectives) {
+                    objective.Serialize(pw1);
+                }
             }
         }
         if(loots.size() > 0 && status == S_CURRENT) {

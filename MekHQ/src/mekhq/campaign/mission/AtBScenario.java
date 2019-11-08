@@ -243,7 +243,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         entityIds = new HashMap<UUID, Entity>();
         transportLinkages = new HashMap<>();
         externalIDLookup = new HashMap<>();
-        setScenarioObjectives(new ArrayList<>());
 
         light = PlanetaryConditions.L_DAY;
         weather = PlanetaryConditions.WE_NONE;
@@ -644,6 +643,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                     && specMissionEnemies.get(weight) != null) {
                 botForces.get(0).setEntityList(specMissionEnemies.get(weight));
             }
+            setObjectives(campaign, getContract(campaign));
         }
     }
 
