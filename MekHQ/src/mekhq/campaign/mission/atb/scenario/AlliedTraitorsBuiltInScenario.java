@@ -80,7 +80,7 @@ public class AlliedTraitorsBuiltInScenario extends AtBScenario {
 	
     @Override
     public void setObjectives(Campaign campaign, AtBContract contract) {
-	    super.setObjectives(campaign, contract);
+        super.setObjectives(campaign, contract);
 	    
 	    String allyBotName = getContract(campaign).getAllyBotName();
 	    
