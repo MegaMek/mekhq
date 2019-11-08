@@ -78,7 +78,7 @@ public class AlliedTraitorsBuiltInScenario extends AtBScenario {
 				new BotForce(getContract(campaign).getAllyBotName(), 2, enemyStart, getSpecMissionEnemies().get(0)));
 	}
 	
-	@Override
+    @Override
     public void setObjectives(Campaign campaign, AtBContract contract) {
 	    super.setObjectives(campaign, contract);
 	    
