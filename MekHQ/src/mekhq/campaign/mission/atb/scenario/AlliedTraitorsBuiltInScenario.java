@@ -81,8 +81,15 @@ public class AlliedTraitorsBuiltInScenario extends AtBScenario {
 	@Override
     public void setObjectives(Campaign campaign, AtBContract contract) {
 	    super.setObjectives(campaign, contract);
+	    
+	    String allyBotName = getContract(campaign).getAllyBotName();
+	    
         ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 100);
+        // this is a special case where the target is actually the "allied" bot.
+        destroyHostiles.clearForces();
+        destroyHostiles.addForce(allyBotName);
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 100, false);
+        keepFriendliesAlive.removeForce(allyBotName);
 
         getScenarioObjectives().add(destroyHostiles);
         getScenarioObjectives().add(keepFriendliesAlive);
