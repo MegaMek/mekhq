@@ -5,7 +5,7 @@
     <detailedBriefing>Break through to the opposite edge of the map or rout the hostile force.</detailedBriefing>
     <mapParameters>
         <allowedTerrainTypes/>
-        <allowRotation>false</allowRotation>
+        <allowRotation>true</allowRotation>
         <baseHeight>50</baseHeight>
         <baseWidth>17</baseWidth>
         <heightScalingIncrement>0</heightScalingIncrement>

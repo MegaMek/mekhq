@@ -351,6 +351,34 @@ public class ScenarioObjective {
         }
     }
     
+    /**
+     * Whether this objective is applicable to a force template.
+     * This is the case if the objective's associated force names contain either the 
+     * force template's name or any of the the force template's linked force names.
+     */
+    public boolean isApplicableToForceTemplate(ScenarioForceTemplate forceTemplate) {
+        // no template = not applicable
+        if(forceTemplate == null) {
+            return false;
+        }
+        
+        // if the template force is listed in this objective, we're good
+        if(getAssociatedForceNames().contains(forceTemplate.getForceName())) {
+            return true;
+        }
+        
+        // if the template force is linked to a force listed in this objective, we're good.
+        if(forceTemplate.getObjectiveLinkedForces() != null) {
+            for(String linkedForceName : forceTemplate.getObjectiveLinkedForces()) {
+                if(getAssociatedForceNames().contains(linkedForceName)) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+    
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
