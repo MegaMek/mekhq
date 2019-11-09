@@ -26,7 +26,6 @@ import org.joda.money.BigMoney;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * This class represents an quantity of money and its associated
@@ -161,6 +160,10 @@ public class Money implements Comparable<Money> {
 
     public String toAmountAndNameString() {
         return CurrencyManager.getInstance().getUiAmountAndNamePrinter().print(this.wrapped.toMoney(RoundingMode.HALF_EVEN));
+    }
+
+    public static Money parse(String moneyStr) {
+        return new Money(BigMoney.parse(moneyStr));
     }
 
     @Override

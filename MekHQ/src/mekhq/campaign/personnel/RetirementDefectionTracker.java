@@ -25,7 +25,6 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -99,15 +98,15 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
         String financialReport = campaign.getFinancialReport();
         Money netWorth = Money.zero();
         try {
-            Pattern p = Pattern.compile("Net Worth\\D*(.*)");
+            Pattern p = Pattern.compile("Net Worth\\D*([\\d,.]+)");
             Matcher m = p.matcher(financialReport);
             m.find();
-            netWorth = Money.of(Double.parseDouble(m.group(1)));
+            netWorth = Money.parse(m.group(1));
             if (campaign.getCampaignOptions().getSharesExcludeLargeCraft()) {
-                p = Pattern.compile("Large Craft\\D*(.*)");
+                p = Pattern.compile("Large Craft\\D*([\\d,.]*)");
                 m = p.matcher(financialReport);
                 if (m.find() && null != m.group(1)) {
-                    netWorth = netWorth.minus(Money.of(Double.parseDouble(m.group(1))));
+                    netWorth = netWorth.minus(Money.parse(m.group(1)));
                 }
             }
         } catch (Exception e) {
