@@ -39,8 +39,11 @@ public class SVArmor extends Armor {
     private int bar;
     private int techRating;
 
+    /**
+     * Constructor used during campaign deserialization
+     */
     @SuppressWarnings("unused")
-    private SVArmor() {
+    public SVArmor() {
         this(2, RATING_D, 0, Entity.LOC_NONE, null);
     }
 
@@ -162,6 +165,7 @@ public class SVArmor extends Armor {
 
     @Override
     protected void loadFieldsFromXmlNode(Node node) {
+        super.loadFieldsFromXmlNode(node);
         for (int x = 0; x < node.getChildNodes().getLength(); x++) {
             final Node wn = node.getChildNodes().item(x);
             switch (wn.getNodeName()) {
