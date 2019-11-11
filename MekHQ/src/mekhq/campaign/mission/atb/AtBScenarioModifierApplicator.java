@@ -67,12 +67,18 @@ public class AtBScenarioModifierApplicator {
      * @param scenario
      * @param forceToApply
      */
-    private static void postAddForce(Campaign campaign, AtBDynamicScenario scenario, ScenarioForceTemplate forceToApply) {
+    private static void postAddForce(Campaign campaign, AtBDynamicScenario scenario, ScenarioForceTemplate templateToApply) {
         int effectiveBV = AtBDynamicScenarioFactory.calculateEffectiveBV(scenario, campaign);
         int effectiveUnitCount = AtBDynamicScenarioFactory.calculateEffectiveUnitCount(scenario, campaign);
+        int deploymentZone = AtBDynamicScenarioFactory.calculateDeploymentZone(templateToApply, scenario, templateToApply.getForceName());
         
         AtBDynamicScenarioFactory.generateForce(scenario, scenario.getContract(campaign), campaign, 
-                effectiveBV, effectiveUnitCount, EntityWeightClass.WEIGHT_ASSAULT, forceToApply);
+                effectiveBV, effectiveUnitCount, EntityWeightClass.WEIGHT_ASSAULT, templateToApply);
+        
+        // the most recently added bot force is the one we just generated
+        BotForce generatedBotForce = scenario.getBotForce(scenario.getNumBots() - 1);
+        generatedBotForce.setStart(deploymentZone);
+        AtBDynamicScenarioFactory.setDeploymentTurnsForReinforcements(generatedBotForce.getEntityList(), 0);
         
         // at this point, we have to re-translate the scenario objectives
         // since we're adding a force that could potentially go into any of them

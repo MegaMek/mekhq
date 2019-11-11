@@ -123,27 +123,61 @@
 		<modifier>
 			ExtraBadEvent.xml
 		</modifier>
-		<!--modifier>
-			Need objective mechanism
-			Need campaign state
-			AddObjectiveEvent.xml
-		</modifier-->
+
+		<!-- Facility objective modifiers -->
+		<modifier>
+			FacilityHostileDestroy.xml
+		</modifier>
+		<modifier>
+			FacilityHostileCapture.xml
+		</modifier>
+		<modifier>
+			FacilityHostileEngage.xml
+		</modifier>
+		<modifier> --- not done from here to below
+			FacilityHostileExtract.xml
+		</modifier>
+		<modifier>
+			FacilityHostileRecon.xml
+		</modifier>
+		<modifier>
+			FacilityHostilePreventEvac.xml
+		</modifier>
+
+		<!-- FacilityAlliedDefend.xml -->
+		<!-- FacilityAlliedEvac.xml -->
+
+		<!-- FacilityHostileMechBase.xml -->
+		<!-- FacilityHostileTankBase.xml -->
+		<!-- FacilityHostileAirBase.xml -->
+		<!-- FacilityHostileSupplyDepot.xml -->
+
+		<!-- SearchAndRescue.xml -->	
+
 
 		<!-- Scenario modifiers that come from campaign state go here -->
 		<modifier>
 			IntegratedAllies.xml
+			-- add 'keep these guys alive, lose 1 pt per guy' objective
+			-- add 'keep 50% allied forces alive' (Player, These Guys, Allied Force) objective
 		</modifier>
 		<modifier>
 			HouseOfficer.xml
+			-- add 'keep this guy alive, lose 1 pt per guy' objective
+			-- add 'keep 50% allied forces alive' (Player, This Guy, Allied Force) objective
 		</modifier>
 		<modifier>
 			Liaison.xml
+			-- add 'keep this guy alive, lose 1 pt per guy' objective
+			-- add 'keep 50% allied forces alive' (Player, Allied Force) objective
 		</modifier>
 		<modifier>
 			PrimaryAllies.xml
 		</modifier>
 		<modifier>
 			AlliedTrainees.xml
+			-- add 'keep these guys alive, lose 1 pt per guy' objective
+			-- add 'keep 50% allied forces alive' (Player, Allied Force) objective
 		</modifier>
 	</modifiers>
 </scenarioModifierManifest>

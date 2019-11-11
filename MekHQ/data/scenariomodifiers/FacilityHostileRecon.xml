@@ -1,0 +1,34 @@
+<AtBScenarioModifier>
+	<additionalBriefingText>Destroy or cripple all of the designated turrets.</additionalBriefingText>
+	<benefitsPlayer>false</benefitsPlayer>
+	<eventTiming>PreForceGeneration</eventTiming>
+	<scenarioObjective>
+            <associatedForceNames>
+                <associatedForceName>Primary Opfor</associatedForceName>
+            </associatedForceNames>
+            <associatedUnitIDs/>
+            <successEffects>
+                <successEffect>
+                    <effectType>ScenarioVictory</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </successEffect>
+            </successEffects>
+            <failureEffects>
+                <failureEffect>
+                    <effectType>ScenarioDefeat</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </failureEffect>
+            </failureEffects>
+            <additionalDetails/>
+            <description>Enage the following enemy unit(s) and force(s):</description>
+            <destinationEdge>NONE</destinationEdge>
+            <objectiveCriterion>Custom</objectiveCriterion>
+            <percentage>1</percentage>
+            <timeLimitAtMost>false</timeLimitAtMost>
+            <timeLimitScaleFactor>2</timeLimitScaleFactor>
+            <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
+        </scenarioObjective>
+    </scenarioObjectives>
+</AtBScenarioModifier>

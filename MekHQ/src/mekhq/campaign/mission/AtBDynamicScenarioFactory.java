@@ -387,7 +387,8 @@ public class AtBDynamicScenarioFactory {
             }
             
             if(forceTemplate.getAllowAeroBombs()) {
-                populateAeroBombs(generatedLance, campaign, scenario.getTemplate().mapParameters.getMapLocation() == MapLocation.AllGroundTerrain);
+                boolean isAeroMap = scenario.getTemplate().mapParameters.getMapLocation() == MapLocation.AllGroundTerrain;
+                populateAeroBombs(generatedLance, campaign, !isAeroMap);
             }
             
             if(forceTemplate.getUseArtillery() && forceTemplate.getDeployOffboard()) {
@@ -1578,7 +1579,7 @@ public class AtBDynamicScenarioFactory {
      * @param originalForceTemplateID The ID of the force template where we started.
      * @return Deployment zone as defined in Board.java
      */
-    private static int calculateDeploymentZone(ScenarioForceTemplate forceTemplate, AtBDynamicScenario scenario, String originalForceTemplateID) {
+    public static int calculateDeploymentZone(ScenarioForceTemplate forceTemplate, AtBDynamicScenario scenario, String originalForceTemplateID) {
         int calculatedEdge = Board.START_ANY;
         
         // if we have a specific deployment zone OR have looped around
@@ -2079,7 +2080,7 @@ public class AtBDynamicScenarioFactory {
         
         for(Entity entity : entityList) {
             if(entity.isBomber()) {
-                // if this entity has no guns (e.g. 
+                // if this entity has no guns (e.g. is a Boeing Jump Bomber)
                 if(entity.getIndividualWeaponList().size() == 0) {
                     loadBombs(entity, validBombChoices);
                     continue;

@@ -25,6 +25,9 @@
 <maxWeightClass>4</maxWeightClass>
 <retreatThreshold>75</retreatThreshold>
 <startingAltitude>0</startingAltitude>
+<objectiveLinkedForces>
+	<objectiveLinkedForce>Primary Opfor</objectiveLinkedForce>
+</objectiveLinkedForces>
 <syncDeploymentType>None</syncDeploymentType>
 <useArtillery>false</useArtillery>
 	</forceDefinition>
