@@ -152,7 +152,9 @@
 		<!-- FacilityHostileAirBase.xml -->
 		<!-- FacilityHostileSupplyDepot.xml -->
 
-		<!-- SearchAndRescue.xml -->	
+		<!-- SearchAndRescue.xml -->
+		
+		-- need code/flag that only appends a force to an objective if it is on the same team?
 
 
 		<!-- Scenario modifiers that come from campaign state go here -->
