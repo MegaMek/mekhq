@@ -3401,12 +3401,12 @@ public class Campaign implements Serializable, ITechManager {
     private void awardTrainingXPByMaximumRole(Lance l) {
         for (UUID trainerId : forceIds.get(l.getForceId()).getAllUnits()) {
             Unit trainerUnit = getUnit(trainerId);
-            
+
             // not sure how this occurs, but it probably shouldn't halt processing of a new day.
             if(trainerUnit == null) {
                 continue;
             }
-            
+
             Person commander = getUnit(trainerId).getCommander();
             // AtB 2.31: Training lance – needs a officer with Veteran skill levels
             //           and adds 1xp point to every Green skilled unit.
@@ -3420,11 +3420,11 @@ public class Campaign implements Serializable, ITechManager {
                     // the personnel under their command...
                     for (UUID traineeId : forceIds.get(l.getForceId()).getAllUnits()) {
                         Unit traineeUnit = getUnit(traineeId);
-                        
+
                         if(traineeUnit == null) {
                             continue;
                         }
-                        
+
                         for (Person p : traineeUnit.getCrew()) {
                             if (p == commander) {
                                 continue;
@@ -6438,12 +6438,12 @@ public class Campaign implements Serializable, ITechManager {
         entity.heat = 0;
         entity.heatBuildup = 0;
         entity.setTransportId(Entity.NONE);
-        entity.setUnloaded(false);
-        entity.setDone(false);
         entity.resetTransporter();
         entity.setDeployRound(0);
         entity.setSwarmAttackerId(Entity.NONE);
         entity.setSwarmTargetId(Entity.NONE);
+        entity.setUnloaded(false);
+        entity.setDone(false);
         entity.setLastTarget(Entity.NONE);
         entity.setNeverDeployed(true);
         entity.setStuck(false);
