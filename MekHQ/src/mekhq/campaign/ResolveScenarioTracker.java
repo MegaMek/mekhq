@@ -673,13 +673,16 @@ public class ResolveScenarioTracker {
             boolean pickedUp = en instanceof MechWarrior 
                     && !((MechWarrior)en).getPickedUpByExternalIdAsString().equals("-1")
                     && null != unitsStatus.get(UUID.fromString(((MechWarrior)en).getPickedUpByExternalIdAsString()));
+            // If this option is turned on and the player controls the battlefield, 
+            // assume that all ejected warriors have been picked up
+            if (campaign.getGameOptions().booleanOption(OptionsConstants.ADVGRNDMOV_EJECTED_PILOTS_FLEE)) {
+                pickedUp = true;
+            }
             //if the crew ejected from this unit, then skip it because we should find them elsewhere
             //if they are alive
-            //If the optional 'Ejected Pilots Flee' is on, process pilots anyway because they won't be on the battlefield
             if(!(en instanceof EjectedCrew)
                     && null != en.getCrew()
-                    && en.getCrew().isEjected()
-                    && (!(campaign.getGameOptions().booleanOption(OptionsConstants.ADVGRNDMOV_EJECTED_PILOTS_FLEE)))) {
+                    && (en.getCrew().isEjected() && !campaign.getGameOptions().booleanOption(OptionsConstants.ADVGRNDMOV_EJECTED_PILOTS_FLEE))) {
                 continue;
             }
             //shuffling the crew ensures that casualties are randomly assigned in multi-crew units
@@ -950,6 +953,7 @@ public class ResolveScenarioTracker {
                 checkForLostLimbs(e, control);
                 UnitStatus status = null;
                 if(!e.getExternalIdAsString().equals("-1") && e.isSalvage()) {
+                    // Check to see if this is a friendly deployed unit with a unit ID in the campaign
                     status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
                 }
                 if(null != status) {
@@ -969,6 +973,7 @@ public class ResolveScenarioTracker {
                         }
                     }
                 } else {
+                    // Enemy crew/pilot entity is actually in the salvage list
                     if(e instanceof EjectedCrew & null != e.getCrew() && !e.getCrew().getExternalIdAsString().equals("-1")) {
                         enemyEjections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew)e);
                         continue;
