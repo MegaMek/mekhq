@@ -6,6 +6,7 @@ v0.47.2-SNAPSHOT
 + Issue #1327, 1329: Fixed multiple issues relating to scenario resolution introduced in 47.1
 + Issue #1333: Simca Ambulance possibly causing campaign to not load
 + Issue #1337: Offboard artillery - designate hex phase skipped when artillery comes from mekhq
++ Issue #1330: Fix NPE when PersonViewPanel has a pregnant individual
 
 v0.47.1 (2019-11-05 0300 UTC)
 + PR #1259: Fix map size display for AtB scenarios in the briefing tab (cosmetic issue only)
