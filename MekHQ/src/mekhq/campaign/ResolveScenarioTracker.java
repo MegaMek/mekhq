@@ -33,6 +33,7 @@ import megamek.common.*;
 import megamek.common.event.GameVictoryEvent;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.logging.LogLevel;
+import megamek.common.options.OptionsConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.event.PersonBattleFinishedEvent;
@@ -547,7 +548,7 @@ public class ResolveScenarioTracker {
                 //cant do the following by u.usesSoloPilot because entity may be different if ejected
                 else if(en instanceof Mech
                         || en instanceof Protomech
-                        || (en instanceof Aero && !(en instanceof SmallCraft || en instanceof Jumpship))) {
+                        || en.isFighter()) {
                     status.setHits(pilot.getHits());
                 } else {
                     //we have a multi-crewed vee/Aero/Infantry
@@ -674,9 +675,11 @@ public class ResolveScenarioTracker {
                     && null != unitsStatus.get(UUID.fromString(((MechWarrior)en).getPickedUpByExternalIdAsString()));
             //if the crew ejected from this unit, then skip it because we should find them elsewhere
             //if they are alive
+            //If the optional 'Ejected Pilots Flee' is on, process pilots anyway because they won't be on the battlefield
             if(!(en instanceof EjectedCrew)
                     && null != en.getCrew()
-                    && en.getCrew().isEjected()) {
+                    && en.getCrew().isEjected()
+                    && (!(campaign.getGameOptions().booleanOption(OptionsConstants.ADVGRNDMOV_EJECTED_PILOTS_FLEE)))) {
                 continue;
             }
             //shuffling the crew ensures that casualties are randomly assigned in multi-crew units
@@ -746,7 +749,7 @@ public class ResolveScenarioTracker {
                 PrisonerStatus status = new PrisonerStatus(p.getFullName(), u.getEntity().getDisplayName(), p);
                 if (en instanceof Mech
                         || en instanceof Protomech
-                        || (en instanceof Aero && !(en instanceof SmallCraft || en instanceof Jumpship))
+                        || en.isFighter()
                         || en instanceof MechWarrior) {
                     Crew pilot = en.getCrew();
                     if(null == pilot) {
