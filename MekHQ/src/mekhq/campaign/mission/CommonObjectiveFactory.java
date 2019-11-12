@@ -84,10 +84,12 @@ public class CommonObjectiveFactory {
         
         ObjectiveEffect successEffect = new ObjectiveEffect();
         successEffect.effectType = ObjectiveEffectType.ScenarioVictory;
+        successEffect.howMuch = 1;
         keepFriendliesAlive.addSuccessEffect(successEffect);
         
         ObjectiveEffect friendlyFailureEffect = new ObjectiveEffect();
         friendlyFailureEffect.effectType = ObjectiveEffectType.ScenarioDefeat;
+        friendlyFailureEffect.howMuch = 1;
         keepFriendliesAlive.addFailureEffect(friendlyFailureEffect);  
         
         return keepFriendliesAlive;
@@ -115,10 +117,12 @@ public class CommonObjectiveFactory {
 
         ObjectiveEffect successEffect = new ObjectiveEffect();
         successEffect.effectType = ObjectiveEffectType.ScenarioVictory;
+        successEffect.howMuch = 1;
         keepFriendliesAlive.addSuccessEffect(successEffect);
         
         ObjectiveEffect friendlyFailureEffect = new ObjectiveEffect();
         friendlyFailureEffect.effectType = ObjectiveEffectType.ScenarioDefeat;
+        friendlyFailureEffect.howMuch = 1;
         keepFriendliesAlive.addFailureEffect(friendlyFailureEffect);  
         
         return keepFriendliesAlive;
@@ -137,10 +141,12 @@ public class CommonObjectiveFactory {
         
         ObjectiveEffect successEffect = new ObjectiveEffect();
         successEffect.effectType = ObjectiveEffectType.ScenarioVictory;
+        successEffect.howMuch = 1;
         destroyHostiles.addSuccessEffect(successEffect);
         
         ObjectiveEffect failureEffect = new ObjectiveEffect();
         failureEffect.effectType = ObjectiveEffectType.ScenarioDefeat;
+        failureEffect.howMuch = 1;
         destroyHostiles.addFailureEffect(failureEffect);
         
         return destroyHostiles;
@@ -168,7 +174,13 @@ public class CommonObjectiveFactory {
         
         ObjectiveEffect successEffect = new ObjectiveEffect();
         successEffect.effectType = ObjectiveEffectType.ScenarioVictory;
+        successEffect.howMuch = 1;
         destroyHostiles.addSuccessEffect(successEffect);
+        
+        ObjectiveEffect failureEffect = new ObjectiveEffect();
+        failureEffect.effectType = ObjectiveEffectType.ScenarioDefeat;
+        failureEffect.howMuch = 1;
+        destroyHostiles.addFailureEffect(failureEffect);
         
         return destroyHostiles;
     }
@@ -190,10 +202,12 @@ public class CommonObjectiveFactory {
         
         ObjectiveEffect successEffect = new ObjectiveEffect();
         successEffect.effectType = ObjectiveEffectType.ScenarioVictory;
+        successEffect.howMuch = 1;
         breakthrough.addSuccessEffect(successEffect);
         
         ObjectiveEffect failureEffect = new ObjectiveEffect();
         failureEffect.effectType = ObjectiveEffectType.ScenarioDefeat;
+        failureEffect.howMuch = 1;
         breakthrough.addFailureEffect(failureEffect);
         
         return breakthrough;
