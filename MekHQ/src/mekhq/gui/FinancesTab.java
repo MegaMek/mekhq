@@ -80,7 +80,7 @@ import mekhq.gui.model.LoanTableModel;
 public final class FinancesTab extends CampaignGuiTab {
 
     private static final long serialVersionUID = -3203920871646865885L;
-    
+
     private ResourceBundle resourceMap;
 
     private JTable financeTable;
@@ -96,7 +96,7 @@ public final class FinancesTab extends CampaignGuiTab {
         super(gui, name);
         MekHQ.registerHandler(this);
     }
-    
+
     private enum GraphType {
         BALANCE_AMOUNT, MONTHLY_FINANCES;
     }
@@ -164,17 +164,17 @@ public final class FinancesTab extends CampaignGuiTab {
         JTabbedPane financeTab = new JTabbedPane();
         financeTab.setMinimumSize(new java.awt.Dimension(450, 300));
         financeTab.setPreferredSize(new java.awt.Dimension(450, 300));
-        
+
         JSplitPane splitFinances = new JSplitPane(JSplitPane.VERTICAL_SPLIT, panBalance, financeTab);
         splitFinances.setOneTouchExpandable(true);
         splitFinances.setContinuousLayout(true);
         splitFinances.setResizeWeight(1.0);
         splitFinances.setName("splitFinances");
-        
+
         financeTab.addTab(resourceMap.getString("activeLoans.text"), panLoan);
         financeTab.addTab(resourceMap.getString("cbillsBalanceTime.text"), financeAmountPanel);
         financeTab.addTab(resourceMap.getString("monthlyRevenueExpenditures.text"), financeMonthlyPanel);
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -206,7 +206,7 @@ public final class FinancesTab extends CampaignGuiTab {
         areaNetWorth.setLineWrap(true);
         areaNetWorth.setWrapStyleWord(true);
         areaNetWorth.setFont(new Font("Courier New", Font.PLAIN, 12));
-        areaNetWorth.setText(getCampaign().getFinancialReport());
+        areaNetWorth.setText(getCampaign().getFormattedFinancialReport());
         areaNetWorth.setEditable(false);
 
         JScrollPane descriptionScroll = new JScrollPane(areaNetWorth);
@@ -242,13 +242,13 @@ public final class FinancesTab extends CampaignGuiTab {
                                    cal.get(Calendar.YEAR)),
                             balance.getAmount().doubleValue());
         }
-                
+
         TimeSeriesCollection dataset = new TimeSeriesCollection();
         dataset.addSeries(s1);
-        
+
         return dataset;
     }
-    
+
     private CategoryDataset setupMonthlyDataset() {
         SimpleDateFormat df = new SimpleDateFormat("MMM-yyyy");
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
@@ -289,10 +289,10 @@ public final class FinancesTab extends CampaignGuiTab {
                 dataset.addValue(monthlyExpenditures.getAmount().doubleValue(), resourceMap.getString("graphMonthlyExpenditures.text"), pastMonthYear);
             }
         }
-        
+
         return dataset;
     }
-    
+
     private JPanel createGraphPanel(GraphType gt) {
         JFreeChart chart = null;
         if (gt.equals(GraphType.BALANCE_AMOUNT)) {
@@ -305,7 +305,7 @@ public final class FinancesTab extends CampaignGuiTab {
         panel.setMouseWheelEnabled(true);
         return panel;
     }
-    
+
     private JFreeChart createAmountChart(XYDataset dataset) {
         JFreeChart chart = ChartFactory.createTimeSeriesChart(
             "", // title
@@ -333,12 +333,12 @@ public final class FinancesTab extends CampaignGuiTab {
 
         DateAxis axis = (DateAxis) plot.getDomainAxis();
         axis.setDateFormatOverride(new SimpleDateFormat("MMM-yyyy"));
-        
+
         chart.removeLegend();
 
         return chart;
     }
-    
+
     private JFreeChart createMonthlyChart(CategoryDataset dataset) {
         JFreeChart chart = ChartFactory.createBarChart(
             "", // title
@@ -347,7 +347,7 @@ public final class FinancesTab extends CampaignGuiTab {
             dataset);
 
         chart.setBackgroundPaint(Color.WHITE);
-        
+
         chart.getLegend().setPosition(RectangleEdge.TOP);
 
         return chart;
@@ -396,7 +396,7 @@ public final class FinancesTab extends CampaignGuiTab {
     }
 
     public void refreshFinancialTransactions() {
-        SwingUtilities.invokeLater(() -> { 
+        SwingUtilities.invokeLater(() -> {
             financeModel.setData(getCampaign().getFinances().getAllTransactions());
             loanModel.setData(getCampaign().getFinances().getAllLoans());
             refreshFinancialReport();
@@ -404,12 +404,12 @@ public final class FinancesTab extends CampaignGuiTab {
     }
 
     public void refreshFinancialReport() {
-        SwingUtilities.invokeLater(() -> { 
-            areaNetWorth.setText(getCampaign().getFinancialReport());
+        SwingUtilities.invokeLater(() -> {
+            areaNetWorth.setText(getCampaign().getFormattedFinancialReport());
             areaNetWorth.setCaretPosition(0);
         });
     }
-    
+
     ActionScheduler financialTransactionsScheduler = new ActionScheduler(this::refreshFinancialTransactions);
     ActionScheduler financialReportScheduler = new ActionScheduler(this::refreshFinancialReport);
 
@@ -437,32 +437,32 @@ public final class FinancesTab extends CampaignGuiTab {
             financialReportScheduler.schedule();
         }
     }
-    
+
     @Subscribe
     public void handle(AcquisitionEvent ev) {
         financialTransactionsScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(TransactionEvent ev) {
         financialTransactionsScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(LoanEvent ev) {
         financialTransactionsScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(UnitEvent ev) {
         financialReportScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(PartEvent ev) {
         financialReportScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(AssetEvent ev) {
         financialReportScheduler.schedule();
