@@ -47,7 +47,7 @@ public class SVEnginePart extends Part {
      * Constructor used during campaign deserialization
      */
     @SuppressWarnings("unused")
-    private SVEnginePart() {
+    public SVEnginePart() {
         this(0, 0.0, Engine.COMBUSTION_ENGINE, RATING_D, FuelType.PETROCHEMICALS, null);
     }
 

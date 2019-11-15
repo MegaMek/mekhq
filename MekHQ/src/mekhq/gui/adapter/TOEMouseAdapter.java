@@ -3,12 +3,7 @@ package mekhq.gui.adapter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.StringTokenizer;
-import java.util.UUID;
-import java.util.Vector;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.swing.JMenu;
@@ -141,7 +136,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                                     if (null != u.getTech()) {
                                         u.removeTech();
                                     }
-                                    
+
                                     u.setTech(tech);
                                 } else {
                                     cantTech += tech.getName() + " cannot maintain " + u.getName() + "\n";
@@ -171,7 +166,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
         } else if (command.contains("DEPLOY_FORCE")) {
             int sid = Integer.parseInt(target);
             Scenario scenario = gui.getCampaign().getScenario(sid);
-            
+
             if(scenario instanceof AtBDynamicScenario) {
                 ForceTemplateAssignmentDialog ftad = new ForceTemplateAssignmentDialog(gui, forces, null, (AtBDynamicScenario) scenario);
             } else {
@@ -210,7 +205,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                 CamoChoiceDialog ccd = getCamoChoiceDialogForForce(singleForce);
                 ccd.setLocationRelativeTo(gui.getFrame());
                 ccd.setVisible(true);
-    
+
                 if (ccd.clickedSelect() == true) {
                     for (UUID id : singleForce.getAllUnits()) {
                         Unit unit = gui.getCampaign().getUnit(id);
@@ -304,7 +299,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
         } else if (command.contains("DEPLOY_UNIT")) {
             int sid = Integer.parseInt(target);
             Scenario scenario = gui.getCampaign().getScenario(sid);
-            
+
             if(scenario instanceof AtBDynamicScenario) {
                 ForceTemplateAssignmentDialog ftad = new ForceTemplateAssignmentDialog(gui, null, units, (AtBDynamicScenario) scenario);
             } else {
@@ -783,10 +778,11 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     }
                     menu = new JMenu("Add Unit");
                     menu.setEnabled(false);
-                    HashMap<String, JMenu> unitTypeMenus = new HashMap<String, JMenu>();
-                    HashMap<String, JMenu> weightClassForUnitType = new HashMap<String, JMenu>();
-                    
-                    // TODO: Doesn't currently account for Support Vees of any type
+                    HashMap<String, JMenu> unitTypeMenus = new HashMap<>();
+                    HashMap<String, JMenu> weightClassForUnitType = new HashMap<>();
+                    final List<Integer> svTypes = Arrays.asList(UnitType.TANK,
+                            UnitType.VTOL, UnitType.NAVAL, UnitType.CONV_FIGHTER);
+
                     for (int i = 0; i < UnitType.SIZE; i++)
                     {
                         String unittype = UnitType.getTypeName(i);
@@ -800,7 +796,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                             if (tonnage == 0) {
                                 continue;
                             }
-                            
+
                             int weightClass = EntityWeightClass.getWeightClass(tonnage, unittype);
                             String displayname2 = EntityWeightClass.getClassName(weightClass, unittype, false);
                             String weightClassMenuName = unittype + "_"
@@ -810,13 +806,25 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                             weightClassForUnitType.get(weightClassMenuName).setEnabled(false);
                         }
                     }
-                    
+
+                    for (int wc = EntityWeightClass.WEIGHT_SMALL_SUPPORT; wc <= EntityWeightClass.WEIGHT_LARGE_SUPPORT; wc++) {
+                        for (int ut : svTypes) {
+                            String typeName = UnitType.getTypeName(ut);
+                            String wcName = EntityWeightClass.getClassName(wc, typeName, true);
+                            String menuName = typeName + "_" + wcName;
+                            JMenu m = new JMenu(wcName);
+                            m.setName(menuName);
+                            m.setEnabled(false);
+                            weightClassForUnitType.put(menuName, m);
+                        }
+                    }
+
                     // Only add units that have commanders
                     // Or Gun Emplacements!
                     // TODO: Or Robotic Systems!
                     JMenu unsorted = new JMenu("Unsorted");
                     for (Unit u : gui.getCampaign().getUnits(true, true)) {
-                        String type = UnitType.determineUnitType(u.getEntity());
+                        String type = UnitType.getTypeName(u.getEntity().getUnitType());
                         String className = u.getEntity().getWeightClassName();
                         if (null != u.getCommander()) {
                             Person p = u.getCommander();
@@ -878,6 +886,23 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                             }
                             menu.add(tmp);
                             menu.setEnabled(true);
+                        }
+                    }
+
+                    for (int ut : svTypes) {
+                        String unittype = UnitType.getTypeName(ut);
+                        JMenu tmp = unitTypeMenus.get(UnitType.getTypeName(ut));
+                        if (tmp.isEnabled()) {
+                            for (int wc = EntityWeightClass.WEIGHT_SMALL_SUPPORT; wc <= EntityWeightClass.WEIGHT_LARGE_SUPPORT; wc++) {
+                                JMenu tmp2 = weightClassForUnitType
+                                        .get(unittype + "_"
+                                                + EntityWeightClass.getClassName(wc, unittype, true));
+                                if (tmp2.isEnabled()) {
+                                    tmp.add(tmp2);
+                                }
+                                menu.add(tmp);
+                                menu.setEnabled(true);
+                            }
                         }
                     }
 
@@ -1164,7 +1189,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
             .collect(
                 Collectors.collectingAndThen(
                     Collectors.groupingBy(
-                        e -> Pair.of(e.getCamoCategory(), e.getCamoFileName()), 
+                        e -> Pair.of(e.getCamoCategory(), e.getCamoFileName()),
                         Collectors.counting()),
                     m -> m.entrySet().stream().max(Map.Entry.comparingByValue()).map(o -> o.getKey())
                 )
@@ -1178,7 +1203,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
             }
         }
 
-        return new CamoChoiceDialog(gui.getFrame(), true, category, fileName, 
+        return new CamoChoiceDialog(gui.getFrame(), true, category, fileName,
             gui.getCampaign().getColorIndex(), gui.getIconPackage().getCamos());
     }
 }
