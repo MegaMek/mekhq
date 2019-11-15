@@ -1,5 +1,7 @@
 VERSION HISTORY:
 ----------------
+v0.47.3-SNAPSHOT
+
 v0.47.2 (2019-11-15 2000 UTC) 
 + PR #1325: Customize protomechs and advanced aero in MekLab
 + PR #1326: Fix another potential error preventing day advancement when giving training XP
