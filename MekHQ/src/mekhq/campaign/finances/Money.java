@@ -162,10 +162,6 @@ public class Money implements Comparable<Money> {
         return CurrencyManager.getInstance().getUiAmountAndNamePrinter().print(this.wrapped.toMoney(RoundingMode.HALF_EVEN));
     }
 
-    public static Money parse(String moneyStr) {
-        return new Money(BigMoney.parse(moneyStr));
-    }
-
     @Override
     public String toString() {
         return this.wrapped.toString();
