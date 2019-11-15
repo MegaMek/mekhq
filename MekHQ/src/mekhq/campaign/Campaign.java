@@ -7113,74 +7113,19 @@ public class Campaign implements Serializable, ITechManager {
 
     }
 
-    public String getFinancialReport() {
+    public FinancialReport getFinancialReport() {
+        return FinancialReport.calculate(this);
+    }
+
+    public String getFormattedFinancialReport() {
         StringBuffer sb = new StringBuffer();
-        Money cash = finances.getBalance();
-        Money loans = finances.getLoanBalance();
-        Money mech = Money.zero();
-        Money vee = Money.zero();
-        Money ba = Money.zero();
-        Money infantry = Money.zero();
-        Money smallCraft = Money.zero();
-        Money largeCraft = Money.zero();
-        Money proto = Money.zero();
-        Money spareParts = Money.zero();
-        for (Map.Entry<UUID, Unit> mu : units.entrySet()) {
-            Unit u = mu.getValue();
-            Money value = u.getSellValue();
-            if (u.getEntity() instanceof Mech) {
-                mech = mech.plus(value);
-            } else if (u.getEntity() instanceof Tank) {
-                vee = vee.plus(value);
-            } else if (u.getEntity() instanceof BattleArmor) {
-                ba = ba.plus(value);
-            } else if (u.getEntity() instanceof Infantry) {
-                infantry = infantry.plus(value);
-            } else if (u.getEntity() instanceof Dropship
-                    || u.getEntity() instanceof Jumpship) {
-                largeCraft = largeCraft.plus(value);
-            } else if (u.getEntity() instanceof Aero) {
-                smallCraft = smallCraft.plus(value);
-            } else if (u.getEntity() instanceof Protomech) {
-                proto = proto.plus(value);
-            }
-        }
 
-        spareParts = spareParts.plus(getSpareParts().stream().map(x -> x.getActualValue().multipliedBy(x.getQuantity())).collect(Collectors.toList()));
+        FinancialReport r = getFinancialReport();
 
-        Money monthlyIncome = Money.zero();
-        Money monthlyExpenses = Money.zero();
-        Money coSpareParts = Money.zero();
-        Money coFuel = Money.zero();
-        Money coAmmo = Money.zero();
-        Money maintenance = Money.zero();
-        Money salaries = Money.zero();
-        Money overhead = Money.zero();
-        Money contracts = Money.zero();
+        Money liabilities = r.getTotalLiabilities();
+        Money assets = r.getTotalAssets();
+        Money netWorth = r.getNetWorth();
 
-        if (campaignOptions.payForMaintain()) {
-            maintenance = getWeeklyMaintenanceCosts().multipliedBy(4);
-        }
-        if (campaignOptions.payForSalaries()) {
-            salaries = getPayRoll();
-        }
-        if (campaignOptions.payForOverhead()) {
-            overhead = getOverheadExpenses();
-        }
-        if (campaignOptions.usePeacetimeCost()) {
-            coSpareParts = getMonthlySpareParts();
-            coAmmo = getMonthlyAmmo();
-            coFuel = getMonthlyFuel();
-        }
-
-        contracts = contracts.plus(getActiveContracts().stream().map(Contract::getMonthlyPayOut).collect(Collectors.toList()));
-        monthlyIncome = monthlyIncome.plus(contracts);
-        monthlyExpenses = maintenance.plus(salaries).plus(overhead).plus(coSpareParts).plus(coAmmo).plus(coFuel);
-
-        Money assets = cash.plus(mech).plus(vee).plus(ba).plus(infantry).plus(largeCraft)
-                            .plus(smallCraft).plus(proto).plus(spareParts).plus(getFinances().getTotalAssetValue());
-        Money liabilities = loans;
-        Money netWorth = assets.minus(liabilities);
         int longest = Math.max(
                 liabilities.toAmountAndSymbolString().length(),
                 assets.toAmountAndSymbolString().length());
@@ -7193,37 +7138,37 @@ public class Campaign implements Serializable, ITechManager {
         sb.append("    Assets............... ")
                 .append(String.format(formatted, assets.toAmountAndSymbolString())).append("\n");
         sb.append("       Cash.............. ")
-                .append(String.format(formatted, cash.toAmountAndSymbolString())).append("\n");
-        if (mech.isPositive()) {
+                .append(String.format(formatted, r.getCash().toAmountAndSymbolString())).append("\n");
+        if (r.getMechValue().isPositive()) {
             sb.append("       Mechs............. ")
-                    .append(String.format(formatted, mech.toAmountAndSymbolString())).append("\n");
+                    .append(String.format(formatted, r.getMechValue().toAmountAndSymbolString())).append("\n");
         }
-        if (vee.isPositive()) {
+        if (r.getVeeValue().isPositive()) {
             sb.append("       Vehicles.......... ")
-                    .append(String.format(formatted, vee.toAmountAndSymbolString())).append("\n");
+                    .append(String.format(formatted, r.getVeeValue().toAmountAndSymbolString())).append("\n");
         }
-        if (ba.isPositive()) {
+        if (r.getBattleArmorValue().isPositive()) {
             sb.append("       BattleArmor....... ")
-                    .append(String.format(formatted, ba.toAmountAndSymbolString())).append("\n");
+                    .append(String.format(formatted, r.getBattleArmorValue().toAmountAndSymbolString())).append("\n");
         }
-        if (infantry.isPositive()) {
+        if (r.getInfantryValue().isPositive()) {
             sb.append("       Infantry.......... ")
-                    .append(String.format(formatted, infantry.toAmountAndSymbolString())).append("\n");
+                    .append(String.format(formatted, r.getInfantryValue().toAmountAndSymbolString())).append("\n");
         }
-        if (proto.isPositive()) {
+        if (r.getProtomechValue().isPositive()) {
             sb.append("       Protomechs........ ")
-                    .append(String.format(formatted, proto.toAmountAndSymbolString())).append("\n");
+                    .append(String.format(formatted, r.getProtomechValue().toAmountAndSymbolString())).append("\n");
         }
-        if (smallCraft.isPositive()) {
+        if (r.getSmallCraftValue().isPositive()) {
             sb.append("       Small Craft....... ")
-                    .append(String.format(formatted, smallCraft.toAmountAndSymbolString())).append("\n");
+                    .append(String.format(formatted, r.getSmallCraftValue().toAmountAndSymbolString())).append("\n");
         }
-        if (largeCraft.isPositive()) {
+        if (r.getLargeCraftValue().isPositive()) {
             sb.append("       Large Craft....... ")
-                    .append(String.format(formatted, largeCraft.toAmountAndSymbolString())).append("\n");
+                    .append(String.format(formatted, r.getLargeCraftValue().toAmountAndSymbolString())).append("\n");
         }
         sb.append("       Spare Parts....... ")
-                .append(String.format(formatted, spareParts.toAmountAndSymbolString())).append("\n");
+                .append(String.format(formatted, r.getSparePartsValue().toAmountAndSymbolString())).append("\n");
 
         if (getFinances().getAllAssets().size() > 0) {
             for (Asset asset : getFinances().getAllAssets()) {
@@ -7246,33 +7191,33 @@ public class Campaign implements Serializable, ITechManager {
         sb.append("    Liabilities.......... ")
                 .append(String.format(formatted, liabilities.toAmountAndSymbolString())).append("\n");
         sb.append("       Loans............. ")
-                .append(String.format(formatted, loans.toAmountAndSymbolString())).append("\n\n\n");
+                .append(String.format(formatted, r.getLoans().toAmountAndSymbolString())).append("\n\n\n");
 
         sb.append("Monthly Profit........... ")
-                .append(String.format(formatted, monthlyIncome.minus(monthlyExpenses).toAmountAndSymbolString()))
+                .append(String.format(formatted, r.getMonthlyIncome().minus(r.getMonthlyExpenses()).toAmountAndSymbolString()))
                 .append("\n\n");
         sb.append("Monthly Income........... ")
-                .append(String.format(formatted, monthlyIncome.toAmountAndSymbolString())).append("\n");
+                .append(String.format(formatted, r.getMonthlyIncome().toAmountAndSymbolString())).append("\n");
         sb.append("    Contract Payments.... ")
-                .append(String.format(formatted, contracts.toAmountAndSymbolString())).append("\n\n");
+                .append(String.format(formatted, r.getContracts().toAmountAndSymbolString())).append("\n\n");
         sb.append("Monthly Expenses......... ")
-                .append(String.format(formatted, monthlyExpenses.toAmountAndSymbolString())).append("\n");
+                .append(String.format(formatted, r.getMonthlyExpenses().toAmountAndSymbolString())).append("\n");
         sb.append("    Salaries............. ")
-                .append(String.format(formatted, salaries.toAmountAndSymbolString())).append("\n");
+                .append(String.format(formatted, r.getSalaries().toAmountAndSymbolString())).append("\n");
         sb.append("    Maintenance.......... ")
-                .append(String.format(formatted, maintenance.toAmountAndSymbolString())).append("\n");
+                .append(String.format(formatted, r.getMaintenance().toAmountAndSymbolString())).append("\n");
         sb.append("    Overhead............. ")
-                .append(String.format(formatted, overhead.toAmountAndSymbolString())).append("\n");
+                .append(String.format(formatted, r.getOverheadCosts().toAmountAndSymbolString())).append("\n");
         if (campaignOptions.usePeacetimeCost()) {
             sb.append("    Spare Parts.......... ")
-                    .append(String.format(formatted, coSpareParts.toAmountAndSymbolString())).append("\n");
+                    .append(String.format(formatted, r.getMonthlySparePartCosts().toAmountAndSymbolString())).append("\n");
             sb.append("    Training Munitions... ")
-                    .append(String.format(formatted, coAmmo.toAmountAndSymbolString())).append("\n");
+                    .append(String.format(formatted, r.getMonthlyAmmoCosts().toAmountAndSymbolString())).append("\n");
             sb.append("    Fuel................. ")
-                    .append(String.format(formatted, coFuel.toAmountAndSymbolString())).append("\n");
+                    .append(String.format(formatted, r.getMonthlyFuelCosts().toAmountAndSymbolString())).append("\n");
         }
 
-        return new String(sb);
+        return sb.toString();
     }
 
     public void setHealingTimeOptions(int newHeal, int newNaturalHeal) {
