@@ -3304,20 +3304,24 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public Skill getSkillForWorkingOn(Unit unit) {
-        if (null != unit && unit.getEntity() instanceof Mech && hasSkill(SkillType.S_TECH_MECH)) {
+        if (unit == null) {
+            return null;
+        }
+        if ((unit.getEntity() instanceof Mech || unit.getEntity() instanceof Protomech)
+            && hasSkill(SkillType.S_TECH_MECH)) {
             return getSkill(SkillType.S_TECH_MECH);
         }
-        if (null != unit && unit.getEntity() instanceof BattleArmor && hasSkill(SkillType.S_TECH_BA)) {
+        if (unit.getEntity() instanceof BattleArmor && hasSkill(SkillType.S_TECH_BA)) {
             return getSkill(SkillType.S_TECH_BA);
         }
-        if (null != unit && unit.getEntity() instanceof Tank && hasSkill(SkillType.S_TECH_MECHANIC)) {
+        if (unit.getEntity() instanceof Tank && hasSkill(SkillType.S_TECH_MECHANIC)) {
             return getSkill(SkillType.S_TECH_MECHANIC);
         }
-        if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)
+        if ((unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)
             && hasSkill(SkillType.S_TECH_VESSEL)) {
             return getSkill(SkillType.S_TECH_VESSEL);
         }
-        if (null != unit && unit.getEntity() instanceof Aero
+        if (unit.getEntity() instanceof Aero
             && !(unit.getEntity() instanceof Dropship)
             && !(unit.getEntity() instanceof Jumpship)
             && hasSkill(SkillType.S_TECH_AERO)) {
