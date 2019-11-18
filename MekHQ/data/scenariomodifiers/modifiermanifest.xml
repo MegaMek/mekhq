@@ -41,9 +41,6 @@
 			EnemyDropship.xml
 		</modifier>
 		<modifier>
-			GroundedEnemyDropship.xml
-		</modifier>
-		<modifier>
 			GoodIntel.xml
 		</modifier>
 		<modifier>
@@ -87,10 +84,9 @@
 			Need planetary condition adjustments
 			OffworldOperation.xml
 		</modifier-->
-		<!--modifier>
-			Need objectives
+		<modifier>
 			SearchAndRescue.xml
-		</modifier-->
+		</modifier>
 
 		<!-- Fixed scenario modifiers suitable for specific scenario types go here -->
 		<modifier>
@@ -134,7 +130,7 @@
 		<modifier>
 			FacilityHostileEngage.xml
 		</modifier>
-		<modifier> --- not done from here to below
+		<modifier>
 			FacilityHostileExtract.xml
 		</modifier>
 		<modifier>
@@ -152,34 +148,38 @@
 		<!-- FacilityHostileAirBase.xml -->
 		<!-- FacilityHostileSupplyDepot.xml -->
 
-		<!-- SearchAndRescue.xml -->
-		
-		-- need code/flag that only appends a force to an objective if it is on the same team?
-
-
 		<!-- Scenario modifiers that come from campaign state go here -->
 		<modifier>
-			IntegratedAllies.xml
-			-- add 'keep these guys alive, lose 1 pt per guy' objective
-			-- add 'keep 50% allied forces alive' (Player, These Guys, Allied Force) objective
+			IntegratedAlliesGround.xml
 		</modifier>
 		<modifier>
-			HouseOfficer.xml
-			-- add 'keep this guy alive, lose 1 pt per guy' objective
-			-- add 'keep 50% allied forces alive' (Player, This Guy, Allied Force) objective
+			HouseOfficerGround.xml
 		</modifier>
 		<modifier>
-			Liaison.xml
-			-- add 'keep this guy alive, lose 1 pt per guy' objective
-			-- add 'keep 50% allied forces alive' (Player, Allied Force) objective
+			LiaisonGround.xml
 		</modifier>
 		<modifier>
-			PrimaryAllies.xml
+			PrimaryAlliesGround.xml
 		</modifier>
 		<modifier>
-			AlliedTrainees.xml
-			-- add 'keep these guys alive, lose 1 pt per guy' objective
-			-- add 'keep 50% allied forces alive' (Player, Allied Force) objective
+			AlliedTraineesGround.xml
+		</modifier>
+
+		<!-- and the air versions -->
+		<modifier>
+			IntegratedAlliesAir.xml
+		</modifier>
+		<modifier>
+			HouseOfficerAir.xml
+		</modifier>
+		<modifier>
+			LiaisonAir.xml
+		</modifier>
+		<modifier>
+			PrimaryAlliesAir.xml
+		</modifier>
+		<modifier>
+			AlliedTraineesAir.xml
 		</modifier>
 	</modifiers>
 </scenarioModifierManifest>

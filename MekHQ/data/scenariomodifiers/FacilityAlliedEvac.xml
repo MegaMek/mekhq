@@ -1,14 +1,14 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>Prevent at least 75% of the designated units from leaving the area.</additionalBriefingText>
+	<additionalBriefingText>Get at least 75% of the designated units clear of the base.</additionalBriefingText>
 	<benefitsPlayer>false</benefitsPlayer>
-	<eventTiming>PostForceGeneration</eventTiming>
+	<eventTiming>PreForceGeneration</eventTiming>
 	<forceDefinition>
 		<actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
                 <allowedUnitType>-2</allowedUnitType>
                 <arrivalTurn>0</arrivalTurn>
                 <canReinforceLinked>true</canReinforceLinked>
-                <contributesToBV>false</contributesToBV>
+                <contributesToBV>true</contributesToBV>
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
@@ -17,7 +17,7 @@
                 </deploymentZones>
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
-                <forceAlignment>2</forceAlignment>
+                <forceAlignment>1</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
                 <forceName>Evacuating Units</forceName>
                 <generationMethod>2</generationMethod>
@@ -50,7 +50,7 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails/>
-            <description>Prevent 75% the following enemy unit(s) and force(s) from escaping:</description>
+            <description>Get 75% the following unit(s) and force(s) to the destination edge:</description>
             <destinationEdge>RANDOM</destinationEdge>
             <objectiveCriterion>Custom</objectiveCriterion>
             <percentage>75</percentage>

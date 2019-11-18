@@ -356,7 +356,7 @@ public class ScenarioObjective {
      * This is the case if the objective's associated force names contain either the 
      * force template's name or any of the the force template's linked force names.
      */
-    public boolean isApplicableToForceTemplate(ScenarioForceTemplate forceTemplate) {
+    public boolean isApplicableToForceTemplate(ScenarioForceTemplate forceTemplate, AtBDynamicScenario scenario) {
         // no template = not applicable
         if(forceTemplate == null) {
             return false;
@@ -370,8 +370,10 @@ public class ScenarioObjective {
         // if the template force is linked to a force listed in this objective, we're good.
         if(forceTemplate.getObjectiveLinkedForces() != null) {
             for(String linkedForceName : forceTemplate.getObjectiveLinkedForces()) {
-                if(getAssociatedForceNames().contains(linkedForceName)) {
-                    return true;
+                boolean objectiveContainsLinkedForce = getAssociatedForceNames().contains(linkedForceName);
+                if(objectiveContainsLinkedForce) {
+                    ScenarioForceTemplate linkedForceTemplate = scenario.getTemplate().scenarioForces.get(linkedForceName);
+                    return linkedForceTemplate.getForceAlignment() == forceTemplate.getForceAlignment();
                 }
             }
         }

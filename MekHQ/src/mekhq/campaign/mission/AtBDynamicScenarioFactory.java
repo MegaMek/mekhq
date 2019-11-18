@@ -276,6 +276,8 @@ public class AtBDynamicScenarioFactory {
         if(forceAlignment == ForceAlignment.PlanetOwner) {
             factionCode = getPlanetOwnerFaction(contract, currentDate);
             forceAlignment = getPlanetOwnerAlignment(contract, factionCode, currentDate);
+            // updates the force alignment for the template for later examination
+            forceTemplate.setForceAlignment(forceAlignment.ordinal());
         }
         
         switch(forceAlignment) {
@@ -493,6 +495,7 @@ public class AtBDynamicScenarioFactory {
             if(forceTemplate != null && forceTemplate.isAlliedPlayerForce()) {
                 for(Entity en : botForce.getEntityList()) {
                     scenario.getAlliesPlayer().add(en);
+                    scenario.getBotUnitTemplates().put(UUID.fromString(en.getExternalIdAsString()), forceTemplate);
                 }
                 
                 scenario.botForces.remove(botIndex);
@@ -547,7 +550,7 @@ public class AtBDynamicScenarioFactory {
             
             // if the bot force's force template's name is included in the objective's force names
             // or if the bot force is hostile and we're including all enemy forces
-            if(templateObjective.isApplicableToForceTemplate(forceTemplate) ||
+            if(templateObjective.isApplicableToForceTemplate(forceTemplate, scenario) ||
                     (botForceIsHostile && templateObjective.getAssociatedForceNames().contains(ScenarioObjective.FORCE_SHORTCUT_ALL_ENEMY_FORCES))) {
                 objectiveForceNames.add(botForce.getName());
                 calculatedDestinationZone = OffBoardDirection.translateBoardStart(getOppositeEdge(forceTemplate.getActualDeploymentZone()));
@@ -557,7 +560,7 @@ public class AtBDynamicScenarioFactory {
         for(int forceID : scenario.getPlayerForceTemplates().keySet()) {
             ScenarioForceTemplate playerForceTemplate = scenario.getPlayerForceTemplates().get(forceID);
             
-            if(templateObjective.isApplicableToForceTemplate(playerForceTemplate) ||
+            if(templateObjective.isApplicableToForceTemplate(playerForceTemplate, scenario) ||
                     templateObjective.getAssociatedForceNames().contains(ScenarioObjective.FORCE_SHORTCUT_ALL_PRIMARY_PLAYER_FORCES)) {
                 objectiveForceNames.add(campaign.getForce(forceID).getName());
                 calculatedDestinationZone = OffBoardDirection.translateBoardStart(getOppositeEdge(playerForceTemplate.getActualDeploymentZone()));
@@ -567,10 +570,20 @@ public class AtBDynamicScenarioFactory {
         for(UUID unitID : scenario.getPlayerUnitTemplates().keySet()) {
             ScenarioForceTemplate playerForceTemplate = scenario.getPlayerUnitTemplates().get(unitID);
             
-            if(templateObjective.isApplicableToForceTemplate(playerForceTemplate) ||
+            if(templateObjective.isApplicableToForceTemplate(playerForceTemplate, scenario) ||
                     templateObjective.getAssociatedForceNames().contains(ScenarioObjective.FORCE_SHORTCUT_ALL_PRIMARY_PLAYER_FORCES)) {
                 objectiveUnitIDs.add(unitID.toString());
                 calculatedDestinationZone = OffBoardDirection.translateBoardStart(getOppositeEdge(playerForceTemplate.getActualDeploymentZone()));
+            }
+        }
+        
+        // this handles generated units that have been put under the player's control
+        for(UUID unitID : scenario.getBotUnitTemplates().keySet()) {
+            ScenarioForceTemplate botForceTemplate = scenario.getBotUnitTemplates().get(unitID);
+            
+            if(templateObjective.isApplicableToForceTemplate(botForceTemplate, scenario)) {
+                objectiveUnitIDs.add(unitID.toString());
+                calculatedDestinationZone = OffBoardDirection.translateBoardStart(getOppositeEdge(botForceTemplate.getActualDeploymentZone()));
             }
         }
         

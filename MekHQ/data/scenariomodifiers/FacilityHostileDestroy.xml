@@ -2,7 +2,8 @@
 	<additionalBriefingText>Destroy or cripple all of the designated turrets.</additionalBriefingText>
 	<benefitsPlayer>false</benefitsPlayer>
 	<eventTiming>PreForceGeneration</eventTiming>
-	<scenarioObjective>
+	<objectives>
+        <objective>
             <associatedForceNames>
                 <associatedForceName>Base Turrets</associatedForceName>
             </associatedForceNames>
@@ -24,10 +25,11 @@
             <additionalDetails/
             <description>Destroy all of the following force(s) and unit(s):</description>
             <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Preserve</objectiveCriterion>
+            <objectiveCriterion>Destroy</objectiveCriterion>
             <percentage>100</percentage>
             <timeLimit>0</timeLimit>
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>
-        </scenarioObjective>
+        </objective>
+        </objectives>
 </AtBScenarioModifier>
