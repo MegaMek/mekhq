@@ -141,9 +141,9 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails/>
-            <description>Destroy 75% of all hostile units present.</description>
+            <description>Destroy or rout 75% of all hostile units present:</description>
             <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Destroy</objectiveCriterion>
+            <objectiveCriterion>ForceWithdraw</objectiveCriterion>
             <percentage>75</percentage>
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>

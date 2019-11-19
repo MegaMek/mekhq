@@ -94,12 +94,8 @@ public class AtBScenarioModifier {
      * @param eventTiming Whether this is occurring before or after primary forces have been generated.
      */
     public void processModifier(AtBDynamicScenario scenario, Campaign campaign, EventTiming eventTiming) {
-        
-        //File f = new File("D:\\Projects\\mekhq\\MekHQ\\data\\scenariomodifiers\\testmod.xml");
-        //generateTestModifier().Serialize(f);
-        
         if(eventTiming == this.getEventTiming()) {
-            if(getAdditionalBriefingText() != null & getAdditionalBriefingText().length() > 0) {
+            if(getAdditionalBriefingText() != null && getAdditionalBriefingText().length() > 0) {
                 AtBScenarioModifierApplicator.appendScenarioBriefingText(scenario, getAdditionalBriefingText());
             }
             

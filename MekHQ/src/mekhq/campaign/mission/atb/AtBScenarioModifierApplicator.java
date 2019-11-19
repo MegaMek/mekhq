@@ -54,10 +54,10 @@ public class AtBScenarioModifierApplicator {
      * @param eventTiming
      */
     public static void addForce(Campaign campaign, AtBDynamicScenario scenario, ScenarioForceTemplate forceToApply, EventTiming eventTiming) {
+        preAddForce(campaign, scenario, forceToApply);
+        
         if(eventTiming == EventTiming.PostForceGeneration) {
             postAddForce(campaign, scenario, forceToApply);
-        } else if (eventTiming == EventTiming.PreForceGeneration) { 
-            preAddForce(campaign, scenario, forceToApply);
         }
     }
     
@@ -79,6 +79,7 @@ public class AtBScenarioModifierApplicator {
         BotForce generatedBotForce = scenario.getBotForce(scenario.getNumBots() - 1);
         generatedBotForce.setStart(deploymentZone);
         AtBDynamicScenarioFactory.setDeploymentTurnsForReinforcements(generatedBotForce.getEntityList(), 0);
+        AtBDynamicScenarioFactory.setDestinationZone(generatedBotForce, templateToApply);
         
         // at this point, we have to re-translate the scenario objectives
         // since we're adding a force that could potentially go into any of them
@@ -347,10 +348,10 @@ public class AtBScenarioModifierApplicator {
      */
     public static void applyObjective(AtBDynamicScenario scenario, Campaign campaign, ScenarioObjective objective, EventTiming timing) {
         // if we're doing this before force generation, just add the objective for future translation
-        // if we're doing it after, we have to translate it individually
-        if(timing == EventTiming.PreForceGeneration) {
-            scenario.getTemplate().scenarioObjectives.add(objective);
-        } else {
+        scenario.getTemplate().scenarioObjectives.add(objective);
+        
+        // if we're doing it after, we have to translate it individually        
+        if(timing == EventTiming.PostForceGeneration) {
             ScenarioObjective actualObjective = AtBDynamicScenarioFactory.translateTemplateObjective(scenario, campaign, objective);
             scenario.getScenarioObjectives().add(actualObjective);
         }

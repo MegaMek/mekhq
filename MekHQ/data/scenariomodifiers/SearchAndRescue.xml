@@ -16,7 +16,7 @@
 		</deploymentZones>
 		<destinationZone>4</destinationZone>
 		<fixedUnitCount>0</fixedUnitCount>
-		<forceAlignment>4</forceAlignment>
+		<forceAlignment>2</forceAlignment>
 		<forceMultiplier>1.0</forceMultiplier>
 		<forceName>Designated Facilities</forceName>
 		<generationMethod>2</generationMethod>

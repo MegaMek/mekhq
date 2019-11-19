@@ -171,6 +171,7 @@ public class AtBDynamicScenarioFactory {
             scenario.removeBotForce(x);
         }
         
+        scenario.getAlliesPlayer().clear();        
         scenario.getExternalIDLookup().clear();
         
         // fix the player force weight class and unit count at the current time.
@@ -1639,7 +1640,7 @@ public class AtBDynamicScenarioFactory {
      * @param force The bot force for which to set the edge.
      * @param forceTemplate The template which governs the destination edge.
      */
-    private static void setDestinationZone(BotForce force, ScenarioForceTemplate forceTemplate) {
+    public static void setDestinationZone(BotForce force, ScenarioForceTemplate forceTemplate) {
         int actualDestinationEdge = forceTemplate.getDestinationZone();
         
         // set the 'auto flee' flag to true if the bot has a destination edge

@@ -52,7 +52,6 @@ public class ScenarioObjectiveProcessor {
      */
     public void evaluateScenarioObjectives(ResolveScenarioTracker tracker) {
         for(ScenarioObjective objective : tracker.getScenario().getScenarioObjectives()) {
-            
             Set<String> currentObjectiveUnitIDs = new HashSet<>(objective.getAssociatedUnitIDs());
             currentObjectiveUnitIDs.addAll(unrollObjectiveForces(objective, tracker));
             
@@ -167,8 +166,8 @@ public class ScenarioObjectiveProcessor {
                     entityMeetsObjective = !forceEntityEscape && entityIsCaptured(entity, opponentHasBattlefieldControl);
                     break;
                 case PreventReachMapEdge:
-                    entityMeetsObjective = forceEntityDestruction ||
-                        !entityHasReachedDestinationEdge(entity, objective, opponentHasBattlefieldControl);
+                    entityMeetsObjective = forceEntityDestruction || 
+                        !forceEntityEscape && !entityHasReachedDestinationEdge(entity, objective, opponentHasBattlefieldControl);
                     break;
                 case Preserve:
                     entityMeetsObjective = forceEntityEscape || 
@@ -213,7 +212,7 @@ public class ScenarioObjectiveProcessor {
             case Preserve:
                 return !entityIsDestroyed(entity, opponentHasBattlefieldControl);
             case ReachMapEdge:
-                return entityHasReachedDestinationEdge(entity, objective, opponentHasBattlefieldControl);
+                return entityHasReachedDestinationEdge(entity, objective, !opponentHasBattlefieldControl);
             default:
                 return false;
             }
@@ -228,7 +227,7 @@ public class ScenarioObjectiveProcessor {
     private boolean entityIsDestroyed(Entity entity, boolean opponentHasBattlefieldControl) {
         // "destroy" is a kill
         // it's destroyed if it's destroyed, or if it's been disabled and the enemy has no chance to recover it
-        return entity.isDestroyed() || (entity.getCrew().isDead() || entity.isImmobile()) && !opponentHasBattlefieldControl;
+        return entity.isDestroyed() || ((entity.getCrew().isDead() || entity.isImmobile()) && opponentHasBattlefieldControl);
     }
     
     /**
@@ -254,9 +253,9 @@ public class ScenarioObjectiveProcessor {
      * Check whether or not the entity can be considered as having reached the destination edge in the given objective
      */
     private boolean entityHasReachedDestinationEdge(Entity entity, ScenarioObjective objective, boolean opponentHasBattlefieldControl) {
-        // we've reached the edge if it hasn't gotten to the destination edge
-        // or the opponent has been routed and the entity hasn't been shot to hell
-        return entity.getRetreatedDirection() == objective.getDestinationEdge() ||
+                // we've reached the destination edge if we've reached an edge and it's the right one
+        return ((entity.getRetreatedDirection() != OffBoardDirection.NONE) && (entity.getRetreatedDirection() == objective.getDestinationEdge())) ||
+                // or the opponent has been routed and the entity hasn't been shot to hell
                 (!entity.isCrippled() && !entity.isDestroyed() && !opponentHasBattlefieldControl);
     }
     

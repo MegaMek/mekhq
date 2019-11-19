@@ -140,8 +140,12 @@
 			FacilityHostilePreventEvac.xml
 		</modifier>
 
-		<!-- FacilityAlliedDefend.xml -->
-		<!-- FacilityAlliedEvac.xml -->
+		<modifier>
+			FacilityAlliedDefend.xml 
+		</modifier>
+		<modifier>
+			FacilityAlliedEvac.xml
+		</modifier>
 
 		<!-- FacilityHostileMechBase.xml -->
 		<!-- FacilityHostileTankBase.xml -->

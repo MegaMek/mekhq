@@ -249,8 +249,13 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
             gridBagConstraints.gridwidth = 1;
             
             modifierBox = new JComboBox<>();
+            EventTiming scenarioState = ((AtBDynamicScenario) scenario).getNumBots() > 0 ?
+                    EventTiming.PostForceGeneration : EventTiming.PreForceGeneration;
+            
             for(String modifierKey : AtBScenarioModifier.getOrderedModifierKeys()) {
-                modifierBox.addItem(modifierKey);
+                if(AtBScenarioModifier.getScenarioModifier(modifierKey).getEventTiming() == scenarioState) {
+                    modifierBox.addItem(modifierKey);
+                }
             }
             panMain.add(modifierBox, gridBagConstraints);
             

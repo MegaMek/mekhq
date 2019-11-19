@@ -69,7 +69,6 @@
                 <associatedForceName>Integrated Allies</associatedForceName>
                 <associatedForceName>Player</associatedForceName>
                 <associatedForceName>Allied Force</associatedForceName>
-                <associatedForceName>Base Turrets</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs/>
             <successEffects>

@@ -5,7 +5,7 @@
 	<forceDefinition>
 		<actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
-                <allowedUnitType>-2</allowedUnitType>
+                <allowedUnitType>-1</allowedUnitType>
                 <arrivalTurn>0</arrivalTurn>
                 <canReinforceLinked>true</canReinforceLinked>
                 <contributesToBV>false</contributesToBV>
@@ -15,13 +15,13 @@
                 <deploymentZones>
                     <deploymentZone>10</deploymentZone>
                 </deploymentZones>
-                <destinationZone>5</destinationZone>
+                <destinationZone>6</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
                 <forceName>Evacuating Units</forceName>
                 <generationMethod>2</generationMethod>
-                <generationOrder>6</generationOrder>
+                <generationOrder>3</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>1</minWeightClass>
                 <retreatThreshold>50</retreatThreshold>
@@ -51,12 +51,12 @@
             </failureEffects>
             <additionalDetails/>
             <description>Prevent 75% the following enemy unit(s) and force(s) from escaping:</description>
-            <destinationEdge>RANDOM</destinationEdge>
-            <objectiveCriterion>Custom</objectiveCriterion>
+            <destinationEdge>NONE</destinationEdge>
+            <objectiveCriterion>PreventReachMapEdge</objectiveCriterion>
             <percentage>75</percentage>
             <timeLimitAtMost>false</timeLimitAtMost>
             <timeLimitScaleFactor>2</timeLimitScaleFactor>
-            <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
+            <timeLimitType>None</timeLimitType>
         </objective>
         </objectives>
 </AtBScenarioModifier>

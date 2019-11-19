@@ -392,7 +392,8 @@ public class ScenarioObjective {
                 objectiveCriterion == ObjectiveCriterion.PreventReachMapEdge) {
             sb.append("\n");
             
-            if(destinationEdge != OffBoardDirection.NONE) {
+            if((destinationEdge != null) &&
+                    (destinationEdge != OffBoardDirection.NONE)) {
                 sb.append(destinationEdge.toString());
             } else {
                 sb.append("opposite deployment");

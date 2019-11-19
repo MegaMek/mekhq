@@ -1,7 +1,7 @@
 <AtBScenarioModifier>
 	<additionalBriefingText>Your force will be deployed under the command of a house officer. Keep them alive. Additionally, allied command will dicatate retreat conditions.</additionalBriefingText>
 	<benefitsPlayer>true</benefitsPlayer>
-	<eventTiming>PostForceGeneration</eventTiming>
+	<eventTiming>PreForceGeneration</eventTiming>
 	<forceDefinition>
 		<actualDeploymentZone>-1</actualDeploymentZone>
 		<allowAeroBombs>true</allowAeroBombs>
@@ -69,7 +69,6 @@
                 <associatedForceName>House Officer</associatedForceName>
                 <associatedForceName>Player</associatedForceName>
                 <associatedForceName>Allied Force</associatedForceName>
-                <associatedForceName>Base Turrets</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs/>
             <successEffects>
