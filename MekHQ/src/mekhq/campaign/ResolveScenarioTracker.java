@@ -33,6 +33,7 @@ import megamek.common.*;
 import megamek.common.event.GameVictoryEvent;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.logging.LogLevel;
+import megamek.common.options.OptionsConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.event.PersonBattleFinishedEvent;
@@ -556,7 +557,7 @@ public class ResolveScenarioTracker {
                 //cant do the following by u.usesSoloPilot because entity may be different if ejected
                 else if(en instanceof Mech
                         || en instanceof Protomech
-                        || (en instanceof Aero && !(en instanceof SmallCraft || en instanceof Jumpship))) {
+                        || en.isFighter()) {
                     status.setHits(pilot.getHits());
                 } else {
                     //we have a multi-crewed vee/Aero/Infantry
@@ -681,11 +682,16 @@ public class ResolveScenarioTracker {
             boolean pickedUp = en instanceof MechWarrior 
                     && !((MechWarrior)en).getPickedUpByExternalIdAsString().equals("-1")
                     && null != unitsStatus.get(UUID.fromString(((MechWarrior)en).getPickedUpByExternalIdAsString()));
+            // If this option is turned on and the player controls the battlefield, 
+            // assume that all ejected warriors have been picked up
+            if (campaign.getGameOptions().booleanOption(OptionsConstants.ADVGRNDMOV_EJECTED_PILOTS_FLEE)) {
+                pickedUp = true;
+            }
             //if the crew ejected from this unit, then skip it because we should find them elsewhere
             //if they are alive
             if(!(en instanceof EjectedCrew)
                     && null != en.getCrew()
-                    && en.getCrew().isEjected()) {
+                    && (en.getCrew().isEjected() && !campaign.getGameOptions().booleanOption(OptionsConstants.ADVGRNDMOV_EJECTED_PILOTS_FLEE))) {
                 continue;
             }
             //shuffling the crew ensures that casualties are randomly assigned in multi-crew units
@@ -755,7 +761,7 @@ public class ResolveScenarioTracker {
                 PrisonerStatus status = new PrisonerStatus(p.getFullName(), u.getEntity().getDisplayName(), p);
                 if (en instanceof Mech
                         || en instanceof Protomech
-                        || (en instanceof Aero && !(en instanceof SmallCraft || en instanceof Jumpship))
+                        || en.isFighter()
                         || en instanceof MechWarrior) {
                     Crew pilot = en.getCrew();
                     if(null == pilot) {
@@ -957,6 +963,7 @@ public class ResolveScenarioTracker {
                 checkForLostLimbs(e, control);
                 UnitStatus status = null;
                 if(!e.getExternalIdAsString().equals("-1") && e.isSalvage()) {
+                    // Check to see if this is a friendly deployed unit with a unit ID in the campaign
                     status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
                 }
                 if(null != status) {
@@ -976,6 +983,7 @@ public class ResolveScenarioTracker {
                         }
                     }
                 } else {
+                    // Enemy crew/pilot entity is actually in the salvage list
                     if(e instanceof EjectedCrew & null != e.getCrew() && !e.getCrew().getExternalIdAsString().equals("-1")) {
                         enemyEjections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew)e);
                         continue;
