@@ -2,6 +2,7 @@ VERSION HISTORY:
 ----------------
 v0.47.3-SNAPSHOT
 + Issue #1344: Ensure techs show the right skill for Protomechs
++ PR #1348: Enable scenario modifiers to add objectives to scenarios generated from templates
 
 v0.47.2 (2019-11-15 2000 UTC) 
 + PR #1325: Customize protomechs and advanced aero in MekLab
