@@ -63,9 +63,6 @@ public class AtBScenarioModifierApplicator {
     
     /**
      * Adds the given force to the scenario after primary forces have been generated.
-     * @param campaign
-     * @param scenario
-     * @param forceToApply
      */
     private static void postAddForce(Campaign campaign, AtBDynamicScenario scenario, ScenarioForceTemplate templateToApply) {
         int effectiveBV = AtBDynamicScenarioFactory.calculateEffectiveBV(scenario, campaign);
@@ -78,7 +75,7 @@ public class AtBScenarioModifierApplicator {
         // the most recently added bot force is the one we just generated
         BotForce generatedBotForce = scenario.getBotForce(scenario.getNumBots() - 1);
         generatedBotForce.setStart(deploymentZone);
-        AtBDynamicScenarioFactory.setDeploymentTurnsForReinforcements(generatedBotForce.getEntityList(), 0);
+        AtBDynamicScenarioFactory.setDeploymentTurns(generatedBotForce, templateToApply.getArrivalTurn());
         AtBDynamicScenarioFactory.setDestinationZone(generatedBotForce, templateToApply);
         
         // at this point, we have to re-translate the scenario objectives

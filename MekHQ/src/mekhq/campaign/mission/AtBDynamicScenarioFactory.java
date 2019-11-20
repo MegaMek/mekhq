@@ -191,7 +191,7 @@ public class AtBDynamicScenarioFactory {
         
         setScenarioRerolls(scenario, campaign);
         
-        setDeploymentTurns(scenario, campaign);
+        setDeploymentTurns(scenario);
         translatePlayerNPCsToAttached(scenario, campaign);
         translateTemplateObjectives(scenario, campaign);
         scaleObjectiveTimeLimits(scenario, campaign);
@@ -1706,20 +1706,28 @@ public class AtBDynamicScenarioFactory {
      * Sets up the deployment turns for all bot units within the specified scenario
      * @param scenario The scenario to process
      */
-    private static void setDeploymentTurns(AtBDynamicScenario scenario, Campaign campaign) {
+    private static void setDeploymentTurns(AtBDynamicScenario scenario) {
         for(int x = 0; x < scenario.getNumBots(); x++) {
             BotForce currentBotForce = scenario.getBotForce(x);
             ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(currentBotForce);
-            int deployRound = forceTemplate.getArrivalTurn();
-            
-            if(deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
-                setDeploymentTurnsStaggeredByLance(currentBotForce.getEntityList());
-            } else if(deployRound == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) {
-                setDeploymentTurnsForReinforcements(currentBotForce.getEntityList(), 0);
-            } else {                
-                for(Entity entity : currentBotForce.getEntityList()) {
-                    entity.setDeployRound(deployRound);
-                }
+            setDeploymentTurns(currentBotForce, forceTemplate.getArrivalTurn());
+        }
+    }
+    
+    /**
+     * Sets up deployment turns for all bot units within the specified bot force according to the specified force template's rules.
+     * @param scenario The bot force to process
+     * @param deployRound The specific deployment round, or a special constant. 
+     * ARRIVAL_TURN_STAGGERED is processed just prior to scenario start instead (?)
+     */
+    public static void setDeploymentTurns(BotForce botForce, int deployRound) {
+        if(deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
+            setDeploymentTurnsStaggeredByLance(botForce.getEntityList());
+        } else if(deployRound == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) {
+            setDeploymentTurnsForReinforcements(botForce.getEntityList(), 0);
+        } else {                
+            for(Entity entity : botForce.getEntityList()) {
+                entity.setDeployRound(deployRound);
             }
         }
     }
