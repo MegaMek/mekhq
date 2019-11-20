@@ -28,9 +28,12 @@
 		<forceMultiplier>1.0</forceMultiplier>
 		<forceName>Opfor Aircraft</forceName>
 		<generationMethod>3</generationMethod>
-		<generationOrder>3</generationOrder>
+		<generationOrder>5</generationOrder>
 		<maxWeightClass>4</maxWeightClass>
-		<retreatThreshold>0</retreatThreshold>
+		<objectiveLinkedForces>
+                    <objectiveLinkedForce>Primary Opfor</objectiveLinkedForce>
+                </objectiveLinkedForces>
+		<retreatThreshold>50</retreatThreshold>
 		<startingAltitude>5</startingAltitude>
 		<syncDeploymentType>None</syncDeploymentType>
 		<syncedForceName />

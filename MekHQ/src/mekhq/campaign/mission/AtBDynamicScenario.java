@@ -47,6 +47,7 @@ public class AtBDynamicScenario extends AtBScenario {
     private ScenarioTemplate template;      // the template that is being used to generate this scenario
     
     private Map<BotForce, ScenarioForceTemplate> botForceTemplates;
+    private Map<UUID, ScenarioForceTemplate> botUnitTemplates;
     private Map<Integer, ScenarioForceTemplate> playerForceTemplates;
     private Map<UUID, ScenarioForceTemplate> playerUnitTemplates;
     
@@ -56,6 +57,7 @@ public class AtBDynamicScenario extends AtBScenario {
         super();
         
         botForceTemplates = new HashMap<>();
+        botUnitTemplates = new HashMap<>();
         playerForceTemplates = new HashMap<>();
         playerUnitTemplates = new HashMap<>();
         scenarioModifiers = new ArrayList<>();
@@ -207,6 +209,10 @@ public class AtBDynamicScenario extends AtBScenario {
     
     public Map<BotForce, ScenarioForceTemplate> getBotForceTemplates() {
         return botForceTemplates;
+    }
+    
+    public Map<UUID, ScenarioForceTemplate> getBotUnitTemplates() {
+        return botUnitTemplates;
     }
     
     public int getEffectiveOpforSkill() {

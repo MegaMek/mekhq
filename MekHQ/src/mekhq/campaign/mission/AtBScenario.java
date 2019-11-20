@@ -1358,7 +1358,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 en.setDeployRound(deployRound);
             });
             
-            AtBDynamicScenarioFactory.populateAeroBombs(aircraft, campaign);
+            boolean isAeroMap = getTerrainType() == TER_LOW_ATMO ||
+                    getTerrainType() == TER_SPACE;
+            
+            AtBDynamicScenarioFactory.populateAeroBombs(aircraft, campaign, !isAeroMap);
             
             BotForce bf = getEnemyBotForce(getContract(campaign), enemyHome, enemyHome, aircraft);
             bf.setName(bf.getName() + " (Air Support)");

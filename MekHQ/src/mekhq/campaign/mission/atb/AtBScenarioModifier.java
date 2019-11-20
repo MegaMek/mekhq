@@ -1,10 +1,28 @@
+/*
+ * Copyright (c) 2019 The Megamek Team. All rights reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package mekhq.campaign.mission.atb;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -12,10 +30,12 @@ import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 
 import megamek.common.Compute;
@@ -27,6 +47,7 @@ import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.ScenarioObjective;
+import mekhq.campaign.mission.ScenarioTemplate;
 
 @XmlRootElement(name="AtBScenarioModifier")
 public class AtBScenarioModifier {
@@ -56,7 +77,15 @@ public class AtBScenarioModifier {
     private List<MapLocation> allowedMapLocations = null;
     private Boolean useAmbushLogic = null; 
     private Boolean switchSides = null;
-    private List<ScenarioObjective> objectives = null;
+    private List<ScenarioObjective> objectives = new ArrayList<>();
+    
+    public static AtBScenarioModifier generateTestModifier() {
+        AtBScenarioModifier sm = new AtBScenarioModifier();
+        sm.objectives = new ArrayList<>();
+        sm.objectives.add(new ScenarioObjective());
+        
+        return sm;
+    }
     
     /**
      * Process this scenario modifier for a particular scenario, given a particular timing indicator.
@@ -66,7 +95,7 @@ public class AtBScenarioModifier {
      */
     public void processModifier(AtBDynamicScenario scenario, Campaign campaign, EventTiming eventTiming) {
         if(eventTiming == this.getEventTiming()) {
-            if(getAdditionalBriefingText() != null & getAdditionalBriefingText().length() > 0) {
+            if(getAdditionalBriefingText() != null && getAdditionalBriefingText().length() > 0) {
                 AtBScenarioModifierApplicator.appendScenarioBriefingText(scenario, getAdditionalBriefingText());
             }
             
@@ -100,6 +129,12 @@ public class AtBScenarioModifier {
             
             if(getSwitchSides() != null && getEventRecipient() != null) {
                 AtBScenarioModifierApplicator.switchSides(scenario, getEventRecipient());
+            }
+            
+            if(getObjectives() != null && getObjectives().size() > 0) {
+                for(ScenarioObjective objective : getObjectives()) {
+                    AtBScenarioModifierApplicator.applyObjective(scenario, campaign, objective, eventTiming);
+                }
             }
         }
     }
@@ -224,6 +259,23 @@ public class AtBScenarioModifier {
         }
 
         return resultingList;
+    }
+    
+    /**
+     * Serialize this instance of a scenario template to a File
+     * Please pass in a non-null file.
+     * @param outputFile The destination file.
+     */
+    public void Serialize(File outputFile) {
+        try {
+            JAXBContext context = JAXBContext.newInstance(AtBScenarioModifier.class);
+            JAXBElement<AtBScenarioModifier> templateElement = new JAXBElement<>(new QName("AtBScenarioModifier"), AtBScenarioModifier.class, this);
+            Marshaller m = context.createMarshaller();
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            m.marshal(templateElement, outputFile);
+        } catch(Exception e) {
+            MekHQ.getLogger().error(AtBScenarioModifier.class, "Serialize", e.getMessage());
+        }
     }
     
     @Override
@@ -351,6 +403,8 @@ public class AtBScenarioModifier {
         this.switchSides = switchSides;
     }
     
+    @XmlElementWrapper(name="objectives")
+    @XmlElement(name="objective")
     public List<ScenarioObjective> getObjectives() {
         return objectives;
     }

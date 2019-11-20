@@ -41,9 +41,6 @@
 			EnemyDropship.xml
 		</modifier>
 		<modifier>
-			GroundedEnemyDropship.xml
-		</modifier>
-		<modifier>
 			GoodIntel.xml
 		</modifier>
 		<modifier>
@@ -87,10 +84,9 @@
 			Need planetary condition adjustments
 			OffworldOperation.xml
 		</modifier-->
-		<!--modifier>
-			Need objectives
+		<modifier>
 			SearchAndRescue.xml
-		</modifier-->
+		</modifier>
 
 		<!-- Fixed scenario modifiers suitable for specific scenario types go here -->
 		<modifier>
@@ -123,27 +119,71 @@
 		<modifier>
 			ExtraBadEvent.xml
 		</modifier>
-		<!--modifier>
-			Need objective mechanism
-			Need campaign state
-			AddObjectiveEvent.xml
-		</modifier-->
+
+		<!-- Facility objective modifiers -->
+		<modifier>
+			FacilityHostileDestroy.xml
+		</modifier>
+		<modifier>
+			FacilityHostileCapture.xml
+		</modifier>
+		<modifier>
+			FacilityHostileEngage.xml
+		</modifier>
+		<modifier>
+			FacilityHostileExtract.xml
+		</modifier>
+		<modifier>
+			FacilityHostileRecon.xml
+		</modifier>
+		<modifier>
+			FacilityHostilePreventEvac.xml
+		</modifier>
+
+		<modifier>
+			FacilityAlliedDefend.xml 
+		</modifier>
+		<modifier>
+			FacilityAlliedEvac.xml
+		</modifier>
+
+		<!-- FacilityHostileMechBase.xml -->
+		<!-- FacilityHostileTankBase.xml -->
+		<!-- FacilityHostileAirBase.xml -->
+		<!-- FacilityHostileSupplyDepot.xml -->
 
 		<!-- Scenario modifiers that come from campaign state go here -->
 		<modifier>
-			IntegratedAllies.xml
+			IntegratedAlliesGround.xml
 		</modifier>
 		<modifier>
-			HouseOfficer.xml
+			HouseOfficerGround.xml
 		</modifier>
 		<modifier>
-			Liaison.xml
+			LiaisonGround.xml
 		</modifier>
 		<modifier>
-			PrimaryAllies.xml
+			PrimaryAlliesGround.xml
 		</modifier>
 		<modifier>
-			AlliedTrainees.xml
+			AlliedTraineesGround.xml
+		</modifier>
+
+		<!-- and the air versions -->
+		<modifier>
+			IntegratedAlliesAir.xml
+		</modifier>
+		<modifier>
+			HouseOfficerAir.xml
+		</modifier>
+		<modifier>
+			LiaisonAir.xml
+		</modifier>
+		<modifier>
+			PrimaryAlliesAir.xml
+		</modifier>
+		<modifier>
+			AlliedTraineesAir.xml
 		</modifier>
 	</modifiers>
 </scenarioModifierManifest>

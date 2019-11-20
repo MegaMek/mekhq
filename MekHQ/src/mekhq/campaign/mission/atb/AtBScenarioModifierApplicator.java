@@ -1,6 +1,24 @@
+/*
+ * Copyright (c) 2019 The Megamek Team. All rights reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package mekhq.campaign.mission.atb;
 
-import java.util.List;
 import java.util.UUID;
 
 import megamek.client.RandomSkillsGenerator;
@@ -36,25 +54,33 @@ public class AtBScenarioModifierApplicator {
      * @param eventTiming
      */
     public static void addForce(Campaign campaign, AtBDynamicScenario scenario, ScenarioForceTemplate forceToApply, EventTiming eventTiming) {
+        preAddForce(campaign, scenario, forceToApply);
+        
         if(eventTiming == EventTiming.PostForceGeneration) {
             postAddForce(campaign, scenario, forceToApply);
-        } else if (eventTiming == EventTiming.PreForceGeneration) { 
-            preAddForce(campaign, scenario, forceToApply);
         }
     }
     
     /**
      * Adds the given force to the scenario after primary forces have been generated.
-     * @param campaign
-     * @param scenario
-     * @param forceToApply
      */
-    private static void postAddForce(Campaign campaign, AtBDynamicScenario scenario, ScenarioForceTemplate forceToApply) {
+    private static void postAddForce(Campaign campaign, AtBDynamicScenario scenario, ScenarioForceTemplate templateToApply) {
         int effectiveBV = AtBDynamicScenarioFactory.calculateEffectiveBV(scenario, campaign);
         int effectiveUnitCount = AtBDynamicScenarioFactory.calculateEffectiveUnitCount(scenario, campaign);
+        int deploymentZone = AtBDynamicScenarioFactory.calculateDeploymentZone(templateToApply, scenario, templateToApply.getForceName());
         
         AtBDynamicScenarioFactory.generateForce(scenario, scenario.getContract(campaign), campaign, 
-                effectiveBV, effectiveUnitCount, EntityWeightClass.WEIGHT_ASSAULT, forceToApply);
+                effectiveBV, effectiveUnitCount, EntityWeightClass.WEIGHT_ASSAULT, templateToApply);
+        
+        // the most recently added bot force is the one we just generated
+        BotForce generatedBotForce = scenario.getBotForce(scenario.getNumBots() - 1);
+        generatedBotForce.setStart(deploymentZone);
+        AtBDynamicScenarioFactory.setDeploymentTurns(generatedBotForce, templateToApply.getArrivalTurn());
+        AtBDynamicScenarioFactory.setDestinationZone(generatedBotForce, templateToApply);
+        
+        // at this point, we have to re-translate the scenario objectives
+        // since we're adding a force that could potentially go into any of them
+        AtBDynamicScenarioFactory.translateTemplateObjectives(scenario, campaign);
     }
     
     /**
@@ -312,5 +338,19 @@ public class AtBScenarioModifierApplicator {
      */
     public static void appendScenarioBriefingText(AtBDynamicScenario scenario, String additionalBriefingText) {
         scenario.setDesc(String.format("%s\n\n%s", scenario.getDescription(), additionalBriefingText));
+    }
+    
+    /**
+     * Applies an objective to the scenario. 
+     */
+    public static void applyObjective(AtBDynamicScenario scenario, Campaign campaign, ScenarioObjective objective, EventTiming timing) {
+        // if we're doing this before force generation, just add the objective for future translation
+        scenario.getTemplate().scenarioObjectives.add(objective);
+        
+        // if we're doing it after, we have to translate it individually        
+        if(timing == EventTiming.PostForceGeneration) {
+            ScenarioObjective actualObjective = AtBDynamicScenarioFactory.translateTemplateObjective(scenario, campaign, objective);
+            scenario.getScenarioObjectives().add(actualObjective);
+        }
     }
 }

@@ -1,3 +1,22 @@
+/*
+ * Copyright (c) 2019 The Megamek Team. All rights reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package mekhq.campaign.mission;
 
 import java.util.ArrayList;
@@ -25,6 +44,7 @@ import megamek.common.Crew;
 import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
 import megamek.common.EntityWeightClass;
+import megamek.common.IBomber;
 import megamek.common.Infantry;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
@@ -72,6 +92,7 @@ public class AtBDynamicScenarioFactory {
     public static int UNIT_WEIGHT_UNSPECIFIED = -1;
     
     private static int[] validBotBombs = { BombType.B_HE, BombType.B_CLUSTER, BombType.B_RL, BombType.B_INFERNO, BombType.B_THUNDER };
+    private static int[] validBotAABombs = { BombType.B_RL };
     
     private static int[] minimumBVPercentage = { 50, 60, 70, 80, 90, 100 };
     
@@ -150,6 +171,7 @@ public class AtBDynamicScenarioFactory {
             scenario.removeBotForce(x);
         }
         
+        scenario.getAlliesPlayer().clear();        
         scenario.getExternalIDLookup().clear();
         
         // fix the player force weight class and unit count at the current time.
@@ -169,7 +191,7 @@ public class AtBDynamicScenarioFactory {
         
         setScenarioRerolls(scenario, campaign);
         
-        setDeploymentTurns(scenario, campaign);
+        setDeploymentTurns(scenario);
         translatePlayerNPCsToAttached(scenario, campaign);
         translateTemplateObjectives(scenario, campaign);
         scaleObjectiveTimeLimits(scenario, campaign);
@@ -255,6 +277,8 @@ public class AtBDynamicScenarioFactory {
         if(forceAlignment == ForceAlignment.PlanetOwner) {
             factionCode = getPlanetOwnerFaction(contract, currentDate);
             forceAlignment = getPlanetOwnerAlignment(contract, factionCode, currentDate);
+            // updates the force alignment for the template for later examination
+            forceTemplate.setForceAlignment(forceAlignment.ordinal());
         }
         
         switch(forceAlignment) {
@@ -366,7 +390,8 @@ public class AtBDynamicScenarioFactory {
             }
             
             if(forceTemplate.getAllowAeroBombs()) {
-                populateAeroBombs(generatedLance, campaign);
+                boolean isAeroMap = scenario.getTemplate().mapParameters.getMapLocation() == MapLocation.AllGroundTerrain;
+                populateAeroBombs(generatedLance, campaign, !isAeroMap);
             }
             
             if(forceTemplate.getUseArtillery() && forceTemplate.getDeployOffboard()) {
@@ -471,6 +496,7 @@ public class AtBDynamicScenarioFactory {
             if(forceTemplate != null && forceTemplate.isAlliedPlayerForce()) {
                 for(Entity en : botForce.getEntityList()) {
                     scenario.getAlliesPlayer().add(en);
+                    scenario.getBotUnitTemplates().put(UUID.fromString(en.getExternalIdAsString()), forceTemplate);
                 }
                 
                 scenario.botForces.remove(botIndex);
@@ -482,85 +508,104 @@ public class AtBDynamicScenarioFactory {
     /**
      * Translates the template's objectives, filling them in with actual forces from the scenario.
      */
-    private static void translateTemplateObjectives(AtBDynamicScenario scenario, Campaign campaign) {
+    public static void translateTemplateObjectives(AtBDynamicScenario scenario, Campaign campaign) {
         scenario.getScenarioObjectives().clear();
         
         for(ScenarioObjective templateObjective : scenario.getTemplate().scenarioObjectives) {
-            ScenarioObjective actualObjective = new ScenarioObjective(templateObjective);
-            actualObjective.clearAssociatedUnits();
-            actualObjective.clearForces();
-            
-            List<String> objectiveForceNames = new ArrayList<>();
-            List<String> objectiveUnitIDs = new ArrayList<>();
-            
-            OffBoardDirection calculatedDestinationZone = OffBoardDirection.NONE;
-            
-            //for each of the objective's force names loop through all of the following: 
-            // bot forces
-            // assigned player forces
-            // assigned player units
-            // for each one, if the item is associated with a template that has the template objective's force name
-            // add it to the list of actual objective force names
-            // this needs to happen because template force names aren't the same as the generated force names
-            
-            // additionally, while we're looping through forces, we'll attempt to calculate a destination zone, which we will need
-            // if the objective is a reach edge/prevent reaching edge and the direction is "destination edge" ("None").
-            
-            for(int x = 0; x < scenario.getNumBots(); x++) {
-                BotForce botForce = scenario.getBotForce(x);
-                ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(botForce);
-                boolean botForceIsHostile = botForce.getTeam() == ForceAlignment.Opposing.ordinal() ||
-                        botForce.getTeam() == ForceAlignment.Third.ordinal();
-                
-                // if the bot force's force template's name is included in the objective's force names
-                // or if the bot force is hostile and we're including all enemy forces
-                if(forceTemplate != null && 
-                        (templateObjective.getAssociatedForceNames().contains(forceTemplate.getForceName()) ||
-                        (botForceIsHostile && templateObjective.getAssociatedForceNames().contains(ScenarioObjective.FORCE_SHORTCUT_ALL_ENEMY_FORCES)))) {
-                    objectiveForceNames.add(botForce.getName());
-                    calculatedDestinationZone = OffBoardDirection.translateBoardStart(getOppositeEdge(forceTemplate.getActualDeploymentZone()));
-                }
-            }
-            
-            for(int forceID : scenario.getPlayerForceTemplates().keySet()) {
-                ScenarioForceTemplate playerForceTemplate = scenario.getPlayerForceTemplates().get(forceID);
-                
-                if(templateObjective.getAssociatedForceNames().contains(playerForceTemplate.getForceName()) ||
-                        templateObjective.getAssociatedForceNames().contains(ScenarioObjective.FORCE_SHORTCUT_ALL_PRIMARY_PLAYER_FORCES)) {
-                    objectiveForceNames.add(campaign.getForce(forceID).getName());
-                    calculatedDestinationZone = OffBoardDirection.translateBoardStart(getOppositeEdge(playerForceTemplate.getActualDeploymentZone()));
-                }
-            }
-            
-            for(UUID unitID : scenario.getPlayerUnitTemplates().keySet()) {
-                ScenarioForceTemplate playerForceTemplate = scenario.getPlayerUnitTemplates().get(unitID);
-                
-                if(templateObjective.getAssociatedForceNames().contains(playerForceTemplate.getForceName()) ||
-                        templateObjective.getAssociatedForceNames().contains(ScenarioObjective.FORCE_SHORTCUT_ALL_PRIMARY_PLAYER_FORCES)) {
-                    objectiveUnitIDs.add(unitID.toString());
-                    calculatedDestinationZone = OffBoardDirection.translateBoardStart(getOppositeEdge(playerForceTemplate.getActualDeploymentZone()));
-                }
-            }
-            
-            for(String forceName : objectiveForceNames) {
-                actualObjective.addForce(forceName);
-            }
-            
-            for(String unitID : objectiveUnitIDs) {
-                actualObjective.addUnit(unitID);
-            }
-            
-            // if the objective specifies that it's to reach or prevent reaching a map edge
-            // and has been set to "force destination edge", set that here
-            if(actualObjective.getDestinationEdge() == OffBoardDirection.NONE && 
-                    calculatedDestinationZone != OffBoardDirection.NONE &&
-                    (actualObjective.getObjectiveCriterion() == ObjectiveCriterion.ReachMapEdge ||
-                    actualObjective.getObjectiveCriterion() == ObjectiveCriterion.PreventReachMapEdge)) {
-                actualObjective.setDestinationEdge(calculatedDestinationZone);
-            }
+            ScenarioObjective actualObjective = translateTemplateObjective(scenario, campaign, templateObjective);
             
             scenario.getScenarioObjectives().add(actualObjective);
         }
+    }
+    
+    /**
+     * Translates a single objective, filling it in with actual forces from the scenario.
+     */
+    public static ScenarioObjective translateTemplateObjective(AtBDynamicScenario scenario, 
+            Campaign campaign, ScenarioObjective templateObjective) {
+        ScenarioObjective actualObjective = new ScenarioObjective(templateObjective);
+        actualObjective.clearAssociatedUnits();
+        actualObjective.clearForces();
+        
+        List<String> objectiveForceNames = new ArrayList<>();
+        List<String> objectiveUnitIDs = new ArrayList<>();
+        
+        OffBoardDirection calculatedDestinationZone = OffBoardDirection.NONE;
+        
+        //for each of the objective's force names loop through all of the following: 
+        // bot forces
+        // assigned player forces
+        // assigned player units
+        // for each one, if the item is associated with a template that has the template objective's force name
+        // add it to the list of actual objective force names
+        // this needs to happen because template force names aren't the same as the generated force names
+        
+        // additionally, while we're looping through forces, we'll attempt to calculate a destination zone, which we will need
+        // if the objective is a reach edge/prevent reaching edge and the direction is "destination edge" ("None").
+        
+        for(int x = 0; x < scenario.getNumBots(); x++) {
+            BotForce botForce = scenario.getBotForce(x);
+            ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(botForce);
+            boolean botForceIsHostile = botForce.getTeam() == ForceAlignment.Opposing.ordinal() ||
+                    botForce.getTeam() == ForceAlignment.Third.ordinal();
+            
+            // if the bot force's force template's name is included in the objective's force names
+            // or if the bot force is hostile and we're including all enemy forces
+            if(templateObjective.isApplicableToForceTemplate(forceTemplate, scenario) ||
+                    (botForceIsHostile && templateObjective.getAssociatedForceNames().contains(ScenarioObjective.FORCE_SHORTCUT_ALL_ENEMY_FORCES))) {
+                objectiveForceNames.add(botForce.getName());
+                calculatedDestinationZone = OffBoardDirection.translateBoardStart(getOppositeEdge(forceTemplate.getActualDeploymentZone()));
+            }
+        }
+        
+        for(int forceID : scenario.getPlayerForceTemplates().keySet()) {
+            ScenarioForceTemplate playerForceTemplate = scenario.getPlayerForceTemplates().get(forceID);
+            
+            if(templateObjective.isApplicableToForceTemplate(playerForceTemplate, scenario) ||
+                    templateObjective.getAssociatedForceNames().contains(ScenarioObjective.FORCE_SHORTCUT_ALL_PRIMARY_PLAYER_FORCES)) {
+                objectiveForceNames.add(campaign.getForce(forceID).getName());
+                calculatedDestinationZone = OffBoardDirection.translateBoardStart(getOppositeEdge(playerForceTemplate.getActualDeploymentZone()));
+            }
+        }
+        
+        for(UUID unitID : scenario.getPlayerUnitTemplates().keySet()) {
+            ScenarioForceTemplate playerForceTemplate = scenario.getPlayerUnitTemplates().get(unitID);
+            
+            if(templateObjective.isApplicableToForceTemplate(playerForceTemplate, scenario) ||
+                    templateObjective.getAssociatedForceNames().contains(ScenarioObjective.FORCE_SHORTCUT_ALL_PRIMARY_PLAYER_FORCES)) {
+                objectiveUnitIDs.add(unitID.toString());
+                calculatedDestinationZone = OffBoardDirection.translateBoardStart(getOppositeEdge(playerForceTemplate.getActualDeploymentZone()));
+            }
+        }
+        
+        // this handles generated units that have been put under the player's control
+        for(UUID unitID : scenario.getBotUnitTemplates().keySet()) {
+            ScenarioForceTemplate botForceTemplate = scenario.getBotUnitTemplates().get(unitID);
+            
+            if(templateObjective.isApplicableToForceTemplate(botForceTemplate, scenario)) {
+                objectiveUnitIDs.add(unitID.toString());
+                calculatedDestinationZone = OffBoardDirection.translateBoardStart(getOppositeEdge(botForceTemplate.getActualDeploymentZone()));
+            }
+        }
+        
+        for(String forceName : objectiveForceNames) {
+            actualObjective.addForce(forceName);
+        }
+        
+        for(String unitID : objectiveUnitIDs) {
+            actualObjective.addUnit(unitID);
+        }
+        
+        // if the objective specifies that it's to reach or prevent reaching a map edge
+        // and has been set to "force destination edge", set that here
+        if(actualObjective.getDestinationEdge() == OffBoardDirection.NONE && 
+                calculatedDestinationZone != OffBoardDirection.NONE &&
+                (actualObjective.getObjectiveCriterion() == ObjectiveCriterion.ReachMapEdge ||
+                actualObjective.getObjectiveCriterion() == ObjectiveCriterion.PreventReachMapEdge)) {
+            actualObjective.setDestinationEdge(calculatedDestinationZone);
+        }
+        
+        return actualObjective;
     }
     
     /**
@@ -1548,7 +1593,7 @@ public class AtBDynamicScenarioFactory {
      * @param originalForceTemplateID The ID of the force template where we started.
      * @return Deployment zone as defined in Board.java
      */
-    private static int calculateDeploymentZone(ScenarioForceTemplate forceTemplate, AtBDynamicScenario scenario, String originalForceTemplateID) {
+    public static int calculateDeploymentZone(ScenarioForceTemplate forceTemplate, AtBDynamicScenario scenario, String originalForceTemplateID) {
         int calculatedEdge = Board.START_ANY;
         
         // if we have a specific deployment zone OR have looped around
@@ -1595,7 +1640,7 @@ public class AtBDynamicScenarioFactory {
      * @param force The bot force for which to set the edge.
      * @param forceTemplate The template which governs the destination edge.
      */
-    private static void setDestinationZone(BotForce force, ScenarioForceTemplate forceTemplate) {
+    public static void setDestinationZone(BotForce force, ScenarioForceTemplate forceTemplate) {
         int actualDestinationEdge = forceTemplate.getDestinationZone();
         
         // set the 'auto flee' flag to true if the bot has a destination edge
@@ -1661,20 +1706,28 @@ public class AtBDynamicScenarioFactory {
      * Sets up the deployment turns for all bot units within the specified scenario
      * @param scenario The scenario to process
      */
-    private static void setDeploymentTurns(AtBDynamicScenario scenario, Campaign campaign) {
+    private static void setDeploymentTurns(AtBDynamicScenario scenario) {
         for(int x = 0; x < scenario.getNumBots(); x++) {
             BotForce currentBotForce = scenario.getBotForce(x);
             ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(currentBotForce);
-            int deployRound = forceTemplate.getArrivalTurn();
-            
-            if(deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
-                setDeploymentTurnsStaggeredByLance(currentBotForce.getEntityList());
-            } else if(deployRound == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) {
-                setDeploymentTurnsForReinforcements(currentBotForce.getEntityList(), 0);
-            } else {                
-                for(Entity entity : currentBotForce.getEntityList()) {
-                    entity.setDeployRound(deployRound);
-                }
+            setDeploymentTurns(currentBotForce, forceTemplate.getArrivalTurn());
+        }
+    }
+    
+    /**
+     * Sets up deployment turns for all bot units within the specified bot force according to the specified force template's rules.
+     * @param scenario The bot force to process
+     * @param deployRound The specific deployment round, or a special constant. 
+     * ARRIVAL_TURN_STAGGERED is processed just prior to scenario start instead (?)
+     */
+    public static void setDeploymentTurns(BotForce botForce, int deployRound) {
+        if(deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
+            setDeploymentTurnsStaggeredByLance(botForce.getEntityList());
+        } else if(deployRound == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) {
+            setDeploymentTurnsForReinforcements(botForce.getEntityList(), 0);
+        } else {                
+            for(Entity entity : botForce.getEntityList()) {
+                entity.setDeployRound(deployRound);
             }
         }
     }
@@ -2041,25 +2094,39 @@ public class AtBDynamicScenarioFactory {
      * @param campaign Campaign object. In the future, may be used to check list of bombs
      * for technological availability.
      */
-    public static void populateAeroBombs(List<Entity> entityList, Campaign campaign) {
+    public static void populateAeroBombs(List<Entity> entityList, Campaign campaign, boolean groundMap) {
         int maxBombers = Compute.randomInt(entityList.size()) + 1;
         int numBombers = 0;
         
+        int[] validBombChoices = groundMap ? validBotBombs : validBotAABombs;
+        
         for(Entity entity : entityList) {
-            if(numBombers >= maxBombers) {
-                break;
-            }
-            
             if(entity.isBomber()) {
-                int[] bombChoices = new int[BombType.B_NUM];
-                int numBombs = (int) (entity.getWeight() / 5);
-                int bombIndex = validBotBombs[(Compute.randomInt(validBotBombs.length))];
-                bombChoices[bombIndex] = numBombs;
+                // if this entity has no guns (e.g. is a Boeing Jump Bomber)
+                if(entity.getIndividualWeaponList().size() == 0) {
+                    loadBombs(entity, validBombChoices);
+                    continue;
+                }
                 
-                ((megamek.common.IBomber) entity).setBombChoices(bombChoices);
+                if(numBombers >= maxBombers) {
+                    break;
+                }
+                
+                loadBombs(entity, validBombChoices);
                 numBombers++;
             }
         }
+    }
+    
+    // todo: determine how many bombs can fit on this entity, and either pick 
+    // a random amount or fill 'er up
+    private static void loadBombs(Entity entity, int[] validBombChoices) {
+        int[] bombChoices = new int[BombType.B_NUM];
+        int numBombs = (int) (entity.getWeight() / 5);
+        int bombIndex = validBombChoices[(Compute.randomInt(validBombChoices.length))];
+        bombChoices[bombIndex] = numBombs;
+        
+        ((IBomber) entity).setBombChoices(bombChoices);
     }
     
     /**

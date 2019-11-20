@@ -5,7 +5,7 @@
     <detailedBriefing>Prevent enemy units from crossing the far edge of the map.</detailedBriefing>
     <mapParameters>
         <allowedTerrainTypes/>
-        <allowRotation>false</allowRotation>
+        <allowRotation>true</allowRotation>
         <baseHeight>50</baseHeight>
         <baseWidth>17</baseWidth>
         <heightScalingIncrement>0</heightScalingIncrement>
