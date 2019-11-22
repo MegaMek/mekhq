@@ -99,6 +99,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     private UUID id;
     private int oldId;
     private String fluffName;
+    // This is the ID of the large craft assigned to transport this unit
+    private UUID transportId;
 
     //assignments
     private int forceId;
@@ -289,6 +291,14 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
     public void setId(UUID i) {
         this.id = i;
+    }
+    
+    public UUID getTransportId() {
+        return transportId;
+    }
+
+    public void setTransportId(UUID i) {
+        this.transportId = i;
     }
 
     public int getSite() {
