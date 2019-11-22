@@ -126,11 +126,6 @@ public final class TOETab extends CampaignGuiTab {
     public void refreshOrganization() {
         javax.swing.SwingUtilities.invokeLater(() -> {
             orgTree.updateUI();
-            // This seems like bad juju since it makes it annoying as hell to
-            // add multiple units to a force if it's de-selected every single
-            // time
-            // So, commenting it out - ralgith
-            // orgTree.setSelectionPath(null);
             refreshForceView();
         });
     }
