@@ -4637,6 +4637,7 @@ public class Campaign implements Serializable, ITechManager {
                         rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_MECHANIC):
+            case Person.T_VEHICLE_CREW:
                 person.addSkill(SkillType.S_TECH_MECHANIC, expLvl,
                         rskillPrefs.randomizeSkill(), bonus, mod);
                 break;

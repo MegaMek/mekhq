@@ -895,6 +895,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             case (T_MECH_TECH):
                 return hasSkill(SkillType.S_TECH_MECH) && getSkill(SkillType.S_TECH_MECH).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
             case (T_MECHANIC):
+            case T_VEHICLE_CREW:
                 return hasSkill(SkillType.S_TECH_MECHANIC) && getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
             case (T_AERO_TECH):
                 return hasSkill(SkillType.S_TECH_AERO) && getSkill(SkillType.S_TECH_AERO).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
@@ -911,8 +912,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
             case (T_ADMIN_TRA):
             case (T_ADMIN_HR):
                 return hasSkill(SkillType.S_ADMIN);
-            case (T_VEHICLE_CREW):
-                return true;
             default:
                 return false;
         }
@@ -2380,6 +2379,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     return -1;
                 }
             case T_MECHANIC:
+            case T_VEHICLE_CREW:
                 if (hasSkill(SkillType.S_TECH_MECHANIC)) {
                     return getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel();
                 } else {
