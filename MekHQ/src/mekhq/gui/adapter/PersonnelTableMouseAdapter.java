@@ -1524,7 +1524,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             gunnerMenu.add(cbMenuItem);
                         }
                         if (unit.canTakeMoreVesselCrew()
-                                && person.hasSkill(SkillType.S_TECH_VESSEL)) {
+                                && ((unit.getEntity().isAero() && person.hasSkill(SkillType.S_TECH_VESSEL))
+                                    || ((unit.getEntity().isSupportVehicle() && person.hasSkill(SkillType.S_TECH_MECHANIC))))){
                             cbMenuItem = new JCheckBoxMenuItem(
                                     unit.getName());
                             // TODO: check the box
@@ -1683,7 +1684,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             continue;
                         }
                         if (unit.canTakeMoreVesselCrew()
-                                && person.hasSkill(SkillType.S_TECH_VESSEL)) {
+                                && ((unit.getEntity().isAero() && person.hasSkill(SkillType.S_TECH_VESSEL))
+                                || ((unit.getEntity().isSupportVehicle() && person.hasSkill(SkillType.S_TECH_MECHANIC))))){
                             cbMenuItem = new JCheckBoxMenuItem(
                                     unit.getName());
                             // TODO: check the box
