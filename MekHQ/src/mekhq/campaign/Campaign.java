@@ -6282,7 +6282,7 @@ public class Campaign implements Serializable, ITechManager {
             unit.addGunner(p);
         }
         while (unit.canTakeMoreVesselCrew()) {
-            Person p = newPerson(Person.T_SPACE_CREW);
+            Person p = newPerson(unit.getEntity().isSupportVehicle() ? Person.T_VEHICLE_CREW : Person.T_SPACE_CREW);
             if (!isGM) {
                 if (!recruitPerson(p)) {
                     return;

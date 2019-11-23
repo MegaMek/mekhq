@@ -112,9 +112,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public static final int T_ADMIN_HR = 25; // End of support roles
     public static final int T_LAM_PILOT = 26; // Not a separate type, but an alias for MW + Aero pilot
                                               // Does not count as either combat or support role
+    public static final int T_VEHICLE_CREW = 27; // non-gunner/non-driver support vehicle crew
 
     // This value should always be +1 of the last defined role
-    public static final int T_NUM = 27;
+    public static final int T_NUM = 28;
 
     public static final int S_ACTIVE = 0;
     public static final int S_RETIRED = 1;
@@ -157,7 +158,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public static final int DESIG_CHI     = 12;
     public static final int DESIG_GAMMA   = 13;
     public static final int DESIG_NUM     = 14;
-    
+
     private static final Map<Integer, Money> MECHWARRIOR_AERO_RANSOM_VALUES;
     private static final Map<Integer, Money> OTHER_RANSOM_VALUES;
 
@@ -178,12 +179,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
         return Math.min(children, 8); // Limit to octuplets, for the sake of sanity
     };
-    
+
     private static final String[] PREGNANCY_MULTIPLE_NAMES = {null, null,
         "twins", "triplets", "quadruplets", "quintuplets",
         "sextuplets", "septuplets", "octuplets", "nonuplets", "decuplets"
     };
-    
+
     public static final ExtraData.IntKey PREGNANCY_CHILDREN_DATA
         = new ExtraData.IntKey("procreation:children");
     public static final ExtraData.StringKey PREGNANCY_FATHER_DATA
@@ -197,7 +198,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         SkillType.S_TECH_AERO,
         SkillType.S_TECH_VESSEL,
     };
-    
+
     protected UUID id;
     protected int oldId;
 
@@ -316,7 +317,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private int originalUnitWeight; // uses EntityWeightClass; 0 (Extra-Light) for no original unit
     private int originalUnitTech; // 0 = IS1, 1 = IS2, 2 = Clan
     private UUID originalUnitId;
-    
+
     // Generic extra data, for use with plugins and mods
     private ExtraData extraData = new ExtraData();
 
@@ -343,7 +344,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_REGULAR, Money.of(25000));
         MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_VETERAN, Money.of(75000));
         MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_ELITE, Money.of(150000));
-        
+
         OTHER_RANSOM_VALUES = new HashMap<>();
         OTHER_RANSOM_VALUES.put(SkillType.EXP_ULTRA_GREEN, Money.of(2500));
         OTHER_RANSOM_VALUES.put(SkillType.EXP_GREEN, Money.of(5000));
@@ -351,7 +352,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         OTHER_RANSOM_VALUES.put(SkillType.EXP_VETERAN, Money.of(25000));
         OTHER_RANSOM_VALUES.put(SkillType.EXP_ELITE, Money.of(50000));
     }
-    
+
     //default constructor
     public Person(Campaign c) {
         this("Biff the Understudy", c);
@@ -360,11 +361,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public Person(Campaign c, String factionCode) {
         this("Biff the Understudy", c, factionCode);
     }
-    
+
     public Person(String name, Campaign c) {
         this(name, c, c.getFactionCode());
     }
-    
+
     public Person(String name, Campaign c, String factionCode) {
         this.name = name;
         callsign = "";
@@ -510,11 +511,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public int getPrisonerStatus() {
         return prisonerStatus;
     }
-    
+
     public boolean isWillingToDefect() {
         return willingToDefect;
     }
-    
+
     public void setWillingToDefect(boolean willingToDefect) {
         this.willingToDefect = willingToDefect && (prisonerStatus == PRISONER_YES);
     }
@@ -832,6 +833,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 return "Admin/HR";
             case (T_LAM_PILOT):
                 return "LAM Pilot";
+            case (T_VEHICLE_CREW):
+                return "Vehicle Crew";
             default:
                 return "??";
         }
@@ -908,6 +911,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
             case (T_ADMIN_TRA):
             case (T_ADMIN_HR):
                 return hasSkill(SkillType.S_ADMIN);
+            case (T_VEHICLE_CREW):
+                return true;
             default:
                 return false;
         }
@@ -979,7 +984,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             //use zero if hasn't been recruited yet
             return -1;
         }
-         
+
         int timeinservice = today.get(Calendar.YEAR) - recruitment.get(Calendar.YEAR);
 
         // Add the tentative time in service to the date of recruitment to get this year's service history
@@ -1060,12 +1065,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
         final UUID ancId = anc.getId();
         final String surname = getName().contains(" ") ? getName().split(" ", 2)[1] : "";
-        
+
         // Cleanup
         setDueDate(null);
         extraData.set(PREGNANCY_CHILDREN_DATA, 0);
         extraData.set(PREGNANCY_FATHER_DATA, null);
-        
+
         return IntStream.range(0, size).mapToObj(i -> {
             Person baby = campaign.newPerson(T_NONE);
             baby.setDependent(true);
@@ -1103,7 +1108,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         concieved = (Compute.randomInt(10000) < 2);
                     }
                 }
-                
+
                 if(concieved) {
                     GregorianCalendar tCal = (GregorianCalendar) campaign.getCalendar().clone();
                     tCal.add(GregorianCalendar.DAY_OF_YEAR, PREGNANCY_DURATION.getAsInt());
@@ -1189,11 +1194,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public void awardXP(int xp) {
         this.xp += xp;
     }
-    
+
     public int getEngineerXp() {
         return engXp;
     }
-    
+
     public void setEngineerXp(int xp) {
         engXp = xp;
     }
@@ -1253,7 +1258,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public boolean isInActive() {
         return getStatus() != S_ACTIVE;
     }
-    
+
     public ExtraData getExtraData() {
         return extraData;
     }
@@ -1552,7 +1557,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public static Person generateInstanceFromXML(Node wn, Campaign c, Version version) {
         final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign,Version)"; //$NON-NLS-1$
-        
+
         Person retVal = null;
 
         try {
@@ -1969,7 +1974,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         "ID not pre-defined; generating person's ID."); //$NON-NLS-1$
                 retVal.id = UUID.randomUUID();
             }
-    
+
             // Prisoner and Bondsman updating
             if (retVal.prisonerStatus != PRISONER_NOT && retVal.rank == 0) {
                 if (retVal.prisonerStatus == PRISONER_BONDSMAN) {
@@ -2547,6 +2552,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             case T_VTOL_PILOT:
             case T_VEE_GUNNER:
             case T_CONV_PILOT:
+            case T_VEHICLE_CREW:
                 sb.append("Lambda");
                 break;
             default: break;
@@ -2641,15 +2647,15 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public Skill getSkill(String skillName) {
         return skills.get(skillName);
     }
-    
+
     public void addSkill(String skillName, int lvl, int bonus) {
         skills.put(skillName, new Skill(skillName, lvl, bonus));
     }
-    
+
     public void addSkill(String skillName, int xpLvl, boolean random, int bonus) {
         skills.put(skillName, new Skill(skillName, xpLvl, random, bonus, 0));
     }
-    
+
     public void addSkill(String skillName, int xpLvl, boolean random, int bonus, int rollMod) {
         skills.put(skillName, new Skill(skillName, xpLvl, random, bonus, rollMod));
     }
@@ -2659,18 +2665,18 @@ public class Person implements Serializable, MekHqXmlSerializable {
             skills.remove(skillName);
         }
     }
-    
+
     public int getSkillNumber() {
         return skills.size();
     }
-    
+
     /**
      * Remove all skills
      */
     public void removeAllSkills() {
         skills.clear();
-    }   
-    
+    }
+
     /**
      * Limit skills to the maximum of the given level
      */
@@ -2723,7 +2729,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         // Check parent locations as well (a hand can be missing if the corresponding arm is)
         return isLocationMissing(loc.parent);
     }
-    
+
     public void heal() {
         hits = Math.max(hits - 1, 0);
         if (!needsFixing()) {
@@ -2739,11 +2745,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
         heal();
         return " <font color='green'><b>Successfully healed one hit.</b></font>";
     }
-    
+
     public PersonnelOptions getOptions() {
         return options;
     }
-    
+
     /**
      * Returns the options of the given category that this pilot has
      */
@@ -2866,15 +2872,15 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
         }
     }
-    
+
     /**
      * Resets support personnel edge points to the purchased level. Used for weekly refresh.
-     * 
+     *
      */
     public void resetCurrentEdge() {
         setCurrentEdge(getEdge());
     }
-    
+
     /**
      * Sets support personnel edge points to the value 'e'. Used for weekly refresh.
      * @param e - integer used to track this person's edge points available for the current week
@@ -2882,19 +2888,19 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public void setCurrentEdge(int e) {
         currentEdge = e;
     }
-    
+
     /**
      *  Returns this person's currently available edge points. Used for weekly refresh.
-     * 
+     *
      */
     public int getCurrentEdge() {
         return currentEdge;
     }
-    
+
     public void setEdgeUsed(int e) {
         edgeUsedThisRound = e;
     }
-    
+
     public int getEdgeUsed() {
         return edgeUsedThisRound;
     }
@@ -2911,7 +2917,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
-    
+
     /**
      * This will flip the boolean status of the current edge trigger
      *
@@ -2986,7 +2992,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
         }
     }
-    
+
     /**
      * @return true if this person has either a primary or a secondary role that is considered a combat
      *         role
@@ -3002,18 +3008,19 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public boolean isSupport() {
         return isSupportRole(primaryRole) || isSupportRole(secondaryRole);
     }
-    
+
     /**
      * Determines whether a role is considered a combat role. Note that T_LAM_PILOT is a special
      * placeholder which is not used for either primary or secondary role and will return false.
-     * 
+     *
      * @param role A value that can be used for a person's primary or secondary role.
      * @return     Whether the role is considered a combat role
      */
     public static boolean isCombatRole(int role) {
-        return (role > T_NONE) && (role <= T_NAVIGATOR);
+        return ((role > T_NONE) && (role <= T_NAVIGATOR))
+                || (role == T_VEHICLE_CREW);
     }
-    
+
     /**
      * @param role A value that can be used for a person's primary or secondary role.
      * @return     Whether the role is considered a support role
@@ -3363,7 +3370,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         } else {
             toReturn.append(String.format(", %d medics<br />", campaign.getMedicsPerDoctor()));
         }
-        
+
         toReturn.append(String.format("%d patient(s)</font></html>", campaign.getPatientsFor(this)));
 
         return toReturn.toString();
@@ -3415,7 +3422,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             else if (!first) {
                 toReturn.append("; ");
             }
-            
+
             toReturn.append(SkillType.getExperienceLevelName(skill.getExperienceLevel()));
             toReturn.append(" " + skillName);
             first = false;
@@ -3558,7 +3565,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private int getHitsInLocation(BodyLocation loc) {
         return ((null != loc) && hitsPerLocation.containsKey(loc)) ? hitsPerLocation.get(loc).intValue() : 0;
     }
-    
+
     public void diagnose(int hits) {
         InjuryUtil.resolveAfterCombat(campaign, this, hits);
         InjuryUtil.resolveCombatDamage(campaign, this, hits);
@@ -3620,7 +3627,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public boolean hasInjury(BodyLocation loc) {
         return (null != getInjuryByLocation(loc));
     }
-    
+
     public boolean hasInjury(BodyLocation loc, InjuryType type) {
         return (null != getInjuryByLocationAndType(loc, type));
     }
@@ -3682,7 +3689,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return injuries.stream().flatMap(i -> i.getModifiers().stream())
             .anyMatch(mod -> mod.tags.contains(InjuryType.MODTAG_INJURY));
     }
-    
+
     public boolean hasInjuries(boolean permCheck) {
         boolean tf = false;
         if (injuries.size() > 0) {
@@ -3758,7 +3765,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
             case T_NVEE_DRIVER:
             case T_VTOL_PILOT:
             case T_VEE_GUNNER:
-            return Ranks.RPROF_VEE;
+            case T_VEHICLE_CREW:
+                return Ranks.RPROF_VEE;
             case T_BA:
             case T_INFANTRY:
                 return Ranks.RPROF_INF;
@@ -3874,7 +3882,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public void setEngineer(boolean b) {
         engineer = b;
     }
-    
+
     public String getChildList() {
         List<UUID> ancestors = new ArrayList<>();
         for (Ancestors a : campaign.getAncestors()) {
@@ -3883,7 +3891,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 ancestors.add(a.getId());
             }
         }
-        
+
         List<String> children = new ArrayList<>();
         for (Person p : campaign.getPersonnel()) {
             if (ancestors.contains(p.getAncestorsID())) {
@@ -3896,7 +3904,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public boolean hasAnyFamily() {
         return hasChildren() || hasSpouse();
     }
-    
+
     public boolean hasChildren() {
         boolean hasKids = false;
         if (getId() != null) {
@@ -3907,10 +3915,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 }
             }
         }
-        
+
         return hasKids;
     }
-    
+
     /** Returns the ransom value of this individual
     * Useful for prisoner who you want to ransom or hand off to your employer in an AtB context */
     public Money getRansomValue() {

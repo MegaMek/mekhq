@@ -72,9 +72,9 @@ public class CampaignOptions implements Serializable {
     public final static int REPAIR_SYSTEM_STRATOPS = 0;
     public final static int REPAIR_SYSTEM_WARCHEST_CUSTOM = 1;
     public final static int REPAIR_SYSTEM_GENERIC_PARTS = 2;
-    
+
     public final static int MAXIMUM_D6_VALUE = 6;
-    
+
     //FIXME: This needs to be localized
     public final static String[] REPAIR_SYSTEM_NAMES = {"Strat Ops", "Warchest Custom", "Generic Spare Parts"};
 
@@ -82,13 +82,13 @@ public class CampaignOptions implements Serializable {
     public final static double MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT = 1.0;
     public final static double MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT = 1.0;
     public final static double MAXIMUM_WARSHIP_EQUIPMENT_PERCENT = 1.0;
-    
+
     public final static int PLANET_ACQUISITION_ALL = 0;
     public final static int PLANET_ACQUISITION_NEUTRAL = 1;
     public final static int PLANET_ACQUISITION_ALLY = 2;
     public final static int PLANET_ACQUISITION_SELF = 3;
 
-    
+
     private boolean useFactionForNames;
     private boolean useUnitRating;
 
@@ -314,7 +314,7 @@ public class CampaignOptions implements Serializable {
     private boolean massRepairUseAssignedTechsFirst;
     private boolean massRepairReplacePod;
     private List<MassRepairOption> massRepairOptions;
-    
+
     //Miscellaneous
     private boolean historicalDailyLog;
 
@@ -501,6 +501,7 @@ public class CampaignOptions implements Serializable {
         salaryTypeBase[Person.T_MEDIC] = Money.of(400);
         salaryTypeBase[Person.T_PROTO_PILOT] = Money.of(960);
         salaryTypeBase[Person.T_LAM_PILOT] = Money.of(1500);
+        salaryTypeBase[Person.T_VEHICLE_CREW] = Money.of(900);
         salaryXpMultiplier = new double[5];
         salaryXpMultiplier[SkillType.EXP_ULTRA_GREEN] = 0.6;
         salaryXpMultiplier[SkillType.EXP_GREEN] = 0.6;
@@ -563,7 +564,7 @@ public class CampaignOptions implements Serializable {
         allowOpforLocalUnits = false;
         opforAeroChance = 5;
         opforLocalUnitChance = 5;
-        
+
         //Mass Repair/Salvage Options
         massRepairUseExtraTime = true;
         massRepairUseRushJob = true;
@@ -573,11 +574,11 @@ public class CampaignOptions implements Serializable {
         massRepairUseAssignedTechsFirst = false;
         massRepairReplacePod = true;
         massRepairOptions = new ArrayList<>();
-        
+
         for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
         	massRepairOptions.add(new MassRepairOption(MassRepairOption.VALID_REPAIR_TYPES[i]));
         }
-        
+
         historicalDailyLog = false;
    }
 
@@ -609,7 +610,7 @@ public class CampaignOptions implements Serializable {
                 return "Unknown";
         }
     }
-    
+
     public static String getFactionLimitName(int lvl) {
         switch (lvl) {
             case PLANET_ACQUISITION_ALL:
@@ -765,7 +766,7 @@ public class CampaignOptions implements Serializable {
     public void setEdge(boolean b) {
         this.useEdge = b;
     }
-    
+
     public boolean useSupportEdge() {
         return useSupportEdge;
     }
@@ -1111,19 +1112,19 @@ public class CampaignOptions implements Serializable {
     public void setAllowCanonRefitOnly(boolean b) {
         allowCanonRefitOnly = b;
     }
-    
+
     public boolean useVariableTechLevel() {
         return variableTechLevel;
     }
-    
+
     public void setVariableTechLevel(boolean b) {
         variableTechLevel = b;
     }
-    
+
     public void setfactionIntroDate(boolean b) {
         factionIntroDate = b;
     }
-    
+
     public boolean useFactionIntroDate() {
         return factionIntroDate;
     }
@@ -1262,15 +1263,15 @@ public class CampaignOptions implements Serializable {
     public void setAdminXPPeriod(int m) {
         adminXPPeriod = m;
     }
-    
+
     public boolean historicalDailyLog() {
         return historicalDailyLog;
     }
-    
+
     public void setHistoricalDailyLog(boolean b) {
         this.historicalDailyLog = b;
     }
-    
+
     public int getEdgeCost() {
         return edgeCost;
     }
@@ -1358,35 +1359,35 @@ public class CampaignOptions implements Serializable {
     public void setAcquireMinimumTime(int b) {
         acquireMinimumTime = b;
     }
-    
+
     public boolean usesPlanetaryAcquisition() {
     	return usePlanetaryAcquisition;
     }
-    
+
     public void setPlanetaryAcquisition(boolean b) {
     	usePlanetaryAcquisition = b;
     }
-    
+
     public int getPlanetAcquisitionFactionLimit() {
     	return planetAcquisitionFactionLimit;
     }
-    
+
     public void setPlanetAcquisitionFactionLimit(int b) {
     	planetAcquisitionFactionLimit = b;
     }
-    
+
     public boolean disallowPlanetAcquisitionClanCrossover() {
     	return planetAcquisitionNoClanCrossover;
     }
-    
+
     public void setDisallowPlanetAcquisitionClanCrossover(boolean b) {
     	planetAcquisitionNoClanCrossover = b;
     }
-    
+
     public int getMaxJumpsPlanetaryAcquisition() {
     	return maxJumpsPlanetaryAcquisition;
     }
-    
+
     public void setMaxJumpsPlanetaryAcquisition(int m) {
     	maxJumpsPlanetaryAcquisition = m;
     }
@@ -1394,27 +1395,27 @@ public class CampaignOptions implements Serializable {
     public int getPenaltyClanPartsFroIS() {
     	return penaltyClanPartsFromIS;
     }
-    
+
     public void setPenaltyClanPartsFroIS(int i) {
     	penaltyClanPartsFromIS = i ;
     }
-    
+
     public boolean disallowClanPartsFromIS() {
     	return noClanPartsFromIS;
     }
-    
+
     public void setDisallowClanPartsFromIS(boolean b) {
     	noClanPartsFromIS = b;
     }
-    
+
     public boolean usePlanetAcquisitionVerboseReporting() {
     	return planetAcquisitionVerbose;
     }
-    
+
     public void setPlanetAcquisitionVerboseReporting(boolean b) {
     	planetAcquisitionVerbose = b;
     }
-    
+
     public double getEquipmentContractPercent() {
         return equipmentContractPercent;
     }
@@ -1486,7 +1487,7 @@ public class CampaignOptions implements Serializable {
     public void setIsAcquisitionPenalty(int b) {
         isAcquisitionPenalty = b;
     }
-    
+
     public int getPlanetTechAcquisitionBonus(int type) {
         if (type < 0 || type >= planetTechAcquisitionBonus.length) {
             return 0;
@@ -1500,7 +1501,7 @@ public class CampaignOptions implements Serializable {
         }
         this.planetTechAcquisitionBonus[type] = base;
     }
-    
+
     public int getPlanetIndustryAcquisitionBonus(int type) {
         if (type < 0 || type >= planetIndustryAcquisitionBonus.length) {
             return 0;
@@ -1514,7 +1515,7 @@ public class CampaignOptions implements Serializable {
         }
         this.planetIndustryAcquisitionBonus[type] = base;
     }
-    
+
     public int getPlanetOutputAcquisitionBonus(int type) {
         if (type < 0 || type >= planetOutputAcquisitionBonus.length) {
             return 0;
@@ -1616,7 +1617,7 @@ public class CampaignOptions implements Serializable {
     public void setDestroyPartTarget(int d) {
         destroyPartTarget = d;
     }
-    
+
     public boolean useAeroSystemHits() {
         return useAeroSystemHits;
     }
@@ -1968,15 +1969,15 @@ public class CampaignOptions implements Serializable {
 	public boolean useStaticRATs() {
 		return staticRATs;
 	}
-	
+
 	public void setStaticRATs(boolean staticRATs) {
 		this.staticRATs = staticRATs;
 	}
-	
+
 	public boolean canIgnoreRatEra() {
 	    return ignoreRatEra;
 	}
-	
+
 	public void setIgnoreRatEra(boolean ignore) {
 	    ignoreRatEra = ignore;
 	}
@@ -2167,11 +2168,11 @@ public class CampaignOptions implements Serializable {
 	public boolean massRepairScrapImpossible() {
 		return massRepairScrapImpossible;
 	}
-	
+
 	public void setMassRepairScrapImpossible(boolean b) {
 		this.massRepairScrapImpossible = b;
 	}
-	
+
 	public boolean massRepairUseAssignedTechsFirst() {
 		return massRepairUseAssignedTechsFirst;
 	}
@@ -2200,58 +2201,58 @@ public class CampaignOptions implements Serializable {
 		if (mro.getType() == -1) {
 			return;
 		}
-		
+
 		int foundIdx = -1;
-		
+
 		for (int i = 0; i < massRepairOptions.size(); i++) {
 			if (massRepairOptions.get(i).getType() == mro.getType()) {
 				foundIdx = i;
 				break;
 			}
 		}
-		
+
 		if (foundIdx == -1) {
 			massRepairOptions.add(mro);
 		} else {
 			massRepairOptions.add(foundIdx, mro);
 			massRepairOptions.remove(foundIdx + 1);
 		}
-		
+
 		massRepairOptions.sort((o1, o2) -> o1.getType() < o2.getType() ? -1 : 1);
 	}
 
 	public void setAllowOpforAeros(boolean allowOpforAeros) {
 	    this.allowOpforAeros = allowOpforAeros;
 	}
-	
+
 	public boolean getAllowOpforAeros() {
 	    return allowOpforAeros;
 	}
-	
+
 	public void setAllowOpforLocalUnits(boolean allowOpforLocalUnits) {
         this.allowOpforLocalUnits = allowOpforLocalUnits;
     }
-    
+
     public boolean getAllowOpforLocalUnits() {
         return allowOpforLocalUnits;
     }
-    
+
     public void setOpforAeroChance(int chance) {
         this.opforAeroChance = chance;
     }
-    
+
     public int getOpforAeroChance() {
         return opforAeroChance;
     }
-    
+
     public void setOpforLocalUnitChance(int chance) {
         this.opforLocalUnitChance = chance;
     }
-    
+
     public int getOpforLocalUnitChance() {
         return opforLocalUnitChance;
     }
-	
+
 	public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clanPriceModifier", clanPriceModifier); //private double
@@ -2451,26 +2452,26 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairScrapImpossible", massRepairScrapImpossible);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairUseAssignedTechsFirst", massRepairUseAssignedTechsFirst);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairReplacePod", massRepairReplacePod);
-        
+
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<massRepairOptions>");
 
         for (int i = 0; i < massRepairOptions.size(); i++) {
         	MassRepairOption mro = massRepairOptions.get(i);
-        	
+
         	pw1.println(MekHqXmlUtil.indentStr(indent + 2) + "<massRepairOption" + i + ">");
-        	
+
         	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "type", mro.getType());
         	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "active", mro.isActive() ? 1 : 0);
         	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "skillMin", mro.getSkillMin());
         	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "skillMax", mro.getSkillMax());
         	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "btnMin", mro.getBthMin());
         	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "btnMax", mro.getBthMax());
-        	
+
         	pw1.println(MekHqXmlUtil.indentStr(indent + 2) + "</massRepairOption" + i + ">");
         }
-        
+
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "</massRepairOptions>");
-        
+
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                 + "<planetTechAcquisitionBonus>"
                 + Utilities.printIntegerArray(planetTechAcquisitionBonus)
@@ -2483,7 +2484,7 @@ public class CampaignOptions implements Serializable {
                 + "<planetOutputAcquisitionBonus>"
                 + Utilities.printIntegerArray(planetOutputAcquisitionBonus)
                 + "</planetOutputAcquisitionBonus>");
-        
+
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<salaryTypeBase>"
                     + Utilities.printMoneyArray(salaryTypeBase)
@@ -2954,11 +2955,11 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("massRepairOptimizeToCompleteToday")) {
                 retVal.massRepairOptimizeToCompleteToday = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("massRepairScrapImpossible")) {
-                retVal.massRepairScrapImpossible = Boolean.parseBoolean(wn2.getTextContent().trim());        
+                retVal.massRepairScrapImpossible = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseAssignedTechsFirst")) {
-                retVal.massRepairUseAssignedTechsFirst = Boolean.parseBoolean(wn2.getTextContent().trim());                        
+                retVal.massRepairUseAssignedTechsFirst = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("massRepairReplacePod")) {
-                retVal.massRepairReplacePod = Boolean.parseBoolean(wn2.getTextContent().trim());                        
+                retVal.massRepairReplacePod = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("massRepairOptions")) {
                 NodeList mroList = wn2.getChildNodes();
 
@@ -2968,13 +2969,13 @@ public class CampaignOptions implements Serializable {
                     if (mroNode.getNodeType() != Node.ELEMENT_NODE) {
                         continue;
                     }
-                    
+
                     for (int mroTypeIdx = 0; mroTypeIdx < MassRepairOption.VALID_REPAIR_TYPES.length; mroTypeIdx++) {
                     	if (mroNode.getNodeName().equalsIgnoreCase("massRepairOption" + mroTypeIdx)) {
-                    		
+
                     		MassRepairOption mro = new MassRepairOption();
                     		mro.setType(-1);
-                    		
+
                             NodeList mroItemList = mroNode.getChildNodes();
 
                             for (int mroItemIdx = 0; mroItemIdx < mroItemList.getLength(); mroItemIdx++) {
@@ -2983,11 +2984,11 @@ public class CampaignOptions implements Serializable {
                                 if (mroItemNode.getNodeType() != Node.ELEMENT_NODE) {
                                     continue;
                                 }
-                     
+
                                 MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
                                         String.format("massRepairOption %d.%s\n\t%s", //$NON-NLS-1$
                                                 mroTypeIdx, mroItemNode.getNodeName(), mroItemNode.getTextContent()));
-                                
+
                                 if (mroItemNode.getNodeName().equalsIgnoreCase("type")) {
                                 	mro.setType(Integer.parseInt(mroItemNode.getTextContent().trim()));
                                 } else if (mroItemNode.getNodeName().equalsIgnoreCase("active")) {
@@ -3002,13 +3003,13 @@ public class CampaignOptions implements Serializable {
                                 	mro.setBthMax(Integer.parseInt(mroItemNode.getTextContent().trim()));
                                 }
                             }
-                            
+
                             if (mro.getType() != -1) {
                             	retVal.addMassRepairOption(mro);
                             }
                     	}
-                    }                    
-                }            	
+                    }
+                }
             }
         }
 
@@ -3017,16 +3018,16 @@ public class CampaignOptions implements Serializable {
 
         return retVal;
     }
-    
+
     public static class MassRepairOption {
     	public MassRepairOption() {
-    		
+
     	}
-    	
+
     	public MassRepairOption(int type) {
     		this (type, false, SkillType.EXP_ULTRA_GREEN, SkillType.EXP_ELITE, 4, 4);
     	}
-    	
+
     	public MassRepairOption(int type, boolean active, int skillMin, int skillMax, int bthMin, int bthMax) {
 			this.type = type;
 			this.active = active;
@@ -3036,62 +3037,62 @@ public class CampaignOptions implements Serializable {
 			this.bthMax = bthMax;
 		}
 
-    	public static int[] VALID_REPAIR_TYPES = new int[] { Part.REPAIR_PART_TYPE.ARMOR, Part.REPAIR_PART_TYPE.AMMO, 
-    			Part.REPAIR_PART_TYPE.WEAPON, Part.REPAIR_PART_TYPE.GENERAL_LOCATION, Part.REPAIR_PART_TYPE.ENGINE, 
+    	public static int[] VALID_REPAIR_TYPES = new int[] { Part.REPAIR_PART_TYPE.ARMOR, Part.REPAIR_PART_TYPE.AMMO,
+    			Part.REPAIR_PART_TYPE.WEAPON, Part.REPAIR_PART_TYPE.GENERAL_LOCATION, Part.REPAIR_PART_TYPE.ENGINE,
     			Part.REPAIR_PART_TYPE.GYRO, Part.REPAIR_PART_TYPE.ACTUATOR, Part.REPAIR_PART_TYPE.ELECTRONICS,
     			Part.REPAIR_PART_TYPE.POD_SPACE, Part.REPAIR_PART_TYPE.GENERAL };
-    	
+
 		private int type;
     	private boolean active = true;
     	private int skillMin;
     	private int skillMax;
     	private int bthMin;
     	private int bthMax;
-    	
+
 		public int getType() {
 			return type;
 		}
-		
+
 		public void setType(int type) {
 			this.type = type;
 		}
-		
+
 		public boolean isActive() {
 			return active;
 		}
-		
+
 		public void setActive(boolean active) {
 			this.active = active;
 		}
-		
+
 		public int getSkillMin() {
 			return skillMin;
 		}
-		
+
 		public void setSkillMin(int skillMin) {
 			this.skillMin = skillMin;
 		}
-		
+
 		public int getSkillMax() {
 			return skillMax;
 		}
-		
+
 		public void setSkillMax(int skillMax) {
 			this.skillMax = skillMax;
 		}
-		
+
 		public int getBthMin() {
 			return bthMin;
 		}
-		
+
 		public void setBthMin(int bthMin) {
 			this.bthMin = bthMin;
 		}
-		
+
 		public int getBthMax() {
 			return bthMax;
 		}
-		
+
 		public void setBthMax(int bthMax) {
 			this.bthMax = bthMax;
 		}
