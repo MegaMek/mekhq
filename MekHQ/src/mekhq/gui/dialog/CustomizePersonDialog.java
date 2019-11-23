@@ -6,7 +6,6 @@
 
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -26,18 +25,18 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
-import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import org.joda.time.DateTime;
 
 import megamek.client.ui.swing.DialogOptionComponent;
 import megamek.client.ui.swing.DialogOptionListener;
@@ -59,6 +58,8 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.control.EditKillLogControl;
 import mekhq.gui.control.EditMissionLogControl;
 import mekhq.gui.control.EditPersonnelLogControl;
@@ -117,6 +118,10 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private javax.swing.JTextField textBloodname;
     private MarkdownEditorPanel txtBio;
     private JComboBox<Faction> choiceFaction;
+    private JComboBox<PlanetarySystem> choiceSystem;
+    private DefaultComboBoxModel<PlanetarySystem> allSystems;
+    private JCheckBox chkOnlyOurFaction;
+    private JComboBox<Planet> choicePlanet;
     private JCheckBox chkClan;
     private JComboBox<String> choicePheno;
     
@@ -359,6 +364,10 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
 
                 // We don't have to call backgroundChanged because it is already
                 // called when we update the chkClan checkbox.
+
+                if (chkOnlyOurFaction.isSelected()) {
+                    filterPlanetarySystemsForOurFaction(true);
+                }
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -369,6 +378,114 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         panDemog.add(choiceFaction, gridBagConstraints);
+
+        y++;
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        panDemog.add(new JLabel("Origin System:"), gridBagConstraints);
+
+        DefaultComboBoxModel<Planet> planetsModel = new DefaultComboBoxModel<>();
+        choicePlanet = new JComboBox<>(planetsModel);
+
+        allSystems = getPlanetarySystemsComboBoxModel();
+        choiceSystem = new JComboBox<>(allSystems);
+        choiceSystem.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list,
+                                                          final Object value,
+                                                          final int index,
+                                                          final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected,
+                                                   cellHasFocus);
+                if (value instanceof PlanetarySystem) {
+                    PlanetarySystem system = (PlanetarySystem)value;
+                    setText(system.getName(new DateTime(campaign.getCalendar())));
+                }
+
+                return this;
+            }
+        });
+        if (person.getOriginPlanet() != null) {
+            PlanetarySystem planetarySystem = person.getOriginPlanet().getParentSystem();
+            choiceSystem.setSelectedIndex(allSystems.getIndexOf(planetarySystem));
+            updatePlanetsComboBoxModel(planetsModel, planetarySystem);
+        }
+        choiceSystem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                // Update the clan check box based on the new selected faction
+                PlanetarySystem selectedSystem = (PlanetarySystem)choiceSystem.getSelectedItem();
+
+                choicePlanet.setSelectedIndex(-1);
+                updatePlanetsComboBoxModel(planetsModel, selectedSystem);
+            }
+        });
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        panDemog.add(choiceSystem, gridBagConstraints);
+
+        chkOnlyOurFaction = new JCheckBox("Faction Specific");
+        chkOnlyOurFaction.addActionListener(e -> {
+            filterPlanetarySystemsForOurFaction(chkOnlyOurFaction.isSelected());
+        });
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        panDemog.add(chkOnlyOurFaction, gridBagConstraints);
+
+        y++;
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        panDemog.add(new JLabel("Origin Planet:"), gridBagConstraints);
+
+        choicePlanet.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list,
+                                                          final Object value,
+                                                          final int index,
+                                                          final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected,
+                                                   cellHasFocus);
+                if (value instanceof Planet) {
+                    Planet planet = (Planet)value;
+                    setText(planet.getName(new DateTime(campaign.getCalendar())));
+                }
+
+                return this;
+            }
+        });
+        if (person.getOriginPlanet() != null) {
+            choicePlanet.setSelectedIndex(planetsModel.getIndexOf(person.getOriginPlanet()));
+        }
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        panDemog.add(choicePlanet, gridBagConstraints);
 
         y++;
 
@@ -745,6 +862,69 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         return factionsModel;
     }
 
+    private DefaultComboBoxModel<PlanetarySystem> getPlanetarySystemsComboBoxModel() {
+        DefaultComboBoxModel<PlanetarySystem> model = new DefaultComboBoxModel<>();
+
+        DateTime currentYear = new DateTime(campaign.getCalendar());
+        List<PlanetarySystem> orderedSystems = campaign.getSystems().stream()
+            .sorted((a, b) -> a.getName(currentYear).compareTo(b.getName(currentYear)))
+            .collect(Collectors.toList());
+        for (PlanetarySystem system : orderedSystems) {
+            model.addElement(system);
+        }
+        return model;
+    }
+
+    private DefaultComboBoxModel<PlanetarySystem> getPlanetarySystemsComboBoxModel(Faction faction) {
+        DefaultComboBoxModel<PlanetarySystem> model = new DefaultComboBoxModel<>();
+
+        DateTime currentYear = new DateTime(campaign.getCalendar());
+        List<PlanetarySystem> orderedSystems = campaign.getSystems().stream()
+            .filter(a -> a.getFactionSet(currentYear).contains(faction))
+            .sorted((a, b) -> a.getName(currentYear).compareTo(b.getName(currentYear)))
+            .collect(Collectors.toList());
+        for (PlanetarySystem system : orderedSystems) {
+            model.addElement(system);
+        }
+
+        return model;
+    }
+
+    private void filterPlanetarySystemsForOurFaction(boolean onlyOurFaction) {
+        PlanetarySystem selectedSystem = (PlanetarySystem)choiceSystem.getSelectedItem();
+        Planet selectedPlanet = (Planet)choicePlanet.getSelectedItem();
+        if (onlyOurFaction && choiceFaction.getSelectedItem() != null) {
+            Faction faction = (Faction)choiceFaction.getSelectedItem();
+
+            DefaultComboBoxModel<PlanetarySystem> model = getPlanetarySystemsComboBoxModel(faction);
+            if (model.getIndexOf(selectedSystem) < 0) {
+                selectedSystem = null;
+                selectedPlanet = null;
+            }
+
+            updatePlanetsComboBoxModel((DefaultComboBoxModel<Planet>)choicePlanet.getModel(), null);
+            choiceSystem.setModel(model);
+        } else {
+            choiceSystem.setModel(allSystems);
+        }
+        choiceSystem.setSelectedItem(selectedSystem);
+
+        updatePlanetsComboBoxModel((DefaultComboBoxModel<Planet>)choicePlanet.getModel(), selectedSystem);
+        choicePlanet.setSelectedItem(selectedPlanet);
+    }
+
+    private void updatePlanetsComboBoxModel(DefaultComboBoxModel<Planet> planetsModel, PlanetarySystem planetarySystem) {
+        planetsModel.removeAllElements();
+        if (planetarySystem != null) {
+            planetsModel.addElement(planetarySystem.getPrimaryPlanet());
+            for (Planet planet : planetarySystem.getPlanets()) {
+                if (planet != planetarySystem.getPrimaryPlanet()) {
+                    planetsModel.addElement(planet);
+                }
+            }
+        }
+    }
+
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnCloseActionPerformed
         setVisible(false);
     }// GEN-LAST:event_btnCloseActionPerformed
@@ -759,6 +939,12 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         person.setBirthday(birthdate);
         person.setRecruitment(recruitment);
         person.setOriginFaction((Faction) choiceFaction.getSelectedItem());
+        if (choiceSystem.getSelectedItem() != null
+            && choicePlanet.getSelectedItem() != null) {
+            person.setOriginPlanet((Planet)choicePlanet.getSelectedItem());
+        } else {
+            person.setOriginPlanet(null);
+        }
         person.setPhenotype(choicePheno.getSelectedIndex());
         person.setClanner(chkClan.isSelected());
         try {
