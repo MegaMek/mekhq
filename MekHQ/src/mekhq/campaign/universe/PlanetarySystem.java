@@ -425,7 +425,16 @@ public class PlanetarySystem implements Serializable {
     public Planet getPlanet(int pos) {
         return planets.get(pos);
     }
-    
+
+    public Planet getPlanetById(String id) {
+        for (Planet p : planets.values()) {
+            if (p.getId().equals(id)) {
+                return p;
+            }
+        }
+        return null;
+    }
+
     public Set<Integer> getPlanetPositions() {
         return planets.keySet();
     }

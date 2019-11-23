@@ -4380,6 +4380,10 @@ public class Campaign implements Serializable, ITechManager {
         return systems;
     }
 
+    public PlanetarySystem getSystemById(String id) {
+        return Systems.getInstance().getSystemById(id);
+    }
+
     public Vector<String> getSystemNames() {
         Vector<String> systemNames = new Vector<String>();
         for (PlanetarySystem key : Systems.getInstance().getSystems().values()) {
