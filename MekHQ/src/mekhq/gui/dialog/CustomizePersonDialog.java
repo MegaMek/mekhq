@@ -878,10 +878,10 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private DefaultComboBoxModel<PlanetarySystem> getPlanetarySystemsComboBoxModel(Faction faction) {
         DefaultComboBoxModel<PlanetarySystem> model = new DefaultComboBoxModel<>();
 
-        DateTime currentYear = new DateTime(campaign.getCalendar());
+        DateTime birthYear = new DateTime(person.getBirthday());
         List<PlanetarySystem> orderedSystems = campaign.getSystems().stream()
-            .filter(a -> a.getFactionSet(currentYear).contains(faction))
-            .sorted((a, b) -> a.getName(currentYear).compareTo(b.getName(currentYear)))
+            .filter(a -> a.getFactionSet(birthYear).contains(faction))
+            .sorted((a, b) -> a.getName(birthYear).compareTo(b.getName(birthYear)))
             .collect(Collectors.toList());
         for (PlanetarySystem system : orderedSystems) {
             model.addElement(system);
