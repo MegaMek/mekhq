@@ -3572,6 +3572,10 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return Compute.getTotalDriverNeeds(entity);
     }
 
+    /**
+     * Compute the number of generic space/vehicle crew (e.g. not driver, gunner, or navigator)
+     * @return The number of generic crew required
+     */
     public int getTotalCrewNeeds() {
         int nav = 0;
         if(entity instanceof SmallCraft || entity instanceof Jumpship) {
@@ -3579,6 +3583,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 nav = 1;
             }
             return getAeroCrewNeeds() - getTotalDriverNeeds() - nav;
+        } else if (entity.isSupportVehicle()) {
+            return getFullCrewSize() - getTotalDriverNeeds() - getTotalGunnerNeeds();
         }
         return 0;
     }
@@ -3591,11 +3597,13 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     public boolean canTakeMoreVesselCrew() {
         int nCrew = vesselCrew.size();
         int nav = 0;
-        if(entity instanceof SmallCraft || entity instanceof Jumpship) {
+        if (entity instanceof SmallCraft || entity instanceof Jumpship) {
             if(entity instanceof Jumpship && !(entity instanceof SpaceStation)) {
                 nav = 1;
             }
             return nCrew < (getAeroCrewNeeds() - getTotalDriverNeeds() - nav);
+        } else if (entity.isSupportVehicle()) {
+            return nCrew < (getFullCrewSize() - getTotalDriverNeeds() - getTotalGunnerNeeds());
         }
         return false;
     }
