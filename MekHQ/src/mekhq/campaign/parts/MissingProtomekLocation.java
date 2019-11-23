@@ -202,13 +202,10 @@ public class MissingProtomekLocation extends MissingPart {
 		 }
         //there must be no usable equipment currently in the location
         //you can only salvage a location that has nothing left on it
-        for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
-            CriticalSlot slot = unit.getEntity().getCritical(loc, i);
-            // ignore empty & non-hittable slots
-            if ((slot == null) || !slot.isEverHittable()) {
-                continue;
-            }
-            if (slot.isRepairable()) {
+        for (Part part : unit.getParts()) {
+            if ((part.getLocation() == getLocation())
+                    && !(part instanceof MissingPart)
+                    && (!(part instanceof ProtomekArmor) || ((ProtomekArmor) part).getAmount() > 0)) {
                 return "Repairable parts in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first. They can then be re-installed.";
             }
         }
@@ -266,19 +263,19 @@ public class MissingProtomekLocation extends MissingPart {
 
 	@Override
 	public int getLocation() {
-		return Protomech.LOC_TORSO;
+		return loc;
 	}
 
     @Override
     public TechAdvancement getTechAdvancement() {
         return ProtomekLocation.TECH_ADVANCEMENT;
     }
-    
+
     @Override
 	public int getMassRepairOptionType() {
     	return Part.REPAIR_PART_TYPE.GENERAL_LOCATION;
     }
-	
+
 	@Override
 	public int getRepairPartType() {
     	return Part.REPAIR_PART_TYPE.MEK_LOCATION;
