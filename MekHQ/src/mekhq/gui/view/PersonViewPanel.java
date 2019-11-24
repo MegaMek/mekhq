@@ -26,6 +26,8 @@ import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 
+import org.joda.time.DateTime;
+
 import megamek.common.Crew;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
@@ -523,7 +525,13 @@ public class PersonViewPanel extends ScrollablePanel {
             pnlInfo.add(lblOrigin1, gridBagConstraints);
 
             lblOrigin2.setName("lblOrigin2"); // NOI18N
-            lblOrigin2.setText(person.getOriginFaction().getFullName(person.getCampaign().getGameYear()));
+            String factionName = person.getOriginFaction().getFullName(person.getCampaign().getGameYear());
+            if (person.getOriginPlanet() != null) {
+                String planetName = person.getOriginPlanet().getName(new DateTime(person.getCampaign().getCalendar()));
+                lblOrigin2.setText(String.format("%s (%s)", planetName, factionName));
+            } else {
+                lblOrigin2.setText(factionName);
+            }
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = firsty;

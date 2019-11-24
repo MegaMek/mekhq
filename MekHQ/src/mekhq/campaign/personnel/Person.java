@@ -70,6 +70,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Planet;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -252,6 +253,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private boolean clan;
     private String bloodname;
     private Faction originFaction;
+    private Planet originPlanet;
 
     //assignments
     private UUID unitId;
@@ -449,6 +451,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void setOriginFaction(Faction f) {
         originFaction = f;
+    }
+
+    public Planet getOriginPlanet() {
+        return originPlanet;
+    }
+
+    public void setOriginPlanet(Planet p) {
+        originPlanet = p;
     }
 
     public boolean isCommander() {
@@ -1309,6 +1319,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     + "<faction>"
                     + originFaction.getShortName()
                     + "</faction>");
+        if (originPlanet != null) {
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                        + "<planetId systemId=\""
+                        + originPlanet.getParentSystem().getId()
+                        + "\">"
+                        + originPlanet.getId()
+                        + "</planetId>");
+        }
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<clan>"
                     + clan
@@ -1589,6 +1607,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     retVal.dependent = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("faction")) {
                     retVal.originFaction = Faction.getFaction(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("planetId")) {
+                    String systemId = wn2.getAttributes().getNamedItem("systemId").getTextContent().trim();
+                    String planetId = wn2.getTextContent().trim();
+                    retVal.originPlanet = c.getSystemById(systemId).getPlanetById(planetId);
                 } else if (wn2.getNodeName().equalsIgnoreCase("isClanTech")
                            || wn2.getNodeName().equalsIgnoreCase("clan")) {
                     retVal.clan = Boolean.parseBoolean(wn2.getTextContent().trim());
