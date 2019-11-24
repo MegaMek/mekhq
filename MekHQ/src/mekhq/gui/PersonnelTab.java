@@ -137,7 +137,7 @@ public final class PersonnelTab extends CampaignGuiTab {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see mekhq.gui.CampaignGuiTab#initTab()
      */
     @Override
@@ -255,7 +255,7 @@ public final class PersonnelTab extends CampaignGuiTab {
                         splitPersonnel.setDividerLocation(1.0);
                     }
                 }
-            }            
+            }
         });
         TableColumn column = null;
         for (int i = 0; i < PersonnelTableModel.N_COL; i++) {
@@ -314,14 +314,14 @@ public final class PersonnelTab extends CampaignGuiTab {
     public JTable getPersonnelTable() {
         return personnelTable;
     }
-    
+
     public PersonnelTableModel getPersonModel() {
         return personModel;
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see mekhq.gui.CampaignGuiTab#refreshAll()
      */
     @Override
@@ -411,7 +411,7 @@ public final class PersonnelTab extends CampaignGuiTab {
                         || (nGroup == PG_SUPPORT && type > Person.T_SPACE_GUNNER)
                         || (nGroup == PG_MW && type == Person.T_MECHWARRIOR)
                         || (nGroup == PG_CREW && (type == Person.T_GVEE_DRIVER || type == Person.T_NVEE_DRIVER
-                                || type == Person.T_VTOL_PILOT || type == Person.T_VEE_GUNNER))
+                                || type == Person.T_VTOL_PILOT || type == Person.T_VEE_GUNNER || type == Person.T_VEHICLE_CREW))
                         || (nGroup == PG_PILOT && type == Person.T_AERO_PILOT)
                         || (nGroup == PG_CPILOT && type == Person.T_CONV_PILOT)
                         || (nGroup == PG_PROTO && type == Person.T_PROTO_PILOT)
@@ -870,27 +870,27 @@ public final class PersonnelTab extends CampaignGuiTab {
         changePersonnelView();
         personnelListScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(DeploymentChangedEvent ev) {
         filterPersonnelScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(PersonChangedEvent ev) {
         personnelListScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(PersonNewEvent ev) {
         personnelListScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(PersonRemovedEvent ev) {
         personnelListScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(PersonLogEvent ev) {
         refreshPersonnelView();
@@ -910,7 +910,7 @@ public final class PersonnelTab extends CampaignGuiTab {
     public void handle(PartWorkEvent ev) {
         filterPersonnelScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(OvertimeModeEvent ev) {
         filterPersonnelScheduler.schedule();

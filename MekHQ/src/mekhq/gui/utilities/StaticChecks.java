@@ -37,7 +37,7 @@ public class StaticChecks {
         }
         return true;
     }
-    
+
     public static boolean areAnyForcesDeployed(Vector<Force> forces) {
         for (Force force : forces) {
             if (force.isDeployed()) {
@@ -55,7 +55,7 @@ public class StaticChecks {
         }
         return true;
     }
-    
+
     public static boolean areAnyUnitsDeployed(Vector<Unit> units) {
         for (Unit unit : units) {
             if (unit.isDeployed()) {
@@ -236,7 +236,8 @@ public class StaticChecks {
 
     public static boolean areAllVesselCrew(Person[] people) {
         for (Person person : people) {
-            if (Person.T_SPACE_CREW != person.getPrimaryRole()) {
+            if (Person.T_SPACE_CREW != person.getPrimaryRole()
+                    && Person.T_VEHICLE_CREW != person.getPrimaryRole()) {
                 return false;
             }
         }
@@ -295,14 +296,14 @@ public class StaticChecks {
         }
         return true;
     }
-    
+
     public static boolean areAllPrisoners(Person[] people) {
         for(Person person : people) {
             if(!person.isPrisoner()) {
                 return false;
             }
         }
-        
+
         return true;
     }
 
