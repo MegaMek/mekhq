@@ -194,7 +194,9 @@ public class Campaign implements Serializable, ITechManager {
     // we will use the same basic system (borrowed from MegaMek) for tracking
     // all three
     // OK now we have more, parts, personnel, forces, missions, and scenarios.
+    // and more still - we're tracking Dropships and Warships in a separate set so that we can assign units to transports
     private Map<UUID, Unit> units = new LinkedHashMap<>();
+    private Set<UUID> transportShips = new HashSet<>();
     private Map<UUID, Person> personnel = new LinkedHashMap<>();
     private Map<UUID, Ancestors> ancestors = new LinkedHashMap<>();
     private TreeMap<Integer, Part> parts = new TreeMap<>();
@@ -1027,6 +1029,22 @@ public class Campaign implements Serializable, ITechManager {
                 "Adding unit: (" + u.getId() + "):" + u); //$NON-NLS-1$
         units.put(u.getId(), u);
         checkDuplicateNamesDuringAdd(u.getEntity());
+
+        // Assign an entity ID to our new unit
+        if (Entity.NONE == u.getEntity().getId()) {
+            u.getEntity().setId(game.getNextEntityId());
+        }
+        game.addEntity(u.getEntity().getId(), u.getEntity());
+    }
+    
+    /**
+     * 
+     * @param u
+     */
+    public void addTransportShip(UUID id) {
+        MekHQ.getLogger().log(getClass(), "addTransportShip()", LogLevel.INFO, //$NON-NLS-1$
+                "Adding Dropship/Warship: " + id); //$NON-NLS-1$
+        transportShips.add(id);
 
         // Assign an entity ID to our new unit
         if (Entity.NONE == u.getEntity().getId()) {
@@ -7246,6 +7264,8 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
     }
+    
+    **
 
     public int getTotalMechBays() {
         double bays = 0;
