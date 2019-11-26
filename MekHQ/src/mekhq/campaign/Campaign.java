@@ -73,6 +73,7 @@ import megamek.common.SimpleTechLevel;
 import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
+import megamek.common.Warship;
 import megamek.common.annotations.Nullable;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
@@ -1029,6 +1030,13 @@ public class Campaign implements Serializable, ITechManager {
                 "Adding unit: (" + u.getId() + "):" + u); //$NON-NLS-1$
         units.put(u.getId(), u);
         checkDuplicateNamesDuringAdd(u.getEntity());
+        
+        //If this is a ship, add it to the list of potential transports
+        //Jumpships and space stations are intentionally ignored at present, because this functionality is being
+        //used to auto-load ground units into bays, and doing this for large craft that can't transit is pointless.
+        if (u.getEntity() != null && (u.getEntity() instanceof Dropship || u.getEntity() instanceof Warship)) {
+            addTransportShip(u.getId());
+        }
 
         // Assign an entity ID to our new unit
         if (Entity.NONE == u.getEntity().getId()) {
@@ -1038,19 +1046,25 @@ public class Campaign implements Serializable, ITechManager {
     }
     
     /**
-     * 
-     * @param u
+     * Adds an entry to the list of transit-capable transport ships. We'll use this
+     * to look for empty bays that ground units can be assigned to
+     * @param id - The unique ID of the ship we want to add to this Set
      */
     public void addTransportShip(UUID id) {
         MekHQ.getLogger().log(getClass(), "addTransportShip()", LogLevel.INFO, //$NON-NLS-1$
                 "Adding Dropship/Warship: " + id); //$NON-NLS-1$
         transportShips.add(id);
-
-        // Assign an entity ID to our new unit
-        if (Entity.NONE == u.getEntity().getId()) {
-            u.getEntity().setId(game.getNextEntityId());
-        }
-        game.addEntity(u.getEntity().getId(), u.getEntity());
+    }
+    
+    /**
+     * Deletes an entry from the list of transit-capable transport ships. This gets updated when
+     * the ship is removed from the campaign for one reason or another
+     * @param id - The unique ID of the ship we want to remove from this Set
+     */
+    public void removeTransportShip(UUID id) {
+        MekHQ.getLogger().log(getClass(), "removeTransportShip()", LogLevel.INFO, //$NON-NLS-1$
+                "Removing Dropship/Warship: " + id); //$NON-NLS-1$
+        transportShips.remove(id);
     }
 
     /**
@@ -1122,6 +1136,13 @@ public class Campaign implements Serializable, ITechManager {
         units.put(id, unit);
         removeUnitFromForce(unit); // Added to avoid the 'default force bug'
         // when calculating cargo
+        
+        //If this is a ship, add it to the list of potential transports
+        //Jumpships and space stations are intentionally ignored at present, because this functionality is being
+        //used to auto-load ground units into bays, and doing this for large craft that can't transit is pointless.
+        if (unit.getEntity() != null && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Warship)) {
+            addTransportShip(id);
+        }
 
         unit.initializeParts(true);
         unit.runDiagnostic(false);
@@ -7264,8 +7285,13 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
     }
-    
-    **
+    /**
+     * Returns our list of potential transport ships
+     * @return
+     */
+    public Set<UUID> getTransportShips() {
+        return transportShips;
+    }
 
     public int getTotalMechBays() {
         double bays = 0;
