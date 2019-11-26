@@ -3390,6 +3390,9 @@ public class Campaign implements Serializable, ITechManager {
 
         // remove unit from any forces
         removeUnitFromForce(unit);
+        
+        //If this is a ship, remove it from the list of potential transports
+        removeTransportShip(id);
 
         // finally remove the unit
         units.remove(unit.getId());
