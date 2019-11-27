@@ -48,8 +48,76 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
         super();
         this.gui = gui;
     }
-private String FORCE = "FORCE";
-private String UNIT = "UNIT";
+    
+    //Named Constants for various commands
+    //Force-related
+    private static final String FORCE = "FORCE";
+    private static final String ADD_FORCE = "ADD_FORCE";
+    private static final String REMOVE_FORCE = "REMOVE_FORCE";
+    private static final String DEPLOY_FORCE = "DEPLOY_FORCE";
+    private static final String UNDEPLOY_FORCE = "UNDEPLOY_FORCE";
+    
+    private static final String COMMAND_ADD_FORCE = "ADD_FORCE|FORCE|empty|";
+    private static final String COMMAND_DEPLOY_FORCE = "DEPLOY_FORCE|FORCE|";
+    private static final String COMMAND_REMOVE_FORCE = "REMOVE_FORCE|FORCE|empty|";
+    private static final String COMMAND_UNDEPLOY_FORCE = "UNDEPLOY_FORCE|FORCE|empty|";
+
+    //Unit-related
+    private static final String UNIT = "UNIT";
+    private static final String ADD_UNIT = "ADD_UNIT";
+    private static final String DEPLOY_UNIT = "DEPLOY_UNIT";
+    private static final String GOTO_UNIT = "GOTO_UNIT";
+    private static final String REMOVE_UNIT = "REMOVE_UNIT";
+    private static final String UNDEPLOY_UNIT = "UNDEPLOY_UNIT";
+    
+    private static final String COMMAND_ADD_UNIT = "ADD_UNIT|FORCE|";
+    private static final String COMMAND_ASSIGN_TO_SHIP = "ASSIGN_TO_SHIP|UNIT|empty|";
+    private static final String COMMAND_REMOVE_UNIT = "REMOVE_UNIT|UNIT|empty|";
+    private static final String COMMAND_DEPLOY_UNIT = "DEPLOY_UNIT|FORCE|";
+    private static final String COMMAND_UNDEPLOY_UNIT = "UNDEPLOY_UNIT|UNIT|empty|";
+    private static final String COMMAND_GOTO_UNIT = "GOTO_UNIT|UNIT|empty|";
+
+    //Tech-Related
+    private static final String ADD_LANCE_TECH = "ADD_LANCE_TECH";
+    private static final String REMOVE_LANCE_TECH = "REMOVE_LANCE_TECH";
+    
+    private static final String COMMAND_ADD_LANCE_TECH = "ADD_LANCE_TECH|FORCE|";
+    private static final String COMMAND_REMOVE_LANCE_TECH = "REMOVE_LANCE_TECH|FORCE|";
+    //Icons and Descriptions
+    private static final String CHANGE_CAMO = "CHANGE_CAMO";
+    private static final String CHANGE_DESC = "CHANGE_DESC";
+    private static final String CHANGE_ICON = "CHANGE_ICON";
+    private static final String CHANGE_NAME = "CHANGE_NAME";
+    
+    private static final String COMMAND_CHANGE_FORCE_CAMO = "CHANGE_CAMO|FORCE|empty|";
+    private static final String COMMAND_CHANGE_FORCE_DESC = "CHANGE_DESC|FORCE|empty|";
+    private static final String COMMAND_CHANGE_FORCE_ICON = "CHANGE_ICON|FORCE|empty|";
+    private static final String COMMAND_CHANGE_FORCE_NAME = "CHANGE_NAME|FORCE|empty|";
+    //C3 Network-related
+    private static final String C3I = "C3I";
+    private static final String NC3 = "NC3";
+    private static final String ADD_NETWORK = "ADD_NETWORK";
+    private static final String ADD_SLAVES = "ADD_SLAVES";
+    private static final String DISBAND_NETWORK = "DISBAND_NETWORK";
+    private static final String REMOVE_C3 = "REMOVE_C3";
+    private static final String REMOVE_NETWORK = "REMOVE_NETWORK";
+    private static final String SET_MM = "SET_MM";
+    private static final String SET_IND_M = "SET_IND_M";
+    
+    private static final String COMMAND_ADD_SLAVE = "ADD_SLAVES|UNIT|";
+    private static final String COMMAND_REMOVE_C3 = "REMOVE_C3|UNIT|empty|";
+    private static final String COMMAND_SET_CO_MASTER = "SET_MM|UNIT|empty|";
+    private static final String COMMAND_SET_IND_MASTER = "SET_IND_M|UNIT|empty|";
+    private static final String COMMAND_CREATE_C3I = "C3I|UNIT|empty|";
+    private static final String COMMAND_CREATE_NC3 = "NC3|UNIT|empty|";
+    private static final String COMMAND_ADD_TO_NETWORK = "ADD_NETWORK|UNIT|";
+    private static final String COMMAND_DISBAND_NETWORK = "DISBAND_NETWORK|UNIT|empty|";
+    private static final String COMMAND_REMOVE_FROM_NETWORK = "REMOVE_NETWORK|UNIT|empty|";
+    //Other
+    private static final String GOTO_PILOT = "GOTO_PILOT";
+    
+    private static final String COMMAND_GOTO_PILOT = "GOTO_PILOT|UNIT|empty|";
+
     @Override
     public void actionPerformed(ActionEvent action) {
         StringTokenizer st = new StringTokenizer(action.getActionCommand(),
@@ -61,20 +129,20 @@ private String UNIT = "UNIT";
         Vector<Unit> units = new Vector<Unit>();
         while (st.hasMoreTokens()) {
             String id = st.nextToken();
-            if (type.equals(this.FORCE)) {
+            if (type.equals(TOEMouseAdapter.FORCE)) {
                 Force force = gui.getCampaign().getForce(Integer.parseInt(id));
                 if (null != force) {
                     forces.add(force);
                 }
             }
-            if (type.equals(this.UNIT)) {
+            if (type.equals(TOEMouseAdapter.UNIT)) {
                 Unit unit = gui.getCampaign().getUnit(UUID.fromString(id));
                 if (null != unit) {
                     units.add(unit);
                 }
             }
         }
-        if (type.equals(this.FORCE)) {
+        if (type.equals(TOEMouseAdapter.FORCE)) {
             Vector<Force> newForces = new Vector<Force>();
             for (Force force : forces) {
                 boolean duplicate = false;
@@ -103,7 +171,7 @@ private String UNIT = "UNIT";
         if (!units.isEmpty()) {
             singleUnit = units.get(0);
         }
-        if (command.contains("ADD_FORCE")) {
+        if (command.contains(TOEMouseAdapter.ADD_FORCE)) {
             if (null != singleForce) {
                 String name = (String) JOptionPane.showInputDialog(null,
                         "Enter the force name", "Force Name",
@@ -115,7 +183,7 @@ private String UNIT = "UNIT";
                 }
             }
         }
-        if (command.contains("ADD_LANCE_TECH")) {
+        if (command.contains(TOEMouseAdapter.ADD_LANCE_TECH)) {
             if (null != singleForce) {
                 Person tech = gui.getCampaign().getPerson(UUID.fromString(target));
                 if (null != tech) {
@@ -152,19 +220,19 @@ private String UNIT = "UNIT";
                 }
             }
         }
-        if (command.contains("ADD_UNIT")) {
+        if (command.contains(TOEMouseAdapter.ADD_UNIT)) {
             if (null != singleForce) {
                 Unit u = gui.getCampaign().getUnit(UUID.fromString(target));
                 if (null != u) {
                     gui.getCampaign().addUnitToForce(u, singleForce.getId());
                 }
             }
-        } else if (command.contains("UNDEPLOY_FORCE")) {
+        } else if (command.contains(TOEMouseAdapter.UNDEPLOY_FORCE)) {
             for (Force force : forces) {
                 gui.undeployForce(force);
                 //Event triggered from undeployForce
             }
-        } else if (command.contains("DEPLOY_FORCE")) {
+        } else if (command.contains(TOEMouseAdapter.DEPLOY_FORCE)) {
             int sid = Integer.parseInt(target);
             Scenario scenario = gui.getCampaign().getScenario(sid);
 
@@ -187,7 +255,7 @@ private String UNIT = "UNIT";
                     MekHQ.triggerEvent(new DeploymentChangedEvent(force, scenario));
                 }
             }
-        } else if (command.contains("CHANGE_ICON")) {
+        } else if (command.contains(TOEMouseAdapter.CHANGE_ICON)) {
             if (null != singleForce) {
                 ImageChoiceDialog pcd = new ImageChoiceDialog(
                         gui.getFrame(), true, singleForce.getIconCategory(),
@@ -201,7 +269,7 @@ private String UNIT = "UNIT";
                     MekHQ.triggerEvent(new OrganizationChangedEvent(singleForce));
                 }
             }
-        } else if (command.contains("CHANGE_CAMO")) {
+        } else if (command.contains(TOEMouseAdapter.CHANGE_CAMO)) {
             if (null != singleForce) {
                 CamoChoiceDialog ccd = getCamoChoiceDialogForForce(singleForce);
                 ccd.setLocationRelativeTo(gui.getFrame());
@@ -219,7 +287,7 @@ private String UNIT = "UNIT";
                     MekHQ.triggerEvent(new OrganizationChangedEvent(singleForce));
                 }
             }
-        } else if (command.contains("CHANGE_NAME")) {
+        } else if (command.contains(TOEMouseAdapter.CHANGE_NAME)) {
             if (null != singleForce) {
                 String name = (String) JOptionPane.showInputDialog(null,
                         "Enter the force name", "Force Name",
@@ -230,7 +298,7 @@ private String UNIT = "UNIT";
                 }
                 MekHQ.triggerEvent(new OrganizationChangedEvent(singleForce));
             }
-        } else if (command.contains("CHANGE_DESC")) {
+        } else if (command.contains(TOEMouseAdapter.CHANGE_DESC)) {
             if (null != singleForce) {
                 MarkdownEditorDialog tad = new MarkdownEditorDialog(gui.getFrame(), true,
                         "Edit Force Description",
@@ -241,7 +309,7 @@ private String UNIT = "UNIT";
                     MekHQ.triggerEvent(new OrganizationChangedEvent(singleForce));
                 }
             }
-        } else if (command.contains("REMOVE_FORCE")) {
+        } else if (command.contains(TOEMouseAdapter.REMOVE_FORCE)) {
             for (Force force : forces) {
                 if (null != force && null != force.getParentForce()) {
                     if (0 != JOptionPane.showConfirmDialog(
@@ -254,7 +322,7 @@ private String UNIT = "UNIT";
                     gui.getCampaign().removeForce(force);
                 }
             }
-        } else if (command.contains("REMOVE_LANCE_TECH")) {
+        } else if (command.contains(TOEMouseAdapter.REMOVE_LANCE_TECH)) {
             if (null != singleForce && singleForce.getTechID() != null) {
                 Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
                 oldTech.clearTechUnitIDs();
@@ -271,7 +339,7 @@ private String UNIT = "UNIT";
                 }
                 singleForce.setTechID(null);
             }
-        } else if (command.contains("REMOVE_UNIT")) {
+        } else if (command.contains(TOEMouseAdapter.REMOVE_UNIT)) {
             for (Unit unit : units) {
                 if (null != unit) {
                     Force parentForce = gui.getCampaign().getForceFor(unit);
@@ -284,20 +352,20 @@ private String UNIT = "UNIT";
                     MekHQ.triggerEvent(new OrganizationChangedEvent(parentForce, unit));
                 }
             }
-        } else if (command.contains("UNDEPLOY_UNIT")) {
+        } else if (command.contains(TOEMouseAdapter.UNDEPLOY_UNIT)) {
             for (Unit unit : units) {
                 gui.undeployUnit(unit);
                 //Event triggered from undeployUnit
             }
-        } else if (command.contains("GOTO_UNIT")) {
+        } else if (command.contains(TOEMouseAdapter.GOTO_UNIT)) {
             if (null != singleUnit) {
                 gui.focusOnUnit(singleUnit.getId());
             }
-        } else if (command.contains("GOTO_PILOT")) {
+        } else if (command.contains(TOEMouseAdapter.GOTO_PILOT)) {
             if (null != singleUnit && null != singleUnit.getCommander()) {
                 gui.focusOnPerson(singleUnit.getCommander().getId());
             }
-        } else if (command.contains("DEPLOY_UNIT")) {
+        } else if (command.contains(TOEMouseAdapter.DEPLOY_UNIT)) {
             int sid = Integer.parseInt(target);
             Scenario scenario = gui.getCampaign().getScenario(sid);
 
@@ -312,7 +380,7 @@ private String UNIT = "UNIT";
                     }
                 }
             }
-        } else if (command.contains("C3I")) {
+        } else if (command.contains(TOEMouseAdapter.C3I)) {
             // don't set them directly, set the C3i UUIDs and then
             // run gui.refreshNetworks on the campaign
             // TODO: is that too costly?
@@ -334,22 +402,41 @@ private String UNIT = "UNIT";
             }
             gui.getCampaign().refreshNetworks();
             MekHQ.triggerEvent(new NetworkChangedEvent(units));
-        } else if (command.contains("REMOVE_NETWORK")) {
+        } else if (command.contains(TOEMouseAdapter.NC3)) {
+            Vector<String> uuids = new Vector<String>();
+            for (Unit unit : units) {
+                if (null == unit.getEntity()) {
+                    continue;
+                }
+                uuids.add(unit.getEntity().getC3UUIDAsString());
+            }
+            for (int pos = 0; pos < uuids.size(); pos++) {
+                for (Unit unit : units) {
+                    if (null == unit.getEntity()) {
+                        continue;
+                    }
+                    unit.getEntity().setNC3NextUUIDAsString(pos,
+                            uuids.get(pos));
+                }
+            }
+            gui.getCampaign().refreshNetworks();
+            MekHQ.triggerEvent(new NetworkChangedEvent(units));
+        } else if (command.contains(TOEMouseAdapter.REMOVE_NETWORK)) {
             gui.getCampaign().removeUnitsFromNetwork(units);
             MekHQ.triggerEvent(new NetworkChangedEvent(units));
-        } else if (command.contains("DISBAND_NETWORK")) {
+        } else if (command.contains(TOEMouseAdapter.DISBAND_NETWORK)) {
             if (null != singleUnit) {
                 gui.getCampaign().disbandNetworkOf(singleUnit);
             }
-        } else if (command.contains("ADD_NETWORK")) {
+        } else if (command.contains(TOEMouseAdapter.ADD_NETWORK)) {
             gui.getCampaign().addUnitsToNetwork(units, target);
-        } else if (command.contains("ADD_SLAVES")) {
+        } else if (command.contains(TOEMouseAdapter.ADD_SLAVES)) {
             for (Unit u : units) {
                 u.getEntity().setC3MasterIsUUIDAsString(target);
             }
             gui.getCampaign().refreshNetworks();
             MekHQ.triggerEvent(new NetworkChangedEvent(units));
-        } else if (command.contains("SET_MM")) {
+        } else if (command.contains(TOEMouseAdapter.SET_MM)) {
             for (Unit u : units) {
                 gui.getCampaign().removeUnitsFromC3Master(u);
                 u.getEntity().setC3MasterIsUUIDAsString(
@@ -357,7 +444,7 @@ private String UNIT = "UNIT";
             }
             gui.getCampaign().refreshNetworks();
             MekHQ.triggerEvent(new NetworkChangedEvent(units));
-        } else if (command.contains("SET_IND_M")) {
+        } else if (command.contains(TOEMouseAdapter.SET_IND_M)) {
             for (Unit u : units) {
                 u.getEntity().setC3MasterIsUUIDAsString(null);
                 u.getEntity().setC3Master(null, true);
@@ -366,7 +453,7 @@ private String UNIT = "UNIT";
             gui.getCampaign().refreshNetworks();
             MekHQ.triggerEvent(new NetworkChangedEvent(units));
         }
-        if (command.contains("REMOVE_C3")) {
+        if (command.contains(TOEMouseAdapter.REMOVE_C3)) {
             for (Unit u : units) {
                 u.getEntity().setC3MasterIsUUIDAsString(null);
                 u.getEntity().setC3Master(null, true);
@@ -448,19 +535,19 @@ private String UNIT = "UNIT";
                 }
                 if (!multipleSelection) {
                     menuItem = new JMenuItem("Change Name...");
-                    menuItem.setActionCommand("CHANGE_NAME|FORCE|empty|"
+                    menuItem.setActionCommand(TOEMouseAdapter.COMMAND_CHANGE_FORCE_NAME
                             + forceIds);
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(true);
                     popup.add(menuItem);
                     menuItem = new JMenuItem("Change Description...");
-                    menuItem.setActionCommand("CHANGE_DESC|FORCE|empty|"
+                    menuItem.setActionCommand(TOEMouseAdapter.COMMAND_CHANGE_FORCE_DESC
                             + forceIds);
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(true);
                     popup.add(menuItem);
                     menuItem = new JMenuItem("Add New Force...");
-                    menuItem.setActionCommand("ADD_FORCE|FORCE|empty|"
+                    menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_FORCE
                             + forceIds);
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(true);
@@ -510,7 +597,7 @@ private String UNIT = "UNIT";
                                 if (role == Person.T_MECH_TECH) {
                                     if (skillLvl.equals(SkillType.ULTRA_GREEN_NM)) {
                                         menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
-                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_LANCE_TECH + tech.getId() + "|" + forceIds);
                                         menuItem.addActionListener(this);
                                         menuItem.setEnabled(true);
                                         m_ug_menu.add(menuItem);
@@ -518,7 +605,7 @@ private String UNIT = "UNIT";
                                     }
                                     if (skillLvl.equals(SkillType.GREEN_NM)) {
                                         menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
-                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_LANCE_TECH + tech.getId() + "|" + forceIds);
                                         menuItem.addActionListener(this);
                                         menuItem.setEnabled(true);
                                         m_g_menu.add(menuItem);
@@ -526,7 +613,7 @@ private String UNIT = "UNIT";
                                     }
                                     if (skillLvl.equals(SkillType.REGULAR_NM)) {
                                         menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
-                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_LANCE_TECH + tech.getId() + "|" + forceIds);
                                         menuItem.addActionListener(this);
                                         menuItem.setEnabled(true);
                                         m_r_menu.add(menuItem);
@@ -534,7 +621,7 @@ private String UNIT = "UNIT";
                                     }
                                     if (skillLvl.equals(SkillType.VETERAN_NM)) {
                                         menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
-                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_LANCE_TECH + tech.getId() + "|" + forceIds);
                                         menuItem.addActionListener(this);
                                         menuItem.setEnabled(true);
                                         m_v_menu.add(menuItem);
@@ -542,19 +629,19 @@ private String UNIT = "UNIT";
                                     }
                                     if (skillLvl.equals(SkillType.ELITE_NM)) {
                                         menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
-                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_LANCE_TECH + tech.getId() + "|" + forceIds);
                                         menuItem.addActionListener(this);
                                         menuItem.setEnabled(true);
                                         m_e_menu.add(menuItem);
                                         m_e_menu.setEnabled(true);
                                     }
                                 }
-
-                                // We're a AerpTech!
+                                
+                                // We're a AeroTech!
                                 if (role == Person.T_AERO_TECH) {
                                     if (skillLvl.equals(SkillType.ULTRA_GREEN_NM)) {
                                         menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
-                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_LANCE_TECH + tech.getId() + "|" + forceIds);
                                         menuItem.addActionListener(this);
                                         menuItem.setEnabled(true);
                                         a_ug_menu.add(menuItem);
@@ -562,7 +649,7 @@ private String UNIT = "UNIT";
                                     }
                                     if (skillLvl.equals(SkillType.GREEN_NM)) {
                                         menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
-                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_LANCE_TECH + tech.getId() + "|" + forceIds);
                                         menuItem.addActionListener(this);
                                         menuItem.setEnabled(true);
                                         a_g_menu.add(menuItem);
@@ -570,7 +657,7 @@ private String UNIT = "UNIT";
                                     }
                                     if (skillLvl.equals(SkillType.REGULAR_NM)) {
                                         menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
-                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_LANCE_TECH + tech.getId() + "|" + forceIds);
                                         menuItem.addActionListener(this);
                                         menuItem.setEnabled(true);
                                         a_r_menu.add(menuItem);
@@ -578,7 +665,7 @@ private String UNIT = "UNIT";
                                     }
                                     if (skillLvl.equals(SkillType.VETERAN_NM)) {
                                         menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
-                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_LANCE_TECH + tech.getId() + "|" + forceIds);
                                         menuItem.addActionListener(this);
                                         menuItem.setEnabled(true);
                                         a_v_menu.add(menuItem);
@@ -586,7 +673,7 @@ private String UNIT = "UNIT";
                                     }
                                     if (skillLvl.equals(SkillType.ELITE_NM)) {
                                         menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
-                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_LANCE_TECH + tech.getId() + "|" + forceIds);
                                         menuItem.addActionListener(this);
                                         menuItem.setEnabled(true);
                                         a_e_menu.add(menuItem);
@@ -598,7 +685,7 @@ private String UNIT = "UNIT";
                                 if (role == Person.T_MECHANIC) {
                                     if (skillLvl.equals(SkillType.ULTRA_GREEN_NM)) {
                                         menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
-                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_LANCE_TECH + tech.getId() + "|" + forceIds);
                                         menuItem.addActionListener(this);
                                         menuItem.setEnabled(true);
                                         v_ug_menu.add(menuItem);
@@ -606,7 +693,7 @@ private String UNIT = "UNIT";
                                     }
                                     if (skillLvl.equals(SkillType.GREEN_NM)) {
                                         menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
-                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_LANCE_TECH + tech.getId() + "|" + forceIds);
                                         menuItem.addActionListener(this);
                                         menuItem.setEnabled(true);
                                         v_g_menu.add(menuItem);
@@ -614,7 +701,7 @@ private String UNIT = "UNIT";
                                     }
                                     if (skillLvl.equals(SkillType.REGULAR_NM)) {
                                         menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
-                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_LANCE_TECH + tech.getId() + "|" + forceIds);
                                         menuItem.addActionListener(this);
                                         menuItem.setEnabled(true);
                                         v_r_menu.add(menuItem);
@@ -622,7 +709,7 @@ private String UNIT = "UNIT";
                                     }
                                     if (skillLvl.equals(SkillType.VETERAN_NM)) {
                                         menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
-                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_LANCE_TECH + tech.getId() + "|" + forceIds);
                                         menuItem.addActionListener(this);
                                         menuItem.setEnabled(true);
                                         v_v_menu.add(menuItem);
@@ -630,7 +717,7 @@ private String UNIT = "UNIT";
                                     }
                                     if (skillLvl.equals(SkillType.ELITE_NM)) {
                                         menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
-                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_LANCE_TECH + tech.getId() + "|" + forceIds);
                                         menuItem.addActionListener(this);
                                         menuItem.setEnabled(true);
                                         v_e_menu.add(menuItem);
@@ -642,7 +729,7 @@ private String UNIT = "UNIT";
                                 if (role == Person.T_BA_TECH) {
                                     if (skillLvl.equals(SkillType.ULTRA_GREEN_NM)) {
                                         menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
-                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_LANCE_TECH + tech.getId() + "|" + forceIds);
                                         menuItem.addActionListener(this);
                                         menuItem.setEnabled(true);
                                         ba_ug_menu.add(menuItem);
@@ -650,7 +737,7 @@ private String UNIT = "UNIT";
                                     }
                                     if (skillLvl.equals(SkillType.GREEN_NM)) {
                                         menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
-                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_LANCE_TECH + tech.getId() + "|" + forceIds);
                                         menuItem.addActionListener(this);
                                         menuItem.setEnabled(true);
                                         ba_g_menu.add(menuItem);
@@ -658,7 +745,7 @@ private String UNIT = "UNIT";
                                     }
                                     if (skillLvl.equals(SkillType.REGULAR_NM)) {
                                         menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
-                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_LANCE_TECH + tech.getId() + "|" + forceIds);
                                         menuItem.addActionListener(this);
                                         menuItem.setEnabled(true);
                                         ba_r_menu.add(menuItem);
@@ -666,7 +753,7 @@ private String UNIT = "UNIT";
                                     }
                                     if (skillLvl.equals(SkillType.VETERAN_NM)) {
                                         menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
-                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_LANCE_TECH + tech.getId() + "|" + forceIds);
                                         menuItem.addActionListener(this);
                                         menuItem.setEnabled(true);
                                         ba_v_menu.add(menuItem);
@@ -674,7 +761,7 @@ private String UNIT = "UNIT";
                                     }
                                     if (skillLvl.equals(SkillType.ELITE_NM)) {
                                         menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
-                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_LANCE_TECH + tech.getId() + "|" + forceIds);
                                         menuItem.addActionListener(this);
                                         menuItem.setEnabled(true);
                                         ba_e_menu.add(menuItem);
@@ -772,7 +859,7 @@ private String UNIT = "UNIT";
                     }
                     if (force.getTechID() != null) {
                         menuItem = new JMenuItem("Remove Tech from Force");
-                        menuItem.setActionCommand("REMOVE_LANCE_TECH|FORCE|" + force.getTechID() + "|" + forceIds);
+                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_REMOVE_LANCE_TECH + force.getTechID() + "|" + forceIds);
                         menuItem.addActionListener(this);
                         menuItem.setEnabled(true);
                         popup.add(menuItem);
@@ -833,7 +920,7 @@ private String UNIT = "UNIT";
                                     && u.isPresent()) {
                                 menuItem = new JMenuItem(p.getFullTitle()
                                         + ", " + u.getName());
-                                menuItem.setActionCommand("ADD_UNIT|FORCE|"
+                                menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_UNIT
                                         + u.getId() + "|" + forceIds);
                                 menuItem.addActionListener(this);
                                 menuItem.setEnabled(u.isAvailable());
@@ -850,7 +937,7 @@ private String UNIT = "UNIT";
                             if (u.getForceId() < 1 && u.isPresent()) {
                                 menuItem = new JMenuItem("AutoTurret, "
                                         + u.getName());
-                                menuItem.setActionCommand("ADD_UNIT|FORCE|"
+                                menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_UNIT
                                         + u.getId() + "|" + forceIds);
                                 menuItem.addActionListener(this);
                                 menuItem.setEnabled(u.isAvailable());
@@ -906,7 +993,6 @@ private String UNIT = "UNIT";
                             }
                         }
                     }
-
                     if (unsorted.getComponentCount() > 0 || unsorted.getItemCount() > 0) {
                         menu.add(unsorted);
                         menu.setEnabled(true);
@@ -917,14 +1003,14 @@ private String UNIT = "UNIT";
                         popup.add(menu);
                     }
                     menuItem = new JMenuItem("Change Force Icon...");
-                    menuItem.setActionCommand("CHANGE_ICON|FORCE|empty|"
+                    menuItem.setActionCommand(TOEMouseAdapter.COMMAND_CHANGE_FORCE_ICON
                             + forceIds);
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(true);
                     popup.add(menuItem);
 
                     menuItem = new JMenuItem("Change Force Camo...");
-                    menuItem.setActionCommand("CHANGE_CAMO|FORCE|empty|" + forceIds);
+                    menuItem.setActionCommand(TOEMouseAdapter.COMMAND_CHANGE_FORCE_CAMO + forceIds);
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(true);
                     popup.add(menuItem);
@@ -949,7 +1035,7 @@ private String UNIT = "UNIT";
                                     continue;
                                 }
                                 menuItem = new JMenuItem(s.getName());
-                                menuItem.setActionCommand("DEPLOY_FORCE|FORCE|"
+                                menuItem.setActionCommand(TOEMouseAdapter.COMMAND_DEPLOY_FORCE
                                         + s.getId() + "|" + forceIds);
                                 menuItem.addActionListener(this);
                                 menuItem.setEnabled(true);
@@ -968,14 +1054,14 @@ private String UNIT = "UNIT";
                 }
                 if (StaticChecks.areAllForcesDeployed(forces)) {
                     menuItem = new JMenuItem("Undeploy Force");
-                    menuItem.setActionCommand("UNDEPLOY_FORCE|FORCE|empty|"
+                    menuItem.setActionCommand(TOEMouseAdapter.COMMAND_UNDEPLOY_FORCE
                             + forceIds);
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(true);
                     popup.add(menuItem);
                 }
                 menuItem = new JMenuItem("Remove Force");
-                menuItem.setActionCommand("REMOVE_FORCE|FORCE|empty|"
+                menuItem.setActionCommand(TOEMouseAdapter.COMMAND_REMOVE_FORCE
                         + forceIds);
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(!StaticChecks.areAnyForcesDeployed(forces) && !StaticChecks.areAnyUnitsDeployed(unitsInForces));
@@ -996,7 +1082,7 @@ private String UNIT = "UNIT";
                         if (nodesFree >= units.size()) {
                             menuItem = new JMenuItem(network[2] + ": "
                                     + network[1] + " nodes free");
-                            menuItem.setActionCommand("ADD_SLAVES|UNIT|"
+                            menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_SLAVE
                                     + network[0] + "|" + unitIds);
                             menuItem.addActionListener(this);
                             menuItem.setEnabled(true);
@@ -1009,7 +1095,7 @@ private String UNIT = "UNIT";
                 }
                 if (StaticChecks.areAllUnitsIndependentC3Masters(units)) {
                     menuItem = new JMenuItem("Set as Company Level Master");
-                    menuItem.setActionCommand("SET_MM|UNIT|empty|"
+                    menuItem.setActionCommand(TOEMouseAdapter.COMMAND_SET_CO_MASTER
                             + unitIds);
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(true);
@@ -1021,7 +1107,7 @@ private String UNIT = "UNIT";
                         if (nodesFree >= units.size()) {
                             menuItem = new JMenuItem(network[2] + ": "
                                     + network[1] + " nodes free");
-                            menuItem.setActionCommand("ADD_SLAVES|UNIT|"
+                            menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_SLAVE
                                     + network[0] + "|" + unitIds);
                             menuItem.addActionListener(this);
                             menuItem.setEnabled(true);
@@ -1034,7 +1120,7 @@ private String UNIT = "UNIT";
                 }
                 if (StaticChecks.areAllUnitsCompanyLevelMasters(units)) {
                     menuItem = new JMenuItem("Set as Independent Master");
-                    menuItem.setActionCommand("SET_IND_M|UNIT|empty|"
+                    menuItem.setActionCommand(TOEMouseAdapter.COMMAND_SET_IND_MASTER
                             + unitIds);
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(true);
@@ -1042,19 +1128,18 @@ private String UNIT = "UNIT";
                 }
                 if (StaticChecks.doAllUnitsHaveC3Master(units)) {
                     menuItem = new JMenuItem("Remove from network");
-                    menuItem.setActionCommand("REMOVE_C3|UNIT|empty|"
+                    menuItem.setActionCommand(TOEMouseAdapter.COMMAND_REMOVE_C3
                             + unitIds);
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(true);
                     networkMenu.add(menuItem);
                 }
                 if (StaticChecks.doAllUnitsHaveC3i(units)) {
-
                     if (multipleSelection
                             && StaticChecks.areAllUnitsNotC3iNetworked(units)
                             && units.size() < 7) {
                         menuItem = new JMenuItem("Create new C3i network");
-                        menuItem.setActionCommand("C3I|UNIT|empty|"
+                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_CREATE_C3I
                                 + unitIds);
                         menuItem.addActionListener(this);
                         menuItem.setEnabled(true);
@@ -1068,7 +1153,7 @@ private String UNIT = "UNIT";
                             if (nodesFree >= units.size()) {
                                 menuItem = new JMenuItem(network[0] + ": "
                                         + network[1] + " nodes free");
-                                menuItem.setActionCommand("ADD_NETWORK|UNIT|"
+                                menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_TO_NETWORK
                                         + network[0] + "|" + unitIds);
                                 menuItem.addActionListener(this);
                                 menuItem.setEnabled(true);
@@ -1081,14 +1166,14 @@ private String UNIT = "UNIT";
                     }
                     if (StaticChecks.areAllUnitsC3iNetworked(units)) {
                         menuItem = new JMenuItem("Remove from network");
-                        menuItem.setActionCommand("REMOVE_NETWORK|UNIT|empty|"
+                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_REMOVE_FROM_NETWORK
                                 + unitIds);
                         menuItem.addActionListener(this);
                         menuItem.setEnabled(true);
                         networkMenu.add(menuItem);
                         if (StaticChecks.areAllUnitsOnSameC3iNetwork(units)) {
                             menuItem = new JMenuItem("Disband this network");
-                            menuItem.setActionCommand("DISBAND_NETWORK|UNIT|empty|"
+                            menuItem.setActionCommand(TOEMouseAdapter.COMMAND_DISBAND_NETWORK
                                     + unitIds);
                             menuItem.addActionListener(this);
                             menuItem.setEnabled(true);
@@ -1101,7 +1186,7 @@ private String UNIT = "UNIT";
                     popup.add(networkMenu);
                 }
                 menuItem = new JMenuItem("Remove Unit from TO&E");
-                menuItem.setActionCommand("REMOVE_UNIT|UNIT|empty|"
+                menuItem.setActionCommand(TOEMouseAdapter.COMMAND_REMOVE_UNIT
                         + unitIds);
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(!StaticChecks.areAnyUnitsDeployed(units));
@@ -1125,7 +1210,7 @@ private String UNIT = "UNIT";
                                     continue;
                                 }
                                 menuItem = new JMenuItem(s.getName());
-                                menuItem.setActionCommand("DEPLOY_UNIT|UNIT|"
+                                menuItem.setActionCommand(TOEMouseAdapter.COMMAND_DEPLOY_UNIT
                                         + s.getId() + "|" + unitIds);
                                 menuItem.addActionListener(this);
                                 menuItem.setEnabled(true);
@@ -1145,7 +1230,7 @@ private String UNIT = "UNIT";
                 }
                 if (StaticChecks.areAllUnitsDeployed(units)) {
                     menuItem = new JMenuItem("Undeploy Unit");
-                    menuItem.setActionCommand("UNDEPLOY_UNIT|UNIT|empty|"
+                    menuItem.setActionCommand(TOEMouseAdapter.COMMAND_UNDEPLOY_UNIT
                             + unitIds);
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(true);
@@ -1153,20 +1238,20 @@ private String UNIT = "UNIT";
                 }
                 if (!multipleSelection) {
                     menuItem = new JMenuItem("Go to Unit in Hangar");
-                    menuItem.setActionCommand("GOTO_UNIT|UNIT|empty|"
+                    menuItem.setActionCommand(TOEMouseAdapter.COMMAND_GOTO_UNIT
                             + unitIds);
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(true);
                     popup.add(menuItem);
                     menuItem = new JMenuItem(
                             "Go to Pilot/Commander in Personnel");
-                    menuItem.setActionCommand("GOTO_PILOT|UNIT|empty|"
+                    menuItem.setActionCommand(TOEMouseAdapter.COMMAND_GOTO_PILOT
                             + unitIds);
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(true);
                     popup.add(menuItem);
                     menuItem = new JMenuItem("Assign Unit to Transport Ship");
-                    menuItem.setActionCommand("ASSIGN_UNIT_TRANSPORT|UNIT|empty|"
+                    menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ASSIGN_TO_SHIP
                             + unitIds);
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(true);
