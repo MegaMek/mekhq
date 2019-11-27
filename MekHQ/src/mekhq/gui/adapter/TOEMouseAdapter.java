@@ -48,7 +48,8 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
         super();
         this.gui = gui;
     }
-
+private String FORCE = "FORCE";
+private String UNIT = "UNIT";
     @Override
     public void actionPerformed(ActionEvent action) {
         StringTokenizer st = new StringTokenizer(action.getActionCommand(),
@@ -60,20 +61,20 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
         Vector<Unit> units = new Vector<Unit>();
         while (st.hasMoreTokens()) {
             String id = st.nextToken();
-            if (type.equals("FORCE")) {
+            if (type.equals(this.FORCE)) {
                 Force force = gui.getCampaign().getForce(Integer.parseInt(id));
                 if (null != force) {
                     forces.add(force);
                 }
             }
-            if (type.equals("UNIT")) {
+            if (type.equals(this.UNIT)) {
                 Unit unit = gui.getCampaign().getUnit(UUID.fromString(id));
                 if (null != unit) {
                     units.add(unit);
                 }
             }
         }
-        if (type.equals("FORCE")) {
+        if (type.equals(this.FORCE)) {
             Vector<Force> newForces = new Vector<Force>();
             for (Force force : forces) {
                 boolean duplicate = false;
@@ -1160,6 +1161,12 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     menuItem = new JMenuItem(
                             "Go to Pilot/Commander in Personnel");
                     menuItem.setActionCommand("GOTO_PILOT|UNIT|empty|"
+                            + unitIds);
+                    menuItem.addActionListener(this);
+                    menuItem.setEnabled(true);
+                    popup.add(menuItem);
+                    menuItem = new JMenuItem("Assign Unit to Transport Ship");
+                    menuItem.setActionCommand("ASSIGN_UNIT_TRANSPORT|UNIT|empty|"
                             + unitIds);
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(true);
