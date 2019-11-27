@@ -125,6 +125,72 @@ public class StaticChecks {
         }
         return true;
     }
+    
+    public static boolean doAllUnitsHaveNC3(Vector<Unit> units) {
+        for (Unit unit : units) {
+            Entity e = unit.getEntity();
+            if (null == e) {
+                return false;
+            }
+            if (!e.hasNavalC3()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean areAllUnitsNotNC3Networked(Vector<Unit> units) {
+        for (Unit unit : units) {
+            Entity e = unit.getEntity();
+            if (null == e) {
+                return false;
+            }
+            if (e.hasNavalC3() && e.calculateFreeC3Nodes() < 5) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean areAllUnitsNC3Networked(Vector<Unit> units) {
+        for (Unit unit : units) {
+            Entity e = unit.getEntity();
+            if (null == e) {
+                return false;
+            }
+            if (!e.hasNavalC3()) {
+                return false;
+            }
+            if (e.hasNavalC3() && e.calculateFreeC3Nodes() == 5) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean areAllUnitsOnSameNC3Network(Vector<Unit> units) {
+        String network = null;
+        for (Unit unit : units) {
+            Entity e = unit.getEntity();
+            if (null == e) {
+                return false;
+            }
+            //Naval C3 recycles a lot of C3i code. C3i units will cause a false positive
+            //without this check
+            if (!e.hasNavalC3()) {
+                return false;
+            }
+            if (null == e.getC3NetId()) {
+                return false;
+            }
+            if (null == network) {
+                network = e.getC3NetId();
+            } else if (!e.getC3NetId().equals(network)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     public static boolean areAllUnitsC3Slaves(Vector<Unit> units) {
         for (Unit unit : units) {
