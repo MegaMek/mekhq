@@ -6760,6 +6760,34 @@ public class Campaign implements Serializable, ITechManager {
         }
         return networks;
     }
+    
+    public Vector<String[]> getAvailableNC3Networks() {
+        Vector<String[]> networks = new Vector<String[]>();
+        Vector<String> networkNames = new Vector<String>();
+
+        for(Unit u : getUnits()) {
+
+            if (u.getForceId() < 0) {
+                // only units currently in the TO&E
+                continue;
+            }
+            Entity en = u.getEntity();
+            if (null == en) {
+                continue;
+            }
+            if (en.hasNavalC3() && en.calculateFreeC3Nodes() < 5
+                    && en.calculateFreeC3Nodes() > 0) {
+                String[] network = new String[2];
+                network[0] = en.getC3NetId();
+                network[1] = "" + en.calculateFreeC3Nodes();
+                if (!networkNames.contains(network[0])) {
+                    networks.add(network);
+                    networkNames.add(network[0]);
+                }
+            }
+        }
+        return networks;
+    }
 
     public Vector<String[]> getAvailableC3MastersForSlaves() {
         Vector<String[]> networks = new Vector<String[]>();
