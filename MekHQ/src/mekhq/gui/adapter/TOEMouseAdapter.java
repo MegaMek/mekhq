@@ -1134,6 +1134,54 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     menuItem.setEnabled(true);
                     networkMenu.add(menuItem);
                 }
+                //Naval C3 checks
+                if (StaticChecks.doAllUnitsHaveNC3(units)) {
+                    if (multipleSelection
+                            && StaticChecks.areAllUnitsNotNC3Networked(units)
+                            && units.size() < 7) {
+                        menuItem = new JMenuItem("Create new NC3 network");
+                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_CREATE_NC3
+                                + unitIds);
+                        menuItem.addActionListener(this);
+                        menuItem.setEnabled(true);
+                        networkMenu.add(menuItem);
+                    }
+                    if (StaticChecks.areAllUnitsNotNC3Networked(units)) {
+                        availMenu = new JMenu("Add to network");
+                        for (String[] network : gui.getCampaign()
+                                .getAvailableNC3Networks()) {
+                            int nodesFree = Integer.parseInt(network[1]);
+                            if (nodesFree >= units.size()) {
+                                menuItem = new JMenuItem(network[0] + ": "
+                                        + network[1] + " nodes free");
+                                menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_TO_NETWORK
+                                        + network[0] + "|" + unitIds);
+                                menuItem.addActionListener(this);
+                                menuItem.setEnabled(true);
+                                availMenu.add(menuItem);
+                            }
+                        }
+                        if (availMenu.getMenuComponentCount() > 0 || availMenu.getItemCount() > 0) {
+                            networkMenu.add(availMenu);
+                        }
+                    }
+                    if (StaticChecks.areAllUnitsNC3Networked(units)) {
+                        menuItem = new JMenuItem("Remove from network");
+                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_REMOVE_FROM_NETWORK
+                                + unitIds);
+                        menuItem.addActionListener(this);
+                        menuItem.setEnabled(true);
+                        networkMenu.add(menuItem);
+                        if (StaticChecks.areAllUnitsOnSameNC3Network(units)) {
+                            menuItem = new JMenuItem("Disband this network");
+                            menuItem.setActionCommand(TOEMouseAdapter.COMMAND_DISBAND_NETWORK
+                                    + unitIds);
+                            menuItem.addActionListener(this);
+                            menuItem.setEnabled(true);
+                            networkMenu.add(menuItem);
+                        }
+                    }
+                }
                 if (StaticChecks.doAllUnitsHaveC3i(units)) {
                     if (multipleSelection
                             && StaticChecks.areAllUnitsNotC3iNetworked(units)
