@@ -2144,4 +2144,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         return getAlliesPlayer().stream().anyMatch(unit -> unit.getExternalIdAsString().equals(entity.getExternalIdAsString())) ||
                 super.isFriendlyUnit(entity, campaign);
     }
+    
+    public String getBattlefieldControlDescription() { 
+        return getResourceBundle().getString("battleDetails.common.winnerControlsBattlefield");
+    }
 }

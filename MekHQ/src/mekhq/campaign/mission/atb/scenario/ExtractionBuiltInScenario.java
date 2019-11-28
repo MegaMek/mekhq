@@ -187,4 +187,9 @@ public class ExtractionBuiltInScenario extends AtBScenario {
         
         getScenarioObjectives().add(civilianObjective);
     }
+    
+    @Override
+    public String getBattlefieldControlDescription() {
+        return getResourceBundle().getString("battleDetails.common.defenderControlsBattlefield");
+    }
 }

@@ -142,4 +142,9 @@ public class BreakthroughBuiltInScenario extends AtBScenario {
 
         getScenarioObjectives().add(destroyHostiles);
     }
+    
+    @Override
+    public String getBattlefieldControlDescription() {
+        return getResourceBundle().getString("battleDetails.common.defenderControlsBattlefield");
+    }
 }

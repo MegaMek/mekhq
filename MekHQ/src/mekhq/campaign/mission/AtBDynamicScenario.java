@@ -13,7 +13,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
@@ -353,5 +352,10 @@ public class AtBDynamicScenario extends AtBScenario {
         playerUnitTemplates.clear();
         playerForceTemplates.clear();
         super.clearAllForcesAndPersonnel(campaign);
+    }
+    
+    @Override
+    public String getBattlefieldControlDescription() {
+        return "";
     }
 }

@@ -448,6 +448,10 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
             objectiveBuilder.append("\n");
         }
         
+        if(scenario instanceof AtBScenario) {
+            objectiveBuilder.append(((AtBScenario) scenario).getBattlefieldControlDescription());
+        }
+        
         txtDetails.setText(objectiveBuilder.toString());
         txtDetails.setLineWrap(true);
         txtDetails.setWrapStyleWord(true);
