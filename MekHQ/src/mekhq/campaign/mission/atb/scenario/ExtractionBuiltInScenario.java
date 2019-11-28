@@ -36,6 +36,7 @@ import mekhq.campaign.mission.ObjectiveEffect;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
+import mekhq.campaign.mission.ScenarioObjective.TimeLimitType;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 
 @AtBScenarioEnabled
@@ -135,16 +136,24 @@ public class ExtractionBuiltInScenario extends AtBScenario {
     public void setObjectives(Campaign campaign, AtBContract contract) {
         super.setObjectives(campaign, contract);
 
-        ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this,
-                50, false);
+        ScenarioObjective keepFriendliesAlive = null;
         ScenarioObjective keepAttachedUnitsAlive = CommonObjectiveFactory.getKeepAttachedGroundUnitsAlive(contract,
                 this);
         ScenarioObjective destroyHostiles = null;
         ScenarioObjective civilianObjective;
 
         if (isAttacker()) {
-            civilianObjective = CommonObjectiveFactory.getPreserveSpecificFriendlies(CIVILIAN_FORCE_ID, 66, false);
-
+            civilianObjective = CommonObjectiveFactory.getPreserveSpecificFriendlies(CIVILIAN_FORCE_ID, 50, false);
+            keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 66, false);
+            
+            civilianObjective.setTimeLimit(12);
+            civilianObjective.setTimeLimitAtMost(false);
+            civilianObjective.setTimeLimitType(TimeLimitType.Fixed);
+            
+            keepFriendliesAlive.setTimeLimit(12);
+            keepFriendliesAlive.setTimeLimitAtMost(false);
+            keepFriendliesAlive.setTimeLimitType(TimeLimitType.Fixed);
+            
             // not losing the scenario also gets you a "bonus"
             ObjectiveEffect bonusEffect = new ObjectiveEffect();
             bonusEffect.effectType = ObjectiveEffectType.AtBBonus;
@@ -156,13 +165,12 @@ public class ExtractionBuiltInScenario extends AtBScenario {
         } else {
             civilianObjective = CommonObjectiveFactory.getDestroyEnemies(CIVILIAN_FORCE_ID, 100);
             civilianObjective.setTimeLimit(10);
-            civilianObjective
-                    .addDetail(String.format(defaultResourceBundle.getString("commonObjectives.timeLimit.text"),
-                            civilianObjective.getTimeLimit()));
+            civilianObjective.setTimeLimitAtMost(true);
+            civilianObjective.setTimeLimitType(TimeLimitType.Fixed);
             destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 33);
             destroyHostiles.setTimeLimit(10);
-            destroyHostiles.addDetail(String.format(defaultResourceBundle.getString("commonObjectives.timeLimit.text"),
-                    destroyHostiles.getTimeLimit()));
+            destroyHostiles.setTimeLimitAtMost(true);
+            destroyHostiles.setTimeLimitType(TimeLimitType.Fixed);
         }
 
         if (destroyHostiles != null) {
@@ -173,7 +181,10 @@ public class ExtractionBuiltInScenario extends AtBScenario {
             getScenarioObjectives().add(keepAttachedUnitsAlive);
         }
 
-        getScenarioObjectives().add(keepFriendliesAlive);
+        if (keepFriendliesAlive != null) {
+            getScenarioObjectives().add(keepFriendliesAlive);
+        }
+        
         getScenarioObjectives().add(civilianObjective);
     }
 }
