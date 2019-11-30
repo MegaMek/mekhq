@@ -167,6 +167,29 @@ public class CurrentLocation implements Serializable {
     }
 
     /**
+     * Gets a value indicating whether or not the jumpship
+     * is currently recharging.
+     * @param campaign The campaign object which owns the jumpship.
+     * @return True if the jumpship has to spend time recharging,
+     *         otherwise false.
+     */
+    public boolean isRecharging(Campaign campaign) {
+        DateTime currentDate = Utilities.getDateTimeDay(campaign.getCalendar());
+        return currentSystem.getRechargeTime(currentDate) > 0;
+    }
+
+    /**
+     * Marks the jumpship at the current location to be
+     * fully charged.
+     * @param campaign The campaign object which owns the jumpship.
+     */
+    public void setRecharged(Campaign campaign) {
+        DateTime currentDate = Utilities.getDateTimeDay(campaign.getCalendar());
+        double neededRechargeTime = currentSystem.getRechargeTime(currentDate);
+        rechargeTime = neededRechargeTime;
+    }
+
+    /**
      * Check for a jump path and if found, do whatever needs to be done to move
      * forward
      */
@@ -181,7 +204,7 @@ public class CurrentLocation implements Serializable {
             campaign.addReport("Jumpships spent " + (Math.round(100.0 * usedRechargeTime)/100.0) + " hours recharging drives");
             rechargeTime += usedRechargeTime;
             if(rechargeTime >= neededRechargeTime) {
-                campaign.addReport("Jumpship drives full charged");
+                campaign.addReport("Jumpship drives fully charged");
             }
         }
         if((null == jumpPath) || jumpPath.isEmpty()) {
@@ -222,7 +245,7 @@ public class CurrentLocation implements Serializable {
                     campaign.addReport("Jumpships spent " + (Math.round(100.0 * usedRechargeTime)/100.0) + " hours recharging drives");
                     rechargeTime += usedRechargeTime;
                     if(rechargeTime >= neededRechargeTime) {
-                        campaign.addReport("Jumpship drives full charged");
+                        campaign.addReport("Jumpship drives fully charged");
                     }
                 }
             }
