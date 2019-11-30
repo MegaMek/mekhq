@@ -232,16 +232,16 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         btnPlusTenK = new JButton(resourceMap.getString("btnPlus10k.text"));
         btnMinusTenK = new JButton(resourceMap.getString("btnMinus10k.text"));
         checkMinusButtons();
-        btnPlusHundredMillion.addActionListener(evt -> adjustPrincipal(Money.of(100000000)));
-        btnMinusHundredMillion.addActionListener(evt -> adjustPrincipal(Money.of(-100000000)));
-        btnPlusTenMillion.addActionListener(evt -> adjustPrincipal(Money.of(10000000)));
-        btnMinusTenMillion.addActionListener(evt -> adjustPrincipal(Money.of(-10000000)));
-        btnPlusMillion.addActionListener(evt -> adjustPrincipal(Money.of(1000000)));
-        btnMinusMillion.addActionListener(evt -> adjustPrincipal(Money.of(-1000000)));
-        btnPlusHundredK.addActionListener(evt -> adjustPrincipal(Money.of(100000)));
-        btnMinusHundredK.addActionListener(evt -> adjustPrincipal(Money.of(-100000)));
-        btnPlusTenK.addActionListener(evt -> adjustPrincipal(Money.of(10000)));
-        btnMinusTenK.addActionListener(evt -> adjustPrincipal(Money.of(-10000)));
+        btnPlusHundredMillion.addActionListener(evt -> adjustPrincipal(Money.of(100_000_000)));
+        btnMinusHundredMillion.addActionListener(evt -> adjustPrincipal(Money.of(-100_000_000)));
+        btnPlusTenMillion.addActionListener(evt -> adjustPrincipal(Money.of(10_000_000)));
+        btnMinusTenMillion.addActionListener(evt -> adjustPrincipal(Money.of(-10_000_000)));
+        btnPlusMillion.addActionListener(evt -> adjustPrincipal(Money.of(1_000_000)));
+        btnMinusMillion.addActionListener(evt -> adjustPrincipal(Money.of(-1_000_000)));
+        btnPlusHundredK.addActionListener(evt -> adjustPrincipal(Money.of(100_000)));
+        btnMinusHundredK.addActionListener(evt -> adjustPrincipal(Money.of(-100_000)));
+        btnPlusTenK.addActionListener(evt -> adjustPrincipal(Money.of(10_000)));
+        btnMinusTenK.addActionListener(evt -> adjustPrincipal(Money.of(-10_000)));
 
         JPanel plusPanel = new JPanel(new GridLayout(2, 5));
         plusPanel.add(btnPlusHundredMillion);
@@ -652,10 +652,10 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
     }
 
     private void checkMinusButtons() {
-        btnMinusHundredMillion.setEnabled(loan.getPrincipal().isGreaterThan(Money.of(100000000)));
-        btnMinusTenMillion.setEnabled(loan.getPrincipal().isGreaterThan(Money.of(10000000)));
-        btnMinusMillion.setEnabled(loan.getPrincipal().isGreaterThan(Money.of(1000000)));
-        btnMinusHundredK.setEnabled(loan.getPrincipal().isGreaterThan(Money.of(100000)));
-        btnMinusTenK.setEnabled(loan.getPrincipal().isGreaterThan(Money.of(10000)));
+        btnMinusHundredMillion.setEnabled(loan.getPrincipal().isGreaterThan(Money.of(100_000_000)));
+        btnMinusTenMillion.setEnabled(loan.getPrincipal().isGreaterThan(Money.of(10_000_000)));
+        btnMinusMillion.setEnabled(loan.getPrincipal().isGreaterThan(Money.of(1_000_000)));
+        btnMinusHundredK.setEnabled(loan.getPrincipal().isGreaterThan(Money.of(100_000)));
+        btnMinusTenK.setEnabled(loan.getPrincipal().isGreaterThan(Money.of(10_000)));
     }
 }
