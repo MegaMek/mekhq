@@ -166,6 +166,18 @@ public class CurrentLocation implements Serializable {
         jumpPath = path;
     }
 
+    /**
+     * Gets a value indicating whether or not the jumpship
+     * is currently recharging.
+     * @param campaign The campaign object.
+     * @return True if the jumpship has to spend time recharging,
+     *         otherwise false.
+     */
+    public boolean isRecharging(Campaign campaign) {
+        DateTime currentDate = Utilities.getDateTimeDay(campaign.getCalendar());
+        return currentSystem.getRechargeTime(currentDate) > 0;
+    }
+
     public void setRecharged(Campaign campaign) {
         DateTime currentDate = Utilities.getDateTimeDay(campaign.getCalendar());
         double neededRechargeTime = currentSystem.getRechargeTime(currentDate);

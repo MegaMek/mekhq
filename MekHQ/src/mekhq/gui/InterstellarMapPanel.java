@@ -331,7 +331,9 @@ public class InterstellarMapPanel extends JPanel {
                     popup.add(item);
                     JMenu menuGM = new JMenu("GM Mode");
                     item = new JMenuItem("Move to selected planet");
-                    item.setEnabled(selectedSystem != null && campaign.isGM());
+                    item.setEnabled(selectedSystem != null 
+                                        && selectedSystem != campaign.getLocation().getCurrentSystem()
+                                        && campaign.isGM());
                     if (selectedSystem != null) {// only add if there is a planet to center on
                         item.addActionListener(new ActionListener() {
                             @Override
@@ -363,16 +365,15 @@ public class InterstellarMapPanel extends JPanel {
                     */
 
                     item = new JMenuItem("Recharge Jumpdrive");
-                    item.setEnabled(selectedSystem != null && campaign.isGM());
-                    if (selectedSystem != null) {
-                        item.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent ae) {
-                                campaign.getLocation().setRecharged(campaign);
-                                campaign.addReport("GM: Jumpship drives fully charged");
-                            }
-                        });
-                    }
+                    item.setEnabled(campaign.getLocation().isRecharging(campaign) && campaign.isGM());
+                    item.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent ae) {
+                            campaign.getLocation().setRecharged(campaign);
+                            campaign.addReport("GM: Jumpship drives fully charged");
+                            hqview.refreshLocation();
+                        }
+                    });
                     menuGM.add(item);
 
                     popup.add(menuGM);
