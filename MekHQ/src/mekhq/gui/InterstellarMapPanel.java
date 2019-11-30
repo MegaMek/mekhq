@@ -331,9 +331,7 @@ public class InterstellarMapPanel extends JPanel {
                     popup.add(item);
                     JMenu menuGM = new JMenu("GM Mode");
                     item = new JMenuItem("Move to selected planet");
-                    item.setEnabled(selectedSystem != null 
-                                        && selectedSystem != campaign.getCurrentSystem()
-                                        && campaign.isGM());
+                    item.setEnabled(selectedSystem != null  && campaign.isGM());
                     if (selectedSystem != null) {// only add if there is a planet to center on
                         item.addActionListener(new ActionListener() {
                             @Override
