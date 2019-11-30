@@ -332,7 +332,7 @@ public class InterstellarMapPanel extends JPanel {
                     JMenu menuGM = new JMenu("GM Mode");
                     item = new JMenuItem("Move to selected planet");
                     item.setEnabled(selectedSystem != null 
-                                        && selectedSystem != campaign.getLocation().getCurrentSystem()
+                                        && selectedSystem != campaign.getCurrentSystem()
                                         && campaign.isGM());
                     if (selectedSystem != null) {// only add if there is a planet to center on
                         item.addActionListener(new ActionListener() {

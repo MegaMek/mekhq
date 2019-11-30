@@ -169,7 +169,7 @@ public class CurrentLocation implements Serializable {
     /**
      * Gets a value indicating whether or not the jumpship
      * is currently recharging.
-     * @param campaign The campaign object.
+     * @param campaign The campaign object which owns the jumpship.
      * @return True if the jumpship has to spend time recharging,
      *         otherwise false.
      */
@@ -178,6 +178,11 @@ public class CurrentLocation implements Serializable {
         return currentSystem.getRechargeTime(currentDate) > 0;
     }
 
+    /**
+     * Marks the jumpship at the current location to be
+     * fully charged.
+     * @param campaign The campaign object which owns the jumpship.
+     */
     public void setRecharged(Campaign campaign) {
         DateTime currentDate = Utilities.getDateTimeDay(campaign.getCalendar());
         double neededRechargeTime = currentSystem.getRechargeTime(currentDate);
