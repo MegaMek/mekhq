@@ -6612,13 +6612,14 @@ public class Campaign implements Serializable, ITechManager {
 
     public void refreshNetworks() {
         for (Unit unit : getUnits()) {
-            // we are going to rebuild the c3 and c3i networks based on
+            // we are going to rebuild the c3, nc3 and c3i networks based on
             // the c3UUIDs
             // TODO: can we do this more efficiently?
             // this code is cribbed from megamek.server#receiveEntityAdd
             Entity entity = unit.getEntity();
-            if (null != entity && (entity.hasC3() || entity.hasC3i())) {
+            if (null != entity && (entity.hasC3() || entity.hasC3i() || entity.hasNavalC3())) {
                 boolean C3iSet = false;
+                boolean NC3Set = false;
 
                 for (Entity e : game.getEntitiesVector()) {
                     // C3 Checks
@@ -6629,8 +6630,25 @@ public class Campaign implements Serializable, ITechManager {
                             break;
                         }
                     }
+                    //Naval C3 checks
+                    if (entity.hasNavalC3() && (NC3Set == false)) {
+                        entity.setC3NetIdSelf();
+                        int pos = 0;
+                        //Well, they're the same value of 6...
+                        while (pos < Entity.MAX_C3i_NODES) {
+                            // We've found a network, join it.
+                            if ((entity.getNC3NextUUIDAsString(pos) != null)
+                                    && (e.getC3UUIDAsString() != null)
+                                    && entity.getNC3NextUUIDAsString(pos).equals(e.getC3UUIDAsString())) {
+                                entity.setC3NetId(e);
+                                NC3Set = true;
+                                break;
+                            }
 
-                    // C3i Checks// C3i Checks
+                            pos++;
+                        }
+                    }
+                    // C3i Checks
                     if (entity.hasC3i() && (C3iSet == false)) {
                         entity.setC3NetIdSelf();
                         int pos = 0;
@@ -6663,7 +6681,11 @@ public class Campaign implements Serializable, ITechManager {
         }
         for (int pos = 0; pos < Entity.MAX_C3i_NODES; pos++) {
             for (Unit nUnit : networkedUnits) {
-                nUnit.getEntity().setC3iNextUUIDAsString(pos, null);
+            	if (nUnit.getEntity().hasNavalC3()) {
+            		nUnit.getEntity().setNC3NextUUIDAsString(pos, null);
+            	} else {
+            		nUnit.getEntity().setC3iNextUUIDAsString(pos, null);
+            	}
             }
         }
         refreshNetworks();
@@ -6687,14 +6709,27 @@ public class Campaign implements Serializable, ITechManager {
         }
         for (int pos = 0; pos < Entity.MAX_C3i_NODES; pos++) {
             for (Unit u : removedUnits) {
-                u.getEntity().setC3iNextUUIDAsString(pos, null);
+            	if (u.getEntity().hasNavalC3()) {
+            		u.getEntity().setNC3NextUUIDAsString(pos, null);
+            	} else {
+            		u.getEntity().setC3iNextUUIDAsString(pos, null);
+            	}
             }
             for (Unit nUnit : networkedUnits) {
                 if (pos < uuids.size()) {
-                    nUnit.getEntity().setC3iNextUUIDAsString(pos,
-                            uuids.get(pos));
+                	if (nUnit.getEntity().hasNavalC3()) {
+                		nUnit.getEntity().setNC3NextUUIDAsString(pos,
+                                uuids.get(pos));
+                	} else {
+                		nUnit.getEntity().setC3iNextUUIDAsString(pos,
+                                uuids.get(pos));
+                	}
                 } else {
-                    nUnit.getEntity().setC3iNextUUIDAsString(pos, null);
+                	if (nUnit.getEntity().hasNavalC3()) {
+                		nUnit.getEntity().setNC3NextUUIDAsString(pos, null);
+                	} else {
+                		nUnit.getEntity().setC3iNextUUIDAsString(pos, null);
+                	}
                 }
             }
         }
@@ -6721,11 +6756,20 @@ public class Campaign implements Serializable, ITechManager {
         }
         for (int pos = 0; pos < Entity.MAX_C3i_NODES; pos++) {
             for (Unit nUnit : networkedUnits) {
-                if (pos < uuids.size()) {
-                    nUnit.getEntity().setC3iNextUUIDAsString(pos,
-                            uuids.get(pos));
+            	if (pos < uuids.size()) {
+                	if (nUnit.getEntity().hasNavalC3()) {
+                		nUnit.getEntity().setNC3NextUUIDAsString(pos,
+                                uuids.get(pos));
+                	} else {
+                		nUnit.getEntity().setC3iNextUUIDAsString(pos,
+                                uuids.get(pos));
+                	}
                 } else {
-                    nUnit.getEntity().setC3iNextUUIDAsString(pos, null);
+                	if (nUnit.getEntity().hasNavalC3()) {
+                		nUnit.getEntity().setNC3NextUUIDAsString(pos, null);
+                	} else {
+                		nUnit.getEntity().setC3iNextUUIDAsString(pos, null);
+                	}
                 }
             }
         }
