@@ -568,7 +568,21 @@ public class ForceViewPanel extends ScrollablePanel {
         toReturn += "<b>BV:</b> " + unit.getEntity().calculateBattleValue(true, null == unit.getEntity().getCrew()) + "<br/>";
         toReturn += unit.getStatus();
         Entity entity = unit.getEntity();
-    	if (entity.hasC3i()) {
+        if (entity.hasNavalC3()) {
+            toReturn += "<br><i>";
+            if (entity.calculateFreeC3Nodes() >= 5) {
+                toReturn += Messages.getString("ChatLounge.NC3None");
+            } else {
+                toReturn += Messages
+                        .getString("ChatLounge.NC3Network")
+                        + entity.getC3NetId();
+                if (entity.calculateFreeC3Nodes() > 0) {
+                    toReturn += Messages.getString("ChatLounge.NC3Nodes",
+                            new Object[] { entity.calculateFreeC3Nodes() });
+                }
+            }
+            toReturn += "</i>";
+        } else if (entity.hasC3i()) {
     		toReturn += "<br><i>";
             if (entity.calculateFreeC3Nodes() >= 5) {
             	toReturn += Messages.getString("ChatLounge.C3iNone");

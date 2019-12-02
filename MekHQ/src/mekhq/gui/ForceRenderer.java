@@ -70,7 +70,19 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 uname = "<font color='red'>" + uname + "</font>";
             }
             Entity entity = u.getEntity();
-            if (entity.hasC3i()) {
+            if (entity.hasNavalC3()) {
+                if (entity.calculateFreeC3Nodes() >= 5) {
+                    c3network += Messages.getString("ChatLounge.NC3None");
+                } else {
+                    c3network += Messages
+                            .getString("ChatLounge.NC3Network")
+                            + entity.getC3NetId();
+                    if (entity.calculateFreeC3Nodes() > 0) {
+                        c3network += Messages.getString("ChatLounge.NC3Nodes",
+                                new Object[] { entity.calculateFreeC3Nodes() });
+                    }
+                }
+            } else if (entity.hasC3i()) {
                 if (entity.calculateFreeC3Nodes() >= 5) {
                     c3network += Messages.getString("ChatLounge.C3iNone");
                 } else {
