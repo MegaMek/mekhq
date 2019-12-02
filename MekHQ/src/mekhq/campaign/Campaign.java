@@ -3630,7 +3630,15 @@ public class Campaign implements Serializable, ITechManager {
             force.removeUnit(u.getId());
             u.setForceId(Force.FORCE_NONE);
             u.setScenarioId(-1);
-            if (u.getEntity().hasC3i()
+            if (u.getEntity().hasNavalC3()
+                    && u.getEntity().calculateFreeC3Nodes() < 5) {
+                Vector<Unit> removedUnits = new Vector<Unit>();
+                removedUnits.add(u);
+                removeUnitsFromNetwork(removedUnits);
+                u.getEntity().setC3MasterIsUUIDAsString(null);
+                u.getEntity().setC3Master(null, true);
+                refreshNetworks();
+            } else if (u.getEntity().hasC3i()
                     && u.getEntity().calculateFreeC3Nodes() < 5) {
                 Vector<Unit> removedUnits = new Vector<Unit>();
                 removedUnits.add(u);

@@ -660,7 +660,7 @@ public class CampaignXmlParser {
 
         for(Unit unit : retVal.getUnits()) {
             // Some units have been incorrectly assigned a null C3UUID as a string. This should correct that by setting a new C3UUID
-            if ((unit.getEntity().hasC3() || unit.getEntity().hasC3i())
+            if ((unit.getEntity().hasC3() || unit.getEntity().hasC3i() || unit.getEntity().hasNavalC3())
                     && (unit.getEntity().getC3UUIDAsString() == null || unit.getEntity().getC3UUIDAsString().equals("null"))) {
                 unit.getEntity().setC3UUID();
                 unit.getEntity().setC3NetIdSelf();
@@ -1116,7 +1116,7 @@ public class CampaignXmlParser {
             en.setExternalIdAsString(u.getId().toString());
 
             // If they have C3 or C3i we need to set their ID
-            if (en.hasC3() || en.hasC3i()) {
+            if (en.hasC3() || en.hasC3i() || en.hasNavalC3()) {
                 en.setC3UUID();
                 en.setC3NetIdSelf();
             }
