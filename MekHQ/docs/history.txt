@@ -8,6 +8,7 @@ v0.47.3-SNAPSHOT
 + PR #1355: General support vehicle crew (fixes deployment bug)
 + Issue #1354: Feature: adds +/-100M button to New Loan dialog
 + PR #1289, #1359: Feature: adds GM Jumpship Recharge on Interstellar Map context menu
++ PR #1360: Fix several issues with adding/removing techs from a force
 
 v0.47.2 (2019-11-15 2000 UTC) 
 + PR #1325: Customize protomechs and advanced aero in MekLab
