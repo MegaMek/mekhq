@@ -152,6 +152,8 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                         }
                     }
                 }
+                
+                MekHQ.triggerEvent(new OrganizationChangedEvent(singleForce));
             }
         }
         if (command.contains("ADD_UNIT")) {
@@ -267,6 +269,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     }
                 }
                 singleForce.setTechID(null);
+                MekHQ.triggerEvent(new OrganizationChangedEvent(singleForce));
             }
         } else if (command.contains("REMOVE_UNIT")) {
             for (Unit unit : units) {
