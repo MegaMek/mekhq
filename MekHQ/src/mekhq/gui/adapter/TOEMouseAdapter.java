@@ -73,7 +73,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
     private static final String COMMAND_ADD_UNIT = "ADD_UNIT|FORCE|";
     private static final String COMMAND_ASSIGN_TO_SHIP = "ASSIGN_TO_SHIP|UNIT|empty|";
     private static final String COMMAND_REMOVE_UNIT = "REMOVE_UNIT|UNIT|empty|";
-    private static final String COMMAND_DEPLOY_UNIT = "DEPLOY_UNIT|FORCE|";
+    private static final String COMMAND_DEPLOY_UNIT = "DEPLOY_UNIT|UNIT|";
     private static final String COMMAND_UNDEPLOY_UNIT = "UNDEPLOY_UNIT|UNIT|empty|";
     private static final String COMMAND_GOTO_UNIT = "GOTO_UNIT|UNIT|empty|";
 
