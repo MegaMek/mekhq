@@ -1243,6 +1243,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                 menuItem.setEnabled(!StaticChecks.areAnyUnitsDeployed(units));
                 popup.add(menuItem);
                 if (StaticChecks.areAllUnitsAvailable(units)) {
+                    //Deploy unit to a scenario - includes submenus for scenario selection
                     menu = new JMenu("Deploy Unit");
                     JMenu missionMenu;
                     for (Mission m : gui.getCampaign().getMissions()) {
@@ -1273,10 +1274,23 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                         }
                         menu.add(missionMenu);
                     }
-
+                    // Scroll bar in case the list is too long for one screen
                     if (menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
                         MenuScroller.createScrollBarsOnMenus(menu);
                         popup.add(menu);
+                    }
+                    
+                    //Assign unit to a transport ship - this will check to see if the ship has capacity
+                    //enough for all selected units, but the specific bay will not be set and units will be
+                    //auto-loaded into any available bay on the ship during deployment
+                    menu = new JMenu("Assign Unit to Transport Ship");
+                    JMenu transportShipMenu;
+                    for (UUID id : gui.getCampaign().getTransportShips()) {
+                        Unit ship = gui.getCampaign().getUnit(id);
+                        if (ship == null) {
+                            continue;
+                        }
+                        if (ship.getASFCapacity())
                     }
                 }
                 if (StaticChecks.areAllUnitsDeployed(units)) {
@@ -1293,7 +1307,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(true);
                 popup.add(menuItem);
-                if (StaticChecks.areAllUnitsAssigned(units)) {
+                if (StaticChecks.areAllUnitsTransported(units)) {
                     menuItem = new JMenuItem("Unassign Unit from Transport Ship");
                     menuItem.setActionCommand(TOEMouseAdapter.COMMAND_UNASSIGN_FROM_SHIP
                             + unitIds);
