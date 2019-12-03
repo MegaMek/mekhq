@@ -293,6 +293,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         this.id = i;
     }
     
+    // A set of methods for working with transport ship assignment for this unit
+    
+    public boolean hasTransportShipId() {
+        return transportShipId != null;
+    }
+    
     public UUID getTransportShipId() {
         return transportShipId;
     }
