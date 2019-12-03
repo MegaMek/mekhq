@@ -3,7 +3,9 @@ package mekhq.gui.utilities;
 import java.util.UUID;
 import java.util.Vector;
 
+import megamek.common.ConvFighter;
 import megamek.common.Entity;
+import megamek.common.SmallCraft;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Ranks;
@@ -78,6 +80,39 @@ public class StaticChecks {
             }
         }
         return true;
+    }
+    
+    /**
+     * Used to test a selection of Units provided by the player and a larger Transport to determine 
+     * whether or not the Transport can carry all of the selected units 
+     * @param units Vector of units that the player has selected
+     * @param ship A single Transport-Bay-equipped Unit whose capacity we want to test the selection against
+     * @returns a String  indicating why the Transport cannot carry all of the selected units, or a blank result if it can
+     */
+    public static String canTransportShipCarry(Vector<Unit> units, Unit ship) {
+        String reason = "";
+        int numberASF = 0;
+        int numberBA = 0;
+        int numberHVee = 0;
+        int numberInfantry = 0;
+        int numberLVee = 0;
+        int numberMech = 0;
+        int numberProto = 0;
+        int numberSC = 0;
+        int numberSHVee = 0;
+        //First test all units in the selection and find out how many of each we have
+        for (Unit unit : units) {
+            if (unit.getEntity().isLargeCraft()) {
+                //No. Try your selection again.
+                return "Selection of Units includes a large spacecraft";
+            } else if (unit.getEntity() instanceof SmallCraft) {
+                numberSC++;
+            } else if (unit.getEntity() instanceof ConvFighter) {
+                numberSC++;
+            }
+        }
+        
+        return reason;
     }
 
     public static boolean doAllUnitsHaveC3i(Vector<Unit> units) {
