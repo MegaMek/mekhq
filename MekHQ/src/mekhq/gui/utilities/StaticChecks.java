@@ -64,6 +64,21 @@ public class StaticChecks {
         }
         return false;
     }
+    
+    /**
+     * Used to test a selection of Units provided by the player and determine whether or not they have a 
+     * Transport ship assignment
+     * @param units Vector of units that the player has selected
+     * @return false if any unit in the passed-in Vector has not been assigned to a Transport ship
+     */
+    public static boolean areAllUnitsTransported(Vector<Unit> units) {
+        for (Unit unit : units) {
+            if (!unit.isDeployed()) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     public static boolean doAllUnitsHaveC3i(Vector<Unit> units) {
         for (Unit unit : units) {
