@@ -1284,13 +1284,33 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     //enough for all selected units, but the specific bay will not be set and units will be
                     //auto-loaded into any available bay on the ship during deployment
                     menu = new JMenu("Assign Unit to Transport Ship");
-                    JMenu transportShipMenu;
+                    StringJoiner cantCarryReasons = new StringJoiner("");
                     for (UUID id : gui.getCampaign().getTransportShips()) {
                         Unit ship = gui.getCampaign().getUnit(id);
                         if (ship == null) {
                             continue;
                         }
-                        if (ship.getASFCapacity())
+                        String reason = StaticChecks.canTransportShipCarry(units, ship);
+                        JMenu transportShipMenu = new JMenu(ship.getName());
+                        if (reason == null) {
+                            //Add this ship to the menu of choices
+                            menuItem = new JMenuItem(ship.getName());
+                            menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ASSIGN_TO_SHIP
+                                    + unitIds);
+                            menuItem.addActionListener(this);
+                            menuItem.setEnabled(true);
+                            transportShipMenu.add(menuItem);
+                        } else {
+                            //Start building a reason and display the whole thing as a nag
+                            cantCarryReasons.add("Ship " + ship.getName() + " " + reason);
+                        }
+                    }
+                    if (cantCarryReasons != null) {
+                        
+                    }
+                    if (menu.getMenuComponentCount() > 30) {
+                        MenuScroller.setScrollerFor(menu, 30);
+                        popup.add(menu);
                     }
                 }
                 if (StaticChecks.areAllUnitsDeployed(units)) {
@@ -1301,12 +1321,6 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     menuItem.setEnabled(true);
                     popup.add(menuItem);
                 }
-                menuItem = new JMenuItem("Assign Unit to Transport Ship");
-                menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ASSIGN_TO_SHIP
-                        + unitIds);
-                menuItem.addActionListener(this);
-                menuItem.setEnabled(true);
-                popup.add(menuItem);
                 if (StaticChecks.areAllUnitsTransported(units)) {
                     menuItem = new JMenuItem("Unassign Unit from Transport Ship");
                     menuItem.setActionCommand(TOEMouseAdapter.COMMAND_UNASSIGN_FROM_SHIP
