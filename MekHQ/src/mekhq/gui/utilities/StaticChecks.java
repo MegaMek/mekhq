@@ -1,11 +1,17 @@
 package mekhq.gui.utilities;
 
+import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.Vector;
 
-import megamek.common.ConvFighter;
+import megamek.common.Aero;
+import megamek.common.BattleArmor;
 import megamek.common.Entity;
+import megamek.common.Infantry;
+import megamek.common.Mech;
+import megamek.common.Protomech;
 import megamek.common.SmallCraft;
+import megamek.common.Tank;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Ranks;
@@ -90,7 +96,8 @@ public class StaticChecks {
      * @returns a String  indicating why the Transport cannot carry all of the selected units, or a blank result if it can
      */
     public static String canTransportShipCarry(Vector<Unit> units, Unit ship) {
-        String reason = "";
+        StringJoiner reason = new StringJoiner("Cannot load selection onto ship " + ship.getName());
+        boolean loadOK = true;
         int numberASF = 0;
         int numberBA = 0;
         int numberHVee = 0;
@@ -107,12 +114,78 @@ public class StaticChecks {
                 return "Selection of Units includes a large spacecraft";
             } else if (unit.getEntity() instanceof SmallCraft) {
                 numberSC++;
-            } else if (unit.getEntity() instanceof ConvFighter) {
-                numberSC++;
+            } else if (unit.getEntity() instanceof Aero) {
+                // Includes conventional fighters
+                numberASF++;
+            } else if (unit.getEntity() instanceof BattleArmor) {
+                numberBA++;
+            } else if (unit.getEntity() instanceof Infantry) {
+                numberInfantry++;
+            } else if (unit.getEntity() instanceof Mech) {
+                // Includes LAMs and Quadvees
+                numberMech++;
+            } else if (unit.getEntity() instanceof Protomech) {
+                numberProto++;
+            } else if (unit.getEntity() instanceof Tank) {
+                // Tanks and VTOLs
+                double weight = unit.getEntity().getWeight();
+                if (unit.getEntity().isSuperHeavy()) {
+                    numberSHVee++;
+                } else if (weight >= 51) {
+                    numberHVee++;
+                } else {
+                    numberLVee++;
+                }
             }
         }
-        
-        return reason;
+        // Now test the designated ship and let us know if it can carry everyone
+        if (numberSC > ship.getSmallCraftCapacity()) {
+            reason.add("Selection of Units includes too many small craft. <br>");
+            loadOK = false;
+        }
+        // Fighters can fit into any unused SC bays
+        if (numberASF > (ship.getASFCapacity() + (ship.getSmallCraftCapacity() - numberSC))) {
+            reason.add("Selection of Units includes too many fighters. <br>");
+            loadOK = false;
+        }
+        if (numberBA > ship.getBattleArmorCapacity()) {
+            reason.add("Selection of Units includes too many Battle Armor units. <br>");
+            loadOK = false;
+        }
+        if (numberInfantry > ship.getInfantryCapacity()) {
+            reason.add("Selection of Units includes too many Infantry units. <br>");
+            loadOK = false;
+        }
+        if (numberMech > ship.getMechCapacity()) {
+            reason.add("Selection of Units includes too many Mechs. <br>");
+            loadOK = false;
+        }
+        if (numberProto > ship.getProtomechCapacity()) {
+            reason.add("Selection of Units includes too many ProtoMechs. <br>");
+            loadOK = false;
+        }
+        if (numberSHVee > ship.getSuperHeavyVehicleCapacity()) {
+            reason.add("Selection of Units includes too many SuperHeavy Vehicles. <br>");
+            loadOK = false;
+        }
+        // Heavy vehicles can fit into unused SuperHeavy bays
+        if (numberHVee > (ship.getHeavyVehicleCapacity() + (ship.getSuperHeavyVehicleCapacity() - numberSHVee))) {
+            reason.add("Selection of Units includes too many Heavy Vehicles. <br>");
+            loadOK = false;
+        }
+        // Light vehicles can fit into any unused vehicle bays
+        if (numberLVee > 
+            (ship.getLightVehicleCapacity() + 
+                    (ship.getSuperHeavyVehicleCapacity() - numberSHVee) + 
+                    (ship.getHeavyVehicleCapacity() - numberHVee))) {
+            reason.add("Selection of Units includes too many Light Vehicles. <br>");
+            loadOK = false;
+        }
+        if (!loadOK) {
+            return reason.toString();
+        }        
+        // Everything's ok to load. Return a blank string.
+        return null;
     }
 
     public static boolean doAllUnitsHaveC3i(Vector<Unit> units) {
