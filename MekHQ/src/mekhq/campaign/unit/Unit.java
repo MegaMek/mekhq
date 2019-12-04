@@ -1178,6 +1178,16 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         return bays;
     }
+    
+    public double getSuperHeavyVehicleCapacity() {
+        double bays = 0;
+        for (Bay b : getEntity().getTransportBays()) {
+            if (b instanceof SuperHeavyVehicleBay) {
+                bays += b.getCapacity();
+            }
+        }
+        return bays;
+    }
 
     public double getBattleArmorCapacity() {
         double bays = 0;
