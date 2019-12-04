@@ -1291,7 +1291,6 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                             continue;
                         }
                         String reason = StaticChecks.canTransportShipCarry(units, ship);
-                        JMenu transportShipMenu = new JMenu(ship.getName());
                         if (reason == null) {
                             //Add this ship to the menu of choices
                             menuItem = new JMenuItem(ship.getName());
@@ -1299,7 +1298,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                                     + unitIds);
                             menuItem.addActionListener(this);
                             menuItem.setEnabled(true);
-                            transportShipMenu.add(menuItem);
+                            menu.add(menuItem);
                         } else {
                             //Start building a reason and display the whole thing as a nag
                             cantCarryReasons.add("Ship " + ship.getName() + " " + reason);
@@ -1308,9 +1307,11 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     if (cantCarryReasons != null) {
                         
                     }
+                    if (menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
+                        popup.add(menu);
+                    }
                     if (menu.getMenuComponentCount() > 30) {
                         MenuScroller.setScrollerFor(menu, 30);
-                        popup.add(menu);
                     }
                 }
                 if (StaticChecks.areAllUnitsDeployed(units)) {
