@@ -1280,32 +1280,21 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                         popup.add(menu);
                     }
                     
-                    //Assign unit to a transport ship - this will check to see if the ship has capacity
-                    //enough for all selected units, but the specific bay will not be set and units will be
-                    //auto-loaded into any available bay on the ship during deployment
+                    //Attempt to Assign unit to a transport ship. This checks to see if the ship
+                    //is in a basic state that can accept units. Capacity gets checked once the action
+                    //is submitted.
                     menu = new JMenu("Assign Unit to Transport Ship");
-                    StringJoiner cantCarryReasons = new StringJoiner("");
                     for (UUID id : gui.getCampaign().getTransportShips()) {
                         Unit ship = gui.getCampaign().getUnit(id);
-                        if (ship == null) {
+                        if (ship == null || ship.isSalvage() || ship.getCommander() == null) {
                             continue;
                         }
-                        String reason = StaticChecks.canTransportShipCarry(units, ship);
-                        if (reason == null) {
-                            //Add this ship to the menu of choices
-                            menuItem = new JMenuItem(ship.getName());
-                            menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ASSIGN_TO_SHIP
-                                    + unitIds);
-                            menuItem.addActionListener(this);
-                            menuItem.setEnabled(true);
-                            menu.add(menuItem);
-                        } else {
-                            //Start building a reason and display the whole thing as a nag
-                            cantCarryReasons.add("Ship " + ship.getName() + " " + reason);
-                        }
-                    }
-                    if (cantCarryReasons != null) {
-                        
+                        menuItem = new JMenuItem(ship.getName());
+                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ASSIGN_TO_SHIP
+                                + unitIds);
+                        menuItem.addActionListener(this);
+                        menuItem.setEnabled(true);
+                        menu.add(menuItem);
                     }
                     if (menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
                         popup.add(menu);
