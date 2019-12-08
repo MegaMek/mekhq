@@ -405,6 +405,8 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
         panStats.add(txtDesc, gridBagConstraints);
         
         StringBuilder objectiveBuilder = new StringBuilder();
+        objectiveBuilder.append(scenario.getDeploymentInstructions());
+        
         for(ScenarioObjective objective : scenario.getScenarioObjectives()) {
             objectiveBuilder.append(objective.getDescription());
             objectiveBuilder.append("\n");
@@ -448,9 +450,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
             objectiveBuilder.append("\n");
         }
         
-        if(scenario instanceof AtBScenario) {
-            objectiveBuilder.append(((AtBScenario) scenario).getBattlefieldControlDescription());
-        }
+        objectiveBuilder.append(((AtBScenario) scenario).getBattlefieldControlDescription());
         
         txtDetails.setText(objectiveBuilder.toString());
         txtDetails.setLineWrap(true);

@@ -2148,4 +2148,14 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     public String getBattlefieldControlDescription() { 
         return getResourceBundle().getString("battleDetails.common.winnerControlsBattlefield");
     }
+    
+    public String getDeploymentInstructions() {
+        if(this.isBigBattle()) {
+            return getResourceBundle().getString("battleDetails.deployEightMeks");
+        } else if(isSpecialMission()) {
+            return getResourceBundle().getString("battleDetails.deploySingleMek");
+        } else {
+            return "";
+        }
+    }
 }
