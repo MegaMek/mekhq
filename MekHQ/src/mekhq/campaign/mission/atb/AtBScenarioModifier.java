@@ -253,7 +253,7 @@ public class AtBScenarioModifier {
                 resultingList = templateElement.getValue();
             }
         } catch(Exception e) {
-            MekHQ.getLogger().error(ScenarioModifierManifest.class, "Deserialize", "Error Deserializing Scenario Modifier" + fileName, e);
+            MekHQ.getLogger().error(ScenarioModifierManifest.class, "Deserialize", "Error Deserializing Scenario Modifier: " + fileName, e);
         }
 
         return resultingList;

@@ -22,7 +22,7 @@
 		<generationOrder>3</generationOrder>
 		<maxWeightClass>4</maxWeightClass>
 		<retreatThreshold>50</retreatThreshold>
-		<startingAltitude>0</startingAltitude>
+		<startingAltitude>5</startingAltitude>
 		<syncDeploymentType>SameEdge</syncDeploymentType>
 		<syncedForceName>Player</syncedForceName>
 		<useArtillery>false</useArtillery>

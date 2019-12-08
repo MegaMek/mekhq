@@ -41,8 +41,9 @@
                 <generationOrder>1</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
+                <objectiveLinkedForces/>
                 <retreatThreshold>50</retreatThreshold>
-                <startingAltitude>0</startingAltitude>
+                <startingAltitude>5</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
                 <useArtillery>false</useArtillery>
             </value>
@@ -69,8 +70,9 @@
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
+                <objectiveLinkedForces/>
                 <retreatThreshold>50</retreatThreshold>
-                <startingAltitude>0</startingAltitude>
+                <startingAltitude>5</startingAltitude>
                 <syncDeploymentType>OppositeEdge</syncDeploymentType>
                 <syncedForceName>Player</syncedForceName>
                 <useArtillery>false</useArtillery>
@@ -98,9 +100,10 @@
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>1</minWeightClass>
+                <objectiveLinkedForces/>
                 <retreatThreshold>50</retreatThreshold>
-                <startingAltitude>0</startingAltitude>
-                <syncDeploymentType>SameEdge</syncDeploymentType>
+                <startingAltitude>5</startingAltitude>
+                <syncDeploymentType>OppositeEdge</syncDeploymentType>
                 <syncedForceName>Player</syncedForceName>
                 <useArtillery>false</useArtillery>
             </value>
