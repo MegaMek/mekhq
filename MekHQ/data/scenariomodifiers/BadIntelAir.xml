@@ -1,0 +1,40 @@
+<AtBScenarioModifier>
+	<additionalBriefingText>Recon underestimated enemy strength, and additional enemy units are present.</additionalBriefingText>
+	<benefitsPlayer>false</benefitsPlayer>
+	<eventTiming>PostForceGeneration</eventTiming>
+	<forceDefinition>
+		<actualDeploymentZone>-1</actualDeploymentZone>
+		<allowAeroBombs>false</allowAeroBombs>
+		<allowedUnitType>-3</allowedUnitType>
+		<arrivalTurn>0</arrivalTurn>
+		<canReinforceLinked>true</canReinforceLinked>
+		<contributesToBV>false</contributesToBV>
+		<contributesToMapSize>false</contributesToMapSize>
+		<contributesToUnitCount>false</contributesToUnitCount>
+		<deploymentZones>
+			<deploymentZone>1</deploymentZone>
+			<deploymentZone>2</deploymentZone>
+			<deploymentZone>3</deploymentZone>
+			<deploymentZone>4</deploymentZone>
+			<deploymentZone>5</deploymentZone>
+			<deploymentZone>6</deploymentZone>
+			<deploymentZone>7</deploymentZone>
+			<deploymentZone>8</deploymentZone>
+			<deploymentZone>9</deploymentZone>
+		</deploymentZones>
+		<destinationZone>4</destinationZone>
+		<fixedUnitCount>-1</fixedUnitCount>
+		<forceAlignment>2</forceAlignment>
+		<forceMultiplier>1.0</forceMultiplier>
+		<forceName>Opfor Ground Reinforcements</forceName>
+		<generationMethod>3</generationMethod>
+		<generationOrder>3</generationOrder>
+		<maxWeightClass>4</maxWeightClass>
+		<retreatThreshold>0</retreatThreshold>
+		<objectiveLinkedForces>
+			<objectiveLinkedForce>Primary Opfor</objectiveLinkedForce>
+		</objectiveLinkedForces>
+		<syncDeploymentType>None</syncDeploymentType>
+		<syncedForceName />
+	</forceDefinition>
+</AtBScenarioModifier>
