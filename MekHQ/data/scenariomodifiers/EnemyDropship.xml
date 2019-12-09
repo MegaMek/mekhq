@@ -25,7 +25,7 @@
                     <objectiveLinkedForce>Primary Opfor</objectiveLinkedForce>
                 </objectiveLinkedForces>
 		<retreatThreshold>50</retreatThreshold>
-		<startingAltitude>0</startingAltitude>
+		<startingAltitude>5</startingAltitude>
 		<syncDeploymentType>SameEdge</syncDeploymentType>
 		<syncedForceName>Primary Opfor</syncedForceName>
 		<useArtillery>false</useArtillery>

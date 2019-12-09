@@ -190,9 +190,11 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
             if (contract.getRequiredLanceType() == Lance.ROLE_FIGHT
                     || contract.getRequiredLanceType() == Lance.ROLE_SCOUT) {
                 victoryEffect.effectType = ObjectiveEffectType.ContractVictory;
+                destroyHostiles.addDetail(getResourceBundle().getString("battleDetails.baseAttack.attacker.details.winnerFightScout"));
             } else {
                 victoryEffect.effectType = ObjectiveEffectType.ContractMoraleUpdate;
                 victoryEffect.howMuch = -3;
+                destroyHostiles.addDetail(getResourceBundle().getString("battleDetails.baseAttack.attacker.details.winnerDefendTraining"));
             }
             destroyHostiles.addSuccessEffect(victoryEffect);
         }
@@ -206,5 +208,17 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
         }
         getScenarioObjectives().add(destroyHostiles);
         getScenarioObjectives().add(keepFriendliesAlive);
+    }
+    
+    @Override
+    public String getBattlefieldControlDescription() {
+        String retval = super.getBattlefieldControlDescription();
+        
+        if(!isAttacker()) {
+            retval += "\r\n";
+            retval += getResourceBundle().getString("battleDetails.baseAttack.attacker.details.loser");
+        }
+        
+        return retval;
     }
 }

@@ -53,7 +53,6 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioObjective;
-import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
 import mekhq.campaign.mission.ScenarioObjectiveProcessor;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
@@ -1044,7 +1043,18 @@ public class ResolveScenarioWizardDialog extends JDialog {
             Map<ScenarioObjective, Set<String>> qualifyingObjectiveUnits = objectiveProcessor.getQualifyingObjectiveUnits();
             
             for(ScenarioObjective objective : tracker.getScenario().getScenarioObjectives()) {
-                if(objective.getObjectiveCriterion() == ObjectiveCriterion.Custom) {
+                // first, we determine the list of units that are potentially associated with the current objective
+                List<String> currentObjectiveUnits = new ArrayList<>();
+                for(String unitID : potentialObjectiveUnits.get(objective)) {
+                    UUID uuid = UUID.fromString(unitID);
+                    if(tracker.getAllInvolvedUnits().containsKey(uuid)) {
+                        currentObjectiveUnits.add(unitID);
+                    }
+                }
+                
+                // if it's a custom objective or there are no associated units, we display
+                // a single line and an override 
+                if(currentObjectiveUnits.size() == 0) {
                     JCheckBox chkObjective = new JCheckBox();
                     chkObjective.setText(objective.getDescription());
                     chkObjective.setForeground(Color.RED);
@@ -1075,11 +1085,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 
                 objectiveCheckboxes.put(objective, new ArrayList<>());
                 
-                for(String unitID : potentialObjectiveUnits.get(objective)) {
+                for(String unitID : currentObjectiveUnits) {
                     UUID uuid = UUID.fromString(unitID);
-                    if(!tracker.getAllInvolvedUnits().containsKey(uuid)) {
-                        continue;
-                    }
                     
                     JCheckBox chkItemState = new JCheckBox(tracker.getAllInvolvedUnits().get(uuid).getShortName());
                     chkItemState.setSelected(qualifyingObjectiveUnits.get(objective).contains(unitID));

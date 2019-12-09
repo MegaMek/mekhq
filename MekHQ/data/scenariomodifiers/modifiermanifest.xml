@@ -44,7 +44,10 @@
 			GoodIntel.xml
 		</modifier>
 		<modifier>
-			BadIntel.xml
+			BadIntelGround.xml
+		</modifier>
+		<modifier>
+			BadIntelAir.xml
 		</modifier>
 		<!--modifier>
 			Need "special duel flag".
@@ -78,7 +81,10 @@
 			AlliedTreachery.xml
 		</modifier-->
 		<modifier>
-			PreBattleDamage.xml
+			PreBattleDamageHostiles.xml
+		</modifier>
+		<modifier>
+			PreBattleDamageAllies.xml
 		</modifier>
 		<!--modifier>
 			Need planetary condition adjustments

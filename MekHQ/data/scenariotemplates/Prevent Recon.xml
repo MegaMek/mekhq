@@ -105,9 +105,9 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails/>
-            <description>Destroy the following enemy force(s) and unit(s):</description>
+            <description>Destroy or rout the following enemy force(s) and unit(s):</description>
             <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Destroy</objectiveCriterion>
+            <objectiveCriterion>ForceWithdraw</objectiveCriterion>
             <percentage>50</percentage>
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitScaleFactor>2</timeLimitScaleFactor>
