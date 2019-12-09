@@ -599,7 +599,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                                         selectedPerson);
                         if (null == spa) {
                             if (gui.getCampaign().getCampaignOptions().useEdge()) {
-                                selectedPerson.acquireAbility(
+                                selectedPerson.getOptions().acquireAbility(
                                         PilotOptions.EDGE_ADVANTAGES, "edge", //$NON-NLS-1$
                                         selectedPerson.getEdge() + 1);
                                 gui.getCampaign().addReport(String.format(resourceMap.getString("gainedEdge.format"), selectedPerson.getHyperlinkedName())); //$NON-NLS-1$
@@ -616,7 +616,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             {
                 String selected = data[1];
                 int cost = Integer.parseInt(data[2]);
-                selectedPerson.acquireAbility(PilotOptions.LVL3_ADVANTAGES,
+                selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
                         selected, true);
                 gui.getCampaign().personUpdated(selectedPerson);
                 selectedPerson.setXp(selectedPerson.getXp() - cost);
@@ -628,7 +628,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             {
                 String selected = data[1];
                 int cost = Integer.parseInt(data[2]);
-                selectedPerson.acquireAbility(PilotOptions.LVL3_ADVANTAGES,
+                selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
                         "weapon_specialist", selected); //$NON-NLS-1$
                 gui.getCampaign().personUpdated(selectedPerson);
                 selectedPerson.setXp(selectedPerson.getXp() - cost);
@@ -640,7 +640,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             {
                 String selected = data[1];
                 int cost = Integer.parseInt(data[2]);
-                selectedPerson.acquireAbility(PilotOptions.LVL3_ADVANTAGES,
+                selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
                         "specialist", selected); //$NON-NLS-1$
                 gui.getCampaign().personUpdated(selectedPerson);
                 selectedPerson.setXp(selectedPerson.getXp() - cost);
@@ -652,7 +652,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             {
                 String selected = data[1];
                 int cost = Integer.parseInt(data[2]);
-                selectedPerson.acquireAbility(PilotOptions.LVL3_ADVANTAGES,
+                selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
                         "range_master", selected); //$NON-NLS-1$
                 gui.getCampaign().personUpdated(selectedPerson);
                 selectedPerson.setXp(selectedPerson.getXp() - cost);
@@ -664,7 +664,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             {
                 String selected = data[1];
                 int cost = Integer.parseInt(data[2]);
-                selectedPerson.acquireAbility(PilotOptions.LVL3_ADVANTAGES,
+                selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
                         "human_tro", selected); //$NON-NLS-1$
                 gui.getCampaign().personUpdated(selectedPerson);
                 selectedPerson.setXp(selectedPerson.getXp() - cost);
@@ -677,7 +677,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 String selected = data[1];
                 int cost = Integer.parseInt(data[2]);
                 String ability = data[3];
-                selectedPerson.acquireAbility(PilotOptions.LVL3_ADVANTAGES,
+                selectedPerson.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES,
                         ability, selected); //$NON-NLS-1$
                 gui.getCampaign().personUpdated(selectedPerson);
                 selectedPerson.setXp(selectedPerson.getXp() - cost);
