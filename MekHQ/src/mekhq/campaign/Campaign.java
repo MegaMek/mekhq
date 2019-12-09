@@ -142,8 +142,10 @@ import mekhq.campaign.parts.StructuralIntegrity;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
+import mekhq.campaign.personnel.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.Ancestors;
 import mekhq.campaign.personnel.Bloodname;
+import mekhq.campaign.personnel.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.Rank;
@@ -4421,256 +4423,15 @@ public class Campaign implements Serializable, ITechManager {
             type = Person.T_MECHWARRIOR;
             secondary = Person.T_AERO_PILOT;
         }
-        boolean isFemale = getRNG().isFemale();
-        Person person = new Person(this, factionCode);
-        if (isFemale) {
-            person.setGender(Person.G_FEMALE);
-        }
-        person.setName(getRNG().generate(isFemale));
-        int bonus = rskillPrefs.getOverallRecruitBonus() + rskillPrefs.getRecruitBonus(type);
-        // LAM pilots get +3 to random experience roll
-        if ((type == Person.T_MECHWARRIOR) && (secondary == Person.T_AERO_PILOT)) {
-            bonus += 3;
-        }
-        int expLvl = Utilities.generateExpLevel(bonus);
-        person.setPrimaryRole(type);
-        person.setSecondaryRole(secondary);
-        if (getCampaignOptions().useDylansRandomXp()) {
-            person.setXp(Utilities.generateRandomExp());
-        }
-        person.setDaysToWaitForHealing(getCampaignOptions().getNaturalHealingWaitingPeriod());
-        //check for clan phenotypes
-        bonus = 0;
-        if (person.isClanner()) {
-            switch (type) {
-                case (Person.T_MECHWARRIOR):
-                    if (Utilities.rollProbability(getCampaignOptions().getProbPhenoMW())) {
-                        person.setPhenotype(Person.PHENOTYPE_MW);
-                        bonus = 1;
-                    }
-                    break;
-                case (Person.T_GVEE_DRIVER):
-                case (Person.T_NVEE_DRIVER):
-                case (Person.T_VTOL_PILOT):
-                case (Person.T_VEE_GUNNER):
-                    if (Utilities.rollProbability(getCampaignOptions().getProbPhenoVee())) {
-                        person.setPhenotype(Person.PHENOTYPE_VEE);
-                        bonus = 1;
-                    }
-                    break;
-                case (Person.T_CONV_PILOT):
-                case (Person.T_AERO_PILOT):
-                case (Person.T_PROTO_PILOT):
-                    if (Utilities.rollProbability(getCampaignOptions().getProbPhenoAero())) {
-                        person.setPhenotype(Person.PHENOTYPE_AERO);
-                        bonus = 1;
-                    }
-                    break;
-                case (Person.T_BA):
-                    if (Utilities.rollProbability(getCampaignOptions().getProbPhenoBA())) {
-                        person.setPhenotype(Person.PHENOTYPE_BA);
-                        bonus = 1;
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-        GregorianCalendar birthdate = (GregorianCalendar) getCalendar().clone();
-        birthdate.set(Calendar.YEAR, birthdate.get(Calendar.YEAR) - Utilities.getAgeByExpLevel(expLvl, person.isClanner() && person.getPhenotype() != Person.PHENOTYPE_NONE));
-        // choose a random day and month
-        int nDays = 365;
-        if (birthdate.isLeapYear(birthdate.get(Calendar.YEAR))) {
-            nDays = 366;
-        }
-        int randomDay = Compute.randomInt(nDays) + 1;
-        birthdate.set(Calendar.DAY_OF_YEAR, randomDay);
-        person.setBirthday(birthdate);
-        // set default skills
-        int mod = 0;
-        if ((type == Person.T_MECHWARRIOR) && (secondary == Person.T_AERO_PILOT)) {
-            mod = -2;
-        }
-        generateDefaultSkills(type, person, expLvl, bonus, mod);
-        if (secondary != Person.T_NONE) {
-            generateDefaultSkills(secondary, person, expLvl, bonus, mod);
-        }
-        // apply phenotype bonus only to primary skills
-        bonus = 0;
-        // roll small arms skill
-        if (!person.hasSkill(SkillType.S_SMALL_ARMS)) {
-            int sarmsLvl = -12;
-            if (person.isSupport()) {
-                sarmsLvl = Utilities.generateExpLevel(rskillPrefs
-                        .getSupportSmallArmsBonus());
-            } else {
-                sarmsLvl = Utilities.generateExpLevel(rskillPrefs
-                        .getCombatSmallArmsBonus());
-            }
-            if (sarmsLvl > SkillType.EXP_ULTRA_GREEN) {
-                person.addSkill(SkillType.S_SMALL_ARMS, sarmsLvl,
-                        rskillPrefs.randomizeSkill(), bonus);
-            }
 
-        }
-        // roll tactics skill
-        if (!person.isSupport()) {
-            int tacLvl = Utilities.generateExpLevel(rskillPrefs
-                    .getTacticsMod(expLvl));
-            if (tacLvl > SkillType.EXP_ULTRA_GREEN) {
-                person.addSkill(SkillType.S_TACTICS, tacLvl,
-                        rskillPrefs.randomizeSkill(), bonus);
-            }
-        }
-        // roll artillery skill
-        if (getCampaignOptions().useArtillery()
-                && (type == Person.T_MECHWARRIOR || type == Person.T_VEE_GUNNER || type == Person.T_INFANTRY)
-                && Utilities.rollProbability(rskillPrefs.getArtilleryProb())) {
-            int artyLvl = Utilities.generateExpLevel(rskillPrefs
-                    .getArtilleryBonus());
-            if (artyLvl > SkillType.EXP_ULTRA_GREEN) {
-                person.addSkill(SkillType.S_ARTILLERY, artyLvl,
-                        rskillPrefs.randomizeSkill(), bonus);
-            }
-        }
-        // roll random secondary skill
-        if (Utilities.rollProbability(rskillPrefs.getSecondSkillProb())) {
-            ArrayList<String> possibleSkills = new ArrayList<String>();
-            for (String stype : SkillType.skillList) {
-                if (!person.hasSkill(stype)) {
-                    possibleSkills.add(stype);
-                }
-            }
-            String selSkill = possibleSkills.get(Compute
-                    .randomInt(possibleSkills.size()));
-            int secondLvl = Utilities.generateExpLevel(rskillPrefs
-                    .getSecondSkillBonus());
-            person.addSkill(selSkill, secondLvl, rskillPrefs.randomizeSkill(),
-                    bonus);
-        }
-        // TODO: roll special abilities
-        if (getCampaignOptions().useAbilities()) {
-            int nabil = Utilities.rollSpecialAbilities(rskillPrefs
-                    .getSpecialAbilBonus(expLvl));
-            while (nabil > 0 && null != rollSPA(type, person)) {
-                nabil--;
-            }
-        }
+        Person person = new DefaultPersonnelGenerator(factionCode).generate(this, type, secondary);
+
+        // Assign a random portrait after we generate a new person
         if (getCampaignOptions().usePortraitForType(type)) {
             assignRandomPortraitFor(person);
         }
-        //check for Bloodname
-        if (person.isClanner()) {
-            checkBloodnameAdd(person, type, factionCode);
-        }
 
         return person;
-    }
-
-    private void generateDefaultSkills(int type, Person person, int expLvl, int bonus, int mod) {
-        switch (type) {
-            case (Person.T_MECHWARRIOR):
-                person.addSkill(SkillType.S_PILOT_MECH, expLvl,
-                        rskillPrefs.randomizeSkill(), bonus, mod);
-                person.addSkill(SkillType.S_GUN_MECH, expLvl, rskillPrefs.randomizeSkill(), bonus, mod);
-                break;
-            case (Person.T_GVEE_DRIVER):
-                person.addSkill(SkillType.S_PILOT_GVEE, expLvl,
-                        rskillPrefs.randomizeSkill(), bonus, mod);
-                person.addSkill(SkillType.S_GUN_VEE, expLvl, rskillPrefs.randomizeSkill(), bonus, mod);
-                break;
-            case (Person.T_NVEE_DRIVER):
-                person.addSkill(SkillType.S_PILOT_NVEE, expLvl,
-                        rskillPrefs.randomizeSkill(), bonus, mod);
-                person.addSkill(SkillType.S_GUN_VEE, expLvl, rskillPrefs.randomizeSkill(), bonus, mod);
-                break;
-            case (Person.T_VTOL_PILOT):
-                person.addSkill(SkillType.S_PILOT_VTOL, expLvl,
-                        rskillPrefs.randomizeSkill(), bonus, mod);
-                person.addSkill(SkillType.S_GUN_VEE, expLvl, rskillPrefs.randomizeSkill(), bonus, mod);
-                break;
-            case (Person.T_VEE_GUNNER):
-                person.addSkill(SkillType.S_GUN_VEE, expLvl,
-                        rskillPrefs.randomizeSkill(), bonus, mod);
-                break;
-            case (Person.T_CONV_PILOT):
-                person.addSkill(SkillType.S_PILOT_JET, expLvl,
-                        rskillPrefs.randomizeSkill(), bonus, mod);
-                person.addSkill(SkillType.S_GUN_JET, expLvl, rskillPrefs.randomizeSkill(), bonus, mod);
-                break;
-            case (Person.T_AERO_PILOT):
-                person.addSkill(SkillType.S_PILOT_AERO, expLvl,
-                        rskillPrefs.randomizeSkill(), bonus, mod);
-                person.addSkill(SkillType.S_GUN_AERO, expLvl, rskillPrefs.randomizeSkill(), bonus, mod);
-                break;
-            case (Person.T_PROTO_PILOT):
-                person.addSkill(SkillType.S_GUN_PROTO, expLvl,
-                        rskillPrefs.randomizeSkill(), bonus, mod);
-                break;
-            case (Person.T_BA):
-                person.addSkill(SkillType.S_GUN_BA, expLvl,
-                        rskillPrefs.randomizeSkill(), bonus, mod);
-                person.addSkill(SkillType.S_ANTI_MECH, expLvl, rskillPrefs.randomizeSkill(), bonus, mod);
-                person.addSkill(SkillType.S_SMALL_ARMS, expLvl, rskillPrefs.randomizeSkill(), bonus, mod);
-                break;
-            case (Person.T_INFANTRY):
-                if (Utilities.rollProbability(rskillPrefs.getAntiMekProb())) {
-                    person.addSkill(SkillType.S_ANTI_MECH, expLvl,
-                            rskillPrefs.randomizeSkill(), bonus, mod);
-                }
-                person.addSkill(SkillType.S_SMALL_ARMS, expLvl, rskillPrefs.randomizeSkill(), bonus, mod);
-                break;
-            case (Person.T_SPACE_PILOT):
-                person.addSkill(SkillType.S_PILOT_SPACE, expLvl,
-                        rskillPrefs.randomizeSkill(), bonus, mod);
-                break;
-            case (Person.T_SPACE_CREW):
-                person.addSkill(SkillType.S_TECH_VESSEL, expLvl,
-                        rskillPrefs.randomizeSkill(), bonus, mod);
-                break;
-            case (Person.T_SPACE_GUNNER):
-                person.addSkill(SkillType.S_GUN_SPACE, expLvl,
-                        rskillPrefs.randomizeSkill(), bonus, mod);
-                break;
-            case (Person.T_NAVIGATOR):
-                person.addSkill(SkillType.S_NAV, expLvl,
-                        rskillPrefs.randomizeSkill(), bonus, mod);
-                break;
-            case (Person.T_MECH_TECH):
-                person.addSkill(SkillType.S_TECH_MECH, expLvl,
-                        rskillPrefs.randomizeSkill(), bonus, mod);
-                break;
-            case (Person.T_MECHANIC):
-            case Person.T_VEHICLE_CREW:
-                person.addSkill(SkillType.S_TECH_MECHANIC, expLvl,
-                        rskillPrefs.randomizeSkill(), bonus, mod);
-                break;
-            case (Person.T_AERO_TECH):
-                person.addSkill(SkillType.S_TECH_AERO, expLvl,
-                        rskillPrefs.randomizeSkill(), bonus, mod);
-                break;
-            case (Person.T_BA_TECH):
-                person.addSkill(SkillType.S_TECH_BA, expLvl,
-                        rskillPrefs.randomizeSkill(), bonus, mod);
-                break;
-            case (Person.T_ASTECH):
-                person.addSkill(SkillType.S_ASTECH, 0, 0);
-                break;
-            case (Person.T_DOCTOR):
-                person.addSkill(SkillType.S_DOCTOR, expLvl,
-                        rskillPrefs.randomizeSkill(), bonus, mod);
-                break;
-            case (Person.T_MEDIC):
-                person.addSkill(SkillType.S_MEDTECH, 0, 0);
-                break;
-            case (Person.T_ADMIN_COM):
-            case (Person.T_ADMIN_LOG):
-            case (Person.T_ADMIN_TRA):
-            case (Person.T_ADMIN_HR):
-                person.addSkill(SkillType.S_ADMIN, expLvl,
-                        rskillPrefs.randomizeSkill(), bonus, mod);
-                break;
-        }
     }
 
     /**
@@ -4870,7 +4631,7 @@ public class Campaign implements Serializable, ITechManager {
                     special = Crew.SPECIAL_MISSILE;
                     break;
             }
-            person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name, special);
+            person.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES, name, special);
         } else if (name.equals(OptionsConstants.GUNNERY_RANGE_MASTER)) {
             String special = Crew.RANGEMASTER_NONE;
             switch (Compute.randomInt(2)) {
@@ -4884,7 +4645,7 @@ public class Campaign implements Serializable, ITechManager {
                     special = Crew.RANGEMASTER_EXTREME;
                     break;
             }
-            person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
+            person.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
                     special);
         } else if (name.equals(OptionsConstants.MISC_HUMAN_TRO)) {
             String special = Crew.HUMANTRO_NONE;
@@ -4902,14 +4663,14 @@ public class Campaign implements Serializable, ITechManager {
                     special = Crew.HUMANTRO_BA;
                     break;
             }
-            person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
+            person.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
                     special);
         } else if (name.equals(OptionsConstants.GUNNERY_WEAPON_SPECIALIST)) {
-            person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
+            person.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
                     SpecialAbility.chooseWeaponSpecialization(type, getFaction().isClan(),
                             getCampaignOptions().getTechLevel(), getCalendar().get(GregorianCalendar.YEAR)));
         } else {
-            person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name, true);
+            person.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES, name, true);
         }
         return name;
     }

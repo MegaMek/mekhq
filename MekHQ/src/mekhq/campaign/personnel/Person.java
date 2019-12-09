@@ -227,7 +227,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     protected ArrayList<LogEntry> personnelLog;
     protected List<LogEntry> missionLog;
 
-    private Hashtable<String, Skill> skills;
+    private Skills skills = new Skills();
     private PersonnelOptions options = new PersonnelOptions();
     private int toughness;
 
@@ -383,7 +383,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         rankLevel = 0;
         status = S_ACTIVE;
         hits = 0;
-        skills = new Hashtable<>();
         salary = Money.of(-1);
         campaign = c;
         doctorId = null;
@@ -1477,8 +1476,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         + df.format(recruitment.getTime())
                         + "</recruitment>");
         }
-        for (String skName : skills.keySet()) {
-            Skill skill = skills.get(skName);
+        for (Skill skill : skills.getSkills()) {
             skill.writeToXml(pw1, indent + 1);
         }
         if (countOptions(PilotOptions.LVL3_ADVANTAGES) > 0) {
@@ -1752,7 +1750,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("skill")) {
                     Skill s = Skill.generateInstanceFromXML(wn2);
                     if (null != s && null != s.getType()) {
-                        retVal.skills.put(s.getType().getName(), s);
+                        retVal.skills.addSkill(s.getType().getName(), s);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("techUnitIds")) {
                     NodeList nl2 = wn2.getChildNodes();
@@ -2661,31 +2659,38 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return " <font color='red'><b>Failed to heal.</b></font>";
     }
 
+
     public boolean hasSkill(String skillName) {
-        return null != skills.get(skillName);
+        return skills.hasSkill(skillName);
+    }
+
+    public Skills getSkills() {
+        return skills;
     }
 
     @Nullable
     public Skill getSkill(String skillName) {
-        return skills.get(skillName);
+        return skills.getSkill(skillName);
+    }
+
+    public void addSkill(String skillName, Skill skill) {
+        skills.addSkill(skillName, skill);
     }
 
     public void addSkill(String skillName, int lvl, int bonus) {
-        skills.put(skillName, new Skill(skillName, lvl, bonus));
+        skills.addSkill(skillName, new Skill(skillName, lvl, bonus));
     }
 
     public void addSkill(String skillName, int xpLvl, boolean random, int bonus) {
-        skills.put(skillName, new Skill(skillName, xpLvl, random, bonus, 0));
+        skills.addSkill(skillName, new Skill(skillName, xpLvl, random, bonus, 0));
     }
 
     public void addSkill(String skillName, int xpLvl, boolean random, int bonus, int rollMod) {
-        skills.put(skillName, new Skill(skillName, xpLvl, random, bonus, rollMod));
+        skills.addSkill(skillName, new Skill(skillName, xpLvl, random, bonus, rollMod));
     }
 
     public void removeSkill(String skillName) {
-        if (hasSkill(skillName)) {
-            skills.remove(skillName);
-        }
+        skills.removeSkill(skillName);
     }
 
     public int getSkillNumber() {
@@ -2703,9 +2708,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * Limit skills to the maximum of the given level
      */
     public void limitSkills(int maxLvl) {
-        for(Map.Entry<String, Skill> skill : skills.entrySet()) {
-            if(skill.getValue().getLevel() > maxLvl) {
-                skill.getValue().setLevel(maxLvl);
+        for(Skill skill : skills.getSkills()) {
+            if(skill.getLevel() > maxLvl) {
+                skill.setLevel(maxLvl);
             }
         }
     }
@@ -2772,24 +2777,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return options;
     }
 
-    /**
-     * Returns the options of the given category that this pilot has
-     */
-    public Enumeration<IOption> getOptions(String grpKey) {
-        for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements(); ) {
-            IOptionGroup group = i.nextElement();
-
-            if (group.getKey().equalsIgnoreCase(grpKey)) {
-                return group.getOptions();
-            }
-        }
-
-        // no pilot advantages -- return an empty Enumeration
-        return new Vector<IOption>().elements();
-    }
-
-    public ArrayList<SpecialAbility> getEligibleSPAs(boolean generation) {
-        ArrayList<SpecialAbility> eligible = new ArrayList<>();
+    public List<SpecialAbility> getEligibleSPAs(boolean generation) {
+        List<SpecialAbility> eligible = new ArrayList<>();
         for (Enumeration<IOption> i = getOptions(PilotOptions.LVL3_ADVANTAGES); i.hasMoreElements(); ) {
             IOption ability = i.nextElement();
             if (!ability.booleanValue()) {
@@ -2807,6 +2796,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
         }
         return eligible;
+    }
+
+    /**
+     * Returns the options of the given category that this pilot has
+     */
+    public Enumeration<IOption> getOptions(String grpKey) {
+        return options.getOptions(grpKey);
     }
 
     public int countOptions() {
@@ -2992,27 +2988,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
             return null;
         }
         return "<html>" + abilityString + "</html>";
-    }
-
-    public void acquireAbility(String type, String name, Object value) {
-        //we might also need to remove some prior abilities
-        SpecialAbility spa = SpecialAbility.getAbility(name);
-        Vector<String> toRemove = new Vector<>();
-        if(null != spa) {
-            toRemove = spa.getRemovedAbilities();
-        }
-        for (Enumeration<IOption> i = getOptions(type); i.hasMoreElements(); ) {
-            IOption ability = i.nextElement();
-            if (ability.getName().equals(name)) {
-                ability.setValue(value);
-            } else {
-                for(String remove : toRemove) {
-                    if (ability.getName().equals(remove)) {
-                        ability.setValue(ability.getDefault());
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -3506,8 +3481,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void resetSkillTypes() {
-        for (String skillName : skills.keySet()) {
-            Skill s = skills.get(skillName);
+        for (Skill s : skills.getSkills()) {
             s.updateType();
         }
     }
