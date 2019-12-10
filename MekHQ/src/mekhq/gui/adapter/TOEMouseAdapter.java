@@ -228,13 +228,14 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
             if (units != null && ship != null) {
                 StringJoiner cantLoad = new StringJoiner(", ");
                 String cantLoadReasons = StaticChecks.canTransportShipCarry(units, ship);
-                if (!cantLoadReasons.equals("")) {
+                if (cantLoadReasons != null) {
                     cantLoad.add(ship.getName() + " cannot load selected units for the following reasons: \n" +
                             cantLoadReasons);
                     //If the ship can't load the selected units, display a nag with the reasons why
                     JOptionPane.showMessageDialog(null, cantLoad, "Warning", JOptionPane.WARNING_MESSAGE);
                 } else {
-                //otherwise, load the units
+                    //otherwise, load the units
+                    ship.loadTransportShip(units);
                 }
             }
         }
