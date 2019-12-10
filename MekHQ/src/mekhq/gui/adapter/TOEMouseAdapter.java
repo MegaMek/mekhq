@@ -73,7 +73,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
     private static final String UNDEPLOY_UNIT = "UNDEPLOY_UNIT";
     
     private static final String COMMAND_ADD_UNIT = "ADD_UNIT|FORCE|";
-    private static final String COMMAND_ASSIGN_TO_SHIP = "ASSIGN_TO_SHIP|UNIT|empty|";
+    private static final String COMMAND_ASSIGN_TO_SHIP = "ASSIGN_TO_SHIP|UNIT|";
     private static final String COMMAND_REMOVE_UNIT = "REMOVE_UNIT|UNIT|empty|";
     private static final String COMMAND_DEPLOY_UNIT = "DEPLOY_UNIT|UNIT|";
     private static final String COMMAND_UNASSIGN_FROM_SHIP = "UNASSIGN_FROM_SHIP|UNIT|empty|";
@@ -219,6 +219,34 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                             cantTech += "You will need to assign a tech manually.";
                             JOptionPane.showMessageDialog(null, cantTech, "Warning", JOptionPane.WARNING_MESSAGE);
                         }
+                    }
+                }
+            }
+        }
+        if (command.contains(TOEMouseAdapter.ASSIGN_TO_SHIP)) {
+            Unit ship = gui.getCampaign().getUnit(UUID.fromString(target));
+            if (null != ship) {
+                // singleForce.setTechID(tech.getId());
+
+                if (singleForce.getAllUnits() !=null) {
+                    String cantTech = "";
+                    for (UUID uuid : singleForce.getAllUnits()) {
+                        Unit u = gui.getCampaign().getUnit(uuid);
+                        if (u != null) {
+                            if (tech.canTech(u.getEntity())) {
+                                if (null != u.getTech()) {
+                                    u.removeTech();
+                                }
+
+                                u.setTech(tech);
+                            } else {
+                                cantTech += tech.getName() + " cannot maintain " + u.getName() + "\n";
+                            }
+                        }
+                    }
+                    if (!cantTech.equals("")) {
+                        cantTech += "You will need to assign a tech manually.";
+                        JOptionPane.showMessageDialog(null, cantTech, "Warning", JOptionPane.WARNING_MESSAGE);
                     }
                 }
             }
@@ -1291,7 +1319,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                         }
                         menuItem = new JMenuItem(ship.getName());
                         menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ASSIGN_TO_SHIP
-                                + unitIds);
+                                + id + "|" + unitIds);
                         menuItem.addActionListener(this);
                         menuItem.setEnabled(true);
                         menu.add(menuItem);
