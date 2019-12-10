@@ -1248,6 +1248,16 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         return bays;
     }
+    
+    public void loadTransportShip(Vector<Unit> units) {
+        for (Unit u : units) {
+            for (Bay b : getEntity().getTransportBays()) {
+                if (b.canLoad(u.getEntity())) {
+                    b.load(u.getEntity());
+                }
+            }
+        }
+    }
 
     public double getUnitCostMultiplier() {
         double multiplier = 1.0;
