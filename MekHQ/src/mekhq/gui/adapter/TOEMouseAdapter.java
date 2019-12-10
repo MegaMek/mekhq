@@ -225,29 +225,16 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
         }
         if (command.contains(TOEMouseAdapter.ASSIGN_TO_SHIP)) {
             Unit ship = gui.getCampaign().getUnit(UUID.fromString(target));
-            if (null != ship) {
-                // singleForce.setTechID(tech.getId());
-
-                if (singleForce.getAllUnits() !=null) {
-                    String cantTech = "";
-                    for (UUID uuid : singleForce.getAllUnits()) {
-                        Unit u = gui.getCampaign().getUnit(uuid);
-                        if (u != null) {
-                            if (tech.canTech(u.getEntity())) {
-                                if (null != u.getTech()) {
-                                    u.removeTech();
-                                }
-
-                                u.setTech(tech);
-                            } else {
-                                cantTech += tech.getName() + " cannot maintain " + u.getName() + "\n";
-                            }
-                        }
-                    }
-                    if (!cantTech.equals("")) {
-                        cantTech += "You will need to assign a tech manually.";
-                        JOptionPane.showMessageDialog(null, cantTech, "Warning", JOptionPane.WARNING_MESSAGE);
-                    }
+            if (units != null && ship != null) {
+                StringJoiner cantLoad = new StringJoiner(", ");
+                String cantLoadReasons = StaticChecks.canTransportShipCarry(units, ship);
+                if (!cantLoadReasons.equals("")) {
+                    cantLoad.add(ship.getName() + " cannot load selected units for the following reasons: \n" +
+                            cantLoadReasons);
+                    //If the ship can't load the selected units, display a nag with the reasons why
+                    JOptionPane.showMessageDialog(null, cantLoad, "Warning", JOptionPane.WARNING_MESSAGE);
+                } else {
+                //otherwise, load the units
                 }
             }
         }
