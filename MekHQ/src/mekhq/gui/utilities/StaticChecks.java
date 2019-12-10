@@ -96,7 +96,7 @@ public class StaticChecks {
      * @returns a String  indicating why the Transport cannot carry all of the selected units, or a blank result if it can
      */
     public static String canTransportShipCarry(Vector<Unit> units, Unit ship) {
-        StringJoiner reason = new StringJoiner("Cannot load selection onto ship " + ship.getName());
+        StringJoiner reason = new StringJoiner("");
         boolean loadOK = true;
         int numberASF = 0;
         int numberBA = 0;
@@ -111,7 +111,7 @@ public class StaticChecks {
         for (Unit unit : units) {
             if (unit.getEntity().isLargeCraft()) {
                 //No. Try your selection again.
-                return "Selection of Units includes a large spacecraft";
+                return "    Selection of Units includes a large spacecraft. \n";
             } else if (unit.getEntity() instanceof SmallCraft) {
                 numberSC++;
             } else if (unit.getEntity() instanceof Aero) {
@@ -140,37 +140,37 @@ public class StaticChecks {
         }
         // Now test the designated ship and let us know if it can carry everyone
         if (numberSC > ship.getSmallCraftCapacity()) {
-            reason.add("Selection of Units includes too many small craft. <br>");
+            reason.add("    Selection of Units includes too many small craft. \n");
             loadOK = false;
         }
         // Fighters can fit into any unused SC bays
         if (numberASF > (ship.getASFCapacity() + (ship.getSmallCraftCapacity() - numberSC))) {
-            reason.add("Selection of Units includes too many fighters. <br>");
+            reason.add("    Selection of Units includes too many fighters. \n");
             loadOK = false;
         }
         if (numberBA > ship.getBattleArmorCapacity()) {
-            reason.add("Selection of Units includes too many Battle Armor units. <br>");
+            reason.add("    Selection of Units includes too many Battle Armor units. \n");
             loadOK = false;
         }
         if (numberInfantry > ship.getInfantryCapacity()) {
-            reason.add("Selection of Units includes too many Infantry units. <br>");
+            reason.add("    Selection of Units includes too many Infantry units. \n");
             loadOK = false;
         }
         if (numberMech > ship.getMechCapacity()) {
-            reason.add("Selection of Units includes too many Mechs. <br>");
+            reason.add("    Selection of Units includes too many Mechs. \n");
             loadOK = false;
         }
         if (numberProto > ship.getProtomechCapacity()) {
-            reason.add("Selection of Units includes too many ProtoMechs. <br>");
+            reason.add("    Selection of Units includes too many ProtoMechs. \n");
             loadOK = false;
         }
         if (numberSHVee > ship.getSuperHeavyVehicleCapacity()) {
-            reason.add("Selection of Units includes too many SuperHeavy Vehicles. <br>");
+            reason.add("    Selection of Units includes too many SuperHeavy Vehicles. \n");
             loadOK = false;
         }
         // Heavy vehicles can fit into unused SuperHeavy bays
         if (numberHVee > (ship.getHeavyVehicleCapacity() + (ship.getSuperHeavyVehicleCapacity() - numberSHVee))) {
-            reason.add("Selection of Units includes too many Heavy Vehicles. <br>");
+            reason.add("    Selection of Units includes too many Heavy Vehicles. \n");
             loadOK = false;
         }
         // Light vehicles can fit into any unused vehicle bays
@@ -178,7 +178,7 @@ public class StaticChecks {
             (ship.getLightVehicleCapacity() + 
                     (ship.getSuperHeavyVehicleCapacity() - numberSHVee) + 
                     (ship.getHeavyVehicleCapacity() - numberHVee))) {
-            reason.add("Selection of Units includes too many Light Vehicles. <br>");
+            reason.add("    Selection of Units includes too many Light Vehicles. \n");
             loadOK = false;
         }
         if (!loadOK) {
