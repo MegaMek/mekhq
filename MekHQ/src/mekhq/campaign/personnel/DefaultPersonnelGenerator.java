@@ -24,12 +24,29 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
 
     private final String factionCode;
 
+    /**
+     * Creates a new DefaultPersonnelGenerator, which will create
+     * {@link Person} objects using the faction in a {@link Campaign}.
+     */
     public DefaultPersonnelGenerator() {
         this(null);
     }
 
+    /**
+     * Creates a new DefaultPersonGenerator with a specific faction code.
+     * @param factionCode The faction code to assign to all generated persons.
+     */
     public DefaultPersonnelGenerator(String factionCode) {
         this.factionCode = factionCode;
+    }
+
+    @Override
+    protected Person createPerson(Campaign campaign) {
+        if (this.factionCode != null) {
+            return new Person(campaign, this.factionCode);
+        }
+
+        return super.createPerson(campaign);
     }
 
     @Override
@@ -39,14 +56,14 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
 
     @Override
     public Person generate(Campaign campaign, int primaryRole, int secondaryRole) {
-        Person person = new Person(campaign, this.factionCode != null ? this.factionCode : campaign.getFactionCode());
+        Person person = createPerson(campaign);
 
         person.setPrimaryRole(primaryRole);
         person.setSecondaryRole(secondaryRole);
 
         generateName(campaign, person);
 
-        int expLvl = calculateExperienceLevel(campaign, person);
+        int expLvl = generateExperienceLevel(campaign, person);
 
         generateXp(campaign, person, expLvl);
 
@@ -54,10 +71,12 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
 
         generateBirthday(campaign, person, expLvl, person.isClanner() && person.getPhenotype() != Person.PHENOTYPE_NONE);
 
-        AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(campaign.getCampaignOptions());
+        AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator();
+        skillGenerator.setSkillPreferences(getSkillPreferences());
         skillGenerator.generateSkills(person, expLvl);
 
-        AbstractSpecialAbilityGenerator specialAbilityGenerator = new DefaultSpecialAbilityGenerator(campaign.getCampaignOptions());
+        AbstractSpecialAbilityGenerator specialAbilityGenerator = new DefaultSpecialAbilityGenerator();
+        specialAbilityGenerator.setSkillPreferences(getSkillPreferences());
         specialAbilityGenerator.generateSpecialAbilities(person, expLvl);
 
         //

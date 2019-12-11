@@ -2677,16 +2677,20 @@ public class Person implements Serializable, MekHqXmlSerializable {
         skills.addSkill(skillName, skill);
     }
 
-    public void addSkill(String skillName, int lvl, int bonus) {
-        skills.addSkill(skillName, new Skill(skillName, lvl, bonus));
+    public void addSkill(String skillName, int level, int bonus) {
+        skills.addSkill(skillName, new Skill(skillName, level, bonus));
     }
 
-    public void addSkill(String skillName, int xpLvl, boolean random, int bonus) {
-        skills.addSkill(skillName, new Skill(skillName, xpLvl, random, bonus, 0));
+    public void addSkill(String skillName, int expLvl, boolean random, int bonus) {
+        addSkill(skillName, expLvl, random, bonus, 0);
     }
 
-    public void addSkill(String skillName, int xpLvl, boolean random, int bonus, int rollMod) {
-        skills.addSkill(skillName, new Skill(skillName, xpLvl, random, bonus, rollMod));
+    public void addSkill(String skillName, int expLvl, boolean random, int bonus, int rollMod) {
+        if (random) {
+            skills.addSkill(skillName, Skill.randomizeLevel(skillName, expLvl, bonus, rollMod));
+        } else {
+            skills.addSkill(skillName, Skill.createFromExperience(skillName, expLvl, bonus));
+        }
     }
 
     public void removeSkill(String skillName) {

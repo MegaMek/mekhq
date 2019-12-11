@@ -20,6 +20,7 @@ package mekhq.campaign.personnel;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Objects;
 
 import megamek.client.RandomNameGenerator;
 import megamek.common.Compute;
@@ -33,23 +34,40 @@ import mekhq.campaign.RandomSkillPreferences;
  */
 public abstract class AbstractPersonnelGenerator {
 
-    private final RandomNameGenerator randomNameGenerator = new RandomNameGenerator();
-    private final RandomSkillPreferences rskillPrefs = new RandomSkillPreferences();
+    private RandomNameGenerator randomNameGenerator = new RandomNameGenerator();
+
+    private RandomSkillPreferences rskillPrefs = new RandomSkillPreferences();
 
     /**
      * Gets the {@link RandomNameGenerator}.
      * @return The {@link RandomNameGenerator} to use.
      */
-    protected RandomNameGenerator getRNG() {
+    public RandomNameGenerator getNameGenerator() {
         return randomNameGenerator;
+    }
+
+    /**
+     * Sets the {@link RandomNameGenerator}.
+     * @param rng A {@link RandomNameGenerator} to use.
+     */
+    public void setNameGenerator(RandomNameGenerator rng) {
+        randomNameGenerator = Objects.requireNonNull(rng);
     }
 
     /**
      * Gets the {@link RandomSkillPreferences}.
      * @return The {@link RandomSkillPreferences} to use.
      */
-    protected RandomSkillPreferences getSkillPreferences() {
+    public RandomSkillPreferences getSkillPreferences() {
         return rskillPrefs;
+    }
+
+    /**
+     * Sets the {@link RandomSkillPreferences}.
+     * @param skillPreferences A {@link RandomSkillPreferences} to use.
+     */
+    public void setSkillPreferences(RandomSkillPreferences skillPreferences) {
+        rskillPrefs = Objects.requireNonNull(skillPreferences);
     }
 
     /**
@@ -69,8 +87,22 @@ public abstract class AbstractPersonnelGenerator {
      */
     public abstract Person generate(Campaign campaign, int primaryRole, int secondaryRole);
 
+    /**
+     * Creates a {@link Person} object for the given {@link Campaign}.
+     * @param campaign The {@link Campaign} to create the person within.
+     * @return A new {@link Person} object for the given campaign.
+     */
+    protected Person createPerson(Campaign campaign) {
+        return new Person(campaign, campaign.getFactionCode());
+    }
 
-    protected int calculateExperienceLevel(Campaign campaign, Person person) {
+    /**
+     * Generates an experience level for a {@link Person}.
+     * @param campaign The {@link Campaign} which tracks the person.
+     * @param person The {@link Person} being generated.
+     * @return An integer value between {@link SkillType#EXP_ULTRA_GREEN} and {@link SkillType#EXP_ELITE}.
+     */
+    protected int generateExperienceLevel(Campaign campaign, Person person) {
         int bonus = getSkillPreferences().getOverallRecruitBonus()
                 + getSkillPreferences().getRecruitBonus(person.getPrimaryRole());
 
@@ -82,20 +114,37 @@ public abstract class AbstractPersonnelGenerator {
         return Utilities.generateExpLevel(bonus);
     }
 
+    /**
+     * Generates a name for a {@link Person}.
+     * @param campaign The {@link Campaign} which tracks the person.
+     * @param person The {@link Person} being generated.
+     */
     protected void generateName(Campaign campaign, Person person) {
-        boolean isFemale = getRNG().isFemale();
+        boolean isFemale = getNameGenerator().isFemale();
         if (isFemale) {
             person.setGender(Person.G_FEMALE);
         }
-        person.setName(getRNG().generate(isFemale));
+        person.setName(getNameGenerator().generate(isFemale));
     }
 
+    /**
+     * Generates the starting XP for a {@link Person}.
+     * @param campaign The {@link Campaign} which tracks the person.
+     * @param person The {@link Person} being generated.
+     * @param expLvl The experience level of {@code person}.
+     */
     protected void generateXp(Campaign campaign, Person person, int expLvl) {
         if (campaign.getCampaignOptions().useDylansRandomXp()) {
             person.setXp(Utilities.generateRandomExp());
         }
     }
 
+    /**
+     * Generates the clan phenotype, if applicable, for a {@link Person}.
+     * @param campaign The {@link Campaign} which tracks the person.
+     * @param person The {@link Person} being generated.
+     * @param expLvl The experience level of {@code person}.
+     */
     protected void generatePhenotype(Campaign campaign, Person person, int expLvl) {
         //check for clan phenotypes
         if (person.isClanner()) {
@@ -131,6 +180,13 @@ public abstract class AbstractPersonnelGenerator {
         }
     }
 
+    /**
+     * Generates the birthday for a {@link Person}.
+     * @param campaign The {@link Campaign} which tracks the person.
+     * @param person The {@link Person} being generated.
+     * @param expLvl The experience level of {@code person}.
+     * @param isClanner A value indicating if {@code person} is a clanner.
+     */
     protected void generateBirthday(Campaign campaign, Person person, int expLvl, boolean isClanner) {
         GregorianCalendar birthdate = (GregorianCalendar) campaign.getCalendar().clone();
         birthdate.set(Calendar.YEAR, birthdate.get(Calendar.YEAR) - Utilities.getAgeByExpLevel(expLvl, isClanner));

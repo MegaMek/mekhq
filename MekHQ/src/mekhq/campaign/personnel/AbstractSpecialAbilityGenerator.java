@@ -20,26 +20,37 @@ package mekhq.campaign.personnel;
 
 import java.util.Objects;
 
-import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.RandomSkillPreferences;
 
+/**
+ * Represents a class which can generate new Special Abilities
+ * for a {@link Person}.
+ */
 public abstract class AbstractSpecialAbilityGenerator {
 
-    private final CampaignOptions options;
+    private RandomSkillPreferences rskillPrefs = new RandomSkillPreferences();
 
-    private final RandomSkillPreferences rskillPrefs = new RandomSkillPreferences();
-
-    protected AbstractSpecialAbilityGenerator(CampaignOptions options) {
-        this.options = Objects.requireNonNull(options);
-    }
-
-    protected CampaignOptions getCampaignOptions() {
-        return options;
-    }
-
-    protected RandomSkillPreferences getRandomSkillPreferences() {
+    /**
+     * Gets the {@link RandomSkillPreferences}.
+     * @return The {@link RandomSkillPreferences} to use.
+     */
+    public RandomSkillPreferences getSkillPreferences() {
         return rskillPrefs;
     }
 
+    /**
+     * Sets the {@link RandomSkillPreferences}.
+     * @param skillPreferences A {@link RandomSkillPreferences} to use.
+     */
+    public void setSkillPreferences(RandomSkillPreferences skillPreferences) {
+        rskillPrefs = Objects.requireNonNull(skillPreferences);
+    }
+
+    /**
+     * Generates special abilities for the {@link Person} given their
+     * experience level.
+     * @param person The {@link Person} to add special abilities.
+     * @param expLvl The experience level of the person (e.g. {@link SkillType#EXP_GREEN}).
+     */
     public abstract void generateSpecialAbilities(Person person, int expLvl);
 }

@@ -34,14 +34,10 @@ import mekhq.campaign.personnel.SpecialAbility;
 
 public class DefaultSpecialAbilityGenerator extends AbstractSpecialAbilityGenerator {
 
-    public DefaultSpecialAbilityGenerator(CampaignOptions options) {
-        super(options);
-    }
-
     @Override
     public void generateSpecialAbilities(Person person, int expLvl) {
-        if (getCampaignOptions().useAbilities()) {
-            int nabil = Utilities.rollSpecialAbilities(getRandomSkillPreferences().getSpecialAbilBonus(expLvl));
+        if (getCampaignOptions(person).useAbilities()) {
+            int nabil = Utilities.rollSpecialAbilities(getSkillPreferences().getSpecialAbilBonus(expLvl));
             while (nabil > 0 && null != rollSPA(person)) {
                 nabil--;
             }
@@ -110,7 +106,7 @@ public class DefaultSpecialAbilityGenerator extends AbstractSpecialAbilityGenera
             person.getOptions()
                 .acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
                     SpecialAbility.chooseWeaponSpecialization(person.getPrimaryRole(), person.getOriginFaction().isClan(),
-                            getCampaignOptions().getTechLevel(), person.getCampaign().getCalendar().get(GregorianCalendar.YEAR)));
+                            getCampaignOptions(person).getTechLevel(), person.getCampaign().getCalendar().get(GregorianCalendar.YEAR)));
         } else {
             person.getOptions()
                 .acquireAbility(PilotOptions.LVL3_ADVANTAGES, name, true);
@@ -138,5 +134,9 @@ public class DefaultSpecialAbilityGenerator extends AbstractSpecialAbilityGenera
             }
         }
         return eligible;
+    }
+
+    private CampaignOptions getCampaignOptions(Person person) {
+        return person.getCampaign().getCampaignOptions();
     }
 }
