@@ -56,6 +56,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             }
             String uname = "";
             String c3network = "";
+            String transport = "";
             Unit u = (Unit)value;
             Person pp = u.getCommander();
             if(null != pp) {
@@ -121,7 +122,10 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             if(!c3network.isEmpty()) {
                 c3network = "<br><i>" + c3network + "</i>";
             }
-            setText("<html>" + name + ", " + uname + c3network + "</html>");
+            if(u.getCampaign().getUnit(u.getTransportShipId()) != null) {
+                transport += "<br>" + "Transported by: " + u.getCampaign().getUnit(u.getTransportShipId()).getName();
+            }
+            setText("<html>" + name + ", " + uname + c3network + transport + "</html>");
             if(u.isDeployed() && !sel) {
                 setBackground(Color.LIGHT_GRAY);
             }
