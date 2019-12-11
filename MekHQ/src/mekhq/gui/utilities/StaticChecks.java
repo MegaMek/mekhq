@@ -120,7 +120,8 @@ public class StaticChecks {
             } else if (unit.getEntity() instanceof BattleArmor) {
                 numberBA++;
             } else if (unit.getEntity() instanceof Infantry) {
-                numberInfantry++;
+                //Make sure we account for space consumed by different platoon types
+                numberInfantry+= unit.getEntity().getWeight();
             } else if (unit.getEntity() instanceof Mech) {
                 // Includes LAMs and Quadvees
                 numberMech++;
@@ -139,45 +140,45 @@ public class StaticChecks {
             }
         }
         // Now test the designated ship and let us know if it can carry everyone
-        if (numberSC > ship.getSmallCraftCapacity()) {
+        if (numberSC > ship.getCurrentSmallCraftCapacity()) {
             reason.add("    Selection of Units includes too many small craft. \n");
             loadOK = false;
         }
         // Fighters can fit into any unused SC bays
-        if (numberASF > (ship.getASFCapacity() + (ship.getSmallCraftCapacity() - numberSC))) {
+        if (numberASF > (ship.getCurrentASFCapacity() + (ship.getCurrentSmallCraftCapacity() - numberSC))) {
             reason.add("    Selection of Units includes too many fighters. \n");
             loadOK = false;
         }
-        if (numberBA > ship.getBattleArmorCapacity()) {
+        if (numberBA > ship.getCurrentBattleArmorCapacity()) {
             reason.add("    Selection of Units includes too many Battle Armor units. \n");
             loadOK = false;
         }
-        if (numberInfantry > ship.getInfantryCapacity()) {
+        if (numberInfantry > ship.getCurrentInfantryCapacity()) {
             reason.add("    Selection of Units includes too many Infantry units. \n");
             loadOK = false;
         }
-        if (numberMech > ship.getMechCapacity()) {
+        if (numberMech > ship.getCurrentMechCapacity()) {
             reason.add("    Selection of Units includes too many Mechs. \n");
             loadOK = false;
         }
-        if (numberProto > ship.getProtomechCapacity()) {
+        if (numberProto > ship.getCurrentProtomechCapacity()) {
             reason.add("    Selection of Units includes too many ProtoMechs. \n");
             loadOK = false;
         }
-        if (numberSHVee > ship.getSuperHeavyVehicleCapacity()) {
+        if (numberSHVee > ship.getCurrentSuperHeavyVehicleCapacity()) {
             reason.add("    Selection of Units includes too many SuperHeavy Vehicles. \n");
             loadOK = false;
         }
         // Heavy vehicles can fit into unused SuperHeavy bays
-        if (numberHVee > (ship.getHeavyVehicleCapacity() + (ship.getSuperHeavyVehicleCapacity() - numberSHVee))) {
+        if (numberHVee > (ship.getCurrentHeavyVehicleCapacity() + (ship.getCurrentSuperHeavyVehicleCapacity() - numberSHVee))) {
             reason.add("    Selection of Units includes too many Heavy Vehicles. \n");
             loadOK = false;
         }
         // Light vehicles can fit into any unused vehicle bays
         if (numberLVee > 
-            (ship.getLightVehicleCapacity() + 
-                    (ship.getSuperHeavyVehicleCapacity() - numberSHVee) + 
-                    (ship.getHeavyVehicleCapacity() - numberHVee))) {
+            (ship.getCurrentLightVehicleCapacity() + 
+                    (ship.getCurrentSuperHeavyVehicleCapacity() - numberSHVee) + 
+                    (ship.getCurrentHeavyVehicleCapacity() - numberHVee))) {
             reason.add("    Selection of Units includes too many Light Vehicles. \n");
             loadOK = false;
         }

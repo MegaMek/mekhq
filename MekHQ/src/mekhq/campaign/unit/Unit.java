@@ -1168,12 +1168,32 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         return bays;
     }
+    
+    public double getCurrentLightVehicleCapacity() {
+        double bays = 0;
+        for (Bay b : getEntity().getTransportBays()) {
+            if (b instanceof LightVehicleBay) {
+                bays += b.getUnused();
+            }
+        }
+        return bays;
+    }
 
     public double getHeavyVehicleCapacity() {
         double bays = 0;
         for (Bay b : getEntity().getTransportBays()) {
             if (b instanceof HeavyVehicleBay) {
                 bays += b.getCapacity();
+            }
+        }
+        return bays;
+    }
+    
+    public double getCurrentHeavyVehicleCapacity() {
+        double bays = 0;
+        for (Bay b : getEntity().getTransportBays()) {
+            if (b instanceof HeavyVehicleBay) {
+                bays += b.getUnused();
             }
         }
         return bays;
@@ -1188,12 +1208,32 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         return bays;
     }
+    
+    public double getCurrentSuperHeavyVehicleCapacity() {
+        double bays = 0;
+        for (Bay b : getEntity().getTransportBays()) {
+            if (b instanceof SuperHeavyVehicleBay) {
+                bays += b.getUnused();
+            }
+        }
+        return bays;
+    }
 
     public double getBattleArmorCapacity() {
         double bays = 0;
         for (Bay b : getEntity().getTransportBays()) {
             if (b instanceof BattleArmorBay) {
                 bays += b.getCapacity();
+            }
+        }
+        return bays;
+    }
+    
+    public double getCurrentBattleArmorCapacity() {
+        double bays = 0;
+        for (Bay b : getEntity().getTransportBays()) {
+            if (b instanceof BattleArmorBay) {
+                bays += b.getUnused();
             }
         }
         return bays;
@@ -1208,12 +1248,32 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         return bays;
     }
+    
+    public double getCurrentInfantryCapacity() {
+        double bays = 0;
+        for (Bay b : getEntity().getTransportBays()) {
+            if (b instanceof InfantryBay) {
+                bays += b.getUnused();
+            }
+        }
+        return bays;
+    }
 
     public double getASFCapacity() {
         double bays = 0;
         for (Bay b : getEntity().getTransportBays()) {
             if (b instanceof ASFBay) {
                 bays += b.getCapacity();
+            }
+        }
+        return bays;
+    }
+    
+    public double getCurrentASFCapacity() {
+        double bays = 0;
+        for (Bay b : getEntity().getTransportBays()) {
+            if (b instanceof ASFBay) {
+                bays += b.getUnused();
             }
         }
         return bays;
@@ -1228,12 +1288,32 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         return bays;
     }
+    
+    public double getCurrentSmallCraftCapacity() {
+        double bays = 0;
+        for (Bay b : getEntity().getTransportBays()) {
+            if (b instanceof SmallCraftBay) {
+                bays += b.getUnused();
+            }
+        }
+        return bays;
+    }
 
     public double getMechCapacity() {
         double bays = 0;
         for (Bay b : getEntity().getTransportBays()) {
             if (b instanceof MechBay) {
                 bays += b.getCapacity();
+            }
+        }
+        return bays;
+    }
+    
+    public double getCurrentMechCapacity() {
+        double bays = 0;
+        for (Bay b : getEntity().getTransportBays()) {
+            if (b instanceof MechBay) {
+                bays += b.getUnused();
             }
         }
         return bays;
@@ -1249,11 +1329,32 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return bays;
     }
     
+    public double getCurrentProtomechCapacity() {
+        double bays = 0;
+        for (Bay b : getEntity().getTransportBays()) {
+            if (b instanceof ProtomechBay) {
+                bays += b.getUnused();
+            }
+        }
+        return bays;
+    }
+    
+    /**
+     * Bay loading utility used when assigning units to bay-equipped transport units
+     * For each passed-in unit, this will find the first available, transport bay and set
+     * both the target bay and the UUID of the transport ship. Once in the MM lobby, this data
+     * will be used to actually load the unit into a bay on the transport.
+     * @param Vector of units that we wish to load into this transport
+     */
     public void loadTransportShip(Vector<Unit> units) {
         for (Unit u : units) {
             for (Bay b : getEntity().getTransportBays()) {
                 if (b.canLoad(u.getEntity())) {
+                    u.setTransportShipId(getId());
+                    u.getEntity().setTargetBay(b.getBayNumber());
+                    // Go ahead and use this here to make sure various Bay values get updated properly
                     b.load(u.getEntity());
+                    break;
                 }
             }
         }
