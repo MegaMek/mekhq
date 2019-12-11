@@ -1354,6 +1354,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     u.getEntity().setTargetBay(b.getBayNumber());
                     // Go ahead and use this here to make sure various Bay values get updated properly
                     b.load(u.getEntity());
+                    // In MHQ, we don't care about how many units per turn the bay can load
+                    b.resetCounts();
                     break;
                 }
             }
