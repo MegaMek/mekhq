@@ -1475,6 +1475,13 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     +tech.toString()
                     +"</techId>");
         }
+        // If this entity is assigned to a transport, write that
+        if (getTransportShipId() != null) {
+            pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
+                    +"<transportShipId>"
+                    +getTransportShipId().toString()
+                    +"</transportShipId>");
+        }
         pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<salvaged>"
                 + salvaged + "</salvaged>");
         pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<site>" + site
@@ -1604,6 +1611,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     if(!wn2.getTextContent().equals("null")) {
                         retVal.tech = UUID.fromString(wn2.getTextContent());
                     }
+                }
+                else if (wn2.getNodeName().equalsIgnoreCase("transportShipId")) {
+                    retVal.setTransportShipId(UUID.fromString(wn2.getTextContent()));
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("forceId")) {
                     retVal.forceId = Integer.parseInt(wn2.getTextContent());
