@@ -1085,6 +1085,33 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(!StaticChecks.areAnyForcesDeployed(forces) && !StaticChecks.areAnyUnitsDeployed(unitsInForces));
                 popup.add(menuItem);
+                //Attempt to Assign all units in the selected force(s) to a transport ship. 
+                //This checks to see if the ship is in a basic state that can accept units. 
+                //Capacity gets checked once the action is submitted.
+                menu = new JMenu("Assign Force to Transport Ship");
+                Unit unit = unitsInForces.get(0);
+                String unitIds = "" + unit.getId().toString();
+                for (int i = 1; i < unitsInForces.size(); i++) {
+                    unitIds += "|" + unitsInForces.get(i).getId().toString();
+                }
+                for (UUID id : gui.getCampaign().getTransportShips()) {
+                    Unit ship = gui.getCampaign().getUnit(id);
+                    if (ship == null || ship.isSalvage() || ship.getCommander() == null) {
+                        continue;
+                    }
+                    menuItem = new JMenuItem(ship.getName());
+                    menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ASSIGN_TO_SHIP
+                            + id + "|" + unitIds);
+                    menuItem.addActionListener(this);
+                    menuItem.setEnabled(true);
+                    menu.add(menuItem);
+                }
+                if (menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
+                    popup.add(menu);
+                }
+                if (menu.getMenuComponentCount() > 30) {
+                    MenuScroller.setScrollerFor(menu, 30);
+                }
             } else if (unitsSelected) {
                 Unit unit = units.get(0);
                 String unitIds = "" + unit.getId().toString();
