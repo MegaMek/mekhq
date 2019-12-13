@@ -51,6 +51,7 @@ public abstract class AbstractSpecialAbilityGenerator {
      * experience level.
      * @param person The {@link Person} to add special abilities.
      * @param expLvl The experience level of the person (e.g. {@link SkillType#EXP_GREEN}).
+     * @return A value indicating whether or not a special ability was assigned.
      */
-    public abstract void generateSpecialAbilities(Person person, int expLvl);
+    public abstract boolean generateSpecialAbilities(Person person, int expLvl);
 }
