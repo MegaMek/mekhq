@@ -385,6 +385,12 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                             unit.removeTech();
                         }
                     }
+                    Unit oldShip = gui.getCampaign().getUnit(unit.getTransportShipId());
+                    // If the unit is assigned to a transport, unassign it
+                    if (oldShip != null) {
+                        oldShip.unloadTransportShip(unit);
+                    }
+                    // If the unit IS a transport, unassign all units from it
                     MekHQ.triggerEvent(new OrganizationChangedEvent(parentForce, unit));
                 }
             }
