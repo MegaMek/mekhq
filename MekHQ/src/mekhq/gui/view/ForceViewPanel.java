@@ -24,6 +24,7 @@ import javax.swing.JLabel;
 
 import megamek.client.ui.Messages;
 import megamek.client.ui.swing.util.PlayerColors;
+import megamek.common.Bay;
 import megamek.common.Crew;
 import megamek.common.Entity;
 import megamek.common.UnitType;
@@ -596,6 +597,22 @@ public class ForceViewPanel extends ScrollablePanel {
                 }
             }
     		toReturn += "</i>";
+        }
+        if (unit.getTransportShipId() != null) {
+            toReturn += "<br><i>" + "Transported by: ";
+            Unit transport = campaign.getUnit(unit.getTransportShipId());
+            if (transport != null) {
+                toReturn += transport.getName();
+            }
+            toReturn += "</i>";
+        }
+        // If this is a transport ship, tell us what bay capacity is at
+        for (Bay b : unit.getEntity().getTransportBays()) {
+            //Ignore these bay types
+            if (b.isCargo() || b.isQuarters()) {
+                continue;
+            }
+            toReturn += "<br><i>" + b.getType() + " bay #" + b.getBayNumber() + ": " + b.getUnused() + " free.</i>";
         }
         toReturn += "</font></html>";
         return toReturn;
