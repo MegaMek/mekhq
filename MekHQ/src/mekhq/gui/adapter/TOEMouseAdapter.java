@@ -234,8 +234,25 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     //If the ship can't load the selected units, display a nag with the reasons why
                     JOptionPane.showMessageDialog(null, cantLoad, "Warning", JOptionPane.WARNING_MESSAGE);
                 } else {
-                    //otherwise, load the units
+                    //First, remove the units from any other Transport they might be on
+                    for (Unit u : units) {
+                        Unit oldShip = gui.getCampaign().getUnit(u.getTransportShipId());
+                        if (oldShip != null) {
+                            oldShip.unloadTransportShip(u);
+                        }
+                    }
+                    //now load the units
                     ship.loadTransportShip(units);
+                }
+            }
+        }
+        if (command.contains(UNASSIGN_FROM_SHIP)) {
+            if (units != null) {
+                for (Unit u : units) {
+                    Unit oldShip = gui.getCampaign().getUnit(u.getTransportShipId());
+                    if (oldShip != null) {
+                        oldShip.unloadTransportShip(u);
+                    }
                 }
             }
         }
