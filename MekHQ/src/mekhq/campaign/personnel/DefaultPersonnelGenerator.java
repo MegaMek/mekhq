@@ -18,32 +18,41 @@
  */
 package mekhq.campaign.personnel;
 
-import mekhq.campaign.Campaign;
+import java.util.Objects;
 
+import mekhq.campaign.Campaign;
+import mekhq.campaign.universe.AbstractFactionSelector;
+import mekhq.campaign.universe.DefaultFactionSelector;
+import mekhq.campaign.universe.Faction;
+
+/**
+ * Creates {@link Person} instances using the default MekHQ algorithm.
+ */
 public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
 
-    private final String factionCode;
+    private final AbstractFactionSelector factionGenerator;
 
     /**
      * Creates a new DefaultPersonnelGenerator, which will create
      * {@link Person} objects using the faction in a {@link Campaign}.
      */
     public DefaultPersonnelGenerator() {
-        this(null);
+        this(new DefaultFactionSelector());
     }
 
     /**
-     * Creates a new DefaultPersonGenerator with a specific faction code.
-     * @param factionCode The faction code to assign to all generated persons.
+     * Creates a new DefaultPersonGenerator with a faction generator.
+     * @param factionGenerator The faction generator to use with all generated persons.
      */
-    public DefaultPersonnelGenerator(String factionCode) {
-        this.factionCode = factionCode;
+    public DefaultPersonnelGenerator(AbstractFactionSelector factionGenerator) {
+        this.factionGenerator = Objects.requireNonNull(factionGenerator);
     }
 
     @Override
     protected Person createPerson(Campaign campaign) {
-        if (this.factionCode != null) {
-            return new Person(campaign, this.factionCode);
+        Faction faction = this.factionGenerator.selectFaction(campaign);
+        if (faction != null) {
+            return new Person(campaign, faction.getShortName());
         }
 
         return super.createPerson(campaign);

@@ -163,6 +163,8 @@ import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.unit.UnitTechProgression;
+import mekhq.campaign.universe.AbstractFactionSelector;
+import mekhq.campaign.universe.DefaultFactionSelector;
 import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.IUnitGenerator;
@@ -4416,17 +4418,30 @@ public class Campaign implements Serializable, ITechManager {
      *
      * @param type The primary role
      * @param secondary A secondary role; used for LAM pilots to generate MW + Aero pilot
+     * @param factionCode The faction code for the person.
      * @return
      */
     public Person newPerson(int type, int secondary, String factionCode) {
+        AbstractFactionSelector factionGenerator = new DefaultFactionSelector(factionCode);
+        AbstractPersonnelGenerator personnelGenerator = new DefaultPersonnelGenerator(factionGenerator);
+        personnelGenerator.setNameGenerator(getRNG());
+        personnelGenerator.setSkillPreferences(getRandomSkillPreferences());
+
+        return newPerson(type, secondary, personnelGenerator);
+    }
+
+    /**
+     * Generate a new {@link Person} of the given type, using the supplied {@link AbstractPersonnelGenerator}
+     * @param type The primary role of the {@link Person}.
+     * @param secondary The secondary role, or {@link Person#T_NONE}, of the {@link Person}.
+     * @param personnelGenerator The {@link AbstractPersonnelGenerator} to use when creating the {@link Person}.
+     * @return A new {@link Person} configured using {@code personnelGenerator}.
+     */
+    public Person newPerson(int type, int secondary, AbstractPersonnelGenerator personnelGenerator) {
         if (type == Person.T_LAM_PILOT) {
             type = Person.T_MECHWARRIOR;
             secondary = Person.T_AERO_PILOT;
         }
-
-        AbstractPersonnelGenerator personnelGenerator = new DefaultPersonnelGenerator(factionCode);
-        personnelGenerator.setNameGenerator(getRNG());
-        personnelGenerator.setSkillPreferences(getRandomSkillPreferences());
 
         Person person = personnelGenerator.generate(this, type, secondary);
 
