@@ -4425,7 +4425,8 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         AbstractPersonnelGenerator personnelGenerator = new DefaultPersonnelGenerator(factionCode);
-        personnelGenerator.setNameGenerator(RandomNameGenerator.getInstance());
+        personnelGenerator.setNameGenerator(getRNG());
+        personnelGenerator.setSkillPreferences(getRandomSkillPreferences());
 
         Person person = personnelGenerator.generate(this, type, secondary);
 
