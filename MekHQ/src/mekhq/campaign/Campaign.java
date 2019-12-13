@@ -4424,7 +4424,10 @@ public class Campaign implements Serializable, ITechManager {
             secondary = Person.T_AERO_PILOT;
         }
 
-        Person person = new DefaultPersonnelGenerator(factionCode).generate(this, type, secondary);
+        AbstractPersonnelGenerator personnelGenerator = new DefaultPersonnelGenerator(factionCode);
+        personnelGenerator.setNameGenerator(RandomNameGenerator.getInstance());
+
+        Person person = personnelGenerator.generate(this, type, secondary);
 
         // Assign a random portrait after we generate a new person
         if (getCampaignOptions().usePortraitForType(type)) {
