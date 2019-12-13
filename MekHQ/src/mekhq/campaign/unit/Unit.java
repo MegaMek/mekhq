@@ -1344,7 +1344,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * For each passed-in unit, this will find the first available, transport bay and set
      * both the target bay and the UUID of the transport ship. Once in the MM lobby, this data
      * will be used to actually load the unit into a bay on the transport.
-     * @param Vector of units that we wish to load into this transport
+     * @param units  Vector of units that we wish to load into this transport
      */
     public void loadTransportShip(Vector<Unit> units) {
         for (Unit u : units) {
@@ -1360,6 +1360,25 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 }
             }
         }
+    }
+    
+    /**
+     * Bay unloading utility used when removing units from bay-equipped transport units
+     * and/or moving them to a new transport
+     * @param unit The unit that we wish to unload from this transport
+     */
+    public void unloadTransportShip(Unit u) {
+        if (u.getTransportShipId().equals(getId())) {
+            Bay b = getEntity().getBayById(u.getEntity().getTargetBay());
+            if (b != null) {
+                // Go ahead and use this here to make sure various Bay values get updated properly
+                b.unload(u.getEntity());
+                // In MHQ, we don't care about how many units per turn the bay can unload
+                b.resetCounts();
+            }
+        }
+        u.getEntity().setTargetBay(-1); //Safety set!
+        u.setTransportShipId(null);
     }
 
     public double getUnitCostMultiplier() {
