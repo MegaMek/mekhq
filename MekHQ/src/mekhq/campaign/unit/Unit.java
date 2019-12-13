@@ -1368,14 +1368,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * @param unit The unit that we wish to unload from this transport
      */
     public void unloadTransportShip(Unit u) {
-        if (u.getTransportShipId().equals(getId())) {
-            Bay b = getEntity().getBayById(u.getEntity().getTargetBay());
-            if (b != null) {
-                // Go ahead and use this here to make sure various Bay values get updated properly
-                b.unload(u.getEntity());
-                // In MHQ, we don't care about how many units per turn the bay can unload
-                b.resetCounts();
-            }
+        Bay b = getEntity().getBayById(u.getEntity().getTargetBay());
+        if (b != null && b.getLoadedUnits().contains(u.getEntity())) {
+            // Go ahead and use this here to make sure various Bay values get updated properly
+            b.unload(u.getEntity());
+            // In MHQ, we don't care about how many units per turn the bay can unload
+            b.resetCounts();
         }
         u.getEntity().setTargetBay(-1); //Safety set!
         u.setTransportShipId(null);
