@@ -358,6 +358,17 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     gui.getCampaign().removeForce(force);
                 }
             }
+            for (Unit unit : units) {
+                Unit oldShip = gui.getCampaign().getUnit(unit.getTransportShipId());
+                // If the unit is assigned to a transport, unassign it
+                if (oldShip != null) {
+                    oldShip.unloadFromTransportShip(unit);
+                }
+                // If the unit IS a transport, unassign all units from it
+                if (!unit.getEntity().getBayLoadedUnits().isEmpty()) {
+                    unit.unloadTransportShip();
+                }
+            }
         } else if (command.contains(TOEMouseAdapter.REMOVE_LANCE_TECH)) {
             if (null != singleForce && singleForce.getTechID() != null) {
                 Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
@@ -392,7 +403,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     }
                     // If the unit IS a transport, unassign all units from it
                     if (!unit.getEntity().getBayLoadedUnits().isEmpty()) {
-                    	unit.unloadTransportShip();
+                        unit.unloadTransportShip();
                     }
                     MekHQ.triggerEvent(new OrganizationChangedEvent(parentForce, unit));
                 }
