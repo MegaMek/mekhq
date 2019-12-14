@@ -320,6 +320,10 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     public void removeTransportedUnit(UUID id) {
         transportedUnits.remove(id);
     }
+    
+    public void clearTransportedUnits() {
+        transportedUnits.clear();
+    }
 
     public int getSite() {
         return site;
@@ -1366,6 +1370,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 if (b.canLoad(u.getEntity())) {
                     u.setTransportShipId(getId());
                     u.getEntity().setTargetBay(b.getBayNumber());
+                    addTransportedUnit(u.getId());
                     // Go ahead and use this here to make sure various Bay values get updated properly
                     b.load(u.getEntity());
                     // In MHQ, we don't care about how many units per turn the bay can load
@@ -1384,6 +1389,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     public void unloadFromTransportShip(Unit u) {
         Bay b = getEntity().getBayById(u.getEntity().getTargetBay());
         if (b != null && b.getLoadedUnits().contains(u.getEntity())) {
+            removeTransportedUnit(u.getId());
             // Go ahead and use this here to make sure various Bay values get updated properly
             b.unload(u.getEntity());
             // In MHQ, we don't care about how many units per turn the bay can unload
@@ -1405,6 +1411,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 // In MHQ, we don't care about how many units per turn the bay can unload
                 b.resetCounts();
             }
+            clearTransportedUnits();
         }
         // And now reset the Transported values for all the units we just booted
         for (Unit u : campaign.getUnits()) {
