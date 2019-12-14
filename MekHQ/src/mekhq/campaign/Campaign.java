@@ -2232,10 +2232,10 @@ public class Campaign implements Serializable, ITechManager {
      * @return true if the campaign can pay for the acquisition; false if it cannot.
      */
     public boolean canPayFor(IAcquisitionWork acquisition) {
-    	//SHOULD we check to see if this acquisition needs to be paid for
+        //SHOULD we check to see if this acquisition needs to be paid for
         if( (acquisition instanceof UnitOrder && getCampaignOptions().payForUnits())
                 ||(acquisition instanceof Part && getCampaignOptions().payForParts()) ) {
-        	//CAN the acquisition actually be paid for
+            //CAN the acquisition actually be paid for
             return getFunds().isGreaterOrEqualThan(acquisition.getBuyCost());
         }
         return true;
@@ -2382,7 +2382,7 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         if (found) {
-        	acquisition.decrementQuantity();
+            acquisition.decrementQuantity();
             MekHQ.triggerEvent(new AcquisitionEvent(acquisition));
         }
         if(!getCampaignOptions().usesPlanetaryAcquisition() || getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
@@ -4243,10 +4243,10 @@ public class Campaign implements Serializable, ITechManager {
         // Customised planetary events
         pw1.println("\t<customPlanetaryEvents>");
         for(PlanetarySystem psystem : Systems.getInstance().getSystems().values()) {
-        	//first check for system-wide events
+            //first check for system-wide events
             List<PlanetarySystem.PlanetarySystemEvent> customSysEvents = new ArrayList<>();
             for(PlanetarySystem.PlanetarySystemEvent event : psystem.getEvents()) {
-            	if(event.custom) {
+                if(event.custom) {
                     customSysEvents.add(event);
                 }
             }
@@ -4259,30 +4259,30 @@ public class Campaign implements Serializable, ITechManager {
                 }
                 startedSystem = true;
             }
-        	//now check for planetary events
+            //now check for planetary events
             for(Planet p : psystem.getPlanets()) {
                 List<Planet.PlanetaryEvent> customEvents = new ArrayList<>();
-	            for(Planet.PlanetaryEvent event : p.getEvents()) {
-	                if(event.custom) {
-	                    customEvents.add(event);
-	                }
-	            }
-	            if(!customEvents.isEmpty()) {
-	            	if(!startedSystem) {
-	            		//only write this if we haven't already started the system
-	            		pw1.println("\t\t<system><id>" + psystem.getId() + "</id>");
-	            	}
-	                pw1.println("\t\t\t<planet><sysPos>" + p.getSystemPosition() + "</sysPos>");
-	                for(Planet.PlanetaryEvent event : customEvents) {
-	                    Systems.getInstance().writePlanetaryEvent(pw1, event);
-	                    pw1.println();
-	                }
-	                pw1.println("\t\t\t</planet>");
-	                startedSystem = true;
-	            }
+                for(Planet.PlanetaryEvent event : p.getEvents()) {
+                    if(event.custom) {
+                        customEvents.add(event);
+                    }
+                }
+                if(!customEvents.isEmpty()) {
+                    if(!startedSystem) {
+                        //only write this if we haven't already started the system
+                        pw1.println("\t\t<system><id>" + psystem.getId() + "</id>");
+                    }
+                    pw1.println("\t\t\t<planet><sysPos>" + p.getSystemPosition() + "</sysPos>");
+                    for(Planet.PlanetaryEvent event : customEvents) {
+                        Systems.getInstance().writePlanetaryEvent(pw1, event);
+                        pw1.println();
+                    }
+                    pw1.println("\t\t\t</planet>");
+                    startedSystem = true;
+                }
             }
             if(startedSystem) {
-            	//close the system
+                //close the system
                 pw1.println("\t\t</system>");
             }
         }
@@ -5046,108 +5046,108 @@ public class Campaign implements Serializable, ITechManager {
      * @return
      */
     public JumpPath calculateJumpPath(PlanetarySystem start, PlanetarySystem end) {
-    	if (null == start) {
-    		return null;
-    	}
-    	if ((null == end) || start.getId().equals(end.getId())) {
-    		JumpPath jpath = new JumpPath();
-    		jpath.addSystem(start);
-    		return jpath;
-    	}
+        if (null == start) {
+            return null;
+        }
+        if ((null == end) || start.getId().equals(end.getId())) {
+            JumpPath jpath = new JumpPath();
+            jpath.addSystem(start);
+            return jpath;
+        }
 
-    	String startKey = start.getId();
-    	String endKey = end.getId();
+        String startKey = start.getId();
+        String endKey = end.getId();
 
-    	final DateTime now = Utilities.getDateTimeDay(calendar);
-    	String current = startKey;
-    	Set<String> closed = new HashSet<>();
-    	Set<String> open = new HashSet<>();
-    	boolean found = false;
-    	int jumps = 0;
+        final DateTime now = Utilities.getDateTimeDay(calendar);
+        String current = startKey;
+        Set<String> closed = new HashSet<>();
+        Set<String> open = new HashSet<>();
+        boolean found = false;
+        int jumps = 0;
 
-    	// we are going to through and set up some hashes that will make our
-    	// work easier
-    	// hash of parent key
-    	Map<String, String> parent = new HashMap<>();
-    	// hash of H for each planet which will not change
-    	Map<String, Double> scoreH = new HashMap<>();
-    	// hash of G for each planet which might change
-    	Map<String, Double> scoreG = new HashMap<>();
+        // we are going to through and set up some hashes that will make our
+        // work easier
+        // hash of parent key
+        Map<String, String> parent = new HashMap<>();
+        // hash of H for each planet which will not change
+        Map<String, Double> scoreH = new HashMap<>();
+        // hash of G for each planet which might change
+        Map<String, Double> scoreG = new HashMap<>();
 
-    	for (String key : Systems.getInstance().getSystems().keySet()) {
-    		scoreH.put(
-    				key,
-    				end.getDistanceTo(Systems.getInstance().getSystems()
-    						.get(key)));
-    	}
-    	scoreG.put(current, 0.0);
-    	closed.add(current);
+        for (String key : Systems.getInstance().getSystems().keySet()) {
+            scoreH.put(
+                    key,
+                    end.getDistanceTo(Systems.getInstance().getSystems()
+                            .get(key)));
+        }
+        scoreG.put(current, 0.0);
+        closed.add(current);
 
-    	while (!found && jumps < 10000) {
-    		jumps++;
-    		double currentG = scoreG.get(current) + Systems.getInstance().getSystemById(current).getRechargeTime(now);
+        while (!found && jumps < 10000) {
+            jumps++;
+            double currentG = scoreG.get(current) + Systems.getInstance().getSystemById(current).getRechargeTime(now);
 
-    		final String localCurrent = current;
-    		Systems.getInstance().visitNearbySystems(Systems.getInstance().getSystemById(current), 30, p -> {
-    			if (closed.contains(p.getId())) {
-    				return;
-    			} else if (open.contains(p.getId())) {
-    				// is the current G better than the existing G
-    				if (currentG < scoreG.get(p.getId())) {
-    					// then change G and parent
-    					scoreG.put(p.getId(), currentG);
-    					parent.put(p.getId(), localCurrent);
-    				}
-    			} else {
-    				// put the current G for this one in memory
-    				scoreG.put(p.getId(), currentG);
-    				// put the parent in memory
-    				parent.put(p.getId(), localCurrent);
-    				open.add(p.getId());
-    			}
-    		});
+            final String localCurrent = current;
+            Systems.getInstance().visitNearbySystems(Systems.getInstance().getSystemById(current), 30, p -> {
+                if (closed.contains(p.getId())) {
+                    return;
+                } else if (open.contains(p.getId())) {
+                    // is the current G better than the existing G
+                    if (currentG < scoreG.get(p.getId())) {
+                        // then change G and parent
+                        scoreG.put(p.getId(), currentG);
+                        parent.put(p.getId(), localCurrent);
+                    }
+                } else {
+                    // put the current G for this one in memory
+                    scoreG.put(p.getId(), currentG);
+                    // put the parent in memory
+                    parent.put(p.getId(), localCurrent);
+                    open.add(p.getId());
+                }
+            });
 
-    		String bestMatch = null;
-    		double bestF = Double.POSITIVE_INFINITY;
-    		for (String possible : open) {
-    			// calculate F
-    			double currentF = scoreG.get(possible) + scoreH.get(possible);
-    			if (currentF < bestF) {
-    				bestMatch = possible;
-    				bestF = currentF;
-    			}
-    		}
+            String bestMatch = null;
+            double bestF = Double.POSITIVE_INFINITY;
+            for (String possible : open) {
+                // calculate F
+                double currentF = scoreG.get(possible) + scoreH.get(possible);
+                if (currentF < bestF) {
+                    bestMatch = possible;
+                    bestF = currentF;
+                }
+            }
 
-    		current = bestMatch;
-    		if(null == current) {
-    			// We're done - probably failed to find anything
-    			break;
-    		}
+            current = bestMatch;
+            if(null == current) {
+                // We're done - probably failed to find anything
+                break;
+            }
 
-    		closed.add(current);
-    		open.remove(current);
-    		if (current.equals(endKey)) {
-    			found = true;
-    		}
-    	}
+            closed.add(current);
+            open.remove(current);
+            if (current.equals(endKey)) {
+                found = true;
+            }
+        }
 
-    	// now we just need to back up from the last current by parents until we
-    	// hit null
-    	List<PlanetarySystem> path = new ArrayList<>();
-    	String nextKey = current;
-    	while (null != nextKey) {
-    		path.add(Systems.getInstance().getSystemById(nextKey));
-    		// MekHQApp.logMessage(nextKey);
-    		nextKey = parent.get(nextKey);
-    	}
+        // now we just need to back up from the last current by parents until we
+        // hit null
+        List<PlanetarySystem> path = new ArrayList<>();
+        String nextKey = current;
+        while (null != nextKey) {
+            path.add(Systems.getInstance().getSystemById(nextKey));
+            // MekHQApp.logMessage(nextKey);
+            nextKey = parent.get(nextKey);
+        }
 
-    	// now reverse the direaction
-    	JumpPath finalPath = new JumpPath();
-    	for (int i = (path.size() - 1); i >= 0; i--) {
-    		finalPath.addSystem(path.get(i));
-    	}
+        // now reverse the direaction
+        JumpPath finalPath = new JumpPath();
+        for (int i = (path.size() - 1); i >= 0; i--) {
+            finalPath.addSystem(path.get(i));
+        }
 
-    	return finalPath;
+        return finalPath;
     }
 
     public List<PlanetarySystem> getAllReachableSystemsFrom(PlanetarySystem system) {
@@ -6689,11 +6689,11 @@ public class Campaign implements Serializable, ITechManager {
         }
         for (int pos = 0; pos < Entity.MAX_C3i_NODES; pos++) {
             for (Unit nUnit : networkedUnits) {
-            	if (nUnit.getEntity().hasNavalC3()) {
-            		nUnit.getEntity().setNC3NextUUIDAsString(pos, null);
-            	} else {
-            		nUnit.getEntity().setC3iNextUUIDAsString(pos, null);
-            	}
+                if (nUnit.getEntity().hasNavalC3()) {
+                    nUnit.getEntity().setNC3NextUUIDAsString(pos, null);
+                } else {
+                    nUnit.getEntity().setC3iNextUUIDAsString(pos, null);
+                }
             }
         }
         refreshNetworks();
@@ -6717,27 +6717,27 @@ public class Campaign implements Serializable, ITechManager {
         }
         for (int pos = 0; pos < Entity.MAX_C3i_NODES; pos++) {
             for (Unit u : removedUnits) {
-            	if (u.getEntity().hasNavalC3()) {
-            		u.getEntity().setNC3NextUUIDAsString(pos, null);
-            	} else {
-            		u.getEntity().setC3iNextUUIDAsString(pos, null);
-            	}
+                if (u.getEntity().hasNavalC3()) {
+                    u.getEntity().setNC3NextUUIDAsString(pos, null);
+                } else {
+                    u.getEntity().setC3iNextUUIDAsString(pos, null);
+                }
             }
             for (Unit nUnit : networkedUnits) {
                 if (pos < uuids.size()) {
-                	if (nUnit.getEntity().hasNavalC3()) {
-                		nUnit.getEntity().setNC3NextUUIDAsString(pos,
+                    if (nUnit.getEntity().hasNavalC3()) {
+                        nUnit.getEntity().setNC3NextUUIDAsString(pos,
                                 uuids.get(pos));
-                	} else {
-                		nUnit.getEntity().setC3iNextUUIDAsString(pos,
+                    } else {
+                        nUnit.getEntity().setC3iNextUUIDAsString(pos,
                                 uuids.get(pos));
-                	}
+                    }
                 } else {
-                	if (nUnit.getEntity().hasNavalC3()) {
-                		nUnit.getEntity().setNC3NextUUIDAsString(pos, null);
-                	} else {
-                		nUnit.getEntity().setC3iNextUUIDAsString(pos, null);
-                	}
+                    if (nUnit.getEntity().hasNavalC3()) {
+                        nUnit.getEntity().setNC3NextUUIDAsString(pos, null);
+                    } else {
+                        nUnit.getEntity().setC3iNextUUIDAsString(pos, null);
+                    }
                 }
             }
         }
@@ -6764,20 +6764,20 @@ public class Campaign implements Serializable, ITechManager {
         }
         for (int pos = 0; pos < Entity.MAX_C3i_NODES; pos++) {
             for (Unit nUnit : networkedUnits) {
-            	if (pos < uuids.size()) {
-                	if (nUnit.getEntity().hasNavalC3()) {
-                		nUnit.getEntity().setNC3NextUUIDAsString(pos,
+                if (pos < uuids.size()) {
+                    if (nUnit.getEntity().hasNavalC3()) {
+                        nUnit.getEntity().setNC3NextUUIDAsString(pos,
                                 uuids.get(pos));
-                	} else {
-                		nUnit.getEntity().setC3iNextUUIDAsString(pos,
+                    } else {
+                        nUnit.getEntity().setC3iNextUUIDAsString(pos,
                                 uuids.get(pos));
-                	}
+                    }
                 } else {
-                	if (nUnit.getEntity().hasNavalC3()) {
-                		nUnit.getEntity().setNC3NextUUIDAsString(pos, null);
-                	} else {
-                		nUnit.getEntity().setC3iNextUUIDAsString(pos, null);
-                	}
+                    if (nUnit.getEntity().hasNavalC3()) {
+                        nUnit.getEntity().setNC3NextUUIDAsString(pos, null);
+                    } else {
+                        nUnit.getEntity().setC3iNextUUIDAsString(pos, null);
+                    }
                 }
             }
         }
