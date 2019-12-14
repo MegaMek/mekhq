@@ -355,18 +355,21 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                                     "Delete Force?", JOptionPane.YES_NO_OPTION)) {
                         return;
                     }
+                    for (UUID id : force.getAllUnits()) {
+                        Unit unit = gui.getCampaign().getUnit(id);
+                        if (unit != null) {
+                            Unit oldShip = gui.getCampaign().getUnit(unit.getTransportShipId());
+                            // If the unit is assigned to a transport, unassign it
+                            if (oldShip != null) {
+                                oldShip.unloadFromTransportShip(unit);
+                            }
+                            // If the unit IS a transport, unassign all units from it
+                            if (!unit.getEntity().getBayLoadedUnits().isEmpty()) {
+                                unit.unloadTransportShip();
+                            }
+                        }
+                    }
                     gui.getCampaign().removeForce(force);
-                }
-            }
-            for (Unit unit : units) {
-                Unit oldShip = gui.getCampaign().getUnit(unit.getTransportShipId());
-                // If the unit is assigned to a transport, unassign it
-                if (oldShip != null) {
-                    oldShip.unloadFromTransportShip(unit);
-                }
-                // If the unit IS a transport, unassign all units from it
-                if (!unit.getEntity().getBayLoadedUnits().isEmpty()) {
-                    unit.unloadTransportShip();
                 }
             }
         } else if (command.contains(TOEMouseAdapter.REMOVE_LANCE_TECH)) {
