@@ -238,7 +238,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     for (Unit u : units) {
                         Unit oldShip = gui.getCampaign().getUnit(u.getTransportShipId());
                         if (oldShip != null) {
-                            oldShip.unloadTransportShip(u);
+                            oldShip.unloadFromTransportShip(u);
                         }
                     }
                     //now load the units
@@ -251,7 +251,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                 for (Unit u : units) {
                     Unit oldShip = gui.getCampaign().getUnit(u.getTransportShipId());
                     if (oldShip != null) {
-                        oldShip.unloadTransportShip(u);
+                        oldShip.unloadFromTransportShip(u);
                     }
                 }
             }
@@ -388,9 +388,12 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     Unit oldShip = gui.getCampaign().getUnit(unit.getTransportShipId());
                     // If the unit is assigned to a transport, unassign it
                     if (oldShip != null) {
-                        oldShip.unloadTransportShip(unit);
+                        oldShip.unloadFromTransportShip(unit);
                     }
                     // If the unit IS a transport, unassign all units from it
+                    if (!unit.getEntity().getBayLoadedUnits().isEmpty()) {
+                    	unit.unloadTransportShip();
+                    }
                     MekHQ.triggerEvent(new OrganizationChangedEvent(parentForce, unit));
                 }
             }
