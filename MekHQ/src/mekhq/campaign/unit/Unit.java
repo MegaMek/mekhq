@@ -1367,7 +1367,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * and/or moving them to a new transport
      * @param unit The unit that we wish to unload from this transport
      */
-    public void unloadTransportShip(Unit u) {
+    public void unloadFromTransportShip(Unit u) {
         Bay b = getEntity().getBayById(u.getEntity().getTargetBay());
         if (b != null && b.getLoadedUnits().contains(u.getEntity())) {
             // Go ahead and use this here to make sure various Bay values get updated properly
@@ -1377,6 +1377,29 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         u.getEntity().setTargetBay(-1); //Safety set!
         u.setTransportShipId(null);
+    }
+    
+    /**
+     * Bay unloading utility used when removing a bay-equipped Transport unit
+     * This removes all units assigned to the transport from it
+     */
+    public void unloadTransportShip() {
+    	for (Bay b : getEntity().getTransportBays()) {
+    		// Unload everyone from the bay
+    		for (Entity e : b.getLoadedUnits()) {
+                b.unload(e);
+                // In MHQ, we don't care about how many units per turn the bay can unload
+                b.resetCounts();
+    		}
+    	}
+    	// And now reset the Transported values for all the units we just booted
+        for (Unit u : campaign.getUnits()) {
+        	if (u.getTransportShipId() != null && u.getTransportShipId().equals(getId())) {
+        		u.getEntity().setTargetBay(-1);
+            	u.setTransportShipId(null);
+        	}
+        }
+        	
     }
 
     public double getUnitCostMultiplier() {
