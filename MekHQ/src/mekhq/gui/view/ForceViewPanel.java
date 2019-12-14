@@ -565,8 +565,8 @@ public class ForceViewPanel extends ScrollablePanel {
     }
     
     public String getSummaryFor(Unit unit) {
-        String toReturn = "<html><font size='2'><b>" + unit.getName() + "</b><br/>";
-        toReturn += "<b>BV:</b> " + unit.getEntity().calculateBattleValue(true, null == unit.getEntity().getCrew()) + "<br/>";
+        String toReturn = "<html><font size='3'><b>" + unit.getName() + "</b></font><br/>";
+        toReturn += "<font size='2'><b>BV:</b> " + unit.getEntity().calculateBattleValue(true, null == unit.getEntity().getCrew()) + "<br/>";
         toReturn += unit.getStatus();
         Entity entity = unit.getEntity();
         if (entity.hasNavalC3()) {
