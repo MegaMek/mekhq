@@ -101,6 +101,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     private String fluffName;
     // This is the ID of the large craft assigned to transport this unit
     private UUID transportShipId;
+    // If this unit is a transport, list all other units assigned to it
+    private Set<UUID> transportedUnits;
 
     //assignments
     private int forceId;
@@ -305,6 +307,18 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
     public void setTransportShipId(UUID i) {
         this.transportShipId = i;
+    }
+    
+    public Set<UUID> getTransportedUnits() {
+        return transportedUnits;
+    }
+    
+    public void addTransportedUnit(UUID id) {
+        transportedUnits.add(id);
+    }
+    
+    public void removeTransportedUnit(UUID id) {
+        transportedUnits.remove(id);
     }
 
     public int getSite() {
@@ -1394,7 +1408,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         // And now reset the Transported values for all the units we just booted
         for (Unit u : campaign.getUnits()) {
-            if (u.getTransportShipId() != null && u.getTransportShipId().equals(getId())) {
+            if (u.hasTransportShipId() && u.getTransportShipId().equals(getId())) {
                 u.getEntity().setTargetBay(-1);
                 u.setTransportShipId(null);
             }
@@ -1515,7 +1529,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     +"</techId>");
         }
         // If this entity is assigned to a transport, write that
-        if (getTransportShipId() != null) {
+        if (hasTransportShipId()) {
             pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
                     +"<transportShipId>"
                     +getTransportShipId().toString()

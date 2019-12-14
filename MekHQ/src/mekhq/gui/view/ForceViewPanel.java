@@ -598,7 +598,7 @@ public class ForceViewPanel extends ScrollablePanel {
             }
     		toReturn += "</i>";
         }
-        if (unit.getTransportShipId() != null) {
+        if (unit.hasTransportShipId()) {
             toReturn += "<br><i>" + "Transported by: ";
             Unit transport = campaign.getUnit(unit.getTransportShipId());
             if (transport != null) {
