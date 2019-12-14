@@ -426,16 +426,39 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
             }
         } else if (command.contains(TOEMouseAdapter.DEPLOY_UNIT)) {
             int sid = Integer.parseInt(target);
+            HashSet<Unit> extraUnits = new HashSet<Unit>();
             Scenario scenario = gui.getCampaign().getScenario(sid);
-
             if(scenario instanceof AtBDynamicScenario) {
                 ForceTemplateAssignmentDialog ftad = new ForceTemplateAssignmentDialog(gui, null, units, (AtBDynamicScenario) scenario);
             } else {
                 for (Unit unit : units) {
                     if (null != unit && null != scenario) {
+                        if (!unit.getTransportedUnits().isEmpty()) {
+                            // Prompt the player to also deploy any units transported by this one
+                            if (0 != JOptionPane.showConfirmDialog(
+                                    null,
+                                    "You are deploying a Transport with units assigned to it. \n"
+                                            + "Would you also like to deploy these units?",
+                                            "Also deploy transported units?", JOptionPane.YES_NO_OPTION)) {
+                                for (UUID id : unit.getTransportedUnits()) {
+                                    Unit cargo = gui.getCampaign().getUnit(id);
+                                    if (cargo != null) {
+                                        extraUnits.add(cargo);
+                                    }
+                                }
+                            }
+                        }
                         scenario.addUnit(unit.getId());
                         unit.setScenarioId(scenario.getId());
                         MekHQ.triggerEvent(new DeploymentChangedEvent(unit, scenario));
+                    }
+                }
+                // Now add the extras, if there are any
+                for (Unit extra : extraUnits) {
+                    if (null != extra && null != scenario) {
+                        scenario.addUnit(extra.getId());
+                        extra.setScenarioId(scenario.getId());
+                        MekHQ.triggerEvent(new DeploymentChangedEvent(extra, scenario));
                     }
                 }
             }
