@@ -426,16 +426,16 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
             }
         } else if (command.contains(TOEMouseAdapter.DEPLOY_UNIT)) {
             int sid = Integer.parseInt(target);
-            HashSet<Unit> extraUnits = new HashSet<Unit>();
             Scenario scenario = gui.getCampaign().getScenario(sid);
             if(scenario instanceof AtBDynamicScenario) {
                 ForceTemplateAssignmentDialog ftad = new ForceTemplateAssignmentDialog(gui, null, units, (AtBDynamicScenario) scenario);
             } else {
+                HashSet<Unit> extraUnits = new HashSet<Unit>();
                 for (Unit unit : units) {
                     if (null != unit && null != scenario) {
                         if (!unit.getTransportedUnits().isEmpty()) {
                             // Prompt the player to also deploy any units transported by this one
-                            if (0 != JOptionPane.showConfirmDialog(
+                            if (0 == JOptionPane.showConfirmDialog(
                                     null,
                                     "You are deploying a Transport with units assigned to it. \n"
                                             + "Would you also like to deploy these units?",

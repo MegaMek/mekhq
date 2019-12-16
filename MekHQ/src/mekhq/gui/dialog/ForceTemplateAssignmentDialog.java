@@ -37,6 +37,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
@@ -236,12 +237,28 @@ public class ForceTemplateAssignmentDialog extends JDialog {
      */
     private void assignUnitToTemplate() {
         Unit unit = unitList.getSelectedValue();
-        
         currentScenario.removeUnit(unit.getId());
         currentScenario.addUnit(unit.getId(), templateList.getSelectedValue().getForceName());
         unit.setScenarioId(currentScenario.getId());
         MekHQ.triggerEvent(new DeploymentChangedEvent(unit, currentScenario));
-        
+        if (!unit.getTransportedUnits().isEmpty()) {
+            // Prompt the player to also deploy any units transported by this one
+            if (0 == JOptionPane.showConfirmDialog(
+                    null,
+                    unit.getName() +  " is a transport with units assigned to it. \n"
+                            + "Would you also like to deploy these units?",
+                            "Also deploy transported units?", JOptionPane.YES_NO_OPTION)) {
+                for (UUID id : unit.getTransportedUnits()) {
+                    Unit cargo = unit.getCampaign().getUnit(id);
+                    if (cargo != null) {
+                        currentScenario.removeUnit(cargo.getId());
+                        currentScenario.addUnit(cargo.getId(), templateList.getSelectedValue().getForceName());
+                        cargo.setScenarioId(currentScenario.getId());
+                        MekHQ.triggerEvent(new DeploymentChangedEvent(cargo, currentScenario));
+                    }
+                }
+            }
+        }
         refreshUnitList();
     }
     
