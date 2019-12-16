@@ -278,6 +278,25 @@ public class ForceTemplateAssignmentDialog extends JDialog {
             Unit u = campaignGUI.getCampaign().getUnit(uid);
             if (null != u) {
                 u.setScenarioId(currentScenario.getId());
+                // If your force includes transports with units assigned, 
+                // prompt the player to also deploy any units transported by this one
+                if (!u.getTransportedUnits().isEmpty()) {
+                    int optionChoice = JOptionPane.showConfirmDialog(null,
+                            u.getName() +  " is a transport with units assigned to it. \n"
+                                    + "Would you also like to deploy these units?",
+                                    "Also deploy transported units?", JOptionPane.YES_NO_OPTION);
+                    if (optionChoice == JOptionPane.YES_OPTION) {
+                        for (UUID id : u.getTransportedUnits()) {
+                            Unit cargo = u.getCampaign().getUnit(id);
+                            if (cargo != null) {
+                                currentScenario.removeUnit(cargo.getId());
+                                currentScenario.addUnit(cargo.getId(), templateList.getSelectedValue().getForceName());
+                                cargo.setScenarioId(currentScenario.getId());
+                                MekHQ.triggerEvent(new DeploymentChangedEvent(cargo, currentScenario));
+                            }
+                        }
+                    }
+                }
             }
         }
         MekHQ.triggerEvent(new DeploymentChangedEvent(force, currentScenario));
