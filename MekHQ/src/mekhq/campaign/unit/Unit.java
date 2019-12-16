@@ -102,7 +102,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     // This is the ID of the large craft assigned to transport this unit
     private UUID transportShipId;
     // If this unit is a transport, list all other units assigned to it
-    private ArrayList<UUID> transportedUnits;
+    private Set<UUID> transportedUnits = new HashSet<UUID>();
 
     //assignments
     private int forceId;
@@ -173,7 +173,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         this.vesselCrew = new ArrayList<>();
         this.navigator = null;
         this.tech = null;
-        this.transportedUnits = new ArrayList<>();
         this.mothballTime = 0;
         this.mothballed = false;
         this.oldDrivers = new ArrayList<>();
@@ -310,7 +309,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         this.transportShipId = i;
     }
     
-    public ArrayList<UUID> getTransportedUnits() {
+    public Set<UUID> getTransportedUnits() {
         return transportedUnits;
     }
     
