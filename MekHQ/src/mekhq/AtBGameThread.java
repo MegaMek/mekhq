@@ -25,6 +25,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
+import javax.swing.JOptionPane;
 
 import megamek.client.Client;
 import megamek.client.bot.BotClient;
@@ -182,7 +187,11 @@ public class AtBGameThread extends GameThread {
                     // Set the TempID for autoreporting
                     entity.setExternalIdAsString(unit.getId().toString());
                     // Set the owner
-                    entity.setOwner(client.getLocalPlayer()); 
+                    entity.setOwner(client.getLocalPlayer());
+                    if (!unit.getTransportedUnits().isEmpty()) {
+                        //Store this unit as a potential transport to load
+                        scenario.getPlayerTransportLinkages().put(unit.getId(), new ArrayList<UUID>());
+                    }
                     // Calculate deployment round
                     int deploymentRound = entity.getDeployRound();
                     if(!(scenario instanceof AtBDynamicScenario)) {
@@ -209,6 +218,26 @@ public class AtBGameThread extends GameThread {
                     client.sendAddEntity(entity);
                     // Wait a few secs to not overuse bandwith
                     Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
+                }
+                // Run through the units again. This time add transported units to the correct linkage,
+                // but only if the transport itself is in the game too.
+                for (Unit unit : units) {
+                    if (unit.hasTransportShipId()) {
+                        if (!scenario.getPlayerTransportLinkages().containsKey(unit.getTransportShipId())) {
+                            continue;
+                        }
+                        scenario.addPlayerTransportRelationship(unit.getTransportShipId(), unit.getId());
+                    }
+                }
+                // Now, clean the list of any transports that don't have deployed units in the game
+                Set<UUID> emptyTransports = new HashSet<>();
+                for (UUID id : scenario.getPlayerTransportLinkages().keySet()) {
+                    if (scenario.getPlayerTransportLinkages().get(id).isEmpty()) {
+                        emptyTransports.add(id);
+                    }
+                }
+                for (UUID id : emptyTransports) {
+                    scenario.getPlayerTransportLinkages().remove(id);
                 }
 
                 /* Add player-controlled ally units */
@@ -268,8 +297,19 @@ public class AtBGameThread extends GameThread {
                     configureBot(botClient, bf);
                     
                     // we need to wait until the game has actually started to do transport loading
+                    // This will load the bot's infantry into APCs
                     if(scenario instanceof AtBScenario) {
                         AtBDynamicScenarioFactory.loadTransports((AtBScenario) scenario, botClient);
+                    }
+                    
+                    // Prompt the player to auto-load units into transports
+                    if (!scenario.getPlayerTransportLinkages().isEmpty()) {
+                        int choice = JOptionPane.showConfirmDialog(null,
+                                "You are deploying a Transport with units assigned to it.",
+                                        "Load Units on Transport?", JOptionPane.YES_NO_OPTION);
+                        if (JOptionPane.YES_OPTION == choice) {
+                            
+                        }
                     }
                 }
             }
