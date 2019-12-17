@@ -27,7 +27,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.w3c.dom.NamedNodeMap;
@@ -79,6 +81,9 @@ public class Scenario implements Serializable {
 
     private List<ScenarioObjective> scenarioObjectives;
     
+    //Stores combinations of units and the transports they are assigned to
+    private Map<UUID, ArrayList<UUID>> playerTransportLinkages;
+    
     public Scenario() {
         this(null);
     }
@@ -93,6 +98,7 @@ public class Scenario implements Serializable {
         this.unitIds = new ArrayList<>();
         this.loots = new ArrayList<>();
         this.scenarioObjectives = new ArrayList<>();
+        this.playerTransportLinkages = new HashMap<>();
     }
     
     public static String getStatusName(int s) {
@@ -168,6 +174,19 @@ public class Scenario implements Serializable {
 
     public void setScenarioObjectives(List<ScenarioObjective> scenarioObjectives) {
         this.scenarioObjectives = scenarioObjectives;
+    }
+    
+    public Map<UUID,ArrayList<UUID>> getPlayerTransportLinkages() {
+        return playerTransportLinkages;
+    }
+    
+    /**
+     * Adds a transport-cargo pair to the internal transport relationship store.
+     * @param transport
+     * @param cargo
+     */
+    public void addPlayerTransportRelationship(UUID transportId, UUID cargoId) {
+        playerTransportLinkages.get(transportId).add(cargoId);
     }
 
     public int getId() {
