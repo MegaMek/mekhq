@@ -243,11 +243,11 @@ public class ForceTemplateAssignmentDialog extends JDialog {
         MekHQ.triggerEvent(new DeploymentChangedEvent(unit, currentScenario));
         if (!unit.getTransportedUnits().isEmpty()) {
             // Prompt the player to also deploy any units transported by this one
-            if (0 == JOptionPane.showConfirmDialog(
-                    null,
+            int optionChoice = JOptionPane.showConfirmDialog(null,
                     unit.getName() +  " is a transport with units assigned to it. \n"
                             + "Would you also like to deploy these units?",
-                            "Also deploy transported units?", JOptionPane.YES_NO_OPTION)) {
+                            "Also deploy transported units?", JOptionPane.YES_NO_OPTION);
+            if (optionChoice == JOptionPane.YES_OPTION) {
                 for (UUID id : unit.getTransportedUnits()) {
                     Unit cargo = unit.getCampaign().getUnit(id);
                     if (cargo != null) {

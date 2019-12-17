@@ -348,7 +348,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
         } else if (command.contains(TOEMouseAdapter.REMOVE_FORCE)) {
             for (Force force : forces) {
                 if (null != force && null != force.getParentForce()) {
-                    if (0 != JOptionPane.showConfirmDialog(
+                    if (JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(
                             null,
                             "Are you sure you want to delete "
                                     + force.getFullName() + "?",
@@ -435,11 +435,11 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     if (null != unit && null != scenario) {
                         if (!unit.getTransportedUnits().isEmpty()) {
                             // Prompt the player to also deploy any units transported by this one
-                            if (0 == JOptionPane.showConfirmDialog(
-                                    null,
+                            int optionChoice = JOptionPane.showConfirmDialog(null,
                                     "You are deploying a Transport with units assigned to it. \n"
                                             + "Would you also like to deploy these units?",
-                                            "Also deploy transported units?", JOptionPane.YES_NO_OPTION)) {
+                                            "Also deploy transported units?", JOptionPane.YES_NO_OPTION);
+                            if (optionChoice == JOptionPane.YES_OPTION) {
                                 for (UUID id : unit.getTransportedUnits()) {
                                     Unit cargo = gui.getCampaign().getUnit(id);
                                     if (cargo != null) {
