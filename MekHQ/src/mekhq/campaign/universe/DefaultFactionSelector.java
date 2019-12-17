@@ -21,20 +21,20 @@ package mekhq.campaign.universe;
 import mekhq.campaign.Campaign;
 
 /**
- * Generates {@link Faction} objects.
+ * Selects a {@link Faction} object.
  */
 public class DefaultFactionSelector extends AbstractFactionSelector {
     private String factionCode;
 
     /**
-     * Creates a new DefaultFactionGenerator class which uses
+     * Creates a new DefaultFactionSelector class which uses
      * {@link Campaign#getFaction()} to select the faction.
      */
     public DefaultFactionSelector() {
     }
 
     /**
-     * Creates a new DefaultFactionGenerator using the specified
+     * Creates a new DefaultFactionSelector using the specified
      * faction.
      * @param factionCode The short name of the {@link Faction}.
      */

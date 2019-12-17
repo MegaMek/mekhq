@@ -30,7 +30,7 @@ import mekhq.campaign.universe.Faction;
  */
 public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
 
-    private final AbstractFactionSelector factionGenerator;
+    private final AbstractFactionSelector factionSelector;
 
     /**
      * Creates a new DefaultPersonnelGenerator, which will create
@@ -41,16 +41,16 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
     }
 
     /**
-     * Creates a new DefaultPersonGenerator with a faction generator.
-     * @param factionGenerator The faction generator to use with all generated persons.
+     * Creates a new DefaultPersonGenerator with a faction selector.
+     * @param factionSelector The faction selector to use with all generated persons.
      */
-    public DefaultPersonnelGenerator(AbstractFactionSelector factionGenerator) {
-        this.factionGenerator = Objects.requireNonNull(factionGenerator);
+    public DefaultPersonnelGenerator(AbstractFactionSelector factionSelector) {
+        this.factionSelector = Objects.requireNonNull(factionSelector);
     }
 
     @Override
     protected Person createPerson(Campaign campaign) {
-        Faction faction = this.factionGenerator.selectFaction(campaign);
+        Faction faction = this.factionSelector.selectFaction(campaign);
         if (faction != null) {
             return new Person(campaign, faction.getShortName());
         }
