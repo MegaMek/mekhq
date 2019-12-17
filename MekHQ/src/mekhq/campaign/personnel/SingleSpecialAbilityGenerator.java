@@ -45,7 +45,7 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
         return false;
     }
 
-    private String rollSPA(Person person) {
+    public String rollSPA(Person person) {
         List<SpecialAbility> abilityList = getEligibleSPAs(person);
         if (abilityList.isEmpty()) {
             return null;

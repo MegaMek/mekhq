@@ -47,7 +47,6 @@ import megamek.common.BombType;
 import megamek.common.Compute;
 import megamek.common.ConvFighter;
 import megamek.common.Coords;
-import megamek.common.Crew;
 import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
@@ -81,8 +80,6 @@ import megamek.common.options.GameOptions;
 import megamek.common.options.IBasicOption;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
-import megamek.common.options.OptionsConstants;
-import megamek.common.options.PilotOptions;
 import megamek.common.util.BuildingBlock;
 import megamek.common.util.DirectoryItems;
 import mekhq.campaign.event.AcquisitionEvent;
@@ -4648,73 +4645,6 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
         MekHQ.triggerEvent(new PersonChangedEvent(person));
-    }
-
-    public String rollSPA(int type, Person person) {
-        List<SpecialAbility> abilityList = person.getEligibleSPAs(true);
-        if (abilityList.isEmpty()) {
-            return null;
-        }
-
-        // create a weighted list based on XP
-        List<SpecialAbility> weightedList = SpecialAbility.getWeightedSpecialAbilities(abilityList);
-
-        String name = Utilities.getRandomItem(weightedList).getName();
-        if (name.equals(OptionsConstants.GUNNERY_SPECIALIST)) {
-            String special = Crew.SPECIAL_NONE;
-            switch (Compute.randomInt(2)) {
-                case 0:
-                    special = Crew.SPECIAL_ENERGY;
-                    break;
-                case 1:
-                    special = Crew.SPECIAL_BALLISTIC;
-                    break;
-                case 2:
-                    special = Crew.SPECIAL_MISSILE;
-                    break;
-            }
-            person.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES, name, special);
-        } else if (name.equals(OptionsConstants.GUNNERY_RANGE_MASTER)) {
-            String special = Crew.RANGEMASTER_NONE;
-            switch (Compute.randomInt(2)) {
-                case 0:
-                    special = Crew.RANGEMASTER_MEDIUM;
-                    break;
-                case 1:
-                    special = Crew.RANGEMASTER_LONG;
-                    break;
-                case 2:
-                    special = Crew.RANGEMASTER_EXTREME;
-                    break;
-            }
-            person.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
-                    special);
-        } else if (name.equals(OptionsConstants.MISC_HUMAN_TRO)) {
-            String special = Crew.HUMANTRO_NONE;
-            switch (Compute.randomInt(3)) {
-                case 0:
-                    special = Crew.HUMANTRO_MECH;
-                    break;
-                case 1:
-                    special = Crew.HUMANTRO_AERO;
-                    break;
-                case 2:
-                    special = Crew.HUMANTRO_VEE;
-                    break;
-                case 3:
-                    special = Crew.HUMANTRO_BA;
-                    break;
-            }
-            person.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
-                    special);
-        } else if (name.equals(OptionsConstants.GUNNERY_WEAPON_SPECIALIST)) {
-            person.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
-                    SpecialAbility.chooseWeaponSpecialization(type, getFaction().isClan(),
-                            getCampaignOptions().getTechLevel(), getCalendar().get(GregorianCalendar.YEAR)));
-        } else {
-            person.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES, name, true);
-        }
-        return name;
     }
 
     public void setRanks(Ranks r) {

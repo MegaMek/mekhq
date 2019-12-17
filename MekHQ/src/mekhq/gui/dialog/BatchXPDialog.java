@@ -42,6 +42,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.gui.model.PersonnelTableModel;
@@ -319,7 +320,8 @@ public final class BatchXPDialog extends JDialog {
                 if(campaign.getCampaignOptions().getUseAtB()) {
                     if((p.getPrimaryRole() > Person.T_NONE) && (p.getPrimaryRole() <= Person.T_CONV_PILOT)
                         && (p.getExperienceLevel(false) > experience) && (experience >= SkillType.EXP_REGULAR)) {
-                        String spa = campaign.rollSPA(p.getPrimaryRole(), p);
+                        SingleSpecialAbilityGenerator spaGenerator = new SingleSpecialAbilityGenerator();
+                        String spa = spaGenerator.rollSPA(p);
                         if(null == spa) {
                             if(campaign.getCampaignOptions().useEdge()) {
                                 p.getOptions().acquireAbility(PilotOptions.EDGE_ADVANTAGES, "edge", p.getEdge() + 1); //$NON-NLS-1$

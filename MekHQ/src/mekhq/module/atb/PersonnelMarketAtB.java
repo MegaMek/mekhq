@@ -31,7 +31,7 @@ import mekhq.module.api.PersonnelMarketMethod;
 
 /**
  * Method for generating market personnel according to AtB rules.
- * 
+ *
  * @author Neoancient
  *
  */
@@ -47,7 +47,7 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
         if (c.getCalendar().get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
             List<Person> retVal = new ArrayList<>();
             Person p = null;
-            
+
             int roll = Compute.d6(2);
             if (roll == 2) {
                 switch (Compute.randomInt(4)) {
@@ -124,12 +124,13 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                             p = c.newPerson(Person.T_VEE_GUNNER);
                         }
                         p = c.newPerson((Compute.d6() < 4)?Person.T_GVEE_DRIVER:Person.T_VEE_GUNNER);
+                        /* CAW: Already handled by newPerson.
                         if (c.getCampaignOptions().useAbilities()) {
                             int nabil = Math.max(0, p.getExperienceLevel(false) - SkillType.EXP_REGULAR);
                             while (nabil > 0 && null != c.rollSPA(p.getPrimaryRole(), p)) {
                                 nabil--;
                             }
-                        }
+                        }*/
                         id = UUID.randomUUID();
                         p.setId(id);
                         retVal.add(p);
@@ -197,10 +198,11 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                     adjustSkill(p, SkillType.S_GUN_PROTO, gunneryMod);
                     break;
                 }
+                /* CAW: already handled by Campaign::newPerson
                 int nabil = Math.max(0, p.getExperienceLevel(false) - SkillType.EXP_REGULAR);
                 while (nabil > 0 && null != c.rollSPA(p.getPrimaryRole(), p)) {
                     nabil--;
-                }
+                }*/
             }
             return retVal;
         }
