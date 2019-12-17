@@ -4425,8 +4425,8 @@ public class Campaign implements Serializable, ITechManager {
      *
      * @param type The primary role
      * @param secondary A secondary role; used for LAM pilots to generate MW + Aero pilot
-     * @param factionCode The faction code for the person.
-     * @return
+     * @param factionSelector The faction selector to use for the person.
+     * @return A new {@link Person}.
      */
     public Person newPerson(int type, int secondary, AbstractFactionSelector factionSelector) {
         return newPerson(type, secondary, factionSelector, new NoPlanetSelector());
@@ -4438,9 +4438,9 @@ public class Campaign implements Serializable, ITechManager {
      *
      * @param type The primary role
      * @param secondary A secondary role; used for LAM pilots to generate MW + Aero pilot
-     * @param factionSelector The faction code for the person.
+     * @param factionSelector The faction selector to use for the person.
      * @param planetSelector The planet selector for the person.
-     * @return
+     * @return A new {@link Person}.
      */
     public Person newPerson(int type, int secondary, AbstractFactionSelector factionSelector, AbstractPlanetSelector planetSelector) {
         AbstractPersonnelGenerator personnelGenerator = new DefaultPersonnelGenerator(factionSelector, planetSelector);
