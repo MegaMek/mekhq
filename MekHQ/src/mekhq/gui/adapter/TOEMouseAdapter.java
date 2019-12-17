@@ -1176,7 +1176,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     MenuScroller.setScrollerFor(menu, 30);
                 }
                 if (StaticChecks.areAllUnitsTransported(unitsInForces)) {
-                    menuItem = new JMenuItem("Unassign Unit from Transport Ship");
+                    menuItem = new JMenuItem("Unassign Force from Transport Ship");
                     menuItem.setActionCommand(TOEMouseAdapter.COMMAND_UNASSIGN_FROM_SHIP
                             + unitIds);
                     menuItem.addActionListener(this);
