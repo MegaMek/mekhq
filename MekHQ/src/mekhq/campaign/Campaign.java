@@ -164,12 +164,14 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.unit.UnitTechProgression;
 import mekhq.campaign.universe.AbstractFactionSelector;
+import mekhq.campaign.universe.AbstractPlanetSelector;
 import mekhq.campaign.universe.DefaultFactionSelector;
 import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.News;
 import mekhq.campaign.universe.NewsItem;
+import mekhq.campaign.universe.NoPlanetSelector;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RATGeneratorConnector;
@@ -4401,15 +4403,23 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Person newPerson(int type) {
-        return newPerson(type, getFactionCode());
+        return newPerson(type, new DefaultFactionSelector());
     }
 
     public Person newPerson(int type, int secondary) {
-        return newPerson(type, secondary, getFactionCode());
+        return newPerson(type, secondary, new DefaultFactionSelector());
     }
 
     public Person newPerson(int type, String factionCode) {
-        return newPerson(type, Person.T_NONE, factionCode);
+        return newPerson(type, new DefaultFactionSelector(factionCode));
+    }
+
+    public Person newPerson(int type, AbstractFactionSelector factionSelector) {
+        return newPerson(type, Person.T_NONE, factionSelector);
+    }
+
+    public Person newPerson(int type, AbstractFactionSelector factionSelector, AbstractPlanetSelector planetSelector) {
+        return newPerson(type, Person.T_NONE, factionSelector, planetSelector);
     }
 
     /**
@@ -4421,9 +4431,22 @@ public class Campaign implements Serializable, ITechManager {
      * @param factionCode The faction code for the person.
      * @return
      */
-    public Person newPerson(int type, int secondary, String factionCode) {
-        AbstractFactionSelector factionGenerator = new DefaultFactionSelector(factionCode);
-        AbstractPersonnelGenerator personnelGenerator = new DefaultPersonnelGenerator(factionGenerator);
+    public Person newPerson(int type, int secondary, AbstractFactionSelector factionSelector) {
+        return newPerson(type, secondary, factionSelector, new NoPlanetSelector());
+    }
+
+    /**
+     * Generate a new pilotPerson of the given type using whatever randomization options have been given in the
+     * CampaignOptions
+     *
+     * @param type The primary role
+     * @param secondary A secondary role; used for LAM pilots to generate MW + Aero pilot
+     * @param factionSelector The faction code for the person.
+     * @param planetSelector The planet selector for the person.
+     * @return
+     */
+    public Person newPerson(int type, int secondary, AbstractFactionSelector factionSelector, AbstractPlanetSelector planetSelector) {
+        AbstractPersonnelGenerator personnelGenerator = new DefaultPersonnelGenerator(factionSelector, planetSelector);
         personnelGenerator.setNameGenerator(getRNG());
         personnelGenerator.setSkillPreferences(getRandomSkillPreferences());
 
