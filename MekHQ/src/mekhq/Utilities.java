@@ -65,6 +65,8 @@ import javax.swing.JTable;
 import javax.swing.table.TableModel;
 
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.equipment.*;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -72,6 +74,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
 
+import megamek.client.Client;
 import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
@@ -1597,5 +1600,38 @@ public class Utilities {
 
         // Return the buffered image
         return bimage;
+    }
+    
+    /**
+     * Handles loading a player's transported units onto their transports once a megamek scenario has actually started;
+     * @param scenario - the scenario which is being started
+     * @param client - the player's Client instance
+     */
+    public static void loadPlayerTransports(Scenario scenario, Client client) {
+        Map<String, Integer> idMap = new HashMap<>();
+        // this is a bit inefficient, should really give the client/game the ability to look up an entity by external ID
+        for(Entity entity : client.getEntitiesVector()) {
+            if(entity.getOwnerId() == client.getLocalPlayerNumber()) {
+                idMap.put(entity.getExternalIdAsString(), entity.getId());
+            }
+        }
+        
+        for(Entity potentialTransport : client.getEntitiesVector()) {
+            if((potentialTransport.getOwnerId() == client.getLocalPlayerNumber()) && 
+                    scenario.getTransportLinkages().containsKey(potentialTransport.getExternalIdAsString())) {
+                for(String cargoID : scenario.getTransportLinkages().get(potentialTransport.getExternalIdAsString())) {
+                    Entity cargo = scenario.getExternalIDLookup().get(cargoID);
+                    
+                    // if the game contains the potential cargo unit
+                    // and the potential transport can actually load it, send the load command to the server
+                    if((cargo != null) && 
+                            idMap.containsKey(cargo.getExternalIdAsString()) && 
+                            potentialTransport.canLoad(cargo)) {
+                        client.sendLoadEntity(idMap.get(cargo.getExternalIdAsString()), 
+                                idMap.get(potentialTransport.getExternalIdAsString()), -1);
+                    }
+                }
+            }
+        }
     }
 }
