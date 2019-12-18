@@ -46,6 +46,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -55,6 +56,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.Vector;
@@ -1603,34 +1605,37 @@ public class Utilities {
     }
     
     /**
-     * Handles loading a player's transported units onto their transports once a megamek scenario has actually started;
-     * @param scenario - the scenario which is being started
+     * Handles loading a player's transported units onto their transports once a megamek scenario has actually started.
+     * This separates loading air and ground units, since map type and planetary conditions may prohibit ground unit deployment
+     * while the player wants fighters launched to defend the transport
+     * @param trnId - The MM id of the transport entity we want to load
+     * @param toLoad - List of Entity ids for the units we want to load into this transport
      * @param client - the player's Client instance
+     * @param loadFighters - Should aero type units be loaded?
+     * @param loadGround - should ground units be loaded?
      */
-    public static void loadPlayerTransports(Scenario scenario, Client client) {
-        Map<String, Integer> idMap = new HashMap<>();
-        // this is a bit inefficient, should really give the client/game the ability to look up an entity by external ID
-        for(Entity entity : client.getEntitiesVector()) {
-            if(entity.getOwnerId() == client.getLocalPlayerNumber()) {
-                idMap.put(entity.getExternalIdAsString(), entity.getId());
-            }
+    public static void loadPlayerTransports(int trnId, Set<Integer> toLoad,
+                Client client, boolean loadFighters, boolean loadGround) {
+        if (!loadFighters && !loadGround) {
+            //Nothing to do. Get outta here!
+            return;
         }
-        
-        for(Entity potentialTransport : client.getEntitiesVector()) {
-            if((potentialTransport.getOwnerId() == client.getLocalPlayerNumber()) && 
-                    scenario.getTransportLinkages().containsKey(potentialTransport.getExternalIdAsString())) {
-                for(String cargoID : scenario.getTransportLinkages().get(potentialTransport.getExternalIdAsString())) {
-                    Entity cargo = scenario.getExternalIDLookup().get(cargoID);
-                    
-                    // if the game contains the potential cargo unit
-                    // and the potential transport can actually load it, send the load command to the server
-                    if((cargo != null) && 
-                            idMap.containsKey(cargo.getExternalIdAsString()) && 
-                            potentialTransport.canLoad(cargo)) {
-                        client.sendLoadEntity(idMap.get(cargo.getExternalIdAsString()), 
-                                idMap.get(potentialTransport.getExternalIdAsString()), -1);
-                    }
-                }
+        Entity transport = client.getEntity(trnId);
+        // Reset the transport unit's bays so that we can load them completely
+        transport.resetTransporter();
+        for (int id : toLoad) {
+            Entity cargo = client.getEntity(id);
+            if (cargo == null) {
+                continue;
+            }
+            if (cargo.getTargetBay() == -1) {
+                //Then MHQ did something weird and we don't have the information to load this unit
+                continue;
+            }
+            if (cargo.isFighter() && loadFighters && transport.canLoad(cargo)) {
+                client.sendLoadEntity(trnId, id, cargo.getTargetBay());
+            } else if(loadGround && transport.canLoad(cargo)) {
+                client.sendLoadEntity(trnId, id, cargo.getTargetBay());
             }
         }
     }
