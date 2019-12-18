@@ -77,25 +77,31 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
 
 import megamek.client.Client;
+import megamek.common.ASFBay;
 import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
+import megamek.common.Bay;
 import megamek.common.Compute;
 import megamek.common.ConvFighter;
 import megamek.common.Crew;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.HeavyVehicleBay;
 import megamek.common.ITechnology;
 import megamek.common.Infantry;
 import megamek.common.Jumpship;
 import megamek.common.LandAirMech;
+import megamek.common.LightVehicleBay;
 import megamek.common.Mech;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.Mounted;
 import megamek.common.Protomech;
 import megamek.common.SmallCraft;
+import megamek.common.SmallCraftBay;
+import megamek.common.SuperHeavyVehicleBay;
 import megamek.common.Tank;
 import megamek.common.TechConstants;
 import megamek.common.UnitType;
@@ -1628,15 +1634,76 @@ public class Utilities {
             if (cargo == null) {
                 continue;
             }
-            if (cargo.getTargetBay() == -1) {
-                //Then MHQ did something weird and we don't have the information to load this unit
-                continue;
-            }
-            if (cargo.isFighter() && loadFighters && transport.canLoad(cargo)) {
-                client.sendLoadEntity(trnId, id, cargo.getTargetBay());
-            } else if(loadGround && transport.canLoad(cargo)) {
-                client.sendLoadEntity(trnId, id, cargo.getTargetBay());
+            int bayNumber = selectBestBayFor(cargo, transport);
+            // And now load the units
+            if (cargo.isFighter() && loadFighters && transport.canLoad(cargo) && bayNumber != -1) {
+                client.sendLoadEntity(id, trnId, bayNumber);
+            } else if(loadGround && transport.canLoad(cargo) && bayNumber != -1) {
+                client.sendLoadEntity(id, trnId, bayNumber);
             }
         }
+    }
+    
+    public static int selectBestBayFor(Entity cargo, Entity transport) {
+        if (cargo.isFighter()) {
+            // Try to load ASF bays first, so as not to hog SC bays
+            for (Bay b: transport.getTransportBays()) {
+                if (b instanceof ASFBay && b.canLoad(cargo)) {
+                    return b.getBayNumber();
+                }
+            }
+            for (Bay b: transport.getTransportBays()) {
+                if (b instanceof SmallCraftBay && b.canLoad(cargo)) {
+                    return b.getBayNumber();
+                }
+            }
+        } else if (cargo.getEntityType() == Entity.ETYPE_TANK) {
+            // Try to fit light tanks into light, heavy or superheavy vehicle bays in that order
+            if (cargo.getWeight() <= 50) {
+                for (Bay b: transport.getTransportBays()) {
+                    if (b instanceof LightVehicleBay && b.canLoad(cargo)) {
+                        return b.getBayNumber();
+                    }
+                }
+                for (Bay b: transport.getTransportBays()) {
+                    if (b instanceof HeavyVehicleBay && b.canLoad(cargo)) {
+                        return b.getBayNumber();
+                    }
+                }
+                for (Bay b: transport.getTransportBays()) {
+                    if (b instanceof SuperHeavyVehicleBay && b.canLoad(cargo)) {
+                        return b.getBayNumber();
+                    }
+                }
+            } else if (cargo.getWeight() <= 100) {
+                // Try to fit heavy tanks into heavy or superheavy vehicle bays in that order
+                for (Bay b: transport.getTransportBays()) {
+                    if (b instanceof HeavyVehicleBay && b.canLoad(cargo)) {
+                        return b.getBayNumber();
+                    }
+                }
+                for (Bay b: transport.getTransportBays()) {
+                    if (b instanceof SuperHeavyVehicleBay && b.canLoad(cargo)) {
+                        return b.getBayNumber();
+                    }
+                }
+            } else {
+                // Superheavies should only fit in one type of bay
+                for (Bay b: transport.getTransportBays()) {
+                    if (b.canLoad(cargo)) {
+                        return b.getBayNumber();
+                    }
+                }
+            }
+        } else {
+            // Just return the first available bay
+            for (Bay b : transport.getTransportBays()) {
+                if (b.canLoad(cargo)) {
+                    return b.getBayNumber();
+                }
+            }
+        }
+        // Shouldn't happen
+        return -1;
     }
 }
