@@ -304,11 +304,34 @@ public class AtBGameThread extends GameThread {
                     
                     // Prompt the player to auto-load units into transports
                     if (!scenario.getPlayerTransportLinkages().isEmpty()) {
-                        int choice = JOptionPane.showConfirmDialog(null,
-                                "You are deploying a Transport with units assigned to it.",
-                                        "Load Units on Transport?", JOptionPane.YES_NO_OPTION);
-                        if (JOptionPane.YES_OPTION == choice) {
-                            
+                        boolean loadFighters = false;
+                        boolean loadGround = false;
+                        for (UUID id : scenario.getPlayerTransportLinkages().keySet()) {
+                            Unit transport = campaign.getUnit(id);
+                            Set<Integer> toLoad = new HashSet<>();
+                            // Let the player choose to load fighters and/or ground units on each transport
+                            int ftrChoice = JOptionPane.showConfirmDialog(null,
+                                    "Would you like the fighters assigned to " + transport.getName()
+                                    + " to deploy loaded into its bays?",
+                                            "Load Fighters on Transport?", JOptionPane.YES_NO_OPTION);
+                            if (JOptionPane.YES_OPTION == ftrChoice) {
+                                loadFighters = true;
+                            }
+                            int groundChoice = JOptionPane.showConfirmDialog(null,
+                                    "Would you like the ground units assigned to " + transport.getName()
+                                    + " to deploy loaded into its bays?",
+                                            "Load Ground Units on Transport?", JOptionPane.YES_NO_OPTION);
+                            if (JOptionPane.YES_OPTION == groundChoice) {
+                                loadGround = true;
+                            }
+                            // Now, send the load commands
+                            if (loadFighters || loadGround) {
+                                for (UUID cargoId : scenario.getPlayerTransportLinkages().get(id)) {
+                                    //Convert the list of Unit UUIDs to MM EntityIds
+                                    toLoad.add(campaign.getUnit(cargoId).getEntity().getId());
+                                }
+                                Utilities.loadPlayerTransports(transport.getEntity().getId(), toLoad, client, loadFighters, loadGround);
+                            }
                         }
                     }
                 }
