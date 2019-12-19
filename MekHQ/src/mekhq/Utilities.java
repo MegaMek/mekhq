@@ -1636,9 +1636,9 @@ public class Utilities {
             }
             int bayNumber = selectBestBayFor(cargo, transport);
             // And now load the units
-            if (cargo.isFighter() && loadFighters && transport.canLoad(cargo) && bayNumber != -1) {
+            if (cargo.isFighter() && loadFighters && transport.canLoad(cargo, false) && bayNumber != -1) {
                 client.sendLoadEntity(id, trnId, bayNumber);
-            } else if(loadGround && transport.canLoad(cargo) && bayNumber != -1) {
+            } else if(loadGround && transport.canLoad(cargo, false) && bayNumber != -1) {
                 client.sendLoadEntity(id, trnId, bayNumber);
             }
         }
