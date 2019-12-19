@@ -227,6 +227,12 @@ public class AtBGameThread extends GameThread {
                             continue;
                         }
                         scenario.addPlayerTransportRelationship(unit.getTransportShipId(), unit.getId());
+                        // Set these flags so we know what prompts to display later
+                        if (unit.getEntity().isAero()) {
+                            campaign.getUnit(unit.getTransportShipId()).setCarryingAero(true);
+                        } else {
+                            campaign.getUnit(unit.getTransportShipId()).setCarryingGround(true);
+                        }
                     }
                 }
                 // Now, clean the list of any transports that don't have deployed units in the game
@@ -310,19 +316,17 @@ public class AtBGameThread extends GameThread {
                             Unit transport = campaign.getUnit(id);
                             Set<Integer> toLoad = new HashSet<>();
                             // Let the player choose to load fighters and/or ground units on each transport
-                            int ftrChoice = JOptionPane.showConfirmDialog(null,
-                                    "Would you like the fighters assigned to " + transport.getName()
-                                    + " to deploy loaded into its bays?",
-                                            "Load Fighters on Transport?", JOptionPane.YES_NO_OPTION);
-                            if (JOptionPane.YES_OPTION == ftrChoice) {
-                                loadFighters = true;
+                            if (transport.isCarryingAero()) {
+                                loadFighters = (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
+                                                    "Would you like the fighters assigned to " + transport.getName()
+                                                        + " to deploy loaded into its bays?",
+                                                    "Load Fighters on Transport?", JOptionPane.YES_NO_OPTION));
                             }
-                            int groundChoice = JOptionPane.showConfirmDialog(null,
-                                    "Would you like the ground units assigned to " + transport.getName()
-                                    + " to deploy loaded into its bays?",
-                                            "Load Ground Units on Transport?", JOptionPane.YES_NO_OPTION);
-                            if (JOptionPane.YES_OPTION == groundChoice) {
-                                loadGround = true;
+                            if (transport.isCarryingGround()) {
+                                loadGround = (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
+                                                "Would you like the ground units assigned to " + transport.getName()
+                                                    + " to deploy loaded into its bays?",
+                                                "Load Ground Units on Transport?", JOptionPane.YES_NO_OPTION));
                             }
                             // Now, send the load commands
                             if (loadFighters || loadGround) {

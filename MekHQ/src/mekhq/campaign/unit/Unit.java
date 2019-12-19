@@ -103,6 +103,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     private UUID transportShipId;
     // If this unit is a transport, list all other units assigned to it
     private Set<UUID> transportedUnits = new HashSet<UUID>();
+    private boolean carryingAero = false;
+    private boolean carryingGround = false;
 
     //assignments
     private int forceId;
@@ -323,6 +325,22 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     
     public void clearTransportedUnits() {
         transportedUnits.clear();
+    }
+    
+    public boolean isCarryingAero() {
+        return carryingAero;
+    }
+    
+    public void setCarryingAero(boolean b) {
+        carryingAero = b;
+    }
+    
+    public boolean isCarryingGround() {
+        return carryingGround;
+    }
+    
+    public void setCarryingGround(boolean b) {
+        carryingGround = b;
     }
 
     public int getSite() {
