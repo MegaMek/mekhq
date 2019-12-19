@@ -103,6 +103,17 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     private UUID transportShipId;
     // If this unit is a transport, list all other units assigned to it
     private Set<UUID> transportedUnits = new HashSet<UUID>();
+    private int aeroCapacity;
+    private int baCapacity;
+    private int dockCapacity;
+    private int hVeeCapacity;
+    private int infCapacity;
+    private int lVeeCapacity;
+    private int mechCapacity;
+    private int protoCapacity;
+    private int shVeeCapacity;
+    private int scCapacity;
+    // Convenience data used by GameThread
     private boolean carryingAero = false;
     private boolean carryingGround = false;
 
@@ -190,6 +201,16 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         this.astechDaysMaintained = 0;
         this.lastMaintenanceReport = null;
         this.fluffName = "";
+        this.aeroCapacity = 0;
+        this.baCapacity = 0;
+        this.dockCapacity = 0;
+        this.hVeeCapacity = 0;
+        this.infCapacity = 0;
+        this.lVeeCapacity = 0;
+        this.mechCapacity = 0;
+        this.protoCapacity = 0;
+        this.shVeeCapacity = 0;
+        this.scCapacity = 0;
         reCalc();
     }
 
