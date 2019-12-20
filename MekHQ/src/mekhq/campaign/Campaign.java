@@ -168,12 +168,13 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.News;
 import mekhq.campaign.universe.NewsItem;
-import mekhq.campaign.universe.NoPlanetSelector;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RATGeneratorConnector;
 import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.RandomFactionGenerator;
+import mekhq.campaign.universe.RangedFactionSelector;
+import mekhq.campaign.universe.RangedPlanetSelector;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
@@ -4400,11 +4401,11 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Person newPerson(int type) {
-        return newPerson(type, new DefaultFactionSelector());
+        return newPerson(type, Person.T_NONE);
     }
 
     public Person newPerson(int type, int secondary) {
-        return newPerson(type, secondary, new DefaultFactionSelector());
+        return newPerson(type, secondary, new RangedFactionSelector(getCampaignOptions().getSearchRadius()));
     }
 
     public Person newPerson(int type, String factionCode) {
@@ -4429,7 +4430,7 @@ public class Campaign implements Serializable, ITechManager {
      * @return A new {@link Person}.
      */
     public Person newPerson(int type, int secondary, AbstractFactionSelector factionSelector) {
-        return newPerson(type, secondary, factionSelector, new NoPlanetSelector());
+        return newPerson(type, secondary, factionSelector, new RangedPlanetSelector(getCampaignOptions().getSearchRadius()));
     }
 
     /**
