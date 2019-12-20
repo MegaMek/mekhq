@@ -60,14 +60,14 @@ import mekhq.gui.view.LanceAssignmentView;
 
 /**
  * Contract class for use with Against the Bot rules
- * 
+ *
  * @author Neoancient
  *
  */
 public class AtBContract extends Contract implements Serializable {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1491090021356604379L;
 
@@ -99,7 +99,7 @@ public class AtBContract extends Contract implements Serializable {
     public static final int MORALE_HIGH = 4;
     public static final int MORALE_INVINCIBLE = 5;
     public static final int MORALE_NUM = 6;
-    
+
     public static final String[] moraleLevelNames = {
         "Rout", "Very Low", "Low", "Normal", "High", "Invincible"
     };
@@ -124,10 +124,10 @@ public class AtBContract extends Contract implements Serializable {
     protected AtBContract parentContract;
     /* hired by another mercenary unit on contract to a third-party employer */
     boolean mercSubcontract;
-    
+
     protected String employerCode;
     protected String enemyCode;
-    
+
     protected int missionType;
     protected int allySkill;
     protected int allyQuality;
@@ -141,22 +141,22 @@ public class AtBContract extends Contract implements Serializable {
     protected String enemyCamoCategory;
     protected String enemyCamoFileName;
     protected int enemyColorIndex;
-    
+
     protected int extensionLength;
-    
+
     protected int requiredLances;
     protected int moraleLevel;
     protected Date routEnd;
     protected int partsAvailabilityLevel;
     protected int sharesPct;
-    
+
     protected int playerMinorBreaches;
     protected int employerMinorBreaches;
     protected int contractScoreArbitraryModifier;
-    
+
     protected int moraleMod = 0;
     protected int numBonusParts;
-    
+
     /* lasts for a month, then removed at next events roll */
     protected boolean priorLogisticsFailure;
     /* If the date is non-null, there will be a special mission or big battle
@@ -173,15 +173,15 @@ public class AtBContract extends Contract implements Serializable {
     protected AtBContract() {
         this(null);
     }
-    
+
     public AtBContract(String name) {
         super(name, "Independent");
         employerCode = "IND";
         enemyCode = "IND";
-        
+
         parentContract = null;
         mercSubcontract = false;
-        
+
         missionType = MT_GARRISONDUTY;
         allySkill = RandomSkillsGenerator.L_REG;
         allyQuality = IUnitRating.DRAGOON_C;
@@ -195,7 +195,7 @@ public class AtBContract extends Contract implements Serializable {
         enemyCamoCategory = Player.NO_CAMO;
         enemyCamoFileName = null;
         enemyColorIndex = 2;
-        
+
         extensionLength = 0;
 
         sharesPct = 0;
@@ -206,8 +206,8 @@ public class AtBContract extends Contract implements Serializable {
         specialEventScenarioDate = null;
         battleTypeMod = 0;
         nextWeekBattleTypeMod = 0;
-    }	
-    
+    }
+
     public void initContractDetails(Campaign campaign) {
         if (getEffectiveNumUnits(campaign) <= 12) {
             setOverheadComp(OH_FULL);
@@ -216,11 +216,11 @@ public class AtBContract extends Contract implements Serializable {
         } else {
             setOverheadComp(OH_NONE);
         }
-        
+
         allyBotName = getEmployerName(campaign.getGameYear());
         enemyBotName = getEnemyName(campaign.getGameYear());
     }
-    
+
     public void calculateLength(boolean variable) {
         if (variable) {
             calculateVariableLength();
@@ -255,7 +255,7 @@ public class AtBContract extends Contract implements Serializable {
             }
         }
     }
-    
+
     /* Variable contract lengths taken from AtB v. 2.25 */
     private void calculateVariableLength() {
         switch (missionType) {
@@ -287,7 +287,7 @@ public class AtBContract extends Contract implements Serializable {
             break;
         }
     }
-    
+
     public void calculatePartsAvailabilityLevel(Campaign campaign) {
         /* AtB rules apply -1 from 2950 to 3040, but MekHQ accounts
          * for era variations already
@@ -356,7 +356,7 @@ public class AtBContract extends Contract implements Serializable {
             return false;
         }
     }
-    
+
     public void calculatePaymentMultiplier(Campaign campaign) {
         int unitRatingMod = campaign.getUnitRatingMod();
         double multiplier = 1.0;
@@ -408,7 +408,7 @@ public class AtBContract extends Contract implements Serializable {
             multiplier *= 1.4;
             break;
         }
-        
+
         Faction employer = Faction.getFaction(employerCode);
         if ((null != employer)
                 && (RandomFactionGenerator.getInstance().getFactionHints().isISMajorPower(employer)
@@ -417,7 +417,7 @@ public class AtBContract extends Contract implements Serializable {
         } else if (enemyCode.equals("IND") ||
                 enemyCode.equals("PIND")) {
             multiplier *= 1.0;
-        } else {  
+        } else {
             multiplier *= 1.1;
         }
         if (enemyCode.equals("REB") ||
@@ -431,7 +431,7 @@ public class AtBContract extends Contract implements Serializable {
             cmdrStrategy = campaign.getFlaggedCommander().
                     getSkill(SkillType.S_STRATEGY).getLevel();
         }
-        int maxDeployedLances = 
+        int maxDeployedLances =
             campaign.getCampaignOptions().getBaseStrategyDeployment() +
             campaign.getCampaignOptions().getAdditionalStrategyDeployment() *
             cmdrStrategy;
@@ -448,7 +448,7 @@ public class AtBContract extends Contract implements Serializable {
 
         setMultiplier(multiplier);
     }
-    
+
     public void checkMorale(GregorianCalendar calendar, int dragoonRating) {
         if (null != routEnd) {
             if (calendar.getTime().after(routEnd)) {
@@ -463,7 +463,7 @@ public class AtBContract extends Contract implements Serializable {
         int defeats = 0;
         GregorianCalendar lastMonth = (GregorianCalendar)calendar.clone();
         lastMonth.add(Calendar.MONTH, -1);
-        
+
         for (Scenario s : getScenarios()) {
             if (lastMonth.after(s.getDate())) {
                 continue;
@@ -523,7 +523,7 @@ public class AtBContract extends Contract implements Serializable {
         if (defeats == 0) {
             mod--;
         }
-        
+
         // After finding the applicable modifiers, roll according to the
         // following table to find the new morale level:
         int roll = Compute.d6(2) + mod;
@@ -545,14 +545,14 @@ public class AtBContract extends Contract implements Serializable {
         else if (roll >= 13) {
             moraleLevel += 2;
         }
-        
+
         // Clamp morale to 0 - 5
         if (moraleLevel < 0) moraleLevel = 0;
         if (moraleLevel > 5) moraleLevel = 5;
-        
-        // Enemy defeated, retreats or do not offer opposition to the player 
+
+        // Enemy defeated, retreats or do not offer opposition to the player
         // forces, equal to a early victory for contracts that are not
-        // Garrision-type, and a 1d6-3 (minimum 1) months without enemy 
+        // Garrision-type, and a 1d6-3 (minimum 1) months without enemy
         // activity for Garrision-type contracts.
         if (moraleLevel == 0 && missionType <= MT_RIOTDUTY) {
             GregorianCalendar nextBattleRoll = (GregorianCalendar)calendar.clone();
@@ -560,10 +560,10 @@ public class AtBContract extends Contract implements Serializable {
             nextBattleRoll.add(Calendar.DAY_OF_MONTH, -1);
             routEnd = nextBattleRoll.getTime();
         }
-        
+
         moraleMod = 0;
     }
-    
+
     public int getRepairLocation(int dragoonRating) {
         int retval = Unit.SITE_BAY;
         if (missionType == MT_GUERRILLAWARFARE ||
@@ -577,15 +577,15 @@ public class AtBContract extends Contract implements Serializable {
         }
         return Math.min(retval, Unit.SITE_BAY);
     }
-    
+
     public void addMoraleMod(int mod) {
         moraleMod += mod;
     }
-    
+
     public int getRequiredLanceType() {
         return getRequiredLanceType(missionType);
     }
-    
+
     public static int getRequiredLanceType(int missionType) {
         switch (missionType) {
         case MT_CADREDUTY:
@@ -613,7 +613,7 @@ public class AtBContract extends Contract implements Serializable {
         int battles = 0;
         boolean earlySuccess = false;
         for (Scenario s : getScenarios()) {
-            
+
             /* Special Missions get no points for victory and and only -1
              * for defeat.
              */
@@ -621,7 +621,7 @@ public class AtBContract extends Contract implements Serializable {
                 if (s.getStatus() == Scenario.S_DEFEAT ||
                         s.getStatus() == Scenario.S_MDEFEAT) {
                     score--;
-                }				
+                }
             } else {
                 switch (s.getStatus()) {
                 case Scenario.S_VICTORY:
@@ -663,10 +663,10 @@ public class AtBContract extends Contract implements Serializable {
     public int getContractScoreArbitraryModifier() {
         return contractScoreArbitraryModifier;
     }
-    
+
     public void doBonusRoll(Campaign c) {
         final String METHOD_NAME = "doBonusRoll(Campaign)"; //$NON-NLS-1$
-        
+
         int number;
         String rat = null;
         int roll = Compute.d6();
@@ -675,8 +675,7 @@ public class AtBContract extends Contract implements Serializable {
             number = Compute.d6();
             c.addReport("Bonus: " + number + " dependent" + ((number>1)?"s":""));
             for (int i = 0; i < number; i++) {
-                Person p = c.newPerson(Person.T_ASTECH);
-                p.setDependent(true);
+                Person p = c.newDependent(Person.T_ASTECH);
                 p.setId(UUID.randomUUID());
                 c.addPersonWithoutId(p, true);
             }
@@ -715,7 +714,7 @@ public class AtBContract extends Contract implements Serializable {
                             "Unable to load entity: " + msl.get(0).getSourceFile() + ": " + msl.get(0).getEntryName() + ": " + ex.getMessage()); //$NON-NLS-1$
                     MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
                 }
-                
+
             }
             if (null != en) {
                 c.addUnit(en, false, 0);
@@ -724,27 +723,27 @@ public class AtBContract extends Contract implements Serializable {
             }
         }
     }
-    
+
     public boolean isSubcontract() {
         return parentContract != null;
     }
-    
+
     public AtBContract getParentContract() {
         return parentContract;
     }
-    
+
     public void setParentContract(AtBContract parent) {
         parentContract = parent;
     }
-    
+
     public boolean isMercSubcontract() {
         return mercSubcontract;
     }
-    
+
     public void setMercSubcontract(boolean sub) {
         mercSubcontract = sub;
     }
-    
+
     public void checkEvents(Campaign c) {
         if (c.getCalendar().get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
             nextWeekBattleTypeMod = 0;
@@ -910,13 +909,13 @@ public class AtBContract extends Contract implements Serializable {
                     partsAvailabilityLevel++;
                     break;
                 case 6:
-                    String unit = 
+                    String unit =
                             c.getUnitMarket().addSingleUnit(c, UnitMarket.MARKET_EMPLOYER,
                                     UnitType.MEK, getEmployerCode(),
                                     IUnitRating.DRAGOON_F, 50) +
                                     " offered by employer on the <a href='UNIT_MARKET'>unit market</a>";
                     if (unit != null) {
-                        text += "Surplus Sale: " + unit;						
+                        text += "Surplus Sale: " + unit;
                     }
                 }
                 c.addReport(text);
@@ -942,7 +941,7 @@ public class AtBContract extends Contract implements Serializable {
                 nextMonday.add(Calendar.DAY_OF_WEEK, 7);
             }
             nextMonday.add(Calendar.DAY_OF_WEEK, Calendar.MONDAY - c.getCalendar().get(Calendar.DAY_OF_WEEK));
-            if (specialEventScenarioDate.before(nextMonday.getTime())) {	
+            if (specialEventScenarioDate.before(nextMonday.getTime())) {
                 AtBScenario s = AtBScenarioFactory.createScenario(c, null,
                         specialEventScenarioType, false,
                         specialEventScenarioDate);
@@ -956,13 +955,13 @@ public class AtBContract extends Contract implements Serializable {
             }
         }
     }
-    
+
     public Date getRandomDayOfMonth(GregorianCalendar cal) {
         GregorianCalendar calendar = (GregorianCalendar)cal.clone();
         calendar.set(Calendar.DAY_OF_MONTH, Compute.randomInt(calendar.getActualMaximum(Calendar.DAY_OF_MONTH)) + 1);
         return calendar.getTime();
     }
-    
+
     public int findSpecialMissionType() {
         int roll = Compute.randomInt(20) + 1;
         if (missionType >= MT_DIVERSIONARYRAID) {
@@ -1009,7 +1008,7 @@ public class AtBContract extends Contract implements Serializable {
             return AtBScenario.STARLEAGUECACHE2;
         }
     }
-    
+
     public int findBigBattleType() {
         int roll = Compute.d6();
         if (missionType >= MT_DIVERSIONARYRAID) {
@@ -1040,7 +1039,7 @@ public class AtBContract extends Contract implements Serializable {
             return AtBScenario.PIRATEFREEFORALL;
         }
     }
-    
+
     public boolean contractExtended (Campaign campaign) {
         if (getMissionType() != MT_PIRATEHUNTING &&
                 getMissionType() != MT_RIOTDUTY) {
@@ -1071,7 +1070,7 @@ public class AtBContract extends Contract implements Serializable {
         }
         return false;
     }
-    
+
     @Override
     public Money getMonthlyPayOut() {
         if (extensionLength == 0) {
@@ -1079,7 +1078,7 @@ public class AtBContract extends Contract implements Serializable {
         }
         /* The transport clause and the advance monies have already been
          * accounted for over the original length of the contract. The extension
-         * uses the base monthly amounts for support and overhead, with a 
+         * uses the base monthly amounts for support and overhead, with a
          * 50% bonus to the base amount.
          */
 
@@ -1093,7 +1092,7 @@ public class AtBContract extends Contract implements Serializable {
                 .plus(getOverheadAmount())
                 .dividedBy(getLength());
     }
-    
+
     public void checkForFollowup(Campaign campaign) {
         if ((getMissionType() == AtBContract.MT_DIVERSIONARYRAID ||
                 getMissionType() == AtBContract.MT_RECONRAID ||
@@ -1222,7 +1221,7 @@ public class AtBContract extends Contract implements Serializable {
                 +"<nextWeekBattleTypeMod>"
                 +nextWeekBattleTypeMod
                 +"</nextWeekBattleTypeMod>");
-        
+
         if (null != specialEventScenarioDate) {
             pw1.println(MekHqXmlUtil.indentStr(indent+1)
                     +"<specialEventScenarioDate>"
@@ -1242,7 +1241,7 @@ public class AtBContract extends Contract implements Serializable {
 
         for (int x=0; x<nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            
+
             if (wn2.getNodeName().equalsIgnoreCase("employerCode")) {
                 employerCode = wn2.getTextContent();
             } else if (wn2.getNodeName().equalsIgnoreCase("enemyCode")) {
@@ -1310,12 +1309,12 @@ public class AtBContract extends Contract implements Serializable {
     public String getEmployerCode() {
         return employerCode;
     }
-    
+
     public void setEmployerCode(String code, int year) {
         employerCode = code;
         setEmployer(getEmployerName(year));
     }
-    
+
     public String getEmployerName(int year) {
         if (mercSubcontract) {
             return "Mercenary (" +
@@ -1323,11 +1322,11 @@ public class AtBContract extends Contract implements Serializable {
         }
         return Faction.getFaction(employerCode).getFullName(year);
     }
-    
+
     public String getEnemyCode() {
         return enemyCode;
     }
-        
+
     public String getEnemyName(int year) {
         return Faction.getFaction(enemyCode).getFullName(year);
     }
@@ -1335,16 +1334,16 @@ public class AtBContract extends Contract implements Serializable {
     public void setEnemyCode(String enemyCode) {
         this.enemyCode = enemyCode;
     }
-    
+
     public int getMissionType() {
         return missionType;
     }
-    
+
     public void setMissionType(int missionType) {
         this.missionType = missionType;
         setType(missionTypeNames[missionType]);
     }
-    
+
     public String getMissionTypeName() {
         return missionTypeNames[missionType];
     }
@@ -1352,147 +1351,147 @@ public class AtBContract extends Contract implements Serializable {
     public int getAllySkill() {
         return allySkill;
     }
-    
+
     public void setAllySkill(int allySkill) {
         this.allySkill = allySkill;
     }
-    
+
     public int getEnemySkill() {
         return enemySkill;
     }
-    
+
     public void setEnemySkill(int enemySkill) {
         this.enemySkill = enemySkill;
     }
-    
+
     public int getAllyQuality() {
         return allyQuality;
     }
-    
+
     public void setAllyQuality(int allyQuality) {
         this.allyQuality = allyQuality;
     }
-    
+
     public int getEnemyQuality() {
         return enemyQuality;
     }
-    
+
     public void setEnemyQuality(int enemyQuality) {
         this.enemyQuality = enemyQuality;
     }
-    
+
     public String getAllyBotName() {
         return allyBotName;
     }
-    
+
     public void setAllyBotName(String name) {
         allyBotName = name;
     }
-    
+
     public String getEnemyBotName() {
         return enemyBotName;
     }
-    
+
     public void setEnemyBotName(String name) {
         enemyBotName = name;
     }
-    
+
     public String getAllyCamoCategory() {
         return allyCamoCategory;
     }
-    
+
     public void setAllyCamoCategory(String category) {
         allyCamoCategory = category;
     }
-    
+
     public String getAllyCamoFileName() {
         return allyCamoFileName;
     }
-    
+
     public void setAllyCamoFileName(String fileName) {
         allyCamoFileName = fileName;
     }
-    
+
     public int getAllyColorIndex() {
         return allyColorIndex;
     }
-    
+
     public void setAllyColorIndex(int index) {
         allyColorIndex = index;
     }
-    
+
     public String getEnemyCamoCategory() {
         return enemyCamoCategory;
     }
-    
+
     public void setEnemyCamoCategory(String category) {
         enemyCamoCategory = category;
     }
-    
+
     public String getEnemyCamoFileName() {
         return enemyCamoFileName;
     }
-    
+
     public void setEnemyCamoFileName(String fileName) {
         enemyCamoFileName = fileName;
     }
-    
+
     public int getEnemyColorIndex() {
         return enemyColorIndex;
     }
-    
+
     public void setEnemyColorIndex(int index) {
         enemyColorIndex = index;
     }
-    
+
     public int getRequiredLances() {
         return requiredLances;
     }
-    
+
     public void setRequiredLances(int required) {
         requiredLances = required;
     }
-    
+
     public int getPartsAvailabilityLevel() {
         return partsAvailabilityLevel;
     }
-    
+
     public void adjustPartsAvailabilityLevel(int mod) {
         partsAvailabilityLevel += mod;
     }
-    
+
     public int getMoraleLevel() {
         return moraleLevel;
     }
-    
+
     public void setMoraleLevel(int level) {
         moraleLevel = level;
     }
-    
+
     public String getMoraleLevelName() {
         return moraleLevelNames[moraleLevel];
     }
-    
+
     public int getSharesPct() {
         return sharesPct;
     }
-    
+
     public void setSharesPct(int pct) {
         sharesPct = pct;
     }
-    
+
     public void addPlayerMinorBreach() {
         playerMinorBreaches++;
     }
-    
+
     public void addPlayerMinorBreaches(int num) {
         playerMinorBreaches += num;
     }
-    
+
     public void addEmployerMinorBreach() {
         employerMinorBreaches++;
     }
-    
+
     public void addEmployerMinorBreaches(int num) {
         employerMinorBreaches += num;
     }
@@ -1500,26 +1499,26 @@ public class AtBContract extends Contract implements Serializable {
     public void setContractScoreArbitraryModifier(int newModifier) {
         contractScoreArbitraryModifier = newModifier;
     }
-    
+
     public int getNumBonusParts() {
         return numBonusParts;
     }
-    
+
     public void addBonusParts(int num) {
         numBonusParts += num;
     }
-    
+
     public void useBonusPart() {
         numBonusParts--;
     }
-    
+
     public int getBattleTypeMod() {
         return battleTypeMod + nextWeekBattleTypeMod;
     }
 
     public AtBContract(Contract c, Campaign campaign) {
         this(c.getName());
-        
+
         setType(c.getType());
         setSystemId(c.getSystemId());
         setDesc(c.getDescription());
@@ -1553,7 +1552,7 @@ public class AtBContract extends Contract implements Serializable {
         setSupportAmount(c.getSupportAmount());
         setTransportAmount(c.getTransportAmount());
         setSigningBonusAmount(c.getSigningBonusAmount());
-        
+
         /* Guess at AtBContract values */
         missionType = -1;
         for (int i = 0; i < MT_NUM; i++) {
@@ -1578,14 +1577,14 @@ public class AtBContract extends Contract implements Serializable {
         } else {
             employerCode = f.getShortName();
         }
-        
+
         if (missionType == MT_PIRATEHUNTING) {
             enemyCode = "PIR";
         }
         if (missionType == MT_RIOTDUTY) {
             enemyCode = "REB";
         }
-        
+
         requiredLances = Math.max(getEffectiveNumUnits(campaign) / 6, 1);
         calculatePartsAvailabilityLevel(campaign);
         allyBotName = getEmployerName(campaign.getGameYear());
@@ -1616,7 +1615,7 @@ public class AtBContract extends Contract implements Serializable {
         retVal.setSigningBonusPct(c.getSigningBonusPct());
         retVal.setAdvancePct(c.getAdvancePct());
         retVal.setMRBCFee(c.payMRBCFee());
-        
+
         retVal.setMissionType(c.getMissionType());
         retVal.setEmployerCode(c.getEmployerCode(), campaign.getGameYear());
         retVal.setEnemyCode(c.getEnemyCode());
@@ -1624,8 +1623,8 @@ public class AtBContract extends Contract implements Serializable {
         retVal.calculatePartsAvailabilityLevel(campaign);
         retVal.setAllyBotName(c.getAllyBotName());
         retVal.setEnemyBotName(c.getEnemyBotName());
-        
+
         return retVal;
     }
-    
+
 }

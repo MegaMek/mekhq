@@ -163,6 +163,7 @@ import mekhq.campaign.unit.UnitTechProgression;
 import mekhq.campaign.universe.AbstractFactionSelector;
 import mekhq.campaign.universe.AbstractPlanetSelector;
 import mekhq.campaign.universe.DefaultFactionSelector;
+import mekhq.campaign.universe.DefaultPlanetSelector;
 import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.IUnitGenerator;
@@ -783,8 +784,7 @@ public class Campaign implements Serializable, ITechManager {
                     }
                     int dependents = getRetirementDefectionTracker().getPayout(pid).getDependents();
                     while (dependents > 0) {
-                        Person p = newPerson(Person.T_ASTECH);
-                        p.setDependent(true);
+                        Person p = newDependent(Person.T_ASTECH);
                         if (recruitPerson(p)) {
                             dependents--;
                         } else {
@@ -2991,8 +2991,7 @@ public class Campaign implements Serializable, ITechManager {
                 change++;
             }
             for (int i = 0; i < change; i++) {
-                Person p = newPerson(Person.T_ASTECH);
-                p.setDependent(true);
+                Person p = newDependent(Person.T_ASTECH);
                 p.setId(UUID.randomUUID());
                 addPersonWithoutId(p, true);
             }
@@ -4398,6 +4397,12 @@ public class Campaign implements Serializable, ITechManager {
 
     public PlanetarySystem getSystemByName(String name) {
         return Systems.getInstance().getSystemByName(name, Utilities.getDateTimeDay(calendar));
+    }
+
+    public Person newDependent(int type) {
+        Person person = newPerson(type, new DefaultFactionSelector(), new DefaultPlanetSelector());
+        person.setDependent(true);
+        return person;
     }
 
     public Person newPerson(int type) {

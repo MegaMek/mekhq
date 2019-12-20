@@ -1080,8 +1080,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         extraData.set(PREGNANCY_FATHER_DATA, null);
 
         return IntStream.range(0, size).mapToObj(i -> {
-            Person baby = campaign.newPerson(T_NONE);
-            baby.setDependent(true);
+            Person baby = campaign.newDependent(T_NONE);
             baby.setName(baby.getName().split(" ", 2)[0] + " " + surname);
             baby.setBirthday((GregorianCalendar) campaign.getCalendar().clone());
             UUID babyId = UUID.randomUUID();

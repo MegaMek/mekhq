@@ -124,13 +124,6 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                             p = c.newPerson(Person.T_VEE_GUNNER);
                         }
                         p = c.newPerson((Compute.d6() < 4)?Person.T_GVEE_DRIVER:Person.T_VEE_GUNNER);
-                        /* CAW: Already handled by newPerson.
-                        if (c.getCampaignOptions().useAbilities()) {
-                            int nabil = Math.max(0, p.getExperienceLevel(false) - SkillType.EXP_REGULAR);
-                            while (nabil > 0 && null != c.rollSPA(p.getPrimaryRole(), p)) {
-                                nabil--;
-                            }
-                        }*/
                         id = UUID.randomUUID();
                         p.setId(id);
                         retVal.add(p);
