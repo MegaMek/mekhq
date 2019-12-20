@@ -103,16 +103,16 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     private UUID transportShipId;
     // If this unit is a transport, list all other units assigned to it
     private Set<UUID> transportedUnits = new HashSet<UUID>();
-    private int aeroCapacity;
-    private int baCapacity;
+    private double aeroCapacity;
+    private double baCapacity;
     private int dockCapacity;
-    private int hVeeCapacity;
-    private int infCapacity;
-    private int lVeeCapacity;
-    private int mechCapacity;
-    private int protoCapacity;
-    private int shVeeCapacity;
-    private int scCapacity;
+    private double hVeeCapacity;
+    private double infCapacity;
+    private double lVeeCapacity;
+    private double mechCapacity;
+    private double protoCapacity;
+    private double shVeeCapacity;
+    private double scCapacity;
     // Convenience data used by GameThread
     private boolean carryingAero = false;
     private boolean carryingGround = false;
@@ -293,7 +293,17 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
 
     public void reCalc() {
-        // Do nothing.
+        // Initialize the bay capacity
+        this.aeroCapacity = getASFCapacity();
+        this.baCapacity = getBattleArmorCapacity();
+        this.dockCapacity = getDocks();
+        this.hVeeCapacity = getHeavyVehicleCapacity();
+        this.infCapacity = getInfantryCapacity();
+        this.lVeeCapacity = getLightVehicleCapacity();
+        this.mechCapacity = getMechCapacity();
+        this.protoCapacity = getProtomechCapacity();
+        this.shVeeCapacity = getSuperHeavyVehicleCapacity();
+        this.scCapacity = getSmallCraftCapacity();
     }
 
     public void setEntity(Entity en) {
@@ -1215,6 +1225,16 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     public int getDocks() {
         return getEntity().getDocks();
     }
+    
+    // Get only collars to which a Dropship has been assigned
+    public int getCurrentDocks() {
+        return dockCapacity;
+    }
+    
+    // Used to assign a Dropship to a collar on a specific Jumpship in the TO&E
+    public void setDocks(int docks) {
+        dockCapacity = docks;
+    }
 
     public double getLightVehicleCapacity() {
         double bays = 0;
@@ -1226,14 +1246,14 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return bays;
     }
     
+    // Get only bays to which a light tank has been assigned
     public double getCurrentLightVehicleCapacity() {
-        double bays = 0;
-        for (Bay b : getEntity().getTransportBays()) {
-            if (b instanceof LightVehicleBay) {
-                bays += b.getUnused();
-            }
-        }
-        return bays;
+        return lVeeCapacity;
+    }
+    
+    // Used to assign a tank to a bay on a specific transport ship in the TO&E
+    public void setLightVehicleCapacity(double bays) {
+        lVeeCapacity = bays;
     }
 
     public double getHeavyVehicleCapacity() {
@@ -1246,14 +1266,14 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return bays;
     }
     
+    // Get only bays to which a heavy tank has been assigned
     public double getCurrentHeavyVehicleCapacity() {
-        double bays = 0;
-        for (Bay b : getEntity().getTransportBays()) {
-            if (b instanceof HeavyVehicleBay) {
-                bays += b.getUnused();
-            }
-        }
-        return bays;
+        return hVeeCapacity;
+    }
+    
+    // Used to assign a tank to a bay on a specific transport ship in the TO&E
+    public void setHeavyVehicleCapacity(double bays) {
+        hVeeCapacity = bays;
     }
     
     public double getSuperHeavyVehicleCapacity() {
@@ -1266,15 +1286,16 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return bays;
     }
     
+    // Get only bays to which a superheavy tank has been assigned
     public double getCurrentSuperHeavyVehicleCapacity() {
-        double bays = 0;
-        for (Bay b : getEntity().getTransportBays()) {
-            if (b instanceof SuperHeavyVehicleBay) {
-                bays += b.getUnused();
-            }
-        }
-        return bays;
+        return shVeeCapacity;
     }
+    
+    // Used to assign a tank to a bay on a specific transport ship in the TO&E
+    public void setSuperHeavyVehicleCapacity(double bays) {
+        shVeeCapacity = bays;
+    }
+    
 
     public double getBattleArmorCapacity() {
         double bays = 0;
@@ -1285,15 +1306,14 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         return bays;
     }
-    
+    // Get only bays to which a ba squad has been assigned
     public double getCurrentBattleArmorCapacity() {
-        double bays = 0;
-        for (Bay b : getEntity().getTransportBays()) {
-            if (b instanceof BattleArmorBay) {
-                bays += b.getUnused();
-            }
-        }
-        return bays;
+        return baCapacity;
+    }
+    
+    // Used to assign a ba squad to a bay on a specific transport ship in the TO&E
+    public void setBattleArmorCapacity(double bays) {
+        baCapacity = bays;
     }
 
     public double getInfantryCapacity() {
@@ -1306,14 +1326,15 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return bays;
     }
     
+    // Return the unused tonnage of any conventional infantry bays
     public double getCurrentInfantryCapacity() {
-        double bays = 0;
-        for (Bay b : getEntity().getTransportBays()) {
-            if (b instanceof InfantryBay) {
-                bays += b.getUnused();
-            }
-        }
-        return bays;
+        return infCapacity;
+    }
+    
+    // Used to assign an infantry unit to a bay on a specific transport ship in the TO&E
+    // Tonnage consumed depends on the platoon/squad weight
+    public void setInfantryCapacity(double tonnage) {
+        infCapacity = tonnage;
     }
 
     public double getASFCapacity() {
@@ -1326,14 +1347,14 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return bays;
     }
     
+    // Get only bays to which a fighter has been assigned
     public double getCurrentASFCapacity() {
-        double bays = 0;
-        for (Bay b : getEntity().getTransportBays()) {
-            if (b instanceof ASFBay) {
-                bays += b.getUnused();
-            }
-        }
-        return bays;
+        return aeroCapacity;
+    }
+    
+    // Used to assign a fighter to a bay on a specific transport ship in the TO&E
+    public void setASFCapacity(double bays) {
+        aeroCapacity = bays;
     }
 
     public double getSmallCraftCapacity() {
@@ -1346,14 +1367,14 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return bays;
     }
     
+    // Get only bays to which a small craft has been assigned
     public double getCurrentSmallCraftCapacity() {
-        double bays = 0;
-        for (Bay b : getEntity().getTransportBays()) {
-            if (b instanceof SmallCraftBay) {
-                bays += b.getUnused();
-            }
-        }
-        return bays;
+        return scCapacity;
+    }
+    
+    // Used to assign a small craft to a bay on a specific transport ship in the TO&E
+    public void setSmallCraftCapacity(double bays) {
+        scCapacity = bays;
     }
 
     public double getMechCapacity() {
@@ -1366,14 +1387,14 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return bays;
     }
     
+    // Get only bays to which a mech has been assigned
     public double getCurrentMechCapacity() {
-        double bays = 0;
-        for (Bay b : getEntity().getTransportBays()) {
-            if (b instanceof MechBay) {
-                bays += b.getUnused();
-            }
-        }
-        return bays;
+        return mechCapacity;
+    }
+    
+    // Used to assign a mech or LAM to a bay on a specific transport ship in the TO&E
+    public void setMechCapacity(double bays) {
+        mechCapacity = bays;
     }
 
     public double getProtomechCapacity() {
@@ -1386,14 +1407,14 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return bays;
     }
     
+    // Get only bays to which a protomech has been assigned
     public double getCurrentProtomechCapacity() {
-        double bays = 0;
-        for (Bay b : getEntity().getTransportBays()) {
-            if (b instanceof ProtomechBay) {
-                bays += b.getUnused();
-            }
-        }
-        return bays;
+        return protoCapacity;
+    }
+    
+    // Used to assign a Protomech to a bay on a specific transport ship in the TO&E
+    public void setProtoCapacity(double bays) {
+        protoCapacity = bays;
     }
     
     /**
