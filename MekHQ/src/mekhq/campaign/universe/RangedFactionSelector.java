@@ -21,7 +21,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
     private final int range;
 
     private boolean allowClan = false;
-    private double distanceScale = 10.0;
+    private double distanceScale = 0.35;
     private double mercLikelihood = 0.5;
 
     public RangedFactionSelector(int range) {
@@ -71,7 +71,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
                 continue;
             }
             double distance = planetarySystem.getDistanceTo(currentSystem);
-            double delta = (double)(long)pop / Math.pow(10.0, distance / distanceScale);
+            double delta = 100.0 * Math.log10((long)pop) / (1 + distance * distanceScale);
             for (Faction faction : planetarySystem.getFactionSet(now)) {
                 if (faction.is(Tag.ABANDONED) || faction.is(Tag.HIDDEN) || faction.is(Tag.INACTIVE)
                     || faction.is(Tag.MERC)) {
@@ -94,8 +94,8 @@ public class RangedFactionSelector extends AbstractFactionSelector {
         for (Map.Entry<Faction, Double> faction : weights.entrySet()) {
             // always add to the total, even if we don't add the faction.
             // this ensures low probability factions don't jump to the top.
-            total += faction.getValue();
             if (faction.getValue() > 0.01 && !enemies.contains(faction.getKey())) {
+                total += faction.getValue();
                 factions.put(total, faction.getKey());
             }
         }

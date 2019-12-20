@@ -14,8 +14,27 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
 
     private final int range;
 
+    private double distanceScale = 0.35;
+    private boolean isExtraRandom;
+
     public RangedPlanetSelector(int range) {
         this.range = range;
+    }
+
+    public double getDistanceScale() {
+        return distanceScale;
+    }
+
+    public void setDistanceScale(double distanceScale) {
+        this.distanceScale = distanceScale;
+    }
+
+    public boolean isExtraRandom() {
+        return isExtraRandom;
+    }
+
+    public void setExtraRandom(boolean b) {
+        isExtraRandom = b;
     }
 
     @Override
@@ -36,11 +55,21 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
         for (PlanetarySystem system : systems) {
             double distance = system.getDistanceTo(currentSystem);
             if (faction.is(Tag.MERC) || system.getFactionSet(now).contains(faction)) {
-                Planet planet = system.getPrimaryPlanet();
-                Long pop = planet.getPopulation(now);
-                if (pop != null) {
-                    total += (double)(long)pop / Math.pow(10.0, distance / 10.0);
-                    planets.put(total, planet);
+                if (!isExtraRandom) {
+                    Planet planet = system.getPrimaryPlanet();
+                    Long pop = planet.getPopulation(now);
+                    if (pop != null) {
+                        total += 100.0 * Math.log10((long)pop) / (1 + distance * distanceScale);
+                        planets.put(total, planet);
+                    }
+                } else {
+                    for (Planet planet : system.getPlanets()) {
+                        Long pop = planet.getPopulation(now);
+                        if (pop != null) {
+                            total += 100.0 * Math.log10((long)pop) / (1 + distance * distanceScale);
+                            planets.put(total, planet);
+                        }
+                    }
                 }
             }
         }
