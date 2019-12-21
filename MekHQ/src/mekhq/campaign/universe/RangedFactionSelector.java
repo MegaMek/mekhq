@@ -21,7 +21,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
     private final int range;
 
     private boolean allowClan = false;
-    private double distanceScale = 0.35;
+    private double distanceScale = 0.45;
     private double mercLikelihood = 0.5;
 
     public RangedFactionSelector(int range) {
@@ -59,19 +59,22 @@ public class RangedFactionSelector extends AbstractFactionSelector {
     public Faction selectFaction(Campaign campaign) {
         PlanetarySystem currentSystem = campaign.getCurrentSystem();
 
-        List<PlanetarySystem> systems = Systems.getInstance().getNearbySystems(currentSystem, range);
-
         DateTime now = Utilities.getDateTimeDay(campaign.getDate());
 
         Map<Faction, Double> weights = new HashMap<>();
-        for (PlanetarySystem planetarySystem : systems) {
+        Systems.getInstance().visitNearbySystems(currentSystem, range, planetarySystem -> {
             Planet planet = planetarySystem.getPrimaryPlanet();
             Long pop = planet.getPopulation(now);
             if (pop == null) {
-                continue;
+                return;
             }
+
             double distance = planetarySystem.getDistanceTo(currentSystem);
-            double delta = 100.0 * Math.log10((long)pop) / (1 + distance * distanceScale);
+
+            // Weight the faction by the planet's population divided by its
+            // distance from our current system. The scaling factor is used
+            // to affect the 'spread'.
+            double delta = Math.log10((long)pop) / (1 + distance * distanceScale);
             for (Faction faction : planetarySystem.getFactionSet(now)) {
                 if (faction.is(Tag.ABANDONED) || faction.is(Tag.HIDDEN) || faction.is(Tag.INACTIVE)
                     || faction.is(Tag.MERC)) {
@@ -82,19 +85,24 @@ public class RangedFactionSelector extends AbstractFactionSelector {
                     continue;
                 }
 
-                // each faction on planet is given even weighting...perhaps not ideal
+                // each faction on planet is given even weighting
+                // TODO: apply a weight based on the faction tag (e.g. MAJOR vs MINOR)
                 weights.compute(faction, (f, total) -> total != null ? total + delta : delta);
             }
-        }
+        });
 
         Set<Faction> enemies = getEnemies(campaign);
 
+        //
+        // Convert the tallied per-faction weights into a TreeMap
+        // to perform roulette randomization
+        //
         TreeMap<Double, Faction> factions = new TreeMap<>();
-        double total = 0.0;
+        double total = 0.0, min = weights.values().stream().reduce(0.0, Double::sum) * 0.01;
         for (Map.Entry<Faction, Double> faction : weights.entrySet()) {
-            // always add to the total, even if we don't add the faction.
-            // this ensures low probability factions don't jump to the top.
-            if (faction.getValue() > 0.01 && !enemies.contains(faction.getKey())) {
+            // Only take factions which will have a probability > 1%
+            // ...and are not actively fighting us
+            if (faction.getValue() > min && !enemies.contains(faction.getKey())) {
                 total += faction.getValue();
                 factions.put(total, faction.getKey());
             }

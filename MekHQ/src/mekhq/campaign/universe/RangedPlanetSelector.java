@@ -14,7 +14,7 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
 
     private final int range;
 
-    private double distanceScale = 0.35;
+    private double distanceScale = 0.45;
     private boolean isExtraRandom;
 
     public RangedPlanetSelector(int range) {
