@@ -98,13 +98,16 @@ public class RangedFactionSelector extends AbstractFactionSelector {
         // to perform roulette randomization
         //
         TreeMap<Double, Faction> factions = new TreeMap<>();
-        double total = 0.0, min = weights.values().stream().reduce(0.0, Double::sum) * 0.01;
-        for (Map.Entry<Faction, Double> faction : weights.entrySet()) {
-            // Only take factions which will have a probability > 1%
-            // ...and are not actively fighting us
-            if (faction.getValue() > min && !enemies.contains(faction.getKey())) {
-                total += faction.getValue();
-                factions.put(total, faction.getKey());
+        double total = 0.0;
+        for (Map.Entry<Faction, Double> entry : weights.entrySet()) {
+            Faction faction = entry.getKey();
+            double value = entry.getValue();
+
+            // Only take factions which are not actively fighting us
+            if (!enemies.contains(faction)) {
+                double factionWeight = getFactionWeight(faction);
+                total += value * factionWeight;
+                factions.put(total, faction);
             }
         }
 
@@ -123,5 +126,23 @@ public class RangedFactionSelector extends AbstractFactionSelector {
             }
         }
         return enemies;
+    }
+
+    private double getFactionWeight(Faction faction) {
+        if (faction.is(Tag.MERC) || faction.is(Tag.SUPER) || faction.is(Tag.MAJOR)) {
+            return 1.0;
+        } else if (faction.is(Tag.MINOR)) {
+            return 0.5;
+        } else if (faction.is(Tag.SMALL)) {
+            return 0.2;
+        } else if (faction.is(Tag.REBEL) || faction.is(Tag.CHAOS) 
+                    || faction.is(Tag.TRADER) || faction.is(Tag.PIRATE)) {
+            return 0.05;
+        } else if (faction.is(Tag.CLAN)) {
+            return 0.01;
+        } else {
+            // Don't include any of the other tags
+            return 0.0;
+        }
     }
 }
