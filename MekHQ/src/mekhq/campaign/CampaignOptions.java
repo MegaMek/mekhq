@@ -119,6 +119,8 @@ public class CampaignOptions implements Serializable {
     private boolean capturePrisoners;
     private int defaultPrisonerStatus;
     private boolean showOriginFaction;
+    private boolean randomizeOrigin;
+    private int originSearchRadius;
 
     //personnel market related
     private boolean personnelMarketReportRefresh;
@@ -1006,6 +1008,39 @@ public class CampaignOptions implements Serializable {
      */
     public void setShowOriginFaction(boolean b) {
         showOriginFaction = b;
+    }
+
+    /**
+     * Gets a value indicating whether or not to randomize the
+     * origin of personnel.
+     */
+    public boolean randomizeOrigin() {
+        return randomizeOrigin;
+    }
+
+    /**
+     * Sets a value indicating whether or not to randomize
+     * the origin of personnel.
+     */
+    public void setRandomizeOrigin(boolean b) {
+        randomizeOrigin = b;
+    }
+
+    /**
+     * Gets the search radius to use for randomizing
+     * personnel origins.
+     */
+    public int getOriginSearchRadius() {
+        return originSearchRadius;
+    }
+
+    /**
+     * Sets the search radius to use for randomizing
+     * personnel origins.
+     * @param r The search radius.
+     */
+    public void setOriginSearchRadius(int r) {
+        originSearchRadius = r;
     }
 
     public int getScenarioXP() {
@@ -2278,6 +2313,8 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useDylansRandomXp", useDylansRandomXp);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useQuirks", useQuirks);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "showOriginFaction", showOriginFaction);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "randomizeOrigin", randomizeOrigin);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "originSearchRadius", originSearchRadius);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForParts", payForParts);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForRepairs", payForRepairs);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForUnits", payForUnits);
@@ -2579,6 +2616,10 @@ public class CampaignOptions implements Serializable {
                 retVal.useQuirks = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("showOriginFaction")) {
                 retVal.showOriginFaction = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("randomizeOrigin")) {
+                retVal.randomizeOrigin = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("originSearchRaidus")) {
+                retVal.originSearchRadius = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("payForParts")) {
                 retVal.payForParts = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("payForRepairs")) {
