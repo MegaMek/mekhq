@@ -147,13 +147,15 @@ public class RangedFactionSelector extends AbstractFactionSelector {
     }
 
     private double getFactionWeight(Faction faction) {
-        if (faction.is(Tag.MERC) || faction.is(Tag.SUPER) || faction.is(Tag.MAJOR)) {
+        if (faction.isComstar() || faction.getShortName().equals("WOB")) {
+            return 0.05;
+        } else if (faction.is(Tag.MERC) || faction.is(Tag.SUPER) || faction.is(Tag.MAJOR)) {
             return 1.0;
         } else if (faction.is(Tag.MINOR)) {
             return 0.5;
         } else if (faction.is(Tag.SMALL)) {
             return 0.2;
-        } else if (faction.is(Tag.REBEL) || faction.is(Tag.CHAOS) 
+        } else if (faction.is(Tag.REBEL) || faction.is(Tag.CHAOS)
                     || faction.is(Tag.TRADER) || faction.is(Tag.PIRATE)) {
             return 0.05;
         } else if (faction.is(Tag.CLAN)) {
