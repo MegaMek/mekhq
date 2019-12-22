@@ -341,6 +341,8 @@ public class CampaignOptions implements Serializable {
         useDylansRandomXp = false;
         useQuirks = false;
         showOriginFaction = true;
+        randomizeOrigin = false;
+        originSearchRadius = 60;
         payForParts = false;
         payForRepairs = false;
         payForUnits = false;
