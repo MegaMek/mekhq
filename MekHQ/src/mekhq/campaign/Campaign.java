@@ -4405,12 +4405,28 @@ public class Campaign implements Serializable, ITechManager {
         return person;
     }
 
+    public AbstractFactionSelector getFactionSelector() {
+        if (getCampaignOptions().randomizeOrigin()) {
+            return new RangedFactionSelector(getCampaignOptions().getOriginSearchRadius());
+        } else {
+            return new DefaultFactionSelector();
+        }
+    }
+
+    public AbstractPlanetSelector getPlanetSelector() {
+        if (getCampaignOptions().randomizeOrigin()) {
+            return new RangedPlanetSelector(getCampaignOptions().getOriginSearchRadius());
+        } else {
+            return new DefaultPlanetSelector();
+        }
+    }
+
     public Person newPerson(int type) {
         return newPerson(type, Person.T_NONE);
     }
 
     public Person newPerson(int type, int secondary) {
-        return newPerson(type, secondary, new RangedFactionSelector(getCampaignOptions().getSearchRadius()));
+        return newPerson(type, secondary, getFactionSelector());
     }
 
     public Person newPerson(int type, String factionCode) {
@@ -4435,7 +4451,7 @@ public class Campaign implements Serializable, ITechManager {
      * @return A new {@link Person}.
      */
     public Person newPerson(int type, int secondary, AbstractFactionSelector factionSelector) {
-        return newPerson(type, secondary, factionSelector, new RangedPlanetSelector(getCampaignOptions().getSearchRadius()));
+        return newPerson(type, secondary, factionSelector, getPlanetSelector());
     }
 
     /**
