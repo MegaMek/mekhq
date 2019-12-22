@@ -36,7 +36,12 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
     private boolean isExtraRandom;
 
     public RangedPlanetSelector(int range) {
+        this(range, /*isExtraRandom*/false);
+    }
+
+    public RangedPlanetSelector(int range, boolean isExtraRandom) {
         this.range = range;
+        this.isExtraRandom = isExtraRandom;
     }
 
     public double getDistanceScale() {

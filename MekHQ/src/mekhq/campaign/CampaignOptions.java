@@ -121,6 +121,7 @@ public class CampaignOptions implements Serializable {
     private boolean showOriginFaction;
     private boolean randomizeOrigin;
     private int originSearchRadius;
+    private boolean isOriginExtraRandom;
 
     //personnel market related
     private boolean personnelMarketReportRefresh;
@@ -343,6 +344,7 @@ public class CampaignOptions implements Serializable {
         showOriginFaction = true;
         randomizeOrigin = false;
         originSearchRadius = 60;
+        isOriginExtraRandom = false;
         payForParts = false;
         payForRepairs = false;
         payForUnits = false;
@@ -1043,6 +1045,24 @@ public class CampaignOptions implements Serializable {
      */
     public void setOriginSearchRadius(int r) {
         originSearchRadius = r;
+    }
+
+    /**
+     * Gets a value indicating whether or not to randomize
+     * origin to the planetary level, rather than just the
+     * system level.
+     */
+    public boolean isOriginExtraRandom() {
+        return isOriginExtraRandom;
+    }
+
+    /**
+     * Sets a value indicating whether or not to randomize
+     * origin to the planetary level, rather than just the
+     * system level.
+     */
+    public void setOriginExtraRandom(boolean b) {
+        isOriginExtraRandom = b;
     }
 
     public int getScenarioXP() {
@@ -2317,6 +2337,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "showOriginFaction", showOriginFaction);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "randomizeOrigin", randomizeOrigin);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "originSearchRadius", originSearchRadius);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "isOriginExtraRandom", isOriginExtraRandom);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForParts", payForParts);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForRepairs", payForRepairs);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForUnits", payForUnits);
@@ -2622,6 +2643,8 @@ public class CampaignOptions implements Serializable {
                 retVal.randomizeOrigin = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("originSearchRaidus")) {
                 retVal.originSearchRadius = Integer.parseInt(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("isOriginExtraRandom")) {
+                retVal.isOriginExtraRandom = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("payForParts")) {
                 retVal.payForParts = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("payForRepairs")) {
