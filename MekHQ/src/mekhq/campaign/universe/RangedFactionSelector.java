@@ -39,8 +39,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
     private final int range;
 
     private boolean allowClan = false;
-    private double distanceScale = 0.45;
-    private double mercLikelihood = 0.5;
+    private double distanceScale = 0.6;
 
     public RangedFactionSelector(int range) {
         this.range = range;
@@ -62,17 +61,6 @@ public class RangedFactionSelector extends AbstractFactionSelector {
         this.distanceScale = distanceScale;
     }
 
-    /**
-     * @return the mercLikelihood
-     */
-    public double getMercLikelihood() {
-        return mercLikelihood;
-    }
-
-    public void setMercLikelihood(double fraction) {
-        mercLikelihood = fraction;
-    }
-
     @Override
     public Faction selectFaction(Campaign campaign) {
         PlanetarySystem currentSystem = campaign.getCurrentSystem();
@@ -83,7 +71,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
         Systems.getInstance().visitNearbySystems(currentSystem, range, planetarySystem -> {
             Planet planet = planetarySystem.getPrimaryPlanet();
             Long pop = planet.getPopulation(now);
-            if (pop == null) {
+            if (pop == null || (long)pop <= 0) {
                 return;
             }
 
@@ -109,6 +97,10 @@ public class RangedFactionSelector extends AbstractFactionSelector {
             }
         });
 
+        if (weights.isEmpty()) {
+            return Faction.getFaction("MERC");
+        }
+
         Set<Faction> enemies = getEnemies(campaign);
 
         //
@@ -130,7 +122,12 @@ public class RangedFactionSelector extends AbstractFactionSelector {
         }
 
         // There is a chance they're a merc!
-        factions.put(total + total * mercLikelihood, Faction.getFaction("MERC"));
+        Faction mercenaries = Faction.getFaction("MERC");
+        if (factions.isEmpty()) {
+            return mercenaries;
+        }
+
+        factions.put(total + total * getFactionWeight(mercenaries), mercenaries);
 
         double random = ThreadLocalRandom.current().nextDouble(factions.lastKey());
         return factions.ceilingEntry(random).getValue();

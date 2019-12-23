@@ -32,7 +32,7 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
 
     private final int range;
 
-    private double distanceScale = 0.45;
+    private double distanceScale = 0.6;
     private boolean isExtraRandom;
 
     public RangedPlanetSelector(int range) {
@@ -81,14 +81,14 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
                 if (!isExtraRandom) {
                     Planet planet = system.getPrimaryPlanet();
                     Long pop = planet.getPopulation(now);
-                    if (pop != null) {
+                    if (pop != null && (long)pop > 0) {
                         total += 100.0 * Math.log10((long)pop) / (1 + distance * distanceScale);
                         planets.put(total, planet);
                     }
                 } else {
                     for (Planet planet : system.getPlanets()) {
                         Long pop = planet.getPopulation(now);
-                        if (pop != null) {
+                        if (pop != null && (long)pop > 0) {
                             total += 100.0 * Math.log10((long)pop) / (1 + distance * distanceScale);
                             planets.put(total, planet);
                         }

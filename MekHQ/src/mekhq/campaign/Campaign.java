@@ -4407,7 +4407,9 @@ public class Campaign implements Serializable, ITechManager {
 
     public AbstractFactionSelector getFactionSelector() {
         if (getCampaignOptions().randomizeOrigin()) {
-            return new RangedFactionSelector(getCampaignOptions().getOriginSearchRadius());
+            RangedFactionSelector selector = new RangedFactionSelector(getCampaignOptions().getOriginSearchRadius());
+            selector.setDistanceScale(getCampaignOptions().getOriginDistanceScale());
+            return selector;
         } else {
             return new DefaultFactionSelector();
         }
@@ -4415,8 +4417,11 @@ public class Campaign implements Serializable, ITechManager {
 
     public AbstractPlanetSelector getPlanetSelector() {
         if (getCampaignOptions().randomizeOrigin()) {
-            return new RangedPlanetSelector(getCampaignOptions().getOriginSearchRadius(),
+            RangedPlanetSelector selector =
+                new RangedPlanetSelector(getCampaignOptions().getOriginSearchRadius(),
                         getCampaignOptions().isOriginExtraRandom());
+            selector.setDistanceScale(getCampaignOptions().getOriginDistanceScale());
+            return selector;
         } else {
             return new DefaultPlanetSelector();
         }
