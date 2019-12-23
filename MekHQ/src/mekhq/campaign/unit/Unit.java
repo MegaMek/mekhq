@@ -100,7 +100,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     private int oldId;
     private String fluffName;
     // This is the ID of the large craft assigned to transport this unit
-    private UUID transportShipId;
+    private Map<UUID,Integer> transportShipId = new HashMap<>();
     // If this unit is a transport, list all other units assigned to it
     private Set<UUID> transportedUnits = new HashSet<UUID>();
     private double aeroCapacity;
@@ -201,16 +201,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         this.astechDaysMaintained = 0;
         this.lastMaintenanceReport = null;
         this.fluffName = "";
-        this.aeroCapacity = 0;
-        this.baCapacity = 0;
-        this.dockCapacity = 0;
-        this.hVeeCapacity = 0;
-        this.infCapacity = 0;
-        this.lVeeCapacity = 0;
-        this.mechCapacity = 0;
-        this.protoCapacity = 0;
-        this.shVeeCapacity = 0;
-        this.scCapacity = 0;
         reCalc();
     }
 
@@ -291,8 +281,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
     }
 
-
     public void reCalc() {
+        //Do Nothing
+    }
+    
+    public void initializeBaySpace() {
         // Initialize the bay capacity
         this.aeroCapacity = getASFCapacity();
         this.baCapacity = getBattleArmorCapacity();
@@ -334,12 +327,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return transportShipId != null;
     }
     
-    public UUID getTransportShipId() {
+    public Map<UUID,Integer> getTransportShipId() {
         return transportShipId;
     }
 
-    public void setTransportShipId(UUID i) {
-        this.transportShipId = i;
+    public void setTransportShipId(UUID i, int bayNumber) {
+        transportShipId.put(i, bayNumber);
     }
     
     public Set<UUID> getTransportedUnits() {
@@ -1426,18 +1419,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      */
     public void loadTransportShip(Vector<Unit> units) {
         for (Unit u : units) {
-            for (Bay b : getEntity().getTransportBays()) {
-                if (b.canLoad(u.getEntity())) {
-                    u.setTransportShipId(getId());
-                    u.getEntity().setTargetBay(b.getBayNumber());
-                    addTransportedUnit(u.getId());
-                    // Go ahead and use this here to make sure various Bay values get updated properly
-                    b.load(u.getEntity());
-                    // In MHQ, we don't care about how many units per turn the bay can load
-                    b.resetCounts();
-                    break;
-                }
-            }
+            int bayNumber = Utilities.selectBestBayFor(u.getEntity(), getEntity());
+            u.setTransportShipId(getId(),bayNumber);
+            addTransportedUnit(u.getId());
         }
     }
     
@@ -1447,16 +1431,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * @param unit The unit that we wish to unload from this transport
      */
     public void unloadFromTransportShip(Unit u) {
-        Bay b = getEntity().getBayById(u.getEntity().getTargetBay());
-        if (b != null && b.getLoadedUnits().contains(u.getEntity())) {
-            removeTransportedUnit(u.getId());
-            // Go ahead and use this here to make sure various Bay values get updated properly
-            b.unload(u.getEntity());
-            // In MHQ, we don't care about how many units per turn the bay can unload
-            b.resetCounts();
-        }
-        u.getEntity().setTargetBay(-1); //Safety set!
-        u.setTransportShipId(null);
+        removeTransportedUnit(u.getId());
+        u.getTransportShipId().clear();
     }
     
     /**
@@ -1464,20 +1440,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * This removes all units assigned to the transport from it
      */
     public void unloadTransportShip() {
-        for (Bay b : getEntity().getTransportBays()) {
-            // Unload everyone from the bay
-            for (Entity e : b.getLoadedUnits()) {
-                b.unload(e);
-                // In MHQ, we don't care about how many units per turn the bay can unload
-                b.resetCounts();
-            }
-            clearTransportedUnits();
-        }
+        clearTransportedUnits();
         // And now reset the Transported values for all the units we just booted
         for (Unit u : campaign.getUnits()) {
             if (u.hasTransportShipId() && u.getTransportShipId().equals(getId())) {
-                u.getEntity().setTargetBay(-1);
-                u.setTransportShipId(null);
+                u.getTransportShipId().clear();
             }
         }
     }
@@ -1597,15 +1564,38 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         // If this entity is assigned to a transport, write that
         if (hasTransportShipId()) {
-            pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
-                    +"<transportShipId>"
-                    +getTransportShipId().toString()
-                    +"</transportShipId>");
+            for (UUID id : getTransportShipId().keySet()) {
+                pw1.println(MekHqXmlUtil.indentStr(indentLvl+1) + "<transportShipId=\"" + id.toString() + "\"/>"
+                        + getTransportShipId().get(id)
+                        + "</transportShipId>");
+            }
         }
         for (UUID uid : getTransportedUnits()) {
             pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<transportedUnitId>"
                     + uid.toString() + "</transportedUnitId>");
         }
+        //Used transport bay space
+        pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<asfCapacity>"
+                + aeroCapacity + "</asfCapacity>");
+        pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<baCapacity>"
+                + baCapacity + "</baCapacity>");
+        pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<dockCapacity>"
+                + dockCapacity + "</dockCapacity>");
+        pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<hVeeCapacity>"
+                + hVeeCapacity + "</hVeeCapacity>");
+        pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<infCapacity>"
+                + infCapacity + "</infCapacity>");
+        pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<lVeeCapacity>"
+                + lVeeCapacity + "</lVeeCapacity>");
+        pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<mechCapacity>"
+                + mechCapacity + "</mechCapacity>");
+        pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<protoCapacity>"
+                + protoCapacity + "</protoCapacity>");
+        pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<scCapacity>"
+                + scCapacity + "</scCapacity>");
+        pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<shVeeCapacity>"
+                + shVeeCapacity + "</shVeeCapacity>");
+        //Salvage status
         pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<salvaged>"
                 + salvaged + "</salvaged>");
         pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<site>" + site
@@ -1736,11 +1726,45 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         retVal.tech = UUID.fromString(wn2.getTextContent());
                     }
                 }
+                /*
                 else if (wn2.getNodeName().equalsIgnoreCase("transportShipId")) {
-                    retVal.setTransportShipId(UUID.fromString(wn2.getTextContent()));
+                    UUID id = UUID.fromString(wn2.getFirstChild().getNodeName());
+                    int bay = Integer.parseInt(wn2.getFirstChild().getTextContent());
+                        retVal.setTransportShipId(id, bay);
                 }
+                */
                 else if (wn2.getNodeName().equalsIgnoreCase("transportedUnitId")) {
                     retVal.addTransportedUnit(UUID.fromString(wn2.getTextContent()));
+                }
+                else if (wn2.getNodeName().equalsIgnoreCase("asfCapacity")) {
+                    retVal.aeroCapacity = Integer.parseInt(wn2.getTextContent());
+                }
+                else if (wn2.getNodeName().equalsIgnoreCase("baCapacity")) {
+                    retVal.baCapacity = Integer.parseInt(wn2.getTextContent());
+                }
+                else if (wn2.getNodeName().equalsIgnoreCase("dockCapacity")) {
+                    retVal.dockCapacity = Integer.parseInt(wn2.getTextContent());
+                }
+                else if (wn2.getNodeName().equalsIgnoreCase("hVeeCapacity")) {
+                    retVal.hVeeCapacity = Integer.parseInt(wn2.getTextContent());
+                }
+                else if (wn2.getNodeName().equalsIgnoreCase("infCapacity")) {
+                    retVal.infCapacity = Integer.parseInt(wn2.getTextContent());
+                }
+                else if (wn2.getNodeName().equalsIgnoreCase("lVeeCapacity")) {
+                    retVal.lVeeCapacity = Integer.parseInt(wn2.getTextContent());
+                }
+                else if (wn2.getNodeName().equalsIgnoreCase("mechCapacity")) {
+                    retVal.mechCapacity = Integer.parseInt(wn2.getTextContent());
+                }
+                else if (wn2.getNodeName().equalsIgnoreCase("protoCapacity")) {
+                    retVal.protoCapacity = Integer.parseInt(wn2.getTextContent());
+                }
+                else if (wn2.getNodeName().equalsIgnoreCase("scCapacity")) {
+                    retVal.scCapacity = Integer.parseInt(wn2.getTextContent());
+                }
+                else if (wn2.getNodeName().equalsIgnoreCase("shVeeCapacity")) {
+                    retVal.shVeeCapacity = Integer.parseInt(wn2.getTextContent());
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("forceId")) {
                     retVal.forceId = Integer.parseInt(wn2.getTextContent());
