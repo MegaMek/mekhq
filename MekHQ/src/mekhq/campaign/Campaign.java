@@ -1134,6 +1134,7 @@ public class Campaign implements Serializable, ITechManager {
         Unit unit = new Unit(en, this);
         unit.setId(id);
         units.put(id, unit);
+        unit.initializeBaySpace();
         removeUnitFromForce(unit); // Added to avoid the 'default force bug'
         // when calculating cargo
         
@@ -3729,6 +3730,7 @@ public class Campaign implements Serializable, ITechManager {
             Unit u = getUnit(uid);
             if (null != u) {
                 u.initializeParts(true);
+                u.initializeBaySpace();
                 u.runDiagnostic(false);
             }
         }

@@ -991,6 +991,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             saveCustomization();
         }
         oldUnit.setRefit(this);
+        // Bay space might change, and either way all cargo needs to be unloaded while the refit is in progress
+        oldUnit.unloadTransportShip();
         newEntity.setOwner(oldUnit.getEntity().getOwner());
         // We don't want to require waiting for a refit kit if all that is missing is ammo or ammo bins.
         Map<AmmoType,Integer> shotsNeeded = new HashMap<>();
@@ -1377,6 +1379,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 
         //dont forget to switch entities!
         oldUnit.setEntity(newEntity);
+        //Bay capacities might have changed - reset them
+        oldUnit.initializeBaySpace();
 
         //set up new parts
         ArrayList<Part> newParts = new ArrayList<>();
