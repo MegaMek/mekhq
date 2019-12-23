@@ -64,7 +64,6 @@ import mekhq.adapter.PressureAdapter;
 import mekhq.adapter.SocioIndustrialDataAdapter;
 import mekhq.adapter.StringListAdapter;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.io.CampaignXmlParser;
 import mekhq.campaign.universe.Faction.Tag;
 
 
@@ -508,12 +507,19 @@ public class Planet implements Serializable {
         if( null == when || null == events || null == getter ) {
             return defaultValue;
         }
-        Map.Entry<DateTime, PlanetaryEvent> event = events.floorEntry(when);
+
         T result = null;
-        while (event != null && result == null) {
+
+        // Walk backwards starting from the defined date...
+        Map<DateTime, PlanetaryEvent> map = events.headMap(when, /*inclusive:*/true).descendingMap();
+        for (Map.Entry<DateTime, PlanetaryEvent> event : map.entrySet()) {
             result = getter.get(event.getValue());
-            event = events.lowerEntry(event.getKey());
+            if (result != null) {
+                // ...taking the first non-null value.
+                break;
+            }
         }
+
         return Utilities.nonNull(result, defaultValue);
     }
 
