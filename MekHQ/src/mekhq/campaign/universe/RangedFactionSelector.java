@@ -20,7 +20,6 @@ package mekhq.campaign.universe;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -34,35 +33,93 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.universe.Faction.Tag;
 
+/**
+ * An implementation of {@link AbstractFactionSelector} which chooses
+ * a faction from a defined range of planets.
+ */
 public class RangedFactionSelector extends AbstractFactionSelector {
 
     private final int range;
 
+    private DateTime cachedDate;
+    private PlanetarySystem cachedSystem;
+    private TreeMap<Double, Faction> cachedFactions;
+
     private boolean allowClan = false;
     private double distanceScale = 0.6;
 
+    /**
+     * Creates a new {@code RangedFactionSelector} with the given range.
+     * @param range The range around the current location ({@link Campaign#getCurrentSystem()})
+     *              from which to select factions.
+     */
     public RangedFactionSelector(int range) {
         this.range = range;
     }
 
+    /**
+     * Gets a value indicating whether or not the clans are a valid
+     * faction to choose from.
+     * @return A value indicating whether or not the clans are a valid
+     *         faction to choose from.
+     */
     public boolean isAllowClan() {
         return allowClan;
     }
 
+    /**
+     * Sets a value indicating whether or not the clans are a valid
+     * faction to choose from.
+     * @param allowClan {@code true} if clans should be considered
+     *                  during faction selection, otherwise {@code false}.
+     */
     public void setAllowClan(boolean allowClan) {
         this.allowClan = allowClan;
+        clearCache();
     }
 
+    /**
+     * Gets a scale to apply to planetary distances.
+     * @return The scaling factor to apply to planetary distances.
+     */
     public double getDistanceScale() {
         return distanceScale;
     }
 
+    /**
+     * Sets the scale to apply to planetary distances.
+     * @param distanceScale A scaling factor--ideally between 0.1 and 2.0--
+     *                      to apply to planetary distances during weighting.
+     *                      Values above 1.0 prefer the current location,
+     *                      while values closer to 0.1 spread out the faction
+     *                      selection.
+     */
     public void setDistanceScale(double distanceScale) {
         this.distanceScale = distanceScale;
+        clearCache();
     }
 
     @Override
     public Faction selectFaction(Campaign campaign) {
+        if (cachedFactions == null
+            || !cachedSystem.equals(campaign.getCurrentSystem())
+            || Utilities.getDateTimeDay(campaign.getDate()).isAfter(cachedDate)) {
+            createLookupMap(campaign);
+        }
+
+        double random = ThreadLocalRandom.current().nextDouble(cachedFactions.lastKey());
+        return cachedFactions.ceilingEntry(random).getValue();
+    }
+
+    /**
+     * Clears the cache associated with faction probabilities.
+     */
+    public void clearCache() {
+        cachedDate = null;
+        cachedFactions = null;
+    }
+
+    private void createLookupMap(Campaign campaign) {
         PlanetarySystem currentSystem = campaign.getCurrentSystem();
 
         DateTime now = Utilities.getDateTimeDay(campaign.getDate());
@@ -91,14 +148,24 @@ public class RangedFactionSelector extends AbstractFactionSelector {
                     continue;
                 }
 
-                // each faction on planet is given even weighting
-                // TODO: apply a weight based on the faction tag (e.g. MAJOR vs MINOR)
+                // each faction on planet is given even weighting here, and then faction tag
+                // weights are applied before calculating the probabilities
                 weights.compute(faction, (f, total) -> total != null ? total + delta : delta);
             }
         });
 
+        Faction mercenaries = Faction.getFaction("MERC");
+        TreeMap<Double, Faction> factions = new TreeMap<>();
         if (weights.isEmpty()) {
-            return Faction.getFaction("MERC");
+            factions.put(1.0, mercenaries);
+            if (!campaign.getFaction().equals(mercenaries)) {
+                factions.put(2.0, campaign.getFaction());
+            }
+
+            cachedDate = now;
+            cachedSystem = currentSystem;
+            cachedFactions = factions;
+            return;
         }
 
         Set<Faction> enemies = getEnemies(campaign);
@@ -107,7 +174,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
         // Convert the tallied per-faction weights into a TreeMap
         // to perform roulette randomization
         //
-        TreeMap<Double, Faction> factions = new TreeMap<>();
+
         double total = 0.0;
         for (Map.Entry<Faction, Double> entry : weights.entrySet()) {
             Faction faction = entry.getKey();
@@ -122,17 +189,25 @@ public class RangedFactionSelector extends AbstractFactionSelector {
         }
 
         // There is a chance they're a merc!
-        Faction mercenaries = Faction.getFaction("MERC");
         if (factions.isEmpty()) {
-            return mercenaries;
+            factions.put(1.0, mercenaries);
+            if (!campaign.getFaction().equals(mercenaries)) {
+                factions.put(2.0, campaign.getFaction());
+            }
+        } else {
+            factions.put(total + total * getFactionWeight(mercenaries), mercenaries);
         }
 
-        factions.put(total + total * getFactionWeight(mercenaries), mercenaries);
-
-        double random = ThreadLocalRandom.current().nextDouble(factions.lastKey());
-        return factions.ceilingEntry(random).getValue();
+        cachedDate = now;
+        cachedSystem = currentSystem;
+        cachedFactions = factions;
     }
 
+    /**
+     * Gets the set of enemies for the {@link Campaign}.
+     * @param campaign The current campaign.
+     * @return A set of current enemies for the {@link Campaign}.
+     */
     private Set<Faction> getEnemies(Campaign campaign) {
         Set<Faction> enemies = new HashSet<>();
         for (Contract contract : campaign.getActiveContracts()) {
@@ -143,6 +218,14 @@ public class RangedFactionSelector extends AbstractFactionSelector {
         return enemies;
     }
 
+    /**
+     * Gets a weight to apply to a {@link Faction}. This is based on the
+     * tags assigned to the faction.
+     *
+     * @param faction The {@link Faction} to get a weight when calculating
+     *                probabilities.
+     * @return A weight to apply to the given {@link Faction}.
+     */
     private double getFactionWeight(Faction faction) {
         if (faction.isComstar() || faction.getShortName().equals("WOB")) {
             return 0.05;
