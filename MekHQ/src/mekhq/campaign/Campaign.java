@@ -4399,12 +4399,21 @@ public class Campaign implements Serializable, ITechManager {
         return Systems.getInstance().getSystemByName(name, Utilities.getDateTimeDay(calendar));
     }
 
+    /**
+     * Creates a new {@link Person}, who is a dependent, of a given primary role.
+     * @param type The primary role of the {@link Person}, e.g. {@link Person#T_MECHWARRIOR}.
+     * @return A new {@link Person} of the given primary role, who is a dependent.
+     */
     public Person newDependent(int type) {
         Person person = newPerson(type, new DefaultFactionSelector(), new DefaultPlanetSelector());
         person.setDependent(true);
         return person;
     }
 
+    /**
+     * Gets the {@link AbstractFactionSelector} to use with this campaign.
+     * @return An {@link AbstractFactionSelector} to use when selecting a {@link Faction}.
+     */
     public AbstractFactionSelector getFactionSelector() {
         if (getCampaignOptions().randomizeOrigin()) {
             RangedFactionSelector selector = new RangedFactionSelector(getCampaignOptions().getOriginSearchRadius());
@@ -4415,6 +4424,10 @@ public class Campaign implements Serializable, ITechManager {
         }
     }
 
+    /**
+     * Gets the {@link AbstractPlanetSelector} to use with this campaign.
+     * @return An {@link AbstractPlanetSelector} to use when selecting a {@link Planet}.
+     */
     public AbstractPlanetSelector getPlanetSelector() {
         if (getCampaignOptions().randomizeOrigin()) {
             RangedPlanetSelector selector =
@@ -4425,6 +4438,19 @@ public class Campaign implements Serializable, ITechManager {
         } else {
             return new DefaultPlanetSelector();
         }
+    }
+
+    /**
+     * Gets the {@link AbstractPersonnelGenerator} to use with this campaign.
+     * @param factionSelector The {@link AbstractFactionSelector} to use when choosing a {@link Faction}.
+     * @param planetSelector The {@link AbstractPlanetSelector} to use when choosing a {@link Planet}.
+     * @return An {@link AbstractPersonnelGenerator} to use when creating new personnel.
+     */
+    public AbstractPersonnelGenerator getPersonnelGenerator(AbstractFactionSelector factionSelector, AbstractPlanetSelector planetSelector) {
+        DefaultPersonnelGenerator generator = new DefaultPersonnelGenerator(factionSelector, planetSelector);
+        generator.setNameGenerator(getRNG());
+        generator.setSkillPreferences(getRandomSkillPreferences());
+        return generator;
     }
 
     public Person newPerson(int type) {
@@ -4471,10 +4497,7 @@ public class Campaign implements Serializable, ITechManager {
      * @return A new {@link Person}.
      */
     public Person newPerson(int type, int secondary, AbstractFactionSelector factionSelector, AbstractPlanetSelector planetSelector) {
-        AbstractPersonnelGenerator personnelGenerator = new DefaultPersonnelGenerator(factionSelector, planetSelector);
-        personnelGenerator.setNameGenerator(getRNG());
-        personnelGenerator.setSkillPreferences(getRandomSkillPreferences());
-
+        AbstractPersonnelGenerator personnelGenerator = getPersonnelGenerator(factionSelector, planetSelector);
         return newPerson(type, secondary, personnelGenerator);
     }
 
