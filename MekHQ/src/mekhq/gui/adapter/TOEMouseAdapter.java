@@ -236,9 +236,11 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                 } else {
                     //First, remove the units from any other Transport they might be on
                     for (Unit u : units) {
-                        Unit oldShip = gui.getCampaign().getUnit(u.getTransportShipId());
-                        if (oldShip != null) {
-                            oldShip.unloadFromTransportShip(u);
+                        for (UUID oldShipId : u.getTransportShipId().keySet()) {
+                            Unit oldShip = gui.getCampaign().getUnit(oldShipId);
+                            if (oldShip != null) {
+                                oldShip.unloadFromTransportShip(u);
+                            }
                         }
                     }
                     //now load the units
@@ -249,9 +251,11 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
         if (command.contains(UNASSIGN_FROM_SHIP)) {
             if (units != null) {
                 for (Unit u : units) {
-                    Unit oldShip = gui.getCampaign().getUnit(u.getTransportShipId());
-                    if (oldShip != null) {
-                        oldShip.unloadFromTransportShip(u);
+                    for (UUID oldShipId : u.getTransportShipId().keySet()) {
+                        Unit oldShip = gui.getCampaign().getUnit(oldShipId);
+                        if (oldShip != null) {
+                            oldShip.unloadFromTransportShip(u);
+                        }
                     }
                 }
             }
@@ -358,10 +362,11 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     for (UUID id : force.getAllUnits()) {
                         Unit unit = gui.getCampaign().getUnit(id);
                         if (unit != null) {
-                            Unit oldShip = gui.getCampaign().getUnit(unit.getTransportShipId());
-                            // If the unit is assigned to a transport, unassign it
-                            if (oldShip != null) {
-                                oldShip.unloadFromTransportShip(unit);
+                            for (UUID oldShipId : unit.getTransportShipId().keySet()) {
+                                Unit oldShip = gui.getCampaign().getUnit(oldShipId);
+                                if (oldShip != null) {
+                                    oldShip.unloadFromTransportShip(unit);
+                                }
                             }
                             // If the unit IS a transport, unassign all units from it
                             if (!unit.getEntity().getBayLoadedUnits().isEmpty()) {
@@ -399,10 +404,11 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                             unit.removeTech();
                         }
                     }
-                    Unit oldShip = gui.getCampaign().getUnit(unit.getTransportShipId());
-                    // If the unit is assigned to a transport, unassign it
-                    if (oldShip != null) {
-                        oldShip.unloadFromTransportShip(unit);
+                    for (UUID oldShipId : unit.getTransportShipId().keySet()) {
+                        Unit oldShip = gui.getCampaign().getUnit(oldShipId);
+                        if (oldShip != null) {
+                            oldShip.unloadFromTransportShip(unit);
+                        }
                     }
                     // If the unit IS a transport, unassign all units from it
                     if (!unit.getEntity().getBayLoadedUnits().isEmpty()) {

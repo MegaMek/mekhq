@@ -599,12 +599,14 @@ public class ForceViewPanel extends ScrollablePanel {
     		toReturn += "</i>";
         }
         if (unit.hasTransportShipId()) {
-            toReturn += "<br><i>" + "Transported by: ";
-            Unit transport = campaign.getUnit(unit.getTransportShipId());
-            if (transport != null) {
-                toReturn += transport.getName();
+            for (UUID id : unit.getTransportShipId().keySet()) {
+                Unit transport = campaign.getUnit(id);
+                if (transport != null) {
+                    toReturn += "<br><i>" + "Transported by: ";
+                    toReturn += transport.getName();
+                    toReturn += "</i>";
+                }
             }
-            toReturn += "</i>";
         }
         // If this is a transport ship, tell us what bay capacity is at
         for (Bay b : unit.getEntity().getTransportBays()) {

@@ -226,6 +226,7 @@ public class AtBGameThread extends GameThread {
                         if (!scenario.getPlayerTransportLinkages().containsKey(unit.getTransportShipId())) {
                             continue;
                         }
+                        /*
                         scenario.addPlayerTransportRelationship(unit.getTransportShipId(), unit.getId());
                         // Set these flags so we know what prompts to display later
                         if (unit.getEntity().isAero()) {
@@ -233,6 +234,7 @@ public class AtBGameThread extends GameThread {
                         } else {
                             campaign.getUnit(unit.getTransportShipId()).setCarryingGround(true);
                         }
+                        */
                     }
                 }
                 // Now, clean the list of any transports that don't have deployed units in the game
