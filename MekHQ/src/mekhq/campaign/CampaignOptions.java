@@ -122,6 +122,7 @@ public class CampaignOptions implements Serializable {
     private boolean randomizeOrigin;
     private int originSearchRadius;
     private boolean isOriginExtraRandom;
+    private double originDistanceScale;
 
     //personnel market related
     private boolean personnelMarketReportRefresh;
@@ -343,8 +344,9 @@ public class CampaignOptions implements Serializable {
         useQuirks = false;
         showOriginFaction = true;
         randomizeOrigin = false;
-        originSearchRadius = 60;
+        originSearchRadius = 45;
         isOriginExtraRandom = false;
+        originDistanceScale = 0.6;
         payForParts = false;
         payForRepairs = false;
         payForUnits = false;
@@ -1063,6 +1065,22 @@ public class CampaignOptions implements Serializable {
      */
     public void setOriginExtraRandom(boolean b) {
         isOriginExtraRandom = b;
+    }
+
+    /**
+     * Gets the distance scale factor to apply when weighting
+     * random origin planets.
+     */
+    public double getOriginDistanceScale() {
+        return originDistanceScale;
+    }
+
+    /**
+     * Sets the distance scale factor to apply when weighting
+     * random origin planets (should be between 0.1 and 2).
+     */
+    public void setOriginDistanceScale(double v) {
+        originDistanceScale = v;
     }
 
     public int getScenarioXP() {
@@ -2645,6 +2663,8 @@ public class CampaignOptions implements Serializable {
                 retVal.originSearchRadius = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("isOriginExtraRandom")) {
                 retVal.isOriginExtraRandom = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("originDistanceScale")) {
+                retVal.originDistanceScale = Double.parseDouble(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("payForParts")) {
                 retVal.payForParts = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("payForRepairs")) {

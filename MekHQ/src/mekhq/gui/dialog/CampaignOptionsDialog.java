@@ -1812,7 +1812,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = 25;
         panPersonnel.add(chkRandomizeOrigin, gridBagConstraints);
 
-        spnOriginSearchRadius = new JSpinner(new SpinnerNumberModel(options.getOriginSearchRadius(), 50, 250, 10));
+        spnOriginSearchRadius = new JSpinner(new SpinnerNumberModel(options.getOriginSearchRadius(), 10, 250, 10));
         JPanel panOriginSearchRadius = new JPanel();
         panOriginSearchRadius.add(spnOriginSearchRadius);
         panOriginSearchRadius.add(new JLabel("Random Origin Search Radius"));
