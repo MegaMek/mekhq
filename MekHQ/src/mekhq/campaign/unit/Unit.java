@@ -1565,9 +1565,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         // If this entity is assigned to a transport, write that
         if (hasTransportShipId()) {
             for (UUID id : getTransportShipId().keySet()) {
-                pw1.println(MekHqXmlUtil.indentStr(indentLvl+1) + "<transportShipId=\"" + id.toString() + "\"/>"
-                        + getTransportShipId().get(id)
-                        + "</transportShipId>");
+                pw1.println(MekHqXmlUtil.indentStr(indentLvl+1) + "<transportShip id=\"" + id.toString() 
+                        + "\" baynumber=\"" + getTransportShipId().get(id) + "\"/>");
             }
         }
         for (UUID uid : getTransportedUnits()) {
@@ -1727,7 +1726,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     }
                 }
                 /*
-                else if (wn2.getNodeName().equalsIgnoreCase("transportShipId")) {
+                else if (wn2.getNodeName().equalsIgnoreCase("transportShip")) {
                     UUID id = UUID.fromString(wn2.getFirstChild().getNodeName());
                     int bay = Integer.parseInt(wn2.getFirstChild().getTextContent());
                         retVal.setTransportShipId(id, bay);
