@@ -32,6 +32,7 @@ import megamek.common.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.parts.*;
+
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -1214,6 +1215,128 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         return capacity;
     }
+    
+    /** 
+     * Convenience method to call the right capacity getter based on unit type and weight
+     * @param unitType integer obtained from a unit's entity that denotes its type (mech, tank, etc)
+     * @param unitWeight double Weight in tons of the unit's entity. Important for tanks and infantry
+     */
+    public double getCorrectBayCapacity(int unitType, double unitWeight) {
+        final String METHOD_NAME = "getCorrectBayCapacity(unitType,unitWeight)"; //$NON-NLS-1$
+        switch (unitType) {
+            case UnitType.MEK:
+                return getCurrentMechCapacity();
+        case UnitType.AERO:
+        case UnitType.CONV_FIGHTER:
+            // Return a small craft slot if no ASF slots exist
+            if (getCurrentASFCapacity() > 0) {
+                return getCurrentASFCapacity();
+            } else {
+                return getCurrentSmallCraftCapacity();
+            }
+        case UnitType.DROPSHIP:
+            return getCurrentDocks();
+        case UnitType.SMALL_CRAFT:
+            return getCurrentSmallCraftCapacity();
+        case UnitType.BATTLE_ARMOR:
+            return getCurrentBattleArmorCapacity();
+        case UnitType.TANK:
+        case UnitType.NAVAL:
+        case UnitType.VTOL:
+            // Return the smallest available bay that can hold the unit
+            if (unitWeight <= 50) {
+                if (getCurrentLightVehicleCapacity() > 0) {
+                    return getCurrentLightVehicleCapacity();
+                } else if (getCurrentHeavyVehicleCapacity() > 0) {
+                    return getCurrentHeavyVehicleCapacity();
+                } else {
+                    return getCurrentSuperHeavyVehicleCapacity();
+                }
+            } else if (unitWeight <= 100) {
+                if (getCurrentHeavyVehicleCapacity() > 0) {
+                    return getCurrentHeavyVehicleCapacity();
+                } else {
+                    return getCurrentSuperHeavyVehicleCapacity();
+                }
+            } else {
+                return getCurrentSuperHeavyVehicleCapacity();
+            }
+        default:
+            MekHQ.getLogger().log(Unit.class, METHOD_NAME, LogLevel.ERROR,
+                    "No transport bay defined for specified unit type."); //$NON-NLS-1$
+            return 0;
+        }
+    }
+    
+    /** 
+     * Convenience method to call the right capacity update based on unit type
+     * @param unitType integer obtained from a unit's entity that denotes its type (mech, tank, etc)
+     * @param unitWeight double Weight in tons of the unit's entity. Important for tanks and infantry
+     * @param addUnit boolean value that determines whether to add or subtract 1 from bay capacity
+     */
+    public void updateBayCapacity(int unitType, double unitWeight, boolean addUnit) {
+        final String METHOD_NAME = "updateBayCapacity(unitType,unitWeight,addUnit)"; //$NON-NLS-1$
+        // Default. Consume 1 bay of the appropriate type
+        int amount = -1;
+        if (addUnit) {
+            // Return 1 bay/cubicle to the transport's pool
+            amount = 1;
+        }
+        switch (unitType) {
+            case UnitType.MEK:
+                setMechCapacity(getCurrentMechCapacity() + amount);
+                break;
+            case UnitType.AERO:
+            case UnitType.CONV_FIGHTER:
+                // Use a small craft slot if no ASF slots exist
+                if (getCurrentASFCapacity() > 0) {
+                    setASFCapacity(getCurrentASFCapacity() + amount);
+                } else {
+                    setSmallCraftCapacity(getCurrentSmallCraftCapacity() + amount);
+                }
+                break;
+            case UnitType.DROPSHIP:
+                setDocks(getCurrentDocks() + amount);
+                break;
+            case UnitType.SMALL_CRAFT:
+                setSmallCraftCapacity(getCurrentSmallCraftCapacity() + amount);
+                break;
+            case UnitType.INFANTRY:
+                // Infantry bay capacities are in tons, so consumption depends on platoon type
+                setInfantryCapacity(getCurrentInfantryCapacity() + (amount * unitWeight));
+                break;
+            case UnitType.BATTLE_ARMOR:
+                setBattleArmorCapacity(getCurrentBattleArmorCapacity() + amount);
+                break;
+            case UnitType.TANK:
+            case UnitType.NAVAL:
+            case UnitType.VTOL:
+                // Update space on the smallest available bay that can hold the unit
+                if (unitWeight <= 50) {
+                    if (getCurrentLightVehicleCapacity() > 0) {
+                        setLightVehicleCapacity(getCurrentLightVehicleCapacity() + amount);
+                    } else if (getCurrentHeavyVehicleCapacity() > 0) {
+                        setHeavyVehicleCapacity(getCurrentHeavyVehicleCapacity() + amount);
+                    } else {
+                        setSuperHeavyVehicleCapacity(getCurrentSuperHeavyVehicleCapacity() + amount);
+                    }
+                } else if (unitWeight <= 100) {
+                    if (getCurrentHeavyVehicleCapacity() > 0) {
+                        setHeavyVehicleCapacity(getCurrentHeavyVehicleCapacity() + amount);
+                    } else {
+                        setSuperHeavyVehicleCapacity(getCurrentSuperHeavyVehicleCapacity() + amount);
+                    }
+                } else {
+                    setSuperHeavyVehicleCapacity(getCurrentSuperHeavyVehicleCapacity() + amount);
+                }
+                break;
+            default:
+                //This shouldn't happen
+                MekHQ.getLogger().log(Unit.class, METHOD_NAME, LogLevel.ERROR,
+                        "No transport bay defined for specified unit type."); //$NON-NLS-1$
+                break;
+        }
+    }
 
     public int getDocks() {
         return getEntity().getDocks();
@@ -1419,9 +1542,13 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      */
     public void loadTransportShip(Vector<Unit> units) {
         for (Unit u : units) {
+            int unitType = u.getEntity().getUnitType();
+            double unitWeight = u.getEntity().getWeight();
             int bayNumber = Utilities.selectBestBayFor(u.getEntity(), getEntity());
             u.setTransportShipId(getId(),bayNumber);
             addTransportedUnit(u.getId());
+            updateBayCapacity(unitType, unitWeight, false);
+            
         }
     }
     
@@ -1431,8 +1558,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * @param unit The unit that we wish to unload from this transport
      */
     public void unloadFromTransportShip(Unit u) {
+        int unitType = u.getEntity().getUnitType();
+        double unitWeight = u.getEntity().getWeight();
         removeTransportedUnit(u.getId());
         u.getTransportShipId().clear();
+        updateBayCapacity(unitType, unitWeight, true);
     }
     
     /**
@@ -1441,6 +1571,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      */
     public void unloadTransportShip() {
         clearTransportedUnits();
+        initializeBaySpace();
         // And now reset the Transported values for all the units we just booted
         for (Unit u : campaign.getUnits()) {
             if (u.hasTransportShipId() && u.getTransportShipId().equals(getId())) {
