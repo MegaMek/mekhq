@@ -24,7 +24,6 @@ import javax.swing.JLabel;
 
 import megamek.client.ui.Messages;
 import megamek.client.ui.swing.util.PlayerColors;
-import megamek.common.Bay;
 import megamek.common.Crew;
 import megamek.common.Entity;
 import megamek.common.UnitType;
@@ -609,12 +608,27 @@ public class ForceViewPanel extends ScrollablePanel {
             }
         }
         // If this is a transport ship, tell us what bay capacity is at
-        for (Bay b : unit.getEntity().getTransportBays()) {
-            //Ignore these bay types
-            if (b.isCargo() || b.isQuarters()) {
-                continue;
+        if (!unit.getEntity().getTransportBays().isEmpty()) {
+            int veeTotal = (int) (unit.getCurrentLightVehicleCapacity() + unit.getCurrentHeavyVehicleCapacity() + unit.getCurrentSuperHeavyVehicleCapacity());
+            int aeroTotal = (int) (unit.getCurrentASFCapacity() + unit.getCurrentSmallCraftCapacity());
+            if (unit.getCurrentMechCapacity() > 0) {
+                toReturn += "<br><i>" + "Mech Bays: " + (int)unit.getCurrentMechCapacity() + " free.</i>";
             }
-            toReturn += "<br><i>" + b.getType() + " bay #" + b.getBayNumber() + ": " + b.getUnused() + " free.</i>";
+            if (veeTotal > 0) {
+                toReturn += "<br><i>" + "Vehicle Bays: " + veeTotal + " free.</i>";
+            }
+            if (aeroTotal > 0) {
+                toReturn += "<br><i>" + "ASF/SC Bays: " + aeroTotal + " free.</i>";
+            }
+            if (unit.getCurrentProtomechCapacity() > 0) {
+                toReturn += "<br><i>" + "ProtoMech Bays: " + (int)unit.getCurrentProtomechCapacity() + " free.</i>";
+            }
+            if (unit.getCurrentBattleArmorCapacity() > 0) {
+                toReturn += "<br><i>" + "Battle Armor Bays: " + (int)unit.getCurrentBattleArmorCapacity() + " free.</i>";
+            }
+            if (unit.getCurrentInfantryCapacity() > 0) {
+                toReturn += "<br><i>" + "Infantry Bays: " + (int)unit.getCurrentInfantryCapacity() + " tons free.</i>";
+            }
         }
         toReturn += "</font></html>";
         return toReturn;
