@@ -4,14 +4,8 @@ import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.Vector;
 
-import megamek.common.Aero;
-import megamek.common.BattleArmor;
 import megamek.common.Entity;
-import megamek.common.Infantry;
-import megamek.common.Mech;
-import megamek.common.Protomech;
-import megamek.common.SmallCraft;
-import megamek.common.Tank;
+import megamek.common.UnitType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Ranks;
@@ -112,23 +106,26 @@ public class StaticChecks {
             if (unit.getEntity().isLargeCraft()) {
                 //No. Try your selection again.
                 return "    Selection of Units includes a large spacecraft. \n";
-            } else if (unit.getEntity() instanceof SmallCraft) {
+            } else if (unit.getEntity().getUnitType() == UnitType.SMALL_CRAFT) {
                 numberSC++;
-            } else if (unit.getEntity() instanceof Aero) {
+            } else if (unit.getEntity().getUnitType() == UnitType.AERO 
+                        || unit.getEntity().getUnitType() == UnitType.CONV_FIGHTER) {
                 // Includes conventional fighters
                 numberASF++;
-            } else if (unit.getEntity() instanceof BattleArmor) {
+            } else if (unit.getEntity().getUnitType() == UnitType.BATTLE_ARMOR) {
                 numberBA++;
-            } else if (unit.getEntity() instanceof Infantry) {
+            } else if (unit.getEntity().getUnitType() == UnitType.INFANTRY) {
                 //Make sure we account for space consumed by different platoon types
                 numberInfantry+= unit.getEntity().getWeight();
-            } else if (unit.getEntity() instanceof Mech) {
+            } else if (unit.getEntity().getUnitType() == UnitType.MEK) {
                 // Includes LAMs and Quadvees
                 numberMech++;
-            } else if (unit.getEntity() instanceof Protomech) {
+            } else if (unit.getEntity().getUnitType() == UnitType.PROTOMEK) {
                 numberProto++;
-            } else if (unit.getEntity() instanceof Tank) {
-                // Tanks and VTOLs
+            } else if (unit.getEntity().getUnitType() == UnitType.TANK 
+                        || unit.getEntity().getUnitType() == UnitType.VTOL 
+                        || unit.getEntity().getUnitType() == UnitType.NAVAL) {
+                // Tanks, VTOLs and wet naval vessels
                 double weight = unit.getEntity().getWeight();
                 if (unit.getEntity().isSuperHeavy()) {
                     numberSHVee++;
