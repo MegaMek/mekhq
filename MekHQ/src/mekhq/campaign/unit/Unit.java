@@ -1283,30 +1283,31 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             amount = 1;
         }
         switch (unitType) {
+            //Be sure that when releasing bay space, the transport does not go over its normal maximum
             case UnitType.MEK:
-                setMechCapacity(getCurrentMechCapacity() + amount);
+                setMechCapacity(Math.min((getCurrentMechCapacity() + amount),getMechCapacity()));
                 break;
             case UnitType.AERO:
             case UnitType.CONV_FIGHTER:
                 // Use a small craft slot if no ASF slots exist
                 if (getCurrentASFCapacity() > 0) {
-                    setASFCapacity(getCurrentASFCapacity() + amount);
+                    setASFCapacity(Math.min((getCurrentASFCapacity() + amount),getASFCapacity()));
                 } else {
-                    setSmallCraftCapacity(getCurrentSmallCraftCapacity() + amount);
+                    setSmallCraftCapacity(Math.min((getCurrentSmallCraftCapacity() + amount),getSmallCraftCapacity()));
                 }
                 break;
             case UnitType.DROPSHIP:
-                setDocks(getCurrentDocks() + amount);
+                setDocks(Math.min((getCurrentDocks() + amount),getDocks()));
                 break;
             case UnitType.SMALL_CRAFT:
-                setSmallCraftCapacity(getCurrentSmallCraftCapacity() + amount);
+                setSmallCraftCapacity(Math.min((getCurrentSmallCraftCapacity() + amount),getSmallCraftCapacity()));
                 break;
             case UnitType.INFANTRY:
                 // Infantry bay capacities are in tons, so consumption depends on platoon type
-                setInfantryCapacity(getCurrentInfantryCapacity() + (amount * unitWeight));
+                setInfantryCapacity(Math.min((getCurrentInfantryCapacity() + (amount * unitWeight)),getInfantryCapacity()));
                 break;
             case UnitType.BATTLE_ARMOR:
-                setBattleArmorCapacity(getCurrentBattleArmorCapacity() + amount);
+                setBattleArmorCapacity(Math.min((getCurrentBattleArmorCapacity() + amount),getBattleArmorCapacity()));
                 break;
             case UnitType.TANK:
             case UnitType.NAVAL:
@@ -1314,20 +1315,20 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 // Update space on the smallest available bay that can hold the unit
                 if (unitWeight <= 50) {
                     if (getCurrentLightVehicleCapacity() > 0) {
-                        setLightVehicleCapacity(getCurrentLightVehicleCapacity() + amount);
+                        setLightVehicleCapacity(Math.min((getCurrentLightVehicleCapacity() + amount),getLightVehicleCapacity()));
                     } else if (getCurrentHeavyVehicleCapacity() > 0) {
-                        setHeavyVehicleCapacity(getCurrentHeavyVehicleCapacity() + amount);
+                        setHeavyVehicleCapacity(Math.min((getCurrentHeavyVehicleCapacity() + amount),getHeavyVehicleCapacity()));
                     } else {
-                        setSuperHeavyVehicleCapacity(getCurrentSuperHeavyVehicleCapacity() + amount);
+                        setSuperHeavyVehicleCapacity(Math.min((getCurrentSuperHeavyVehicleCapacity() + amount),getSuperHeavyVehicleCapacity()));
                     }
                 } else if (unitWeight <= 100) {
                     if (getCurrentHeavyVehicleCapacity() > 0) {
-                        setHeavyVehicleCapacity(getCurrentHeavyVehicleCapacity() + amount);
+                        setHeavyVehicleCapacity(Math.min((getCurrentHeavyVehicleCapacity() + amount),getHeavyVehicleCapacity()));
                     } else {
-                        setSuperHeavyVehicleCapacity(getCurrentSuperHeavyVehicleCapacity() + amount);
+                        setSuperHeavyVehicleCapacity(Math.min((getCurrentSuperHeavyVehicleCapacity() + amount),getSuperHeavyVehicleCapacity()));
                     }
                 } else {
-                    setSuperHeavyVehicleCapacity(getCurrentSuperHeavyVehicleCapacity() + amount);
+                    setSuperHeavyVehicleCapacity(Math.min((getCurrentSuperHeavyVehicleCapacity() + amount),getSuperHeavyVehicleCapacity()));
                 }
                 break;
             default:
