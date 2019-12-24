@@ -1725,13 +1725,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         retVal.tech = UUID.fromString(wn2.getTextContent());
                     }
                 }
-                /*
                 else if (wn2.getNodeName().equalsIgnoreCase("transportShip")) {
-                    UUID id = UUID.fromString(wn2.getFirstChild().getNodeName());
-                    int bay = Integer.parseInt(wn2.getFirstChild().getTextContent());
-                        retVal.setTransportShipId(id, bay);
+                    NamedNodeMap attributes = wn2.getAttributes();
+                    UUID id = UUID.fromString(attributes.getNamedItem("id").getTextContent());
+                    int bay = Integer.parseInt(attributes.getNamedItem("baynumber").getTextContent());
+                    retVal.setTransportShipId(id, bay);
                 }
-                */
                 else if (wn2.getNodeName().equalsIgnoreCase("transportedUnitId")) {
                     retVal.addTransportedUnit(UUID.fromString(wn2.getTextContent()));
                 }
