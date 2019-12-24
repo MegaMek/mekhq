@@ -1548,7 +1548,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             u.setTransportShipId(getId(),bayNumber);
             addTransportedUnit(u.getId());
             updateBayCapacity(unitType, unitWeight, false);
-            
         }
     }
     
