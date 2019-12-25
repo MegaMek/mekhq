@@ -47,5 +47,6 @@ public abstract class AbstractPlanetSelector {
     /**
      * Clears any cache associated with planet selection.
      */
-    public abstract void clearCache();
+    public void clearCache() {
+    }
 }

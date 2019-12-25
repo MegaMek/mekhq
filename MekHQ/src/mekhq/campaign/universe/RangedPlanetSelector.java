@@ -169,6 +169,7 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
      */
     @Override
     public void clearCache() {
+        super.clearCache();
         cachedDate = null;
         cachedSystem = null;
         cachedPlanets = null;

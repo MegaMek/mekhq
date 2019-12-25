@@ -120,6 +120,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
      */
     @Override
     public void clearCache() {
+        super.clearCache();
         cachedDate = null;
         cachedFactions = null;
     }

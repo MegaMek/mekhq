@@ -191,11 +191,6 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                     adjustSkill(p, SkillType.S_GUN_PROTO, gunneryMod);
                     break;
                 }
-                /* CAW: already handled by Campaign::newPerson
-                int nabil = Math.max(0, p.getExperienceLevel(false) - SkillType.EXP_REGULAR);
-                while (nabil > 0 && null != c.rollSPA(p.getPrimaryRole(), p)) {
-                    nabil--;
-                }*/
             }
             return retVal;
         }

@@ -63,5 +63,6 @@ public abstract class AbstractFactionSelector {
     /**
      * Clears any cache associated with faction selection.
      */
-    public abstract void clearCache();
+    public void clearCache() {
+    }
 }
