@@ -24,6 +24,34 @@ import mekhq.campaign.Campaign;
  * Represents a class which selects {@link Faction} objects.
  */
 public abstract class AbstractFactionSelector {
+
+    /**
+     * A value indicating whether or not the clans are a valid
+     * faction to choose from.
+     */
+    private boolean allowClan = false;
+
+    /**
+     * Gets a value indicating whether or not the clans are a valid
+     * faction to choose from.
+     * @return A value indicating whether or not the clans are a valid
+     *         faction to choose from.
+     */
+    public boolean isAllowClan() {
+        return allowClan;
+    }
+
+    /**
+     * Sets a value indicating whether or not the clans are a valid
+     * faction to choose from.
+     * @param allowClan {@code true} if clans should be considered
+     *                  during faction selection, otherwise {@code false}.
+     */
+    public void setAllowClan(boolean allowClan) {
+        this.allowClan = allowClan;
+        clearCache();
+    }
+
     /**
      * Selects a {@link Faction} for a {@link Campaign}.
      * @param campaign The {@link Campaign} within which this {@link Faction}
@@ -31,4 +59,9 @@ public abstract class AbstractFactionSelector {
      * @return A {@link Faction} selected for {@code campaign}.
      */
     public abstract Faction selectFaction(Campaign campaign);
+
+    /**
+     * Clears any cache associated with faction selection.
+     */
+    public abstract void clearCache();
 }

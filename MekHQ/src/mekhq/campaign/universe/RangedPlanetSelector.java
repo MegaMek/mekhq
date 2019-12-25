@@ -36,13 +36,45 @@ import mekhq.campaign.universe.Faction.Tag;
  */
 public class RangedPlanetSelector extends AbstractPlanetSelector {
 
+    /**
+     * The range around {@link Campaign#getCurrentSystem()} to search
+     * for planets.
+     */
     private final int range;
 
+    /**
+     * The current date of the {@link Campaign} when the values were
+     * cached.
+     */
     private DateTime cachedDate;
+
+    /**
+     * The current {@link PlanetarySystem} of the {@link Campaign} when
+     * the values were cached.
+     */
     private PlanetarySystem cachedSystem;
+
+    /**
+     * This map stores cached weights for a planet keyed by faction.
+     * Each weight should be cummulative. That is, if two planets have
+     * equal weights, you could express this with weights of 1.0 and 2.0
+     * or 5.0 and 10.0. This way, when selecting a planet at random using
+     * the weights you can create a random double between 0.0 and the largest
+     * value in the map, then select the key equal to or greater than the value.
+     */
     private Map<Faction, TreeMap<Double, Planet>> cachedPlanets;
 
+    /**
+     * A scale to apply to planetary distances.
+     */
     private double distanceScale = 0.6;
+
+    /**
+     * A value indicating if extra randomness should be
+     * used when selecting planets. Currently, this is implemented
+     * by including planets within systems, rather than just
+     * the primary planet for a system.
+     */
     private boolean isExtraRandom;
 
     /**
@@ -135,6 +167,7 @@ public class RangedPlanetSelector extends AbstractPlanetSelector {
     /**
      * Clears the cache associated with per-faction planet probabilities.
      */
+    @Override
     public void clearCache() {
         cachedDate = null;
         cachedSystem = null;

@@ -43,4 +43,9 @@ public abstract class AbstractPlanetSelector {
      */
     @Nullable
     public abstract Planet selectPlanet(Campaign campaign, @Nullable Faction faction);
+
+    /**
+     * Clears any cache associated with planet selection.
+     */
+    public abstract void clearCache();
 }

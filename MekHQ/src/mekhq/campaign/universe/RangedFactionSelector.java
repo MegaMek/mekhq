@@ -39,13 +39,37 @@ import mekhq.campaign.universe.Faction.Tag;
  */
 public class RangedFactionSelector extends AbstractFactionSelector {
 
+    /**
+     * The range around {@link Campaign#getCurrentSystem()} to search
+     * for factions.
+     */
     private final int range;
 
+    /**
+     * The current date of the {@link Campaign} when the values were
+     * cached.
+     */
     private DateTime cachedDate;
+
+    /**
+     * The current {@link PlanetarySystem} of the {@link Campaign} when
+     * the values were cached.
+     */
     private PlanetarySystem cachedSystem;
+
+    /**
+     * This map stores weights for a faction. Each weight should
+     * be cummulative. That is, if two factions have equal weights,
+     * you could express this with weights of 1.0 and 2.0 or 5.0 and 10.0.
+     * This way, when selecting a faction at random using the weights
+     * you can create a random double between 0.0 and the largest value
+     * in the map, then select the key equal to or greater than the value.
+     */
     private TreeMap<Double, Faction> cachedFactions;
 
-    private boolean allowClan = false;
+    /**
+     * A scale to apply to planetary distances.
+     */
     private double distanceScale = 0.6;
 
     /**
@@ -57,26 +81,6 @@ public class RangedFactionSelector extends AbstractFactionSelector {
         this.range = range;
     }
 
-    /**
-     * Gets a value indicating whether or not the clans are a valid
-     * faction to choose from.
-     * @return A value indicating whether or not the clans are a valid
-     *         faction to choose from.
-     */
-    public boolean isAllowClan() {
-        return allowClan;
-    }
-
-    /**
-     * Sets a value indicating whether or not the clans are a valid
-     * faction to choose from.
-     * @param allowClan {@code true} if clans should be considered
-     *                  during faction selection, otherwise {@code false}.
-     */
-    public void setAllowClan(boolean allowClan) {
-        this.allowClan = allowClan;
-        clearCache();
-    }
 
     /**
      * Gets a scale to apply to planetary distances.
@@ -114,11 +118,15 @@ public class RangedFactionSelector extends AbstractFactionSelector {
     /**
      * Clears the cache associated with faction probabilities.
      */
+    @Override
     public void clearCache() {
         cachedDate = null;
         cachedFactions = null;
     }
 
+    /**
+     * Creates the cached {@link Faction} lookup map.
+     */
     private void createLookupMap(Campaign campaign) {
         PlanetarySystem currentSystem = campaign.getCurrentSystem();
 
@@ -144,7 +152,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
                     continue;
                 }
 
-                if (faction.is(Tag.CLAN) && !allowClan) {
+                if (faction.is(Tag.CLAN) && !isAllowClan()) {
                     continue;
                 }
 
@@ -157,10 +165,11 @@ public class RangedFactionSelector extends AbstractFactionSelector {
         Faction mercenaries = Faction.getFaction("MERC");
         TreeMap<Double, Faction> factions = new TreeMap<>();
         if (weights.isEmpty()) {
+
+            // If we have no valid factions, we can always
+            // have mercs and the campaign's faction.
             factions.put(1.0, mercenaries);
-            if (!campaign.getFaction().equals(mercenaries)) {
-                factions.put(2.0, campaign.getFaction());
-            }
+            factions.put(2.0, campaign.getFaction());
 
             cachedDate = now;
             cachedSystem = currentSystem;
@@ -178,23 +187,22 @@ public class RangedFactionSelector extends AbstractFactionSelector {
         double total = 0.0;
         for (Map.Entry<Faction, Double> entry : weights.entrySet()) {
             Faction faction = entry.getKey();
-            double value = entry.getValue();
 
             // Only take factions which are not actively fighting us
             if (!enemies.contains(faction)) {
                 double factionWeight = getFactionWeight(faction);
-                total += value * factionWeight;
+                total += entry.getValue() * factionWeight;
                 factions.put(total, faction);
             }
         }
 
-        // There is a chance they're a merc!
         if (factions.isEmpty()) {
+            // If we have no valid factions, we can always
+            // have mercs and the campaign's faction.
             factions.put(1.0, mercenaries);
-            if (!campaign.getFaction().equals(mercenaries)) {
-                factions.put(2.0, campaign.getFaction());
-            }
+            factions.put(2.0, campaign.getFaction());
         } else {
+            // There is a good chance they're a merc!
             factions.put(total + total * getFactionWeight(mercenaries), mercenaries);
         }
 
@@ -241,7 +249,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
         } else if (faction.is(Tag.CLAN)) {
             return 0.01;
         } else {
-            // Don't include any of the other tags
+            // Don't include any of the other tags like hidden or inactive
             return 0.0;
         }
     }
