@@ -6265,6 +6265,21 @@ public class Campaign implements Serializable, ITechManager {
         }
     }
 
+    /**
+     * Assigns a random origin to a {@link Person}.
+     * @param p The {@link Person} who should receive a randomized origin.
+     */
+    public void assignRandomOriginFor(Person p) {
+        AbstractFactionSelector factionSelector = getFactionSelector();
+        AbstractPlanetSelector planetSelector = getPlanetSelector();
+
+        Faction faction = factionSelector.selectFaction(this);
+        Planet planet = planetSelector.selectPlanet(this, faction);
+
+        p.setOriginFaction(faction);
+        p.setOriginPlanet(planet);
+    }
+
     public void clearGameData(Entity entity) {
         for (Mounted m : entity.getEquipment()) {
             m.setUsedThisRound(false);
