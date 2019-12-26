@@ -1724,26 +1724,28 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     + uid.toString() + "</transportedUnitId>");
         }
         //Used transport bay space
-        pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<asfCapacity>"
-                + aeroCapacity + "</asfCapacity>");
-        pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<baCapacity>"
-                + baCapacity + "</baCapacity>");
-        pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<dockCapacity>"
-                + dockCapacity + "</dockCapacity>");
-        pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<hVeeCapacity>"
-                + hVeeCapacity + "</hVeeCapacity>");
-        pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<infCapacity>"
-                + infCapacity + "</infCapacity>");
-        pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<lVeeCapacity>"
-                + lVeeCapacity + "</lVeeCapacity>");
-        pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<mechCapacity>"
-                + mechCapacity + "</mechCapacity>");
-        pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<protoCapacity>"
-                + protoCapacity + "</protoCapacity>");
-        pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<scCapacity>"
-                + scCapacity + "</scCapacity>");
-        pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<shVeeCapacity>"
-                + shVeeCapacity + "</shVeeCapacity>");
+        if (getEntity() != null && !getEntity().getTransportBays().isEmpty()) {
+            pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<asfCapacity>"
+                    + aeroCapacity + "</asfCapacity>");
+            pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<baCapacity>"
+                    + baCapacity + "</baCapacity>");
+            pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<dockCapacity>"
+                    + dockCapacity + "</dockCapacity>");
+            pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<hVeeCapacity>"
+                    + hVeeCapacity + "</hVeeCapacity>");
+            pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<infCapacity>"
+                    + infCapacity + "</infCapacity>");
+            pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<lVeeCapacity>"
+                    + lVeeCapacity + "</lVeeCapacity>");
+            pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<mechCapacity>"
+                    + mechCapacity + "</mechCapacity>");
+            pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<protoCapacity>"
+                    + protoCapacity + "</protoCapacity>");
+            pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<scCapacity>"
+                    + scCapacity + "</scCapacity>");
+            pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<shVeeCapacity>"
+                    + shVeeCapacity + "</shVeeCapacity>");
+        }
         //Salvage status
         pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<salvaged>"
                 + salvaged + "</salvaged>");
@@ -1885,34 +1887,34 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     retVal.addTransportedUnit(UUID.fromString(wn2.getTextContent()));
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("asfCapacity")) {
-                    retVal.aeroCapacity = Integer.parseInt(wn2.getTextContent());
+                    retVal.aeroCapacity = Double.parseDouble(wn2.getTextContent());
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("baCapacity")) {
-                    retVal.baCapacity = Integer.parseInt(wn2.getTextContent());
+                    retVal.baCapacity = Double.parseDouble(wn2.getTextContent());
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("dockCapacity")) {
                     retVal.dockCapacity = Integer.parseInt(wn2.getTextContent());
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("hVeeCapacity")) {
-                    retVal.hVeeCapacity = Integer.parseInt(wn2.getTextContent());
+                    retVal.hVeeCapacity = Double.parseDouble(wn2.getTextContent());
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("infCapacity")) {
-                    retVal.infCapacity = Integer.parseInt(wn2.getTextContent());
+                    retVal.infCapacity = Double.parseDouble(wn2.getTextContent());
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("lVeeCapacity")) {
-                    retVal.lVeeCapacity = Integer.parseInt(wn2.getTextContent());
+                    retVal.lVeeCapacity = Double.parseDouble(wn2.getTextContent());
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("mechCapacity")) {
-                    retVal.mechCapacity = Integer.parseInt(wn2.getTextContent());
+                    retVal.mechCapacity = Double.parseDouble(wn2.getTextContent());
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("protoCapacity")) {
-                    retVal.protoCapacity = Integer.parseInt(wn2.getTextContent());
+                    retVal.protoCapacity = Double.parseDouble(wn2.getTextContent());
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("scCapacity")) {
-                    retVal.scCapacity = Integer.parseInt(wn2.getTextContent());
+                    retVal.scCapacity = Double.parseDouble(wn2.getTextContent());
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("shVeeCapacity")) {
-                    retVal.shVeeCapacity = Integer.parseInt(wn2.getTextContent());
+                    retVal.shVeeCapacity = Double.parseDouble(wn2.getTextContent());
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("forceId")) {
                     retVal.forceId = Integer.parseInt(wn2.getTextContent());

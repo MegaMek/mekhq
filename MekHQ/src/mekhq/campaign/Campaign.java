@@ -3730,7 +3730,6 @@ public class Campaign implements Serializable, ITechManager {
             Unit u = getUnit(uid);
             if (null != u) {
                 u.initializeParts(true);
-                u.initializeBaySpace();
                 u.runDiagnostic(false);
             }
         }
