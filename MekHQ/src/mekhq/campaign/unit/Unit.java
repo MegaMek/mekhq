@@ -1270,11 +1270,14 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     
     /** 
      * Convenience method to call the right capacity update based on unit type
+     * When updating capacity, this method is concerned primarily with ensuring that space isn't released
+     * beyond the unit's maximum. Checks are made to keep from going below 0 before we ever get here.
      * @param unitType integer obtained from a unit's entity that denotes its type (mech, tank, etc)
-     * @param unitWeight double Weight in tons of the unit's entity. Important for tanks and infantry
+     * @param unitWeight double Weight in tons of the unit's entity. Important for infantry
      * @param addUnit boolean value that determines whether to add or subtract 1 from bay capacity
+     * @param bayNumber integer representing the bay number that has been assigned to a cargo entity
      */
-    public void updateBayCapacity(int unitType, double unitWeight, boolean addUnit) {
+    public void updateBayCapacity(int unitType, double unitWeight, boolean addUnit, int bayNumber) {
         final String METHOD_NAME = "updateBayCapacity(unitType,unitWeight,addUnit)"; //$NON-NLS-1$
         // Default. Consume 1 bay of the appropriate type
         int amount = -1;
@@ -1289,12 +1292,25 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 break;
             case UnitType.AERO:
             case UnitType.CONV_FIGHTER:
-                // Use a small craft slot if no ASF slots exist
-                if (getCurrentASFCapacity() > 0) {
-                    setASFCapacity(Math.min((getCurrentASFCapacity() + amount),getASFCapacity()));
-                } else {
-                    setSmallCraftCapacity(Math.min((getCurrentSmallCraftCapacity() + amount),getSmallCraftCapacity()));
+                // Use the assigned bay number to determine if we need to update ASF or Small Craft capacity
+                Bay aeroBay = getEntity().getBayById(bayNumber);
+                if (aeroBay != null) {
+                    if (BayType.getTypeForBay(aeroBay).equals(BayType.FIGHTER)) {
+                        setASFCapacity(Math.min((getCurrentASFCapacity() + amount),getASFCapacity()));
+                        break;
+                    } else if (BayType.getTypeForBay(aeroBay).equals(BayType.SMALL_CRAFT)){
+                        setSmallCraftCapacity(Math.min((getCurrentSmallCraftCapacity() + amount),getSmallCraftCapacity()));
+                        break;
+                    } else {
+                        //This shouldn't happen
+                        MekHQ.getLogger().log(Unit.class, METHOD_NAME, LogLevel.ERROR,
+                                "Fighter got assigned to a non-ASF, non-SC bay."); //$NON-NLS-1$
+                        break;
+                    }
                 }
+                //This shouldn't happen either
+                MekHQ.getLogger().log(Unit.class, METHOD_NAME, LogLevel.ERROR,
+                        "Fighter's baynumber assignment produced a null bay"); //$NON-NLS-1$
                 break;
             case UnitType.DROPSHIP:
                 setDocks(Math.min((getCurrentDocks() + amount),getDocks()));
@@ -1312,29 +1328,28 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             case UnitType.TANK:
             case UnitType.NAVAL:
             case UnitType.VTOL:
-                // Update space on the smallest available bay that can hold the unit
-                if (unitWeight <= 50) {
-                    if (getCurrentLightVehicleCapacity() > 0) {
+                // Use the assigned bay number to determine if we need to update ASF or Small Craft capacity
+                Bay tankBay = getEntity().getBayById(bayNumber);
+                if (tankBay != null) {
+                    if (BayType.getTypeForBay(tankBay).equals(BayType.VEHICLE_LIGHT)) {
                         setLightVehicleCapacity(Math.min((getCurrentLightVehicleCapacity() + amount),getLightVehicleCapacity()));
-                    } else if (getCurrentHeavyVehicleCapacity() > 0) {
+                        break;
+                    } else if (BayType.getTypeForBay(tankBay).equals(BayType.VEHICLE_HEAVY)){
                         setHeavyVehicleCapacity(Math.min((getCurrentHeavyVehicleCapacity() + amount),getHeavyVehicleCapacity()));
-                    } else {
+                        break;
+                    } else if (BayType.getTypeForBay(tankBay).equals(BayType.VEHICLE_SH)){
                         setSuperHeavyVehicleCapacity(Math.min((getCurrentSuperHeavyVehicleCapacity() + amount),getSuperHeavyVehicleCapacity()));
-                    }
-                } else if (unitWeight <= 100) {
-                    if (getCurrentHeavyVehicleCapacity() > 0) {
-                        setHeavyVehicleCapacity(Math.min((getCurrentHeavyVehicleCapacity() + amount),getHeavyVehicleCapacity()));
+                        break;
                     } else {
-                        setSuperHeavyVehicleCapacity(Math.min((getCurrentSuperHeavyVehicleCapacity() + amount),getSuperHeavyVehicleCapacity()));
+                        //This shouldn't happen
+                        MekHQ.getLogger().log(Unit.class, METHOD_NAME, LogLevel.ERROR,
+                                "Vehicle got assigned to a non-light/heavy/superheavy vehicle bay."); //$NON-NLS-1$
+                        break;
                     }
-                } else {
-                    setSuperHeavyVehicleCapacity(Math.min((getCurrentSuperHeavyVehicleCapacity() + amount),getSuperHeavyVehicleCapacity()));
                 }
-                break;
-            default:
-                //This shouldn't happen
+                //This shouldn't happen either
                 MekHQ.getLogger().log(Unit.class, METHOD_NAME, LogLevel.ERROR,
-                        "No transport bay defined for specified unit type."); //$NON-NLS-1$
+                        "Vehicle's baynumber assignment produced a null bay"); //$NON-NLS-1$
                 break;
         }
     }
@@ -1548,7 +1563,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             int bayNumber = Utilities.selectBestBayFor(u.getEntity(), getEntity());
             u.setTransportShipId(getId(),bayNumber);
             addTransportedUnit(u.getId());
-            updateBayCapacity(unitType, unitWeight, false);
+            updateBayCapacity(unitType, unitWeight, false, bayNumber);
         }
     }
     
@@ -1560,9 +1575,13 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     public void unloadFromTransportShip(Unit u) {
         int unitType = u.getEntity().getUnitType();
         double unitWeight = u.getEntity().getWeight();
+        for (UUID id : u.getTransportShipId().keySet()) {
+            int bayNumber = u.getTransportShipId().get(id);
+            updateBayCapacity(unitType, unitWeight, true, bayNumber);
+        }
         removeTransportedUnit(u.getId());
         u.getTransportShipId().clear();
-        updateBayCapacity(unitType, unitWeight, true);
+        
     }
     
     /**
