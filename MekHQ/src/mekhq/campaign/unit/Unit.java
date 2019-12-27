@@ -1593,8 +1593,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         initializeBaySpace();
         // And now reset the Transported values for all the units we just booted
         for (Unit u : campaign.getUnits()) {
-            if (u.hasTransportShipId() && u.getTransportShipId().equals(getId())) {
-                u.getTransportShipId().clear();
+            if (u.hasTransportShipId()) {
+                for (UUID id : u.getTransportShipId().keySet()) {
+                    if (id.equals(getId())) {
+                        u.getTransportShipId().clear();
+                    }
+                }
             }
         }
     }

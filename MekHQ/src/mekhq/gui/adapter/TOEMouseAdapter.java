@@ -371,7 +371,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                                 }
                             }
                             // If the unit IS a transport, unassign all units from it
-                            if (!unit.getEntity().getBayLoadedUnits().isEmpty()) {
+                            if (!unit.getTransportedUnits().isEmpty()) {
                                 unit.unloadTransportShip();
                             }
                         }
@@ -414,7 +414,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                         }
                     }
                     // If the unit IS a transport, unassign all units from it
-                    if (!unit.getEntity().getBayLoadedUnits().isEmpty()) {
+                    if (!unit.getTransportedUnits().isEmpty()) {
                         unit.unloadTransportShip();
                     }
                     MekHQ.triggerEvent(new OrganizationChangedEvent(parentForce, unit));
