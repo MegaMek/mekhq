@@ -88,6 +88,7 @@ import megamek.common.EquipmentType;
 import megamek.common.HeavyVehicleBay;
 import megamek.common.ITechnology;
 import megamek.common.Infantry;
+import megamek.common.InfantryBay;
 import megamek.common.Jumpship;
 import megamek.common.LandAirMech;
 import megamek.common.LightVehicleBay;
@@ -1667,56 +1668,41 @@ public class Utilities {
             }
         } else if (cargo.getEntityType() == Entity.ETYPE_TANK) {
             // Try to fit lighter tanks into smaller bays first
-            if (cargo.getWeight() <= 50) {
-                for (Bay b: transport.getTransportBays()) {
-                    if (b instanceof LightVehicleBay && b.canLoad(cargo)) {
-                        //Load 1 unit into the bay 
-                        b.setCurrentSpace(1);
-                        return b.getBayNumber();
-                    }
+            for (Bay b: transport.getTransportBays()) {
+                if (b instanceof LightVehicleBay && b.canLoad(cargo)) {
+                    //Load 1 unit into the bay 
+                    b.setCurrentSpace(1);
+                    return b.getBayNumber();
                 }
-                for (Bay b: transport.getTransportBays()) {
-                    if (b instanceof HeavyVehicleBay && b.canLoad(cargo)) {
-                        //Load 1 unit into the bay 
-                        b.setCurrentSpace(1);
-                        return b.getBayNumber();
-                    }
+            }
+            for (Bay b: transport.getTransportBays()) {
+                if (b instanceof HeavyVehicleBay && b.canLoad(cargo)) {
+                    //Load 1 unit into the bay 
+                    b.setCurrentSpace(1);
+                    return b.getBayNumber();
                 }
-                for (Bay b: transport.getTransportBays()) {
-                    if (b instanceof SuperHeavyVehicleBay && b.canLoad(cargo)) {
-                        //Load 1 unit into the bay 
-                        b.setCurrentSpace(1);
-                        return b.getBayNumber();
-                    }
+            }
+            for (Bay b: transport.getTransportBays()) {
+                if (b instanceof SuperHeavyVehicleBay && b.canLoad(cargo)) {
+                    //Load 1 unit into the bay 
+                    b.setCurrentSpace(1);
+                    return b.getBayNumber();
                 }
-            } else if (cargo.getWeight() <= 100) {
-                // Try to fit heavy tanks into heavy or superheavy vehicle bays in that order
-                for (Bay b: transport.getTransportBays()) {
-                    if (b instanceof HeavyVehicleBay && b.canLoad(cargo)) {
-                        //Load 1 unit into the bay 
-                        b.setCurrentSpace(1);
-                        return b.getBayNumber();
-                    }
-                }
-                for (Bay b: transport.getTransportBays()) {
-                    if (b instanceof SuperHeavyVehicleBay && b.canLoad(cargo)) {
-                        //Load 1 unit into the bay 
-                        b.setCurrentSpace(1);
-                        return b.getBayNumber();
-                    }
-                }
-            } else {
-                // Superheavies should only fit in one type of bay
-                for (Bay b: transport.getTransportBays()) {
-                    if (b.canLoad(cargo)) {
-                        return b.getBayNumber();
-                    }
+            }
+        } else if (cargo.getUnitType() == UnitType.INFANTRY) {
+            for (Bay b: transport.getTransportBays()) {
+                if (b instanceof InfantryBay && b.canLoad(cargo)) {
+                    //Update bay tonnage based on platoon/squad weight
+                    b.setCurrentSpace(cargo.getWeight());
+                    return b.getBayNumber();
                 }
             }
         } else {
             // Just return the first available bay
             for (Bay b : transport.getTransportBays()) {
                 if (b.canLoad(cargo)) {
+                    //Load 1 unit into the bay 
+                    b.setCurrentSpace(1);
                     return b.getBayNumber();
                 }
             }
