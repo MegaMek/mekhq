@@ -46,7 +46,6 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -67,8 +66,6 @@ import javax.swing.JTable;
 import javax.swing.table.TableModel;
 
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.equipment.*;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -1627,19 +1624,26 @@ public class Utilities {
             return;
         }
         Entity transport = client.getEntity(trnId);
-        // Reset the transport unit's bays so that we can load them completely
+        // Reset transporter status, as currentSpace might still retain updates from when the Unit
+        // was assigned to the Transport on the TO&E tab
         transport.resetTransporter();
         for (int id : toLoad) {
             Entity cargo = client.getEntity(id);
             if (cargo == null) {
                 continue;
             }
-            int bayNumber = selectBestBayFor(cargo, transport);
+            // Find a bay with space in it and update that space so the next unit can process
+            cargo.setTargetBay(selectBestBayFor(cargo, transport));
+        }
+        // Reset transporter status again so that sendLoadEntity can process correctly
+        transport.resetTransporter();
+        for (int id : toLoad) {
+            Entity cargo = client.getEntity(id);
             // And now load the units
-            if (cargo.isFighter() && loadFighters && transport.canLoad(cargo, false) && bayNumber != -1) {
-                client.sendLoadEntity(id, trnId, bayNumber);
-            } else if(loadGround && transport.canLoad(cargo, false) && bayNumber != -1) {
-                client.sendLoadEntity(id, trnId, bayNumber);
+            if (cargo.isFighter() && loadFighters && transport.canLoad(cargo, false) && cargo.getTargetBay() != -1) {
+                client.sendLoadEntity(id, trnId, cargo.getTargetBay());
+            } else if(loadGround && transport.canLoad(cargo, false) && cargo.getTargetBay() != -1) {
+                client.sendLoadEntity(id, trnId, cargo.getTargetBay());
             }
         }
     }
@@ -1649,29 +1653,39 @@ public class Utilities {
             // Try to load ASF bays first, so as not to hog SC bays
             for (Bay b: transport.getTransportBays()) {
                 if (b instanceof ASFBay && b.canLoad(cargo)) {
+                    //Load 1 unit into the bay 
+                    b.setCurrentSpace(1);
                     return b.getBayNumber();
                 }
             }
             for (Bay b: transport.getTransportBays()) {
                 if (b instanceof SmallCraftBay && b.canLoad(cargo)) {
+                    //Load 1 unit into the bay 
+                    b.setCurrentSpace(1);
                     return b.getBayNumber();
                 }
             }
         } else if (cargo.getEntityType() == Entity.ETYPE_TANK) {
-            // Try to fit light tanks into light, heavy or superheavy vehicle bays in that order
+            // Try to fit lighter tanks into smaller bays first
             if (cargo.getWeight() <= 50) {
                 for (Bay b: transport.getTransportBays()) {
                     if (b instanceof LightVehicleBay && b.canLoad(cargo)) {
+                        //Load 1 unit into the bay 
+                        b.setCurrentSpace(1);
                         return b.getBayNumber();
                     }
                 }
                 for (Bay b: transport.getTransportBays()) {
                     if (b instanceof HeavyVehicleBay && b.canLoad(cargo)) {
+                        //Load 1 unit into the bay 
+                        b.setCurrentSpace(1);
                         return b.getBayNumber();
                     }
                 }
                 for (Bay b: transport.getTransportBays()) {
                     if (b instanceof SuperHeavyVehicleBay && b.canLoad(cargo)) {
+                        //Load 1 unit into the bay 
+                        b.setCurrentSpace(1);
                         return b.getBayNumber();
                     }
                 }
@@ -1679,11 +1693,15 @@ public class Utilities {
                 // Try to fit heavy tanks into heavy or superheavy vehicle bays in that order
                 for (Bay b: transport.getTransportBays()) {
                     if (b instanceof HeavyVehicleBay && b.canLoad(cargo)) {
+                        //Load 1 unit into the bay 
+                        b.setCurrentSpace(1);
                         return b.getBayNumber();
                     }
                 }
                 for (Bay b: transport.getTransportBays()) {
                     if (b instanceof SuperHeavyVehicleBay && b.canLoad(cargo)) {
+                        //Load 1 unit into the bay 
+                        b.setCurrentSpace(1);
                         return b.getBayNumber();
                     }
                 }
