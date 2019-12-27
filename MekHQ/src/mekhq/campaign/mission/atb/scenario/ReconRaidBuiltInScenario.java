@@ -139,9 +139,12 @@ public class ReconRaidBuiltInScenario extends AtBScenario {
             destroyHostiles.setTimeLimit(10);
             destroyHostiles.setTimeLimitAtMost(true);
             destroyHostiles.setTimeLimitType(TimeLimitType.Fixed);
-            destroyHostiles.addDetail(String.format(defaultResourceBundle.getString("commonObjectives.timeLimit.text"),
-                    destroyHostiles.getTimeLimit()));
             getScenarioObjectives().add(destroyHostiles);
         }
+    }
+    
+    @Override
+    public String getBattlefieldControlDescription() {
+        return getResourceBundle().getString("battleDetails.common.defenderControlsBattlefield");
     }
 }

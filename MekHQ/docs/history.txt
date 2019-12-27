@@ -3,6 +3,12 @@ VERSION HISTORY:
 v0.47.3-SNAPSHOT
 + Issue #1344: Ensure techs show the right skill for Protomechs
 + PR #1348: Enable scenario modifiers to add objectives to scenarios generated from templates
++ Issue #1349: Problem with replacing Protomech limbs lost in combat
++ PR #1352: Feature: Add origin planet to Personnel
++ PR #1355: General support vehicle crew (fixes deployment bug)
++ Issue #1354: Feature: adds +/-100M button to New Loan dialog
++ PR #1289, #1359: Feature: adds GM Jumpship Recharge on Interstellar Map context menu
++ PR #1360: Fix several issues with adding/removing techs from a force
 
 v0.47.2 (2019-11-15 2000 UTC) 
 + PR #1325: Customize protomechs and advanced aero in MekLab

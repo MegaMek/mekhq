@@ -8,13 +8,13 @@
 		<allowedUnitType>0</allowedUnitType>
 		<arrivalTurn>0</arrivalTurn>
 		<canReinforceLinked>false</canReinforceLinked>
-		<contributesToBV>false</contributesToBV>
-		<contributesToMapSize>false</contributesToMapSize>
-		<contributesToUnitCount>false</contributesToUnitCount>
+		<contributesToBV>true</contributesToBV>
+		<contributesToMapSize>true</contributesToMapSize>
+		<contributesToUnitCount>true</contributesToUnitCount>
 		<deployOffboard>false</deployOffboard>
 		<deploymentZones/>
 		<destinationZone>4</destinationZone>
-		<fixedUnitCount>-1</fixedUnitCount>
+		<fixedUnitCount>1</fixedUnitCount>
 		<forceAlignment>1</forceAlignment>
 		<forceMultiplier>1.0</forceMultiplier>
 		<forceName>House Officer</forceName>

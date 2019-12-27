@@ -143,18 +143,9 @@ public class AtBScenarioModifierApplicator {
                     
                     for(int clusterCount = 0; clusterCount < numClusters; clusterCount++) {
                         HitData hitData = en.rollHitLocation(ToHitData.HIT_NORMAL, Compute.randomInt(4));
-                        int resultingArmor = en.getArmor(hitData) - 5;
+                        int resultingArmor = Math.max(1, en.getArmor(hitData) - 5);
                         
-                        if(resultingArmor >= 0) {
-                            en.setArmor(resultingArmor, hitData);
-                        } else {
-                            en.setArmor(0, hitData);
-                            
-                            // the resulting armor is less than 0 at this point, so we subtract it from the internal structure
-                            // for sanity's sake, we don't inflict crits, and don't transfer damage inwards
-                            int resultingStructure = Math.max(0, en.getInternal(hitData) + resultingArmor);
-                            en.setInternal(resultingStructure, hitData);
-                        }
+                        en.setArmor(resultingArmor, hitData);
                     }
                 }
             }

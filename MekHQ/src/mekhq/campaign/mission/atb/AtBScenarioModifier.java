@@ -21,7 +21,6 @@ package mekhq.campaign.mission.atb;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -47,7 +46,6 @@ import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.ScenarioObjective;
-import mekhq.campaign.mission.ScenarioTemplate;
 
 @XmlRootElement(name="AtBScenarioModifier")
 public class AtBScenarioModifier {
@@ -255,7 +253,7 @@ public class AtBScenarioModifier {
                 resultingList = templateElement.getValue();
             }
         } catch(Exception e) {
-            MekHQ.getLogger().error(ScenarioModifierManifest.class, "Deserialize", "Error Deserializing Scenario Modifier", e);
+            MekHQ.getLogger().error(ScenarioModifierManifest.class, "Deserialize", "Error Deserializing Scenario Modifier: " + fileName, e);
         }
 
         return resultingList;

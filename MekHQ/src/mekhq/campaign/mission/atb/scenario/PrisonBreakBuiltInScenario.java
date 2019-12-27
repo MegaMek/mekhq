@@ -122,7 +122,10 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
                 1, true);
         ScenarioObjective keepPrisonersAlive = CommonObjectiveFactory.getPreserveSpecificFriendlies(PRISONER_FORCE_ID,
                 1, true);
-
+        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(GUARD_FORCE_ID, 100);
+        destroyHostiles.getSuccessEffects().clear();
+        destroyHostiles.addDetail(getResourceBundle().getString("commonObjectives.battlefieldControl"));
+        
         keepFriendliesAlive.setTimeLimit(8);
         keepFriendliesAlive.setTimeLimitAtMost(false);
         keepFriendliesAlive.setTimeLimitType(TimeLimitType.Fixed);
@@ -136,10 +139,16 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
         keepPrisonersAlive.setTimeLimitAtMost(false);
         keepPrisonersAlive.setTimeLimitType(TimeLimitType.Fixed);
         keepPrisonersAlive.addSuccessEffect(bonusEffect);
-        keepPrisonersAlive.addDetail(String.format(defaultResourceBundle.getString("commonObjectives.bonusRolls.text"),
+        keepPrisonersAlive.addDetail(String.format(getResourceBundle().getString("commonObjectives.bonusRolls.text"),
                 bonusEffect.howMuch));
 
         getScenarioObjectives().add(keepFriendliesAlive);
         getScenarioObjectives().add(keepPrisonersAlive);
+        getScenarioObjectives().add(destroyHostiles);
+    }
+    
+    @Override
+    public String getBattlefieldControlDescription() {
+        return "";
     }
 }

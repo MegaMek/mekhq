@@ -3767,6 +3767,21 @@ public class Campaign implements Serializable, ITechManager {
                 }
             }
         }
+        
+        // clean up non-existent unit references in force unit lists
+        for(Force force : forceIds.values()) {
+            List<UUID> orphanForceUnitIDs = new ArrayList<>();
+            
+            for(UUID unitID : force.getUnits()) {
+                if(getUnit(unitID) == null) {
+                    orphanForceUnitIDs.add(unitID);
+                }
+            }
+            
+            for(UUID unitID : orphanForceUnitIDs) {
+                force.removeUnit(unitID);
+            }
+        }
     }
 
     public boolean isOvertimeAllowed() {
@@ -4431,6 +4446,10 @@ public class Campaign implements Serializable, ITechManager {
         return systems;
     }
 
+    public PlanetarySystem getSystemById(String id) {
+        return Systems.getInstance().getSystemById(id);
+    }
+
     public Vector<String> getSystemNames() {
         Vector<String> systemNames = new Vector<String>();
         for (PlanetarySystem key : Systems.getInstance().getSystems().values()) {
@@ -4688,6 +4707,7 @@ public class Campaign implements Serializable, ITechManager {
                         rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_MECHANIC):
+            case Person.T_VEHICLE_CREW:
                 person.addSkill(SkillType.S_TECH_MECHANIC, expLvl,
                         rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
@@ -6333,7 +6353,7 @@ public class Campaign implements Serializable, ITechManager {
             unit.addGunner(p);
         }
         while (unit.canTakeMoreVesselCrew()) {
-            Person p = newPerson(Person.T_SPACE_CREW);
+            Person p = newPerson(unit.getEntity().isSupportVehicle() ? Person.T_VEHICLE_CREW : Person.T_SPACE_CREW);
             if (!isGM) {
                 if (!recruitPerson(p)) {
                     return;

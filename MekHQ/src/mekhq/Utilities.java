@@ -600,10 +600,6 @@ public class Utilities {
         Person consoleCmdr = null;
         int totalGunnery = 0;
         int totalPiloting = 0;
-        drivers.clear();
-        gunners.clear();
-        vesselCrew.clear();
-        navigator = null;
 
         // If the entire crew is dead, we don't want to generate them.
         // Actually, we do because they might not be truly dead - this will be the case for BA for example
@@ -719,7 +715,7 @@ public class Utilities {
 
                 // this will have the side effect of giving every driver on the crew
                 // the SPAs from the entity's crew.
-                // Not really any way around it 
+                // Not really any way around it
                 populateOptionsFromCrew(p, oldCrew);
                 drivers.add(p);
             }
@@ -809,7 +805,8 @@ public class Utilities {
         //Multi-slot crews already have the names set. Single-slot multi-crew units need to assign the commander's name.
         boolean nameset = oldCrew.getSlotCount() > 1;
         while(vesselCrew.size() < u.getTotalCrewNeeds()) {
-            Person p = c.newPerson(Person.T_SPACE_CREW, factionCode);
+            Person p = c.newPerson(u.getEntity().isSupportVehicle() ?
+                    Person.T_VEHICLE_CREW : Person.T_SPACE_CREW, factionCode);
             if (!nameset) {
                 p.setName(commanderName);
                 nameset = true;
@@ -1112,9 +1109,9 @@ public class Utilities {
                 }
             }
         }
-        // For ammo types we want to match the same munition type if possible to avoid 
+        // For ammo types we want to match the same munition type if possible to avoid
         // imposing unnecessary ammo swaps.
-        // However, if we've just done a refit we may very well have changed ammo types, 
+        // However, if we've just done a refit we may very well have changed ammo types,
         // so we need to set the equipment numbers in this case.
         List<Part> notFound = new ArrayList<>();
         for(Part part : remaining) {
@@ -1583,7 +1580,7 @@ public class Utilities {
 
         }
     }
-    
+
     /**
      * Converts a given Image into a BufferedImage
      *
