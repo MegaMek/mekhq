@@ -72,7 +72,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
     public UnitRatingMethod getUnitRatingMethod() {
         return UnitRatingMethod.CAMPAIGN_OPS;
     }
-    
+
     int getNonAdminPersonnelCount() {
         return nonAdminPersonnelCount;
     }
@@ -152,7 +152,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
                     break;
             }
             // UnitType doesn't include FixedWingSupport.
-            if (entity instanceof FixedWingSupport) { 
+            if (entity instanceof FixedWingSupport) {
                 if (u.getFullCrewSize() < u.getActiveCrew().size()) {
                     addCraftWithoutCrew(u);
                 }
@@ -165,13 +165,13 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         if (null == crew) {
             return;
         }
-        
+
         int gunnery = crew.getGunnery();
         int antiMek = infantry.getAntiMekSkill();
         if (antiMek == 0 || antiMek == 8) {
             antiMek = gunnery + 1;
         }
-        
+
         BigDecimal skillLevel = BigDecimal.valueOf(gunnery)
                                     .add(BigDecimal.valueOf(antiMek));
 
@@ -458,15 +458,15 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         if (commander == null) {
             return 0;
         }
-        int skillTotal = getCommanderSkill(SkillType.S_LEADER);
-        skillTotal += getCommanderSkill(SkillType.S_TACTICS);
-        skillTotal += getCommanderSkill(SkillType.S_STRATEGY);
-        skillTotal += getCommanderSkill(SkillType.S_NEG);
+        int skillTotal = getCommanderSkillLevelWithBonus(SkillType.S_LEADER);
+        skillTotal += getCommanderSkillLevelWithBonus(SkillType.S_TACTICS);
+        skillTotal += getCommanderSkillLevelWithBonus(SkillType.S_STRATEGY);
+        skillTotal += getCommanderSkillLevelWithBonus(SkillType.S_NEG);
 
         // ToDo AToW Traits.
-        // ToDo MHQ would need  to support: Combat Sense, Connections, 
-        // ToDo                             Reputation, Wealth, High CHA, 
-        // ToDo                             Combat Paralysis, 
+        // ToDo MHQ would need  to support: Combat Sense, Connections,
+        // ToDo                             Reputation, Wealth, High CHA,
+        // ToDo                             Combat Paralysis,
         // ToDo                             Unlucky & Low CHA.
 
         int commanderValue = skillTotal; // ToDo + positiveTraits - negativeTraits.
@@ -504,7 +504,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         tci.updateCapacityIndicators(getMechBayCount(), getMechCount());
         tci.updateCapacityIndicators(getProtoBayCount(), getProtoCount());
         tci.updateCapacityIndicators(getHeavyVeeBayCount(), getHeavyVeeCount());
-        
+
         // vehicles are the only units that can share heavy/light bays so we have some special logic
         // we've stuffed all possible heavy vehicles into heavy vehicle bays.
         // if we have some heavy vehicle bays left over, add them to the light vehicle bay count
@@ -513,7 +513,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         if(heavyVeeBays > 0) {
             lightVeeBays += heavyVeeBays;
         }
-        
+
         tci.updateCapacityIndicators(lightVeeBays, getLightVeeCount());
         tci.updateCapacityIndicators(getFighterBayCount(), getFighterCount());
         tci.updateCapacityIndicators(getBaBayCount(), getBattleArmorCount() / 5); // battle armor bays can hold 5 battle armor per bay
@@ -536,7 +536,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         }
 
         // TODO: Calculate transport needs and capacity for support personnel.
-        // According to Campaign Ops, this will require tracking bay personnel 
+        // According to Campaign Ops, this will require tracking bay personnel
         // & passenger quarters.
 
         if (getJumpshipCount() > 0) {
@@ -561,7 +561,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
         return totalValue;
     }
-    
+
     int calcTechSupportValue() {
         int totalValue = 0;
         setTotalTechTeams(0);
@@ -576,7 +576,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         astechTeams = getCampaign().getNumberAstechs() / 6;
 
         for (Person tech : getCampaign().getTechs()) {
-            // If we're out of astech teams, the rest of the techs are 
+            // If we're out of astech teams, the rest of the techs are
             // unsupported and don't count.
             if (astechTeams <= 0) {
                 break;
@@ -742,13 +742,13 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
         final String TEMPLATE = "    %-" + SUBHEADER_LENGTH + "s %3d";
         out.append("\n").append(String.format(TEMPLATE, "Leadership:",
-                                              getCommanderSkill(SkillType.S_LEADER)));
+                                                getCommanderSkillLevelWithBonus(SkillType.S_LEADER)));
         out.append("\n").append(String.format(TEMPLATE, "Negotiation:",
-                                              getCommanderSkill(SkillType.S_NEG)));
+                                                getCommanderSkillLevelWithBonus(SkillType.S_NEG)));
         out.append("\n").append(String.format(TEMPLATE, "Strategy:",
-                                              getCommanderSkill(SkillType.S_STRATEGY)));
+                                                getCommanderSkillLevelWithBonus(SkillType.S_STRATEGY)));
         out.append("\n").append(String.format(TEMPLATE, "Tactics:",
-                                              getCommanderSkill(SkillType.S_TACTICS)));
+                                                getCommanderSkillLevelWithBonus(SkillType.S_TACTICS)));
 
         return out.toString();
     }
@@ -993,7 +993,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
     private void clearCraftWithoutCrew() {
         craftWithoutCrew.clear();
     }
-    
+
     /**
      * Data structure that holds transport capacity indicators
      * @author NickAragua
@@ -1003,7 +1003,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         private boolean sufficientCapacity = true;
         private boolean excessCapacity = false;
         private boolean doubleCapacity = true;
-        
+
         public boolean hasSufficientCapacity() {
             return sufficientCapacity;
         }
@@ -1011,11 +1011,11 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         public boolean hasExcessCapacity() {
             return excessCapacity;
         }
-        
+
         public boolean hasDoubleCapacity() {
             return doubleCapacity;
         }
-        
+
         /**
          * Updates the transport capacity indicators
          * @param bayCount The number of available bays
@@ -1027,22 +1027,22 @@ public class CampaignOpsReputation extends AbstractUnitRating {
             if(unitCount == 0) {
                 return;
             }
-            
-            // examples: 
+
+            // examples:
             //  1 infantry platoon, 1 bay = sufficient capacity
             //  1 infantry platoon, 1 tank, 1 infantry bay, 1 tank bay = excess capacity
             //  1 infantry platoon, 1 tank, 2 infantry bay, 1 tank bay = double capacity
             //  1 infantry platoon, no infantry bays, 1 tank, 1 tank bay = insufficient capacity
-            
+
             // we have enough capacity if there are as many or more bays than units
-            sufficientCapacity &= (bayCount >= unitCount); 
-            
-            // we have excess capacity if there are more bays than units for at least one unit type AND 
+            sufficientCapacity &= (bayCount >= unitCount);
+
+            // we have excess capacity if there are more bays than units for at least one unit type AND
             // we have sufficient capacity for everything else
             excessCapacity |= (bayCount > unitCount) && sufficientCapacity;
-            
+
             // we have double capacity if there are more than twice as many bays as units for every unit type
-            doubleCapacity &= (bayCount > (unitCount * 2)); 
+            doubleCapacity &= (bayCount > (unitCount * 2));
         }
     }
 }
