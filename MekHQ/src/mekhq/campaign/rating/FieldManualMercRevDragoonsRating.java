@@ -317,7 +317,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                                    new BigDecimal(5), 0,
                                    RoundingMode.HALF_EVEN).intValue());
 
-        if(medSupportNeeded != 0){ //this is not included in the above to fix the zero personnel case
+        if(medSupportNeeded > 0){ //this is not included in the above to fix the zero personnel case
             medSupportNeeded += 3;
         }
     }
