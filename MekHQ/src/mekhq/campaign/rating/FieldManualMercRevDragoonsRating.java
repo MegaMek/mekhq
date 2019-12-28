@@ -284,9 +284,9 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
         if (getCampaign().getCampaignOptions().useQuirks()) {
             if (en.hasQuirk("easy_maintain")) {
-                hours -= hours * 0.2;
+                hours *= 0.8;
             } else if (en.hasQuirk("difficult_maintain")) {
-                hours += hours * 0.2;
+                hours *= 1.2;
             }
         }
         getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
@@ -296,10 +296,10 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         dropJumpShipSupportNeeded += hours;
     }
 
-    // The wording on this in FM:Mr is rather confusing.  Near as I can parse 
-    // it out, you divide your total personnel into 7-man "squads".  These each 
-    // require 4 hours of medical support (3 + (7/5) = 3 + 1.4 = 4.4 rounds to 
-    // 4).   The left over personnel form a new "squad" which requires 3 hours 
+    // The wording on this in FM:Mr is rather confusing.  Near as I can parse
+    // it out, you divide your total personnel into 7-man "squads".  These each
+    // require 4 hours of medical support (3 + (7/5) = 3 + 1.4 = 4.4 rounds to
+    // 4).   The left over personnel form a new "squad" which requires 3 hours
     // + (# left over / 5).  So, if you have 25 personnel that would be:
     //   25 / 7 = 3 squads of 7 and 1 squad of 4.
     //   3 * (3 + 7/5) = 3 * (3 + 1.4) = 3 * 4 = 12 hours
@@ -543,7 +543,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         }
 
         /*
-          todo consider adding rpg traits in MekHQ (they would have no impact 
+          todo consider adding rpg traits in MekHQ (they would have no impact
           todo on megamek).
           value += (total positive - total negative)
           See FM: Mercs (rev) pg 154 for a full list.
@@ -570,11 +570,12 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     private BigDecimal getMedicalSupportPercentage() {
-        if (getMedicalSupportAvailable() <= 0) {
-            return BigDecimal.ZERO;
-        }
         if (getMedicalSupportHoursNeeded() <= 0) {
+            //returns 100% if there is no need for medical support
             return HUNDRED;
+        } else if (getMedicalSupportAvailable() <= 0) {
+            //returns 0% if there are hours needed and no support available
+            return BigDecimal.ZERO;
         }
 
         BigDecimal percent = new BigDecimal(getMedicalSupportAvailable())
@@ -598,13 +599,13 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     private BigDecimal getAdminSupportPercentage() {
-        if (adminSupportHours <= 0) {
-            return BigDecimal.ZERO;
-        }
         if (adminSupportNeeded <= 0) {
+            //returns 100% if there is no need for administrative support
+            return HUNDRED;
+        } else if (adminSupportHours <= 0) {
+            //returns 0% if there are hours needed and no support available
             return BigDecimal.ZERO;
         }
-
         BigDecimal percent =
                 new BigDecimal(adminSupportHours).divide(
                         new BigDecimal(adminSupportNeeded),
@@ -634,12 +635,13 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     private BigDecimal getTechSupportPercentage() {
-        if (getTechSupportHours() <= 0) {
-            return BigDecimal.ZERO;
-        }
         int techSupportNeeded = getTechSupportNeeded();
         if (techSupportNeeded <= 0) {
+            //returns 100% if there is no need for tech support
             return HUNDRED;
+        } else if (getTechSupportHours() <= 0) {
+            //returns 0% if there are hours needed and no support available
+            return BigDecimal.ZERO;
         }
 
         BigDecimal percent = BigDecimal.valueOf(getTechSupportHours())
@@ -964,7 +966,20 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
     public BigDecimal getTransportPercent() {
         // todo Superheavys.
-        //Find out how short of transport bays we are.
+
+        //Find the current number of units that might require transport
+        BigDecimal totalUnits = new BigDecimal(getMechCount() +
+                getLightVeeCount() +
+                getHeavyVeeCount() +
+                getFighterCount() +
+                getNumberBaSquads() +
+                calcInfantryPlatoons());
+        if (totalUnits.compareTo(BigDecimal.ZERO) == 0) {
+            //if you have no units, you don't need to transport them, return 100%
+            return HUNDRED;
+        }
+
+        //Find out if we are short on transport bays
         int heavyVeeBays = getHeavyVeeBayCount();
         int numberWithoutTransport = Math.max((getMechCount() -
                                                getMechBayCount()), 0);
@@ -986,15 +1001,9 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                                             getSmallCraftBayCount()), 0);
         BigDecimal transportNeeded = new BigDecimal(numberWithoutTransport);
 
-        //Find the percentage of units that are transported.
-        BigDecimal totalUnits = new BigDecimal(getMechCount() +
-                                               getLightVeeCount() +
-                                               getHeavyVeeCount() +
-                                               getFighterCount() +
-                                               getNumberBaSquads() +
-                                               calcInfantryPlatoons());
-        if (totalUnits.compareTo(BigDecimal.ZERO) == 0) {
-            return BigDecimal.ZERO;
+        if (transportNeeded.compareTo(BigDecimal.ZERO) == 0){
+            //If all units are transported, return 100%
+            return HUNDRED;
         }
         BigDecimal percentUntransported = transportNeeded.divide(totalUnits,
                                                                  PRECISION,
@@ -1036,7 +1045,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             return 0;
         }
 
-        //Number of high-tech units is equal to the number of IS2 units plus 
+        //Number of high-tech units is equal to the number of IS2 units plus
         // twice the number of Clan units.
         BigDecimal highTechNumber = new BigDecimal(getCountIS2() +
                                                    (getCountClan() * 2));
@@ -1061,7 +1070,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         BigDecimal scoredPercent = getHighTechPercent().subtract(
                 new BigDecimal(30));
 
-        //If we have a negative value (hi-tech percent was < 30%) return a 
+        //If we have a negative value (hi-tech percent was < 30%) return a
         // value of zero.
         if (scoredPercent.compareTo(BigDecimal.ZERO) <= 0) {
             return 0;
@@ -1087,11 +1096,11 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     /**
-     * Adds the tech level of the passed unit to the number of Clan or IS 
+     * Adds the tech level of the passed unit to the number of Clan or IS
      * Advanced units in the list (as appropriate).
      *
      * @param u     The {@code Unit} to be evaluated.
-     * @param value The unit's value.  Most have a value of '1' but infantry 
+     * @param value The unit's value.  Most have a value of '1' but infantry
      *              and battle armor are less.
      */
     private void updateAdvanceTechCount(Unit u, BigDecimal value) {
@@ -1174,7 +1183,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     private int getCountClan() {
         return countClan;
     }
-    
+
     public UnitRatingMethod getUnitRatingMethod() {
         return UnitRatingMethod.FLD_MAN_MERCS_REV;
     }
