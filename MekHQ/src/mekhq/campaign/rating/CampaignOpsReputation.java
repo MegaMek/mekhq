@@ -72,7 +72,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
     public UnitRatingMethod getUnitRatingMethod() {
         return UnitRatingMethod.CAMPAIGN_OPS;
     }
-    
+
     int getNonAdminPersonnelCount() {
         return nonAdminPersonnelCount;
     }
@@ -134,7 +134,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
                 updateTotalSkill(u.getEntity().getCrew(), entity.getUnitType());
             }
 
-            // todo: Add Mobile Structure when Megamek supports it.
+            // todo: Add Mobile Structure when MegaMek supports it.
             switch (unitType) {
                 case UnitType.SPACE_STATION:
                 case UnitType.NAVAL:
@@ -152,7 +152,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
                     break;
             }
             // UnitType doesn't include FixedWingSupport.
-            if (entity instanceof FixedWingSupport) { 
+            if (entity instanceof FixedWingSupport) {
                 if (u.getFullCrewSize() < u.getActiveCrew().size()) {
                     addCraftWithoutCrew(u);
                 }
@@ -165,13 +165,13 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         if (null == crew) {
             return;
         }
-        
+
         int gunnery = crew.getGunnery();
         int antiMek = infantry.getAntiMekSkill();
         if (antiMek == 0 || antiMek == 8) {
             antiMek = gunnery + 1;
         }
-        
+
         BigDecimal skillLevel = BigDecimal.valueOf(gunnery)
                                     .add(BigDecimal.valueOf(antiMek));
 
@@ -464,9 +464,9 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         skillTotal += getCommanderSkill(SkillType.S_NEG);
 
         // ToDo AToW Traits.
-        // ToDo MHQ would need  to support: Combat Sense, Connections, 
-        // ToDo                             Reputation, Wealth, High CHA, 
-        // ToDo                             Combat Paralysis, 
+        // ToDo MHQ would need  to support: Combat Sense, Connections,
+        // ToDo                             Reputation, Wealth, High CHA,
+        // ToDo                             Combat Paralysis,
         // ToDo                             Unlucky & Low CHA.
 
         int commanderValue = skillTotal; // ToDo + positiveTraits - negativeTraits.
@@ -503,22 +503,20 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         TransportCapacityIndicators tci = new TransportCapacityIndicators();
         tci.updateCapacityIndicators(getMechBayCount(), getMechCount());
         tci.updateCapacityIndicators(getProtoBayCount(), getProtoCount());
-        tci.updateCapacityIndicators(getHeavyVeeBayCount(), getHeavyVeeCount());
-        
-        // vehicles are the only units that can share heavy/light bays so we have some special logic
-        // we've stuffed all possible heavy vehicles into heavy vehicle bays.
-        // if we have some heavy vehicle bays left over, add them to the light vehicle bay count
-        int heavyVeeBays = getHeavyVeeBayCount() - getHeavyVeeCount();
-        int lightVeeBays = getLightVeeBayCount();
-        if(heavyVeeBays > 0) {
-            lightVeeBays += heavyVeeBays;
-        }
-        
-        tci.updateCapacityIndicators(lightVeeBays, getLightVeeCount());
-        tci.updateCapacityIndicators(getFighterBayCount(), getFighterCount());
         tci.updateCapacityIndicators(getBaBayCount(), getBattleArmorCount() / 5); // battle armor bays can hold 5 battle armor per bay
         tci.updateCapacityIndicators(getInfantryBayCount(), calcInfantryPlatoons());
-        tci.updateCapacityIndicators(getSmallCraftBayCount(), getSmallCraftCount());
+
+        // vehicles can share heavy/light bays, while small craft and fighters can share bays
+        // we've stuffed all possible heavy vehicles into heavy vehicle bays.
+        // if we have some heavy vehicle bays left over, add them to the light vehicle bay count
+        // The same is done for small craft and fighters, just replace heavy vehicle with small craft and light vehicle with fighters
+        int excessHeavyVeeBays = Math.max(getHeavyVeeBayCount() - getHeavyVeeCount(), 0);
+        int excessSmallCraftBays = Math.max(getSmallCraftBayCount() - getSmallCraftCount(), 0);
+
+        tci.updateCapacityIndicators(getLightVeeBayCount() + excessHeavyVeeBays, getLightVeeCount());
+        tci.updateCapacityIndicators(getHeavyVeeBayCount() - excessHeavyVeeBays, getHeavyVeeCount());
+        tci.updateCapacityIndicators(getFighterBayCount() + excessSmallCraftBays, getFighterCount());
+        tci.updateCapacityIndicators(getSmallCraftBayCount() - excessSmallCraftBays, getSmallCraftCount());
 
         //Find the percentage of units that are transported.
         if (tci.hasDoubleCapacity()) {
@@ -536,7 +534,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         }
 
         // TODO: Calculate transport needs and capacity for support personnel.
-        // According to Campaign Ops, this will require tracking bay personnel 
+        // According to Campaign Ops, this will require tracking bay personnel
         // & passenger quarters.
 
         if (getJumpshipCount() > 0) {
@@ -561,7 +559,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
         return totalValue;
     }
-    
+
     int calcTechSupportValue() {
         int totalValue = 0;
         setTotalTechTeams(0);
@@ -576,7 +574,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         astechTeams = getCampaign().getNumberAstechs() / 6;
 
         for (Person tech : getCampaign().getTechs()) {
-            // If we're out of astech teams, the rest of the techs are 
+            // If we're out of astech teams, the rest of the techs are
             // unsupported and don't count.
             if (astechTeams <= 0) {
                 break;
@@ -772,16 +770,17 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
         int heavyVeeBayCount = getHeavyVeeBayCount();
         int excessHeavyVeeBays = Math.max(0, heavyVeeBayCount - getHeavyVeeCount());
-
+        int smallCraftBayCount = getSmallCraftBayCount();
+        int excessSmallCraftBays = Math.max(0, smallCraftBayCount - getSmallCraftCount());
         String out = String.format("%-" + HEADER_LENGTH + "s %3d",
                                    "Transportation:", getTransportValue()) +
                      "\n" + String.format(TEMPLATE, "Mech Bays:",
                                           getMechCount(), getMechBayCount()) +
                      "\n" + String.format(TEMPLATE, "Fighter Bays:",
                                           getFighterCount(), getFighterBayCount()) +
+                     " (plus " + excessSmallCraftBays + " excess small craft)" +
                      "\n" + String.format(TEMPLATE, "Small Craft Bays:",
-                                          getSmallCraftCount(),
-                                          getSmallCraftBayCount()) +
+                                          getSmallCraftCount(), smallCraftBayCount) +
                      "\n" + String.format(TEMPLATE, "Protomech Bays:",
                                           getProtoCount(),
                                           getProtoBayCount()) +
@@ -993,7 +992,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
     private void clearCraftWithoutCrew() {
         craftWithoutCrew.clear();
     }
-    
+
     /**
      * Data structure that holds transport capacity indicators
      * @author NickAragua
@@ -1003,7 +1002,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         private boolean sufficientCapacity = true;
         private boolean excessCapacity = false;
         private boolean doubleCapacity = true;
-        
+
         public boolean hasSufficientCapacity() {
             return sufficientCapacity;
         }
@@ -1011,11 +1010,11 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         public boolean hasExcessCapacity() {
             return excessCapacity;
         }
-        
+
         public boolean hasDoubleCapacity() {
             return doubleCapacity;
         }
-        
+
         /**
          * Updates the transport capacity indicators
          * @param bayCount The number of available bays
@@ -1027,22 +1026,22 @@ public class CampaignOpsReputation extends AbstractUnitRating {
             if(unitCount == 0) {
                 return;
             }
-            
-            // examples: 
+
+            // examples:
             //  1 infantry platoon, 1 bay = sufficient capacity
             //  1 infantry platoon, 1 tank, 1 infantry bay, 1 tank bay = excess capacity
             //  1 infantry platoon, 1 tank, 2 infantry bay, 1 tank bay = double capacity
             //  1 infantry platoon, no infantry bays, 1 tank, 1 tank bay = insufficient capacity
-            
+
             // we have enough capacity if there are as many or more bays than units
-            sufficientCapacity &= (bayCount >= unitCount); 
-            
-            // we have excess capacity if there are more bays than units for at least one unit type AND 
+            sufficientCapacity &= (bayCount >= unitCount);
+
+            // we have excess capacity if there are more bays than units for at least one unit type AND
             // we have sufficient capacity for everything else
             excessCapacity |= (bayCount > unitCount) && sufficientCapacity;
-            
+
             // we have double capacity if there are more than twice as many bays as units for every unit type
-            doubleCapacity &= (bayCount > (unitCount * 2)); 
+            doubleCapacity &= (bayCount > (unitCount * 2));
         }
     }
 }
