@@ -269,7 +269,9 @@ public abstract class AbstractUnitRating implements IUnitRating {
         return skill.getBonus();
     }
 
-    /* Returns the Commander's Skill Level with Bonus for the specified skill */
+    /**
+     *  Returns the Commander's Skill Level with Bonus for the specified skill
+     */
     int getCommanderSkillLevelWithBonus(String skillName) {
         Person commander = getCommander();
         if (commander == null) {
