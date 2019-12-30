@@ -307,18 +307,15 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     //   total = 16 hours.
     private void calcMedicalSupportHoursNeeded() {
         int activePersonnelCount = getCampaign().getActivePersonnel().size();
-        int numSquads = new BigDecimal(activePersonnelCount)
-                .divide(new BigDecimal(7), 0,
-                        RoundingMode.DOWN).intValue();
+
+        // Calculated based on 7-person squads
+        int numSquads = (int) (activePersonnelCount / 7); // integer division intended
+        // each squad takes 4.4 hours (3 + 7/5) rounded to the nearest hour
+        medSupportNeeded = numSquads * 4;
         int leftOver = activePersonnelCount - (numSquads * 7);
-
-        medSupportNeeded = (numSquads * 4) +
-                           (new BigDecimal(leftOver).divide(
-                                   new BigDecimal(5), 0,
-                                   RoundingMode.HALF_EVEN).intValue());
-
-        if(medSupportNeeded != 0){ //this is not included in the above to fix the zero personnel case
-            medSupportNeeded += 3;
+        if (leftOver > 0) {
+            // the left overs form a squad which needs (3 + N / 5) rounded hours
+            medSupportNeeded += (int) Math.round(3 + leftOver / 5.0);
         }
     }
 
