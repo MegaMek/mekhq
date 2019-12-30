@@ -256,7 +256,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         }
 
         // todo Decide if this should be an additional campaign option or if this is implicit in having Faction &
-        // todo Era mods turned on for the campiagn in the first place.
+        // todo Era mods turned on for the campaign in the first place.
 //        if (campaign.getCampaignOptions().useFactionModifiers() && en.isClan()) {
 //            hoursNeeded *= 2;
 //        } else if (campaign.getCampaignOptions().useEraMods() && (en.getTechLevel() > TechConstants.T_INTRO_BOXSET)) {
@@ -520,36 +520,19 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             return 0;
         }
 
-        int value = 0;
-
-        Skill test = getCommander().getSkill(SkillType.S_LEADER);
-        if (test != null) {
-            value += test.getLevel();
-        }
-
-        test = getCommander().getSkill(SkillType.S_NEG);
-        if (test != null) {
-            value += test.getLevel();
-        }
-
-        test = getCommander().getSkill(SkillType.S_STRATEGY);
-        if (test != null) {
-            value += test.getLevel();
-        }
-
-        test = getCommander().getSkill(SkillType.S_TACTICS);
-        if (test != null) {
-            value += test.getLevel();
-        }
+        int skillTotal = getCommanderSkillLevelWithBonus(SkillType.S_LEADER);
+        skillTotal += getCommanderSkillLevelWithBonus(SkillType.S_TACTICS);
+        skillTotal += getCommanderSkillLevelWithBonus(SkillType.S_STRATEGY);
+        skillTotal += getCommanderSkillLevelWithBonus(SkillType.S_NEG);
 
         /*
           todo consider adding rpg traits in MekHQ (they would have no impact
-          todo on megamek).
+          todo on MegaMek).
           value += (total positive - total negative)
           See FM: Mercs (rev) pg 154 for a full list.
          */
 
-        return value;
+        return skillTotal;
     }
 
     private int getMedicPoolHours() {
@@ -762,16 +745,16 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
         final String TEMPLATE = "    %-" + SUBHEADER_LENGTH + "s %3d";
         out.append(String.format(TEMPLATE, "Leadership:",
-                                 getCommanderSkill(SkillType.S_LEADER)))
+                                 getCommanderSkillLevelWithBonus(SkillType.S_LEADER)))
            .append("\n");
         out.append(String.format(TEMPLATE, "Negotiation:",
-                                 getCommanderSkill(SkillType.S_NEG)))
+                                 getCommanderSkillLevelWithBonus(SkillType.S_NEG)))
            .append("\n");
         out.append(String.format(TEMPLATE, "Strategy:",
-                                 getCommanderSkill(SkillType.S_STRATEGY)))
+                                 getCommanderSkillLevelWithBonus(SkillType.S_STRATEGY)))
            .append("\n");
         out.append(String.format(TEMPLATE, "Tactics:",
-                                 getCommanderSkill(SkillType.S_TACTICS)));
+                                 getCommanderSkillLevelWithBonus(SkillType.S_TACTICS)));
 
         return out.toString();
     }

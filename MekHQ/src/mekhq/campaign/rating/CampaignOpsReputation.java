@@ -458,10 +458,10 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         if (commander == null) {
             return 0;
         }
-        int skillTotal = getCommanderSkill(SkillType.S_LEADER);
-        skillTotal += getCommanderSkill(SkillType.S_TACTICS);
-        skillTotal += getCommanderSkill(SkillType.S_STRATEGY);
-        skillTotal += getCommanderSkill(SkillType.S_NEG);
+        int skillTotal = getCommanderSkillLevelWithBonus(SkillType.S_LEADER);
+        skillTotal += getCommanderSkillLevelWithBonus(SkillType.S_TACTICS);
+        skillTotal += getCommanderSkillLevelWithBonus(SkillType.S_STRATEGY);
+        skillTotal += getCommanderSkillLevelWithBonus(SkillType.S_NEG);
 
         // ToDo AToW Traits.
         // ToDo MHQ would need  to support: Combat Sense, Connections,
@@ -740,13 +740,13 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
         final String TEMPLATE = "    %-" + SUBHEADER_LENGTH + "s %3d";
         out.append("\n").append(String.format(TEMPLATE, "Leadership:",
-                                              getCommanderSkill(SkillType.S_LEADER)));
+                                                getCommanderSkillLevelWithBonus(SkillType.S_LEADER)));
         out.append("\n").append(String.format(TEMPLATE, "Negotiation:",
-                                              getCommanderSkill(SkillType.S_NEG)));
+                                                getCommanderSkillLevelWithBonus(SkillType.S_NEG)));
         out.append("\n").append(String.format(TEMPLATE, "Strategy:",
-                                              getCommanderSkill(SkillType.S_STRATEGY)));
+                                                getCommanderSkillLevelWithBonus(SkillType.S_STRATEGY)));
         out.append("\n").append(String.format(TEMPLATE, "Tactics:",
-                                              getCommanderSkill(SkillType.S_TACTICS)));
+                                                getCommanderSkillLevelWithBonus(SkillType.S_TACTICS)));
 
         return out.toString();
     }
