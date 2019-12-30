@@ -284,9 +284,9 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
         if (getCampaign().getCampaignOptions().useQuirks()) {
             if (en.hasQuirk("easy_maintain")) {
-                hours -= hours * 0.2;
+                hours *= 0.8;
             } else if (en.hasQuirk("difficult_maintain")) {
-                hours += hours * 0.2;
+                hours *= 1.2;
             }
         }
         getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
@@ -307,15 +307,16 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     //   total = 16 hours.
     private void calcMedicalSupportHoursNeeded() {
         int activePersonnelCount = getCampaign().getActivePersonnel().size();
-        int numSquads = new BigDecimal(activePersonnelCount)
-                .divide(new BigDecimal(7), 0,
-                        RoundingMode.DOWN).intValue();
-        int leftOver = activePersonnelCount - (numSquads * 7);
 
-        medSupportNeeded = (numSquads * 4) +
-                           (3 + (new BigDecimal(leftOver).divide(
-                                   new BigDecimal(5), 0,
-                                   RoundingMode.HALF_EVEN).intValue()));
+        // Calculated based on 7-person squads
+        int numSquads = (int) (activePersonnelCount / 7); // integer division intended
+        // each squad takes 4.4 hours (3 + 7/5) rounded to the nearest hour
+        medSupportNeeded = numSquads * 4;
+        int leftOver = activePersonnelCount - (numSquads * 7);
+        if (leftOver > 0) {
+            // the left overs form a squad which needs (3 + N / 5) rounded hours
+            medSupportNeeded += (int) Math.round(3 + leftOver / 5.0);
+        }
     }
 
     private int getMedicalSupportHoursNeeded() {
@@ -553,11 +554,12 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     private BigDecimal getMedicalSupportPercentage() {
-        if (getMedicalSupportAvailable() <= 0) {
-            return BigDecimal.ZERO;
-        }
         if (getMedicalSupportHoursNeeded() <= 0) {
+            //returns 100% if there is no need for medical support
             return HUNDRED;
+        } else if (getMedicalSupportAvailable() <= 0) {
+            //returns 0% if there are hours needed and no support available
+            return BigDecimal.ZERO;
         }
 
         BigDecimal percent = new BigDecimal(getMedicalSupportAvailable())
@@ -581,13 +583,13 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     private BigDecimal getAdminSupportPercentage() {
-        if (adminSupportHours <= 0) {
-            return BigDecimal.ZERO;
-        }
         if (adminSupportNeeded <= 0) {
+            //returns 100% if there is no need for administrative support
+            return HUNDRED;
+        } else if (adminSupportHours <= 0) {
+            //returns 0% if there are hours needed and no support available
             return BigDecimal.ZERO;
         }
-
         BigDecimal percent =
                 new BigDecimal(adminSupportHours).divide(
                         new BigDecimal(adminSupportNeeded),
@@ -617,12 +619,13 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     private BigDecimal getTechSupportPercentage() {
-        if (getTechSupportHours() <= 0) {
-            return BigDecimal.ZERO;
-        }
         int techSupportNeeded = getTechSupportNeeded();
         if (techSupportNeeded <= 0) {
+            //returns 100% if there is no need for tech support
             return HUNDRED;
+        } else if (getTechSupportHours() <= 0) {
+            //returns 0% if there are hours needed and no support available
+            return BigDecimal.ZERO;
         }
 
         BigDecimal percent = BigDecimal.valueOf(getTechSupportHours())
@@ -947,7 +950,20 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
     public BigDecimal getTransportPercent() {
         // todo Superheavys.
-        //Find out how short of transport bays we are.
+
+        //Find the current number of units that might require transport
+        BigDecimal totalUnits = new BigDecimal(getMechCount() +
+                getLightVeeCount() +
+                getHeavyVeeCount() +
+                getFighterCount() +
+                getNumberBaSquads() +
+                calcInfantryPlatoons());
+        if (totalUnits.compareTo(BigDecimal.ZERO) == 0) {
+            //if you have no units, you don't need to transport them, return 100%
+            return HUNDRED;
+        }
+
+        //Find out if we are short on transport bays
         int heavyVeeBays = getHeavyVeeBayCount();
         int numberWithoutTransport = Math.max((getMechCount() -
                                                getMechBayCount()), 0);
@@ -969,15 +985,9 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                                             getSmallCraftBayCount()), 0);
         BigDecimal transportNeeded = new BigDecimal(numberWithoutTransport);
 
-        //Find the percentage of units that are transported.
-        BigDecimal totalUnits = new BigDecimal(getMechCount() +
-                                               getLightVeeCount() +
-                                               getHeavyVeeCount() +
-                                               getFighterCount() +
-                                               getNumberBaSquads() +
-                                               calcInfantryPlatoons());
-        if (totalUnits.compareTo(BigDecimal.ZERO) == 0) {
-            return BigDecimal.ZERO;
+        if (transportNeeded.compareTo(BigDecimal.ZERO) == 0){
+            //If all units are transported, return 100%
+            return HUNDRED;
         }
         BigDecimal percentUntransported = transportNeeded.divide(totalUnits,
                                                                  PRECISION,
