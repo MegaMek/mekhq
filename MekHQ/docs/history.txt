@@ -10,6 +10,7 @@ v0.47.3-SNAPSHOT
 + PR #1289, #1359: Feature: adds GM Jumpship Recharge on Interstellar Map context menu
 + PR #1360: Fix several issues with adding/removing techs from a force
 + PR #1362: Random personnel background generation (enabled via Campaign Options)
++ Issue #1306: Commander skill level bonuses are now applied in rating calculations
 
 v0.47.2 (2019-11-15 2000 UTC) 
 + PR #1325: Customize protomechs and advanced aero in MekLab
