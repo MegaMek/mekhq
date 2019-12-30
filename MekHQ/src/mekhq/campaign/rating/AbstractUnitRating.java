@@ -107,7 +107,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
     private int failCount = 0;
     private BigDecimal supportPercent = BigDecimal.ZERO;
     private BigDecimal transportPercent = BigDecimal.ZERO;
-    
+
     private static boolean initialized = false;
 
     /**
@@ -196,7 +196,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
                 return commander;
             }
 
-            // If we don't have a list of potential commanders, we cannot 
+            // If we don't have a list of potential commanders, we cannot
             // determine a commander.
             List<Person> commanderList = getCommanderList();
             if (commanderList == null || commanderList.isEmpty()) {
@@ -204,7 +204,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
                 return null;
             }
 
-            //Sort the list of personnel by rank from highest to lowest.  
+            //Sort the list of personnel by rank from highest to lowest.
             // Whoever has the highest rank is the commander.
             commanderList.sort((p1, p2) -> {
                 // Active personnel outrank inactive personnel.
@@ -239,6 +239,9 @@ public abstract class AbstractUnitRating implements IUnitRating {
         return commander;
     }
 
+    /**
+     *  Returns the Commander's Skill Level for the specified skill
+     */
     int getCommanderSkill(String skillName) {
         Person commander = getCommander();
         if (commander == null) {
@@ -249,6 +252,36 @@ public abstract class AbstractUnitRating implements IUnitRating {
             return 0;
         }
         return skill.getLevel();
+    }
+
+    /**
+     * Returns the Commander's Skill Bonus for the specified skill
+     */
+    int getCommanderBonus(String skillName) {
+        Person commander = getCommander();
+        if (commander == null) {
+            return 0;
+        }
+        Skill skill = commander.getSkill(skillName);
+        if (skill == null){
+            return 0;
+        }
+        return skill.getBonus();
+    }
+
+    /**
+     *  Returns the Commander's Skill Level with Bonus for the specified skill
+     */
+    int getCommanderSkillLevelWithBonus(String skillName) {
+        Person commander = getCommander();
+        if (commander == null) {
+            return 0;
+        }
+        Skill skill = commander.getSkill(skillName);
+        if (skill == null){
+            return 0;
+        }
+        return skill.getLevel() + skill.getBonus();
     }
 
     /**
@@ -296,7 +329,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
                                 .intValue();
         value = Math.min(value, 25);
 
-        //Only the highest of these values should be used, regardless of how 
+        //Only the highest of these values should be used, regardless of how
         // many are actually owned.
         if (isWarhipWithDocsOwner()) {
             value += 30;
@@ -362,7 +395,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
     }
 
     /**
-     * Calculates the weighted value of the unit based on if it is Infantry, 
+     * Calculates the weighted value of the unit based on if it is Infantry,
      * Battle Armor or something else.
      *
      * @param u The {@code Unit} to be evaluated.
@@ -413,9 +446,9 @@ public abstract class AbstractUnitRating implements IUnitRating {
      * Calculates the unit's rating score.
      */
     protected abstract int calculateUnitRatingScore();
-    
+
     /**
-     * Recalculates the dragoons rating.  If this has already been done, the 
+     * Recalculates the dragoons rating.  If this has already been done, the
      * initialized flag should already be set true
      * and this method will immediately exit.
      */
@@ -572,15 +605,15 @@ public abstract class AbstractUnitRating implements IUnitRating {
     private void incrementMechCount() {
         mechCount++;
     }
-    
+
     private void setInfantryUnitCount(int count) {
         infantryUnitCount = count;
     }
-    
+
     private void incrementInfantryUnitCount() {
         infantryUnitCount++;
     }
-    
+
     public int getInfantryUnitCount() {
         return infantryUnitCount;
     }
@@ -690,7 +723,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
     int calcInfantryPlatoons() {
         return (int) Math.ceil((double) getInfantryCount() / 28);
     }
-    
+
     int getDropshipCount() {
         return dropshipCount;
     }
@@ -866,7 +899,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
 
     void updateUnitCounts(Unit u) {
         final String METHOD_NAME = "updateUnitCounts(Unit)";
-        
+
         if (u.isMothballed()) {
             return;
         }
@@ -929,7 +962,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
                 break;
             case UnitType.INFANTRY:
                 Infantry i = (Infantry) e;
-                
+
                 incrementInfantryCount(i.getSquadSize() * i.getSquadN());
                 incrementInfantryUnitCount();
                 break;
