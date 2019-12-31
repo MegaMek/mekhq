@@ -941,10 +941,10 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
         int numberWithoutTransport = Math.max((getMechCount() - getMechBayCount()), 0);
         numberWithoutTransport += Math.max(getProtoCount() - getProtoBayCount(), 0);
-        numberWithoutTransport += Math.max(getHeavyVeeCount() - getHeavyVeeBayCount() - excessHeavyVeeBays, 0);
-        numberWithoutTransport += Math.max(getLightVeeCount() - getLightVeeBayCount() + excessHeavyVeeBays, 0);
-        numberWithoutTransport += Math.max(getSmallCraftCount() - getSmallCraftBayCount() - excessSmallCraftBays, 0);
-        numberWithoutTransport += Math.max(getFighterCount() - getFighterBayCount() + excessSmallCraftBays, 0);
+        numberWithoutTransport += Math.max(getHeavyVeeCount() - getHeavyVeeBayCount(), 0);
+        numberWithoutTransport += Math.max(getLightVeeCount() - getLightVeeBayCount() - excessHeavyVeeBays, 0);
+        numberWithoutTransport += Math.max(getSmallCraftCount() - getSmallCraftBayCount(), 0);
+        numberWithoutTransport += Math.max(getFighterCount() - getFighterBayCount() - excessSmallCraftBays, 0);
         numberWithoutTransport += Math.max(calcInfantryPlatoons() - getInfantryBayCount(), 0);
 
         BigDecimal transportNeeded = new BigDecimal(numberWithoutTransport);
