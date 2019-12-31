@@ -506,17 +506,38 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         tci.updateCapacityIndicators(getBaBayCount(), getBattleArmorCount() / 5); // battle armor bays can hold 5 battle armor per bay
         tci.updateCapacityIndicators(getInfantryBayCount(), calcInfantryPlatoons());
 
-        // vehicles can share heavy/light bays, while small craft and fighters can share bays
-        // we've stuffed all possible heavy vehicles into heavy vehicle bays.
-        // if we have some heavy vehicle bays left over, add them to the light vehicle bay count
+        // Light vehicles can use heavy or light vehicle bays, while fighters can use fighter or small craft bays
+        // Once we've stuffed stuffed all possible heavy vehicles into heavy vehicle bays.
+        // if we have some heavy vehicle bays left over, add them to the light vehicle bay count, and then calculate the
+        // number of heavy vehicle bays that are still empty.
         // The same is done for small craft and fighters, just replace heavy vehicle with small craft and light vehicle with fighters
         int excessHeavyVeeBays = Math.max(getHeavyVeeBayCount() - getHeavyVeeCount(), 0);
         int excessSmallCraftBays = Math.max(getSmallCraftBayCount() - getSmallCraftCount(), 0);
 
+        // We need to subtract any filled bays from the count. This follows the following logic:
+        // Assume you have 2 heavy vehicle bays, and 4 light vehicle bays, and are trying to store 1 heavy and 5 light vehicles
+        // You have 1 more light vehicle than light vehicle bays to store them in, so you check how many free heavy vehicle bays
+        // there are. Finding 1, you can store the light vehicle there, and it doesn't count as having excess
+        int heavyVeeBaysFilledByLights;
+        int excessLightVees = Math.max(getLightVeeCount() - getLightVeeBayCount(), 0);
+        if (excessLightVees <= excessHeavyVeeBays){
+            heavyVeeBaysFilledByLights = excessLightVees;
+        } else {
+            heavyVeeBaysFilledByLights = excessHeavyVeeBays;
+        }
+
+        int smallCraftBaysFilledByFighters;
+        int excessFighters = Math.max(getFighterCount() - getFighterBayCount(), 0);
+        if (excessFighters <= excessSmallCraftBays){
+            smallCraftBaysFilledByFighters = excessFighters;
+        } else {
+            smallCraftBaysFilledByFighters = excessSmallCraftBays;
+        }
+
         tci.updateCapacityIndicators(getLightVeeBayCount() + excessHeavyVeeBays, getLightVeeCount());
-        tci.updateCapacityIndicators(getHeavyVeeBayCount() - excessHeavyVeeBays, getHeavyVeeCount());
+        tci.updateCapacityIndicators(getHeavyVeeBayCount() - heavyVeeBaysFilledByLights, getHeavyVeeCount());
         tci.updateCapacityIndicators(getFighterBayCount() + excessSmallCraftBays, getFighterCount());
-        tci.updateCapacityIndicators(getSmallCraftBayCount() - excessSmallCraftBays, getSmallCraftCount());
+        tci.updateCapacityIndicators(getSmallCraftBayCount() - smallCraftBaysFilledByFighters, getSmallCraftCount());
 
         //Find the percentage of units that are transported.
         if (tci.hasDoubleCapacity()) {
