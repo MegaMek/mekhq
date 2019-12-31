@@ -27,7 +27,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import megamek.common.*;
+import megamek.common.ASFBay;
+import megamek.common.BattleArmor;
+import megamek.common.BattleArmorBay;
+import megamek.common.Bay;
+import megamek.common.SmallCraft;
+import megamek.common.Entity;
+import megamek.common.HeavyVehicleBay;
+import megamek.common.SuperHeavyVehicleBay;
+import megamek.common.Infantry;
+import megamek.common.InfantryBay;
+import megamek.common.Jumpship;
+import megamek.common.LightVehicleBay;
+import megamek.common.MechBay;
+import megamek.common.SmallCraftBay;
+import megamek.common.UnitType;
+
 import megamek.common.logging.LogLevel;
 import megamek.common.logging.MMLogger;
 import mekhq.MekHQ;
@@ -36,7 +51,6 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.unit.Unit;
-import sun.jvm.hotspot.gc.shared.Space;
 
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)
@@ -511,48 +525,6 @@ public abstract class AbstractUnitRating implements IUnitRating {
             }
         }
     }
-
-/*    private void updateBayCount(Dropship ds) {
-        for (Bay bay : ds.getTransportBays()) {
-            if (bay instanceof MechBay) {
-                setMechBayCount(getMechBayCount() + (int)bay.getCapacity());
-            } else if (bay instanceof BattleArmorBay) {
-                setBaBayCount(getBaBayCount() + (int)bay.getCapacity());
-            } else if (bay instanceof InfantryBay) {
-                setInfantryBayCount(getInfantryBayCount() + (int) (bay.getCapacity() / ((InfantryBay) bay).getPlatoonType().getWeight()));
-            } else if (bay instanceof LightVehicleBay) {
-                setLightVeeBayCount(getLightVeeBayCount() + (int) bay.getCapacity());
-            } else if (bay instanceof HeavyVehicleBay) {
-                setHeavyVeeBayCount(getHeavyVeeBayCount() + (int) bay.getCapacity());
-            } else if (bay instanceof SuperHeavyVehicleBay) {
-                setSuperHeavyVeeBayCount(getSuperHeavyVeeBayCount() + (int) bay.getCapacity());
-            } else if (bay instanceof ASFBay) {
-                setFighterBayCount(getFighterBayCount() + (int) bay.getCapacity());
-            } else if (bay instanceof SmallCraftBay) {
-                setSmallCraftBayCount(getSmallCraftBayCount() + (int) bay.getCapacity());
-            }
-        }
-    }
-
-    void updateBayCount(Entity e) {
-        if (e instanceof Dropship) {
-            updateBayCount((Dropship) e);
-        } else if (e instanceof Jumpship) {
-            updateBayCount((Jumpship) e);
-        }
-    }
-
-    private void updateBayCount(Jumpship jumpship) {
-        for (Bay bay : jumpship.getTransportBays()) {
-            if (bay instanceof ASFBay) {
-                setFighterBayCount(getFighterBayCount() +
-                                   (int) bay.getCapacity());
-            } else if (bay instanceof SmallCraftBay) {
-                setSmallCraftBayCount(getSmallCraftBayCount() +
-                                      (int) bay.getCapacity());
-            }
-        }
-    }*/
 
     void updateDockingCollarCount(Jumpship jumpship) {
         setDockingCollarCount(getDockingCollarCount() +
