@@ -256,7 +256,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         }
 
         // todo Decide if this should be an additional campaign option or if this is implicit in having Faction &
-        // todo Era mods turned on for the campiagn in the first place.
+        // todo Era mods turned on for the campaign in the first place.
 //        if (campaign.getCampaignOptions().useFactionModifiers() && en.isClan()) {
 //            hoursNeeded *= 2;
 //        } else if (campaign.getCampaignOptions().useEraMods() && (en.getTechLevel() > TechConstants.T_INTRO_BOXSET)) {
@@ -775,57 +775,28 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
     String getTransportationDetails() {
         StringBuilder out = new StringBuilder();
-        out.append(String.format("%-" + HEADER_LENGTH + "s %3d",
-                                 "Transportation",
-                                 getTransportValue())).append("\n");
-
         final String TEMPLATE = "    %-" + SUBHEADER_LENGTH + "s %3s";
-        out.append(String.format(TEMPLATE, "Dropship Capacity:",
-                                 getTransportPercent().toPlainString() + "%"))
-           .append("\n");
+        final String TEMPLATE_TWO = "        #%-" + CATEGORY_LENGTH + "s %3d needed / %3d available";
 
-        final String TEMPLATE_TWO = "        #%-" + CATEGORY_LENGTH +
-                                    "s %3d needed / %3d available";
-        out.append(String.format(TEMPLATE_TWO, "Mech Bays:", getMechCount(),
-                                 getMechBayCount()));
-        out.append("\n").append(String.format(TEMPLATE_TWO, "Fighter Bays:",
-                                              getFighterCount(),
-                                              getFighterBayCount()));
-        out.append("\n").append(String.format(TEMPLATE_TWO, "Small Craft Bays:",
-                                              getSmallCraftCount(),
-                                              getSmallCraftBayCount()));
-        out.append("\n").append(String.format(TEMPLATE_TWO, "Protomech Bays:",
-                                              getProtoCount(),
-                                              getProtoBayCount()));
-        out.append("\n").append(String.format(TEMPLATE_TWO,
-                                              "Heavy Vehicle Bays:",
-                                              getHeavyVeeCount(),
-                                              getHeavyVeeBayCount()));
-        int excessHeavyVeeBays = Math.max(0, getHeavyVeeBayCount() -
-                                             getHeavyVeeCount());
-        out.append("\n").append(String.format(TEMPLATE_TWO,
-                                              "Light Vehicle Bays:",
-                                              getLightVeeCount(),
-                                              getLightVeeBayCount()))
-           .append(" (plus ").append(excessHeavyVeeBays)
-           .append(" excess heavy)");
-        out.append("\n").append(String.format(TEMPLATE_TWO, "BA Bays:",
-                                              getNumberBaSquads(),
-                                              getBaBayCount()));
-        out.append("\n").append(String.format(TEMPLATE_TWO,
-                                              "Infantry Bays:",
-                                              calcInfantryPlatoons(),
-                                              getInfantryBayCount()));
+        out.append(String.format("%-" + HEADER_LENGTH + "s %3d", "Transportation", getTransportValue())).append("\n");
 
-        out.append("\n").append(String.format(TEMPLATE, "Jumpship?",
-                                              (isJumpshipOwner() ? "Yes" :
-                                               "No")));
-        out.append("\n").append(String.format(TEMPLATE, "Warship w/out Collar?",
-                                              (isWarshipOwner() ? "Yes" :
-                                               "No")));
-        out.append("\n").append(String.format(TEMPLATE, "Warship w/ Collar?",
-                                              (isWarhipWithDocsOwner() ?
-                                               "Yes" : "No")));
+        int excessSmallCraftBays = Math.max(0, getSmallCraftBayCount() - getSmallCraftCount());
+        int excessHeavyVeeBays = Math.max(0, getHeavyVeeBayCount() - getHeavyVeeCount());
+
+        out.append(String.format(TEMPLATE, "Dropship Capacity:", getTransportPercent().toPlainString() + "%"))
+        .append("\n").append(String.format(TEMPLATE_TWO, "Mech Bays:", getMechCount(), getMechBayCount()))
+        .append("\n").append(String.format(TEMPLATE_TWO, "Fighter Bays:", getFighterCount(), getFighterBayCount()))
+        .append(" (plus ").append(excessSmallCraftBays).append(" excess small craft)")
+        .append("\n").append(String.format(TEMPLATE_TWO, "Small Craft Bays:", getSmallCraftCount(), getSmallCraftBayCount()))
+        .append("\n").append(String.format(TEMPLATE_TWO, "Protomech Bays:", getProtoCount(), getProtoBayCount()))
+        .append("\n").append(String.format(TEMPLATE_TWO, "Heavy Vehicle Bays:", getHeavyVeeCount(), getHeavyVeeBayCount()))
+        .append("\n").append(String.format(TEMPLATE_TWO, "Light Vehicle Bays:", getLightVeeCount(), getLightVeeBayCount()))
+        .append(" (plus ").append(excessHeavyVeeBays).append(" excess heavy)")
+        .append("\n").append(String.format(TEMPLATE_TWO, "BA Bays:", getNumberBaSquads(), getBaBayCount()))
+        .append("\n").append(String.format(TEMPLATE_TWO, "Infantry Bays:", calcInfantryPlatoons(), getInfantryBayCount()))
+        .append("\n").append(String.format(TEMPLATE, "Jumpship?", (isJumpshipOwner() ? "Yes" : "No")))
+        .append("\n").append(String.format(TEMPLATE, "Warship w/out Collar?", (isWarshipOwner() ? "Yes" : "No")))
+        .append("\n").append(String.format(TEMPLATE, "Warship w/ Collar?", (isWarhipWithDocsOwner() ? "Yes" : "No")));
 
         return out.toString();
     }
@@ -963,26 +934,18 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             return HUNDRED;
         }
 
-        //Find out if we are short on transport bays
-        int heavyVeeBays = getHeavyVeeBayCount();
-        int numberWithoutTransport = Math.max((getMechCount() -
-                                               getMechBayCount()), 0);
-        numberWithoutTransport += Math.max(getProtoCount() -
-                                           getProtoBayCount(), 0);
-        numberWithoutTransport += Math.max(getHeavyVeeCount() -
-                                           heavyVeeBays, 0);
-        heavyVeeBays -= getHeavyVeeCount();
-        numberWithoutTransport += Math.max((getLightVeeCount() -
-                                            (getLightVeeBayCount() +
-                                             heavyVeeBays)), 0);
-        numberWithoutTransport += Math.max((getFighterCount() -
-                                            getFighterBayCount()), 0);
-        numberWithoutTransport += Math.max((getNumberBaSquads() -
-                                            getBaBayCount()), 0);
-        numberWithoutTransport += Math.max((calcInfantryPlatoons() -
-                                            getInfantryBayCount()), 0);
-        numberWithoutTransport += Math.max((getSmallCraftCount() -
-                                            getSmallCraftBayCount()), 0);
+        //Find out how short of transport bays we are.
+        int excessHeavyVeeBays = Math.max(getHeavyVeeBayCount() - getHeavyVeeCount(), 0); //removes any filled heavy vehicle bays, rest can be used to store light vehicles
+        int excessSmallCraftBays = Math.max(getSmallCraftBayCount() - getSmallCraftCount(), 0); //removes any filled small craft bays, rest can be used to store fighters
+
+        int numberWithoutTransport = Math.max((getMechCount() - getMechBayCount()), 0);
+        numberWithoutTransport += Math.max(getProtoCount() - getProtoBayCount(), 0);
+        numberWithoutTransport += Math.max(getHeavyVeeCount() - getHeavyVeeBayCount(), 0);
+        numberWithoutTransport += Math.max(getLightVeeCount() - getLightVeeBayCount() - excessHeavyVeeBays, 0);
+        numberWithoutTransport += Math.max(getSmallCraftCount() - getSmallCraftBayCount(), 0);
+        numberWithoutTransport += Math.max(getFighterCount() - getFighterBayCount() - excessSmallCraftBays, 0);
+        numberWithoutTransport += Math.max(calcInfantryPlatoons() - getInfantryBayCount(), 0);
+
         BigDecimal transportNeeded = new BigDecimal(numberWithoutTransport);
 
         if (transportNeeded.compareTo(BigDecimal.ZERO) == 0){
