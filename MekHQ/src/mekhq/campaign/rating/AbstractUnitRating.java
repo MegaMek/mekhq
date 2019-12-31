@@ -27,20 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import megamek.common.ASFBay;
-import megamek.common.BattleArmor;
-import megamek.common.BattleArmorBay;
-import megamek.common.Bay;
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.HeavyVehicleBay;
-import megamek.common.Infantry;
-import megamek.common.InfantryBay;
-import megamek.common.Jumpship;
-import megamek.common.LightVehicleBay;
-import megamek.common.MechBay;
-import megamek.common.SmallCraftBay;
-import megamek.common.UnitType;
+import megamek.common.*;
 import megamek.common.logging.LogLevel;
 import megamek.common.logging.MMLogger;
 import mekhq.MekHQ;
@@ -49,6 +36,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.unit.Unit;
+import sun.jvm.hotspot.gc.shared.Space;
 
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)
@@ -95,6 +83,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
     private int smallCraftBayCount = 0;
     private int lightVeeBayCount = 0;
     private int heavyVeeBayCount = 0;
+    private int superHeavyVeeBayCount = 0;
     private int baBayCount = 0;
     private int infantryBayCount = 0;
     private int dockingCollarCount = 0;
@@ -402,14 +391,14 @@ public abstract class AbstractUnitRating implements IUnitRating {
      */
     BigDecimal getUnitValue(Unit u) {
         BigDecimal value = BigDecimal.ONE;
-        if (isConventionalInfanry(u) &&
+        if (isConventionalInfantry(u) &&
             (((Infantry) u.getEntity()).getSquadN() == 1)) {
             value = new BigDecimal("0.25");
         }
         return value;
     }
 
-    boolean isConventionalInfanry(Unit u) {
+    boolean isConventionalInfantry(Unit u) {
         return (u.getEntity() instanceof Infantry) &&
                !(u.getEntity() instanceof BattleArmor);
     }
@@ -480,6 +469,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
         setBaBayCount(0);
         setLightVeeBayCount(0);
         setHeavyVeeBayCount(0);
+        setSuperHeavyVeeBayCount(0);
         setInfantryBayCount(0);
         setDockingCollarCount(0);
 
@@ -498,28 +488,48 @@ public abstract class AbstractUnitRating implements IUnitRating {
         getLogger().methodEnd(getClass(), "initValues()");
     }
 
-    private void updateBayCount(Dropship ds) {
-        // ToDo Superheavy Bays.
+    void updateBayCount(Entity e) {
+        if ((e instanceof Jumpship) || (e instanceof SmallCraft)) {
+            for (Bay bay : e.getTransportBays()) {
+                if (bay instanceof MechBay) {
+                    setMechBayCount(getMechBayCount() + (int)bay.getCapacity());
+                } else if (bay instanceof BattleArmorBay) {
+                    setBaBayCount(getBaBayCount() + (int)bay.getCapacity());
+                } else if (bay instanceof InfantryBay) {
+                    setInfantryBayCount(getInfantryBayCount() + (int) (bay.getCapacity() / ((InfantryBay) bay).getPlatoonType().getWeight()));
+                } else if (bay instanceof LightVehicleBay) {
+                    setLightVeeBayCount(getLightVeeBayCount() + (int) bay.getCapacity());
+                } else if (bay instanceof HeavyVehicleBay) {
+                    setHeavyVeeBayCount(getHeavyVeeBayCount() + (int) bay.getCapacity());
+                } else if (bay instanceof SuperHeavyVehicleBay) {
+                    setSuperHeavyVeeBayCount(getSuperHeavyVeeBayCount() + (int) bay.getCapacity());
+                } else if (bay instanceof ASFBay) {
+                    setFighterBayCount(getFighterBayCount() + (int) bay.getCapacity());
+                } else if (bay instanceof SmallCraftBay) {
+                    setSmallCraftBayCount(getSmallCraftBayCount() + (int) bay.getCapacity());
+                }
+            }
+        }
+    }
+
+/*    private void updateBayCount(Dropship ds) {
         for (Bay bay : ds.getTransportBays()) {
             if (bay instanceof MechBay) {
                 setMechBayCount(getMechBayCount() + (int)bay.getCapacity());
             } else if (bay instanceof BattleArmorBay) {
                 setBaBayCount(getBaBayCount() + (int)bay.getCapacity());
             } else if (bay instanceof InfantryBay) {
-                setInfantryBayCount(getInfantryBayCount() +
-                                    (int) (bay.getCapacity() / ((InfantryBay) bay).getPlatoonType().getWeight()));
+                setInfantryBayCount(getInfantryBayCount() + (int) (bay.getCapacity() / ((InfantryBay) bay).getPlatoonType().getWeight()));
             } else if (bay instanceof LightVehicleBay) {
-                setLightVeeBayCount(getLightVeeBayCount() +
-                                    (int) bay.getCapacity());
+                setLightVeeBayCount(getLightVeeBayCount() + (int) bay.getCapacity());
             } else if (bay instanceof HeavyVehicleBay) {
-                setHeavyVeeBayCount(getHeavyVeeBayCount() +
-                                    (int) bay.getCapacity());
+                setHeavyVeeBayCount(getHeavyVeeBayCount() + (int) bay.getCapacity());
+            } else if (bay instanceof SuperHeavyVehicleBay) {
+                setSuperHeavyVeeBayCount(getSuperHeavyVeeBayCount() + (int) bay.getCapacity());
             } else if (bay instanceof ASFBay) {
-                setFighterBayCount(getFighterBayCount() +
-                                   (int) bay.getCapacity());
+                setFighterBayCount(getFighterBayCount() + (int) bay.getCapacity());
             } else if (bay instanceof SmallCraftBay) {
-                setSmallCraftBayCount(getSmallCraftBayCount() +
-                                      (int) bay.getCapacity());
+                setSmallCraftBayCount(getSmallCraftBayCount() + (int) bay.getCapacity());
             }
         }
     }
@@ -542,7 +552,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
                                       (int) bay.getCapacity());
             }
         }
-    }
+    }*/
 
     void updateDockingCollarCount(Jumpship jumpship) {
         setDockingCollarCount(getDockingCollarCount() +
@@ -818,6 +828,14 @@ public abstract class AbstractUnitRating implements IUnitRating {
 
     private void setHeavyVeeBayCount(int heavyVeeBayCount) {
         this.heavyVeeBayCount = heavyVeeBayCount;
+    }
+
+    int getSuperHeavyVeeBayCount() {
+        return superHeavyVeeBayCount;
+    }
+
+    private void setSuperHeavyVeeBayCount(int superHeavyVeeBayCount) {
+        this.superHeavyVeeBayCount = superHeavyVeeBayCount;
     }
 
     int getBaBayCount() {
