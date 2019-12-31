@@ -134,7 +134,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
                 updateTotalSkill(u.getEntity().getCrew(), entity.getUnitType());
             }
 
-            // todo: Add Mobile Structure when Megamek supports it.
+            // todo: Add Mobile Structure when MegaMek supports it.
             switch (unitType) {
                 case UnitType.SPACE_STATION:
                 case UnitType.NAVAL:
@@ -503,22 +503,41 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         TransportCapacityIndicators tci = new TransportCapacityIndicators();
         tci.updateCapacityIndicators(getMechBayCount(), getMechCount());
         tci.updateCapacityIndicators(getProtoBayCount(), getProtoCount());
-        tci.updateCapacityIndicators(getHeavyVeeBayCount(), getHeavyVeeCount());
-
-        // vehicles are the only units that can share heavy/light bays so we have some special logic
-        // we've stuffed all possible heavy vehicles into heavy vehicle bays.
-        // if we have some heavy vehicle bays left over, add them to the light vehicle bay count
-        int heavyVeeBays = getHeavyVeeBayCount() - getHeavyVeeCount();
-        int lightVeeBays = getLightVeeBayCount();
-        if(heavyVeeBays > 0) {
-            lightVeeBays += heavyVeeBays;
-        }
-
-        tci.updateCapacityIndicators(lightVeeBays, getLightVeeCount());
-        tci.updateCapacityIndicators(getFighterBayCount(), getFighterCount());
         tci.updateCapacityIndicators(getBaBayCount(), getBattleArmorCount() / 5); // battle armor bays can hold 5 battle armor per bay
         tci.updateCapacityIndicators(getInfantryBayCount(), calcInfantryPlatoons());
-        tci.updateCapacityIndicators(getSmallCraftBayCount(), getSmallCraftCount());
+
+        // Light vehicles can use heavy or light vehicle bays, while fighters can use fighter or small craft bays
+        // Once we've stuffed stuffed all possible heavy vehicles into heavy vehicle bays.
+        // if we have some heavy vehicle bays left over, add them to the light vehicle bay count, and then calculate the
+        // number of heavy vehicle bays that are still empty.
+        // The same is done for small craft and fighters, just replace heavy vehicle with small craft and light vehicle with fighters
+        int excessHeavyVeeBays = Math.max(getHeavyVeeBayCount() - getHeavyVeeCount(), 0);
+        int excessSmallCraftBays = Math.max(getSmallCraftBayCount() - getSmallCraftCount(), 0);
+
+        // We need to subtract any filled bays from the count. This follows the following logic:
+        // Assume you have 2 heavy vehicle bays, and 4 light vehicle bays, and are trying to store 1 heavy and 5 light vehicles
+        // You have 1 more light vehicle than light vehicle bays to store them in, so you check how many free heavy vehicle bays
+        // there are. Finding 1, you can store the light vehicle there, and it doesn't count as having excess
+        int heavyVeeBaysFilledByLights;
+        int excessLightVees = Math.max(getLightVeeCount() - getLightVeeBayCount(), 0);
+        if (excessLightVees <= excessHeavyVeeBays){
+            heavyVeeBaysFilledByLights = excessLightVees;
+        } else {
+            heavyVeeBaysFilledByLights = excessHeavyVeeBays;
+        }
+
+        int smallCraftBaysFilledByFighters;
+        int excessFighters = Math.max(getFighterCount() - getFighterBayCount(), 0);
+        if (excessFighters <= excessSmallCraftBays){
+            smallCraftBaysFilledByFighters = excessFighters;
+        } else {
+            smallCraftBaysFilledByFighters = excessSmallCraftBays;
+        }
+
+        tci.updateCapacityIndicators(getLightVeeBayCount() + excessHeavyVeeBays, getLightVeeCount());
+        tci.updateCapacityIndicators(getHeavyVeeBayCount() - heavyVeeBaysFilledByLights, getHeavyVeeCount());
+        tci.updateCapacityIndicators(getFighterBayCount() + excessSmallCraftBays, getFighterCount());
+        tci.updateCapacityIndicators(getSmallCraftBayCount() - smallCraftBaysFilledByFighters, getSmallCraftCount());
 
         //Find the percentage of units that are transported.
         if (tci.hasDoubleCapacity()) {
@@ -772,16 +791,17 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
         int heavyVeeBayCount = getHeavyVeeBayCount();
         int excessHeavyVeeBays = Math.max(0, heavyVeeBayCount - getHeavyVeeCount());
-
+        int smallCraftBayCount = getSmallCraftBayCount();
+        int excessSmallCraftBays = Math.max(0, smallCraftBayCount - getSmallCraftCount());
         String out = String.format("%-" + HEADER_LENGTH + "s %3d",
                                    "Transportation:", getTransportValue()) +
                      "\n" + String.format(TEMPLATE, "Mech Bays:",
                                           getMechCount(), getMechBayCount()) +
                      "\n" + String.format(TEMPLATE, "Fighter Bays:",
                                           getFighterCount(), getFighterBayCount()) +
+                     " (plus " + excessSmallCraftBays + " excess small craft)" +
                      "\n" + String.format(TEMPLATE, "Small Craft Bays:",
-                                          getSmallCraftCount(),
-                                          getSmallCraftBayCount()) +
+                                          getSmallCraftCount(), smallCraftBayCount) +
                      "\n" + String.format(TEMPLATE, "Protomech Bays:",
                                           getProtoCount(),
                                           getProtoBayCount()) +
