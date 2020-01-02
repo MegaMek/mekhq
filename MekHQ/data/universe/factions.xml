@@ -21,7 +21,7 @@ altNamesByYear - Identifies alternate names for a given year.
 					Format: <altNamesByYear year='XXXX'>Faction name</altNamesByYear>
 altNames - A list of alternate names for a faction, 'also known as' type of names,
 					not official designations
-startingPlanet - Identifies the starting planet if you begin a new campaign with this faction. 
+startingPlanet - Identifies the starting planet if you begin a new campaign with this faction.
 				 The name of the planet must be the name as it is recognized in MekHQ.
 				 If left out, then this defaults to Terra.
 changePlanet - Identifies the starting planet after the given year
@@ -37,7 +37,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	"pirate", "merc", "trader", "minor", "rebel", "inactive", "hidden", "abandoned", "chaos"
  -->
 <factions>
-	<choosableFactionCodes>MERC,CC,DC,FS,FWL,LA,FC,ROS,CS,WOB,FRR,SIC,MOC,MH,OA,TC,CDS,CGB,CHH,CJF,CNC,CSJ,CSV,CSR,CW,CBS,CCC,CCO,CFM,CGS,CIH,CSA,TH,RWR,CIR,JF,PIR,NIOPS,CDP,HL,NC,RD</choosableFactionCodes>
+	<choosableFactionCodes>MERC,CC,DC,FS,FWL,LA,FC,ROS,CS,WOB,FRR,SIC,MOC,MH,OA,TC,SL,CDS,CGB,CHH,CJF,CNC,CSJ,CSV,CSR,CW,CBS,CCC,CCO,CFM,CGS,CIH,CSA,TH,RWR,CIR,JF,PIR,NIOPS,CDP,HL,NC,RD,ARC</choosableFactionCodes>
 	<!-- Early spaceflight factions -->
 	<faction>
 		<shortname>WA</shortname>
@@ -1810,12 +1810,33 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<tags>periphery,minor</tags>
    	<start>3084</start>
 	</faction>
-	 <faction>
+	<faction>
       <shortname>THa</shortname>
       <fullname>The Havens</fullname>
       <nameGenerator>General</nameGenerator>
       <colorRGB>147,173,172</colorRGB>
 		<tags>periphery,minor</tags>
    	<start>3089</start>
+	</faction>
+	<faction>
+		<shortname>ARC</shortname>
+		<fullname>Aurigan Coalition</fullname>
+		<startingPlanet>Coromodir</startingPlanet>
+		<changePlanet year="3022">New Abilene</changePlanet>
+		<changePlanet year="3025">Coromodir</changePlanet>
+		<nameGenerator>General</nameGenerator>
+		<colorRGB>210,46,38</colorRGB>
+		<tags>periphery,minor</tags>
+		<start>2910</start>
+	</faction>
+	<faction>
+		<shortname>ARD</shortname>
+		<fullname>Aurigan Directorate</fullname>
+		<startingPlanet>Coromodir</startingPlanet>
+		<nameGenerator>General</nameGenerator>
+		<colorRGB>103,140,73</colorRGB>
+		<tags>periphery,minor</tags>
+		<start>3022</start>
+		<end>3025</end>
 	</faction>
 </factions>

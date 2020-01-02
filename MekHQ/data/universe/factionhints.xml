@@ -229,13 +229,21 @@ they shouldn't be fighting DC and Stone's Coalition, so I make them neutral for 
 		<parties start="2830-06-14">FWL,LA</parties>		
 	</war>
 
-	<war name="The Concordat-Magistracy War" start="2813-07-01" end="2814-06-30">
-		<parties>LA,RWR</parties>
+	<!-- Taurian-Canopian War -->
+	<war name="The Taurian-Canopian War" start="2813-07-01" end="2814-02-30">
+		<parties>TC,MOC</parties>
 	</war>
+	
 	<war name="Marik Civil War" start="3014-05-22" end="3015-05-31">
 		<parties>FWL,FWLR</parties>
 	</war>
-	
+
+	<!-- Aurigan Civil War: setting for HBS' BattleTech game. The dates are very roughly estimated based on descriptions in game and in the sourcebook -->
+	<war name="Aurigan Civil War" start="3025-01-25" end ="3025-09-01">
+		<parties>ARC,ARD</parties>
+		<parties start="3025-05-09" end="3025-08-15">ARC,TC</parties>
+	</war>
+
 	<war name="Fourth Succession War" start="3026-01-01" end="3030-12-31">
 		<parties>FS,CC</parties>
 		<parties>FS,DC</parties>
@@ -669,5 +677,4 @@ they shouldn't be fighting DC and Stone's Coalition, so I make them neutral for 
 	<alliance start="3064-02-18">
 		<parties>CSR,OA,RA</parties>
 	</alliance>
-	
 </factionHints>
