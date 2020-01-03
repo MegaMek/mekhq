@@ -503,6 +503,18 @@ public class Planet implements Serializable {
         return new ArrayList<PlanetaryEvent>(events.values());
     }
 
+    public List<PlanetaryEvent> getCustomEvents() {
+        List<PlanetaryEvent> customEvents = new ArrayList<>();
+        if (events != null) {
+            for (PlanetaryEvent event : events.values()) {
+                if (event.custom) {
+                    customEvents.add(event);
+                }
+            }
+        }
+        return Collections.unmodifiableList(customEvents);
+    }
+
     protected <T> T getEventData(DateTime when, T defaultValue, EventGetter<T> getter) {
         if( null == when || null == events || null == getter ) {
             return defaultValue;
@@ -879,7 +891,7 @@ public class Planet implements Serializable {
      * @param dryRun Whether to actually perform the updates.
      * @return Human readable form of what was/would have been updated.
      */
-    public String updateFromTSVPlanet(Planet tsvPlanet, boolean dryRun) {
+    public String updateFromTSVPlanet(final Planet tsvPlanet, boolean dryRun) {
         StringBuilder sb = new StringBuilder();
 
         if(!tsvPlanet.x.equals(this.x) || !tsvPlanet.y.equals(this.y)) {
@@ -894,8 +906,9 @@ public class Planet implements Serializable {
         // loop using index
         // look ahead by one event (if possible) and check that getFaction(next event year) isn't already
         // the same as the faction from the current event : sometimes, our data is more exact than the incoming data
-        for(int eventIndex = 0; eventIndex < tsvPlanet.getEvents().size(); eventIndex++) {
-            PlanetaryEvent event = tsvPlanet.getEvents().get(eventIndex);
+        List<PlanetaryEvent> tsvEvents = tsvPlanet.getEvents();
+        for(int eventIndex = 0; eventIndex < tsvEvents.size(); eventIndex++) {
+            PlanetaryEvent event = tsvEvents.get(eventIndex);
             // check other planet events (currently only updating faction change events)
             // if the other planet has an 'ownership change' event with a non-"U" faction
             // check that this planet does not have an existing non-"U" faction already owning it at the event date
@@ -920,7 +933,7 @@ public class Planet implements Serializable {
                         // now we travel into the future, to the next "other" event, and if this planet has acquired a faction
                         // before the next "other" event, then we
                         int nextEventIndex = eventIndex + 1;
-                        PlanetaryEvent nextEvent = nextEventIndex < tsvPlanet.getEvents().size() ? tsvPlanet.getEvents().get(nextEventIndex) : null;
+                        PlanetaryEvent nextEvent = nextEventIndex < tsvEvents.size() ? tsvEvents.get(nextEventIndex) : null;
                         DateTime nextEventDate;
 
                         // if we're at the last event, then just check that the planet doesn't have a faction in the year 3600
