@@ -254,30 +254,39 @@ public class Armor extends Part implements IAcquisitionWork {
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<amount>"
-                +amount
-                +"</amount>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<type>"
-                +type
-                +"</type>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<location>"
-                +location
-                +"</location>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<rear>"
-                +rear
-                +"</rear>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<amountNeeded>"
-                +amountNeeded
-                +"</amountNeeded>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<clan>"
-                +clan
-                +"</clan>");
+        String level1 = MekHqXmlUtil.indentStr(indent+1);
+        StringBuilder builder = new StringBuilder(128);
+        builder.append(level1)
+            .append("<amount>")
+                .append(amount)
+                .append("</amount>")
+                .append(NL);
+        builder.append(level1)
+                .append("<type>")
+                .append(type)
+                .append("</type>")
+                .append(NL);
+        builder.append(level1)
+                .append("<location>")
+                .append(location)
+                .append("</location>")
+                .append(NL);
+        builder.append(level1)
+                .append("<rear>")
+                .append(rear)
+                .append("</rear>")
+                .append(NL);
+        builder.append(level1)
+                .append("<amountNeeded>")
+                .append(amountNeeded)
+                .append("</amountNeeded>")
+                .append(NL);
+        builder.append(level1)
+                .append("<clan>")
+                .append(clan)
+                .append("</clan>")
+                .append(NL);
+        pw1.print(builder.toString());
         writeAdditionalFields(pw1, indent + 1);
         writeToXmlEnd(pw1, indent);
     }
