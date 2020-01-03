@@ -520,19 +520,23 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         // there are. Finding 1, you can store the light vehicle there, and it doesn't count as having excess
         int heavyVeeBaysFilledByLights;
         int excessLightVees = Math.max(getLightVeeCount() - getLightVeeBayCount(), 0);
-        if (excessLightVees <= excessHeavyVeeBays){
+        if (excessLightVees <= excessHeavyVeeBays) {
             heavyVeeBaysFilledByLights = excessLightVees;
         } else {
             heavyVeeBaysFilledByLights = excessHeavyVeeBays;
         }
+        heavyVeeBaysFilledByLights = 0;
+        excessHeavyVeeBays = 0;
 
         int smallCraftBaysFilledByFighters;
         int excessFighters = Math.max(getFighterCount() - getFighterBayCount(), 0);
-        if (excessFighters <= excessSmallCraftBays){
+        if (excessFighters <= excessSmallCraftBays) {
             smallCraftBaysFilledByFighters = excessFighters;
         } else {
             smallCraftBaysFilledByFighters = excessSmallCraftBays;
         }
+        smallCraftBaysFilledByFighters = 0;
+        excessSmallCraftBays = 0;
 
         tci.updateCapacityIndicators(getLightVeeBayCount() + excessHeavyVeeBays, getLightVeeCount());
         tci.updateCapacityIndicators(getHeavyVeeBayCount() - heavyVeeBaysFilledByLights, getHeavyVeeCount());

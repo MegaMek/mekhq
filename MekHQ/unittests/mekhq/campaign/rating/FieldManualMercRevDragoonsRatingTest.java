@@ -465,7 +465,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         String expected = "Transportation      -10\n" +
                           "    Dropship Capacity:       0%\n" +
                           "        #Mech Bays:                   0 needed /   0 available\n" +
-                          "        #Fighter Bays:                0 needed /   0 available\n" +
+                          "        #Fighter Bays:                0 needed /   0 available (plus 0 excess small craft)\n" +
                           "        #Small Craft Bays:            0 needed /   0 available\n" +
                           "        #Protomech Bays:              0 needed /   0 available\n" +
                           "        #Heavy Vehicle Bays:          4 needed /   0 available\n" +
@@ -483,7 +483,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         expected = "Transportation        0\n" +
                    "    Dropship Capacity:      100%\n" +
                    "        #Mech Bays:                   0 needed /   0 available\n" +
-                   "        #Fighter Bays:                0 needed /   0 available\n" +
+                   "        #Fighter Bays:                0 needed /   0 available (plus 0 excess small craft)\n" +
                    "        #Small Craft Bays:            0 needed /   0 available\n" +
                    "        #Protomech Bays:              0 needed /   0 available\n" +
                    "        #Heavy Vehicle Bays:          4 needed /   8 available\n" +

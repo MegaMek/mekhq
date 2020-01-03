@@ -920,14 +920,16 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     public BigDecimal getTransportPercent() {
-        // todo Superheavys.
+        // todo Superheavys, Battle Armour
 
         //Find the current number of units that might require transport
         BigDecimal totalUnits = new BigDecimal(getMechCount() +
-                getLightVeeCount() +
+                getProtoCount() +
                 getHeavyVeeCount() +
+                getLightVeeCount() +
+                getSmallCraftCount() +
                 getFighterCount() +
-                getNumberBaSquads() +
+                //getNumberBaSquads() +
                 calcInfantryPlatoons());
         if (totalUnits.compareTo(BigDecimal.ZERO) == 0) {
             //if you have no units, you don't need to transport them, return 100%
@@ -944,6 +946,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         numberWithoutTransport += Math.max(getLightVeeCount() - getLightVeeBayCount() - excessHeavyVeeBays, 0);
         numberWithoutTransport += Math.max(getSmallCraftCount() - getSmallCraftBayCount(), 0);
         numberWithoutTransport += Math.max(getFighterCount() - getFighterBayCount() - excessSmallCraftBays, 0);
+        //numberWithoutTransport += Math.max(getNumberBASquads() - getBABayCount(), 0);
         numberWithoutTransport += Math.max(calcInfantryPlatoons() - getInfantryBayCount(), 0);
 
         BigDecimal transportNeeded = new BigDecimal(numberWithoutTransport);
