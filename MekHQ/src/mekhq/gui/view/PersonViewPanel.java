@@ -8,6 +8,8 @@ package mekhq.gui.view;
 
 import java.awt.*;
 import java.awt.Dialog.ModalityType;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.Image;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -42,6 +44,9 @@ import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.gui.CampaignGUI;
+import mekhq.gui.GuiTabType;
 import mekhq.gui.dialog.MedicalViewDialog;
 import mekhq.gui.model.PersonnelEventLogModel;
 import mekhq.gui.model.PersonnelKillLogModel;
@@ -51,28 +56,32 @@ import mekhq.gui.utilities.WrapLayout;
 
 /**
  * A custom panel that gets filled in with goodies from a Person record
- * @author  Jay Lawson <jaylawson39 at yahoo.com>
+ *
+ * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class PersonViewPanel extends ScrollablePanel {
     private static final long serialVersionUID = 7004741688464105277L;
 
     private static final int MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW = 4;
 
-    private Person person;
-    private Campaign campaign;
+    private final CampaignGUI gui;
 
-    private DirectoryItems portraits;
-    private DirectoryItems awardIcons;
-    private IconPackage ip;
+    private final Person person;
+    private final Campaign campaign;
+
+    private final DirectoryItems portraits;
+    private final DirectoryItems awardIcons;
+    private final IconPackage ip;
 
     ResourceBundle resourceMap = null;
 
-    public PersonViewPanel(Person p, Campaign c, IconPackage ip) {
+    public PersonViewPanel(Person p, Campaign c, CampaignGUI gui) {
         this.person = p;
         this.campaign = c;
-        this.ip = ip;
-        this.portraits = ip.getPortraits();
-        this.awardIcons = ip.getAwardIcons();
+        this.gui = gui;
+        this.ip = gui.getIconPackage();
+        this.portraits = this.ip.getPortraits();
+        this.awardIcons = this.ip.getAwardIcons();
         resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonViewPanel", new EncodeControl()); //$NON-NLS-1$
         initComponents();
     }
@@ -90,7 +99,7 @@ public class PersonViewPanel extends ScrollablePanel {
         gbc_pnlPortrait.gridy = 0;
         gbc_pnlPortrait.fill = GridBagConstraints.NONE;
         gbc_pnlPortrait.anchor = GridBagConstraints.NORTHWEST;
-        gbc_pnlPortrait.insets = new Insets(10,10,0,0);
+        gbc_pnlPortrait.insets = new Insets(10, 10, 0, 0);
         add(pnlPortrait, gbc_pnlPortrait);
 
         JPanel pnlInfo = fillInfo();
@@ -117,7 +126,7 @@ public class PersonViewPanel extends ScrollablePanel {
         add(pnlSkills, gridBagConstraints);
         gridy++;
 
-        if(campaign.getCampaignOptions().useAdvancedMedical()) {
+        if (campaign.getCampaignOptions().useAdvancedMedical()) {
             JPanel pnlInjuries = fillInjuries();
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -130,22 +139,22 @@ public class PersonViewPanel extends ScrollablePanel {
             gridy++;
         }
 
-        if(person.hasAnyFamily()) {
-	        JPanel pnlFamily = fillFamily();
-	        gridBagConstraints = new GridBagConstraints();
-	        gridBagConstraints.gridx = 0;
-	        gridBagConstraints.gridy = gridy;
-	        gridBagConstraints.gridwidth = 2;
-	        gridBagConstraints.weightx = 1.0;
-	        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-	        gridBagConstraints.fill = GridBagConstraints.BOTH;
-	        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-	        add(pnlFamily, gridBagConstraints);
-	        gridy++;
+        if (person.hasAnyFamily()) {
+            JPanel pnlFamily = fillFamily();
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridy;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(pnlFamily, gridBagConstraints);
+            gridy++;
         }
 
-        if(person.awardController.hasAwards()) {
-            if(person.awardController.hasAwardsWithRibbons()){
+        if (person.awardController.hasAwards()) {
+            if (person.awardController.hasAwardsWithRibbons()) {
                 Box boxRibbons = drawRibbons();
 
                 GridBagConstraints gbc_pnlAllRibbons = new GridBagConstraints();
@@ -153,7 +162,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 gbc_pnlAllRibbons.gridy = 1;
                 gbc_pnlAllRibbons.fill = GridBagConstraints.NONE;
                 gbc_pnlAllRibbons.anchor = GridBagConstraints.NORTHWEST;
-                gbc_pnlAllRibbons.insets = new Insets(0,0,0,0);
+                gbc_pnlAllRibbons.insets = new Insets(0, 0, 0, 0);
                 pnlPortrait.add(boxRibbons, gbc_pnlAllRibbons);
             }
 
@@ -162,7 +171,7 @@ public class PersonViewPanel extends ScrollablePanel {
             pnlAllAwards.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlAwards.title")));
             pnlAllAwards.setBackground(Color.WHITE);
 
-            if(person.awardController.hasAwardsWithMedals()){
+            if (person.awardController.hasAwardsWithMedals()) {
                 JPanel pnlMedals = drawMedals();
                 pnlMedals.setName("pnlMedals");
                 pnlMedals.setBackground(Color.WHITE);
@@ -170,7 +179,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 pnlAllAwards.add(pnlMedals);
             }
 
-            if(person.awardController.hasAwardsWithMiscs()){
+            if (person.awardController.hasAwardsWithMiscs()) {
                 JPanel pnlMiscAwards = drawMiscAwards();
                 pnlMiscAwards.setName("pnlMiscAwards");
                 pnlMiscAwards.setBackground(Color.WHITE);
@@ -178,20 +187,20 @@ public class PersonViewPanel extends ScrollablePanel {
                 pnlAllAwards.add(pnlMiscAwards);
             }
 
-            if(person.awardController.hasAwardsWithMedals() || person.awardController.hasAwardsWithMiscs()) {
-	            gridBagConstraints = new GridBagConstraints();
-	            gridBagConstraints.fill = GridBagConstraints.BOTH;
-	            gridBagConstraints.gridwidth = 2;
-	            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-	            gridBagConstraints.gridx = 0;
-	            gridBagConstraints.gridy = gridy;
-	            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-	            add(pnlAllAwards, gridBagConstraints);
-	            gridy++;
+            if (person.awardController.hasAwardsWithMedals() || person.awardController.hasAwardsWithMiscs()) {
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.fill = GridBagConstraints.BOTH;
+                gridBagConstraints.gridwidth = 2;
+                gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+                gridBagConstraints.gridx = 0;
+                gridBagConstraints.gridy = gridy;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                add(pnlAllAwards, gridBagConstraints);
+                gridy++;
             }
         }
 
-        if(person.getBiography().length() > 0) {
+        if (person.getBiography().length() > 0) {
             JTextPane txtDesc = new JTextPane();
             txtDesc.setName("txtDesc"); //$NON-NLS-1$
             txtDesc.setBackground(Color.WHITE);
@@ -200,7 +209,7 @@ public class PersonViewPanel extends ScrollablePanel {
             txtDesc.setText(MarkdownRenderer.getRenderedHtml(person.getBiography()));
             txtDesc.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createTitledBorder(resourceMap.getString("pnlDescription.title")), //$NON-NLS-1$
-                    BorderFactory.createEmptyBorder(0,2,2,2)));
+                    BorderFactory.createEmptyBorder(0, 2, 2, 2)));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridy;
@@ -212,7 +221,7 @@ public class PersonViewPanel extends ScrollablePanel {
             gridy++;
         }
 
-        if(person.getPersonnelLog().size() >0) {
+        if (person.getPersonnelLog().size() > 0) {
             JPanel pnlLog = fillLog();
             pnlLog.setName("pnlLog"); //$NON-NLS-1$
             pnlLog.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlLog.title"))); //$NON-NLS-1$
@@ -229,13 +238,13 @@ public class PersonViewPanel extends ScrollablePanel {
             gridy++;
         }
 
-        if(person.getMissionLog().size() >0) {
+        if (person.getMissionLog().size() > 0) {
             JPanel pnlMissionsLog = fillMissionLog();
 
             pnlMissionsLog.setName("missionLog"); //$NON-NLS-1$
             pnlMissionsLog.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createTitledBorder(resourceMap.getString("missionLog.title")), //$NON-NLS-1$
-                    BorderFactory.createEmptyBorder(5,5,5,5)));
+                    BorderFactory.createEmptyBorder(5, 5, 5, 5)));
             pnlMissionsLog.setBackground(Color.WHITE);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -248,13 +257,13 @@ public class PersonViewPanel extends ScrollablePanel {
             gridy++;
         }
 
-        if(!campaign.getKillsFor(person.getId()).isEmpty()) {
+        if (!campaign.getKillsFor(person.getId()).isEmpty()) {
             JPanel pnlKills = fillKillRecord();
 
             pnlKills.setName("txtKills"); //$NON-NLS-1$
             pnlKills.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createTitledBorder(resourceMap.getString("pnlKills.title")), //$NON-NLS-1$
-                    BorderFactory.createEmptyBorder(5,5,5,5)));
+                    BorderFactory.createEmptyBorder(5, 5, 5, 5)));
             gridBagConstraints = new GridBagConstraints();
             pnlKills.setBackground(Color.WHITE);
             gridBagConstraints.gridx = 0;
@@ -267,7 +276,7 @@ public class PersonViewPanel extends ScrollablePanel {
             gridy++;
         }
 
-        //use glue to fill up the remaining space so everything is aligned to the top
+        // use glue to fill up the remaining space so everything is aligned to the top
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = gridy;
@@ -283,49 +292,49 @@ public class PersonViewPanel extends ScrollablePanel {
      */
     private Box drawRibbons() {
         Box boxRibbons = Box.createVerticalBox();
-        boxRibbons.add(Box.createRigidArea(new Dimension(100,0)));
+        boxRibbons.add(Box.createRigidArea(new Dimension(100, 0)));
 
-        List<Award> awards = person.awardController.getAwards().stream().filter(a -> a.getNumberOfRibbonFiles() > 0).sorted()
-                .collect(Collectors.toList());
+        List<Award> awards = person.awardController.getAwards().stream().filter(a -> a.getNumberOfRibbonFiles() > 0)
+                .sorted().collect(Collectors.toList());
         Collections.reverse(awards);
 
         int i = 0;
         Box rowRibbonsBox = null;
         ArrayList<Box> rowRibbonsBoxes = new ArrayList<>();
 
-        for(Award award : awards){
+        for (Award award : awards) {
             JLabel ribbonLabel = new JLabel();
             Image ribbon;
 
-            if(i%MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW == 0){
+            if (i % MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW == 0) {
                 rowRibbonsBox = Box.createHorizontalBox();
                 rowRibbonsBox.setBackground(Color.RED);
             }
-            try{
+            try {
                 int numberOfAwards = person.awardController.getNumberOfAwards(award);
                 String ribbonFileName = award.getRibbonFileName(numberOfAwards);
                 ribbon = (Image) awardIcons.getItem(award.getSet() + "/ribbons/", ribbonFileName);
-                if(ribbon == null) continue;
-                ribbon = ribbon.getScaledInstance(25,8, Image.SCALE_DEFAULT);
+                if (ribbon == null)
+                    continue;
+                ribbon = ribbon.getScaledInstance(25, 8, Image.SCALE_DEFAULT);
                 ribbonLabel.setIcon(new ImageIcon(ribbon));
                 ribbonLabel.setToolTipText(award.getTooltip());
                 rowRibbonsBox.add(ribbonLabel, 0);
-            }
-            catch (Exception err) {
+            } catch (Exception err) {
                 err.printStackTrace();
             }
 
             i++;
-            if(i%MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW == 0){
+            if (i % MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW == 0) {
                 rowRibbonsBoxes.add(rowRibbonsBox);
             }
         }
-        if(i%MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW!=0){
+        if (i % MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW != 0) {
             rowRibbonsBoxes.add(rowRibbonsBox);
         }
 
         Collections.reverse(rowRibbonsBoxes);
-        for(Box box : rowRibbonsBoxes){
+        for (Box box : rowRibbonsBoxes) {
             boxRibbons.add(box);
         }
 
@@ -335,27 +344,27 @@ public class PersonViewPanel extends ScrollablePanel {
     /**
      * Draws the medals above the personal log.
      */
-    private JPanel drawMedals(){
+    private JPanel drawMedals() {
         JPanel pnlMedals = new JPanel();
 
-        List<Award> awards = person.awardController.getAwards().stream().filter(a -> a.getNumberOfMedalFiles() > 0).sorted()
-                .collect(Collectors.toList());
+        List<Award> awards = person.awardController.getAwards().stream().filter(a -> a.getNumberOfMedalFiles() > 0)
+                .sorted().collect(Collectors.toList());
 
-        for(Award award : awards){
+        for (Award award : awards) {
             JLabel medalLabel = new JLabel();
 
             Image medal = null;
-            try{
+            try {
                 int numberOfAwards = person.awardController.getNumberOfAwards(award);
                 String medalFileName = award.getMedalFileName(numberOfAwards);
                 medal = (Image) awardIcons.getItem(award.getSet() + "/medals/", medalFileName);
-                if(medal == null) continue;
-                medal = ImageHelpers.getScaledForBoundaries(medal, new Dimension(30,60), Image.SCALE_DEFAULT);
+                if (medal == null)
+                    continue;
+                medal = ImageHelpers.getScaledForBoundaries(medal, new Dimension(30, 60), Image.SCALE_DEFAULT);
                 medalLabel.setIcon(new ImageIcon(medal));
                 medalLabel.setToolTipText(award.getTooltip());
                 pnlMedals.add(medalLabel);
-            }
-            catch (Exception err) {
+            } catch (Exception err) {
                 err.printStackTrace();
             }
         }
@@ -379,8 +388,10 @@ public class PersonViewPanel extends ScrollablePanel {
                 int numberOfAwards = person.awardController.getNumberOfAwards(award);
                 String miscFileName = award.getMiscFileName(numberOfAwards);
                 Image miscAwardBufferedImage = (Image) awardIcons.getItem(award.getSet() + "/misc/", miscFileName);
-                if (miscAwardBufferedImage == null) continue;
-                miscAward = ImageHelpers.getScaledForBoundaries(miscAwardBufferedImage, new Dimension(100,100), Image.SCALE_DEFAULT);
+                if (miscAwardBufferedImage == null)
+                    continue;
+                miscAward = ImageHelpers.getScaledForBoundaries(miscAwardBufferedImage, new Dimension(100, 100),
+                        Image.SCALE_DEFAULT);
                 miscLabel.setIcon(new ImageIcon(miscAward));
                 miscLabel.setToolTipText(award.getTooltip());
                 pnlMiscAwards.add(miscLabel);
@@ -394,9 +405,9 @@ public class PersonViewPanel extends ScrollablePanel {
     /**
      * set the portrait for the given person.
      *
-     * @return The <code>Image</code> of the pilot's portrait. This value
-     *         will be <code>null</code> if no portrait was selected
-     *          or if there was an error loading it.
+     * @return The <code>Image</code> of the pilot's portrait. This value will be
+     *         <code>null</code> if no portrait was selected or if there was an
+     *         error loading it.
      */
     public JPanel setPortrait() {
 
@@ -414,7 +425,7 @@ public class PersonViewPanel extends ScrollablePanel {
         String category = person.getPortraitCategory();
         String filename = person.getPortraitFileName();
 
-        if(Crew.ROOT_PORTRAIT.equals(category)) {
+        if (Crew.ROOT_PORTRAIT.equals(category)) {
             category = ""; //$NON-NLS-1$
         }
 
@@ -427,11 +438,11 @@ public class PersonViewPanel extends ScrollablePanel {
         Image portrait = null;
         try {
             portrait = (Image) portraits.getItem(category, filename);
-            if(null != portrait) {
+            if (null != portrait) {
                 portrait = portrait.getScaledInstance(100, -1, Image.SCALE_DEFAULT);
             } else {
-                portrait = (Image) portraits.getItem("", "default.gif");  //$NON-NLS-1$ //$NON-NLS-2$
-                if(null != portrait) {
+                portrait = (Image) portraits.getItem("", "default.gif"); //$NON-NLS-1$ //$NON-NLS-2$
+                if (null != portrait) {
                     portrait = portrait.getScaledInstance(100, -1, Image.SCALE_DEFAULT);
                 }
             }
@@ -445,7 +456,7 @@ public class PersonViewPanel extends ScrollablePanel {
         gbc_lblPortrait.gridy = 0;
         gbc_lblPortrait.fill = GridBagConstraints.NONE;
         gbc_lblPortrait.anchor = GridBagConstraints.NORTHWEST;
-        gbc_lblPortrait.insets = new Insets(0,0,0,0);
+        gbc_lblPortrait.insets = new Insets(0, 0, 0, 0);
         pnlPortrait.add(lblPortrait, gbc_lblPortrait);
 
         return pnlPortrait;
@@ -476,7 +487,7 @@ public class PersonViewPanel extends ScrollablePanel {
 
         GridBagConstraints gridBagConstraints;
 
-        int firsty=0;
+        int firsty = 0;
 
         lblType.setName("lblType"); // NOI18N
         lblType.setText(String.format(resourceMap.getString("format.italic"), person.getRoleDesc())); //$NON-NLS-1$
@@ -528,7 +539,22 @@ public class PersonViewPanel extends ScrollablePanel {
             String factionName = person.getOriginFaction().getFullName(person.getCampaign().getGameYear());
             if (person.getOriginPlanet() != null) {
                 String planetName = person.getOriginPlanet().getName(new DateTime(person.getCampaign().getCalendar()));
-                lblOrigin2.setText(String.format("%s (%s)", planetName, factionName));
+                lblOrigin2.setText(String.format("<html><a href='#'>%s</a> (%s)</html>", planetName, factionName));
+                lblOrigin2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                lblOrigin2.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        PlanetarySystem system = person.getOriginPlanet().getParentSystem();
+                        // Stay on the interstellar map if their origin planet is the primary planet...
+                        if (system.getPrimaryPlanet() == person.getOriginPlanet()) {
+                            gui.getMapTab().switchSystemsMap(system);
+                        } else {
+                            // ...otherwise, dive on in to the system view!
+                            gui.getMapTab().switchPlanetaryMap(person.getOriginPlanet());
+                        }
+                        gui.setSelectedTab(GuiTabType.MAP);
+                    }
+                });
             } else {
                 lblOrigin2.setText(factionName);
             }

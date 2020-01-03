@@ -127,7 +127,7 @@ public class InterstellarMapPanel extends JPanel {
 
     private Timer optionPanelTimer;
     private boolean optionPanelHidden;
-    
+
     private ArrayList<PlanetarySystem> systems;
 
     private JumpPath jumpPath;
@@ -612,7 +612,7 @@ public class InterstellarMapPanel extends JPanel {
                 if(optHPGNetwork.isSelected()) {
                     // Grab the network from the planet manager
                     Collection<Systems.HPGLink> hpgNetwork = Systems.getInstance().getHPGNetwork(now);
-                    
+
                     for(PlanetarySystem system : systems) {
                         if(isSystemVisible(system, true)) {
                             double x = map2scrX(system.getX());
@@ -690,7 +690,7 @@ public class InterstellarMapPanel extends JPanel {
                         if(i > 0) {
                             PlanetarySystem systemA = campaign.getLocation().getJumpPath().get(i-1);
                             g2.setPaint(Color.YELLOW);
-                            g2.draw(new Line2D.Double(map2scrX(systemA.getX()), map2scrY(systemA.getY()), 
+                            g2.draw(new Line2D.Double(map2scrX(systemA.getX()), map2scrY(systemA.getY()),
                                     map2scrX(systemB.getX()), map2scrY(systemB.getY())));
                         }
                     }
@@ -1007,7 +1007,7 @@ public class InterstellarMapPanel extends JPanel {
 
         return true;
     }
-    
+
     private boolean isSystemVisible(PlanetarySystem system, boolean hideEmpty) {
         if(null == system) {
             return false;
@@ -1058,7 +1058,7 @@ public class InterstellarMapPanel extends JPanel {
         return jumpPath;
     }
 
-    private void changeSelectedSystem(PlanetarySystem p) {
+    public void changeSelectedSystem(PlanetarySystem p) {
         selectedSystem = p;
         jumpPath = new JumpPath();
         notifyListeners();
@@ -1070,18 +1070,18 @@ public class InterstellarMapPanel extends JPanel {
      * @return a Color
      */
     public Color getSystemColor(PlanetarySystem p) {
-    	
+
     	//color shading is from the Viridis color palettes
-    	
+
 		long pop = p.getPopulation(Utilities.getDateTimeDay(campaign.getCalendar()));
 
 		//if no population, then just return black no matter what we asked for
 		if(pop==0l) {
 			return Color.BLACK;
 		}
-		
+
     	SocioIndustrialData socio = p.getSocioIndustrial(Utilities.getDateTimeDay(campaign.getCalendar()));
-    	
+
     	if(null != socio && optTech.isSelected()) {
 	    	switch(socio.tech) {
 	    		case EquipmentType.RATING_F:
@@ -1095,7 +1095,7 @@ public class InterstellarMapPanel extends JPanel {
 	    			return new Color(93,200,99);
 	    		case EquipmentType.RATING_A:
 	    			return new Color(253,231,37);
-	    		default: 
+	    		default:
 	    			return Color.BLACK;
 	    	}
     	}
@@ -1112,7 +1112,7 @@ public class InterstellarMapPanel extends JPanel {
 	    			return new Color(251,136,97);
 	    		case EquipmentType.RATING_A:
 	    			return new Color(252,253,191);
-	    		default: 
+	    		default:
 	    			return Color.BLACK;
 	    	}
     	}
@@ -1129,7 +1129,7 @@ public class InterstellarMapPanel extends JPanel {
 	    			return new Color(248,148,65);
 	    		case EquipmentType.RATING_A:
 	    			return new Color(240,249,33);
-	    		default: 
+	    		default:
 	    			return Color.BLACK;
 	    	}
     	}
@@ -1146,7 +1146,7 @@ public class InterstellarMapPanel extends JPanel {
 	    			return new Color(249,140,10);
 	    		case EquipmentType.RATING_A:
 	    			return new Color(252,255,164);
-	    		default: 
+	    		default:
 	    			return Color.BLACK;
 	    	}
     	}
@@ -1163,11 +1163,11 @@ public class InterstellarMapPanel extends JPanel {
 	    			return new Color(188,175,111);
 	    		case EquipmentType.RATING_A:
 	    			return new Color(255,234,70);
-	    		default: 
+	    		default:
 	    			return Color.BLACK;
 	    	}
     	}
-    	
+
     	if(optPopulation.isSelected()) {
     		//numbers based roughly on deciles of population distribution
     		//in 2750
@@ -1178,7 +1178,7 @@ public class InterstellarMapPanel extends JPanel {
     		} else if(pop>=1000000000l) {
     			return new Color(109,205,89);
     		} else if(pop>=500000000l) {
-    			return new Color(53,183,121);	
+    			return new Color(53,183,121);
     		} else if(pop>=300000000l) {
     			return new Color(31,158,137);
     		} else if(pop>=200000000l) {
@@ -1195,7 +1195,7 @@ public class InterstellarMapPanel extends JPanel {
     			return Color.GRAY;
     		}
     	}
-    	
+
     	if(optHPG.isSelected()) {
     		Integer hpg = p.getHPG(Utilities.getDateTimeDay(campaign.getCalendar()));
     		if(null == hpg) {
@@ -1211,13 +1211,13 @@ public class InterstellarMapPanel extends JPanel {
     			return new Color(222,73,104);
     		case EquipmentType.RATING_A:
     			return new Color(252,253,191);
-    		default: 
+    		default:
     			return Color.BLACK;
     		}
     	}
-    	
+
     	if(optRecharge.isSelected()) {
-    		
+
     		//use two shades of grey for C and D as this is pony express
     		switch(p.getNumberRechargeStations(Utilities.getDateTimeDay(campaign.getCalendar()))) {
     		case 2:
@@ -1226,11 +1226,11 @@ public class InterstellarMapPanel extends JPanel {
     			return new Color(225,100,98);
     		case 0:
     			return new Color(128,128,128);
-    		default: 
+    		default:
     			return Color.BLACK;
     		}
     	}
-    	
+
 		return Color.GRAY;
     }
 
@@ -1248,7 +1248,7 @@ public class InterstellarMapPanel extends JPanel {
         }
     }
     */
-    
+
     /**
      * All configuration behaviour of InterStellarMap are saved here.
      *

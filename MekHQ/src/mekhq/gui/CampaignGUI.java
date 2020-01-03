@@ -124,7 +124,7 @@ import mekhq.io.FileType;
  */
 public class CampaignGUI extends JPanel {
     private static final long serialVersionUID = -687162569841072579L;
-    
+
     public static final int MAX_START_WIDTH = 1400;
     public static final int MAX_START_HEIGHT = 900;
     // the max quantity when mass purchasing parts, hiring, etc. using the JSpinner
@@ -152,7 +152,7 @@ public class CampaignGUI extends JPanel {
     private JMenuItem miShipSearch;
     private JMenuItem miRetirementDefectionDialog;
     private JCheckBoxMenuItem miShowOverview;
-    
+
     private EnumMap<GuiTabType,CampaignGuiTab> standardTabs;
 
     /* Components for the status panel */
@@ -241,7 +241,7 @@ public class CampaignGUI extends JPanel {
         miShowOverview.setSelected(show);
         showOverviewTab(show);
     }
-    
+
     public void showOverviewTab(boolean show) {
         if (show) {
             addStandardTab(GuiTabType.OVERVIEW);
@@ -254,7 +254,7 @@ public class CampaignGUI extends JPanel {
         GMToolsDialog gmTools = new GMToolsDialog(getFrame(), this);
         gmTools.setVisible(true);
     }
-    
+
     public void showMassMothballDialog(Unit[] units, boolean activate) {
         MassMothballDialog mothballDialog = new MassMothballDialog(getFrame(), units, getCampaign(), activate);
         mothballDialog.setVisible(true);
@@ -280,7 +280,7 @@ public class CampaignGUI extends JPanel {
     public void spendBatchXP() {
         BatchXPDialog batchXPDialog = new BatchXPDialog(getFrame(), getCampaign());
         batchXPDialog.setVisible(true);
-        
+
         if(batchXPDialog.hasDataChanged()) {
             refreshReport();
         }
@@ -327,7 +327,7 @@ public class CampaignGUI extends JPanel {
         add(mainPanel, BorderLayout.CENTER);
         add(btnPanel, BorderLayout.PAGE_START);
         add(statusPanel, BorderLayout.PAGE_END);
-        
+
         standardTabs.values().forEach(t -> t.refreshAll());
 
         refreshCalendar();
@@ -383,50 +383,66 @@ public class CampaignGUI extends JPanel {
     public CampaignGuiTab getTab(GuiTabType tabType) {
         return standardTabs.get(tabType);
     }
-    
+
     public TOETab getTOETab() {
         return (TOETab) getTab(GuiTabType.TOE);
     }
-    
+
     public BriefingTab getBriefingTab() {
         return (BriefingTab) getTab(GuiTabType.BRIEFING);
     }
-    
+
     public MapTab getMapTab() {
         return (MapTab) getTab(GuiTabType.MAP);
     }
-    
+
     public PersonnelTab getPersonnelTab() {
         return (PersonnelTab) getTab(GuiTabType.PERSONNEL);
     }
-    
+
     public HangarTab getHangarTab() {
         return (HangarTab) getTab(GuiTabType.HANGAR);
     }
-    
+
     public WarehouseTab getWarehouseTab() {
         return (WarehouseTab) getTab(GuiTabType.WAREHOUSE);
     }
-    
+
     public RepairTab getRepairTab() {
         return (RepairTab) getTab(GuiTabType.REPAIR);
     }
-    
+
     public MekLabTab getMekLabTab() {
         return (MekLabTab) getTab(GuiTabType.MEKLAB);
     }
-    
+
     public InfirmaryTab getInfimaryTab() {
         return (InfirmaryTab) getTab(GuiTabType.INFIRMARY);
     }
-    
+
     public boolean hasTab(GuiTabType tabType) {
         return standardTabs.containsKey(tabType);
     }
-    
+
+    /**
+     * Sets the selected tab by its {@link GuiTabType}.
+     * @param tabType The type of tab to select.
+     */
+    public void setSelectedTab(GuiTabType tabType) {
+        if (standardTabs.containsKey(tabType)) {
+            CampaignGuiTab tab = standardTabs.get(tabType);
+            for (int ii = 0; ii < tabMain.getTabCount(); ++ii) {
+                if (tabMain.getComponentAt(ii) == tab) {
+                    tabMain.setSelectedIndex(ii);
+                    break;
+                }
+            }
+        }
+    }
+
     /**
      * Adds one of the built-in tabs to the gui, if it is not already present.
-     * 
+     *
      * @param tab The type of tab to add
      */
     public void addStandardTab(GuiTabType tab) {
@@ -446,10 +462,10 @@ public class CampaignGUI extends JPanel {
             tabMain.insertTab(t.getTabName(), null, t, null, index);
         }
     }
-    
+
     /**
      * Adds a custom tab to the gui at the end
-     * 
+     *
      * @param tab The tab to add
      */
     public void addCustomTab(CampaignGuiTab tab) {
@@ -462,11 +478,11 @@ public class CampaignGUI extends JPanel {
             addStandardTab(tab.tabType());
         }
     }
-    
+
     /**
      * Adds a custom tab to the gui in the specified position. If <code>tab</code> is a built-in
      * type it will be placed in its normal position if it does not already exist.
-     * 
+     *
      * @param tab	The tab to add
      * @param index	The position to place the tab
      */
@@ -480,10 +496,10 @@ public class CampaignGUI extends JPanel {
             addStandardTab(tab.tabType());
         }
     }
-    
+
     /**
      * Adds a custom tab to the gui positioned after one of the built-in tabs
-     * 
+     *
      * @param tab		The tab to add
      * @param stdTab	The build-in tab after which to place the new one
      */
@@ -510,10 +526,10 @@ public class CampaignGUI extends JPanel {
             addStandardTab(tab.tabType());
         }
     }
-    
+
     /**
      * Adds a custom tab to the gui positioned before one of the built-in tabs
-     * 
+     *
      * @param tab		The tab to add
      * @param stdTab	The build-in tab before which to place the new one
      */
@@ -540,10 +556,10 @@ public class CampaignGUI extends JPanel {
             addStandardTab(tab.tabType());
         }
     }
-    
+
     /**
      * Removes one of the built-in tabs from the gui.
-     * 
+     *
      * @param tabType	The tab to remove
      */
     public void removeStandardTab(GuiTabType tabType) {
@@ -553,20 +569,20 @@ public class CampaignGUI extends JPanel {
             removeTab(tab);
         }
     }
-    
+
     /**
      * Removes a tab from the gui.
-     * 
+     *
      * @param tab	The tab to remove
      */
     public void removeTab(CampaignGuiTab tab) {
         tab.disposeTab();
         removeTab(tab.getTabName());
     }
-    
+
     /**
      * Removes a tab from the gui.
-     * 
+     *
      * @param tabName	The name of the tab to remove
      */
     public void removeTab(String tabName) {
@@ -579,7 +595,7 @@ public class CampaignGUI extends JPanel {
             tabMain.removeTabAt(index);
         }
     }
-    
+
     private void initMenu() {
 
         menuBar = new JMenuBar();
@@ -625,10 +641,10 @@ public class CampaignGUI extends JPanel {
          * miExportPartsActionPerformed(evt); } });
          * menuExport.add(miExportParts);
          */
-        
+
         JMenu miExportCSVFile = new JMenu(resourceMap.getString("menuExportCSV.text")); // NOI18N
         JMenu miExportXMLFile = new JMenu(resourceMap.getString("menuExportXML.text")); // NOI18N
-        
+
         menuExport.add(miExportCSVFile);
         menuExport.add(miExportXMLFile);
 
@@ -661,7 +677,7 @@ public class CampaignGUI extends JPanel {
             }
         });
         miExportCSVFile.add(miExportUnitCSV);
-        
+
         JMenuItem miExportPlanetsXML = new JMenuItem(
                 resourceMap.getString("miExportPlanets.text"));
         miExportPlanetsXML.addActionListener(new ActionListener() {
@@ -671,7 +687,7 @@ public class CampaignGUI extends JPanel {
             }
         });
         miExportXMLFile.add(miExportPlanetsXML);
-        
+
         JMenuItem miExportFinancesCSV = new JMenuItem(
                 resourceMap.getString("miExportFinances.text")); // NOI18N
         miExportFinancesCSV.addActionListener(new ActionListener() {
@@ -691,7 +707,7 @@ public class CampaignGUI extends JPanel {
             }
         });
         menuExport.add(miExportCampaignSubset);
-        
+
         JMenuItem miImportOptions = new JMenuItem(
                 resourceMap.getString("miImportOptions.text")); // NOI18N
         miImportOptions.addActionListener(new ActionListener() {
@@ -1157,7 +1173,7 @@ public class CampaignGUI extends JPanel {
             }
         });
         menuManage.add(miBatchXP);
-        
+
         JMenuItem miScenarioEditor = new JMenuItem("Scenario Template Editor");
         miScenarioEditor.setEnabled(true);
         miScenarioEditor.addActionListener(new ActionListener() {
@@ -1353,7 +1369,7 @@ public class CampaignGUI extends JPanel {
             ((RepairTab)getTab(GuiTabType.REPAIR)).filterTasks();
         }
     }
-        
+
     public void focusOnUnit(UUID id) {
         HangarTab ht = (HangarTab)getTab(GuiTabType.HANGAR);
         if (null == id || null == ht) {
@@ -1448,12 +1464,12 @@ public class CampaignGUI extends JPanel {
         if(!getCampaign().newDay()) {
             return;
         }
-        
+
         refreshCalendar();
         refreshLocation();
         initReport();
         refreshFunds();
-        
+
         refreshAllTabs();
     }// GEN-LAST:event_btnAdvanceDayActionPerformed
 
@@ -1581,7 +1597,7 @@ public class CampaignGUI extends JPanel {
 
     private void menuSaveXmlActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuSaveActionPerformed
         final String METHOD_NAME = "menuSaveXmlActionPerformed(ActionEvent)";
-        
+
         MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                 "Saving campaign..."); //$NON-NLS-1$
         // Choose a file...
@@ -1590,10 +1606,10 @@ public class CampaignGUI extends JPanel {
             // I want a file, y'know!
             return;
         }
-        
+
         saveCampaign(getFrame(), getCampaign(), file);
     }
-    
+
     /**
      * Attempts to saves the given campaign to the given file.
      * @param frame The parent frame in which to display the error message. May be null.
@@ -1605,7 +1621,7 @@ public class CampaignGUI extends JPanel {
             path += ".cpnx";
             file = new File(path);
         }
-        
+
         // check for existing file and make a back-up if found
         String path2 = path + "_backup";
         File backupFile = new File(path2);
@@ -1651,10 +1667,10 @@ public class CampaignGUI extends JPanel {
                 Utilities.copyfile(backupFile, file);
                 backupFile.delete();
             }
-            
+
             return false;
         }
-        
+
         return true;
     }
 
@@ -1783,7 +1799,7 @@ public class CampaignGUI extends JPanel {
             MekHQ.getLogger().error(getClass(), "miLoadForcesActionPerformed(ActionEvent)", ex);
         }
     }// GEN-LAST:event_miLoadForcesActionPerformed
-    
+
     private void miImportPersonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miImportPersonActionPerformed
         try {
             loadPersonFile();
@@ -1815,7 +1831,7 @@ public class CampaignGUI extends JPanel {
             MekHQ.getLogger().error(getClass(), "miExportOptionsActionPerformed(ActionEvent)", ex);
         }
     }
-    
+
     private void miExportFinancesCSVActionPerformed(java.awt.event.ActionEvent evt) {
         try {
             exportFinances(FileType.CSV, resourceMap.getString("dlgSaveFinancesCSV.text"), getCampaign().getName() + getCampaign().getShortDateAsString() + "_ExportedFinances");
@@ -1823,7 +1839,7 @@ public class CampaignGUI extends JPanel {
             MekHQ.getLogger().error(getClass(), "miExportOptionsActionPerformed(ActionEvent)", ex);
         }
     }
-    
+
     private void miExportPersonnelCSVActionPerformed(java.awt.event.ActionEvent evt) {
         try {
             exportPersonnel(FileType.CSV, resourceMap.getString("dlgSavePersonnelCSV.text"), getCampaign().getName() + getCampaign().getShortDateAsString() + "_ExportedPersonnel");
@@ -1831,7 +1847,7 @@ public class CampaignGUI extends JPanel {
             MekHQ.getLogger().error(getClass(), "miExportOptionsActionPerformed(ActionEvent)", ex);
         }
     }
-    
+
     private void miExportUnitCSVActionPerformed(java.awt.event.ActionEvent evt) {
         try {
             exportUnits(FileType.CSV, resourceMap.getString("dlgSaveUnitsCSV.text"), getCampaign().getName() + getCampaign().getShortDateAsString() + "_ExportedUnits");
@@ -1839,7 +1855,7 @@ public class CampaignGUI extends JPanel {
             MekHQ.getLogger().error(getClass(), "miExportOptionsActionPerformed(ActionEvent)", ex);
         }
     }
-    
+
     private void miImportOptionsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miExportPersonActionPerformed
         try {
             loadOptionsFile();
@@ -1959,7 +1975,7 @@ public class CampaignGUI extends JPanel {
         String RefitRefurbish;
         if (r.isBeingRefurbished()) {
             RefitRefurbish = "Refurbishment is a " + r.getRefitClassName() + " refit and must be done at a factory and costs 10% of the purchase price"
-                             + ".\n Are you sure you want to refurbish "; 
+                             + ".\n Are you sure you want to refurbish ";
         } else {
             RefitRefurbish = "This is a " + r.getRefitClassName() + " refit. Are you sure you want to refit ";
         }
@@ -2018,10 +2034,10 @@ public class CampaignGUI extends JPanel {
         UnitCostReportDialog mrd = new UnitCostReportDialog(getFrame(), u);
         mrd.setVisible(true);
     }
-    
+
     /**
      * Shows a dialog that lets the user select a tech for a task on a particular unit
-     * 
+     *
      * @param u    The unit to be serviced, used to filter techs for skill on the unit.
      * @param desc The description of the task
      * @return     The ID of the selected tech, or null if none is selected.
@@ -2032,7 +2048,7 @@ public class CampaignGUI extends JPanel {
 
     /**
      * Shows a dialog that lets the user select a tech for a task on a particular unit
-     * 
+     *
      * @param u                 The unit to be serviced, used to filter techs for skill on the unit.
      * @param desc              The description of the task
      * @param ignoreMaintenance If true, ignores the time required for maintenance tasks when displaying
@@ -2080,7 +2096,7 @@ public class CampaignGUI extends JPanel {
     public Part getPartByNameAndDetails(String pnd) {
         return getCampaign().getPartsStore().getByNameAndDetails(pnd);
     }
-    
+
     /**
      * Exports Planets to a file (CSV, XML, etc.)
      * @param format
@@ -2112,7 +2128,7 @@ public class CampaignGUI extends JPanel {
         });
         */
     }
-    
+
     /**
      * Exports Personnel to a file (CSV, XML, etc.)
      * @param format
@@ -2141,7 +2157,7 @@ public class CampaignGUI extends JPanel {
             JOptionPane.showMessageDialog(mainPanel, resourceMap.getString("dlgNoPersonnel.text"));
         }
     }
-    
+
     /**
      * Exports Units to a file (CSV, XML, etc.)
      * @param format
@@ -2208,7 +2224,7 @@ public class CampaignGUI extends JPanel {
             Utilities.copyfile(file, backupFile);
         }
     }
-    
+
     /**
      * Checks to make sure the file has the appropriate ending / extension.
      * @param file
@@ -2223,10 +2239,10 @@ public class CampaignGUI extends JPanel {
         }
         return file;
     }
-    
+
     protected void loadListFile(boolean allowNewPilots) throws IOException {
         final String METHOD_NAME = "loadListFile(boolean)";
-        
+
         File unitFile = FileDialogs.openUnits(frame).orElse(null);
 
         if (unitFile != null) {
@@ -2497,7 +2513,7 @@ public class CampaignGUI extends JPanel {
             fos.close();
 
             JOptionPane.showMessageDialog(mainPanel, getResourceMap().getString("dlgCampaignSettingsSaved.text"));
-            
+
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                     "Campaign Options saved saved to " + file); //$NON-NLS-1$
         } catch (Exception ex) {
@@ -2851,7 +2867,7 @@ public class CampaignGUI extends JPanel {
         panLog.appendLog(newLogEntries);
         logDialog.appendLog(newLogEntries);
     }
-    
+
     public void initReport() {
         String report = getCampaign().getCurrentReportHTML();
         panLog.refreshLog(report);
@@ -2897,7 +2913,7 @@ public class CampaignGUI extends JPanel {
                 + getCampaign().getAstechPool() + "</html>";
         lblTempAstechs.setText(text);
     }
-    
+
     private void refreshTempMedics() {
         String text = "<html><b>Temp Medics:</b> "
                 + getCampaign().getMedicPool() + "</html>";
@@ -2906,56 +2922,56 @@ public class CampaignGUI extends JPanel {
 
     private ActionScheduler fundsScheduler = new ActionScheduler(this::refreshFunds);
     private ActionScheduler ratingScheduler = new ActionScheduler(this::refreshRating);
-    
+
     @Subscribe
     public void handle(ReportEvent ev) {
         refreshReport();
     }
-    
+
     @Subscribe
     public void handle(OptionsChangedEvent ev) {
         fundsScheduler.schedule();
         ratingScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(TransactionEvent ev) {
         fundsScheduler.schedule();
         ratingScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(LoanEvent ev) {
         fundsScheduler.schedule();
         ratingScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(AssetEvent ev) {
         fundsScheduler.schedule();
         ratingScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(MissionEvent ev) {
         ratingScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(PersonEvent ev) {
         ratingScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(UnitEvent ev) {
         ratingScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(AstechPoolChangedEvent ev) {
         refreshTempAstechs();
     }
-    
+
     @Subscribe
     public void handle(MedicPoolChangedEvent ev) {
         refreshTempMedics();
@@ -3047,7 +3063,7 @@ public class CampaignGUI extends JPanel {
                 prevId = parent.getId();
             }
         }
-        
+
         if (null != scenario) {
             MekHQ.triggerEvent(new DeploymentChangedEvent(f, scenario));
         }
