@@ -561,11 +561,6 @@ public class CampaignOpsReputation extends AbstractUnitRating {
             smallCraftBaysFilledByFighters = excessSmallCraftBays;
         }
 
-        heavyVeeBaysFilledByLights = 0;
-        excessHeavyVeeBays = 0;
-        smallCraftBaysFilledByFighters = 0;
-        excessSmallCraftBays = 0;
-
         //tci.updateCapacityIndicators(getSuperHeavyVeeBayCount() - superHeavyVeeBaysFilledByLighterVees, getSuperHeavyVeeCount());
         //tci.updateCapacityIndicators(getHeavyVeeBayCount() + excessSuperHeavyVeeBays - heavyVeeBaysFilledByLights, getHeavyVeeCount());
         tci.updateCapacityIndicators(getHeavyVeeBayCount() - heavyVeeBaysFilledByLights, getHeavyVeeCount());
@@ -1043,9 +1038,9 @@ public class CampaignOpsReputation extends AbstractUnitRating {
      * @author NickAragua
      *
      */
-    private class TransportCapacityIndicators {
+    private static class TransportCapacityIndicators {
         private boolean sufficientCapacity = true;
-        private boolean excessCapacity = false;
+        private boolean excessCapacity = true;
         private boolean doubleCapacity = true;
 
         public boolean hasSufficientCapacity() {
@@ -1083,7 +1078,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
             // we have excess capacity if there are more bays than units for at least one unit type AND
             // we have sufficient capacity for everything else
-            excessCapacity |= (bayCount > unitCount) && sufficientCapacity;
+            excessCapacity &= ((bayCount > unitCount) || sufficientCapacity);
 
             // we have double capacity if there are more than twice as many bays as units for every unit type
             doubleCapacity &= (bayCount > (unitCount * 2));
