@@ -238,7 +238,7 @@ they shouldn't be fighting DC and Stone's Coalition, so I make them neutral for 
 		<parties>FWL,FWLR</parties>
 	</war>
 
-	<!-- Aurigan Civil War: setting for HBS' BattleTech game. The dates are very roughly estimated based on descriptions in game and in the sourcebook -->
+	<!-- Aurigan Civil War: setting for HBS' BattleTech game. The dates are very roughly estimated based on descriptions in game and in the sourcebook. That means they are semi-canon, and should be updated if possible -->
 	<war name="Aurigan Civil War" start="3025-01-25" end ="3025-09-01">
 		<parties>ARC,ARD</parties>
 		<parties start="3025-05-09" end="3025-08-15">ARC,TC</parties>

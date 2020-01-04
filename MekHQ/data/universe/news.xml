@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- 
+<!--
 news.xml
 9/15/2013
 Jay Lawson
@@ -7,7 +7,7 @@ Updated
 9/9/2017
 Adam Brant
 
-This file defines defines a set of news item that will display in the daily report frame of MekHQ. 
+This file defines defines a set of news item that will display in the daily report frame of MekHQ.
 
 Here is a description of what goes in each newsItem tag
 headline - This is the headline that will appear in the daily report and in the title of the full article.
@@ -16,7 +16,7 @@ date - the date of the news item in YYYY-MM-DD format. This is required. If the 
        will be rolled randomly (each campaign will have its own random seed for that). Same if only the year
 	   is supplied.
 	   Finally, the year can be of the form "302X", which will generate a random day within that decade.
-desc - a longer description of the news item. This is optional, but must be present for the "read more" link. 
+desc - a longer description of the news item. This is optional, but must be present for the "read more" link.
        It should always be surrounded by <![CDATA[stuff]]> and may contain html markup.
 service - an optional tag for the news service doing the reporing
 location - an optional tag for the location of the news report
