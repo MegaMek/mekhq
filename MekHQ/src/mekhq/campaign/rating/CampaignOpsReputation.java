@@ -503,14 +503,18 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         TransportCapacityIndicators tci = new TransportCapacityIndicators();
         tci.updateCapacityIndicators(getMechBayCount(), getMechCount());
         tci.updateCapacityIndicators(getProtoBayCount(), getProtoCount());
-        tci.updateCapacityIndicators(getBaBayCount(), getBattleArmorCount() / 5); // battle armor bays can hold 5 battle armor per bay
+        tci.updateCapacityIndicators(getBaBayCount(), getBattleArmorCount() / 5); // battle armor bays can hold 5 suits of battle armor per bay
         tci.updateCapacityIndicators(getInfantryBayCount(), calcInfantryPlatoons());
 
-        // Light vehicles can use heavy or light vehicle bays, while fighters can use fighter or small craft bays
-        // Once we've stuffed stuffed all possible heavy vehicles into heavy vehicle bays.
-        // if we have some heavy vehicle bays left over, add them to the light vehicle bay count, and then calculate the
-        // number of heavy vehicle bays that are still empty.
-        // The same is done for small craft and fighters, just replace heavy vehicle with small craft and light vehicle with fighters
+        // Heavy vehicles can use heavy or super heavy vehicle bays and light vehicles can use light, heavy, or super heavy vehicle bays,
+        // while fighters can use fighter or small craft bays
+        // We put all possible super heavy vehicles into super heavy vehicle bays.
+        // If we have some super heavy vehicle bays left over, add them to the heavy vehicle bay count, and then calculate the
+        // number of heavy vehicle bays that are still empty. We then add these to the light vehicle bay count
+        // The same is done for small craft and fighters, just replace heavy vehicle with small craft and light vehicle with fighters,
+        // and remove references to super heavy vehicles
+        //int excessSuperHeavyVeeBays = Math.max(getSuperHeavyVeeBayCount() - getSuperHeavyVeeCount(), 0);
+        //int excessHeavyVeeBays = Math.max(getHeavyVeeBayCount() + excessSuperHeavyVeeBays - getHeavyVeeCount(), 0);
         int excessHeavyVeeBays = Math.max(getHeavyVeeBayCount() - getHeavyVeeCount(), 0);
         int excessSmallCraftBays = Math.max(getSmallCraftBayCount() - getSmallCraftCount(), 0);
 
@@ -518,6 +522,29 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         // Assume you have 2 heavy vehicle bays, and 4 light vehicle bays, and are trying to store 1 heavy and 5 light vehicles
         // You have 1 more light vehicle than light vehicle bays to store them in, so you check how many free heavy vehicle bays
         // there are. Finding 1, you can store the light vehicle there, and it doesn't count as having excess
+        /*int superHeavyVeeBaysFilledByLighterVees, heavyVeeBaysFilledByLights, smallCraftBaysFilledByFighters;
+        int excessHeavyVees = Math.max(getHeavyVeeCount() - getHeavyVeeBayCount(), 0);
+        int excessLightVees = Math.max(getLightVeeCount() - getLightVeeBayCount(), 0);
+        int excessFighters = Math.max(getFighterCount() - getFighterBayCount(), 0);
+
+        if (excessHeavyVees + excessLightVees <= excessSuperHeavyVeeBays) {
+            superHeavyVeeBaysFilledByLighterVees = excessHeavyVees + excessLightVees;
+        } else {
+            superHeavyVeeBaysFilledByLighterVees = excessSuperHeavyVeeBays;
+        }
+
+        if (excessLightVees <= excessHeavyVeeBays) {
+            heavyVeeBaysFilledByLights = excessLightVees;
+        } else {
+            heavyVeeBaysFilledByLights = excessHeavyVeeBays;
+        }
+
+        if (excessFighters <= excessSmallCraftBays) {
+            smallCraftBaysFilledByFighters = excessFighters;
+        } else {
+            smallCraftBaysFilledByFighters = excessSmallCraftBays;
+        }*/
+
         int heavyVeeBaysFilledByLights;
         int excessLightVees = Math.max(getLightVeeCount() - getLightVeeBayCount(), 0);
         if (excessLightVees <= excessHeavyVeeBays) {
@@ -525,8 +552,6 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         } else {
             heavyVeeBaysFilledByLights = excessHeavyVeeBays;
         }
-        heavyVeeBaysFilledByLights = 0;
-        excessHeavyVeeBays = 0;
 
         int smallCraftBaysFilledByFighters;
         int excessFighters = Math.max(getFighterCount() - getFighterBayCount(), 0);
@@ -535,13 +560,18 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         } else {
             smallCraftBaysFilledByFighters = excessSmallCraftBays;
         }
+
+        heavyVeeBaysFilledByLights = 0;
+        excessHeavyVeeBays = 0;
         smallCraftBaysFilledByFighters = 0;
         excessSmallCraftBays = 0;
 
-        tci.updateCapacityIndicators(getLightVeeBayCount() + excessHeavyVeeBays, getLightVeeCount());
+        //tci.updateCapacityIndicators(getSuperHeavyVeeBayCount() - superHeavyVeeBaysFilledByLighterVees, getSuperHeavyVeeCount());
+        //tci.updateCapacityIndicators(getHeavyVeeBayCount() + excessSuperHeavyVeeBays - heavyVeeBaysFilledByLights, getHeavyVeeCount());
         tci.updateCapacityIndicators(getHeavyVeeBayCount() - heavyVeeBaysFilledByLights, getHeavyVeeCount());
-        tci.updateCapacityIndicators(getFighterBayCount() + excessSmallCraftBays, getFighterCount());
+        tci.updateCapacityIndicators(getLightVeeBayCount() + excessHeavyVeeBays, getLightVeeCount());
         tci.updateCapacityIndicators(getSmallCraftBayCount() - smallCraftBaysFilledByFighters, getSmallCraftCount());
+        tci.updateCapacityIndicators(getFighterBayCount() + excessSmallCraftBays, getFighterCount());
 
         //Find the percentage of units that are transported.
         if (tci.hasDoubleCapacity()) {
@@ -793,44 +823,34 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         final String TEMPLATE = "    %-" + CATEGORY_LENGTH +
                                 "s %3d needed / %3d available";
 
+        //int superHeavyVeeBayCount = getSuperHeavyVeeBayCount();
         int heavyVeeBayCount = getHeavyVeeBayCount();
-        int excessHeavyVeeBays = Math.max(0, heavyVeeBayCount - getHeavyVeeCount());
         int smallCraftBayCount = getSmallCraftBayCount();
-        int excessSmallCraftBays = Math.max(0, smallCraftBayCount - getSmallCraftCount());
-        String out = String.format("%-" + HEADER_LENGTH + "s %3d",
-                                   "Transportation:", getTransportValue()) +
-                     "\n" + String.format(TEMPLATE, "Mech Bays:",
-                                          getMechCount(), getMechBayCount()) +
-                     "\n" + String.format(TEMPLATE, "Fighter Bays:",
-                                          getFighterCount(), getFighterBayCount()) +
+
+        //int excessSuperHeavyVeeBays = Math.max(superHeavyVeeBayCount - getSuperHeavyVeeCount(),0);
+        //int excessHeavyVeeBays = Math.max(heavyVeeBayCount + excessSuperHeavyVeeBays - getHeavyVeeCount(), 0);
+        int excessHeavyVeeBays = Math.max(heavyVeeBayCount - getHeavyVeeCount(), 0);
+        int excessSmallCraftBays = Math.max(smallCraftBayCount - getSmallCraftCount(), 0);
+
+        String out = String.format("%-" + HEADER_LENGTH + "s %3d", "Transportation:", getTransportValue()) +
+                     "\n" + String.format(TEMPLATE, "Mech Bays:", getMechCount(), getMechBayCount()) +
+                     "\n" + String.format(TEMPLATE, "Fighter Bays:", getFighterCount(), getFighterBayCount()) +
                      " (plus " + excessSmallCraftBays + " excess small craft)" +
-                     "\n" + String.format(TEMPLATE, "Small Craft Bays:",
-                                          getSmallCraftCount(), smallCraftBayCount) +
-                     "\n" + String.format(TEMPLATE, "Protomech Bays:",
-                                          getProtoCount(),
-                                          getProtoBayCount()) +
-                     "\n" + String.format(TEMPLATE, "Heavy Vehicle Bays:",
-                                          getHeavyVeeCount(),
-                                          heavyVeeBayCount) +
-                     "\n" + String.format(TEMPLATE, "Light Vehicle Bays:",
-                                          getLightVeeCount(),
-                                          getLightVeeBayCount()) +
+                     "\n" + String.format(TEMPLATE, "Small Craft Bays:", getSmallCraftCount(), smallCraftBayCount) +
+                     "\n" + String.format(TEMPLATE, "Protomech Bays:", getProtoCount(), getProtoBayCount()) +
+                     //"\n" + String.format(TEMPLATE, "Super Heavy Vehicle Bays:", getSuperHeavyVeeCount(), superHeavyVeeBayCount) +
+                     "\n" + String.format(TEMPLATE, "Heavy Vehicle Bays:", getHeavyVeeCount(), heavyVeeBayCount) +
+                     //" (plus " + excessSuperHeavyVeeBays + " excess super heavy)" +
+                     "\n" + String.format(TEMPLATE, "Light Vehicle Bays:", getLightVeeCount(), getLightVeeBayCount()) +
+                     //" (plus " + excessHeavyVeeBays + " excess heavy and super heavy)" +
                      " (plus " + excessHeavyVeeBays + " excess heavy)" +
-                     "\n" + String.format(TEMPLATE, "BA Bays:",
-                                          getBattleArmorCount() / 5,
-                                          getBaBayCount()) +
-                     "\n" + String.format(TEMPLATE, "Infantry Bays:",
-                                          calcInfantryPlatoons(),
-                                          getInfantryBayCount()) +
-                     "\n" + String.format(TEMPLATE, "Docking Collars:",
-                                          getDropshipCount(),
-                                          getDockingCollarCount());
+                     "\n" + String.format(TEMPLATE, "BA Bays:", getBattleArmorCount() / 5, getBaBayCount()) +
+                     "\n" + String.format(TEMPLATE, "Infantry Bays:", calcInfantryPlatoons(), getInfantryBayCount()) +
+                     "\n" + String.format(TEMPLATE, "Docking Collars:", getDropshipCount(), getDockingCollarCount());
 
         final String TEMPLATE_2 = "    %-" + CATEGORY_LENGTH + "s %3s";
-        out += "\n" + String.format(TEMPLATE_2, "Has Jumpships?",
-                                    getJumpshipCount() > 0 ? "Yes" : "No");
-        out += "\n" + String.format(TEMPLATE_2, "Has Warships?",
-                                    getWarshipCount() > 0 ? "Yes" : "No");
+        out += "\n" + String.format(TEMPLATE_2, "Has Jumpships?", getJumpshipCount() > 0 ? "Yes" : "No");
+        out += "\n" + String.format(TEMPLATE_2, "Has Warships?", getWarshipCount() > 0 ? "Yes" : "No");
 
         return out;
     }

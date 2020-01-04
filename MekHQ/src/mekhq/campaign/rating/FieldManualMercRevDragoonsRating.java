@@ -780,8 +780,10 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
         out.append(String.format("%-" + HEADER_LENGTH + "s %3d", "Transportation", getTransportValue())).append("\n");
 
-        int excessSmallCraftBays = Math.max(0, getSmallCraftBayCount() - getSmallCraftCount());
-        int excessHeavyVeeBays = Math.max(0, getHeavyVeeBayCount() - getHeavyVeeCount());
+        //int excessSuperHeavyVeeBays = Math.max(getSuperHeavyVeeBayCount() - getSuperHeavyVeeCount(), 0);
+        //int excessHeavyVeeBays = Math.max(getHeavyVeeBayCount() + excessSuperHeavyVeeBays - getHeavyVeeCount(), 0);
+        int excessHeavyVeeBays = Math.max(getHeavyVeeBayCount() - getHeavyVeeCount(), 0);
+        int excessSmallCraftBays = Math.max(getSmallCraftBayCount() - getSmallCraftCount(), 0);
 
         out.append(String.format(TEMPLATE, "Dropship Capacity:", getTransportPercent().toPlainString() + "%"))
         .append("\n").append(String.format(TEMPLATE_TWO, "Mech Bays:", getMechCount(), getMechBayCount()))
@@ -789,8 +791,11 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         .append(" (plus ").append(excessSmallCraftBays).append(" excess small craft)")
         .append("\n").append(String.format(TEMPLATE_TWO, "Small Craft Bays:", getSmallCraftCount(), getSmallCraftBayCount()))
         .append("\n").append(String.format(TEMPLATE_TWO, "Protomech Bays:", getProtoCount(), getProtoBayCount()))
+        //.append("\n").append(String.format(TEMPLATE_TWO, "Super Heavy Vehicle Bays:", getSuperHeavyVeeCount(), getSuperHeavyVeeBayCount()))
         .append("\n").append(String.format(TEMPLATE_TWO, "Heavy Vehicle Bays:", getHeavyVeeCount(), getHeavyVeeBayCount()))
+        //.append(" (plus ").append(excessSuperHeavyVeeBays).append(" excess super heavy)")
         .append("\n").append(String.format(TEMPLATE_TWO, "Light Vehicle Bays:", getLightVeeCount(), getLightVeeBayCount()))
+        //.append(" (plus ").append(excessHeavyVeeBays).append(" excess heavy and super heavy)")
         .append(" (plus ").append(excessHeavyVeeBays).append(" excess heavy)")
         .append("\n").append(String.format(TEMPLATE_TWO, "BA Bays:", getNumberBaSquads(), getBaBayCount()))
         .append("\n").append(String.format(TEMPLATE_TWO, "Infantry Bays:", calcInfantryPlatoons(), getInfantryBayCount()))
@@ -920,16 +925,18 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     public BigDecimal getTransportPercent() {
-        // todo Superheavys, Battle Armour
-
+        // battle armor bays can hold 5 suits of battle armor per bay, while units can be 6 in some lore examples
+        // so this is calculated first, and all calculations are based on this number
+        int numBaBaysRequired = getBattleArmorCount() / 5;
         //Find the current number of units that might require transport
         BigDecimal totalUnits = new BigDecimal(getMechCount() +
                 getProtoCount() +
+                //getSuperHeavyVeeCount() +
                 getHeavyVeeCount() +
                 getLightVeeCount() +
                 getSmallCraftCount() +
                 getFighterCount() +
-                //getNumberBaSquads() +
+                numBaBaysRequired +
                 calcInfantryPlatoons());
         if (totalUnits.compareTo(BigDecimal.ZERO) == 0) {
             //if you have no units, you don't need to transport them, return 100%
@@ -937,16 +944,20 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         }
 
         //Find out how short of transport bays we are.
+        //int excessSuperHeavyVeeBays = Math.max(getSuperHeavyVeeBayCount() - getSuperHeavyVeeCount(), 0); //removes any filled super heavy vehicle bays, rest can be used to store heavy or light vehicles
+        //int excessHeavyVeeBays = Math.max(getHeavyVeeBayCount() + excessSuperHeavyVeeBays - getHeavyVeeCount(), 0); //removes any filled heavy vehicle bays and spare super heavy vehicle bays, rest can be used to store light vehicles
         int excessHeavyVeeBays = Math.max(getHeavyVeeBayCount() - getHeavyVeeCount(), 0); //removes any filled heavy vehicle bays, rest can be used to store light vehicles
         int excessSmallCraftBays = Math.max(getSmallCraftBayCount() - getSmallCraftCount(), 0); //removes any filled small craft bays, rest can be used to store fighters
 
         int numberWithoutTransport = Math.max((getMechCount() - getMechBayCount()), 0);
         numberWithoutTransport += Math.max(getProtoCount() - getProtoBayCount(), 0);
+        //numberWithoutTransport += Math.max(getSuperHeavyVeeCount() - getSuperHeavyVeeBayCount(), 0);
+        //numberWithoutTransport += Math.max(getHeavyVeeCount() - getHeavyVeeBayCount() - excessSuperHeavyVeeBays, 0);
         numberWithoutTransport += Math.max(getHeavyVeeCount() - getHeavyVeeBayCount(), 0);
         numberWithoutTransport += Math.max(getLightVeeCount() - getLightVeeBayCount() - excessHeavyVeeBays, 0);
         numberWithoutTransport += Math.max(getSmallCraftCount() - getSmallCraftBayCount(), 0);
         numberWithoutTransport += Math.max(getFighterCount() - getFighterBayCount() - excessSmallCraftBays, 0);
-        //numberWithoutTransport += Math.max(getNumberBASquads() - getBABayCount(), 0);
+        numberWithoutTransport += Math.max(numBaBaysRequired - getBaBayCount(), 0);
         numberWithoutTransport += Math.max(calcInfantryPlatoons() - getInfantryBayCount(), 0);
 
         BigDecimal transportNeeded = new BigDecimal(numberWithoutTransport);
