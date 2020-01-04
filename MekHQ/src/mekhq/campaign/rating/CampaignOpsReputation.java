@@ -494,6 +494,8 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
     @Override
     public int getTransportValue() {
+        // TODO: Implement Super Heavy (code is done, just needs to be tested)
+        
         if (getTotalCombatUnits() == 0) {
             return 0;
         }
@@ -815,6 +817,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
     }
 
     String getTransportationDetails() {
+        // TODO: Implement Super Heavy (code is done, just needs to be tested)
         final String TEMPLATE = "    %-" + CATEGORY_LENGTH +
                                 "s %3d needed / %3d available";
 

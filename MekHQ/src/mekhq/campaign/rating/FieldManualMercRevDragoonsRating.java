@@ -774,6 +774,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     String getTransportationDetails() {
+        // TODO: Implement Super Heavy (code is done, just needs to be tested)
         StringBuilder out = new StringBuilder();
         final String TEMPLATE = "    %-" + SUBHEADER_LENGTH + "s %3s";
         final String TEMPLATE_TWO = "        #%-" + CATEGORY_LENGTH + "s %3d needed / %3d available";
@@ -925,6 +926,8 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     public BigDecimal getTransportPercent() {
+        // TODO: Implement Super Heavy (code is done, just needs to be tested)
+
         // battle armor bays can hold 5 suits of battle armor per bay, while units can be 6 in some lore examples
         // so this is calculated first, and all calculations are based on this number
         int numBaBaysRequired = getBattleArmorCount() / 5;
