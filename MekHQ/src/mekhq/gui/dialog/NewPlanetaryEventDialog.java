@@ -13,7 +13,6 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -29,30 +28,25 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import mekhq.MekHQ;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import megamek.common.EquipmentType;
-import megamek.common.PlanetaryConditions;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.adapter.SocioIndustrialDataAdapter;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.universe.Climate;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.Planet.PlanetaryEvent;
+import mekhq.gui.preferences.JWindowPreference;
+import mekhq.preferences.PreferencesNode;
 
 public class NewPlanetaryEventDialog extends JDialog {
     private static final long serialVersionUID = 6025304629282204159L;
@@ -389,6 +383,7 @@ public class NewPlanetaryEventDialog extends JDialog {
                 if(chooser.isChanged()) {
                     event.faction = chooser.getResult();
                     event.custom = true;
+                    planet.refreshEvents();
                     updateDate();
                 }
             }
@@ -534,6 +529,7 @@ public class NewPlanetaryEventDialog extends JDialog {
             default: break;
         }
         event.custom = true;
+        planet.refreshEvents();
     }
 
     private String nullEmptyText(JTextField field) {
@@ -561,6 +557,7 @@ public class NewPlanetaryEventDialog extends JDialog {
             default: return;
         }
         event.custom = true;
+        planet.refreshEvents();
     }
 
     private static class HPGChoice {

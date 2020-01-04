@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -172,6 +173,15 @@ public class Planet implements Serializable {
      */
     @XmlTransient
     TreeMap<DateTime, PlanetaryEvent> events;
+
+    /**
+     * This is a cache of the current event data based
+     * on the latest date given. {@link Planet#refreshEvents()}
+     * should be called if event data has been modified
+     * or the current date moved backwards.
+     */
+    @XmlTransient
+    CurrentEvents currentEvents;
 
     //a hash to keep track of dynamic garrison changes
     //TreeMap<DateTime, List<String>> garrisonHistory;
@@ -473,7 +483,7 @@ public class Planet implements Serializable {
 
     // Date-dependant data
 
-    public PlanetaryEvent getOrCreateEvent(DateTime when) {
+    public synchronized PlanetaryEvent getOrCreateEvent(DateTime when) {
         if(null == when) {
             return null;
         }
@@ -486,6 +496,7 @@ public class Planet implements Serializable {
             event.date = when;
             events.put(when, event);
         }
+        currentEvents = null;
         return event;
     }
 
@@ -520,19 +531,82 @@ public class Planet implements Serializable {
             return defaultValue;
         }
 
-        T result = null;
+        PlanetaryEvent event = getCurrentEvent(when);
 
-        // Walk backwards starting from the defined date...
-        Map<DateTime, PlanetaryEvent> map = events.headMap(when, /*inclusive:*/true).descendingMap();
-        for (Map.Entry<DateTime, PlanetaryEvent> event : map.entrySet()) {
-            result = getter.get(event.getValue());
-            if (result != null) {
-                // ...taking the first non-null value.
-                break;
+        T result = getter.get(event);
+
+        return Utilities.nonNull(result, defaultValue);
+    }
+
+    private synchronized PlanetaryEvent getCurrentEvent(DateTime now) {
+        if (currentEvents == null) {
+            currentEvents = new CurrentEvents();
+        }
+
+        return currentEvents.getCurrentEvent(now);
+    }
+
+    /**
+     * This methed signals that the internal cache of event data
+     * should be refreshed. This should be called when any
+     * field on a planetary event is updated, or if any events
+     * are added and/or removed.
+     */
+    public synchronized void refreshEvents() {
+        currentEvents = null;
+    }
+
+    /**
+     * This class tracks the current {@link PlanetaryEvent}.
+     */
+    class CurrentEvents {
+        private DateTime lastUpdated;
+        private PlanetaryEvent planetaryEvent = new PlanetaryEvent();
+        private Map.Entry<DateTime, PlanetaryEvent> nextEvent;
+        private Iterator<Map.Entry<DateTime, PlanetaryEvent>> eventStream;
+
+        private void initialize(DateTime now) {
+            lastUpdated = now;
+            if (events != null) {
+                eventStream = events.entrySet().iterator();
+                if (eventStream.hasNext()) {
+                    nextEvent = eventStream.next();
+                }
             }
         }
 
-        return Utilities.nonNull(result, defaultValue);
+        /**
+         * Gets the current {@link PlanetaryEvent} for the time.
+         * @param now The current time.
+         * @return The up-to-date {@link PlanetaryEvent} as of {@code now}.
+         */
+        public PlanetaryEvent getCurrentEvent(DateTime now) {
+            if (lastUpdated == null || lastUpdated.isAfter(now)) {
+                // initialize ourselves if we're fresh or if we
+                // went back in time (which breaks how the event stream works)
+                initialize(now);
+            }
+
+            // if we have no more events for this planet,
+            // or if our current date is before the next date
+            // return our cached event
+            if (nextEvent == null || now.isBefore(nextEvent.getKey())) {
+                return planetaryEvent;
+            }
+
+            // fast-forward to the next event
+            do {
+                planetaryEvent.copyDataFrom(nextEvent.getValue());
+                if (eventStream.hasNext()) {
+                    nextEvent = eventStream.next();
+                } else {
+                    nextEvent = null;
+                }
+
+            } while(nextEvent != null && !now.isBefore(nextEvent.getKey()));
+
+            return planetaryEvent;
+        }
     }
 
     /** @return events for this year. Never returns <i>null</i>. */
@@ -1062,6 +1136,8 @@ public class Planet implements Serializable {
         public String shortName;
         @XmlJavaTypeAdapter(StringListAdapter.class)
         public List<String> faction;
+        @XmlTransient
+        public Set<Faction> factions;
         @XmlJavaTypeAdapter(LifeFormAdapter.class)
         public LifeForm lifeForm;
         @XmlJavaTypeAdapter(ClimateAdapter.class)
@@ -1086,6 +1162,7 @@ public class Planet implements Serializable {
         public void copyDataFrom(PlanetaryEvent other) {
             climate = Utilities.nonNull(other.climate, climate);
             faction = Utilities.nonNull(other.faction, faction);
+            factions = updateFactions(factions, faction, other.faction);
             hpg = Utilities.nonNull(other.hpg, hpg);
             lifeForm = Utilities.nonNull(other.lifeForm, lifeForm);
             message = Utilities.nonNull(other.message, message);
@@ -1100,6 +1177,17 @@ public class Planet implements Serializable {
             population = Utilities.nonNull(other.population, population);
             dayLength = Utilities.nonNull(other.dayLength, dayLength);
             custom = (other.custom || custom);
+        }
+
+        private Set<Faction> updateFactions(Set<Faction> current, List<String> codes, List<String> otherCodes) {
+            // CAW: reference equality intended
+            if (codes != otherCodes) {
+                current = new HashSet<>(codes.size());
+                for (String code : codes) {
+                    current.add(Faction.getFaction(code));
+                }
+            }
+            return current;
         }
 
         public void replaceDataFrom(PlanetaryEvent other) {
