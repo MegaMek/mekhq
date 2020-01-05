@@ -1,0 +1,12 @@
+3026 Mercenaries and Pirates Tank - Medium
+Hetzer (LRM),1
+Goblin,2
+Vedette (AC2),3
+Hetzer,4
+Vedette,5
+Vedette,6
+Vedette,5
+Vedette,4
+Maxim,3
+Condor,2
+Drillson,1

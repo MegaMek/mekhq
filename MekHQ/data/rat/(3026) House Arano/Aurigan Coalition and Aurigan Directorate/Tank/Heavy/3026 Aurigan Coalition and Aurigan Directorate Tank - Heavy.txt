@@ -1,0 +1,12 @@
+3026 Aurigan Coalition and Aurigan Directorate Tank - Heavy
+Pike Support Vehicle,1
+SRM Carrier,2
+LRM Carrier,3
+Vargr,4
+SRM Carrier,5
+Bulldog,6
+Manticore Heavy Tank,5
+Vargr LRM,4
+Bulldog (AC),3
+Manticore Heavy Tank,2
+Laser Carrier,1

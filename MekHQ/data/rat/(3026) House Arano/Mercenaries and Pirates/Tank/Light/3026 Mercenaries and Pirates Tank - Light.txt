@@ -1,0 +1,12 @@
+3026 Mercenaries and Pirates Tank - Light
+Packrat,1
+Ferret Light Scout,2
+Galleon,3
+Scorpion (SRM),4
+Scimitar,5
+Saladin,6
+Saracen,5
+Scorpion,4
+Harasser,3
+Warrior,2
+Hunter,1

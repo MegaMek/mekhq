@@ -1,0 +1,12 @@
+3026 Mercenaries and Pirates Aerospace - DropShip
+Achilles,1
+Intruder,2
+Fortress,3
+Gazelle,4
+Leopard,5
+Union,6
+Trojan,5
+Triumph,4
+Leopard,3
+Intruder,2
+Leopard CV,1

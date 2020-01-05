@@ -1,0 +1,12 @@
+3026 Magistracy of Canopus Tank - Assault
+Ontos Heavy Tank,1
+Partisan Heavy Tank,2
+Partisan Heavy Tank,3
+Schrek PPC Carrier,4
+Behemoth Heavy Tank,5
+Demolisher,6
+Demolisher,5
+Ontos Heavy Tank,4
+Schrek PPC Carrier,3
+Sturmfeur,2
+Behemoth Heavy Tank,1

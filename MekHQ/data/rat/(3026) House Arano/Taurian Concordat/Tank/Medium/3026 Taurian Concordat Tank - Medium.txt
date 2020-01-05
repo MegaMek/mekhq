@@ -1,0 +1,12 @@
+3026 Taurian Concordat Tank - Medium
+Condor,1
+Vedette,2
+Goblin,3
+Maxim,4
+Vedette,5
+Vedette,6
+Vedette,5
+Hetzer,4
+Hetzer,3
+Vedette (AC2),2
+Condor,1

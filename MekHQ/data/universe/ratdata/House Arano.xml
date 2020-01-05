@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rat source='House Arano'>
+	<era year='3026'>
+		<rat name='3026  Aerospace - DropShip'>
+			<factions>FWL</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3026  Aerospace - Heavy'>
+			<factions>FWL</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3026  Aerospace - Light'>
+			<factions>FWL</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3026  Aerospace - Medium'>
+			<factions>FWL</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3026  Mech - Assault'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3026  Mech - Heavy'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3026  Mech - Light'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3026  Mech - Medium'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3026  Tank - Assault'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3026  Tank - Heavy'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3026  Tank - Light'>
+			<factions>FWL</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3026  Tank - Medium'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+	</era>
+</rat>

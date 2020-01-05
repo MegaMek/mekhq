@@ -1,0 +1,12 @@
+3026 Aurigan Coalition and Aurigan Directorate Aerospace - DropShip
+Mammoth,1
+Overlord,2
+Intruder,3
+Gazelle,4
+Leopard,5
+Union,6
+Trojan,5
+Triumph,4
+Leopard,3
+Vengeance,2
+Leopard CV,1

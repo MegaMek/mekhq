@@ -1,0 +1,12 @@
+3026 Taurian Concordat Tank - Heavy
+Pike Support Vehicle,1
+SRM Carrier,2
+LRM Carrier,3
+LRM Carrier,4
+SRM Carrier,5
+Bulldog,6
+Manticore Heavy Tank,5
+Bulldog (LRM),4
+Bulldog (AC),3
+Manticore Heavy Tank,2
+Laser Carrier,1

@@ -1,0 +1,12 @@
+3026 Magistracy of Canopus Tank - Heavy
+Manticore Heavy Tank,1
+Rommel,2
+Pike Support Vehicle,3
+Manticore Heavy Tank,4
+Von Luckner,5
+LRM Carrier,6
+SRM Carrier,5
+Bulldog,4
+Patton,3
+Von Luckner,2
+SRM Carrier,1

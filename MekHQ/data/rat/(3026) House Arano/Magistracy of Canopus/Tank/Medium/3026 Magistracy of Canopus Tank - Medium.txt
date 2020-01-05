@@ -1,0 +1,12 @@
+3026 Magistracy of Canopus Tank - Medium
+Condor,1
+Goblin,2
+Drillson,3
+Drillson,4
+Vedette,5
+Hetzer,6
+Condor,5
+Goblin,4
+Maxim,3
+Maxim,2
+Hetzer,1

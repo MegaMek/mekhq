@@ -1,0 +1,12 @@
+3026 Aurigan Coalition and Aurigan Directorate Tank - Light
+Galleon,1
+Scorpion (SRM),2
+Harasser,3
+Saracen,4
+Pegasus,5
+Scorpion,6
+Saladin,5
+Scimitar,4
+Heavy Wheeled APC,3
+Wheeled APC,2
+Hunter,1

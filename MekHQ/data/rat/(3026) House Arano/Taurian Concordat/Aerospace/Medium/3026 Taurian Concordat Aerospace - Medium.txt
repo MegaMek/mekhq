@@ -1,0 +1,12 @@
+3026 Taurian Concordat Aerospace - Medium
+Hellcat,1
+Lightning,2
+Lucifer LCF-R15,3
+Lightning,4
+Lucifer LCF-R15,5
+Hellcat,6
+Stingray F-90,5
+Hellcat,4
+Lightning,3
+Hellcat,2
+Lightning,1

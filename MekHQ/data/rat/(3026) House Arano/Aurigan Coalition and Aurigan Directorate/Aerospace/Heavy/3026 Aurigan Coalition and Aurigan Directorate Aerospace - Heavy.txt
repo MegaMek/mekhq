@@ -1,0 +1,12 @@
+3026 Aurigan Coalition and Aurigan Directorate Aerospace - Heavy
+Stuka STU-K5,1
+Eagle,2
+Eagle,3
+Chippewa CHP-W5,4
+Eagle,5
+Eagle,6
+Thunderbird,5
+Slayer SL-15,4
+Thunderbird,3
+Eagle,2
+Stuka STU-K5,1

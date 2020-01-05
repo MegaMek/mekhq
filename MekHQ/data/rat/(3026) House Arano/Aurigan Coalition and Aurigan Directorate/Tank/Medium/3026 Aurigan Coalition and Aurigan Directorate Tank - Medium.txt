@@ -1,0 +1,12 @@
+3026 Aurigan Coalition and Aurigan Directorate Tank - Medium
+Condor,1
+Sleipnir SRM,2
+Goblin,3
+Maxim,4
+Sleipnir,5
+Vedette,6
+Sleipnir,5
+Hetzer,4
+Goblin,3
+Maxim,2
+Condor,1

@@ -1,0 +1,12 @@
+3026 Aurigan Coalition and Aurigan Directorate Aerospace - Light
+Sparrowhawk SPR-H5,1
+Seydlitz SYF-21,2
+Seydlitz SYF-21,3
+Sparrowhawk SPR-H5,4
+Centurion,5
+Cheetah F-10,6
+Sabre,5
+Sabre,4
+Cheetah F-10,3
+Centurion,2
+Sabre,1
