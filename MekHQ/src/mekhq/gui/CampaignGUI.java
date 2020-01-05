@@ -28,6 +28,7 @@ import java.awt.GridBagLayout;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.*;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -1639,12 +1640,12 @@ public class CampaignGUI extends JPanel {
             if (path.endsWith(".gz")) {
                 os = new GZIPOutputStream(fos);
             }
-
+            os = new BufferedOutputStream(os);
             pw = new PrintWriter(new OutputStreamWriter(os, "UTF-8"));
             campaign.writeToXml(pw);
             pw.flush();
             pw.close();
-            fos.close();
+            os.close();
             // delete the backup file because we didn't need it
             if (backupFile.exists()) {
                 backupFile.delete();
@@ -1652,6 +1653,9 @@ public class CampaignGUI extends JPanel {
             MekHQ.getLogger().log(CampaignGUI.class, METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                     "Campaign saved to " + file); //$NON-NLS-1$
         } catch (Exception ex) {
+            if (os != null) {
+                try { os.close(); } catch (Exception ignored) { }
+            }
             MekHQ.getLogger().error(CampaignGUI.class, METHOD_NAME, ex); //$NON-NLS-1$
             JOptionPane
                     .showMessageDialog(
