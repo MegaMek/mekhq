@@ -159,7 +159,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     private void updateJumpships(Entity en) {
         if (en instanceof Warship) {
             if (en.getDocks() > 0) {
-                setWarhipWithDocsOwner(true);
+                setWarshipWithDocsOwner(true);
             } else {
                 setWarshipOwner(true);
             }
@@ -180,9 +180,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             return;
         }
 
-        getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
-                        "Unit " + u.getName() +
-                        " updating tech support needs.");
+        getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG, "Unit " + u.getName() + " updating tech support needs.");
 
         double timeMult = 1;
         int needed = 0;
@@ -205,10 +203,8 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                             "Unit " + u.getName() + " needs " +
                             needed + " mech tech hours.");
             mechSupportNeeded += needed;
-        } else if (en instanceof Warship ||
-                   en instanceof Jumpship ||
-                   en instanceof Dropship) {
-            // according to FMMR, this should be tracked separately because it only applies to admin support but not
+        } else if (en instanceof Jumpship || en instanceof Dropship) {
+            // according to FM:M(r), this should be tracked separately because it only applies to admin support but not
             // technical support.
             updateDropJumpShipSupportNeeds(en);
         } else if ((en instanceof SmallCraft)) {
@@ -802,7 +798,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         .append("\n").append(String.format(TEMPLATE_TWO, "Infantry Bays:", calcInfantryPlatoons(), getInfantryBayCount()))
         .append("\n").append(String.format(TEMPLATE, "Jumpship?", (isJumpshipOwner() ? "Yes" : "No")))
         .append("\n").append(String.format(TEMPLATE, "Warship w/out Collar?", (isWarshipOwner() ? "Yes" : "No")))
-        .append("\n").append(String.format(TEMPLATE, "Warship w/ Collar?", (isWarhipWithDocsOwner() ? "Yes" : "No")));
+        .append("\n").append(String.format(TEMPLATE, "Warship w/ Collar?", (isWarshipWithDocsOwner() ? "Yes" : "No")));
 
         return out.toString();
     }

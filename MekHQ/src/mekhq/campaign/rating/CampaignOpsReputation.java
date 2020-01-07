@@ -495,7 +495,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
     @Override
     public int getTransportValue() {
         // TODO: Implement Super Heavy (code is done, just needs to be tested)
-        
+
         if (getTotalCombatUnits() == 0) {
             return 0;
         }
@@ -549,19 +549,11 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
         int heavyVeeBaysFilledByLights;
         int excessLightVees = Math.max(getLightVeeCount() - getLightVeeBayCount(), 0);
-        if (excessLightVees <= excessHeavyVeeBays) {
-            heavyVeeBaysFilledByLights = excessLightVees;
-        } else {
-            heavyVeeBaysFilledByLights = excessHeavyVeeBays;
-        }
+        heavyVeeBaysFilledByLights = Math.min(excessLightVees, excessHeavyVeeBays);
 
         int smallCraftBaysFilledByFighters;
         int excessFighters = Math.max(getFighterCount() - getFighterBayCount(), 0);
-        if (excessFighters <= excessSmallCraftBays) {
-            smallCraftBaysFilledByFighters = excessFighters;
-        } else {
-            smallCraftBaysFilledByFighters = excessSmallCraftBays;
-        }
+        smallCraftBaysFilledByFighters = Math.min(excessFighters, excessSmallCraftBays);
 
         //tci.updateCapacityIndicators(getSuperHeavyVeeBayCount() - superHeavyVeeBaysFilledByLighterVees, getSuperHeavyVeeCount());
         //tci.updateCapacityIndicators(getHeavyVeeBayCount() + excessSuperHeavyVeeBays - heavyVeeBaysFilledByLights, getHeavyVeeCount());
