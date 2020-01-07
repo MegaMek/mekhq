@@ -40,6 +40,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
+import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.view.JumpPathViewPanel;
@@ -73,7 +74,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see mekhq.gui.CampaignGuiTab#initTab()
      */
     @Override
@@ -135,7 +136,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         panTopButtons.add(btnBeginTransit, gridBagConstraints);
 
         panMapView.add(panTopButtons, BorderLayout.PAGE_START);
-        
+
         //the actual map
         panMap = new InterstellarMapPanel(getCampaign(), getCampaignGui());
         // lets go ahead and zoom in on the current location
@@ -145,7 +146,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         mapView = new JViewport();
         mapView.setMinimumSize(new java.awt.Dimension(600,600));
         mapView.setView(panMapView);
-        
+
         scrollPlanetView = new JScrollPane();
         scrollPlanetView.setMinimumSize(new java.awt.Dimension(400, 600));
         scrollPlanetView.setPreferredSize(new java.awt.Dimension(400, 600));
@@ -159,7 +160,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
 
         panMap.setCampaign(getCampaign());
         panMap.addActionListener(this);
-        
+
         panSystem = new PlanetarySystemMapPanel(getCampaign(), getCampaignGui());
         panSystem.addActionListener(this);
 
@@ -169,7 +170,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see mekhq.gui.CampaignGuiTab#refreshAll()
      */
     @Override
@@ -213,7 +214,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
             });
         }
     }
-    
+
     protected void refreshPlanetView() {
         JumpPath path = panMap.getJumpPath();
         if (null != path && !path.isEmpty()) {
@@ -232,13 +233,43 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
             });
         }
     }
-    
+
+    /**
+     * Switch to the planetary system view, highlighting
+     * a specific {@link Planet}
+     * @param p The {@link Planet} to select.
+     */
+    public void switchPlanetaryMap(Planet p) {
+        PlanetarySystem s = p.getParentSystem();
+        panMap.setSelectedSystem(s);
+        panSystem.updatePlanetarySystem(p);
+        mapView.setView(panSystem);
+        refreshPlanetView();
+    }
+
+    /**
+     * Switches to the planetary system view, highlighting
+     * a specific {@link PlanetarySystem}.
+     * @param s The {@link PlanetarySystem} to select.
+     */
     public void switchPlanetaryMap(PlanetarySystem s) {
+        panMap.setSelectedSystem(s);
         panSystem.updatePlanetarySystem(s);
         mapView.setView(panSystem);
         refreshPlanetView();
     }
-    
+
+    /**
+     * Switches to the interstellar map view, highlighting
+     * a specific {@link PlanetarySystem}.
+     * @param s The {@link PlanetarySystem} to select.
+     */
+    public void switchSystemsMap(PlanetarySystem s) {
+        panMap.setSelectedSystem(s);
+        panSystem.updatePlanetarySystem(s);
+        switchSystemsMap();
+    }
+
     public void switchSystemsMap() {
         mapView.setView(panMapView);
         refreshSystemView();

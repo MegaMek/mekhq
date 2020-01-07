@@ -159,7 +159,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     private void updateJumpships(Entity en) {
         if (en instanceof Warship) {
             if (en.getDocks() > 0) {
-                setWarhipWithDocsOwner(true);
+                setWarshipWithDocsOwner(true);
             } else {
                 setWarshipOwner(true);
             }
@@ -180,9 +180,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             return;
         }
 
-        getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
-                        "Unit " + u.getName() +
-                        " updating tech support needs.");
+        getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG, "Unit " + u.getName() + " updating tech support needs.");
 
         double timeMult = 1;
         int needed = 0;
@@ -205,10 +203,8 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                             "Unit " + u.getName() + " needs " +
                             needed + " mech tech hours.");
             mechSupportNeeded += needed;
-        } else if (en instanceof Warship ||
-                   en instanceof Jumpship ||
-                   en instanceof Dropship) {
-            // according to FMMR, this should be tracked separately because it only applies to admin support but not
+        } else if (en instanceof Jumpship || en instanceof Dropship) {
+            // according to FM:M(r), this should be tracked separately because it only applies to admin support but not
             // technical support.
             updateDropJumpShipSupportNeeds(en);
         } else if ((en instanceof SmallCraft)) {
@@ -774,14 +770,17 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     String getTransportationDetails() {
+        // TODO: Implement Super Heavy (code is done, just needs to be tested)
         StringBuilder out = new StringBuilder();
         final String TEMPLATE = "    %-" + SUBHEADER_LENGTH + "s %3s";
         final String TEMPLATE_TWO = "        #%-" + CATEGORY_LENGTH + "s %3d needed / %3d available";
 
         out.append(String.format("%-" + HEADER_LENGTH + "s %3d", "Transportation", getTransportValue())).append("\n");
 
-        int excessSmallCraftBays = Math.max(0, getSmallCraftBayCount() - getSmallCraftCount());
-        int excessHeavyVeeBays = Math.max(0, getHeavyVeeBayCount() - getHeavyVeeCount());
+        //int excessSuperHeavyVeeBays = Math.max(getSuperHeavyVeeBayCount() - getSuperHeavyVeeCount(), 0);
+        //int excessHeavyVeeBays = Math.max(getHeavyVeeBayCount() + excessSuperHeavyVeeBays - getHeavyVeeCount(), 0);
+        int excessHeavyVeeBays = Math.max(getHeavyVeeBayCount() - getHeavyVeeCount(), 0);
+        int excessSmallCraftBays = Math.max(getSmallCraftBayCount() - getSmallCraftCount(), 0);
 
         out.append(String.format(TEMPLATE, "Dropship Capacity:", getTransportPercent().toPlainString() + "%"))
         .append("\n").append(String.format(TEMPLATE_TWO, "Mech Bays:", getMechCount(), getMechBayCount()))
@@ -789,14 +788,17 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         .append(" (plus ").append(excessSmallCraftBays).append(" excess small craft)")
         .append("\n").append(String.format(TEMPLATE_TWO, "Small Craft Bays:", getSmallCraftCount(), getSmallCraftBayCount()))
         .append("\n").append(String.format(TEMPLATE_TWO, "Protomech Bays:", getProtoCount(), getProtoBayCount()))
+        //.append("\n").append(String.format(TEMPLATE_TWO, "Super Heavy Vehicle Bays:", getSuperHeavyVeeCount(), getSuperHeavyVeeBayCount()))
         .append("\n").append(String.format(TEMPLATE_TWO, "Heavy Vehicle Bays:", getHeavyVeeCount(), getHeavyVeeBayCount()))
+        //.append(" (plus ").append(excessSuperHeavyVeeBays).append(" excess super heavy)")
         .append("\n").append(String.format(TEMPLATE_TWO, "Light Vehicle Bays:", getLightVeeCount(), getLightVeeBayCount()))
+        //.append(" (plus ").append(excessHeavyVeeBays).append(" excess heavy and super heavy)")
         .append(" (plus ").append(excessHeavyVeeBays).append(" excess heavy)")
         .append("\n").append(String.format(TEMPLATE_TWO, "BA Bays:", getNumberBaSquads(), getBaBayCount()))
         .append("\n").append(String.format(TEMPLATE_TWO, "Infantry Bays:", calcInfantryPlatoons(), getInfantryBayCount()))
         .append("\n").append(String.format(TEMPLATE, "Jumpship?", (isJumpshipOwner() ? "Yes" : "No")))
         .append("\n").append(String.format(TEMPLATE, "Warship w/out Collar?", (isWarshipOwner() ? "Yes" : "No")))
-        .append("\n").append(String.format(TEMPLATE, "Warship w/ Collar?", (isWarhipWithDocsOwner() ? "Yes" : "No")));
+        .append("\n").append(String.format(TEMPLATE, "Warship w/ Collar?", (isWarshipWithDocsOwner() ? "Yes" : "No")));
 
         return out.toString();
     }
@@ -920,14 +922,20 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     public BigDecimal getTransportPercent() {
-        // todo Superheavys.
+        // TODO: Implement Super Heavy (code is done, just needs to be tested)
 
+        // battle armor bays can hold 5 suits of battle armor per bay, while units can be 6 in some lore examples
+        // so this is calculated first, and all calculations are based on this number
+        int numBaBaysRequired = getBattleArmorCount() / 5;
         //Find the current number of units that might require transport
         BigDecimal totalUnits = new BigDecimal(getMechCount() +
-                getLightVeeCount() +
+                getProtoCount() +
+                //getSuperHeavyVeeCount() +
                 getHeavyVeeCount() +
+                getLightVeeCount() +
+                getSmallCraftCount() +
                 getFighterCount() +
-                getNumberBaSquads() +
+                numBaBaysRequired +
                 calcInfantryPlatoons());
         if (totalUnits.compareTo(BigDecimal.ZERO) == 0) {
             //if you have no units, you don't need to transport them, return 100%
@@ -935,15 +943,20 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         }
 
         //Find out how short of transport bays we are.
+        //int excessSuperHeavyVeeBays = Math.max(getSuperHeavyVeeBayCount() - getSuperHeavyVeeCount(), 0); //removes any filled super heavy vehicle bays, rest can be used to store heavy or light vehicles
+        //int excessHeavyVeeBays = Math.max(getHeavyVeeBayCount() + excessSuperHeavyVeeBays - getHeavyVeeCount(), 0); //removes any filled heavy vehicle bays and spare super heavy vehicle bays, rest can be used to store light vehicles
         int excessHeavyVeeBays = Math.max(getHeavyVeeBayCount() - getHeavyVeeCount(), 0); //removes any filled heavy vehicle bays, rest can be used to store light vehicles
         int excessSmallCraftBays = Math.max(getSmallCraftBayCount() - getSmallCraftCount(), 0); //removes any filled small craft bays, rest can be used to store fighters
 
         int numberWithoutTransport = Math.max((getMechCount() - getMechBayCount()), 0);
         numberWithoutTransport += Math.max(getProtoCount() - getProtoBayCount(), 0);
+        //numberWithoutTransport += Math.max(getSuperHeavyVeeCount() - getSuperHeavyVeeBayCount(), 0);
+        //numberWithoutTransport += Math.max(getHeavyVeeCount() - getHeavyVeeBayCount() - excessSuperHeavyVeeBays, 0);
         numberWithoutTransport += Math.max(getHeavyVeeCount() - getHeavyVeeBayCount(), 0);
         numberWithoutTransport += Math.max(getLightVeeCount() - getLightVeeBayCount() - excessHeavyVeeBays, 0);
         numberWithoutTransport += Math.max(getSmallCraftCount() - getSmallCraftBayCount(), 0);
         numberWithoutTransport += Math.max(getFighterCount() - getFighterBayCount() - excessSmallCraftBays, 0);
+        numberWithoutTransport += Math.max(numBaBaysRequired - getBaBayCount(), 0);
         numberWithoutTransport += Math.max(calcInfantryPlatoons() - getInfantryBayCount(), 0);
 
         BigDecimal transportNeeded = new BigDecimal(numberWithoutTransport);
@@ -1080,12 +1093,12 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                 if (techLevel > TechConstants.T_INTRO_BOXSET) {
                     if (TechConstants.isClan(techLevel)) {
                         setNumberClan(getNumberClan().add(value));
-                        if (!isConventionalInfanry(u)) {
+                        if (!isConventionalInfantry(u)) {
                             setCountClan(getCountClan() + 1);
                         }
                     } else {
                         setNumberIS2(getNumberIS2().add(value));
-                        if (!isConventionalInfanry(u)) {
+                        if (!isConventionalInfantry(u)) {
                             setCountIS2(getCountIS2() + 1);
                         }
                     }

@@ -3719,17 +3719,17 @@ public class Campaign implements Serializable, ITechManager {
                 }
             }
         }
-        
+
         // clean up non-existent unit references in force unit lists
         for(Force force : forceIds.values()) {
             List<UUID> orphanForceUnitIDs = new ArrayList<>();
-            
+
             for(UUID unitID : force.getUnits()) {
                 if(getUnit(unitID) == null) {
                     orphanForceUnitIDs.add(unitID);
                 }
             }
-            
+
             for(UUID unitID : orphanForceUnitIDs) {
                 force.removeUnit(unitID);
             }
@@ -4229,12 +4229,7 @@ public class Campaign implements Serializable, ITechManager {
             }
         	//now check for planetary events
             for(Planet p : psystem.getPlanets()) {
-                List<Planet.PlanetaryEvent> customEvents = new ArrayList<>();
-	            for(Planet.PlanetaryEvent event : p.getEvents()) {
-	                if(event.custom) {
-	                    customEvents.add(event);
-	                }
-	            }
+                List<Planet.PlanetaryEvent> customEvents = p.getCustomEvents();
 	            if(!customEvents.isEmpty()) {
 	            	if(!startedSystem) {
 	            		//only write this if we haven't already started the system

@@ -773,12 +773,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
         choiceStatus.setModel(statusModel);
         choiceStatus.setName("choiceStatus"); // NOI18N
-        
+
         // dynamically update victory/defeat dropdown based on objective checkboxes
-        int scenarioStatus = objectiveProcessor.determineScenarioStatus(tracker.getScenario(), 
+        int scenarioStatus = objectiveProcessor.determineScenarioStatus(tracker.getScenario(),
                 new HashMap<ScenarioObjective, Boolean>(), getObjectiveUnitCounts());
         choiceStatus.setSelectedIndex(scenarioStatus - 1);
-        
+
         pnlStatus.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 5));
         pnlStatus.add(lblStatus);
         pnlStatus.add(choiceStatus);
@@ -1022,7 +1022,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
         pack();
     }
-    
+
     private void generateObjectiveStatusPanel() {
         pnlObjectiveStatus = new JPanel();
         if (usePanel(OBJECTIVEPANEL)) {
@@ -1036,12 +1036,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
             pnlObjectiveStatus.add(new JLabel("Objectives:"), gbc);
             objectiveCheckboxes = new HashMap<>();
             objectiveOverrideCheckboxes = new HashMap<>();
-            
+
             objectiveProcessor.evaluateScenarioObjectives(tracker);
-            
+
             Map<ScenarioObjective, Set<String>> potentialObjectiveUnits = objectiveProcessor.getPotentialObjectiveUnits();
             Map<ScenarioObjective, Set<String>> qualifyingObjectiveUnits = objectiveProcessor.getQualifyingObjectiveUnits();
-            
+
             for(ScenarioObjective objective : tracker.getScenario().getScenarioObjectives()) {
                 // first, we determine the list of units that are potentially associated with the current objective
                 List<String> currentObjectiveUnits = new ArrayList<>();
@@ -1051,9 +1051,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
                         currentObjectiveUnits.add(unitID);
                     }
                 }
-                
+
                 // if it's a custom objective or there are no associated units, we display
-                // a single line and an override 
+                // a single line and an override
                 if(currentObjectiveUnits.size() == 0) {
                     JCheckBox chkObjective = new JCheckBox();
                     chkObjective.setText(objective.getDescription());
@@ -1061,7 +1061,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
                     gbc.gridy++;
                     pnlObjectiveStatus.add(chkObjective, gbc);
                     objectiveOverrideCheckboxes.put(objective, chkObjective);
-                    
+
                     chkObjective.addItemListener(new ItemListener() {
                         @Override
                         public void itemStateChanged(ItemEvent e) {
@@ -1073,21 +1073,21 @@ public class ResolveScenarioWizardDialog extends JDialog {
                             }
                         }
                     });
-                    
+
                     continue;
                 }
-                
+
                 // each "standard" objective has a list of units that determine whether it's completed
                 // the objective matrix contains a set of unit IDs that meet the objective
                 JLabel lblObjective = new JLabel(objective.toShortString());
                 gbc.gridy++;
                 pnlObjectiveStatus.add(lblObjective, gbc);
-                
+
                 objectiveCheckboxes.put(objective, new ArrayList<>());
-                
+
                 for(String unitID : currentObjectiveUnits) {
                     UUID uuid = UUID.fromString(unitID);
-                    
+
                     JCheckBox chkItemState = new JCheckBox(tracker.getAllInvolvedUnits().get(uuid).getShortName());
                     chkItemState.setSelected(qualifyingObjectiveUnits.get(objective).contains(unitID));
                     chkItemState.setActionCommand(unitID);
@@ -1096,7 +1096,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
                     pnlObjectiveStatus.add(chkItemState, gbc);
                     objectiveCheckboxes.get(objective).add(chkItemState);
                 }
-                
+
                 gbc.gridy++;
                 updateObjectiveDisplay(objective, lblObjective);
             }
@@ -1145,7 +1145,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             pnlMain.setPreferredSize(pnlPrisonerStatus.getLayout().preferredLayoutSize(pnlMain));
             break;
         }
-        
+
 
         javax.swing.SwingUtilities.invokeLater(() -> scrMain.getVerticalScrollBar().setValue(0));
         pack();
@@ -1197,29 +1197,29 @@ public class ResolveScenarioWizardDialog extends JDialog {
         btnFinish.setEnabled(false);
         boolean passedCurrent = false;
         boolean switchMade = false;
-        
+
         // if we're done with the units panel, update the objectives state based on selection status
         // and damaged editing results
         if (currentPanel.equals(ResolveScenarioWizardDialog.UNITSPANEL)) {
             for(int x = 0; x < chksTotaled.size(); x++) {
                 JCheckBox box = chksTotaled.get(x);
                 UUID id = UUID.fromString(box.getActionCommand());
-                objectiveProcessor.updateObjectiveEntityState(tracker.getAllInvolvedUnits().get(id), 
+                objectiveProcessor.updateObjectiveEntityState(tracker.getAllInvolvedUnits().get(id),
                         false, box.isSelected(), !tracker.playerHasBattlefieldControl());
             }
         }
-        
+
         // if we're done with the salvage panel, update the objectives state based on selection status
         // and damaged editing results
         if (currentPanel.equals(ResolveScenarioWizardDialog.SALVAGEPANEL)) {
             for(int x = 0; x < escapeBoxes.size(); x++) {
                 JCheckBox box = escapeBoxes.get(x);
                 UUID id = UUID.fromString(box.getActionCommand());
-                objectiveProcessor.updateObjectiveEntityState(tracker.getAllInvolvedUnits().get(id), 
+                objectiveProcessor.updateObjectiveEntityState(tracker.getAllInvolvedUnits().get(id),
                         box.isSelected(), false, tracker.playerHasBattlefieldControl());
             }
         }
-        
+
         // now update the objective panel if we updated objective state
         if(usePanel(ResolveScenarioWizardDialog.OBJECTIVEPANEL)) {
             if(currentPanel.equals(ResolveScenarioWizardDialog.UNITSPANEL) ||
@@ -1232,7 +1232,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 }
             }
         }
-        
+
         for(int i = 0; i < panelOrder.length; i++) {
             String name = panelOrder[i];
             if(passedCurrent) {
@@ -1346,12 +1346,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
         //now process
         tracker.resolveScenario(choiceStatus.getSelectedIndex()+1,txtReport.getText());
-        
+
         if(tracker.getScenario().hasObjectives()) {
             // process objectives here
             for(ScenarioObjective objective : tracker.getScenario().getScenarioObjectives()) {
                 int qualifyingUnitCount = 0;
-                
+
                 if(objectiveCheckboxes.containsKey(objective)) {
                     for(JCheckBox box : objectiveCheckboxes.get(objective)) {
                         if(box.isSelected()) {
@@ -1359,16 +1359,16 @@ public class ResolveScenarioWizardDialog extends JDialog {
                         }
                     }
                 }
-                
+
                 Boolean override = null;
                 if(objectiveOverrideCheckboxes.containsKey(objective)) {
                     override = objectiveOverrideCheckboxes.get(objective).isSelected();
                 }
-                
+
                 objectiveProcessor.processObjective(objective, qualifyingUnitCount, override, tracker, false);
             }
         }
-        
+
         this.setVisible(false);
     }
 
@@ -1411,26 +1411,26 @@ public class ResolveScenarioWizardDialog extends JDialog {
      */
     private Map<ScenarioObjective, Integer> getObjectiveUnitCounts() {
         Map<ScenarioObjective, Integer> objectiveUnitCounts = new HashMap<>();
-        
+
         if(objectiveCheckboxes == null) {
             return objectiveUnitCounts;
         }
-        
+
         for(ScenarioObjective objective : objectiveCheckboxes.keySet()) {
             int qualifyingUnitCount = 0;
-            
+
             for(JCheckBox box : objectiveCheckboxes.get(objective)) {
                 if(box.isSelected()) {
                     qualifyingUnitCount++;
                 }
             }
-            
+
             objectiveUnitCounts.put(objective, qualifyingUnitCount);
         }
-        
+
         return objectiveUnitCounts;
     }
-    
+
     private void checkSalvageRights() {
         // Perform a little magic to make sure we aren't trying to do both of these things
         for (JCheckBox escaped : escapeBoxes) {
@@ -1498,17 +1498,17 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private void updatePreviewPanel() {
 
         // set victory/defeat status based on scenario objectives
-        int scenarioStatus = objectiveProcessor.determineScenarioStatus(tracker.getScenario(), 
+        int scenarioStatus = objectiveProcessor.determineScenarioStatus(tracker.getScenario(),
                 new HashMap<ScenarioObjective, Boolean>(), getObjectiveUnitCounts());
         choiceStatus.setSelectedIndex(scenarioStatus - 1);
-        
+
          // do a "dry run" of the scenario objectives to output a report
         StringBuilder sb = new StringBuilder();
-        
+
         if(tracker.getScenario().hasObjectives()) {
             for(ScenarioObjective objective : tracker.getScenario().getScenarioObjectives()) {
                 int qualifyingUnitCount = 0;
-                
+
                 if(objectiveCheckboxes.containsKey(objective)) {
                     for(JCheckBox box : objectiveCheckboxes.get(objective)) {
                         if(box.isSelected()) {
@@ -1516,19 +1516,19 @@ public class ResolveScenarioWizardDialog extends JDialog {
                         }
                     }
                 }
-                
+
                 Boolean override = null;
                 if(objectiveOverrideCheckboxes.containsKey(objective)) {
                     override = objectiveOverrideCheckboxes.get(objective).isSelected();
                 }
-                
+
                 sb.append(objectiveProcessor.processObjective(objective, qualifyingUnitCount, override, tracker, true));
                 sb.append("\n");
             }
-            
+
             txtReport.setText(sb.toString());
         }
-        
+
         //pilots first
         String missingNames = "";
         String kiaNames = "";
@@ -1660,7 +1660,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
 
         PersonViewPanel pvp = new PersonViewPanel(
-                pstatus.getPerson(),tracker.getCampaign(),tracker.getCampaign().getApp().getIconPackage());
+                pstatus.getPerson(),tracker.getCampaign(),tracker.getCampaign().getApp().getCampaigngui());
 
         final JDialog dialog = new JDialog(frame, "Prisoner View", true); //$NON-NLS-1$
         dialog.getContentPane().setLayout(new GridBagLayout());
@@ -1697,7 +1697,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         dialog.setLocationRelativeTo(frame);
         dialog.setVisible(true);
     }
-    
+
     /**
      * Event handler for when the user clicks on an objective unit checkbox
      * @param objective The objective to check
@@ -1705,13 +1705,13 @@ public class ResolveScenarioWizardDialog extends JDialog {
      */
     private void updateObjectiveDisplay(ScenarioObjective objective, JLabel label) {
         int qualifyingUnitCount = 0;
-        
+
         for(JCheckBox checkBox : objectiveCheckboxes.get(objective)) {
             if(checkBox.isSelected()) {
                 qualifyingUnitCount++;
             }
         }
-        
+
         boolean objectiveMet = objectiveProcessor.objectiveMet(objective, qualifyingUnitCount);
         if(objectiveMet) {
             label.setForeground(Color.green.darker());
@@ -1719,7 +1719,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             label.setForeground(Color.RED);
         }
     }
-    
+
 
     private class CheckTotalListener implements ItemListener {
 
