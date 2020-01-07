@@ -27,7 +27,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import megamek.common.*;
+import megamek.common.ASFBay;
+import megamek.common.BattleArmor;
+import megamek.common.BattleArmorBay;
+import megamek.common.Bay;
+import megamek.common.Dropship;
+import megamek.common.SpaceStation;
+import megamek.common.Entity;
+import megamek.common.HeavyVehicleBay;
+import megamek.common.SuperHeavyVehicleBay;
+import megamek.common.Infantry;
+import megamek.common.InfantryBay;
+import megamek.common.Jumpship;
+import megamek.common.LightVehicleBay;
+import megamek.common.MechBay;
+import megamek.common.SmallCraftBay;
+import megamek.common.UnitType;
 
 import megamek.common.logging.LogLevel;
 import megamek.common.logging.MMLogger;
