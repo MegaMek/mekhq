@@ -513,11 +513,9 @@ public class CampaignOpsReputationTest {
                 "    Fighter Bays:                2 needed /   2 available (plus 0 excess small craft)\n" +
                 "    Small Craft Bays:            0 needed /   0 available\n" +
                 "    Protomech Bays:              0 needed /   0 available\n" +
-                //"    Super Heavy Vehicle Bays:    0 needed /   0 available\n" +
-                "    Heavy Vehicle Bays:          0 needed /   0 available\n" +
-                //"    Heavy Vehicle Bays:          0 needed /   0 available (plus 0 excess super heavy)\n" +
-                "    Light Vehicle Bays:          8 needed /  22 available (plus 0 excess heavy)\n" +
-                //"    Light Vehicle Bays:          8 needed /  22 available (plus 0 excess heavy and super heavy)\n" +
+                "    Super Heavy Vehicle Bays:    0 needed /   0 available\n" +
+                "    Heavy Vehicle Bays:          0 needed /   0 available (plus 0 excess super heavy)\n" +
+                "    Light Vehicle Bays:          8 needed /  22 available (plus 0 excess heavy and 0 excess super heavy)\n" +
                 "    BA Bays:                     0 needed /   0 available\n" +
                 "    Infantry Bays:               1 needed /   4 available\n" +
                 "    Docking Collars:             1 needed /   4 available\n" +
@@ -571,11 +569,9 @@ public class CampaignOpsReputationTest {
                 "    Fighter Bays:                0 needed /   0 available (plus 0 excess small craft)\n" +
                 "    Small Craft Bays:            0 needed /   0 available\n" +
                 "    Protomech Bays:              0 needed /   0 available\n" +
-                //"    Super Heavy Vehicle Bays:    0 needed /   0 available\n" +
-                "    Heavy Vehicle Bays:          0 needed /   0 available\n" +
-                //"    Heavy Vehicle Bays:          0 needed /   0 available\n (plus 0 excess super heavy)" +
-                "    Light Vehicle Bays:          0 needed /   0 available (plus 0 excess heavy)\n" +
-                //"    Light Vehicle Bays:          0 needed /   0 available (plus 0 excess heavy and super heavy))\n" +
+                "    Super Heavy Vehicle Bays:    0 needed /   0 available\n" +
+                "    Heavy Vehicle Bays:          0 needed /   0 available (plus 0 excess super heavy)\n" +
+                "    Light Vehicle Bays:          0 needed /   0 available (plus 0 excess heavy and 0 excess super heavy)\n" +
                 "    BA Bays:                     0 needed /   0 available\n" +
                 "    Infantry Bays:               0 needed /   0 available\n" +
                 "    Docking Collars:             0 needed /   0 available\n" +
@@ -654,11 +650,9 @@ public class CampaignOpsReputationTest {
                           "    Fighter Bays:                2 needed /   2 available (plus 0 excess small craft)\n" +
                           "    Small Craft Bays:            0 needed /   0 available\n" +
                           "    Protomech Bays:              0 needed /   0 available\n" +
-                          //"    Super Heavy Vehicle Bays:    0 needed /   0 available\n" +
-                          "    Heavy Vehicle Bays:          0 needed /   0 available\n" +
-                          //"    Heavy Vehicle Bays:          0 needed /   0 available (plus 0 excess super heavy)\n" +
-                          "    Light Vehicle Bays:          8 needed /  22 available (plus 0 excess heavy)\n" +
-                          //"    Light Vehicle Bays:          8 needed /  22 available (plus 0 excess heavy and super heavy)\n" +
+                          "    Super Heavy Vehicle Bays:    0 needed /   0 available\n" +
+                          "    Heavy Vehicle Bays:          0 needed /   0 available (plus 0 excess super heavy)\n" +
+                          "    Light Vehicle Bays:          8 needed /  22 available (plus 0 excess heavy and 0 excess super heavy)\n" +
                           "    BA Bays:                     0 needed /   0 available\n" +
                           "    Infantry Bays:               1 needed /   4 available\n" +
                           "    Docking Collars:             1 needed /   4 available\n" +
@@ -673,11 +667,9 @@ public class CampaignOpsReputationTest {
                    "    Fighter Bays:                2 needed /   2 available (plus 0 excess small craft)\n" +
                    "    Small Craft Bays:            0 needed /   0 available\n" +
                    "    Protomech Bays:              0 needed /   0 available\n" +
-                   //"    Super Heavy Vehicle Bays:    0 needed /   0 available\n" +
-                   "    Heavy Vehicle Bays:          4 needed /   0 available\n" +
-                   //"    Heavy Vehicle Bays:          4 needed /   0 available (plus 0 excess super heavy)\n" +
-                   "    Light Vehicle Bays:          8 needed /  22 available (plus 0 excess heavy)\n" +
-                   //"    Light Vehicle Bays:          8 needed /  22 available (plus 0 excess heavy and super heavy)\n" +
+                   "    Super Heavy Vehicle Bays:    0 needed /   0 available\n" +
+                   "    Heavy Vehicle Bays:          4 needed /   0 available (plus 0 excess super heavy)\n" +
+                   "    Light Vehicle Bays:          8 needed /  22 available (plus 0 excess heavy and 0 excess super heavy)\n" +
                    "    BA Bays:                     0 needed /   0 available\n" +
                    "    Infantry Bays:               1 needed /   4 available\n" +
                    "    Docking Collars:             1 needed /   4 available\n" +
@@ -692,11 +684,9 @@ public class CampaignOpsReputationTest {
                    "    Fighter Bays:                2 needed /   2 available (plus 0 excess small craft)\n" +
                    "    Small Craft Bays:            0 needed /   0 available\n" +
                    "    Protomech Bays:              0 needed /   0 available\n" +
-                   //"    Super Heavy Vehicle Bays:    0 needed /   0 available\n" +
-                   "    Heavy Vehicle Bays:          4 needed /   8 available\n" +
-                   //"    Heavy Vehicle Bays:          4 needed /   8 available (plus 0 excess super heavy)\n" +
-                   "    Light Vehicle Bays:          8 needed /  22 available (plus 4 excess heavy)\n" +
-                   //"    Light Vehicle Bays:          8 needed /  22 available (plus 4 excess heavy and super heavy)\n" +
+                   "    Super Heavy Vehicle Bays:    0 needed /   0 available\n" +
+                   "    Heavy Vehicle Bays:          4 needed /   8 available (plus 0 excess super heavy)\n" +
+                   "    Light Vehicle Bays:          8 needed /  22 available (plus 4 excess heavy and 0 excess super heavy)\n" +
                    "    BA Bays:                     0 needed /   0 available\n" +
                    "    Infantry Bays:               1 needed /   4 available\n" +
                    "    Docking Collars:             1 needed /   4 available\n" +
