@@ -1,0 +1,12 @@
+3026 Free Worlds League Tank - Heavy
+Pike Support Vehicle,1
+Pike Support Vehicle,2
+Von Luckner,3
+Bulldog,4
+Bulldog,5
+SRM Carrier,6
+LRM Carrier,5
+Manticore Heavy Tank,4
+Manticore Heavy Tank,3
+Von Luckner,2
+LRM Carrier,1

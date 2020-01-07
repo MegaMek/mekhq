@@ -1,0 +1,12 @@
+3026 Capellan Confederation Tank - Medium
+Maxim,1
+Hetzer,2
+Hetzer,3
+Condor,4
+Drillson,5
+Goblin,6
+Vedette,5
+Hetzer,4
+Goblin,3
+Condor (Liao),2
+Maxim,1

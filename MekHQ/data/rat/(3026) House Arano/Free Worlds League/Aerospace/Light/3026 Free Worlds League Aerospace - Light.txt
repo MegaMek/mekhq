@@ -1,0 +1,12 @@
+3026 Free Worlds League Aerospace - Light
+Seydlitz SYF-21,1
+Centurion,2
+Seydlitz SYF-21,3
+Centurion,4
+Cheetah F-10,5
+Cheetah F-10,6
+Sabre,5
+Cheetah F-12-S,4
+Thrush TR-7,3
+Cheetah F-10,2
+Sabre,1

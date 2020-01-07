@@ -1,0 +1,12 @@
+3026 Federated Suns Aerospace - Heavy
+Chippewa CHP-W10,1
+Chippewa CHP-W10,2
+Stuka STU-K15,3
+Thunderbird,4
+Eagle,5
+Stuka STU-K15,6
+Stuka STU-K10,5
+Eagle,4
+Eagle,3
+Thunderbird,2
+Eagle,1

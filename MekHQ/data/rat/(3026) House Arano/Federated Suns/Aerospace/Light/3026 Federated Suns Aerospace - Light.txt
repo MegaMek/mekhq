@@ -1,0 +1,12 @@
+3026 Federated Suns Aerospace - Light
+Centurion,1
+Thrush TR-7,2
+Seydlitz SYD-21,3
+Seydlitz SYD-21,4
+Sparrowhawk SPR-H5,5
+Sparrowhawk SPR-H5,6
+Centurion,5
+Sabre,4
+Sabre,3
+Sparrowhawk SPR-H8,2
+Centurion,1

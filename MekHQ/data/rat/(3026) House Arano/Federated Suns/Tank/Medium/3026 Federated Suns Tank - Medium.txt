@@ -1,0 +1,12 @@
+3026 Federated Suns Tank - Medium
+Hetzer,1
+Condor,2
+Goblin,3
+Maxim,4
+Drillson,5
+Goblin,6
+Condor,5
+Vedette,4
+Drillson,3
+Hetzer,2
+Drillson,1

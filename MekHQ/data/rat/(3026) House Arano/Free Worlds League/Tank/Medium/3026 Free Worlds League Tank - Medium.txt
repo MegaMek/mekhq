@@ -1,0 +1,12 @@
+3026 Free Worlds League Tank - Medium
+Maxim,1
+Hetzer,2
+Hetzer,3
+Goblin,4
+Goblin,5
+Drillson,6
+Drillson,5
+Vedette,4
+Vedette,3
+Condor,2
+Condor,1

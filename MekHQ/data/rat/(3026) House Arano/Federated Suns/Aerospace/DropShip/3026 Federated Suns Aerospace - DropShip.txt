@@ -1,0 +1,12 @@
+3026 Federated Suns Aerospace - DropShip
+Achilles,1
+Intruder,2
+Seeker,3
+Overlord,4
+Avenger,5
+Union,6
+Leopard,5
+Gazelle,4
+Leopard CV,3
+Triumph,2
+Fortress,1

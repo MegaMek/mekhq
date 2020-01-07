@@ -1,0 +1,12 @@
+3026 Capellan Confederation Tank - Heavy
+Pike Support Vehicle,1
+Brutus Assault Tank,2
+Patton,3
+Manticore Heavy Tank,4
+Rommel,5
+Bulldog,6
+Manticore Heavy Tank,5
+Von Luckner,4
+SRM Carrier,3
+LRM Carrier,2
+LRM Carrier,1

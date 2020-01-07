@@ -1,0 +1,12 @@
+3026 Federated Suns Tank - Light
+Warrior,1
+Warrior,2
+Saladin,3
+Packrat,4
+Hunter,5
+Striker,6
+Pegasus,5
+J. Edgar,4
+Galleon,3
+Saracen,2
+Scimitar,1

@@ -1,0 +1,12 @@
+3026 Capellan Confederation Tank - Light
+Warrior,1
+Pegasus,2
+Galleon,3
+Saladin,4
+Galleon,5
+Hunter,6
+Warrior,5
+Scimitar,4
+Scorpion,3
+Scorpion,2
+Saracen,1

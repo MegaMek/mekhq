@@ -1,0 +1,12 @@
+3026 Federated Suns Tank - Heavy
+Von Luckner,1
+Rommel,2
+SRM Carrier,3
+Bulldog,4
+Patton,5
+Manticore Heavy Tank,6
+Rommel,5
+Bulldog,4
+LRM Carrier,3
+Brutus Assault Tank,2
+Pike Support Vehicle,1

@@ -1,0 +1,12 @@
+3026 Free Worlds League Tank - Light
+Ferret Light Scout,1
+Harasser,2
+Hunter,3
+Saladin,4
+Warrior,5
+Galleon,6
+Scorpion,5
+Scimitar,4
+Saracen,3
+Pegasus,2
+J Edgar,1

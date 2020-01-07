@@ -1,0 +1,12 @@
+3026 Capellan Confederation Tank - Assault
+Ontos Heavy Tank,1
+Schrek PPC Carrier,2
+Partisan Heavy Tank,3
+Partisan Heavy Tank,4
+Ontos Heavy Tank,5
+Demolisher,6
+Demolisher,5
+Behemoth Heavy Tank,4
+Schrek PPC Carrier,3
+Behemoth Heavy Tank,2
+Behemoth Heavy Tank,1
