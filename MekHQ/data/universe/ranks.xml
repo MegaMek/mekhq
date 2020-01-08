@@ -4664,7 +4664,7 @@
 	</rankSystem>
 	<rankSystem>
 		<!-- Aurigan Coalition -->
-		<system>14</system>
+		<system>18</system>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
 			<officer>false</officer>
