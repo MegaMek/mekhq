@@ -497,4 +497,19 @@ public class FieldManualMercRevDragoonsRatingTest {
                    "    Warship w/ Collar?       No";
         assertEquals(expected, testRating.getTransportationDetails());
     }
+
+    @Test
+    public void testSHVeeBayOverflow() {
+        FieldManualMercRevDragoonsRating testRating = spy(new FieldManualMercRevDragoonsRating(mockCampaign));
+        testRating.initValues();
+        doReturn(2).when(testRating).getSuperHeavyVeeBayCount();
+        doReturn(2).when(testRating).getHeavyVeeBayCount();
+        doReturn(2).when(testRating).getLightVeeBayCount();
+        doReturn(1).when(testRating).getSuperHeavyVeeCount();
+        doReturn(0).when(testRating).getHeavyVeeCount();
+        doReturn(5).when(testRating).getLightVeeCount();
+
+        assertEquals(BigDecimal.valueOf(100.0)
+                .setScale(0, BigDecimal.ROUND_HALF_EVEN), testRating.getTransportPercent());
+    }
 }
