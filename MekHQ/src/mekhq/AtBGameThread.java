@@ -68,6 +68,11 @@ public class AtBGameThread extends GameThread {
         super(name, c, app, units, started);
         this.scenario = scenario;
     }
+    
+    // String tokens for dialog boxes used for transport loading
+    private static String LOAD_FTR_DIALOG_TEXT = "Would you like the fighters assigned to %s to deploy loaded into its bays?";
+    private static String LOAD_FTR_DIALOG_TITLE = "Load Fighters on Transport?";
+
 
     @Override
     public void run() {
@@ -321,9 +326,8 @@ public class AtBGameThread extends GameThread {
                             // Let the player choose to load fighters and/or ground units on each transport
                             if (transport.isCarryingAero()) {
                                 loadFighters = (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
-                                                    "Would you like the fighters assigned to " + transport.getName()
-                                                        + " to deploy loaded into its bays?",
-                                                    "Load Fighters on Transport?", JOptionPane.YES_NO_OPTION));
+                                                    StringBuilder,
+                                                    AtBGameThread.LOAD_FTR_DIALOG_TITLE, JOptionPane.YES_NO_OPTION));
                             }
                             if (transport.isCarryingGround()) {
                                 loadGround = (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
