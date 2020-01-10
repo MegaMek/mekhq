@@ -1617,6 +1617,7 @@ public class Utilities {
      */
     public static void loadPlayerTransports(int trnId, Set<Integer> toLoad,
                 Client client, boolean loadFighters, boolean loadGround) {
+        String METHOD_NAME = "loadPlayerTransports(int,Set<Integer>,Client,boolean,boolean)";
         if (!loadFighters && !loadGround) {
             //Nothing to do. Get outta here!
             return;
@@ -1640,8 +1641,20 @@ public class Utilities {
             // And now load the units
             if (cargo.isFighter() && loadFighters && transport.canLoad(cargo, false) && cargo.getTargetBay() != -1) {
                 client.sendLoadEntity(id, trnId, cargo.getTargetBay());
+                // Add a wait to make sure that we don't start processing client.sendLoadEntity out of order
+                try {
+                    Thread.sleep(500);
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(Utilities.class, METHOD_NAME, e); //$NON-NLS-1$
+                }
             } else if(loadGround && transport.canLoad(cargo, false) && cargo.getTargetBay() != -1) {
                 client.sendLoadEntity(id, trnId, cargo.getTargetBay());
+                // Add a wait to make sure that we don't start processing client.sendLoadEntity out of order
+                try {
+                    Thread.sleep(500);
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(Utilities.class, METHOD_NAME, e); //$NON-NLS-1$
+                }
             }
         }
     }
