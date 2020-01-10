@@ -361,21 +361,8 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                                     "Delete Force?", JOptionPane.YES_NO_OPTION)) {
                         return;
                     }
-                    for (UUID id : force.getAllUnits()) {
-                        Unit unit = gui.getCampaign().getUnit(id);
-                        if (unit != null) {
-                            for (UUID oldShipId : unit.getTransportShipId().keySet()) {
-                                Unit oldShip = gui.getCampaign().getUnit(oldShipId);
-                                if (oldShip != null) {
-                                    oldShip.unloadFromTransportShip(unit);
-                                }
-                            }
-                            // If the unit IS a transport, unassign all units from it
-                            if (!unit.getTransportedUnits().isEmpty()) {
-                                unit.unloadTransportShip();
-                            }
-                        }
-                    }
+                    // Clear any transport assignments of units in the deleted force
+                    
                     gui.getCampaign().removeForce(force);
                 }
             }
@@ -1497,5 +1484,28 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
 
         return new CamoChoiceDialog(gui.getFrame(), true, category, fileName,
             gui.getCampaign().getColorIndex(), gui.getIconPackage().getCamos());
+    }
+    
+    /**
+     * Worker function to make sure transport assignment data gets cleared out when unit(s) are removed from the TO&E
+     * @param unitsToUpdate A vector of UUIDs of the units that we need to update. This can be either a collection that the player
+     * has selected or all units in a given force
+     */
+    private void clearTransportAssignment(Vector<UUID> unitsToUpdate) {
+        for (UUID id : force.getAllUnits()) {
+            Unit unit = gui.getCampaign().getUnit(id);
+            if (unit != null) {
+                for (UUID oldShipId : unit.getTransportShipId().keySet()) {
+                    Unit oldShip = gui.getCampaign().getUnit(oldShipId);
+                    if (oldShip != null) {
+                        oldShip.unloadFromTransportShip(unit);
+                    }
+                }
+                // If the unit IS a transport, unassign all units from it
+                if (!unit.getTransportedUnits().isEmpty()) {
+                unit.unloadTransportShip();
+                }
+            }
+        }
     }
 }
