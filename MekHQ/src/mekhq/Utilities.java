@@ -1646,6 +1646,13 @@ public class Utilities {
         }
     }
     
+    /**
+     * Method that loops through a Transport ship's bays and finds one with enough available space to load the Cargo unit
+     * Helps assign a bay number to the Unit record so that transport bays can be automatically filled once a game of MegaMek is started
+     * @param cargo The Entity we wish to load into a bay
+     * @param transport The Bay-equipped Entity we want to load Cargo aboard
+     * @return integer representing the (lowest) bay number on Transport that has space to carry Cargo
+     */
     public static int selectBestBayFor(Entity cargo, Entity transport) {
         if (cargo.isFighter()) {
             // Try to load ASF bays first, so as not to hog SC bays

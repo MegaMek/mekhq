@@ -6834,6 +6834,11 @@ public class Campaign implements Serializable, ITechManager {
         return networks;
     }
     
+    /**
+     * Method that returns a Vector of the unique name Strings of all Naval C3 networks that have at least 1 free node
+     * Adapted from getAvailableC3iNetworks() as the two technologies have very similar workings
+     * @return
+     */
     public Vector<String[]> getAvailableNC3Networks() {
         Vector<String[]> networks = new Vector<String[]>();
         Vector<String> networkNames = new Vector<String>();
