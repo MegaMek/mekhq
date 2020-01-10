@@ -72,6 +72,8 @@ public class AtBGameThread extends GameThread {
     // String tokens for dialog boxes used for transport loading
     private static String LOAD_FTR_DIALOG_TEXT = "Would you like the fighters assigned to %s to deploy loaded into its bays?";
     private static String LOAD_FTR_DIALOG_TITLE = "Load Fighters on Transport?";
+    private static String LOAD_GND_DIALOG_TEXT = "Would you like the ground units assigned to %s to deploy loaded into its bays?";
+    private static String LOAD_GND_DIALOG_TITLE = "Load Ground Units on Transport?";
 
 
     @Override
@@ -326,14 +328,13 @@ public class AtBGameThread extends GameThread {
                             // Let the player choose to load fighters and/or ground units on each transport
                             if (transport.isCarryingAero()) {
                                 loadFighters = (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
-                                                    StringBuilder,
+                                                    String.format(AtBGameThread.LOAD_FTR_DIALOG_TEXT, transport.getName()),
                                                     AtBGameThread.LOAD_FTR_DIALOG_TITLE, JOptionPane.YES_NO_OPTION));
                             }
                             if (transport.isCarryingGround()) {
                                 loadGround = (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
-                                                "Would you like the ground units assigned to " + transport.getName()
-                                                    + " to deploy loaded into its bays?",
-                                                "Load Ground Units on Transport?", JOptionPane.YES_NO_OPTION));
+                                        String.format(AtBGameThread.LOAD_GND_DIALOG_TEXT, transport.getName()),
+                                        AtBGameThread.LOAD_GND_DIALOG_TITLE, JOptionPane.YES_NO_OPTION));
                             }
                             // Now, send the load commands
                             if (loadFighters || loadGround) {
