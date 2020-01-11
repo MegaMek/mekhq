@@ -133,7 +133,7 @@
 		</rat>
 		<rat name='3026 Capellan Confederation Tank - Light'>
 			<factions>CC</factions>
-			<unitTypes>Tank</unitTypes>
+			<unitTypes>Tank,VTOL</unitTypes>
 			<weightClasses>L</weightClasses>
 			<ratings>F,D,C,B,A</ratings>
 		</rat>
@@ -204,7 +204,7 @@
 		</rat>
 		<rat name='3026 Federated Suns Tank - Light'>
 			<factions>FS</factions>
-			<unitTypes>Tank</unitTypes>
+			<unitTypes>Tank,VTOL</unitTypes>
 			<weightClasses>L</weightClasses>
 			<ratings>F,D,C,B,A</ratings>
 		</rat>
@@ -275,7 +275,7 @@
 		</rat>
 		<rat name='3026 Free Worlds League Tank - Light'>
 			<factions>FWL</factions>
-			<unitTypes>Tank</unitTypes>
+			<unitTypes>Tank,VTOL</unitTypes>
 			<weightClasses>L</weightClasses>
 			<ratings>F,D,C,B,A</ratings>
 		</rat>
@@ -346,7 +346,7 @@
 		</rat>
 		<rat name='3026 Magistracy of Canopus Tank - Light'>
 			<factions>MOC</factions>
-			<unitTypes>Tank</unitTypes>
+			<unitTypes>Tank,VTOL</unitTypes>
 			<weightClasses>L</weightClasses>
 			<ratings>F,D,C,B,A</ratings>
 		</rat>
@@ -417,7 +417,7 @@
 		</rat>
 		<rat name='3026 Mercenaries and Pirates Tank - Light'>
 			<factions>MERC,PIR,IND,PIND</factions>
-			<unitTypes>Tank</unitTypes>
+			<unitTypes>Tank,VTOL</unitTypes>
 			<weightClasses>L</weightClasses>
 			<ratings>F,D,C,B,A</ratings>
 		</rat>
@@ -488,7 +488,7 @@
 		</rat>
 		<rat name='3026 Taurian Concordat Tank - Light'>
 			<factions>TC</factions>
-			<unitTypes>Tank</unitTypes>
+			<unitTypes>Tank,VTOL</unitTypes>
 			<weightClasses>L</weightClasses>
 			<ratings>F,D,C,B,A</ratings>
 		</rat>

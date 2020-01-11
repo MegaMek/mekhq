@@ -1,6 +1,6 @@
 3026 Magistracy of Canopus Mech - Light
 Panther PNT-9R,1
-Urbanmech UM-R60,2
+UrbanMech UM-R60,2
 Firestarter FS9-H,3
 Javelin JVN-10N,4
 Locust LCT-1V,5

@@ -1,12 +1,12 @@
 3026 Capellan Confederation Aerospace - Medium
-Lightning,1
-Lightning,2
+Lightning LTN-G15,1
+Lightning LTN-G15,2
 Transit TR-11,3
 Transit TR-11,4
 Transit TR-11,5
 Transit TR-11,6
-Hellcat,5
-Hellcat,4
-Lightning,3
-Hellcat,2
+Hellcat HCT-213,5
+Hellcat HCT-213,4
+Lightning LTN-G15,3
+Hellcat HCT-213,2
 Transit TR-11,1

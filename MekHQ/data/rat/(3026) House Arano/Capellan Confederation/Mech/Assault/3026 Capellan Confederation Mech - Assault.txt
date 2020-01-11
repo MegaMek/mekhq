@@ -2,8 +2,8 @@
 Highlander HGN-733,1
 Atlas AS7-D,2
 Awesome AWS-8Q,3
-Battlemaster BLR-1G,4
-Battlemaster BLR-1G,5
+BattleMaster BLR-1G,4
+BattleMaster BLR-1G,5
 Charger CGR-1A1,6
 Goliath GOL-1H,5
 Awesome AWS-8Q,4

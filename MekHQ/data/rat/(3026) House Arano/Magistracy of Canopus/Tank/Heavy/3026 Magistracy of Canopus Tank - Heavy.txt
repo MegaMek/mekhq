@@ -1,12 +1,12 @@
 3026 Magistracy of Canopus Tank - Heavy
-Manticore Heavy Tank,1
-Rommel,2
-Pike Support Vehicle,3
-Manticore Heavy Tank,4
-Von Luckner,5
-LRM Carrier,6
-SRM Carrier,5
-Bulldog,4
-Patton,3
-Von Luckner,2
-SRM Carrier,1
+Manticore Heavy Tank (Standard),1
+Rommel Tank (Standard),2
+Pike Support Vehicle (Standard),3
+Manticore Heavy Tank (Standard),4
+Von Luckner Heavy Tank VNL-K65N,5
+LRM Carrier (Standard),6
+SRM Carrier (Standard),5
+Bulldog Medium Tank (Standard),4
+Patton Tank (Standard),3
+Von Luckner Heavy Tank VNL-K65N,2
+SRM Carrier (Standard),1

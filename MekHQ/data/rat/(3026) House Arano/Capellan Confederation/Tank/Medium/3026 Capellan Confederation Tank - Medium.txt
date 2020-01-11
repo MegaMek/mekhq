@@ -1,12 +1,12 @@
 3026 Capellan Confederation Tank - Medium
-Maxim,1
-Hetzer,2
-Hetzer,3
-Condor,4
-Drillson,5
-Goblin,6
-Vedette,5
-Hetzer,4
-Goblin,3
-Condor (Liao),2
-Maxim,1
+Maxim Heavy Hover Transport (Standard),1
+Hetzer Wheeled Assault Gun (Standard),2
+Hetzer Wheeled Assault Gun (Standard),3
+Condor Heavy Hover Tank (Standard),4
+Drillson Heavy Hover Tank (Standard),5
+Goblin Medium Tank (Standard),6
+Vedette Medium Tank (Standard),5
+Hetzer Wheeled Assault Gun (Standard),4
+Goblin Medium Tank (Standard),3
+Condor Heavy Hover Tank (Liao),2
+Maxim Heavy Hover Transport (Standard),1

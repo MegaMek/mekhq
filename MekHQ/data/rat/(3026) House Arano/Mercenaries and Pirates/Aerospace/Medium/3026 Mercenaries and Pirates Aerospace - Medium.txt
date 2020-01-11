@@ -1,12 +1,12 @@
 3026 Mercenaries and Pirates Aerospace - Medium
-Hellcat,1
-Lightning,2
+Hellcat HCT-213,1
+Lightning LTN-G15,2
 Stingray F-90,3
-Lightning,4
+Lightning LTN-G15,4
 Stingray F-90,5
-Hellcat,6
-Lightning,5
-Hellcat,4
+Hellcat HCT-213,6
+Lightning LTN-G15,5
+Hellcat HCT-213,4
 Lucifer LCF-R15,3
-Hellcat,2
+Hellcat HCT-213,2
 Lucifer LCF-R15,1

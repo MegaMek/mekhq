@@ -1,7 +1,7 @@
 3026 Capellan Confederation Mech - Medium
 Shadow Hawk SHD-2H,1
 Dervish DV-6M,2
-Whitworth WHT-1,3
+Whitworth WTH-1,3
 Enforcer ENF-4R,4
 Blackjack BJ-1,5
 Vindicator VND-1R,6

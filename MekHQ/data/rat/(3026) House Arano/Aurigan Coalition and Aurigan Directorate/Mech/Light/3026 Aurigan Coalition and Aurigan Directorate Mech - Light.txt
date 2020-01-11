@@ -2,7 +2,7 @@
 Spider SDR-5V,1
 Wasp WSP-1A,2
 Locust LCT-3V,3
-Urbanmech UM-R60,4
+UrbanMech UM-R60,4
 Wasp WSP-1A,5
 Locust LCT-1V,6
 Stinger STG-3R,5

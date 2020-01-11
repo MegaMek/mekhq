@@ -1,5 +1,5 @@
 3026 Capellan Confederation Mech - Light
-UrbanMech UM-60RL,1
+UrbanMech UM-R60L,1
 Spider SDR-5V,2
 Raven RVN-1X,3
 Wasp WSP-1L,4

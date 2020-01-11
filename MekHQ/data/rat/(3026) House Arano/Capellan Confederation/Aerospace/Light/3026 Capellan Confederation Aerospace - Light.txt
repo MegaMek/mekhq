@@ -1,12 +1,12 @@
 3026 Capellan Confederation Aerospace - Light
-Sabre,1
-Sabre,2
-Sabre,3
-Sabre,4
+Sabre SB-27,1
+Sabre SB-27,2
+Sabre SB-27,3
+Sabre SB-27,4
 Thrush TR-7,5
 Thrush TR-7,6
 Thrush TR-7,5
-Centurion,4
-Centurion,3
-Centurion,2
-Centurion,1
+Centurion CNT-1D,4
+Centurion CNT-1D,3
+Centurion CNT-1D,2
+Centurion CNT-1D,1

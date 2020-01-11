@@ -1,12 +1,12 @@
 3026 Mercenaries and Pirates Tank - Heavy
-Bulldog,1
-Manticore Heavy Tank,2
-Laser Carrier,3
-Bulldog (LRM),4
-Bulldog,5
-Manticore Heavy Tank,6
-LRM Carrier,5
-SRM Carrier,4
-Bulldog (AC),3
-SRM Carrier,2
-LRM Carrier,1
+Bulldog Medium Tank (Standard),1
+Manticore Heavy Tank (Standard),2
+Laser Carrier (Standard),3
+Bulldog Medium Tank (LRM),4
+Bulldog Medium Tank (Standard),5
+Manticore Heavy Tank (Standard),6
+LRM Carrier (Standard),5
+SRM Carrier (Standard),4
+Bulldog Medium Tank (AC2),3
+SRM Carrier (Standard),2
+LRM Carrier (Standard),1

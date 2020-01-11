@@ -1,12 +1,12 @@
 3026 Taurian Concordat Aerospace - Heavy
-Stuka STU-5K,1
-Eagle,2
+Stuka STU-K5,1
+Eagle EGL-R6,2
 Slayer SL-15,3
 Chippewa CHP-W5,4
-Eagle,5
+Eagle EGL-R6,5
 Chippewa CHP-W5,6
 Thunderbird TRB-D36,5
 Vulcan VLC-5N,4
 Vulcan VLC-5N,3
-Eagle,2
+Eagle EGL-R6,2
 Stuka STU-K5,1

@@ -1,12 +1,12 @@
 3026 Mercenaries and Pirates Tank - Assault
-Rhino (Flamer),1
-Schrek AC Carrier,2
-Behemoth Heavy Tank,3
-Behemoth Heavy Tank,4
-Schrek PPC Carrier,5
-Partisan Heavy Tank,6
-Demolisher,5
-Demolisher,4
-Rhino,3
-Demolisher,2
-Rhino (MG),1
+Rhino Fire Support Tank (Flamer),1
+Schrek AC Carrier (Standard),2
+Behemoth Heavy Tank (Standard),3
+Behemoth Heavy Tank (Standard),4
+Schrek PPC Carrier (Standard),5
+Partisan Heavy Tank (Standard),6
+Demolisher Heavy Tank (Standard Mk. I),5
+Demolisher Heavy Tank (Standard Mk. I),4
+Rhino Fire Support Tank (Standard),3
+Demolisher Heavy Tank (Standard Mk. I),2
+Rhino Fire Support Tank (MG),1

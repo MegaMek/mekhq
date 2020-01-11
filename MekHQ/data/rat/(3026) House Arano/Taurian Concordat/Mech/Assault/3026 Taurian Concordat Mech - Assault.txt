@@ -1,5 +1,5 @@
 3026 Taurian Concordat Mech - Assault
-Battlemaster BLR-1G,1
+BattleMaster BLR-1G,1
 Goliath GOL-1H,2
 Stalker STK-4N,3
 Stalker STK-3F,4

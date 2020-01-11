@@ -1,12 +1,12 @@
 3026 Free Worlds League Tank - Medium
-Maxim,1
-Hetzer,2
-Hetzer,3
-Goblin,4
-Goblin,5
-Drillson,6
-Drillson,5
-Vedette,4
-Vedette,3
-Condor,2
-Condor,1
+Maxim Heavy Hover Transport (Standard),1
+Hetzer Wheeled Assault Gun (Standard),2
+Hetzer Wheeled Assault Gun (Standard),3
+Goblin Medium Tank (Standard),4
+Goblin Medium Tank (Standard),5
+Drillson Heavy Hover Tank (Standard),6
+Drillson Heavy Hover Tank (Standard),5
+Vedette Medium Tank (Standard),4
+Vedette Medium Tank (Standard),3
+Condor Heavy Hover Tank (Standard),2
+Condor Heavy Hover Tank (Standard),1

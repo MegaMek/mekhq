@@ -1,12 +1,12 @@
 3026 Magistracy of Canopus Tank - Light
-Pegasus,1
-Saladin,2
-Harasser,3
-Hunter,4
-Saracen,5
-Scorpion,6
-Scorpion,5
-Galleon,4
-Warrior,3
-Ferret Light Scout,2
-Scimitar,1
+Pegasus Scout Hover Tank (Standard),1
+Saladin Assault Hover Tank (Standard),2
+Harasser Missile Platform (Standard),3
+Hunter Light Support Tank (Standard),4
+Saracen Medium Hover Tank (Standard),5
+Scorpion Light Tank (Standard),6
+Scorpion Light Tank (Standard),5
+Galleon Light Tank GAL-100,4
+Warrior Attack Helicopter H-7,3
+Ferret Light Scout VTOL (Standard),2
+Scimitar Medium Hover Tank (Standard),1

@@ -2,11 +2,11 @@
 Javelin JVN-10N,1
 Wasp WSP-1A,2
 Locust LCT-3V,3
-Urbanmech UM-R60,4
+UrbanMech UM-R60,4
 Locust LCT-1V,5
 Wasp WSP-1A,6
 Stinger STG-3R,5
 Commando COM-2D,4
 Stinger STG-3G,3
 Wasp WSP-1A,2
-Valkerie VLK-QA,1
+Valkyrie VLK-QA,1

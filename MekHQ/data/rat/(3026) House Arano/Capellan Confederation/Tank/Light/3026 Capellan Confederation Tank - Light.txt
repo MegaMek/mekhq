@@ -1,12 +1,12 @@
 3026 Capellan Confederation Tank - Light
-Warrior,1
-Pegasus,2
-Galleon,3
-Saladin,4
-Galleon,5
-Hunter,6
-Warrior,5
-Scimitar,4
-Scorpion,3
-Scorpion,2
-Saracen,1
+Warrior Attack Helicopter H-7,1
+Pegasus Scout Hover Tank (Standard),2
+Galleon Light Tank GAL-100,3
+Saladin Assault Hover Tank (Standard),4
+Galleon Light Tank GAL-100,5
+Hunter Light Support Tank (Standard),6
+Warrior Attack Helicopter H-7,5
+Scimitar Medium Hover Tank (Standard),4
+Scorpion Light Tank (Standard),3
+Scorpion Light Tank (Standard),2
+Saracen Medium Hover Tank (Standard),1

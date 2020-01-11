@@ -1,12 +1,12 @@
 3026 Aurigan Coalition and Aurigan Directorate Aerospace - Medium
-Hellcat,1
-Lightning,2
-Lightning,3
-Lightning,4
-Lightning,5
-Hellcat,6
+Hellcat HCT-213,1
+Lightning LTN-G15,2
+Lightning LTN-G15,3
+Lightning LTN-G15,4
+Lightning LTN-G15,5
+Hellcat HCT-213,6
 Stingray F-90,5
-Hellcat,4
+Hellcat HCT-213,4
 Stingray F-90,3
-Hellcat,2
+Hellcat HCT-213,2
 Stingray F-90,1

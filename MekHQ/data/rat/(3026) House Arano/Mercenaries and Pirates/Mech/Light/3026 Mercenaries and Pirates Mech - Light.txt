@@ -2,7 +2,7 @@
 Locust LCT-3V,1
 Locust LCT-1E,2
 Stinger STG-3G,3
-Urbanmech UM-R60,4
+UrbanMech UM-R60,4
 Stinger STG-3R,5
 Wasp WSP-1A,6
 Locust LCT-1V,5
