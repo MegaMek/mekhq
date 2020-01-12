@@ -35,7 +35,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
 
     /**
      * This dialog is used to both hire new pilots and to edit existing ones
-     * 
+     *
      */
     private static final long serialVersionUID = -6265589976779860566L;
     private Person person;
@@ -58,7 +58,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     }
 
     private void refreshView() {
-        scrollView.setViewportView(new PersonViewPanel(person, hqView.getCampaign(), hqView.getIconPackage()));
+        scrollView.setViewportView(new PersonViewPanel(person, hqView.getCampaign(), hqView));
         // This odd code is to make sure that the scrollbar stays at the top
         // I cant just call it here, because it ends up getting reset somewhere
         // later
@@ -130,9 +130,11 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     }
 
     private JPanel createSidebar(ResourceBundle resourceMap) {
+        boolean randomizeOrigin = hqView.getCampaign().getCampaignOptions().randomizeOrigin();
+
         JPanel panSidebar = new JPanel();
         panSidebar.setName("panButtons"); // NOI18N
-        panSidebar.setLayout(new java.awt.GridLayout(6, 1));
+        panSidebar.setLayout(new java.awt.GridLayout(6 + (randomizeOrigin ? 1 : 0), 1));
 
         choiceRanks.setName("choiceRanks"); // NOI18N
         refreshRanksCombo();
@@ -148,6 +150,13 @@ public class NewRecruitDialog extends javax.swing.JDialog {
         button.setName("btnRandomPortrait"); // NOI18N
         button.addActionListener(e -> randomPortrait());
         panSidebar.add(button);
+
+        if (randomizeOrigin) {
+            button = new JButton(resourceMap.getString("btnRandomOrigin.text")); // NOI18N
+            button.setName("btnRandomOrigin"); // NOI18N
+            button.addActionListener(e -> randomOrigin());
+            panSidebar.add(button);
+        }
 
         button = new JButton(resourceMap.getString("btnChoosePortrait.text")); // NOI18N
         button.setName("btnChoosePortrait"); // NOI18N
@@ -214,6 +223,11 @@ public class NewRecruitDialog extends javax.swing.JDialog {
 
     private void randomPortrait() {
         hqView.getCampaign().assignRandomPortraitFor(person);
+        refreshView();
+    }
+
+    private void randomOrigin() {
+        hqView.getCampaign().assignRandomOriginFor(person);
         refreshView();
     }
 
