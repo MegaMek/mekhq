@@ -362,6 +362,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                         return;
                     }
                     // Clear any transport assignments of units in the deleted force
+                    clearTransportAssignment(force.getAllUnits());
                     
                     gui.getCampaign().removeForce(force);
                 }
@@ -394,16 +395,9 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                             unit.removeTech();
                         }
                     }
-                    for (UUID oldShipId : unit.getTransportShipId().keySet()) {
-                        Unit oldShip = gui.getCampaign().getUnit(oldShipId);
-                        if (oldShip != null) {
-                            oldShip.unloadFromTransportShip(unit);
-                        }
-                    }
-                    // If the unit IS a transport, unassign all units from it
-                    if (!unit.getTransportedUnits().isEmpty()) {
-                        unit.unloadTransportShip();
-                    }
+                    // Clear any transport assignments of units in the deleted force
+                    clearTransportAssignment(unit);
+                    
                     MekHQ.triggerEvent(new OrganizationChangedEvent(parentForce, unit));
                 }
             }
@@ -1492,19 +1486,29 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
      * has selected or all units in a given force
      */
     private void clearTransportAssignment(Vector<UUID> unitsToUpdate) {
-        for (UUID id : force.getAllUnits()) {
+        for (UUID id : unitsToUpdate) {
             Unit unit = gui.getCampaign().getUnit(id);
             if (unit != null) {
-                for (UUID oldShipId : unit.getTransportShipId().keySet()) {
-                    Unit oldShip = gui.getCampaign().getUnit(oldShipId);
-                    if (oldShip != null) {
-                        oldShip.unloadFromTransportShip(unit);
-                    }
+                clearTransportAssignment(unit);
+            }
+        }
+    }
+    
+    /**
+     * Worker function to make sure transport assignment data gets cleared out when unit(s) are removed from the TO&E
+     * @param currentUnit The unit currently being processed
+     */
+    private void clearTransportAssignment(Unit currentUnit) {
+        if (currentUnit != null) {
+            for (UUID oldShipId : currentUnit.getTransportShipId().keySet()) {
+                Unit oldShip = gui.getCampaign().getUnit(oldShipId);
+                if (oldShip != null) {
+                    oldShip.unloadFromTransportShip(currentUnit);
                 }
-                // If the unit IS a transport, unassign all units from it
-                if (!unit.getTransportedUnits().isEmpty()) {
-                unit.unloadTransportShip();
-                }
+            }
+            // If the unit IS a transport, unassign all units from it
+            if (!currentUnit.getTransportedUnits().isEmpty()) {
+                currentUnit.unloadTransportShip();
             }
         }
     }
