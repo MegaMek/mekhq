@@ -247,6 +247,11 @@ public class StaticChecks {
         return true;
     }
     
+    /**
+     * Tests a selection of units to see if all of them have Naval C3 equipment
+     * @param units A vector of units to test for Naval C3 equipment
+     * @return false if any unit in the selection does not have a functioning NC3
+     */
     public static boolean doAllUnitsHaveNC3(Vector<Unit> units) {
         for (Unit unit : units) {
             Entity e = unit.getEntity();
@@ -260,6 +265,11 @@ public class StaticChecks {
         return true;
     }
 
+    /**
+     * Tests a selection of units to see if all of them have no Naval C3 network assigned
+     * @param units A vector of units to test for Naval C3 network assignment
+     * @return false if any unit in the selection does not have a functioning NC3 or is already on an NC3 network
+     */
     public static boolean areAllUnitsNotNC3Networked(Vector<Unit> units) {
         for (Unit unit : units) {
             Entity e = unit.getEntity();
@@ -273,6 +283,11 @@ public class StaticChecks {
         return true;
     }
 
+    /**
+     * Tests a selection of units to see if all of them are on a Naval C3 network
+     * @param units A vector of units to test for Naval C3 network assignment
+     * @return false if any unit in the selection does not have a functioning NC3 or is not on an NC3 network with any other units
+     */
     public static boolean areAllUnitsNC3Networked(Vector<Unit> units) {
         for (Unit unit : units) {
             Entity e = unit.getEntity();
@@ -289,6 +304,12 @@ public class StaticChecks {
         return true;
     }
 
+    /**
+     * Tests a selection of units to see if all of them are on the same Naval C3 network by ID
+     * @param units A vector of units to test for Naval C3 network assignment
+     * @return false if any unit in the selection does not have a functioning NC3, or is not on an NC3 network,
+     *     or if any of the units is on a different NC3 network from the others.
+     */
     public static boolean areAllUnitsOnSameNC3Network(Vector<Unit> units) {
         String network = null;
         for (Unit unit : units) {
