@@ -122,8 +122,11 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
     private static final String COMMAND_GOTO_PILOT = "GOTO_PILOT|UNIT|empty|";
     
     // String tokens for dialog boxes used for transport loading
-    private static String LOAD_UNITS_DIALOG_TEXT = "You are deploying a Transport with units assigned to it. \n" + "Would you also like to deploy these units?";
-    private static String LOAD_UNITS_DIALOG_TITLE = "Also deploy transported units?";
+    private static final String LOAD_UNITS_DIALOG_TEXT = "You are deploying a Transport with units assigned to it. \n" + "Would you also like to deploy these units?";
+    private static final String LOAD_UNITS_DIALOG_TITLE = "Also deploy transported units?";
+    
+    private static final String ASSIGN_FORCE_TRN_TITLE = "Assign Force to Transport Ship";
+    private static final String UNASSIGN_FORCE_TRN_TITLE = "Unassign Force from Transport Ship";
 
     @Override
     public void actionPerformed(ActionEvent action) {
@@ -1143,7 +1146,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                 //Attempt to Assign all units in the selected force(s) to a transport ship. 
                 //This checks to see if the ship is in a basic state that can accept units. 
                 //Capacity gets checked once the action is submitted.
-                menu = new JMenu("Assign Force to Transport Ship");
+                menu = new JMenu(TOEMouseAdapter.ASSIGN_FORCE_TRN_TITLE);
                 Unit unit = unitsInForces.get(0);
                 String unitIds = "" + unit.getId().toString();
                 for (int i = 1; i < unitsInForces.size(); i++) {
@@ -1168,7 +1171,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     MenuScroller.setScrollerFor(menu, 30);
                 }
                 if (StaticChecks.areAllUnitsTransported(unitsInForces)) {
-                    menuItem = new JMenuItem("Unassign Force from Transport Ship");
+                    menuItem = new JMenuItem(TOEMouseAdapter.UNASSIGN_FORCE_TRN_TITLE);
                     menuItem.setActionCommand(TOEMouseAdapter.COMMAND_UNASSIGN_FROM_SHIP
                             + unitIds);
                     menuItem.addActionListener(this);
