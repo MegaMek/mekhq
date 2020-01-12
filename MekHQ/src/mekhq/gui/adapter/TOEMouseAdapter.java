@@ -120,6 +120,10 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
     private static final String GOTO_PILOT = "GOTO_PILOT";
     
     private static final String COMMAND_GOTO_PILOT = "GOTO_PILOT|UNIT|empty|";
+    
+    // String tokens for dialog boxes used for transport loading
+    private static String LOAD_UNITS_DIALOG_TEXT = "You are deploying a Transport with units assigned to it. \n" + "Would you also like to deploy these units?";
+    private static String LOAD_UNITS_DIALOG_TITLE = "Also deploy transported units?";
 
     @Override
     public void actionPerformed(ActionEvent action) {
@@ -425,10 +429,8 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     if (null != unit && null != scenario) {
                         if (!unit.getTransportedUnits().isEmpty()) {
                             // Prompt the player to also deploy any units transported by this one
-                            int optionChoice = JOptionPane.showConfirmDialog(null,
-                                    "You are deploying a Transport with units assigned to it. \n"
-                                            + "Would you also like to deploy these units?",
-                                            "Also deploy transported units?", JOptionPane.YES_NO_OPTION);
+                            int optionChoice = JOptionPane.showConfirmDialog(null, TOEMouseAdapter.LOAD_UNITS_DIALOG_TEXT,
+                                    TOEMouseAdapter.LOAD_UNITS_DIALOG_TITLE, JOptionPane.YES_NO_OPTION);
                             if (optionChoice == JOptionPane.YES_OPTION) {
                                 for (UUID id : unit.getTransportedUnits()) {
                                     Unit cargo = gui.getCampaign().getUnit(id);
