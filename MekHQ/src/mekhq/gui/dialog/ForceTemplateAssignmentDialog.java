@@ -78,6 +78,9 @@ public class ForceTemplateAssignmentDialog extends JDialog {
     private Vector<Unit> currentUnitVector;
     private CampaignGUI campaignGUI;
     
+    private static final String DEPLOY_TRANSPORTED_DIALOG_TEXT = " is a transport with units assigned to it. \n" + "Would you also like to deploy these units?";
+    private static final String DEPLOY_TRANSPORTED_DIALOG_TITLE = "Also deploy transported units?";
+    
     public ForceTemplateAssignmentDialog(CampaignGUI gui, Vector<Force> assignedForces, Vector<Unit> assignedUnits, AtBDynamicScenario scenario) {
         currentForceVector = assignedForces;
         currentUnitVector = assignedUnits;
@@ -243,21 +246,7 @@ public class ForceTemplateAssignmentDialog extends JDialog {
         MekHQ.triggerEvent(new DeploymentChangedEvent(unit, currentScenario));
         if (!unit.getTransportedUnits().isEmpty()) {
             // Prompt the player to also deploy any units transported by this one
-            int optionChoice = JOptionPane.showConfirmDialog(null,
-                    unit.getName() +  " is a transport with units assigned to it. \n"
-                            + "Would you also like to deploy these units?",
-                            "Also deploy transported units?", JOptionPane.YES_NO_OPTION);
-            if (optionChoice == JOptionPane.YES_OPTION) {
-                for (UUID id : unit.getTransportedUnits()) {
-                    Unit cargo = unit.getCampaign().getUnit(id);
-                    if (cargo != null) {
-                        currentScenario.removeUnit(cargo.getId());
-                        currentScenario.addUnit(cargo.getId(), templateList.getSelectedValue().getForceName());
-                        cargo.setScenarioId(currentScenario.getId());
-                        MekHQ.triggerEvent(new DeploymentChangedEvent(cargo, currentScenario));
-                    }
-                }
-            }
+            deployTransportedUnitsDialog(unit);
         }
         refreshUnitList();
     }
@@ -281,27 +270,35 @@ public class ForceTemplateAssignmentDialog extends JDialog {
                 // If your force includes transports with units assigned, 
                 // prompt the player to also deploy any units transported by this one
                 if (!u.getTransportedUnits().isEmpty()) {
-                    int optionChoice = JOptionPane.showConfirmDialog(null,
-                            u.getName() +  " is a transport with units assigned to it. \n"
-                                    + "Would you also like to deploy these units?",
-                                    "Also deploy transported units?", JOptionPane.YES_NO_OPTION);
-                    if (optionChoice == JOptionPane.YES_OPTION) {
-                        for (UUID id : u.getTransportedUnits()) {
-                            Unit cargo = u.getCampaign().getUnit(id);
-                            if (cargo != null) {
-                                currentScenario.removeUnit(cargo.getId());
-                                currentScenario.addUnit(cargo.getId(), templateList.getSelectedValue().getForceName());
-                                cargo.setScenarioId(currentScenario.getId());
-                                MekHQ.triggerEvent(new DeploymentChangedEvent(cargo, currentScenario));
-                            }
-                        }
-                    }
+                    deployTransportedUnitsDialog(u);
                 }
             }
         }
         MekHQ.triggerEvent(new DeploymentChangedEvent(force, currentScenario));
         
         refreshForceList();
+    }
+    
+    /**
+     * Worker function that prompts the player to deploy any units assigned to a transport to a scenario when the transport
+     * is deployed to that scenario
+     * @param unit The transport unit whose name and cargo we wish to deal with
+     */
+    private void deployTransportedUnitsDialog(Unit unit) {
+        int optionChoice = JOptionPane.showConfirmDialog(null,
+                unit.getName() +  ForceTemplateAssignmentDialog.DEPLOY_TRANSPORTED_DIALOG_TEXT,
+                ForceTemplateAssignmentDialog.DEPLOY_TRANSPORTED_DIALOG_TITLE, JOptionPane.YES_NO_OPTION);
+        if (optionChoice == JOptionPane.YES_OPTION) {
+            for (UUID id : unit.getTransportedUnits()) {
+                Unit cargo = unit.getCampaign().getUnit(id);
+                if (cargo != null) {
+                    currentScenario.removeUnit(cargo.getId());
+                    currentScenario.addUnit(cargo.getId(), templateList.getSelectedValue().getForceName());
+                    cargo.setScenarioId(currentScenario.getId());
+                    MekHQ.triggerEvent(new DeploymentChangedEvent(cargo, currentScenario));
+                }
+            }
+        }
     }
         
     private class UnitListCellRenderer extends DefaultListCellRenderer {
