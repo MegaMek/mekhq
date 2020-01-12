@@ -70,10 +70,10 @@ public class AtBGameThread extends GameThread {
     }
     
     // String tokens for dialog boxes used for transport loading
-    private static String LOAD_FTR_DIALOG_TEXT = "Would you like the fighters assigned to %s to deploy loaded into its bays?";
-    private static String LOAD_FTR_DIALOG_TITLE = "Load Fighters on Transport?";
-    private static String LOAD_GND_DIALOG_TEXT = "Would you like the ground units assigned to %s to deploy loaded into its bays?";
-    private static String LOAD_GND_DIALOG_TITLE = "Load Ground Units on Transport?";
+    private static final String LOAD_FTR_DIALOG_TEXT = "Would you like the fighters assigned to %s to deploy loaded into its bays?";
+    private static final String LOAD_FTR_DIALOG_TITLE = "Load Fighters on Transport?";
+    private static final String LOAD_GND_DIALOG_TEXT = "Would you like the ground units assigned to %s to deploy loaded into its bays?";
+    private static final String LOAD_GND_DIALOG_TITLE = "Load Ground Units on Transport?";
 
 
     @Override
