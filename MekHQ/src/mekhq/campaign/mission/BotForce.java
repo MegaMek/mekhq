@@ -160,12 +160,12 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
     public void setColorIndex(int index) {
         colorIndex = index;
     }
-    
+
     public int getTotalBV() {
         final String METHOD_NAME = "getTotalBV";
 
         int bv = 0;
-        
+
         for(Entity entity : getEntityList()) {
             if (entity == null) {
                 MekHQ.getLogger().error(BotForce.class, METHOD_NAME, "Null entity when calculating the BV a bot force, we should never find a null here. Please investigate");
@@ -173,7 +173,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
                 bv += entity.calculateBattleValue(true, false);
             }
         }
-        
+
         return bv;
     }
 
@@ -188,18 +188,18 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
     public void setDestinationEdge(int i) {
         behaviorSettings.setDestinationEdge(findCardinalEdge(i));
     }
-    
+
     public void setRetreatEdge(int i) {
         behaviorSettings.setRetreatEdge(findCardinalEdge(i));
     }
 
     public void writeToXml(PrintWriter pw1, int indent) {
         final String METHOD_NAME = "writeToXml";
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "name", MekHqXmlUtil.escape(name));
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "name", name);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "team", team);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "start", start);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "camoCategory", MekHqXmlUtil.escape(camoCategory));
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "camoFileName", MekHqXmlUtil.escape(camoFileName));
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "camoCategory", camoCategory);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "camoFileName", camoFileName);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "colorIndex", colorIndex);
 
         pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<entities>");
@@ -228,7 +228,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
 
     public void setFieldsFromXmlNode(Node wn) {
         final String METHOD_NAME = "setFieldsFromXmlNode(Node)"; //$NON-NLS-1$
-        
+
         NodeList nl = wn.getChildNodes();
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
