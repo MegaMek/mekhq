@@ -16,6 +16,7 @@ v0.47.3-SNAPSHOT
 + PR #1379: Feature: Adds hyperlink from origin system on personnel panel to the map panel
 + PR #1382: Speed up Advance Day using profiling data
 + PR #1387: Include Super Heavy Vehicle Bays in Unit Rating/Reputation
++ Issue #1390: Bug: fix XML parsing failure when putting customs in CPNX that have ampersands (etc)
 
 v0.47.2 (2019-11-15 2000 UTC) 
 + PR #1325: Customize protomechs and advanced aero in MekLab
