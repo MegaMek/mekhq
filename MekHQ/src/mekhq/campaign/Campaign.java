@@ -4316,9 +4316,9 @@ public class Campaign implements Serializable, ITechManager {
             pw1.println("\t<custom>");
             pw1.println("\t\t<name>" + name + "</name>");
             if (en instanceof Mech) {
-                pw1.print("\t\t<mtf>");
+                pw1.print("\t\t<mtf><![CDATA[");
                 pw1.print(((Mech) en).getMtf());
-                pw1.print("\t\t</mtf>\n");
+                pw1.println("]]></mtf>");
             } else {
                 pw1.print("\t\t<blk><![CDATA[");
 
@@ -4327,9 +4327,9 @@ public class Campaign implements Serializable, ITechManager {
                     if (s.isEmpty()) {
                         continue;
                     }
-                    pw1.print(s + "\n");
+                    pw1.println(s);
                 }
-                pw1.print("]]>\n\t\t</blk>\n");
+                pw1.println("]]></blk>");
             }
             pw1.println("\t</custom>");
         }
