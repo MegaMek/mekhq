@@ -21,15 +21,7 @@
 
 package mekhq.campaign.universe;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
@@ -65,7 +57,8 @@ public class RandomFactionGenerator {
     private static final int BORDER_RANGE_NEAR_PERIPHERY = 90;
     private static final int BORDER_RANGE_DEEP_PERIPHERY = 210; //a bit more than this distance between HL and NC
 
-    private static final Date FORTRESS_REPUBLIC = new Date (new GregorianCalendar(3135,10,1).getTimeInMillis());
+    private static final Date FORTRESS_REPUBLIC = new Date (new GregorianCalendar(3135,
+            Calendar.NOVEMBER,1).getTimeInMillis());
 
     private static RandomFactionGenerator rfg = null;
 
@@ -288,8 +281,8 @@ public class RandomFactionGenerator {
     /**
      * Builds a map of potential enemies keyed to cumulative weight
      *
-     * @param employer
-     * @return
+     * @param employer The employer faction
+     * @return         The weight map of potential enemies
      */
     protected WeightedMap<Faction> buildEnemyMap(Faction employer) {
         WeightedMap<Faction> enemyMap = new WeightedMap<>();
@@ -364,7 +357,7 @@ public class RandomFactionGenerator {
 
     /**
      * Constructs a list of a faction's potential enemies based on common borders.
-     * @param employerName The employer faction
+     * @param employer     The employer faction
      * @return             A list of faction that share a border
      */
     public List<String> getEnemyList(Faction employer) {
@@ -419,7 +412,7 @@ public class RandomFactionGenerator {
      */
     protected double adjustBorderWeight(double count, Faction f,
             Faction enemy, Date date) {
-        final Date TUKKAYID = new Date (new GregorianCalendar(3052,5,20).getTimeInMillis());
+        final Date TUKKAYID = new Date(new GregorianCalendar(3052, Calendar.JUNE,20).getTimeInMillis());
 
         if (factionHints.isNeutral(f, enemy, currentDate())
                 || factionHints.isNeutral(enemy, f, currentDate())) {
@@ -453,8 +446,8 @@ public class RandomFactionGenerator {
     /**
      * Selects a random planet from a list of potential targets based on the attacking and defending factions.
      *
-     * @param attacker
-     * @param defender
+     * @param attacker  The faction key of the attacker
+     * @param defender  The faction key of the defender
      * @return          The planetId of the chosen planet, or null if there are no target candidates
      */
     @Nullable public String getMissionTarget(String attacker, String defender) {
@@ -509,28 +502,36 @@ public class RandomFactionGenerator {
      * Builds a list of planets controlled by the defender that are near one or more of the attacker's
      * planets.
      *
-     * @param attackerKey   The attacking faction
-     * @param defenderKey   The defending faction
+     * @param attacker   The attacking faction
+     * @param defender   The defending faction
      * @return              A list of potential mission targets
      */
     public List<PlanetarySystem> getMissionTargetList(Faction attacker, Faction defender) {
-        if (!borderTracker.getFactionsInRegion().contains(attacker)) {
+        // If the attacker or defender are not in the set of factions that control planets,
+        // and they are not rebels or pirates, they will be a faction contained within another
+        // (e.g. Nova Cat in the Draconis Combine, or Wolf-in-Exile in Lyran space
+        if (!borderTracker.getFactionsInRegion().contains(attacker)
+                && !attacker.is(Faction.Tag.PIRATE)) {
             attacker = factionHints.getContainedFactionHost(attacker, currentDate());
         }
-        if (!borderTracker.getFactionsInRegion().contains(defender)) {
+        if (!borderTracker.getFactionsInRegion().contains(defender)
+                && !defender.is(Faction.Tag.PIRATE)
+                && !defender.is(Faction.Tag.REBEL)) {
             defender = factionHints.getContainedFactionHost(defender, currentDate());
         }
         if ((null == attacker) || (null == defender)) {
             return Collections.emptyList();
         }
         // Locate rebels on any of the attacker's planet
-        if (defender.getShortName().equals("REB")) {
+        if (defender.is(Faction.Tag.REBEL)) {
             return new ArrayList<>(borderTracker.getBorders(attacker).getSystems());
         }
 
         Set<PlanetarySystem> planetSet = new HashSet<>(borderTracker.getBorderSystems(attacker, defender));
-        // Locate missions by or against pirates on border worlds
-        if (attacker.getShortName().equals("PIR") || defender.getShortName().equals("PIR")) {
+        // If mission is against generic pirates (those that don't control any systems),
+        // add all border systems as possible locations
+        if ((attacker.is(Faction.Tag.PIRATE) && !borderTracker.getFactionsInRegion().contains(attacker))
+                || (defender.is(Faction.Tag.PIRATE) && !borderTracker.getFactionsInRegion().contains(defender))) {
             for (Faction f : borderTracker.getFactionsInRegion()) {
                 planetSet.addAll(borderTracker.getBorderSystems(f, attacker));
                 planetSet.addAll(borderTracker.getBorderSystems(attacker, f));
