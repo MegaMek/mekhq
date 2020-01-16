@@ -47,6 +47,7 @@ import megamek.common.BombType;
 import megamek.common.Compute;
 import megamek.common.ConvFighter;
 import megamek.common.Coords;
+import megamek.common.Crew;
 import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
@@ -72,6 +73,7 @@ import megamek.common.SimpleTechLevel;
 import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
+import megamek.common.Warship;
 import megamek.common.annotations.Nullable;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
@@ -80,6 +82,8 @@ import megamek.common.options.GameOptions;
 import megamek.common.options.IBasicOption;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
+import megamek.common.options.OptionsConstants;
+import megamek.common.options.PilotOptions;
 import megamek.common.util.BuildingBlock;
 import megamek.common.util.DirectoryItems;
 import mekhq.campaign.event.AcquisitionEvent;
@@ -199,7 +203,9 @@ public class Campaign implements Serializable, ITechManager {
     // we will use the same basic system (borrowed from MegaMek) for tracking
     // all three
     // OK now we have more, parts, personnel, forces, missions, and scenarios.
+    // and more still - we're tracking Dropships and Warships in a separate set so that we can assign units to transports
     private Map<UUID, Unit> units = new LinkedHashMap<>();
+    private Set<UUID> transportShips = new HashSet<>();
     private Map<UUID, Person> personnel = new LinkedHashMap<>();
     private Map<UUID, Ancestors> ancestors = new LinkedHashMap<>();
     private TreeMap<Integer, Part> parts = new TreeMap<>();
@@ -1031,12 +1037,41 @@ public class Campaign implements Serializable, ITechManager {
                 "Adding unit: (" + u.getId() + "):" + u); //$NON-NLS-1$
         units.put(u.getId(), u);
         checkDuplicateNamesDuringAdd(u.getEntity());
+        
+        //If this is a ship, add it to the list of potential transports
+        //Jumpships and space stations are intentionally ignored at present, because this functionality is being
+        //used to auto-load ground units into bays, and doing this for large craft that can't transit is pointless.
+        if (u.getEntity() != null && (u.getEntity() instanceof Dropship || u.getEntity() instanceof Warship)) {
+            addTransportShip(u.getId());
+        }
 
         // Assign an entity ID to our new unit
         if (Entity.NONE == u.getEntity().getId()) {
             u.getEntity().setId(game.getNextEntityId());
         }
         game.addEntity(u.getEntity().getId(), u.getEntity());
+    }
+    
+    /**
+     * Adds an entry to the list of transit-capable transport ships. We'll use this
+     * to look for empty bays that ground units can be assigned to
+     * @param id - The unique ID of the ship we want to add to this Set
+     */
+    public void addTransportShip(UUID id) {
+        MekHQ.getLogger().log(getClass(), "addTransportShip()", LogLevel.INFO, //$NON-NLS-1$
+                "Adding Dropship/Warship: " + id); //$NON-NLS-1$
+        transportShips.add(id);
+    }
+    
+    /**
+     * Deletes an entry from the list of transit-capable transport ships. This gets updated when
+     * the ship is removed from the campaign for one reason or another
+     * @param id - The unique ID of the ship we want to remove from this Set
+     */
+    public void removeTransportShip(UUID id) {
+        MekHQ.getLogger().log(getClass(), "removeTransportShip()", LogLevel.INFO, //$NON-NLS-1$
+                "Removing Dropship/Warship: " + id); //$NON-NLS-1$
+        transportShips.remove(id);
     }
 
     /**
@@ -1106,8 +1141,16 @@ public class Campaign implements Serializable, ITechManager {
         Unit unit = new Unit(en, this);
         unit.setId(id);
         units.put(id, unit);
+        unit.initializeBaySpace();
         removeUnitFromForce(unit); // Added to avoid the 'default force bug'
         // when calculating cargo
+        
+        //If this is a ship, add it to the list of potential transports
+        //Jumpships and space stations are intentionally ignored at present, because this functionality is being
+        //used to auto-load ground units into bays, and doing this for large craft that can't transit is pointless.
+        if (unit.getEntity() != null && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Warship)) {
+            addTransportShip(id);
+        }
 
         unit.initializeParts(true);
         unit.runDiagnostic(false);
@@ -2197,10 +2240,10 @@ public class Campaign implements Serializable, ITechManager {
      * @return true if the campaign can pay for the acquisition; false if it cannot.
      */
     public boolean canPayFor(IAcquisitionWork acquisition) {
-    	//SHOULD we check to see if this acquisition needs to be paid for
+        //SHOULD we check to see if this acquisition needs to be paid for
         if( (acquisition instanceof UnitOrder && getCampaignOptions().payForUnits())
                 ||(acquisition instanceof Part && getCampaignOptions().payForParts()) ) {
-        	//CAN the acquisition actually be paid for
+            //CAN the acquisition actually be paid for
             return getFunds().isGreaterOrEqualThan(acquisition.getBuyCost());
         }
         return true;
@@ -2347,7 +2390,7 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         if (found) {
-        	acquisition.decrementQuantity();
+            acquisition.decrementQuantity();
             MekHQ.triggerEvent(new AcquisitionEvent(acquisition));
         }
         if(!getCampaignOptions().usesPlanetaryAcquisition() || getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
@@ -3354,6 +3397,9 @@ public class Campaign implements Serializable, ITechManager {
 
         // remove unit from any forces
         removeUnitFromForce(unit);
+        
+        //If this is a ship, remove it from the list of potential transports
+        removeTransportShip(id);
 
         // finally remove the unit
         units.remove(unit.getId());
@@ -3591,7 +3637,15 @@ public class Campaign implements Serializable, ITechManager {
             force.removeUnit(u.getId());
             u.setForceId(Force.FORCE_NONE);
             u.setScenarioId(-1);
-            if (u.getEntity().hasC3i()
+            if (u.getEntity().hasNavalC3()
+                    && u.getEntity().calculateFreeC3Nodes() < 5) {
+                Vector<Unit> removedUnits = new Vector<Unit>();
+                removedUnits.add(u);
+                removeUnitsFromNetwork(removedUnits);
+                u.getEntity().setC3MasterIsUUIDAsString(null);
+                u.getEntity().setC3Master(null, true);
+                refreshNetworks();
+            } else if (u.getEntity().hasC3i()
                     && u.getEntity().calculateFreeC3Nodes() < 5) {
                 Vector<Unit> removedUnits = new Vector<Unit>();
                 removedUnits.add(u);
@@ -4211,10 +4265,10 @@ public class Campaign implements Serializable, ITechManager {
         // Customised planetary events
         pw1.println("\t<customPlanetaryEvents>");
         for(PlanetarySystem psystem : Systems.getInstance().getSystems().values()) {
-        	//first check for system-wide events
+            //first check for system-wide events
             List<PlanetarySystem.PlanetarySystemEvent> customSysEvents = new ArrayList<>();
             for(PlanetarySystem.PlanetarySystemEvent event : psystem.getEvents()) {
-            	if(event.custom) {
+                if(event.custom) {
                     customSysEvents.add(event);
                 }
             }
@@ -4227,7 +4281,7 @@ public class Campaign implements Serializable, ITechManager {
                 }
                 startedSystem = true;
             }
-        	//now check for planetary events
+            //now check for planetary events
             for(Planet p : psystem.getPlanets()) {
                 List<Planet.PlanetaryEvent> customEvents = p.getCustomEvents();
 	            if(!customEvents.isEmpty()) {
@@ -4245,7 +4299,7 @@ public class Campaign implements Serializable, ITechManager {
 	            }
             }
             if(startedSystem) {
-            	//close the system
+                //close the system
                 pw1.println("\t\t</system>");
             }
         }
@@ -4795,108 +4849,108 @@ public class Campaign implements Serializable, ITechManager {
      * @return
      */
     public JumpPath calculateJumpPath(PlanetarySystem start, PlanetarySystem end) {
-    	if (null == start) {
-    		return null;
-    	}
-    	if ((null == end) || start.getId().equals(end.getId())) {
-    		JumpPath jpath = new JumpPath();
-    		jpath.addSystem(start);
-    		return jpath;
-    	}
+        if (null == start) {
+            return null;
+        }
+        if ((null == end) || start.getId().equals(end.getId())) {
+            JumpPath jpath = new JumpPath();
+            jpath.addSystem(start);
+            return jpath;
+        }
 
-    	String startKey = start.getId();
-    	String endKey = end.getId();
+        String startKey = start.getId();
+        String endKey = end.getId();
 
-    	final DateTime now = Utilities.getDateTimeDay(calendar);
-    	String current = startKey;
-    	Set<String> closed = new HashSet<>();
-    	Set<String> open = new HashSet<>();
-    	boolean found = false;
-    	int jumps = 0;
+        final DateTime now = Utilities.getDateTimeDay(calendar);
+        String current = startKey;
+        Set<String> closed = new HashSet<>();
+        Set<String> open = new HashSet<>();
+        boolean found = false;
+        int jumps = 0;
 
-    	// we are going to through and set up some hashes that will make our
-    	// work easier
-    	// hash of parent key
-    	Map<String, String> parent = new HashMap<>();
-    	// hash of H for each planet which will not change
-    	Map<String, Double> scoreH = new HashMap<>();
-    	// hash of G for each planet which might change
-    	Map<String, Double> scoreG = new HashMap<>();
+        // we are going to through and set up some hashes that will make our
+        // work easier
+        // hash of parent key
+        Map<String, String> parent = new HashMap<>();
+        // hash of H for each planet which will not change
+        Map<String, Double> scoreH = new HashMap<>();
+        // hash of G for each planet which might change
+        Map<String, Double> scoreG = new HashMap<>();
 
-    	for (String key : Systems.getInstance().getSystems().keySet()) {
-    		scoreH.put(
-    				key,
-    				end.getDistanceTo(Systems.getInstance().getSystems()
-    						.get(key)));
-    	}
-    	scoreG.put(current, 0.0);
-    	closed.add(current);
+        for (String key : Systems.getInstance().getSystems().keySet()) {
+            scoreH.put(
+                    key,
+                    end.getDistanceTo(Systems.getInstance().getSystems()
+                            .get(key)));
+        }
+        scoreG.put(current, 0.0);
+        closed.add(current);
 
-    	while (!found && jumps < 10000) {
-    		jumps++;
-    		double currentG = scoreG.get(current) + Systems.getInstance().getSystemById(current).getRechargeTime(now);
+        while (!found && jumps < 10000) {
+            jumps++;
+            double currentG = scoreG.get(current) + Systems.getInstance().getSystemById(current).getRechargeTime(now);
 
-    		final String localCurrent = current;
-    		Systems.getInstance().visitNearbySystems(Systems.getInstance().getSystemById(current), 30, p -> {
-    			if (closed.contains(p.getId())) {
-    				return;
-    			} else if (open.contains(p.getId())) {
-    				// is the current G better than the existing G
-    				if (currentG < scoreG.get(p.getId())) {
-    					// then change G and parent
-    					scoreG.put(p.getId(), currentG);
-    					parent.put(p.getId(), localCurrent);
-    				}
-    			} else {
-    				// put the current G for this one in memory
-    				scoreG.put(p.getId(), currentG);
-    				// put the parent in memory
-    				parent.put(p.getId(), localCurrent);
-    				open.add(p.getId());
-    			}
-    		});
+            final String localCurrent = current;
+            Systems.getInstance().visitNearbySystems(Systems.getInstance().getSystemById(current), 30, p -> {
+                if (closed.contains(p.getId())) {
+                    return;
+                } else if (open.contains(p.getId())) {
+                    // is the current G better than the existing G
+                    if (currentG < scoreG.get(p.getId())) {
+                        // then change G and parent
+                        scoreG.put(p.getId(), currentG);
+                        parent.put(p.getId(), localCurrent);
+                    }
+                } else {
+                    // put the current G for this one in memory
+                    scoreG.put(p.getId(), currentG);
+                    // put the parent in memory
+                    parent.put(p.getId(), localCurrent);
+                    open.add(p.getId());
+                }
+            });
 
-    		String bestMatch = null;
-    		double bestF = Double.POSITIVE_INFINITY;
-    		for (String possible : open) {
-    			// calculate F
-    			double currentF = scoreG.get(possible) + scoreH.get(possible);
-    			if (currentF < bestF) {
-    				bestMatch = possible;
-    				bestF = currentF;
-    			}
-    		}
+            String bestMatch = null;
+            double bestF = Double.POSITIVE_INFINITY;
+            for (String possible : open) {
+                // calculate F
+                double currentF = scoreG.get(possible) + scoreH.get(possible);
+                if (currentF < bestF) {
+                    bestMatch = possible;
+                    bestF = currentF;
+                }
+            }
 
-    		current = bestMatch;
-    		if(null == current) {
-    			// We're done - probably failed to find anything
-    			break;
-    		}
+            current = bestMatch;
+            if(null == current) {
+                // We're done - probably failed to find anything
+                break;
+            }
 
-    		closed.add(current);
-    		open.remove(current);
-    		if (current.equals(endKey)) {
-    			found = true;
-    		}
-    	}
+            closed.add(current);
+            open.remove(current);
+            if (current.equals(endKey)) {
+                found = true;
+            }
+        }
 
-    	// now we just need to back up from the last current by parents until we
-    	// hit null
-    	List<PlanetarySystem> path = new ArrayList<>();
-    	String nextKey = current;
-    	while (null != nextKey) {
-    		path.add(Systems.getInstance().getSystemById(nextKey));
-    		// MekHQApp.logMessage(nextKey);
-    		nextKey = parent.get(nextKey);
-    	}
+        // now we just need to back up from the last current by parents until we
+        // hit null
+        List<PlanetarySystem> path = new ArrayList<>();
+        String nextKey = current;
+        while (null != nextKey) {
+            path.add(Systems.getInstance().getSystemById(nextKey));
+            // MekHQApp.logMessage(nextKey);
+            nextKey = parent.get(nextKey);
+        }
 
-    	// now reverse the direaction
-    	JumpPath finalPath = new JumpPath();
-    	for (int i = (path.size() - 1); i >= 0; i--) {
-    		finalPath.addSystem(path.get(i));
-    	}
+        // now reverse the direaction
+        JumpPath finalPath = new JumpPath();
+        for (int i = (path.size() - 1); i >= 0; i--) {
+            finalPath.addSystem(path.get(i));
+        }
 
-    	return finalPath;
+        return finalPath;
     }
 
     public List<PlanetarySystem> getAllReachableSystemsFrom(PlanetarySystem system) {
@@ -6384,13 +6438,14 @@ public class Campaign implements Serializable, ITechManager {
 
     public void refreshNetworks() {
         for (Unit unit : getUnits()) {
-            // we are going to rebuild the c3 and c3i networks based on
+            // we are going to rebuild the c3, nc3 and c3i networks based on
             // the c3UUIDs
             // TODO: can we do this more efficiently?
             // this code is cribbed from megamek.server#receiveEntityAdd
             Entity entity = unit.getEntity();
-            if (null != entity && (entity.hasC3() || entity.hasC3i())) {
+            if (null != entity && (entity.hasC3() || entity.hasC3i() || entity.hasNavalC3())) {
                 boolean C3iSet = false;
+                boolean NC3Set = false;
 
                 for (Entity e : game.getEntitiesVector()) {
                     // C3 Checks
@@ -6401,8 +6456,25 @@ public class Campaign implements Serializable, ITechManager {
                             break;
                         }
                     }
+                    //Naval C3 checks
+                    if (entity.hasNavalC3() && (NC3Set == false)) {
+                        entity.setC3NetIdSelf();
+                        int pos = 0;
+                        //Well, they're the same value of 6...
+                        while (pos < Entity.MAX_C3i_NODES) {
+                            // We've found a network, join it.
+                            if ((entity.getNC3NextUUIDAsString(pos) != null)
+                                    && (e.getC3UUIDAsString() != null)
+                                    && entity.getNC3NextUUIDAsString(pos).equals(e.getC3UUIDAsString())) {
+                                entity.setC3NetId(e);
+                                NC3Set = true;
+                                break;
+                            }
 
-                    // C3i Checks// C3i Checks
+                            pos++;
+                        }
+                    }
+                    // C3i Checks
                     if (entity.hasC3i() && (C3iSet == false)) {
                         entity.setC3NetIdSelf();
                         int pos = 0;
@@ -6435,7 +6507,11 @@ public class Campaign implements Serializable, ITechManager {
         }
         for (int pos = 0; pos < Entity.MAX_C3i_NODES; pos++) {
             for (Unit nUnit : networkedUnits) {
-                nUnit.getEntity().setC3iNextUUIDAsString(pos, null);
+                if (nUnit.getEntity().hasNavalC3()) {
+                    nUnit.getEntity().setNC3NextUUIDAsString(pos, null);
+                } else {
+                    nUnit.getEntity().setC3iNextUUIDAsString(pos, null);
+                }
             }
         }
         refreshNetworks();
@@ -6459,14 +6535,27 @@ public class Campaign implements Serializable, ITechManager {
         }
         for (int pos = 0; pos < Entity.MAX_C3i_NODES; pos++) {
             for (Unit u : removedUnits) {
-                u.getEntity().setC3iNextUUIDAsString(pos, null);
+                if (u.getEntity().hasNavalC3()) {
+                    u.getEntity().setNC3NextUUIDAsString(pos, null);
+                } else {
+                    u.getEntity().setC3iNextUUIDAsString(pos, null);
+                }
             }
             for (Unit nUnit : networkedUnits) {
                 if (pos < uuids.size()) {
-                    nUnit.getEntity().setC3iNextUUIDAsString(pos,
-                            uuids.get(pos));
+                    if (nUnit.getEntity().hasNavalC3()) {
+                        nUnit.getEntity().setNC3NextUUIDAsString(pos,
+                                uuids.get(pos));
+                    } else {
+                        nUnit.getEntity().setC3iNextUUIDAsString(pos,
+                                uuids.get(pos));
+                    }
                 } else {
-                    nUnit.getEntity().setC3iNextUUIDAsString(pos, null);
+                    if (nUnit.getEntity().hasNavalC3()) {
+                        nUnit.getEntity().setNC3NextUUIDAsString(pos, null);
+                    } else {
+                        nUnit.getEntity().setC3iNextUUIDAsString(pos, null);
+                    }
                 }
             }
         }
@@ -6494,10 +6583,19 @@ public class Campaign implements Serializable, ITechManager {
         for (int pos = 0; pos < Entity.MAX_C3i_NODES; pos++) {
             for (Unit nUnit : networkedUnits) {
                 if (pos < uuids.size()) {
-                    nUnit.getEntity().setC3iNextUUIDAsString(pos,
-                            uuids.get(pos));
+                    if (nUnit.getEntity().hasNavalC3()) {
+                        nUnit.getEntity().setNC3NextUUIDAsString(pos,
+                                uuids.get(pos));
+                    } else {
+                        nUnit.getEntity().setC3iNextUUIDAsString(pos,
+                                uuids.get(pos));
+                    }
                 } else {
-                    nUnit.getEntity().setC3iNextUUIDAsString(pos, null);
+                    if (nUnit.getEntity().hasNavalC3()) {
+                        nUnit.getEntity().setNC3NextUUIDAsString(pos, null);
+                    } else {
+                        nUnit.getEntity().setC3iNextUUIDAsString(pos, null);
+                    }
                 }
             }
         }
@@ -6520,6 +6618,39 @@ public class Campaign implements Serializable, ITechManager {
                 continue;
             }
             if (en.hasC3i() && en.calculateFreeC3Nodes() < 5
+                    && en.calculateFreeC3Nodes() > 0) {
+                String[] network = new String[2];
+                network[0] = en.getC3NetId();
+                network[1] = "" + en.calculateFreeC3Nodes();
+                if (!networkNames.contains(network[0])) {
+                    networks.add(network);
+                    networkNames.add(network[0]);
+                }
+            }
+        }
+        return networks;
+    }
+    
+    /**
+     * Method that returns a Vector of the unique name Strings of all Naval C3 networks that have at least 1 free node
+     * Adapted from getAvailableC3iNetworks() as the two technologies have very similar workings
+     * @return
+     */
+    public Vector<String[]> getAvailableNC3Networks() {
+        Vector<String[]> networks = new Vector<String[]>();
+        Vector<String> networkNames = new Vector<String>();
+
+        for(Unit u : getUnits()) {
+
+            if (u.getForceId() < 0) {
+                // only units currently in the TO&E
+                continue;
+            }
+            Entity en = u.getEntity();
+            if (null == en) {
+                continue;
+            }
+            if (en.hasNavalC3() && en.calculateFreeC3Nodes() < 5
                     && en.calculateFreeC3Nodes() > 0) {
                 String[] network = new String[2];
                 network[0] = en.getC3NetId();
@@ -7059,6 +7190,13 @@ public class Campaign implements Serializable, ITechManager {
                 }
             }
         }
+    }
+    /**
+     * Returns our list of potential transport ships
+     * @return
+     */
+    public Set<UUID> getTransportShips() {
+        return transportShips;
     }
 
     public int getTotalMechBays() {

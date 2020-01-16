@@ -1,9 +1,11 @@
 package mekhq.gui.utilities;
 
+import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.Vector;
 
 import megamek.common.Entity;
+import megamek.common.UnitType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Ranks;
@@ -64,6 +66,125 @@ public class StaticChecks {
         }
         return false;
     }
+    
+    /**
+     * Used to test a selection of Units provided by the player and determine whether or not they have a 
+     * Transport ship assignment
+     * @param units Vector of units that the player has selected
+     * @return false if any unit in the passed-in Vector has not been assigned to a Transport ship
+     */
+    public static boolean areAllUnitsTransported(Vector<Unit> units) {
+        for (Unit unit : units) {
+            if (!unit.hasTransportShipId()) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    /**
+     * Used to test a selection of Units provided by the player and a larger Transport to determine 
+     * whether or not the Transport can carry all of the selected units 
+     * @param units Vector of units that the player has selected
+     * @param ship A single Transport-Bay-equipped Unit whose capacity we want to test the selection against
+     * @returns a String  indicating why the Transport cannot carry all of the selected units, or a blank result if it can
+     */
+    public static String canTransportShipCarry(Vector<Unit> units, Unit ship) {
+        StringJoiner reason = new StringJoiner("");
+        boolean loadOK = true;
+        int numberASF = 0;
+        int numberBA = 0;
+        int numberHVee = 0;
+        int numberInfantry = 0;
+        int numberLVee = 0;
+        int numberMech = 0;
+        int numberProto = 0;
+        int numberSC = 0;
+        int numberSHVee = 0;
+        //First test all units in the selection and find out how many of each we have
+        for (Unit unit : units) {
+            if (unit.getEntity().isLargeCraft()) {
+                //No. Try your selection again.
+                return "    Selection of Units includes a large spacecraft. \n";
+            } else if (unit.getEntity().getUnitType() == UnitType.SMALL_CRAFT) {
+                numberSC++;
+            } else if (unit.getEntity().getUnitType() == UnitType.AERO 
+                        || unit.getEntity().getUnitType() == UnitType.CONV_FIGHTER) {
+                // Includes conventional fighters
+                numberASF++;
+            } else if (unit.getEntity().getUnitType() == UnitType.BATTLE_ARMOR) {
+                numberBA++;
+            } else if (unit.getEntity().getUnitType() == UnitType.INFANTRY) {
+                //Make sure we account for space consumed by different platoon types
+                numberInfantry+= unit.getEntity().getWeight();
+            } else if (unit.getEntity().getUnitType() == UnitType.MEK) {
+                // Includes LAMs and Quadvees
+                numberMech++;
+            } else if (unit.getEntity().getUnitType() == UnitType.PROTOMEK) {
+                numberProto++;
+            } else if (unit.getEntity().getUnitType() == UnitType.TANK 
+                        || unit.getEntity().getUnitType() == UnitType.VTOL 
+                        || unit.getEntity().getUnitType() == UnitType.NAVAL) {
+                // Tanks, VTOLs and wet naval vessels
+                double weight = unit.getEntity().getWeight();
+                if (unit.getEntity().isSuperHeavy()) {
+                    numberSHVee++;
+                } else if (weight >= 51) {
+                    numberHVee++;
+                } else {
+                    numberLVee++;
+                }
+            }
+        }
+        // Now test the designated ship and let us know if it can carry everyone
+        if (numberSC > ship.getCurrentSmallCraftCapacity()) {
+            reason.add("    Selection of Units includes too many small craft. \n");
+            loadOK = false;
+        }
+        // Fighters can fit into any unused SC bays
+        if (numberASF > (ship.getCurrentASFCapacity() + (ship.getCurrentSmallCraftCapacity() - numberSC))) {
+            reason.add("    Selection of Units includes too many fighters. \n");
+            loadOK = false;
+        }
+        if (numberBA > ship.getCurrentBattleArmorCapacity()) {
+            reason.add("    Selection of Units includes too many Battle Armor units. \n");
+            loadOK = false;
+        }
+        if (numberInfantry > ship.getCurrentInfantryCapacity()) {
+            reason.add("    Selection of Units includes too many Infantry units. \n");
+            loadOK = false;
+        }
+        if (numberMech > ship.getCurrentMechCapacity()) {
+            reason.add("    Selection of Units includes too many Mechs. \n");
+            loadOK = false;
+        }
+        if (numberProto > ship.getCurrentProtomechCapacity()) {
+            reason.add("    Selection of Units includes too many ProtoMechs. \n");
+            loadOK = false;
+        }
+        if (numberSHVee > ship.getCurrentSuperHeavyVehicleCapacity()) {
+            reason.add("    Selection of Units includes too many SuperHeavy Vehicles. \n");
+            loadOK = false;
+        }
+        // Heavy vehicles can fit into unused SuperHeavy bays
+        if (numberHVee > (ship.getCurrentHeavyVehicleCapacity() + (ship.getCurrentSuperHeavyVehicleCapacity() - numberSHVee))) {
+            reason.add("    Selection of Units includes too many Heavy Vehicles. \n");
+            loadOK = false;
+        }
+        // Light vehicles can fit into any unused vehicle bays
+        if (numberLVee > 
+            (ship.getCurrentLightVehicleCapacity() + 
+                    (ship.getCurrentSuperHeavyVehicleCapacity() - numberSHVee) + 
+                    (ship.getCurrentHeavyVehicleCapacity() - numberHVee))) {
+            reason.add("    Selection of Units includes too many Light Vehicles. \n");
+            loadOK = false;
+        }
+        if (!loadOK) {
+            return reason.toString();
+        }        
+        // Everything's ok to load. Return a blank string.
+        return null;
+    }
 
     public static boolean doAllUnitsHaveC3i(Vector<Unit> units) {
         for (Unit unit : units) {
@@ -112,6 +233,93 @@ public class StaticChecks {
         for (Unit unit : units) {
             Entity e = unit.getEntity();
             if (null == e) {
+                return false;
+            }
+            if (null == e.getC3NetId()) {
+                return false;
+            }
+            if (null == network) {
+                network = e.getC3NetId();
+            } else if (!e.getC3NetId().equals(network)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    /**
+     * Tests a selection of units to see if all of them have Naval C3 equipment
+     * @param units A vector of units to test for Naval C3 equipment
+     * @return false if any unit in the selection does not have a functioning NC3
+     */
+    public static boolean doAllUnitsHaveNC3(Vector<Unit> units) {
+        for (Unit unit : units) {
+            Entity e = unit.getEntity();
+            if (null == e) {
+                return false;
+            }
+            if (!e.hasNavalC3()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Tests a selection of units to see if all of them have no Naval C3 network assigned
+     * @param units A vector of units to test for Naval C3 network assignment
+     * @return false if any unit in the selection does not have a functioning NC3 or is already on an NC3 network
+     */
+    public static boolean areAllUnitsNotNC3Networked(Vector<Unit> units) {
+        for (Unit unit : units) {
+            Entity e = unit.getEntity();
+            if (null == e) {
+                return false;
+            }
+            if (e.hasNavalC3() && e.calculateFreeC3Nodes() < 5) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Tests a selection of units to see if all of them are on a Naval C3 network
+     * @param units A vector of units to test for Naval C3 network assignment
+     * @return false if any unit in the selection does not have a functioning NC3 or is not on an NC3 network with any other units
+     */
+    public static boolean areAllUnitsNC3Networked(Vector<Unit> units) {
+        for (Unit unit : units) {
+            Entity e = unit.getEntity();
+            if (null == e) {
+                return false;
+            }
+            if (!e.hasNavalC3()) {
+                return false;
+            }
+            if (e.hasNavalC3() && e.calculateFreeC3Nodes() == 5) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Tests a selection of units to see if all of them are on the same Naval C3 network by ID
+     * @param units A vector of units to test for Naval C3 network assignment
+     * @return false if any unit in the selection does not have a functioning NC3, or is not on an NC3 network,
+     *     or if any of the units is on a different NC3 network from the others.
+     */
+    public static boolean areAllUnitsOnSameNC3Network(Vector<Unit> units) {
+        String network = null;
+        for (Unit unit : units) {
+            Entity e = unit.getEntity();
+            if (null == e) {
+                return false;
+            }
+            //Naval C3 recycles a lot of C3i code. C3i units will cause a false positive
+            //without this check
+            if (!e.hasNavalC3()) {
                 return false;
             }
             if (null == e.getC3NetId()) {

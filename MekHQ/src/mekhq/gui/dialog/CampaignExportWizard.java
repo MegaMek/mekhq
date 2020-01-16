@@ -539,6 +539,13 @@ public class CampaignExportWizard extends JDialog {
             
             destinationCampaign.importUnit(unit);
             destinationCampaign.getUnit(unit.getId()).setForceId(Force.FORCE_NONE);
+            // Reset any transport assignments, as the export may not contain all transports and cargo units
+            if (unit.hasTransportShipId()) {
+                unit.getTransportShipId().clear();
+            }
+            if (!unit.getTransportedUnits().isEmpty()) {
+                unit.unloadTransportShip();
+            }
         }
         
         // overwrite any people with the same ID.

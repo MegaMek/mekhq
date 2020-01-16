@@ -25,6 +25,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
+import javax.swing.JOptionPane;
 
 import megamek.client.Client;
 import megamek.client.bot.BotClient;
@@ -63,6 +68,13 @@ public class AtBGameThread extends GameThread {
         super(name, c, app, units, started);
         this.scenario = scenario;
     }
+    
+    // String tokens for dialog boxes used for transport loading
+    private static final String LOAD_FTR_DIALOG_TEXT = "Would you like the fighters assigned to %s to deploy loaded into its bays?";
+    private static final String LOAD_FTR_DIALOG_TITLE = "Load Fighters on Transport?";
+    private static final String LOAD_GND_DIALOG_TEXT = "Would you like the ground units assigned to %s to deploy loaded into its bays?";
+    private static final String LOAD_GND_DIALOG_TITLE = "Load Ground Units on Transport?";
+
 
     @Override
     public void run() {
@@ -182,7 +194,11 @@ public class AtBGameThread extends GameThread {
                     // Set the TempID for autoreporting
                     entity.setExternalIdAsString(unit.getId().toString());
                     // Set the owner
-                    entity.setOwner(client.getLocalPlayer()); 
+                    entity.setOwner(client.getLocalPlayer());
+                    if (!unit.getTransportedUnits().isEmpty()) {
+                        //Store this unit as a potential transport to load
+                        scenario.getPlayerTransportLinkages().put(unit.getId(), new ArrayList<UUID>());
+                    }
                     // Calculate deployment round
                     int deploymentRound = entity.getDeployRound();
                     if(!(scenario instanceof AtBDynamicScenario)) {
@@ -209,6 +225,35 @@ public class AtBGameThread extends GameThread {
                     client.sendAddEntity(entity);
                     // Wait a few secs to not overuse bandwith
                     Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
+                }
+                // Run through the units again. This time add transported units to the correct linkage,
+                // but only if the transport itself is in the game too.
+                for (Unit unit : units) {
+                    if (unit.hasTransportShipId()) {
+                        for (UUID trnId : unit.getTransportShipId().keySet()) {
+                            if (!scenario.getPlayerTransportLinkages().containsKey(trnId)) {
+                                continue;
+                            }
+                        
+                            scenario.addPlayerTransportRelationship(trnId, unit.getId());
+                            // Set these flags so we know what prompts to display later
+                            if (unit.getEntity().isAero()) {
+                                campaign.getUnit(trnId).setCarryingAero(true);
+                            } else {
+                                campaign.getUnit(trnId).setCarryingGround(true);
+                            }
+                        }
+                    }
+                }
+                // Now, clean the list of any transports that don't have deployed units in the game
+                Set<UUID> emptyTransports = new HashSet<>();
+                for (UUID id : scenario.getPlayerTransportLinkages().keySet()) {
+                    if (scenario.getPlayerTransportLinkages().get(id).isEmpty()) {
+                        emptyTransports.add(id);
+                    }
+                }
+                for (UUID id : emptyTransports) {
+                    scenario.getPlayerTransportLinkages().remove(id);
                 }
 
                 /* Add player-controlled ally units */
@@ -268,8 +313,38 @@ public class AtBGameThread extends GameThread {
                     configureBot(botClient, bf);
                     
                     // we need to wait until the game has actually started to do transport loading
+                    // This will load the bot's infantry into APCs
                     if(scenario instanceof AtBScenario) {
                         AtBDynamicScenarioFactory.loadTransports((AtBScenario) scenario, botClient);
+                    }
+                    
+                    // Prompt the player to auto-load units into transports
+                    if (!scenario.getPlayerTransportLinkages().isEmpty()) {
+                        boolean loadFighters = false;
+                        boolean loadGround = false;
+                        for (UUID id : scenario.getPlayerTransportLinkages().keySet()) {
+                            Unit transport = campaign.getUnit(id);
+                            Set<Integer> toLoad = new HashSet<>();
+                            // Let the player choose to load fighters and/or ground units on each transport
+                            if (transport.isCarryingAero()) {
+                                loadFighters = (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
+                                                    String.format(AtBGameThread.LOAD_FTR_DIALOG_TEXT, transport.getName()),
+                                                    AtBGameThread.LOAD_FTR_DIALOG_TITLE, JOptionPane.YES_NO_OPTION));
+                            }
+                            if (transport.isCarryingGround()) {
+                                loadGround = (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
+                                        String.format(AtBGameThread.LOAD_GND_DIALOG_TEXT, transport.getName()),
+                                        AtBGameThread.LOAD_GND_DIALOG_TITLE, JOptionPane.YES_NO_OPTION));
+                            }
+                            // Now, send the load commands
+                            if (loadFighters || loadGround) {
+                                for (UUID cargoId : scenario.getPlayerTransportLinkages().get(id)) {
+                                    //Convert the list of Unit UUIDs to MM EntityIds
+                                    toLoad.add(campaign.getUnit(cargoId).getEntity().getId());
+                                }
+                                Utilities.loadPlayerTransports(transport.getEntity().getId(), toLoad, client, loadFighters, loadGround);
+                            }
+                        }
                     }
                 }
             }

@@ -564,11 +564,25 @@ public class ForceViewPanel extends ScrollablePanel {
     }
     
     public String getSummaryFor(Unit unit) {
-        String toReturn = "<html><font size='2'><b>" + unit.getName() + "</b><br/>";
-        toReturn += "<b>BV:</b> " + unit.getEntity().calculateBattleValue(true, null == unit.getEntity().getCrew()) + "<br/>";
+        String toReturn = "<html><font size='3'><b>" + unit.getName() + "</b></font><br/>";
+        toReturn += "<font size='2'><b>BV:</b> " + unit.getEntity().calculateBattleValue(true, null == unit.getEntity().getCrew()) + "<br/>";
         toReturn += unit.getStatus();
         Entity entity = unit.getEntity();
-    	if (entity.hasC3i()) {
+        if (entity.hasNavalC3()) {
+            toReturn += "<br><i>";
+            if (entity.calculateFreeC3Nodes() >= 5) {
+                toReturn += Messages.getString("ChatLounge.NC3None");
+            } else {
+                toReturn += Messages
+                        .getString("ChatLounge.NC3Network")
+                        + entity.getC3NetId();
+                if (entity.calculateFreeC3Nodes() > 0) {
+                    toReturn += Messages.getString("ChatLounge.NC3Nodes",
+                            new Object[] { entity.calculateFreeC3Nodes() });
+                }
+            }
+            toReturn += "</i>";
+        } else if (entity.hasC3i()) {
     		toReturn += "<br><i>";
             if (entity.calculateFreeC3Nodes() >= 5) {
             	toReturn += Messages.getString("ChatLounge.C3iNone");
@@ -582,6 +596,39 @@ public class ForceViewPanel extends ScrollablePanel {
                 }
             }
     		toReturn += "</i>";
+        }
+        if (unit.hasTransportShipId()) {
+            for (UUID id : unit.getTransportShipId().keySet()) {
+                Unit transport = campaign.getUnit(id);
+                if (transport != null) {
+                    toReturn += "<br><i>" + "Transported by: ";
+                    toReturn += transport.getName();
+                    toReturn += "</i>";
+                }
+            }
+        }
+        // If this is a transport ship, tell us what bay capacity is at
+        if (!unit.getEntity().getTransportBays().isEmpty()) {
+            int veeTotal = (int) (unit.getCurrentLightVehicleCapacity() + unit.getCurrentHeavyVehicleCapacity() + unit.getCurrentSuperHeavyVehicleCapacity());
+            int aeroTotal = (int) (unit.getCurrentASFCapacity() + unit.getCurrentSmallCraftCapacity());
+            if (unit.getCurrentMechCapacity() > 0) {
+                toReturn += "<br><i>" + "Mech Bays: " + (int)unit.getCurrentMechCapacity() + " free.</i>";
+            }
+            if (veeTotal > 0) {
+                toReturn += "<br><i>" + "Vehicle Bays: " + veeTotal + " free.</i>";
+            }
+            if (aeroTotal > 0) {
+                toReturn += "<br><i>" + "ASF/SC Bays: " + aeroTotal + " free.</i>";
+            }
+            if (unit.getCurrentProtomechCapacity() > 0) {
+                toReturn += "<br><i>" + "ProtoMech Bays: " + (int)unit.getCurrentProtomechCapacity() + " free.</i>";
+            }
+            if (unit.getCurrentBattleArmorCapacity() > 0) {
+                toReturn += "<br><i>" + "Battle Armor Bays: " + (int)unit.getCurrentBattleArmorCapacity() + " free.</i>";
+            }
+            if (unit.getCurrentInfantryCapacity() > 0) {
+                toReturn += "<br><i>" + "Infantry Bays: " + (int)unit.getCurrentInfantryCapacity() + " tons free.</i>";
+            }
         }
         toReturn += "</font></html>";
         return toReturn;

@@ -55,6 +55,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.Vector;
@@ -72,25 +73,33 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
 
+import megamek.client.Client;
+import megamek.common.ASFBay;
 import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
+import megamek.common.Bay;
 import megamek.common.Compute;
 import megamek.common.ConvFighter;
 import megamek.common.Crew;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.HeavyVehicleBay;
 import megamek.common.ITechnology;
 import megamek.common.Infantry;
+import megamek.common.InfantryBay;
 import megamek.common.Jumpship;
 import megamek.common.LandAirMech;
+import megamek.common.LightVehicleBay;
 import megamek.common.Mech;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.Mounted;
 import megamek.common.Protomech;
 import megamek.common.SmallCraft;
+import megamek.common.SmallCraftBay;
+import megamek.common.SuperHeavyVehicleBay;
 import megamek.common.Tank;
 import megamek.common.TechConstants;
 import megamek.common.UnitType;
@@ -1594,5 +1603,128 @@ public class Utilities {
 
         // Return the buffered image
         return bimage;
+    }
+    
+    /**
+     * Handles loading a player's transported units onto their transports once a megamek scenario has actually started.
+     * This separates loading air and ground units, since map type and planetary conditions may prohibit ground unit deployment
+     * while the player wants fighters launched to defend the transport
+     * @param trnId - The MM id of the transport entity we want to load
+     * @param toLoad - List of Entity ids for the units we want to load into this transport
+     * @param client - the player's Client instance
+     * @param loadFighters - Should aero type units be loaded?
+     * @param loadGround - should ground units be loaded?
+     */
+    public static void loadPlayerTransports(int trnId, Set<Integer> toLoad,
+                Client client, boolean loadFighters, boolean loadGround) {
+        String METHOD_NAME = "loadPlayerTransports(int,Set<Integer>,Client,boolean,boolean)";
+        if (!loadFighters && !loadGround) {
+            //Nothing to do. Get outta here!
+            return;
+        }
+        Entity transport = client.getEntity(trnId);
+        // Reset transporter status, as currentSpace might still retain updates from when the Unit
+        // was assigned to the Transport on the TO&E tab
+        transport.resetTransporter();
+        for (int id : toLoad) {
+            Entity cargo = client.getEntity(id);
+            if (cargo == null) {
+                continue;
+            }
+            // Find a bay with space in it and update that space so the next unit can process
+            cargo.setTargetBay(selectBestBayFor(cargo, transport));
+        }
+        // Reset transporter status again so that sendLoadEntity can process correctly
+        transport.resetTransporter();
+        for (int id : toLoad) {
+            Entity cargo = client.getEntity(id);
+            // And now load the units
+            if (cargo.isFighter() && loadFighters && transport.canLoad(cargo, false) && cargo.getTargetBay() != -1) {
+                client.sendLoadEntity(id, trnId, cargo.getTargetBay());
+                // Add a wait to make sure that we don't start processing client.sendLoadEntity out of order
+                try {
+                    Thread.sleep(500);
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(Utilities.class, METHOD_NAME, e); //$NON-NLS-1$
+                }
+            } else if(loadGround && transport.canLoad(cargo, false) && cargo.getTargetBay() != -1) {
+                client.sendLoadEntity(id, trnId, cargo.getTargetBay());
+                // Add a wait to make sure that we don't start processing client.sendLoadEntity out of order
+                try {
+                    Thread.sleep(500);
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(Utilities.class, METHOD_NAME, e); //$NON-NLS-1$
+                }
+            }
+        }
+    }
+    
+    /**
+     * Method that loops through a Transport ship's bays and finds one with enough available space to load the Cargo unit
+     * Helps assign a bay number to the Unit record so that transport bays can be automatically filled once a game of MegaMek is started
+     * @param cargo The Entity we wish to load into a bay
+     * @param transport The Bay-equipped Entity we want to load Cargo aboard
+     * @return integer representing the (lowest) bay number on Transport that has space to carry Cargo
+     */
+    public static int selectBestBayFor(Entity cargo, Entity transport) {
+        if (cargo.isFighter()) {
+            // Try to load ASF bays first, so as not to hog SC bays
+            for (Bay b: transport.getTransportBays()) {
+                if (b instanceof ASFBay && b.canLoad(cargo)) {
+                    //Load 1 unit into the bay 
+                    b.setCurrentSpace(1);
+                    return b.getBayNumber();
+                }
+            }
+            for (Bay b: transport.getTransportBays()) {
+                if (b instanceof SmallCraftBay && b.canLoad(cargo)) {
+                    //Load 1 unit into the bay 
+                    b.setCurrentSpace(1);
+                    return b.getBayNumber();
+                }
+            }
+        } else if (cargo.getEntityType() == Entity.ETYPE_TANK) {
+            // Try to fit lighter tanks into smaller bays first
+            for (Bay b: transport.getTransportBays()) {
+                if (b instanceof LightVehicleBay && b.canLoad(cargo)) {
+                    //Load 1 unit into the bay 
+                    b.setCurrentSpace(1);
+                    return b.getBayNumber();
+                }
+            }
+            for (Bay b: transport.getTransportBays()) {
+                if (b instanceof HeavyVehicleBay && b.canLoad(cargo)) {
+                    //Load 1 unit into the bay 
+                    b.setCurrentSpace(1);
+                    return b.getBayNumber();
+                }
+            }
+            for (Bay b: transport.getTransportBays()) {
+                if (b instanceof SuperHeavyVehicleBay && b.canLoad(cargo)) {
+                    //Load 1 unit into the bay 
+                    b.setCurrentSpace(1);
+                    return b.getBayNumber();
+                }
+            }
+        } else if (cargo.getUnitType() == UnitType.INFANTRY) {
+            for (Bay b: transport.getTransportBays()) {
+                if (b instanceof InfantryBay && b.canLoad(cargo)) {
+                    //Update bay tonnage based on platoon/squad weight
+                    b.setCurrentSpace(cargo.getWeight());
+                    return b.getBayNumber();
+                }
+            }
+        } else {
+            // Just return the first available bay
+            for (Bay b : transport.getTransportBays()) {
+                if (b.canLoad(cargo)) {
+                    //Load 1 unit into the bay 
+                    b.setCurrentSpace(1);
+                    return b.getBayNumber();
+                }
+            }
+        }
+        // Shouldn't happen
+        return -1;
     }
 }

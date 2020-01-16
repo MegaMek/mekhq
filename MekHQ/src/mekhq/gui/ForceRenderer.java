@@ -3,6 +3,7 @@ package mekhq.gui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Image;
+import java.util.UUID;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -56,6 +57,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             }
             String uname = "";
             String c3network = "";
+            String transport = "";
             Unit u = (Unit)value;
             Person pp = u.getCommander();
             if(null != pp) {
@@ -70,7 +72,19 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 uname = "<font color='red'>" + uname + "</font>";
             }
             Entity entity = u.getEntity();
-            if (entity.hasC3i()) {
+            if (entity.hasNavalC3()) {
+                if (entity.calculateFreeC3Nodes() >= 5) {
+                    c3network += Messages.getString("ChatLounge.NC3None");
+                } else {
+                    c3network += Messages
+                            .getString("ChatLounge.NC3Network")
+                            + entity.getC3NetId();
+                    if (entity.calculateFreeC3Nodes() > 0) {
+                        c3network += Messages.getString("ChatLounge.NC3Nodes",
+                                new Object[] { entity.calculateFreeC3Nodes() });
+                    }
+                }
+            } else if (entity.hasC3i()) {
                 if (entity.calculateFreeC3Nodes() >= 5) {
                     c3network += Messages.getString("ChatLounge.C3iNone");
                 } else {
@@ -109,7 +123,15 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             if(!c3network.isEmpty()) {
                 c3network = "<br><i>" + c3network + "</i>";
             }
-            setText("<html>" + name + ", " + uname + c3network + "</html>");
+            if(u.hasTransportShipId()) {
+                for (UUID id : u.getTransportShipId().keySet()) {
+                    Unit ship = u.getCampaign().getUnit(id);
+                    if (ship != null) {
+                        transport += "<br>" + "Transported by: " + ship.getName();
+                    }
+                }
+            }
+            setText("<html>" + name + ", " + uname + c3network + transport + "</html>");
             if(u.isDeployed() && !sel) {
                 setBackground(Color.LIGHT_GRAY);
             }
