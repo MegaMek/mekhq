@@ -5,19 +5,18 @@ D-UK
 Config:Biped Omnimech
 TechBase:Clan
 Era:3050
-Rules Level:5
+Rules Level:2
 
 Mass:80
-Engine:400 XL (Clan) Engine(IS)
-Structure:IS Standard
+Engine:400 XL Engine
+Structure:Standard
 Myomer:Standard
 
 Heat Sinks:16 Double
-Base Chassis Heat Sinks:16
 Walk MP:5
 Jump MP:0
 
-Armor:Ferro-Fibrous(Clan)
+Armor:Ferro-Fibrous
 LA Armor:23
 RA Armor:23
 LT Armor:24
@@ -30,68 +29,67 @@ RTL Armor:10
 RTR Armor:10
 RTC Armor:10
 
-Weapons:5
-LRM 20, Left Arm
-ER Large Laser, Right Arm
-ER Large Laser, Right Arm
-LRM 20, Left Torso
-ER Small Laser, Head
+Weapons:4
+2 CLERLargeLaser, Right Arm
+1 CLLRM20, Left Arm, Ammo:18
+1 CLLRM20, Left Torso
+1 CLERSmallLaser, Head
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
 Lower Arm Actuator
-CLLRM20 (omnipod)
-CLLRM20 (omnipod)
-CLLRM20 (omnipod)
-CLLRM20 (omnipod)
-Clan Ferro-Fibrous
+CLLRM20
+CLLRM20
+CLLRM20
+CLLRM20
 -Empty-
 -Empty-
 -Empty-
 -Empty-
+Ferro-Fibrous
 
 Right Arm:
 Shoulder
 Upper Arm Actuator
 Lower Arm Actuator
-CLERLargeLaser (omnipod)
-CLERLargeLaser (omnipod)
-Clan Ferro-Fibrous
+CLERLargeLaser
+CLERLargeLaser
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
+Ferro-Fibrous
 
 Left Torso:
 Fusion Engine
 Fusion Engine
-CLLRM20 (omnipod)
-CLLRM20 (omnipod)
-CLLRM20 (omnipod)
-CLLRM20 (omnipod)
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+CLLRM20
+CLLRM20
+CLLRM20
+CLLRM20
 -Empty-
 -Empty-
 -Empty-
 -Empty-
+Ferro-Fibrous
+Ferro-Fibrous
 
 Right Torso:
 Fusion Engine
 Fusion Engine
-Clan Ammo LRM-20 (omnipod)
-Clan Ammo LRM-20 (omnipod)
-Clan Ammo LRM-20 (omnipod)
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+CLLRM20 Ammo
+CLLRM20 Ammo
+CLLRM20 Ammo
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
+Ferro-Fibrous
+Ferro-Fibrous
 
 Center Torso:
 Fusion Engine
@@ -104,14 +102,14 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-Clan Ferro-Fibrous
 -Empty-
+Ferro-Fibrous
 
 Head:
 Life Support
 Sensors
 Cockpit
-CLERSmallLaser (omnipod)
+CLERSmallLaser
 Sensors
 Life Support
 -Empty-
@@ -148,5 +146,4 @@ Foot Actuator
 -Empty-
 -Empty-
 -Empty-
-
 

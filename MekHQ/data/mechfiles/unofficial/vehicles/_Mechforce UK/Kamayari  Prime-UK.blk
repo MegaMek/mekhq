@@ -2,105 +2,69 @@
 <BlockVersion>
 1
 </BlockVersion>
-
-##Write the version number just in case...
+#Write the version number just in case...
 <Version>
 MAM0
 </Version>
-
 <UnitType>
 Tank
 </UnitType>
-
 <Name>
 Kamayari
 </Name>
-
 <Model>
 Prime-UK
 </Model>
-
-<year>
-3058
-</year>
-
-<type>
-IS Level 5
-</type>
-
-<motion_type>
-Tracked
-</motion_type>
-
-<transporters>
-BattleArmorHandles - troopers:-1
-</transporters>
-
+<Tonnage>
+90
+</Tonnage>
 <cruiseMP>
 3
 </cruiseMP>
-
-<engine_type>
-2
-</engine_type>
-
-<armor_type>
-1
-</armor_type>
-
-<armor_tech>
--1
-</armor_tech>
-
-<omni>
-1
-</omni>
-
-<armor>
+<Armor>
 50
 45
 45
 25
 50
-</armor>
-
-<Body Equipment>
-ISArrowIVAmmo:OMNI
-ISArrowIVHomingAmmo:OMNI
-ISArrowIVAmmo:OMNI
-ISArrowIVHomingAmmo:OMNI
-ISArrowIVAmmo:OMNI
-ISArrowIVHomingAmmo:OMNI
-ISArrowIVAmmo:OMNI
-ISArrowIVHomingAmmo:OMNI
-ISC3MasterUnit:OMNI
-ISC3MasterUnit:OMNI
-</Body Equipment>
-
-<Front Equipment>
-Medium Laser:OMNI
-Medium Laser:OMNI
-</Front Equipment>
-
-<Right Equipment>
-</Right Equipment>
-
-<Left Equipment>
-</Left Equipment>
-
-<Rear Equipment>
-</Rear Equipment>
-
+</Armor>
 <Turret Equipment>
-ISArrowIV:OMNI
-ISArrowIV:OMNI
+ISArrowIVSystem
+ISArrowIVSystem
 </Turret Equipment>
-
-<tonnage>
-90.0
-</tonnage>
-
-<baseChassisTurretWeight>
-3.0
-</baseChassisTurretWeight>
-
+<Front Equipment>
+ISMediumLaser
+ISMediumLaser
+</Front Equipment>
+<Body Equipment>
+ISArrowIV Ammo
+ISArrowIV Homing Ammo
+ISArrowIV Ammo
+ISArrowIV Homing Ammo
+ISArrowIV Ammo
+ISArrowIV Homing Ammo
+ISArrowIV Ammo
+ISArrowIV Homing Ammo
+ISC3MasterComputer
+ISC3MasterComputer
+</Body Equipment>
+<type>
+IS Level 3
+</type>
+<year>
+3058
+</year>
+<internal_type>
+0
+</internal_type>
+<armor_type>
+1
+</armor_type>
+<engine_type>
+2
+</engine_type>
+<motion_type>
+Tracked
+</motion_type>
+<omni>
+</omni>

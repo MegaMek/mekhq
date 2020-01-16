@@ -5,19 +5,18 @@ C-UK
 Config:Biped Omnimech
 TechBase:Clan
 Era:3050
-Rules Level:5
+Rules Level:2
 
 Mass:100
-Engine:300 XL (Clan) Engine(IS)
-Structure:IS Standard
+Engine:300 XL Engine
+Structure:Standard
 Myomer:Standard
 
 Heat Sinks:20 Double
-Base Chassis Heat Sinks:12
 Walk MP:3
 Jump MP:0
 
-Armor:Standard(Clan)
+Armor:Standard Armor
 LA Armor:34
 RA Armor:34
 LT Armor:32
@@ -30,27 +29,23 @@ RTL Armor:10
 RTR Armor:10
 RTC Armor:14
 
-Weapons:10
-Ultra AC/2, Left Arm
-Ultra AC/2, Left Arm
-LB 2-X AC, Right Arm
-LB 2-X AC, Right Arm
-Large Pulse Laser, Left Torso
-Large Pulse Laser, Right Torso
-Large Pulse Laser, Right Torso
-Medium Pulse Laser, Center Torso
-Medium Pulse Laser, Center Torso
-ER Small Laser, Head
+Weapons:6
+2 CLLBXAC2, Right Arm, Ammo:45
+2 CLUltraAC2, Left Arm, Ammo:90
+2 CLLargePulseLaser, Right Torso
+1 CLLargePulseLaser, Left Torso
+2 CLMediumPulseLaser, Center Torso
+1 CLERSmallLaser, Head
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
-CLUltraAC2 (omnipod)
-CLUltraAC2 (omnipod)
-CLUltraAC2 (omnipod)
-CLUltraAC2 (omnipod)
-Clan Ultra AC/2 Ammo (omnipod)
-Clan Ultra AC/2 Ammo (omnipod)
+CLUltraAC2
+CLUltraAC2
+CLUltraAC2
+CLUltraAC2
+CLUltraAC2 Ammo
+CLUltraAC2 Ammo
 -Empty-
 -Empty-
 -Empty-
@@ -59,13 +54,13 @@ Clan Ultra AC/2 Ammo (omnipod)
 Right Arm:
 Shoulder
 Upper Arm Actuator
-CLLBXAC2 (omnipod)
-CLLBXAC2 (omnipod)
-CLLBXAC2 (omnipod)
-CLLBXAC2 (omnipod)
-CLLBXAC2 (omnipod)
-CLLBXAC2 (omnipod)
-Clan LB 2-X Cluster Ammo (omnipod)
+CLLBXAC2
+CLLBXAC2
+CLLBXAC2
+CLLBXAC2
+CLLBXAC2
+CLLBXAC2
+CLLBXAC2 CL Ammo
 -Empty-
 -Empty-
 -Empty-
@@ -73,30 +68,30 @@ Clan LB 2-X Cluster Ammo (omnipod)
 Left Torso:
 Fusion Engine
 Fusion Engine
-CLLargePulseLaser (omnipod)
-CLLargePulseLaser (omnipod)
-CLDoubleHeatSink
-CLDoubleHeatSink
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
+CLLargePulseLaser
+CLLargePulseLaser
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
 -Empty-
 -Empty-
 
 Right Torso:
 Fusion Engine
 Fusion Engine
-CLLargePulseLaser (omnipod)
-CLLargePulseLaser (omnipod)
-CLLargePulseLaser (omnipod)
-CLLargePulseLaser (omnipod)
-CLDoubleHeatSink
-CLDoubleHeatSink
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
+CLLargePulseLaser
+CLLargePulseLaser
+CLLargePulseLaser
+CLLargePulseLaser
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
 
 Center Torso:
 Fusion Engine
@@ -109,14 +104,14 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-CLMediumPulseLaser (omnipod)
-CLMediumPulseLaser (omnipod)
+CLMediumPulseLaser
+CLMediumPulseLaser
 
 Head:
 Life Support
 Sensors
 Cockpit
-CLERSmallLaser (omnipod)
+CLERSmallLaser
 Sensors
 Life Support
 -Empty-
@@ -131,8 +126,8 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-CLDoubleHeatSink
-CLDoubleHeatSink
+CLDouble Heat Sink
+CLDouble Heat Sink
 -Empty-
 -Empty-
 -Empty-
@@ -145,13 +140,12 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
+CLDouble Heat Sink
+CLDouble Heat Sink
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
-
 

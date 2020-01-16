@@ -142,9 +142,6 @@ IS Ammo SRM-6 Artemis-capable:15
 ISArtemisIV
 </Aft Equipment>
 
-<Hull Equipment>
-</Hull Equipment>
-
 <structural_integrity>
 15
 </structural_integrity>

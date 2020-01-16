@@ -5,19 +5,18 @@ A-UK
 Config:Biped Omnimech
 TechBase:Clan
 Era:3058
-Rules Level:5
+Rules Level:2
 
 Mass:65
-Engine:260 XL (Clan) Engine(IS)
-Structure:Clan Endo Steel
+Engine:260 XL Engine
+Structure:Endo Steel
 Myomer:Standard
 
 Heat Sinks:12 Double
-Base Chassis Heat Sinks:10
 Walk MP:4
 Jump MP:0
 
-Armor:Ferro-Fibrous(Clan)
+Armor:Ferro-Fibrous
 LA Armor:20
 RA Armor:20
 LT Armor:23
@@ -30,70 +29,68 @@ RTL Armor:7
 RTR Armor:7
 RTC Armor:10
 
-Weapons:7
-LRM 15, Left Arm
-LRM 15, Left Arm
-LRM 15, Right Arm
-LRM 15, Right Arm
-LRM 15, Left Torso
-LRM 15, Right Torso
-ER Small Laser, Head
+Weapons:5
+2 CLLRM15, Right Arm, Ammo:64
+2 CLLRM15, Left Arm
+1 CLLRM15, Right Torso
+1 CLLRM15, Left Torso
+1 CLERSmallLaser, Head
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
-CLLRM15 (omnipod)
-CLLRM15 (omnipod)
-CLArtemisIV (omnipod)
-CLLRM15 (omnipod)
-CLLRM15 (omnipod)
-CLArtemisIV (omnipod)
-Clan Ammo LRM-15 (Clan) Artemis-capable (omnipod)
-Clan Ammo LRM-15 (Clan) Artemis-capable (omnipod)
-Clan Ammo LRM-15 (Clan) Artemis-capable (omnipod)
-Clan Ammo LRM-15 (Clan) Artemis-capable (omnipod)
+CLLRM15
+CLLRM15
+CLArtemisIV
+CLLRM15
+CLLRM15
+CLArtemisIV
+CLLRM15 Ammo (Clan) Artemis-capable
+CLLRM15 Ammo (Clan) Artemis-capable
+CLLRM15 Ammo (Clan) Artemis-capable
+CLLRM15 Ammo (Clan) Artemis-capable
 
 Right Arm:
 Shoulder
 Upper Arm Actuator
-CLLRM15 (omnipod)
-CLLRM15 (omnipod)
-CLArtemisIV (omnipod)
-CLLRM15 (omnipod)
-CLLRM15 (omnipod)
-CLArtemisIV (omnipod)
-Clan Ammo LRM-15 (Clan) Artemis-capable (omnipod)
-Clan Ammo LRM-15 (Clan) Artemis-capable (omnipod)
-Clan Ammo LRM-15 (Clan) Artemis-capable (omnipod)
-Clan Ammo LRM-15 (Clan) Artemis-capable (omnipod)
+CLLRM15
+CLLRM15
+CLArtemisIV
+CLLRM15
+CLLRM15
+CLArtemisIV
+CLLRM15 Ammo (Clan) Artemis-capable
+CLLRM15 Ammo (Clan) Artemis-capable
+CLLRM15 Ammo (Clan) Artemis-capable
+CLLRM15 Ammo (Clan) Artemis-capable
 
 Left Torso:
 Fusion Engine
 Fusion Engine
-CLLRM15 (omnipod)
-CLLRM15 (omnipod)
-CLArtemisIV (omnipod)
-Clan Endo Steel
-Clan Endo Steel
-Clan Endo Steel
-Clan Endo Steel
-Clan Endo Steel
-Clan Endo Steel
-Clan Endo Steel
+CLLRM15
+CLLRM15
+CLArtemisIV
+Endo Steel
+Endo Steel
+Endo Steel
+Endo Steel
+Endo Steel
+Endo Steel
+Endo Steel
 
 Right Torso:
 Fusion Engine
 Fusion Engine
-CLLRM15 (omnipod)
-CLLRM15 (omnipod)
-CLArtemisIV (omnipod)
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+CLLRM15
+CLLRM15
+CLArtemisIV
+Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
 
 Center Torso:
 Fusion Engine
@@ -113,7 +110,7 @@ Head:
 Life Support
 Sensors
 Cockpit
-CLERSmallLaser (omnipod)
+CLERSmallLaser
 Sensors
 Life Support
 -Empty-
@@ -128,8 +125,8 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
+CLDouble Heat Sink
+CLDouble Heat Sink
 -Empty-
 -Empty-
 -Empty-
@@ -142,13 +139,12 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
+CLDouble Heat Sink
+CLDouble Heat Sink
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
-
 

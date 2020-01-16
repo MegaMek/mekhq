@@ -2,22 +2,21 @@ Version:1.0
 Masakari (Warhawk)
 X-Batchall
 
-Config:Biped Omnimech
+Config:Biped Omni
 TechBase:Clan
 Era:3060
-Rules Level:5
+Rules Level:2
 
 Mass:85
-Engine:340 XL (Clan) Engine(IS)
-Structure:IS Standard
-Myomer:Standard
+Engine:340 XL Engine
+Structure:Standard
+Myomer:MASC
 
 Heat Sinks:20 Double
-Base Chassis Heat Sinks:13
 Walk MP:4
 Jump MP:0
 
-Armor:Ferro-Fibrous(Clan)
+Armor:Ferro-Fibrous
 LA Armor:28
 RA Armor:28
 LT Armor:26
@@ -30,68 +29,67 @@ RTL Armor:10
 RTR Armor:10
 RTC Armor:10
 
-Weapons:5
-Heavy Large Laser, Left Arm
-Heavy Large Laser, Left Arm
-Ultra AC/20, Right Arm
-ER Small Laser, Left Torso
-Medium Pulse Laser, Head
+Weapons:4
+1 CLUltraAC20, Right Arm, Ammo:10
+2 CLHeavyLargeLaser, Left Arm
+1 CLERSmallLaser, Left Torso
+1 CLMediumPulseLaser, Head
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
-CLHeavyLargeLaser (omnipod)
-CLHeavyLargeLaser (omnipod)
-CLHeavyLargeLaser (omnipod)
-CLHeavyLargeLaser (omnipod)
-CLHeavyLargeLaser (omnipod)
-CLHeavyLargeLaser (omnipod)
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+CLHeavyLargeLaser
+CLHeavyLargeLaser
+CLHeavyLargeLaser
+CLHeavyLargeLaser
+CLHeavyLargeLaser
+CLHeavyLargeLaser
+Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
 
 Right Arm:
 Shoulder
 Upper Arm Actuator
-CLUltraAC20 (omnipod)
-CLUltraAC20 (omnipod)
-CLUltraAC20 (omnipod)
-CLUltraAC20 (omnipod)
-CLUltraAC20 (omnipod)
-CLUltraAC20 (omnipod)
-CLUltraAC20 (omnipod)
-CLUltraAC20 (omnipod)
-Clan Ultra AC/20 Ammo (omnipod)
-Clan Ultra AC/20 Ammo (omnipod)
+CLUltraAC20
+CLUltraAC20
+CLUltraAC20
+CLUltraAC20
+CLUltraAC20
+CLUltraAC20
+CLUltraAC20
+CLUltraAC20
+CLUltraAC20 Ammo
+CLUltraAC20 Ammo
 
 Left Torso:
 Fusion Engine
 Fusion Engine
-CLERSmallLaser (omnipod)
+CLERSmallLaser
 CLMASC
 CLMASC
 CLMASC
-CLDoubleHeatSink
-CLDoubleHeatSink
-CLDoubleHeatSink
-CLDoubleHeatSink
-CLDoubleHeatSink
-CLDoubleHeatSink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
 
 Right Torso:
 Fusion Engine
 Fusion Engine
-CLTargeting Computer (omnipod)
-CLTargeting Computer (omnipod)
-CLTargeting Computer (omnipod)
-CLTargeting Computer (omnipod)
-CLTargeting Computer (omnipod)
-CLDoubleHeatSink
-CLDoubleHeatSink
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+CLTargeting Computer
+CLTargeting Computer
+CLTargeting Computer
+CLTargeting Computer
+CLTargeting Computer
+CLDouble Heat Sink
+CLDouble Heat Sink
+Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
 
 Center Torso:
 Fusion Engine
@@ -104,14 +102,14 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
+CLDouble Heat Sink
+CLDouble Heat Sink
 
 Head:
 Life Support
 Sensors
 Cockpit
-CLMediumPulseLaser (omnipod)
+CLMediumPulseLaser
 Sensors
 Life Support
 -Empty-
@@ -126,8 +124,8 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-CLDoubleHeatSink
-CLDoubleHeatSink
+CLDouble Heat Sink
+CLDouble Heat Sink
 -Empty-
 -Empty-
 -Empty-
@@ -140,13 +138,11 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-CLDoubleHeatSink
-CLDoubleHeatSink
+CLDouble Heat Sink
+CLDouble Heat Sink
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
-
-

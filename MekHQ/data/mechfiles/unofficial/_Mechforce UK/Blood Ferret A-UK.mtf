@@ -5,19 +5,18 @@ A-UK
 Config:Biped Omnimech
 TechBase:Clan
 Era:3055
-Rules Level:5
+Rules Level:2
 
 Mass:20
-Engine:160 XL (Clan) Engine(IS)
-Structure:Clan Endo Steel
-Myomer:Standard
+Engine:160 XL Engine
+Structure:Endo Steel
+Myomer:MASC
 
 Heat Sinks:10 Double
-Base Chassis Heat Sinks:6
 Walk MP:8
 Jump MP:0
 
-Armor:Standard(Clan)
+Armor:Standard Armor
 LA Armor:5
 RA Armor:5
 LT Armor:6
@@ -31,13 +30,13 @@ RTR Armor:3
 RTC Armor:4
 
 Weapons:1
-ER PPC, Left Arm
+1 CLERPPC, Left Arm
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
-CLERPPC (omnipod)
-CLERPPC (omnipod)
+CLERPPC
+CLERPPC
 -Empty-
 -Empty-
 -Empty-
@@ -64,9 +63,8 @@ Hand Actuator
 Left Torso:
 Fusion Engine
 Fusion Engine
-CLDoubleHeatSink
-CLDoubleHeatSink
-Clan Endo Steel
+CLDouble Heat Sink
+CLDouble Heat Sink
 -Empty-
 -Empty-
 -Empty-
@@ -74,20 +72,21 @@ Clan Endo Steel
 -Empty-
 -Empty-
 -Empty-
+Endo Steel
 
 Right Torso:
 Fusion Engine
 Fusion Engine
-CLDoubleHeatSink
-CLDoubleHeatSink
-CLDoubleHeatSink
-CLDoubleHeatSink
-CLDoubleHeatSink
-CLDoubleHeatSink
-Clan Endo Steel
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
 -Empty-
 -Empty-
 -Empty-
+Endo Steel
 
 Center Torso:
 Fusion Engine
@@ -100,7 +99,7 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-Clan Endo Steel
+Endo Steel
 CLMASC
 
 Head:
@@ -122,8 +121,8 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Clan Endo Steel
-Clan Endo Steel
+Endo Steel
+Endo Steel
 -Empty-
 -Empty-
 -Empty-
@@ -136,13 +135,12 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Clan Endo Steel
-Clan Endo Steel
+Endo Steel
+Endo Steel
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
-
 

@@ -5,19 +5,18 @@ Lone Wolf-UK
 Config:Biped Omnimech
 TechBase:Clan
 Era:3050
-Rules Level:5
+Rules Level:2
 
 Mass:100
-Engine:300 XL (Clan) Engine(IS)
-Structure:IS Standard
+Engine:300 XL Engine
+Structure:Standard
 Myomer:Standard
 
 Heat Sinks:20 Double
-Base Chassis Heat Sinks:12
 Walk MP:3
 Jump MP:0
 
-Armor:Standard(Clan)
+Armor:Standard Armor
 LA Armor:34
 RA Armor:34
 LT Armor:32
@@ -30,71 +29,69 @@ RTL Armor:10
 RTR Armor:10
 RTC Armor:14
 
-Weapons:8
-Gauss Rifle, Left Arm
-Medium Pulse Laser, Right Arm
-Medium Pulse Laser, Right Arm
-Medium Pulse Laser, Right Arm
-LRM 10, Left Torso
-LB 20-X AC, Center Torso
-LRM 10, Right Torso
-SRM 4 (OS), Head
+Weapons:6
+3 CLMediumPulseLaser, Right Arm
+1 CLGaussRifle, Left Arm, Ammo:32
+1 CLLBXAC20, Right Torso, Ammo:15
+1 CLLRM10, Right Torso, Ammo:24
+1 CLLRM10, Left Torso
+1 CLSRM4 (OS), Head
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
-CLGaussRifle (omnipod)
-CLGaussRifle (omnipod)
-CLGaussRifle (omnipod)
-CLGaussRifle (omnipod)
-CLGaussRifle (omnipod)
-CLGaussRifle (omnipod)
-Clan Gauss Ammo (omnipod)
-Clan Gauss Ammo (omnipod)
-Clan Gauss Ammo (omnipod)
-Clan Gauss Ammo (omnipod)
+CLGaussRifle
+CLGaussRifle
+CLGaussRifle
+CLGaussRifle
+CLGaussRifle
+CLGaussRifle
+CLGauss Ammo
+CLGauss Ammo
+CLGauss Ammo
+CLGauss Ammo
 
 Right Arm:
 Shoulder
 Upper Arm Actuator
-CLMediumPulseLaser (omnipod)
-CLMediumPulseLaser (omnipod)
-CLMediumPulseLaser (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
+CLMediumPulseLaser
+CLMediumPulseLaser
+CLMediumPulseLaser
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
 -Empty-
 
 Left Torso:
 Fusion Engine
 Fusion Engine
-CLLRM10 (omnipod)
-Clan Ammo LRM-10 (omnipod)
-Clan Ammo LRM-10 (omnipod)
-Clan LB 20-X Cluster Ammo (omnipod)
-Clan LB 20-X AC Ammo (omnipod)
-Clan LB 20-X Cluster Ammo (omnipod)
-CLDoubleHeatSink
-CLDoubleHeatSink
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
+CLLRM10
+CLLRM10 Ammo
+CLLRM10 Ammo
+CLLBXAC20 CL Ammo
+CLLBXAC20 Ammo
+CLLBXAC20 CL Ammo
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
 
 Right Torso:
 Fusion Engine
 Fusion Engine
-CLLBXAC20 (omnipod)
-CLLBXAC20 (omnipod)
-CLLBXAC20 (omnipod)
-CLLBXAC20 (omnipod)
-CLLBXAC20 (omnipod)
-CLLBXAC20 (omnipod)
-CLLBXAC20 (omnipod)
-CLLRM10 (omnipod)
-CLDoubleHeatSink
-CLDoubleHeatSink
+CLLBXAC20 (Split)
+CLLBXAC20 (Split)
+CLLBXAC20 (Split)
+CLLBXAC20 (Split)
+CLLBXAC20 (Split)
+CLLBXAC20 (Split)
+CLLBXAC20 (Split)
+CLLRM10
+CLDouble Heat Sink
+CLDouble Heat Sink
 
 Center Torso:
 Fusion Engine
@@ -107,14 +104,14 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-CLLBXAC20 (omnipod)
-CLLBXAC20 (omnipod)
+CLLBXAC20 (Split)
+CLLBXAC20 (Split)
 
 Head:
 Life Support
 Sensors
 Cockpit
-CLSRM4 (OS) (omnipod)
+CLSRM4 (OS)
 Sensors
 Life Support
 -Empty-
@@ -129,8 +126,8 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-CLDoubleHeatSink
-CLDoubleHeatSink
+CLDouble Heat Sink
+CLDouble Heat Sink
 -Empty-
 -Empty-
 -Empty-
@@ -143,13 +140,12 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
+CLDouble Heat Sink
+CLDouble Heat Sink
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
-
 

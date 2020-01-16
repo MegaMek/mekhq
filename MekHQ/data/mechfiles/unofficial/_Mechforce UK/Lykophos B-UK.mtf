@@ -5,19 +5,18 @@ B-UK
 Config:Biped Omnimech
 TechBase:Clan
 Era:3050
-Rules Level:5
+Rules Level:2
 
 Mass:80
-Engine:320 XL (Clan) Engine(IS)
-Structure:IS Standard
-Myomer:Standard
+Engine:320 XL Engine
+Structure:Standard
+Myomer:MASC
 
 Heat Sinks:12 Double
-Base Chassis Heat Sinks:12
 Walk MP:4
 Jump MP:4
 
-Armor:Ferro-Fibrous(Clan)
+Armor:Ferro-Fibrous
 LA Armor:26
 RA Armor:26
 LT Armor:26
@@ -31,32 +30,32 @@ RTR Armor:8
 RTC Armor:9
 
 Weapons:6
-Gauss Rifle, Left Arm
-ER PPC, Right Arm
-ER Small Laser, Left Torso
-Streak SRM 6, Left Torso
-Streak SRM 6, Right Torso
-ER Small Laser, Right Torso
+1 CLERPPC, Right Arm
+1 CLGaussRifle, Left Arm, Ammo:16
+1 CLStreakSRM6, Right Torso, Ammo:15
+1 CLERSmallLaser, Right Torso
+1 CLERSmallLaser, Left Torso
+1 CLStreakSRM6, Left Torso
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
-CLGaussRifle (omnipod)
-CLGaussRifle (omnipod)
-CLGaussRifle (omnipod)
-CLGaussRifle (omnipod)
-CLGaussRifle (omnipod)
-CLGaussRifle (omnipod)
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+CLGaussRifle
+CLGaussRifle
+CLGaussRifle
+CLGaussRifle
+CLGaussRifle
+CLGaussRifle
+Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
 
 Right Arm:
 Shoulder
 Upper Arm Actuator
-CLERPPC (omnipod)
-CLERPPC (omnipod)
+CLERPPC
+CLERPPC
 CLMASC
 CLMASC
 CLMASC
@@ -69,24 +68,24 @@ CLMASC
 Left Torso:
 Fusion Engine
 Fusion Engine
-CLTargeting Computer (omnipod)
-CLTargeting Computer (omnipod)
-CLTargeting Computer (omnipod)
-CLTargeting Computer (omnipod)
-CLERSmallLaser (omnipod)
-CLStreakSRM6 (omnipod)
-CLStreakSRM6 (omnipod)
-Clan Gauss Ammo (omnipod)
-Clan Gauss Ammo (omnipod)
+CLTargeting Computer
+CLTargeting Computer
+CLTargeting Computer
+CLTargeting Computer
+CLERSmallLaser
+CLStreakSRM6
+CLStreakSRM6
+CLGauss Ammo
+CLGauss Ammo
 -Empty-
 
 Right Torso:
 Fusion Engine
 Fusion Engine
-CLStreakSRM6 (omnipod)
-CLStreakSRM6 (omnipod)
-CLERSmallLaser (omnipod)
-Clan Streak SRM 6 Ammo (omnipod)
+CLStreakSRM6
+CLStreakSRM6
+CLERSmallLaser
+CLStreakSRM6 Ammo
 -Empty-
 -Empty-
 -Empty-
@@ -105,14 +104,14 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
 
 Head:
 Life Support
 Sensors
 Cockpit
-Clan Ferro-Fibrous
+Ferro-Fibrous
 Sensors
 Life Support
 -Empty-
@@ -127,8 +126,8 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Jump Jet (omnipod)
-Jump Jet (omnipod)
+Jump Jet
+Jump Jet
 -Empty-
 -Empty-
 -Empty-
@@ -141,13 +140,12 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Jump Jet (omnipod)
-Jump Jet (omnipod)
+Jump Jet
+Jump Jet
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
-
 

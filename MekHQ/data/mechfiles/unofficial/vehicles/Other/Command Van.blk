@@ -12,9 +12,6 @@ Tank
 <Name>
 Command Van
 </Name>
-<Model>
-(Standard)
-</Model>
 <Tonnage>
 15
 </Tonnage>
@@ -39,10 +36,10 @@ ISLRM5 Ammo
 ISMG Ammo (200)
 </Body Equipment>
 <type>
-IS Level 5
+IS
 </type>
 <year>
-2300
+3025
 </year>
 <internal_type>
 0

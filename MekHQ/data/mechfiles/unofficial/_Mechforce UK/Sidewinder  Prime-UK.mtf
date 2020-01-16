@@ -5,19 +5,18 @@ Prime-UK
 Config:Biped Omnimech
 TechBase:Clan
 Era:3058
-Rules Level:5
+Rules Level:2
 
 Mass:75
-Engine:300 XL (Clan) Engine(IS)
-Structure:Clan Endo Steel
-Myomer:Standard
+Engine:300 XL Engine
+Structure:Endo Steel
+Myomer:MASC
 
 Heat Sinks:12 Double
-Base Chassis Heat Sinks:12
 Walk MP:4
 Jump MP:4
 
-Armor:Ferro-Fibrous(Clan)
+Armor:Ferro-Fibrous
 LA Armor:24
 RA Armor:24
 LT Armor:24
@@ -31,55 +30,55 @@ RTR Armor:7
 RTC Armor:8
 
 Weapons:7
-Large Pulse Laser, Left Arm
-Medium Pulse Laser, Left Arm
-AMS, Left Arm
-Gauss Rifle, Right Arm
-LRM 10, Left Torso
-LRM 10, Right Torso
-Medium Pulse Laser, Center Torso
+1 CLGaussRifle, Right Arm, Ammo:16
+1 CLLargePulseLaser, Left Arm
+1 CLMediumPulseLaser, Left Arm
+1 CLAntiMissileSystem, Left Arm, Ammo:24
+1 CLLRM10, Right Torso, Ammo:24
+1 CLLRM10, Left Torso
+1 CLMediumPulseLaser, Center Torso
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
 Lower Arm Actuator
 Hand Actuator
-CLLargePulseLaser (omnipod)
-CLLargePulseLaser (omnipod)
-Clan Ferro-Fibrous
-CLMediumPulseLaser (omnipod)
-Clan Ferro-Fibrous
-CLAntiMissileSystem (omnipod)
-CLAMS Ammo (omnipod)
-Clan Ferro-Fibrous
+CLLargePulseLaser
+CLLargePulseLaser
+Ferro-Fibrous
+CLMediumPulseLaser
+Ferro-Fibrous
+CLAntiMissileSystem
+CLAMS Ammo
+Ferro-Fibrous
 
 Right Arm:
 Shoulder
 Upper Arm Actuator
-CLGaussRifle (omnipod)
-CLGaussRifle (omnipod)
-CLGaussRifle (omnipod)
-CLGaussRifle (omnipod)
-CLGaussRifle (omnipod)
-CLGaussRifle (omnipod)
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+CLGaussRifle
+CLGaussRifle
+CLGaussRifle
+CLGaussRifle
+CLGaussRifle
+CLGaussRifle
+Ferro-Fibrous
+Ferro-Fibrous
 -Empty-
 -Empty-
 
 Left Torso:
 Fusion Engine
 Fusion Engine
-Jump Jet (omnipod)
-Jump Jet (omnipod)
-CLLRM10 (omnipod)
-CLArtemisIV (omnipod)
-Clan Ammo LRM-10 (Clan) Artemis-capable (omnipod)
-Clan Ammo LRM-10 (Clan) Artemis-capable (omnipod)
-Clan Ferro-Fibrous
-Clan Endo Steel
-Clan Endo Steel
-Clan Endo Steel
+Jump Jet
+Jump Jet
+CLLRM10
+CLArtemisIV
+CLLRM10 Ammo (Clan) Artemis-capable
+CLLRM10 Ammo (Clan) Artemis-capable
+Ferro-Fibrous
+Endo Steel
+Endo Steel
+Endo Steel
 
 Right Torso:
 Fusion Engine
@@ -87,13 +86,13 @@ Fusion Engine
 CLMASC
 CLMASC
 CLMASC
-Jump Jet (omnipod)
-Clan Ferro-Fibrous
-Jump Jet (omnipod)
-CLLRM10 (omnipod)
-CLArtemisIV (omnipod)
-Clan Gauss Ammo (omnipod)
-Clan Gauss Ammo (omnipod)
+Jump Jet
+Ferro-Fibrous
+Jump Jet
+CLLRM10
+CLArtemisIV
+CLGauss Ammo
+CLGauss Ammo
 
 Center Torso:
 Fusion Engine
@@ -106,7 +105,7 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-CLMediumPulseLaser (omnipod)
+CLMediumPulseLaser
 -Empty-
 
 Head:
@@ -128,8 +127,8 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Clan Endo Steel
-Clan Endo Steel
+Endo Steel
+Endo Steel
 -Empty-
 -Empty-
 -Empty-
@@ -142,13 +141,12 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Clan Endo Steel
-Clan Endo Steel
+Endo Steel
+Endo Steel
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
-
 

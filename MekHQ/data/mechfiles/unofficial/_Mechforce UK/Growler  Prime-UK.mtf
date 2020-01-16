@@ -5,19 +5,18 @@ Prime-UK
 Config:Biped Omnimech
 TechBase:Clan
 Era:3058
-Rules Level:5
+Rules Level:2
 
 Mass:35
-Engine:315 XL (Clan) Engine(IS)
-Structure:IS Standard
-Myomer:Standard
+Engine:315 XL Engine
+Structure:Standard
+Myomer:MASC
 
 Heat Sinks:10 Double
-Base Chassis Heat Sinks:10
 Walk MP:9
 Jump MP:0
 
-Armor:Standard(Clan)
+Armor:Standard Armor
 LA Armor:12
 RA Armor:12
 LT Armor:11
@@ -30,15 +29,9 @@ RTL Armor:4
 RTR Armor:4
 RTC Armor:6
 
-Weapons:8
-ER Small Laser, Left Torso
-ER Small Laser, Left Torso
-ER Small Laser, Left Torso
-ER Small Laser, Left Torso
-ER Small Laser, Right Torso
-ER Small Laser, Right Torso
-ER Small Laser, Right Torso
-ER Small Laser, Right Torso
+Weapons:2
+4 CLERSmallLaser, Right Torso
+4 CLERSmallLaser, Left Torso
 
 Left Arm:
 Shoulder
@@ -72,10 +65,10 @@ Left Torso:
 Fusion Engine
 Fusion Engine
 CLMASC
-CLERSmallLaser (omnipod)
-CLERSmallLaser (omnipod)
-CLERSmallLaser (omnipod)
-CLERSmallLaser (omnipod)
+CLERSmallLaser
+CLERSmallLaser
+CLERSmallLaser
+CLERSmallLaser
 -Empty-
 -Empty-
 -Empty-
@@ -85,11 +78,11 @@ CLERSmallLaser (omnipod)
 Right Torso:
 Fusion Engine
 Fusion Engine
-CLTargeting Computer (omnipod)
-CLERSmallLaser (omnipod)
-CLERSmallLaser (omnipod)
-CLERSmallLaser (omnipod)
-CLERSmallLaser (omnipod)
+CLTargeting Computer
+CLERSmallLaser
+CLERSmallLaser
+CLERSmallLaser
+CLERSmallLaser
 -Empty-
 -Empty-
 -Empty-
@@ -151,5 +144,4 @@ Foot Actuator
 -Empty-
 -Empty-
 -Empty-
-
 

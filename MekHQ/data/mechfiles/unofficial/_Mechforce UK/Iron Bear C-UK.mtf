@@ -5,19 +5,18 @@ C-UK
 Config:Biped Omnimech
 TechBase:Clan
 Era:3055
-Rules Level:5
+Rules Level:2
 
 Mass:50
-Engine:300 XL (Clan) Engine(IS)
-Structure:Clan Endo Steel
+Engine:300 XL Engine
+Structure:Endo Steel
 Myomer:Standard
 
 Heat Sinks:12 Double
-Base Chassis Heat Sinks:12
 Walk MP:6
 Jump MP:6
 
-Armor:Standard(Clan)
+Armor:Standard Armor
 LA Armor:14
 RA Armor:14
 LT Armor:15
@@ -31,36 +30,36 @@ RTR Armor:7
 RTC Armor:7
 
 Weapons:5
-Medium Pulse Laser, Left Arm
-Medium Pulse Laser, Left Arm
-Large Pulse Laser, Right Arm
-Streak SRM 4, Left Torso
-Streak SRM 4, Right Torso
+1 CLLargePulseLaser, Right Arm
+2 CLMediumPulseLaser, Left Arm
+1 CLStreakSRM4, Right Torso, Ammo:25
+1 CLECMSuite, Right Torso
+1 CLStreakSRM4, Left Torso
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
 Lower Arm Actuator
 Hand Actuator
-CLMediumPulseLaser (omnipod)
-CLMediumPulseLaser (omnipod)
-Clan Endo Steel
-Clan Endo Steel
-Clan Endo Steel
+CLMediumPulseLaser
+CLMediumPulseLaser
 -Empty-
 -Empty-
 -Empty-
+Endo Steel
+Endo Steel
+Endo Steel
 
 Right Arm:
 Shoulder
 Upper Arm Actuator
 Lower Arm Actuator
-CLLargePulseLaser (omnipod)
-CLLargePulseLaser (omnipod)
-Clan Endo Steel
-Clan Endo Steel
-Clan Endo Steel
+CLLargePulseLaser
+CLLargePulseLaser
 -Empty-
+Endo Steel
+Endo Steel
+Endo Steel
 -Empty-
 -Empty-
 -Empty-
@@ -68,9 +67,9 @@ Clan Endo Steel
 Left Torso:
 Fusion Engine
 Fusion Engine
-Jump Jet (omnipod)
-CLStreakSRM4 (omnipod)
-Clan Streak SRM 4 Ammo (omnipod)
+Jump Jet
+CLStreakSRM4
+CLStreakSRM4 Ammo
 -Empty-
 -Empty-
 -Empty-
@@ -82,9 +81,9 @@ Clan Streak SRM 4 Ammo (omnipod)
 Right Torso:
 Fusion Engine
 Fusion Engine
-Jump Jet (omnipod)
-CLStreakSRM4 (omnipod)
-CLECMSuite (omnipod)
+Jump Jet
+CLStreakSRM4
+CLECMSuite
 -Empty-
 -Empty-
 -Empty-
@@ -104,14 +103,14 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-CLTargeting Computer (omnipod)
-CLTargeting Computer (omnipod)
+CLTargeting Computer
+CLTargeting Computer
 
 Head:
 Life Support
 Sensors
 Cockpit
-Clan Endo Steel
+Endo Steel
 Sensors
 Life Support
 -Empty-
@@ -126,8 +125,8 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Jump Jet (omnipod)
-Jump Jet (omnipod)
+Jump Jet
+Jump Jet
 -Empty-
 -Empty-
 -Empty-
@@ -140,13 +139,12 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Jump Jet (omnipod)
-Jump Jet (omnipod)
+Jump Jet
+Jump Jet
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
-
 

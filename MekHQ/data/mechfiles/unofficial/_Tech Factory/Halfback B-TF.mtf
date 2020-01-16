@@ -5,19 +5,18 @@ B-TF
 Config:Biped Omnimech
 TechBase:Clan
 Era:3055
-Rules Level:5
+Rules Level:2
 
 Mass:50
-Engine:300 XL (Clan) Engine(IS)
-Structure:Clan Endo Steel
-Myomer:Standard
+Engine:300 XL Engine
+Structure:Endo Steel
+Myomer:MASC
 
 Heat Sinks:11 Double
-Base Chassis Heat Sinks:10
 Walk MP:6
 Jump MP:0
 
-Armor:Ferro-Fibrous(Clan)
+Armor:Ferro-Fibrous
 LA Armor:16
 RA Armor:16
 LT Armor:17
@@ -31,28 +30,28 @@ RTR Armor:7
 RTC Armor:7
 
 Weapons:2
-LB 20-X AC, Left Arm
-ER PPC, Right Arm
+1 CLERPPC, Right Arm
+1 CLLBXAC20, Left Arm, Ammo:10
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
-CLLBXAC20 (omnipod)
-CLLBXAC20 (omnipod)
-CLLBXAC20 (omnipod)
-CLLBXAC20 (omnipod)
-CLLBXAC20 (omnipod)
-CLLBXAC20 (omnipod)
-CLLBXAC20 (omnipod)
-CLLBXAC20 (omnipod)
-CLLBXAC20 (omnipod)
+CLLBXAC20
+CLLBXAC20
+CLLBXAC20
+CLLBXAC20
+CLLBXAC20
+CLLBXAC20
+CLLBXAC20
+CLLBXAC20
+CLLBXAC20
 -Empty-
 
 Right Arm:
 Shoulder
 Upper Arm Actuator
-CLERPPC (omnipod)
-CLERPPC (omnipod)
+CLERPPC
+CLERPPC
 -Empty-
 -Empty-
 -Empty-
@@ -65,12 +64,12 @@ CLERPPC (omnipod)
 Left Torso:
 Fusion Engine
 Fusion Engine
-Clan LB 20-X Cluster Ammo (omnipod)
-Clan LB 20-X AC Ammo (omnipod)
-Clan Endo Steel
-Clan Endo Steel
-Clan Endo Steel
-Clan Endo Steel
+CLLBXAC20 CL Ammo
+CLLBXAC20 Ammo
+Endo Steel
+Endo Steel
+Endo Steel
+Endo Steel
 -Empty-
 -Empty-
 -Empty-
@@ -79,13 +78,13 @@ Clan Endo Steel
 Right Torso:
 Fusion Engine
 Fusion Engine
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-Clan Endo Steel
-Clan Endo Steel
-Clan Endo Steel
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+CLDouble Heat Sink
+CLDouble Heat Sink
+Endo Steel
+Endo Steel
+Endo Steel
+Ferro-Fibrous
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
@@ -108,7 +107,7 @@ Head:
 Life Support
 Sensors
 Cockpit
-Clan Ferro-Fibrous
+Ferro-Fibrous
 Sensors
 Life Support
 -Empty-
@@ -123,8 +122,8 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
@@ -137,13 +136,12 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
-
 

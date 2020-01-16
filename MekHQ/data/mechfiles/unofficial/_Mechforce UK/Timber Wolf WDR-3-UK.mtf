@@ -5,19 +5,18 @@ WDR-3-UK
 Config:Biped Omnimech
 TechBase:Mixed (Clan Chassis)
 Era:3060
-Rules Level:5
+Rules Level:4
 
 Mass:75
-Engine:375 XL (Clan) Engine
-Structure:Clan Endo Steel
+Engine:375 XL Engine
+Structure:Endo Steel
 Myomer:Standard
 
 Heat Sinks:15 Double
-Base Chassis Heat Sinks:15
 Walk MP:5
 Jump MP:0
 
-Armor:Ferro-Fibrous(Clan)
+Armor:Ferro-Fibrous
 LA Armor:24
 RA Armor:24
 LT Armor:25
@@ -30,23 +29,25 @@ RTL Armor:7
 RTR Armor:7
 RTC Armor:9
 
-Weapons:7
-ER PPC, Left Arm
-AMS, Left Arm
-ER PPC, Right Arm
-AMS, Right Arm
-C3 Master with TAG, Left Torso
-C3 Master with TAG, Right Torso
-ER Small Laser, Center Torso
+Weapons:9
+1 CLERPPC, Right Arm
+1 CLAntiMissileSystem, Right Arm, Ammo:48
+1 CLERPPC, Left Arm
+1 CLAntiMissileSystem, Left Arm
+1 ISC3MasterComputer, Right Torso
+1 CLActiveProbe, Right Torso
+1 ISC3MasterComputer, Left Torso
+1 CLECMSuite, Left Torso
+1 CLERSmallLaser, Center Torso
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
-CLERPPC (omnipod)
-CLERPPC (omnipod)
-CLAntiMissileSystem (omnipod)
-CLAMS Ammo (omnipod)
-Clan Ferro-Fibrous
+CLERPPC
+CLERPPC
+CLAntiMissileSystem
+CLAMS Ammo
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
@@ -56,11 +57,11 @@ Clan Ferro-Fibrous
 Right Arm:
 Shoulder
 Upper Arm Actuator
-CLERPPC (omnipod)
-CLERPPC (omnipod)
-CLAntiMissileSystem (omnipod)
-CLAMS Ammo (omnipod)
-Clan Ferro-Fibrous
+CLERPPC
+CLERPPC
+CLAntiMissileSystem
+CLAMS Ammo
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
@@ -70,29 +71,29 @@ Clan Ferro-Fibrous
 Left Torso:
 Fusion Engine
 Fusion Engine
-ISC3MasterUnit (omnipod)
-ISC3MasterUnit (omnipod)
-ISC3MasterUnit (omnipod)
-ISC3MasterUnit (omnipod)
-ISC3MasterUnit (omnipod)
-CLECMSuite (omnipod)
-Clan Endo Steel
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+ISC3MasterComputer
+ISC3MasterComputer
+ISC3MasterComputer
+ISC3MasterComputer
+ISC3MasterComputer
+CLECMSuite
+Endo Steel
+Ferro-Fibrous
+Ferro-Fibrous
 -Empty-
 
 Right Torso:
 Fusion Engine
 Fusion Engine
-ISC3MasterUnit (omnipod)
-ISC3MasterUnit (omnipod)
-ISC3MasterUnit (omnipod)
-ISC3MasterUnit (omnipod)
-ISC3MasterUnit (omnipod)
-CLActiveProbe (omnipod)
-Clan Endo Steel
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+ISC3MasterComputer
+ISC3MasterComputer
+ISC3MasterComputer
+ISC3MasterComputer
+ISC3MasterComputer
+CLActiveProbe
+Endo Steel
+Ferro-Fibrous
+Ferro-Fibrous
 -Empty-
 
 Center Torso:
@@ -106,14 +107,14 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-CLERSmallLaser (omnipod)
-Clan Endo Steel
+CLERSmallLaser
+Endo Steel
 
 Head:
 Life Support
 Sensors
 Cockpit
-Clan Ferro-Fibrous
+Ferro-Fibrous
 Sensors
 Life Support
 -Empty-
@@ -128,8 +129,8 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Clan Endo Steel
-Clan Endo Steel
+Endo Steel
+Endo Steel
 -Empty-
 -Empty-
 -Empty-
@@ -142,13 +143,12 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Clan Endo Steel
-Clan Endo Steel
+Endo Steel
+Endo Steel
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
-
 

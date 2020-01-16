@@ -5,19 +5,18 @@ A-UK
 Config:Biped Omnimech
 TechBase:Clan
 Era:3050
-Rules Level:5
+Rules Level:2
 
 Mass:60
-Engine:300 XL (Clan) Engine(IS)
-Structure:Clan Endo Steel
+Engine:300 XL Engine
+Structure:Endo Steel
 Myomer:Standard
 
 Heat Sinks:10 Double
-Base Chassis Heat Sinks:10
 Walk MP:5
 Jump MP:5
 
-Armor:Ferro-Fibrous(Clan)
+Armor:Ferro-Fibrous
 LA Armor:18
 RA Armor:18
 LT Armor:20
@@ -30,22 +29,21 @@ RTL Armor:8
 RTR Armor:8
 RTC Armor:12
 
-Weapons:5
-Ultra AC/10, Left Arm
-Ultra AC/10, Right Arm
-ER Medium Laser, Left Torso
-ER Medium Laser, Left Torso
-ER Small Laser, Center Torso
+Weapons:4
+1 CLUltraAC10, Right Arm, Ammo:40
+1 CLUltraAC10, Left Arm
+2 CLERMediumLaser, Left Torso
+1 CLERSmallLaser, Center Torso
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
-CLUltraAC10 (omnipod)
-CLUltraAC10 (omnipod)
-CLUltraAC10 (omnipod)
-CLUltraAC10 (omnipod)
-Clan Ultra AC/10 Ammo (omnipod)
-Clan Ultra AC/10 Ammo (omnipod)
+CLUltraAC10
+CLUltraAC10
+CLUltraAC10
+CLUltraAC10
+CLUltraAC10 Ammo
+CLUltraAC10 Ammo
 -Empty-
 -Empty-
 -Empty-
@@ -54,12 +52,12 @@ Clan Ultra AC/10 Ammo (omnipod)
 Right Arm:
 Shoulder
 Upper Arm Actuator
-CLUltraAC10 (omnipod)
-CLUltraAC10 (omnipod)
-CLUltraAC10 (omnipod)
-CLUltraAC10 (omnipod)
-Clan Ultra AC/10 Ammo (omnipod)
-Clan Ultra AC/10 Ammo (omnipod)
+CLUltraAC10
+CLUltraAC10
+CLUltraAC10
+CLUltraAC10
+CLUltraAC10 Ammo
+CLUltraAC10 Ammo
 -Empty-
 -Empty-
 -Empty-
@@ -68,30 +66,30 @@ Clan Ultra AC/10 Ammo (omnipod)
 Left Torso:
 Fusion Engine
 Fusion Engine
-CLERMediumLaser (omnipod)
-CLERMediumLaser (omnipod)
-Jump Jet (omnipod)
-Jump Jet (omnipod)
-Clan Endo Steel
-Clan Endo Steel
-Clan Endo Steel
-Clan Endo Steel
-Clan Endo Steel
-Clan Endo Steel
+CLERMediumLaser
+CLERMediumLaser
+Jump Jet
+Jump Jet
+Endo Steel
+Endo Steel
+Endo Steel
+Endo Steel
+Endo Steel
+Endo Steel
 
 Right Torso:
 Fusion Engine
 Fusion Engine
-Jump Jet (omnipod)
-Jump Jet (omnipod)
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
-Clan Endo Steel
+Jump Jet
+Jump Jet
+Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
+Endo Steel
 
 Center Torso:
 Fusion Engine
@@ -104,8 +102,8 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-CLERSmallLaser (omnipod)
-Jump Jet (omnipod)
+CLERSmallLaser
+Jump Jet
 
 Head:
 Life Support
@@ -148,5 +146,4 @@ Foot Actuator
 -Empty-
 -Empty-
 -Empty-
-
 

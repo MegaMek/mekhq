@@ -5,19 +5,18 @@ B-TF
 Config:Biped Omnimech
 TechBase:Inner Sphere
 Era:3058
-Rules Level:5
+Rules Level:2
 
 Mass:75
-Engine:375 XL Engine(IS)
-Structure:IS Endo Steel
+Engine:375 XL Engine
+Structure:Endo Steel
 Myomer:Standard
 
 Heat Sinks:15 Double
-Base Chassis Heat Sinks:15
 Walk MP:5
 Jump MP:0
 
-Armor:Standard(Inner Sphere)
+Armor:Standard Armor
 LA Armor:21
 RA Armor:21
 LT Armor:25
@@ -31,23 +30,23 @@ RTR Armor:7
 RTC Armor:8
 
 Weapons:6
-LRM 15, Left Torso
-Medium Laser, Left Torso
-LRM 15, Right Torso
-Medium Laser, Right Torso
-ER Large Laser, Center Torso
-Medium Laser, Head
+1 ISLRM15, Right Torso, Ammo:32
+1 ISMediumLaser, Right Torso
+1 ISLRM15, Left Torso
+1 ISMediumLaser, Left Torso
+1 ISERLargeLaser, Center Torso
+1 ISMediumLaser, Head
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
 Lower Arm Actuator
 Hand Actuator
-IS Endo Steel
-IS Endo Steel
-IS Endo Steel
-IS Endo Steel
-IS Endo Steel
+Endo-Steel
+Endo-Steel
+Endo-Steel
+Endo-Steel
+Endo-Steel
 -Empty-
 -Empty-
 -Empty-
@@ -57,11 +56,11 @@ Shoulder
 Upper Arm Actuator
 Lower Arm Actuator
 Hand Actuator
-IS Endo Steel
-IS Endo Steel
-IS Endo Steel
-IS Endo Steel
-IS Endo Steel
+Endo-Steel
+Endo-Steel
+Endo-Steel
+Endo-Steel
+Endo-Steel
 -Empty-
 -Empty-
 -Empty-
@@ -70,12 +69,12 @@ Left Torso:
 Fusion Engine
 Fusion Engine
 Fusion Engine
-LRM 15 (omnipod)
-LRM 15 (omnipod)
-LRM 15 (omnipod)
-Medium Laser (omnipod)
-IS Endo Steel
-IS Endo Steel
+ISLRM15
+ISLRM15
+ISLRM15
+ISMediumLaser
+Endo-Steel
+Endo-Steel
 -Empty-
 -Empty-
 -Empty-
@@ -84,12 +83,12 @@ Right Torso:
 Fusion Engine
 Fusion Engine
 Fusion Engine
-LRM 15 (omnipod)
-LRM 15 (omnipod)
-LRM 15 (omnipod)
-Medium Laser (omnipod)
-IS Endo Steel
-IS Endo Steel
+ISLRM15
+ISLRM15
+ISLRM15
+ISMediumLaser
+Endo-Steel
+Endo-Steel
 -Empty-
 -Empty-
 -Empty-
@@ -105,14 +104,14 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-ISERLargeLaser (omnipod)
-ISERLargeLaser (omnipod)
+ISERLargeLaser
+ISERLargeLaser
 
 Head:
 Life Support
 Sensors
 Cockpit
-Medium Laser (omnipod)
+ISMediumLaser
 Sensors
 Life Support
 -Empty-
@@ -127,8 +126,8 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-IS Ammo LRM-15 (omnipod)
-IS Ammo LRM-15 (omnipod)
+ISLRM15 Ammo
+ISLRM15 Ammo
 -Empty-
 -Empty-
 -Empty-
@@ -141,13 +140,12 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-IS Ammo LRM-15 (omnipod)
-IS Ammo LRM-15 (omnipod)
+ISLRM15 Ammo
+ISLRM15 Ammo
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
-
 

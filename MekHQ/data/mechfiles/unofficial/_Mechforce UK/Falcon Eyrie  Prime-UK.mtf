@@ -5,19 +5,18 @@ Prime-UK
 Config:Biped Omnimech
 TechBase:Clan
 Era:3058
-Rules Level:5
+Rules Level:2
 
 Mass:90
-Engine:360 XL (Clan) Engine(IS)
-Structure:Clan Endo Steel
-Myomer:Standard
+Engine:360 XL Engine
+Structure:Endo Steel
+Myomer:MASC
 
 Heat Sinks:21 Double
-Base Chassis Heat Sinks:14
 Walk MP:4
 Jump MP:0
 
-Armor:Standard(Clan)
+Armor:Standard Armor
 LA Armor:25
 RA Armor:25
 LT Armor:25
@@ -30,49 +29,43 @@ RTL Armor:8
 RTR Armor:8
 RTC Armor:10
 
-Weapons:14
-ER Medium Laser, Left Arm
-ER Medium Laser, Left Arm
-ER Medium Laser, Left Arm
-ER Small Laser, Left Arm
-LRM 15, Right Arm
-LRM 15, Right Arm
-LRM 15, Right Arm
-ER Medium Laser, Right Torso
-ER Medium Laser, Right Torso
-LRM 10, Right Torso
-AMS, Right Torso
-ER Large Laser, Center Torso
-ER Large Laser, Center Torso
-AMS, Head
+Weapons:8
+3 CLLRM15, Right Arm, Ammo:24
+3 CLERMediumLaser, Left Arm
+1 CLERSmallLaser, Left Arm
+2 CLERMediumLaser, Right Torso
+1 CLLRM10, Right Torso, Ammo:12
+1 CLAntiMissileSystem, Right Torso, Ammo:24
+2 CLERLargeLaser, Center Torso
+1 CLAntiMissileSystem, Head
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
-CLERMediumLaser (omnipod)
-CLERMediumLaser (omnipod)
-CLERMediumLaser (omnipod)
-CLERSmallLaser (omnipod)
-Clan Endo Steel
-Clan Endo Steel
-Clan Endo Steel
-Clan Endo Steel
-Clan Endo Steel
-Clan Endo Steel
+CLERMediumLaser
+CLERMediumLaser
+CLERMediumLaser
+CLERSmallLaser
+Endo Steel
+Endo Steel
+Endo Steel
+Endo Steel
+Endo Steel
+Endo Steel
 
 Right Arm:
 Shoulder
 Upper Arm Actuator
-CLLRM15 (omnipod)
-CLLRM15 (omnipod)
-CLLRM15 (omnipod)
-CLLRM15 (omnipod)
-CLLRM15 (omnipod)
-CLLRM15 (omnipod)
-Clan Ammo LRM-15 (omnipod)
-Clan Ammo LRM-15 (omnipod)
-Clan Ammo LRM-15 (omnipod)
-Clan Endo Steel
+CLLRM15
+CLLRM15
+CLLRM15
+CLLRM15
+CLLRM15
+CLLRM15
+CLLRM15 Ammo
+CLLRM15 Ammo
+CLLRM15 Ammo
+Endo Steel
 
 Left Torso:
 Fusion Engine
@@ -81,26 +74,26 @@ CLMASC
 CLMASC
 CLMASC
 CLMASC
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
 
 Right Torso:
 Fusion Engine
 Fusion Engine
-CLERMediumLaser (omnipod)
-CLERMediumLaser (omnipod)
-CLLRM10 (omnipod)
-CLAntiMissileSystem (omnipod)
-Clan Ammo LRM-10 (omnipod)
-CLAMS Ammo (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
+CLERMediumLaser
+CLERMediumLaser
+CLLRM10
+CLAntiMissileSystem
+CLLRM10 Ammo
+CLAMS Ammo
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
 
 Center Torso:
 Fusion Engine
@@ -113,14 +106,14 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-CLERLargeLaser (omnipod)
-CLERLargeLaser (omnipod)
+CLERLargeLaser
+CLERLargeLaser
 
 Head:
 Life Support
 Sensors
 Cockpit
-CLAntiMissileSystem (omnipod)
+CLAntiMissileSystem
 Sensors
 Life Support
 -Empty-
@@ -135,8 +128,8 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
+CLDouble Heat Sink
+CLDouble Heat Sink
 -Empty-
 -Empty-
 -Empty-
@@ -149,13 +142,12 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
+CLDouble Heat Sink
+CLDouble Heat Sink
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
-
 

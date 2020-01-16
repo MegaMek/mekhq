@@ -77,7 +77,7 @@ Hitch
 </Rear Equipment>
 
 <transporters>
-troopspace:55
+infantrybay:11:3
 cargobay:5:1
 </transporters>
 
@@ -88,7 +88,3 @@ HB:House Marik - Age of War
 <tonnage>
 80
 </tonnage>
-
-<history>
-Unit is overweight by design. To be legal it would need a couple of 2 less infantry, or 1 less field kitchen.
-</history>

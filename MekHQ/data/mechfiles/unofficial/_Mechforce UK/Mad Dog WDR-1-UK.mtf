@@ -5,19 +5,18 @@ WDR-1-UK
 Config:Biped Omnimech
 TechBase:Mixed (Clan Chassis)
 Era:3060
-Rules Level:5
+Rules Level:4
 
 Mass:60
-Engine:300 XL (Clan) Engine
-Structure:IS Standard
+Engine:300 XL Engine
+Structure:Standard
 Myomer:Standard
 
 Heat Sinks:19 Double
-Base Chassis Heat Sinks:12
 Walk MP:5
 Jump MP:0
 
-Armor:Ferro-Fibrous(Clan)
+Armor:Ferro-Fibrous
 LA Armor:16
 RA Armor:16
 LT Armor:16
@@ -30,23 +29,24 @@ RTL Armor:7
 RTR Armor:7
 RTC Armor:7
 
-Weapons:6
-ER Large Laser, Left Arm
-Medium Pulse Laser, Left Arm
-ER Large Laser, Right Arm
-Medium Pulse Laser, Right Arm
-Streak SRM 6, Left Torso
-Streak SRM 6, Right Torso
+Weapons:7
+1 CLERLargeLaser, Right Arm
+1 CLMediumPulseLaser, Right Arm
+1 CLERLargeLaser, Left Arm
+1 CLMediumPulseLaser, Left Arm
+1 CLStreakSRM6, Right Torso, Ammo:30
+1 CLStreakSRM6, Left Torso
+1 ISC3SlaveUnit, Center Torso
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
 Lower Arm Actuator
-CLERLargeLaser (omnipod)
-CLMediumPulseLaser (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-Clan Ferro-Fibrous
+CLERLargeLaser
+CLMediumPulseLaser
+CLDouble Heat Sink
+CLDouble Heat Sink
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
@@ -56,11 +56,11 @@ Right Arm:
 Shoulder
 Upper Arm Actuator
 Lower Arm Actuator
-CLERLargeLaser (omnipod)
-CLMediumPulseLaser (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-Clan Ferro-Fibrous
+CLERLargeLaser
+CLMediumPulseLaser
+CLDouble Heat Sink
+CLDouble Heat Sink
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
@@ -69,13 +69,13 @@ Clan Ferro-Fibrous
 Left Torso:
 Fusion Engine
 Fusion Engine
-CLStreakSRM6 (omnipod)
-CLStreakSRM6 (omnipod)
-Clan Streak SRM 6 Ammo (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+CLStreakSRM6
+CLStreakSRM6
+CLStreakSRM6 Ammo
+CLDouble Heat Sink
+CLDouble Heat Sink
+Ferro-Fibrous
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
@@ -83,15 +83,15 @@ Clan Ferro-Fibrous
 Right Torso:
 Fusion Engine
 Fusion Engine
-CLStreakSRM6 (omnipod)
-CLStreakSRM6 (omnipod)
-Clan Streak SRM 6 Ammo (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+CLStreakSRM6
+CLStreakSRM6
+CLStreakSRM6 Ammo
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+Ferro-Fibrous
+Ferro-Fibrous
 -Empty-
 
 Center Torso:
@@ -105,14 +105,14 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-ISC3SlaveUnit (omnipod)
+ISC3SlaveUnit
 -Empty-
 
 Head:
 Life Support
 Sensors
 Cockpit
-Clan Ferro-Fibrous
+Ferro-Fibrous
 Sensors
 Life Support
 -Empty-
@@ -127,8 +127,8 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
+CLDouble Heat Sink
+CLDouble Heat Sink
 -Empty-
 -Empty-
 -Empty-
@@ -141,13 +141,12 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
+CLDouble Heat Sink
+CLDouble Heat Sink
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
-
 

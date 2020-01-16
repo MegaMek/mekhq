@@ -5,19 +5,18 @@ B-UK
 Config:Biped Omnimech
 TechBase:Clan
 Era:3058
-Rules Level:5
+Rules Level:2
 
 Mass:45
-Engine:270 XL (Clan) Engine(IS)
-Structure:IS Standard
+Engine:270 XL Engine
+Structure:Standard
 Myomer:Standard
 
 Heat Sinks:10 Double
-Base Chassis Heat Sinks:10
 Walk MP:6
 Jump MP:6
 
-Armor:Ferro-Fibrous(Clan)
+Armor:Ferro-Fibrous
 LA Armor:14
 RA Armor:14
 LT Armor:15
@@ -30,22 +29,21 @@ RTL Armor:7
 RTR Armor:7
 RTC Armor:8
 
-Weapons:6
-Narc, Left Arm
-LRM 15, Right Arm
-Large Pulse Laser, Left Torso
-ER Small Laser, Left Torso
-ER Small Laser, Right Torso
-ER Small Laser, Right Torso
+Weapons:5
+1 CLLRM15, Right Arm, Ammo:16
+1 CLNarcBeacon, Left Arm, Ammo:6
+2 CLERSmallLaser, Right Torso (R)
+1 CLLargePulseLaser, Left Torso
+1 CLERSmallLaser, Left Torso (R)
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
 Lower Arm Actuator
 Hand Actuator
-CLNarcBeacon (omnipod)
-CLNarc Pods (omnipod)
-Clan Ferro-Fibrous
+CLNarcBeacon
+CLNarc Pods
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
@@ -57,23 +55,23 @@ Shoulder
 Upper Arm Actuator
 Lower Arm Actuator
 Hand Actuator
-Clan Ammo LRM-15 (Clan) Narc-capable (omnipod)
-CLLRM15 (omnipod)
-CLLRM15 (omnipod)
-Clan Ammo LRM-15 (Clan) Narc-capable (omnipod)
-Clan Ferro-Fibrous
+CLLRM15 Ammo (Clan) Narc-capable
+CLLRM15
+CLLRM15
+CLLRM15 Ammo (Clan) Narc-capable
 -Empty-
 -Empty-
 -Empty-
+Ferro-Fibrous
 
 Left Torso:
 Fusion Engine
 Fusion Engine
-Jump Jet (omnipod)
-Jump Jet (omnipod)
-CLLargePulseLaser (omnipod)
-CLLargePulseLaser (omnipod)
-CLERSmallLaser (R) (omnipod)
+Jump Jet
+Jump Jet
+CLLargePulseLaser
+CLLargePulseLaser
+CLERSmallLaser (R)
 -Empty-
 -Empty-
 -Empty-
@@ -83,11 +81,11 @@ CLERSmallLaser (R) (omnipod)
 Right Torso:
 Fusion Engine
 Fusion Engine
-Jump Jet (omnipod)
-Jump Jet (omnipod)
-CLERSmallLaser (R) (omnipod)
-CLERSmallLaser (R) (omnipod)
-Clan Ferro-Fibrous
+Jump Jet
+Jump Jet
+CLERSmallLaser (R)
+CLERSmallLaser (R)
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
@@ -105,8 +103,8 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-Jump Jet (omnipod)
-Jump Jet (omnipod)
+Jump Jet
+Jump Jet
 
 Head:
 Life Support
@@ -127,8 +125,8 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
@@ -141,13 +139,12 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
-
 

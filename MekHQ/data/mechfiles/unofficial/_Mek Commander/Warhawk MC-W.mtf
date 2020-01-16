@@ -5,19 +5,18 @@ MC-W
 Config:Biped Omnimech
 TechBase:Clan
 Era:3059
-Rules Level:5
+Rules Level:2
 
 Mass:85
-Engine:340 XL (Clan) Engine(IS)
-Structure:Clan Endo Steel
+Engine:340 XL Engine
+Structure:Endo Steel
 Myomer:Standard
 
 Heat Sinks:15 Double
-Base Chassis Heat Sinks:13
 Walk MP:4
 Jump MP:0
 
-Armor:Ferro-Fibrous(Clan)
+Armor:Ferro-Fibrous
 LA Armor:26
 RA Armor:26
 LT Armor:26
@@ -31,69 +30,69 @@ RTR Armor:8
 RTC Armor:10
 
 Weapons:7
-ER PPC, Left Arm
-Gauss Rifle, Left Arm
-ER PPC, Right Arm
-Gauss Rifle, Right Arm
-Flamer, Left Torso
-Flamer, Right Torso
-LRM 10, Right Torso
+1 CLERPPC, Right Arm
+1 CLGaussRifle, Right Arm, Ammo:16
+1 CLERPPC, Left Arm
+1 CLGaussRifle, Left Arm
+1 CLFlamer, Right Torso
+1 CLLRM10, Right Torso, Ammo:12
+1 CLFlamer, Left Torso
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
-CLERPPC (omnipod)
-CLERPPC (omnipod)
-CLGaussRifle (omnipod)
-CLGaussRifle (omnipod)
-CLGaussRifle (omnipod)
-CLGaussRifle (omnipod)
-CLGaussRifle (omnipod)
-CLGaussRifle (omnipod)
-Clan Ferro-Fibrous
-Clan Endo Steel
+CLERPPC
+CLERPPC
+CLGaussRifle
+CLGaussRifle
+CLGaussRifle
+CLGaussRifle
+CLGaussRifle
+CLGaussRifle
+Ferro-Fibrous
+Endo Steel
 
 Right Arm:
 Shoulder
 Upper Arm Actuator
-CLERPPC (omnipod)
-CLERPPC (omnipod)
-CLGaussRifle (omnipod)
-CLGaussRifle (omnipod)
-CLGaussRifle (omnipod)
-CLGaussRifle (omnipod)
-CLGaussRifle (omnipod)
-CLGaussRifle (omnipod)
-Clan Ferro-Fibrous
-Clan Endo Steel
+CLERPPC
+CLERPPC
+CLGaussRifle
+CLGaussRifle
+CLGaussRifle
+CLGaussRifle
+CLGaussRifle
+CLGaussRifle
+Ferro-Fibrous
+Endo Steel
 
 Left Torso:
 Fusion Engine
 Fusion Engine
-CLFlamer (omnipod)
-Clan Gauss Ammo (omnipod)
-Clan Gauss Ammo (omnipod)
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+CLFlamer
+CLGauss Ammo
+CLGauss Ammo
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
+Ferro-Fibrous
+Ferro-Fibrous
 
 Right Torso:
 Fusion Engine
 Fusion Engine
-CLFlamer (omnipod)
-CLLRM10 (omnipod)
-Clan Ammo LRM-10 (omnipod)
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
-Clan Endo Steel
-Clan Endo Steel
-Clan Endo Steel
+CLFlamer
+CLLRM10
+CLLRM10 Ammo
 -Empty-
 -Empty-
+Ferro-Fibrous
+Ferro-Fibrous
+Endo Steel
+Endo Steel
+Endo Steel
 
 Center Torso:
 Fusion Engine
@@ -106,14 +105,14 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-Clan Endo Steel
-Clan Endo Steel
+Endo Steel
+Endo Steel
 
 Head:
 Life Support
 Sensors
 Cockpit
-Clan Ferro-Fibrous
+Ferro-Fibrous
 Sensors
 Life Support
 -Empty-
@@ -128,8 +127,8 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-CLDoubleHeatSink
-CLDoubleHeatSink
+CLDouble Heat Sink
+CLDouble Heat Sink
 -Empty-
 -Empty-
 -Empty-
@@ -142,13 +141,12 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-CLDoubleHeatSink
-CLDoubleHeatSink
+CLDouble Heat Sink
+CLDouble Heat Sink
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
-
 

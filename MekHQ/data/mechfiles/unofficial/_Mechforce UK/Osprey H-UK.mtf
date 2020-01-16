@@ -5,19 +5,18 @@ H-UK
 Config:Biped Omnimech
 TechBase:Clan
 Era:3058
-Rules Level:5
+Rules Level:2
 
 Mass:40
-Engine:280 XL (Clan) Engine(IS)
-Structure:Clan Endo Steel
+Engine:280 XL Engine
+Structure:Endo Steel
 Myomer:Standard
 
 Heat Sinks:15 Double
-Base Chassis Heat Sinks:10
 Walk MP:7
 Jump MP:7
 
-Armor:Ferro-Fibrous(Clan)
+Armor:Ferro-Fibrous
 LA Armor:10
 RA Armor:10
 LT Armor:15
@@ -31,69 +30,69 @@ RTR Armor:5
 RTC Armor:7
 
 Weapons:7
-Heavy Large Laser, Right Arm
-Heavy Medium Laser, Left Torso
-Heavy Small Laser, Left Torso
-Heavy Medium Laser, Right Torso
-AMS, Right Torso
-Heavy Small Laser, Right Torso
-Heavy Small Laser, Center Torso
+1 CLHeavyLargeLaser, Right Arm
+1 CLHeavyMediumLaser, Right Torso
+1 CLAntiMissileSystem, Right Torso, Ammo:24
+1 CLHeavySmallLaser, Right Torso
+1 CLHeavyMediumLaser, Left Torso
+1 CLHeavySmallLaser, Left Torso
+1 CLHeavySmallLaser, Center Torso
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
 Lower Arm Actuator
 Hand Actuator
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
-Clan Endo Steel
-Clan Endo Steel
+CLDouble Heat Sink
+CLDouble Heat Sink
+Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
+Endo Steel
+Endo Steel
 -Empty-
 
 Right Arm:
 Shoulder
 Upper Arm Actuator
-CLHeavyLargeLaser (omnipod)
-CLHeavyLargeLaser (omnipod)
-CLHeavyLargeLaser (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-Clan Endo Steel
-Clan Endo Steel
-Clan Endo Steel
-Clan Endo Steel
-Clan Endo Steel
+CLHeavyLargeLaser
+CLHeavyLargeLaser
+CLHeavyLargeLaser
+CLDouble Heat Sink
+CLDouble Heat Sink
+Endo Steel
+Endo Steel
+Endo Steel
+Endo Steel
+Endo Steel
 
 Left Torso:
 Fusion Engine
 Fusion Engine
-CLHeavyMediumLaser (omnipod)
-CLHeavyMediumLaser (omnipod)
-CLHeavySmallLaser (omnipod)
-Jump Jet (omnipod)
-Jump Jet (omnipod)
-Jump Jet (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
+CLHeavyMediumLaser
+CLHeavyMediumLaser
+CLHeavySmallLaser
+Jump Jet
+Jump Jet
+Jump Jet
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
 
 Right Torso:
 Fusion Engine
 Fusion Engine
-CLHeavyMediumLaser (omnipod)
-CLHeavyMediumLaser (omnipod)
-CLAntiMissileSystem (omnipod)
-CLAMS Ammo (omnipod)
-CLHeavySmallLaser (omnipod)
-Jump Jet (omnipod)
-Jump Jet (omnipod)
-Jump Jet (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
+CLHeavyMediumLaser
+CLHeavyMediumLaser
+CLAntiMissileSystem
+CLAMS Ammo
+CLHeavySmallLaser
+Jump Jet
+Jump Jet
+Jump Jet
+CLDouble Heat Sink
+CLDouble Heat Sink
 
 Center Torso:
 Fusion Engine
@@ -106,8 +105,8 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-CLHeavySmallLaser (omnipod)
-Jump Jet (omnipod)
+CLHeavySmallLaser
+Jump Jet
 
 Head:
 Life Support
@@ -128,8 +127,8 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
@@ -142,13 +141,12 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
-
 

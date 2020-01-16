@@ -5,19 +5,18 @@ KH-UK
 Config:Biped Omnimech
 TechBase:Mixed (Clan Chassis)
 Era:3058
-Rules Level:5
+Rules Level:4
 
 Mass:60
-Engine:300 XL (Clan) Engine
-Structure:IS Standard
+Engine:300 XL Engine
+Structure:Standard
 Myomer:Standard
 
 Heat Sinks:12 Double
-Base Chassis Heat Sinks:12
 Walk MP:5
 Jump MP:0
 
-Armor:Ferro-Fibrous(Clan)
+Armor:Ferro-Fibrous
 LA Armor:16
 RA Armor:16
 LT Armor:16
@@ -30,22 +29,23 @@ RTL Armor:7
 RTR Armor:7
 RTC Armor:7
 
-Weapons:5
-Ultra AC/5, Left Arm
-Large Pulse Laser, Right Arm
-ER Medium Laser, Right Arm
-LRM 15, Left Torso
-LRM 15, Right Torso
+Weapons:6
+1 CLLargePulseLaser, Right Arm
+1 CLERMediumLaser, Right Arm
+1 CLUltraAC5, Left Arm, Ammo:40
+1 CLLRM15, Right Torso, Ammo:16
+1 CLLRM15, Left Torso
+1 ISC3SlaveUnit, Center Torso
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
-CLUltraAC5 (omnipod)
-CLUltraAC5 (omnipod)
-CLUltraAC5 (omnipod)
-Clan Ultra AC/5 Ammo (omnipod)
-Clan Ultra AC/5 Ammo (omnipod)
-Clan Ferro-Fibrous
+CLUltraAC5
+CLUltraAC5
+CLUltraAC5
+CLUltraAC5 Ammo
+CLUltraAC5 Ammo
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
@@ -54,10 +54,10 @@ Clan Ferro-Fibrous
 Right Arm:
 Shoulder
 Upper Arm Actuator
-CLLargePulseLaser (omnipod)
-CLLargePulseLaser (omnipod)
-CLERMediumLaser (omnipod)
-Clan Ferro-Fibrous
+CLLargePulseLaser
+CLLargePulseLaser
+CLERMediumLaser
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
@@ -68,12 +68,12 @@ Clan Ferro-Fibrous
 Left Torso:
 Fusion Engine
 Fusion Engine
-CLLRM15 (omnipod)
-CLLRM15 (omnipod)
-CLArtemisIV (omnipod)
-Clan Ammo LRM-15 (Clan) Artemis-capable (omnipod)
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+CLLRM15
+CLLRM15
+CLArtemisIV
+CLLRM15 Ammo (Clan) Artemis-capable
+Ferro-Fibrous
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
@@ -82,12 +82,12 @@ Clan Ferro-Fibrous
 Right Torso:
 Fusion Engine
 Fusion Engine
-CLLRM15 (omnipod)
-CLLRM15 (omnipod)
-CLArtemisIV (omnipod)
-Clan Ammo LRM-15 (Clan) Artemis-capable (omnipod)
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+CLLRM15
+CLLRM15
+CLArtemisIV
+CLLRM15 Ammo (Clan) Artemis-capable
+Ferro-Fibrous
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
@@ -104,14 +104,14 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-ISC3SlaveUnit (omnipod)
+ISC3SlaveUnit
 -Empty-
 
 Head:
 Life Support
 Sensors
 Cockpit
-Clan Ferro-Fibrous
+Ferro-Fibrous
 Sensors
 Life Support
 -Empty-
@@ -148,5 +148,4 @@ Foot Actuator
 -Empty-
 -Empty-
 -Empty-
-
 
