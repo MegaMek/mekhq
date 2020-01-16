@@ -19,6 +19,7 @@ v0.47.3-SNAPSHOT
 + Issue #1390: Bug: fix XML parsing failure when putting customs in CPNX that have ampersands (etc)
 + Issue #1284: Can't get contracts from Comstar's capital planet
 + Issue #1384: PIR and REB AtB Contracts can not be generated
++ PR #1371: Ability to load units into dropships/warships for automatic deployment to megamek scenarios; Naval C3 network configuration in MekHQ
 
 v0.47.2 (2019-11-15 2000 UTC) 
 + PR #1325: Customize protomechs and advanced aero in MekLab
