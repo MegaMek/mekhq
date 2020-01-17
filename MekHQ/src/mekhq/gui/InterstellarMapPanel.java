@@ -49,9 +49,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -695,6 +697,11 @@ public class InterstellarMapPanel extends JPanel {
                         }
                     }
                 }
+                
+                Map<Faction, String> capitals = new HashMap<>();
+                for (Faction faction : Faction.getFactions()) {
+                	capitals.put(faction,faction.getStartingPlanet(campaign.getGameYear()));
+                }
 
                 for(PlanetarySystem system : systems) {
                     if(isSystemVisible(system, false)) {
@@ -738,7 +745,7 @@ public class InterstellarMapPanel extends JPanel {
 	                        if(null != factions && !isSystemEmpty(system)) {
 	                            int i = 0;
 	                            for(Faction faction : factions) {
-	                            	if (faction.getStartingPlanet(campaign.getGameYear()).equals(system.getId())) {
+	                            	if (capitals.get(faction).equals(system.getId())) {
 	                            		g2.setPaint(new Color(212,175,55));
 		                                arc.setArcByCenter(x, y, size+3, 0, 360.0 * (1-((double)i)/factions.size()), Arc2D.PIE);
 		                                g2.fill(arc);
