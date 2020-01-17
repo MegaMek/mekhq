@@ -738,6 +738,16 @@ public class InterstellarMapPanel extends JPanel {
 	                        if(null != factions && !isSystemEmpty(system)) {
 	                            int i = 0;
 	                            for(Faction faction : factions) {
+	                            	if (faction.getStartingPlanet(campaign.getGameYear()).equals(system.getId())) {
+	                            		g2.setPaint(new Color(212,175,55));
+		                                arc.setArcByCenter(x, y, size+3, 0, 360.0 * (1-((double)i)/factions.size()), Arc2D.PIE);
+		                                g2.fill(arc);
+	                            	}
+	                            	if (campaign.getAtBConfig().isHiringHall(system.getId(), campaign.getDate())) {
+	                            		g2.setPaint(new Color(192,192,192));
+		                                arc.setArcByCenter(x, y, size+3, 0, 360.0 * (1-((double)i)/factions.size()), Arc2D.PIE);
+		                                g2.fill(arc);
+		                            }
 	                                g2.setPaint(faction.getColor());
 	                                arc.setArcByCenter(x, y, size, 0, 360.0 * (1-((double)i)/factions.size()), Arc2D.PIE);
 	                                g2.fill(arc);
