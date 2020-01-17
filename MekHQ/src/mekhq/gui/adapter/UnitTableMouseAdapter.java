@@ -18,6 +18,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
+import javax.swing.UIManager;
 import javax.swing.event.MouseInputAdapter;
 
 import megamek.client.ui.swing.UnitEditorDialog;
@@ -791,24 +792,30 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             if (oneSelected && unit.requiresMaintenance()
                     && !unit.isSelfCrewed() && unit.isAvailable()) {
                 menu = new JMenu("Assign Tech");
+                JMenu menuElite = new JMenu(SkillType.ELITE_NM);
+                JMenu menuVeteran = new JMenu(SkillType.VETERAN_NM);
+                JMenu menuRegular = new JMenu(SkillType.REGULAR_NM);
+                JMenu menuGreen = new JMenu(SkillType.GREEN_NM);
+                JMenu menuUltraGreen = new JMenu(SkillType.ULTRA_GREEN_NM);
+
+                int techsFound = 0;
                 for (Person tech : gui.getCampaign().getTechs()) {
                     if (tech.canTech(unit.getEntity())
-                            && (tech.getMaintenanceTimeUsing() + unit
-                                    .getMaintenanceTime()) <= 480) {
+                            && (tech.getMaintenanceTimeUsing()
+                                    + unit.getMaintenanceTime()) <= 480) {
                         String skillLvl = "Unknown";
                         if (null != tech.getSkillForWorkingOn(unit)) {
-                            skillLvl = SkillType
-                                    .getExperienceLevelName(tech
-                                            .getSkillForWorkingOn(unit)
-                                            .getExperienceLevel());
+                            skillLvl = SkillType.getExperienceLevelName(
+                                tech.getSkillForWorkingOn(unit)
+                                    .getExperienceLevel());
                         }
+
                         cbMenuItem = new JCheckBoxMenuItem(
-                                tech.getFullTitle() + " (" + skillLvl
-                                        + ", "
-                                        + tech.getMaintenanceTimeUsing()
-                                        + "m)");
-                        cbMenuItem.setActionCommand("ASSIGN:"
-                                + tech.getId());
+                                tech.getFullTitle()
+                                    + " ("
+                                    + tech.getMaintenanceTimeUsing()
+                                    + "m)");
+                        cbMenuItem.setActionCommand("ASSIGN:" + tech.getId());
                         cbMenuItem.setEnabled(true);
                         if (null != unit.getTechId()
                                 && unit.getTechId().equals(tech.getId())) {
@@ -816,14 +823,42 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                         } else {
                             cbMenuItem.addActionListener(this);
                         }
-                        menu.add(cbMenuItem);
+
+                        JMenu subMenu = null;
+                        switch (skillLvl) {
+                        case SkillType.ELITE_NM:
+                            subMenu = menuElite;
+                            break;
+                        case SkillType.VETERAN_NM:
+                            subMenu = menuVeteran;
+                            break;
+                        case SkillType.REGULAR_NM:
+                            subMenu = menuRegular;
+                            break;
+                        case SkillType.GREEN_NM:
+                            subMenu = menuGreen;
+                            break;
+                        case SkillType.ULTRA_GREEN_NM:
+                            subMenu = menuUltraGreen;
+                            break;
+                        }
+                        if (subMenu != null) {
+                            subMenu.add(cbMenuItem);
+                            if (cbMenuItem.isSelected()) {
+                                subMenu.setIcon(UIManager.getIcon("CheckBoxMenuItem.checkIcon"));
+                            }
+                            techsFound++;
+                        }
                     }
                 }
-                if (menu.getItemCount() > 0) {
+                if (techsFound > 0) {
+                    addMenuIfNonEmpty(menu, menuElite, 20);
+                    addMenuIfNonEmpty(menu, menuVeteran, 20);
+                    addMenuIfNonEmpty(menu, menuRegular, 20);
+                    addMenuIfNonEmpty(menu, menuGreen, 20);
+                    addMenuIfNonEmpty(menu, menuUltraGreen, 20);
+
                     popup.add(menu);
-                    if (menu.getItemCount() > 20) {
-                        MenuScroller.setScrollerFor(menu, 20);
-                    }
                 }
             }
             if (oneSelected && unit.requiresMaintenance()) {
@@ -1019,6 +1054,15 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             popup.addSeparator();
             popup.add(menu);
             popup.show(e.getComponent(), e.getX(), e.getY());
+        }
+    }
+
+    private static void addMenuIfNonEmpty(JMenu menu, JMenu child, int scrollerThreshold) {
+        if (child.getItemCount() > 0) {
+            menu.add(child);
+            if (child.getItemCount() > scrollerThreshold) {
+                MenuScroller.setScrollerFor(child, scrollerThreshold);
+            }
         }
     }
 }
