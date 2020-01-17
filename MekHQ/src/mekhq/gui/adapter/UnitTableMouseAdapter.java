@@ -7,9 +7,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.Vector;
@@ -22,7 +20,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.event.MouseInputAdapter;
-import javax.swing.plaf.metal.MetalIconFactory;
 
 import megamek.client.ui.swing.UnitEditorDialog;
 import megamek.client.ui.swing.util.MenuScroller;
@@ -804,7 +801,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 int techsFound = 0;
                 for (Person tech : gui.getCampaign().getTechs()) {
                     if (tech.canTech(unit.getEntity())
-                            && (tech.getMaintenanceTimeUsing() 
+                            && (tech.getMaintenanceTimeUsing()
                                     + unit.getMaintenanceTime()) <= 480) {
                         String skillLvl = "Unknown";
                         if (null != tech.getSkillForWorkingOn(unit)) {
@@ -812,9 +809,9 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                                 tech.getSkillForWorkingOn(unit)
                                     .getExperienceLevel());
                         }
-                        
+
                         cbMenuItem = new JCheckBoxMenuItem(
-                                tech.getFullTitle() 
+                                tech.getFullTitle()
                                     + " ("
                                     + tech.getMaintenanceTimeUsing()
                                     + "m)");
@@ -839,17 +836,19 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                             subMenu = menuRegular;
                             break;
                         case SkillType.GREEN_NM:
-                            subMenu = menuGreen;;
+                            subMenu = menuGreen;
                             break;
                         case SkillType.ULTRA_GREEN_NM:
                             subMenu = menuUltraGreen;
                             break;
                         }
-                        subMenu.add(cbMenuItem);
-                        if (cbMenuItem.isSelected()) {
-                            subMenu.setIcon(UIManager.getIcon("CheckBoxMenuItem.checkIcon"));
+                        if (subMenu != null) {
+                            subMenu.add(cbMenuItem);
+                            if (cbMenuItem.isSelected()) {
+                                subMenu.setIcon(UIManager.getIcon("CheckBoxMenuItem.checkIcon"));
+                            }
+                            techsFound++;
                         }
-                        techsFound++;
                     }
                 }
                 if (techsFound > 0) {
