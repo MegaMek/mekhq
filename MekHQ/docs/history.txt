@@ -1,6 +1,6 @@
 VERSION HISTORY:
 ----------------
-0.46.1-SNAPSHOT
+0.46.1 (2020-01-17 0800 UTC)
 + PR #1259: Fix map size display for AtB scenarios in the briefing tab (cosmetic issue only)
 + Issue #1257: Don't double up salaries when charging for peacetime costs
 + PR #1268: Fix money formatting in prisoner ransom messages
@@ -11,6 +11,10 @@ VERSION HISTORY:
 + PR #1305: Mac OSX key bindings on non-standard look and feel
 + PR #1317: fix NPE that halts new day processing while applying training XP
 + Issue #1308: Fix NPE when the campaign folder is not present
++ Issue #1374: Unit Rating: Small Craft Bay can now store Fighters
++ Issue #1390: Bug: fix XML parsing failure when putting customs in CPNX that have ampersands (etc)
++ Issue #1284: Can't get contracts from Comstar's capital planet
++ Issue #1384: PIR and REB AtB Contracts can not be generated
 
 0.46.0 (2019-08-12 1900 UTC)
 + Issue 1249: Tech Names Missing in Event Log
