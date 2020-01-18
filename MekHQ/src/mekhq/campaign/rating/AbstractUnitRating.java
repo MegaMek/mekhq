@@ -208,17 +208,17 @@ public abstract class AbstractUnitRating implements IUnitRating {
                 return null;
             }
 
-            //Sort the list of personnel by rank from highest to lowest.
-            // Whoever has the highest rank is the commander.
+            //Sort the list of personnel by rank from highest to lowest
+            // Whoever has the highest rank is the commander
             commanderList.sort((p1, p2) -> {
-                // Active personnel outrank inactive personnel.
+                // Active personnel outrank inactive personnel
                 if (p1.isActive() && !p2.isActive()) {
                     return -1;
                 } else if (!p1.isActive() && p2.isActive()) {
                     return 1;
                 }
 
-                // Compare rank.
+                // Compare rank
                 int p1Rank = p1.getRankNumeric();
                 int p2Rank = p2.getRankNumeric();
                 if (p1Rank > p2Rank) {
@@ -227,7 +227,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
                     return 1;
                 }
 
-                // Compare expreience.
+                // Compare experience
                 int p1ExperienceLevel = p1.getExperienceLevel(false);
                 int p2ExperienceLevel = p2.getExperienceLevel(false);
                 if (p1ExperienceLevel > p2ExperienceLevel) {

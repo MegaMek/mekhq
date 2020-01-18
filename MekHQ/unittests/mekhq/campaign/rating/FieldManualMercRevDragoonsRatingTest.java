@@ -468,11 +468,9 @@ public class FieldManualMercRevDragoonsRatingTest {
                           "        #Fighter Bays:                0 needed /   0 available (plus 0 excess small craft)\n" +
                           "        #Small Craft Bays:            0 needed /   0 available\n" +
                           "        #Protomech Bays:              0 needed /   0 available\n" +
-//                          "        #Super Heavy Vehicle Bays:    0 needed /   0 available\n" +
-                          "        #Heavy Vehicle Bays:          4 needed /   0 available\n" +
-//                          "        #Heavy Vehicle Bays:          4 needed /   0 available (plus 0 excess super heavy)\n" +
-                          "        #Light Vehicle Bays:          4 needed /   0 available (plus 0 excess heavy)\n" +
-//                          "        #Light Vehicle Bays:          4 needed /   0 available (plus 0 excess heavy and super heavy)\n" +
+                          "        #Super Heavy Vehicle Bays:    0 needed /   0 available\n" +
+                          "        #Heavy Vehicle Bays:          4 needed /   0 available (plus 0 excess super heavy)\n" +
+                          "        #Light Vehicle Bays:          4 needed /   0 available (plus 0 excess heavy and 0 excess super heavy)\n" +
                           "        #BA Bays:                     0 needed /   0 available\n" +
                           "        #Infantry Bays:               0 needed /   0 available\n" +
                           "    Jumpship?                No\n" +
@@ -489,16 +487,29 @@ public class FieldManualMercRevDragoonsRatingTest {
                    "        #Fighter Bays:                0 needed /   0 available (plus 0 excess small craft)\n" +
                    "        #Small Craft Bays:            0 needed /   0 available\n" +
                    "        #Protomech Bays:              0 needed /   0 available\n" +
-//                   "        #Super Heavy Vehicle Bays:    0 needed /   0 available\n" +
-                   "        #Heavy Vehicle Bays:          4 needed /   8 available\n" +
-//                   "        #Heavy Vehicle Bays:          4 needed /   8 available (plus 0 excess super heavy)\n" +
-                   "        #Light Vehicle Bays:          4 needed /   0 available (plus 4 excess heavy)\n" +
-//                   "        #Light Vehicle Bays:          4 needed /   0 available (plus 4 excess heavy and super heavy)\n" +
+                   "        #Super Heavy Vehicle Bays:    0 needed /   0 available\n" +
+                   "        #Heavy Vehicle Bays:          4 needed /   8 available (plus 0 excess super heavy)\n" +
+                   "        #Light Vehicle Bays:          4 needed /   0 available (plus 4 excess heavy and 0 excess super heavy)\n" +
                    "        #BA Bays:                     0 needed /   0 available\n" +
                    "        #Infantry Bays:               0 needed /   0 available\n" +
                    "    Jumpship?                No\n" +
                    "    Warship w/out Collar?    No\n" +
                    "    Warship w/ Collar?       No";
         assertEquals(expected, testRating.getTransportationDetails());
+    }
+
+    @Test
+    public void testSHVeeBayOverflow() {
+        FieldManualMercRevDragoonsRating testRating = spy(new FieldManualMercRevDragoonsRating(mockCampaign));
+        testRating.initValues();
+        doReturn(2).when(testRating).getSuperHeavyVeeBayCount();
+        doReturn(2).when(testRating).getHeavyVeeBayCount();
+        doReturn(2).when(testRating).getLightVeeBayCount();
+        doReturn(1).when(testRating).getSuperHeavyVeeCount();
+        doReturn(0).when(testRating).getHeavyVeeCount();
+        doReturn(5).when(testRating).getLightVeeCount();
+
+        assertEquals(BigDecimal.valueOf(100.0)
+                .setScale(0, BigDecimal.ROUND_HALF_EVEN), testRating.getTransportPercent());
     }
 }

@@ -387,6 +387,25 @@ public class MekHqXmlUtil {
         if (null != loc) {
             retVal += loc;
         }
+        
+        // Write the Naval C3 Data if needed
+        if (tgtEnt.hasNavalC3()) {
+            retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "<nc3set>";
+            retVal += CommonConstants.NL;
+            Iterator<Entity> nc3List = list.iterator();
+            while (nc3List.hasNext()) {
+                final Entity nc3Entity = nc3List.next();
+
+                if (nc3Entity.onSameC3NetworkAs(tgtEnt, true)) {
+                    retVal += MekHqXmlUtil.indentStr(indentLvl+2) + "<nc3_link link=\"";
+                    retVal += nc3Entity.getC3UUIDAsString();
+                    retVal += "\"/>";
+                    retVal += CommonConstants.NL;
+                }
+            }
+            retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "</nc3set>";
+            retVal += CommonConstants.NL;
+        }
 
         // Write the C3i Data if needed
         if (tgtEnt.hasC3i()) {
