@@ -530,32 +530,45 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 
                 String selectedSurname = selectedPerson.getName().split(SPACE, 2)[1];
                 String spouseSurname = spouse.getName().split(SPACE, 2)[1];
-                String selectedGivenname = selectedPerson.getName().split(SPACE, 2)[0];
-                String spouseGivenname = spouse.getName().split(SPACE, 2)[0];
+                String selectedGivenName = selectedPerson.getName().split(SPACE, 2)[0];
+                String spouseGivenName = spouse.getName().split(SPACE, 2)[0];
 
                 switch (surnameOption) {
                     case OPT_SURNAME_NO_CHANGE:
                         break;
                     case OPT_SURNAME_YOURS:
-                        spouse.setName(spouseGivenname + SPACE + selectedSurname);
-                        spouse.setMaidenName(spouseSurname);
+                        if(selectedSurname != null) {
+                            spouse.setName(spouseGivenName + SPACE + selectedSurname);
+                            spouse.setMaidenName(spouseSurname);
+                        }
                         break;
                     case OPT_SURNAME_SPOUSE:
-                        selectedPerson.setName(selectedGivenname + SPACE + spouseSurname);
-                        selectedPerson.setMaidenName(selectedSurname);
+                        if (spouseSurname != null) {
+                            selectedPerson.setName(selectedGivenName + SPACE + spouseSurname);
+                            selectedPerson.setMaidenName(selectedSurname);
+                        }
                         break;
                     case OPT_SURNAME_HYP_YOURS:
-                        selectedPerson.setName(selectedGivenname + SPACE + selectedSurname + HYPHEN + spouseSurname);
-                        selectedPerson.setMaidenName(selectedSurname);
+                        if ((selectedSurname != null) && (spouseSurname != null)) {
+                            selectedPerson.setName(selectedGivenName + SPACE + selectedSurname + HYPHEN + spouseSurname);
+                            selectedPerson.setMaidenName(selectedSurname);
+                        }
+                        else if (spouseSurname != null) {
+                            selectedPerson.setName(selectedGivenName + SPACE + spouseSurname);
+                        }
                         break;
                     case OPT_SURNAME_HYP_SPOUSE:
-                        spouse.setName(spouseGivenname + SPACE + spouseSurname+ HYPHEN + selectedSurname);
-                        spouse.setMaidenName(spouseSurname);
+                        if ((selectedSurname != null) && (spouseSurname != null)) {
+                            spouse.setName(selectedGivenName + SPACE + spouseSurname + HYPHEN + selectedSurname);
+                            spouse.setMaidenName(spouseSurname);
+                        }
+                        else if (selectedSurname != null){
+                            spouse.setName(selectedGivenName + SPACE + selectedSurname);
+                        }
                         break;
                     default:
-                        spouse.setName(spouseGivenname + SPACE + "ImaError"); //$NON-NLS-1$
-                        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                                String.format("Unknown error in Surname chooser between \"%s\" and \"%s\"", //$NON-NLS-1$
+                        spouse.setName(spouseGivenName + SPACE + "ImaError"); //$NON-NLS-1$
+                        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR, String.format("Unknown error in Surname chooser between \"%s\" and \"%s\"", //$NON-NLS-1$
                             selectedPerson.getFullName(), spouse.getFullName()));
                         break;
                 }
@@ -1189,10 +1202,10 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             boolean oneSelected = personnelTable.getSelectedRowCount() == 1;
             Person person = personnelModel.getPerson(personnelTable
                     .convertRowIndexToModel(row));
-            JMenuItem menuItem = null;
-            JMenu menu = null;
-            JMenu submenu = null;
-            JCheckBoxMenuItem cbMenuItem = null;
+            JMenuItem menuItem;
+            JMenu menu;
+            JMenu submenu;
+            JCheckBoxMenuItem cbMenuItem;
             Person[] selected = getSelectedPeople();
             // **lets fill the pop up menu**//
             if (StaticChecks.areAllEligible(selected)) {
@@ -1795,7 +1808,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     String type;
 
                     List<Person> personnel = new ArrayList(gui.getCampaign().getPersonnel());
-                    Collections.sort(personnel, Comparator.comparing((Person p) -> p.getAge(calendar)).thenComparing(p -> p.getName()));
+                    personnel.sort(Comparator.comparing((Person p) -> p.getAge(calendar)).thenComparing(Person::getName));
 
                     for (Person ps : personnel) {
                         if (person.safeSpouse(ps) && !ps.isDeadOrMIA()) {
@@ -1948,10 +1961,10 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 menu.add(newMenu);
                 if (gui.getCampaign().getCampaignOptions().useAbilities()) {
                     JMenu abMenu = new JMenu(resourceMap.getString("spendOnSpecialAbilities.text")); //$NON-NLS-1$
-                    int cost = -1;
+                    int cost;
 
                     List<SpecialAbility> specialAbilities = new ArrayList(SpecialAbility.getAllSpecialAbilities().values());
-                    Collections.sort(specialAbilities, Comparator.comparing((SpecialAbility sa) -> sa.getName()));
+                    specialAbilities.sort(Comparator.comparing(SpecialAbility::getName));
 
                     for (SpecialAbility spa : specialAbilities) {
                         if (null == spa) {
@@ -2632,10 +2645,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     }
 
     private JCheckBoxMenuItem newCheckboxMenu(String text, String command, boolean selected) {
-        return newCheckboxMenu(text, command, selected, true);
-    }
-
-    private JCheckBoxMenuItem newCheckboxMenu(String text, String command, boolean selected, boolean enabled) {
         JCheckBoxMenuItem result = new JCheckBoxMenuItem(text);
         result.setSelected(selected);
         result.setActionCommand(command);
