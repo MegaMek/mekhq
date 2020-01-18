@@ -1827,7 +1827,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<altNamesByYear year='3022'>Arano Restoration</altNamesByYear>
 		<altNamesByYear year='3026'>Aurigan Coalition</altNamesByYear>
 		<nameGenerator>General</nameGenerator>
-		<colorRGB>210,46,38</colorRGB>
+		<colorRGB>255,36,0</colorRGB>
 		<tags>periphery,minor</tags>
 		<start>2910</start>
 	</faction>
