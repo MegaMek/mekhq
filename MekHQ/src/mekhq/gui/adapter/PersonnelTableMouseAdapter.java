@@ -537,32 +537,32 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     case OPT_SURNAME_NO_CHANGE:
                         break;
                     case OPT_SURNAME_YOURS:
-                        if(selectedSurname != null) {
+                        if(selectedSurname != "") {
                             spouse.setName(spouseGivenName + SPACE + selectedSurname);
                             spouse.setMaidenName(spouseSurname);
                         }
                         break;
                     case OPT_SURNAME_SPOUSE:
-                        if (spouseSurname != null) {
+                        if (spouseSurname != "") {
                             selectedPerson.setName(selectedGivenName + SPACE + spouseSurname);
                             selectedPerson.setMaidenName(selectedSurname);
                         }
                         break;
                     case OPT_SURNAME_HYP_YOURS:
-                        if ((selectedSurname != null) && (spouseSurname != null)) {
+                        if ((selectedSurname != "") && (spouseSurname != "")) {
                             selectedPerson.setName(selectedGivenName + SPACE + selectedSurname + HYPHEN + spouseSurname);
                             selectedPerson.setMaidenName(selectedSurname);
                         }
-                        else if (spouseSurname != null) {
+                        else if (spouseSurname != "") {
                             selectedPerson.setName(selectedGivenName + SPACE + spouseSurname);
                         }
                         break;
                     case OPT_SURNAME_HYP_SPOUSE:
-                        if ((selectedSurname != null) && (spouseSurname != null)) {
+                        if ((selectedSurname != "") && (spouseSurname != "")) {
                             spouse.setName(selectedGivenName + SPACE + spouseSurname + HYPHEN + selectedSurname);
                             spouse.setMaidenName(spouseSurname);
                         }
-                        else if (selectedSurname != null){
+                        else if (selectedSurname != ""){
                             spouse.setName(selectedGivenName + SPACE + selectedSurname);
                         }
                         break;
