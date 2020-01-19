@@ -2141,29 +2141,35 @@ public class Campaign implements Serializable, ITechManager {
     private ShoppingList goShoppingStandard(ShoppingList sList) {
         // loop through shopping list. If its time to check, then check as appropriate.
         // Items not found get added to the remaining item list
-        List<IAcquisitionWork> remainingItems = new ArrayList<>();
-        for (IAcquisitionWork shoppingItem : sList.getAllShoppingItems()) {
+        List<IAcquisitionWork> currentList = new ArrayList<>(sList.getAllShoppingItems());
+
+        while (!currentList.isEmpty()) {
             Person person = getLogisticsPerson();
             if (null == person && !getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
                 addReport("Your force has no one capable of acquiring equipment.");
                 break;
             }
 
-            if (shoppingItem.getDaysToWait() <= 0) {
-                while (canAcquireParts(person)
-                        && shoppingItem.getQuantity() > 0) {
-                    if (!acquireEquipment(shoppingItem, person)) {
-                        shoppingItem.resetDaysToWait();
-                        break;
+            List<IAcquisitionWork> remainingItems = new ArrayList<>();
+            for (IAcquisitionWork shoppingItem : currentList) {
+                if (shoppingItem.getDaysToWait() <= 0) {
+                    while (canAcquireParts(person)
+                            && shoppingItem.getQuantity() > 0) {
+                        if (!acquireEquipment(shoppingItem, person)) {
+                            shoppingItem.resetDaysToWait();
+                            break;
+                        }
                     }
                 }
+                if (shoppingItem.getQuantity() > 0 || shoppingItem.getDaysToWait() > 0) {
+                    remainingItems.add(shoppingItem);
+                }
             }
-            if (shoppingItem.getQuantity() > 0 || shoppingItem.getDaysToWait() > 0) {
-                remainingItems.add(shoppingItem);
-            }
+
+            currentList = remainingItems;
         }
 
-        return new ShoppingList(remainingItems);
+        return new ShoppingList(currentList);
     }
 
     private ShoppingList goShoppingByPlanet(ShoppingList sList) {
