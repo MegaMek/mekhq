@@ -750,9 +750,9 @@ public class InterstellarMapPanel extends JPanel {
 		                                arc.setArcByCenter(x, y, size+3, 0, 360.0 * (1-((double)i)/factions.size()), Arc2D.PIE);
 		                                g2.fill(arc);
 	                            	}
-	                            	if (campaign.getAtBConfig().isHiringHall(system.getId(), campaign.getDate())) {
+	                            	if (campaign.getCampaignOptions().getUseAtB()  && campaign.getAtBConfig().isHiringHall(system.getId(), campaign.getDate())) {
 	                            		g2.setPaint(new Color(192,192,192));
-		                                arc.setArcByCenter(x, y, size+3, 0, 360.0 * (1-((double)i)/factions.size()), Arc2D.PIE);
+		                                arc.setArcByCenter(x, y, size+2, 0, 360.0 * (1-((double)i)/factions.size()), Arc2D.PIE);
 		                                g2.fill(arc);
 		                            }
 	                                g2.setPaint(faction.getColor());
