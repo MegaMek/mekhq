@@ -552,7 +552,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR, String.format("Name of Length 0 in found in marriage between \"%s\" and \"%s\". Please raise this as an Issue at https://github.com/MegaMek/mekhq", selectedPerson.getFullName(), spouse.getFullName()));
                 }
 
-
                 switch (surnameOption) {
                     case OPT_SURNAME_NO_CHANGE:
                         break;
@@ -774,7 +773,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 gui.getCampaign().changePrisonerStatus(selectedPerson, Person.PRISONER_YES);
                 break;
             case CMD_FREE:
-                // TODO: Warn in particular for "freeing" in deep space, leading to Geneva Conventions violation
+                // TODO: Warn in particular for "freeing" in deep space, leading to Geneva Conventions violation (#1400 adding Crime to MekHQ)
                 // TODO: Record the people into some NPC pool, if still alive
                 if(0 == JOptionPane.showConfirmDialog(
                         null,
