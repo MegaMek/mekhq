@@ -1037,7 +1037,7 @@ public class Campaign implements Serializable, ITechManager {
                 "Adding unit: (" + u.getId() + "):" + u); //$NON-NLS-1$
         units.put(u.getId(), u);
         checkDuplicateNamesDuringAdd(u.getEntity());
-        
+
         //If this is a ship, add it to the list of potential transports
         //Jumpships and space stations are intentionally ignored at present, because this functionality is being
         //used to auto-load ground units into bays, and doing this for large craft that can't transit is pointless.
@@ -1051,7 +1051,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         game.addEntity(u.getEntity().getId(), u.getEntity());
     }
-    
+
     /**
      * Adds an entry to the list of transit-capable transport ships. We'll use this
      * to look for empty bays that ground units can be assigned to
@@ -1062,7 +1062,7 @@ public class Campaign implements Serializable, ITechManager {
                 "Adding Dropship/Warship: " + id); //$NON-NLS-1$
         transportShips.add(id);
     }
-    
+
     /**
      * Deletes an entry from the list of transit-capable transport ships. This gets updated when
      * the ship is removed from the campaign for one reason or another
@@ -1144,7 +1144,7 @@ public class Campaign implements Serializable, ITechManager {
         unit.initializeBaySpace();
         removeUnitFromForce(unit); // Added to avoid the 'default force bug'
         // when calculating cargo
-        
+
         //If this is a ship, add it to the list of potential transports
         //Jumpships and space stations are intentionally ignored at present, because this functionality is being
         //used to auto-load ground units into bays, and doing this for large craft that can't transit is pointless.
@@ -1969,8 +1969,6 @@ public class Campaign implements Serializable, ITechManager {
     /**
      * return an html report on this unit. This will go in MekInfo
      *
-     * @param
-     * @return
      */
     /*
      * public String getUnitDesc(UUID unitId) { Unit unit = getUnit(unitId); String
@@ -1987,6 +1985,8 @@ public class Campaign implements Serializable, ITechManager {
     /*
      * toReturn += "</font>"; toReturn += "</html>"; return toReturn; }
      */
+
+
     public String healPerson(Person medWork, Person doctor) {
         if (getCampaignOptions().useAdvancedMedical()) {
             return "";
@@ -3397,7 +3397,7 @@ public class Campaign implements Serializable, ITechManager {
 
         // remove unit from any forces
         removeUnitFromForce(unit);
-        
+
         //If this is a ship, remove it from the list of potential transports
         removeTransportShip(id);
 
@@ -5917,7 +5917,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Vector<IBasicOption> getGameOptionsVector() {
-        Vector<IBasicOption> options = new Vector<IBasicOption>();
+        Vector<IBasicOption> options = new Vector<>();
         for (Enumeration<IOptionGroup> i = gameOptions.getGroups(); i
                 .hasMoreElements(); ) {
             IOptionGroup group = i.nextElement();
@@ -5980,12 +5980,7 @@ public class Campaign implements Serializable, ITechManager {
             return Collections.emptyList();
         }
 
-        Collections.sort(personalKills, new Comparator<Kill>() {
-            @Override
-            public int compare(final Kill u1, final Kill u2) {
-                return u1.getDate().compareTo(u2.getDate());
-            }
-        });
+        personalKills.sort(Comparator.comparing(Kill::getDate));
         return personalKills;
     }
 
@@ -6007,11 +6002,11 @@ public class Campaign implements Serializable, ITechManager {
      */
     private void checkDuplicateNamesDuringAdd(Entity entity) {
         if (duplicateNameHash.get(entity.getShortName()) == null) {
-            duplicateNameHash.put(entity.getShortName(), Integer.valueOf(1));
+            duplicateNameHash.put(entity.getShortName(), 1);
         } else {
             int count = duplicateNameHash.get(entity.getShortName());
             count++;
-            duplicateNameHash.put(entity.getShortName(), Integer.valueOf(count));
+            duplicateNameHash.put(entity.getShortName(), count);
             entity.duplicateMarker = count;
             entity.generateShortName();
             entity.generateDisplayName();
@@ -6021,24 +6016,22 @@ public class Campaign implements Serializable, ITechManager {
     /**
      * If we remove a unit, we may need to update the duplicate identifier. TODO: This function is super slow :(
      *
-     * @param entity
+     * @param entity This is the entity whose name is checked for any duplicates
      */
     private void checkDuplicateNamesDuringDelete(Entity entity) {
-        Object o = duplicateNameHash.get(entity.getShortNameRaw());
+        Integer o = duplicateNameHash.get(entity.getShortNameRaw());
         if (o != null) {
-            int count = ((Integer) o).intValue();
+            int count = o;
             if (count > 1) {
                 for (Unit u : getUnits()) {
                     Entity e = u.getEntity();
-                    if (e.getShortNameRaw().equals(entity.getShortNameRaw())
-                            && (e.duplicateMarker > entity.duplicateMarker)) {
+                    if (e.getShortNameRaw().equals(entity.getShortNameRaw()) && (e.duplicateMarker > entity.duplicateMarker)) {
                         e.duplicateMarker--;
                         e.generateShortName();
                         e.generateDisplayName();
                     }
                 }
-                duplicateNameHash.put(entity.getShortNameRaw(),
-                    Integer.valueOf(count - 1));
+                duplicateNameHash.put(entity.getShortNameRaw(), count - 1);
             } else {
                 duplicateNameHash.remove(entity.getShortNameRaw());
             }
@@ -6630,7 +6623,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         return networks;
     }
-    
+
     /**
      * Method that returns a Vector of the unique name Strings of all Naval C3 networks that have at least 1 free node
      * Adapted from getAvailableC3iNetworks() as the two technologies have very similar workings
