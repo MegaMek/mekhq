@@ -1037,7 +1037,7 @@ public class Campaign implements Serializable, ITechManager {
                 "Adding unit: (" + u.getId() + "):" + u); //$NON-NLS-1$
         units.put(u.getId(), u);
         checkDuplicateNamesDuringAdd(u.getEntity());
-        
+
         //If this is a ship, add it to the list of potential transports
         //Jumpships and space stations are intentionally ignored at present, because this functionality is being
         //used to auto-load ground units into bays, and doing this for large craft that can't transit is pointless.
@@ -1051,7 +1051,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         game.addEntity(u.getEntity().getId(), u.getEntity());
     }
-    
+
     /**
      * Adds an entry to the list of transit-capable transport ships. We'll use this
      * to look for empty bays that ground units can be assigned to
@@ -1062,7 +1062,7 @@ public class Campaign implements Serializable, ITechManager {
                 "Adding Dropship/Warship: " + id); //$NON-NLS-1$
         transportShips.add(id);
     }
-    
+
     /**
      * Deletes an entry from the list of transit-capable transport ships. This gets updated when
      * the ship is removed from the campaign for one reason or another
@@ -1144,7 +1144,7 @@ public class Campaign implements Serializable, ITechManager {
         unit.initializeBaySpace();
         removeUnitFromForce(unit); // Added to avoid the 'default force bug'
         // when calculating cargo
-        
+
         //If this is a ship, add it to the list of potential transports
         //Jumpships and space stations are intentionally ignored at present, because this functionality is being
         //used to auto-load ground units into bays, and doing this for large craft that can't transit is pointless.
@@ -3397,7 +3397,7 @@ public class Campaign implements Serializable, ITechManager {
 
         // remove unit from any forces
         removeUnitFromForce(unit);
-        
+
         //If this is a ship, remove it from the list of potential transports
         removeTransportShip(id);
 
@@ -5850,11 +5850,11 @@ public class Campaign implements Serializable, ITechManager {
                 PersonalLogger.spouseKia(spouse, person, getDate());
                 spouse.setSpouseID(null);
             }
-            // set the deathday
-            person.setDeathday((GregorianCalendar) calendar.clone());
+            // set the date of death
+            person.setDateOfDeath((GregorianCalendar) calendar.clone());
         } else if (person.getStatus() == Person.S_KIA) {
-            // remove deathdates for resurrection
-            person.setDeathday(null);
+            // remove date of death for resurrection
+            person.setDateOfDeath(null);
         }
         if (status == Person.S_MIA) {
             ServiceLogger.mia(person, getDate());
@@ -6630,7 +6630,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         return networks;
     }
-    
+
     /**
      * Method that returns a Vector of the unique name Strings of all Naval C3 networks that have at least 1 free node
      * Adapted from getAvailableC3iNetworks() as the two technologies have very similar workings

@@ -528,43 +528,81 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 Person spouse = gui.getCampaign().getPerson(UUID.fromString(data[1]));
                 String surnameOption = data[2];
 
-                String selectedSurname = selectedPerson.getName().split(SPACE, 2)[1];
-                String spouseSurname = spouse.getName().split(SPACE, 2)[1];
-                String selectedGivenName = selectedPerson.getName().split(SPACE, 2)[0];
-                String spouseGivenName = spouse.getName().split(SPACE, 2)[0];
+                String[] selectedName = selectedPerson.getName().split(SPACE, 2);
+                String[] spouseName = spouse.getName().split(SPACE,2);
+                String selectedGivenName = null, selectedSurname = null, spouseGivenName = null, spouseSurname = null;
+
+                if (selectedName.length >= 2) {
+                    selectedGivenName = selectedName[0];
+                    selectedSurname = selectedName[1];
+                } else if (selectedName.length == 1) {
+                    selectedGivenName = selectedName[0];
+                } else{
+                    selectedPerson.setName("ImaError"); //$NON-NLS-1$
+                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR, String.format("Name of Length 0 in found in marriage between \"%s\" and \"%s\". Please raise this as an Issue at https://github.com/MegaMek/mekhq", selectedPerson.getFullName(), spouse.getFullName()));
+                }
+
+                if (spouseName.length >= 2) {
+                    spouseGivenName = spouseName[0];
+                    spouseSurname = spouseName[1];
+                } else if (spouseName.length == 1) {
+                    spouseGivenName = spouseName[0];
+                } else{
+                    spouse.setName("ImaError"); //$NON-NLS-1$
+                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR, String.format("Name of Length 0 in found in marriage between \"%s\" and \"%s\". Please raise this as an Issue at https://github.com/MegaMek/mekhq", selectedPerson.getFullName(), spouse.getFullName()));
+                }
+
 
                 switch (surnameOption) {
                     case OPT_SURNAME_NO_CHANGE:
                         break;
-                    case OPT_SURNAME_YOURS:
-                        if(selectedSurname != "") {
-                            spouse.setName(spouseGivenName + SPACE + selectedSurname);
-                            spouse.setMaidenName(spouseSurname);
-                        }
-                        break;
                     case OPT_SURNAME_SPOUSE:
-                        if (spouseSurname != "") {
+                        if (spouseSurname != null) {
                             selectedPerson.setName(selectedGivenName + SPACE + spouseSurname);
-                            selectedPerson.setMaidenName(selectedSurname);
+                        } else if (selectedSurname != null) {
+                            selectedPerson.setName(selectedGivenName);
                         }
+                        //both null is ignored as a case, as it would lead to no changes
+
+                        selectedPerson.setMaidenName(selectedSurname); //null is handled in the divorce code
                         break;
                     case OPT_SURNAME_HYP_YOURS:
-                        if ((selectedSurname != "") && (spouseSurname != "")) {
+                        if ((selectedSurname != null) && (spouseSurname != null)) {
                             selectedPerson.setName(selectedGivenName + SPACE + selectedSurname + HYPHEN + spouseSurname);
-                            selectedPerson.setMaidenName(selectedSurname);
                         }
-                        else if (spouseSurname != "") {
+                        else if (spouseSurname != null) {
                             selectedPerson.setName(selectedGivenName + SPACE + spouseSurname);
                         }
+                        else if (selectedSurname != null){
+                            selectedPerson.setName(selectedGivenName + SPACE + selectedSurname);
+                        }
+                        //both null is ignored as a case, as it would lead to no changes
+
+                        selectedPerson.setMaidenName(selectedSurname); //null is handled in the divorce code
+                        break;
+                    case OPT_SURNAME_YOURS:
+                        if((selectedSurname != null)) {
+                            spouse.setName(spouseGivenName + SPACE + selectedSurname);
+                        } else if (spouseSurname != null) {
+                            spouse.setName(spouseGivenName);
+                        }
+                        //both null is ignored as a case, as it would lead to no changes
+
+                        spouse.setMaidenName(spouseSurname); //null is handled in the divorce code
                         break;
                     case OPT_SURNAME_HYP_SPOUSE:
-                        if ((selectedSurname != "") && (spouseSurname != "")) {
-                            spouse.setName(selectedGivenName + SPACE + spouseSurname + HYPHEN + selectedSurname);
-                            spouse.setMaidenName(spouseSurname);
+                        if ((selectedSurname != null) && (spouseSurname != null)) {
+                            spouse.setName(spouseGivenName + SPACE + spouseSurname + HYPHEN + selectedSurname);
                         }
-                        else if (selectedSurname != ""){
-                            spouse.setName(selectedGivenName + SPACE + selectedSurname);
+                        else if (spouseSurname != null) {
+                            spouse.setName(spouseGivenName + SPACE + spouseSurname);
                         }
+                        else if (selectedSurname != null){
+                            spouse.setName(spouseGivenName + SPACE + selectedSurname);
+                        }
+                        //both null is ignored as a case, as it would lead to no changes
+
+                        spouse.setMaidenName(spouseSurname); //null is handled in the divorce code
                         break;
                     default:
                         spouse.setName(spouseGivenName + SPACE + "ImaError"); //$NON-NLS-1$
