@@ -6016,7 +6016,7 @@ public class Campaign implements Serializable, ITechManager {
     /**
      * If we remove a unit, we may need to update the duplicate identifier. TODO: This function is super slow :(
      *
-     * @param entity: this is the entity whose name is checked for any duplicates
+     * @param entity This is the entity whose name is checked for any duplicates
      */
     private void checkDuplicateNamesDuringDelete(Entity entity) {
         Integer o = duplicateNameHash.get(entity.getShortNameRaw());
