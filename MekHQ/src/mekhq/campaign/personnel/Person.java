@@ -3882,7 +3882,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
         engineer = b;
     }
 
-    public String getChildList() {
+
+    /**
+     * getChildList creates a list of all children from the current person
+     * @return a list of Person objects for all children of the current person
+     */
+    public List<Person> getChildList() {
         List<UUID> ancestors = new ArrayList<>();
         for (Ancestors a : campaign.getAncestors()) {
             if ((null != a)
@@ -3891,13 +3896,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
         }
 
-        List<String> children = new ArrayList<>();
+        List<Person> children = new ArrayList<>();
         for (Person p : campaign.getPersonnel()) {
             if (ancestors.contains(p.getAncestorsID())) {
-                children.add(p.getFullName());
+                children.add(p);
             }
         }
-        return "<html>" + Utilities.combineString(children, "<br/>") + "</html>";
+
+        return children;
     }
 
     public boolean hasAnyFamily() {
