@@ -204,7 +204,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     protected int oldId;
 
     // Lineage & Procreation
-    protected UUID ancestorsID;
+    protected UUID ancestorsId;
     protected UUID spouse;
     protected GregorianCalendar dueDate;
 
@@ -1043,24 +1043,34 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return dueDate != null;
     }
 
-    public UUID getAncestorsID() {
-        return ancestorsID;
+    public UUID getAncestorsId() {
+        return ancestorsId;
     }
 
-    public void setAncestorsID(UUID id) {
-        ancestorsID = id;
+    public void setAncestorsId(UUID id) {
+        ancestorsId = id;
     }
 
     public Ancestors getAncestors() {
-        return campaign.getAncestors(ancestorsID);
+        return campaign.getAncestors(ancestorsId);
     }
 
     public Person getMother() {
-        return campaign.getPerson(getAncestors().getMotherID());
+        Ancestors a = getAncestors();
+
+        if (a != null) {
+            return campaign.getPerson(a.getMotherID());
+        }
+        return null;
     }
 
     public Person getFather() {
-        return campaign.getPerson(getAncestors().getFatherID());
+        Ancestors a = getAncestors();
+
+        if (a != null) {
+            return campaign.getPerson(a.getFatherID());
+        }
+        return null;
     }
 
     public Collection<Person> birth() {
@@ -1088,7 +1098,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 babyId = UUID.randomUUID();
             }
             baby.setId(babyId);
-            baby.setAncestorsID(ancId);
+            baby.setAncestorsId(ancId);
             campaign.addReport(getHyperlinkedName() + " has given birth to " + baby.getHyperlinkedName() + ", a baby " + (baby.getGender() == G_MALE ? "boy!" : "girl!"));
             if (campaign.getCampaignOptions().logConception()) {
                 MedicalLogger.deliveredBaby(this, baby, campaign.getDate());
@@ -1169,8 +1179,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         // Huge convoluted return statement
         return (
                 !this.equals(p)
-                && (getAncestorsID() == null
-                || !campaign.getAncestors(getAncestorsID()).checkMutualAncestors(campaign.getAncestors(p.getAncestorsID())))
+                && (getAncestorsId() == null
+                || !campaign.getAncestors(getAncestorsId()).checkMutualAncestors(campaign.getAncestors(p.getAncestorsId())))
                 && !p.hasSpouse()
                 && getGender() != p.getGender()
                 && p.getAge(campaign.getCalendar()) > 13
@@ -1353,10 +1363,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     + "<id>"
                     + this.id.toString()
                     + "</id>");
-        if (ancestorsID != null) {
+        if (ancestorsId != null) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                         + "<ancestors>"
-                        + this.ancestorsID.toString()
+                        + this.ancestorsId.toString()
                         + "</ancestors>");
         }
         if (spouse != null) {
@@ -1642,7 +1652,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         retVal.id = UUID.fromString(wn2.getTextContent());
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("ancestors")) {
-                    retVal.ancestorsID = UUID.fromString(wn2.getTextContent());
+                    retVal.ancestorsId = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("spouse")) {
                     retVal.spouse = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("duedate")) {
@@ -3882,7 +3892,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
         engineer = b;
     }
 
-    public String getChildList() {
+
+    /**
+     * getChildList creates a list of all children from the current person
+     * @return a list of Person objects for all children of the current person
+     */
+    public List<Person> getChildList() {
         List<UUID> ancestors = new ArrayList<>();
         for (Ancestors a : campaign.getAncestors()) {
             if ((null != a)
@@ -3891,19 +3906,28 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
         }
 
-        List<String> children = new ArrayList<>();
+        List<Person> children = new ArrayList<>();
         for (Person p : campaign.getPersonnel()) {
-            if (ancestors.contains(p.getAncestorsID())) {
-                children.add(p.getFullName());
+            if (ancestors.contains(p.getAncestorsId())) {
+                children.add(p);
             }
         }
-        return "<html>" + Utilities.combineString(children, "<br/>") + "</html>";
+
+        return children;
     }
 
+    /**
+     *
+     * @return true if the person has either a spouse, any children, or specified parents
+     */
     public boolean hasAnyFamily() {
-        return hasChildren() || hasSpouse();
+        return hasChildren() || hasSpouse() || hasParents();
     }
 
+    /**
+     *
+     * @return true if the person has at least one kid, false otherwise
+     */
     public boolean hasChildren() {
         boolean hasKids = false;
         if (getId() != null) {
@@ -3916,6 +3940,45 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
 
         return hasKids;
+    }
+
+    /**
+     *
+     * @return true if the Person has either a mother or father, otherwise false
+     */
+    public boolean hasParents() {
+        boolean hasParents = false;
+
+        if (hasFather() || hasMother()) {
+            hasParents = true;
+        }
+        return hasParents;
+    }
+
+    /**
+     *
+     * @return true if the person has a listed father, false otherwise
+     */
+    public boolean hasFather() {
+        boolean hasFather = false;
+
+        if (getFather() != null) {
+            hasFather = true;
+        }
+        return hasFather;
+    }
+
+    /**
+     *
+     * @return true if the Person has a listed mother, false otherwise
+     */
+    public boolean hasMother() {
+        boolean hasMother = false;
+
+        if (getMother() != null) {
+            hasMother = true;
+        }
+        return hasMother;
     }
 
     /** Returns the ransom value of this individual
