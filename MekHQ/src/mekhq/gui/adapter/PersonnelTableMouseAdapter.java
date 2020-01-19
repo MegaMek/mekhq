@@ -526,16 +526,22 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             case CMD_ADD_SPOUSE:
             {
+                // TODO: Add support for multipart Surnames
                 Person spouse = gui.getCampaign().getPerson(UUID.fromString(data[1]));
                 String surnameOption = data[2];
 
-                String[] selectedName = selectedPerson.getName().split(SPACE, 2);
-                String[] spouseName = spouse.getName().split(SPACE,2);
+                String[] selectedName = selectedPerson.getName().split(SPACE);
+                String[] spouseName = spouse.getName().split(SPACE);
                 String selectedGivenName = "", selectedSurname = "", spouseGivenName = "", spouseSurname = "";
 
                 if (selectedName.length >= 2) {
-                    selectedGivenName = selectedName[0];
-                    selectedSurname = selectedName[1];
+                    for (int i = 0; i < selectedName.length - 1; i++) { //allows multipart given names
+                        selectedGivenName += selectedName[i];
+                        if (i < selectedName.length - 2){ //don't add a space at the end of the last part of a multipart given name
+                            selectedGivenName += SPACE;
+                        }
+                    }
+                    selectedSurname = selectedName[selectedName.length - 1];
                 } else if (selectedName.length == 1) {
                     selectedGivenName = selectedName[0];
                 } else{
@@ -544,8 +550,13 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
 
                 if (spouseName.length >= 2) {
-                    spouseGivenName = spouseName[0];
-                    spouseSurname = spouseName[1];
+                    for (int i = 0; i < spouseName.length - 1; i++) { //allows multipart given names
+                        spouseGivenName += spouseName[i];
+                        if (i < spouseName.length - 2){ //don't add a space at the end of the last part of a multipart given name
+                            spouseGivenName += SPACE;
+                        }
+                    }
+                    spouseSurname = spouseName[spouseName.length - 1];
                 } else if (spouseName.length == 1) {
                     spouseGivenName = spouseName[0];
                 } else {
