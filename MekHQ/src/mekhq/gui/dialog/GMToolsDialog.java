@@ -349,21 +349,23 @@ public class GMToolsDialog extends JDialog implements ActionListener {
                 lastRolledUnit = performRollRat();
             }
 
-            Entity e;
-            try {
-                e = new MechFileParser(lastRolledUnit.getSourceFile(), lastRolledUnit.getEntryName()).getEntity();
-                Unit u = gui.getCampaign().addUnit(e, false, 0);
-                if (person != null) {
-                    u.addPilotOrSoldier(person);
-                    person.setOriginalUnit(u);
-                    setVisible(false);
+            if (lastRolledUnit != null) {
+                Entity e;
+                try {
+                    e = new MechFileParser(lastRolledUnit.getSourceFile(), lastRolledUnit.getEntryName()).getEntity();
+                    Unit u = gui.getCampaign().addUnit(e, false, 0);
+                    if (person != null) {
+                        u.addPilotOrSoldier(person);
+                        person.setOriginalUnit(u);
+                        setVisible(false);
+                    }
+                    lastRolledUnit = null;
+                } catch (EntityLoadingException e1) {
+                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                            "Failed to load entity " + lastRolledUnit.getName() + " from " + lastRolledUnit.getSourceFile().toString()); //$NON-NLS-1$
+                    MekHQ.getLogger().error(getClass(), METHOD_NAME, e1);
+                    unitPicked.setText("Failed to load entity " + lastRolledUnit.getName());
                 }
-                lastRolledUnit = null;
-            } catch (EntityLoadingException e1) {
-                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                        "Failed to load entity " + lastRolledUnit.getName() + " from " + lastRolledUnit.getSourceFile().toString()); //$NON-NLS-1$
-                MekHQ.getLogger().error(getClass(), METHOD_NAME, e1);
-                unitPicked.setText("Failed to load entity " + lastRolledUnit.getName());
             }
         }
     }
