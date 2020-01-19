@@ -1066,7 +1066,7 @@ public class InterstellarMapPanel extends JPanel {
 
     /**
      * Return a planet color based on what the user has selected from the radio button options
-     * @param a Planet object
+     * @param p PlanetarySystem object
      * @return a Color
      */
     public Color getSystemColor(PlanetarySystem p) {
@@ -1286,7 +1286,6 @@ public class InterstellarMapPanel extends JPanel {
          */
         int planetID;
     }
-
 
     private transient List<ActionListener> listeners = new ArrayList<>();
 
