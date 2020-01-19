@@ -43,6 +43,7 @@ import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
+import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.finances.Money;
@@ -525,37 +526,95 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             case CMD_ADD_SPOUSE:
             {
+                // TODO: Add support for multipart Surnames
                 Person spouse = gui.getCampaign().getPerson(UUID.fromString(data[1]));
                 String surnameOption = data[2];
 
-                String selectedSurname = selectedPerson.getName().split(SPACE, 2)[1];
-                String spouseSurname = spouse.getName().split(SPACE, 2)[1];
-                String selectedGivenname = selectedPerson.getName().split(SPACE, 2)[0];
-                String spouseGivenname = spouse.getName().split(SPACE, 2)[0];
+                String[] selectedName = selectedPerson.getName().split(SPACE);
+                String[] spouseName = spouse.getName().split(SPACE);
+                String selectedGivenName = "", selectedSurname = "", spouseGivenName = "", spouseSurname = "";
+
+                if (selectedName.length >= 2) {
+                    for (int i = 0; i < selectedName.length - 1; i++) { //allows multipart given names
+                        selectedGivenName += selectedName[i];
+                        if (i < selectedName.length - 2){ //don't add a space at the end of the last part of a multipart given name
+                            selectedGivenName += SPACE;
+                        }
+                    }
+                    selectedSurname = selectedName[selectedName.length - 1];
+                } else if (selectedName.length == 1) {
+                    selectedGivenName = selectedName[0];
+                } else{
+                    selectedPerson.setName("ImaError"); //$NON-NLS-1$
+                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR, String.format("Name of Length 0 in found in marriage between \"%s\" and \"%s\". Please raise this as an Issue at https://github.com/MegaMek/mekhq", selectedPerson.getFullName(), spouse.getFullName()));
+                }
+
+                if (spouseName.length >= 2) {
+                    for (int i = 0; i < spouseName.length - 1; i++) { //allows multipart given names
+                        spouseGivenName += spouseName[i];
+                        if (i < spouseName.length - 2){ //don't add a space at the end of the last part of a multipart given name
+                            spouseGivenName += SPACE;
+                        }
+                    }
+                    spouseSurname = spouseName[spouseName.length - 1];
+                } else if (spouseName.length == 1) {
+                    spouseGivenName = spouseName[0];
+                } else {
+                    spouse.setName("ImaError"); //$NON-NLS-1$
+                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR, String.format("Name of Length 0 in found in marriage between \"%s\" and \"%s\". Please raise this as an Issue at https://github.com/MegaMek/mekhq", selectedPerson.getFullName(), spouse.getFullName()));
+                }
 
                 switch (surnameOption) {
                     case OPT_SURNAME_NO_CHANGE:
                         break;
-                    case OPT_SURNAME_YOURS:
-                        spouse.setName(spouseGivenname + SPACE + selectedSurname);
-                        spouse.setMaidenName(spouseSurname);
-                        break;
                     case OPT_SURNAME_SPOUSE:
-                        selectedPerson.setName(selectedGivenname + SPACE + spouseSurname);
-                        selectedPerson.setMaidenName(selectedSurname);
+                        if (!StringUtil.isNullOrEmpty(spouseSurname)) {
+                            selectedPerson.setName(selectedGivenName + SPACE + spouseSurname);
+                        } else {
+                            selectedPerson.setName(selectedGivenName);
+                        }
+
+                        selectedPerson.setMaidenName(selectedSurname); //"" is handled in the divorce code
+                        break;
+                    case OPT_SURNAME_YOURS:
+                        if(!StringUtil.isNullOrEmpty(selectedSurname)) {
+                            spouse.setName(spouseGivenName + SPACE + selectedSurname);
+                        } else {
+                            spouse.setName(spouseGivenName);
+                        }
+                        spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
                         break;
                     case OPT_SURNAME_HYP_YOURS:
-                        selectedPerson.setName(selectedGivenname + SPACE + selectedSurname + HYPHEN + spouseSurname);
-                        selectedPerson.setMaidenName(selectedSurname);
+                        if (!StringUtil.isNullOrEmpty(selectedSurname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
+                            selectedPerson.setName(selectedGivenName + SPACE + selectedSurname + HYPHEN + spouseSurname);
+                        }
+                        else if (!StringUtil.isNullOrEmpty(spouseSurname)) {
+                            selectedPerson.setName(selectedGivenName + SPACE + spouseSurname);
+                        }
+                        else if (!StringUtil.isNullOrEmpty(selectedSurname)) {
+                            selectedPerson.setName(selectedGivenName + SPACE + selectedSurname);
+                        }
+                        //both null is ignored as a case, as it would lead to no changes
+
+                        selectedPerson.setMaidenName(selectedSurname); //"" is handled in the divorce code
                         break;
                     case OPT_SURNAME_HYP_SPOUSE:
-                        spouse.setName(spouseGivenname + SPACE + spouseSurname+ HYPHEN + selectedSurname);
-                        spouse.setMaidenName(spouseSurname);
+                        if (!StringUtil.isNullOrEmpty(selectedSurname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
+                            spouse.setName(spouseGivenName + SPACE + spouseSurname + HYPHEN + selectedSurname);
+                        }
+                        else if (!StringUtil.isNullOrEmpty(spouseSurname)) {
+                            spouse.setName(spouseGivenName + SPACE + spouseSurname);
+                        }
+                        else if (!StringUtil.isNullOrEmpty(selectedSurname)){
+                            spouse.setName(spouseGivenName + SPACE + selectedSurname);
+                        }
+                        //both null is ignored as a case, as it would lead to no changes
+
+                        spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
                         break;
                     default:
-                        spouse.setName(spouseGivenname + SPACE + "ImaError"); //$NON-NLS-1$
-                        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                                String.format("Unknown error in Surname chooser between \"%s\" and \"%s\"", //$NON-NLS-1$
+                        spouse.setName(spouseGivenName + SPACE + "ImaError"); //$NON-NLS-1$
+                        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR, String.format("Unknown error in Surname chooser between \"%s\" and \"%s\"", //$NON-NLS-1$
                             selectedPerson.getFullName(), spouse.getFullName()));
                         break;
                 }
@@ -723,7 +782,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 gui.getCampaign().changePrisonerStatus(selectedPerson, Person.PRISONER_YES);
                 break;
             case CMD_FREE:
-                // TODO: Warn in particular for "freeing" in deep space, leading to Geneva Conventions violation
+                // TODO: Warn in particular for "freeing" in deep space, leading to Geneva Conventions violation (#1400 adding Crime to MekHQ)
                 // TODO: Record the people into some NPC pool, if still alive
                 if(0 == JOptionPane.showConfirmDialog(
                         null,
@@ -1189,10 +1248,10 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             boolean oneSelected = personnelTable.getSelectedRowCount() == 1;
             Person person = personnelModel.getPerson(personnelTable
                     .convertRowIndexToModel(row));
-            JMenuItem menuItem = null;
-            JMenu menu = null;
-            JMenu submenu = null;
-            JCheckBoxMenuItem cbMenuItem = null;
+            JMenuItem menuItem;
+            JMenu menu;
+            JMenu submenu;
+            JCheckBoxMenuItem cbMenuItem;
             Person[] selected = getSelectedPeople();
             // **lets fill the pop up menu**//
             if (StaticChecks.areAllEligible(selected)) {
@@ -1795,7 +1854,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     String type;
 
                     List<Person> personnel = new ArrayList(gui.getCampaign().getPersonnel());
-                    Collections.sort(personnel, Comparator.comparing((Person p) -> p.getAge(calendar)).thenComparing(p -> p.getName()));
+                    personnel.sort(Comparator.comparing((Person p) -> p.getAge(calendar)).thenComparing(Person::getName));
 
                     for (Person ps : personnel) {
                         if (person.safeSpouse(ps) && !ps.isDeadOrMIA()) {
@@ -1948,10 +2007,10 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 menu.add(newMenu);
                 if (gui.getCampaign().getCampaignOptions().useAbilities()) {
                     JMenu abMenu = new JMenu(resourceMap.getString("spendOnSpecialAbilities.text")); //$NON-NLS-1$
-                    int cost = -1;
+                    int cost;
 
                     List<SpecialAbility> specialAbilities = new ArrayList(SpecialAbility.getAllSpecialAbilities().values());
-                    Collections.sort(specialAbilities, Comparator.comparing((SpecialAbility sa) -> sa.getName()));
+                    specialAbilities.sort(Comparator.comparing(SpecialAbility::getName));
 
                     for (SpecialAbility spa : specialAbilities) {
                         if (null == spa) {
@@ -2632,10 +2691,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     }
 
     private JCheckBoxMenuItem newCheckboxMenu(String text, String command, boolean selected) {
-        return newCheckboxMenu(text, command, selected, true);
-    }
-
-    private JCheckBoxMenuItem newCheckboxMenu(String text, String command, boolean selected, boolean enabled) {
         JCheckBoxMenuItem result = new JCheckBoxMenuItem(text);
         result.setSelected(selected);
         result.setActionCommand(command);

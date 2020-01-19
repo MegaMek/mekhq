@@ -56,21 +56,21 @@ import megamek.common.UnitType;
  *
  */
 public class SkillPrereq implements MekHqXmlSerializable {
-    private Hashtable<String, Integer> skillset;
+    private Hashtable<String, Integer> skillSet;
 
     public SkillPrereq() {
-        skillset = new Hashtable<String, Integer>();
+        skillSet = new Hashtable<String, Integer>();
     }
 
     @SuppressWarnings("unchecked") // FIXME: Broken Java with it's Object clones
 	public SkillPrereq clone() {
     	SkillPrereq clone = new SkillPrereq();
-    	clone.skillset = (Hashtable<String, Integer>)this.skillset.clone();
+    	clone.skillSet = (Hashtable<String, Integer>)this.skillSet.clone();
     	return clone;
     }
 
     public boolean isEmpty() {
-        return skillset.isEmpty();
+        return skillSet.isEmpty();
     }
 
     public boolean qualifies(Person p) {
@@ -78,9 +78,9 @@ public class SkillPrereq implements MekHqXmlSerializable {
     }
 
     public boolean qualifies(Skills s) {
-        for(String skillName : skillset.keySet()) {
+        for(String skillName : skillSet.keySet()) {
             if(s.hasSkill(skillName)) {
-                if(s.getSkill(skillName).getExperienceLevel() >= skillset.get(skillName)) {
+                if(s.getSkill(skillName).getExperienceLevel() >= skillSet.get(skillName)) {
                     return true;
                 }
             }
@@ -91,71 +91,71 @@ public class SkillPrereq implements MekHqXmlSerializable {
     /**
      * Determines if the given unit type "qualifies" for this skill pre-requisite.
      * For now, we simply check whether the pre-requisite skills are required for the unit type
-     * @param e
+     * @param unitType the type of unit that is being checked
      * @return
      */
     public boolean qualifies(int unitType) {
         switch(unitType) {
         case UnitType.AERO:
-            return skillset.containsKey(SkillType.S_PILOT_AERO) ||
-                    skillset.containsKey(SkillType.S_GUN_AERO);
+            return skillSet.containsKey(SkillType.S_PILOT_AERO) ||
+                    skillSet.containsKey(SkillType.S_GUN_AERO);
         case UnitType.BATTLE_ARMOR:
-            return skillset.containsKey(SkillType.S_GUN_BA) ||
-                    skillset.containsKey(SkillType.S_ANTI_MECH);
+            return skillSet.containsKey(SkillType.S_GUN_BA) ||
+                    skillSet.containsKey(SkillType.S_ANTI_MECH);
         case UnitType.CONV_FIGHTER:
-            return skillset.containsKey(SkillType.S_GUN_JET) ||
-                    skillset.containsKey(SkillType.S_PILOT_JET);
+            return skillSet.containsKey(SkillType.S_GUN_JET) ||
+                    skillSet.containsKey(SkillType.S_PILOT_JET);
         case UnitType.DROPSHIP:
         case UnitType.JUMPSHIP:
         case UnitType.WARSHIP:
         case UnitType.SPACE_STATION:
         case UnitType.SMALL_CRAFT:
-            return skillset.containsKey(SkillType.S_PILOT_SPACE) ||
-                    skillset.containsKey(SkillType.S_GUN_SPACE) ||
-                    skillset.containsKey(SkillType.S_TECH_VESSEL) ||
-                    skillset.containsKey(SkillType.S_NAV);
+            return skillSet.containsKey(SkillType.S_PILOT_SPACE) ||
+                    skillSet.containsKey(SkillType.S_GUN_SPACE) ||
+                    skillSet.containsKey(SkillType.S_TECH_VESSEL) ||
+                    skillSet.containsKey(SkillType.S_NAV);
         case UnitType.GUN_EMPLACEMENT:
         case UnitType.TANK:
-            return skillset.containsKey(SkillType.S_PILOT_GVEE) ||
-                    skillset.containsKey(SkillType.S_GUN_VEE);
+            return skillSet.containsKey(SkillType.S_PILOT_GVEE) ||
+                    skillSet.containsKey(SkillType.S_GUN_VEE);
         case UnitType.INFANTRY:
-            return skillset.containsKey(SkillType.S_SMALL_ARMS) ||
-                    skillset.containsKey(SkillType.S_ANTI_MECH);
+            return skillSet.containsKey(SkillType.S_SMALL_ARMS) ||
+                    skillSet.containsKey(SkillType.S_ANTI_MECH);
         case UnitType.NAVAL:
-            return skillset.containsKey(SkillType.S_PILOT_NVEE) ||
-                    skillset.containsKey(SkillType.S_GUN_VEE);
+            return skillSet.containsKey(SkillType.S_PILOT_NVEE) ||
+                    skillSet.containsKey(SkillType.S_GUN_VEE);
         case UnitType.PROTOMEK:
-            return skillset.containsKey(SkillType.S_GUN_PROTO);
+            return skillSet.containsKey(SkillType.S_GUN_PROTO);
         case UnitType.VTOL:
-            return skillset.containsKey(SkillType.S_PILOT_VTOL) ||
-                    skillset.containsKey(SkillType.S_GUN_VEE);
+            return skillSet.containsKey(SkillType.S_PILOT_VTOL) ||
+                    skillSet.containsKey(SkillType.S_GUN_VEE);
         case UnitType.MEK:
-            return skillset.containsKey(SkillType.S_PILOT_MECH) ||
-                    skillset.containsKey(SkillType.S_GUN_MECH);
+            return skillSet.containsKey(SkillType.S_PILOT_MECH) ||
+                    skillSet.containsKey(SkillType.S_GUN_MECH);
         default:
             return false;
         }
     }
 
     public int getSkillLevel(String skillName) {
-    	if(null != skillset.get(skillName)) {
-    		return skillset.get(skillName);
+    	if(null != skillSet.get(skillName)) {
+    		return skillSet.get(skillName);
     	}
     	return -1;
     }
 
     public void addPrereq(String type, int lvl) {
-    	skillset.put(type, lvl);
+    	skillSet.put(type, lvl);
     }
 
     @Override
     public String toString() {
         String toReturn = "";
-        Enumeration<String> enumKeys = skillset.keys();
+        Enumeration<String> enumKeys = skillSet.keys();
         while(enumKeys.hasMoreElements()) {
             String key = enumKeys.nextElement();
             SkillType.getType(key).getName();
-            int lvl = skillset.get(key);
+            int lvl = skillSet.get(key);
             String skillLvl = "";
             if(lvl >= SkillType.EXP_GREEN) {
                 skillLvl = SkillType.getExperienceLevelName(lvl) + " ";
@@ -171,8 +171,8 @@ public class SkillPrereq implements MekHqXmlSerializable {
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<skillPrereq>");
-        for(String key : skillset.keySet()) {
-            int lvl = skillset.get(key);
+        for(String key : skillSet.keySet()) {
+            int lvl = skillSet.get(key);
             if(lvl <= 0) {
                 pw1.println(MekHqXmlUtil.indentStr(indent+1)
                         +"<skill>"
