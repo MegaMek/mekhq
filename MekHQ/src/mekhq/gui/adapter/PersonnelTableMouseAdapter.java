@@ -43,6 +43,7 @@ import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
+import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.finances.Money;
@@ -556,7 +557,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     case OPT_SURNAME_NO_CHANGE:
                         break;
                     case OPT_SURNAME_SPOUSE:
-                        if (!IsNullOrEmpty(spouseSurname)) {
+                        if (!StringUtil.isNullOrEmpty(spouseSurname)) {
                             selectedPerson.setName(selectedGivenName + SPACE + spouseSurname);
                         } else {
                             selectedPerson.setName(selectedGivenName);
@@ -564,36 +565,36 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 
                         selectedPerson.setMaidenName(selectedSurname); //"" is handled in the divorce code
                         break;
-                    case OPT_SURNAME_HYP_YOURS:
-                        if (!IsNullOrEmpty(selectedSurname) && !IsNullOrEmpty(spouseSurname)) {
-                            selectedPerson.setName(selectedGivenName + SPACE + selectedSurname + HYPHEN + spouseSurname);
-                        }
-                        else if (!IsNullOrEmpty(spouseSurname)) {
-                            selectedPerson.setName(selectedGivenName + SPACE + spouseSurname);
-                        }
-                        else if (!IsNullOrEmpty(selectedSurname)) {
-                            selectedPerson.setName(selectedGivenName + SPACE + selectedSurname);
-                        }
-                        //both null is ignored as a case, as it would lead to no changes
-
-                        selectedPerson.setMaidenName(selectedSurname); //"" is handled in the divorce code
-                        break;
                     case OPT_SURNAME_YOURS:
-                        if(!IsNullOrEmpty(selectedSurname)) {
+                        if(!StringUtil.isNullOrEmpty(selectedSurname)) {
                             spouse.setName(spouseGivenName + SPACE + selectedSurname);
                         } else {
                             spouse.setName(spouseGivenName);
                         }
                         spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
                         break;
+                    case OPT_SURNAME_HYP_YOURS:
+                        if (!StringUtil.isNullOrEmpty(selectedSurname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
+                            selectedPerson.setName(selectedGivenName + SPACE + selectedSurname + HYPHEN + spouseSurname);
+                        }
+                        else if (!StringUtil.isNullOrEmpty(spouseSurname)) {
+                            selectedPerson.setName(selectedGivenName + SPACE + spouseSurname);
+                        }
+                        else if (!StringUtil.isNullOrEmpty(selectedSurname)) {
+                            selectedPerson.setName(selectedGivenName + SPACE + selectedSurname);
+                        }
+                        //both null is ignored as a case, as it would lead to no changes
+
+                        selectedPerson.setMaidenName(selectedSurname); //"" is handled in the divorce code
+                        break;
                     case OPT_SURNAME_HYP_SPOUSE:
-                        if (!IsNullOrEmpty(selectedSurname) && !IsNullOrEmpty(spouseSurname)) {
+                        if (!StringUtil.isNullOrEmpty(selectedSurname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
                             spouse.setName(spouseGivenName + SPACE + spouseSurname + HYPHEN + selectedSurname);
                         }
-                        else if (!IsNullOrEmpty(spouseSurname)) {
+                        else if (!StringUtil.isNullOrEmpty(spouseSurname)) {
                             spouse.setName(spouseGivenName + SPACE + spouseSurname);
                         }
-                        else if (!IsNullOrEmpty(selectedSurname)){
+                        else if (!StringUtil.isNullOrEmpty(selectedSurname)){
                             spouse.setName(spouseGivenName + SPACE + selectedSurname);
                         }
                         //both null is ignored as a case, as it would lead to no changes
@@ -2685,10 +2686,5 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
         result.addActionListener(this);
         result.setEnabled(true);
         return result;
-    }
-
-    private boolean IsNullOrEmpty(String str){
-        return str.trim().length() == 0;
-//        return ((str != null) && (!str.trim().isEmpty()));
     }
 }
