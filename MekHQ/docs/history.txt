@@ -21,6 +21,7 @@ v0.47.3-SNAPSHOT
 + Issue #1384: PIR and REB AtB Contracts can not be generated
 + PR #1371: Ability to load units into dropships/warships for automatic deployment to megamek scenarios; Naval C3 network configuration in MekHQ
 + Issue #1363: Feature: in Hangar's Assign Tech menu, group by skill level
++ PR #1403: Bug: TO&E menu may crash if no units in force (and general cleanup)
 
 v0.47.2 (2019-11-15 2000 UTC) 
 + PR #1325: Customize protomechs and advanced aero in MekLab
