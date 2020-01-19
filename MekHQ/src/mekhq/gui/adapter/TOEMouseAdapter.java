@@ -14,6 +14,7 @@ import javax.swing.JTree;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.tree.TreePath;
 
+import megamek.common.util.StringUtil;
 import org.apache.commons.lang3.tuple.Pair;
 
 import megamek.client.ui.swing.util.MenuScroller;
@@ -48,7 +49,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
         super();
         this.gui = gui;
     }
-    
+
     //Named Constants for various commands
     //Force-related
     private static final String FORCE = "FORCE";
@@ -56,7 +57,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
     private static final String REMOVE_FORCE = "REMOVE_FORCE";
     private static final String DEPLOY_FORCE = "DEPLOY_FORCE";
     private static final String UNDEPLOY_FORCE = "UNDEPLOY_FORCE";
-    
+
     private static final String COMMAND_ADD_FORCE = "ADD_FORCE|FORCE|empty|";
     private static final String COMMAND_DEPLOY_FORCE = "DEPLOY_FORCE|FORCE|";
     private static final String COMMAND_REMOVE_FORCE = "REMOVE_FORCE|FORCE|empty|";
@@ -71,7 +72,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
     private static final String REMOVE_UNIT = "REMOVE_UNIT";
     private static final String UNASSIGN_FROM_SHIP = "UNASSIGN_FROM_SHIP";
     private static final String UNDEPLOY_UNIT = "UNDEPLOY_UNIT";
-    
+
     private static final String COMMAND_ADD_UNIT = "ADD_UNIT|FORCE|";
     private static final String COMMAND_ASSIGN_TO_SHIP = "ASSIGN_TO_SHIP|UNIT|";
     private static final String COMMAND_REMOVE_UNIT = "REMOVE_UNIT|UNIT|empty|";
@@ -83,19 +84,21 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
     //Tech-Related
     private static final String ADD_LANCE_TECH = "ADD_LANCE_TECH";
     private static final String REMOVE_LANCE_TECH = "REMOVE_LANCE_TECH";
-    
+
     private static final String COMMAND_ADD_LANCE_TECH = "ADD_LANCE_TECH|FORCE|";
     private static final String COMMAND_REMOVE_LANCE_TECH = "REMOVE_LANCE_TECH|FORCE|";
+
     //Icons and Descriptions
     private static final String CHANGE_CAMO = "CHANGE_CAMO";
     private static final String CHANGE_DESC = "CHANGE_DESC";
     private static final String CHANGE_ICON = "CHANGE_ICON";
     private static final String CHANGE_NAME = "CHANGE_NAME";
-    
+
     private static final String COMMAND_CHANGE_FORCE_CAMO = "CHANGE_CAMO|FORCE|empty|";
     private static final String COMMAND_CHANGE_FORCE_DESC = "CHANGE_DESC|FORCE|empty|";
     private static final String COMMAND_CHANGE_FORCE_ICON = "CHANGE_ICON|FORCE|empty|";
     private static final String COMMAND_CHANGE_FORCE_NAME = "CHANGE_NAME|FORCE|empty|";
+
     //C3 Network-related
     private static final String C3I = "C3I";
     private static final String NC3 = "NC3";
@@ -106,7 +109,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
     private static final String REMOVE_NETWORK = "REMOVE_NETWORK";
     private static final String SET_MM = "SET_MM";
     private static final String SET_IND_M = "SET_IND_M";
-    
+
     private static final String COMMAND_ADD_SLAVE = "ADD_SLAVES|UNIT|";
     private static final String COMMAND_REMOVE_C3 = "REMOVE_C3|UNIT|empty|";
     private static final String COMMAND_SET_CO_MASTER = "SET_MM|UNIT|empty|";
@@ -116,27 +119,27 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
     private static final String COMMAND_ADD_TO_NETWORK = "ADD_NETWORK|UNIT|";
     private static final String COMMAND_DISBAND_NETWORK = "DISBAND_NETWORK|UNIT|empty|";
     private static final String COMMAND_REMOVE_FROM_NETWORK = "REMOVE_NETWORK|UNIT|empty|";
+
     //Other
     private static final String GOTO_PILOT = "GOTO_PILOT";
-    
+
     private static final String COMMAND_GOTO_PILOT = "GOTO_PILOT|UNIT|empty|";
-    
+
     // String tokens for dialog boxes used for transport loading
     private static final String LOAD_UNITS_DIALOG_TEXT = "You are deploying a Transport with units assigned to it. \n" + "Would you also like to deploy these units?";
     private static final String LOAD_UNITS_DIALOG_TITLE = "Also deploy transported units?";
-    
+
     private static final String ASSIGN_FORCE_TRN_TITLE = "Assign Force to Transport Ship";
     private static final String UNASSIGN_FORCE_TRN_TITLE = "Unassign Force from Transport Ship";
 
     @Override
     public void actionPerformed(ActionEvent action) {
-        StringTokenizer st = new StringTokenizer(action.getActionCommand(),
-                "|");
+        StringTokenizer st = new StringTokenizer(action.getActionCommand(), "|");
         String command = st.nextToken();
         String type = st.nextToken();
         String target = st.nextToken();
-        Vector<Force> forces = new Vector<Force>();
-        Vector<Unit> units = new Vector<Unit>();
+        Vector<Force> forces = new Vector<>();
+        Vector<Unit> units = new Vector<>();
         while (st.hasMoreTokens()) {
             String id = st.nextToken();
             if (type.equals(TOEMouseAdapter.FORCE)) {
@@ -153,7 +156,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
             }
         }
         if (type.equals(TOEMouseAdapter.FORCE)) {
-            Vector<Force> newForces = new Vector<Force>();
+            Vector<Force> newForces = new Vector<>();
             for (Force force : forces) {
                 boolean duplicate = false;
                 for (Force otherForce : forces) {
@@ -228,13 +231,13 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                         }
                     }
                 }
-                
+
                 MekHQ.triggerEvent(new OrganizationChangedEvent(singleForce));
             }
         }
         if (command.contains(TOEMouseAdapter.ASSIGN_TO_SHIP)) {
             Unit ship = gui.getCampaign().getUnit(UUID.fromString(target));
-            if (units != null && ship != null) {
+            if ((units != null) && (ship != null)) {
                 StringJoiner cantLoad = new StringJoiner(", ");
                 String cantLoadReasons = StaticChecks.canTransportShipCarry(units, ship);
                 if (cantLoadReasons != null) {
@@ -324,7 +327,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                 ccd.setLocationRelativeTo(gui.getFrame());
                 ccd.setVisible(true);
 
-                if (ccd.clickedSelect() == true) {
+                if (ccd.clickedSelect()) {
                     for (UUID id : singleForce.getAllUnits()) {
                         Unit unit = gui.getCampaign().getUnit(id);
                         if (null != unit) {
@@ -370,7 +373,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     }
                     // Clear any transport assignments of units in the deleted force
                     clearTransportAssignment(force.getAllUnits());
-                    
+
                     gui.getCampaign().removeForce(force);
                 }
             }
@@ -404,7 +407,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     }
                     // Clear any transport assignments of units in the deleted force
                     clearTransportAssignment(unit);
-                    
+
                     MekHQ.triggerEvent(new OrganizationChangedEvent(parentForce, unit));
                 }
             }
@@ -427,7 +430,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
             if(scenario instanceof AtBDynamicScenario) {
                 ForceTemplateAssignmentDialog ftad = new ForceTemplateAssignmentDialog(gui, null, units, (AtBDynamicScenario) scenario);
             } else {
-                HashSet<Unit> extraUnits = new HashSet<Unit>();
+                HashSet<Unit> extraUnits = new HashSet<>();
                 for (Unit unit : units) {
                     if (null != unit && null != scenario) {
                         if (!unit.getTransportedUnits().isEmpty()) {
@@ -461,7 +464,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
             // don't set them directly, set the C3i UUIDs and then
             // run gui.refreshNetworks on the campaign
             // TODO: is that too costly?
-            Vector<String> uuids = new Vector<String>();
+            Vector<String> uuids = new Vector<>();
             for (Unit unit : units) {
                 if (null == unit.getEntity()) {
                     continue;
@@ -480,7 +483,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
             gui.getCampaign().refreshNetworks();
             MekHQ.triggerEvent(new NetworkChangedEvent(units));
         } else if (command.contains(TOEMouseAdapter.NC3)) {
-            Vector<String> uuids = new Vector<String>();
+            Vector<String> uuids = new Vector<>();
             for (Unit unit : units) {
                 if (null == unit.getEntity()) {
                     continue;
@@ -551,7 +554,6 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
     }
 
     private void maybeShowPopup(MouseEvent e) {
-
         if (e.isPopupTrigger()) {
             JPopupMenu popup = new JPopupMenu();
             JMenuItem menuItem;
@@ -566,10 +568,10 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
             // we will allow multiple selection of either units or forces
             // but not both - if both are selected then default to
             // unit and deselect all forces
-            Vector<Force> forces = new Vector<Force>();
-            Vector<Unit> unitsInForces = new Vector<Unit>();
-            Vector<Unit> units = new Vector<Unit>();
-            Vector<TreePath> uPath = new Vector<TreePath>();
+            Vector<Force> forces = new Vector<>();
+            Vector<Unit> unitsInForces = new Vector<>();
+            Vector<Unit> units = new Vector<>();
+            Vector<TreePath> uPath = new Vector<>();
             for (TreePath path : tree.getSelectionPaths()) {
                 Object node = path.getLastPathComponent();
                 if (node instanceof Force) {
@@ -602,8 +604,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                 }
                 tree.setSelectionPaths(paths);
             }
-            boolean multipleSelection = (forcesSelected && forces.size() > 1)
-                    || (unitsSelected && units.size() > 1);
+            boolean multipleSelection = (forcesSelected && forces.size() > 1) || (unitsSelected && units.size() > 1);
             if (forcesSelected) {
                 Force force = forces.get(0);
                 String forceIds = "" + force.getId();
@@ -666,8 +667,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
 
                         for (Person tech : gui.getCampaign().getTechs()) {
                             if (tech.getMaintenanceTimeUsing() == 0 && !tech.isEngineer()) {
-                                String skillLvl = "Unknown";
-                                skillLvl = SkillType.getExperienceLevelName(tech.getExperienceLevel(tech.isTechPrimary() ? false : true));
+                                String skillLvl = SkillType.getExperienceLevelName(tech.getExperienceLevel(!tech.isTechPrimary()));
                                 int role = tech.isTechPrimary() ? tech.getPrimaryRole() : tech.getSecondaryRole();
 
                                 // We're a MechTech!
@@ -713,7 +713,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                                         m_e_menu.setEnabled(true);
                                     }
                                 }
-                                
+
                                 // We're a AeroTech!
                                 if (role == Person.T_AERO_TECH) {
                                     if (skillLvl.equals(SkillType.ULTRA_GREEN_NM)) {
@@ -1138,45 +1138,45 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     popup.add(menuItem);
                 }
                 menuItem = new JMenuItem("Remove Force");
-                menuItem.setActionCommand(TOEMouseAdapter.COMMAND_REMOVE_FORCE
-                        + forceIds);
+                menuItem.setActionCommand(TOEMouseAdapter.COMMAND_REMOVE_FORCE + forceIds);
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(!StaticChecks.areAnyForcesDeployed(forces) && !StaticChecks.areAnyUnitsDeployed(unitsInForces));
                 popup.add(menuItem);
-                //Attempt to Assign all units in the selected force(s) to a transport ship. 
-                //This checks to see if the ship is in a basic state that can accept units. 
+                //Attempt to Assign all units in the selected force(s) to a transport ship.
+                //This checks to see if the ship is in a basic state that can accept units.
                 //Capacity gets checked once the action is submitted.
                 menu = new JMenu(TOEMouseAdapter.ASSIGN_FORCE_TRN_TITLE);
-                Unit unit = unitsInForces.get(0);
-                String unitIds = "" + unit.getId().toString();
-                for (int i = 1; i < unitsInForces.size(); i++) {
-                    unitIds += "|" + unitsInForces.get(i).getId().toString();
-                }
-                for (UUID id : gui.getCampaign().getTransportShips()) {
-                    Unit ship = gui.getCampaign().getUnit(id);
-                    if (ship == null || ship.isSalvage() || ship.getCommander() == null) {
-                        continue;
+                if (unitsInForces.size() > 0) {
+                    Unit unit = unitsInForces.get(0);
+                    String unitIds = "" + unit.getId().toString();
+                    for (int i = 1; i < unitsInForces.size(); i++) {
+                        unitIds += "|" + unitsInForces.get(i).getId().toString();
                     }
-                    menuItem = new JMenuItem(ship.getName());
-                    menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ASSIGN_TO_SHIP
-                            + id + "|" + unitIds);
-                    menuItem.addActionListener(this);
-                    menuItem.setEnabled(true);
-                    menu.add(menuItem);
-                }
-                if (menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
-                    popup.add(menu);
-                }
-                if (menu.getMenuComponentCount() > 30) {
-                    MenuScroller.setScrollerFor(menu, 30);
-                }
-                if (StaticChecks.areAllUnitsTransported(unitsInForces)) {
-                    menuItem = new JMenuItem(TOEMouseAdapter.UNASSIGN_FORCE_TRN_TITLE);
-                    menuItem.setActionCommand(TOEMouseAdapter.COMMAND_UNASSIGN_FROM_SHIP
-                            + unitIds);
-                    menuItem.addActionListener(this);
-                    menuItem.setEnabled(true);
-                    popup.add(menuItem);
+
+                    for (UUID id : gui.getCampaign().getTransportShips()) {
+                        Unit ship = gui.getCampaign().getUnit(id);
+                        if (ship == null || ship.isSalvage() || ship.getCommander() == null) {
+                            continue;
+                        }
+                        menuItem = new JMenuItem(ship.getName());
+                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ASSIGN_TO_SHIP + id + "|" + unitIds);
+                        menuItem.addActionListener(this);
+                        menuItem.setEnabled(true);
+                        menu.add(menuItem);
+                    }
+                    if (menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
+                        popup.add(menu);
+                    }
+                    if (menu.getMenuComponentCount() > 30) {
+                        MenuScroller.setScrollerFor(menu, 30);
+                    }
+                    if (StaticChecks.areAllUnitsTransported(unitsInForces)) {
+                        menuItem = new JMenuItem(TOEMouseAdapter.UNASSIGN_FORCE_TRN_TITLE);
+                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_UNASSIGN_FROM_SHIP + unitIds);
+                        menuItem.addActionListener(this);
+                        menuItem.setEnabled(true);
+                        popup.add(menuItem);
+                    }
                 }
             } else if (unitsSelected) {
                 Unit unit = units.get(0);
@@ -1388,7 +1388,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                         MenuScroller.createScrollBarsOnMenus(menu);
                         popup.add(menu);
                     }
-                    
+
                     //Attempt to Assign unit to a transport ship. This checks to see if the ship
                     //is in a basic state that can accept units. Capacity gets checked once the action
                     //is submitted.
@@ -1462,19 +1462,19 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
         // Gather the most used camo category/file name for the force
         Optional<Pair<String, String>> used = force.getAllUnits().stream()
             .map(id -> gui.getCampaign().getUnit(id))
-            .filter(u -> u != null)
-            .map(u -> u.getEntity())
+            .filter(Objects::nonNull)
+            .map(Unit::getEntity)
             .collect(
                 Collectors.collectingAndThen(
                     Collectors.groupingBy(
                         e -> Pair.of(e.getCamoCategory(), e.getCamoFileName()),
                         Collectors.counting()),
-                    m -> m.entrySet().stream().max(Map.Entry.comparingByValue()).map(o -> o.getKey())
+                    m -> m.entrySet().stream().max(Map.Entry.comparingByValue()).map(Map.Entry::getKey)
                 )
             );
         if (used.isPresent()) {
             // IF there is a camo category and its not blank...
-            if (used.get().getKey() != "" && used.get().getKey() != null) {
+            if (!StringUtil.isNullOrEmpty(used.get().getKey())) {
                 // ...use it as the category/fileName
                 category = used.get().getKey();
                 fileName = used.get().getValue();
@@ -1484,7 +1484,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
         return new CamoChoiceDialog(gui.getFrame(), true, category, fileName,
             gui.getCampaign().getColorIndex(), gui.getIconPackage().getCamos());
     }
-    
+
     /**
      * Worker function to make sure transport assignment data gets cleared out when unit(s) are removed from the TO&E
      * @param unitsToUpdate A vector of UUIDs of the units that we need to update. This can be either a collection that the player
@@ -1498,7 +1498,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
             }
         }
     }
-    
+
     /**
      * Worker function to make sure transport assignment data gets cleared out when unit(s) are removed from the TO&E
      * @param currentUnit The unit currently being processed
