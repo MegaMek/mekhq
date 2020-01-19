@@ -719,7 +719,7 @@ public class PersonViewPanel extends ScrollablePanel {
         JLabel lblSpouse1 = new JLabel();
         JLabel lblSpouse2 = new JLabel();
         JLabel lblChildren1 = new JLabel();
-        JLabel lblChildren2 = new JLabel();
+        JLabel lblChildren2;
         JLabel lblFather1 = new JLabel();
         JLabel lblFather2 = new JLabel();
         JLabel lblMother1 = new JLabel();
