@@ -575,8 +575,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     /**
      * Determines whether a list of forces is eligible to deploy to the scenario.
      *
-     * @param forces: list of forces
-     * @param c: the campaign that the forces are part of
+     * @param forces    list of forces
+     * @param c         the campaign that the forces are part of
      * @return true if all units in all forces in the list are eligible, otherwise false
      */
     public boolean canDeployForces(Vector<Force> forces, Campaign c) {

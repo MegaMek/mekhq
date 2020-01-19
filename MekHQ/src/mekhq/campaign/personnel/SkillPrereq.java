@@ -91,7 +91,7 @@ public class SkillPrereq implements MekHqXmlSerializable {
     /**
      * Determines if the given unit type "qualifies" for this skill pre-requisite.
      * For now, we simply check whether the pre-requisite skills are required for the unit type
-     * @param unitType: the type of unit that is being checked
+     * @param unitType the type of unit that is being checked
      * @return
      */
     public boolean qualifies(int unitType) {

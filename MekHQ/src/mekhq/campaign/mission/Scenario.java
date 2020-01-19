@@ -182,8 +182,8 @@ public class Scenario implements Serializable {
 
     /**
      * Adds a transport-cargo pair to the internal transport relationship store.
-     * @param transportId: the UUID of the transport object
-     * @param cargoId: the UUID of the cargo being transported
+     * @param transportId the UUID of the transport object
+     * @param cargoId     the UUID of the cargo being transported
      */
     public void addPlayerTransportRelationship(UUID transportId, UUID cargoId) {
         playerTransportLinkages.get(transportId).add(cargoId);

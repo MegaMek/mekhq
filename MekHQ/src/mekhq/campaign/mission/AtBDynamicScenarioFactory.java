@@ -452,8 +452,7 @@ public class AtBDynamicScenarioFactory {
     public static List<Entity> generateCivilianUnits(int num, Campaign campaign) {
         RandomUnitGenerator.getInstance().setChosenRAT("CivilianUnits");
         ArrayList<MechSummary> msl = RandomUnitGenerator.getInstance().generate(num);
-        List<Entity> entities = msl.stream().map(ms -> createEntityWithCrew("IND", RandomSkillsGenerator.L_GREEN, campaign, ms)).collect(Collectors.<Entity>toList());
-        return new ArrayList<>(entities);
+        return msl.stream().map(ms -> createEntityWithCrew("IND", RandomSkillsGenerator.L_GREEN, campaign, ms)).collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
@@ -468,8 +467,7 @@ public class AtBDynamicScenarioFactory {
     public static List<Entity> generateTurrets(int num, int skill, int quality, Campaign campaign) {
         int currentYear = campaign.getCalendar().get(Calendar.YEAR);
         List<MechSummary> msl = campaign.getUnitGenerator().generateTurrets(num, skill, quality, currentYear);
-        List<Entity> entities = msl.stream().map(ms -> createEntityWithCrew("IND", skill, campaign, ms)).collect(Collectors.<Entity>toList());
-        return new ArrayList<>(entities);
+        return msl.stream().map(ms -> createEntityWithCrew("IND", skill, campaign, ms)).collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
@@ -630,11 +628,13 @@ public class AtBDynamicScenarioFactory {
      */
     private static void setLightConditions(AtBDynamicScenario scenario) {
         int roll = Compute.randomInt(10) + 1;
-        int light = PlanetaryConditions.L_DAY; //this handles all rolls less than 6
+        int light;
 
-        if ((6 <= roll) && (roll < 8)){
+        if (roll < 6) {
+            light = PlanetaryConditions.L_DAY;
+        } else if (roll < 8) {
             light = PlanetaryConditions.L_DUSK;
-        } else if (roll == 8){
+        } else if (roll == 8) {
             light = PlanetaryConditions.L_FULL_MOON;
         } else if (roll == 9) {
             light = PlanetaryConditions.L_MOONLESS;
@@ -1022,12 +1022,12 @@ public class AtBDynamicScenarioFactory {
      * Fill the provided transports with randomly generated units that
      * can fit into their bays.
      * @param scenario
-     * @param transports: list of potential transports
+     * @param transports list of potential transports
      * @param factionCode
      * @param skill
      * @param quality
      * @param campaign
-     * @return transportedUnits, which are the units being transported
+     * @return transportedUnits List of units being transported
      */
     public static List<Entity> fillTransports(AtBScenario scenario, List<Entity> transports, String factionCode, int skill, int quality, Campaign campaign) {
         List<Entity> transportedUnits = new ArrayList<>();
