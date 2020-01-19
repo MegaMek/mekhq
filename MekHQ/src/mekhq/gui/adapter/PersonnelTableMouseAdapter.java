@@ -530,7 +530,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 
                 String[] selectedName = selectedPerson.getName().split(SPACE, 2);
                 String[] spouseName = spouse.getName().split(SPACE,2);
-                String selectedGivenName = null, selectedSurname = null, spouseGivenName = null, spouseSurname = null;
+                String selectedGivenName = "", selectedSurname = "", spouseGivenName = "", spouseSurname = "";
 
                 if (selectedName.length >= 2) {
                     selectedGivenName = selectedName[0];
@@ -547,7 +547,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     spouseSurname = spouseName[1];
                 } else if (spouseName.length == 1) {
                     spouseGivenName = spouseName[0];
-                } else{
+                } else {
                     spouse.setName("ImaError"); //$NON-NLS-1$
                     MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR, String.format("Name of Length 0 in found in marriage between \"%s\" and \"%s\". Please raise this as an Issue at https://github.com/MegaMek/mekhq", selectedPerson.getFullName(), spouse.getFullName()));
                 }
@@ -556,52 +556,49 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     case OPT_SURNAME_NO_CHANGE:
                         break;
                     case OPT_SURNAME_SPOUSE:
-                        if (spouseSurname != null) {
+                        if (!IsNullOrEmpty(spouseSurname)) {
                             selectedPerson.setName(selectedGivenName + SPACE + spouseSurname);
-                        } else if (selectedSurname != null) {
+                        } else {
                             selectedPerson.setName(selectedGivenName);
                         }
-                        //both null is ignored as a case, as it would lead to no changes
 
-                        selectedPerson.setMaidenName(selectedSurname); //null is handled in the divorce code
+                        selectedPerson.setMaidenName(selectedSurname); //"" is handled in the divorce code
                         break;
                     case OPT_SURNAME_HYP_YOURS:
-                        if ((selectedSurname != null) && (spouseSurname != null)) {
+                        if (!IsNullOrEmpty(selectedSurname) && !IsNullOrEmpty(spouseSurname)) {
                             selectedPerson.setName(selectedGivenName + SPACE + selectedSurname + HYPHEN + spouseSurname);
                         }
-                        else if (spouseSurname != null) {
+                        else if (!IsNullOrEmpty(spouseSurname)) {
                             selectedPerson.setName(selectedGivenName + SPACE + spouseSurname);
                         }
-                        else if (selectedSurname != null){
+                        else if (!IsNullOrEmpty(selectedSurname)) {
                             selectedPerson.setName(selectedGivenName + SPACE + selectedSurname);
                         }
                         //both null is ignored as a case, as it would lead to no changes
 
-                        selectedPerson.setMaidenName(selectedSurname); //null is handled in the divorce code
+                        selectedPerson.setMaidenName(selectedSurname); //"" is handled in the divorce code
                         break;
                     case OPT_SURNAME_YOURS:
-                        if((selectedSurname != null)) {
+                        if(!IsNullOrEmpty(selectedSurname)) {
                             spouse.setName(spouseGivenName + SPACE + selectedSurname);
-                        } else if (spouseSurname != null) {
+                        } else {
                             spouse.setName(spouseGivenName);
                         }
-                        //both null is ignored as a case, as it would lead to no changes
-
-                        spouse.setMaidenName(spouseSurname); //null is handled in the divorce code
+                        spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
                         break;
                     case OPT_SURNAME_HYP_SPOUSE:
-                        if ((selectedSurname != null) && (spouseSurname != null)) {
+                        if (!IsNullOrEmpty(selectedSurname) && !IsNullOrEmpty(spouseSurname)) {
                             spouse.setName(spouseGivenName + SPACE + spouseSurname + HYPHEN + selectedSurname);
                         }
-                        else if (spouseSurname != null) {
+                        else if (!IsNullOrEmpty(spouseSurname)) {
                             spouse.setName(spouseGivenName + SPACE + spouseSurname);
                         }
-                        else if (selectedSurname != null){
+                        else if (!IsNullOrEmpty(selectedSurname)){
                             spouse.setName(spouseGivenName + SPACE + selectedSurname);
                         }
                         //both null is ignored as a case, as it would lead to no changes
 
-                        spouse.setMaidenName(spouseSurname); //null is handled in the divorce code
+                        spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
                         break;
                     default:
                         spouse.setName(spouseGivenName + SPACE + "ImaError"); //$NON-NLS-1$
@@ -2688,5 +2685,10 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
         result.addActionListener(this);
         result.setEnabled(true);
         return result;
+    }
+
+    private boolean IsNullOrEmpty(String str){
+        return str.trim().length() == 0;
+//        return ((str != null) && (!str.trim().isEmpty()));
     }
 }
