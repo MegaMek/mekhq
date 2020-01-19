@@ -2150,7 +2150,7 @@ public class Campaign implements Serializable, ITechManager {
             }
 
             if (shoppingItem.getDaysToWait() <= 0) {
-                while (person.getAcquisitions() < getCampaignOptions().getMaxAcquisitions()
+                while (canAcquireParts(person)
                         && shoppingItem.getQuantity() > 0) {
                     if (!acquireEquipment(shoppingItem, person)) {
                         shoppingItem.resetDaysToWait();
@@ -2167,12 +2167,6 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     private ShoppingList goShoppingByPlanet(ShoppingList sList) {
-        Person person = getLogisticsPerson();
-        if (null == person && !getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
-            addReport("Your force has no one capable of acquiring equipment.");
-            return sList;
-        }
-
         // we are shopping by planets, so more involved
         List<IAcquisitionWork> currentList = sList.getAllShoppingItems();
         DateTime currentDate = Utilities.getDateTimeDay(getCalendar());
@@ -2181,51 +2175,72 @@ public class Campaign implements Serializable, ITechManager {
         // shopping list
         List<IAcquisitionWork> shelvedItems = new ArrayList<>();
 
-        String personTitle = "";
-        if (null != person) {
-            personTitle = person.getHyperlinkedFullTitle() + " ";
-        }
-
         //find planets within a certain radius - the function will weed out dead planets
         List<PlanetarySystem> systems = Systems.getInstance().getShoppingSystems(getCurrentSystem(),
                 getCampaignOptions().getMaxJumpsPlanetaryAcquisition(),
                 currentDate);
 
-        for (PlanetarySystem system: systems) {
-            List<IAcquisitionWork> remainingItems = new ArrayList<>();
+        while (!currentList.isEmpty()) {
+            Person person = getLogisticsPerson();
+            if (null == person && !getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
+                addReport("Your force has no one capable of acquiring equipment.");
+                break;
+            }
 
-            //loop through shopping list. If its time to check, then check as appropriate. Items not
-            //found get added to the remaining item list
-            for (IAcquisitionWork shoppingItem : currentList) {
-                if (shoppingItem.getDaysToWait() <= 0) {
-                    if (findContactForAcquisition(shoppingItem, person, system)) {
-                        int transitTime = calculatePartTransitTime(system);
-                        int totalQuantity = 0;
-                        while (shoppingItem.getQuantity() > 0 && acquireEquipment(shoppingItem, person, system, transitTime)) {
-                            totalQuantity++;
+            String personTitle = "";
+            if (null != person) {
+                personTitle = person.getHyperlinkedFullTitle() + " ";
+            }
+
+            for (PlanetarySystem system: systems) {
+                List<IAcquisitionWork> remainingItems = new ArrayList<>();
+
+                //loop through shopping list. If its time to check, then check as appropriate. Items not
+                //found get added to the remaining item list. Rotate through personnel
+                boolean done = false;
+                for (IAcquisitionWork shoppingItem : currentList) {
+                    if (!canAcquireParts(person)) {
+                        remainingItems.add(shoppingItem);
+                        done = true;
+                        continue;
+                    }
+
+                    if (shoppingItem.getDaysToWait() <= 0) {
+                        if (findContactForAcquisition(shoppingItem, person, system)) {
+                            int transitTime = calculatePartTransitTime(system);
+                            int totalQuantity = 0;
+                            while (shoppingItem.getQuantity() > 0
+                                    && canAcquireParts(person)
+                                    && acquireEquipment(shoppingItem, person, system, transitTime)) {
+                                totalQuantity++;
+                            }
+                            if (totalQuantity > 0) {
+                                addReport(personTitle + "<font color='green'><b> found " + shoppingItem.getQuantityName(totalQuantity) + " on " + system.getPrintableName(currentDate) + ". Delivery in " + transitTime + " days.</b></font>");
+                            }
                         }
-                        if (totalQuantity > 0) {
-                            addReport(personTitle + "<font color='green'><b> found " + shoppingItem.getQuantityName(totalQuantity) + " on " + system.getPrintableName(currentDate) + ". Delivery in " + transitTime + " days.</b></font>");
+                    }
+                    // if we didn't find everything on this planet, then add to the remaining list
+                    if (shoppingItem.getQuantity() > 0 || shoppingItem.getDaysToWait() > 0) {
+                        // if we can't afford it, then don't keep searching for it on other planets
+                        if (!canPayFor(shoppingItem)) {
+                            if (!getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
+                                addReport("<font color='red'><b>You cannot afford to purchase another "
+                                        + shoppingItem.getAcquisitionName() + "</b></font>");
+                            }
+                            shelvedItems.add(shoppingItem);
+                        } else {
+                            remainingItems.add(shoppingItem);
                         }
                     }
                 }
-                // if we didn't find everything on this planet, then add to the remaining list
-                if (shoppingItem.getQuantity() > 0 || shoppingItem.getDaysToWait() > 0) {
-                    // if we can't afford it, then don't keep searching for it on other planets
-                    if (!canPayFor(shoppingItem)) {
-                        if (!getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
-                            addReport("<font color='red'><b>You cannot afford to purchase another "
-                                    + shoppingItem.getAcquisitionName() + "</b></font>");
-                        }
-                        shelvedItems.add(shoppingItem);
-                    } else {
-                        remainingItems.add(shoppingItem);
-                    }
+
+                // we are done with this planet. replace our current list with the remaining items
+                currentList = remainingItems;
+
+                if (done) {
+                    break;
                 }
             }
-            // we are done with this planet. replace our current list with the remaining
-            // items
-            currentList = remainingItems;
         }
 
         // add shelved items back to the currentlist
@@ -2240,6 +2255,23 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         return new ShoppingList(currentList);
+    }
+
+    /**
+     * Gets a value indicating if {@code person} can acquire parts.
+     * @param person The {@link Person} to check if they have remaining
+     *               time to perform acquisitions.
+     * @return True if {@code person} could acquire another part, otherwise false.
+     */
+    public boolean canAcquireParts(@Nullable Person person) {
+        if (person == null) {
+            // CAW: in this case we're using automatic success
+            //      and the logistics person will be null.
+            return true;
+        }
+        int maxAcquisitions = getCampaignOptions().getMaxAcquisitions();
+        return maxAcquisitions <= 0
+            || person.getAcquisitions() < maxAcquisitions;
     }
 
     /***
