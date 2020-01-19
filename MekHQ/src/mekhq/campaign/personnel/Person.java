@@ -209,7 +209,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     protected GregorianCalendar dueDate;
 
     private String name;
-    private String maidenname;
+    private String maidenName;
 
     private String callsign;
     private int gender;
@@ -222,7 +222,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     protected String biography;
     protected GregorianCalendar birthday;
-    protected GregorianCalendar deathday;
+    protected GregorianCalendar dateOfDeath;
     protected GregorianCalendar recruitment;
     protected ArrayList<LogEntry> personnelLog;
     protected List<LogEntry> missionLog;
@@ -678,11 +678,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public String getMaidenName() {
-        return maidenname;
+        return maidenName;
     }
 
     public void setMaidenName(String n) {
-        this.maidenname = n;
+        this.maidenName = n;
     }
 
     public String getFullName() {
@@ -942,12 +942,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return birthday;
     }
 
-    public GregorianCalendar getDeathday() {
-        return deathday;
+    public GregorianCalendar GetDateOfDeath() {
+        return dateOfDeath;
     }
 
-    public void setDeathday(GregorianCalendar date) {
-        this.deathday = date;
+    public void setDateOfDeath(GregorianCalendar date) {
+        this.dateOfDeath = date;
     }
 
     public void setRecruitment(GregorianCalendar date) {
@@ -968,9 +968,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public int getAge(GregorianCalendar today) {
         // Get age based on year
-        if (null != deathday) {
-            //use deathday instead of birthdate
-            today = deathday;
+        if (null != dateOfDeath) {
+            //use date of death instead of birthday
+            today = dateOfDeath;
         }
 
         int age = today.get(Calendar.YEAR) - birthday.get(Calendar.YEAR);
@@ -1283,11 +1283,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     + "<name>"
                     + MekHqXmlUtil.escape(name)
                     + "</name>");
-        if (maidenname != null) {
+        if (maidenName != null) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "<maidenname>"
-                    + MekHqXmlUtil.escape(maidenname)
-                    + "</maidenname>");
+                    + "<maidenName>"
+                    + MekHqXmlUtil.escape(maidenName)
+                    + "</maidenName>");
         }
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<callsign>"
@@ -1436,9 +1436,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     + status
                     + "</status>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "<prisonerstatus>"
+                    + "<prisonerStatus>"
                     + prisonerStatus
-                    + "</prisonerstatus>");
+                    + "</prisonerStatus>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<willingToDefect>"
                     + willingToDefect
@@ -1463,10 +1463,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     + "<birthday>"
                     + df.format(birthday.getTime())
                     + "</birthday>");
-        if (null != deathday) {
+        if (null != dateOfDeath) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                         + "<deathday>"
-                        + df.format(deathday.getTime())
+                        + df.format(dateOfDeath.getTime())
                         + "</deathday>");
         }
         if (null != recruitment) {
@@ -1585,7 +1585,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             String edge = null;
             String implants = null;
 
-            //backwards compatability
+            //backwards compatibility
             String pilotName = null;
             String pilotNickname = null;
             int pilotGunnery = -1;
@@ -1598,8 +1598,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     retVal.name = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("maidenname")) {
-                    retVal.maidenname = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("maidenName")) {
+                    retVal.maidenName = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("callsign")) {
                     retVal.callsign = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("commander")) {
@@ -1700,7 +1700,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("status")) {
                     retVal.status = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("prisonerstatus")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("prisonerStatus")) {
                     retVal.prisonerStatus = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("willingToDefect")) {
                     retVal.willingToDefect = Boolean.parseBoolean(wn2.getTextContent());
@@ -1716,8 +1716,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     retVal.birthday.setTime(df.parse(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("deathday")) {
                     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                    retVal.deathday = (GregorianCalendar) GregorianCalendar.getInstance();
-                    retVal.deathday.setTime(df.parse(wn2.getTextContent().trim()));
+                    retVal.dateOfDeath = (GregorianCalendar) GregorianCalendar.getInstance();
+                    retVal.dateOfDeath.setTime(df.parse(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("recruitment")) {
                     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                     retVal.recruitment = (GregorianCalendar) GregorianCalendar.getInstance();
@@ -3577,8 +3577,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         Unit u = campaign.getUnit(getUnitId());
         if (status == Person.S_KIA) {
             MedicalLogger.diedFromWounds(this, campaign.getDate());
-            //set the deathday
-            setDeathday((GregorianCalendar) campaign.getCalendar().clone());
+            //set the date of death
+            setDateOfDeath((GregorianCalendar) campaign.getCalendar().clone());
         }
         if (status == Person.S_RETIRED) {
             ServiceLogger.retireDueToWounds(this, campaign.getDate());

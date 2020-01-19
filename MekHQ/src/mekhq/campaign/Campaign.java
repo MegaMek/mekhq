@@ -5850,11 +5850,11 @@ public class Campaign implements Serializable, ITechManager {
                 PersonalLogger.spouseKia(spouse, person, getDate());
                 spouse.setSpouseID(null);
             }
-            // set the deathday
-            person.setDeathday((GregorianCalendar) calendar.clone());
+            // set the date of death
+            person.setDateOfDeath((GregorianCalendar) calendar.clone());
         } else if (person.getStatus() == Person.S_KIA) {
-            // remove deathdates for resurrection
-            person.setDeathday(null);
+            // remove date of death for resurrection
+            person.setDateOfDeath(null);
         }
         if (status == Person.S_MIA) {
             ServiceLogger.mia(person, getDate());
