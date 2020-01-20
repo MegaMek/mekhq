@@ -384,15 +384,15 @@ public final class OverviewTab extends CampaignGuiTab {
                             scrollOverviewUnitRating);
                 }
             }
-    
+
             scrollOverviewUnitRating.setViewportView(new RatingReport(getCampaign()).getReport());
             scrollOverviewCombatPersonnel.setViewportView(new PersonnelReport(getCampaign()).getCombatPersonnelReport());
             scrollOverviewSupportPersonnel.setViewportView(new PersonnelReport(getCampaign()).getSupportPersonnelReport());
             scrollOverviewTransport.setViewportView(new TransportReport(getCampaign()).getReport());
             scrollOverviewCargo.setViewportView(new CargoReport(getCampaign()).getReport());
             HangarReport hr = new HangarReport(getCampaign());
-            overviewHangarArea.setText(hr.getHangarTotals());
             scrollOverviewHangar.setViewportView(hr.getHangarTree());
+            overviewHangarArea.setText(hr.getHangarTotals());
             refreshOverviewPartsInUse();
         });
     }
@@ -419,17 +419,17 @@ public final class OverviewTab extends CampaignGuiTab {
     }
 
     private ActionScheduler overviewScheduler = new ActionScheduler(this::refreshOverview);
-    
+
     @Subscribe
     public void handle(OptionsChangedEvent ev) {
         overviewScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(DeploymentChangedEvent ev) {
         overviewScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(ScenarioResolvedEvent ev) {
         overviewScheduler.schedule();
@@ -439,22 +439,22 @@ public final class OverviewTab extends CampaignGuiTab {
     public void handle(UnitEvent ev) {
         overviewScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(PersonEvent ev) {
         overviewScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(PartEvent ev) {
         overviewScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(PartWorkEvent ev) {
         overviewScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(LoanEvent ev) {
     	overviewScheduler.schedule();
