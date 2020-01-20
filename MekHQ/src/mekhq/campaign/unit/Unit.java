@@ -1944,7 +1944,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
         } catch (Exception ex) {
             // Doh!
-            MekHQ.getLogger().error(Unit.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(Unit.class, METHOD_NAME, "Could not parse unit " + idNode.getTextContent().trim(), ex);
+            return null;
         }
 
         if (retVal.id == null) {
