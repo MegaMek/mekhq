@@ -42,15 +42,11 @@ import megamek.common.Mech;
 import megamek.common.Protomech;
 import megamek.common.SmallCraft;
 import megamek.common.SpaceStation;
-import megamek.common.SupportTank;
-import megamek.common.SupportVTOL;
 import megamek.common.Tank;
 import megamek.common.VTOL;
 import megamek.common.Warship;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
-
-
 
 /**
  * @author Jay Lawson
@@ -62,15 +58,15 @@ public class HangarReport extends Report {
     public HangarReport(Campaign c) {
         super(c);
     }
-    
+
     public String getTitle() {
         return "Hangar Breakdown";
     }
-    
+
     public JTree getHangarTree() {
     	DefaultMutableTreeNode top = new DefaultMutableTreeNode("Hangar");
         JTree overviewHangarTree = new JTree(top);
- 
+
         // BattleMechs
         // boolean expandMechs = false;
         int countMechs = 0;
@@ -88,7 +84,7 @@ public class HangarReport extends Report {
         int mediumOmniMech = 0;
         int lightOmniMech = 0;
         int ultralightOmniMech = 0;
-        
+
         // ASF
         //boolean expandASF = false;
         int countASF = 0;
@@ -100,7 +96,7 @@ public class HangarReport extends Report {
         int countOmniLightASF = 0;
         int countOmniMediumASF = 0;
         int countOmniHeavyASF = 0;
-        
+
         // Vehicles
         //boolean expandVees = false;
         int countVees = 0;
@@ -182,7 +178,7 @@ public class HangarReport extends Report {
         int countOmniHydrofoilHeavy = 0;
         int countOmniHydrofoilMedium = 0;
         int countOmniHydrofoilLight = 0;
-        
+
         // Battle Armor and Infantry
         //boolean expandInfantry = false;
         int countInfantry = 0;
@@ -196,7 +192,7 @@ public class HangarReport extends Report {
         int countBAMedium = 0;
         int countBAHeavy = 0;
         int countBAAssault = 0;
-        
+
         // Jumpships, Warships, Dropships, and SmallCraft
         //boolean expandSpace = false;
         int countSpace = 0;
@@ -209,12 +205,15 @@ public class HangarReport extends Report {
         int countMediumDS = 0;
         int countSmallDS = 0;
         int countSmallCraft = 0;
-        
-        // Conventional Fighters
+
+        // Space Stations
+        int countSpaceStations = 0;
+
+        // Conventional Fighter
         int countConv = 0;
-        
+
         // Support Vees
-        /*boolean expandSupportVees = false;
+        //boolean expandSupportVees = false;
         int countSupportVees = 0;
         int countSupportStandardVees = 0;
         int countSupportOmniVees = 0;
@@ -293,11 +292,11 @@ public class HangarReport extends Report {
         int countSupportOmniHydrofoilAssault = 0;
         int countSupportOmniHydrofoilHeavy = 0;
         int countSupportOmniHydrofoilMedium = 0;
-        int countSupportOmniHydrofoilLight = 0;*/
-        
+        int countSupportOmniHydrofoilLight = 0;
+
         // Turrets
         int countGE = 0;
-        
+
         // Protomechs
         //boolean expandProtos = false;
         int countProtos = 0;
@@ -305,8 +304,7 @@ public class HangarReport extends Report {
         int countMediumProtos = 0;
         int countHeavyProtos = 0;
         int countAssaultProtos = 0;
-        
-        
+
         // Gather data and load it into the tree
         for (Unit u : getCampaign().getUnits()) {
             Entity e = u.getEntity();
@@ -346,7 +344,7 @@ public class HangarReport extends Report {
             } else if (e instanceof ConvFighter) {
                 countConv++;
             } else if (e instanceof SpaceStation) {
-                continue;
+                countSpaceStations++;
             } else if (e instanceof Warship) {
                 countSpace++;
                 countWarships++;
@@ -405,8 +403,181 @@ public class HangarReport extends Report {
                 }
             } else if (e instanceof GunEmplacement) {
                 countGE++;
-            } else if (e instanceof SupportTank || e instanceof SupportVTOL) {
-                continue;
+            } else if (e.isSupportVehicle()){
+                countSupportVees++;
+                if (e.isOmni()) {
+                    countSupportOmniVees++;
+                    if (e instanceof VTOL) {
+                        countSupportOmniVTOL++;
+                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+                            countSupportOmniVTOLLight++;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.TRACKED) {
+                        countSupportOmniTracked++;
+                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+                            countSupportOmniTrackedLight++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+                            countSupportOmniTrackedMedium++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+                            countSupportOmniTrackedHeavy++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+                            countSupportOmniTrackedAssault++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
+                            countSupportOmniTrackedColossal++;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.WHEELED) {
+                        countSupportOmniWheeled++;
+                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+                            countSupportOmniWheeledLight++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+                            countSupportOmniWheeledMedium++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+                            countSupportOmniWheeledHeavy++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+                            countSupportOmniWheeledAssault++;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.HOVER) {
+                        countSupportOmniHover++;
+                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+                            countSupportOmniHoverLight++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+                            countSupportOmniHoverMedium++;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.WIGE) {
+                        countSupportOmniWiGE++;
+                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+                            countSupportOmniWiGELight++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+                            countSupportOmniWiGEMedium++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+                            countSupportOmniWiGEHeavy++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+                            countSupportOmniWiGEAssault++;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.NAVAL) {
+                        countSupportOmniNaval++;
+                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+                            countSupportOmniNavalLight++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+                            countSupportOmniNavalMedium++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+                            countSupportOmniNavalHeavy++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+                            countSupportOmniNavalAssault++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
+                            countSupportOmniNavalColossal++;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.SUBMARINE) {
+                        countSupportOmniSub++;
+                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+                            countSupportOmniSubLight++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+                            countSupportOmniSubMedium++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+                            countSupportOmniSubHeavy++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+                            countSupportOmniSubAssault++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
+                            countSupportOmniSubColossal++;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.HYDROFOIL) {
+                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+                            countSupportOmniHydrofoilLight++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+                            countSupportOmniHydrofoilMedium++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+                            countSupportOmniHydrofoilHeavy++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+                            countSupportOmniHydrofoilAssault++;
+                        }
+                    }
+                } else {
+                    countSupportStandardVees++;
+                    if (e instanceof VTOL) {
+                        countSupportVTOL++;
+                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+                            countSupportVTOLLight++;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.TRACKED) {
+                        countSupportTracked++;
+                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+                            countSupportTrackedLight++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+                            countSupportTrackedMedium++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+                            countSupportTrackedHeavy++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+                            countSupportTrackedAssault++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
+                            countSupportTrackedColossal++;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.WHEELED) {
+                        countSupportWheeled++;
+                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+                            countSupportWheeledLight++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+                            countSupportWheeledMedium++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+                            countSupportWheeledHeavy++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+                            countSupportWheeledAssault++;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.HOVER) {
+                        countSupportHover++;
+                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+                            countSupportHoverLight++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+                            countSupportHoverMedium++;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.WIGE) {
+                        countSupportWiGE++;
+                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+                            countSupportWiGELight++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+                            countSupportWiGEMedium++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+                            countSupportWiGEHeavy++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+                            countSupportWiGEAssault++;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.NAVAL) {
+                        countSupportNaval++;
+                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+                            countSupportNavalLight++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+                            countSupportNavalMedium++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+                            countSupportNavalHeavy++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+                            countSupportNavalAssault++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
+                            countSupportNavalColossal++;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.SUBMARINE) {
+                        countSupportSub++;
+                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+                            countSupportSubLight++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+                            countSupportSubMedium++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+                            countSupportSubHeavy++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+                            countSupportSubAssault++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
+                            countSupportSubColossal++;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.HYDROFOIL) {
+                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+                            countSupportHydrofoilLight++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+                            countSupportHydrofoilMedium++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+                            countSupportHydrofoilHeavy++;
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+                            countSupportHydrofoilAssault++;
+                        }
+                    }
+                }
             } else if (e instanceof Tank) {
                 countVees++;
                 if (e.isOmni()) {
@@ -608,288 +779,452 @@ public class HangarReport extends Report {
                 }
             }
         }
-        
+
         // Mech Nodes
-        final DefaultMutableTreeNode mechs = new DefaultMutableTreeNode("'Mechs: "+countMechs);
-        DefaultMutableTreeNode battlemechs = new DefaultMutableTreeNode("BattleMechs: "+countBattleMechs);
-        DefaultMutableTreeNode omnis = new DefaultMutableTreeNode("OmniMechs: "+countOmniMechs);
+        final DefaultMutableTreeNode mechs = new DefaultMutableTreeNode("'Mechs: " + countMechs);
+        DefaultMutableTreeNode battlemechs = new DefaultMutableTreeNode("BattleMechs: " + countBattleMechs);
+        DefaultMutableTreeNode omnis = new DefaultMutableTreeNode("OmniMechs: " + countOmniMechs);
         mechs.add(battlemechs);
         mechs.add(omnis);
-        DefaultMutableTreeNode colossalmechs = new DefaultMutableTreeNode("Colossal: "+colossalMech);
+        DefaultMutableTreeNode colossalmechs = new DefaultMutableTreeNode("Super Heavy: " + colossalMech);
         battlemechs.add(colossalmechs);
-        DefaultMutableTreeNode assaultmechs = new DefaultMutableTreeNode("Assault: "+assaultMech);
+        DefaultMutableTreeNode assaultmechs = new DefaultMutableTreeNode("Assault: " + assaultMech);
         battlemechs.add(assaultmechs);
-        DefaultMutableTreeNode heavymechs = new DefaultMutableTreeNode("Heavy: "+heavyMech);
+        DefaultMutableTreeNode heavymechs = new DefaultMutableTreeNode("Heavy: " + heavyMech);
         battlemechs.add(heavymechs);
-        DefaultMutableTreeNode mediummechs = new DefaultMutableTreeNode("Medium: "+mediumMech);
+        DefaultMutableTreeNode mediummechs = new DefaultMutableTreeNode("Medium: " + mediumMech);
         battlemechs.add(mediummechs);
-        DefaultMutableTreeNode lightmechs = new DefaultMutableTreeNode("Light: "+lightMech);
+        DefaultMutableTreeNode lightmechs = new DefaultMutableTreeNode("Light: " + lightMech);
         battlemechs.add(lightmechs);
-        DefaultMutableTreeNode ultralightmechs = new DefaultMutableTreeNode("Ultralight: "+ultralightMech);
+        DefaultMutableTreeNode ultralightmechs = new DefaultMutableTreeNode("Ultralight: " + ultralightMech);
         battlemechs.add(ultralightmechs);
-        DefaultMutableTreeNode colossalomnis = new DefaultMutableTreeNode("Colossal: "+colossalOmniMech);
+        DefaultMutableTreeNode colossalomnis = new DefaultMutableTreeNode("Super Heavy: " + colossalOmniMech);
         omnis.add(colossalomnis);
-        DefaultMutableTreeNode assaultomnis = new DefaultMutableTreeNode("Assault: "+assaultOmniMech);
+        DefaultMutableTreeNode assaultomnis = new DefaultMutableTreeNode("Assault: " + assaultOmniMech);
         omnis.add(assaultomnis);
-        DefaultMutableTreeNode heavyomnis = new DefaultMutableTreeNode("Heavy: "+heavyOmniMech);
+        DefaultMutableTreeNode heavyomnis = new DefaultMutableTreeNode("Heavy: " + heavyOmniMech);
         omnis.add(heavyomnis);
-        DefaultMutableTreeNode mediumomnis = new DefaultMutableTreeNode("Medium: "+mediumOmniMech);
+        DefaultMutableTreeNode mediumomnis = new DefaultMutableTreeNode("Medium: " + mediumOmniMech);
         omnis.add(mediumomnis);
-        DefaultMutableTreeNode lightomnis = new DefaultMutableTreeNode("Light: "+lightOmniMech);
+        DefaultMutableTreeNode lightomnis = new DefaultMutableTreeNode("Light: " + lightOmniMech);
         omnis.add(lightomnis);
-        DefaultMutableTreeNode ultralightomnis = new DefaultMutableTreeNode("Ultralight: "+ultralightOmniMech);
+        DefaultMutableTreeNode ultralightomnis = new DefaultMutableTreeNode("Ultralight: " + ultralightOmniMech);
         omnis.add(ultralightomnis);
         top.add(mechs);
-        
+
         // ASF Nodes
-        final DefaultMutableTreeNode ASF = new DefaultMutableTreeNode("'Aerospace Fighters: "+countASF);
-        DefaultMutableTreeNode sASF = new DefaultMutableTreeNode("Standard Fighters: "+countStandardASF);
-        DefaultMutableTreeNode oASF = new DefaultMutableTreeNode("OmniFighters: "+countOmniASF);
+        final DefaultMutableTreeNode ASF = new DefaultMutableTreeNode("'Aerospace Fighters: " + countASF);
+        DefaultMutableTreeNode sASF = new DefaultMutableTreeNode("Standard Fighters: " + countStandardASF);
+        DefaultMutableTreeNode oASF = new DefaultMutableTreeNode("OmniFighters: " + countOmniASF);
         ASF.add(sASF);
         ASF.add(oASF);
-        DefaultMutableTreeNode sHeavyASF = new DefaultMutableTreeNode("Heavy: "+countHeavyASF);
+        DefaultMutableTreeNode sHeavyASF = new DefaultMutableTreeNode("Heavy: " + countHeavyASF);
         sASF.add(sHeavyASF);
-        DefaultMutableTreeNode sMediumASF = new DefaultMutableTreeNode("Medium: "+countMediumASF);
+        DefaultMutableTreeNode sMediumASF = new DefaultMutableTreeNode("Medium: " + countMediumASF);
         sASF.add(sMediumASF);
-        DefaultMutableTreeNode sLightASF = new DefaultMutableTreeNode("Light: "+countLightASF);
+        DefaultMutableTreeNode sLightASF = new DefaultMutableTreeNode("Light: " + countLightASF);
         sASF.add(sLightASF);
-        DefaultMutableTreeNode oHeavyASF = new DefaultMutableTreeNode("Heavy: "+countOmniHeavyASF);
+        DefaultMutableTreeNode oHeavyASF = new DefaultMutableTreeNode("Heavy: " + countOmniHeavyASF);
         oASF.add(oHeavyASF);
-        DefaultMutableTreeNode oMediumASF = new DefaultMutableTreeNode("Medium: "+countOmniMediumASF);
+        DefaultMutableTreeNode oMediumASF = new DefaultMutableTreeNode("Medium: " + countOmniMediumASF);
         oASF.add(oMediumASF);
-        DefaultMutableTreeNode oLightASF = new DefaultMutableTreeNode("Light: "+countOmniLightASF);
+        DefaultMutableTreeNode oLightASF = new DefaultMutableTreeNode("Light: " + countOmniLightASF);
         oASF.add(oLightASF);
         top.add(ASF);
-        
+
         // Vee Nodes
-        final DefaultMutableTreeNode vees = new DefaultMutableTreeNode("Vehicles: "+countVees);
-        DefaultMutableTreeNode sVees = new DefaultMutableTreeNode("Standard: "+countStandardVees);
-        DefaultMutableTreeNode oVees = new DefaultMutableTreeNode("OmniVees: "+countOmniVees);
+        final DefaultMutableTreeNode vees = new DefaultMutableTreeNode("Vehicles: " + countVees);
+        DefaultMutableTreeNode sVees = new DefaultMutableTreeNode("Standard: " + countStandardVees);
+        DefaultMutableTreeNode oVees = new DefaultMutableTreeNode("OmniVees: " + countOmniVees);
         vees.add(sVees);
         vees.add(oVees);
-        DefaultMutableTreeNode sTracked = new DefaultMutableTreeNode("Tracked: "+countTracked);
+        DefaultMutableTreeNode sTracked = new DefaultMutableTreeNode("Tracked: " + countTracked);
         sVees.add(sTracked);
-        DefaultMutableTreeNode sTrackedColossal = new DefaultMutableTreeNode("Super Heavy: "+countTrackedColossal);
+        DefaultMutableTreeNode sTrackedColossal = new DefaultMutableTreeNode("Super Heavy: " + countTrackedColossal);
         sTracked.add(sTrackedColossal);
-        DefaultMutableTreeNode sTrackedAssault = new DefaultMutableTreeNode("Assault: "+countTrackedAssault);
+        DefaultMutableTreeNode sTrackedAssault = new DefaultMutableTreeNode("Assault: " + countTrackedAssault);
         sTracked.add(sTrackedAssault);
-        DefaultMutableTreeNode sTrackedHeavy = new DefaultMutableTreeNode("Heavy: "+countTrackedHeavy);
+        DefaultMutableTreeNode sTrackedHeavy = new DefaultMutableTreeNode("Heavy: " + countTrackedHeavy);
         sTracked.add(sTrackedHeavy);
-        DefaultMutableTreeNode sTrackedMedium = new DefaultMutableTreeNode("Medium: "+countTrackedMedium);
+        DefaultMutableTreeNode sTrackedMedium = new DefaultMutableTreeNode("Medium: " + countTrackedMedium);
         sTracked.add(sTrackedMedium);
-        DefaultMutableTreeNode sTrackedLight = new DefaultMutableTreeNode("Light: "+countTrackedLight);
+        DefaultMutableTreeNode sTrackedLight = new DefaultMutableTreeNode("Light: " + countTrackedLight);
         sTracked.add(sTrackedLight);
-        DefaultMutableTreeNode oTracked = new DefaultMutableTreeNode("Tracked: "+countOmniTracked);
+        DefaultMutableTreeNode oTracked = new DefaultMutableTreeNode("Tracked: " + countOmniTracked);
         oVees.add(oTracked);
-        DefaultMutableTreeNode oTrackedColossal = new DefaultMutableTreeNode("Super Heavy: "+countOmniTrackedColossal);
+        DefaultMutableTreeNode oTrackedColossal = new DefaultMutableTreeNode("Super Heavy: " + countOmniTrackedColossal);
         oTracked.add(oTrackedColossal);
-        DefaultMutableTreeNode oTrackedAssault = new DefaultMutableTreeNode("Assault: "+countOmniTrackedAssault);
+        DefaultMutableTreeNode oTrackedAssault = new DefaultMutableTreeNode("Assault: " + countOmniTrackedAssault);
         oTracked.add(oTrackedAssault);
-        DefaultMutableTreeNode oTrackedHeavy = new DefaultMutableTreeNode("Heavy: "+countOmniTrackedHeavy);
+        DefaultMutableTreeNode oTrackedHeavy = new DefaultMutableTreeNode("Heavy: " +countOmniTrackedHeavy);
         oTracked.add(oTrackedHeavy);
-        DefaultMutableTreeNode oTrackedMedium = new DefaultMutableTreeNode("Medium: "+countOmniTrackedMedium);
+        DefaultMutableTreeNode oTrackedMedium = new DefaultMutableTreeNode("Medium: " + countOmniTrackedMedium);
         oTracked.add(oTrackedMedium);
-        DefaultMutableTreeNode oTrackedLight = new DefaultMutableTreeNode("Light: "+countOmniTrackedLight);
+        DefaultMutableTreeNode oTrackedLight = new DefaultMutableTreeNode("Light: " + countOmniTrackedLight);
         oTracked.add(oTrackedLight);
-        DefaultMutableTreeNode sWheeled = new DefaultMutableTreeNode("Wheeled: "+countWheeled);
+        DefaultMutableTreeNode sWheeled = new DefaultMutableTreeNode("Wheeled: " + countWheeled);
         sVees.add(sWheeled);
-        DefaultMutableTreeNode sWheeledAssault = new DefaultMutableTreeNode("Assault: "+countWheeledAssault);
+        DefaultMutableTreeNode sWheeledAssault = new DefaultMutableTreeNode("Assault: " + countWheeledAssault);
         sWheeled.add(sWheeledAssault);
-        DefaultMutableTreeNode sWheeledHeavy = new DefaultMutableTreeNode("Heavy: "+countWheeledHeavy);
+        DefaultMutableTreeNode sWheeledHeavy = new DefaultMutableTreeNode("Heavy: " + countWheeledHeavy);
         sWheeled.add(sWheeledHeavy);
-        DefaultMutableTreeNode sWheeledMedium = new DefaultMutableTreeNode("Medium: "+countWheeledMedium);
+        DefaultMutableTreeNode sWheeledMedium = new DefaultMutableTreeNode("Medium: " + countWheeledMedium);
         sWheeled.add(sWheeledMedium);
-        DefaultMutableTreeNode sWheeledLight = new DefaultMutableTreeNode("Light: "+countWheeledLight);
+        DefaultMutableTreeNode sWheeledLight = new DefaultMutableTreeNode("Light: " + countWheeledLight);
         sWheeled.add(sWheeledLight);
-        DefaultMutableTreeNode oWheeled = new DefaultMutableTreeNode("Wheeled: "+countOmniWheeled);
+        DefaultMutableTreeNode oWheeled = new DefaultMutableTreeNode("Wheeled: " + countOmniWheeled);
         oVees.add(oWheeled);
-        DefaultMutableTreeNode oWheeledAssault = new DefaultMutableTreeNode("Assault: "+countOmniWheeledAssault);
+        DefaultMutableTreeNode oWheeledAssault = new DefaultMutableTreeNode("Assault: " + countOmniWheeledAssault);
         oWheeled.add(oWheeledAssault);
-        DefaultMutableTreeNode oWheeledHeavy = new DefaultMutableTreeNode("Heavy: "+countOmniWheeledHeavy);
+        DefaultMutableTreeNode oWheeledHeavy = new DefaultMutableTreeNode("Heavy: " + countOmniWheeledHeavy);
         oWheeled.add(oWheeledHeavy);
-        DefaultMutableTreeNode oWheeledMedium = new DefaultMutableTreeNode("Medium: "+countOmniWheeledMedium);
+        DefaultMutableTreeNode oWheeledMedium = new DefaultMutableTreeNode("Medium: " + countOmniWheeledMedium);
         oWheeled.add(oWheeledMedium);
-        DefaultMutableTreeNode oWheeledLight = new DefaultMutableTreeNode("Light: "+countOmniWheeledLight);
+        DefaultMutableTreeNode oWheeledLight = new DefaultMutableTreeNode("Light: " + countOmniWheeledLight);
         oWheeled.add(oWheeledLight);
-        DefaultMutableTreeNode sHover = new DefaultMutableTreeNode("Hover: "+countHover);
+        DefaultMutableTreeNode sHover = new DefaultMutableTreeNode("Hover: " + countHover);
         sVees.add(sHover);
-        DefaultMutableTreeNode sHoverMedium = new DefaultMutableTreeNode("Medium: "+countHoverMedium);
+        DefaultMutableTreeNode sHoverMedium = new DefaultMutableTreeNode("Medium: " + countHoverMedium);
         sHover.add(sHoverMedium);
-        DefaultMutableTreeNode sHoverLight = new DefaultMutableTreeNode("Light: "+countHoverLight);
+        DefaultMutableTreeNode sHoverLight = new DefaultMutableTreeNode("Light: " + countHoverLight);
         sHover.add(sHoverLight);
-        DefaultMutableTreeNode oHover = new DefaultMutableTreeNode("Hover: "+countOmniHover);
+        DefaultMutableTreeNode oHover = new DefaultMutableTreeNode("Hover: " + countOmniHover);
         oVees.add(oHover);
-        DefaultMutableTreeNode oHoverMedium = new DefaultMutableTreeNode("Medium: "+countOmniHoverMedium);
+        DefaultMutableTreeNode oHoverMedium = new DefaultMutableTreeNode("Medium: " + countOmniHoverMedium);
         oHover.add(oHoverMedium);
-        DefaultMutableTreeNode oHoverLight = new DefaultMutableTreeNode("Light: "+countOmniHoverLight);
+        DefaultMutableTreeNode oHoverLight = new DefaultMutableTreeNode("Light: " + countOmniHoverLight);
         oHover.add(oHoverLight);
-        DefaultMutableTreeNode sVTOL = new DefaultMutableTreeNode("VTOL: "+countVTOL);
+        DefaultMutableTreeNode sVTOL = new DefaultMutableTreeNode("VTOL: " + countVTOL);
         sVees.add(sVTOL);
-        DefaultMutableTreeNode sVTOLLight = new DefaultMutableTreeNode("Light: "+countVTOLLight);
+        DefaultMutableTreeNode sVTOLLight = new DefaultMutableTreeNode("Light: " + countVTOLLight);
         sVTOL.add(sVTOLLight);
-        DefaultMutableTreeNode oVTOL = new DefaultMutableTreeNode("VTOL: "+countOmniVTOL);
+        DefaultMutableTreeNode oVTOL = new DefaultMutableTreeNode("VTOL: " + countOmniVTOL);
         oVees.add(oVTOL);
-        DefaultMutableTreeNode oVTOLLight = new DefaultMutableTreeNode("Light: "+countOmniVTOLLight);
+        DefaultMutableTreeNode oVTOLLight = new DefaultMutableTreeNode("Light: " + countOmniVTOLLight);
         oVTOL.add(oVTOLLight);
-        DefaultMutableTreeNode sWiGE = new DefaultMutableTreeNode("WiGE: "+countWiGE);
+        DefaultMutableTreeNode sWiGE = new DefaultMutableTreeNode("WiGE: " + countWiGE);
         sVees.add(sWiGE);
-        DefaultMutableTreeNode sWiGEAssault = new DefaultMutableTreeNode("Assault: "+countWiGEAssault);
+        DefaultMutableTreeNode sWiGEAssault = new DefaultMutableTreeNode("Assault: " + countWiGEAssault);
         sWiGE.add(sWiGEAssault);
-        DefaultMutableTreeNode sWiGEHeavy = new DefaultMutableTreeNode("Heavy: "+countWiGEHeavy);
+        DefaultMutableTreeNode sWiGEHeavy = new DefaultMutableTreeNode("Heavy: " + countWiGEHeavy);
         sWiGE.add(sWiGEHeavy);
-        DefaultMutableTreeNode sWiGEMedium = new DefaultMutableTreeNode("Medium: "+countWiGEMedium);
+        DefaultMutableTreeNode sWiGEMedium = new DefaultMutableTreeNode("Medium: " + countWiGEMedium);
         sWiGE.add(sWiGEMedium);
-        DefaultMutableTreeNode sWiGELight = new DefaultMutableTreeNode("Light: "+countWiGELight);
+        DefaultMutableTreeNode sWiGELight = new DefaultMutableTreeNode("Light: " + countWiGELight);
         sWiGE.add(sWiGELight);
-        DefaultMutableTreeNode oWiGE = new DefaultMutableTreeNode("WiGE: "+countOmniWiGE);
+        DefaultMutableTreeNode oWiGE = new DefaultMutableTreeNode("WiGE: " + countOmniWiGE);
         oVees.add(oWiGE);
-        DefaultMutableTreeNode oWiGEAssault = new DefaultMutableTreeNode("Assault: "+countOmniWiGEAssault);
+        DefaultMutableTreeNode oWiGEAssault = new DefaultMutableTreeNode("Assault: " + countOmniWiGEAssault);
         oWiGE.add(oWiGEAssault);
-        DefaultMutableTreeNode oWiGEHeavy = new DefaultMutableTreeNode("Heavy: "+countOmniWiGEHeavy);
+        DefaultMutableTreeNode oWiGEHeavy = new DefaultMutableTreeNode("Heavy: " + countOmniWiGEHeavy);
         oWiGE.add(oWiGEHeavy);
-        DefaultMutableTreeNode oWiGEMedium = new DefaultMutableTreeNode("Medium: "+countOmniWiGEMedium);
+        DefaultMutableTreeNode oWiGEMedium = new DefaultMutableTreeNode("Medium: " + countOmniWiGEMedium);
         oWiGE.add(oWiGEMedium);
-        DefaultMutableTreeNode oWiGELight = new DefaultMutableTreeNode("Light: "+countOmniWiGELight);
+        DefaultMutableTreeNode oWiGELight = new DefaultMutableTreeNode("Light: " + countOmniWiGELight);
         oWiGE.add(oWiGELight);
-        DefaultMutableTreeNode sNaval = new DefaultMutableTreeNode("Naval: "+countNaval);
+        DefaultMutableTreeNode sNaval = new DefaultMutableTreeNode("Naval: " + countNaval);
         sVees.add(sNaval);
-        DefaultMutableTreeNode sNavalColossal = new DefaultMutableTreeNode("Super Heavy: "+countNavalColossal);
+        DefaultMutableTreeNode sNavalColossal = new DefaultMutableTreeNode("Super Heavy: " + countNavalColossal);
         sNaval.add(sNavalColossal);
-        DefaultMutableTreeNode sNavalAssault = new DefaultMutableTreeNode("Assault: "+countNavalAssault);
+        DefaultMutableTreeNode sNavalAssault = new DefaultMutableTreeNode("Assault: " + countNavalAssault);
         sNaval.add(sNavalAssault);
-        DefaultMutableTreeNode sNavalHeavy = new DefaultMutableTreeNode("Heavy: "+countNavalHeavy);
+        DefaultMutableTreeNode sNavalHeavy = new DefaultMutableTreeNode("Heavy: " + countNavalHeavy);
         sNaval.add(sNavalHeavy);
-        DefaultMutableTreeNode sNavalMedium = new DefaultMutableTreeNode("Medium: "+countNavalMedium);
+        DefaultMutableTreeNode sNavalMedium = new DefaultMutableTreeNode("Medium: " + countNavalMedium);
         sNaval.add(sNavalMedium);
-        DefaultMutableTreeNode sNavalLight = new DefaultMutableTreeNode("Light: "+countNavalLight);
+        DefaultMutableTreeNode sNavalLight = new DefaultMutableTreeNode("Light: " + countNavalLight);
         sNaval.add(sNavalLight);
-        DefaultMutableTreeNode oNaval = new DefaultMutableTreeNode("Naval: "+countOmniNaval);
+        DefaultMutableTreeNode oNaval = new DefaultMutableTreeNode("Naval: " + countOmniNaval);
         oVees.add(oNaval);
-        DefaultMutableTreeNode oNavalColossal = new DefaultMutableTreeNode("Super Heavy: "+countOmniNavalColossal);
+        DefaultMutableTreeNode oNavalColossal = new DefaultMutableTreeNode("Super Heavy: " + countOmniNavalColossal);
         oNaval.add(oNavalColossal);
-        DefaultMutableTreeNode oNavalAssault = new DefaultMutableTreeNode("Assault: "+countOmniNavalAssault);
+        DefaultMutableTreeNode oNavalAssault = new DefaultMutableTreeNode("Assault: " + countOmniNavalAssault);
         oNaval.add(oNavalAssault);
-        DefaultMutableTreeNode oNavalHeavy = new DefaultMutableTreeNode("Heavy: "+countOmniNavalHeavy);
+        DefaultMutableTreeNode oNavalHeavy = new DefaultMutableTreeNode("Heavy: " + countOmniNavalHeavy);
         oNaval.add(oNavalHeavy);
-        DefaultMutableTreeNode oNavalMedium = new DefaultMutableTreeNode("Medium: "+countOmniNavalMedium);
+        DefaultMutableTreeNode oNavalMedium = new DefaultMutableTreeNode("Medium: " + countOmniNavalMedium);
         oNaval.add(oNavalMedium);
-        DefaultMutableTreeNode oNavalLight = new DefaultMutableTreeNode("Light: "+countOmniNavalLight);
+        DefaultMutableTreeNode oNavalLight = new DefaultMutableTreeNode("Light: " + countOmniNavalLight);
         oNaval.add(oNavalLight);
-        DefaultMutableTreeNode sSub = new DefaultMutableTreeNode("Sub: "+countSub);
+        DefaultMutableTreeNode sSub = new DefaultMutableTreeNode("Sub: " + countSub);
         sVees.add(sSub);
-        DefaultMutableTreeNode sSubColossal = new DefaultMutableTreeNode("Super Heavy: "+countSubColossal);
+        DefaultMutableTreeNode sSubColossal = new DefaultMutableTreeNode("Super Heavy: " + countSubColossal);
         sSub.add(sSubColossal);
-        DefaultMutableTreeNode sSubAssault = new DefaultMutableTreeNode("Assault: "+countSubAssault);
+        DefaultMutableTreeNode sSubAssault = new DefaultMutableTreeNode("Assault: " + countSubAssault);
         sSub.add(sSubAssault);
-        DefaultMutableTreeNode sSubHeavy = new DefaultMutableTreeNode("Heavy: "+countSubHeavy);
+        DefaultMutableTreeNode sSubHeavy = new DefaultMutableTreeNode("Heavy: " + countSubHeavy);
         sSub.add(sSubHeavy);
-        DefaultMutableTreeNode sSubMedium = new DefaultMutableTreeNode("Medium: "+countSubMedium);
+        DefaultMutableTreeNode sSubMedium = new DefaultMutableTreeNode("Medium: " + countSubMedium);
         sSub.add(sSubMedium);
-        DefaultMutableTreeNode sSubLight = new DefaultMutableTreeNode("Light: "+countSubLight);
+        DefaultMutableTreeNode sSubLight = new DefaultMutableTreeNode("Light: " + countSubLight);
         sSub.add(sSubLight);
-        DefaultMutableTreeNode oSub = new DefaultMutableTreeNode("Sub: "+countOmniSub);
+        DefaultMutableTreeNode oSub = new DefaultMutableTreeNode("Sub: " + countOmniSub);
         oVees.add(oSub);
-        DefaultMutableTreeNode oSubColossal = new DefaultMutableTreeNode("Super Heavy: "+countOmniSubColossal);
+        DefaultMutableTreeNode oSubColossal = new DefaultMutableTreeNode("Super Heavy: " + countOmniSubColossal);
         oSub.add(oSubColossal);
-        DefaultMutableTreeNode oSubAssault = new DefaultMutableTreeNode("Assault: "+countOmniSubAssault);
+        DefaultMutableTreeNode oSubAssault = new DefaultMutableTreeNode("Assault: " + countOmniSubAssault);
         oSub.add(oSubAssault);
-        DefaultMutableTreeNode oSubHeavy = new DefaultMutableTreeNode("Heavy: "+countOmniSubHeavy);
+        DefaultMutableTreeNode oSubHeavy = new DefaultMutableTreeNode("Heavy: " + countOmniSubHeavy);
         oSub.add(oSubHeavy);
-        DefaultMutableTreeNode oSubMedium = new DefaultMutableTreeNode("Medium: "+countOmniSubMedium);
+        DefaultMutableTreeNode oSubMedium = new DefaultMutableTreeNode("Medium: " + countOmniSubMedium);
         oSub.add(oSubMedium);
-        DefaultMutableTreeNode oSubLight = new DefaultMutableTreeNode("Light: "+countOmniSubLight);
+        DefaultMutableTreeNode oSubLight = new DefaultMutableTreeNode("Light: " + countOmniSubLight);
         oSub.add(oSubLight);
-        DefaultMutableTreeNode sHydrofoil = new DefaultMutableTreeNode("Hydrofoil: "+countHydrofoil);
+        DefaultMutableTreeNode sHydrofoil = new DefaultMutableTreeNode("Hydrofoil: " + countHydrofoil);
         sVees.add(sHydrofoil);
-        DefaultMutableTreeNode sHydrofoilAssault = new DefaultMutableTreeNode("Assault: "+countHydrofoilAssault);
+        DefaultMutableTreeNode sHydrofoilAssault = new DefaultMutableTreeNode("Assault: " + countHydrofoilAssault);
         sHydrofoil.add(sHydrofoilAssault);
-        DefaultMutableTreeNode sHydrofoilHeavy = new DefaultMutableTreeNode("Heavy: "+countHydrofoilHeavy);
+        DefaultMutableTreeNode sHydrofoilHeavy = new DefaultMutableTreeNode("Heavy: " + countHydrofoilHeavy);
         sHydrofoil.add(sHydrofoilHeavy);
-        DefaultMutableTreeNode sHydrofoilMedium = new DefaultMutableTreeNode("Medium: "+countHydrofoilMedium);
+        DefaultMutableTreeNode sHydrofoilMedium = new DefaultMutableTreeNode("Medium: " + countHydrofoilMedium);
         sHydrofoil.add(sHydrofoilMedium);
-        DefaultMutableTreeNode sHydrofoilLight = new DefaultMutableTreeNode("Light: "+countHydrofoilLight);
+        DefaultMutableTreeNode sHydrofoilLight = new DefaultMutableTreeNode("Light: " + countHydrofoilLight);
         sHydrofoil.add(sHydrofoilLight);
-        DefaultMutableTreeNode oHydrofoil = new DefaultMutableTreeNode("Hydrofoil: "+countOmniHydrofoil);
+        DefaultMutableTreeNode oHydrofoil = new DefaultMutableTreeNode("Hydrofoil: " + countOmniHydrofoil);
         oVees.add(oHydrofoil);
-        DefaultMutableTreeNode oHydrofoilAssault = new DefaultMutableTreeNode("Assault: "+countOmniHydrofoilAssault);
+        DefaultMutableTreeNode oHydrofoilAssault = new DefaultMutableTreeNode("Assault: " + countOmniHydrofoilAssault);
         oHydrofoil.add(oHydrofoilAssault);
-        DefaultMutableTreeNode oHydrofoilHeavy = new DefaultMutableTreeNode("Heavy: "+countOmniHydrofoilHeavy);
+        DefaultMutableTreeNode oHydrofoilHeavy = new DefaultMutableTreeNode("Heavy: " + countOmniHydrofoilHeavy);
         oHydrofoil.add(oHydrofoilHeavy);
-        DefaultMutableTreeNode oHydrofoilMedium = new DefaultMutableTreeNode("Medium: "+countOmniHydrofoilMedium);
+        DefaultMutableTreeNode oHydrofoilMedium = new DefaultMutableTreeNode("Medium: " + countOmniHydrofoilMedium);
         oHydrofoil.add(oHydrofoilMedium);
-        DefaultMutableTreeNode oHydrofoilLight = new DefaultMutableTreeNode("Light: "+countOmniHydrofoilLight);
+        DefaultMutableTreeNode oHydrofoilLight = new DefaultMutableTreeNode("Light: " + countOmniHydrofoilLight);
         oHydrofoil.add(oHydrofoilLight);
         top.add(vees);
-        
+
+        // Support Vee Nodes
+        final DefaultMutableTreeNode supportVees = new DefaultMutableTreeNode("Support Vehicles: " + countSupportVees);
+        DefaultMutableTreeNode sSupportVees = new DefaultMutableTreeNode("Standard: " + countSupportStandardVees);
+        DefaultMutableTreeNode oSupportVees = new DefaultMutableTreeNode("OmniVees: " + countSupportOmniVees);
+        supportVees.add(sSupportVees);
+        supportVees.add(oSupportVees);
+        DefaultMutableTreeNode sSupportTracked = new DefaultMutableTreeNode("Tracked: " + countSupportTracked);
+        sSupportVees.add(sSupportTracked);
+        DefaultMutableTreeNode sSupportTrackedColossal = new DefaultMutableTreeNode("Super Heavy: " + countSupportTrackedColossal);
+        sSupportTracked.add(sSupportTrackedColossal);
+        DefaultMutableTreeNode sSupportTrackedAssault = new DefaultMutableTreeNode("Assault: " + countSupportTrackedAssault);
+        sSupportTracked.add(sSupportTrackedAssault);
+        DefaultMutableTreeNode sSupportTrackedHeavy = new DefaultMutableTreeNode("Heavy: " + countSupportTrackedHeavy);
+        sSupportTracked.add(sSupportTrackedHeavy);
+        DefaultMutableTreeNode sSupportTrackedMedium = new DefaultMutableTreeNode("Medium: " + countSupportTrackedMedium);
+        sSupportTracked.add(sSupportTrackedMedium);
+        DefaultMutableTreeNode sSupportTrackedLight = new DefaultMutableTreeNode("Light: " + countSupportTrackedLight);
+        sSupportTracked.add(sSupportTrackedLight);
+        DefaultMutableTreeNode oSupportTracked = new DefaultMutableTreeNode("Tracked: " + countSupportOmniTracked);
+        oSupportVees.add(oSupportTracked);
+        DefaultMutableTreeNode oSupportTrackedColossal = new DefaultMutableTreeNode("Super Heavy: " + countSupportOmniTrackedColossal);
+        oSupportTracked.add(oSupportTrackedColossal);
+        DefaultMutableTreeNode oSupportTrackedAssault = new DefaultMutableTreeNode("Assault: " + countSupportOmniTrackedAssault);
+        oSupportTracked.add(oSupportTrackedAssault);
+        DefaultMutableTreeNode oSupportTrackedHeavy = new DefaultMutableTreeNode("Heavy: " +countSupportOmniTrackedHeavy);
+        oSupportTracked.add(oSupportTrackedHeavy);
+        DefaultMutableTreeNode oSupportTrackedMedium = new DefaultMutableTreeNode("Medium: " + countSupportOmniTrackedMedium);
+        oSupportTracked.add(oSupportTrackedMedium);
+        DefaultMutableTreeNode oSupportTrackedLight = new DefaultMutableTreeNode("Light: " + countSupportOmniTrackedLight);
+        oSupportTracked.add(oSupportTrackedLight);
+        DefaultMutableTreeNode sSupportWheeled = new DefaultMutableTreeNode("Wheeled: " + countSupportWheeled);
+        sSupportVees.add(sSupportWheeled);
+        DefaultMutableTreeNode sSupportWheeledAssault = new DefaultMutableTreeNode("Assault: " + countSupportWheeledAssault);
+        sSupportWheeled.add(sSupportWheeledAssault);
+        DefaultMutableTreeNode sSupportWheeledHeavy = new DefaultMutableTreeNode("Heavy: " + countSupportWheeledHeavy);
+        sSupportWheeled.add(sSupportWheeledHeavy);
+        DefaultMutableTreeNode sSupportWheeledMedium = new DefaultMutableTreeNode("Medium: " + countSupportWheeledMedium);
+        sSupportWheeled.add(sWheeledMedium);
+        DefaultMutableTreeNode sSupportWheeledLight = new DefaultMutableTreeNode("Light: " + countSupportWheeledLight);
+        sSupportWheeled.add(sSupportWheeledLight);
+        DefaultMutableTreeNode oSupportWheeled = new DefaultMutableTreeNode("Wheeled: " + countSupportOmniWheeled);
+        oSupportVees.add(oSupportWheeled);
+        DefaultMutableTreeNode oSupportWheeledAssault = new DefaultMutableTreeNode("Assault: " + countSupportOmniWheeledAssault);
+        oSupportWheeled.add(oSupportWheeledAssault);
+        DefaultMutableTreeNode oSupportWheeledHeavy = new DefaultMutableTreeNode("Heavy: " + countSupportOmniWheeledHeavy);
+        oSupportWheeled.add(oSupportWheeledHeavy);
+        DefaultMutableTreeNode oSupportWheeledMedium = new DefaultMutableTreeNode("Medium: " + countSupportOmniWheeledMedium);
+        oSupportWheeled.add(oSupportWheeledMedium);
+        DefaultMutableTreeNode oSupportWheeledLight = new DefaultMutableTreeNode("Light: " + countSupportOmniWheeledLight);
+        oSupportWheeled.add(oSupportWheeledLight);
+        DefaultMutableTreeNode sSupportHover = new DefaultMutableTreeNode("Hover: " + countSupportHover);
+        sSupportVees.add(sSupportHover);
+        DefaultMutableTreeNode sSupportHoverMedium = new DefaultMutableTreeNode("Medium: " + countSupportHoverMedium);
+        sSupportHover.add(sSupportHoverMedium);
+        DefaultMutableTreeNode sSupportHoverLight = new DefaultMutableTreeNode("Light: " + countSupportHoverLight);
+        sSupportHover.add(sSupportHoverLight);
+        DefaultMutableTreeNode oSupportHover = new DefaultMutableTreeNode("Hover: " + countSupportOmniHover);
+        oSupportVees.add(oSupportHover);
+        DefaultMutableTreeNode oSupportHoverMedium = new DefaultMutableTreeNode("Medium: " + countSupportOmniHoverMedium);
+        oSupportHover.add(oSupportHoverMedium);
+        DefaultMutableTreeNode oSupportHoverLight = new DefaultMutableTreeNode("Light: " + countSupportOmniHoverLight);
+        oSupportHover.add(oSupportHoverLight);
+        DefaultMutableTreeNode sSupportVTOL = new DefaultMutableTreeNode("VTOL: " + countSupportVTOL);
+        sSupportVees.add(sSupportVTOL);
+        DefaultMutableTreeNode sSupportVTOLLight = new DefaultMutableTreeNode("Light: " + countSupportVTOLLight);
+        sSupportVTOL.add(sSupportVTOLLight);
+        DefaultMutableTreeNode oSupportVTOL = new DefaultMutableTreeNode("VTOL: " + countSupportOmniVTOL);
+        oSupportVees.add(oSupportVTOL);
+        DefaultMutableTreeNode oSupportVTOLLight = new DefaultMutableTreeNode("Light: " + countSupportOmniVTOLLight);
+        oSupportVTOL.add(oSupportVTOLLight);
+        DefaultMutableTreeNode sSupportWiGE = new DefaultMutableTreeNode("WiGE: " + countSupportWiGE);
+        sSupportVees.add(sSupportWiGE);
+        DefaultMutableTreeNode sSupportWiGEAssault = new DefaultMutableTreeNode("Assault: " + countSupportWiGEAssault);
+        sSupportWiGE.add(sSupportWiGEAssault);
+        DefaultMutableTreeNode sSupportWiGEHeavy = new DefaultMutableTreeNode("Heavy: " + countSupportWiGEHeavy);
+        sSupportWiGE.add(sSupportWiGEHeavy);
+        DefaultMutableTreeNode sSupportWiGEMedium = new DefaultMutableTreeNode("Medium: " + countSupportWiGEMedium);
+        sSupportWiGE.add(sSupportWiGEMedium);
+        DefaultMutableTreeNode sSupportWiGELight = new DefaultMutableTreeNode("Light: " + countSupportWiGELight);
+        sSupportWiGE.add(sSupportWiGELight);
+        DefaultMutableTreeNode oSupportWiGE = new DefaultMutableTreeNode("WiGE: " + countSupportOmniWiGE);
+        oSupportVees.add(oSupportWiGE);
+        DefaultMutableTreeNode oSupportWiGEAssault = new DefaultMutableTreeNode("Assault: " + countSupportOmniWiGEAssault);
+        oSupportWiGE.add(oSupportWiGEAssault);
+        DefaultMutableTreeNode oSupportWiGEHeavy = new DefaultMutableTreeNode("Heavy: " + countSupportOmniWiGEHeavy);
+        oSupportWiGE.add(oSupportWiGEHeavy);
+        DefaultMutableTreeNode oSupportWiGEMedium = new DefaultMutableTreeNode("Medium: " + countSupportOmniWiGEMedium);
+        oSupportWiGE.add(oSupportWiGEMedium);
+        DefaultMutableTreeNode oSupportWiGELight = new DefaultMutableTreeNode("Light: " + countSupportOmniWiGELight);
+        oSupportWiGE.add(oSupportWiGELight);
+        DefaultMutableTreeNode sSupportNaval = new DefaultMutableTreeNode("Naval: " + countSupportNaval);
+        sSupportVees.add(sSupportNaval);
+        DefaultMutableTreeNode sSupportNavalColossal = new DefaultMutableTreeNode("Super Heavy: " + countSupportNavalColossal);
+        sSupportNaval.add(sSupportNavalColossal);
+        DefaultMutableTreeNode sSupportNavalAssault = new DefaultMutableTreeNode("Assault: " + countSupportNavalAssault);
+        sSupportNaval.add(sSupportNavalAssault);
+        DefaultMutableTreeNode sSupportNavalHeavy = new DefaultMutableTreeNode("Heavy: " + countSupportNavalHeavy);
+        sSupportNaval.add(sSupportNavalHeavy);
+        DefaultMutableTreeNode sSupportNavalMedium = new DefaultMutableTreeNode("Medium: " + countSupportNavalMedium);
+        sSupportNaval.add(sSupportNavalMedium);
+        DefaultMutableTreeNode sSupportNavalLight = new DefaultMutableTreeNode("Light: " + countSupportNavalLight);
+        sSupportNaval.add(sSupportNavalLight);
+        DefaultMutableTreeNode oSupportNaval = new DefaultMutableTreeNode("Naval: " + countSupportOmniNaval);
+        oSupportVees.add(oSupportNaval);
+        DefaultMutableTreeNode oSupportNavalColossal = new DefaultMutableTreeNode("Super Heavy: " + countSupportOmniNavalColossal);
+        oSupportNaval.add(oSupportNavalColossal);
+        DefaultMutableTreeNode oSupportNavalAssault = new DefaultMutableTreeNode("Assault: " + countSupportOmniNavalAssault);
+        oSupportNaval.add(oSupportNavalAssault);
+        DefaultMutableTreeNode oSupportNavalHeavy = new DefaultMutableTreeNode("Heavy: " + countSupportOmniNavalHeavy);
+        oSupportNaval.add(oSupportNavalHeavy);
+        DefaultMutableTreeNode oSupportNavalMedium = new DefaultMutableTreeNode("Medium: " + countSupportOmniNavalMedium);
+        oSupportNaval.add(oSupportNavalMedium);
+        DefaultMutableTreeNode oSupportNavalLight = new DefaultMutableTreeNode("Light: " + countSupportOmniNavalLight);
+        oSupportNaval.add(oSupportNavalLight);
+        DefaultMutableTreeNode sSupportSub = new DefaultMutableTreeNode("Sub: " + countSupportSub);
+        sSupportVees.add(sSupportSub);
+        DefaultMutableTreeNode sSupportSubColossal = new DefaultMutableTreeNode("Super Heavy: " + countSupportSubColossal);
+        sSupportSub.add(sSupportSubColossal);
+        DefaultMutableTreeNode sSupportSubAssault = new DefaultMutableTreeNode("Assault: " + countSupportSubAssault);
+        sSupportSub.add(sSupportSubAssault);
+        DefaultMutableTreeNode sSupportSubHeavy = new DefaultMutableTreeNode("Heavy: " + countSupportSubHeavy);
+        sSupportSub.add(sSupportSubHeavy);
+        DefaultMutableTreeNode sSupportSubMedium = new DefaultMutableTreeNode("Medium: " + countSupportSubMedium);
+        sSupportSub.add(sSupportSubMedium);
+        DefaultMutableTreeNode sSupportSubLight = new DefaultMutableTreeNode("Light: " + countSupportSubLight);
+        sSupportSub.add(sSupportSubLight);
+        DefaultMutableTreeNode oSupportSub = new DefaultMutableTreeNode("Sub: " + countSupportOmniSub);
+        oSupportVees.add(oSupportSub);
+        DefaultMutableTreeNode oSupportSubColossal = new DefaultMutableTreeNode("Super Heavy: " + countSupportOmniSubColossal);
+        oSupportSub.add(oSupportSubColossal);
+        DefaultMutableTreeNode oSupportSubAssault = new DefaultMutableTreeNode("Assault: " + countSupportOmniSubAssault);
+        oSupportSub.add(oSupportSubAssault);
+        DefaultMutableTreeNode oSupportSubHeavy = new DefaultMutableTreeNode("Heavy: " + countSupportOmniSubHeavy);
+        oSupportSub.add(oSupportSubHeavy);
+        DefaultMutableTreeNode oSupportSubMedium = new DefaultMutableTreeNode("Medium: " + countSupportOmniSubMedium);
+        oSupportSub.add(oSupportSubMedium);
+        DefaultMutableTreeNode oSupportSubLight = new DefaultMutableTreeNode("Light: " + countSupportOmniSubLight);
+        oSupportSub.add(oSupportSubLight);
+        DefaultMutableTreeNode sSupportHydrofoil = new DefaultMutableTreeNode("Hydrofoil: " + countSupportHydrofoil);
+        sSupportVees.add(sSupportHydrofoil);
+        DefaultMutableTreeNode sSupportHydrofoilAssault = new DefaultMutableTreeNode("Assault: " + countSupportHydrofoilAssault);
+        sSupportHydrofoil.add(sSupportHydrofoilAssault);
+        DefaultMutableTreeNode sSupportHydrofoilHeavy = new DefaultMutableTreeNode("Heavy: " + countSupportHydrofoilHeavy);
+        sSupportHydrofoil.add(sSupportHydrofoilHeavy);
+        DefaultMutableTreeNode sSupportHydrofoilMedium = new DefaultMutableTreeNode("Medium: " + countSupportHydrofoilMedium);
+        sSupportHydrofoil.add(sSupportHydrofoilMedium);
+        DefaultMutableTreeNode sSupportHydrofoilLight = new DefaultMutableTreeNode("Light: " + countSupportHydrofoilLight);
+        sSupportHydrofoil.add(sSupportHydrofoilLight);
+        DefaultMutableTreeNode oSupportHydrofoil = new DefaultMutableTreeNode("Hydrofoil: " + countSupportOmniHydrofoil);
+        oSupportVees.add(oSupportHydrofoil);
+        DefaultMutableTreeNode oSupportHydrofoilAssault = new DefaultMutableTreeNode("Assault: " + countSupportOmniHydrofoilAssault);
+        oSupportHydrofoil.add(oSupportHydrofoilAssault);
+        DefaultMutableTreeNode oSupportHydrofoilHeavy = new DefaultMutableTreeNode("Heavy: " + countSupportOmniHydrofoilHeavy);
+        oSupportHydrofoil.add(oSupportHydrofoilHeavy);
+        DefaultMutableTreeNode oSupportHydrofoilMedium = new DefaultMutableTreeNode("Medium: " + countSupportOmniHydrofoilMedium);
+        oSupportHydrofoil.add(oSupportHydrofoilMedium);
+        DefaultMutableTreeNode oSupportHydrofoilLight = new DefaultMutableTreeNode("Light: " + countSupportOmniHydrofoilLight);
+        oSupportHydrofoil.add(oSupportHydrofoilLight);
+        top.add(supportVees);
+
         // Conventional Fighters
-        final DefaultMutableTreeNode conv = new DefaultMutableTreeNode("Conventional Fighters: "+countConv);
+        final DefaultMutableTreeNode conv = new DefaultMutableTreeNode("Conventional Fighters: " + countConv);
         top.add(conv);
-        
+
         // Infantry Nodes
         int allInfantry = (countInfantry+countBA);
-        final DefaultMutableTreeNode inf = new DefaultMutableTreeNode("Infantry: "+allInfantry);
-        DefaultMutableTreeNode cInf = new DefaultMutableTreeNode("Conventional: "+countInfantry);
-        DefaultMutableTreeNode BAInf = new DefaultMutableTreeNode("Battle Armor: "+countBA);
+        final DefaultMutableTreeNode inf = new DefaultMutableTreeNode("Infantry: " + allInfantry);
+        DefaultMutableTreeNode cInf = new DefaultMutableTreeNode("Conventional: " + countInfantry);
         inf.add(cInf);
+        DefaultMutableTreeNode BAInf = new DefaultMutableTreeNode("Battle Armor: " + countBA);
         inf.add(BAInf);
-        DefaultMutableTreeNode infFoot = new DefaultMutableTreeNode("Foot Platoons: "+countFootInfantry);
+        DefaultMutableTreeNode infFoot = new DefaultMutableTreeNode("Foot Platoons: " + countFootInfantry);
         cInf.add(infFoot);
-        DefaultMutableTreeNode infJump = new DefaultMutableTreeNode("Jump Platoons: "+countJumpInfantry);
+        DefaultMutableTreeNode infJump = new DefaultMutableTreeNode("Jump Platoons: " + countJumpInfantry);
         cInf.add(infJump);
-        DefaultMutableTreeNode infMechanized = new DefaultMutableTreeNode("Mechanized Platoons: "+countMechanizedInfantry);
+        DefaultMutableTreeNode infMechanized = new DefaultMutableTreeNode("Mechanized Platoons: " + countMechanizedInfantry);
         cInf.add(infMechanized);
-        DefaultMutableTreeNode infMotorized = new DefaultMutableTreeNode("Motorized Platoons: "+countMotorizedInfantry);
+        DefaultMutableTreeNode infMotorized = new DefaultMutableTreeNode("Motorized Platoons: " + countMotorizedInfantry);
         cInf.add(infMotorized);
-        DefaultMutableTreeNode baPAL = new DefaultMutableTreeNode("PAL/Exoskeleton: "+countBAPAL);
+        DefaultMutableTreeNode baPAL = new DefaultMutableTreeNode("PAL/Exoskeleton: " + countBAPAL);
         BAInf.add(baPAL);
-        DefaultMutableTreeNode baLight = new DefaultMutableTreeNode("Light: "+countBALight);
+        DefaultMutableTreeNode baLight = new DefaultMutableTreeNode("Light: " + countBALight);
         BAInf.add(baLight);
-        DefaultMutableTreeNode baMedium = new DefaultMutableTreeNode("Medium: "+countBAMedium);
+        DefaultMutableTreeNode baMedium = new DefaultMutableTreeNode("Medium: " + countBAMedium);
         BAInf.add(baMedium);
-        DefaultMutableTreeNode baHeavy = new DefaultMutableTreeNode("Heavy: "+countBAHeavy);
+        DefaultMutableTreeNode baHeavy = new DefaultMutableTreeNode("Heavy: " + countBAHeavy);
         BAInf.add(baHeavy);
-        DefaultMutableTreeNode baAssault = new DefaultMutableTreeNode("Assault: "+countBAAssault);
+        DefaultMutableTreeNode baAssault = new DefaultMutableTreeNode("Assault: " + countBAAssault);
         BAInf.add(baAssault);
         top.add(inf);
-        
-        // Protomechs
-        final DefaultMutableTreeNode protos = new DefaultMutableTreeNode("Protomechs: "+countProtos);
-        DefaultMutableTreeNode plight = new DefaultMutableTreeNode("Light: "+countLightProtos);
-        protos.add(plight);
-        DefaultMutableTreeNode pmedium = new DefaultMutableTreeNode("Medium: "+countMediumProtos);
-        protos.add(pmedium);
-        DefaultMutableTreeNode pheavy = new DefaultMutableTreeNode("Heavy: "+countHeavyProtos);
-        protos.add(pheavy);
-        DefaultMutableTreeNode passault = new DefaultMutableTreeNode("Assault: "+countAssaultProtos);
-        protos.add(passault);
+
+        // ProtoMechs
+        final DefaultMutableTreeNode protos = new DefaultMutableTreeNode("ProtoMechs: " + countProtos);
+        DefaultMutableTreeNode pLight = new DefaultMutableTreeNode("Light: " + countLightProtos);
+        protos.add(pLight);
+        DefaultMutableTreeNode pMedium = new DefaultMutableTreeNode("Medium: " + countMediumProtos);
+        protos.add(pMedium);
+        DefaultMutableTreeNode pHeavy = new DefaultMutableTreeNode("Heavy: " + countHeavyProtos);
+        protos.add(pHeavy);
+        DefaultMutableTreeNode pAssault = new DefaultMutableTreeNode("Assault: " + countAssaultProtos);
+        protos.add(pAssault);
         top.add(protos);
-        
+
         // Turrets
-        final DefaultMutableTreeNode ge = new DefaultMutableTreeNode("Gun Emplacements: "+countGE);
+        final DefaultMutableTreeNode ge = new DefaultMutableTreeNode("Gun Emplacements: " + countGE);
         top.add(ge);
-        
+
         // Space
-        final DefaultMutableTreeNode space = new DefaultMutableTreeNode("Spacecraft: "+countSpace);
-        DefaultMutableTreeNode ws = new DefaultMutableTreeNode("Warships: "+countWarships);
+        final DefaultMutableTreeNode space = new DefaultMutableTreeNode("Spacecraft: " + countSpace);
+        DefaultMutableTreeNode ws = new DefaultMutableTreeNode("Warships: " + countWarships);
         space.add(ws);
-        DefaultMutableTreeNode js = new DefaultMutableTreeNode("Jumpships: "+countJumpships);
+        DefaultMutableTreeNode js = new DefaultMutableTreeNode("JumpShips: " + countJumpships);
         space.add(js);
-        DefaultMutableTreeNode ds = new DefaultMutableTreeNode("Dropships: "+countDropships);
-        space.add(ds);
-        DefaultMutableTreeNode sc = new DefaultMutableTreeNode("Small Craft: "+countSmallCraft);
-        space.add(sc);
-        DefaultMutableTreeNode smws = new DefaultMutableTreeNode("Small Warships: "+countSmallWS);
+        DefaultMutableTreeNode smws = new DefaultMutableTreeNode("Small Warships: " + countSmallWS);
         ws.add(smws);
-        DefaultMutableTreeNode lgws = new DefaultMutableTreeNode("Large Warships: "+countLargeWS);
+        DefaultMutableTreeNode lgws = new DefaultMutableTreeNode("Large Warships: " + countLargeWS);
         ws.add(lgws);
-        DefaultMutableTreeNode smds = new DefaultMutableTreeNode("Small Dropships: "+countSmallDS);
+        DefaultMutableTreeNode ds = new DefaultMutableTreeNode("DropShips: " + countDropships);
+        space.add(ds);
+        DefaultMutableTreeNode smds = new DefaultMutableTreeNode("Small Dropships: " + countSmallDS);
         ds.add(smds);
-        DefaultMutableTreeNode mdds = new DefaultMutableTreeNode("Medium Dropships: "+countMediumDS);
+        DefaultMutableTreeNode mdds = new DefaultMutableTreeNode("Medium Dropships: " + countMediumDS);
         ds.add(mdds);
-        DefaultMutableTreeNode lgds = new DefaultMutableTreeNode("Large Dropships: "+countLargeDS);
+        DefaultMutableTreeNode lgds = new DefaultMutableTreeNode("Large Dropships: " + countLargeDS);
         ds.add(lgds);
+        DefaultMutableTreeNode sc = new DefaultMutableTreeNode("Small Craft: " + countSmallCraft);
+        space.add(sc);
         top.add(space);
-        
+
+        //Space Stations
+        final DefaultMutableTreeNode spaceStation = new DefaultMutableTreeNode("Space Station: " + countSpaceStations);
+        top.add(spaceStation);
+
         for (Unit u : getCampaign().getUnits()) {
             Entity e = u.getEntity();
             if (e instanceof Mech) {
@@ -925,6 +1260,8 @@ public class HangarReport extends Report {
                 }
             } else if (e instanceof ConvFighter) {
                 conv.add(new DefaultMutableTreeNode(u.getName()));
+            } else if (e instanceof SpaceStation) {
+                spaceStation.add(new DefaultMutableTreeNode(u.getName()));
             } else if (e instanceof Warship) {
                 //expandSpace = true;
                 if (e.getWeightClass() == EntityWeightClass.WEIGHT_SMALL_WAR) {
@@ -969,18 +1306,174 @@ public class HangarReport extends Report {
             } else if (e instanceof Protomech) {
                 //expandProtos = true;
                 if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-                    plight.add(new DefaultMutableTreeNode(u.getName()));
+                    pLight.add(new DefaultMutableTreeNode(u.getName()));
                 } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-                    pmedium.add(new DefaultMutableTreeNode(u.getName()));
+                    pMedium.add(new DefaultMutableTreeNode(u.getName()));
                 } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-                    pheavy.add(new DefaultMutableTreeNode(u.getName()));
+                    pHeavy.add(new DefaultMutableTreeNode(u.getName()));
                 } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
-                    passault.add(new DefaultMutableTreeNode(u.getName()));
+                    pAssault.add(new DefaultMutableTreeNode(u.getName()));
                 }
             } else if (e instanceof GunEmplacement) {
                 ge.add(new DefaultMutableTreeNode(u.getName()));
-            } else if (e instanceof SupportTank || e instanceof SupportVTOL) {
-                continue;
+            } else if (e.isSupportVehicle()) {
+                if (e.isOmni()) {
+                    if (e instanceof VTOL) {
+                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+                            oSupportVTOLLight.add(new DefaultMutableTreeNode(u.getName()));
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.TRACKED) {
+                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+                            oSupportTrackedLight.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+                            oSupportTrackedMedium.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+                            oSupportTrackedHeavy.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+                            oSupportTrackedAssault.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
+                            oSupportTrackedColossal.add(new DefaultMutableTreeNode(u.getName()));
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.WHEELED) {
+                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+                            oSupportWheeledLight.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+                            oSupportWheeledMedium.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+                            oSupportWheeledHeavy.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+                            oSupportWheeledAssault.add(new DefaultMutableTreeNode(u.getName()));
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.HOVER) {
+                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+                            oSupportHoverLight.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+                            oSupportHoverMedium.add(new DefaultMutableTreeNode(u.getName()));
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.WIGE) {
+                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+                            oSupportWiGELight.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+                            oSupportWiGEMedium.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+                            oSupportWiGEHeavy.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+                            oSupportWiGEAssault.add(new DefaultMutableTreeNode(u.getName()));
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.NAVAL) {
+                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+                            oSupportNavalLight.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+                            oSupportNavalMedium.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+                            oSupportNavalHeavy.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+                            oSupportNavalAssault.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
+                            oSupportNavalColossal.add(new DefaultMutableTreeNode(u.getName()));
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.SUBMARINE) {
+                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+                            oSupportSubLight.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+                            oSupportSubMedium.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+                            oSupportSubHeavy.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+                            oSupportSubAssault.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
+                            oSupportSubColossal.add(new DefaultMutableTreeNode(u.getName()));
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.HYDROFOIL) {
+                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+                            oSupportHydrofoilLight.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+                            oSupportHydrofoilMedium.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+                            oSupportHydrofoilHeavy.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+                            oSupportHydrofoilAssault.add(new DefaultMutableTreeNode(u.getName()));
+                        }
+                    }
+                } else {
+                    if (e instanceof VTOL) {
+                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+                            sSupportVTOLLight.add(new DefaultMutableTreeNode(u.getName()));
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.TRACKED) {
+                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+                            sSupportTrackedLight.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+                            sSupportTrackedMedium.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+                            sSupportTrackedHeavy.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+                            sSupportTrackedAssault.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
+                            sSupportTrackedColossal.add(new DefaultMutableTreeNode(u.getName()));
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.WHEELED) {
+                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+                            sSupportWheeledLight.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+                            sSupportWheeledMedium.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+                            sSupportWheeledHeavy.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+                            sSupportWheeledAssault.add(new DefaultMutableTreeNode(u.getName()));
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.HOVER) {
+                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+                            sSupportHoverLight.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+                            sSupportHoverMedium.add(new DefaultMutableTreeNode(u.getName()));
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.WIGE) {
+                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+                            sSupportWiGELight.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+                            sSupportWiGEMedium.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+                            sSupportWiGEHeavy.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+                            sSupportWiGEAssault.add(new DefaultMutableTreeNode(u.getName()));
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.NAVAL) {
+                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+                            sSupportNavalLight.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+                            sSupportNavalMedium.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+                            sSupportNavalHeavy.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+                            sSupportNavalAssault.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
+                            sSupportNavalColossal.add(new DefaultMutableTreeNode(u.getName()));
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.SUBMARINE) {
+                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+                            sSupportSubLight.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+                            sSupportSubMedium.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+                            sSupportSubHeavy.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+                            sSupportSubAssault.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
+                            sSupportSubColossal.add(new DefaultMutableTreeNode(u.getName()));
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.HYDROFOIL) {
+                        if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+                            sSupportHydrofoilLight.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+                            sSupportHydrofoilMedium.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+                            sSupportHydrofoilHeavy.add(new DefaultMutableTreeNode(u.getName()));
+                        } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+                            sSupportHydrofoilAssault.add(new DefaultMutableTreeNode(u.getName()));
+                        }
+                    }
+                }
             } else if (e instanceof Tank) {
                 //expandVees = true;
                 if (e.isOmni()) {
@@ -1166,17 +1659,17 @@ public class HangarReport extends Report {
                 }
             }
         }
-        
+
         // Reset our UI
         /*
         final boolean expandMechsFinal = expandMechs;
         final boolean expandASFFinal = expandASF;
         final boolean expandVeesFinal = expandVees;
-        final boolean expandInfantryFinal = expandInfantry; 
+        final boolean expandInfantryFinal = expandInfantry;
         final boolean expandSpaceFinal = expandSpace;
         final boolean expandProtosFinal = expandProtos;
         */
-        
+
         overviewHangarTree.setSelectionPath(null);
         overviewHangarTree.expandPath(new TreePath(top.getPath()));
         /*
@@ -1198,10 +1691,10 @@ public class HangarReport extends Report {
         if (expandProtosFinal) {
             overviewHangarTree.expandPath(new TreePath(protos.getPath()));
         }*/
-        
+
         return overviewHangarTree;
     }
-    
+
     public String getHangarTotals() {
     	int countInTransit = 0;
         int countPresent = 0;
@@ -1222,25 +1715,24 @@ public class HangarReport extends Report {
                 countDeployed++;
             }
         }
-        
-        return "Total Units: "+total+
-                "\n  Present: "+countPresent+
-                "\n  In Transit: "+countInTransit+
-                "\n  Damaged: "+countDamaged+
-                "\n  Deployed: "+countDeployed;
+
+        return "Total Units: "+ total +
+                "\n  Present: " + countPresent +
+                "\n  In Transit: " + countInTransit +
+                "\n  Damaged: " + countDamaged +
+                "\n  Deployed: " + countDeployed;
     }
 
     public JTextPane getReport() {
         JTextPane txtReport = new JTextPane();
         txtReport.setMinimumSize(new Dimension(800, 500));
         txtReport.setFont(new Font("Courier New", Font.PLAIN, 12));
-        
+
         txtReport.setAlignmentY(1.0f);
 
         txtReport.setText(getHangarTotals() + "\n\n\n");
         txtReport.insertComponent(getHangarTree());
-      
+
         return txtReport;
     }
-   
 }
