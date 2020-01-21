@@ -207,104 +207,137 @@ public class HangarReport extends Report {
         // Support Vees
         //boolean expandSupportVees = false;
         int countSupportVees = 0;
+
         int countSupportStandardVees = 0;
-        int countSupportOmniVees = 0;
 
         int countSupportWheeled = 0;
-        int countSupportWheeledSmall = 0;
-        int countSupportWheeledMedium = 0;
         int countSupportWheeledLarge = 0;
+        int countSupportWheeledMedium = 0;
+        int countSupportWheeledSmall = 0;
 
         int countSupportTracked = 0;
-        int countSupportTrackedSmall = 0;
-        int countSupportTrackedMedium = 0;
         int countSupportTrackedLarge = 0;
+        int countSupportTrackedMedium = 0;
+        int countSupportTrackedSmall = 0;
+
 
         int countSupportHover = 0;
-        int countSupportHoverSmall = 0;
-        int countSupportHoverMedium = 0;
         int countSupportHoverLarge = 0;
+        int countSupportHoverMedium = 0;
+        int countSupportHoverSmall = 0;
 
         int countSupportVTOL = 0;
-        int countSupportVTOLSmall = 0;
-        int countSupportVTOLMedium = 0;
         int countSupportVTOLLarge = 0;
+        int countSupportVTOLMedium = 0;
+        int countSupportVTOLSmall = 0;
 
         int countSupportWiGE = 0;
-        int countSupportWiGESmall = 0;
-        int countSupportWiGEMedium = 0;
         int countSupportWiGELarge = 0;
+        int countSupportWiGEMedium = 0;
+        int countSupportWiGESmall = 0;
 
         int countSupportAirship = 0;
-        int countSupportAirshipSmall = 0;
-        int countSupportAirshipMedium = 0;
         int countSupportAirshipLarge = 0;
+        int countSupportAirshipMedium = 0;
+        int countSupportAirshipSmall = 0;
 
         int countSupportFixedWing = 0;
-        int countSupportFixedWingSmall = 0;
-        int countSupportFixedWingMedium = 0;
         int countSupportFixedWingLarge = 0;
+        int countSupportFixedWingMedium = 0;
+        int countSupportFixedWingSmall = 0;
 
         int countSupportNaval = 0;
-        int countSupportNavalSmall = 0;
-        int countSupportNavalMedium = 0;
         int countSupportNavalLarge = 0;
+        int countSupportNavalMedium = 0;
+        int countSupportNavalSmall = 0;
         int countSupportSub = 0;
-        int countSupportSubSmall = 0;
-        int countSupportSubMedium = 0;
         int countSupportSubLarge = 0;
+        int countSupportSubMedium = 0;
+        int countSupportSubSmall = 0;
         int countSupportHydrofoil = 0;
-        int countSupportHydrofoilSmall = 0;
-        int countSupportHydrofoilMedium = 0;
         int countSupportHydrofoilLarge = 0;
+        int countSupportHydrofoilMedium = 0;
+        int countSupportHydrofoilSmall = 0;
+
+        int countSupportSatellite = 0;
+        int countSupportSatelliteLarge = 0;
+        int countSupportSatelliteMedium = 0;
+        int countSupportSatelliteSmall = 0;
+
+        int countSupportRail = 0;
+        int countSupportRailLarge = 0;
+        int countSupportRailMedium = 0;
+        int countSupportRailSmall = 0;
+
+        int countSupportMaglev = 0;
+        int countSupportMaglevLarge = 0;
+        int countSupportMaglevMedium = 0;
+        int countSupportMaglevSmall = 0;
+
+        int countSupportOmniVees = 0;
 
         int countSupportOmniTracked = 0;
-        int countSupportOmniTrackedSmall = 0;
-        int countSupportOmniTrackedMedium = 0;
         int countSupportOmniTrackedLarge = 0;
+        int countSupportOmniTrackedMedium = 0;
+        int countSupportOmniTrackedSmall = 0;
 
         int countSupportOmniWheeled = 0;
-        int countSupportOmniWheeledSmall = 0;
-        int countSupportOmniWheeledMedium = 0;
         int countSupportOmniWheeledLarge = 0;
+        int countSupportOmniWheeledMedium = 0;
+        int countSupportOmniWheeledSmall = 0;
 
         int countSupportOmniHover = 0;
-        int countSupportOmniHoverSmall = 0;
-        int countSupportOmniHoverMedium = 0;
         int countSupportOmniHoverLarge = 0;
+        int countSupportOmniHoverMedium = 0;
+        int countSupportOmniHoverSmall = 0;
 
         int countSupportOmniVTOL = 0;
-        int countSupportOmniVTOLSmall = 0;
-        int countSupportOmniVTOLMedium = 0;
         int countSupportOmniVTOLLarge = 0;
+        int countSupportOmniVTOLMedium = 0;
+        int countSupportOmniVTOLSmall = 0;
 
         int countSupportOmniWiGE = 0;
-        int countSupportOmniWiGESmall = 0;
-        int countSupportOmniWiGEMedium = 0;
         int countSupportOmniWiGELarge = 0;
+        int countSupportOmniWiGEMedium = 0;
+        int countSupportOmniWiGESmall = 0;
 
         int countSupportOmniAirship = 0;
-        int countSupportOmniAirshipSmall = 0;
-        int countSupportOmniAirshipMedium = 0;
         int countSupportOmniAirshipLarge = 0;
+        int countSupportOmniAirshipMedium = 0;
+        int countSupportOmniAirshipSmall = 0;
 
         int countSupportOmniFixedWing = 0;
-        int countSupportOmniFixedWingSmall = 0;
-        int countSupportOmniFixedWingMedium = 0;
         int countSupportOmniFixedWingLarge = 0;
+        int countSupportOmniFixedWingMedium = 0;
+        int countSupportOmniFixedWingSmall = 0;
 
         int countSupportOmniNaval = 0;
-        int countSupportOmniNavalSmall = 0;
-        int countSupportOmniNavalMedium = 0;
         int countSupportOmniNavalLarge = 0;
+        int countSupportOmniNavalMedium = 0;
+        int countSupportOmniNavalSmall = 0;
         int countSupportOmniSub = 0;
-        int countSupportOmniSubSmall = 0;
-        int countSupportOmniSubMedium = 0;
         int countSupportOmniSubLarge = 0;
+        int countSupportOmniSubMedium = 0;
+        int countSupportOmniSubSmall = 0;
         int countSupportOmniHydrofoil = 0;
-        int countSupportOmniHydrofoilSmall = 0;
-        int countSupportOmniHydrofoilMedium = 0;
         int countSupportOmniHydrofoilLarge = 0;
+        int countSupportOmniHydrofoilMedium = 0;
+        int countSupportOmniHydrofoilSmall = 0;
+
+        int countSupportOmniSatellite = 0;
+        int countSupportOmniSatelliteLarge = 0;
+        int countSupportOmniSatelliteMedium = 0;
+        int countSupportOmniSatelliteSmall = 0;
+
+        int countSupportOmniRail = 0;
+        int countSupportOmniRailLarge = 0;
+        int countSupportOmniRailMedium = 0;
+        int countSupportOmniRailSmall = 0;
+
+        int countSupportOmniMaglev = 0;
+        int countSupportOmniMaglevLarge = 0;
+        int countSupportOmniMaglevMedium = 0;
+        int countSupportOmniMaglevSmall = 0;
 
         // Battle Armor and Infantry
         //boolean expandInfantry = false;
@@ -696,6 +729,34 @@ public class HangarReport extends Report {
         DefaultMutableTreeNode sSupportHydrofoilSmall = new DefaultMutableTreeNode();
         sSupportHydrofoil.add(sSupportHydrofoilSmall);
 
+        DefaultMutableTreeNode sSupportSatellite = new DefaultMutableTreeNode();
+        sSupportVees.add(sSupportSatellite);
+        DefaultMutableTreeNode sSupportSatelliteLarge = new DefaultMutableTreeNode();
+        sSupportSatellite.add(sSupportSatelliteLarge);
+        DefaultMutableTreeNode sSupportSatelliteMedium = new DefaultMutableTreeNode();
+        sSupportSatellite.add(sSupportSatelliteMedium);
+        DefaultMutableTreeNode sSupportSatelliteSmall = new DefaultMutableTreeNode();
+        sSupportSatellite.add(sSupportSatelliteSmall);
+
+        DefaultMutableTreeNode sSupportRail = new DefaultMutableTreeNode();
+        sSupportVees.add(sSupportRail);
+        DefaultMutableTreeNode sSupportRailLarge = new DefaultMutableTreeNode();
+        sSupportRail.add(sSupportRailLarge);
+        DefaultMutableTreeNode sSupportRailMedium = new DefaultMutableTreeNode();
+        sSupportRail.add(sSupportRailMedium);
+        DefaultMutableTreeNode sSupportRailSmall = new DefaultMutableTreeNode();
+        sSupportRail.add(sSupportRailSmall);
+
+        DefaultMutableTreeNode sSupportMaglev = new DefaultMutableTreeNode();
+        sSupportVees.add(sSupportMaglev);
+        DefaultMutableTreeNode sSupportMaglevLarge = new DefaultMutableTreeNode();
+        sSupportMaglev.add(sSupportMaglevLarge);
+        DefaultMutableTreeNode sSupportMaglevMedium = new DefaultMutableTreeNode();
+        sSupportMaglev.add(sSupportMaglevMedium);
+        DefaultMutableTreeNode sSupportMaglevSmall = new DefaultMutableTreeNode();
+        sSupportMaglev.add(sSupportMaglevSmall);
+
+
         // Omni Support Vees
         DefaultMutableTreeNode oSupportVees = new DefaultMutableTreeNode();
         supportVees.add(oSupportVees);
@@ -790,6 +851,33 @@ public class HangarReport extends Report {
         DefaultMutableTreeNode oSupportHydrofoilSmall = new DefaultMutableTreeNode();
         oSupportHydrofoil.add(oSupportHydrofoilSmall);
 
+        DefaultMutableTreeNode oSupportSatellite = new DefaultMutableTreeNode();
+        oSupportVees.add(oSupportSatellite);
+        DefaultMutableTreeNode oSupportSatelliteLarge = new DefaultMutableTreeNode();
+        oSupportSatellite.add(oSupportSatelliteLarge);
+        DefaultMutableTreeNode oSupportSatelliteMedium = new DefaultMutableTreeNode();
+        oSupportSatellite.add(oSupportSatelliteMedium);
+        DefaultMutableTreeNode oSupportSatelliteSmall = new DefaultMutableTreeNode();
+        oSupportSatellite.add(oSupportSatelliteSmall);
+
+        DefaultMutableTreeNode oSupportRail = new DefaultMutableTreeNode();
+        oSupportVees.add(oSupportRail);
+        DefaultMutableTreeNode oSupportRailLarge = new DefaultMutableTreeNode();
+        oSupportRail.add(oSupportRailLarge);
+        DefaultMutableTreeNode oSupportRailMedium = new DefaultMutableTreeNode();
+        oSupportRail.add(oSupportRailMedium);
+        DefaultMutableTreeNode oSupportRailSmall = new DefaultMutableTreeNode();
+        oSupportRail.add(oSupportRailSmall);
+
+        DefaultMutableTreeNode oSupportMaglev = new DefaultMutableTreeNode();
+        oSupportVees.add(oSupportMaglev);
+        DefaultMutableTreeNode oSupportMaglevLarge = new DefaultMutableTreeNode();
+        oSupportMaglev.add(oSupportMaglevLarge);
+        DefaultMutableTreeNode oSupportMaglevMedium = new DefaultMutableTreeNode();
+        oSupportMaglev.add(oSupportMaglevMedium);
+        DefaultMutableTreeNode oSupportMaglevSmall = new DefaultMutableTreeNode();
+        oSupportMaglev.add(oSupportMaglevSmall);
+
         top.add(supportVees);
 
         // Infantry Nodes
@@ -882,7 +970,7 @@ public class HangarReport extends Report {
         for (Unit u : getCampaign().getUnits()) {
             Entity e = u.getEntity();
 
-            //Add to
+            // Create general stats
             totalNumberOfUnits++;
             if (u.isPresent()) {
                 countUnitsPresent++;
@@ -929,7 +1017,7 @@ public class HangarReport extends Report {
                     }
                 } else {
                     countBattleMechs++;
-                    switch(e.getWeightClass()) {
+                    switch (e.getWeightClass()) {
                         case EntityWeightClass.WEIGHT_COLOSSAL:
                             colossalMech++;
                             colossalMechs.add(new DefaultMutableTreeNode(u.getName()));
@@ -954,6 +1042,433 @@ public class HangarReport extends Report {
                             ultralightMech++;
                             ultralightMechs.add(new DefaultMutableTreeNode(u.getName()));
                             break;
+                    }
+                }
+            } else if (e.isSupportVehicle()) {
+                // this needs to be near or at the top because some of the units that
+                // should have been cause by this will otherwise be selected for other unit types
+                countSupportVees++;
+                if (e.isOmni()) {
+                    countSupportOmniVees++;
+                    if (e.getMovementMode() == EntityMovementMode.WHEELED) {
+                        countSupportOmniWheeled++;
+                        switch(e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
+                                countSupportOmniWheeledLarge++;
+                                oSupportWheeledLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
+                                countSupportOmniWheeledMedium++;
+                                oSupportWheeledMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
+                                countSupportOmniWheeledSmall++;
+                                oSupportWheeledSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.TRACKED) {
+                        countSupportOmniTracked++;
+                        switch(e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
+                                countSupportOmniTrackedLarge++;
+                                oSupportTrackedLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
+                                countSupportOmniTrackedSmall++;
+                                oSupportTrackedSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
+                                countSupportOmniTrackedMedium++;
+                                oSupportTrackedMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.HOVER) {
+                        countSupportOmniHover++;
+                        switch(e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
+                                countSupportOmniHoverLarge++;
+                                oSupportHoverLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
+                                countSupportOmniHoverMedium++;
+                                oSupportHoverMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
+                                countSupportOmniHoverSmall++;
+                                oSupportHoverSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.VTOL) {
+                        countSupportOmniVTOL++;
+                        switch(e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
+                                countSupportOmniVTOLLarge++;
+                                oSupportVTOLLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
+                                countSupportOmniVTOLMedium++;
+                                oSupportVTOLMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
+                                countSupportOmniVTOLSmall++;
+                                oSupportVTOLSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.WIGE) {
+                        countSupportOmniWiGE++;
+                        switch(e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
+                                countSupportOmniWiGELarge++;
+                                oSupportWiGELarge.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
+                                countSupportOmniWiGEMedium++;
+                                oSupportWiGEMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
+                                countSupportOmniWiGESmall++;
+                                oSupportWiGESmall.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.AIRSHIP) {
+                        countSupportOmniAirship++;
+                        switch(e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
+                                countSupportOmniAirshipLarge++;
+                                oSupportAirshipLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
+                                countSupportOmniAirshipMedium++;
+                                oSupportAirshipMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
+                                countSupportOmniAirshipSmall++;
+                                oSupportAirshipSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                        }
+                    } else if (e.isFighter()) {
+                        countSupportOmniFixedWing++;
+                        switch(e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
+                                countSupportOmniFixedWingLarge++;
+                                oSupportFixedWingLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
+                                countSupportOmniFixedWingMedium++;
+                                oSupportFixedWingMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
+                                countSupportOmniFixedWingSmall++;
+                                oSupportFixedWingSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.NAVAL) {
+                        countSupportOmniNaval++;
+                        switch(e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
+                                countSupportOmniNavalLarge++;
+                                oSupportNavalLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
+                                countSupportOmniNavalMedium++;
+                                oSupportNavalMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
+                                countSupportOmniNavalSmall++;
+                                oSupportNavalSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.SUBMARINE) {
+                        countSupportOmniSub++;
+                        switch(e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
+                                countSupportOmniSubLarge++;
+                                oSupportSubLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
+                                countSupportOmniSubMedium++;
+                                oSupportSubMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
+                                countSupportOmniSubSmall++;
+                                oSupportSubSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.HYDROFOIL) {
+                        countSupportOmniHydrofoil++;
+                        switch(e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
+                                countSupportOmniHydrofoilLarge++;
+                                oSupportHydrofoilLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
+                                countSupportOmniHydrofoilMedium++;
+                                oSupportHydrofoilMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
+                                countSupportOmniHydrofoilSmall++;
+                                oSupportHydrofoilSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.STATION_KEEPING) {
+                        countSupportOmniSatellite++;
+                        switch (e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
+                                countSupportOmniSatelliteLarge++;
+                                oSupportSatelliteLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
+                                countSupportOmniSatelliteMedium++;
+                                oSupportSatelliteMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
+                                countSupportOmniSatelliteSmall++;
+                                oSupportSatelliteSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.RAIL) {
+                        countSupportOmniRail++;
+                        switch (e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
+                                countSupportOmniRailLarge++;
+                                oSupportRailLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
+                                countSupportOmniRailMedium++;
+                                oSupportRailMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
+                                countSupportOmniRailSmall++;
+                                oSupportRailSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.MAGLEV) {
+                        countSupportOmniMaglev++;
+                        switch (e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
+                                countSupportOmniMaglevLarge++;
+                                oSupportMaglevLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
+                                countSupportOmniMaglevMedium++;
+                                oSupportMaglevMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
+                                countSupportOmniMaglevSmall++;
+                                oSupportMaglevSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                        }
+                    }
+                } else {
+                    countSupportStandardVees++;
+                    if (e.getMovementMode() == EntityMovementMode.WHEELED) {
+                        countSupportWheeled++;
+                        switch (e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
+                                countSupportWheeledLarge++;
+                                sSupportWheeledLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
+                                countSupportWheeledMedium++;
+                                sSupportWheeledMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
+                                countSupportWheeledSmall++;
+                                sSupportWheeledSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.TRACKED) {
+                        countSupportTracked++;
+                        switch (e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
+                                countSupportTrackedLarge++;
+                                sSupportTrackedLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
+                                countSupportTrackedMedium++;
+                                sSupportTrackedMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
+                                countSupportTrackedSmall++;
+                                sSupportTrackedSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.HOVER) {
+                        countSupportHover++;
+                        switch (e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
+                                countSupportHoverLarge++;
+                                sSupportHoverLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
+                                countSupportHoverMedium++;
+                                sSupportHoverMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
+                                countSupportHoverSmall++;
+                                sSupportHoverSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.VTOL) {
+                        countSupportVTOL++;
+                        switch (e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
+                                countSupportVTOLLarge++;
+                                sSupportVTOLLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
+                                countSupportVTOLMedium++;
+                                sSupportVTOLMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
+                                countSupportVTOLSmall++;
+                                sSupportVTOLSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.WIGE) {
+                        countSupportWiGE++;
+                        switch (e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
+                                countSupportWiGELarge++;
+                                sSupportWiGELarge.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
+                                countSupportWiGEMedium++;
+                                sSupportWiGEMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
+                                countSupportWiGESmall++;
+                                sSupportWiGESmall.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.AIRSHIP) {
+                        countSupportAirship++;
+                        switch (e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
+                                countSupportAirshipLarge++;
+                                sSupportAirshipLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
+                                countSupportAirshipSmall++;
+                                sSupportAirshipSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
+                                countSupportAirshipMedium++;
+                                sSupportAirshipMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                        }
+                    } else if (e.isFighter()) {
+                        countSupportFixedWing++;
+                        switch (e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
+                                countSupportFixedWingLarge++;
+                                sSupportFixedWingLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
+                                countSupportFixedWingMedium++;
+                                sSupportFixedWingMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
+                                countSupportFixedWingSmall++;
+                                sSupportFixedWingSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.NAVAL) {
+                        countSupportNaval++;
+                        switch (e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
+                                countSupportNavalSmall++;
+                                sSupportNavalSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
+                                countSupportNavalMedium++;
+                                sSupportNavalMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
+                                countSupportNavalLarge++;
+                                sSupportNavalLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.SUBMARINE) {
+                        countSupportSub++;
+                        switch (e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
+                                countSupportSubLarge++;
+                                sSupportSubLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
+                                countSupportSubMedium++;
+                                sSupportSubMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
+                                countSupportSubSmall++;
+                                sSupportSubSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.HYDROFOIL) {
+                        countSupportHydrofoil++;
+                        switch (e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
+                                countSupportHydrofoilLarge++;
+                                sSupportHydrofoilLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
+                                countSupportHydrofoilMedium++;
+                                sSupportHydrofoilMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
+                                countSupportHydrofoilSmall++;
+                                sSupportHydrofoilSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.STATION_KEEPING) {
+                        countSupportSatellite++;
+                        switch (e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
+                                countSupportSatelliteLarge++;
+                                sSupportSatelliteLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
+                                countSupportSatelliteMedium++;
+                                sSupportSatelliteMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
+                                countSupportSatelliteSmall++;
+                                sSupportSatelliteSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.RAIL) {
+                        countSupportRail++;
+                        switch (e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
+                                countSupportRailLarge++;
+                                sSupportRailLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
+                                countSupportRailMedium++;
+                                sSupportRailMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
+                                countSupportRailSmall++;
+                                sSupportRailSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                        }
+                    } else if (e.getMovementMode() == EntityMovementMode.MAGLEV) {
+                        countSupportMaglev++;
+                        switch (e.getWeightClass()) {
+                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
+                                countSupportMaglevLarge++;
+                                sSupportMaglevLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
+                                countSupportMaglevMedium++;
+                                sSupportMaglevMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
+                                countSupportMaglevSmall++;
+                                sSupportMaglevSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                break;
+                        }
                     }
                 }
             } else if (e instanceof ConvFighter) {
@@ -1058,335 +1573,6 @@ public class HangarReport extends Report {
             } else if (e instanceof GunEmplacement) {
                 countGE++;
                 ge.add(new DefaultMutableTreeNode(u.getName()));
-            } else if (e.isSupportVehicle()) {
-                countSupportVees++;
-                if (e.isOmni()) {
-                    countSupportOmniVees++;
-                    if (e.getMovementMode() == EntityMovementMode.WHEELED) {
-                        countSupportOmniWheeled++;
-                        switch(e.getWeightClass()) {
-                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
-                                countSupportOmniWheeledLarge++;
-                                oSupportWheeledLarge.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
-                                countSupportOmniWheeledMedium++;
-                                oSupportWheeledMedium.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
-                                countSupportOmniWheeledSmall++;
-                                oSupportWheeledSmall.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                        }
-                    } else if (e.getMovementMode() == EntityMovementMode.TRACKED) {
-                        countSupportOmniTracked++;
-                        switch(e.getWeightClass()) {
-                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
-                                countSupportOmniTrackedLarge++;
-                                oSupportTrackedLarge.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
-                                countSupportOmniTrackedSmall++;
-                                oSupportTrackedSmall.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
-                                countSupportOmniTrackedMedium++;
-                                oSupportTrackedMedium.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                        }
-                    } else if (e.getMovementMode() == EntityMovementMode.HOVER) {
-                        countSupportOmniHover++;
-                        switch(e.getWeightClass()) {
-                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
-                                countSupportOmniHoverLarge++;
-                                oSupportHoverLarge.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
-                                countSupportOmniHoverMedium++;
-                                oSupportHoverMedium.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
-                                countSupportOmniHoverSmall++;
-                                oSupportHoverSmall.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                        }
-                    } else if (e.getMovementMode() == EntityMovementMode.VTOL) {
-                        countSupportOmniVTOL++;
-                        switch(e.getWeightClass()) {
-                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
-                                countSupportOmniVTOLLarge++;
-                                oSupportVTOLLarge.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
-                                countSupportOmniVTOLMedium++;
-                                oSupportVTOLMedium.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
-                                countSupportOmniVTOLSmall++;
-                                oSupportVTOLSmall.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                        }
-                    } else if (e.getMovementMode() == EntityMovementMode.WIGE) {
-                        countSupportOmniWiGE++;
-                        switch(e.getWeightClass()) {
-                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
-                                countSupportOmniWiGELarge++;
-                                oSupportWiGELarge.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
-                                countSupportOmniWiGEMedium++;
-                                oSupportWiGEMedium.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
-                                countSupportOmniWiGESmall++;
-                                oSupportWiGESmall.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                        }
-                    } else if (e.getMovementMode() == EntityMovementMode.AIRSHIP) {
-                        countSupportOmniAirship++;
-                        switch(e.getWeightClass()) {
-                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
-                                countSupportOmniAirshipLarge++;
-                                oSupportAirshipLarge.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
-                                countSupportOmniAirshipMedium++;
-                                oSupportAirshipMedium.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
-                                countSupportOmniAirshipSmall++;
-                                oSupportAirshipSmall.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                        }
-                    } else if (false) { //TODO : Add Fixed Wing-Support
-                        countSupportOmniFixedWing++;
-                        switch(e.getWeightClass()) {
-                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
-                                countSupportOmniFixedWingLarge++;
-                                oSupportFixedWingLarge.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
-                                countSupportOmniFixedWingMedium++;
-                                oSupportFixedWingMedium.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
-                                countSupportOmniFixedWingSmall++;
-                                oSupportFixedWingSmall.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                        }
-                    } else if (e.getMovementMode() == EntityMovementMode.NAVAL) {
-                        countSupportOmniNaval++;
-                        switch(e.getWeightClass()) {
-                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
-                                countSupportOmniNavalLarge++;
-                                oSupportNavalLarge.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
-                                countSupportOmniNavalMedium++;
-                                oSupportNavalMedium.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
-                                countSupportOmniNavalSmall++;
-                                oSupportNavalSmall.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                        }
-                    } else if (e.getMovementMode() == EntityMovementMode.SUBMARINE) {
-                        countSupportOmniSub++;
-                        switch(e.getWeightClass()) {
-                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
-                                countSupportOmniSubLarge++;
-                                oSupportSubLarge.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
-                                countSupportOmniSubMedium++;
-                                oSupportSubMedium.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
-                                countSupportOmniSubSmall++;
-                                oSupportSubSmall.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                        }
-                    } else if (e.getMovementMode() == EntityMovementMode.HYDROFOIL) {
-                        countSupportOmniHydrofoil++;
-                        switch(e.getWeightClass()) {
-                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
-                                countSupportOmniHydrofoilLarge++;
-                                oSupportHydrofoilLarge.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
-                                countSupportOmniHydrofoilMedium++;
-                                oSupportHydrofoilMedium.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
-                                countSupportOmniHydrofoilSmall++;
-                                oSupportHydrofoilSmall.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                        }
-                    }
-                } else {
-                    countSupportStandardVees++;
-                    if (e.getMovementMode() == EntityMovementMode.WHEELED) {
-                        countSupportWheeled++;
-                        switch(e.getWeightClass()) {
-                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
-                                countSupportWheeledLarge++;
-                                sSupportWheeledLarge.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
-                                countSupportWheeledMedium++;
-                                sSupportWheeledMedium.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
-                                countSupportWheeledSmall++;
-                                sSupportWheeledSmall.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                        }
-                    } else if (e.getMovementMode() == EntityMovementMode.TRACKED) {
-                        countSupportTracked++;
-                        switch(e.getWeightClass()) {
-                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
-                                countSupportTrackedLarge++;
-                                sSupportTrackedLarge.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
-                                countSupportTrackedMedium++;
-                                sSupportTrackedMedium.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
-                                countSupportTrackedSmall++;
-                                sSupportTrackedSmall.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                        }
-                    } else if (e.getMovementMode() == EntityMovementMode.HOVER) {
-                        countSupportHover++;
-                        switch(e.getWeightClass()) {
-                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
-                                countSupportHoverLarge++;
-                                sSupportHoverLarge.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
-                                countSupportHoverMedium++;
-                                sSupportHoverMedium.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
-                                countSupportHoverSmall++;
-                                sSupportHoverSmall.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                        }
-                    } else if (e.getMovementMode() == EntityMovementMode.VTOL) {
-                        countSupportVTOL++;
-                        switch(e.getWeightClass()) {
-                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
-                                countSupportVTOLLarge++;
-                                sSupportVTOLLarge.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
-                                countSupportVTOLMedium++;
-                                sSupportVTOLMedium.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
-                                countSupportVTOLSmall++;
-                                sSupportVTOLSmall.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                        }
-                    } else if (e.getMovementMode() == EntityMovementMode.WIGE) {
-                        countSupportWiGE++;
-                        switch(e.getWeightClass()) {
-                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
-                                countSupportWiGELarge++;
-                                sSupportWiGELarge.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
-                                countSupportWiGEMedium++;
-                                sSupportWiGEMedium.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
-                                countSupportWiGESmall++;
-                                sSupportWiGESmall.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                        }
-                    } else if (e.getMovementMode() == EntityMovementMode.AIRSHIP) {
-                        countSupportAirship++;
-                        switch(e.getWeightClass()) {
-                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
-                                countSupportAirshipLarge++;
-                                sSupportAirshipLarge.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
-                                countSupportAirshipSmall++;
-                                sSupportAirshipSmall.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
-                                countSupportAirshipMedium++;
-                                sSupportAirshipMedium.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                        }
-                    } else if (false) { //TODO : Add Fixed-Wing Support
-                        countSupportFixedWing++;
-                        switch(e.getWeightClass()) {
-                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
-                                countSupportFixedWingLarge++;
-                                sSupportFixedWingLarge.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
-                                countSupportFixedWingMedium++;
-                                sSupportFixedWingMedium.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
-                                countSupportFixedWingSmall++;
-                                sSupportFixedWingSmall.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                        }
-                    } else if (e.getMovementMode() == EntityMovementMode.NAVAL) {
-                        countSupportNaval++;
-                        switch(e.getWeightClass()) {
-                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
-                                countSupportNavalSmall++;
-                                sSupportNavalSmall.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
-                                countSupportNavalMedium++;
-                                sSupportNavalMedium.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
-                                countSupportNavalLarge++;
-                                sSupportNavalLarge.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                        }
-                    } else if (e.getMovementMode() == EntityMovementMode.SUBMARINE) {
-                        countSupportSub++;
-                        switch(e.getWeightClass()) {
-                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
-                                countSupportSubLarge++;
-                                sSupportSubLarge.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
-                                countSupportSubMedium++;
-                                sSupportSubMedium.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
-                                countSupportSubSmall++;
-                                sSupportSubSmall.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                        }
-                    } else if (e.getMovementMode() == EntityMovementMode.HYDROFOIL) {
-                        countSupportHydrofoil++;
-                        switch(e.getWeightClass()) {
-                            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
-                                countSupportHydrofoilLarge++;
-                                sSupportHydrofoilLarge.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
-                                countSupportHydrofoilMedium++;
-                                sSupportHydrofoilMedium.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
-                                countSupportHydrofoilSmall++;
-                                sSupportHydrofoilSmall.add(new DefaultMutableTreeNode(u.getName()));
-                                break;
-                        }
-                    }
-                }
             } else if (e instanceof Tank) {
                 countVees++;
                 if (e.isOmni()) {
@@ -1822,7 +2008,6 @@ public class HangarReport extends Report {
         sHydrofoilHeavy.setUserObject("Heavy: " + countHydrofoilHeavy);
         sHydrofoilMedium.setUserObject("Medium: " + countHydrofoilMedium);
         sHydrofoilLight.setUserObject("Light: " + countHydrofoilLight);
-        sHydrofoil.add(sHydrofoilLight);
 
         oVees.setUserObject("OmniVees: " + countOmniVees);
 
@@ -1928,6 +2113,21 @@ public class HangarReport extends Report {
         sSupportHydrofoilMedium.setUserObject("Medium: " + countSupportHydrofoilMedium);
         sSupportHydrofoilSmall.setUserObject("Small: " + countSupportHydrofoilSmall);
 
+        sSupportSatellite.setUserObject("Satellite: " + countSupportSatellite);
+        sSupportSatelliteLarge.setUserObject("Large: " + countSupportSatelliteLarge);
+        sSupportSatelliteMedium.setUserObject("Medium: " + countSupportSatelliteMedium);
+        sSupportSatelliteSmall.setUserObject("Small: " + countSupportSatelliteSmall);
+
+        sSupportRail.setUserObject("Rail: " + countSupportRail);
+        sSupportRailLarge.setUserObject("Large: " + countSupportRailLarge);
+        sSupportRailMedium.setUserObject("Medium: " + countSupportRailMedium);
+        sSupportRailSmall.setUserObject("Small: " + countSupportRailSmall);
+
+        sSupportMaglev.setUserObject("Maglev: " + countSupportMaglev);
+        sSupportMaglevLarge.setUserObject("Large: " + countSupportMaglevLarge);
+        sSupportMaglevMedium.setUserObject("Medium: " + countSupportMaglevMedium);
+        sSupportMaglevSmall.setUserObject("Small: " + countSupportMaglevSmall);
+
         // Omni Support Vees
         oSupportVees.setUserObject("OmniVees: " + countSupportOmniVees);
 
@@ -1981,6 +2181,21 @@ public class HangarReport extends Report {
         oSupportHydrofoilMedium.setUserObject("Medium: " + countSupportOmniHydrofoilMedium);
         oSupportHydrofoilSmall.setUserObject("Small: " + countSupportOmniHydrofoilSmall);
 
+        oSupportSatellite.setUserObject("Satellite: " + countSupportOmniSatellite);
+        oSupportSatelliteLarge.setUserObject("Large: " + countSupportOmniSatelliteLarge);
+        oSupportSatelliteMedium.setUserObject("Medium: " + countSupportOmniSatelliteMedium);
+        oSupportSatelliteSmall.setUserObject("Small: " + countSupportOmniSatelliteSmall);
+
+        oSupportRail.setUserObject("Rail: " + countSupportOmniRail);
+        oSupportRailLarge.setUserObject("Large: " + countSupportOmniRailLarge);
+        oSupportRailMedium.setUserObject("Medium: " + countSupportOmniRailMedium);
+        oSupportRailSmall.setUserObject("Small: " + countSupportOmniRailSmall);
+
+        oSupportMaglev.setUserObject("Maglev: " + countSupportOmniMaglev);
+        oSupportMaglevLarge.setUserObject("Large: " + countSupportOmniMaglevLarge);
+        oSupportMaglevMedium.setUserObject("Medium: " + countSupportOmniMaglevMedium);
+        oSupportMaglevSmall.setUserObject("Small: " + countSupportOmniMaglevSmall);
+
         // Infantry Nodes
         int allInfantry = (countInfantry + countBA);
         inf.setUserObject("Infantry: " + allInfantry);
@@ -2032,6 +2247,7 @@ public class HangarReport extends Report {
 
         //endregion Tree Description Assignment
 
+        // TODO : Implement a function that sorts the units in alphabetical order
 
         overviewHangarTree.setSelectionPath(null);
         overviewHangarTree.expandPath(new TreePath(top.getPath()));
@@ -2071,7 +2287,8 @@ public class HangarReport extends Report {
     }
 
     public String getHangarTotals() {
-        return String.format("Total Units: %d\n  Present: %d\n  In Transit: %d\n  Damaged: %d\n  Deployed: %d", totalNumberOfUnits, countUnitsPresent, countUnitsInTransit, countDamagedUnits, countDeployedUnits);
+        return String.format("Total Units: %d\n  Present: %d\n  In Transit: %d\n  Damaged: %d\n  Deployed: %d",
+                totalNumberOfUnits, countUnitsPresent, countUnitsInTransit, countDamagedUnits, countDeployedUnits);
     }
 
     public JTextPane getReport() {
