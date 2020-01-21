@@ -5,19 +5,18 @@ Prime-UK
 Config:Biped Omnimech
 TechBase:Clan
 Era:3055
-Rules Level:5
+Rules Level:2
 
 Mass:55
-Engine:330 XL (Clan) Engine(IS)
-Structure:Clan Endo Steel
+Engine:330 XL Engine
+Structure:Endo Steel
 Myomer:Standard
 
 Heat Sinks:12 Double
-Base Chassis Heat Sinks:10
 Walk MP:6
 Jump MP:0
 
-Armor:Ferro-Fibrous(Clan)
+Armor:Ferro-Fibrous
 LA Armor:18
 RA Armor:18
 LT Armor:17
@@ -30,23 +29,20 @@ RTL Armor:9
 RTR Armor:9
 RTC Armor:11
 
-Weapons:7
-Streak SRM 6, Left Torso
-Streak SRM 6, Left Torso
-Streak SRM 4, Right Torso
-Streak SRM 4, Right Torso
-Streak SRM 6, Right Torso
-Streak SRM 6, Right Torso
-ER Small Laser, Center Torso
+Weapons:4
+2 CLStreakSRM4, Right Torso, Ammo:25
+2 CLStreakSRM6, Right Torso, Ammo:45
+2 CLStreakSRM6, Left Torso
+1 CLERSmallLaser, Center Torso
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
 Lower Arm Actuator
 Hand Actuator
-Clan Streak SRM 6 Ammo (omnipod)
-Clan Endo Steel
-Clan Ferro-Fibrous
+CLStreakSRM6 Ammo
+Endo Steel
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
@@ -58,11 +54,11 @@ Shoulder
 Upper Arm Actuator
 Lower Arm Actuator
 Hand Actuator
-Clan Streak SRM 6 Ammo (omnipod)
-Clan Streak SRM 4 Ammo (omnipod)
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+CLStreakSRM6 Ammo
+CLStreakSRM4 Ammo
+Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
@@ -70,29 +66,29 @@ Clan Ferro-Fibrous
 Left Torso:
 Fusion Engine
 Fusion Engine
-CLStreakSRM6 (omnipod)
-CLStreakSRM6 (omnipod)
-CLStreakSRM6 (omnipod)
-CLStreakSRM6 (omnipod)
-Clan Endo Steel
-Clan Endo Steel
-Clan Endo Steel
-Clan Endo Steel
-Clan Endo Steel
-Clan Endo Steel
+CLStreakSRM6
+CLStreakSRM6
+CLStreakSRM6
+CLStreakSRM6
+Endo Steel
+Endo Steel
+Endo Steel
+Endo Steel
+Endo Steel
+Endo Steel
 
 Right Torso:
 Fusion Engine
 Fusion Engine
-CLStreakSRM4 (omnipod)
-CLStreakSRM4 (omnipod)
-CLStreakSRM6 (omnipod)
-CLStreakSRM6 (omnipod)
-CLStreakSRM6 (omnipod)
-CLStreakSRM6 (omnipod)
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+CLStreakSRM4
+CLStreakSRM4
+CLStreakSRM6
+CLStreakSRM6
+CLStreakSRM6
+CLStreakSRM6
+Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
 -Empty-
 
 Center Torso:
@@ -106,14 +102,14 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-CLERSmallLaser (omnipod)
+CLERSmallLaser
 -Empty-
 
 Head:
 Life Support
 Sensors
 Cockpit
-Clan Streak SRM 6 Ammo (omnipod)
+CLStreakSRM6 Ammo
 Sensors
 Life Support
 -Empty-
@@ -128,8 +124,8 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
+CLDouble Heat Sink
+CLDouble Heat Sink
 -Empty-
 -Empty-
 -Empty-
@@ -142,13 +138,12 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
+CLDouble Heat Sink
+CLDouble Heat Sink
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
-
 

@@ -5,19 +5,18 @@ A-UK
 Config:Biped Omnimech
 TechBase:Clan
 Era:3058
-Rules Level:5
+Rules Level:2
 
 Mass:90
-Engine:270 Fusion (Clan) Engine(IS)
-Structure:IS Standard
+Engine:270 Fusion Engine
+Structure:Standard
 Myomer:Standard
 
 Heat Sinks:20 Double
-Base Chassis Heat Sinks:10
 Walk MP:3
 Jump MP:0
 
-Armor:Ferro-Fibrous(Clan)
+Armor:Ferro-Fibrous
 LA Armor:30
 RA Armor:30
 LT Armor:28
@@ -30,78 +29,70 @@ RTL Armor:10
 RTR Armor:10
 RTC Armor:14
 
-Weapons:15
-ER Medium Laser, Left Arm
-Large Pulse Laser, Left Arm
-ER Medium Laser, Right Arm
-Large Pulse Laser, Right Arm
-SRM 6, Left Torso
-SRM 6, Left Torso
-SRM 6, Left Torso
-SRM 6, Left Torso
-SRM 6, Left Torso
-SRM 6, Right Torso
-SRM 6, Right Torso
-SRM 6, Right Torso
-SRM 6, Right Torso
-SRM 6, Right Torso
-Narc, Center Torso
+Weapons:7
+1 CLERMediumLaser, Right Arm
+1 CLLargePulseLaser, Right Arm
+1 CLERMediumLaser, Left Arm
+1 CLLargePulseLaser, Left Arm
+5 CLSRM6, Right Torso, Ammo:60
+5 CLSRM6, Left Torso
+1 CLNarcBeacon, Center Torso, Ammo:6
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
 Lower Arm Actuator
-CLERMediumLaser (omnipod)
-CLLargePulseLaser (omnipod)
-CLLargePulseLaser (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
+CLERMediumLaser
+CLLargePulseLaser
+CLLargePulseLaser
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
 
 Right Arm:
 Shoulder
 Upper Arm Actuator
 Lower Arm Actuator
-CLERMediumLaser (omnipod)
-CLLargePulseLaser (omnipod)
-CLLargePulseLaser (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
+CLERMediumLaser
+CLLargePulseLaser
+CLLargePulseLaser
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
 
 Left Torso:
-CLSRM6 (omnipod)
-CLSRM6 (omnipod)
-CLSRM6 (omnipod)
-CLSRM6 (omnipod)
-CLSRM6 (omnipod)
-Clan Ammo SRM-6 (Clan) Narc-capable (omnipod)
-Clan Ammo SRM-6 (Clan) Narc-capable (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+CLSRM6
+CLSRM6
+CLSRM6
+CLSRM6
+CLSRM6
+CLSRM6 Ammo (Clan) Narc-capable
+CLSRM6 Ammo (Clan) Narc-capable
+CLDouble Heat Sink
+CLDouble Heat Sink
+Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
 
 Right Torso:
-CLSRM6 (omnipod)
-CLSRM6 (omnipod)
-CLSRM6 (omnipod)
-CLSRM6 (omnipod)
-CLSRM6 (omnipod)
-Clan Ammo SRM-6 (Clan) Narc-capable (omnipod)
-Clan Ammo SRM-6 (Clan) Narc-capable (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+CLSRM6
+CLSRM6
+CLSRM6
+CLSRM6
+CLSRM6
+CLSRM6 Ammo (Clan) Narc-capable
+CLSRM6 Ammo (Clan) Narc-capable
+CLDouble Heat Sink
+CLDouble Heat Sink
+Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
 
 Center Torso:
 Fusion Engine
@@ -114,14 +105,14 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-CLNarcBeacon (omnipod)
-Clan Ferro-Fibrous
+CLNarcBeacon
+Ferro-Fibrous
 
 Head:
 Life Support
 Sensors
 Cockpit
-CLNarc Pods (omnipod)
+CLNarc Pods
 Sensors
 Life Support
 -Empty-
@@ -136,8 +127,8 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
+CLDouble Heat Sink
+CLDouble Heat Sink
 -Empty-
 -Empty-
 -Empty-
@@ -150,13 +141,12 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
+CLDouble Heat Sink
+CLDouble Heat Sink
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
-
 

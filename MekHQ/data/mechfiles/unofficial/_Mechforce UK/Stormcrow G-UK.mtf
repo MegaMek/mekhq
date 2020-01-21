@@ -5,19 +5,18 @@ G-UK
 Config:Biped Omnimech
 TechBase:Clan
 Era:3050
-Rules Level:5
+Rules Level:2
 
 Mass:55
-Engine:330 XL (Clan) Engine(IS)
-Structure:Clan Endo Steel
+Engine:330 XL Engine
+Structure:Endo Steel
 Myomer:Standard
 
 Heat Sinks:13 Double
-Base Chassis Heat Sinks:10
 Walk MP:6
 Jump MP:0
 
-Armor:Ferro-Fibrous(Clan)
+Armor:Ferro-Fibrous
 LA Armor:18
 RA Armor:18
 LT Armor:17
@@ -30,21 +29,20 @@ RTL Armor:9
 RTR Armor:9
 RTC Armor:10
 
-Weapons:6
-Medium Pulse Laser, Left Arm
-Medium Pulse Laser, Left Arm
-Medium Pulse Laser, Left Arm
-Medium Pulse Laser, Left Arm
-ER PPC, Right Arm
-Streak SRM 6, Left Torso
+Weapons:5
+1 CLERPPC, Right Arm
+4 CLMediumPulseLaser, Left Arm
+1 CLActiveProbe, Right Torso
+1 CLStreakSRM6, Left Torso, Ammo:15
+1 CLECMSuite, Head
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
-CLMediumPulseLaser (omnipod)
-CLMediumPulseLaser (omnipod)
-CLMediumPulseLaser (omnipod)
-CLMediumPulseLaser (omnipod)
+CLMediumPulseLaser
+CLMediumPulseLaser
+CLMediumPulseLaser
+CLMediumPulseLaser
 -Empty-
 -Empty-
 -Empty-
@@ -55,10 +53,10 @@ CLMediumPulseLaser (omnipod)
 Right Arm:
 Shoulder
 Upper Arm Actuator
-CLERPPC (omnipod)
-CLERPPC (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
+CLERPPC
+CLERPPC
+CLDouble Heat Sink
+CLDouble Heat Sink
 -Empty-
 -Empty-
 -Empty-
@@ -69,30 +67,30 @@ CLDoubleHeatSink (omnipod)
 Left Torso:
 Fusion Engine
 Fusion Engine
-CLStreakSRM6 (omnipod)
-CLStreakSRM6 (omnipod)
-Clan Streak SRM 6 Ammo (omnipod)
-Clan Endo Steel
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLStreakSRM6
+CLStreakSRM6
+CLStreakSRM6 Ammo
 -Empty-
+Endo Steel
+Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
 
 Right Torso:
 Fusion Engine
 Fusion Engine
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLActiveProbe (omnipod)
-Clan Endo Steel
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+CLDouble Heat Sink
+CLDouble Heat Sink
+-Empty-
+CLActiveProbe
 -Empty-
 -Empty-
--Empty-
+Endo Steel
+Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
 
 Center Torso:
 Fusion Engine
@@ -105,14 +103,14 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-Clan Endo Steel
-Clan Ferro-Fibrous
+Endo Steel
+Ferro-Fibrous
 
 Head:
 Life Support
 Sensors
 Cockpit
-CLECMSuite (omnipod)
+CLECMSuite
 Sensors
 Life Support
 -Empty-
@@ -127,8 +125,8 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Clan Endo Steel
-Clan Endo Steel
+Endo Steel
+Endo Steel
 -Empty-
 -Empty-
 -Empty-
@@ -141,13 +139,12 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Clan Endo Steel
-Clan Endo Steel
+Endo Steel
+Endo Steel
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
-
 

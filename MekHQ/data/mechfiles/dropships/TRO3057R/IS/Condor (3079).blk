@@ -112,11 +112,8 @@ ISERMediumLaser
 (B) ISERLargeLaser
 ISERMediumLaser
 ISERMediumLaser
+MASH core component
 </Aft Equipment>
-
-<Hull Equipment>
-MASH Core Component
-</Hull Equipment>
 
 <structural_integrity>
 10

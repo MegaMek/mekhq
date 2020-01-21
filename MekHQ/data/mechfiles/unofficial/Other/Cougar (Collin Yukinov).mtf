@@ -5,19 +5,18 @@ Cougar
 Config:Biped Omnimech
 TechBase:Clan
 Era:3132
-Rules Level:5
+Rules Level:3
 
 Mass:35
-Engine:175 XL (Clan) Engine(IS)
-Structure:UNKNOWN
+Engine:175 XL Engine
+Structure:Composite
 Myomer:Standard
 
 Heat Sinks:10 Double
-Base Chassis Heat Sinks:7
 Walk MP:5
 Jump MP:7
 
-Armor:Ferro-Fibrous(Clan)
+Armor:Ferro-Fibrous
 LA Armor:11
 RA Armor:11
 LT Armor:12
@@ -31,16 +30,16 @@ RTR Armor:4
 RTC Armor:5
 
 Weapons:2
-ER PPC, Left Arm
-ER PPC, Right Arm
+1 CLERPPC, Left Arm
+1 CLERPPC, Right Arm
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
-CLERPPC (omnipod)
-CLERPPC (omnipod)
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+CLERPPC
+CLERPPC
+Ferro-Fibrous
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
@@ -51,10 +50,10 @@ Clan Ferro-Fibrous
 Right Arm:
 Shoulder
 Upper Arm Actuator
-CLERPPC (omnipod)
-CLERPPC (omnipod)
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+CLERPPC
+CLERPPC
+Ferro-Fibrous
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
@@ -65,27 +64,27 @@ Clan Ferro-Fibrous
 Left Torso:
 Fusion Engine
 Fusion Engine
-Clan Improved Jump Jet (omnipod)
-Clan Improved Jump Jet (omnipod)
-Clan Improved Jump Jet (omnipod)
-Clan Improved Jump Jet (omnipod)
-Clan Improved Jump Jet (omnipod)
-Clan Improved Jump Jet (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-Clan Ferro-Fibrous
+CLImprovedJump Jet
+CLImprovedJump Jet
+CLImprovedJump Jet
+CLImprovedJump Jet
+CLImprovedJump Jet
+CLImprovedJump Jet
+CLDouble Heat Sink
+CLDouble Heat Sink
+Ferro-Fibrous
 -Empty-
 
 Right Torso:
 Fusion Engine
 Fusion Engine
-Clan Improved Jump Jet (omnipod)
-Clan Improved Jump Jet (omnipod)
-Clan Improved Jump Jet (omnipod)
-Clan Improved Jump Jet (omnipod)
-Clan Improved Jump Jet (omnipod)
-Clan Improved Jump Jet (omnipod)
-Clan Ferro-Fibrous
+CLImprovedJump Jet
+CLImprovedJump Jet
+CLImprovedJump Jet
+CLImprovedJump Jet
+CLImprovedJump Jet
+CLImprovedJump Jet
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
@@ -101,14 +100,14 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-Clan Improved Jump Jet (omnipod)
-Clan Improved Jump Jet (omnipod)
+CLImprovedJump Jet
+CLImprovedJump Jet
 
 Head:
 Life Support
 Sensors
 Cockpit
-Clan Ferro-Fibrous
+Ferro-Fibrous
 Sensors
 Life Support
 -Empty-
@@ -123,8 +122,8 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
+CLDouble Heat Sink
+CLDouble Heat Sink
 -Empty-
 -Empty-
 -Empty-
@@ -137,13 +136,12 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
+CLDouble Heat Sink
+CLDouble Heat Sink
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
-
 

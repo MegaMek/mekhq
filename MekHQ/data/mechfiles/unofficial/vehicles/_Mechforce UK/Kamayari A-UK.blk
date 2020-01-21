@@ -2,103 +2,67 @@
 <BlockVersion>
 1
 </BlockVersion>
-
-##Write the version number just in case...
+#Write the version number just in case...
 <Version>
 MAM0
 </Version>
-
 <UnitType>
 Tank
 </UnitType>
-
 <Name>
 Kamayari
 </Name>
-
 <Model>
 A-UK
 </Model>
-
-<year>
-3058
-</year>
-
-<type>
-IS Level 5
-</type>
-
-<motion_type>
-Tracked
-</motion_type>
-
-<transporters>
-BattleArmorHandles - troopers:-1
-</transporters>
-
+<Tonnage>
+90
+</Tonnage>
 <cruiseMP>
 3
 </cruiseMP>
-
-<engine_type>
-2
-</engine_type>
-
-<armor_type>
-1
-</armor_type>
-
-<armor_tech>
--1
-</armor_tech>
-
-<omni>
-1
-</omni>
-
-<armor>
+<Armor>
 50
 45
 45
 25
 50
-</armor>
-
-<Body Equipment>
-IS MRM 30 Ammo:OMNI
-IS MRM 30 Ammo:OMNI
-IS MRM 30 Ammo:OMNI
-IS MRM 30 Ammo:OMNI
-IS MRM 40 Ammo:OMNI
-IS MRM 40 Ammo:OMNI
-ISC3SlaveUnit:OMNI
-</Body Equipment>
-
-<Front Equipment>
-MRM 40:OMNI
-Medium Laser:OMNI
-</Front Equipment>
-
-<Right Equipment>
-</Right Equipment>
-
-<Left Equipment>
-</Left Equipment>
-
-<Rear Equipment>
-</Rear Equipment>
-
+</Armor>
 <Turret Equipment>
-MRM 30:OMNI
-MRM 30:OMNI
-MRM 30:OMNI
+ISMRM30
+ISMRM30
+ISMRM30
 </Turret Equipment>
-
-<tonnage>
-90.0
-</tonnage>
-
-<baseChassisTurretWeight>
-3.0
-</baseChassisTurretWeight>
-
+<Front Equipment>
+ISMRM40
+ISMediumLaser
+</Front Equipment>
+<Body Equipment>
+ISMRM30 Ammo
+ISMRM30 Ammo
+ISMRM30 Ammo
+ISMRM30 Ammo
+ISMRM40 Ammo
+ISMRM40 Ammo
+ISC3SlaveUnit
+</Body Equipment>
+<type>
+IS
+</type>
+<year>
+3058
+</year>
+<internal_type>
+0
+</internal_type>
+<armor_type>
+1
+</armor_type>
+<engine_type>
+2
+</engine_type>
+<motion_type>
+Tracked
+</motion_type>
+<omni>
+</omni>

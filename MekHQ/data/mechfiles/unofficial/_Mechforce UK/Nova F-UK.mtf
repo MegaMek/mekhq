@@ -5,19 +5,18 @@ F-UK
 Config:Biped Omnimech
 TechBase:Clan
 Era:3050
-Rules Level:5
+Rules Level:2
 
 Mass:50
-Engine:250 XL (Clan) Engine(IS)
-Structure:IS Standard
+Engine:250 XL Engine
+Structure:Standard
 Myomer:Standard
 
 Heat Sinks:14 Double
-Base Chassis Heat Sinks:10
 Walk MP:5
 Jump MP:5
 
-Armor:Standard(Clan)
+Armor:Standard Armor
 LA Armor:16
 RA Armor:16
 LT Armor:16
@@ -31,15 +30,15 @@ RTR Armor:8
 RTC Armor:8
 
 Weapons:2
-Ultra AC/5, Left Arm
-LB 5-X AC, Right Arm
+1 CLLBXAC5, Right Arm, Ammo:20
+1 CLUltraAC5, Left Arm, Ammo:20
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
-CLUltraAC5 (omnipod)
-CLUltraAC5 (omnipod)
-CLUltraAC5 (omnipod)
+CLUltraAC5
+CLUltraAC5
+CLUltraAC5
 -Empty-
 -Empty-
 -Empty-
@@ -51,12 +50,12 @@ CLUltraAC5 (omnipod)
 Right Arm:
 Shoulder
 Upper Arm Actuator
-CLLBXAC5 (omnipod)
-CLLBXAC5 (omnipod)
-CLLBXAC5 (omnipod)
-CLLBXAC5 (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
+CLLBXAC5
+CLLBXAC5
+CLLBXAC5
+CLLBXAC5
+CLDouble Heat Sink
+CLDouble Heat Sink
 -Empty-
 -Empty-
 -Empty-
@@ -65,9 +64,9 @@ CLDoubleHeatSink (omnipod)
 Left Torso:
 Fusion Engine
 Fusion Engine
-CLDoubleHeatSink
-CLDoubleHeatSink
-Clan Ultra AC/5 Ammo (omnipod)
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLUltraAC5 Ammo
 -Empty-
 -Empty-
 -Empty-
@@ -79,11 +78,11 @@ Clan Ultra AC/5 Ammo (omnipod)
 Right Torso:
 Fusion Engine
 Fusion Engine
-CLDoubleHeatSink
-CLDoubleHeatSink
-CLDoubleHeatSink
-CLDoubleHeatSink
-Clan LB 5-X Cluster Ammo (omnipod)
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLLBXAC5 CL Ammo
 -Empty-
 -Empty-
 -Empty-
@@ -145,5 +144,4 @@ Jump Jet
 -Empty-
 -Empty-
 -Empty-
-
 

@@ -21,11 +21,11 @@ Black Eagle
 </Model>
 
 <year>
-2458
+2453
 </year>
 
 <originalBuildYear>
-2458
+2453
 </originalBuildYear>
 
 <type>
@@ -40,7 +40,7 @@ Spheroid
 mechbay:12.0:2
 1stclassquarters:50.0:0
 crewquarters:161.0:0
-cargobay:430.0:1:4
+cargobay:545.5:2:2
 </transporters>
 
 <SafeThrust>
@@ -62,10 +62,6 @@ cargobay:430.0:1:4
 <fuel>
 6819
 </fuel>
-
-<engine_type>
-1
-</engine_type>
 
 <armor_type>
 40
@@ -131,9 +127,6 @@ Medium Laser
 Medium Laser
 Medium Laser
 </Aft Equipment>
-
-<Hull Equipment>
-</Hull Equipment>
 
 <structural_integrity>
 16

@@ -5,19 +5,18 @@ F-UK
 Config:Biped Omnimech
 TechBase:Clan
 Era:3050
-Rules Level:5
+Rules Level:2
 
 Mass:35
-Engine:210 XL (Clan) Engine(IS)
-Structure:Clan Endo Steel
+Engine:210 XL Engine
+Structure:Endo Steel
 Myomer:Standard
 
 Heat Sinks:10 Double
-Base Chassis Heat Sinks:8
 Walk MP:6
 Jump MP:0
 
-Armor:Ferro-Fibrous(Clan)
+Armor:Ferro-Fibrous
 LA Armor:12
 RA Armor:12
 LT Armor:12
@@ -30,19 +29,18 @@ RTL Armor:4
 RTR Armor:4
 RTC Armor:6
 
-Weapons:4
-Medium Pulse Laser, Left Arm
-Medium Pulse Laser, Left Arm
-Ultra AC/10, Right Arm
-Flamer, Center Torso
+Weapons:3
+1 CLUltraAC10, Right Arm, Ammo:20
+2 CLMediumPulseLaser, Left Arm
+1 CLFlamer, Center Torso
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
 Lower Arm Actuator
-CLMediumPulseLaser (omnipod)
-CLMediumPulseLaser (omnipod)
-Clan Ferro-Fibrous
+CLMediumPulseLaser
+CLMediumPulseLaser
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
@@ -53,11 +51,11 @@ Clan Ferro-Fibrous
 Right Arm:
 Shoulder
 Upper Arm Actuator
-CLUltraAC10 (omnipod)
-CLUltraAC10 (omnipod)
-CLUltraAC10 (omnipod)
-CLUltraAC10 (omnipod)
-Clan Ferro-Fibrous
+CLUltraAC10
+CLUltraAC10
+CLUltraAC10
+CLUltraAC10
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
@@ -67,12 +65,12 @@ Clan Ferro-Fibrous
 Left Torso:
 Fusion Engine
 Fusion Engine
-CLDoubleHeatSink
-CLDoubleHeatSink
-Clan Ultra AC/10 Ammo (omnipod)
-Clan Endo Steel
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLUltraAC10 Ammo
+Endo Steel
+Ferro-Fibrous
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
@@ -81,12 +79,12 @@ Clan Ferro-Fibrous
 Right Torso:
 Fusion Engine
 Fusion Engine
-Clan Ultra AC/10 Ammo (omnipod)
-CLDoubleHeatSink
-CLDoubleHeatSink
-Clan Endo Steel
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+CLUltraAC10 Ammo
+CLDouble Heat Sink
+CLDouble Heat Sink
+Endo Steel
+Ferro-Fibrous
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
@@ -103,14 +101,14 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-Clan Endo Steel
+Endo Steel
 CLFlamer
 
 Head:
 Life Support
 Sensors
 Cockpit
-Clan Ferro-Fibrous
+Ferro-Fibrous
 Sensors
 Life Support
 -Empty-
@@ -125,8 +123,8 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Clan Endo Steel
-Clan Endo Steel
+Endo Steel
+Endo Steel
 -Empty-
 -Empty-
 -Empty-
@@ -139,13 +137,12 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Clan Endo Steel
-Clan Endo Steel
+Endo Steel
+Endo Steel
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
-
 

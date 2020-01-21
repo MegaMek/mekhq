@@ -21,11 +21,11 @@ Manatee
 </Model>
 
 <year>
-2403
+2465
 </year>
 
 <originalBuildYear>
-2403
+2449
 </originalBuildYear>
 
 <type>
@@ -37,9 +37,10 @@ Spheroid
 </motion_type>
 
 <transporters>
-cargobay:1044.0:1:1
-1stclassquarters:10.0:0
+2ndclassquarters:0.0:0
 crewquarters:35.0:0
+1stclassquarters:10.0:0
+cargobay:1040.0:1:1
 </transporters>
 
 <SafeThrust>
@@ -47,7 +48,7 @@ crewquarters:35.0:0
 </SafeThrust>
 
 <heatsinks>
-107
+129
 </heatsinks>
 
 <sink_type>
@@ -89,9 +90,6 @@ crewquarters:35.0:0
 <Aft Equipment>
 </Aft Equipment>
 
-<Hull Equipment>
-</Hull Equipment>
-
 <structural_integrity>
 10
 </structural_integrity>
@@ -103,10 +101,6 @@ TRO 3075 - Age of War
 <tonnage>
 1900.0
 </tonnage>
-
-<designtype>
-1
-</designtype>
 
 <crew>
 5

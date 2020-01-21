@@ -5,19 +5,18 @@ C-UK
 Config:Biped Omnimech
 TechBase:Clan
 Era:3050
-Rules Level:5
+Rules Level:2
 
 Mass:80
-Engine:320 XL (Clan) Engine(IS)
-Structure:IS Standard
-Myomer:Standard
+Engine:320 XL Engine
+Structure:Standard
+Myomer:MASC
 
 Heat Sinks:18 Double
-Base Chassis Heat Sinks:12
 Walk MP:4
 Jump MP:4
 
-Armor:Ferro-Fibrous(Clan)
+Armor:Ferro-Fibrous
 LA Armor:26
 RA Armor:26
 LT Armor:26
@@ -31,35 +30,35 @@ RTR Armor:8
 RTC Armor:9
 
 Weapons:4
-ER PPC, Left Arm
-ER PPC, Right Arm
-LRM 15, Left Torso
-LRM 15, Right Torso
+1 CLERPPC, Right Arm
+1 CLERPPC, Left Arm
+1 CLLRM15, Right Torso, Ammo:16
+1 CLLRM15, Left Torso
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
-CLERPPC (omnipod)
-CLERPPC (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+CLERPPC
+CLERPPC
+CLDouble Heat Sink
+CLDouble Heat Sink
 -Empty-
 -Empty-
+Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
 
 Right Arm:
 Shoulder
 Upper Arm Actuator
-CLERPPC (omnipod)
-CLERPPC (omnipod)
+CLERPPC
+CLERPPC
 CLMASC
 CLMASC
 CLMASC
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
+CLDouble Heat Sink
+CLDouble Heat Sink
 -Empty-
 -Empty-
 -Empty-
@@ -67,29 +66,29 @@ CLDoubleHeatSink (omnipod)
 Left Torso:
 Fusion Engine
 Fusion Engine
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLLRM15 (omnipod)
-CLLRM15 (omnipod)
-CLArtemisIV (omnipod)
-Clan Ammo LRM-15 (Clan) Artemis-capable (omnipod)
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLLRM15
+CLLRM15
+CLArtemisIV
+CLLRM15 Ammo (Clan) Artemis-capable
 
 Right Torso:
 Fusion Engine
 Fusion Engine
-CLTargeting Computer (omnipod)
-CLTargeting Computer (omnipod)
-CLTargeting Computer (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLLRM15 (omnipod)
-CLLRM15 (omnipod)
-CLArtemisIV (omnipod)
-Clan Ammo LRM-15 (Clan) Artemis-capable (omnipod)
+CLTargeting Computer
+CLTargeting Computer
+CLTargeting Computer
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLLRM15
+CLLRM15
+CLArtemisIV
+CLLRM15 Ammo (Clan) Artemis-capable
 -Empty-
 
 Center Torso:
@@ -103,14 +102,14 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
 
 Head:
 Life Support
 Sensors
 Cockpit
-Clan Ferro-Fibrous
+Ferro-Fibrous
 Sensors
 Life Support
 -Empty-
@@ -125,8 +124,8 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Jump Jet (omnipod)
-Jump Jet (omnipod)
+Jump Jet
+Jump Jet
 -Empty-
 -Empty-
 -Empty-
@@ -139,13 +138,12 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Jump Jet (omnipod)
-Jump Jet (omnipod)
+Jump Jet
+Jump Jet
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
-
 

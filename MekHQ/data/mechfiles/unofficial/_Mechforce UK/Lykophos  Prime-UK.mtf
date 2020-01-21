@@ -5,19 +5,18 @@ Prime-UK
 Config:Biped Omnimech
 TechBase:Clan
 Era:3050
-Rules Level:5
+Rules Level:2
 
 Mass:80
-Engine:320 XL (Clan) Engine(IS)
-Structure:IS Standard
-Myomer:Standard
+Engine:320 XL Engine
+Structure:Standard
+Myomer:MASC
 
 Heat Sinks:16 Double
-Base Chassis Heat Sinks:12
 Walk MP:4
 Jump MP:4
 
-Armor:Ferro-Fibrous(Clan)
+Armor:Ferro-Fibrous
 LA Armor:26
 RA Armor:26
 LT Armor:26
@@ -30,41 +29,35 @@ RTL Armor:8
 RTR Armor:8
 RTC Armor:9
 
-Weapons:12
-Large Pulse Laser, Left Arm
-Large Pulse Laser, Right Arm
-ER Small Laser, Left Torso
-ER Small Laser, Left Torso
-Streak SRM 4, Left Torso
-Streak SRM 4, Left Torso
-Streak SRM 4, Left Torso
-ER Small Laser, Right Torso
-ER Small Laser, Right Torso
-Streak SRM 4, Right Torso
-Streak SRM 4, Right Torso
-Streak SRM 4, Right Torso
+Weapons:6
+1 CLLargePulseLaser, Right Arm
+1 CLLargePulseLaser, Left Arm
+2 CLERSmallLaser, Right Torso
+3 CLStreakSRM4, Right Torso, Ammo:50
+2 CLERSmallLaser, Left Torso
+3 CLStreakSRM4, Left Torso
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
 Lower Arm Actuator
 Hand Actuator
-CLLargePulseLaser (omnipod)
-CLLargePulseLaser (omnipod)
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+CLLargePulseLaser
+CLLargePulseLaser
 -Empty-
 -Empty-
+Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
 
 Right Arm:
 Shoulder
 Upper Arm Actuator
 Lower Arm Actuator
 Hand Actuator
-CLLargePulseLaser (omnipod)
-CLLargePulseLaser (omnipod)
+CLLargePulseLaser
+CLLargePulseLaser
 CLMASC
 CLMASC
 CLMASC
@@ -75,30 +68,30 @@ CLMASC
 Left Torso:
 Fusion Engine
 Fusion Engine
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLERSmallLaser (omnipod)
-CLERSmallLaser (omnipod)
-CLStreakSRM4 (omnipod)
-CLStreakSRM4 (omnipod)
-CLStreakSRM4 (omnipod)
-Clan Streak SRM 4 Ammo (omnipod)
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLERSmallLaser
+CLERSmallLaser
+CLStreakSRM4
+CLStreakSRM4
+CLStreakSRM4
+CLStreakSRM4 Ammo
 
 Right Torso:
 Fusion Engine
 Fusion Engine
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLERSmallLaser (omnipod)
-CLERSmallLaser (omnipod)
-CLStreakSRM4 (omnipod)
-CLStreakSRM4 (omnipod)
-CLStreakSRM4 (omnipod)
-Clan Streak SRM 4 Ammo (omnipod)
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLERSmallLaser
+CLERSmallLaser
+CLStreakSRM4
+CLStreakSRM4
+CLStreakSRM4
+CLStreakSRM4 Ammo
 
 Center Torso:
 Fusion Engine
@@ -111,14 +104,14 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
 
 Head:
 Life Support
 Sensors
 Cockpit
-Clan Ferro-Fibrous
+Ferro-Fibrous
 Sensors
 Life Support
 -Empty-
@@ -133,8 +126,8 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Jump Jet (omnipod)
-Jump Jet (omnipod)
+Jump Jet
+Jump Jet
 -Empty-
 -Empty-
 -Empty-
@@ -147,13 +140,12 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Jump Jet (omnipod)
-Jump Jet (omnipod)
+Jump Jet
+Jump Jet
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
-
 

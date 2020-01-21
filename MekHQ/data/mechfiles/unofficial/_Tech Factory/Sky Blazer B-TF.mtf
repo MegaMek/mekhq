@@ -5,19 +5,18 @@ B-TF
 Config:Biped Omnimech
 TechBase:Clan
 Era:3058
-Rules Level:5
+Rules Level:2
 
 Mass:35
-Engine:245 XL (Clan) Engine(IS)
-Structure:Clan Endo Steel
+Engine:245 XL Engine
+Structure:Endo Steel
 Myomer:Standard
 
 Heat Sinks:11 Double
-Base Chassis Heat Sinks:9
 Walk MP:7
 Jump MP:0
 
-Armor:Ferro-Fibrous(Clan)
+Armor:Ferro-Fibrous
 LA Armor:11
 RA Armor:11
 LT Armor:11
@@ -30,23 +29,22 @@ RTL Armor:5
 RTR Armor:5
 RTC Armor:6
 
-Weapons:6
-LRM 10, Left Arm
-Streak SRM 4, Left Arm
-LRM 10, Right Arm
-Streak SRM 4, Right Arm
-ER Medium Laser, Center Torso
-ER Medium Laser, Center Torso
+Weapons:5
+1 CLLRM10, Right Arm, Ammo:24
+1 CLStreakSRM4, Right Arm, Ammo:25
+1 CLLRM10, Left Arm
+1 CLStreakSRM4, Left Arm
+2 CLERMediumLaser, Center Torso
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
 Lower Arm Actuator
-CLLRM10 (omnipod)
-Clan Ammo LRM-10 (omnipod)
-CLStreakSRM4 (omnipod)
-Clan Endo Steel
-Clan Endo Steel
+CLLRM10
+CLLRM10 Ammo
+CLStreakSRM4
+Endo Steel
+Endo Steel
 -Empty-
 -Empty-
 -Empty-
@@ -56,11 +54,11 @@ Right Arm:
 Shoulder
 Upper Arm Actuator
 Lower Arm Actuator
-CLLRM10 (omnipod)
-Clan Ammo LRM-10 (omnipod)
-CLStreakSRM4 (omnipod)
-Clan Endo Steel
-Clan Endo Steel
+CLLRM10
+CLLRM10 Ammo
+CLStreakSRM4
+Endo Steel
+Endo Steel
 -Empty-
 -Empty-
 -Empty-
@@ -69,11 +67,11 @@ Clan Endo Steel
 Left Torso:
 Fusion Engine
 Fusion Engine
-CLDoubleHeatSink
-CLDoubleHeatSink
-Clan Endo Steel
-Clan Endo Steel
-Clan Endo Steel
+CLDouble Heat Sink
+CLDouble Heat Sink
+Endo Steel
+Endo Steel
+Endo Steel
 -Empty-
 -Empty-
 -Empty-
@@ -83,11 +81,11 @@ Clan Endo Steel
 Right Torso:
 Fusion Engine
 Fusion Engine
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+CLDouble Heat Sink
+CLDouble Heat Sink
+Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
@@ -105,14 +103,14 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-CLERMediumLaser (omnipod)
-CLERMediumLaser (omnipod)
+CLERMediumLaser
+CLERMediumLaser
 
 Head:
 Life Support
 Sensors
 Cockpit
-Clan Streak SRM 4 Ammo (omnipod)
+CLStreakSRM4 Ammo
 Sensors
 Life Support
 -Empty-
@@ -127,8 +125,8 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
@@ -141,13 +139,12 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+Ferro-Fibrous
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
-
 

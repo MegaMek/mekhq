@@ -3,7 +3,7 @@
 1
 </BlockVersion>
 
-##Write the version number just in case...
+#Write the version number just in case...
 <Version>
 MAM0
 </Version>
@@ -20,38 +20,40 @@ Liberty Jumpship
 (Standard)
 </Model>
 
-<year>
-2469
-</year>
+<Tonnage>
+203000
+</Tonnage>
 
-<originalBuildYear>
-2469
-</originalBuildYear>
+<Armor>
+6
+6
+6
+6
+6
+6
+</Armor>
 
-<type>
-IS Level 4
-</type>
+<Nose Equipment>
+</Nose Equipment>
 
-<motion_type>
-Aerodyne
-</motion_type>
+<Front Left Side Equipment>
+</Front Left Side Equipment>
 
-<transporters>
-smallcraftbay:2.0:2:1
-cargobay:566.5:1:2
-1stclassquarters:0.0:0
-crewquarters:49.0:0
-2ndclassquarters:0.0:0
-steeragequarters:300.0:0
-dockingcollar
-dockingcollar
-dockingcollar
-dockingcollar
-</transporters>
+<Front Right Side Equipment> 
+</Front Right Side Equipment>
 
-<SafeThrust>
-0
-</SafeThrust>
+<Aft Left Side Equipment>
+</Aft Left Side Equipment>
+
+<Aft Right Side Equipment> 
+</Aft Right Side Equipment>
+
+<Aft Equipment> 
+</Aft Equipment>
+
+<structural_integrity>
+1
+</structural_integrity>
 
 <heatsinks>
 114
@@ -62,100 +64,54 @@ dockingcollar
 </sink_type>
 
 <fuel>
-1500
+300
 </fuel>
 
-<engine_type>
-1
-</engine_type>
+<type>
+IS Level 4
+</type>
+
+<year>
+2461
+</year>
+
+<internal_type>
+0
+</internal_type>
 
 <armor_type>
-41
+0
 </armor_type>
 
-<armor_tech>
-7
-</armor_tech>
+<transporters>
+SmallCraftBay:2:2
+CargoBay:566.5:1
+</transporters>
 
-<armor>
-6
-6
-6
-6
-6
-6
-</armor>
+<docking_collar>
+4
+</docking_collar>
 
-<Nose Equipment>
-</Nose Equipment>
-
-<Left Front Side Equipment>
-</Left Front Side Equipment>
-
-<Right Front Side Equipment>
-</Right Front Side Equipment>
-
-<Aft Equipment>
-</Aft Equipment>
-
-<Aft Left Side Equipment>
-</Aft Left Side Equipment>
-
-<Aft Right Side Equipment>
-</Aft Right Side Equipment>
-
-<Hull Equipment>
-</Hull Equipment>
-
-<structural_integrity>
+<grav_deck>
 1
-</structural_integrity>
-
-<source>
-XTRO Primitives III - Age of War
-</source>
-
-<tonnage>
-203000.0
-</tonnage>
-
-<sail>
-1
-</sail>
-
-<grav_decks>
-45
-</grav_decks>
-
-<crew>
-55
-</crew>
-
-<officers>
-7
-</officers>
-
-<gunners>
-0
-</gunners>
-
-<passengers>
-22
-</passengers>
-
-<marines>
-0
-</marines>
-
-<battlearmor>
-0
-</battlearmor>
-
-<life_boat>
-5
-</life_boat>
+</grav_deck>
 
 <escape_pod>
 4
 </escape_pod>
 
+<life_boat>
+5
+</life_boat>
+
+<crew>
+55
+</crew>
+
+<passengers>
+22
+</passengers>
+
+<source>
+XTRO Primitives III - Age of War
+</source>

@@ -5,19 +5,18 @@ MC-J
 Config:Biped Omnimech
 TechBase:Clan
 Era:3059
-Rules Level:5
+Rules Level:2
 
 Mass:30
-Engine:180 XL (Clan) Engine(IS)
-Structure:Clan Endo Steel
+Engine:180 XL Engine
+Structure:Endo Steel
 Myomer:Standard
 
 Heat Sinks:10 Double
-Base Chassis Heat Sinks:7
 Walk MP:6
 Jump MP:6
 
-Armor:Ferro-Fibrous(Clan)
+Armor:Ferro-Fibrous
 LA Armor:8
 RA Armor:8
 LT Armor:10
@@ -31,21 +30,21 @@ RTR Armor:4
 RTC Armor:4
 
 Weapons:4
-Streak SRM 2, Left Arm
-Ultra AC/5, Right Arm
-ER Medium Laser, Left Torso
-ER Medium Laser, Right Torso
+1 CLUltraAC5, Right Arm, Ammo:20
+1 CLStreakSRM2, Left Arm, Ammo:50
+1 CLERMediumLaser, Right Torso
+1 CLERMediumLaser, Left Torso
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
 Lower Arm Actuator
-CLStreakSRM2 (omnipod)
-Clan Streak SRM 2 Ammo (omnipod)
-Clan Endo Steel
-Clan Endo Steel
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+CLStreakSRM2
+CLStreakSRM2 Ammo
+Endo Steel
+Endo Steel
+Ferro-Fibrous
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
@@ -53,26 +52,26 @@ Clan Ferro-Fibrous
 Right Arm:
 Shoulder
 Upper Arm Actuator
-CLUltraAC5 (omnipod)
-CLUltraAC5 (omnipod)
-CLUltraAC5 (omnipod)
-Clan Ultra AC/5 Ammo (omnipod)
-Clan Endo Steel
-Clan Endo Steel
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+CLUltraAC5
+CLUltraAC5
+CLUltraAC5
+CLUltraAC5 Ammo
+Endo Steel
+Endo Steel
+Ferro-Fibrous
+Ferro-Fibrous
 -Empty-
 -Empty-
 
 Left Torso:
 Fusion Engine
 Fusion Engine
-CLERMediumLaser (omnipod)
-CLDoubleHeatSink
-CLDoubleHeatSink
-Clan Endo Steel
-Clan Ferro-Fibrous
-Clan Ferro-Fibrous
+CLERMediumLaser
+CLDouble Heat Sink
+CLDouble Heat Sink
+Endo Steel
+Ferro-Fibrous
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
@@ -81,14 +80,14 @@ Clan Ferro-Fibrous
 Right Torso:
 Fusion Engine
 Fusion Engine
-CLERMediumLaser (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-Clan Endo Steel
-Clan Endo Steel
-Clan Ferro-Fibrous
+CLERMediumLaser
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+Endo Steel
+Endo Steel
+Ferro-Fibrous
 -Empty-
 -Empty-
 
@@ -103,8 +102,8 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-Jump Jet (omnipod)
-Jump Jet (omnipod)
+Jump Jet
+Jump Jet
 
 Head:
 Life Support
@@ -125,8 +124,8 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Jump Jet (omnipod)
-Jump Jet (omnipod)
+Jump Jet
+Jump Jet
 -Empty-
 -Empty-
 -Empty-
@@ -139,13 +138,12 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Jump Jet (omnipod)
-Jump Jet (omnipod)
+Jump Jet
+Jump Jet
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
-
 

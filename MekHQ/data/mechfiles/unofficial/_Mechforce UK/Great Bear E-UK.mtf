@@ -5,19 +5,18 @@ E-UK
 Config:Biped Omnimech
 TechBase:Clan
 Era:3060
-Rules Level:5
+Rules Level:2
 
 Mass:100
-Engine:300 XL (Clan) Engine(IS)
-Structure:IS Standard
+Engine:300 XL Engine
+Structure:Standard
 Myomer:Standard
 
 Heat Sinks:17 Double
-Base Chassis Heat Sinks:12
 Walk MP:3
 Jump MP:0
 
-Armor:Standard(Clan)
+Armor:Standard Armor
 LA Armor:34
 RA Armor:34
 LT Armor:25
@@ -30,73 +29,72 @@ RTL Armor:16
 RTR Armor:16
 RTC Armor:17
 
-Weapons:10
-ATM 12, Left Arm
-ATM 12, Right Arm
-ER Medium Laser, Right Arm
-ATM 12, Left Torso
-ER Medium Laser, Left Torso
-ER Medium Laser, Left Torso
-ER Medium Laser, Left Torso
-ATM 12, Right Torso
-Large Pulse Laser, Right Torso
-ER Medium Laser, Right Torso
+Weapons:9
+1 CLATM12, Right Arm, Ammo:40
+1 CLERMediumLaser, Right Arm
+1 CLATM12, Left Arm
+1 CLATM12, Right Torso
+1 CLLargePulseLaser, Right Torso
+1 CLERMediumLaser, Right Torso
+1 CLATM12, Left Torso
+3 CLERMediumLaser, Left Torso
+1 CLECMSuite, Head
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
-CLATM12 (omnipod)
-CLATM12 (omnipod)
-CLATM12 (omnipod)
-CLATM12 (omnipod)
-CLATM12 (omnipod)
-Clan Ammo ATM-12 ER (omnipod)
-Clan Ammo ATM-12 (omnipod)
-Clan Ammo ATM-12 HE (omnipod)
-Clan Ammo ATM-12 (omnipod)
+CLATM12
+CLATM12
+CLATM12
+CLATM12
+CLATM12
+CLATM12 ER Ammo
+CLATM12 Ammo
+CLATM12 HE Ammo
+CLATM12 Ammo
 -Empty-
 
 Right Arm:
 Shoulder
 Upper Arm Actuator
-CLATM12 (omnipod)
-CLATM12 (omnipod)
-CLATM12 (omnipod)
-CLATM12 (omnipod)
-CLATM12 (omnipod)
-Clan Ammo ATM-12 ER (omnipod)
-Clan Ammo ATM-12 (omnipod)
-Clan Ammo ATM-12 HE (omnipod)
-Clan Ammo ATM-12 (omnipod)
-CLERMediumLaser (omnipod)
+CLATM12
+CLATM12
+CLATM12
+CLATM12
+CLATM12
+CLATM12 ER Ammo
+CLATM12 Ammo
+CLATM12 HE Ammo
+CLATM12 Ammo
+CLERMediumLaser
 
 Left Torso:
 Fusion Engine
 Fusion Engine
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLATM12 (omnipod)
-CLATM12 (omnipod)
-CLATM12 (omnipod)
-CLATM12 (omnipod)
-CLATM12 (omnipod)
-CLERMediumLaser (omnipod)
-CLERMediumLaser (omnipod)
-CLERMediumLaser (omnipod)
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLATM12
+CLATM12
+CLATM12
+CLATM12
+CLATM12
+CLERMediumLaser
+CLERMediumLaser
+CLERMediumLaser
 
 Right Torso:
 Fusion Engine
 Fusion Engine
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLATM12 (omnipod)
-CLATM12 (omnipod)
-CLATM12 (omnipod)
-CLATM12 (omnipod)
-CLATM12 (omnipod)
-CLLargePulseLaser (omnipod)
-CLLargePulseLaser (omnipod)
-CLERMediumLaser (omnipod)
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLATM12
+CLATM12
+CLATM12
+CLATM12
+CLATM12
+CLLargePulseLaser
+CLLargePulseLaser
+CLERMediumLaser
 
 Center Torso:
 Fusion Engine
@@ -109,14 +107,14 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
+CLDouble Heat Sink
+CLDouble Heat Sink
 
 Head:
 Life Support
 Sensors
 Cockpit
-CLECMSuite (omnipod)
+CLECMSuite
 Sensors
 Life Support
 -Empty-
@@ -131,8 +129,8 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
+CLDouble Heat Sink
+CLDouble Heat Sink
 -Empty-
 -Empty-
 -Empty-
@@ -145,13 +143,12 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
+CLDouble Heat Sink
+CLDouble Heat Sink
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
-
 

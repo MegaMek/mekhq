@@ -24,10 +24,6 @@ Clan Medium Battle Armor
 3071
 </year>
 
-<originalBuildYear>
-3071
-</originalBuildYear>
-
 <type>
 Clan Level 2
 </type>
@@ -35,9 +31,6 @@ Clan Level 2
 <motion_type>
 Jump
 </motion_type>
-
-<transporters>
-</transporters>
 
 <cruiseMP>
 1
@@ -52,16 +45,13 @@ Jump
 </armor_tech>
 
 <Point Equipment>
-BAJumpBooster:Body
+Clan Ammo SRM-3:LA:Shots1#
+CLBAJumpBooster:Body
 BASearchlight:LA
 BABasicManipulator:RA
 BAHeavyBattleClaw:LA
 CLBAERMicroLaser:RA
-CLBASRM3 (OS):Body
-SwarmMek
-SwarmWeaponMek
-StopSwarm
-LegAttack
+Clan BA SRM 3 (OS):Body
 </Point Equipment>
 
 <Trooper 1 Equipment>

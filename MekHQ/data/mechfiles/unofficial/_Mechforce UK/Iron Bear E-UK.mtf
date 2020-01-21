@@ -5,19 +5,18 @@ E-UK
 Config:Biped Omnimech
 TechBase:Clan
 Era:3055
-Rules Level:5
+Rules Level:2
 
 Mass:50
-Engine:300 XL (Clan) Engine(IS)
-Structure:Clan Endo Steel
+Engine:300 XL Engine
+Structure:Endo Steel
 Myomer:Standard
 
 Heat Sinks:12 Double
-Base Chassis Heat Sinks:12
 Walk MP:6
 Jump MP:0
 
-Armor:Standard(Clan)
+Armor:Standard Armor
 LA Armor:14
 RA Armor:14
 LT Armor:15
@@ -30,50 +29,46 @@ RTL Armor:7
 RTR Armor:7
 RTC Armor:7
 
-Weapons:9
-Machine Gun, Left Arm
-Machine Gun, Left Arm
-Gauss Rifle, Right Arm
-ER Medium Laser, Left Torso
-ER Medium Laser, Left Torso
-ER Medium Laser, Right Torso
-ER Medium Laser, Right Torso
-ER Medium Laser, Center Torso
-ER Medium Laser, Center Torso
+Weapons:5
+1 CLGaussRifle, Right Arm, Ammo:16
+2 CLMG, Left Arm, Ammo:100
+2 CLERMediumLaser, Right Torso
+2 CLERMediumLaser, Left Torso
+2 CLERMediumLaser, Center Torso
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
 Lower Arm Actuator
 Hand Actuator
-CLMG (omnipod)
-CLMG (omnipod)
-Clan Machine Gun Ammo - Half (omnipod)
-Clan Endo Steel
-Clan Endo Steel
-Clan Endo Steel
+CLMG
+CLMG
+CLMG Ammo (100)
 -Empty-
 -Empty-
+Endo Steel
+Endo Steel
+Endo Steel
 
 Right Arm:
 Shoulder
 Upper Arm Actuator
-CLGaussRifle (omnipod)
-CLGaussRifle (omnipod)
-CLGaussRifle (omnipod)
-CLGaussRifle (omnipod)
-CLGaussRifle (omnipod)
-CLGaussRifle (omnipod)
-Clan Endo Steel
-Clan Endo Steel
-Clan Endo Steel
+CLGaussRifle
+CLGaussRifle
+CLGaussRifle
+CLGaussRifle
+CLGaussRifle
+CLGaussRifle
 -Empty-
+Endo Steel
+Endo Steel
+Endo Steel
 
 Left Torso:
 Fusion Engine
 Fusion Engine
-CLERMediumLaser (omnipod)
-CLERMediumLaser (omnipod)
+CLERMediumLaser
+CLERMediumLaser
 -Empty-
 -Empty-
 -Empty-
@@ -86,10 +81,10 @@ CLERMediumLaser (omnipod)
 Right Torso:
 Fusion Engine
 Fusion Engine
-Clan Gauss Ammo (omnipod)
-Clan Gauss Ammo (omnipod)
-CLERMediumLaser (omnipod)
-CLERMediumLaser (omnipod)
+CLGauss Ammo
+CLGauss Ammo
+CLERMediumLaser
+CLERMediumLaser
 -Empty-
 -Empty-
 -Empty-
@@ -108,14 +103,14 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-CLERMediumLaser (omnipod)
-CLERMediumLaser (omnipod)
+CLERMediumLaser
+CLERMediumLaser
 
 Head:
 Life Support
 Sensors
 Cockpit
-Clan Endo Steel
+Endo Steel
 Sensors
 Life Support
 -Empty-
@@ -152,5 +147,4 @@ Foot Actuator
 -Empty-
 -Empty-
 -Empty-
-
 

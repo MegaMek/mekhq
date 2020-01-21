@@ -5,19 +5,18 @@ MC-W
 Config:Biped Omnimech
 TechBase:Clan
 Era:3059
-Rules Level:5
+Rules Level:2
 
 Mass:45
-Engine:270 XL (Clan) Engine(IS)
-Structure:Clan Endo Steel
+Engine:270 XL Engine
+Structure:Endo Steel
 Myomer:Standard
 
 Heat Sinks:13 Double
-Base Chassis Heat Sinks:10
 Walk MP:6
 Jump MP:0
 
-Armor:Ferro-Fibrous(Clan)
+Armor:Ferro-Fibrous
 LA Armor:12
 RA Armor:12
 LT Armor:16
@@ -31,19 +30,19 @@ RTR Armor:4
 RTC Armor:5
 
 Weapons:4
-Large Pulse Laser, Left Arm
-Large Pulse Laser, Right Arm
-Large Pulse Laser, Center Torso
-ER Medium Laser, Head
+1 CLLargePulseLaser, Right Arm
+1 CLLargePulseLaser, Left Arm
+1 CLLargePulseLaser, Center Torso
+1 CLERMediumLaser, Head
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
 Lower Arm Actuator
-CLLargePulseLaser (omnipod)
-CLLargePulseLaser (omnipod)
-Clan Endo Steel
-Clan Ferro-Fibrous
+CLLargePulseLaser
+CLLargePulseLaser
+Endo Steel
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
@@ -54,10 +53,10 @@ Right Arm:
 Shoulder
 Upper Arm Actuator
 Lower Arm Actuator
-CLLargePulseLaser (omnipod)
-CLLargePulseLaser (omnipod)
-Clan Endo Steel
-Clan Ferro-Fibrous
+CLLargePulseLaser
+CLLargePulseLaser
+Endo Steel
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
@@ -67,12 +66,12 @@ Clan Ferro-Fibrous
 Left Torso:
 Fusion Engine
 Fusion Engine
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-Clan Endo Steel
-Clan Ferro-Fibrous
-Clan Endo Steel
-Clan Ferro-Fibrous
+CLDouble Heat Sink
+CLDouble Heat Sink
+Endo Steel
+Ferro-Fibrous
+Endo Steel
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
@@ -81,12 +80,12 @@ Clan Ferro-Fibrous
 Right Torso:
 Fusion Engine
 Fusion Engine
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-Clan Endo Steel
-Clan Ferro-Fibrous
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLDouble Heat Sink
+Endo Steel
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
@@ -103,14 +102,14 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-CLLargePulseLaser (omnipod)
-CLLargePulseLaser (omnipod)
+CLLargePulseLaser
+CLLargePulseLaser
 
 Head:
 Life Support
 Sensors
 Cockpit
-CLERMediumLaser (omnipod)
+CLERMediumLaser
 Sensors
 Life Support
 -Empty-
@@ -125,8 +124,8 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Clan Endo Steel
-Clan Ferro-Fibrous
+Endo Steel
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
@@ -139,13 +138,12 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Clan Endo Steel
-Clan Ferro-Fibrous
+Endo Steel
+Ferro-Fibrous
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
-
 

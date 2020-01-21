@@ -24,10 +24,6 @@ D 'Raubvogel'
 3086
 </year>
 
-<originalBuildYear>
-3086
-</originalBuildYear>
-
 <type>
 IS Level 2
 </type>
@@ -35,9 +31,6 @@ IS Level 2
 <motion_type>
 Aerodyne
 </motion_type>
-
-<transporters>
-</transporters>
 
 <SafeThrust>
 4
@@ -104,11 +97,10 @@ IS Gauss Ammo:OMNI
 IS Gauss Ammo:OMNI
 IS Ultra AC/2 Ammo:OMNI
 IS Ultra AC/2 Ammo:OMNI
-ISCASE
+ISCASE:OMNI
+Advanced Fire Control
 Armored Chassis
 STOLChassisMod
-OmniChassisMod
-Advanced Fire Control
 </Body Equipment>
 
 <barrating>
@@ -126,8 +118,4 @@ TRO 3085
 <tonnage>
 200.0
 </tonnage>
-
-<baseChassisFireConWeight>
-5.5
-</baseChassisFireConWeight>
 

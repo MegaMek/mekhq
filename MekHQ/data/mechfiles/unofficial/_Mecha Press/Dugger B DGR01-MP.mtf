@@ -5,19 +5,18 @@ DGR01-MP
 Config:Biped Omnimech
 TechBase:Inner Sphere
 Era:3050
-Rules Level:5
+Rules Level:2
 
 Mass:45
-Engine:225 Fusion Engine(IS)
-Structure:IS Standard
+Engine:225 Fusion Engine
+Structure:Standard
 Myomer:Standard
 
 Heat Sinks:10 Single
-Base Chassis Heat Sinks:9
 Walk MP:5
 Jump MP:5
 
-Armor:Standard(Inner Sphere)
+Armor:Standard Armor
 LA Armor:14
 RA Armor:14
 LT Armor:16
@@ -30,24 +29,22 @@ RTL Armor:6
 RTR Armor:6
 RTC Armor:7
 
-Weapons:7
-Medium Pulse Laser, Left Arm
-Medium Pulse Laser, Left Arm
-Medium Pulse Laser, Left Arm
-Medium Pulse Laser, Left Arm
-Medium Laser, Left Torso
-Medium Laser, Right Torso
-TAG, Right Torso
+Weapons:5
+4 ISMediumPulseLaser, Left Arm
+1 ISMediumLaser, Right Torso
+1 ISTAG, Right Torso
+1 ISMediumLaser, Left Torso
+1 ISGuardianECM, Left Torso
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
 Lower Arm Actuator
 Hand Actuator
-ISMediumPulseLaser (omnipod)
-ISMediumPulseLaser (omnipod)
-ISMediumPulseLaser (omnipod)
-ISMediumPulseLaser (omnipod)
+ISMediumPulseLaser
+ISMediumPulseLaser
+ISMediumPulseLaser
+ISMediumPulseLaser
 -Empty-
 -Empty-
 -Empty-
@@ -68,9 +65,9 @@ Hand Actuator
 -Empty-
 
 Left Torso:
-Medium Laser (omnipod)
-ISGuardianECMSuite (omnipod)
-ISGuardianECMSuite (omnipod)
+ISMediumLaser
+ISGuardianECM
+ISGuardianECM
 -Empty-
 -Empty-
 -Empty-
@@ -82,8 +79,8 @@ ISGuardianECMSuite (omnipod)
 -Empty-
 
 Right Torso:
-Medium Laser (omnipod)
-ISTAG (omnipod)
+ISMediumLaser
+ISTAG
 -Empty-
 -Empty-
 -Empty-
@@ -106,7 +103,7 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-Jump Jet (omnipod)
+Jump Jet
 -Empty-
 
 Head:
@@ -128,8 +125,8 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Jump Jet (omnipod)
-Jump Jet (omnipod)
+Jump Jet
+Jump Jet
 -Empty-
 -Empty-
 -Empty-
@@ -142,13 +139,12 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Jump Jet (omnipod)
-Jump Jet (omnipod)
+Jump Jet
+Jump Jet
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
-
 

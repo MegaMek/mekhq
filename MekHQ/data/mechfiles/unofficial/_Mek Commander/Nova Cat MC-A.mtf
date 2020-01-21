@@ -5,19 +5,18 @@ MC-A
 Config:Biped Omnimech
 TechBase:Clan
 Era:3059
-Rules Level:5
+Rules Level:2
 
 Mass:70
-Engine:280 XL (Clan) Engine(IS)
-Structure:Clan Endo Steel
-Myomer:Standard
+Engine:280 XL Engine
+Structure:Endo Steel
+Myomer:MASC
 
 Heat Sinks:12 Double
-Base Chassis Heat Sinks:11
 Walk MP:4
 Jump MP:0
 
-Armor:Standard(Clan)
+Armor:Standard Armor
 LA Armor:21
 RA Armor:21
 LT Armor:23
@@ -31,50 +30,50 @@ RTR Armor:6
 RTC Armor:10
 
 Weapons:6
-LB 20-X AC, Left Arm
-LB 20-X AC, Right Arm
-Medium Pulse Laser, Left Torso
-Medium Pulse Laser, Right Torso
-Medium Pulse Laser, Center Torso
-Flamer, Center Torso
+1 CLLBXAC20, Right Arm, Ammo:20
+1 CLLBXAC20, Left Arm
+1 CLMediumPulseLaser, Right Torso
+1 CLMediumPulseLaser, Left Torso
+1 CLMediumPulseLaser, Center Torso
+1 CLFlamer, Center Torso
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
-CLLBXAC20 (omnipod)
-CLLBXAC20 (omnipod)
-CLLBXAC20 (omnipod)
-CLLBXAC20 (omnipod)
-CLLBXAC20 (omnipod)
-CLLBXAC20 (omnipod)
-CLLBXAC20 (omnipod)
-CLLBXAC20 (omnipod)
-CLLBXAC20 (omnipod)
+CLLBXAC20
+CLLBXAC20
+CLLBXAC20
+CLLBXAC20
+CLLBXAC20
+CLLBXAC20
+CLLBXAC20
+CLLBXAC20
+CLLBXAC20
 -Empty-
 
 Right Arm:
 Shoulder
 Upper Arm Actuator
-CLLBXAC20 (omnipod)
-CLLBXAC20 (omnipod)
-CLLBXAC20 (omnipod)
-CLLBXAC20 (omnipod)
-CLLBXAC20 (omnipod)
-CLLBXAC20 (omnipod)
-CLLBXAC20 (omnipod)
-CLLBXAC20 (omnipod)
-CLLBXAC20 (omnipod)
+CLLBXAC20
+CLLBXAC20
+CLLBXAC20
+CLLBXAC20
+CLLBXAC20
+CLLBXAC20
+CLLBXAC20
+CLLBXAC20
+CLLBXAC20
 -Empty-
 
 Left Torso:
 Fusion Engine
 Fusion Engine
-CLMediumPulseLaser (omnipod)
-Clan LB 20-X Cluster Ammo (omnipod)
-Clan LB 20-X AC Ammo (omnipod)
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-Clan Endo Steel
+CLMediumPulseLaser
+CLLBXAC20 CL Ammo
+CLLBXAC20 Ammo
+CLDouble Heat Sink
+CLDouble Heat Sink
+Endo Steel
 -Empty-
 -Empty-
 -Empty-
@@ -86,10 +85,10 @@ Fusion Engine
 CLMASC
 CLMASC
 CLMASC
-CLMediumPulseLaser (omnipod)
-Clan LB 20-X Cluster Ammo (omnipod)
-Clan LB 20-X AC Ammo (omnipod)
-Clan Endo Steel
+CLMediumPulseLaser
+CLLBXAC20 CL Ammo
+CLLBXAC20 Ammo
+Endo Steel
 -Empty-
 -Empty-
 -Empty-
@@ -105,14 +104,14 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-CLMediumPulseLaser (omnipod)
-CLFlamer (omnipod)
+CLMediumPulseLaser
+CLFlamer
 
 Head:
 Life Support
 Sensors
 Cockpit
-Clan Endo Steel
+Endo Steel
 Sensors
 Life Support
 -Empty-
@@ -127,8 +126,8 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Clan Endo Steel
-Clan Endo Steel
+Endo Steel
+Endo Steel
 -Empty-
 -Empty-
 -Empty-
@@ -141,13 +140,12 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-Clan Endo Steel
-Clan Endo Steel
+Endo Steel
+Endo Steel
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
 -Empty-
-
 

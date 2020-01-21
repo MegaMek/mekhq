@@ -2,22 +2,21 @@ Version:1.0
 Daishi (Dire Wolf)
 X-Batchall
 
-Config:Biped Omnimech
+Config:Biped Omni
 TechBase:Clan
 Era:3050
-Rules Level:5
+Rules Level:2
 
 Mass:100
-Engine:300 XL (Clan) Engine(IS)
-Structure:IS Standard
+Engine:300 XL Engine
+Structure:Standard
 Myomer:Standard
 
 Heat Sinks:15 Double
-Base Chassis Heat Sinks:12
 Walk MP:3
 Jump MP:0
 
-Armor:Standard(Clan)
+Armor:Standard
 LA Armor:34
 RA Armor:34
 LT Armor:32
@@ -30,43 +29,42 @@ RTL Armor:10
 RTR Armor:10
 RTC Armor:14
 
-Weapons:11
-LB 10-X AC, Left Arm
-ER Medium Laser, Left Arm
-ER Medium Laser, Left Arm
-ER Medium Laser, Left Arm
-Ultra AC/10, Right Arm
-ER Large Laser, Right Arm
-ATM 6, Left Torso
-SRM 6, Left Torso
-ATM 6, Right Torso
-SRM 6, Right Torso
-ER Small Laser, Center Torso
+Weapons:10
+1 CLUltraAC10, Right Arm, Ammo:20
+1 CLERLargeLaser, Right Arm
+1 CLLBXAC10, Left Arm, Ammo:20
+3 CLERMediumLaser, Left Arm
+1 CLATM6, Right Torso, Ammo:40
+1 CLSRM6, Right Torso, Ammo:30
+1 CLATM6, Left Torso
+1 CLSRM6, Left Torso
+1 CLERSmallLaser, Center Torso
+1 CLECMSuite, Head
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
-CLLBXAC10 (omnipod)
-CLLBXAC10 (omnipod)
-CLLBXAC10 (omnipod)
-CLLBXAC10 (omnipod)
-CLLBXAC10 (omnipod)
-CLERMediumLaser (omnipod)
-CLERMediumLaser (omnipod)
-CLERMediumLaser (omnipod)
-Clan LB 10-X AC Ammo (omnipod)
-Clan LB 10-X AC Ammo (omnipod)
+CLLBXAC10
+CLLBXAC10
+CLLBXAC10
+CLLBXAC10
+CLLBXAC10
+CLERMediumLaser
+CLERMediumLaser
+CLERMediumLaser
+CLLBXAC10 Ammo
+CLLBXAC10 Ammo
 
 Right Arm:
 Shoulder
 Upper Arm Actuator
-CLUltraAC10 (omnipod)
-CLUltraAC10 (omnipod)
-CLUltraAC10 (omnipod)
-CLUltraAC10 (omnipod)
-CLERLargeLaser (omnipod)
-Clan Ultra AC/10 Ammo (omnipod)
-Clan Ultra AC/10 Ammo (omnipod)
+CLUltraAC10
+CLUltraAC10
+CLUltraAC10
+CLUltraAC10
+CLERLargeLaser
+CLUltraAC10 Ammo
+CLUltraAC10 Ammo
 -Empty-
 -Empty-
 -Empty-
@@ -74,30 +72,30 @@ Clan Ultra AC/10 Ammo (omnipod)
 Left Torso:
 Fusion Engine
 Fusion Engine
-CLATM6 (omnipod)
-CLATM6 (omnipod)
-CLATM6 (omnipod)
-CLSRM6 (omnipod)
-CLArtemisIV (omnipod)
-Clan Ammo ATM-6 (omnipod)
-Clan Ammo ATM-6 HE (omnipod)
-Clan Ammo SRM-6 (Clan) Artemis-capable (omnipod)
-CLDoubleHeatSink
-CLDoubleHeatSink
+CLATM6
+CLATM6
+CLATM6
+CLSRM6
+CLArtemisIV
+Clan Ammo ATM-6
+Clan Ammo ATM-6 HE
+CLSRM6 Ammo (Clan) Artemis-capable
+CLDouble Heat Sink
+CLDouble Heat Sink
 
 Right Torso:
 Fusion Engine
 Fusion Engine
-CLATM6 (omnipod)
-CLATM6 (omnipod)
-CLATM6 (omnipod)
-CLSRM6 (omnipod)
-CLArtemisIV (omnipod)
-Clan Ammo ATM-6 (omnipod)
-Clan Ammo ATM-6 ER (omnipod)
-Clan Ammo SRM-6 (Clan) Artemis-capable (omnipod)
-CLDoubleHeatSink
-CLDoubleHeatSink
+CLATM6
+CLATM6
+CLATM6
+CLSRM6
+CLArtemisIV
+Clan Ammo ATM-6
+Clan Ammo ATM-6 ER
+CLSRM6 Ammo (Clan) Artemis-capable
+CLDouble Heat Sink
+CLDouble Heat Sink
 
 Center Torso:
 Fusion Engine
@@ -110,14 +108,14 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-CLERSmallLaser (omnipod)
+CLERSmallLaser
 -Empty-
 
 Head:
 Life Support
 Sensors
 Cockpit
-CLECMSuite (omnipod)
+CLECMSuite
 Sensors
 Life Support
 -Empty-
@@ -132,8 +130,8 @@ Hip
 Upper Leg Actuator
 Lower Leg Actuator
 Foot Actuator
-CLDoubleHeatSink
-CLDoubleHeatSink
+CLDouble Heat Sink
+CLDouble Heat Sink
 -Empty-
 -Empty-
 -Empty-
@@ -154,5 +152,3 @@ Foot Actuator
 -Empty-
 -Empty-
 -Empty-
-
-

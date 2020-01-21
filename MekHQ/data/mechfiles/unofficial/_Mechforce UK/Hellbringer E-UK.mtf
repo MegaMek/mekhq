@@ -5,19 +5,18 @@ E-UK
 Config:Biped Omnimech
 TechBase:Clan
 Era:3050
-Rules Level:5
+Rules Level:2
 
 Mass:65
-Engine:325 XL (Clan) Engine(IS)
-Structure:IS Standard
+Engine:325 XL Engine
+Structure:Standard
 Myomer:Standard
 
 Heat Sinks:15 Double
-Base Chassis Heat Sinks:13
 Walk MP:5
 Jump MP:0
 
-Armor:Standard(Clan)
+Armor:Standard Armor
 LA Armor:11
 RA Armor:11
 LT Armor:14
@@ -30,24 +29,23 @@ RTL Armor:7
 RTR Armor:7
 RTC Armor:8
 
-Weapons:6
-LRM 15, Left Arm
-LRM 15, Left Arm
-LRM 15, Right Arm
-LRM 15, Right Arm
-AMS, Right Torso
-ER Medium Laser, Center Torso
+Weapons:5
+2 CLLRM15, Right Arm, Ammo:40
+2 CLLRM15, Left Arm
+1 CLAntiMissileSystem, Right Torso, Ammo:24
+1 CLECMSuite, Center Torso
+1 CLERMediumLaser, Center Torso
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
 Lower Arm Actuator
-CLLRM15 (omnipod)
-CLLRM15 (omnipod)
-CLArtemisIV (omnipod)
-CLLRM15 (omnipod)
-CLLRM15 (omnipod)
-CLArtemisIV (omnipod)
+CLLRM15
+CLLRM15
+CLArtemisIV
+CLLRM15
+CLLRM15
+CLArtemisIV
 -Empty-
 -Empty-
 -Empty-
@@ -56,12 +54,12 @@ Right Arm:
 Shoulder
 Upper Arm Actuator
 Lower Arm Actuator
-CLLRM15 (omnipod)
-CLLRM15 (omnipod)
-CLArtemisIV (omnipod)
-CLLRM15 (omnipod)
-CLLRM15 (omnipod)
-CLArtemisIV (omnipod)
+CLLRM15
+CLLRM15
+CLArtemisIV
+CLLRM15
+CLLRM15
+CLArtemisIV
 -Empty-
 -Empty-
 -Empty-
@@ -69,10 +67,10 @@ CLArtemisIV (omnipod)
 Left Torso:
 Fusion Engine
 Fusion Engine
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-Clan Ammo LRM-15 (Clan) Artemis-capable (omnipod)
-Clan Ammo LRM-15 (Clan) Artemis-capable (omnipod)
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLLRM15 Ammo (Clan) Artemis-capable
+CLLRM15 Ammo (Clan) Artemis-capable
 -Empty-
 -Empty-
 -Empty-
@@ -83,13 +81,13 @@ Clan Ammo LRM-15 (Clan) Artemis-capable (omnipod)
 Right Torso:
 Fusion Engine
 Fusion Engine
-CLDoubleHeatSink (omnipod)
-CLDoubleHeatSink (omnipod)
-CLAntiMissileSystem (omnipod)
-CLAMS Ammo (omnipod)
-Clan Ammo LRM-15 (Clan) Artemis-capable (omnipod)
-Clan Ammo LRM-15 (Clan) Artemis-capable (omnipod)
-Clan Ammo LRM-15 (Clan) Artemis-capable (omnipod)
+CLDouble Heat Sink
+CLDouble Heat Sink
+CLAntiMissileSystem
+CLAMS Ammo
+CLLRM15 Ammo (Clan) Artemis-capable
+CLLRM15 Ammo (Clan) Artemis-capable
+CLLRM15 Ammo (Clan) Artemis-capable
 -Empty-
 -Empty-
 -Empty-
@@ -105,8 +103,8 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-CLECMSuite (omnipod)
-CLERMediumLaser (omnipod)
+CLECMSuite
+CLERMediumLaser
 
 Head:
 Life Support
@@ -149,5 +147,4 @@ Foot Actuator
 -Empty-
 -Empty-
 -Empty-
-
 
