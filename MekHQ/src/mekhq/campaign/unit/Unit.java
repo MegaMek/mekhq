@@ -285,7 +285,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     public void reCalc() {
         //Do Nothing
     }
-    
+
     public void initializeBaySpace() {
         // Initialize the bay capacity
         this.aeroCapacity = getASFCapacity();
@@ -321,13 +321,13 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     public void setId(UUID i) {
         this.id = i;
     }
-    
+
     // A set of methods for working with transport ship assignment for this unit
-    
+
     public boolean hasTransportShipId() {
         return transportShipId != null;
     }
-    
+
     public Map<UUID,Integer> getTransportShipId() {
         return transportShipId;
     }
@@ -335,35 +335,35 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     public void setTransportShipId(UUID i, int bayNumber) {
         transportShipId.put(i, bayNumber);
     }
-    
+
     public Set<UUID> getTransportedUnits() {
         return transportedUnits;
     }
-    
+
     public void addTransportedUnit(UUID id) {
         transportedUnits.add(id);
     }
-    
+
     public void removeTransportedUnit(UUID id) {
         transportedUnits.remove(id);
     }
-    
+
     public void clearTransportedUnits() {
         transportedUnits.clear();
     }
-    
+
     public boolean isCarryingAero() {
         return carryingAero;
     }
-    
+
     public void setCarryingAero(boolean b) {
         carryingAero = b;
     }
-    
+
     public boolean isCarryingGround() {
         return carryingGround;
     }
-    
+
     public void setCarryingGround(boolean b) {
         carryingGround = b;
     }
@@ -1150,8 +1150,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             int sinks = 0;
             for (Mounted mount : entity.getWeaponList()) {
                 if (mount.getType().hasFlag(WeaponType.F_ENERGY)) {
-                    WeaponType wtype = (WeaponType) mount.getType();
-                    sinks += wtype.getHeat();
+                    WeaponType wType = (WeaponType) mount.getType();
+                    sinks += wType.getHeat();
                 }
             }
             partsValue = partsValue.plus(2000.0 * sinks);
@@ -1215,8 +1215,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         return capacity;
     }
-    
-    /** 
+
+    /**
      * Convenience method to call the right capacity getter based on unit type and weight
      * @param unitType integer obtained from a unit's entity that denotes its type (mech, tank, etc)
      * @param unitWeight double Weight in tons of the unit's entity. Important for tanks and infantry
@@ -1267,8 +1267,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             return 0;
         }
     }
-    
-    /** 
+
+    /**
      * Convenience method to call the right capacity update based on unit type
      * When updating capacity, this method is concerned primarily with ensuring that space isn't released
      * beyond the unit's maximum. Checks are made to keep from going below 0 before we ever get here.
@@ -1310,7 +1310,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 }
                 //This shouldn't happen either
                 MekHQ.getLogger().log(Unit.class, METHOD_NAME, LogLevel.ERROR,
-                        "Fighter's baynumber assignment produced a null bay"); //$NON-NLS-1$
+                        "Fighter's bay number assignment produced a null bay"); //$NON-NLS-1$
                 break;
             case UnitType.DROPSHIP:
                 setDocks(Math.min((getCurrentDocks() + amount),getDocks()));
@@ -1343,13 +1343,13 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     } else {
                         //This shouldn't happen
                         MekHQ.getLogger().log(Unit.class, METHOD_NAME, LogLevel.ERROR,
-                                "Vehicle got assigned to a non-light/heavy/superheavy vehicle bay."); //$NON-NLS-1$
+                                "Vehicle got assigned to a non-light/heavy/super heavy vehicle bay."); //$NON-NLS-1$
                         break;
                     }
                 }
                 //This shouldn't happen either
                 MekHQ.getLogger().log(Unit.class, METHOD_NAME, LogLevel.ERROR,
-                        "Vehicle's baynumber assignment produced a null bay"); //$NON-NLS-1$
+                        "Vehicle's bay number assignment produced a null bay"); //$NON-NLS-1$
                 break;
         }
     }
@@ -1357,12 +1357,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     public int getDocks() {
         return getEntity().getDocks();
     }
-    
-    // Get only collars to which a Dropship has been assigned
+
+    // Get only collars to which a DropShip has been assigned
     public int getCurrentDocks() {
         return dockCapacity;
     }
-    
+
     // Used to assign a Dropship to a collar on a specific Jumpship in the TO&E
     public void setDocks(int docks) {
         dockCapacity = docks;
@@ -1377,12 +1377,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         return bays;
     }
-    
+
     // Get only bays to which a light tank has been assigned
     public double getCurrentLightVehicleCapacity() {
         return lVeeCapacity;
     }
-    
+
     // Used to assign a tank to a bay on a specific transport ship in the TO&E
     public void setLightVehicleCapacity(double bays) {
         lVeeCapacity = bays;
@@ -1397,17 +1397,17 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         return bays;
     }
-    
+
     // Get only bays to which a heavy tank has been assigned
     public double getCurrentHeavyVehicleCapacity() {
         return hVeeCapacity;
     }
-    
+
     // Used to assign a tank to a bay on a specific transport ship in the TO&E
     public void setHeavyVehicleCapacity(double bays) {
         hVeeCapacity = bays;
     }
-    
+
     public double getSuperHeavyVehicleCapacity() {
         double bays = 0;
         for (Bay b : getEntity().getTransportBays()) {
@@ -1417,17 +1417,17 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         return bays;
     }
-    
-    // Get only bays to which a superheavy tank has been assigned
+
+    // Get only bays to which a super heavy tank has been assigned
     public double getCurrentSuperHeavyVehicleCapacity() {
         return shVeeCapacity;
     }
-    
+
     // Used to assign a tank to a bay on a specific transport ship in the TO&E
     public void setSuperHeavyVehicleCapacity(double bays) {
         shVeeCapacity = bays;
     }
-    
+
 
     public double getBattleArmorCapacity() {
         double bays = 0;
@@ -1442,7 +1442,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     public double getCurrentBattleArmorCapacity() {
         return baCapacity;
     }
-    
+
     // Used to assign a ba squad to a bay on a specific transport ship in the TO&E
     public void setBattleArmorCapacity(double bays) {
         baCapacity = bays;
@@ -1457,12 +1457,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         return bays;
     }
-    
+
     // Return the unused tonnage of any conventional infantry bays
     public double getCurrentInfantryCapacity() {
         return infCapacity;
     }
-    
+
     // Used to assign an infantry unit to a bay on a specific transport ship in the TO&E
     // Tonnage consumed depends on the platoon/squad weight
     public void setInfantryCapacity(double tonnage) {
@@ -1478,12 +1478,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         return bays;
     }
-    
+
     // Get only bays to which a fighter has been assigned
     public double getCurrentASFCapacity() {
         return aeroCapacity;
     }
-    
+
     // Used to assign a fighter to a bay on a specific transport ship in the TO&E
     public void setASFCapacity(double bays) {
         aeroCapacity = bays;
@@ -1498,12 +1498,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         return bays;
     }
-    
+
     // Get only bays to which a small craft has been assigned
     public double getCurrentSmallCraftCapacity() {
         return scCapacity;
     }
-    
+
     // Used to assign a small craft to a bay on a specific transport ship in the TO&E
     public void setSmallCraftCapacity(double bays) {
         scCapacity = bays;
@@ -1518,12 +1518,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         return bays;
     }
-    
+
     // Get only bays to which a mech has been assigned
     public double getCurrentMechCapacity() {
         return mechCapacity;
     }
-    
+
     // Used to assign a mech or LAM to a bay on a specific transport ship in the TO&E
     public void setMechCapacity(double bays) {
         mechCapacity = bays;
@@ -1538,17 +1538,17 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         return bays;
     }
-    
+
     // Get only bays to which a protomech has been assigned
     public double getCurrentProtomechCapacity() {
         return protoCapacity;
     }
-    
+
     // Used to assign a Protomech to a bay on a specific transport ship in the TO&E
     public void setProtoCapacity(double bays) {
         protoCapacity = bays;
     }
-    
+
     /**
      * Bay loading utility used when assigning units to bay-equipped transport units
      * For each passed-in unit, this will find the first available, transport bay and set
@@ -1566,11 +1566,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             updateBayCapacity(unitType, unitWeight, false, bayNumber);
         }
     }
-    
+
     /**
      * Bay unloading utility used when removing units from bay-equipped transport units
      * and/or moving them to a new transport
-     * @param unit The unit that we wish to unload from this transport
+     * @param u The unit that we wish to unload from this transport
      */
     public void unloadFromTransportShip(Unit u) {
         int unitType = u.getEntity().getUnitType();
@@ -1581,9 +1581,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         removeTransportedUnit(u.getId());
         u.getTransportShipId().clear();
-        
+
     }
-    
+
     /**
      * Bay unloading utility used when removing a bay-equipped Transport unit
      * This removes all units assigned to the transport from it
@@ -1719,7 +1719,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         // If this entity is assigned to a transport, write that
         if (hasTransportShipId()) {
             for (UUID id : getTransportShipId().keySet()) {
-                pw1.println(MekHqXmlUtil.indentStr(indentLvl+1) + "<transportShip id=\"" + id.toString() 
+                pw1.println(MekHqXmlUtil.indentStr(indentLvl+1) + "<transportShip id=\"" + id.toString()
                         + "\" baynumber=\"" + getTransportShipId().get(id) + "\"/>");
             }
         }
@@ -1944,7 +1944,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
         } catch (Exception ex) {
             // Doh!
-            MekHQ.getLogger().error(Unit.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(Unit.class, METHOD_NAME, "Could not parse unit " + idNode.getTextContent().trim(), ex);
+            return null;
         }
 
         if (retVal.id == null) {

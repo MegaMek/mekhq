@@ -22,8 +22,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -157,11 +155,11 @@ public final class PersonnelTab extends CampaignGuiTab {
         add(new JLabel(resourceMap.getString("lblPersonChoice.text")), //$NON-NLS-1$ ;
                 gridBagConstraints);
 
-        DefaultComboBoxModel<String> personGroupModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> personGroupModel = new DefaultComboBoxModel<>();
         for (int i = 0; i < PG_NUM; i++) {
             personGroupModel.addElement(getPersonnelGroupName(i));
         }
-        choicePerson = new JComboBox<String>(personGroupModel);
+        choicePerson = new JComboBox<>(personGroupModel);
         choicePerson.setSelectedIndex(0);
         choicePerson.addActionListener(ev -> filterPersonnel());
         gridBagConstraints = new GridBagConstraints();
@@ -184,11 +182,11 @@ public final class PersonnelTab extends CampaignGuiTab {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(new JLabel(resourceMap.getString("lblPersonView.text")), gridBagConstraints);
 
-        DefaultComboBoxModel<String> personViewModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> personViewModel = new DefaultComboBoxModel<>();
         for (int i = 0; i < PV_NUM; i++) {
             personViewModel.addElement(getPersonnelViewName(i));
         }
-        choicePersonView = new JComboBox<String>(personViewModel);
+        choicePersonView = new JComboBox<>(personViewModel);
         choicePersonView.setSelectedIndex(PV_GENERAL);
         choicePersonView.addActionListener(ev -> changePersonnelView());
         gridBagConstraints = new GridBagConstraints();
@@ -203,12 +201,9 @@ public final class PersonnelTab extends CampaignGuiTab {
 
         chkGroupByUnit = new JCheckBox(resourceMap.getString("chkGroupByUnit.text"));
         chkGroupByUnit.setToolTipText(resourceMap.getString("chkGroupByUnit.toolTipText"));
-        chkGroupByUnit.addActionListener(new ActionListener(){
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                personModel.setGroupByUnit(chkGroupByUnit.isSelected());
-                personModel.refreshData();
-            }
+        chkGroupByUnit.addActionListener(e -> {
+            personModel.setGroupByUnit(chkGroupByUnit.isSelected());
+            personModel.refreshData();
         });
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 4;
@@ -227,7 +222,7 @@ public final class PersonnelTab extends CampaignGuiTab {
         XTableColumnModel personColumnModel = new XTableColumnModel();
         personnelTable.setColumnModel(personColumnModel);
         personnelTable.createDefaultColumnsFromModel();
-        personnelSorter = new TableRowSorter<PersonnelTableModel>(personModel);
+        personnelSorter = new TableRowSorter<>(personModel);
         personnelSorter.setComparator(PersonnelTableModel.COL_RANK, new RankSorter(getCampaign()));
         personnelSorter.setComparator(PersonnelTableModel.COL_SKILL, new LevelSorter());
         for (int i = PersonnelTableModel.COL_MECH; i < PersonnelTableModel.N_COL; i++) {
@@ -236,12 +231,11 @@ public final class PersonnelTab extends CampaignGuiTab {
         personnelSorter.setComparator(PersonnelTableModel.COL_SALARY, new FormattedNumberSorter());
         personnelSorter.setComparator(PersonnelTableModel.COL_AGE, new FormattedNumberSorter());
         personnelTable.setRowSorter(personnelSorter);
-        ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+        ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
         sortKeys.add(new RowSorter.SortKey(PersonnelTableModel.COL_RANK, SortOrder.DESCENDING));
         sortKeys.add(new RowSorter.SortKey(PersonnelTableModel.COL_SKILL, SortOrder.DESCENDING));
         personnelSorter.setSortKeys(sortKeys);
-        personnelTable.addMouseListener(new PersonnelTableMouseAdapter(getCampaignGui(),
-                personnelTable, personModel) {
+        personnelTable.addMouseListener(new PersonnelTableMouseAdapter(getCampaignGui(), personnelTable, personModel) {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
@@ -257,7 +251,7 @@ public final class PersonnelTab extends CampaignGuiTab {
                 }
             }
         });
-        TableColumn column = null;
+        TableColumn column;
         for (int i = 0; i < PersonnelTableModel.N_COL; i++) {
             column = personnelTable.getColumnModel().getColumn(i);
             column.setPreferredWidth(personModel.getColumnWidth(i));
@@ -399,7 +393,7 @@ public final class PersonnelTab extends CampaignGuiTab {
     }
 
     public void filterPersonnel() {
-        RowFilter<PersonnelTableModel, Integer> personTypeFilter = null;
+        RowFilter<PersonnelTableModel, Integer> personTypeFilter;
         final int nGroup = choicePerson.getSelectedIndex();
         personTypeFilter = new RowFilter<PersonnelTableModel, Integer>() {
             @Override
@@ -425,7 +419,7 @@ public final class PersonnelTab extends CampaignGuiTab {
                         && !person.isPrisoner()) {
                     return person.isActive();
                 } else if (nGroup == PG_DEPENDENT) {
-                    return person.isDependent() == true;
+                    return person.isDependent();
                 } else if (nGroup == PG_RETIRE) {
                     return person.getStatus() == Person.S_RETIRED;
                 } else if (nGroup == PG_MIA) {
@@ -448,7 +442,7 @@ public final class PersonnelTab extends CampaignGuiTab {
         personnelTable.setRowHeight(15);
 
         // set the renderer
-        TableColumn column = null;
+        TableColumn column;
         for (int i = 0; i < PersonnelTableModel.N_COL; i++) {
             column = columnModel.getColumnByModelIndex(i);
             column.setCellRenderer(
