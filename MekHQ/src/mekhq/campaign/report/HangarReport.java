@@ -1046,7 +1046,7 @@ public class HangarReport extends Report {
                 }
             } else if (e.isSupportVehicle()) {
                 // this needs to be near or at the top because some of the units that
-                // should have been cause by this will otherwise be selected for other unit types
+                // should have been caught by this will otherwise be selected for other unit types
                 countSupportVees++;
                 if (e.isOmni()) {
                     countSupportOmniVees++;
