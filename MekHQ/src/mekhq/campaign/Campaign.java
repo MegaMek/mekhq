@@ -247,6 +247,7 @@ public class Campaign implements Serializable, ITechManager {
 
     // calendar stuff
     private GregorianCalendar calendar;
+    private DateTime currentDateTime;
     private String dateFormat;
     private String shortDateFormat;
 
@@ -309,6 +310,7 @@ public class Campaign implements Serializable, ITechManager {
         player = new Player(0, "self");
         game.addPlayer(0, player);
         calendar = new GregorianCalendar(3067, Calendar.JANUARY, 1);
+        currentDateTime = new DateTime(calendar);
         CurrencyManager.getInstance().setCampaign(this);
         location = new CurrentLocation(Systems.getInstance().getSystems()
                 .get("Outreach"), 0);
@@ -442,6 +444,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public void setCalendar(GregorianCalendar c) {
         calendar = c;
+        currentDateTime = new DateTime(c);
     }
 
     public GregorianCalendar getCalendar() {
@@ -465,7 +468,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public String getCurrentSystemName() {
-        return location.getCurrentSystem().getPrintableName(Utilities.getDateTimeDay(calendar));
+        return location.getCurrentSystem().getPrintableName(getDateTime());
     }
 
     public PlanetarySystem getCurrentSystem() {
@@ -1367,8 +1370,13 @@ public class Campaign implements Serializable, ITechManager {
         ServiceLogger.joined(p, getDate(), getName(), rankEntry);
     }
 
+    @Deprecated
     public Date getDate() {
         return calendar.getTime();
+    }
+
+    public DateTime getDateTime() {
+        return currentDateTime;
     }
 
     public Collection<Person> getPersonnel() {
@@ -2825,7 +2833,7 @@ public class Campaign implements Serializable, ITechManager {
      */
     public void readNews() {
         //read the news
-        DateTime now = Utilities.getDateTimeDay(calendar);
+        DateTime now = getDateTime();
         for(NewsItem article : news.fetchNewsFor(now)) {
             addReport(article.getHeadlineForReport());
         }
@@ -3249,6 +3257,8 @@ public class Campaign implements Serializable, ITechManager {
         this.autosaveService.requestDayAdvanceAutosave(this, this.calendar.get(Calendar.DAY_OF_WEEK));
 
         calendar.add(Calendar.DAY_OF_MONTH, 1);
+        currentDateTime = new DateTime(calendar);
+
         currentReport.clear();
         currentReportHTML = "";
         newReports.clear();
@@ -4454,13 +4464,13 @@ public class Campaign implements Serializable, ITechManager {
     public Vector<String> getSystemNames() {
         Vector<String> systemNames = new Vector<String>();
         for (PlanetarySystem key : Systems.getInstance().getSystems().values()) {
-            systemNames.add(key.getPrintableName(Utilities.getDateTimeDay(calendar)));
+            systemNames.add(key.getPrintableName(getDateTime()));
         }
         return systemNames;
     }
 
     public PlanetarySystem getSystemByName(String name) {
-        return Systems.getInstance().getSystemByName(name, Utilities.getDateTimeDay(calendar));
+        return Systems.getInstance().getSystemByName(name, getDateTime());
     }
 
     /**
@@ -4861,7 +4871,7 @@ public class Campaign implements Serializable, ITechManager {
         String startKey = start.getId();
         String endKey = end.getId();
 
-        final DateTime now = Utilities.getDateTimeDay(calendar);
+        final DateTime now = getDateTime();
         String current = startKey;
         Set<String> closed = new HashSet<>();
         Set<String> open = new HashSet<>();
@@ -8333,7 +8343,7 @@ public class Campaign implements Serializable, ITechManager {
 
     @Override
     public int getGameYear() {
-        return calendar.get(Calendar.YEAR);
+        return currentDateTime.getYear();
     }
 
     @Override

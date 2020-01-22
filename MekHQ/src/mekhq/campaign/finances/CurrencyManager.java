@@ -43,6 +43,8 @@ import javax.xml.parsers.DocumentBuilder;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -57,11 +59,13 @@ import java.util.Set;
 public class CurrencyManager extends CurrencyUnitDataProvider {
     private static final CurrencyManager instance = new CurrencyManager();
 
+    private DateTime lastChecked;
     private Campaign campaign;
-    private ArrayList<Currency> currencies;
-    private HashMap<String, String> currencyCodeToNameMap;
-    private HashMap<String, String> currencyCodeToSymbolMap;
+    private List<Currency> currencies;
+    private Map<String, String> currencyCodeToNameMap;
+    private Map<String, String> currencyCodeToSymbolMap;
     private Currency backupCurrency;
+    private Currency defaultCurrency;
 
     private MoneyFormatter xmlMoneyFormatter;
     private MoneyFormatter uiAmountPrinter;
@@ -116,17 +120,26 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
         return this.uiAmountAndNamePrinter;
     }
 
-    Currency getDefaultCurrency() {
-        if (campaign != null) {
-            HashMap<String, Currency> possibleCurrencies = new HashMap<>();
+    synchronized Currency getDefaultCurrency() {
+        if (this.campaign == null) {
+            return this.backupCurrency;
+        }
+
+        DateTime date = this.campaign.getDateTime();
+        if (this.lastChecked == null || this.lastChecked.isBefore(date)) {
+            this.lastChecked = date;
+            this.defaultCurrency = this.backupCurrency;
+
+            Map<String, Currency> possibleCurrencies = new HashMap<>();
 
             // Use the default currency in this time period, if it exists
+            int year = date.getYear();
             for (Currency currency : this.currencies) {
-                if ((this.campaign.getGameYear() >= currency.getStartYear()) &&
-                        (this.campaign.getGameYear() <= currency.getEndYear())) {
+                if ((year >= currency.getStartYear()) &&
+                        (year <= currency.getEndYear())) {
 
                     if (currency.getIsDefault()) {
-                        return currency;
+                        return defaultCurrency = currency;
                     }
 
                     possibleCurrencies.put(currency.getCode(), currency);
@@ -141,26 +154,25 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
                             null);
 
                     if (currency != null) {
-                        return currency;
+                        return defaultCurrency = currency;
                     }
                 }
             }
 
             // Use the currency of one of the factions in the planet where the unit is deployed, if it exists
-            PlanetarySystem psystem = campaign.getCurrentSystem();
+            PlanetarySystem psystem = this.campaign.getCurrentSystem();
             if (psystem != null) {
-                Set<Faction> factions = psystem.getFactionSet(new DateTime(campaign.getDate()));
+                Set<Faction> factions = psystem.getFactionSet(date);
                 for (Faction faction : factions) {
                     Currency currency = possibleCurrencies.getOrDefault(faction.getCurrencyCode(), null);
                     if (currency != null) {
-                        return currency;
+                        return defaultCurrency = currency;
                     }
                 }
             }
         }
 
-        // No currency found, return the backup
-        return this.backupCurrency;
+        return defaultCurrency;
     }
 
     @Override
