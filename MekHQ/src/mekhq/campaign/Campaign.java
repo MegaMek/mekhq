@@ -28,6 +28,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -3933,6 +3934,28 @@ public class Campaign implements Serializable, ITechManager {
         return spares;
     }
 
+    /**
+     * Finds the first spare part matching a predicate.
+     *
+     * @param predicate The predicate to use when searching
+     *                  for a suitable spare part.
+     * @return A matching spare {@link Part} or {@code null}
+     *         if no suitable match was found.
+     */
+    @Nullable
+    public Part findSparePart(Predicate<Part> predicate) {
+        for (Part part : parts.values()) {
+            if (part.isSpare() && predicate.test(part)) {
+                return part;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Streams the spare parts in the campaign.
+     * @return A stream of spare parts in the campaign.
+     */
     public Stream<Part> streamSpareParts() {
         return parts.values().stream().filter(Part::isSpare);
     }
