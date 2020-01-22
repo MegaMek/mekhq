@@ -579,34 +579,32 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         as.changeAmountAvailable(converted, curType);
     }
 
-    public void changeAmountAvailable(int amount, AmmoType curType) {
-        AmmoStorage a = null;
-        AmmoType aType;
-        for(Part part : campaign.getSpareParts()) {
-            if(!part.isPresent()) {
-                continue;
+    public void changeAmountAvailable(int amount, final AmmoType curType) {
+        AmmoStorage a = (AmmoStorage)campaign.findSparePart(part -> {
+            if (!(part instanceof AmmoStorage) || !part.isPresent()) {
+                return false;
             }
-            if(part instanceof AmmoStorage) {
-                aType = ((AmmoType)((AmmoStorage)part).getType());
-                if(aType.equals(curType) && curType.getMunitionType() == aType.getMunitionType()) {
-                    a = (AmmoStorage)part;
-                    if (amount < 0 && campaign.getCampaignOptions().useAmmoByType()
-                            && a.getShots() < Math.abs(amount)) {
-                        swapAmmoFromCompatible(Math.abs(amount) * aType.getRackSize(), a);
-                    }
-                    a.changeShots(amount);
-                    break;
-                }
+            AmmoType ammoType = (AmmoType)((AmmoStorage)part).getType();
+            return ammoType.equals(curType)
+                && curType.getMunitionType() == ammoType.getMunitionType();
+        });
+
+        if (null != a) {
+            AmmoType aType = (AmmoType)a.getType();
+            if (amount < 0 && campaign.getCampaignOptions().useAmmoByType()
+                && a.getShots() < Math.abs(amount)) {
+                swapAmmoFromCompatible(Math.abs(amount) * aType.getRackSize(), a);
             }
-        }
-        if(null != a && a.getShots() <= 0) {
-            campaign.removePart(a);
-        } else if(null == a && amount > 0) {
+            a.changeShots(amount);
+            if (a.getShots() <= 0) {
+                campaign.removePart(a);
+            }
+        } else if (amount > 0) {
             campaign.addPart(new AmmoStorage(1, curType, amount, campaign), 0);
-        } else if (a == null && amount < 0
+        } else if (amount < 0
                 && campaign.getCampaignOptions().useAmmoByType()
                 && AmmoBin.ALLOWED_BY_TYPE.contains(curType.getAmmoType())) {
-            campaign.addPart(new AmmoStorage(1 , curType ,0, campaign), 0);
+            campaign.addPart(new AmmoStorage(1, curType ,0, campaign), 0);
             changeAmountAvailable(amount, curType);
         }
     }
@@ -679,29 +677,29 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     public int getAmountAvailable() {
-        int amount = 0;
-        AmmoStorage a;
-        AmmoType aType;
-        AmmoType thisType;
-        for(Part part : campaign.getSpareParts()) {
-            if(!part.isPresent()) {
-                continue;
-            }
-            if(part instanceof AmmoStorage) {
-                a = (AmmoStorage)part;
-                aType = (AmmoType)a.getType();
-                thisType = ((AmmoType)getType());
-                if(aType.equals(getType()) && thisType.getMunitionType() == aType.getMunitionType()) {
-                    amount += a.getShots();
-                    if (!(campaign.getCampaignOptions().useAmmoByType())) {
-                        break;
-                    }
-                } else if (isCompatibleAmmo(aType, thisType) && thisType.getRackSize() != 0) {
-                    amount += a.getShots()*aType.getRackSize()/thisType.getRackSize();
-                }
-            }
+        final AmmoType thisType = (AmmoType)getType();
+        if (campaign.getCampaignOptions().useAmmoByType()) {
+            AmmoStorage a = (AmmoStorage)campaign.findSparePart(part -> {
+                return part instanceof AmmoStorage
+                    && thisType.equals(((AmmoStorage)part).getType())
+                    && thisType.getMunitionType() == ((AmmoType)((AmmoStorage)part).getType()).getMunitionType();
+            });
+            return a != null ? a.getShots() : 0;
+        } else {
+            return campaign.streamSpareParts()
+                            .filter(part -> part instanceof AmmoStorage && part.isPresent())
+                            .mapToInt(part -> {
+                                AmmoStorage a = (AmmoStorage)part;
+                                AmmoType aType = (AmmoType)a.getType();
+                                if (aType.equals(getType()) && thisType.getMunitionType() == aType.getMunitionType()) {
+                                    return a.getShots();
+                                } else if (isCompatibleAmmo(aType, thisType) && thisType.getRackSize() != 0) {
+                                    return (a.getShots() * aType.getRackSize()) / thisType.getRackSize();
+                                }
+                                return 0;
+                            })
+                            .sum();
         }
-        return amount;
     }
 
     public boolean isEnoughSpareAmmoAvailable() {
