@@ -130,8 +130,8 @@ public class BaArmor extends Armor implements IAcquisitionWork {
     public boolean isSamePartType(Part part) {
         return part instanceof BaArmor
                 && isClanTechBase() == part.isClanTechBase()
-                && ((BaArmor)part).getType() == this.getType()
-                && getRefitId() == part.getRefitId();
+                && Objects.equals(getRefitId(), part.getRefitId())
+                && ((BaArmor)part).getType() == getType();
     }
     
     @Override
