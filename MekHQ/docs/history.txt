@@ -26,6 +26,7 @@ v0.47.3-SNAPSHOT
 + Issue #1405: Feature: Display Mother and Father for Children in the Force
 + Issue #1406: Feature: Add hyperlinks to family members
 + PR #1410: Add the unit ID to the log when unable to parse a unit
++ Issue #1262: Feature: Identify on the interstellar view planets that are eligible for additional contracts
 
 v0.47.2 (2019-11-15 2000 UTC) 
 + PR #1325: Customize protomechs and advanced aero in MekLab
