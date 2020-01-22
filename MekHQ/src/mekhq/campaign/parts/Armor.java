@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
+import java.util.Objects;
 
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
@@ -558,31 +559,30 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     public int getAmountAvailable() {
-        for(Part part : campaign.getSpareParts()) {
-            if(part instanceof Armor) {
-                Armor a = (Armor)part;
-                if(isSameType(a) && !a.isReservedForRefit() && a.isPresent()) {
-                    return a.getAmount();
-                }
-            }
-        }
-        return 0;
+        Armor a = (Armor)campaign.findSparePart(part -> {
+            return part instanceof Armor
+                && part.isPresent()
+                && !part.isReservedForRefit()
+                && isSameType((Armor)part);
+        });
+
+        return a != null ? a.getAmount() : 0;
     }
 
     public void changeAmountAvailable(int amount) {
-        Armor a = null;
-        for(Part part : campaign.getSpareParts()) {
-            if(part instanceof Armor && isSameType((Armor)part)
-                    && getRefitId() == part.getRefitId()
-                    && part.isPresent()) {
-                a = (Armor)part;
-                a.setAmount(a.getAmount() + amount);
-                break;
+        Armor a = (Armor)campaign.findSparePart(part -> {
+            return part instanceof Armor
+                && part.isPresent()
+                && Objects.equals(getRefitId(), part.getRefitId())
+                && isSameType((Armor)part);
+        });
+
+        if (null != a) {
+            a.setAmount(a.getAmount() + amount);
+            if (a.getAmount() <= 0) {
+                campaign.removePart(a);
             }
-        }
-        if(null != a && a.getAmount() <= 0) {
-            campaign.removePart(a);
-        } else if(null == a && amount > 0) {
+        } else if (amount > 0) {
             campaign.addPart(new Armor(getUnitTonnage(), type, amount, -1, false, isClanTechBase(), campaign), 0);
         }
     }
