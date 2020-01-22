@@ -29,6 +29,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.JOptionPane;
 
@@ -3932,6 +3933,10 @@ public class Campaign implements Serializable, ITechManager {
         return spares;
     }
 
+    public Stream<Part> streamSpareParts() {
+        return parts.values().stream().filter(Part::isSpare);
+    }
+
     public void addFunds(Money quantity) {
         addFunds(quantity, "Rich Uncle", Transaction.C_MISC);
     }
@@ -6948,7 +6953,7 @@ public class Campaign implements Serializable, ITechManager {
     public Money getTotalEquipmentValue() {
         return Money.zero()
                 .plus(getUnits().stream().map(Unit::getSellValue).collect(Collectors.toList()))
-                .plus(getSpareParts().stream().map(Part::getActualValue).collect(Collectors.toList()));
+                .plus(streamSpareParts().map(Part::getActualValue).collect(Collectors.toList()));
     }
 
     /**
@@ -7396,7 +7401,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     @SuppressWarnings("unused") // FIXME: This whole method needs re-worked once Dropship Assignments are in
-    public double getCargoTonnage(boolean inTransit, boolean mothballed) {
+    public double getCargoTonnage(final boolean inTransit, final boolean mothballed) {
         double cargoTonnage = 0;
         double mothballedTonnage = 0;
         int mechs = getNumberOfUnitsByType(Entity.ETYPE_MECH);
@@ -7410,12 +7415,9 @@ public class Campaign implements Serializable, ITechManager {
         int hv = getNumberOfUnitsByType(Entity.ETYPE_TANK, false);
         int protos = getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH);
 
-        for (Part part : getSpareParts()) {
-            if (!inTransit && !part.isPresent()) {
-                continue;
-            }
-            cargoTonnage += (part.getQuantity() * part.getTonnage());
-        }
+        cargoTonnage += streamSpareParts().filter(p -> inTransit || p.isPresent())
+                            .mapToDouble(p -> p.getQuantity() * p.getTonnage())
+                            .sum();
 
         // place units in bays
         // FIXME: This has been temporarily disabled. It really needs dropship assignments done to fix it correctly.

@@ -174,8 +174,8 @@ public class FinancialReport {
         }
 
         r.spareParts = r.spareParts.plus(
-            campaign.getSpareParts()
-                .stream().map(x -> x.getActualValue().multipliedBy(x.getQuantity()))
+            campaign.streamSpareParts()
+                .map(x -> x.getActualValue().multipliedBy(x.getQuantity()))
                 .collect(Collectors.toList()));
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
