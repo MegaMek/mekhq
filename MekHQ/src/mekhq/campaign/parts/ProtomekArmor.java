@@ -21,6 +21,8 @@
 
 package mekhq.campaign.parts;
 
+import java.util.Objects;
+
 import megamek.common.EquipmentType;
 import megamek.common.Protomech;
 import megamek.common.TechAdvancement;
@@ -121,35 +123,29 @@ public class ProtomekArmor extends Armor implements IAcquisitionWork {
     }
 
     public int getAmountAvailable() {
-        for(Part part : campaign.getSpareParts()) {
-            if(part instanceof ProtomekArmor) {
-                ProtomekArmor a = (ProtomekArmor) part;
-                if(a.isClanTechBase() == clan
-                        && a.type == type
-                        && !a.isReservedForRefit() && a.isPresent()) {
-                    return a.getAmount();
-                }
-            }
-        }
-        return 0;
+        ProtomekArmor a = (ProtomekArmor)campaign.findSparePart(part -> {
+            return part instanceof ProtomekArmor
+                && part.isPresent()
+                && !part.isReservedForRefit()
+                && isClanTechBase() == part.isClanTechBase()
+                && getType() == ((ProtomekArmor)part).getType();
+        });
+
+        return a != null ? a.getAmount() : 0;
     }
 
     public void changeAmountAvailable(int amount) {
-        ProtomekArmor a = null;
-        for(Part part : campaign.getSpareParts()) {
-            if(part instanceof ProtomekArmor
-                    && part.isClanTechBase() == clan
-                    && ((ProtomekArmor) part).type == type
-                    && getRefitId() == part.getRefitId()
-                    && part.isPresent()) {
-                a = (ProtomekArmor)part;
-                a.setAmount(a.getAmount() + amount);
-                break;
+        ProtomekArmor a = (ProtomekArmor)campaign.findSparePart(part -> {
+            return isSamePartType(part)
+                && part.isPresent();
+        });
+
+        if (null != a) {
+            a.setAmount(a.getAmount() + amount);
+            if (a.getAmount() <= 0) {
+                campaign.removePart(a);
             }
-        }
-        if(null != a && a.getAmount() <= 0) {
-            campaign.removePart(a);
-        } else if(null == a && amount > 0) {
+        } else if (amount > 0) {
             campaign.addPart(new ProtomekArmor(getUnitTonnage(), type, amount, -1, isClanTechBase(), campaign), 0);
         }
     }
