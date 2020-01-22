@@ -29,6 +29,7 @@ import mekhq.campaign.work.IAcquisitionWork;
 import org.w3c.dom.Node;
 
 import java.io.PrintWriter;
+import java.util.Objects;
 
 /**
  * Standard support vehicle armor, which can differ by BAR and tech rating.
@@ -142,7 +143,8 @@ public class SVArmor extends Armor {
     public void changeAmountAvailable(int amount) {
         SVArmor a = (SVArmor)campaign.findSparePart(part -> {
             return isSamePartType(part)
-                && part.isPresent();
+                && part.isPresent()
+                && Objects.equals(getRefitId(), part.getRefitId());
         });
 
         if (null != a) {
