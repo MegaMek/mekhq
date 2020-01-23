@@ -390,10 +390,11 @@ public class ContractMarket implements Serializable {
 		}
 		JumpPath jp = null;
 		try {
-			jp = campaign.calculateJumpPath(campaign.getCurrentSystem(), contract.getSystem());
+			jp = contract.getJumpPath(campaign);
 		} catch (NullPointerException ex) {
 			// could not calculate jump path; leave jp null
 		}
+		
 		if (jp == null) {
 			if (retries > 0) {
 				return generateAtBContract(campaign, employer, unitRatingMod, retries - 1);
