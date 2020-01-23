@@ -392,11 +392,16 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         signingAmount = amount;
     }
 
+    @Override
     public void setSystemId(String n) {
         super.setSystemId(n);
         cachedJumpPath = null;
     }
     
+    /**
+     * Gets the currently calculated jump path for this contract,
+     * only recalculating if it's not valid any longer or hasn't been calculated yet.
+     */
     public JumpPath getJumpPath(Campaign c) {
         // if we don't have a cached jump path, or if the jump path's starting/ending point 
         // no longer match the campaign's current location or contract's destination
