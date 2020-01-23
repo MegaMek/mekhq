@@ -90,6 +90,11 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
     private int advancePct;
     private int signBonus;
 
+    // this is a transient variable meant to keep track of a single jump path while the contract
+    // runs through initial calculations, as the same jump path is referenced multiple times
+    // and calculating it each time is expensive. No need to preserve it in save date.
+    private JumpPath cachedJumpPath;
+    
     // need to keep track of total value salvaged for salvage rights
     private Money salvagedByUnit = Money.zero();
     private Money salvagedByEmployer = Money.zero();
@@ -387,6 +392,27 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         signingAmount = amount;
     }
 
+    public void setSystemId(String n) {
+        super.setSystemId(n);
+        cachedJumpPath = null;
+    }
+    
+    public JumpPath getJumpPath(Campaign c) {
+        // if we don't have a cached jump path, or if the jump path's starting/ending point 
+        // no longer match the campaign's current location or contract's destination
+        if((cachedJumpPath == null) ||
+                !cachedJumpPath.getFirstSystem().getId().equals(c.getCurrentSystem().getId()) ||
+                !cachedJumpPath.getLastSystem().getId().equals(getSystem().getId())) {
+            cachedJumpPath = c.calculateJumpPath(c.getCurrentSystem(), getSystem());
+        }
+        
+        return cachedJumpPath;
+    }
+    
+    public void setJumpPath(JumpPath path) {
+        cachedJumpPath = path;
+    }
+    
     public Money getMonthlyPayOut() {
         if (getLength() <= 0) {
             return Money.zero();
@@ -427,7 +453,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
     private int getTravelDays(Campaign c) {
         if (null != this.getSystem()) {
             DateTime currentDate = Utilities.getDateTimeDay(c.getCalendar());
-            JumpPath jumpPath = c.calculateJumpPath(c.getCurrentSystem(), getSystem());
+            JumpPath jumpPath = getJumpPath(c);
             double days = Math.round(jumpPath.getTotalTime(currentDate, c.getLocation().getTransitTime()) * 100.0) / 100.0;
             return (int) Math.round(days);
         }
@@ -485,7 +511,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
      */
     public Money getTotalTransportationFees(Campaign c){
         if(null != getSystem() && c.getCampaignOptions().payForTransport()) {
-            JumpPath jumpPath = c.calculateJumpPath(c.getCurrentSystem(), getSystem());
+            JumpPath jumpPath = getJumpPath(c);
 
             boolean campaignOps = c.getCampaignOptions().useEquipmentContractBase();
 
@@ -579,7 +605,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 
         //calculate transportation costs
         if (null != getSystem()) {
-            JumpPath jumpPath = c.calculateJumpPath(c.getCurrentSystem(), getSystem());
+            JumpPath jumpPath = getJumpPath(c);
 
             // FM:Mercs transport payments take into account owned transports and do not use CampaignOps dropship costs.
             // CampaignOps doesn't care about owned transports and does use its own dropship costs.
@@ -598,7 +624,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
                 && c.getCampaignOptions().getUnitRatingMethod().equals(mekhq.campaign.rating.UnitRatingMethod.CAMPAIGN_OPS)) {
             //contract base * transport period * reputation * employer modifier
             transitAmount = c.getContractBase()
-                                    .multipliedBy(((c.calculateJumpPath(c.getCurrentSystem(), getSystem()).getJumps()) * 2.0) / 4.0)
+                                    .multipliedBy(((getJumpPath(c).getJumps()) * 2.0) / 4.0)
                                     .multipliedBy(c.getUnitRatingMod() * 0.2 + 0.5)
                                     .multipliedBy(1.2);
         } else {
@@ -638,7 +664,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         GregorianCalendar cal = new GregorianCalendar();
         cal.setTime(startDate);
         if (adjustStartDate && null != c.getSystemByName(systemId)) {
-            int days = (int) Math.ceil(c.calculateJumpPath(c.getCurrentSystem(), getSystem())
+            int days = (int) Math.ceil(getJumpPath(c)
                     .getTotalTime(Utilities.getDateTimeDay(cal), c.getLocation().getTransitTime()));
             while (days > 0) {
                 cal.add(Calendar.DAY_OF_YEAR, 1);
