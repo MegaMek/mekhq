@@ -401,6 +401,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         // if we don't have a cached jump path, or if the jump path's starting/ending point 
         // no longer match the campaign's current location or contract's destination
         if((cachedJumpPath == null) ||
+                (cachedJumpPath.size() == 0) ||
                 !cachedJumpPath.getFirstSystem().getId().equals(c.getCurrentSystem().getId()) ||
                 !cachedJumpPath.getLastSystem().getId().equals(getSystem().getId())) {
             cachedJumpPath = c.calculateJumpPath(c.getCurrentSystem(), getSystem());
