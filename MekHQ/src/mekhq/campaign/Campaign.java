@@ -1863,7 +1863,7 @@ public class Campaign implements Serializable, ITechManager {
                 }
 
                 // Return, swapping the value if we're looking to have Elites ordered first
-                return eliteFirst ? retVal *= -1 : retVal;
+                return eliteFirst ? -retVal : retVal;
             });
         }
 
@@ -6854,7 +6854,7 @@ public class Campaign implements Serializable, ITechManager {
             }
             if (part.isSamePartType(p)) {
                 if (p.isPresent()) {
-                    if (p instanceof Armor) { // ProtoMech Armor and BaArmor are derived from Armor
+                    if (p instanceof Armor) { // ProtomekArmor and BaArmor are derived from Armor
                         nSupply += ((Armor) p).getAmount();
                     } else if (p instanceof AmmoStorage) {
                         nSupply += ((AmmoStorage) p).getShots();
@@ -6862,7 +6862,7 @@ public class Campaign implements Serializable, ITechManager {
                         nSupply += p.getQuantity();
                     }
                 } else {
-                    if (p instanceof Armor) { // ProtoMech Armor and BaArmor are derived from Armor
+                    if (p instanceof Armor) { // ProtomekArmor and BaArmor are derived from Armor
                         nTransit += ((Armor) p).getAmount();
                     } else if (p instanceof AmmoStorage) {
                         nTransit += ((AmmoStorage) p).getShots();
