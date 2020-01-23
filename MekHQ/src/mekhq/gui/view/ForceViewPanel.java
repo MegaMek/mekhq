@@ -42,22 +42,22 @@ import mekhq.gui.utilities.MarkdownRenderer;
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class ForceViewPanel extends ScrollablePanel {
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 7004741688464105277L;
 
 	private Force force;
 	private Campaign campaign;
-	
+
 	private IconPackage icons;
 
 	private javax.swing.JLabel lblIcon;
 	private javax.swing.JPanel pnlStats;
 	private javax.swing.JPanel pnlSubUnits;
 	private javax.swing.JTextPane txtDesc;
-	
+
 	private javax.swing.JLabel lblType;
 	private javax.swing.JLabel lblAssign1;
 	private javax.swing.JLabel lblAssign2;
@@ -71,14 +71,14 @@ public class ForceViewPanel extends ScrollablePanel {
 	private javax.swing.JLabel lblCost2;
 	private javax.swing.JLabel lblTech1;
 	private javax.swing.JLabel lblTech2;
-	
+
 	public ForceViewPanel(Force f, Campaign c, IconPackage icons) {
 		this.force = f;
 		this.campaign = c;
 		this.icons = icons;
 		initComponents();
 	}
-	
+
 	private void initComponents() {
 		java.awt.GridBagConstraints gridBagConstraints;
 
@@ -86,12 +86,12 @@ public class ForceViewPanel extends ScrollablePanel {
 		pnlStats = new javax.swing.JPanel();
 		pnlSubUnits = new javax.swing.JPanel();
 		txtDesc = new javax.swing.JTextPane();
-		       
+
 		setLayout(new java.awt.GridBagLayout());
 
 		setBackground(Color.WHITE);
-		
-		lblIcon.setName("lblPortait"); // NOI18N
+
+		lblIcon.setName("lblPortrait"); // NOI18N
 		lblIcon.setBackground(Color.WHITE);
 		setIcon(force, lblIcon, 150);
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -101,7 +101,7 @@ public class ForceViewPanel extends ScrollablePanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		gridBagConstraints.insets = new java.awt.Insets(10,10,0,0);
 		add(lblIcon, gridBagConstraints);
-		
+
 		pnlStats.setName("pnlStats");
 		pnlStats.setBorder(BorderFactory.createTitledBorder(force.getName()));
 		pnlStats.setBackground(Color.WHITE);
@@ -113,9 +113,9 @@ public class ForceViewPanel extends ScrollablePanel {
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;	
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		add(pnlStats, gridBagConstraints);
-		
+
 		pnlSubUnits.setName("pnlSubUnits");
 		pnlSubUnits.setBackground(Color.WHITE);
 		fillSubUnits();
@@ -126,9 +126,9 @@ public class ForceViewPanel extends ScrollablePanel {
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;	
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		add(pnlSubUnits, gridBagConstraints);
-		
+
         if(null != force.getDescription() && !force.getDescription().isEmpty()) {
             txtDesc.setName("txtDesc");
             txtDesc.setEditable(false);
@@ -148,7 +148,7 @@ public class ForceViewPanel extends ScrollablePanel {
             add(txtDesc, gridBagConstraints);
         }
 	}
-	
+
 	private void setIcon(Force force, JLabel lbl, int scale) {
         String category = force.getIconCategory();
         String filename = force.getIconFileName();
@@ -164,15 +164,15 @@ public class ForceViewPanel extends ScrollablePanel {
         }
 
         // Try to get the player's portrait file.
-        Image portrait = null;        
+        Image portrait = null;
         try {
             portrait = IconPackage.buildForceIcon(category, filename, icons.getForceIcons(), iconMap);
             if(null != portrait) {
-        		portrait = portrait.getScaledInstance(scale, -1, Image.SCALE_SMOOTH);  
+        		portrait = portrait.getScaledInstance(scale, -1, Image.SCALE_SMOOTH);
             } else {
             	portrait = (Image) icons.getForceIcons().getItem("", "empty.png");
             }
-        	portrait = portrait.getScaledInstance(scale, -1, Image.SCALE_SMOOTH);  
+        	portrait = portrait.getScaledInstance(scale, -1, Image.SCALE_SMOOTH);
             ImageIcon icon = new ImageIcon(portrait);
         	lbl.setIcon(icon);
         } catch (Exception err) {
@@ -180,9 +180,9 @@ public class ForceViewPanel extends ScrollablePanel {
         }
 	}
 
-	
+
 	private void fillStats() {
-		
+
     	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ForceViewPanel", new EncodeControl()); //$NON-NLS-1$
 
     	lblType = new javax.swing.JLabel();
@@ -200,7 +200,7 @@ public class ForceViewPanel extends ScrollablePanel {
 		lblTech2 = new javax.swing.JLabel();
 		java.awt.GridBagConstraints gridBagConstraints;
 		pnlStats.setLayout(new java.awt.GridBagLayout());
-		
+
 	 	long bv = 0;
     	Money cost = Money.zero();
     	double ton = 0;
@@ -236,18 +236,18 @@ public class ForceViewPanel extends ScrollablePanel {
     	if(people.size() > 0) {
     		commander = people.get(0).getFullTitle();
     	}
-    	
+
     	if (null != force.getTechID()) {
     		Person p = campaign.getPerson(force.getTechID());
     		LanceTech = p.getName();
     	}
-    	
+
     	if(null != force.getParentForce()) {
     		assigned = force.getParentForce().getName();
     	}
-    	
+
     	int nexty = 0;
-    	
+
     	if(null != type) {
     		lblType.setName("lblCommander2"); // NOI18N
 			lblType.setText("<html><i>" + type + " " + resourceMap.getString("unit")+ "</i></html>");
@@ -261,7 +261,7 @@ public class ForceViewPanel extends ScrollablePanel {
 			pnlStats.add(lblType, gridBagConstraints);
 			nexty++;
     	}
-    	
+
     	if(!commander.equals("")) {
 	    	lblCommander1.setName("lblCommander1"); // NOI18N
 	    	lblCommander1.setText(resourceMap.getString("lblCommander1.text"));
@@ -271,7 +271,7 @@ public class ForceViewPanel extends ScrollablePanel {
 			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 			pnlStats.add(lblCommander1, gridBagConstraints);
-			
+
 			lblCommander2.setName("lblCommander2"); // NOI18N
 			lblCommander2.setText(commander);
 			gridBagConstraints = new java.awt.GridBagConstraints();
@@ -294,7 +294,7 @@ public class ForceViewPanel extends ScrollablePanel {
     			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
     			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     			pnlStats.add(lblTech1, gridBagConstraints);
-    			
+
     			lblTech2.setName("lblTech2"); // NOI18N
     			lblTech2.setText(LanceTech);
     			gridBagConstraints = new java.awt.GridBagConstraints();
@@ -308,7 +308,7 @@ public class ForceViewPanel extends ScrollablePanel {
     			nexty++;
     			}
     	}
-    	
+
     	if(!assigned.equals("")) {
 	    	lblAssign1.setName("lblAssign1"); // NOI18N
 	    	lblAssign1.setText(resourceMap.getString("lblAssign1.text"));
@@ -318,7 +318,7 @@ public class ForceViewPanel extends ScrollablePanel {
 			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 			pnlStats.add(lblAssign1, gridBagConstraints);
-			
+
 			lblAssign2.setName("lblAssign2"); // NOI18N
 			lblAssign2.setText(assigned);
 			gridBagConstraints = new java.awt.GridBagConstraints();
@@ -331,7 +331,7 @@ public class ForceViewPanel extends ScrollablePanel {
 			pnlStats.add(lblAssign2, gridBagConstraints);
 			nexty++;
     	}
-    	
+
     	lblBV1.setName("lblBV1"); // NOI18N
     	lblBV1.setText(resourceMap.getString("lblBV1.text"));
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -340,7 +340,7 @@ public class ForceViewPanel extends ScrollablePanel {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblBV1, gridBagConstraints);
-		
+
 		lblBV2.setName("lblBV2"); // NOI18N
 		lblBV2.setText(DecimalFormat.getInstance().format(bv));
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -352,7 +352,7 @@ public class ForceViewPanel extends ScrollablePanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblBV2, gridBagConstraints);
 		nexty++;
-		
+
 		lblTonnage1.setName("lblTonnage1"); // NOI18N
 		lblTonnage1.setText(resourceMap.getString("lblTonnage1.text"));
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -361,7 +361,7 @@ public class ForceViewPanel extends ScrollablePanel {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblTonnage1, gridBagConstraints);
-		
+
 		lblTonnage2.setName("lblTonnage2"); // NOI18N
 		lblTonnage2.setText(DecimalFormat.getInstance().format(ton));
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -373,7 +373,7 @@ public class ForceViewPanel extends ScrollablePanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblTonnage2, gridBagConstraints);
 		nexty++;
-		
+
 		// if AtB is enabled, set tooltip to show lance weight breakdowns
 		if (campaign.getCampaignOptions().getUseAtB()) {
 			// see Lance.java for lance weight breakdowns
@@ -389,7 +389,7 @@ public class ForceViewPanel extends ScrollablePanel {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblCost1, gridBagConstraints);
-		
+
 		lblCost2.setName("lblCost2"); // NOI18N
 		lblCost2.setText(cost.toAmountAndSymbolString());
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -401,20 +401,20 @@ public class ForceViewPanel extends ScrollablePanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblCost2, gridBagConstraints);
 		nexty++;
-    	
+
 		//BV
 		//Tonnage?
 		//Cost?
 		//Number of units?
 		//Assigned to
 	}
-	
+
 	private void fillSubUnits() {
-		
+
 		java.awt.GridBagConstraints gridBagConstraints;
 
 		pnlSubUnits.setLayout(new java.awt.GridBagLayout());
-		
+
 		JLabel lblForce;
 
 		int nexty = 0;
@@ -435,7 +435,7 @@ public class ForceViewPanel extends ScrollablePanel {
 			pnlSubUnits.add(lblForce, gridBagConstraints);
 		}
 		JLabel lblPerson;
-		JLabel lblUnit;		
+		JLabel lblUnit;
 		ArrayList<Unit> units = new ArrayList<Unit>();
 		ArrayList<Unit> unmannedUnits = new ArrayList<Unit>();
  		for(UUID uid : force.getUnits()) {
@@ -450,7 +450,7 @@ public class ForceViewPanel extends ScrollablePanel {
 			}
  		}
  		//sort person vector by rank
- 		Collections.sort(units, new Comparator<Unit>(){		 
+ 		Collections.sort(units, new Comparator<Unit>(){
             public int compare(final Unit u1, final Unit u2) {
                return ((Comparable<Integer>)u2.getCommander().getRankNumeric()).compareTo(u1.getCommander().getRankNumeric());
             }
@@ -477,7 +477,7 @@ public class ForceViewPanel extends ScrollablePanel {
 			pnlSubUnits.add(lblPerson, gridBagConstraints);
 			if(null != unit) {
 				lblUnit.setText(getSummaryFor(unit));
-				lblUnit.setIcon(new ImageIcon(getImageFor(unit, lblUnit)));			
+				lblUnit.setIcon(new ImageIcon(getImageFor(unit, lblUnit)));
 			}
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 1;
@@ -490,7 +490,7 @@ public class ForceViewPanel extends ScrollablePanel {
 			pnlSubUnits.add(lblUnit, gridBagConstraints);
 		}
 	}
-	
+
 	/**
      * set the portrait for the given person.
      *
@@ -517,11 +517,11 @@ public class ForceViewPanel extends ScrollablePanel {
         try {
             portrait = (Image) icons.getPortraits().getItem(category, filename);
             if(null != portrait) {
-                portrait = portrait.getScaledInstance(72, -1, Image.SCALE_DEFAULT);               
+                portrait = portrait.getScaledInstance(72, -1, Image.SCALE_DEFAULT);
             } else {
             	portrait = (Image) icons.getPortraits().getItem("", "default.gif");
             	if(null != portrait) {
-                    portrait = portrait.getScaledInstance(72, -1, Image.SCALE_DEFAULT);               
+                    portrait = portrait.getScaledInstance(72, -1, Image.SCALE_DEFAULT);
             	}
             }
             lbl.setIcon(new ImageIcon(portrait));
@@ -529,10 +529,10 @@ public class ForceViewPanel extends ScrollablePanel {
             err.printStackTrace();
         }
     }
-    
+
     private Image getImageFor(Unit u, Component c) {
-        
-		if(null == icons.getMechTiles()) { 
+
+		if(null == icons.getMechTiles()) {
 			return null;
 		}
         Image base = icons.getMechTiles().imageFor(u.getEntity(), c, -1);
@@ -540,7 +540,7 @@ public class ForceViewPanel extends ScrollablePanel {
         EntityImage entityImage = new EntityImage(base, tint, getCamo(u), c);
         return entityImage.loadPreviewImage();
     }
-    
+
     private Image getCamo(Unit unit) {
         // Try to get the player's camo file.
         Image camo = null;
@@ -551,7 +551,7 @@ public class ForceViewPanel extends ScrollablePanel {
         }
         return camo;
     }
-    
+
     public String getSummaryFor(Person person, Unit unit) {
         String toReturn = "<html><font size='2'><b>" + person.getFullTitle() + "</b><br/>";
         toReturn += person.getSkillSummary() + " " + person.getRoleDesc();
@@ -562,7 +562,7 @@ public class ForceViewPanel extends ScrollablePanel {
         toReturn += "</font></html>";
         return toReturn;
     }
-    
+
     public String getSummaryFor(Unit unit) {
         String toReturn = "<html><font size='3'><b>" + unit.getName() + "</b></font><br/>";
         toReturn += "<font size='2'><b>BV:</b> " + unit.getEntity().calculateBattleValue(true, null == unit.getEntity().getCrew()) + "<br/>";
@@ -633,7 +633,7 @@ public class ForceViewPanel extends ScrollablePanel {
         toReturn += "</font></html>";
         return toReturn;
     }
-    
+
     public String getSummaryFor(Force f) {
     	//we are not going to use the campaign methods here because we can be more efficient
     	//by only traversing once
@@ -661,7 +661,7 @@ public class ForceViewPanel extends ScrollablePanel {
     		}
     	}
  		//sort person vector by rank
- 		Collections.sort(people, new Comparator<Person>(){		 
+ 		Collections.sort(people, new Comparator<Person>(){
             public int compare(final Person p1, final Person p2) {
                return ((Comparable<Integer>)p2.getRankNumeric()).compareTo(p1.getRankNumeric());
             }

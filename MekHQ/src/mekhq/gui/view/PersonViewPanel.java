@@ -73,7 +73,7 @@ public class PersonViewPanel extends ScrollablePanel {
     private final DirectoryItems awardIcons;
     private final IconPackage ip;
 
-    ResourceBundle resourceMap = null;
+    ResourceBundle resourceMap;
 
     public PersonViewPanel(Person p, Campaign c, CampaignGUI gui) {
         this.person = p;
@@ -94,7 +94,6 @@ public class PersonViewPanel extends ScrollablePanel {
 
         JPanel pnlPortrait = setPortrait();
         GridBagConstraints gbc_pnlPortrait = new GridBagConstraints();
-        gbc_pnlPortrait = new GridBagConstraints();
         gbc_pnlPortrait.gridx = 0;
         gbc_pnlPortrait.gridy = 0;
         gbc_pnlPortrait.fill = GridBagConstraints.NONE;
@@ -383,7 +382,7 @@ public class PersonViewPanel extends ScrollablePanel {
         for (Award award : awards) {
             JLabel miscLabel = new JLabel();
 
-            Image miscAward = null;
+            Image miscAward;
             try {
                 int numberOfAwards = person.awardController.getNumberOfAwards(award);
                 String miscFileName = award.getMiscFileName(numberOfAwards);
@@ -419,7 +418,7 @@ public class PersonViewPanel extends ScrollablePanel {
         pnlPortrait.setLayout(new GridBagLayout());
 
         JLabel lblPortrait = new JLabel();
-        lblPortrait.setName("lblPortait"); // NOI18N
+        lblPortrait.setName("lblPortrait"); // NOI18N
         lblPortrait.setBackground(Color.WHITE);
 
         String category = person.getPortraitCategory();
@@ -435,7 +434,7 @@ public class PersonViewPanel extends ScrollablePanel {
         }
 
         // Try to get the player's portrait file.
-        Image portrait = null;
+        Image portrait;
         try {
             portrait = (Image) portraits.getItem(category, filename);
             if (null != portrait) {
@@ -463,7 +462,6 @@ public class PersonViewPanel extends ScrollablePanel {
     }
 
     private JPanel fillInfo() {
-
         JPanel pnlInfo = new JPanel(new GridBagLayout());
         pnlInfo.setBorder(BorderFactory.createTitledBorder(person.getFullTitle()));
         pnlInfo.setBackground(Color.WHITE);
@@ -899,13 +897,13 @@ public class PersonViewPanel extends ScrollablePanel {
                     String.format(resourceMap.getString("format.itemHeader"), SkillType.getSkillList()[i])); //$NON-NLS-1$
                 lblValue = new JLabel(person.getSkill(SkillType.getSkillList()[i]).toString());
                 gridBagConstraints = new GridBagConstraints();
-                gridBagConstraints.gridx = 0+addition;
+                gridBagConstraints.gridx = addition;
                 gridBagConstraints.gridy = firsty;
                 gridBagConstraints.fill = GridBagConstraints.NONE;
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 pnlSkills.add(lblName, gridBagConstraints);
                 gridBagConstraints = new GridBagConstraints();
-                gridBagConstraints.gridx = 1+addition;
+                gridBagConstraints.gridx = 1 + addition;
                 gridBagConstraints.gridy = firsty;
                 gridBagConstraints.weightx = weight;
                 gridBagConstraints.insets = new Insets(0, 10, 0, 0);
