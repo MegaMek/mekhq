@@ -33,6 +33,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -1283,7 +1284,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         List<IAcquisitionWork> toRemove = new ArrayList<>();
         toRemove.add(this);
         for (IAcquisitionWork part : campaign.getShoppingList().getPartList()) {
-            if ((part instanceof Part) && ((Part) part).getRefitId() == this.getRefitId()) {
+            if ((part instanceof Part) && Objects.equals(((Part) part).getRefitId(), this.getRefitId())) {
                 toRemove.add(part);
             }
         }

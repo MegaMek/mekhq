@@ -28,7 +28,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.JOptionPane;
 
@@ -247,6 +249,7 @@ public class Campaign implements Serializable, ITechManager {
 
     // calendar stuff
     private GregorianCalendar calendar;
+    private DateTime currentDateTime;
     private String dateFormat;
     private String shortDateFormat;
 
@@ -309,6 +312,7 @@ public class Campaign implements Serializable, ITechManager {
         player = new Player(0, "self");
         game.addPlayer(0, player);
         calendar = new GregorianCalendar(3067, Calendar.JANUARY, 1);
+        currentDateTime = new DateTime(calendar);
         CurrencyManager.getInstance().setCampaign(this);
         location = new CurrentLocation(Systems.getInstance().getSystems()
                 .get("Outreach"), 0);
@@ -442,6 +446,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public void setCalendar(GregorianCalendar c) {
         calendar = c;
+        currentDateTime = new DateTime(c);
     }
 
     public GregorianCalendar getCalendar() {
@@ -465,7 +470,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public String getCurrentSystemName() {
-        return location.getCurrentSystem().getPrintableName(Utilities.getDateTimeDay(calendar));
+        return location.getCurrentSystem().getPrintableName(getDateTime());
     }
 
     public PlanetarySystem getCurrentSystem() {
@@ -1367,8 +1372,13 @@ public class Campaign implements Serializable, ITechManager {
         ServiceLogger.joined(p, getDate(), getName(), rankEntry);
     }
 
+    @Deprecated
     public Date getDate() {
         return calendar.getTime();
+    }
+
+    public DateTime getDateTime() {
+        return currentDateTime;
     }
 
     public Collection<Person> getPersonnel() {
@@ -2875,7 +2885,7 @@ public class Campaign implements Serializable, ITechManager {
      */
     public void readNews() {
         //read the news
-        DateTime now = Utilities.getDateTimeDay(calendar);
+        DateTime now = getDateTime();
         for(NewsItem article : news.fetchNewsFor(now)) {
             addReport(article.getHeadlineForReport());
         }
@@ -3299,6 +3309,8 @@ public class Campaign implements Serializable, ITechManager {
         this.autosaveService.requestDayAdvanceAutosave(this, this.calendar.get(Calendar.DAY_OF_WEEK));
 
         calendar.add(Calendar.DAY_OF_MONTH, 1);
+        currentDateTime = new DateTime(calendar);
+
         currentReport.clear();
         currentReportHTML = "";
         newReports.clear();
@@ -3972,6 +3984,32 @@ public class Campaign implements Serializable, ITechManager {
         return spares;
     }
 
+    /**
+     * Finds the first spare part matching a predicate.
+     *
+     * @param predicate The predicate to use when searching
+     *                  for a suitable spare part.
+     * @return A matching spare {@link Part} or {@code null}
+     *         if no suitable match was found.
+     */
+    @Nullable
+    public Part findSparePart(Predicate<Part> predicate) {
+        for (Part part : parts.values()) {
+            if (part.isSpare() && predicate.test(part)) {
+                return part;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Streams the spare parts in the campaign.
+     * @return A stream of spare parts in the campaign.
+     */
+    public Stream<Part> streamSpareParts() {
+        return parts.values().stream().filter(Part::isSpare);
+    }
+
     public void addFunds(Money quantity) {
         addFunds(quantity, "Rich Uncle", Transaction.C_MISC);
     }
@@ -4504,13 +4542,13 @@ public class Campaign implements Serializable, ITechManager {
     public Vector<String> getSystemNames() {
         Vector<String> systemNames = new Vector<String>();
         for (PlanetarySystem key : Systems.getInstance().getSystems().values()) {
-            systemNames.add(key.getPrintableName(Utilities.getDateTimeDay(calendar)));
+            systemNames.add(key.getPrintableName(getDateTime()));
         }
         return systemNames;
     }
 
     public PlanetarySystem getSystemByName(String name) {
-        return Systems.getInstance().getSystemByName(name, Utilities.getDateTimeDay(calendar));
+        return Systems.getInstance().getSystemByName(name, getDateTime());
     }
 
     /**
@@ -4911,7 +4949,7 @@ public class Campaign implements Serializable, ITechManager {
         String startKey = start.getId();
         String endKey = end.getId();
 
-        final DateTime now = Utilities.getDateTimeDay(calendar);
+        final DateTime now = getDateTime();
         String current = startKey;
         Set<String> closed = new HashSet<>();
         Set<String> open = new HashSet<>();
@@ -6988,7 +7026,7 @@ public class Campaign implements Serializable, ITechManager {
     public Money getTotalEquipmentValue() {
         return Money.zero()
                 .plus(getUnits().stream().map(Unit::getSellValue).collect(Collectors.toList()))
-                .plus(getSpareParts().stream().map(Part::getActualValue).collect(Collectors.toList()));
+                .plus(streamSpareParts().map(Part::getActualValue).collect(Collectors.toList()));
     }
 
     /**
@@ -7436,7 +7474,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     @SuppressWarnings("unused") // FIXME: This whole method needs re-worked once Dropship Assignments are in
-    public double getCargoTonnage(boolean inTransit, boolean mothballed) {
+    public double getCargoTonnage(final boolean inTransit, final boolean mothballed) {
         double cargoTonnage = 0;
         double mothballedTonnage = 0;
         int mechs = getNumberOfUnitsByType(Entity.ETYPE_MECH);
@@ -7450,12 +7488,9 @@ public class Campaign implements Serializable, ITechManager {
         int hv = getNumberOfUnitsByType(Entity.ETYPE_TANK, false);
         int protos = getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH);
 
-        for (Part part : getSpareParts()) {
-            if (!inTransit && !part.isPresent()) {
-                continue;
-            }
-            cargoTonnage += (part.getQuantity() * part.getTonnage());
-        }
+        cargoTonnage += streamSpareParts().filter(p -> inTransit || p.isPresent())
+                            .mapToDouble(p -> p.getQuantity() * p.getTonnage())
+                            .sum();
 
         // place units in bays
         // FIXME: This has been temporarily disabled. It really needs dropship assignments done to fix it correctly.
@@ -8383,7 +8418,7 @@ public class Campaign implements Serializable, ITechManager {
 
     @Override
     public int getGameYear() {
-        return calendar.get(Calendar.YEAR);
+        return currentDateTime.getYear();
     }
 
     @Override
