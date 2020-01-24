@@ -1115,12 +1115,10 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
     public boolean partsInTransit() {
         for (int pid : newUnitParts) {
             Part part = oldUnit.getCampaign().getPart(pid);
-            if (part == null) {
-                if(null == part) {
-                    MekHQ.getLogger().log(getClass(), "partsInTransit()", LogLevel.ERROR, //$NON-NLS-1$
-                            "part with id " + pid + " not found for refit of " + getDesc()); //$NON-NLS-1$
-                    continue;
-                }
+            if (null == part) {
+                MekHQ.getLogger().log(getClass(), "partsInTransit()", LogLevel.ERROR, //$NON-NLS-1$
+                        "part with id " + pid + " not found for refit of " + getDesc()); //$NON-NLS-1$
+                continue;
             }
             if (!part.isPresent()) {
                 return true;
