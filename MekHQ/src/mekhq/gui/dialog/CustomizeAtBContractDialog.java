@@ -44,9 +44,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
@@ -173,7 +171,6 @@ public class CustomizeAtBContractDialog extends JDialog {
         JLabel lblType = new JLabel();
         btnOK = new JButton();
         btnClose = new JButton();
-        JScrollPane scrDesc = new JScrollPane();
         txtDesc = new MarkdownEditorPanel("Contract Description");
         JLabel lblPlanetName = new JLabel();
         String[] skillNames = {"Green", "Regular", "Veteran", "Elite"};
