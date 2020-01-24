@@ -53,7 +53,7 @@ public class DailyReportLogPanel extends JPanel {
     private static final long serialVersionUID = -6512675362473724385L;
 
     JTextPane txtLog;
-    String logText = new String();
+    String logText = "";
 
     public DailyReportLogPanel(ReportHyperlinkListener listener) {
         txtLog = new JTextPane() {
