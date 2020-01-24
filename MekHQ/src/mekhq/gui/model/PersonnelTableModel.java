@@ -763,12 +763,7 @@ import mekhq.gui.BasicInfo;
                 if(actualCol == COL_ASSIGN) {
                 	if (loadAssignmentFromMarket) {
                 		Entity en = personnelMarket.getAttachedEntity(p);
-                		
-                		if (null == en) {
-                			setText("-", color);
-                		}
-                		
-                		setText(en.getDisplayName(), color);
+                        setText(en != null ? en.getDisplayName() : "-", color);
                 	} else {
 	                    Unit u = getCampaign().getUnit(p.getUnitId());
 	                    if(!p.getTechUnitIDs().isEmpty()) {
