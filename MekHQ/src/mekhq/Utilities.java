@@ -520,7 +520,7 @@ public class Utilities {
             }
         }
         if(navigator != null) {
-            if(null != navigator && navigator.getRankNumeric() > bestRank) {
+            if(navigator.getRankNumeric() > bestRank) {
                 commander = navigator;
                 bestRank = navigator.getRankNumeric();
             }

@@ -514,7 +514,7 @@ public class ResolveScenarioTracker {
                 if(null != u.getEntity().getCrew()) {
                     existingHits = u.getEntity().getCrew().getHits();
                 }
-                if(null != en && null != en.getCrew()) {
+                if(null != en.getCrew()) {
                     currentHits = en.getCrew().getHits();
                 }
                 int newHits = Math.max(0,currentHits - existingHits);
@@ -741,7 +741,7 @@ public class ResolveScenarioTracker {
                 if(null != u.getEntity().getCrew()) {
                     existingHits = u.getEntity().getCrew().getHits();
                 }
-                if(null != en && null != en.getCrew()) {
+                if(null != en.getCrew()) {
                     currentHits = en.getCrew().getHits();
                 }
                 int newHits = Math.max(0,currentHits - existingHits);

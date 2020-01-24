@@ -505,8 +505,7 @@ public class CampaignXmlParser {
             }
             if (prt instanceof MissingEnginePart && null != u
                     && u.getEntity() instanceof Tank) {
-                boolean isHover = null != u
-                        && u.getEntity().getMovementMode() == EntityMovementMode.HOVER && u.getEntity() instanceof Tank;
+                boolean isHover = u.getEntity().getMovementMode() == EntityMovementMode.HOVER;
                 ((MissingEnginePart) prt).fixTankFlag(isHover);
             }
             if (prt instanceof MissingEnginePart
