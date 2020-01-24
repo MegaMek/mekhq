@@ -300,7 +300,7 @@ public final class OverviewTab extends CampaignGuiTab {
         Action buy = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int row = Integer.valueOf(e.getActionCommand());
+                int row = Integer.parseInt(e.getActionCommand());
                 PartInUse piu = overviewPartsModel.getPartInUse(row);
                 IAcquisitionWork partToBuy = piu.getPartToBuy();
                 getCampaign().getShoppingList().addShoppingItem(partToBuy, 1, getCampaign());
@@ -311,7 +311,7 @@ public final class OverviewTab extends CampaignGuiTab {
         Action buyInBulk = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int row = Integer.valueOf(e.getActionCommand());
+                int row = Integer.parseInt(e.getActionCommand());
                 PartInUse piu = overviewPartsModel.getPartInUse(row);
                 int quantity = 1;
                 PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(getFrame(), true,
@@ -327,7 +327,7 @@ public final class OverviewTab extends CampaignGuiTab {
         Action add = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int row = Integer.valueOf(e.getActionCommand());
+                int row = Integer.parseInt(e.getActionCommand());
                 PartInUse piu = overviewPartsModel.getPartInUse(row);
                 IAcquisitionWork partToBuy = piu.getPartToBuy();
                 getCampaign().addPart((Part) partToBuy.getNewEquipment(), 0);
@@ -338,7 +338,7 @@ public final class OverviewTab extends CampaignGuiTab {
         Action addInBulk = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int row = Integer.valueOf(e.getActionCommand());
+                int row = Integer.parseInt(e.getActionCommand());
                 PartInUse piu = overviewPartsModel.getPartInUse(row);
                 int quantity = 1;
                 PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(getFrame(), true,
