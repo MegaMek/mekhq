@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
@@ -1351,8 +1352,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      * or an enemy force.
      */
     private void forceAlignmentChangeHandler() {
-        boolean isPlayerForce = (cboAlignment.getSelectedItem() == ScenarioForceTemplate.FORCE_ALIGNMENTS[0]) &&
-                (cboGenerationMethod.getSelectedItem() == ScenarioForceTemplate.FORCE_GENERATION_METHODS[0]);
+        boolean isPlayerForce = Objects.equals(cboAlignment.getSelectedItem(), ScenarioForceTemplate.FORCE_ALIGNMENTS[0]) &&
+                Objects.equals(cboGenerationMethod.getSelectedItem(), ScenarioForceTemplate.FORCE_GENERATION_METHODS[0]);
 
         boolean isEnemyForce = (cboAlignment.getSelectedIndex() == ScenarioForceTemplate.ForceAlignment.Opposing.ordinal()) ||
                 (cboAlignment.getSelectedIndex() == ScenarioForceTemplate.ForceAlignment.Third.ordinal()) ||
