@@ -984,7 +984,7 @@ public class ResolveScenarioTracker {
                     }
                 } else {
                     // Enemy crew/pilot entity is actually in the salvage list
-                    if(e instanceof EjectedCrew & null != e.getCrew() && !e.getCrew().getExternalIdAsString().equals("-1")) {
+                    if(e instanceof EjectedCrew && null != e.getCrew() && !e.getCrew().getExternalIdAsString().equals("-1")) {
                         enemyEjections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew)e);
                         continue;
                     }

@@ -1857,7 +1857,7 @@ public class CampaignXmlParser {
                                 }
                             } 
                         }
-                        if(sysPos>0 & !events.isEmpty()) {
+                        if(sysPos > 0 && !events.isEmpty()) {
                         	eventsMap.put(sysPos, events);
                         }
                     }
