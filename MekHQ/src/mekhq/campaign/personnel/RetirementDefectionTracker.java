@@ -35,6 +35,8 @@ import java.util.UUID;
 
 import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
+
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -601,14 +603,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
     }
 
     private String createCsv(Collection<? extends Object> coll) {
-        String retVal = "";
-        if (coll.size() > 0) {
-            for (Object o : coll) {
-                retVal += o.toString() + ",";
-            }
-            return retVal.substring(0, retVal.length() - 1);
-        }
-        return "";
+        return StringUtils.join(coll, ",");
     }
 
     @Override

@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mekhq.campaign.finances.Money;
+
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -2552,15 +2554,15 @@ public class CampaignOptions implements Serializable {
 
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                 + "<planetTechAcquisitionBonus>"
-                + Utilities.printIntegerArray(planetTechAcquisitionBonus)
+                + StringUtils.join(planetTechAcquisitionBonus, ',')
                 + "</planetTechAcquisitionBonus>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                 + "<planetIndustryAcquisitionBonus>"
-                + Utilities.printIntegerArray(planetIndustryAcquisitionBonus)
+                + StringUtils.join(planetIndustryAcquisitionBonus, ',')
                 + "</planetIndustryAcquisitionBonus>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                 + "<planetOutputAcquisitionBonus>"
-                + Utilities.printIntegerArray(planetOutputAcquisitionBonus)
+                + StringUtils.join(planetOutputAcquisitionBonus, ',')
                 + "</planetOutputAcquisitionBonus>");
 
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
@@ -2569,12 +2571,12 @@ public class CampaignOptions implements Serializable {
                     + "</salaryTypeBase>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<salaryXpMultiplier>"
-                    + Utilities.printDoubleArray(salaryXpMultiplier)
+                    + StringUtils.join(salaryXpMultiplier, ',')
                     + "</salaryXpMultiplier>");
 
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<usePortraitForType>"
-                    + Utilities.printBooleanArray(usePortraitForType)
+                    + StringUtils.join(usePortraitForType, ',')
                     + "</usePortraitForType>");
         StringBuilder csv = new StringBuilder();
         for (int i = 0; i < rats.length; i++) {

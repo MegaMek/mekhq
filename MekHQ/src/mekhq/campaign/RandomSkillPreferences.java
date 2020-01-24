@@ -29,6 +29,7 @@ import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.personnel.Person;
 
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -199,15 +200,15 @@ public class RandomSkillPreferences implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "overallRecruitBonus", overallRecruitBonus);
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<recruitBonuses>"
-				+Utilities.printIntegerArray(recruitBonuses)
+				+StringUtils.join(recruitBonuses, ',')
 				+"</recruitBonuses>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<specialAbilBonus>"
-				+Utilities.printIntegerArray(specialAbilBonus)
+				+StringUtils.join(specialAbilBonus, ',')
 				+"</specialAbilBonus>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<tacticsMod>"
-				+Utilities.printIntegerArray(tacticsMod)
+				+StringUtils.join(tacticsMod, ',')
 				+"</tacticsMod>");
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "randomizeSkill", randomizeSkill);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useClanBonuses", useClanBonuses);
