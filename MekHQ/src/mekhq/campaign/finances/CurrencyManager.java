@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -59,13 +60,28 @@ import java.util.Set;
 public class CurrencyManager extends CurrencyUnitDataProvider {
     private static final CurrencyManager instance = new CurrencyManager();
 
+    /** The last time the default currency was checked. */
     private DateTime lastChecked;
+
+    /** 
+     * The last planetary system the campaign was on
+     * when the default currency was checked.
+     */
+    private PlanetarySystem lastSystem;
+
+    /**
+     * A cached default currency. This should be refreshed
+     * any time the date changes or the current location
+     * changes.
+     */
+    private Currency defaultCurrency;
+
     private Campaign campaign;
+
     private List<Currency> currencies;
     private Map<String, String> currencyCodeToNameMap;
     private Map<String, String> currencyCodeToSymbolMap;
     private Currency backupCurrency;
-    private Currency defaultCurrency;
 
     private MoneyFormatter xmlMoneyFormatter;
     private MoneyFormatter uiAmountPrinter;
@@ -125,9 +141,16 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
             return this.backupCurrency;
         }
 
+        // Check if we need to update the default currency
+        // by comparing the campaign's current date and
+        // planetary system against our cached date and systems
         DateTime date = this.campaign.getDateTime();
-        if (this.lastChecked == null || this.lastChecked.isBefore(date)) {
+        PlanetarySystem currentSystem = this.campaign.getCurrentSystem();
+        if (this.lastChecked == null 
+            || this.lastChecked.isBefore(date)
+            || !Objects.equals(this.lastSystem, currentSystem)) {
             this.lastChecked = date;
+            this.lastSystem = currentSystem;
             this.defaultCurrency = this.backupCurrency;
 
             Map<String, Currency> possibleCurrencies = new HashMap<>();
@@ -160,9 +183,8 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
             }
 
             // Use the currency of one of the factions in the planet where the unit is deployed, if it exists
-            PlanetarySystem psystem = this.campaign.getCurrentSystem();
-            if (psystem != null) {
-                Set<Faction> factions = psystem.getFactionSet(date);
+            if (currentSystem != null) {
+                Set<Faction> factions = currentSystem.getFactionSet(date);
                 for (Faction faction : factions) {
                     Currency currency = possibleCurrencies.getOrDefault(faction.getCurrencyCode(), null);
                     if (currency != null) {
