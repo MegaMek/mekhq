@@ -75,7 +75,7 @@ public class MissingQuadVeeGear extends MissingPart {
 
     @Override
     public double getTonnage() {
-        return Math.ceil(unitTonnage / 10);
+        return Math.ceil(unitTonnage / 10.0);
     }
 
     @Override
