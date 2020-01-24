@@ -556,7 +556,6 @@ public class CampaignOptions implements Serializable {
         instantUnitMarketDelivery = false;
         useWeatherConditions = true;
     	useLightConditions = true;
-    	usePlanetaryConditions = true;
     	usePlanetaryConditions = false;
     	useLeadership = true;
     	useStrategy = true;
