@@ -22,6 +22,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -236,14 +237,21 @@ public class MekHqXmlUtil {
         pw1.println("</"+name+">");
     }
 
+    private static final String[] INDENTS = new String[] {
+        "",
+        "\t",
+        "\t\t",
+        "\t\t\t",
+        "\t\t\t\t",
+        "\t\t\t\t\t",
+        "\t\t\t\t\t\t"
+    };
+
     public static String indentStr(int level) {
-        String retVal = "";
-
-        for (int x=0; x<level; x++) {
-            retVal += "\t";
+        if (level < INDENTS.length) {
+            return INDENTS[level];
         }
-
-        return retVal;
+        return StringUtils.repeat('\t', level);
     }
 
     public static String xmlToString(Node node) throws TransformerException {
