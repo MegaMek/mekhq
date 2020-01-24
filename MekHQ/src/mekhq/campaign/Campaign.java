@@ -1195,8 +1195,9 @@ public class Campaign implements Serializable, ITechManager {
                 });
             }
             if (weightSorted) {
+                // Sorted in descending order of weights
                 Collections.sort(sortedUnits, 
-                    (lhs, rhs) -> Double.compare(lhs.getEntity().getWeight(), rhs.getEntity().getWeight()));
+                    (lhs, rhs) -> Double.compare(rhs.getEntity().getWeight(), lhs.getEntity().getWeight()));
             }
         }
         return sortedUnits;
