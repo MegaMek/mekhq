@@ -404,6 +404,11 @@ public class PodSpace implements Serializable, IPartWork {
 
     @Override
     public String getDetails() {
+        return getDetails(true);
+    }
+
+    @Override
+    public String getDetails(boolean includeRepairDetails) {
         int allParts = 0;
         int replacements = 0;
         int inTransit = 0;

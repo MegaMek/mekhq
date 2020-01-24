@@ -18,7 +18,7 @@ public class PartInUse {
     private Money cost = Money.zero();
 
     private void appendDetails(StringBuilder sb, Part part) {
-        String details = part.getDetails();
+        String details = part.getDetails(/*includeRepairDetails:*/false);
         if(!details.isEmpty()) {
             sb.append(" (").append(details).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
         }
