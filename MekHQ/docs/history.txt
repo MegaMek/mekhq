@@ -30,6 +30,8 @@ v0.47.3-SNAPSHOT
 + Issue #219: Bug: Overview/Hangar Breakdown does not include support vehicles in count
 + PR #1380: Data: House Arano sourcebook planet ownership data added
 + PR #1422: Minor performance improvement for contract market
++ Issue #1366: Bug: Fix empty procurement list on campaign load
++ Issue #1345: Bug: Fix unlimited acquisitions when daily limits in place
 
 v0.47.2 (2019-11-15 2000 UTC) 
 + PR #1325: Customize protomechs and advanced aero in MekLab
