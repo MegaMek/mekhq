@@ -1061,7 +1061,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         Collections.sort(forceTemplateList);
 
         for(ScenarioForceTemplate sft : forceTemplateList) {
-            JLabel lblForceOrder = new JLabel(((Integer) sft.getGenerationOrder()).toString());
+            JLabel lblForceOrder = new JLabel(Integer.toString(sft.getGenerationOrder()));
             panForceList.add(lblForceOrder, gbc);
 
             JLabel lblForceName = new JLabel(sft.getForceName());
@@ -1087,7 +1087,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
                 (sft.getGenerationMethod() == ScenarioForceTemplate.ForceGenerationMethod.FixedUnitCount.ordinal())) {
 
                 if(sft.getFixedUnitCount() >= 0) {
-                    lblMultiplier.setText(((Integer) sft.getFixedUnitCount()).toString());
+                    lblMultiplier.setText(Integer.toString(sft.getFixedUnitCount()));
                 } else {
                     lblMultiplier.setText("Lance");
                 }
@@ -1118,7 +1118,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             gbc.gridx++;
             panForceList.add(lblDestinationZones, gbc);
 
-            JLabel lblRetreatThreshold = new JLabel(((Integer) sft.getRetreatThreshold()).toString());
+            JLabel lblRetreatThreshold = new JLabel(Integer.toString(sft.getRetreatThreshold()));
             gbc.gridx++;
             panForceList.add(lblRetreatThreshold, gbc);
 
@@ -1134,8 +1134,9 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
                 panForceList.add(lblWeightClass, gbc);
             }
 
-            JLabel lblArrivalTurn = new JLabel(sft.getArrivalTurn() < 0 ?
-                    ScenarioForceTemplate.SPECIAL_ARRIVAL_TURNS.get(sft.getArrivalTurn()) : ((Integer) sft.getArrivalTurn()).toString());
+            JLabel lblArrivalTurn = new JLabel(sft.getArrivalTurn() < 0 
+                    ? ScenarioForceTemplate.SPECIAL_ARRIVAL_TURNS.get(sft.getArrivalTurn()) 
+                    : Integer.toString(sft.getArrivalTurn()));
             gbc.gridx++;
             panForceList.add(lblArrivalTurn, gbc);
 
