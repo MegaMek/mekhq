@@ -1195,13 +1195,8 @@ public class Campaign implements Serializable, ITechManager {
                 });
             }
             if (weightSorted) {
-                Collections.sort(sortedUnits, new Comparator<Unit>() {
-                    @Override
-                    public int compare(Unit lhs, Unit rhs) {
-                        // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
-                        return lhs.getEntity().getWeight() > rhs.getEntity().getWeight() ? -1 : (lhs.getEntity().getWeight() < rhs.getEntity().getWeight()) ? 1 : 0;
-                    }
-                });
+                Collections.sort(sortedUnits, 
+                    (lhs, rhs) -> Double.compare(lhs.getEntity().getWeight(), rhs.getEntity().getWeight()));
             }
         }
         return sortedUnits;
