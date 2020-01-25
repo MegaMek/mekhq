@@ -363,13 +363,7 @@ public class RegionPerimeter {
         @Override
         public int compare(Point p1, Point p2) {
             double cp = vectorCrossProduct(origin, p1, p2);
-            if (cp > 0) {
-                return -1;
-            } else if (cp < 0) {
-                return 1;
-            } else {
-                return 0;
-            }
+            return Double.compare(0, cp);
         }
     }
     

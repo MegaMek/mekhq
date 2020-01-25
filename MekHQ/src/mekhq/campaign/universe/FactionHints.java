@@ -488,16 +488,16 @@ public class FactionHints {
                         addNeutralExceptions(f, wn);
                     } else {
                         MekHQ.getLogger().error(getClass(), METHOD_NAME,
-                                "Invalid faction code in factionhints.xml: " + f); //$NON-NLS-1$
+                                "Invalid faction code in factionhints.xml: " + fKey); //$NON-NLS-1$
                     }
                 } else if (nodeName.equals("deepPeriphery")) {
                     for (String fKey : wn.getTextContent().trim().split(",")) {
                         Faction f = Faction.getFaction(fKey);
-                        if (null != fKey) {
+                        if (null != f) {
                             deepPeriphery.add(f);
                         } else {
                             MekHQ.getLogger().error(getClass(), METHOD_NAME,
-                                    "Invalid faction code in factionhints.xml: " + f); //$NON-NLS-1$
+                                    "Invalid faction code in factionhints.xml: " + fKey); //$NON-NLS-1$
                         }
                     }
                 } else if (nodeName.equals("majorPowers")) {
@@ -507,7 +507,7 @@ public class FactionHints {
                             majorPowers.add(f);
                         } else {
                             MekHQ.getLogger().error(getClass(), METHOD_NAME,
-                                    "Invalid faction code in factionhints.xml: " + f); //$NON-NLS-1$
+                                    "Invalid faction code in factionhints.xml: " + fKey); //$NON-NLS-1$
                         }
                     }
                 } else if (nodeName.equals("rivals")) {

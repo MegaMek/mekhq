@@ -885,7 +885,7 @@ public class AtBContract extends Contract implements Serializable {
                 moraleMod--;
                 break;
             case EVT_SPECIALEVENTS:
-                text = new String ("<b>Special Event:</b> ");
+                text = "<b>Special Event:</b> ";
                 switch (Compute.d6()) {
                 case 1:
                     text += "Change of Alliance: Next Enemy Morale roll gets a +1 modifier.";

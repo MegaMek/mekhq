@@ -505,8 +505,7 @@ public class CampaignXmlParser {
             }
             if (prt instanceof MissingEnginePart && null != u
                     && u.getEntity() instanceof Tank) {
-                boolean isHover = null != u
-                        && u.getEntity().getMovementMode() == EntityMovementMode.HOVER && u.getEntity() instanceof Tank;
+                boolean isHover = u.getEntity().getMovementMode() == EntityMovementMode.HOVER;
                 ((MissingEnginePart) prt).fixTankFlag(isHover);
             }
             if (prt instanceof MissingEnginePart
@@ -561,15 +560,19 @@ public class CampaignXmlParser {
                     case Person.T_AERO_PILOT:
                     case Person.T_CONV_PILOT:
                         psn.setPhenotype(Person.PHENOTYPE_AERO);
+                        break;
                     case Person.T_BA:
                         psn.setPhenotype(Person.PHENOTYPE_BA);
+                        break;
                     case Person.T_VEE_GUNNER:
                     case Person.T_GVEE_DRIVER:
                     case Person.T_NVEE_DRIVER:
                     case Person.T_VTOL_PILOT:
                         psn.setPhenotype(Person.PHENOTYPE_VEE);
+                        break;
                     default:
                         psn.setPhenotype(Person.PHENOTYPE_NONE);
+                        break;
                 }
             }
         }
@@ -1858,7 +1861,7 @@ public class CampaignXmlParser {
                                 }
                             } 
                         }
-                        if(sysPos>0 & !events.isEmpty()) {
+                        if(sysPos > 0 && !events.isEmpty()) {
                         	eventsMap.put(sysPos, events);
                         }
                     }

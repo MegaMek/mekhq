@@ -385,11 +385,11 @@ public class Faction {
             } else if(wn2.getNodeName().equalsIgnoreCase("id")) {
                 retVal.id = Integer.valueOf(wn2.getTextContent());
             } else if(wn2.getNodeName().equalsIgnoreCase("start")) {
-                retVal.start = Integer.valueOf(wn2.getTextContent());
+                retVal.start = Integer.parseInt(wn2.getTextContent());
             } else if(wn2.getNodeName().equalsIgnoreCase("currencyCode")) {
                 retVal.currencyCode = wn2.getTextContent();
             } else if(wn2.getNodeName().equalsIgnoreCase("end")) {
-                retVal.end = Integer.valueOf(wn2.getTextContent());
+                retVal.end = Integer.parseInt(wn2.getTextContent());
             } else if(wn2.getNodeName().equalsIgnoreCase("tags")) {
                 Arrays.stream(wn2.getTextContent().split(",")).map(tag -> tag.toUpperCase(Locale.ROOT))
                     .map(Tag::valueOf).forEach(tag -> retVal.tags.add(tag));

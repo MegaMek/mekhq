@@ -56,6 +56,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.Vector;
@@ -519,7 +520,7 @@ public class Utilities {
             }
         }
         if(navigator != null) {
-            if(null != navigator && navigator.getRankNumeric() > bestRank) {
+            if(navigator.getRankNumeric() > bestRank) {
                 commander = navigator;
                 bestRank = navigator.getRankNumeric();
             }
@@ -970,14 +971,11 @@ public class Utilities {
     }
 
     public static String printMoneyArray(Money[] array) {
-        StringBuilder values = new StringBuilder(); //$NON-NLS-1$
-        for(int i = 0; i < array.length; i++) {
-            values.append(array[i].toXmlString());
-            if(i < (array.length-1)) {
-                values.append(","); //$NON-NLS-1$
-            }
+        StringJoiner joiner = new StringJoiner(","); //$NON-NLS-1$
+        for (Money value : array) {
+            joiner.add(value.toXmlString());
         }
-        return values.toString();
+        return joiner.toString();
     }
 
     public static Money[] readMoneyArray(Node node) {
@@ -989,39 +987,6 @@ public class Utilities {
         }
 
         return result;
-    }
-
-    public static String printIntegerArray(int[] array) {
-        String values = ""; //$NON-NLS-1$
-        for(int i = 0; i < array.length; i++) {
-            values += Integer.toString(array[i]);
-            if(i < (array.length-1)) {
-                values += ","; //$NON-NLS-1$
-            }
-        }
-        return values;
-    }
-
-    public static String printDoubleArray(double[] array) {
-        String values = ""; //$NON-NLS-1$
-        for(int i = 0; i < array.length; i++) {
-            values += Double.toString(array[i]);
-            if(i < (array.length-1)) {
-                values += ","; //$NON-NLS-1$
-            }
-        }
-        return values;
-    }
-
-    public static String printBooleanArray(boolean[] array) {
-        String values = ""; //$NON-NLS-1$
-        for(int i = 0; i < array.length; i++) {
-            values += Boolean.toString(array[i]);
-            if(i < (array.length-1)) {
-                values += ","; //$NON-NLS-1$
-            }
-        }
-        return values;
     }
 
     public static int getSimpleTechLevel(int level) {

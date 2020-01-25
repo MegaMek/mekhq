@@ -285,7 +285,7 @@ public class AtBDynamicScenario extends AtBScenario {
     }
 
     public void setScenarioModifiers(List<AtBScenarioModifier> scenarioModifiers) {
-        scenarioModifiers = new ArrayList<>();
+        this.scenarioModifiers = new ArrayList<>();
         Collections.copy(this.scenarioModifiers, scenarioModifiers);
     }
 

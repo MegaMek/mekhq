@@ -514,7 +514,7 @@ public class ResolveScenarioTracker {
                 if(null != u.getEntity().getCrew()) {
                     existingHits = u.getEntity().getCrew().getHits();
                 }
-                if(null != en && null != en.getCrew()) {
+                if(null != en.getCrew()) {
                     currentHits = en.getCrew().getHits();
                 }
                 int newHits = Math.max(0,currentHits - existingHits);
@@ -741,7 +741,7 @@ public class ResolveScenarioTracker {
                 if(null != u.getEntity().getCrew()) {
                     existingHits = u.getEntity().getCrew().getHits();
                 }
-                if(null != en && null != en.getCrew()) {
+                if(null != en.getCrew()) {
                     currentHits = en.getCrew().getHits();
                 }
                 int newHits = Math.max(0,currentHits - existingHits);
@@ -984,7 +984,7 @@ public class ResolveScenarioTracker {
                     }
                 } else {
                     // Enemy crew/pilot entity is actually in the salvage list
-                    if(e instanceof EjectedCrew & null != e.getCrew() && !e.getCrew().getExternalIdAsString().equals("-1")) {
+                    if(e instanceof EjectedCrew && null != e.getCrew() && !e.getCrew().getExternalIdAsString().equals("-1")) {
                         enemyEjections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew)e);
                         continue;
                     }

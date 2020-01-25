@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
+import java.util.StringJoiner;
 import java.util.Vector;
 
 import javax.swing.JOptionPane;
@@ -389,16 +390,11 @@ public class Ranks {
 	}
 
 	public String getRankNameList(int profession) {
-		String rankNames = "";
-		int i = 0;
-		for(Rank rank : getAllRanks()) {
-			rankNames += rank.getName(profession);
-			i++;
-			if(i < getAllRanks().size()) {
-				rankNames += ",";
-			}
+		StringJoiner joiner = new StringJoiner(",");
+		for (Rank rank : getAllRanks()) {
+			joiner.add(rank.getName(profession));
 		}
-		return rankNames;
+		return joiner.toString();
 	}
 
 	//Keep this for reverse compatability in loading campaigns
@@ -406,7 +402,7 @@ public class Ranks {
 		ArrayList<ArrayList<String>> rankNames = new ArrayList<ArrayList<String>>();
 		String[] rnames = names.split(",");
 		for(String rname : rnames) {
-			ArrayList<String> temp = new ArrayList<String>();
+			ArrayList<String> temp = new ArrayList<String>(RPROF_NUM);
 			for (int i = 0; i < RPROF_NUM; i++) {
 				temp.add(rname);
 			}

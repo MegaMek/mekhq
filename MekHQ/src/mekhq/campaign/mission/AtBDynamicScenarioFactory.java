@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -1322,7 +1323,7 @@ public class AtBDynamicScenarioFactory {
     private static String generateUnitWeights(List<Integer> unitTypes, String faction, int weightClass, int maxWeight, Campaign campaign) {
         Faction genFaction = Faction.getFaction(faction);
         String factionWeightString = AtBConfiguration.ORG_IS;
-        if(genFaction.isClan() || faction == "MH") {
+        if(genFaction.isClan() || faction.equals("MH")) {
             factionWeightString = AtBConfiguration.ORG_CLAN;
         } else if (genFaction.isComstar()) {
             factionWeightString = AtBConfiguration.ORG_CS;
@@ -1594,7 +1595,7 @@ public class AtBDynamicScenarioFactory {
         if(forceTemplate.getActualDeploymentZone() != Board.START_NONE) {
             return forceTemplate.getActualDeploymentZone();
         } else if(forceTemplate.getSyncDeploymentType() == SynchronizedDeploymentType.None ||
-                forceTemplate.getSyncedForceName() == originalForceTemplateID) {
+                Objects.equals(forceTemplate.getSyncedForceName(), originalForceTemplateID)) {
             calculatedEdge = forceTemplate.getDeploymentZones().get(Compute.randomInt(forceTemplate.getDeploymentZones().size()));
         } else if (forceTemplate.getSyncDeploymentType() == SynchronizedDeploymentType.SameEdge) {
             calculatedEdge = calculateDeploymentZone(scenario.getTemplate().scenarioForces.get(forceTemplate.getSyncedForceName()), scenario, originalForceTemplateID);
@@ -2013,7 +2014,7 @@ public class AtBDynamicScenarioFactory {
         if(faction != null) {
             // clans and marian hegemony use a fundamental unit size of 5.
             if(faction.isClan() ||
-                    factionCode == "MH") {
+                    factionCode.equals("MH")) {
                 return CLAN_MH_LANCE_SIZE;
             // comstar and wobbies use a fundamental unit size of 6.
             } else if(faction.isComstar()) {
@@ -2033,7 +2034,7 @@ public class AtBDynamicScenarioFactory {
     public static int getAeroLanceSize(int unitTypeCode, boolean isPlanetOwner, String factionCode) {
         // capellans use units of three aircraft at a time, others use two
         // TODO: except maybe clans?
-        int numFightersPerFlight = factionCode == "CC" ? 3 : 2;
+        int numFightersPerFlight = factionCode.equals("CC") ? 3 : 2;
 
         if(unitTypeCode == UnitType.AERO) {
             return numFightersPerFlight;

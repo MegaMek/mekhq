@@ -76,7 +76,7 @@ public enum WorkTime {
     /** @return the work time order corresponding to the given string */
     public static WorkTime of(String str) {
         try {
-            return of(Integer.valueOf(str));
+            return of(Integer.parseInt(str));
         } catch(NumberFormatException nfex) {
             // Try something else
         }

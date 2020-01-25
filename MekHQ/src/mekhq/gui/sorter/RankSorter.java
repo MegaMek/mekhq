@@ -23,7 +23,6 @@ import mekhq.campaign.personnel.Ranks;
         private Matcher matcher;
         public RankSorter(Campaign c) {
             campaign = c;
-            c.getRanks();
             pattern = Pattern.compile("id=\"([^\"]+)\""); //$NON-NLS-1$
         }
 
