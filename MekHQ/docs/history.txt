@@ -33,6 +33,7 @@ v0.47.3-SNAPSHOT
 + Issue #1366: Bug: Fix empty procurement list on campaign load
 + Issue #1345: Bug: Fix unlimited acquisitions when daily limits in place
 + PR #1419: Improve performance of purchasing parts and fix refit bug where armor or ammo may not be used for a refit
++ PR #1424: Resolve errors found by SpotBugs
 
 v0.47.2 (2019-11-15 2000 UTC) 
 + PR #1325: Customize protomechs and advanced aero in MekLab
