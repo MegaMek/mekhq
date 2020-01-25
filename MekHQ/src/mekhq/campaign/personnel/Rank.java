@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.StringJoiner;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
@@ -136,16 +137,15 @@ public class Rank implements MekHqXmlSerializable {
     }
 
     public String getRankNamesAsString() {
-    	String names = "";
-    	String sep = "";
+    	StringJoiner joiner = new StringJoiner(",");
     	for (String name : rankNames) {
-    		names += sep+name;
     		if (rankLevels.size() > 0 && rankLevels.get(rankNames.indexOf(name)) > 0) {
-    			names += rankLevels.get(rankNames.indexOf(name)).toString();
-    		}
-    		sep = ",";
+    			joiner.add(name + rankLevels.get(rankNames.indexOf(name)).toString());
+    		} else {
+                joiner.add(name);
+            }
     	}
-    	return names;
+    	return joiner.toString();
     }
 
     public void writeToXml(PrintWriter pw1, int indent) {

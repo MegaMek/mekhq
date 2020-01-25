@@ -28,6 +28,12 @@ v0.47.3-SNAPSHOT
 + PR #1410: Add the unit ID to the log when unable to parse a unit
 + Issue #1262: Feature: Identify on the interstellar view planets that are eligible for additional contracts
 + Issue #219: Bug: Overview/Hangar Breakdown does not include support vehicles in count
++ PR #1380: Data: House Arano sourcebook planet ownership data added
++ PR #1422: Minor performance improvement for contract market
++ Issue #1366: Bug: Fix empty procurement list on campaign load
++ Issue #1345: Bug: Fix unlimited acquisitions when daily limits in place
++ PR #1419: Improve performance of purchasing parts and fix refit bug where armor or ammo may not be used for a refit
++ PR #1424: Resolve errors found by SpotBugs
 
 v0.47.2 (2019-11-15 2000 UTC) 
 + PR #1325: Customize protomechs and advanced aero in MekLab

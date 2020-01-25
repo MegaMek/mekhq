@@ -1101,8 +1101,29 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         }
     }
 
+    /**
+     * Gets a string containing details regarding the part,
+     * e.g. OmniPod or how many hits it has taken and its
+     * repair cost.
+     * @return A string containing details regarding the part.
+     */
     @Override
     public String getDetails() {
+        return getDetails(true);
+    }
+
+    /**
+     * Gets a string containing details regarding the part,
+     * and optionally include information on its repair
+     * status.
+     * @param includeRepairDetails {@code true} if the details
+     *        should include information such as the number of
+     *        hits or how much it would cost to repair the
+     *        part.
+     * @return A string containing details regarding the part.
+     */
+    @Override
+    public String getDetails(boolean includeRepairDetails) {
         StringJoiner sj = new StringJoiner(", ");
         if (getLocationName() != null) {
             sj.add(getLocationName());
@@ -1110,10 +1131,12 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         if (isOmniPodded()) {
             sj.add("OmniPod");
         }
-        sj.add(hits + " hit(s)");
-        if (campaign.getCampaignOptions().payForRepairs() && (hits > 0)) {
-            Money repairCost = getStickerPrice().multipliedBy(0.2);
-            sj.add(repairCost.toAmountAndSymbolString() + " to repair");
+        if (includeRepairDetails) {
+            sj.add(hits + " hit(s)");
+            if (campaign.getCampaignOptions().payForRepairs() && (hits > 0)) {
+                Money repairCost = getStickerPrice().multipliedBy(0.2);
+                sj.add(repairCost.toAmountAndSymbolString() + " to repair");
+            }
         }
         return sj.toString();
     }

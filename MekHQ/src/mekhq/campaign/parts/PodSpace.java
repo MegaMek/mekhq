@@ -70,10 +70,12 @@ public class PodSpace implements Serializable, IPartWork {
     public PodSpace(int location, Unit unit) {
         this.location = location;
         this.unit = unit;
-        this.campaign = unit.getCampaign();
-        //We don't need a LOC_WINGS podspace, but we do need one for the fuselage equipment, which is stored at LOC_NONE.
-        if (unit.getEntity() instanceof Aero && location == Aero.LOC_WINGS) {
-            this.location = -1;
+        if (unit != null) {
+            this.campaign = unit.getCampaign();
+            //We don't need a LOC_WINGS podspace, but we do need one for the fuselage equipment, which is stored at LOC_NONE.
+            if (unit.getEntity() instanceof Aero && location == Aero.LOC_WINGS) {
+                this.location = -1;
+            }
         }
     }
     
@@ -404,6 +406,11 @@ public class PodSpace implements Serializable, IPartWork {
 
     @Override
     public String getDetails() {
+        return getDetails(true);
+    }
+
+    @Override
+    public String getDetails(boolean includeRepairDetails) {
         int allParts = 0;
         int replacements = 0;
         int inTransit = 0;

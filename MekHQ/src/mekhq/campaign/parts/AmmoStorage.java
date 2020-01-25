@@ -282,29 +282,26 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         resetDaysToWait();
         return "<font color='red'><b> part not found</b>.</font>";
     }
-    
-    public void changeAmountAvailable(int amount, AmmoType curType) {
-        AmmoStorage a = null;
-        long curMunition = curType.getMunitionType();
-        for(Part part : campaign.getSpareParts()) {
-            if(!part.isPresent()) {
-                continue;
+
+    public void changeAmountAvailable(int amount, final AmmoType curType) {
+        final long curMunition = curType.getMunitionType();
+        AmmoStorage a = (AmmoStorage)campaign.findSparePart(part -> {
+            return part instanceof AmmoStorage
+                && part.isPresent()
+                && ((AmmoType)((AmmoStorage)part).getType()).equals(curType)
+                && curMunition == ((AmmoType)((AmmoStorage)part).getType()).getMunitionType();
+        });
+
+        if (null != a) {
+            a.changeShots(amount);
+            if (a.getShots() <= 0) {
+                campaign.removePart(a);
             }
-            if(part instanceof AmmoStorage 
-                    && ((AmmoType)((AmmoStorage)part).getType()).equals((Object)curType)
-                    && curMunition == ((AmmoType)((AmmoStorage)part).getType()).getMunitionType()) {
-                a = (AmmoStorage)part;
-                a.changeShots(amount);
-                break;
-            }
-        }
-        if(null != a && a.getShots() <= 0) {
-            campaign.removePart(a);
-        } else if(null == a && amount > 0) {
-            campaign.addPart(new AmmoStorage(1,curType,amount,campaign), 0);
+        } else if(amount > 0) {
+            campaign.addPart(new AmmoStorage(1, curType, amount, campaign), 0);
         }
     }
-    
+
     @Override
     public String getAcquisitionDesc() {
         String toReturn = "<html><font size='2'";

@@ -260,7 +260,7 @@ public class MissingBattleArmorSuit extends MissingPart {
         			origArmor.updateConditionFromEntity(false);
         		} else if(childPart instanceof BattleArmorEquipmentPart) {
         			for(MissingBattleArmorEquipmentPart p : missingStuff) {
-	            		if(null != childPart && null != p.getUnit() && p.isAcceptableReplacement(childPart, false)) {
+	            		if(null != p.getUnit() && p.isAcceptableReplacement(childPart, false)) {
 	            			//then add child part and remove current part from unit and campaign
 	            			Part newPart = childPart.clone();
 	            			unit.addPart(newPart);

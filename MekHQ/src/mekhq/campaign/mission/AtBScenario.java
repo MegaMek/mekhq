@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.Vector;
 
@@ -1900,14 +1901,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     protected String getCsvFromList(ArrayList<? extends Object> list) {
-        String retVal = new String();
-        for (int i = 0; i < list.size(); i++) {
-            retVal += list.get(i).toString();
-            if (i < list.size() - 1) {
-                retVal += ",";
-            }
+        StringJoiner retVal = new StringJoiner(",");
+        for (Object item : list) {
+            retVal.add(item.toString());
         }
-        return retVal;
+        return retVal.toString();
     }
 
     public AtBContract getContract(Campaign c) {

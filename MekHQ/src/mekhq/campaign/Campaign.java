@@ -28,7 +28,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.JOptionPane;
 
@@ -244,6 +246,7 @@ public class Campaign implements Serializable, ITechManager {
 
     // calendar stuff
     private GregorianCalendar calendar;
+    private DateTime currentDateTime;
     private String dateFormat;
     private String shortDateFormat;
 
@@ -306,6 +309,7 @@ public class Campaign implements Serializable, ITechManager {
         player = new Player(0, "self");
         game.addPlayer(0, player);
         calendar = new GregorianCalendar(3067, Calendar.JANUARY, 1);
+        currentDateTime = new DateTime(calendar);
         CurrencyManager.getInstance().setCampaign(this);
         location = new CurrentLocation(Systems.getInstance().getSystems()
                 .get("Outreach"), 0);
@@ -439,6 +443,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public void setCalendar(GregorianCalendar c) {
         calendar = c;
+        currentDateTime = new DateTime(c);
     }
 
     public GregorianCalendar getCalendar() {
@@ -462,7 +467,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public String getCurrentSystemName() {
-        return location.getCurrentSystem().getPrintableName(Utilities.getDateTimeDay(calendar));
+        return location.getCurrentSystem().getPrintableName(getDateTime());
     }
 
     public PlanetarySystem getCurrentSystem() {
@@ -1181,10 +1186,9 @@ public class Campaign implements Serializable, ITechManager {
                 sortedUnits.sort(Comparator.comparing(Unit::getName));
             }
             if (weightSorted) {
-                sortedUnits.sort((lhs, rhs) -> {
-                    // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
-                    return Double.compare(rhs.getEntity().getWeight(), lhs.getEntity().getWeight());
-                });
+                // Sorted in descending order of weights
+                Collections.sort(sortedUnits, 
+                    (lhs, rhs) -> Double.compare(rhs.getEntity().getWeight(), lhs.getEntity().getWeight()));
             }
         }
         return sortedUnits;
@@ -1350,8 +1354,13 @@ public class Campaign implements Serializable, ITechManager {
         ServiceLogger.joined(p, getDate(), getName(), rankEntry);
     }
 
+    @Deprecated
     public Date getDate() {
         return calendar.getTime();
+    }
+
+    public DateTime getDateTime() {
+        return currentDateTime;
     }
 
     public Collection<Person> getPersonnel() {
@@ -2105,28 +2114,35 @@ public class Campaign implements Serializable, ITechManager {
      *         not successfully acquired
      */
     public ShoppingList goShopping(ShoppingList sList) {
-
-        // get the logistics person and return original list with a message if you don't
-        // have one
-        Person person = getLogisticsPerson();
-        if (null == person && !getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
-            addReport("Your force has no one capable of acquiring equipment.");
-            return sList;
-        }
-
         // loop through shopping items and decrement days to wait
         for (IAcquisitionWork shoppingItem : sList.getAllShoppingItems()) {
             shoppingItem.decrementDaysToWait();
         }
 
         if (!getCampaignOptions().usesPlanetaryAcquisition()) {
-            // loop through shopping list. If its time to check, then check as appropriate.
-            // Items not
-            // found get added to the remaining item list
-            ArrayList<IAcquisitionWork> remainingItems = new ArrayList<>();
-            for (IAcquisitionWork shoppingItem : sList.getAllShoppingItems()) {
+            return goShoppingStandard(sList);
+        } else {
+            return goShoppingByPlanet(sList);
+        }
+    }
+
+    private ShoppingList goShoppingStandard(ShoppingList sList) {
+        // loop through shopping list. If its time to check, then check as appropriate.
+        // Items not found get added to the remaining item list
+        List<IAcquisitionWork> currentList = new ArrayList<>(sList.getAllShoppingItems());
+
+        while (!currentList.isEmpty()) {
+            Person person = getLogisticsPerson();
+            if (null == person && !getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
+                addReport("Your force has no one capable of acquiring equipment.");
+                break;
+            }
+
+            List<IAcquisitionWork> remainingItems = new ArrayList<>();
+            for (IAcquisitionWork shoppingItem : currentList) {
                 if (shoppingItem.getDaysToWait() <= 0) {
-                    while (shoppingItem.getQuantity() > 0) {
+                    while (canAcquireParts(person)
+                            && shoppingItem.getQuantity() > 0) {
                         if (!acquireEquipment(shoppingItem, person)) {
                             shoppingItem.resetDaysToWait();
                             break;
@@ -2138,41 +2154,61 @@ public class Campaign implements Serializable, ITechManager {
                 }
             }
 
-            return new ShoppingList(remainingItems);
+            currentList = remainingItems;
+        }
 
-        } else {
-            // we are shopping by planets, so more involved
-            List<IAcquisitionWork> currentList = sList.getAllShoppingItems();
-            DateTime currentDate = Utilities.getDateTimeDay(getCalendar());
+        return new ShoppingList(currentList);
+    }
 
-            // a list of items than can be taken out of the search and put back on the
-            // shopping list
-            ArrayList<IAcquisitionWork> shelvedItems = new ArrayList<>();
+    private ShoppingList goShoppingByPlanet(ShoppingList sList) {
+        // we are shopping by planets, so more involved
+        List<IAcquisitionWork> currentList = sList.getAllShoppingItems();
+        DateTime currentDate = Utilities.getDateTimeDay(getCalendar());
+
+        // a list of items than can be taken out of the search and put back on the
+        // shopping list
+        List<IAcquisitionWork> shelvedItems = new ArrayList<>();
+
+        //find planets within a certain radius - the function will weed out dead planets
+        List<PlanetarySystem> systems = Systems.getInstance().getShoppingSystems(getCurrentSystem(),
+                getCampaignOptions().getMaxJumpsPlanetaryAcquisition(),
+                currentDate);
+
+        while (!currentList.isEmpty()) {
+            Person person = getLogisticsPerson();
+            if (null == person && !getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
+                addReport("Your force has no one capable of acquiring equipment.");
+                break;
+            }
 
             String personTitle = "";
             if (null != person) {
                 personTitle = person.getHyperlinkedFullTitle() + " ";
             }
 
-            //find planets within a certain radius - the function will weed out dead planets
-            List<PlanetarySystem> systems = Systems.getInstance().getShoppingSystems(getCurrentSystem(),
-                    getCampaignOptions().getMaxJumpsPlanetaryAcquisition(),
-                    currentDate);
-
-            for(PlanetarySystem system: systems) {
-                ArrayList<IAcquisitionWork> remainingItems = new ArrayList<>();
+            for (PlanetarySystem system: systems) {
+                List<IAcquisitionWork> remainingItems = new ArrayList<>();
 
                 //loop through shopping list. If its time to check, then check as appropriate. Items not
-                //found get added to the remaining item list
-                for(IAcquisitionWork shoppingItem : currentList) {
-                    if(shoppingItem.getDaysToWait() <= 0) {
-                        if(findContactForAcquisition(shoppingItem, person, system)) {
+                //found get added to the remaining item list. Rotate through personnel
+                boolean done = false;
+                for (IAcquisitionWork shoppingItem : currentList) {
+                    if (!canAcquireParts(person)) {
+                        remainingItems.add(shoppingItem);
+                        done = true;
+                        continue;
+                    }
+
+                    if (shoppingItem.getDaysToWait() <= 0) {
+                        if (findContactForAcquisition(shoppingItem, person, system)) {
                             int transitTime = calculatePartTransitTime(system);
                             int totalQuantity = 0;
-                            while(shoppingItem.getQuantity() > 0 && acquireEquipment(shoppingItem, person, system, transitTime)) {
+                            while (shoppingItem.getQuantity() > 0
+                                    && canAcquireParts(person)
+                                    && acquireEquipment(shoppingItem, person, system, transitTime)) {
                                 totalQuantity++;
                             }
-                            if(totalQuantity > 0) {
+                            if (totalQuantity > 0) {
                                 addReport(personTitle + "<font color='green'><b> found " + shoppingItem.getQuantityName(totalQuantity) + " on " + system.getPrintableName(currentDate) + ". Delivery in " + transitTime + " days.</b></font>");
                             }
                         }
@@ -2191,24 +2227,45 @@ public class Campaign implements Serializable, ITechManager {
                         }
                     }
                 }
-                // we are done with this planet. replace our current list with the remaining
-                // items
+
+                // we are done with this planet. replace our current list with the remaining items
                 currentList = remainingItems;
-            }
 
-            // add shelved items back to the currentlist
-            currentList.addAll(shelvedItems);
-
-            // loop through and reset waiting time on all items on the remaining shopping
-            // list if they have no waiting time left
-            for (IAcquisitionWork shoppingItem : currentList) {
-                if (shoppingItem.getDaysToWait() <= 0) {
-                    shoppingItem.resetDaysToWait();
+                if (done) {
+                    break;
                 }
             }
-
-            return new ShoppingList(currentList);
         }
+
+        // add shelved items back to the currentlist
+        currentList.addAll(shelvedItems);
+
+        // loop through and reset waiting time on all items on the remaining shopping
+        // list if they have no waiting time left
+        for (IAcquisitionWork shoppingItem : currentList) {
+            if (shoppingItem.getDaysToWait() <= 0) {
+                shoppingItem.resetDaysToWait();
+            }
+        }
+
+        return new ShoppingList(currentList);
+    }
+
+    /**
+     * Gets a value indicating if {@code person} can acquire parts.
+     * @param person The {@link Person} to check if they have remaining
+     *               time to perform acquisitions.
+     * @return True if {@code person} could acquire another part, otherwise false.
+     */
+    public boolean canAcquireParts(@Nullable Person person) {
+        if (person == null) {
+            // CAW: in this case we're using automatic success
+            //      and the logistics person will be null.
+            return true;
+        }
+        int maxAcquisitions = getCampaignOptions().getMaxAcquisitions();
+        return maxAcquisitions <= 0
+            || person.getAcquisitions() < maxAcquisitions;
     }
 
     /***
@@ -2236,7 +2293,9 @@ public class Campaign implements Serializable, ITechManager {
      * @return true if your target roll succeeded.
      */
     public boolean findContactForAcquisition(IAcquisitionWork acquisition, Person person, PlanetarySystem system) {
-
+        if (person.getAcquisitions() >= getCampaignOptions().getMaxAcquisitions()) {
+            return false;
+        }
         DateTime currentDate = Utilities.getDateTimeDay(getCalendar());
         TargetRoll target = getTargetForAcquisition(acquisition, person, false);
         target = system.getPrimaryPlanet().getAcquisitionMods(target, getDate(), getCampaignOptions(), getFaction(),
@@ -2804,7 +2863,7 @@ public class Campaign implements Serializable, ITechManager {
      */
     public void readNews() {
         //read the news
-        DateTime now = Utilities.getDateTimeDay(calendar);
+        DateTime now = getDateTime();
         for(NewsItem article : news.fetchNewsFor(now)) {
             addReport(article.getHeadlineForReport());
         }
@@ -3228,6 +3287,8 @@ public class Campaign implements Serializable, ITechManager {
         this.autosaveService.requestDayAdvanceAutosave(this, this.calendar.get(Calendar.DAY_OF_WEEK));
 
         calendar.add(Calendar.DAY_OF_MONTH, 1);
+        currentDateTime = new DateTime(calendar);
+
         currentReport.clear();
         currentReportHTML = "";
         newReports.clear();
@@ -3897,6 +3958,32 @@ public class Campaign implements Serializable, ITechManager {
         return spares;
     }
 
+    /**
+     * Finds the first spare part matching a predicate.
+     *
+     * @param predicate The predicate to use when searching
+     *                  for a suitable spare part.
+     * @return A matching spare {@link Part} or {@code null}
+     *         if no suitable match was found.
+     */
+    @Nullable
+    public Part findSparePart(Predicate<Part> predicate) {
+        for (Part part : parts.values()) {
+            if (part.isSpare() && predicate.test(part)) {
+                return part;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Streams the spare parts in the campaign.
+     * @return A stream of spare parts in the campaign.
+     */
+    public Stream<Part> streamSpareParts() {
+        return parts.values().stream().filter(Part::isSpare);
+    }
+
     public void addFunds(Money quantity) {
         addFunds(quantity, "Rich Uncle", Transaction.C_MISC);
     }
@@ -4425,13 +4512,13 @@ public class Campaign implements Serializable, ITechManager {
     public Vector<String> getSystemNames() {
         Vector<String> systemNames = new Vector<>();
         for (PlanetarySystem key : Systems.getInstance().getSystems().values()) {
-            systemNames.add(key.getPrintableName(Utilities.getDateTimeDay(calendar)));
+            systemNames.add(key.getPrintableName(getDateTime()));
         }
         return systemNames;
     }
 
     public PlanetarySystem getSystemByName(String name) {
-        return Systems.getInstance().getSystemByName(name, Utilities.getDateTimeDay(calendar));
+        return Systems.getInstance().getSystemByName(name, getDateTime());
     }
 
     /**
@@ -4831,7 +4918,7 @@ public class Campaign implements Serializable, ITechManager {
         String startKey = start.getId();
         String endKey = end.getId();
 
-        final DateTime now = Utilities.getDateTimeDay(calendar);
+        final DateTime now = getDateTime();
         String current = startKey;
         Set<String> closed = new HashSet<>();
         Set<String> open = new HashSet<>();
@@ -6905,7 +6992,7 @@ public class Campaign implements Serializable, ITechManager {
     public Money getTotalEquipmentValue() {
         return Money.zero()
                 .plus(getUnits().stream().map(Unit::getSellValue).collect(Collectors.toList()))
-                .plus(getSpareParts().stream().map(Part::getActualValue).collect(Collectors.toList()));
+                .plus(streamSpareParts().map(Part::getActualValue).collect(Collectors.toList()));
     }
 
     /**
@@ -7351,8 +7438,8 @@ public class Campaign implements Serializable, ITechManager {
         return getCargoTonnage(inTransit, false);
     }
 
-    @SuppressWarnings("unused") // FIXME: This whole method needs re-worked once DropShip Assignments are in
-    public double getCargoTonnage(boolean inTransit, boolean mothballed) {
+    @SuppressWarnings("unused") // FIXME: This whole method needs re-worked once Dropship Assignments are in
+    public double getCargoTonnage(final boolean inTransit, final boolean mothballed) {
         double cargoTonnage = 0;
         double mothballedTonnage = 0;
         int mechs = getNumberOfUnitsByType(Entity.ETYPE_MECH);
@@ -7366,12 +7453,9 @@ public class Campaign implements Serializable, ITechManager {
         int hv = getNumberOfUnitsByType(Entity.ETYPE_TANK, false);
         int protos = getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH);
 
-        for (Part part : getSpareParts()) {
-            if (!inTransit && !part.isPresent()) {
-                continue;
-            }
-            cargoTonnage += (part.getQuantity() * part.getTonnage());
-        }
+        cargoTonnage += streamSpareParts().filter(p -> inTransit || p.isPresent())
+                            .mapToDouble(p -> p.getQuantity() * p.getTonnage())
+                            .sum();
 
         // place units in bays
         // FIXME: This has been temporarily disabled. It really needs DropShip assignments done to fix it correctly.
@@ -8267,7 +8351,7 @@ public class Campaign implements Serializable, ITechManager {
 
     @Override
     public int getGameYear() {
-        return calendar.get(Calendar.YEAR);
+        return currentDateTime.getYear();
     }
 
     @Override

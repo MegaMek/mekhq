@@ -68,7 +68,7 @@ public enum BodyLocation {
     /** @return the body location corresponding to the given string */
     public static BodyLocation of(String str) {
         try {
-            return of(Integer.valueOf(str));
+            return of(Integer.parseInt(str));
         } catch(NumberFormatException nfex) {
             // Try something else
         }

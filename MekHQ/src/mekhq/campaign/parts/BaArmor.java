@@ -21,6 +21,8 @@
 
 package mekhq.campaign.parts;
 
+import java.util.Objects;
+
 import megamek.common.EquipmentType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -128,8 +130,8 @@ public class BaArmor extends Armor implements IAcquisitionWork {
     public boolean isSamePartType(Part part) {
         return part instanceof BaArmor
                 && isClanTechBase() == part.isClanTechBase()
-                && ((BaArmor)part).getType() == this.getType()
-                && getRefitId() == part.getRefitId();
+                && Objects.equals(getRefitId(), part.getRefitId())
+                && ((BaArmor)part).getType() == getType();
     }
     
     @Override
@@ -149,38 +151,32 @@ public class BaArmor extends Armor implements IAcquisitionWork {
     public Part getNewPart() {
         return new BaArmor(0, (int)Math.round(5 * getPointsPerTon()), type, -1, clan, campaign);
     }
-    
+
     public int getAmountAvailable() {
-        for(Part part : campaign.getSpareParts()) {
-            if(part instanceof BaArmor) {
-                BaArmor a = (BaArmor)part;
-                if(a.isClanTechBase() == clan 
-                        && a.getType() == type
-                        && !a.isReservedForRefit() && a.isPresent()) {
-                    return a.getAmount();
-                }
-            }
-        }
-        return 0;
+        BaArmor a = (BaArmor)campaign.findSparePart(part -> {
+            return part instanceof BaArmor
+                && part.isPresent()
+                && !part.isReservedForRefit()
+                && isClanTechBase() == part.isClanTechBase()
+                && ((BaArmor)part).getType() == getType();
+        });
+
+        return a != null ? a.getAmount() : 0;
     }
-    
+
     @Override
     public void changeAmountAvailable(int amount) {
-        BaArmor a = null;
-        for(Part part : campaign.getSpareParts()) {
-            if(part instanceof BaArmor 
-                    && ((BaArmor)part).isClanTechBase() == clan 
-                    && ((BaArmor)part).getType() == type
-                    && getRefitId() == part.getRefitId()
-                    && part.isPresent()) {
-                a = (BaArmor)part;                
-                a.setAmount(a.getAmount() + amount);
-                break;
+        BaArmor a = (BaArmor)campaign.findSparePart(part -> {
+            return isSamePartType(part)
+                && part.isPresent();
+        });
+
+        if(null != a) {
+            a.setAmount(a.getAmount() + amount);
+            if (a.getAmount() <= 0) {
+                campaign.removePart(a);
             }
-        }
-        if(null != a && a.getAmount() <= 0) {
-            campaign.removePart(a);
-        } else if(null == a && amount > 0) {            
+        } else if(amount > 0) {
             campaign.addPart(new BaArmor(getUnitTonnage(), amount, type, -1, isClanTechBase(), campaign), 0);
         }
     }

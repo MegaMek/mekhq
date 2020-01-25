@@ -29,6 +29,7 @@ import mekhq.campaign.work.IAcquisitionWork;
 import org.w3c.dom.Node;
 
 import java.io.PrintWriter;
+import java.util.Objects;
 
 /**
  * Standard support vehicle armor, which can differ by BAR and tech rating.
@@ -130,26 +131,28 @@ public class SVArmor extends Armor {
     }
 
     public int getAmountAvailable() {
-        for(Part part : campaign.getSpareParts()) {
-            if (isSamePartType(part) && !part.isReservedForRefit() && part.isPresent()) {
-                return ((SVArmor) part).getAmount();
-            }
-        }
-        return 0;
+        SVArmor a = (SVArmor)campaign.findSparePart(part -> {
+            return isSamePartType(part)
+                && part.isPresent()
+                && !part.isReservedForRefit();
+        });
+
+        return a != null ? a.getAmount() : 0;
     }
 
     public void changeAmountAvailable(int amount) {
-        SVArmor a = null;
-        for(Part part : campaign.getSpareParts()) {
-            if (isSamePartType(part) && getRefitId() == part.getRefitId() && part.isPresent()) {
-                a = (SVArmor) part;
-                a.setAmount(a.getAmount() + amount);
-                break;
+        SVArmor a = (SVArmor)campaign.findSparePart(part -> {
+            return isSamePartType(part)
+                && part.isPresent()
+                && Objects.equals(getRefitId(), part.getRefitId());
+        });
+
+        if (null != a) {
+            a.setAmount(a.getAmount() + amount);
+            if (a.getAmount() <= 0) {
+                campaign.removePart(a);
             }
-        }
-        if(null != a && a.getAmount() <= 0) {
-            campaign.removePart(a);
-        } else if(null == a && amount > 0) {
+        } else if(amount > 0) {
             campaign.addPart(new SVArmor(bar, techRating, amount, -1, campaign), 0);
         }
     }

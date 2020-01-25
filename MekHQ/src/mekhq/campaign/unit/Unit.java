@@ -2869,11 +2869,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
         }
         if (entity instanceof QuadVee && null == qvGear) {
-            if (null == qvGear) {
-                qvGear = new QuadVeeGear((int)entity.getWeight(), getCampaign());
-                addPart(qvGear);
-                partsToAdd.add(qvGear);
-            }
+            qvGear = new QuadVeeGear((int)entity.getWeight(), getCampaign());
+            addPart(qvGear);
+            partsToAdd.add(qvGear);
         }
         if(entity instanceof Aero) {
             if(null == structuralIntegrity) {

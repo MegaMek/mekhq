@@ -579,15 +579,9 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
             gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
             panDemog.add(lblRecruitment, gridBagConstraints);
 
-            if (recruitment != null) {
-                btnServiceDate.setText(getDateAsString2());
-                btnServiceDate.setName("btnServiceDate"); // NOI18N
-                btnServiceDate.addActionListener(new java.awt.event.ActionListener() {
-                    public void actionPerformed(java.awt.event.ActionEvent evt) {
-                        btnServiceDateActionPerformed(evt);
-                    }
-                });
-            }
+            btnServiceDate.setText(getDateAsString2());
+            btnServiceDate.setName("btnServiceDate"); // NOI18N
+            btnServiceDate.addActionListener(this::btnServiceDateActionPerformed);
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y;

@@ -166,7 +166,7 @@ public class MedicalViewDialog extends JDialog {
                 ActionListener addActionListener = addEvent -> {
                     String[] commands = addEvent.getActionCommand().split(MENU_CMD_SEPARATOR, 2);
                     InjuryType addIType = InjuryType.byKey(commands[0]);
-                    int severity = Integer.valueOf(commands[1]);
+                    int severity = Integer.parseInt(commands[1]);
                     person.addInjury(addIType.newInjury(campaign, person, loc, severity));
                     revalidate();
                 };

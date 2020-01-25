@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.Hashtable;
 
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -445,7 +446,7 @@ public class SkillType implements Serializable {
                 +"</eliteLvl>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<costs>"
-                +printCosts()
+                + StringUtils.join(costs, ',')
                 +"</costs>");
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</skillType>");    
     }
@@ -546,17 +547,6 @@ public class SkillType implements Serializable {
             MekHQ.getLogger().error(SkillType.class, METHOD_NAME, ex);
         }
         hash.put(retVal.name, retVal);
-    }
-    
-    private String printCosts() {
-        String values = "";
-        for(int i = 0; i < costs.length; i++) {
-            values += Integer.toString(costs[i]);
-            if(i < 10) {
-                values += ",";
-            }
-        }
-        return values;
     }
     
     public static SkillType createPilotingMech() {

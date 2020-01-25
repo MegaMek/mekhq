@@ -2352,15 +2352,16 @@ public class CampaignGUI extends JPanel {
                             + p.getFullName() + ")"); //$NON-NLS-1$
                     p = null;
                 }
+                
                 if (p != null) {
                     getCampaign().addPersonWithoutId(p, true);
-                }
 
-                // Clear some values we no longer should have set in case this
-                // has transferred campaigns or things in the campaign have
-                // changed...
-                p.setUnitId(null);
-                p.clearTechUnitIDs();
+                    // Clear some values we no longer should have set in case this
+                    // has transferred campaigns or things in the campaign have
+                    // changed...
+                    p.setUnitId(null);
+                    p.clearTechUnitIDs();
+                }
             }
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                     "Finished load of personnel file"); //$NON-NLS-1$

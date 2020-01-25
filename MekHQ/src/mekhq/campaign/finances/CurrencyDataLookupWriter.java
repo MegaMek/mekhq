@@ -22,7 +22,7 @@
 package mekhq.campaign.finances;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Map;
 
 import org.joda.money.BigMoney;
 import org.joda.money.format.MoneyPrintContext;
@@ -35,9 +35,9 @@ import org.joda.money.format.MoneyPrinter;
  * @author Vicente Cartas Espinel <vicente.cartas at outlook.com>
  */
 class CurrencyDataLookupWriter implements MoneyPrinter {
-    private HashMap<String, String> currencyExtraData;
+    private Map<String, String> currencyExtraData;
 
-    CurrencyDataLookupWriter(HashMap<String, String> currencyExtraData) {
+    CurrencyDataLookupWriter(Map<String, String> currencyExtraData) {
         this.currencyExtraData = currencyExtraData;
     }
 

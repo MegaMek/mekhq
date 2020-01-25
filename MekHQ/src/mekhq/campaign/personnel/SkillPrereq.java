@@ -154,7 +154,6 @@ public class SkillPrereq implements MekHqXmlSerializable {
         Enumeration<String> enumKeys = skillSet.keys();
         while(enumKeys.hasMoreElements()) {
             String key = enumKeys.nextElement();
-            SkillType.getType(key).getName();
             int lvl = skillSet.get(key);
             String skillLvl = "";
             if(lvl >= SkillType.EXP_GREEN) {

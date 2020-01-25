@@ -115,7 +115,7 @@ public class ScenarioViewPanel extends ScrollablePanel {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridheight = 1;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;    

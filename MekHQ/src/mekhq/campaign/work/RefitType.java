@@ -60,7 +60,7 @@ public enum RefitType {
     /** @return the refit type corresponding to the given string */
     public static RefitType of(String str) {
         try {
-            return of(Integer.valueOf(str));
+            return of(Integer.parseInt(str));
         } catch(NumberFormatException nfex) {
             // Try something else
         }

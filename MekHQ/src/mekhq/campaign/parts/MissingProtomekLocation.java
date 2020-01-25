@@ -59,8 +59,6 @@ public class MissingProtomekLocation extends MissingPart {
         this.forQuad = quad;
         //TODO: need to account for internal structure and myomer types
         //crap, no static report for location names?
-        this.name = "Mech Location";
-        this.name = "Protomech Location";
         switch(loc) {
         case(Protomech.LOC_HEAD):
             this.name = "Protomech Head";
@@ -82,6 +80,9 @@ public class MissingProtomekLocation extends MissingPart {
             break;
         case(Protomech.LOC_MAINGUN):
             this.name = "Protomech Main Gun";
+            break;
+        default:
+            this.name = "Protomech Location";
             break;
         }
         if(booster) {

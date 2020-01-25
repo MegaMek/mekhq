@@ -178,52 +178,50 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
             // Mode (extra time, rush job, ...
             // dont allow automatic success jobs to change mode
             // dont allow pod space or pod-mounted equipment to change mode when removing or replacing
-            if (partWork != null) {
-                boolean canChangeMode = true;
-                boolean isScrappable = true;
-                boolean isBeingWorked = false;
-                boolean isFixable = true;
-                for (IPartWork p : parts) {
-                    canChangeMode &= p.canChangeWorkMode()
-                            && p.getAllMods(null).getValue() != TargetRoll.AUTOMATIC_SUCCESS;
-                    isScrappable &= (p instanceof Part) && !((Part)p).canNeverScrap();
-                    isBeingWorked |= (p instanceof Part) && ((Part)p).isBeingWorkedOn();
-                    isFixable &= (null == p.checkFixable());
-                }
-                if (canChangeMode) {
-                    menu = new JMenu("Mode");
-                    for (WorkTime wt : WorkTime.DEFAULT_TIMES) {
-                        cbMenuItem = new JCheckBoxMenuItem(wt.name);
-                        if (partWork.getMode() == wt) {
-                            cbMenuItem.setSelected(true);
-                        } else {
-                            cbMenuItem.setActionCommand("CHANGE_MODE:" + wt.id);
-                            cbMenuItem.addActionListener(this);
-                        }
-                        cbMenuItem.setEnabled(!isBeingWorked);
-                        menu.add(cbMenuItem);
-                    }
-                    popup.add(menu);
-                }
-                // Scrap component
-                if (isScrappable) {
-                    menuItem = new JMenuItem("Scrap component");
-                    menuItem.setActionCommand("SCRAP");
-                    menuItem.addActionListener(this);
-                    menuItem.setEnabled(!isBeingWorked);
-                    popup.add(menuItem);
-                }
-
-                menu = new JMenu("GM Mode");
-                popup.add(menu);
-                // Auto complete task
-
-                menuItem = new JMenuItem("Complete Task");
-                menuItem.setActionCommand("FIX");
-                menuItem.addActionListener(this);
-                menuItem.setEnabled(gui.getCampaign().isGM() && isFixable);
-                menu.add(menuItem);
+            boolean canChangeMode = true;
+            boolean isScrappable = true;
+            boolean isBeingWorked = false;
+            boolean isFixable = true;
+            for (IPartWork p : parts) {
+                canChangeMode &= p.canChangeWorkMode()
+                        && p.getAllMods(null).getValue() != TargetRoll.AUTOMATIC_SUCCESS;
+                isScrappable &= (p instanceof Part) && !((Part)p).canNeverScrap();
+                isBeingWorked |= (p instanceof Part) && ((Part)p).isBeingWorkedOn();
+                isFixable &= (null == p.checkFixable());
             }
+            if (canChangeMode) {
+                menu = new JMenu("Mode");
+                for (WorkTime wt : WorkTime.DEFAULT_TIMES) {
+                    cbMenuItem = new JCheckBoxMenuItem(wt.name);
+                    if (partWork.getMode() == wt) {
+                        cbMenuItem.setSelected(true);
+                    } else {
+                        cbMenuItem.setActionCommand("CHANGE_MODE:" + wt.id);
+                        cbMenuItem.addActionListener(this);
+                    }
+                    cbMenuItem.setEnabled(!isBeingWorked);
+                    menu.add(cbMenuItem);
+                }
+                popup.add(menu);
+            }
+            // Scrap component
+            if (isScrappable) {
+                menuItem = new JMenuItem("Scrap component");
+                menuItem.setActionCommand("SCRAP");
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(!isBeingWorked);
+                popup.add(menuItem);
+            }
+
+            menu = new JMenu("GM Mode");
+            popup.add(menu);
+            // Auto complete task
+
+            menuItem = new JMenuItem("Complete Task");
+            menuItem.setActionCommand("FIX");
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(gui.getCampaign().isGM() && isFixable);
+            menu.add(menuItem);
 
             popup.show(e.getComponent(), e.getX(), e.getY());
         }

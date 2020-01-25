@@ -129,6 +129,7 @@ public class UnitTechProgression {
             Entity en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
             if (null == en) {
                 MekHQ.getLogger().log(BuildMapTask.class, METHOD_NAME, LogLevel.ERROR, "Entity was null: " + ms.getName());
+                return null;
             }
             return en.factionTechLevel(techFaction);
         } catch (EntityLoadingException ex) {

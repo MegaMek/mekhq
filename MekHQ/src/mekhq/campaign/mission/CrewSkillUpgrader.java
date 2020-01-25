@@ -87,7 +87,7 @@ public class CrewSkillUpgrader {
             return;
         }
         
-        double skillAvg = (entity.getCrew().getGunnery() + entity.getCrew().getPiloting()) / 2;
+        double skillAvg = (entity.getCrew().getGunnery() + entity.getCrew().getPiloting()) / 2.0;
         double xpCap = 0;
         int spaCap = 0;
         
