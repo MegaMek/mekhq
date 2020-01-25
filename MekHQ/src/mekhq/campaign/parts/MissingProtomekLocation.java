@@ -259,7 +259,7 @@ public class MissingProtomekLocation extends MissingPart {
 
     @Override
    	public String getLocationName() {
-   		return unit.getEntity().getLocationName(getLocation());
+   		return unit != null ? unit.getEntity().getLocationName(getLocation()) : null;
    	}
 
 	@Override

@@ -224,7 +224,16 @@ public class MekSensor extends Part {
 
     @Override
     public String getDetails() {
-        return super.getDetails() + ", " + getUnitTonnage() + " tons";
+        return getDetails(true);
+    }
+
+    @Override
+    public String getDetails(boolean includeRepairDetails) {
+        String details = super.getDetails(includeRepairDetails);
+        if (!details.isEmpty()) {
+            details += ", ";
+        }
+        return  details + getUnitTonnage() + " tons";
     }
 
     @Override

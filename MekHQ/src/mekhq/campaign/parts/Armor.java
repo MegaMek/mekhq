@@ -147,6 +147,11 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public String getDetails() {
+        return getDetails(true);
+    }
+
+    @Override
+    public String getDetails(boolean includeRepairDetails) {
         if(null != unit) {
             String rearMount = "";
             if(rear) {
@@ -190,12 +195,14 @@ public class Armor extends Part implements IAcquisitionWork {
         return amount + amountNeeded;
     }
 
+    @Override
     public int getLocation() {
         return location;
     }
 
+    @Override
     public String getLocationName() {
-        return unit.getEntity().getLocationName(location);
+        return unit != null ? unit.getEntity().getLocationName(location) : null;
     }
 
     public boolean isRearMounted() {

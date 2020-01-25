@@ -165,15 +165,15 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
 			}
 		}
     }
-    
-    @Override 
+
+    @Override
 	public int getBaseTime() {
 		if(isSalvaging()) {
 			return 30;
 		}
 		return super.getBaseTime();
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		if(isSalvaging()) {
@@ -209,10 +209,15 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
 
     @Override
     public String getDetails() {
+        return getDetails(true);
+    }
+
+    @Override
+    public String getDetails(boolean includeRepairDetails) {
         if(null != unit) {
             return unit.getEntity().getLocationName(trooper);
         }
-        return super.getDetails();
+        return super.getDetails(includeRepairDetails);
     }
 
     public int getTrooper() {
@@ -272,7 +277,7 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
     public boolean needsMaintenance() {
         return false;
     }
-    
+
     public boolean canNeverScrap() {
     	return isModular();
 	}

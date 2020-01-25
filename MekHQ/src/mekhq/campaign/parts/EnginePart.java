@@ -408,14 +408,25 @@ public class EnginePart extends Part {
 
     @Override
     public String getDetails() {
+        return getDetails(true);
+    }
+
+    @Override
+    public String getDetails(boolean includeRepairDetails) {
+        String details = super.getDetails(includeRepairDetails);
         if (null != unit) {
-            return super.getDetails();
+            return details;
         }
+
+        if (!details.isEmpty()) {
+            details += ", ";
+        }
+
         String hvrString = "";
         if (forHover) {
             hvrString = " (hover)";
         }
-        return super.getDetails() + ", " + getUnitTonnage() + " tons" + hvrString;
+        return details + getUnitTonnage() + " tons" + hvrString;
     }
 
     @Override

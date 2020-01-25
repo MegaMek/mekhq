@@ -1,20 +1,20 @@
 /*
  * KFHeliumTank.java
- * 
+ *
  * Copyright (c) 2019, The MegaMek Team
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -22,6 +22,7 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
+import java.util.StringJoiner;
 
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
@@ -42,7 +43,7 @@ import mekhq.campaign.personnel.SkillType;
 public class KFHeliumTank extends Part {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 5737177123881418170L;
 
@@ -94,15 +95,15 @@ public class KFHeliumTank extends Part {
                     hits = 0;
                 }
             }
-            if(checkForDestruction 
-                    && hits > priorHits 
+            if(checkForDestruction
+                    && hits > priorHits
                     && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
             }
         }
     }
 
-    @Override 
+    @Override
     public int getBaseTime() {
         int time;
         if(isSalvaging()) {
@@ -216,7 +217,7 @@ public class KFHeliumTank extends Part {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return part instanceof KFHeliumTank 
+        return part instanceof KFHeliumTank
                 && coreType == ((KFHeliumTank)part).getCoreType()
                 && docks == ((KFHeliumTank)part).getDocks();
     }
@@ -240,7 +241,7 @@ public class KFHeliumTank extends Part {
         NodeList nl = wn.getChildNodes();
         for (int x=0; x<nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            
+
             if (wn2.getNodeName().equalsIgnoreCase("coreType")) {
                 coreType = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("docks")) {
@@ -251,9 +252,19 @@ public class KFHeliumTank extends Part {
 
     @Override
     public String getDetails() {
-        return super.getDetails() 
-                + ", " + getUnitTonnage() + " tons" 
-                + ", " + getDocks() + " collars";
+        return getDetails(true);
+    }
+
+    @Override
+    public String getDetails(boolean includeRepairDetails) {
+        StringJoiner joiner = new StringJoiner(", ");
+        String details = super.getDetails(includeRepairDetails);
+        if (!details.isEmpty()) {
+            joiner.add(details);
+        }
+        joiner.add(getUnitTonnage() + " tons")
+              .add(getDocks() + " collars");
+        return joiner.toString();
     }
 
     @Override

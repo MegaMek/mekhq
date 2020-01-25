@@ -82,7 +82,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         this.shotsNeeded = shots;
         this.oneShot = singleShot;
         this.checkedToday = false;
-        if(null != type && type instanceof AmmoType) {
+        if(type instanceof AmmoType) {
             this.munition = ((AmmoType)type).getMunitionType();
         }
         if(null != name) {
@@ -98,32 +98,34 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         clone.munition = this.munition;
         return clone;
     }
-    
+
     /* Per TM, ammo for fighters is stored in the fuselage. This makes a difference for omnifighter
-     * pod space, so we're going to stick them in LOC_NONE where the heat sinks are */ 
+     * pod space, so we're going to stick them in LOC_NONE where the heat sinks are */
     @Override
     public String getLocationName() {
-        if (unit.getEntity() instanceof Aero
+        if (unit != null
+                && unit.getEntity() instanceof Aero
                 && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))){
             return "Fuselage";
         }
         return super.getLocationName();
     }
-    
+
     @Override
     public int getLocation() {
-        if (unit.getEntity() instanceof Aero
+        if (unit != null
+                && unit.getEntity() instanceof Aero
                 && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))){
             return Aero.LOC_NONE;
         }
         return super.getLocation();
     }
-    
+
     @Override
     public double getTonnage() {
         return (1.0 * getFullShots())/((AmmoType)type).getShots();
     }
-    
+
     public int getFullShots() {
         int fullShots = ((AmmoType)type).getShots();
         if(unit != null) {
@@ -143,7 +145,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         }
         return fullShots;
     }
-    
+
     protected int getCurrentShots() {
         return getFullShots() - shotsNeeded;
     }
@@ -159,7 +161,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     protected Money getPricePerTon() {
-        //if on a unit, then use the ammo type on the existing entity, to avoid getting it wrong due to 
+        //if on a unit, then use the ammo type on the existing entity, to avoid getting it wrong due to
         //ammo swaps
         EquipmentType curType = type;
         if(null != unit && null != unit.getEntity()) {
@@ -170,7 +172,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         }
         return Money.of(curType.getRawCost());
     }
-    
+
     protected int getShotsPerTon() {
         AmmoType atype = (AmmoType)type;
         if(atype.getKgPerShot() > 0) {
@@ -179,7 +181,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         //if not listed by kg per shot, we assume this is a single ton increment
         return ((AmmoType)type).getShots();
     }
-    
+
     @Override
     public Money getStickerPrice() {
         if (getShotsPerTon() <= 0) {
@@ -210,7 +212,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         }
         updateConditionFromEntity(false);
     }
-    
+
     public void changeMunition(EquipmentType type) {
         if (type instanceof AmmoType) {
             munition = ((AmmoType) type).getMunitionType();
@@ -220,7 +222,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
             updateConditionFromEntity(false);
         }
     }
-    
+
     private boolean ammoTypeChanged() {
         if (null != unit) {
             Mounted m = unit.getEntity().getEquipment(equipmentNum);
@@ -259,7 +261,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
                 +"</oneShot>");
         writeToXmlEnd(pw1, indent);
     }
-    
+
     @Override
     protected void loadFieldsFromXmlNode(Node wn) {
         super.loadFieldsFromXmlNode(wn);
@@ -505,16 +507,21 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public String getDetails() {
+        return getDetails(true);
+    }
+
+    @Override
+    public String getDetails(boolean includeRepairDetails) {
         if(isSalvaging()) {
-            return super.getDetails();
+            return super.getDetails(includeRepairDetails);
         }
         if(null != unit) {
             String availability;
             int shotsAvailable = getAmountAvailable();
             PartInventory inventories = campaign.getPartInventory(getNewPart());
-            
+
             String orderTransitString = getOrderTransitStringForDetails(inventories);
-            
+
             if(shotsAvailable == 0) {
                 availability = "<br><font color='red'>No ammo " + orderTransitString + "</font>";
             } else if(shotsAvailable < getShotsNeeded()) {
@@ -522,7 +529,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
             } else {
                 availability = "<br><font color='green'>" + shotsAvailable + " available " + orderTransitString + "</font>";
             }
-            
+
             return type.getDesc() + ", " + getShotsNeeded() + " shots needed" + availability;
         } else {
             return "";
@@ -719,11 +726,11 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         toReturn += "</font></html>";
         return toReturn;
     }
-    
+
     @Override
     public String getAcquisitionDisplayName() {
         return type.getDesc();
-    }    
+    }
 
     @Override
     public String getAcquisitionExtraDesc() {
@@ -795,12 +802,12 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     public int getMassRepairOptionType() {
         return Part.REPAIR_PART_TYPE.AMMO;
     }
-    
+
     @Override
     public boolean isOmniPoddable() {
         return true;
     }
-    
+
     /**
      * Since ammo bins aren't real parts they can't be podded in the warehouse, and
      * whether they're podded on the unit depends entirely on the unit they're installed on.
@@ -813,7 +820,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         Mounted m = getUnit().getEntity().getEquipment(equipmentNum);
         return m != null && m.isOmniPodMounted();
     }
-    
+
     @Override
     public TechAdvancement getTechAdvancement() {
         return type.getTechAdvancement();

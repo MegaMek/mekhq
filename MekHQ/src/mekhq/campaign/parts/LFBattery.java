@@ -1,20 +1,20 @@
 /*
  * LFBattery.java
- * 
+ *
  * Copyright (c) 2019, The MegaMek Team
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -22,6 +22,7 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
+import java.util.StringJoiner;
 
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
@@ -42,7 +43,7 @@ import mekhq.campaign.personnel.SkillType;
 public class LFBattery extends Part {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 6590685996383689912L;
 
@@ -95,15 +96,15 @@ public class LFBattery extends Part {
                     hits = 0;
                 }
             }
-            if(checkForDestruction 
-                    && hits > priorHits 
+            if(checkForDestruction
+                    && hits > priorHits
                     && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
             }
         }
     }
 
-    @Override 
+    @Override
     public int getBaseTime() {
         int time;
         if(isSalvaging()) {
@@ -200,7 +201,7 @@ public class LFBattery extends Part {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return part instanceof LFBattery 
+        return part instanceof LFBattery
                 && coreType == ((LFBattery)part).getCoreType()
                 && docks == ((LFBattery)part).getDocks();
     }
@@ -235,9 +236,19 @@ public class LFBattery extends Part {
 
     @Override
     public String getDetails() {
-        return super.getDetails() 
-                + ", " + getUnitTonnage() + " tons" 
-                + ", " + getDocks() + " collars";
+        return getDetails(true);
+    }
+
+    @Override
+    public String getDetails(boolean includeRepairDetails) {
+        StringJoiner joiner = new StringJoiner(", ");
+        String details = super.getDetails(includeRepairDetails);
+        if (!details.isEmpty()) {
+            joiner.add(details);
+        }
+        joiner.add(getUnitTonnage() + " tons")
+              .add(getDocks() + " collars");
+        return joiner.toString();
     }
 
     @Override

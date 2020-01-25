@@ -54,12 +54,12 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
         super(tonnage, et, equipNum, c, etonnage);
         this.trooper = trooper;
     }
-    
-    @Override 
+
+    @Override
 	public int getBaseTime() {
 		return 30;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		return -2;
@@ -203,12 +203,16 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
 
     @Override
     public String getDetails() {
-    	if(null == unit) {
-    		return super.getDetails();
+        return getDetails(true);
+    }
 
+    @Override
+    public String getDetails(boolean includeRepairDetails) {
+    	if(null == unit) {
+    		return super.getDetails(includeRepairDetails);
         }
     	String toReturn = unit.getEntity().getLocationName(trooper) + "<br>";
-		return toReturn + super.getDetails();
+		return toReturn + super.getDetails(includeRepairDetails);
     }
 
 

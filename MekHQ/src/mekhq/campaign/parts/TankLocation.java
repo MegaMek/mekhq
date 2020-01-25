@@ -1,20 +1,20 @@
 /*
  * TankLocation.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -60,7 +60,7 @@ public class TankLocation extends Part {
     public TankLocation() {
         this(0, 0, null);
     }
-    
+
     public TankLocation clone() {
         TankLocation clone = new TankLocation(loc, getUnitTonnage(), campaign);
         clone.copyBaseData(this);
@@ -69,11 +69,11 @@ public class TankLocation extends Part {
         clone.breached = this.breached;
         return clone;
     }
-    
+
     public int getLoc() {
         return loc;
     }
-    
+
     public TankLocation(int loc, int tonnage, Campaign c) {
         super(tonnage, c);
         this.loc = loc;
@@ -96,18 +96,18 @@ public class TankLocation extends Part {
         }
         computeCost();
     }
-    
+
     protected void computeCost () {
         //TODO: implement
     }
 
     @Override
     public boolean isSamePartType(Part part) {
-        return part instanceof TankLocation 
+        return part instanceof TankLocation
                 && getLoc() == ((TankLocation)part).getLoc()
                 && getUnitTonnage() == ((TankLocation)part).getUnitTonnage();
-    }	
-    
+    }
+
     @Override
     public boolean isSameStatus(Part part) {
         return super.isSameStatus(part) && this.getDamage() == ((TankLocation)part).getDamage();
@@ -116,7 +116,7 @@ public class TankLocation extends Part {
     public int getDamage() {
         return damage;
     }
-    
+
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
@@ -238,10 +238,19 @@ public class TankLocation extends Part {
 
     @Override
     public String getDetails() {
-        if(isBreached()) {
-            return "Breached";
+        return getDetails(true);
+    }
+
+    @Override
+    public String getDetails(boolean includeRepairDetails) {
+        if (includeRepairDetails) {
+            if(isBreached()) {
+                return "Breached";
+            } else {
+                return  damage + " point(s) of damage";
+            }
         } else {
-            return  damage + " point(s) of damage";
+            return super.getDetails(includeRepairDetails);
         }
     }
 
@@ -323,7 +332,7 @@ public class TankLocation extends Part {
 
     @Override
     public String getLocationName() {
-        return unit.getEntity().getLocationName(loc);
+        return unit != null ? unit.getEntity().getLocationName(loc) : null;
     }
 
     @Override
@@ -335,7 +344,7 @@ public class TankLocation extends Part {
     public TechAdvancement getTechAdvancement() {
         return TECH_ADVANCEMENT;
     }
-    
+
     @Override
     public int getMassRepairOptionType() {
         return Part.REPAIR_PART_TYPE.GENERAL_LOCATION;
