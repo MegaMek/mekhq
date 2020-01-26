@@ -35,6 +35,7 @@ v0.47.3-SNAPSHOT
 + PR #1419: Improve performance of purchasing parts and fix refit bug where armor or ammo may not be used for a refit
 + PR #1424: Resolve errors found by SpotBugs
 + Issue #1427: Fix bug where GM Add'ing ammo with 0 shots did not add new ammo
++ PR #1430: Initialize bay space on Campaign load before setting Used Capacity
 
 v0.47.2 (2019-11-15 2000 UTC) 
 + PR #1325: Customize protomechs and advanced aero in MekLab
