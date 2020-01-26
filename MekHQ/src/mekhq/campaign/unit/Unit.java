@@ -1823,6 +1823,18 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         } else {
             retVal.id = UUID.fromString(idNode.getTextContent());
         }
+        
+        //Temp storage for used bay capacities
+        double asfCap = 0.0;
+        double baCap = 0.0;
+        int dockCap = 0;
+        double hVeeCap = 0.0;
+        double infCap = 0.0;
+        double lVeeCap = 0.0;
+        double mechCap = 0.0;
+        double protoCap = 0.0;
+        double shVeeCap = 0.0;
+        double scCap = 0.0;
 
         // Okay, now load Part-specific fields!
         NodeList nl = wn.getChildNodes();
@@ -1891,34 +1903,34 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     retVal.addTransportedUnit(UUID.fromString(wn2.getTextContent()));
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("asfCapacity")) {
-                    retVal.aeroCapacity = Double.parseDouble(wn2.getTextContent());
+                    asfCap = Double.parseDouble(wn2.getTextContent());
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("baCapacity")) {
-                    retVal.baCapacity = Double.parseDouble(wn2.getTextContent());
+                    baCap = Double.parseDouble(wn2.getTextContent());
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("dockCapacity")) {
-                    retVal.dockCapacity = Integer.parseInt(wn2.getTextContent());
+                    dockCap = Integer.parseInt(wn2.getTextContent());
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("hVeeCapacity")) {
-                    retVal.hVeeCapacity = Double.parseDouble(wn2.getTextContent());
+                   hVeeCap = Double.parseDouble(wn2.getTextContent());
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("infCapacity")) {
-                    retVal.infCapacity = Double.parseDouble(wn2.getTextContent());
+                    infCap = Double.parseDouble(wn2.getTextContent());
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("lVeeCapacity")) {
-                    retVal.lVeeCapacity = Double.parseDouble(wn2.getTextContent());
+                    lVeeCap = Double.parseDouble(wn2.getTextContent());
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("mechCapacity")) {
-                    retVal.mechCapacity = Double.parseDouble(wn2.getTextContent());
+                    mechCap = Double.parseDouble(wn2.getTextContent());
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("protoCapacity")) {
-                    retVal.protoCapacity = Double.parseDouble(wn2.getTextContent());
+                    protoCap = Double.parseDouble(wn2.getTextContent());
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("scCapacity")) {
-                    retVal.scCapacity = Double.parseDouble(wn2.getTextContent());
+                    scCap = Double.parseDouble(wn2.getTextContent());
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("shVeeCapacity")) {
-                    retVal.shVeeCapacity = Double.parseDouble(wn2.getTextContent());
+                    shVeeCap = Double.parseDouble(wn2.getTextContent());
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("forceId")) {
                     retVal.forceId = Integer.parseInt(wn2.getTextContent());
@@ -1940,6 +1952,21 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     retVal.lastMaintenanceReport = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("mothballInfo")) {
                     retVal.mothballInfo = MothballInfo.generateInstanceFromXML(wn2, version);
+                }
+                // Set up bay space values after we've loaded everything from the unit record
+                // Otherwise you can get some initialized values where they shouldn't be
+                if (retVal.entity != null && !retVal.getEntity().getTransportBays().isEmpty()) {
+                    retVal.initializeBaySpace();
+                    retVal.setASFCapacity(asfCap);
+                    retVal.setBattleArmorCapacity(baCap);
+                    retVal.setDocks(dockCap);
+                    retVal.setHeavyVehicleCapacity(hVeeCap);
+                    retVal.setInfantryCapacity(infCap);
+                    retVal.setLightVehicleCapacity(lVeeCap);
+                    retVal.setMechCapacity(mechCap);
+                    retVal.setProtoCapacity(protoCap);
+                    retVal.setSmallCraftCapacity(scCap);
+                    retVal.setSuperHeavyVehicleCapacity(shVeeCap);
                 }
             }
         } catch (Exception ex) {
