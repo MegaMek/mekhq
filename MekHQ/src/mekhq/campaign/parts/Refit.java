@@ -1778,6 +1778,11 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 
     @Override
     public String getDetails() {
+        return getDetails(true);
+    }
+
+    @Override
+    public String getDetails(boolean includeRepairDetails) {
         return "(" + getRefitClassName() + "/" + getTimeLeft() + " minutes/" + getCost().toAmountAndSymbolString() + ")";
     }
 

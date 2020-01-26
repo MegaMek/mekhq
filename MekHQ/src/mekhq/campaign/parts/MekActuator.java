@@ -1,20 +1,20 @@
 /*
  * MekActuator.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -25,6 +25,8 @@ import java.io.PrintWriter;
 import java.util.StringJoiner;
 
 import mekhq.campaign.finances.Money;
+
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -247,12 +249,17 @@ public class MekActuator extends Part {
 
     @Override
     public String getDetails() {
+        return getDetails(true);
+    }
+
+    @Override
+    public String getDetails(boolean includeRepairDetails) {
         if (null != unit) {
             StringJoiner sj = new StringJoiner(", ");
-            if (getLocationName() != null) {
+            if (!StringUtils.isEmpty(getLocationName())) {
                 sj.add(getLocationName());
             }
-            if (campaign.getCampaignOptions().payForRepairs()) {
+            if (includeRepairDetails && campaign.getCampaignOptions().payForRepairs()) {
                 Money repairCost = getStickerPrice().multipliedBy(0.2);
                 sj.add(repairCost.toAmountAndSymbolString() + " to repair");
             }
@@ -321,7 +328,7 @@ public class MekActuator extends Part {
 
     @Override
     public String getLocationName() {
-        return unit.getEntity().getLocationName(location);
+        return unit != null ? unit.getEntity().getLocationName(location) : null;
     }
 
     @Override

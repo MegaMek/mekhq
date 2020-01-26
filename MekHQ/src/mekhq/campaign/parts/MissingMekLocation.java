@@ -349,7 +349,7 @@ public class MissingMekLocation extends MissingPart {
 
 	@Override
 	public String getLocationName() {
-		return unit.getEntity().getLocationName(loc);
+		return unit != null ? unit.getEntity().getLocationName(loc) : null;
 	}
 
 	@Override
@@ -361,13 +361,13 @@ public class MissingMekLocation extends MissingPart {
     public TechAdvancement getTechAdvancement() {
         return EquipmentType.getStructureTechAdvancement(structureType, clan);
     }
-    
-	
+
+
 	@Override
 	public int getMassRepairOptionType() {
     	return Part.REPAIR_PART_TYPE.GENERAL_LOCATION;
     }
-	
+
 	@Override
 	public int getRepairPartType() {
     	return Part.REPAIR_PART_TYPE.MEK_LOCATION;

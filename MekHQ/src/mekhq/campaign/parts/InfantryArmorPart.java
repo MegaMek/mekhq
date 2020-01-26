@@ -1,20 +1,20 @@
 /*
  * InfantryMotiveType.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -57,7 +57,7 @@ public class InfantryArmorPart extends Part {
     public InfantryArmorPart() {
         this(0, null, 1.0, false, false, false, false, false, false);
     }
-    
+
     public InfantryArmorPart(int tonnage, Campaign c, double divisor, boolean enc, boolean dest, boolean camo, boolean ir, boolean ecm, boolean space) {
         super(tonnage, c);
         this.damageDivisor = divisor;
@@ -69,7 +69,7 @@ public class InfantryArmorPart extends Part {
         this.spaceSuit = space;
         assignName();
     }
-    
+
     private void assignName() {
         String heavyString = "";
         if(damageDivisor > 1) {
@@ -86,9 +86,14 @@ public class InfantryArmorPart extends Part {
 
         this.name = heavyString + baseName;
     }
-    
+
     @Override
     public String getDetails() {
+        return getDetails(true);
+    }
+
+    @Override
+    public String getDetails(boolean includeRepairDetails) {
         String details = "";
         if(isEncumbering()) {
             details += "encumbering";
@@ -113,7 +118,7 @@ public class InfantryArmorPart extends Part {
         }
         return details;
     }
-    
+
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
         //do nothing

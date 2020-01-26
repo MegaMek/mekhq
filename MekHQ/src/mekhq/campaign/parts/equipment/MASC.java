@@ -1,20 +1,20 @@
 /*
  * MASC.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -45,30 +45,30 @@ public class MASC extends EquipmentPart {
 	private static final long serialVersionUID = 2892728320891712304L;
 
 	protected int engineRating;
-	
+
 	public MASC() {
     	this(0, null, -1, null, 0, false);
     }
-    
+
     public MASC(int tonnage, EquipmentType et, int equipNum, Campaign c, int rating, boolean omniPodded) {
         super(tonnage, et, equipNum, omniPodded, c);
         this.engineRating = rating;
         equipTonnage = calculateTonnage();
     }
-    
+
     public MASC clone() {
     	MASC clone = new MASC(getUnitTonnage(), getType(), getEquipmentNum(), campaign, engineRating, omniPodded);
         clone.copyBaseData(this);
     	return clone;
     }
- 
+
     public void setUnit(Unit u) {
     	super.setUnit(u);
     	if(null != unit && null != unit.getEntity().getEngine()) {
     		engineRating = unit.getEntity().getEngine().getRating();
     	}
     }
-    
+
     private double calculateTonnage() {
     	if(null == type) {
     		return 0;
@@ -79,25 +79,25 @@ public class MASC extends EquipmentPart {
         }
         return Math.round(getUnitTonnage() / 20.0f);
     }
-    
+
     @Override
     public Money getStickerPrice() {
     	if (isSupercharger()) {
     		return Money.of(engineRating * (isOmniPodded()? 1250 : 10000));
-    	} else {           
+    	} else {
             return Money.of(engineRating * getTonnage() * 1000);
         }
     }
-    
+
     public int getEngineRating() {
     	return engineRating;
     }
-    
+
     private boolean isSupercharger() {
     	return type.hasSubType(MiscType.S_SUPERCHARGER);
     }
-    
-    
+
+
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
     	if(needsFixing() || part.needsFixing()) {
@@ -109,10 +109,10 @@ public class MASC extends EquipmentPart {
         		&& getEngineRating() == ((MASC)part).getEngineRating();
     }
 
-    
+
     @Override
 	public void writeToXml(PrintWriter pw1, int indent) {
-		writeToXmlBegin(pw1, indent);		
+		writeToXmlBegin(pw1, indent);
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<equipmentNum>"
 				+equipmentNum
@@ -135,7 +135,7 @@ public class MASC extends EquipmentPart {
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {
 		NodeList nl = wn.getChildNodes();
-		
+
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
 			if (wn2.getNodeName().equalsIgnoreCase("equipmentNum")) {
@@ -153,24 +153,33 @@ public class MASC extends EquipmentPart {
 		}
 		restore();
 	}
-	
+
 	@Override
 	public MissingPart getMissingPart() {
 		return new MissingMASC(getUnitTonnage(), type, equipmentNum, campaign, equipTonnage, engineRating,
 		        omniPodded);
 	}
-	
+
 	@Override
 	public String getDetails() {
+        return getDetails(true);
+    }
+
+    @Override
+    public String getDetails(boolean includeRepairDetails) {
+        String details = super.getDetails(includeRepairDetails);
 		if(null != unit) {
-			return super.getDetails();
-		}
+			return details;
+        }
+        if (!details.isEmpty()) {
+            details += ", ";
+        }
 		if(isSupercharger()) {
-			return super.getDetails() + ", " + getEngineRating() + " rating";
+			return details + ", " + getEngineRating() + " rating";
 		}
-		return super.getDetails() + ", " + getUnitTonnage() + " tons, " + getEngineRating() + " rating";
+		return details + ", " + getUnitTonnage() + " tons, " + getEngineRating() + " rating";
 	 }
-	
+
 	@Override
     public boolean isOmniPoddable() {
     	return isSupercharger();
