@@ -294,12 +294,17 @@ public class MissingBattleArmorSuit extends MissingPart {
 
 	@Override
     public String getDetails() {
+        return getDetails(true);
+    }
+
+    @Override
+    public String getDetails(boolean includeRepairDetails) {
     	if(null == unit) {
-    		return super.getDetails();
+    		return super.getDetails(includeRepairDetails);
 
         }
     	String toReturn = unit.getEntity().getLocationName(trooper) + "<br>";
-		return toReturn + super.getDetails();
+		return toReturn + super.getDetails(includeRepairDetails);
     }
 
 	@Override

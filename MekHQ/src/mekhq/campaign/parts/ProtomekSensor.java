@@ -177,6 +177,11 @@ public class ProtomekSensor extends Part {
 
     @Override
     public String getDetails() {
+        return getDetails(true);
+    }
+
+    @Override
+    public String getDetails(boolean includeRepairDetails) {
         if(null != unit) {
             return unit.getEntity().getLocationName(Protomech.LOC_HEAD);
         }
@@ -257,7 +262,7 @@ public class ProtomekSensor extends Part {
         // No separate listing for the sensors; using same TA as structural components
         return ProtomekLocation.TECH_ADVANCEMENT;
     }
-    
+
     @Override
 	public int getMassRepairOptionType() {
     	return Part.REPAIR_PART_TYPE.ELECTRONICS;

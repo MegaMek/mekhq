@@ -177,6 +177,11 @@ public class ProtomekLegActuator extends Part {
 
     @Override
     public String getDetails() {
+        return getDetails(true);
+    }
+
+    @Override
+    public String getDetails(boolean includeRepairDetails) {
         if(null != unit) {
             return unit.getEntity().getLocationName(Protomech.LOC_LEG);
         }
@@ -244,7 +249,7 @@ public class ProtomekLegActuator extends Part {
 
     @Override
    	public String getLocationName() {
-   		return unit.getEntity().getLocationName(getLocation());
+   		return unit != null ? unit.getEntity().getLocationName(getLocation()) : null;
    	}
 
 	@Override
@@ -256,7 +261,7 @@ public class ProtomekLegActuator extends Part {
     public TechAdvancement getTechAdvancement() {
         return ProtomekLocation.TECH_ADVANCEMENT;
     }
-    
+
     @Override
 	public int getMassRepairOptionType() {
     	return Part.REPAIR_PART_TYPE.ACTUATOR;

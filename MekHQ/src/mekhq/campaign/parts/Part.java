@@ -30,6 +30,8 @@ import java.util.StringJoiner;
 import java.util.UUID;
 
 import mekhq.campaign.finances.Money;
+
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -1125,7 +1127,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     @Override
     public String getDetails(boolean includeRepairDetails) {
         StringJoiner sj = new StringJoiner(", ");
-        if (getLocationName() != null) {
+        if (!StringUtils.isEmpty(getLocationName())) {
             sj.add(getLocationName());
         }
         if (isOmniPodded()) {

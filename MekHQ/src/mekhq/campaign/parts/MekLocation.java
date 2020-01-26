@@ -22,6 +22,7 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
+import java.util.StringJoiner;
 
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
@@ -494,34 +495,40 @@ public class MekLocation extends Part {
 
 	@Override
     public String getDetails() {
+        return getDetails(true);
+    }
+
+    @Override
+    public String getDetails(boolean includeRepairDetails) {
 	    String toReturn = "";
 		if(null != unit) {
-			toReturn = unit.getEntity().getLocationName(loc);
-			if(isBlownOff()) {
-				toReturn += " (Blown Off)";
-			} else if(isBreached()) {
-				toReturn += " (Breached)";
-			} else {
-				toReturn += " (" + Math.round(100*percent) + "%)";
-			}
+            toReturn = unit.getEntity().getLocationName(loc);
+            if (includeRepairDetails) {
+                if(isBlownOff()) {
+                    toReturn += " (Blown Off)";
+                } else if(isBreached()) {
+                    toReturn += " (Breached)";
+                } else {
+                    toReturn += " (" + Math.round(100*percent) + "%)";
+                }
+            }
 			return toReturn;
 		}
-		toReturn += getUnitTonnage() + " tons" + " (" + Math.round(100*percent) + "%)";
+        toReturn += getUnitTonnage() + " tons";
+        if (includeRepairDetails) {
+            toReturn += " (" + Math.round(100*percent) + "%)";
+        }
 		if(loc == Mech.LOC_HEAD) {
-		    String components = "";
+		    StringJoiner components = new StringJoiner(", ");
     		if(hasSensors()) {
-                components += "Sensors";
+                components.add("Sensors");
             }
             if(hasLifeSupport()) {
-                if(components.length() > 0) {
-                    components += ", ";
-                }
-                components += "Life Support";
+                components.add("Life Support");
             }
             if(components.length() > 0) {
-                components = " [" + components + "]";
+                toReturn += " [" + components.toString() + "]";
             }
-            toReturn += components;
 		}
 		return toReturn;
     }

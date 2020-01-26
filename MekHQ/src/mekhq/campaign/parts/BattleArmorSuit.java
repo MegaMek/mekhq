@@ -409,7 +409,7 @@ public class BattleArmorSuit extends Part {
             }
         }
     }
-    
+
     @Override
     public void fix() {
         super.fix();
@@ -504,8 +504,8 @@ public class BattleArmorSuit extends Part {
             }
         }
     }
-    
-    @Override 
+
+    @Override
     public int getBaseTime() {
         return 0;
     }
@@ -517,6 +517,11 @@ public class BattleArmorSuit extends Part {
 
     @Override
     public String getDetails() {
+        return getDetails(true);
+    }
+
+    @Override
+    public String getDetails(boolean includeRepairDetails) {
         if(null != unit) {
             return "Trooper " + trooper;
         } else {
@@ -536,7 +541,7 @@ public class BattleArmorSuit extends Part {
                 return nEquip + " pieces of equipment; " + armor + " armor points";
             }
         }
-        return super.getDetails();
+        return super.getDetails(includeRepairDetails);
     }
 
     @Override

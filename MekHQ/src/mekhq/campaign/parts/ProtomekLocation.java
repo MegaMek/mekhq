@@ -53,7 +53,7 @@ public class ProtomekLocation extends Part {
             .setPrototypeFactions(F_CSJ).setProductionFactions(F_CSJ)
             .setTechRating(RATING_D).setAvailability(RATING_X, RATING_X, RATING_D, RATING_D)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
-    
+
     //some of these aren't used but may be later for advanced designs (i.e. WoR)
     protected int loc;
     protected int structureType;
@@ -405,19 +405,29 @@ public class ProtomekLocation extends Part {
 
     @Override
     public String getDetails() {
+        return getDetails(true);
+    }
+
+    @Override
+    public String getDetails(boolean includeRepairDetails) {
         String toReturn = "";
         if(null != unit) {
             toReturn = unit.getEntity().getLocationName(loc);
-            if(isBlownOff()) {
-                toReturn += " (Blown Off)";
-            } else if(isBreached()) {
-                toReturn += " (Breached)";
-            } else {
-                toReturn += " (" + Math.round(100*percent) + "%)";
+            if (includeRepairDetails) {
+                if(isBlownOff()) {
+                    toReturn += " (Blown Off)";
+                } else if(isBreached()) {
+                    toReturn += " (Breached)";
+                } else {
+                    toReturn += " (" + Math.round(100*percent) + "%)";
+                }
             }
             return toReturn;
         }
-        toReturn += getUnitTonnage() + " tons" + " (" + Math.round(100*percent) + "%)";
+        toReturn += getUnitTonnage() + " tons";
+        if (includeRepairDetails) {
+            toReturn += " (" + Math.round(100*percent) + "%)";
+        }
         return toReturn;
     }
 
@@ -629,7 +639,7 @@ public class ProtomekLocation extends Part {
 
 	@Override
 	public String getLocationName() {
-		return unit.getEntity().getLocationName(loc);
+		return unit != null ? unit.getEntity().getLocationName(loc) : null;
 	}
 
 	@Override
@@ -641,12 +651,12 @@ public class ProtomekLocation extends Part {
 	public TechAdvancement getTechAdvancement() {
 	    return TECH_ADVANCEMENT;
 	}
-    
+
     @Override
 	public int getMassRepairOptionType() {
     	return Part.REPAIR_PART_TYPE.GENERAL_LOCATION;
     }
-	
+
 	@Override
 	public int getRepairPartType() {
     	return Part.REPAIR_PART_TYPE.MEK_LOCATION;

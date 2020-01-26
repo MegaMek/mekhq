@@ -1,20 +1,20 @@
 /*
  * AeroSensor.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -59,19 +59,19 @@ public class AeroSensor extends Part {
     public AeroSensor() {
         this(0, false, null);
     }
-    
+
     public AeroSensor(int tonnage, boolean lc, Campaign c) {
         super(tonnage, c);
         this.name = "Aerospace Sensors";
         this.largeCraft = lc;
     }
-    
+
     public AeroSensor clone() {
         AeroSensor clone = new AeroSensor(getUnitTonnage(), largeCraft, campaign);
         clone.copyBaseData(this);
         return clone;
     }
-        
+
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
         int priorHits = hits;
@@ -100,7 +100,7 @@ public class AeroSensor extends Part {
             }
             if (hits == 1) {
                 time *= 1;
-            } 
+            }
             if (hits == 2) {
                 time *= 2;
             }
@@ -134,7 +134,7 @@ public class AeroSensor extends Part {
             }
             if (hits == 1) {
                 return -1;
-            } 
+            }
             if (hits == 2) {
                 return 0;
             }
@@ -244,11 +244,24 @@ public class AeroSensor extends Part {
 
     @Override
     public String getDetails() {
+        return getDetails(true);
+    }
+
+    @Override
+    public String getDetails(boolean includeRepairDetails) {
         String dropper = "";
         if(largeCraft) {
             dropper = " (spacecraft)";
         }
-        return super.getDetails() + ", " + getUnitTonnage() + " tons" + dropper;
+
+        String details = super.getDetails(includeRepairDetails);
+        if (!details.isEmpty()) {
+            details += ", ";
+        }
+
+        details += getUnitTonnage() + " tons" + dropper;
+
+        return details;
     }
 
     @Override
@@ -271,7 +284,7 @@ public class AeroSensor extends Part {
         }
         return Entity.LOC_NONE;
     }
-    
+
     @Override
     public TechAdvancement getTechAdvancement() {
         return TECH_ADVANCEMENT;
