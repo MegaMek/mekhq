@@ -22,7 +22,6 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
-import java.math.RoundingMode;
 
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
@@ -212,7 +211,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 
 	@Override
     public IAcquisitionWork getAcquisitionWork() {
-        return new AmmoStorage(1,type,((AmmoType)type).getShots(),campaign);
+        return (IAcquisitionWork)getNewPart();
     }
 
 	@Override
@@ -369,7 +368,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     }
 
     public Part getNewPart() {
-        return new AmmoStorage(1,type,shots,campaign);
+        return new AmmoStorage(1,type,((AmmoType)type).getShots(),campaign);
     }
 
     @Override
