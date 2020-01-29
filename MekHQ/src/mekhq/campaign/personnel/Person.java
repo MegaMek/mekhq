@@ -693,7 +693,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
    public String getHyperlinkedName() {
-        return "<a href='PERSON:" + getId() + "'>" + getFullName() + "</a>";
+        return String.format("<a href='PERSON:%s'>%s</a>", getId().toString(), getFullName());
     }
 
     public String getCallsign() {
@@ -1059,7 +1059,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         Ancestors a = getAncestors();
 
         if (a != null) {
-            return campaign.getPerson(a.getMotherID());
+            return campaign.getPerson(a.getMotherId());
         }
         return null;
     }
@@ -1068,18 +1068,18 @@ public class Person implements Serializable, MekHqXmlSerializable {
         Ancestors a = getAncestors();
 
         if (a != null) {
-            return campaign.getPerson(a.getFatherID());
+            return campaign.getPerson(a.getFatherId());
         }
         return null;
     }
 
     public Collection<Person> birth() {
         int size = extraData.get(PREGNANCY_CHILDREN_DATA, 1);
-        String fatherIDString = extraData.get(PREGNANCY_FATHER_DATA);
-        UUID fatherID = (null != fatherIDString) ? UUID.fromString(fatherIDString) : getSpouseID();
-        Ancestors anc = campaign.getAncestors(fatherID, id);
+        String fatherIdString = extraData.get(PREGNANCY_FATHER_DATA);
+        UUID fatherId = (null != fatherIdString) ? UUID.fromString(fatherIdString) : getSpouseID();
+        Ancestors anc = campaign.getAncestors(fatherId, id);
         if(null == anc) {
-            anc = campaign.createAncestors(fatherID, id);
+            anc = campaign.createAncestors(fatherId, id);
         }
         final UUID ancId = anc.getId();
         final String surname = getName().contains(" ") ? getName().split(" ", 2)[1] : "";
@@ -1510,7 +1510,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (countOptions(PilotOptions.MD_ADVANTAGES) > 0) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                         + "<implants>"
-                        + String.valueOf(getOptionList("::", PilotOptions.MD_ADVANTAGES))
+                        + getOptionList("::", PilotOptions.MD_ADVANTAGES)
                         + "</implants>");
         }
         if (!techUnitIds.isEmpty()) {
@@ -1892,7 +1892,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 }
             }
 
-            if (version.getMajorVersion() == 0 && version.getMinorVersion() < 3 && version.getMinorVersion() > 1) {
+            if (version.getMajorVersion() == 0 && version.getMinorVersion() == 2) {
                 //adjust for conventional fighter pilots
                 if (retVal.primaryRole >= T_CONV_PILOT) {
                     retVal.primaryRole += 1;
@@ -2183,7 +2183,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             rankName += " " + Rank.getManeiDominiRankName(maneiDominiRank);
         }
         if (getRankSystem() == Ranks.RS_COM || getRankSystem() == Ranks.RS_WOB) {
-            rankName += getComstarBranchDesignation();
+            rankName += getComStarBranchDesignation();
         }
 
         // If we have a rankLevel, add it
@@ -2226,15 +2226,23 @@ public class Person implements Serializable, MekHqXmlSerializable {
             return "";
 
         switch (maneiDominiClass) {
-            case MD_NONE: return "";
-            case MD_GHOST: return "Ghost";
-            case MD_WRAITH: return "Wraith";
-            case MD_BANSHEE: return "Banshee";
-            case MD_ZOMBIE: return "Zombie";
-            case MD_PHANTOM: return "Phantom";
-            case MD_SPECTER: return "Specter";
-            case MD_POLTERGEIST: return "Poltergeist";
-            default: return "";
+            case MD_GHOST:
+                return "Ghost";
+            case MD_WRAITH:
+                return "Wraith";
+            case MD_BANSHEE:
+                return "Banshee";
+            case MD_ZOMBIE:
+                return "Zombie";
+            case MD_PHANTOM:
+                return "Phantom";
+            case MD_SPECTER:
+                return "Specter";
+            case MD_POLTERGEIST:
+                return "Poltergeist";
+            case MD_NONE:
+            default:
+                return "";
         }
     }
 
@@ -2318,7 +2326,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 if (hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO)) {
                     if(campaign.getCampaignOptions().useAltQualityAveraging()) {
                         int rawScore = (int) Math.floor(
-                            (getSkill(SkillType.S_GUN_AERO).getLevel() + getSkill(SkillType.S_PILOT_AERO).getLevel()) / 2.0
+                            (getSkill(SkillType.S_GUN_AERO).getLevel() + getSkill(SkillType.S_PILOT_AERO)
+                                    .getLevel()) / 2.0
                         );
                         if(getSkill(SkillType.S_GUN_AERO).getType().getExperienceLevel(rawScore) ==
                             getSkill(SkillType.S_PILOT_AERO).getType().getExperienceLevel(rawScore)) {
@@ -2335,7 +2344,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 if (hasSkill(SkillType.S_GUN_JET) && hasSkill(SkillType.S_PILOT_JET)) {
                     if(campaign.getCampaignOptions().useAltQualityAveraging()) {
                         int rawScore = (int) Math.floor(
-                            (getSkill(SkillType.S_GUN_JET).getLevel() + getSkill(SkillType.S_PILOT_JET).getLevel()) / 2.0
+                            (getSkill(SkillType.S_GUN_JET).getLevel() + getSkill(SkillType.S_PILOT_JET)
+                                    .getLevel()) / 2.0
                         );
                         if(getSkill(SkillType.S_GUN_JET).getType().getExperienceLevel(rawScore) ==
                             getSkill(SkillType.S_PILOT_JET).getType().getExperienceLevel(rawScore)) {
@@ -2352,7 +2362,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 if (hasSkill(SkillType.S_GUN_BA) && hasSkill(SkillType.S_ANTI_MECH)) {
                     if(campaign.getCampaignOptions().useAltQualityAveraging()) {
                         int rawScore = (int) Math.floor(
-                            (getSkill(SkillType.S_GUN_BA).getLevel() + getSkill(SkillType.S_ANTI_MECH).getLevel()) / 2.0
+                            (getSkill(SkillType.S_GUN_BA).getLevel() + getSkill(SkillType.S_ANTI_MECH)
+                                    .getLevel()) / 2.0
                         );
                         if(getSkill(SkillType.S_GUN_BA).getType().getExperienceLevel(rawScore) ==
                             getSkill(SkillType.S_ANTI_MECH).getType().getExperienceLevel(rawScore)) {
@@ -2466,7 +2477,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     /**
-     * returns a full description in HTML format that will be used for the graphical display in the personnel table among other places
+     * returns a full description in HTML format that will be used for the graphical display in the
+     * personnel table among other places
      * @param htmlRank if the rank will be wrapped in an HTML DIV and id
      * @return String
      */
@@ -2504,18 +2516,18 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public String makeHTMLRank() {
-        return "<html>"+makeHTMLRankDiv()+"</html>";
+        return String.format("<html>%s</html>", makeHTMLRankDiv());
     }
 
     public String makeHTMLRankDiv() {
-        return "<div id=\""+getId()+"\">"+getRankName()+ (isPrisoner() && isWillingToDefect() ? "*" : "") + "</div>";
+        return String.format("<div id=\"%s\">%s%s</div>", getId().toString(), getRankName(), (isPrisoner() && isWillingToDefect() ? "*" : ""));
     }
 
     public String getHyperlinkedFullTitle() {
-        return "<a href='PERSON:" + getId() + "'>" + getFullTitle() + "</a>";
+        return String.format("<a href='PERSON:%s'>%s</a>", getId().toString(), getFullTitle());
     }
 
-    public String getComstarBranchDesignation() {
+    public String getComStarBranchDesignation() {
         StringBuilder sb = new StringBuilder(" ");
 
         // Primary
@@ -2660,11 +2672,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return 0;
     }
 
-    public TargetRoll getHealingMods(Person doctor) {
+    public TargetRoll getHealingMods() {
         return new TargetRoll(getHealingDifficulty(), "difficulty");
     }
 
-    public String fail(int rating) {
+    public String fail() {
         return " <font color='red'><b>Failed to heal.</b></font>";
     }
 
@@ -3351,7 +3363,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return null;
     }
 
-    public Skill getSkillForWorkingOn(IAcquisitionWork acquisition, String skillName) {
+    public Skill getSkillForWorkingOn(String skillName) {
         if (skillName.equals(CampaignOptions.S_TECH)) {
             return getBestTechSkill();
         }
@@ -3434,7 +3446,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
 
             toReturn.append(SkillType.getExperienceLevelName(skill.getExperienceLevel()));
-            toReturn.append(" " + skillName);
+            toReturn.append(" ").append(skillName);
             first = false;
         }
 
@@ -3450,14 +3462,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public boolean isRightTechTypeFor(IPartWork part) {
         Unit unit = part.getUnit();
         if (null == unit) {
-            if ((hasSkill(SkillType.S_TECH_MECH) && part.isRightTechType(SkillType.S_TECH_MECH))
-                || (hasSkill(SkillType.S_TECH_AERO) && part.isRightTechType(SkillType.S_TECH_AERO))
-                || (hasSkill(SkillType.S_TECH_MECHANIC) && part.isRightTechType(SkillType.S_TECH_MECHANIC))
-                || (hasSkill(SkillType.S_TECH_BA) && part.isRightTechType(SkillType.S_TECH_BA))
-                || (hasSkill(SkillType.S_TECH_VESSEL) && part.isRightTechType(SkillType.S_TECH_VESSEL))) {
-                return true;
-            }
-            return false;
+            return (hasSkill(SkillType.S_TECH_MECH) && part.isRightTechType(SkillType.S_TECH_MECH))
+                    || (hasSkill(SkillType.S_TECH_AERO) && part.isRightTechType(SkillType.S_TECH_AERO))
+                    || (hasSkill(SkillType.S_TECH_MECHANIC) && part.isRightTechType(SkillType.S_TECH_MECHANIC))
+                    || (hasSkill(SkillType.S_TECH_BA) && part.isRightTechType(SkillType.S_TECH_BA))
+                    || (hasSkill(SkillType.S_TECH_VESSEL) && part.isRightTechType(SkillType.S_TECH_VESSEL));
         }
         if (unit.getEntity() instanceof Mech || unit.getEntity() instanceof Protomech) {
             return hasSkill(SkillType.S_TECH_MECH);
@@ -3901,7 +3910,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         List<UUID> ancestors = new ArrayList<>();
         for (Ancestors a : campaign.getAncestors()) {
             if ((null != a)
-                && (getId().equals(a.getMotherID()) || getId().equals(a.getFatherID()))) {
+                && (getId().equals(a.getMotherId()) || getId().equals(a.getFatherId()))) {
                 ancestors.add(a.getId());
             }
         }
@@ -3932,7 +3941,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         boolean hasKids = false;
         if (getId() != null) {
             for (Ancestors a : campaign.getAncestors()) {
-                if (getId().equals(a.getMotherID()) || getId().equals(a.getFatherID())) {
+                if (getId().equals(a.getMotherId()) || getId().equals(a.getFatherId())) {
                     hasKids = true;
                     break;
                 }

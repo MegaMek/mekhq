@@ -221,7 +221,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
          * lances.
          */
         double weight = calculateTotalWeight(c, forceId);
-                
+
         weight = weight * 4.0 / getStdLanceSize(c.getFaction());
         if (weight < 40) {
             return EntityWeightClass.WEIGHT_ULTRA_LIGHT;
@@ -290,11 +290,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
             }
         }
         //sort person vector by rank
-        Collections.sort(people, new Comparator<Person>(){
-            public int compare(final Person p1, final Person p2) {
-                return ((Comparable<Integer>)p2.getRankNumeric()).compareTo(p1.getRankNumeric());
-            }
-        });
+        people.sort((p1, p2) -> ((Comparable<Integer>) p2.getRankNumeric()).compareTo(p1.getRankNumeric()));
         if(people.size() > 0) {
             return people.get(0).getId();
         }
@@ -302,7 +298,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
     }
 
     public static Date getBattleDate(GregorianCalendar c) {
-        GregorianCalendar calendar = (GregorianCalendar)c.clone();
+        GregorianCalendar calendar = (GregorianCalendar) c.clone();
         calendar.add(Calendar.DATE, Compute.randomInt(7));
         return calendar.getTime();
     }
@@ -319,16 +315,16 @@ public class Lance implements Serializable, MekHqXmlSerializable {
         //thresholds are coded from charts with 1-100 range, so we add 1 to mod to adjust 0-based random int
         int battleTypeMod = 1 + (AtBContract.MORALE_NORMAL - getContract(c).getMoraleLevel()) * 5;
         battleTypeMod += getContract(c).getBattleTypeMod();
-        
+
         // debugging code that will allow you to force the generation of a particular scenario.
-        // when generating a lance-based scenario (Standup, Probe, etc), the second parameter in 
+        // when generating a lance-based scenario (Standup, Probe, etc), the second parameter in
         // createScenario is "this" (the lance). Otherwise, it should be null.
         /*if(true) {
             AtBScenario scenario = AtBScenarioFactory.createScenario(c, null, AtBScenario.CIVILIANHELP, true, getBattleDate(c.getCalendar()));
             scenario.setMissionId(this.getMissionId());
             return scenario;
         }*/
-        
+
         switch (role) {
         case ROLE_FIGHT:
             noBattle = (int)(60.0 / intensity + 0.5);
@@ -490,7 +486,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
 
     public static Lance generateInstanceFromXML(Node wn) {
         final String METHOD_NAME = "generateInstanceFromXML(Node)"; //$NON-NLS-1$
-        
+
         Lance retVal = null;
         NamedNodeMap attrs = wn.getAttributes();
         Node classNameNode = attrs.getNamedItem("type");
@@ -517,8 +513,8 @@ public class Lance implements Serializable, MekHqXmlSerializable {
         }
         return retVal;
     }
-    
-    /** 
+
+    /**
      * Worker function that calculates the total weight of a force with the given ID
      * @param c Campaign in which the force resides
      * @param forceId Force for which to calculate weight
@@ -526,7 +522,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
      */
     public static double calculateTotalWeight(Campaign c, int forceId) {
         double weight = 0.0;
-        
+
         for (UUID id : c.getForce(forceId).getUnits()) {
             Unit unit = c.getUnit(id);
             if (null != unit) {
@@ -552,7 +548,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
                 }
             }
         }
-        
+
         return weight;
     }
  }

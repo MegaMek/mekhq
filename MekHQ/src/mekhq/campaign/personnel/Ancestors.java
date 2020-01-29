@@ -18,10 +18,9 @@ public class Ancestors implements Serializable, MekHqXmlSerializable {
 	 *
 	 */
 	private static final long serialVersionUID = -6350146649504329173L;
-	// UUID
 	private UUID id;
-	private UUID fatherID;
-	private UUID motherID;
+	private UUID fatherId;
+	private UUID motherId;
 	private Campaign campaign;
 	private UUID fathersAncestors;
 	private UUID mothersAncestors;
@@ -31,8 +30,8 @@ public class Ancestors implements Serializable, MekHqXmlSerializable {
 	}
 
 	public Ancestors(UUID father, UUID mother, Campaign c) {
-		fatherID = father;
-		motherID = mother;
+		fatherId = father;
+		motherId = mother;
 		campaign = c;
 
 		// Generate ID
@@ -54,20 +53,20 @@ public class Ancestors implements Serializable, MekHqXmlSerializable {
 		}
 	}
 
-    public UUID getFatherID() {
-		return fatherID;
+    public UUID getFatherId() {
+		return fatherId;
 	}
 
-	public void setFatherID(UUID fatherID) {
-		this.fatherID = fatherID;
+	public void setFatherId(UUID fatherId) {
+		this.fatherId = fatherId;
 	}
 
-	public UUID getMotherID() {
-		return motherID;
+	public UUID getMotherId() {
+		return motherId;
 	}
 
-	public void setMotherID(UUID motherID) {
-		this.motherID = motherID;
+	public void setMotherId(UUID motherId) {
+		this.motherId = motherId;
 	}
 
 	public UUID getId() {
@@ -114,13 +113,13 @@ public class Ancestors implements Serializable, MekHqXmlSerializable {
         }
 
 		// Nulls means we can't possibly have a match, eh?
-		if ((fatherID == null && motherID == null)
-				|| (anc.getFatherID() == null && anc.getMotherID() == null)){
+		if (((fatherId == null) && (motherId == null))
+				|| ((anc.getFatherId() == null) && (anc.getMotherId() == null))) {
 			return false;
 		}
 
-		if ((getFatherID() != null && getFatherID().equals(anc.getFatherID()))
-				|| (getMotherID() != null && getMotherID().equals(anc.getMotherID()))) {
+		if (((getFatherId() != null) && getFatherId().equals(anc.getFatherId()))
+				|| ((getMotherId() != null) && getMotherId().equals(anc.getMotherId()))) {
 			return true;
 		}
 
@@ -147,46 +146,31 @@ public class Ancestors implements Serializable, MekHqXmlSerializable {
 
 		// Check their mother...
 		if (anc.getMothersAncestors() != null) {
-			if (anc.getMothersAncestors().checkMutualAncestors(this, depth)) {
-				return true;
-			}
+            return anc.getMothersAncestors().checkMutualAncestors(this, depth);
 		}
 
 		return false;
 	}
 
 	public void writeToXml(PrintWriter pw1, int indent) {
-		pw1.println(MekHqXmlUtil.indentStr(indent) + "<ancestor id=\""
-                + id.toString()
-                + "\">");
+		pw1.println(String.format("%s<ancestor id=\"%s\">", MekHqXmlUtil.indentStr(indent), id.toString()));
 		indent++;
-		pw1.println(MekHqXmlUtil.indentStr(indent)
-				+ "<id>"
-				+ id.toString()
-				+ "</id>");
-		if (fatherID != null) {
-			pw1.println(MekHqXmlUtil.indentStr(indent)
-					+ "<fatherID>"
-					+ fatherID.toString()
-					+ "</fatherID>");
+		pw1.println(String.format("%s<id>%s</id>", MekHqXmlUtil.indentStr(indent), id.toString()));
+		if (fatherId != null) {
+			pw1.println(String.format("%s<fatherId>%s</fatherId>",
+                    MekHqXmlUtil.indentStr(indent), fatherId.toString()));
 		}
-		if (motherID != null) {
-			pw1.println(MekHqXmlUtil.indentStr(indent)
-					+ "<motherID>"
-					+ motherID.toString()
-					+ "</motherID>");
+		if (motherId != null) {
+			pw1.println(String.format("%s<motherId>%s</motherId>",
+                    MekHqXmlUtil.indentStr(indent), motherId.toString()));
 		}
 		if (fathersAncestors != null) {
-			pw1.println(MekHqXmlUtil.indentStr(indent)
-					+ "<fathersAncestors>"
-					+ fathersAncestors.toString()
-					+ "</fathersAncestors>");
+			pw1.println(String.format("%s<fathersAncestors>%s</fathersAncestors>",
+                    MekHqXmlUtil.indentStr(indent), fathersAncestors.toString()));
 		}
 		if (mothersAncestors != null) {
-			pw1.println(MekHqXmlUtil.indentStr(indent)
-					+ "<mothersAncestors>"
-					+ mothersAncestors.toString()
-					+ "</mothersAncestors>");
+			pw1.println(String.format("%s<mothersAncestors>%s</mothersAncestors>",
+                    MekHqXmlUtil.indentStr(indent), mothersAncestors.toString()));
 		}
 		indent--;
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</ancestor>");
@@ -206,10 +190,10 @@ public class Ancestors implements Serializable, MekHqXmlSerializable {
 
 	            if (wn2.getNodeName().equalsIgnoreCase("id")) {
 	                retVal.id = UUID.fromString(wn2.getTextContent());
-	            } else if (wn2.getNodeName().equalsIgnoreCase("fatherID")) {
-	            	retVal.fatherID = UUID.fromString(wn2.getTextContent());
-	            } else if (wn2.getNodeName().equalsIgnoreCase("motherID")) {
-	            	retVal.motherID = UUID.fromString(wn2.getTextContent());
+	            } else if (wn2.getNodeName().equalsIgnoreCase("fatherId")) {
+	            	retVal.fatherId = UUID.fromString(wn2.getTextContent());
+	            } else if (wn2.getNodeName().equalsIgnoreCase("motherId")) {
+	            	retVal.motherId = UUID.fromString(wn2.getTextContent());
 	            } else if (wn2.getNodeName().equalsIgnoreCase("fathersAncestors")) {
 	            	retVal.fathersAncestors = UUID.fromString(wn2.getTextContent());
 	            } else if (wn2.getNodeName().equalsIgnoreCase("mothersAncestors")) {
