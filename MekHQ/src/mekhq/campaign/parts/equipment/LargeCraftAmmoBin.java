@@ -270,9 +270,14 @@ public class LargeCraftAmmoBin extends AmmoBin {
 
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
+        final String METHOD_NAME = "updateConditionFromEntity()"; //$NON-NLS-1$
         if(null != unit) {
             Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-            if(null != mounted) {
+            if (!(mounted.getType() instanceof AmmoType)) {
+                MekHQ.getLogger().log(LargeCraftAmmoBin.class, METHOD_NAME, LogLevel.WARNING,
+                        unit.getName() + " has invalid ammo bin at equipment number " + equipmentNum);
+            }
+            if(null != mounted && mounted.getType() instanceof AmmoType) {
                 capacity = mounted.getAmmoCapacity();
                 type = mounted.getType();
                 if(mounted.isMissing() || mounted.isDestroyed()) {
