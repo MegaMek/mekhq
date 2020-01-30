@@ -822,7 +822,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 firsty++;
             }
 
-            if (person.hasFather()) {
+            if (person.hasMother()) {
                 lblMother1.setName("lblMother1"); // NOI18N //$NON-NLS-1$
                 lblMother1.setText(resourceMap.getString("lblMother1.text")); //$NON-NLS-1$
                 gridBagConstraints = new GridBagConstraints();
