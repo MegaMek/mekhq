@@ -709,6 +709,7 @@ public class PersonViewPanel extends ScrollablePanel {
     }
 
     private JPanel fillFamily() {
+        // TODO : Add Grandchildren and Grandparents to the display
         JPanel pnlFamily = new JPanel(new GridBagLayout());
         pnlFamily.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlFamily.title")));
         pnlFamily.setBackground(Color.WHITE);
@@ -718,10 +719,16 @@ public class PersonViewPanel extends ScrollablePanel {
         JLabel lblSpouse2 = new JLabel();
         JLabel lblChildren1 = new JLabel();
         JLabel lblChildren2;
+        JLabel lblGrandchildren1 = new JLabel();
+        JLabel lblGrandchildren2;
         JLabel lblFather1 = new JLabel();
         JLabel lblFather2 = new JLabel();
         JLabel lblMother1 = new JLabel();
         JLabel lblMother2 = new JLabel();
+        JLabel lblGrandfather1 = new JLabel();
+        JLabel lblGrandfather2;
+        JLabel lblGrandmother1 = new JLabel();
+        JLabel lblGrandmother2;
 
         GridBagConstraints gridBagConstraints;
 
@@ -822,7 +829,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 firsty++;
             }
 
-            if (person.hasFather()) {
+            if (person.hasMother()) {
                 lblMother1.setName("lblMother1"); // NOI18N //$NON-NLS-1$
                 lblMother1.setText(resourceMap.getString("lblMother1.text")); //$NON-NLS-1$
                 gridBagConstraints = new GridBagConstraints();

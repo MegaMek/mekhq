@@ -67,7 +67,6 @@ import mekhq.Version;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
@@ -260,10 +259,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private UUID unitId;
     protected UUID doctorId;
     private ArrayList<UUID> techUnitIds;
-    //for reverse compatability v0.1.8 and earlier
+    //for reverse compatibility v0.1.8 and earlier
     protected int teamId = -1;
 
-    //for reverse compatability
+    //for reverse compatibility
     private int oldUnitId;
     private int oldDoctorId;
 
@@ -284,7 +283,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     // If this Person uses a custom rank system (-1 for no)
     private int rankSystem = -1;
     private Ranks ranks;
-
 
     // Manei Domini "Classes"
     public static final int MD_NONE			= 0;
@@ -3771,11 +3769,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public static int getProfessionFromPrimaryRole(int role) {
         switch (role) {
-            case T_MECHWARRIOR:
-            case T_PROTO_PILOT:
-            case T_DOCTOR:
-            case T_MEDIC:
-                return Ranks.RPROF_MW;
             case T_AERO_PILOT:
             case T_CONV_PILOT:
                 return Ranks.RPROF_ASF;
@@ -3803,6 +3796,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
             case T_ADMIN_TRA:
             case T_ADMIN_HR:
                 return Ranks.RPROF_TECH;
+            case T_MECHWARRIOR:
+            case T_PROTO_PILOT:
+            case T_DOCTOR:
+            case T_MEDIC:
             default:
                 return Ranks.RPROF_MW;
         }
@@ -3938,17 +3935,28 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * @return true if the person has at least one kid, false otherwise
      */
     public boolean hasChildren() {
-        boolean hasKids = false;
-        if (getId() != null) {
-            for (Ancestors a : campaign.getAncestors()) {
-                if (getId().equals(a.getMotherId()) || getId().equals(a.getFatherId())) {
-                    hasKids = true;
-                    break;
-                }
+        for (Ancestors a : campaign.getAncestors()) {
+            if (getId().equals(a.getMotherId()) || getId().equals(a.getFatherId())) {
+                return true;
             }
         }
 
-        return hasKids;
+        return false;
+    }
+
+    /**
+     *
+     * @return true if the person has at least one grandchild, false otherwise
+     */
+    public boolean hasGrandchildren() {
+        for (Ancestors a : campaign.getAncestors()) {
+            if (getId().equals(a.getMotherId()) || getId().equals(a.getFatherId())) {
+                if (campaign.getPerson(a.getId()).hasChildren()){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -3956,12 +3964,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * @return true if the Person has either a mother or father, otherwise false
      */
     public boolean hasParents() {
-        boolean hasParents = false;
-
-        if (hasFather() || hasMother()) {
-            hasParents = true;
-        }
-        return hasParents;
+        return hasFather() || hasMother();
     }
 
     /**
@@ -3969,12 +3972,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * @return true if the person has a listed father, false otherwise
      */
     public boolean hasFather() {
-        boolean hasFather = false;
-
-        if (getFather() != null) {
-            hasFather = true;
-        }
-        return hasFather;
+        return getFather() != null;
     }
 
     /**
@@ -3982,18 +3980,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * @return true if the Person has a listed mother, false otherwise
      */
     public boolean hasMother() {
-        boolean hasMother = false;
-
-        if (getMother() != null) {
-            hasMother = true;
-        }
-        return hasMother;
+        return getMother() != null;
     }
 
     /** Returns the ransom value of this individual
     * Useful for prisoner who you want to ransom or hand off to your employer in an AtB context */
     public Money getRansomValue() {
-        // mechwarriors and aero pilots are worth more than the other types of scrubs
+        // MechWarriors and aero pilots are worth more than the other types of scrubs
         if(primaryRole == T_MECHWARRIOR || primaryRole == T_AERO_PILOT) {
             return MECHWARRIOR_AERO_RANSOM_VALUES.get(getExperienceLevel(false));
         }
