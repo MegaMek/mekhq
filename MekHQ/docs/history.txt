@@ -37,6 +37,7 @@ v0.47.3-SNAPSHOT
 + Issue #1427: Fix bug where GM Add'ing ammo with 0 shots did not add new ammo
 + PR #1430: Initialize bay space on Campaign load before setting Used Capacity
 + PR #1435: Improved fault tolerance for campaigns with large craft that have gone sour due to bad refits
++ PR #1437: Personnel View: Mother will no longer break if a person only has a father
 
 v0.47.2 (2019-11-15 2000 UTC) 
 + PR #1325: Customize protomechs and advanced aero in MekLab
