@@ -3923,8 +3923,34 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     /**
+     * getSiblingsList creates a list of all the siblings from the current person
+     * @return a list of Person objects for all the siblings of the current person
+     */
+    public List<Person> getSiblingsList() {
+        List<UUID> parents = new ArrayList<>();
+        List<Person> siblings = new ArrayList<>();
+
+        if (hasFather()) {
+            parents.add(getFather().getId());
+        }
+
+        if (hasMother()) {
+            parents.add(getMother().getId());
+        }
+
+        for (Person p : campaign.getPersonnel()) {
+            if (parents.contains(p.getAncestorsId()) && !(p.getId().equals(getId()))) {
+                siblings.add(p);
+            }
+        }
+
+        return siblings;
+    }
+
+    /**
      *
-     * @return true if the person has either a spouse, any children, or specified parents
+     * @return true if the person has either a spouse, any children, or specified parents.
+     *          These are required for any extended family to exist.
      */
     public boolean hasAnyFamily() {
         return hasChildren() || hasSpouse() || hasParents();
@@ -3940,7 +3966,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -3951,7 +3976,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public boolean hasGrandchildren() {
         for (Ancestors a : campaign.getAncestors()) {
             if (getId().equals(a.getMotherId()) || getId().equals(a.getFatherId())) {
-                if (campaign.getPerson(a.getId()).hasChildren()){
+                if (campaign.getPerson(a.getId()).hasChildren()) {
                     return true;
                 }
             }
@@ -3981,6 +4006,76 @@ public class Person implements Serializable, MekHqXmlSerializable {
      */
     public boolean hasMother() {
         return getMother() != null;
+    }
+
+    /**
+     *
+     * @return true if the Person has a grandparent, false otherwise
+     */
+    public boolean hasGrandparent() {
+        if (hasFather()) {
+            if (getFather().hasParents()) {
+                return true;
+            }
+        }
+
+        if (hasMother()) {
+            if (getMother().hasParents()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     *
+     * @return true if the Person has an Aunt or Uncle, false otherwise
+     */
+    public boolean hasAuntOrUncle() {
+        if (hasFather()) {
+            if (getFather().hasSiblings()) {
+                return true;
+            }
+        }
+
+        if (hasMother()) {
+            if (getMother().hasSiblings()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     *
+     * @return true if the person has cousins, false otherwise
+     */
+    public boolean hasCousins() {
+        if (hasFather() && getFather().hasSiblings()) {
+            for (Person sibling : getFather().getSiblingsList()) {
+                if (sibling.hasChildren()) {
+                    return true;
+                }
+            }
+        }
+
+        if (hasMother() && getMother().hasSiblings()) {
+            for (Person sibling : getMother().getSiblingsList()) {
+                if (sibling.hasChildren()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     *
+     * @return true if the person has siblings, false otherwise
+     */
+    public boolean hasSiblings() {
+        return getSiblingsList() != null;
     }
 
     /** Returns the ransom value of this individual
