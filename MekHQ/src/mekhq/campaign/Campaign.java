@@ -6301,13 +6301,14 @@ public class Campaign implements Serializable, ITechManager {
                     + existingPerson.getPortraitFileName());
         }
         // TODO: it would be nice to pull the portraits directory from MekHQ
-        // itself
+        // TODO: itself
         DirectoryItems portraits;
         try {
             portraits = new DirectoryItems(
                     new File("data/images/portraits"), "", //$NON-NLS-1$ //$NON-NLS-2$
                     PortraitFileFactory.getInstance());
         } catch (Exception e) {
+            MekHQ.getLogger().error(getClass(), "assignRandomPortraitFor", e);
             return;
         }
         ArrayList<String> possiblePortraits;
