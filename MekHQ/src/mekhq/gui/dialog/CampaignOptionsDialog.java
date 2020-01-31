@@ -1929,8 +1929,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panPersonnel.add(panSalary, gridBagConstraints);
 
+        JScrollPane scrollPersonnel = new JScrollPane(panPersonnel);
+        scrollPersonnel.setPreferredSize(new java.awt.Dimension(500, 400));
 
-        tabOptions.addTab(resourceMap.getString("panPersonnel.TabConstraints.tabTitle"), panPersonnel); // NOI18N
+        tabOptions.addTab(resourceMap.getString("panPersonnel.TabConstraints.tabTitle"), scrollPersonnel); // NOI18N
 
         panFinances.setName("panFinances"); // NOI18N
         panFinances.setLayout(new java.awt.GridBagLayout());
@@ -4326,6 +4328,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                scrollPersonnel.getVerticalScrollBar().setValue(0);
                 scrSPA.getVerticalScrollBar().setValue(0);
                 scrAtB.getVerticalScrollBar().setValue(0);
             }
