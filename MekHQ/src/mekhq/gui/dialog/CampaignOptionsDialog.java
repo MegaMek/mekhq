@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -130,7 +131,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private static final long serialVersionUID = 1935043247792962964L;
     private Campaign campaign;
     private CampaignOptions options;
-    private RandomSkillPreferences rskillPrefs;
+    private RandomSkillPreferences rSkillPrefs;
     private GregorianCalendar date;
     private SimpleDateFormat dateFormat;
     private Frame frame;
@@ -145,54 +146,202 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private Hashtable<String, JSpinner> hashEliteSkill;
     private boolean cancelled;
 
-    private JButton btnCamo;
-    private JButton btnCancel;
-    private JButton btnDate;
+    //region Variable Declarations
+    //General Variables (ones not relating to a specific tab)
+
+    //region Shared UI Variables
+    private JTabbedPane tabOptions;
     private JButton btnOkay;
     private JButton btnSave;
     private JButton btnLoad;
-    private JSpinner spnClanPriceModifier;
-    private JSpinner spnUsedPartsValue[];
-    private JSpinner spnDamagedPartsValue;
+    private JButton btnCancel;
+    //endregion Shared UI Variables
+
+    //region General Tab
+    private JPanel panGeneral;
+    private JLabel lblName;
+    private JTextField txtName;
+    private JLabel lblFaction;
     private JComboBox<String> comboFaction;
     SortedComboBoxModel<String> factionModel;
-    private JComboBox<String> comboFactionNames;
-    private JComboBox<String> comboRanks;
-    private JSlider sldGender;
-    private JLabel lblCamo;
-    private JLabel lblDate;
-    private JLabel lblFaction;
-    private JLabel lblFactionNames;
-    private JLabel lblRank;
-    private JLabel lblGender;
-    private JLabel lblName;
-    private JPanel panGeneral;
-    private JPanel panRepair;
-    private JPanel panSupplies;
-    private JPanel panTech;
-    private JPanel panPersonnel;
-    private JPanel panFinances;
-    private JPanel panMercenary;
-    private JPanel panNameGen;
-    private JPanel panXP;
-    private JPanel panRank;
-    private JPanel panSkill;
-    private JPanel panRandomSkill;
-    private JTabbedPane tabOptions;
-    private JTextField txtName;
-    private JCheckBox useEraModsCheckBox;
-    private JCheckBox assignedTechFirstCheckBox;
-	private JCheckBox resetToFirstTechCheckBox;
     private JCheckBox useUnitRatingCheckBox;
     private JComboBox<String> unitRatingMethodCombo;
+    private JLabel lblDate;
+    private JButton btnDate;
+    private JLabel lblCamo;
+    private JButton btnCamo;
+    //endregion General Tab
+
+    //region Repair and Maintenance Tab
+    private JPanel panRepair;
+    //repair
+    private JCheckBox useEraModsCheckBox;
+    private JCheckBox assignedTechFirstCheckBox;
+    private JCheckBox resetToFirstTechCheckBox;
+    private JCheckBox useQuirksBox;
+    private JCheckBox useAeroSystemHitsBox;
+    private JCheckBox useDamageMargin;
+    private JSpinner spnDamageMargin;
+    private JSpinner spnDestroyPartTarget;
+    //maintenance
+    private JCheckBox checkMaintenance;
+    private JSpinner spnMaintenanceDays;
+    private JSpinner spnMaintenanceBonus;
+    private JCheckBox useQualityMaintenance;
+    private JCheckBox reverseQualityNames;
+    private JCheckBox useUnofficialMaintenance;
+    private JCheckBox logMaintenance;
+    //endregion Repair and Maintenance Tab
+
+    //region Supplies and Acquisitions Tab
+    private JPanel panSupplies;
+    //planetary acquisitions
+    private JCheckBox usePlanetaryAcquisitions;
+    private JSpinner spnMaxJumpPlanetaryAcquisitions;
+    private JComboBox<String> comboPlanetaryAcquisitionsFactionLimits;
+    private JCheckBox disallowPlanetaryAcquisitionClanCrossover;
+    private JCheckBox usePlanetaryAcquisitionsVerbose;
+    private JSpinner[] spnPlanetAcquireTechBonus;
+    private JSpinner[] spnPlanetAcquireIndustryBonus;
+    private JSpinner[] spnPlanetAcquireOutputBonus;
+    private JCheckBox disallowClanPartsFromIS;
+    private JSpinner spnPenaltyClanPartsFromIS;
+    //endregion Supplies and Acquisitions Tab
+
+    //region Tech Limits Tab
+    private JPanel panTech;
+    //endregion Tech Limits Tab
+
+    //region Personnel Tab
+    private JPanel panPersonnel;
+    //Salary
+    private JSpinner spnSalaryCommission;
+    private JSpinner spnSalaryEnlisted;
+    private JSpinner spnSalaryAntiMek;
+    private JSpinner[] spnSalaryXp;
+    private JMoneyTextField[] txtSalaryBase;
+    //endregion Personnel Tab
+
+    //region Finances Tab
+    private JPanel panFinances;
+
+    private JSpinner spnClanPriceModifier;
+    private JSpinner[] spnUsedPartsValue;
+    private JSpinner spnDamagedPartsValue;
+    private JSpinner spnOrderRefund;
+    //endregion Finances Tab
+
+    //region Mercenary Tab
+    private JPanel panMercenary;
+    private JRadioButton btnContractEquipment;
+    private JSpinner spnEquipPercent;
+    private JSpinner spnDropshipPercent;
+    private JSpinner spnJumpshipPercent;
+    private JSpinner spnWarshipPercent;
+    private JCheckBox chkEquipContractSaleValue;
+    private JRadioButton btnContractPersonnel;
+    private JCheckBox chkBLCSaleValue;
+    //endregion Mercenary Tab
+
+    //region Experience Tab
+    private JPanel panXP;
+    private JSpinner spnScenarioXP;
+    private JLabel lblScenarioXP;
+    private JSpinner spnKillXP;
+    private JLabel lblKillXP;
+    private JSpinner spnKills;
+    private JLabel lblKills;
+    private JSpinner spnTaskXP;
+    private JLabel lblTaskXP;
+    private JSpinner spnNTasksXP;
+    private JLabel lblTasks;
+    private JSpinner spnSuccessXP;
+    private JLabel lblSuccessXp;
+    private JSpinner spnMistakeXP;
+    private JLabel lblMistakeXP;
+    private JSpinner spnIdleXP;
+    private JSpinner spnMonthsIdleXP;
+    private JSpinner spnTargetIdleXP;
+    private JSpinner spnContractNegotiationXP;
+    private JSpinner spnAdminWeeklyXP;
+    private JSpinner spnAdminWeeklyXPPeriod;
+    private JSpinner spnEdgeCost;
+    private JTextArea txtInstructionsXP;
+    private JScrollPane scrXP;
+    private JTable tableXP;
+    //endregion Experience Tab
+
+    //region Skills Tab
+    private JPanel panSkill;
+    //endregion Skills Tab
+
+    //region Special Abilities Tab
+    //endregion Special Abilities Tab
+
+    //region Skill Randomization Tab
+
+    private JPanel panRandomSkill;
+    //endregion Skill Randomization Tab
+
+    //region Rank System Tab
+    private JPanel panRank;
+    private JLabel lblRank;
+    private JComboBox<String> comboRanks;
+    @SuppressWarnings("unused")
+    private JButton btnAddRank; // FIXME: Unused
+    @SuppressWarnings("unused")
+    private JButton btnDeleteRank; // FIXME: Unused
+    private JTable tableRanks;
+    private RankTableModel ranksModel;
+    private JScrollPane scrRanks;
+    // FIXME: Place in resource file
+    String[] rankColNames = { "Rate", "MW Rank", "ASF Rank", "Vee Crew Rank", "Naval Rank", "Infantry Rank", "Tech Rank", "Officer", "Pay Multiplier"};
+    //endregion Rank System Tab
+
+    //region Name and Portrait Generation Tab
+    private JPanel panNameGen;
     private JCheckBox useFactionForNamesBox;
+    private JLabel lblFactionNames;
+    private JComboBox<String> comboFactionNames;
+    private JLabel lblGender;
+    private JSlider sldGender;
+    private JCheckBox chkAssignPortraitOnRoleChange;
+    //endregion Name and Portrait Generation Tab
+
+    //region Personnel Market Tab
+    private JPanel panPersonnelMarket;
+    private JLabel personnelMarketTypeLabel;
+    private JComboBox<String> personnelMarketType;
+    private JCheckBox personnelMarketReportRefresh;
+    private JLabel personnelMarketRandomEliteRemovalLabel;
+    private JTextField personnelMarketRandomEliteRemoval;
+    private JLabel personnelMarketRandomVeteranRemovalLabel;
+    private JTextField personnelMarketRandomVeteranRemoval;
+    private JLabel personnelMarketRandomRegularRemovalLabel;
+    private JTextField personnelMarketRandomRegularRemoval;
+    private JLabel personnelMarketRandomGreenRemovalLabel;
+    private JTextField personnelMarketRandomGreenRemoval;
+    private JLabel personnelMarketRandomUltraGreenRemovalLabel;
+    private JTextField personnelMarketRandomUltraGreenRemoval;
+    private JLabel personnelMarketDylansWeightLabel;
+    private JSpinner personnelMarketDylansWeight;
+    //endregion Personnel Market Tab
+
+    //region Against the Bot Tab
+    //endregion Against the Bot Tab
+
+    //region Miscellaneous Tab
+    private JPanel panMisc;
+    private JCheckBox chkHistoricalDailyLog;
+    //endregion Miscellaneous Tab
+    //endregion Variable Declarations
+
     private JCheckBox useTacticsBox;
     private JCheckBox useInitBonusBox;
     private JCheckBox useToughnessBox;
     private JCheckBox useArtilleryBox;
     private JCheckBox useAbilitiesBox;
-    private JCheckBox useQuirksBox;
-    private JCheckBox useAeroSystemHitsBox;
+
     private JCheckBox useEdgeBox;
     private JCheckBox useSupportEdgeBox;
     private JCheckBox useImplantsBox;
@@ -213,25 +362,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox usePeacetimeCostBox;
     private JCheckBox useExtendedPartsModifierBox;
     private JCheckBox showPeacetimeCostBox;
-    private JCheckBox chkAssignPortraitOnRoleChange;
-
-    //planetary acquisitions
-    private JCheckBox usePlanetaryAcquisitions;
-    private JSpinner spnMaxJumpPlanetaryAcquisitions;
-    private JComboBox<String> comboPlanetaryAcquisitionsFactionLimits;
-    private JCheckBox disallowPlanetaryAcquisitionClanCrossover;
-    private JCheckBox usePlanetaryAcquisitionsVerbose;
-    private JSpinner[] spnPlanetAcquireTechBonus;
-    private JSpinner[] spnPlanetAcquireIndustryBonus;
-    private JSpinner[] spnPlanetAcquireOutputBonus;
-    private JCheckBox disallowClanPartsFromIS;
-    private JSpinner spnPenaltyClanPartsFromIS;
-
-    private JMoneyTextField[] txtSalaryBase;
-    private JSpinner[] spnSalaryXp;
-    private JSpinner spnSalaryCommision;
-    private JSpinner spnSalaryEnlisted;
-    private JSpinner spnSalaryAntiMek;
 
     private JSpinner spnHealWaitingPeriod;
     private JSpinner spnNaturalHealWaitingPeriod;
@@ -240,84 +370,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox useTougherHealing;
     private JComboBox<String> comboPrisonerStatus;
 
-
-    // Start Personnel Market
-    private JPanel panPersonnelMarket;
-    private JComboBox<String> personnelMarketType;
-    private JTextField personnelMarketRandomEliteRemoval;
-    private JTextField personnelMarketRandomVeteranRemoval;
-    private JTextField personnelMarketRandomRegularRemoval;
-    private JTextField personnelMarketRandomGreenRemoval;
-    private JTextField personnelMarketRandomUltraGreenRemoval;
-    private JCheckBox personnelMarketReportRefresh;
-    private JSpinner personnelMarketDylansWeight;
-    private JLabel personnelMarketTypeLabel;
-    private JLabel personnelMarketRandomEliteRemovalLabel;
-    private JLabel personnelMarketRandomVeteranRemovalLabel;
-    private JLabel personnelMarketRandomRegularRemovalLabel;
-    private JLabel personnelMarketRandomGreenRemovalLabel;
-    private JLabel personnelMarketRandomUltraGreenRemovalLabel;
-    private JLabel personnelMarketDylansWeightLabel;
-    // End Personnel Market
-
-    private JCheckBox useDamageMargin;
-    private JSpinner spnDamageMargin;
-    private JSpinner spnDestroyPartTarget;
-
-
-    private JCheckBox checkMaintenance;
-    private JCheckBox logMaintenance;
-    private JSpinner spnMaintenanceDays;
-    private JSpinner spnMaintenanceBonus;
-    private JCheckBox useQualityMaintenance;
-    private JCheckBox useUnofficialMaintenance;
-    private JCheckBox reverseQualityNames;
-
-    private JRadioButton btnContractEquipment;
-    private JRadioButton btnContractPersonnel;
-    private JSpinner spnEquipPercent;
-    private JSpinner spnDropshipPercent;
-    private JSpinner spnJumpshipPercent;
-    private JSpinner spnWarshipPercent;
-    private JCheckBox chkEquipContractSaleValue;
-    private JCheckBox chkBLCSaleValue;
-    private JSpinner spnOrderRefund;
     private JCheckBox usePercentageMaintBox;
     private JCheckBox useInfantryDontCountBox;
-
-    private JTable tableRanks;
-    private RankTableModel ranksModel;
-    private JScrollPane scrRanks;
-    @SuppressWarnings("unused")
-	private JButton btnAddRank; // FIXME: Unused?
-    @SuppressWarnings("unused")
-	private JButton btnDeleteRank; // FIXME: Unused?
-    String[] rankColNames = { "Rate", "MW Rank", "ASF Rank", "Vee Crew Rank", "Naval Rank", "Infantry Rank", "Tech Rank", "Officer", "Pay Multiplier"};
-
-    private JTextArea txtInstructionsXP;
-    private JScrollPane scrXP;
-    private JTable tableXP;
-    private JLabel lblScenarioXP;
-    private JSpinner spnScenarioXP;
-    private JLabel lblKillXP;
-    private JSpinner spnKillXP;
-    private JLabel lblKills;
-    private JSpinner spnKills;
-    private JLabel lblTaskXP;
-    private JLabel lblTasks;
-    private JSpinner spnNTasksXP;
-    private JSpinner spnTaskXP;
-    private JSpinner spnSuccessXP;
-    private JLabel lblSuccessXp;
-    private JSpinner spnMistakeXP;
-    private JLabel lblMistakeXP;
-    private JSpinner spnIdleXP;
-    private JSpinner spnTargetIdleXP;
-    private JSpinner spnMonthsIdleXP;
-    private JSpinner spnContractNegotiationXP;
-    private JSpinner spnAdminWeeklyXP;
-    private JSpinner spnAdminWeeklyXPPeriod;
-    private JSpinner spnEdgeCost;
 
     private JCheckBox chkSupportStaffOnly;
     private JSpinner spnAcquireWaitingPeriod;
@@ -463,9 +517,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
     private JSpinner spnStartGameDelay;
 
-    // Miscellaneous tab
-    private JPanel panMisc;
-    private JCheckBox chkHistoricalDailyLog;
 
     /**
      * Creates new form CampaignOptionsDialog
@@ -474,7 +525,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         super(parent, modal);
         this.campaign = c;
         this.options = c.getCampaignOptions();
-        this.rskillPrefs = c.getRandomSkillPreferences();
+        this.rSkillPrefs = c.getRandomSkillPreferences();
         //this is a hack but I have no idea what is going on here
         this.frame = parent;
         this.date = campaign.getCalendar();
@@ -685,7 +736,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         txtName.setMinimumSize(new java.awt.Dimension(500, 30));
         txtName.setName("txtName"); // NOI18N
         txtName.setPreferredSize(new java.awt.Dimension(500, 30));
-        txtName.addActionListener(evt -> txtNameActionPerformed(evt));
+        txtName.addActionListener(this::txtNameActionPerformed);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -720,7 +771,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         btnDate.setMinimumSize(new java.awt.Dimension(400, 30));
         btnDate.setName("btnDate"); // NOI18N
         btnDate.setPreferredSize(new java.awt.Dimension(400, 30));
-        btnDate.addActionListener(evt -> btnDateActionPerformed(evt));
+        btnDate.addActionListener(this::btnDateActionPerformed);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
@@ -773,7 +824,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         btnCamo.setMinimumSize(new java.awt.Dimension(84, 72));
         btnCamo.setName("btnCamo"); // NOI18N
         btnCamo.setPreferredSize(new java.awt.Dimension(84, 72));
-        btnCamo.addActionListener(evt -> btnCamoActionPerformed(evt));
+        btnCamo.addActionListener(this::btnCamoActionPerformed);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 5;
@@ -894,14 +945,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSubRepair.add(useDamageMargin, gridBagConstraints);
 
-        useDamageMargin.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                if (useDamageMargin.isSelected()) {
-                    spnDamageMargin.setEnabled(true);
-                } else {
-                    spnDamageMargin.setEnabled(false);
-                }
+        useDamageMargin.addActionListener(evt -> {
+            if (useDamageMargin.isSelected()) {
+                spnDamageMargin.setEnabled(true);
+            } else {
+                spnDamageMargin.setEnabled(false);
             }
         });
 
@@ -952,22 +1000,19 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSubMaintenance.add(checkMaintenance, gridBagConstraints);
 
-        checkMaintenance.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                if (checkMaintenance.isSelected()) {
-                    spnMaintenanceDays.setEnabled(true);
-                    useQualityMaintenance.setEnabled(true);
-                    useUnofficialMaintenance.setEnabled(true);
-                    spnMaintenanceBonus.setEnabled(true);
-                    logMaintenance.setEnabled(true);
-                } else {
-                    spnMaintenanceDays.setEnabled(false);
-                    useQualityMaintenance.setEnabled(false);
-                    useUnofficialMaintenance.setEnabled(false);
-                    spnMaintenanceBonus.setEnabled(false);
-                    logMaintenance.setEnabled(false);
-                }
+        checkMaintenance.addActionListener(evt -> {
+            if (checkMaintenance.isSelected()) {
+                spnMaintenanceDays.setEnabled(true);
+                useQualityMaintenance.setEnabled(true);
+                useUnofficialMaintenance.setEnabled(true);
+                spnMaintenanceBonus.setEnabled(true);
+                logMaintenance.setEnabled(true);
+            } else {
+                spnMaintenanceDays.setEnabled(false);
+                useQualityMaintenance.setEnabled(false);
+                useUnofficialMaintenance.setEnabled(false);
+                spnMaintenanceBonus.setEnabled(false);
+                logMaintenance.setEnabled(false);
             }
         });
 
@@ -1824,10 +1869,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         JPanel panMultiplier = new JPanel(new GridLayout(1, 3));
         panMultiplier.setBorder(BorderFactory.createTitledBorder("Multipliers"));
-        spnSalaryCommision = new JSpinner(new SpinnerNumberModel(options.getSalaryCommissionMultiplier(), 0, 10, 0.05));
-        ((JSpinner.DefaultEditor) spnSalaryCommision.getEditor()).getTextField().setEditable(false);
+        spnSalaryCommission = new JSpinner(new SpinnerNumberModel(options.getSalaryCommissionMultiplier(), 0, 10, 0.05));
+        ((JSpinner.DefaultEditor) spnSalaryCommission.getEditor()).getTextField().setEditable(false);
         JPanel panSalaryCommission = new JPanel();
-        panSalaryCommission.add(spnSalaryCommision);
+        panSalaryCommission.add(spnSalaryCommission);
         panSalaryCommission.add(new JLabel("Commissioned"));
         panMultiplier.add(panSalaryCommission);
 
@@ -2788,14 +2833,14 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         lblOverallRecruitBonus = new JLabel(resourceMap.getString("lblOverallRecruitBonus.text"));
         chkExtraRandom = new JCheckBox(resourceMap.getString("chkExtraRandom.text"));
         chkExtraRandom.setToolTipText(resourceMap.getString("chkExtraRandom.toolTipText"));
-        chkExtraRandom.setSelected(rskillPrefs.randomizeSkill());
+        chkExtraRandom.setSelected(rSkillPrefs.randomizeSkill());
         chkClanBonus = new JCheckBox(resourceMap.getString("chkClanBonus.text"));
         chkClanBonus.setToolTipText(resourceMap.getString("chkClanBonus.toolTipText"));
-        chkClanBonus.setSelected(rskillPrefs.useClanBonuses());
+        chkClanBonus.setSelected(rSkillPrefs.useClanBonuses());
         lblProbAntiMek = new JLabel(resourceMap.getString("lblProbAntiMek.text"));
-        spnProbAntiMek = new JSpinner(new SpinnerNumberModel(rskillPrefs.getAntiMekProb(), 0, 100, 5));
+        spnProbAntiMek = new JSpinner(new SpinnerNumberModel(rSkillPrefs.getAntiMekProb(), 0, 100, 5));
         ((JSpinner.DefaultEditor) spnProbAntiMek.getEditor()).getTextField().setEditable(false);
-        spnOverallRecruitBonus = new JSpinner(new SpinnerNumberModel(rskillPrefs.getOverallRecruitBonus(), -12, 12, 1));
+        spnOverallRecruitBonus = new JSpinner(new SpinnerNumberModel(rSkillPrefs.getOverallRecruitBonus(), -12, 12, 1));
         ((JSpinner.DefaultEditor) spnOverallRecruitBonus.getEditor()).getTextField().setEditable(false);
         spnOverallRecruitBonus.setToolTipText(resourceMap.getString("spnOverallRecruitBonus.toolTipText"));
         spnTypeRecruitBonus = new JSpinner[Person.T_NUM];
@@ -2805,7 +2850,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         JPanel panRecruit;
         for (int i = 0; i < Person.T_NUM; i++) {
             panRecruit = new JPanel(new GridBagLayout());
-            spin = new JSpinner(new SpinnerNumberModel(rskillPrefs.getRecruitBonus(i), -12, 12, 1));
+            spin = new JSpinner(new SpinnerNumberModel(rSkillPrefs.getRecruitBonus(i), -12, 12, 1));
             ((JSpinner.DefaultEditor) spin.getEditor()).getTextField().setEditable(false);
             spnTypeRecruitBonus[i] = spin;
             gridBagConstraints = new java.awt.GridBagConstraints();
@@ -2931,22 +2976,22 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panArtillery.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder("Artillery Skill"),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-        spnArtyProb = new JSpinner(new SpinnerNumberModel(rskillPrefs.getArtilleryProb(), 0, 100, 5));
+        spnArtyProb = new JSpinner(new SpinnerNumberModel(rSkillPrefs.getArtilleryProb(), 0, 100, 5));
         ((JSpinner.DefaultEditor) spnArtyProb.getEditor()).getTextField().setEditable(false);
         spnArtyProb.setToolTipText(resourceMap.getString("spnArtyProb.toolTipText"));
         panArtillery.add(spnArtyProb);
         panArtillery.add(new JLabel("Probability"));
-        spnArtyBonus = new JSpinner(new SpinnerNumberModel(rskillPrefs.getArtilleryBonus(), -10, 10, 1));
+        spnArtyBonus = new JSpinner(new SpinnerNumberModel(rSkillPrefs.getArtilleryBonus(), -10, 10, 1));
         ((JSpinner.DefaultEditor) spnArtyBonus.getEditor()).getTextField().setEditable(false);
         panArtillery.add(spnArtyBonus);
         panArtillery.add(new JLabel("Bonus"));
         JPanel panSecondary = new JPanel();
-        spnSecondProb = new JSpinner(new SpinnerNumberModel(rskillPrefs.getSecondSkillProb(), 0, 100, 5));
+        spnSecondProb = new JSpinner(new SpinnerNumberModel(rSkillPrefs.getSecondSkillProb(), 0, 100, 5));
         ((JSpinner.DefaultEditor) spnSecondProb.getEditor()).getTextField().setEditable(false);
         spnSecondProb.setToolTipText(resourceMap.getString("spnSecondProb.toolTipText"));
         panSecondary.add(spnSecondProb);
         panSecondary.add(new JLabel("Probability"));
-        spnSecondBonus = new JSpinner(new SpinnerNumberModel(rskillPrefs.getSecondSkillBonus(), -10, 10, 1));
+        spnSecondBonus = new JSpinner(new SpinnerNumberModel(rSkillPrefs.getSecondSkillBonus(), -10, 10, 1));
         ((JSpinner.DefaultEditor) spnSecondBonus.getEditor()).getTextField().setEditable(false);
         panSecondary.add(spnSecondBonus);
         panSecondary.add(new JLabel("Bonus"));
@@ -2954,19 +2999,19 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
                 BorderFactory.createTitledBorder("Secondary Skills"),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         JPanel panTactics = new JPanel();
-        spnTacticsGreen = new JSpinner(new SpinnerNumberModel(rskillPrefs.getTacticsMod(SkillType.EXP_GREEN), -10,
+        spnTacticsGreen = new JSpinner(new SpinnerNumberModel(rSkillPrefs.getTacticsMod(SkillType.EXP_GREEN), -10,
                                                               10, 1));
         ((JSpinner.DefaultEditor) spnTacticsGreen.getEditor()).getTextField().setEditable(false);
         spnTacticsGreen.setToolTipText(resourceMap.getString("spnTacticsGreen.toolTipText"));
-        spnTacticsReg = new JSpinner(new SpinnerNumberModel(rskillPrefs.getTacticsMod(SkillType.EXP_REGULAR), -10,
+        spnTacticsReg = new JSpinner(new SpinnerNumberModel(rSkillPrefs.getTacticsMod(SkillType.EXP_REGULAR), -10,
                                                             10, 1));
         ((JSpinner.DefaultEditor) spnTacticsReg.getEditor()).getTextField().setEditable(false);
         spnTacticsReg.setToolTipText(resourceMap.getString("spnTacticsReg.toolTipText"));
-        spnTacticsVet = new JSpinner(new SpinnerNumberModel(rskillPrefs.getTacticsMod(SkillType.EXP_VETERAN), -10,
+        spnTacticsVet = new JSpinner(new SpinnerNumberModel(rSkillPrefs.getTacticsMod(SkillType.EXP_VETERAN), -10,
                                                             10, 1));
         ((JSpinner.DefaultEditor) spnTacticsVet.getEditor()).getTextField().setEditable(false);
         spnTacticsVet.setToolTipText(resourceMap.getString("spnTacticsVet.toolTipText"));
-        spnTacticsElite = new JSpinner(new SpinnerNumberModel(rskillPrefs.getTacticsMod(SkillType.EXP_ELITE), -10,
+        spnTacticsElite = new JSpinner(new SpinnerNumberModel(rSkillPrefs.getTacticsMod(SkillType.EXP_ELITE), -10,
                                                               10, 1));
         ((JSpinner.DefaultEditor) spnTacticsElite.getEditor()).getTextField().setEditable(false);
         spnTacticsElite.setToolTipText(resourceMap.getString("spnTacticsElite.toolTipText"));
@@ -2982,10 +3027,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
                 BorderFactory.createTitledBorder("Tactics Skill"),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         JPanel panSmallArms = new JPanel();
-        spnCombatSA = new JSpinner(new SpinnerNumberModel(rskillPrefs.getCombatSmallArmsBonus(), -10, 10, 1));
+        spnCombatSA = new JSpinner(new SpinnerNumberModel(rSkillPrefs.getCombatSmallArmsBonus(), -10, 10, 1));
         ((JSpinner.DefaultEditor) spnCombatSA.getEditor()).getTextField().setEditable(false);
         spnCombatSA.setToolTipText(resourceMap.getString("spnCombatSA.toolTipText"));
-        spnSupportSA = new JSpinner(new SpinnerNumberModel(rskillPrefs.getSupportSmallArmsBonus(), -10, 10, 1));
+        spnSupportSA = new JSpinner(new SpinnerNumberModel(rSkillPrefs.getSupportSmallArmsBonus(), -10, 10, 1));
         ((JSpinner.DefaultEditor) spnSupportSA.getEditor()).getTextField().setEditable(false);
         spnSupportSA.setToolTipText(resourceMap.getString("spnSupportSA.toolTipText"));
         panSmallArms.add(spnCombatSA);
@@ -2996,19 +3041,19 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
                 BorderFactory.createTitledBorder("Small Arms Skill"),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         JPanel panAbilities = new JPanel();
-        spnAbilGreen = new JSpinner(new SpinnerNumberModel(rskillPrefs.getSpecialAbilBonus(SkillType.EXP_GREEN), -10,
+        spnAbilGreen = new JSpinner(new SpinnerNumberModel(rSkillPrefs.getSpecialAbilBonus(SkillType.EXP_GREEN), -10,
                                                            10, 1));
         ((JSpinner.DefaultEditor) spnAbilGreen.getEditor()).getTextField().setEditable(false);
         spnAbilGreen.setToolTipText(resourceMap.getString("spnAbilGreen.toolTipText"));
-        spnAbilReg = new JSpinner(new SpinnerNumberModel(rskillPrefs.getSpecialAbilBonus(SkillType.EXP_REGULAR), -10,
+        spnAbilReg = new JSpinner(new SpinnerNumberModel(rSkillPrefs.getSpecialAbilBonus(SkillType.EXP_REGULAR), -10,
                                                          10, 1));
         ((JSpinner.DefaultEditor) spnAbilReg.getEditor()).getTextField().setEditable(false);
         spnAbilReg.setToolTipText(resourceMap.getString("spnAbilReg.toolTipText"));
-        spnAbilVet = new JSpinner(new SpinnerNumberModel(rskillPrefs.getSpecialAbilBonus(SkillType.EXP_VETERAN), -10,
+        spnAbilVet = new JSpinner(new SpinnerNumberModel(rSkillPrefs.getSpecialAbilBonus(SkillType.EXP_VETERAN), -10,
                                                          10, 1));
         ((JSpinner.DefaultEditor) spnAbilVet.getEditor()).getTextField().setEditable(false);
         spnAbilVet.setToolTipText(resourceMap.getString("spnAbilVet.toolTipText"));
-        spnAbilElite = new JSpinner(new SpinnerNumberModel(rskillPrefs.getSpecialAbilBonus(SkillType.EXP_ELITE), -10,
+        spnAbilElite = new JSpinner(new SpinnerNumberModel(rSkillPrefs.getSpecialAbilBonus(SkillType.EXP_ELITE), -10,
                                                            10, 1));
         ((JSpinner.DefaultEditor) spnAbilElite.getEditor()).getTextField().setEditable(false);
         spnAbilElite.setToolTipText(resourceMap.getString("spnAbilElite.toolTipText"));
@@ -3064,12 +3109,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         comboRanks.setSelectedIndex(campaign.getRanks().getRankSystem());
         comboRanks.setName("comboRanks"); // NOI18N
         comboRanks.setActionCommand("fillRanks");
-        comboRanks.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	if (evt.getActionCommand().equals("fillRanks"))
-            		fillRankInfo();
-            }
+        comboRanks.addActionListener(evt -> {
+            if (evt.getActionCommand().equals("fillRanks"))
+                fillRankInfo();
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -3113,7 +3155,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         tableRanks.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         tableRanks.setIntercellSpacing(new Dimension(0, 0));
         tableRanks.setShowGrid(false);
-        TableColumn column = null;
+        TableColumn column;
         for (int i = 0; i < RankTableModel.COL_NUM; i++) {
             column = tableRanks.getColumnModel().getColumn(i);
             column.setPreferredWidth(ranksModel.getColumnWidth(i));
@@ -3123,13 +3165,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             }
         }
         tableRanks.getSelectionModel().addListSelectionListener(
-        		new ListSelectionListener() {
-                    @Override
-                    public void valueChanged(
-                            javax.swing.event.ListSelectionEvent evt) {
-                        tableRanksValueChanged(evt);
-                    }
-                });
+                this::tableRanksValueChanged);
         AbstractAction rankCellAction = new AbstractAction() {
 			private static final long serialVersionUID = -7586376360964669234L;
 
@@ -3197,7 +3233,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useFactionForNamesBox.setToolTipText(resourceMap.getString("useFactionForNamesBox.toolTipText")); // NOI18N
         useFactionForNamesBox.setName("useFactionForNamesBox"); // NOI18N
         useFactionForNamesBox.setSelected(options.useFactionForNames());
-        useFactionForNamesBox.addActionListener(evt -> useFactionForNamesBoxEvent(evt));
+        useFactionForNamesBox.addActionListener(this::useFactionForNamesBoxEvent);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridy = 0;
@@ -3218,7 +3254,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         DefaultComboBoxModel<String> factionNamesModel = new DefaultComboBoxModel<>();
         for (Iterator<String> i = campaign.getRNG().getFactions(); i.hasNext(); ) {
-            String faction = (String) i.next();
+            String faction = i.next();
             factionNamesModel.addElement(faction);
         }
         factionNamesModel.setSelectedItem(campaign.getRNG().getChosenFaction());
@@ -3255,7 +3291,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new Insets(10, 0, 0, 0);
         panNameGen.add(sldGender, gridBagConstraints);
 
-        panRandomPortrait.setName("panRandomPortait"); // NOI18N
+        panRandomPortrait.setName("panRandomPortrait"); // NOI18N
         panRandomPortrait.setLayout(new BorderLayout());
 
         JPanel panUsePortrait = new JPanel(new GridLayout(nrow, 4));
@@ -3279,7 +3315,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panRandomPortrait.add(txtPortraitInst, BorderLayout.PAGE_START);
 
         panRandomPortrait.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(resourceMap.getString("panRandomPortait.title")),
+                BorderFactory.createTitledBorder(resourceMap.getString("panRandomPortrait.title")),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -3326,7 +3362,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         for (PersonnelMarketMethod method : PersonnelMarketServiceManager.getInstance().getAllServices(true)) {
             personnelMarketType.addItem(method.getModuleName());
         }
-        personnelMarketType.setSelectedItem((String) options.getPersonnelMarketType());
+        personnelMarketType.setSelectedItem(options.getPersonnelMarketType());
         personnelMarketRandomEliteRemoval.setText(Integer.toString(options.getPersonnelMarketRandomEliteRemoval()));
         personnelMarketRandomVeteranRemoval.setText(Integer.toString(options.getPersonnelMarketRandomVeteranRemoval()));
         personnelMarketRandomRegularRemoval.setText(Integer.toString(options.getPersonnelMarketRandomRegularRemoval()));
@@ -3366,31 +3402,28 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panPersonnelMarket.add(personnelMarketTypeLabel, gridBagConstraints);
 
-        personnelMarketType.setSelectedItem((String) options.getPersonnelMarketType());
-        personnelMarketType.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                personnelMarketRandomEliteRemoval.setEnabled(personnelMarketType.getSelectedIndex() ==
-                                                             PersonnelMarket.TYPE_RANDOM
-                                                             || personnelMarketType.getSelectedIndex() ==
-                                                                PersonnelMarket.TYPE_DYLANS);
-                personnelMarketRandomVeteranRemoval.setEnabled(personnelMarketType.getSelectedIndex() ==
-                                                               PersonnelMarket.TYPE_RANDOM
-                                                               || personnelMarketType.getSelectedIndex() ==
-                                                                  PersonnelMarket.TYPE_DYLANS);
-                personnelMarketRandomRegularRemoval.setEnabled(personnelMarketType.getSelectedIndex() ==
-                                                               PersonnelMarket.TYPE_RANDOM
-                                                               || personnelMarketType.getSelectedIndex() ==
-                                                                  PersonnelMarket.TYPE_DYLANS);
-                personnelMarketRandomGreenRemoval.setEnabled(personnelMarketType.getSelectedIndex() ==
-                                                             PersonnelMarket.TYPE_RANDOM
-                                                             || personnelMarketType.getSelectedIndex() ==
-                                                                PersonnelMarket.TYPE_DYLANS);
-                personnelMarketRandomUltraGreenRemoval.setEnabled(personnelMarketType.getSelectedIndex() ==
-                                                                  PersonnelMarket.TYPE_RANDOM
-                                                                  || personnelMarketType.getSelectedIndex() ==
-                                                                     PersonnelMarket.TYPE_DYLANS);
-            }
+        personnelMarketType.setSelectedItem(options.getPersonnelMarketType());
+        personnelMarketType.addActionListener(evt -> {
+            personnelMarketRandomEliteRemoval.setEnabled(personnelMarketType.getSelectedIndex() ==
+                                                         PersonnelMarket.TYPE_RANDOM
+                                                         || personnelMarketType.getSelectedIndex() ==
+                                                            PersonnelMarket.TYPE_DYLANS);
+            personnelMarketRandomVeteranRemoval.setEnabled(personnelMarketType.getSelectedIndex() ==
+                                                           PersonnelMarket.TYPE_RANDOM
+                                                           || personnelMarketType.getSelectedIndex() ==
+                                                              PersonnelMarket.TYPE_DYLANS);
+            personnelMarketRandomRegularRemoval.setEnabled(personnelMarketType.getSelectedIndex() ==
+                                                           PersonnelMarket.TYPE_RANDOM
+                                                           || personnelMarketType.getSelectedIndex() ==
+                                                              PersonnelMarket.TYPE_DYLANS);
+            personnelMarketRandomGreenRemoval.setEnabled(personnelMarketType.getSelectedIndex() ==
+                                                         PersonnelMarket.TYPE_RANDOM
+                                                         || personnelMarketType.getSelectedIndex() ==
+                                                            PersonnelMarket.TYPE_DYLANS);
+            personnelMarketRandomUltraGreenRemoval.setEnabled(personnelMarketType.getSelectedIndex() ==
+                                                              PersonnelMarket.TYPE_RANDOM
+                                                              || personnelMarketType.getSelectedIndex() ==
+                                                                 PersonnelMarket.TYPE_DYLANS);
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -3806,13 +3839,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         }
         chosenRats.setModel(chosenRatModel);
         chosenRats.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        chosenRats.addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(ListSelectionEvent arg0) {
-				btnRemoveRat.setEnabled(chosenRats.getSelectedIndex() >= 0);
-				btnMoveRatUp.setEnabled(chosenRats.getSelectedIndex() > 0);
-				btnMoveRatDown.setEnabled(chosenRatModel.size() > chosenRats.getSelectedIndex() + 1);
-			}
+        chosenRats.addListSelectionListener(arg0 -> {
+            btnRemoveRat.setEnabled(chosenRats.getSelectedIndex() >= 0);
+            btnMoveRatUp.setEnabled(chosenRats.getSelectedIndex() > 0);
+            btnMoveRatDown.setEnabled(chosenRatModel.size() > chosenRats.getSelectedIndex() + 1);
         });
         availableRatModel = new DefaultListModel<>();
         for (String rat : RATManager.getAllRATCollections().keySet()) {
@@ -3833,12 +3863,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         }
         availableRats.setModel(availableRatModel);
         availableRats.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        availableRats.addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(ListSelectionEvent arg0) {
-				btnAddRat.setEnabled(availableRats.getSelectedIndex() >= 0);
-			}
-        });
+        availableRats.addListSelectionListener(arg0 -> btnAddRat.setEnabled(availableRats.getSelectedIndex() >= 0));
 
         JTextArea txtRatInstructions = new JTextArea();
         txtRatInstructions.setEditable(false);
@@ -3877,55 +3902,43 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panRatButtons.setLayout(new javax.swing.BoxLayout(panRatButtons, javax.swing.BoxLayout.Y_AXIS));
         btnAddRat.setText(resourceMap.getString("btnAddRat.text"));
         btnAddRat.setToolTipText(resourceMap.getString("btnAddRat.toolTipText"));
-        btnAddRat.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				int selectedIndex = availableRats.getSelectedIndex();
-				chosenRatModel.addElement(availableRats.getSelectedValue());
-				availableRatModel.removeElementAt(availableRats.getSelectedIndex());
-				availableRats.setSelectedIndex(Math.min(selectedIndex, availableRatModel.size() - 1));
-			}
+        btnAddRat.addActionListener(arg0 -> {
+            int selectedIndex = availableRats.getSelectedIndex();
+            chosenRatModel.addElement(availableRats.getSelectedValue());
+            availableRatModel.removeElementAt(availableRats.getSelectedIndex());
+            availableRats.setSelectedIndex(Math.min(selectedIndex, availableRatModel.size() - 1));
         });
         btnAddRat.setEnabled(false);
         panRatButtons.add(btnAddRat);
         btnRemoveRat.setText(resourceMap.getString("btnRemoveRat.text"));
         btnRemoveRat.setToolTipText(resourceMap.getString("btnRemoveRat.toolTipText"));
-        btnRemoveRat.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				int selectedIndex = chosenRats.getSelectedIndex();
-				availableRatModel.addElement(chosenRats.getSelectedValue());
-				chosenRatModel.removeElementAt(chosenRats.getSelectedIndex());
-				chosenRats.setSelectedIndex(Math.min(selectedIndex, chosenRatModel.size() - 1));
-			}
+        btnRemoveRat.addActionListener(arg0 -> {
+            int selectedIndex = chosenRats.getSelectedIndex();
+            availableRatModel.addElement(chosenRats.getSelectedValue());
+            chosenRatModel.removeElementAt(chosenRats.getSelectedIndex());
+            chosenRats.setSelectedIndex(Math.min(selectedIndex, chosenRatModel.size() - 1));
         });
         btnRemoveRat.setEnabled(false);
         panRatButtons.add(btnRemoveRat);
         btnMoveRatUp.setText(resourceMap.getString("btnMoveRatUp.text"));
         btnMoveRatUp.setToolTipText(resourceMap.getString("btnMoveRatUp.toolTipText"));
-        btnMoveRatUp.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				int selectedIndex = chosenRats.getSelectedIndex();
-				String tmp = chosenRatModel.getElementAt(selectedIndex);
-				chosenRatModel.setElementAt(chosenRatModel.getElementAt(selectedIndex - 1), selectedIndex);
-				chosenRatModel.setElementAt(tmp, selectedIndex - 1);
-				chosenRats.setSelectedIndex(selectedIndex - 1);
-			}
+        btnMoveRatUp.addActionListener(arg0 -> {
+            int selectedIndex = chosenRats.getSelectedIndex();
+            String tmp = chosenRatModel.getElementAt(selectedIndex);
+            chosenRatModel.setElementAt(chosenRatModel.getElementAt(selectedIndex - 1), selectedIndex);
+            chosenRatModel.setElementAt(tmp, selectedIndex - 1);
+            chosenRats.setSelectedIndex(selectedIndex - 1);
         });
         btnMoveRatUp.setEnabled(false);
         panRatButtons.add(btnMoveRatUp);
         btnMoveRatDown.setText(resourceMap.getString("btnMoveRatDown.text"));
         btnMoveRatDown.setToolTipText(resourceMap.getString("btnMoveRatDown.toolTipText"));
-        btnMoveRatDown.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				int selectedIndex = chosenRats.getSelectedIndex();
-				String tmp = chosenRatModel.getElementAt(selectedIndex);
-				chosenRatModel.setElementAt(chosenRatModel.getElementAt(selectedIndex + 1), selectedIndex);
-				chosenRatModel.setElementAt(tmp, selectedIndex + 1);
-				chosenRats.setSelectedIndex(selectedIndex + 1);
-			}
+        btnMoveRatDown.addActionListener(arg0 -> {
+            int selectedIndex = chosenRats.getSelectedIndex();
+            String tmp = chosenRatModel.getElementAt(selectedIndex);
+            chosenRatModel.setElementAt(chosenRatModel.getElementAt(selectedIndex + 1), selectedIndex);
+            chosenRatModel.setElementAt(tmp, selectedIndex + 1);
+            chosenRats.setSelectedIndex(selectedIndex + 1);
         });
         btnMoveRatDown.setEnabled(false);
         panRatButtons.add(btnMoveRatDown);
@@ -4054,12 +4067,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 11;
         panSubAtBContract.add(spnIntensity, gridBagConstraints);
-        spnIntensity.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(ChangeEvent arg0) {
-				updateBattleChances();
-			}
-        });
+        spnIntensity.addChangeListener(arg0 -> updateBattleChances());
 
         JLabel lblBattleFrequency = new JLabel(resourceMap.getString("lblBattleFrequency.text"));
         gridBagConstraints.gridx = 0;
@@ -4172,8 +4180,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         chkOpforUsesAero.setText(resourceMap.getString("chkOpforUsesAero.text"));
         chkOpforUsesAero.setToolTipText(resourceMap.getString("chkOpforUsesAero.toolTipText"));
         chkOpforUsesAero.setSelected(options.getAllowOpforAeros());
-        lblOpforAeroChance.setText(resourceMap.getString("lblOpforAeroLikelyhood.text"));
-        lblOpforAeroChance.setToolTipText(resourceMap.getString("lblOpforAeroLikelyhood.toolTipText"));
+        lblOpforAeroChance.setText(resourceMap.getString("lblOpforAeroLikelihood.text"));
+        lblOpforAeroChance.setToolTipText(resourceMap.getString("lblOpforAeroLikelihood.toolTipText"));
         spnOpforAeroChance.setModel(new SpinnerNumberModel(options.getOpforAeroChance(), 0, 6, 1));
         panOpforAero.add(chkOpforUsesAero);
         panOpforAero.add(spnOpforAeroChance);
@@ -4190,8 +4198,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         chkOpforUsesLocalForces.setText(resourceMap.getString("chkOpforUsesLocalForces.text"));
         chkOpforUsesLocalForces.setToolTipText(resourceMap.getString("chkOpforUsesLocalForces.toolTipText"));
         chkOpforUsesLocalForces.setSelected(options.getAllowOpforLocalUnits());
-        lblOpforLocalForceChance.setText(resourceMap.getString("lblOpforAeroLikelyhood.text"));
-        lblOpforLocalForceChance.setToolTipText(resourceMap.getString("lblOpforLocalForceLikelyhood.toolTipText"));
+        lblOpforLocalForceChance.setText(resourceMap.getString("lblOpforAeroLikelihood.text"));
+        lblOpforLocalForceChance.setToolTipText(resourceMap.getString("lblOpforLocalForceLikelihood.toolTipText"));
         spnOpforLocalForceChance.setModel(new SpinnerNumberModel(options.getOpforLocalUnitChance(), 0, 6, 1));
         panOpforLocal.add(chkOpforUsesLocalForces);
         panOpforLocal.add(spnOpforLocalForceChance);
@@ -4326,13 +4334,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 		enableAtBComponents(panSubAtBRat, chkUseAtB.isSelected()
 				&& btnStaticRATs.isSelected());
 
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                scrollPersonnel.getVerticalScrollBar().setValue(0);
-                scrSPA.getVerticalScrollBar().setValue(0);
-                scrAtB.getVerticalScrollBar().setValue(0);
-            }
-         });
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            scrollPersonnel.getVerticalScrollBar().setValue(0);
+            scrSPA.getVerticalScrollBar().setValue(0);
+            scrAtB.getVerticalScrollBar().setValue(0);
+        });
 
         JScrollPane scrMisc = new JScrollPane(panMisc);
         scrMisc.setPreferredSize(new java.awt.Dimension(500, 400));
@@ -4392,7 +4398,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnCancel.setName("btnCancel"); // NOI18N
-        btnCancel.addActionListener(evt -> btnCancelActionPerformed(evt));
+        btnCancel.addActionListener(this::btnCancelActionPerformed);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 1;
@@ -4425,7 +4431,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
                                     .getNameGenerator();
         boolean found = false;
         for (Iterator<String> i = campaign.getRNG().getFactions(); i.hasNext(); ) {
-            String nextFaction = (String) i.next();
+            String nextFaction = i.next();
             if (nextFaction.equals(factionCode)) {
                 found = true;
                 break;
@@ -4439,7 +4445,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private void fillRankInfo() {
         Ranks ranks = new Ranks(comboRanks.getSelectedIndex());
         ranksModel.setDataVector(ranks.getRanksForModel(), rankColNames);
-        TableColumn column = null;
+        TableColumn column;
         for (int i = 0; i < RankTableModel.COL_NUM; i++) {
             column = tableRanks.getColumnModel().getColumn(i);
             column.setPreferredWidth(ranksModel.getColumnWidth(i));
@@ -4506,9 +4512,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 			cgpd.setVisible(true);
 			if(!cgpd.wasCancelled() && null != cgpd.getSelectedPreset()) {
 				cgpd.getSelectedPreset().apply(campaign);
-				////TODO: it would be nice if we could just update the choices in this dialog now
-				//rather than closing it, but that is currently not possible given how
-				//this dialog is set up
+				// TODO: it would be nice if we could just update the choices in this dialog now
+				// TODO: rather than closing it, but that is currently not possible given how
+				// TODO: this dialog is set up
 				MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
 				this.setVisible(false);
 			}
@@ -4551,15 +4557,15 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         }
 
         updateOptions();
-        GamePreset preset = new GamePreset(gpdd.getTitle(), gpdd.getDesc(), options, rskillPrefs, SkillType.lookupHash, SpecialAbility.getAllSpecialAbilities());
+        GamePreset preset = new GamePreset(gpdd.getTitle(), gpdd.getDesc(), options, rSkillPrefs, SkillType.lookupHash, SpecialAbility.getAllSpecialAbilities());
 
         // Then save it out to that file.
-        FileOutputStream fos = null;
-        PrintWriter pw = null;
+        FileOutputStream fos;
+        PrintWriter pw;
 
         try {
             fos = new FileOutputStream(file);
-            pw = new PrintWriter(new OutputStreamWriter(fos, "UTF-8"));
+            pw = new PrintWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8));
             preset.writeToXml(pw, 0);
             pw.flush();
             pw.close();
@@ -4769,26 +4775,26 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setOriginSearchRadius((Integer)spnOriginSearchRadius.getModel().getValue());
         options.setDefaultPrisonerStatus(comboPrisonerStatus.getSelectedIndex());
 
-        rskillPrefs.setOverallRecruitBonus((Integer) spnOverallRecruitBonus.getModel().getValue());
+        rSkillPrefs.setOverallRecruitBonus((Integer) spnOverallRecruitBonus.getModel().getValue());
         for (int i = 0; i < Person.T_NUM; i++) {
-            rskillPrefs.setRecruitBonus(i, (Integer) spnTypeRecruitBonus[i].getModel().getValue());
+            rSkillPrefs.setRecruitBonus(i, (Integer) spnTypeRecruitBonus[i].getModel().getValue());
         }
-        rskillPrefs.setRandomizeSkill(chkExtraRandom.isSelected());
-        rskillPrefs.setAntiMekProb((Integer) spnProbAntiMek.getModel().getValue());
-        rskillPrefs.setArtilleryProb((Integer) spnArtyProb.getModel().getValue());
-        rskillPrefs.setArtilleryBonus((Integer) spnArtyBonus.getModel().getValue());
-        rskillPrefs.setSecondSkillProb((Integer) spnSecondProb.getModel().getValue());
-        rskillPrefs.setSecondSkillBonus((Integer) spnSecondBonus.getModel().getValue());
-        rskillPrefs.setTacticsMod(SkillType.EXP_GREEN, (Integer) spnTacticsGreen.getModel().getValue());
-        rskillPrefs.setTacticsMod(SkillType.EXP_REGULAR, (Integer) spnTacticsReg.getModel().getValue());
-        rskillPrefs.setTacticsMod(SkillType.EXP_VETERAN, (Integer) spnTacticsVet.getModel().getValue());
-        rskillPrefs.setTacticsMod(SkillType.EXP_ELITE, (Integer) spnTacticsElite.getModel().getValue());
-        rskillPrefs.setCombatSmallArmsBonus((Integer) spnCombatSA.getModel().getValue());
-        rskillPrefs.setSupportSmallArmsBonus((Integer) spnSupportSA.getModel().getValue());
-        rskillPrefs.setSpecialAbilBonus(SkillType.EXP_GREEN, (Integer) spnAbilGreen.getModel().getValue());
-        rskillPrefs.setSpecialAbilBonus(SkillType.EXP_REGULAR, (Integer) spnAbilReg.getModel().getValue());
-        rskillPrefs.setSpecialAbilBonus(SkillType.EXP_VETERAN, (Integer) spnAbilVet.getModel().getValue());
-        rskillPrefs.setSpecialAbilBonus(SkillType.EXP_ELITE, (Integer) spnAbilElite.getModel().getValue());
+        rSkillPrefs.setRandomizeSkill(chkExtraRandom.isSelected());
+        rSkillPrefs.setAntiMekProb((Integer) spnProbAntiMek.getModel().getValue());
+        rSkillPrefs.setArtilleryProb((Integer) spnArtyProb.getModel().getValue());
+        rSkillPrefs.setArtilleryBonus((Integer) spnArtyBonus.getModel().getValue());
+        rSkillPrefs.setSecondSkillProb((Integer) spnSecondProb.getModel().getValue());
+        rSkillPrefs.setSecondSkillBonus((Integer) spnSecondBonus.getModel().getValue());
+        rSkillPrefs.setTacticsMod(SkillType.EXP_GREEN, (Integer) spnTacticsGreen.getModel().getValue());
+        rSkillPrefs.setTacticsMod(SkillType.EXP_REGULAR, (Integer) spnTacticsReg.getModel().getValue());
+        rSkillPrefs.setTacticsMod(SkillType.EXP_VETERAN, (Integer) spnTacticsVet.getModel().getValue());
+        rSkillPrefs.setTacticsMod(SkillType.EXP_ELITE, (Integer) spnTacticsElite.getModel().getValue());
+        rSkillPrefs.setCombatSmallArmsBonus((Integer) spnCombatSA.getModel().getValue());
+        rSkillPrefs.setSupportSmallArmsBonus((Integer) spnSupportSA.getModel().getValue());
+        rSkillPrefs.setSpecialAbilBonus(SkillType.EXP_GREEN, (Integer) spnAbilGreen.getModel().getValue());
+        rSkillPrefs.setSpecialAbilBonus(SkillType.EXP_REGULAR, (Integer) spnAbilReg.getModel().getValue());
+        rSkillPrefs.setSpecialAbilBonus(SkillType.EXP_VETERAN, (Integer) spnAbilVet.getModel().getValue());
+        rSkillPrefs.setSpecialAbilBonus(SkillType.EXP_ELITE, (Integer) spnAbilElite.getModel().getValue());
 
         options.setProbPhenoMW((Integer) spnProbPhenoMW.getModel().getValue());
         options.setProbPhenoAero((Integer) spnProbPhenoAero.getModel().getValue());
@@ -4807,7 +4813,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         for (int i = 0; i < 5; i++) {
             options.setSalaryXpMultiplier((Double) spnSalaryXp[i].getModel().getValue(), i);
         }
-        options.setSalaryCommissionMultiplier((Double) spnSalaryCommision.getModel().getValue());
+        options.setSalaryCommissionMultiplier((Double) spnSalaryCommission.getModel().getValue());
         options.setSalaryEnlistedMultiplier((Double) spnSalaryEnlisted.getModel().getValue());
         options.setSalaryAntiMekMultiplier((Double) spnSalaryAntiMek.getModel().getValue());
         //end salary
@@ -5179,7 +5185,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
      *  This table must be added to the row header of the scrollpane that
      *  contains the main table.
      */
-    public class RowNamesTable extends JTable
+    public static class RowNamesTable extends JTable
             implements ChangeListener, PropertyChangeListener {
         /**
          *
@@ -5276,7 +5282,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         /*
          *  Borrow the renderer from JDK1.4.2 table header
          */
-        private class RowNumberRenderer extends DefaultTableCellRenderer {
+        private static class RowNumberRenderer extends DefaultTableCellRenderer {
             /**
              *
              */
@@ -5333,12 +5339,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
                     System.err.println("Got focus");
                     //textField.setSelectionStart(0);
                     //textField.setSelectionEnd(1);
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (valueSet) {
-                                textField.setCaretPosition(1);
-                            }
+                    SwingUtilities.invokeLater(() -> {
+                        if (valueSet) {
+                            textField.setCaretPosition(1);
                         }
                     });
                 }
@@ -5347,12 +5350,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
                 public void focusLost(FocusEvent fe) {
                 }
             });
-            textField.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent ae) {
-                    stopCellEditing();
-                }
-            });
+            textField.addActionListener(ae -> stopCellEditing());
         }
 
         // Prepares the spinner component and returns it.
@@ -5363,12 +5361,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             if (!valueSet) {
                 spinner.setValue(value);
             }
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    textField.requestFocus();
-                }
-            });
+            SwingUtilities.invokeLater(() -> textField.requestFocus());
             return spinner;
         }
 
@@ -5408,5 +5401,4 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             return super.stopCellEditing();
         }
     }
-
 }
