@@ -608,6 +608,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = gridy;
         return gridBagConstraints;
     }
+
     public java.awt.GridBagConstraints createGridBagConstraints(String style, int gridx, int gridy, int value) {
         java.awt.GridBagConstraints gridBagConstraints = createGridBagConstraints(gridx, gridy);
         switch(style) {
@@ -621,12 +622,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         return gridBagConstraints;
     }
+
     public java.awt.GridBagConstraints createGridBagConstraints(int gridx, int gridy, int fill, int anchor) {
         java.awt.GridBagConstraints gridBagConstraints = createGridBagConstraints(gridx, gridy);
         gridBagConstraints.anchor = anchor;
         gridBagConstraints.fill = fill;
         return gridBagConstraints;
-
     }
 
     /**
@@ -753,34 +754,23 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         txtName.setName("txtName"); // NOI18N
         txtName.setPreferredSize(new java.awt.Dimension(500, 30));
         txtName.addActionListener(this::txtNameActionPerformed);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints = createGridBagConstraints("anchor",1, 0, java.awt.GridBagConstraints.WEST);
         panGeneral.add(txtName, gridBagConstraints);
 
         lblName.setText(resourceMap.getString("lblName.text")); // NOI18N
         lblName.setName("lblName"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints = createGridBagConstraints("anchor", 0, 0, java.awt.GridBagConstraints.WEST);
         panGeneral.add(lblName, gridBagConstraints);
 
         lblFaction.setText(resourceMap.getString("lblFaction.text")); // NOI18N
         lblFaction.setName("lblFaction"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints = createGridBagConstraints("anchor", 0, 1, java.awt.GridBagConstraints.WEST);
         panGeneral.add(lblFaction, gridBagConstraints);
 
         lblDate.setText(resourceMap.getString("lblDate.text")); // NOI18N
         lblDate.setName("lblDate"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints = createGridBagConstraints("anchor", 0, 3, java.awt.GridBagConstraints.WEST);
         panGeneral.add(lblDate, gridBagConstraints);
 
         btnDate.setText(getDateAsString());
@@ -788,10 +778,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         btnDate.setName("btnDate"); // NOI18N
         btnDate.setPreferredSize(new java.awt.Dimension(400, 30));
         btnDate.addActionListener(this::btnDateActionPerformed);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints = createGridBagConstraints("anchor", 1, 3, java.awt.GridBagConstraints.WEST);
         panGeneral.add(btnDate, gridBagConstraints);
 
         factionModel = new SortedComboBoxModel<>();
@@ -807,10 +794,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         comboFaction.setName("comboFaction"); // NOI18N
         comboFaction.setPreferredSize(new java.awt.Dimension(400, 30));
         comboFaction.addActionListener(evt -> factionSelected());
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints = createGridBagConstraints("anchor", 1, 1, java.awt.GridBagConstraints.WEST);
         panGeneral.add(comboFaction, gridBagConstraints);
 
         JPanel unitRatingPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 1, 1));
