@@ -19,11 +19,12 @@
   	 Deric Page
   	 Robin Toll <fastsammy@users.sourceforge.net>
 
-  Patch Submitters:
+  More Code:
      Daniel Vystrcil
      Longinus00
      Josh Street
      Neyah Peterson
+ 	 Justin "Windchild" Bowen
 
   Data
       Unit Updates:
