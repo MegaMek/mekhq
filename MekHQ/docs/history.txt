@@ -1,6 +1,6 @@
 VERSION HISTORY:
 ----------------
-v0.47.3-SNAPSHOT
+v0.47.3 (2020-2-11 2200 UTC) 
 + Issue #1344: Ensure techs show the right skill for Protomechs
 + PR #1348: Enable scenario modifiers to add objectives to scenarios generated from templates
 + Issue #1349: Problem with replacing Protomech limbs lost in combat
