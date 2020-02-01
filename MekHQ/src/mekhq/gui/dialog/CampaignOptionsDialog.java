@@ -128,6 +128,8 @@ import mekhq.preferences.PreferencesNode;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class CampaignOptionsDialog extends javax.swing.JDialog {
+    //region Variable Declarations
+    //region General Variables (ones not relating to a specific tab)
     private static final long serialVersionUID = 1935043247792962964L;
     private Campaign campaign;
     private CampaignOptions options;
@@ -145,9 +147,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private Hashtable<String, JSpinner> hashVetSkill;
     private Hashtable<String, JSpinner> hashEliteSkill;
     private boolean cancelled;
-
-    //region Variable Declarations
-    //General Variables (ones not relating to a specific tab)
+    //endregion General Variables (ones not relating to a specific tab)
 
     //region Shared UI Variables
     private JTabbedPane tabOptions;
@@ -195,6 +195,21 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
     //region Supplies and Acquisitions Tab
     private JPanel panSupplies;
+    //acquisition
+    private JSpinner spnAcquireWaitingPeriod;
+    private JComboBox<String> choiceAcquireSkill;
+    private JCheckBox chkSupportStaffOnly;
+    private JSpinner spnAcquireClanPenalty;
+    private JSpinner spnAcquireIsPenalty;
+    private JTextField txtMaxAcquisitions;
+    //Delivery
+    private JSpinner spnNDiceTransitTime;
+    private JSpinner spnConstantTransitTime;
+    private JComboBox<String> choiceTransitTimeUnits;
+    private JSpinner spnAcquireMinimum;
+    private JComboBox<String> choiceAcquireMinimumUnit;
+    private JSpinner spnAcquireMosBonus;
+    private JComboBox<String> choiceAcquireMosUnits;
     //planetary acquisitions
     private JCheckBox usePlanetaryAcquisitions;
     private JSpinner spnMaxJumpPlanetaryAcquisitions;
@@ -210,10 +225,48 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
     //region Tech Limits Tab
     private JPanel panTech;
+    private JCheckBox limitByYearBox;
+    private JCheckBox disallowExtinctStuffBox;
+    private JCheckBox allowClanPurchasesBox;
+    private JCheckBox allowISPurchasesBox;
+    private JCheckBox allowCanonOnlyBox;
+    private JCheckBox allowCanonRefitOnlyBox;
+    private JLabel lblTechLevel;
+    private JComboBox<String> choiceTechLevel;
+    private JCheckBox variableTechLevelBox;
+    private JCheckBox factionIntroDateBox;
+    private JCheckBox useAmmoByTypeBox;
     //endregion Tech Limits Tab
 
     //region Personnel Tab
     private JPanel panPersonnel;
+    private JCheckBox useTacticsBox;
+    private JCheckBox useInitBonusBox;
+    private JCheckBox useToughnessBox;
+    private JCheckBox useArtilleryBox;
+    private JCheckBox useAbilitiesBox;
+    private JCheckBox useEdgeBox;
+    private JCheckBox useSupportEdgeBox;
+    private JCheckBox useImplantsBox;
+    private JCheckBox chkCapturePrisoners;
+    private JComboBox<String> comboPrisonerStatus;
+    private JCheckBox altQualityAveragingCheckBox;
+    private JCheckBox useAdvancedMedicalBox;
+    private JCheckBox useDylansRandomXpBox;
+    private JSpinner spnHealWaitingPeriod;
+    private JSpinner spnNaturalHealWaitingPeriod;
+    private JSpinner spnMinimumHitsForVees;
+    private JCheckBox useRandomHitsForVees;
+    private JCheckBox useTougherHealing;
+    private JCheckBox chkUseUnofficialProcreation;
+    private JCheckBox chkUseUnofficialProcreationNoRelationship;
+    private JCheckBox chkUseParentage;
+    private JCheckBox chkLogConception;
+    private JCheckBox chkUseTransfers;
+    private JCheckBox chkUseTimeInService;
+    private JCheckBox chkShowOriginFaction;
+    private JCheckBox chkRandomizeOrigin;
+    private JSpinner spnOriginSearchRadius;
     //Salary
     private JSpinner spnSalaryCommission;
     private JSpinner spnSalaryEnlisted;
@@ -224,7 +277,22 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
     //region Finances Tab
     private JPanel panFinances;
-
+    private JCheckBox payForPartsBox;
+    private JCheckBox payForRepairsBox;
+    private JCheckBox payForUnitsBox;
+    private JCheckBox payForSalariesBox;
+    private JCheckBox payForOverheadBox;
+    private JCheckBox payForMaintainBox;
+    private JCheckBox payForTransportBox;
+    private JCheckBox sellUnitsBox;
+    private JCheckBox sellPartsBox;
+    private JCheckBox payForRecruitmentBox;
+    private JCheckBox useLoanLimitsBox;
+    private JCheckBox usePercentageMaintBox;
+    private JCheckBox useInfantryDontCountBox;
+    private JCheckBox usePeacetimeCostBox;
+    private JCheckBox useExtendedPartsModifierBox;
+    private JCheckBox showPeacetimeCostBox;
     private JSpinner spnClanPriceModifier;
     private JSpinner[] spnUsedPartsValue;
     private JSpinner spnDamagedPartsValue;
@@ -276,11 +344,37 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     //endregion Skills Tab
 
     //region Special Abilities Tab
+    private JPanel panSpecialAbilities;
+    Hashtable<String, SpecialAbility> tempSPA;
+    private JButton btnAddSPA;
     //endregion Special Abilities Tab
 
     //region Skill Randomization Tab
-
     private JPanel panRandomSkill;
+    private JCheckBox chkExtraRandom;
+    private JSpinner spnProbPhenoMW;
+    private JSpinner spnProbPhenoAero;
+    private JSpinner spnProbPhenoBA;
+    private JSpinner spnProbPhenoVee;
+    private JLabel lblProbAntiMek;
+    private JSpinner spnProbAntiMek;
+    private JLabel lblOverallRecruitBonus;
+    private JSpinner spnOverallRecruitBonus;
+    private JSpinner[] spnTypeRecruitBonus;
+    private JSpinner spnArtyProb;
+    private JSpinner spnArtyBonus;
+    private JSpinner spnTacticsGreen;
+    private JSpinner spnTacticsReg;
+    private JSpinner spnTacticsVet;
+    private JSpinner spnTacticsElite;
+    private JSpinner spnCombatSA;
+    private JSpinner spnSupportSA;
+    private JSpinner spnSecondProb;
+    private JSpinner spnSecondBonus;
+    private JSpinner spnAbilGreen;
+    private JSpinner spnAbilReg;
+    private JSpinner spnAbilVet;
+    private JSpinner spnAbilElite;
     //endregion Skill Randomization Tab
 
     //region Rank System Tab
@@ -305,6 +399,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JComboBox<String> comboFactionNames;
     private JLabel lblGender;
     private JSlider sldGender;
+    private JPanel panRandomPortrait;
+    private JCheckBox[] chkUsePortrait;
     private JCheckBox chkAssignPortraitOnRoleChange;
     //endregion Name and Portrait Generation Tab
 
@@ -328,6 +424,78 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     //endregion Personnel Market Tab
 
     //region Against the Bot Tab
+    private JPanel panAtB;
+    private JCheckBox chkUseAtB;
+    private JComboBox<String> cbSkillLevel;
+    //unit administration
+    private JCheckBox chkUseShareSystem;
+    private JCheckBox chkSharesExcludeLargeCraft;
+    private JCheckBox chkSharesForAll;
+    private JCheckBox chkAeroRecruitsHaveUnits;
+    private JCheckBox chkRetirementRolls;
+    private JCheckBox chkCustomRetirementMods;
+    private JCheckBox chkFoundersNeverRetire;
+    private JCheckBox chkTrackUnitFatigue;
+    private JCheckBox chkUseLeadership;
+    private JCheckBox chkTrackOriginalUnit;
+    private JCheckBox chkUseAero;
+    private JCheckBox chkUseVehicles;
+    private JCheckBox chkClanVehicles;
+    private JCheckBox chkInstantUnitMarketDelivery;
+    private JCheckBox chkContractMarketReportRefresh;
+    private JCheckBox chkUnitMarketReportRefresh;
+
+    //contract operations
+    private JSpinner spnSearchRadius;
+    private JCheckBox chkVariableContractLength;
+    private JCheckBox chkMercSizeLimited;
+    private JCheckBox chkRestrictPartsByMission;
+    private JCheckBox chkLimitLanceWeight;
+    private JCheckBox chkLimitLanceNumUnits;
+    private JCheckBox chkUseStrategy;
+    private JSpinner spnBaseStrategyDeployment;
+    private JSpinner spnAdditionalStrategyDeployment;
+    private JCheckBox chkAdjustPaymentForStrategy;
+    private JSpinner spnIntensity;
+    private JLabel lblFightPct;
+    private JLabel lblDefendPct;
+    private JLabel lblScoutPct;
+    private JLabel lblTrainingPct;
+
+    //RATs
+    private JRadioButton btnDynamicRATs;
+    private JRadioButton btnStaticRATs;
+    private DefaultListModel<String> chosenRatModel;
+    private JList<String> chosenRats;
+    private DefaultListModel<String> availableRatModel;
+    private JList<String> availableRats;
+    private JButton btnAddRat;
+    private JButton btnRemoveRat;
+    private JButton btnMoveRatUp;
+    private JButton btnMoveRatDown;
+    private JCheckBox chkIgnoreRatEra;
+
+    //scenarios
+    private JCheckBox chkDoubleVehicles;
+    private JSpinner spnOpforLanceTypeMechs;
+    private JSpinner spnOpforLanceTypeMixed;
+    private JSpinner spnOpforLanceTypeVehicles;
+    private JCheckBox chkOpforUsesVTOLs;
+    private JCheckBox chkOpforUsesAero;
+    private JSpinner spnOpforAeroChance;
+    private JLabel lblOpforAeroChance;
+    private JCheckBox chkOpforUsesLocalForces;
+    private JSpinner spnOpforLocalForceChance;
+    private JLabel lblOpforLocalForceChance;
+    private JCheckBox chkAdjustPlayerVehicles;
+    private JCheckBox chkRegionalMechVariations;
+    private JCheckBox chkUseDropShips;
+    private JCheckBox chkUseWeatherConditions;
+    private JCheckBox chkUseLightConditions;
+    private JCheckBox chkUsePlanetaryConditions;
+    private JCheckBox chkUseAtBCapture;
+    private JSpinner spnStartGameDelay;
+
     //endregion Against the Bot Tab
 
     //region Miscellaneous Tab
@@ -336,187 +504,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     //endregion Miscellaneous Tab
     //endregion Variable Declarations
 
-    private JCheckBox useTacticsBox;
-    private JCheckBox useInitBonusBox;
-    private JCheckBox useToughnessBox;
-    private JCheckBox useArtilleryBox;
-    private JCheckBox useAbilitiesBox;
-
-    private JCheckBox useEdgeBox;
-    private JCheckBox useSupportEdgeBox;
-    private JCheckBox useImplantsBox;
-	private JCheckBox altQualityAveragingCheckBox;
-    private JCheckBox useAdvancedMedicalBox;
-    private JCheckBox useDylansRandomXpBox;
-    private JCheckBox payForPartsBox;
-    private JCheckBox payForRepairsBox;
-    private JCheckBox payForUnitsBox;
-    private JCheckBox payForSalariesBox;
-    private JCheckBox payForOverheadBox;
-    private JCheckBox payForMaintainBox;
-    private JCheckBox payForTransportBox;
-    private JCheckBox payForRecruitmentBox;
-    private JCheckBox useLoanLimitsBox;
-    private JCheckBox sellUnitsBox;
-    private JCheckBox sellPartsBox;
-    private JCheckBox usePeacetimeCostBox;
-    private JCheckBox useExtendedPartsModifierBox;
-    private JCheckBox showPeacetimeCostBox;
-
-    private JSpinner spnHealWaitingPeriod;
-    private JSpinner spnNaturalHealWaitingPeriod;
-    private JCheckBox useRandomHitsForVees;
-    private JSpinner spnMinimumHitsForVees;
-    private JCheckBox useTougherHealing;
-    private JComboBox<String> comboPrisonerStatus;
-
-    private JCheckBox usePercentageMaintBox;
-    private JCheckBox useInfantryDontCountBox;
-
-    private JCheckBox chkSupportStaffOnly;
-    private JSpinner spnAcquireWaitingPeriod;
-    private JComboBox<String> choiceAcquireSkill;
-    private JSpinner spnAcquireClanPenalty;
-    private JSpinner spnAcquireIsPenalty;
-    private JCheckBox chkCapturePrisoners;
-    private JTextField txtMaxAcquisitions;
-    private JCheckBox chkUseUnofficialProcreation;
-    private JCheckBox chkUseUnofficialProcreationNoRelationship;
-    private JCheckBox chkUseParentage;
-    private JCheckBox chkLogConception;
-    private JCheckBox chkUseTransfers;
-    private JCheckBox chkUseTimeInService;
-    private JCheckBox chkShowOriginFaction;
-    private JCheckBox chkRandomizeOrigin;
-    private JSpinner spnOriginSearchRadius;
-
-    private JSpinner spnNDiceTransitTime;
-    private JSpinner spnConstantTransitTime;
-    private JComboBox<String> choiceTransitTimeUnits;
-    private JSpinner spnAcquireMosBonus;
-    private JComboBox<String> choiceAcquireMosUnits;
-    private JSpinner spnAcquireMinimum;
-    private JComboBox<String> choiceAcquireMinimumUnit;
-
-    private JCheckBox limitByYearBox;
-    private JCheckBox disallowExtinctStuffBox;
-    private JCheckBox allowClanPurchasesBox;
-    private JCheckBox allowISPurchasesBox;
-    private JCheckBox allowCanonOnlyBox;
-    private JCheckBox allowCanonRefitOnlyBox;
-    private JCheckBox variableTechLevelBox;
-    private JCheckBox factionIntroDateBox;
-    private JCheckBox useAmmoByTypeBox;
-    //private JCheckBox disallowSLUnitsBox;
-    private JLabel lblTechLevel;
-    private JComboBox<String> choiceTechLevel;
-
-    private JLabel lblOverallRecruitBonus;
-    private JSpinner spnOverallRecruitBonus;
-    private JSpinner[] spnTypeRecruitBonus;
-    private JCheckBox chkExtraRandom;
+    // TODO: Figure out why these are not used
     private JCheckBox chkClanBonus;
-    private JLabel lblProbAntiMek;
-    private JSpinner spnProbAntiMek;
-    private JSpinner spnArtyProb;
-    private JSpinner spnArtyBonus;
-    private JSpinner spnSecondProb;
-    private JSpinner spnSecondBonus;
-    private JSpinner spnTacticsGreen;
-    private JSpinner spnTacticsReg;
-    private JSpinner spnTacticsVet;
-    private JSpinner spnTacticsElite;
-    private JSpinner spnCombatSA;
-    private JSpinner spnSupportSA;
-    private JSpinner spnAbilGreen;
-    private JSpinner spnAbilReg;
-    private JSpinner spnAbilVet;
-    private JSpinner spnAbilElite;
-    private JSpinner spnProbPhenoMW;
-    private JSpinner spnProbPhenoAero;
-    private JSpinner spnProbPhenoBA;
-    private JSpinner spnProbPhenoVee;
-
-    private JPanel panRandomPortrait;
-    private JCheckBox[] chkUsePortrait;
-
-    private JPanel panSpecialAbilities;
-
-    Hashtable<String, SpecialAbility> tempSPA;
-    private JButton btnAddSPA;
-
-    /* Against the Bot */
-    private JPanel panAtB;
-    private JCheckBox chkUseAtB;
-
-    private JComboBox<String> cbSkillLevel;
-    private JCheckBox chkUseShareSystem;
-    private JCheckBox chkSharesExcludeLargeCraft;
-    private JCheckBox chkSharesForAll;
-    private JCheckBox chkTrackOriginalUnit;
-    private JCheckBox chkRetirementRolls;
-    private JCheckBox chkTrackUnitFatigue;
-    private JCheckBox chkCustomRetirementMods;
-    private JCheckBox chkFoundersNeverRetire;
-    private JCheckBox chkLimitLanceWeight;
-    private JCheckBox chkLimitLanceNumUnits;
-    private JCheckBox chkUseLeadership;
-    private JCheckBox chkUseStrategy;
-    private JSpinner spnBaseStrategyDeployment;
-    private JSpinner spnAdditionalStrategyDeployment;
-    private JCheckBox chkAdjustPaymentForStrategy;
-
-    private JCheckBox chkUseAero;
-    private JCheckBox chkUseVehicles;
-    private JCheckBox chkClanVehicles;
-    private JCheckBox chkDoubleVehicles;
-    private JCheckBox chkAdjustPlayerVehicles;
-    private JSpinner spnOpforLanceTypeMechs;
-    private JSpinner spnOpforLanceTypeMixed;
-    private JSpinner spnOpforLanceTypeVehicles;
-    private JCheckBox chkOpforUsesVTOLs;
-    private JCheckBox chkOpforUsesAero;
-    private JCheckBox chkOpforUsesLocalForces;
-    private JCheckBox chkUseDropShips;
-    private JLabel lblOpforAeroChance;
-    private JLabel lblOpforLocalForceChance;
-    private JSpinner spnOpforAeroChance;
-    private JSpinner spnOpforLocalForceChance;
-
-    private JRadioButton btnDynamicRATs;
-    private JRadioButton btnStaticRATs;
-    private JCheckBox chkIgnoreRatEra;
-    private DefaultListModel<String> chosenRatModel;
-    private DefaultListModel<String> availableRatModel;
-    private JList<String> availableRats;
-    private JList<String> chosenRats;
-    private JButton btnAddRat;
-    private JButton btnRemoveRat;
-    private JButton btnMoveRatUp;
-    private JButton btnMoveRatDown;
-
-    private JSpinner spnSearchRadius;
-    private JSpinner spnIntensity;
-    private JLabel lblFightPct;
-    private JLabel lblDefendPct;
-    private JLabel lblScoutPct;
-    private JLabel lblTrainingPct;
-    private JCheckBox chkVariableContractLength;
-    private JCheckBox chkMercSizeLimited;
-    private JCheckBox chkRestrictPartsByMission;
-    private JCheckBox chkRegionalMechVariations;
-    private JCheckBox chkUseWeatherConditions;
-    private JCheckBox chkUseLightConditions;
-    private JCheckBox chkUsePlanetaryConditions;
-    private JCheckBox chkUseAtBCapture;
-
-    private JCheckBox chkAeroRecruitsHaveUnits;
-    private JCheckBox chkInstantUnitMarketDelivery;
-    private JCheckBox chkContractMarketReportRefresh;
-    private JCheckBox chkUnitMarketReportRefresh;
-
-    private JSpinner spnStartGameDelay;
-
 
     /**
      * Creates new form CampaignOptionsDialog
@@ -611,6 +600,33 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         chkSupportStaffOnly.setSelected(options.isAcquisitionSupportStaffOnly());
 
         setUserPreferences();
+    }
+
+    public java.awt.GridBagConstraints createGridBagConstraints(int gridx, int gridy) {
+        java.awt.GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = gridx;
+        gridBagConstraints.gridy = gridy;
+        return gridBagConstraints;
+    }
+    public java.awt.GridBagConstraints createGridBagConstraints(String style, int gridx, int gridy, int value) {
+        java.awt.GridBagConstraints gridBagConstraints = createGridBagConstraints(gridx, gridy);
+        switch(style) {
+            case "anchor":
+                gridBagConstraints.anchor = value;
+                break;
+            case "fill":
+                gridBagConstraints.fill = value;
+                break;
+        }
+
+        return gridBagConstraints;
+    }
+    public java.awt.GridBagConstraints createGridBagConstraints(int gridx, int gridy, int fill, int anchor) {
+        java.awt.GridBagConstraints gridBagConstraints = createGridBagConstraints(gridx, gridy);
+        gridBagConstraints.anchor = anchor;
+        gridBagConstraints.fill = fill;
+        return gridBagConstraints;
+
     }
 
     /**
@@ -5013,7 +5029,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     }
 
     private void btnAddSPA() {
-
     	SelectUnusedAbilityDialog suad = new SelectUnusedAbilityDialog(this.frame, getUnusedSPA(), getCurrentSPA());
     	suad.setVisible(true);
 
@@ -5024,18 +5039,17 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx =1.0;
-        gridBagConstraints.weighty =0.0;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
         panSpecialAbilities.add(btnAddSPA, gridBagConstraints);
         btnAddSPA.setEnabled(!getUnusedSPA().isEmpty());
-
 
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.weightx =1.0;
-        gridBagConstraints.weighty =1.0;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
 
         for(String title : tempSPA.keySet()) {
             panSpecialAbilities.add(new SpecialAbilityPanel(tempSPA.get(title), this), gridBagConstraints);
