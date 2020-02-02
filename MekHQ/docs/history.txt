@@ -1,6 +1,7 @@
 VERSION HISTORY:
 ----------------
 v0.47.4-SNAPSHOT
++ PR #1440: Implement "Rugged" quirk (2x or 3x between maintenance rolls)
 
 v0.47.3 (2020-2-11 2200 UTC) 
 + Issue #1344: Ensure techs show the right skill for Protomechs
