@@ -7863,7 +7863,17 @@ public class Campaign implements Serializable, ITechManager {
             astechPoolMinutes -= astechsUsed * minutesUsed;
         }
         u.incrementDaysSinceMaintenance(maintained, astechsUsed);
-        if (u.getDaysSinceMaintenance() >= getCampaignOptions().getMaintenanceCycleDays()) {
+        
+        int ruggedMultiplier = 1;
+        if(u.getEntity().hasQuirk(OptionsConstants.QUIRK_POS_RUGGED_1)) {
+            ruggedMultiplier = 2;
+        }
+        
+        if(u.getEntity().hasQuirk(OptionsConstants.QUIRK_POS_RUGGED_2)) {
+            ruggedMultiplier = 3;
+        }
+        
+        if (u.getDaysSinceMaintenance() >= getCampaignOptions().getMaintenanceCycleDays() * ruggedMultiplier) {
             // maybe use the money
             if (campaignOptions.payForMaintain()) {
                 if (finances.debit(u.getMaintenanceCost(), Transaction.C_MAINTAIN, "Maintenance for " + u.getName(),
