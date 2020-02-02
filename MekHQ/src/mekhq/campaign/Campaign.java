@@ -2173,10 +2173,15 @@ public class Campaign implements Serializable, ITechManager {
                 getCampaignOptions().getMaxJumpsPlanetaryAcquisition(),
                 currentDate);
 
+        Set<Person> seen = new HashSet<>();
         while (!currentList.isEmpty()) {
             Person person = getLogisticsPerson();
             if (null == person && !getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
                 addReport("Your force has no one capable of acquiring equipment.");
+                break;
+            } else if (null != person && !seen.add(person)) {
+                // if we've already tried with this logistics person
+                // don't try again; they won't succeed.
                 break;
             }
 
@@ -2233,6 +2238,11 @@ public class Campaign implements Serializable, ITechManager {
                 if (done) {
                     break;
                 }
+            }
+
+            if (null == person) {
+                // If we have no logistics person make no attempt to loop
+                break;
             }
         }
 
