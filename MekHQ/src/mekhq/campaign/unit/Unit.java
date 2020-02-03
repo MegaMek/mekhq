@@ -1826,15 +1826,25 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         
         //Temp storage for used bay capacities
         double asfCap = 0.0;
+        boolean asfSet = false;
         double baCap = 0.0;
+        boolean baSet = false;
         int dockCap = 0;
+        boolean dockSet = false;
         double hVeeCap = 0.0;
+        boolean hVeeSet = false;
         double infCap = 0.0;
+        boolean infSet = false;
         double lVeeCap = 0.0;
+        boolean lVeeSet = false;
         double mechCap = 0.0;
+        boolean mechSet = false;
         double protoCap = 0.0;
+        boolean protoSet = false;
         double shVeeCap = 0.0;
+        boolean shVeeSet = false;
         double scCap = 0.0;
+        boolean scSet = false;
 
         // Okay, now load Part-specific fields!
         NodeList nl = wn.getChildNodes();
@@ -1904,33 +1914,43 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("asfCapacity")) {
                     asfCap = Double.parseDouble(wn2.getTextContent());
+                    asfSet = true;
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("baCapacity")) {
                     baCap = Double.parseDouble(wn2.getTextContent());
+                    baSet = true;
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("dockCapacity")) {
                     dockCap = Integer.parseInt(wn2.getTextContent());
+                    dockSet = true;
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("hVeeCapacity")) {
                    hVeeCap = Double.parseDouble(wn2.getTextContent());
+                   hVeeSet = true;
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("infCapacity")) {
                     infCap = Double.parseDouble(wn2.getTextContent());
+                    infSet = true;
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("lVeeCapacity")) {
                     lVeeCap = Double.parseDouble(wn2.getTextContent());
+                    lVeeSet = true;
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("mechCapacity")) {
                     mechCap = Double.parseDouble(wn2.getTextContent());
+                    mechSet = true;
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("protoCapacity")) {
                     protoCap = Double.parseDouble(wn2.getTextContent());
+                    protoSet = true;
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("scCapacity")) {
                     scCap = Double.parseDouble(wn2.getTextContent());
+                    scSet = true;
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("shVeeCapacity")) {
                     shVeeCap = Double.parseDouble(wn2.getTextContent());
+                    shVeeSet = true;
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("forceId")) {
                     retVal.forceId = Integer.parseInt(wn2.getTextContent());
@@ -1955,18 +1975,38 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 }
                 // Set up bay space values after we've loaded everything from the unit record
                 // Otherwise you can get some initialized values where they shouldn't be
-                if (retVal.entity != null && !retVal.getEntity().getTransportBays().isEmpty()) {
+                if (retVal.entity != null && retVal.getEntity().isLargeCraft()) {
                     retVal.initializeBaySpace();
-                    retVal.setASFCapacity(asfCap);
-                    retVal.setBattleArmorCapacity(baCap);
-                    retVal.setDocks(dockCap);
-                    retVal.setHeavyVehicleCapacity(hVeeCap);
-                    retVal.setInfantryCapacity(infCap);
-                    retVal.setLightVehicleCapacity(lVeeCap);
-                    retVal.setMechCapacity(mechCap);
-                    retVal.setProtoCapacity(protoCap);
-                    retVal.setSmallCraftCapacity(scCap);
-                    retVal.setSuperHeavyVehicleCapacity(shVeeCap);
+                    if (asfSet) {
+                        retVal.setASFCapacity(asfCap);
+                    }
+                    if (baSet) {
+                        retVal.setBattleArmorCapacity(baCap);
+                    }
+                    if (dockSet) {
+                        retVal.setDocks(dockCap);
+                    }
+                    if (hVeeSet) {
+                        retVal.setHeavyVehicleCapacity(hVeeCap);
+                    }
+                    if (infSet) {
+                        retVal.setInfantryCapacity(infCap);
+                    }
+                    if (lVeeSet) {
+                        retVal.setLightVehicleCapacity(lVeeCap);
+                    }
+                    if (mechSet) {
+                        retVal.setMechCapacity(mechCap);
+                    }
+                    if (protoSet) {
+                        retVal.setProtoCapacity(protoCap);
+                    }
+                    if (scSet) {
+                        retVal.setSmallCraftCapacity(scCap);
+                    }
+                    if (shVeeSet) {
+                        retVal.setSuperHeavyVehicleCapacity(shVeeCap);
+                    }
                 }
             }
         } catch (Exception ex) {
