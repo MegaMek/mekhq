@@ -754,12 +754,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         txtName.setName("txtName"); // NOI18N
         txtName.setPreferredSize(new java.awt.Dimension(500, 30));
         txtName.addActionListener(this::txtNameActionPerformed);
-        gridBagConstraints = createGridBagConstraints("anchor",1, 0, java.awt.GridBagConstraints.WEST);
+        gridBagConstraints = createGridBagConstraints("anchor", 1, 0, java.awt.GridBagConstraints.WEST);
         panGeneral.add(txtName, gridBagConstraints);
 
         lblName.setText(resourceMap.getString("lblName.text")); // NOI18N
         lblName.setName("lblName"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints = createGridBagConstraints("anchor", 0, 0, java.awt.GridBagConstraints.WEST);
         panGeneral.add(lblName, gridBagConstraints);
 
