@@ -929,6 +929,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 gridBagConstraints.fill = GridBagConstraints.NONE;
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 pnlFamily.add(lblMother2, gridBagConstraints);
+                firsty++;
             }
 
             if (person.hasSiblings()) {

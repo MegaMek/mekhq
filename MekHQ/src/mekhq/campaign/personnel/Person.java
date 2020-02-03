@@ -3923,8 +3923,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public boolean hasGrandchildren() {
         for (Ancestors a : campaign.getAncestors()) {
             if (getId().equals(a.getMotherId()) || getId().equals(a.getFatherId())) {
-                if (campaign.getPerson(a.getId()).hasChildren()) {
-                    return true;
+                for(Person p : campaign.getPersonnel()) {
+                    if (a.getId().equals(p.getAncestorsId())) {
+                        if (p.hasChildren()) {
+                            return true;
+                        }
+                    }
                 }
             }
         }
@@ -3960,7 +3964,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * @return true if the person has siblings, false otherwise
      */
     public boolean hasSiblings() {
-        return getSiblings() != null;
+        return !getSiblings().isEmpty();
     }
 
     /**
@@ -4152,12 +4156,15 @@ public class Person implements Serializable, MekHqXmlSerializable {
         List<UUID> parents = new ArrayList<>();
         List<Person> siblings = new ArrayList<>();
 
-        if (hasFather()) {
-            parents.add(getFather().getId());
-        }
-
-        if (hasMother()) {
-            parents.add(getMother().getId());
+        for (Ancestors a : campaign.getAncestors()) {
+            if ((a != null) && (getAncestorsId() != a.getId())) {
+                Person father = getFather();
+                Person mother = getMother();
+                if (((father != null) && father.getId().equals(a.getFatherId()))
+                        || ((mother != null) && mother.getId().equals(a.getMotherId()))) {
+                    parents.add(a.getId());
+                }
+            }
         }
 
         for (Person p : campaign.getPersonnel()) {
