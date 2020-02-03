@@ -164,6 +164,15 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public PersonAwardController awardController;
 
+    //region Family Variables
+    // Lineage
+    protected UUID ancestorsId;
+    protected UUID spouse;
+    protected UUID[] formerSpouses;
+
+    //region Procreation
+    protected GregorianCalendar dueDate;
+
     private static final IntSupplier PREGNANCY_DURATION = () -> {
         double gaussian = Math.sqrt(-2 * Math.log(Math.nextUp(Math.random())))
             * Math.cos(2.0 * Math.PI * Math.random());
@@ -171,13 +180,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
         gaussian = Math.max(-4.0, Math.min(4.0, gaussian));
         return (int) Math.round(gaussian * 10 + 38 * 7);
     };
+
     private static final IntSupplier PREGNANCY_SIZE = () -> {
         int children = 1;
         // Hellin's law says it's 1:89 chance, to not make it appear too seldom, we use 1:50
         while(Compute.randomInt(50) == 0) {
             ++ children;
         }
-        return Math.min(children, 8); // Limit to octuplets, for the sake of sanity
+        return Math.min(children, 10); // Limit to decuplets, for the sake of sanity
     };
 
     private static final String[] PREGNANCY_MULTIPLE_NAMES = {null, null,
@@ -185,10 +195,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
         "sextuplets", "septuplets", "octuplets", "nonuplets", "decuplets"
     };
 
-    public static final ExtraData.IntKey PREGNANCY_CHILDREN_DATA
-        = new ExtraData.IntKey("procreation:children");
-    public static final ExtraData.StringKey PREGNANCY_FATHER_DATA
-        = new ExtraData.StringKey("procreation:father");
+    public static final ExtraData.IntKey PREGNANCY_CHILDREN_DATA = new ExtraData.IntKey("procreation:children");
+    public static final ExtraData.StringKey PREGNANCY_FATHER_DATA = new ExtraData.StringKey("procreation:father");
+    //endregion Procreation
+    //endregion Family Variables
 
     /** Contains the skill levels to be displayed in a tech's description */
     private static final String[] DISPLAYED_SKILL_LEVELS = new String[] {
@@ -202,14 +212,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     protected UUID id;
     protected int oldId;
 
-    // Lineage & Procreation
-    protected UUID ancestorsId;
-    protected UUID spouse;
-    protected GregorianCalendar dueDate;
-
     private String name;
     private String maidenName;
-
     private String callsign;
     private int gender;
 
@@ -240,8 +244,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
     // Is this person willing to defect? Only for prisoners ...
     private boolean willingToDefect;
 
+    boolean child; //TODO: Implement this flag
     boolean dependent;
     boolean commander;
+
     boolean isClanTech;
     // Supports edge usage by a ship's engineer composite crewman
     int edgeUsedThisRound;
@@ -270,12 +276,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
     protected int idleMonths;
     protected int daysToWaitForHealing;
 
-    //portrait
+    //region portrait
     protected String portraitCategory;
     protected String portraitFile;
     // runtime override (not saved)
     protected transient String portraitCategoryOverride;
     protected transient String portraitFileOverride;
+    //endregion portrait
 
     // Our rank
     private int rank;
@@ -303,20 +310,17 @@ public class Person implements Serializable, MekHqXmlSerializable {
     protected int nTasks;
     protected boolean engineer;
 
-    /**
-     * * Start Advanced Medical ***
-     */
+    //region Advanced Medical
     private ArrayList<Injury> injuries = new ArrayList<>();
     private Map<BodyLocation, Integer> hitsPerLocation = new EnumMap<>(BodyLocation.class);
-    /**
-     * * End Advanced Medical ***
-     */
+    //endregion Advanced Medical
 
-    /* Against the Bot */
+    //region Against the Bot
     private boolean founder; // +1 share if using shares system
     private int originalUnitWeight; // uses EntityWeightClass; 0 (Extra-Light) for no original unit
     private int originalUnitTech; // 0 = IS1, 1 = IS2, 2 = Clan
     private UUID originalUnitId;
+    //endregion Against the Bot
 
     // Generic extra data, for use with plugins and mods
     private ExtraData extraData = new ExtraData();
@@ -1012,21 +1016,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     @Nullable
-    public UUID getSpouseID() {
+    public UUID getSpouseId() {
         return spouse;
     }
 
     public void setSpouseID(UUID spouse) {
         this.spouse = spouse;
-    }
-
-    @Nullable
-    public Person getSpouse() {
-        return campaign.getPerson(spouse);
-    }
-
-    public boolean hasSpouse(){
-        return (getSpouseID() != null);
     }
 
     public GregorianCalendar getDueDate() {
@@ -1053,28 +1048,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return campaign.getAncestors(ancestorsId);
     }
 
-    public Person getMother() {
-        Ancestors a = getAncestors();
-
-        if (a != null) {
-            return campaign.getPerson(a.getMotherId());
-        }
-        return null;
-    }
-
-    public Person getFather() {
-        Ancestors a = getAncestors();
-
-        if (a != null) {
-            return campaign.getPerson(a.getFatherId());
-        }
-        return null;
-    }
-
     public Collection<Person> birth() {
         int size = extraData.get(PREGNANCY_CHILDREN_DATA, 1);
         String fatherIdString = extraData.get(PREGNANCY_FATHER_DATA);
-        UUID fatherId = (null != fatherIdString) ? UUID.fromString(fatherIdString) : getSpouseID();
+        UUID fatherId = (null != fatherIdString) ? UUID.fromString(fatherIdString) : getSpouseId();
         Ancestors anc = campaign.getAncestors(fatherId, id);
         if(null == anc) {
             anc = campaign.createAncestors(fatherId, id);
@@ -1131,7 +1108,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     int size = PREGNANCY_SIZE.getAsInt();
                     extraData.set(PREGNANCY_CHILDREN_DATA, size);
                     extraData.set(PREGNANCY_FATHER_DATA,
-                        (hasSpouse()) ? getSpouseID().toString() : null);
+                        (hasSpouse()) ? getSpouseId().toString() : null);
 
                     String sizeString = (size < PREGNANCY_MULTIPLE_NAMES.length) ? PREGNANCY_MULTIPLE_NAMES[size] : null;
                     if(null == sizeString) {
@@ -1154,7 +1131,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         int size = PREGNANCY_SIZE.getAsInt();
         extraData.set(PREGNANCY_CHILDREN_DATA, size);
         extraData.set(PREGNANCY_FATHER_DATA,
-            (hasSpouse()) ? getSpouseID().toString() : null);
+            (hasSpouse()) ? getSpouseId().toString() : null);
 
         String sizeString = (size < PREGNANCY_MULTIPLE_NAMES.length) ? PREGNANCY_MULTIPLE_NAMES[size] : null;
         if(null == sizeString) {
@@ -3587,6 +3564,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         InjuryUtil.resolveCombatDamage(campaign, this, hits);
         setHits(0);
     }
+
     public void changeStatus(int status) {
         if (status == getStatus()) {
             return;
@@ -3898,55 +3876,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         engineer = b;
     }
 
-
-    /**
-     * getChildList creates a list of all children from the current person
-     * @return a list of Person objects for all children of the current person
-     */
-    public List<Person> getChildList() {
-        List<UUID> ancestors = new ArrayList<>();
-        for (Ancestors a : campaign.getAncestors()) {
-            if ((null != a)
-                && (getId().equals(a.getMotherId()) || getId().equals(a.getFatherId()))) {
-                ancestors.add(a.getId());
-            }
-        }
-
-        List<Person> children = new ArrayList<>();
-        for (Person p : campaign.getPersonnel()) {
-            if (ancestors.contains(p.getAncestorsId())) {
-                children.add(p);
-            }
-        }
-
-        return children;
-    }
-
-    /**
-     * getSiblingsList creates a list of all the siblings from the current person
-     * @return a list of Person objects for all the siblings of the current person
-     */
-    public List<Person> getSiblingsList() {
-        List<UUID> parents = new ArrayList<>();
-        List<Person> siblings = new ArrayList<>();
-
-        if (hasFather()) {
-            parents.add(getFather().getId());
-        }
-
-        if (hasMother()) {
-            parents.add(getMother().getId());
-        }
-
-        for (Person p : campaign.getPersonnel()) {
-            if (parents.contains(p.getAncestorsId()) && !(p.getId().equals(getId()))) {
-                siblings.add(p);
-            }
-        }
-
-        return siblings;
-    }
-
+    //region Family
+    //region hasFamily
     /**
      *
      * @return true if the person has either a spouse, any children, or specified parents.
@@ -3954,6 +3885,22 @@ public class Person implements Serializable, MekHqXmlSerializable {
      */
     public boolean hasAnyFamily() {
         return hasChildren() || hasSpouse() || hasParents();
+    }
+
+    /**
+     *
+     * @return true if the person has a spouse, false otherwise
+     */
+    public boolean hasSpouse() {
+        return (getSpouseId() != null);
+    }
+
+    /**
+     *
+     * @return true if the person has a former spouse, false otherwise
+     */
+    public boolean hasFormerSpouse() {
+        return formerSpouses != null;
     }
 
     /**
@@ -4010,21 +3957,45 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     /**
      *
+     * @return true if the person has siblings, false otherwise
+     */
+    public boolean hasSiblings() {
+        return getSiblings() != null;
+    }
+
+    /**
+     *
      * @return true if the Person has a grandparent, false otherwise
      */
     public boolean hasGrandparent() {
         if (hasFather()) {
-            if (getFather().hasParents()) {
+            if (hasFathersParents()) {
                 return true;
             }
         }
 
         if (hasMother()) {
-            if (getMother().hasParents()) {
+            if (hasMothersParents()) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     *
+     * @return true if the person's father has any parents, false otherwise
+     */
+    public boolean hasFathersParents() {
+        return getFather().hasParents();
+    }
+
+    /**
+     *
+     * @return true if the person's mother has any parents, false otherwise
+     */
+    public boolean hasMothersParents() {
+        return getMother().hasParents();
     }
 
     /**
@@ -4033,17 +4004,33 @@ public class Person implements Serializable, MekHqXmlSerializable {
      */
     public boolean hasAuntOrUncle() {
         if (hasFather()) {
-            if (getFather().hasSiblings()) {
+            if (hasFathersSiblings()) {
                 return true;
             }
         }
 
         if (hasMother()) {
-            if (getMother().hasSiblings()) {
+            if (hasMothersSiblings()) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     *
+     * @return true if the person's father has siblings, false otherwise
+     */
+    public boolean hasFathersSiblings() {
+        return getFather().hasSiblings();
+    }
+
+    /**
+     *
+     * @return true if the person's mother has siblings, false otherwise
+     */
+    public boolean hasMothersSiblings() {
+        return getMother().hasSiblings();
     }
 
     /**
@@ -4052,7 +4039,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
      */
     public boolean hasCousins() {
         if (hasFather() && getFather().hasSiblings()) {
-            for (Person sibling : getFather().getSiblingsList()) {
+            for (Person sibling : getFather().getSiblings()) {
                 if (sibling.hasChildren()) {
                     return true;
                 }
@@ -4060,7 +4047,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
 
         if (hasMother() && getMother().hasSiblings()) {
-            for (Person sibling : getMother().getSiblingsList()) {
+            for (Person sibling : getMother().getSiblings()) {
                 if (sibling.hasChildren()) {
                     return true;
                 }
@@ -4069,23 +4056,272 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
         return false;
     }
+    //endregion hasFamily
+
+    //region getFamily
 
     /**
      *
-     * @return true if the person has siblings, false otherwise
+     * @return the current person's spouse
      */
-    public boolean hasSiblings() {
-        return getSiblingsList() != null;
+    @Nullable
+    public Person getSpouse() {
+        return campaign.getPerson(spouse);
     }
 
-    /** Returns the ransom value of this individual
-    * Useful for prisoner who you want to ransom or hand off to your employer in an AtB context */
+    /**
+     *
+     * @return a list of Person objects for all the former spouses of the current person
+     */
+    @Nullable
+    public List<Person> getFormerSpouses() {
+        return campaign.getPeople(formerSpouses);
+    }
+
+    /**
+     * getChildren creates a list of all children from the current person
+     * @return a list of Person objects for all children of the current person
+     */
+    public List<Person> getChildren() {
+        List<UUID> ancestors = new ArrayList<>();
+        for (Ancestors a : campaign.getAncestors()) {
+            if ((a != null)
+                    && (getId().equals(a.getMotherId()) || getId().equals(a.getFatherId()))) {
+                ancestors.add(a.getId());
+            }
+        }
+
+        List<Person> children = new ArrayList<>();
+        for (Person p : campaign.getPersonnel()) {
+            if (ancestors.contains(p.getAncestorsId())) {
+                children.add(p);
+            }
+        }
+
+        return children;
+    }
+
+    public List<Person> getGrandchildren() {
+        List<Person> grandchildren = new ArrayList<>();
+        List<Person> tempChildList;
+        for (Ancestors a : campaign.getAncestors()) {
+            if (getId().equals(a.getMotherId()) || getId().equals(a.getFatherId())) {
+                if (campaign.getPerson(a.getId()).hasChildren()) {
+                    tempChildList = campaign.getPerson(a.getId()).getChildren();
+                    //prevents duplicates, if anyone uses a small number of depth for their ancestry
+                    tempChildList.removeAll(grandchildren);
+                    grandchildren.addAll(tempChildList);
+                }
+            }
+        }
+
+        return grandchildren;
+    }
+
+    /**
+     *
+     * @return the current person's father
+     */
+    public Person getFather() {
+        Ancestors a = getAncestors();
+
+        if (a != null) {
+            return campaign.getPerson(a.getFatherId());
+        }
+        return null;
+    }
+
+    /**
+     *
+     * @return the current person's mother
+     */
+    public Person getMother() {
+        Ancestors a = getAncestors();
+
+        if (a != null) {
+            return campaign.getPerson(a.getMotherId());
+        }
+        return null;
+    }
+
+    /**
+     * getSiblings creates a list of all the siblings from the current person
+     * @return a list of Person objects for all the siblings of the current person
+     */
+    public List<Person> getSiblings() {
+        List<UUID> parents = new ArrayList<>();
+        List<Person> siblings = new ArrayList<>();
+
+        if (hasFather()) {
+            parents.add(getFather().getId());
+        }
+
+        if (hasMother()) {
+            parents.add(getMother().getId());
+        }
+
+        for (Person p : campaign.getPersonnel()) {
+            if (parents.contains(p.getAncestorsId()) && !(p.getId().equals(getId()))) {
+                siblings.add(p);
+            }
+        }
+
+        return siblings;
+    }
+
+    /**
+     *
+     * @return a list of the person's siblings with spouses (if any
+     */
+    public List<Person> getSiblingsAndSpouses(){
+        List<UUID> parents = new ArrayList<>();
+        List<Person> siblingsAndSpouses = new ArrayList<>();
+
+        if (hasFather()) {
+            parents.add(getFather().getId());
+        }
+
+        if (hasMother()) {
+            parents.add(getMother().getId());
+        }
+
+        for (Person p : campaign.getPersonnel()) {
+            if (parents.contains(p.getAncestorsId()) && !(p.getId().equals(getId()))) {
+                siblingsAndSpouses.add(p);
+                if (p.hasSpouse()) {
+                    siblingsAndSpouses.add(campaign.getPerson(p.getSpouseId()));
+                }
+            }
+        }
+
+        return siblingsAndSpouses;
+    }
+
+    /**
+     *
+     * @return a list of the person's grandparents
+     */
+    public List<Person> getGrandparents() {
+        List<Person> grandparents = new ArrayList<>();
+        if (hasFather()) {
+            grandparents.addAll(getFathersParents());
+        }
+
+        if (hasMother()) {
+            List<Person> mothersParents = getMothersParents();
+            //prevents duplicates, if anyone uses a small number of depth for their ancestry
+            mothersParents.removeAll(grandparents);
+            grandparents.addAll(mothersParents);
+        }
+        return grandparents;
+    }
+
+    /**
+     *
+     * @return a list of the person's father's parents
+     */
+    public List<Person> getFathersParents() {
+        List<Person> fathersParents = new ArrayList<>();
+        if (getFather().hasFather()) {
+            fathersParents.add(getFather().getFather());
+        }
+        if (getFather().hasMother()) {
+            fathersParents.add(getFather().getMother());
+        }
+
+        return fathersParents;
+    }
+
+    /**
+     *
+     * @return a list of the person's mother's parents
+     */
+    public List<Person> getMothersParents() {
+        List<Person> mothersParents = new ArrayList<>();
+        if (getMother().hasFather()) {
+            mothersParents.add(getMother().getFather());
+        }
+        if (getMother().hasMother()) {
+            mothersParents.add(getMother().getMother());
+        }
+
+        return mothersParents;
+    }
+
+    /**
+     *
+     * @return a list of the person's Aunts and Uncles
+     */
+    public List<Person> getsAuntsAndUncles() {
+        List<Person> auntsAndUncles = new ArrayList<>();
+        if (hasFather()) {
+            auntsAndUncles.addAll(getFathersSiblings());
+        }
+
+        if (hasMother()) {
+            List<Person> mothersSiblings = getMothersSiblings();
+            //prevents duplicates, if anyone uses a small number of depth for their ancestry
+            mothersSiblings.removeAll(auntsAndUncles);
+            auntsAndUncles.addAll(mothersSiblings);
+        }
+
+        return auntsAndUncles;
+    }
+
+    /**
+     *
+     * @return a list of the person's father's siblings and their current spouses
+     */
+    public List<Person> getFathersSiblings() {
+        return getFather().getSiblingsAndSpouses();
+    }
+
+    /**
+     *
+     * @return a list of the person's mothers's siblings and their current spouses
+     */
+    public List<Person> getMothersSiblings() {
+        return getMother().getSiblingsAndSpouses();
+    }
+
+    /**
+     *
+     * @return a list of the person'c cousins
+     */
+    public List<Person> getCousins() {
+        List<Person> cousins = new ArrayList<>();
+        List<Person> tempCousins;
+        if (hasFather() && getFather().hasSiblings()) {
+            for (Person sibling : getFather().getSiblings()) {
+                tempCousins = sibling.getChildren();
+                tempCousins.removeAll(cousins);
+                cousins.addAll(tempCousins);
+            }
+        }
+
+        if (hasMother() && getMother().hasSiblings()) {
+            for (Person sibling : getMother().getSiblings()) {
+                tempCousins = sibling.getChildren();
+                tempCousins.removeAll(cousins);
+                cousins.addAll(tempCousins);
+            }
+        }
+
+        return cousins;
+    }
+    //endregion getFamily
+    //endregion Family
+
+    /**
+     *
+     * @return the ransom value of this individual
+     * Useful for prisoner who you want to ransom or hand off to your employer in an AtB context
+     */
     public Money getRansomValue() {
         // MechWarriors and aero pilots are worth more than the other types of scrubs
-        if(primaryRole == T_MECHWARRIOR || primaryRole == T_AERO_PILOT) {
+        if ((primaryRole == T_MECHWARRIOR) || (primaryRole == T_AERO_PILOT)) {
             return MECHWARRIOR_AERO_RANSOM_VALUES.get(getExperienceLevel(false));
-        }
-        else {
+        } else {
             return OTHER_RANSOM_VALUES.get(getExperienceLevel(false));
         }
     }

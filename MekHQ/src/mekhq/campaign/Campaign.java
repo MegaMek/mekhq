@@ -1418,6 +1418,17 @@ public class Campaign implements Serializable, ITechManager {
         return service;
     }
 
+    public List<Person> getPeople(UUID[] ids) {
+        List<Person> people = new ArrayList<>();
+
+        if (ids != null) {
+            for (UUID id : ids) {
+                people.add(getPerson(id));
+            }
+        }
+        return people;
+    }
+
     public Person getPerson(UUID id) {
         if (id == null) {
             return null;
@@ -3825,7 +3836,7 @@ public class Campaign implements Serializable, ITechManager {
         // Cleans non-existing spouses
         for(Person p : personnel.values()){
             if(p.hasSpouse()){
-                if(!personnel.containsKey(p.getSpouseID())){
+                if(!personnel.containsKey(p.getSpouseId())){
                     p.setSpouseID(null);
                 }
             }
@@ -7906,16 +7917,16 @@ public class Campaign implements Serializable, ITechManager {
             astechPoolMinutes -= astechsUsed * minutesUsed;
         }
         u.incrementDaysSinceMaintenance(maintained, astechsUsed);
-        
+
         int ruggedMultiplier = 1;
         if(u.getEntity().hasQuirk(OptionsConstants.QUIRK_POS_RUGGED_1)) {
             ruggedMultiplier = 2;
         }
-        
+
         if(u.getEntity().hasQuirk(OptionsConstants.QUIRK_POS_RUGGED_2)) {
             ruggedMultiplier = 3;
         }
-        
+
         if (u.getDaysSinceMaintenance() >= getCampaignOptions().getMaintenanceCycleDays() * ruggedMultiplier) {
             // maybe use the money
             if (campaignOptions.payForMaintain()) {

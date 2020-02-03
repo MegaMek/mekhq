@@ -709,7 +709,6 @@ public class PersonViewPanel extends ScrollablePanel {
     }
 
     private JPanel fillFamily() {
-        // TODO : Add Grandchildren and Grandparents to the display
         JPanel pnlFamily = new JPanel(new GridBagLayout());
         pnlFamily.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlFamily.title")));
         pnlFamily.setBackground(Color.WHITE);
@@ -717,6 +716,8 @@ public class PersonViewPanel extends ScrollablePanel {
         //family panel
         JLabel lblSpouse1 = new JLabel();
         JLabel lblSpouse2 = new JLabel();
+        JLabel lblFormerSpouses1 = new JLabel();
+        JLabel lblFormerSpouses2;
         JLabel lblChildren1 = new JLabel();
         JLabel lblChildren2;
         JLabel lblGrandchildren1 = new JLabel();
@@ -725,10 +726,14 @@ public class PersonViewPanel extends ScrollablePanel {
         JLabel lblFather2 = new JLabel();
         JLabel lblMother1 = new JLabel();
         JLabel lblMother2 = new JLabel();
-        JLabel lblGrandfather1 = new JLabel();
-        JLabel lblGrandfather2;
-        JLabel lblGrandmother1 = new JLabel();
-        JLabel lblGrandmother2;
+        JLabel lblSiblings1 = new JLabel();
+        JLabel lblSiblings2;
+        JLabel lblGrandparents1 = new JLabel();
+        JLabel lblGrandparents2;
+        JLabel lblAuntsOrUncles1 = new JLabel();
+        JLabel lblAuntsOrUncles2;
+        JLabel lblCousins1 = new JLabel();
+        JLabel lblCousins2;
 
         GridBagConstraints gridBagConstraints;
 
@@ -750,7 +755,7 @@ public class PersonViewPanel extends ScrollablePanel {
             lblSpouse2.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    gui.getPersonnelTab().focusOnPerson(person.getSpouseID());
+                    gui.getPersonnelTab().focusOnPerson(person.getSpouseId());
                 }
             });
             gridBagConstraints = new GridBagConstraints();
@@ -762,6 +767,40 @@ public class PersonViewPanel extends ScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlFamily.add(lblSpouse2, gridBagConstraints);
             firsty++;
+        }
+
+        if (person.hasFormerSpouse()) {
+            lblFormerSpouses1.setName("lblFormerSpouses1"); // NOI18N //$NON-NLS-1$
+            lblFormerSpouses1.setText(resourceMap.getString("lblFormerSpouses1.text")); //$NON-NLS-1$
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlFamily.add(lblFormerSpouses1, gridBagConstraints);
+
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+
+            for (Person ex : person.getFormerSpouses()) {
+                gridBagConstraints.gridy = firsty;
+                lblFormerSpouses2 = new JLabel();
+                lblFormerSpouses2.setName("lblFormerSpouses2"); // NOI18N //$NON-NLS-1$
+                lblFormerSpouses2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                lblFormerSpouses2.setText(String.format("<html><a href='#'>%s</a></html>", ex.getFullName()));
+                lblFormerSpouses2.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        gui.getPersonnelTab().focusOnPerson(ex.getId());
+                    }
+                });
+                pnlFamily.add(lblFormerSpouses2, gridBagConstraints);
+                firsty++;
+            }
         }
 
         if (campaign.getCampaignOptions().useParentage()) {
@@ -782,7 +821,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 gridBagConstraints.fill = GridBagConstraints.NONE;
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 
-                for (Person child : person.getChildList()) {
+                for (Person child : person.getChildren()) {
                     gridBagConstraints.gridy = firsty;
                     lblChildren2 = new JLabel();
                     lblChildren2.setName("lblChildren2"); // NOI18N //$NON-NLS-1$
@@ -795,6 +834,40 @@ public class PersonViewPanel extends ScrollablePanel {
                         }
                     });
                     pnlFamily.add(lblChildren2, gridBagConstraints);
+                    firsty++;
+                }
+            }
+
+            if (person.hasGrandchildren()) {
+                lblGrandchildren1.setName("lblGrandchildren1"); // NOI18N //$NON-NLS-1$
+                lblGrandchildren1.setText(resourceMap.getString("lblGrandchildren1.text")); //$NON-NLS-1$
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 0;
+                gridBagConstraints.gridy = firsty;
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlFamily.add(lblGrandchildren1, gridBagConstraints);
+
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 1;
+                gridBagConstraints.weightx = 1.0;
+                gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+
+                for (Person grandchild : person.getGrandchildren()) {
+                    gridBagConstraints.gridy = firsty;
+                    lblGrandchildren2 = new JLabel();
+                    lblGrandchildren2.setName("lblGrandchildren2"); // NOI18N //$NON-NLS-1$
+                    lblGrandchildren2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    lblGrandchildren2.setText(String.format("<html><a href='#'>%s</a></html>", grandchild.getFullName()));
+                    lblGrandchildren2.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            gui.getPersonnelTab().focusOnPerson(grandchild.getId());
+                        }
+                    });
+                    pnlFamily.add(lblGrandchildren2, gridBagConstraints);
                     firsty++;
                 }
             }
@@ -859,7 +932,139 @@ public class PersonViewPanel extends ScrollablePanel {
             }
 
             if (person.hasSiblings()) {
+                lblSiblings1.setName("lblSiblings1"); // NOI18N //$NON-NLS-1$
+                lblSiblings1.setText(resourceMap.getString("lblSiblings1.text")); //$NON-NLS-1$
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 0;
+                gridBagConstraints.gridy = firsty;
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlFamily.add(lblSiblings1, gridBagConstraints);
 
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 1;
+                gridBagConstraints.weightx = 1.0;
+                gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+
+                for (Person sibling : person.getSiblings()) {
+                    gridBagConstraints.gridy = firsty;
+                    lblSiblings2 = new JLabel();
+                    lblSiblings2.setName("lblSiblings2"); // NOI18N //$NON-NLS-1$
+                    lblSiblings2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    lblSiblings2.setText(String.format("<html><a href='#'>%s</a></html>", sibling.getFullName()));
+                    lblSiblings2.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            gui.getPersonnelTab().focusOnPerson(sibling.getId());
+                        }
+                    });
+                    pnlFamily.add(lblSiblings2, gridBagConstraints);
+                    firsty++;
+                }
+            }
+
+            if (person.hasGrandparent()) {
+                lblGrandparents1.setName("lblGrandparents1"); // NOI18N //$NON-NLS-1$
+                lblGrandparents1.setText(resourceMap.getString("lblGrandparents1.text")); //$NON-NLS-1$
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 0;
+                gridBagConstraints.gridy = firsty;
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlFamily.add(lblGrandparents1, gridBagConstraints);
+
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 1;
+                gridBagConstraints.weightx = 1.0;
+                gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+
+                for (Person grandparent : person.getGrandparents()) {
+                    gridBagConstraints.gridy = firsty;
+                    lblGrandparents2 = new JLabel();
+                    lblGrandparents2.setName("lblGrandparents2"); // NOI18N //$NON-NLS-1$
+                    lblGrandparents2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    lblGrandparents2.setText(String.format("<html><a href='#'>%s</a></html>", grandparent.getFullName()));
+                    lblGrandparents2.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            gui.getPersonnelTab().focusOnPerson(grandparent.getId());
+                        }
+                    });
+                    pnlFamily.add(lblGrandparents2, gridBagConstraints);
+                    firsty++;
+                }
+            }
+
+            if (person.hasAuntOrUncle()) {
+                lblAuntsOrUncles1.setName("lblAuntsOrUncles1"); // NOI18N //$NON-NLS-1$
+                lblAuntsOrUncles1.setText(resourceMap.getString("lblAuntsOrUncles1.text")); //$NON-NLS-1$
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 0;
+                gridBagConstraints.gridy = firsty;
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlFamily.add(lblAuntsOrUncles1, gridBagConstraints);
+
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 1;
+                gridBagConstraints.weightx = 1.0;
+                gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+
+                for (Person auntOrUncle : person.getsAuntsAndUncles()) {
+                    gridBagConstraints.gridy = firsty;
+                    lblAuntsOrUncles2 = new JLabel();
+                    lblAuntsOrUncles2.setName("lblAuntsOrUncles2"); // NOI18N //$NON-NLS-1$
+                    lblAuntsOrUncles2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    lblAuntsOrUncles2.setText(String.format("<html><a href='#'>%s</a></html>", auntOrUncle.getFullName()));
+                    lblAuntsOrUncles2.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            gui.getPersonnelTab().focusOnPerson(auntOrUncle.getId());
+                        }
+                    });
+                    pnlFamily.add(lblAuntsOrUncles2, gridBagConstraints);
+                    firsty++;
+                }
+            }
+
+            if (person.hasCousins()) {
+                lblCousins1.setName("lblCousins1"); // NOI18N //$NON-NLS-1$
+                lblCousins1.setText(resourceMap.getString("lblCousins1.text")); //$NON-NLS-1$
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 0;
+                gridBagConstraints.gridy = firsty;
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlFamily.add(lblCousins1, gridBagConstraints);
+
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 1;
+                gridBagConstraints.weightx = 1.0;
+                gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+
+                for (Person cousin : person.getCousins()) {
+                    gridBagConstraints.gridy = firsty;
+                    lblCousins2 = new JLabel();
+                    lblCousins2.setName("lblCousins2"); // NOI18N //$NON-NLS-1$
+                    lblCousins2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    lblCousins2.setText(String.format("<html><a href='#'>%s</a></html>", cousin.getFullName()));
+                    lblCousins2.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            gui.getPersonnelTab().focusOnPerson(cousin.getId());
+                        }
+                    });
+                    pnlFamily.add(lblCousins2, gridBagConstraints);
+                    firsty++;
+                }
             }
         }
 
