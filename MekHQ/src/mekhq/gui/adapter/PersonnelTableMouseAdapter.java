@@ -518,9 +518,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                                 + spouse.getMaidenName());
                     }
                 }
-                selectedPerson.getSpouse().setSpouseID(null);
+                selectedPerson.getSpouse().setSpouseId(null);
                 MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson.getSpouse()));
-                selectedPerson.setSpouseID(null);
+                selectedPerson.setSpouseId(null);
                 MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 break;
             }
@@ -619,9 +619,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         break;
                 }
 
-                spouse.setSpouseID(selectedPerson.getId());
+                spouse.setSpouseId(selectedPerson.getId());
                 PersonalLogger.marriage(spouse, selectedPerson, gui.getCampaign().getDate());
-                selectedPerson.setSpouseID(spouse.getId());
+                selectedPerson.setSpouseId(spouse.getId());
                 PersonalLogger.marriage(selectedPerson, spouse, gui.getCampaign().getDate());
                 MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 MekHQ.triggerEvent(new PersonChangedEvent(spouse));
@@ -846,7 +846,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     for (Person person : people) {
                         gui.getCampaign().removePerson(person.getId());
                         if(person.hasSpouse()){
-                            person.getSpouse().setSpouseID(null);
+                            person.getSpouse().setSpouseId(null);
                         }
                     }
                 }
@@ -1827,7 +1827,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             cbMenuItem.addActionListener(this);
             menu.add(cbMenuItem);
             if (oneSelected) {
-                if ((person.getAge(gui.getCampaign().getCalendar()) > 13) && (person.isFemale()) && !person.isPregnant()) {
+                if (!person.isChild() && (person.isFemale()) && !person.isPregnant()) {
                     menuItem = new JMenuItem(resourceMap.getString("addPregnancy.text")); //$NON-NLS-1$
                     menuItem.setActionCommand(CMD_ADD_PREGNANCY);
                     menuItem.addActionListener(this);
@@ -1845,7 +1845,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             if (oneSelected && person.isActive()) {
                 GregorianCalendar calendar = gui.getCampaign().getCalendar();
 
-                if ((person.getAge(calendar) > 13) && (!person.hasSpouse())) {
+                if (!person.isChild() && (!person.hasSpouse())) {
                     menu = new JMenu(resourceMap.getString("changeSpouse.text")); //$NON-NLS-1$
                     JMenuItem surnameMenu;
                     JMenu spouseMenu;

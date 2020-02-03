@@ -94,7 +94,7 @@ public class CampaignOptions implements Serializable {
     private boolean useFactionForNames;
     private boolean useUnitRating;
 
-    //personnel related
+    //region Personnel Tab
     private boolean useTactics;
     private boolean useInitBonus;
     private boolean useToughness;
@@ -103,28 +103,37 @@ public class CampaignOptions implements Serializable {
     private boolean useEdge;
     private boolean useSupportEdge;
     private boolean useImplants;
-	private boolean altQualityAveraging;
-    private int healWaitingPeriod;
-    private int naturalHealingWaitingPeriod;
-    private boolean useAdvancedMedical; // Unofficial
-    private boolean useDylansRandomXp; // Unofficial
-    private boolean useRandomHitsForVees;
-    private int minimumHitsForVees;
-    private boolean tougherHealing;
-    private int maxAcquisitions;
-    private boolean useUnofficialProcreation;
-    private boolean useUnofficialProcreationNoRelationship;
-    private boolean useParentage;
-    private boolean logConception;
-    private boolean useTransfers;
-    private boolean useTimeInService;
     private boolean capturePrisoners;
     private int defaultPrisonerStatus;
+	private boolean altQualityAveraging;
+    private boolean useAdvancedMedical; // Unofficial
+    private boolean useDylansRandomXp; // Unofficial
+    private int healWaitingPeriod;
+    private int naturalHealingWaitingPeriod;
+    private int minimumHitsForVees;
+    private boolean useRandomHitsForVees;
+    private boolean tougherHealing;
+    private boolean useTransfers;
+    private boolean useTimeInService;
     private boolean showOriginFaction;
     private boolean randomizeOrigin;
     private int originSearchRadius;
     private boolean isOriginExtraRandom;
     private double originDistanceScale;
+    //family
+    private boolean useUnofficialProcreation; // Unofficial
+    private boolean useUnofficialProcreationNoRelationship; // Unofficial
+    private int checkMutualAncestorsDepth;
+    private boolean useParentage;
+    private int displayFamilyLevel;
+    private boolean logConception;
+    //salary
+    private double salaryCommissionMultiplier;
+    private double salaryEnlistedMultiplier;
+    private double salaryAntiMekMultiplier;
+    private double[] salaryXpMultiplier;
+    private Money[] salaryTypeBase;
+    //endregion Personnel Tab
 
     //personnel market related
     private boolean personnelMarketReportRefresh;
@@ -172,6 +181,7 @@ public class CampaignOptions implements Serializable {
     private boolean usePercentageMaint; // Unofficial
     private boolean infantryDontCount; // Unofficial
     private double clanPriceModifier;
+    private int maxAcquisitions;
 
     //contract related
     private boolean equipmentContractBase;
@@ -242,13 +252,6 @@ public class CampaignOptions implements Serializable {
 
     //Dragoon's Rating
     private UnitRatingMethod unitRatingMethod;
-
-    //salary related
-    private Money[] salaryTypeBase;
-    private double[] salaryXpMultiplier;
-    private double salaryCommissionMultiplier;
-    private double salaryEnlistedMultiplier;
-    private double salaryAntiMekMultiplier;
 
     //phenotype related
     private int probPhenoMW;
@@ -332,23 +335,7 @@ public class CampaignOptions implements Serializable {
         assignedTechFirst = false;
 		resetToFirstTech = false;
         useUnitRating = true;
-        useTactics = false;
-        useInitBonus = false;
-        useToughness = false;
-        useArtillery = false;
-        useAbilities = false;
-        useEdge = false;
-        useSupportEdge = false;
-        useImplants = false;
-		altQualityAveraging = false;
-        useAdvancedMedical = false;
-        useDylansRandomXp = false;
         useQuirks = false;
-        showOriginFaction = true;
-        randomizeOrigin = false;
-        originSearchRadius = 45;
-        isOriginExtraRandom = false;
-        originDistanceScale = 0.6;
         payForParts = false;
         payForRepairs = false;
         payForUnits = false;
@@ -452,8 +439,6 @@ public class CampaignOptions implements Serializable {
         planetAcquisitionVerbose = false;
         noClanPartsFromIS = true;
         penaltyClanPartsFromIS = 4;
-        healWaitingPeriod = 1;
-        naturalHealingWaitingPeriod = 15;
         destroyByMargin = false;
         destroyMargin = 4;
         destroyPartTarget = 10;
@@ -464,25 +449,51 @@ public class CampaignOptions implements Serializable {
         useUnofficialMaintenance = false;
         reverseQualityNames = false;
         checkMaintenance = true;
-        useRandomHitsForVees = false;
-        minimumHitsForVees = 1;
         maxAcquisitions = 0;
-        useUnofficialProcreation = false;
-        useUnofficialProcreationNoRelationship = false;
-        useParentage = false;
-        logConception = false;
-        useTransfers = true;
-        useTimeInService = false;
+
+        //region Personnel Tab
+        useTactics = false;
+        useInitBonus = false;
+        useToughness = false;
+        useArtillery = false;
+        useAbilities = false;
+        useEdge = false;
+        useSupportEdge = false;
+        useImplants = false;
         capturePrisoners = true;
         defaultPrisonerStatus = PRISONER_RANK;
-        personnelMarketReportRefresh = true;
-        personnelMarketName = PersonnelMarket.getTypeName(PersonnelMarket.TYPE_STRAT_OPS);
-        personnelMarketRandomEliteRemoval = 10;
-        personnelMarketRandomVeteranRemoval = 8;
-        personnelMarketRandomRegularRemoval = 6;
-        personnelMarketRandomGreenRemoval = 4;
-        personnelMarketRandomUltraGreenRemoval = 4;
-        personnelMarketDylansWeight = 0.3;
+        altQualityAveraging = false;
+        useAdvancedMedical = false;
+        useDylansRandomXp = false;
+        healWaitingPeriod = 1;
+        naturalHealingWaitingPeriod = 15;
+        minimumHitsForVees = 1;
+        useRandomHitsForVees = false;
+        tougherHealing = false;
+        useTransfers = true;
+        useTimeInService = false;
+        showOriginFaction = true;
+        randomizeOrigin = false;
+        originSearchRadius = 45;
+        isOriginExtraRandom = false;
+        originDistanceScale = 0.6;
+        //Family
+        useUnofficialProcreation = false;
+        useUnofficialProcreationNoRelationship = false;
+        checkMutualAncestorsDepth = 4;
+        useParentage = false;
+        displayFamilyLevel = 0;
+        logConception = false;
+        //Salary
+        salaryAntiMekMultiplier = 1.5;
+        salaryEnlistedMultiplier = 1.0;
+        salaryCommissionMultiplier = 1.2;
+        salaryXpMultiplier = new double[5];
+        salaryXpMultiplier[SkillType.EXP_ULTRA_GREEN] = 0.6;
+        salaryXpMultiplier[SkillType.EXP_GREEN] = 0.6;
+        salaryXpMultiplier[SkillType.EXP_REGULAR] = 1.0;
+        salaryXpMultiplier[SkillType.EXP_VETERAN] = 1.6;
+        salaryXpMultiplier[SkillType.EXP_ELITE] = 3.2;
         salaryTypeBase = new Money[Person.T_NUM];
         salaryTypeBase[Person.T_NONE] = Money.of(0);
         salaryTypeBase[Person.T_MECHWARRIOR] = Money.of(1500);
@@ -512,20 +523,23 @@ public class CampaignOptions implements Serializable {
         salaryTypeBase[Person.T_PROTO_PILOT] = Money.of(960);
         salaryTypeBase[Person.T_LAM_PILOT] = Money.of(1500);
         salaryTypeBase[Person.T_VEHICLE_CREW] = Money.of(900);
-        salaryXpMultiplier = new double[5];
-        salaryXpMultiplier[SkillType.EXP_ULTRA_GREEN] = 0.6;
-        salaryXpMultiplier[SkillType.EXP_GREEN] = 0.6;
-        salaryXpMultiplier[SkillType.EXP_REGULAR] = 1.0;
-        salaryXpMultiplier[SkillType.EXP_VETERAN] = 1.6;
-        salaryXpMultiplier[SkillType.EXP_ELITE] = 3.2;
-        salaryAntiMekMultiplier = 1.5;
-        salaryCommissionMultiplier = 1.2;
-        salaryEnlistedMultiplier = 1.0;
+        //endregion Personnel Tab
+
+        //region Personnel Market Tab
+        personnelMarketName = PersonnelMarket.getTypeName(PersonnelMarket.TYPE_STRAT_OPS);
+        personnelMarketReportRefresh = true;
+        personnelMarketRandomEliteRemoval = 10;
+        personnelMarketRandomVeteranRemoval = 8;
+        personnelMarketRandomRegularRemoval = 6;
+        personnelMarketRandomGreenRemoval = 4;
+        personnelMarketRandomUltraGreenRemoval = 4;
+        personnelMarketDylansWeight = 0.3;
+        //endregion Personnel Market Tab
+
         probPhenoMW = 95;
         probPhenoAero = 95;
         probPhenoBA = 100;
         probPhenoVee = 0;
-        tougherHealing = false;
 
         useAtB = false;
     	useAero = false;
@@ -589,7 +603,356 @@ public class CampaignOptions implements Serializable {
         }
 
         historicalDailyLog = false;
-   }
+    }
+
+    //region Personnel Tab
+    public boolean useTactics() {
+        return useTactics;
+    }
+
+    public void setUseTactics(boolean b) {
+        this.useTactics = b;
+    }
+
+    public boolean useInitBonus() {
+        return useInitBonus;
+    }
+
+    public void setInitBonus(boolean b) {
+        this.useInitBonus = b;
+    }
+
+    public boolean useToughness() {
+        return useToughness;
+    }
+
+    public void setToughness(boolean b) {
+        this.useToughness = b;
+    }
+
+    public boolean useArtillery() {
+        return useArtillery;
+    }
+
+    public void setArtillery(boolean b) {
+        this.useArtillery = b;
+    }
+
+    public boolean useAbilities() {
+        return useAbilities;
+    }
+
+    public void setAbilities(boolean b) {
+        this.useAbilities = b;
+    }
+
+    public boolean useEdge() {
+        return useEdge;
+    }
+
+    public void setEdge(boolean b) {
+        this.useEdge = b;
+    }
+
+    public boolean useSupportEdge() {
+        return useSupportEdge;
+    }
+
+    public void setSupportEdge(boolean b) {
+        useSupportEdge = b;
+    }
+
+    public boolean useImplants() {
+        return useImplants;
+    }
+
+    public void setImplants(boolean b) {
+        this.useImplants = b;
+    }
+
+    public boolean capturePrisoners() {
+        return capturePrisoners;
+    }
+
+    public void setCapturePrisoners(boolean b) {
+        capturePrisoners = b;
+    }
+
+    public int getDefaultPrisonerStatus() {
+        return defaultPrisonerStatus;
+    }
+
+    public void setDefaultPrisonerStatus(int d) {
+        defaultPrisonerStatus = d;
+    }
+
+    public boolean useAltQualityAveraging() {
+        return altQualityAveraging;
+    }
+
+    public void setAltQualityAveraging(boolean altQualityAveraging) {
+        this.altQualityAveraging = altQualityAveraging;
+    }
+
+    public boolean useAdvancedMedical() {
+        return useAdvancedMedical;
+    }
+
+    public void setAdvancedMedical(boolean b) {
+        this.useAdvancedMedical = b;
+    }
+
+    public boolean useDylansRandomXp() {
+        return useDylansRandomXp;
+    }
+
+    public void setDylansRandomXp(boolean b) {
+        this.useDylansRandomXp = b;
+    }
+
+    public int getHealingWaitingPeriod() {
+        return healWaitingPeriod;
+    }
+
+    public void setHealingWaitingPeriod(int d) {
+        healWaitingPeriod = d;
+    }
+
+    public int getNaturalHealingWaitingPeriod() {
+        return naturalHealingWaitingPeriod;
+    }
+
+    public void setNaturalHealingWaitingPeriod(int d) {
+        naturalHealingWaitingPeriod = d;
+    }
+
+    public int getMinimumHitsForVees() {
+        return minimumHitsForVees;
+    }
+
+    public void setMinimumHitsForVees(int d) {
+        minimumHitsForVees = d;
+    }
+
+    public boolean useRandomHitsForVees() {
+        return useRandomHitsForVees;
+    }
+
+    public void setUseRandomHitsForVees(boolean b) {
+        useRandomHitsForVees = b;
+    }
+
+    public boolean useTougherHealing() {
+        return tougherHealing;
+    }
+
+    public void setTougherHealing(boolean b) {
+        tougherHealing = b;
+    }
+
+    public boolean useUnofficialProcreation() {
+        return useUnofficialProcreation;
+    }
+
+    public void setUseUnofficialProcreation(boolean b) {
+        useUnofficialProcreation = b;
+    }
+
+    public boolean useUnofficialProcreationNoRelationship() {
+        return useUnofficialProcreationNoRelationship;
+    }
+
+    public void setUseUnofficialProcreationNoRelationship(boolean b) {
+        useUnofficialProcreationNoRelationship = b;
+    }
+
+    public int checkMutualAncestorsDepth() {
+        return checkMutualAncestorsDepth;
+    }
+
+    public void setCheckMutualAncestorsDepth(int b) {
+        checkMutualAncestorsDepth = b;
+    }
+
+    public boolean useParentage() {
+        return useParentage;
+    }
+
+    public void setUseParentage(boolean b) {
+        useParentage = b;
+    }
+
+    public int displayFamilyLevel() {
+        return displayFamilyLevel;
+    }
+
+    public void setDisplayFamilyLevel(int b) {
+        displayFamilyLevel = b;
+    }
+
+    public boolean logConception() {
+        return logConception;
+    }
+
+    public void setLogConception(boolean b) {
+        logConception = b;
+    }
+
+    public boolean useTransfers() {
+        return useTransfers;
+    }
+
+    public void setUseTransfers(boolean b) {
+        useTransfers = b;
+    }
+
+    public boolean getUseTimeInService() {
+        return useTimeInService;
+    }
+
+    public void setUseTimeInService(boolean b) {
+        useTimeInService = b;
+    }
+
+    /**
+     * Gets a value indicating whether or not to show a person's
+     * origin faction when displaying their details.
+     */
+    public boolean showOriginFaction() {
+        return showOriginFaction;
+    }
+
+    /**
+     * Sets a value indicating whether or not to show a person's
+     * origin faction when displaying their details.
+     */
+    public void setShowOriginFaction(boolean b) {
+        showOriginFaction = b;
+    }
+
+    /**
+     * Gets a value indicating whether or not to randomize the
+     * origin of personnel.
+     */
+    public boolean randomizeOrigin() {
+        return randomizeOrigin;
+    }
+
+    /**
+     * Sets a value indicating whether or not to randomize
+     * the origin of personnel.
+     */
+    public void setRandomizeOrigin(boolean b) {
+        randomizeOrigin = b;
+    }
+
+    /**
+     * Gets the search radius to use for randomizing
+     * personnel origins.
+     */
+    public int getOriginSearchRadius() {
+        return originSearchRadius;
+    }
+
+    /**
+     * Sets the search radius to use for randomizing
+     * personnel origins.
+     * @param r The search radius.
+     */
+    public void setOriginSearchRadius(int r) {
+        originSearchRadius = r;
+    }
+
+    /**
+     * Gets a value indicating whether or not to randomize
+     * origin to the planetary level, rather than just the
+     * system level.
+     */
+    public boolean isOriginExtraRandom() {
+        return isOriginExtraRandom;
+    }
+
+    /**
+     * Sets a value indicating whether or not to randomize
+     * origin to the planetary level, rather than just the
+     * system level.
+     */
+    public void setOriginExtraRandom(boolean b) {
+        isOriginExtraRandom = b;
+    }
+
+    /**
+     * Gets the distance scale factor to apply when weighting
+     * random origin planets.
+     */
+    public double getOriginDistanceScale() {
+        return originDistanceScale;
+    }
+
+    /**
+     * Sets the distance scale factor to apply when weighting
+     * random origin planets (should be between 0.1 and 2).
+     */
+    public void setOriginDistanceScale(double v) {
+        originDistanceScale = v;
+    }
+
+    //Family
+
+
+    //Salary
+    public double getSalaryCommissionMultiplier() {
+        return salaryCommissionMultiplier;
+    }
+
+    public void setSalaryCommissionMultiplier(double d) {
+        salaryCommissionMultiplier = d;
+    }
+
+    public double getSalaryEnlistedMultiplier() {
+        return salaryEnlistedMultiplier;
+    }
+
+    public void setSalaryEnlistedMultiplier(double d) {
+        salaryEnlistedMultiplier = d;
+    }
+
+    public double getSalaryAntiMekMultiplier() {
+        return salaryAntiMekMultiplier;
+    }
+
+    public void setSalaryAntiMekMultiplier(double d) {
+        salaryAntiMekMultiplier = d;
+    }
+
+    public double getSalaryXpMultiplier(int xp) {
+        if (xp < 0 || xp >= salaryXpMultiplier.length) {
+            return 1.0;
+        }
+        return salaryXpMultiplier[xp];
+    }
+
+    public void setSalaryXpMultiplier(double d, int xp) {
+        if (xp < 0 || xp >= salaryXpMultiplier.length) {
+            return;
+        }
+        this.salaryXpMultiplier[xp] = d;
+    }
+
+    public Money getBaseSalary(int type) {
+        if (type < 0 || type >= salaryTypeBase.length) {
+            return Money.zero();
+        }
+        return salaryTypeBase[type];
+    }
+
+    public void setBaseSalary(Money base, int type) {
+        if (type < 0 || type >= salaryTypeBase.length) {
+            return;
+        }
+        this.salaryTypeBase[type] = base;
+    }
+    //endregion Personnel Tab
 
     public UnitRatingMethod getUnitRatingMethod() {
         return unitRatingMethod;
@@ -726,94 +1089,6 @@ public class CampaignOptions implements Serializable {
 
     public void setFactionForNames(boolean b) {
         this.useFactionForNames = b;
-    }
-
-    public boolean useTactics() {
-        return useTactics;
-    }
-
-    public void setUseTactics(boolean b) {
-        this.useTactics = b;
-    }
-
-    public boolean useInitBonus() {
-        return useInitBonus;
-    }
-
-    public void setInitBonus(boolean b) {
-        this.useInitBonus = b;
-    }
-
-    public boolean useToughness() {
-        return useToughness;
-    }
-
-    public void setToughness(boolean b) {
-        this.useToughness = b;
-    }
-
-    public boolean useArtillery() {
-        return useArtillery;
-    }
-
-    public void setArtillery(boolean b) {
-        this.useArtillery = b;
-    }
-
-    public boolean useAbilities() {
-        return useAbilities;
-    }
-
-    public void setAbilities(boolean b) {
-        this.useAbilities = b;
-    }
-
-    public boolean useEdge() {
-        return useEdge;
-    }
-
-    public void setEdge(boolean b) {
-        this.useEdge = b;
-    }
-
-    public boolean useSupportEdge() {
-        return useSupportEdge;
-    }
-
-    public void setSupportEdge(boolean b) {
-        useSupportEdge = b;
-    }
-
-    public boolean useImplants() {
-        return useImplants;
-    }
-
-    public void setImplants(boolean b) {
-        this.useImplants = b;
-    }
-
-	public boolean useAltQualityAveraging() {
-		return altQualityAveraging;
-	}
-
-	public void setAltQualityAveraging(boolean altQualityAveraging) {
-		this.altQualityAveraging = altQualityAveraging;
-	}
-
-    public boolean useAdvancedMedical() {
-        return useAdvancedMedical;
-    }
-
-    public void setAdvancedMedical(boolean b) {
-        this.useAdvancedMedical = b;
-    }
-
-    public boolean useDylansRandomXp() {
-        return useDylansRandomXp;
-    }
-
-    public void setDylansRandomXp(boolean b) {
-        this.useDylansRandomXp = b;
     }
 
     // Personnel Market
@@ -1001,89 +1276,6 @@ public class CampaignOptions implements Serializable {
         this.useQuirks = b;
     }
 
-    /**
-     * Gets a value indicating whether or not to show a person's
-     * origin faction when displaying their details.
-     */
-    public boolean showOriginFaction() {
-        return showOriginFaction;
-    }
-
-    /**
-     * Sets a value indicating whether or not to show a person's
-     * origin faction when displaying their details.
-     */
-    public void setShowOriginFaction(boolean b) {
-        showOriginFaction = b;
-    }
-
-    /**
-     * Gets a value indicating whether or not to randomize the
-     * origin of personnel.
-     */
-    public boolean randomizeOrigin() {
-        return randomizeOrigin;
-    }
-
-    /**
-     * Sets a value indicating whether or not to randomize
-     * the origin of personnel.
-     */
-    public void setRandomizeOrigin(boolean b) {
-        randomizeOrigin = b;
-    }
-
-    /**
-     * Gets the search radius to use for randomizing
-     * personnel origins.
-     */
-    public int getOriginSearchRadius() {
-        return originSearchRadius;
-    }
-
-    /**
-     * Sets the search radius to use for randomizing
-     * personnel origins.
-     * @param r The search radius.
-     */
-    public void setOriginSearchRadius(int r) {
-        originSearchRadius = r;
-    }
-
-    /**
-     * Gets a value indicating whether or not to randomize
-     * origin to the planetary level, rather than just the
-     * system level.
-     */
-    public boolean isOriginExtraRandom() {
-        return isOriginExtraRandom;
-    }
-
-    /**
-     * Sets a value indicating whether or not to randomize
-     * origin to the planetary level, rather than just the
-     * system level.
-     */
-    public void setOriginExtraRandom(boolean b) {
-        isOriginExtraRandom = b;
-    }
-
-    /**
-     * Gets the distance scale factor to apply when weighting
-     * random origin planets.
-     */
-    public double getOriginDistanceScale() {
-        return originDistanceScale;
-    }
-
-    /**
-     * Sets the distance scale factor to apply when weighting
-     * random origin planets (should be between 0.1 and 2).
-     */
-    public void setOriginDistanceScale(double v) {
-        originDistanceScale = v;
-    }
-
     public int getScenarioXP() {
         return scenarioXP;
     }
@@ -1197,7 +1389,7 @@ public class CampaignOptions implements Serializable {
         variableTechLevel = b;
     }
 
-    public void setfactionIntroDate(boolean b) {
+    public void setFactionIntroDate(boolean b) {
         factionIntroDate = b;
     }
 
@@ -1268,7 +1460,6 @@ public class CampaignOptions implements Serializable {
     public void setProbPhenoVee(int p) {
         probPhenoVee = p;
     }
-
 
     public boolean usePortraitForType(int type) {
         if (type < 0 || type >= usePortraitForType.length) {
@@ -1606,22 +1797,6 @@ public class CampaignOptions implements Serializable {
         this.planetOutputAcquisitionBonus[type] = base;
     }
 
-    public int getHealingWaitingPeriod() {
-        return healWaitingPeriod;
-    }
-
-    public void setHealingWaitingPeriod(int d) {
-        healWaitingPeriod = d;
-    }
-
-    public int getNaturalHealingWaitingPeriod() {
-        return naturalHealingWaitingPeriod;
-    }
-
-    public void setNaturalHealingWaitingPeriod(int d) {
-        naturalHealingWaitingPeriod = d;
-    }
-
     public int getMaintenanceCycleDays() {
         return maintenanceCycleDays;
     }
@@ -1702,152 +1877,12 @@ public class CampaignOptions implements Serializable {
         useAeroSystemHits = b;
     }
 
-    public boolean useRandomHitsForVees() {
-        return useRandomHitsForVees;
-    }
-
-    public void setUseRandomHitsForVees(boolean b) {
-        useRandomHitsForVees = b;
-    }
-
     public int getMaxAcquisitions() {
         return maxAcquisitions;
     }
 
     public void setMaxAcquisitions(int d) {
         maxAcquisitions = d;
-    }
-
-    public boolean useUnofficialProcreation() {
-        return useUnofficialProcreation;
-    }
-
-    public void setUseUnofficialProcreation(boolean b) {
-    	useUnofficialProcreation = b;
-    }
-
-    public boolean useUnofficialProcreationNoRelationship() {
-        return useUnofficialProcreationNoRelationship;
-    }
-
-    public void setUseUnofficialProcreationNoRelationship(boolean b) {
-    	useUnofficialProcreationNoRelationship = b;
-    }
-
-    public boolean useParentage() {
-        return useParentage;
-    }
-
-    public void setUseParentage(boolean b) {
-        useParentage = b;
-    }
-
-    public boolean logConception() {
-        return logConception;
-    }
-
-    public void setLogConception(boolean b) {
-        logConception = b;
-    }
-
-    public boolean useTransfers() {
-    	return useTransfers;
-    }
-
-    public void setUseTransfers(boolean b) {
-    	useTransfers = b;
-    }
-
-    public boolean getUseTimeInService() {
-        return useTimeInService;
-    }
-
-    public void setUseTimeInService(boolean b) {
-        useTimeInService = b;
-    }
-
-    public boolean capturePrisoners() {
-    	return capturePrisoners;
-    }
-
-    public void setCapturePrisoners(boolean b) {
-    	capturePrisoners = b;
-    }
-
-    public int getDefaultPrisonerStatus() {
-        return defaultPrisonerStatus;
-    }
-
-    public void setDefaultPrisonerStatus(int d) {
-    	defaultPrisonerStatus = d;
-    }
-
-    public int getMinimumHitsForVees() {
-        return minimumHitsForVees;
-    }
-
-    public void setMinimumHitsForVees(int d) {
-        minimumHitsForVees = d;
-    }
-
-    public Money getBaseSalary(int type) {
-        if (type < 0 || type >= salaryTypeBase.length) {
-            return Money.zero();
-        }
-        return salaryTypeBase[type];
-    }
-
-    public void setBaseSalary(Money base, int type) {
-        if (type < 0 || type >= salaryTypeBase.length) {
-            return;
-        }
-        this.salaryTypeBase[type] = base;
-    }
-
-    public double getSalaryXpMultiplier(int xp) {
-        if (xp < 0 || xp >= salaryXpMultiplier.length) {
-            return 1.0;
-        }
-        return salaryXpMultiplier[xp];
-    }
-
-    public void setSalaryXpMultiplier(double d, int xp) {
-        if (xp < 0 || xp >= salaryXpMultiplier.length) {
-            return;
-        }
-        this.salaryXpMultiplier[xp] = d;
-    }
-
-    public double getSalaryEnlistedMultiplier() {
-        return salaryEnlistedMultiplier;
-    }
-
-    public void setSalaryEnlistedMultiplier(double d) {
-        salaryEnlistedMultiplier = d;
-    }
-
-    public double getSalaryCommissionMultiplier() {
-        return salaryCommissionMultiplier;
-    }
-
-    public void setSalaryCommissionMultiplier(double d) {
-        salaryCommissionMultiplier = d;
-    }
-
-    public double getSalaryAntiMekMultiplier() {
-        return salaryAntiMekMultiplier;
-    }
-
-    public void setSalaryAntiMekMultiplier(double d) {
-        salaryAntiMekMultiplier = d;
-    }
-
-    public boolean useTougherHealing() {
-        return tougherHealing;
-    }
-
-    public void setTougherHealing(boolean b) {
-        tougherHealing = b;
     }
 
 	public boolean getUseAtB() {
@@ -2447,7 +2482,9 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maxAcquisitions", maxAcquisitions);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnofficialProcreation", useUnofficialProcreation);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnofficialProcreationNoRelationship", useUnofficialProcreationNoRelationship);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "checkMutualAncestorsDepth", checkMutualAncestorsDepth);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useParentage", useParentage);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "displayFamilyLevel", displayFamilyLevel);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "logConception", logConception);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTransfers", useTransfers);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTimeInService", useTimeInService);
@@ -2877,8 +2914,12 @@ public class CampaignOptions implements Serializable {
             	retVal.useUnofficialProcreation = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreationNoRelationship")) {
             	retVal.useUnofficialProcreationNoRelationship = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("checkMutualAncestorsDepth")) {
+                retVal.checkMutualAncestorsDepth = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useParentage")) {
                 retVal.useParentage = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("displayFamilyLevel")) {
+                retVal.displayFamilyLevel = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("logConception")) {
                 retVal.logConception = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useTransfers")) {

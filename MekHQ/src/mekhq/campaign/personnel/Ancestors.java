@@ -100,8 +100,8 @@ public class Ancestors implements Serializable, MekHqXmlSerializable {
 
 	public boolean checkMutualAncestors(Ancestors anc, int depth) {
 		// We only go 4 generations back looking for a connection
-		// TODO: Make this a setting
-		if (depth > 4) {
+		// TODO: Make this a setting of base value 4
+		if (depth > campaign.getCampaignOptions().checkMutualAncestorsDepth()) {
 			return false;
 		}
 

@@ -1020,7 +1020,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return spouse;
     }
 
-    public void setSpouseID(UUID spouse) {
+    public void setSpouseId(UUID spouse) {
         this.spouse = spouse;
     }
 
@@ -1034,6 +1034,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public boolean isPregnant() {
         return dueDate != null;
+    }
+
+    public boolean isChild() {
+        // TODO : Ask if we want this to be a setting, with a required minimum value
+        return getAge(campaign.getCalendar()) > 13;
     }
 
     public UUID getAncestorsId() {
@@ -1089,19 +1094,19 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
         if (!isDeployed()) {
             // Age limitations...
-            if (getAge(campaign.getCalendar()) > 13 && getAge(campaign.getCalendar()) < 51) {
-                boolean concieved = false;
+            if (!isChild() && getAge(campaign.getCalendar()) < 51) {
+                boolean conceived = false;
                 if (!hasSpouse() && campaign.getCampaignOptions().useUnofficialProcreationNoRelationship()) {
                     // 0.005% chance that this procreation attempt will create a child
-                    concieved = (Compute.randomInt(100000) < 2);
+                    conceived = (Compute.randomInt(100000) < 2);
                 } else if (hasSpouse()) {
-                    if (getSpouse().isActive() && !getSpouse().isDeployed() && getSpouse().getAge(campaign.getCalendar()) > 13) {
+                    if (getSpouse().isActive() && !getSpouse().isDeployed() && !getSpouse().isChild()) {
                         // 0.05% chance that this procreation attempt will create a child
-                        concieved = (Compute.randomInt(10000) < 2);
+                        conceived = (Compute.randomInt(10000) < 2);
                     }
                 }
 
-                if(concieved) {
+                if(conceived) {
                     GregorianCalendar tCal = (GregorianCalendar) campaign.getCalendar().clone();
                     tCal.add(GregorianCalendar.DAY_OF_YEAR, PREGNANCY_DURATION.getAsInt());
                     setDueDate(tCal);
@@ -1158,7 +1163,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 || !campaign.getAncestors(getAncestorsId()).checkMutualAncestors(campaign.getAncestors(p.getAncestorsId())))
                 && !p.hasSpouse()
                 && getGender() != p.getGender()
-                && p.getAge(campaign.getCalendar()) > 13
+                && !p.isChild()
         );
     }
 

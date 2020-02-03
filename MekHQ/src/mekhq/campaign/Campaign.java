@@ -3837,7 +3837,7 @@ public class Campaign implements Serializable, ITechManager {
         for(Person p : personnel.values()){
             if(p.hasSpouse()){
                 if(!personnel.containsKey(p.getSpouseId())){
-                    p.setSpouseID(null);
+                    p.setSpouseId(null);
                 }
             }
         }
@@ -5933,7 +5933,7 @@ public class Campaign implements Serializable, ITechManager {
             if (person.hasSpouse()) {
                 Person spouse = person.getSpouse();
                 PersonalLogger.spouseKia(spouse, person, getDate());
-                spouse.setSpouseID(null);
+                spouse.setSpouseId(null);
             }
             // set the date of death
             person.setDateOfDeath((GregorianCalendar) calendar.clone());
