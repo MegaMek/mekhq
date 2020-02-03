@@ -324,7 +324,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //lets just go ahead and pass in the campaign - to hell with OOP
     private Campaign campaign;
 
-    // For upgrading personnel entries to missiong log entries
+    // For upgrading personnel entries to missing log entries
     private static String missionParticipatedString;
     private static String getMissionParticipatedString() {
         if (missionParticipatedString == null) {
@@ -1489,13 +1489,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (countOptions(PilotOptions.LVL3_ADVANTAGES) > 0) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                         + "<advantages>"
-                        + String.valueOf(getOptionList("::", PilotOptions.LVL3_ADVANTAGES))
+                        + getOptionList("::", PilotOptions.LVL3_ADVANTAGES)
                         + "</advantages>");
         }
         if (countOptions(PilotOptions.EDGE_ADVANTAGES) > 0) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                         + "<edge>"
-                        + String.valueOf(getOptionList("::", PilotOptions.EDGE_ADVANTAGES))
+                        + getOptionList("::", PilotOptions.EDGE_ADVANTAGES)
                         + "</edge>");
             // For support personnel, write an available edge value
             if (isSupport() || isEngineer()) {
@@ -3524,12 +3524,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public ArrayList<LogEntry> getPersonnelLog() {
-        Collections.sort(personnelLog, Comparator.comparing(LogEntry::getDate));
+        personnelLog.sort(Comparator.comparing(LogEntry::getDate));
         return personnelLog;
     }
 
     public List<LogEntry> getMissionLog() {
-        Collections.sort(missionLog, Comparator.comparing(LogEntry::getDate));
+        missionLog.sort(Comparator.comparing(LogEntry::getDate));
         return missionLog;
     }
 
@@ -3579,7 +3579,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     private int getHitsInLocation(BodyLocation loc) {
-        return ((null != loc) && hitsPerLocation.containsKey(loc)) ? hitsPerLocation.get(loc).intValue() : 0;
+        return ((null != loc) && hitsPerLocation.containsKey(loc)) ? hitsPerLocation.get(loc) : 0;
     }
 
     public void diagnose(int hits) {
