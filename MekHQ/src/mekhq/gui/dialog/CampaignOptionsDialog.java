@@ -738,7 +738,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         lblFaction.setText(resourceMap.getString("lblFaction.text")); // NOI18N
         lblFaction.setName("lblFaction"); // NOI18N
-        gridBagConstraints  = new java.awt.GridBagConstraints();
+        gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
@@ -757,7 +757,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         btnDate.setName("btnDate"); // NOI18N
         btnDate.setPreferredSize(new java.awt.Dimension(400, 30));
         btnDate.addActionListener(this::btnDateActionPerformed);
-        gridBagConstraints  = new java.awt.GridBagConstraints();
+        gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
@@ -776,7 +776,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         comboFaction.setName("comboFaction"); // NOI18N
         comboFaction.setPreferredSize(new java.awt.Dimension(400, 30));
         comboFaction.addActionListener(evt -> factionSelected());
-        gridBagConstraints  = new java.awt.GridBagConstraints();
+        gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
