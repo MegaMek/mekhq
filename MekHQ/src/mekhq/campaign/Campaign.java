@@ -83,6 +83,7 @@ import megamek.common.options.GameOptions;
 import megamek.common.options.IBasicOption;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
+import megamek.common.options.OptionsConstants;
 import megamek.common.util.BuildingBlock;
 import megamek.common.util.DirectoryItems;
 import mekhq.campaign.event.AcquisitionEvent;
@@ -2130,10 +2131,15 @@ public class Campaign implements Serializable, ITechManager {
         // Items not found get added to the remaining item list
         List<IAcquisitionWork> currentList = new ArrayList<>(sList.getAllShoppingItems());
 
+        Set<Person> seen = new HashSet<>();
         while (!currentList.isEmpty()) {
             Person person = getLogisticsPerson();
             if (null == person && !getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
                 addReport("Your force has no one capable of acquiring equipment.");
+                break;
+            } else if (null != person && !seen.add(person)) {
+                // if we've already tried with this logistics person
+                // don't try again; they won't succeed.
                 break;
             }
 
@@ -2154,6 +2160,11 @@ public class Campaign implements Serializable, ITechManager {
             }
 
             currentList = remainingItems;
+
+            if (null == person) {
+                // If we have no logistics person make no attempt to loop
+                break;
+            }
         }
 
         return new ShoppingList(currentList);
@@ -2173,10 +2184,15 @@ public class Campaign implements Serializable, ITechManager {
                 getCampaignOptions().getMaxJumpsPlanetaryAcquisition(),
                 currentDate);
 
+        Set<Person> seen = new HashSet<>();
         while (!currentList.isEmpty()) {
             Person person = getLogisticsPerson();
             if (null == person && !getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
                 addReport("Your force has no one capable of acquiring equipment.");
+                break;
+            } else if (null != person && !seen.add(person)) {
+                // if we've already tried with this logistics person
+                // don't try again; they won't succeed.
                 break;
             }
 
@@ -2233,6 +2249,11 @@ public class Campaign implements Serializable, ITechManager {
                 if (done) {
                     break;
                 }
+            }
+
+            if (null == person) {
+                // If we have no logistics person make no attempt to loop
+                break;
             }
         }
 
@@ -6301,13 +6322,14 @@ public class Campaign implements Serializable, ITechManager {
                     + existingPerson.getPortraitFileName());
         }
         // TODO: it would be nice to pull the portraits directory from MekHQ
-        // itself
+        // TODO: itself
         DirectoryItems portraits;
         try {
             portraits = new DirectoryItems(
                     new File("data/images/portraits"), "", //$NON-NLS-1$ //$NON-NLS-2$
                     PortraitFileFactory.getInstance());
         } catch (Exception e) {
+            MekHQ.getLogger().error(getClass(), "assignRandomPortraitFor", e);
             return;
         }
         ArrayList<String> possiblePortraits;
@@ -7884,7 +7906,17 @@ public class Campaign implements Serializable, ITechManager {
             astechPoolMinutes -= astechsUsed * minutesUsed;
         }
         u.incrementDaysSinceMaintenance(maintained, astechsUsed);
-        if (u.getDaysSinceMaintenance() >= getCampaignOptions().getMaintenanceCycleDays()) {
+        
+        int ruggedMultiplier = 1;
+        if(u.getEntity().hasQuirk(OptionsConstants.QUIRK_POS_RUGGED_1)) {
+            ruggedMultiplier = 2;
+        }
+        
+        if(u.getEntity().hasQuirk(OptionsConstants.QUIRK_POS_RUGGED_2)) {
+            ruggedMultiplier = 3;
+        }
+        
+        if (u.getDaysSinceMaintenance() >= getCampaignOptions().getMaintenanceCycleDays() * ruggedMultiplier) {
             // maybe use the money
             if (campaignOptions.payForMaintain()) {
                 if (finances.debit(u.getMaintenanceCost(), Transaction.C_MAINTAIN, "Maintenance for " + u.getName(),

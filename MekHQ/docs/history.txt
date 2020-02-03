@@ -1,6 +1,10 @@
 VERSION HISTORY:
 ----------------
-v0.47.3-SNAPSHOT
+v0.47.4-SNAPSHOT
++ PR #1440: Implement "Rugged" quirk (2x or 3x between maintenance rolls)
++ Issue #1447: Bug: Don't infinite loop in acquisition logic
+
+v0.47.3 (2020-2-11 2200 UTC) 
 + Issue #1344: Ensure techs show the right skill for Protomechs
 + PR #1348: Enable scenario modifiers to add objectives to scenarios generated from templates
 + Issue #1349: Problem with replacing Protomech limbs lost in combat
@@ -37,6 +41,9 @@ v0.47.3-SNAPSHOT
 + Issue #1427: Fix bug where GM Add'ing ammo with 0 shots did not add new ammo
 + PR #1430: Initialize bay space on Campaign load before setting Used Capacity
 + PR #1435: Improved fault tolerance for campaigns with large craft that have gone sour due to bad refits
++ PR #1437: Personnel View: Mother will no longer break if a person only has a father
++ Issue #1433: Enabling RandomizePortraits for personnel with pre-existing portraits
++ PR #1438: Adding Scrollbar to Personnel Settings under Campaign Options for small screens
 
 v0.47.2 (2019-11-15 2000 UTC) 
 + PR #1325: Customize protomechs and advanced aero in MekLab
