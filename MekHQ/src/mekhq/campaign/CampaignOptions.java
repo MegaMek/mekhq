@@ -68,9 +68,6 @@ public class CampaignOptions implements Serializable {
     public final static String S_TECH = "Tech";
     public final static String S_AUTO = "Automatic Success";
 
-    public final static int PRISONER_RANK = 0;
-    public final static int BONDSMAN_RANK = 1;
-
     public final static int REPAIR_SYSTEM_STRATOPS = 0;
     public final static int REPAIR_SYSTEM_WARCHEST_CUSTOM = 1;
     public final static int REPAIR_SYSTEM_GENERIC_PARTS = 2;
@@ -105,6 +102,8 @@ public class CampaignOptions implements Serializable {
     private boolean useImplants;
     private boolean capturePrisoners;
     private int defaultPrisonerStatus;
+    public final static int PRISONER_RANK = 0;
+    public final static int BONDSMAN_RANK = 1;
 	private boolean altQualityAveraging;
     private boolean useAdvancedMedical; // Unofficial
     private boolean useDylansRandomXp; // Unofficial
@@ -126,6 +125,9 @@ public class CampaignOptions implements Serializable {
     private int checkMutualAncestorsDepth;
     private boolean useParentage;
     private int displayFamilyLevel;
+    public final static int PARENTS_CHILDREN_SIBLINGS = 0;
+    public final static int GRANDPARENTS_GRANDCHILDREN = 1;
+    public final static int AUNTS_UNCLES_COUSINS = 2;
     private boolean logConception;
     //salary
     private double salaryCommissionMultiplier;

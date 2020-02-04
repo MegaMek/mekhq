@@ -1926,6 +1926,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         }
         //endregion Personnel Tab
 
+        //region Finances Tab
         panFinances.setName("panFinances"); // NOI18N
         panFinances.setLayout(new java.awt.GridBagLayout());
         gridy = 0;
@@ -2188,6 +2189,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panFinances.add(spnOrderRefund, gridBagConstraints);
 
         tabOptions.addTab(resourceMap.getString("panFinances.TabConstraints.tabTitle"), panFinances); // NOI18N
+        //endregion Finances Tab
 
         panMercenary.setName("panMercenary"); // NOI18N
         panMercenary.setLayout(new java.awt.GridBagLayout());
@@ -4573,6 +4575,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setEraMods(useEraModsCheckBox.isSelected());
         options.setAssignedTechFirst(assignedTechFirstCheckBox.isSelected());
 		options.setResetToFirstTech(resetToFirstTechCheckBox.isSelected());
+        options.setQuirks(useQuirksBox.isSelected());
+        campaign.getGameOptions().getOption("stratops_quirks").setValue(useQuirksBox.isSelected());
         options.setClanPriceModifier((Double) spnClanPriceModifier.getModel().getValue());
         for (int i = Part.QUALITY_A; i <= Part.QUALITY_F; i++) {
             options.setUsedPartsValue((Double) spnUsedPartsValue[i].getModel().getValue(), i);
@@ -4595,23 +4599,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setUseUnofficialMaintenance(useUnofficialMaintenance.isSelected());
         options.setMaintenanceBonus((Integer) spnMaintenanceBonus.getModel().getValue());
         options.setMaintenanceCycleDays((Integer) spnMaintenanceDays.getModel().getValue());
-        options.setInitBonus(useInitBonusBox.isSelected());
-        campaign.getGameOptions().getOption("individual_initiative").setValue(useInitBonusBox.isSelected());
-        options.setToughness(useToughnessBox.isSelected());
-        campaign.getGameOptions().getOption("toughness").setValue(useToughnessBox.isSelected());
-        options.setArtillery(useArtilleryBox.isSelected());
-        campaign.getGameOptions().getOption("artillery_skill").setValue(useArtilleryBox.isSelected());
-        options.setAbilities(useAbilitiesBox.isSelected());
-        campaign.getGameOptions().getOption("pilot_advantages").setValue(useAbilitiesBox.isSelected());
-        options.setEdge(useEdgeBox.isSelected());
-        campaign.getGameOptions().getOption("edge").setValue(useEdgeBox.isSelected());
-        options.setSupportEdge(useSupportEdgeBox.isSelected());
-        options.setImplants(useImplantsBox.isSelected());
-        options.setCapturePrisoners(chkCapturePrisoners.isSelected());
-        campaign.getGameOptions().getOption("manei_domini").setValue(useImplantsBox.isSelected());
-		options.setAltQualityAveraging(altQualityAveragingCheckBox.isSelected());
-        options.setAdvancedMedical(useAdvancedMedicalBox.isSelected());
-        options.setDylansRandomXp(useDylansRandomXpBox.isSelected());
         options.setPayForParts(payForPartsBox.isSelected());
         options.setPayForRepairs(payForRepairsBox.isSelected());
         options.setPayForUnits(payForUnitsBox.isSelected());
@@ -4638,17 +4625,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setEquipmentContractSaleValue(chkEquipContractSaleValue.isSelected());
         options.setBLCSaleValue(chkBLCSaleValue.isSelected());
 
-        options.setQuirks(useQuirksBox.isSelected());
-        campaign.getGameOptions().getOption("stratops_quirks").setValue(useQuirksBox.isSelected());
-
         options.setWaitingPeriod((Integer) spnAcquireWaitingPeriod.getModel().getValue());
         options.setAcquisitionSkill((String) choiceAcquireSkill.getSelectedItem());
         options.setAcquisitionSupportStaffOnly(chkSupportStaffOnly.isSelected());
         options.setClanAcquisitionPenalty((Integer) spnAcquireClanPenalty.getModel().getValue());
         options.setIsAcquisitionPenalty((Integer) spnAcquireIsPenalty.getModel().getValue());
         options.setMaxAcquisitions(Integer.parseInt(txtMaxAcquisitions.getText()));
-
-        options.setHistoricalDailyLog(chkHistoricalDailyLog.isSelected());
 
         options.setNDiceTransitTime((Integer) spnNDiceTransitTime.getModel().getValue());
         options.setConstantTransitTime((Integer) spnConstantTransitTime.getModel().getValue());
@@ -4702,25 +4684,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setTechLevel(choiceTechLevel.getSelectedIndex());
         campaign.getGameOptions().getOption("techlevel").setValue((String)choiceTechLevel.getSelectedItem());
 
-        //we need to reset healing time options through the campaign because we may need to
-        //loop through personnel to make adjustments
-        campaign.setHealingTimeOptions((Integer) spnHealWaitingPeriod.getModel().getValue(),
-                                       (Integer) spnNaturalHealWaitingPeriod.getModel().getValue());
-
-        options.setMinimumHitsForVees((Integer) spnMinimumHitsForVees.getModel().getValue());
-        options.setUseRandomHitsForVees(useRandomHitsForVees.isSelected());
-        options.setTougherHealing(useTougherHealing.isSelected());
-        options.setUseUnofficialProcreation(chkUseUnofficialProcreation.isSelected());
-        options.setUseUnofficialProcreationNoRelationship(chkUseUnofficialProcreationNoRelationship.isSelected());
-        options.setUseParentage(chkUseParentage.isSelected());
-        options.setLogConception(chkLogConception.isSelected());
-        options.setUseTransfers(chkUseTransfers.isSelected());
-        options.setUseTimeInService(chkUseTimeInService.isSelected());
-        options.setShowOriginFaction(chkShowOriginFaction.isSelected());
-        options.setRandomizeOrigin(chkRandomizeOrigin.isSelected());
-        options.setOriginSearchRadius((Integer)spnOriginSearchRadius.getModel().getValue());
-        options.setDefaultPrisonerStatus(comboPrisonerStatus.getSelectedIndex());
-
         rSkillPrefs.setOverallRecruitBonus((Integer) spnOverallRecruitBonus.getModel().getValue());
         for (int i = 0; i < Person.T_NUM; i++) {
             rSkillPrefs.setRecruitBonus(i, (Integer) spnTypeRecruitBonus[i].getModel().getValue());
@@ -4747,7 +4710,52 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setProbPhenoBA((Integer) spnProbPhenoBA.getModel().getValue());
         options.setProbPhenoVee((Integer) spnProbPhenoVee.getModel().getValue());
 
-        //start salary
+        //region Personnel Tab
+
+        options.setInitBonus(useInitBonusBox.isSelected());
+        campaign.getGameOptions().getOption("individual_initiative").setValue(useInitBonusBox.isSelected());
+        options.setToughness(useToughnessBox.isSelected());
+        campaign.getGameOptions().getOption("toughness").setValue(useToughnessBox.isSelected());
+        options.setArtillery(useArtilleryBox.isSelected());
+        campaign.getGameOptions().getOption("artillery_skill").setValue(useArtilleryBox.isSelected());
+        options.setAbilities(useAbilitiesBox.isSelected());
+        campaign.getGameOptions().getOption("pilot_advantages").setValue(useAbilitiesBox.isSelected());
+        options.setEdge(useEdgeBox.isSelected());
+        campaign.getGameOptions().getOption("edge").setValue(useEdgeBox.isSelected());
+        options.setSupportEdge(useSupportEdgeBox.isSelected());
+        options.setImplants(useImplantsBox.isSelected());
+        campaign.getGameOptions().getOption("manei_domini").setValue(useImplantsBox.isSelected());
+        options.setCapturePrisoners(chkCapturePrisoners.isSelected());
+        options.setDefaultPrisonerStatus(comboPrisonerStatus.getSelectedIndex());
+        options.setAltQualityAveraging(altQualityAveragingCheckBox.isSelected());
+        options.setAdvancedMedical(useAdvancedMedicalBox.isSelected());
+        options.setDylansRandomXp(useDylansRandomXpBox.isSelected());
+        //we need to reset healing time options through the campaign because we may need to
+        //loop through personnel to make adjustments
+        campaign.setHealingTimeOptions((Integer) spnHealWaitingPeriod.getModel().getValue(),
+                (Integer) spnNaturalHealWaitingPeriod.getModel().getValue());
+        options.setMinimumHitsForVees((Integer) spnMinimumHitsForVees.getModel().getValue());
+        options.setUseRandomHitsForVees(useRandomHitsForVees.isSelected());
+        options.setTougherHealing(useTougherHealing.isSelected());
+        options.setUseTransfers(chkUseTransfers.isSelected());
+        options.setUseTimeInService(chkUseTimeInService.isSelected());
+        options.setShowOriginFaction(chkShowOriginFaction.isSelected());
+        options.setRandomizeOrigin(chkRandomizeOrigin.isSelected());
+        options.setOriginSearchRadius((Integer)spnOriginSearchRadius.getModel().getValue());
+        //Family
+        options.setUseUnofficialProcreation(chkUseUnofficialProcreation.isSelected());
+        options.setUseUnofficialProcreationNoRelationship(chkUseUnofficialProcreationNoRelationship.isSelected());
+        options.setCheckMutualAncestorsDepth((Integer) spnCheckMutualAncestorsDepth.getModel().getValue());
+        options.setUseParentage(chkUseParentage.isSelected());
+        options.setDisplayFamilyLevel(comboDisplayFamilyLevel.getSelectedIndex());
+        options.setLogConception(chkLogConception.isSelected());
+        //Salary
+        options.setSalaryCommissionMultiplier((Double) spnSalaryCommission.getModel().getValue());
+        options.setSalaryEnlistedMultiplier((Double) spnSalaryEnlisted.getModel().getValue());
+        options.setSalaryAntiMekMultiplier((Double) spnSalaryAntiMek.getModel().getValue());
+        for (int i = 0; i < 5; i++) {
+            options.setSalaryXpMultiplier((Double) spnSalaryXp[i].getModel().getValue(), i);
+        }
         for (int i = 1; i < Person.T_NUM; i++) {
             try {
                 Money salary = txtSalaryBase[i].getMoney();
@@ -4756,13 +4764,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
             }
         }
-        for (int i = 0; i < 5; i++) {
-            options.setSalaryXpMultiplier((Double) spnSalaryXp[i].getModel().getValue(), i);
-        }
-        options.setSalaryCommissionMultiplier((Double) spnSalaryCommission.getModel().getValue());
-        options.setSalaryEnlistedMultiplier((Double) spnSalaryEnlisted.getModel().getValue());
-        options.setSalaryAntiMekMultiplier((Double) spnSalaryAntiMek.getModel().getValue());
-        //end salary
+        //endregion Personnel Tab
 
         //start SPA
         SpecialAbility.replaceSpecialAbilities(tempSPA);
@@ -4840,6 +4842,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setContractMarketReportRefresh(chkUnitMarketReportRefresh.isSelected());
 
         // End Against the Bot
+
+        //region Miscellaneous Tab
+        options.setHistoricalDailyLog(chkHistoricalDailyLog.isSelected());
+        //endregion Miscellaneous Tab
+
         MekHQ.triggerEvent(new OptionsChangedEvent(campaign, options));
     }
 

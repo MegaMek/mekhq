@@ -1038,7 +1038,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public boolean isChild() {
         // TODO : Ask if we want this to be a setting, with a required minimum value
-        return getAge(campaign.getCalendar()) > 13;
+        return getAge(campaign.getCalendar()) <= 13;
     }
 
     public UUID getAncestorsId() {
