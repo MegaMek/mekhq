@@ -263,6 +263,7 @@ public class PlanetViewPanel extends ScrollablePanel {
             JLabel lblTemp = new JLabel(resourceMap.getString("lblTemp1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblTemp, gbcLabel);
+            //Using Unicode for the degree symbol as it is required for proper display on certain systems
             JLabel txtTemp = new JLabel(planet.getTemperature(currentDate) + "\u00B0" + "C");
             gbcText.gridy = infoRow;
             panel.add(txtTemp, gbcText);
