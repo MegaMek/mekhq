@@ -851,7 +851,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         JOptionPane.YES_NO_OPTION)) {
                     for (Person person : people) {
                         gui.getCampaign().removePerson(person.getId());
-                        if(person.hasSpouse()){
+                        if(person.hasSpouse()) {
                             person.getSpouse().setSpouseId(null);
                         }
                     }
