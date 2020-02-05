@@ -29,6 +29,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.personnel.FormerSpouse;
 import org.joda.time.DateTime;
 
 import megamek.common.Crew;
@@ -781,12 +782,13 @@ public class PersonViewPanel extends ScrollablePanel {
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
 
-            for (Person ex : person.getFormerSpouses()) {
+            for (FormerSpouse formerSpouse : person.getFormerSpouses()) {
+                Person ex = campaign.getPerson(formerSpouse.getFormerSpouseId());
                 gridBagConstraints.gridy = firsty;
                 lblFormerSpouses2 = new JLabel();
                 lblFormerSpouses2.setName("lblFormerSpouses2"); // NOI18N //$NON-NLS-1$
                 lblFormerSpouses2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                lblFormerSpouses2.setText(String.format("<html><a href='#'>%s</a></html>", ex.getFullName()));
+                lblFormerSpouses2.setText(String.format("<html><a href='#'>%s, %s</a></html>", ex.getFullName(), formerSpouse.getReasonString()));
                 lblFormerSpouses2.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {

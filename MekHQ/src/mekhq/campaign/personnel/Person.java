@@ -168,7 +168,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     // Lineage
     protected UUID ancestorsId;
     protected UUID spouse;
-    protected UUID[] formerSpouses;
+    protected List<FormerSpouse> formerSpouses = new ArrayList<>();
 
     //region Procreation
     protected GregorianCalendar dueDate;
@@ -244,7 +244,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     // Is this person willing to defect? Only for prisoners ...
     private boolean willingToDefect;
 
-    boolean child; //TODO: Implement this flag
     boolean dependent;
     boolean commander;
 
@@ -1053,21 +1052,75 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return campaign.getAncestors(ancestorsId);
     }
 
+    public void procreate() {
+        if(!isFemale() || isPregnant()) {
+            return;
+        }
+
+        if (!isDeployed()) {
+            // Age limitations...
+            if (!isChild() && getAge(campaign.getCalendar()) < 51) {
+                boolean conceived = false;
+                if (hasSpouse()) {
+                    if (getSpouse().isActive() && !getSpouse().isDeployed() && !getSpouse().isChild()
+                            && !(getSpouse().getGender() == getGender())) {
+                        // setting is the chance that this procreation attempt will create a child, base is 0.05%
+                        // the setting is divided by 100 because we are running a float from 0 to 1 instead of 0 to 100
+                        conceived = (Compute.randomInt(10000) < 2);
+                        //conceived = (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceProcreation()/100));
+                    }
+                } else if (campaign.getCampaignOptions().useUnofficialProcreationNoRelationship()) {
+                    // setting is the chance that this procreation attempt will create a child, base is 0.005%
+                    // the setting is divided by 100 because we are running a float from 0 to 1 instead of 0 to 100
+                    conceived = (Compute.randomInt(100000) < 2);
+                    //conceived = (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceProcreationNoRelationship()/100));
+                }
+
+                if(conceived) {
+                    addPregnancy();
+                }
+            }
+        }
+    }
+
+    public void addPregnancy() {
+        GregorianCalendar tCal = (GregorianCalendar) campaign.getCalendar().clone();
+        tCal.add(GregorianCalendar.DAY_OF_YEAR, PREGNANCY_DURATION.getAsInt());
+        setDueDate(tCal);
+        int size = PREGNANCY_SIZE.getAsInt();
+        extraData.set(PREGNANCY_CHILDREN_DATA, size);
+        extraData.set(PREGNANCY_FATHER_DATA, (hasSpouse()) ? getSpouseId().toString() : null);
+
+        String sizeString = (size < PREGNANCY_MULTIPLE_NAMES.length) ? PREGNANCY_MULTIPLE_NAMES[size] : null;
+        if(null == sizeString) {
+            campaign.addReport(getHyperlinkedName()+" has conceived");
+        } else {
+            campaign.addReport(getHyperlinkedName()+" has conceived " + sizeString);
+        }
+        if (campaign.getCampaignOptions().logConception()) {
+            MedicalLogger.hasConceived(this, campaign.getDate(), sizeString);
+        }
+    }
+
+    public void removePregnancy() {
+        setDueDate(null);
+        extraData.set(PREGNANCY_CHILDREN_DATA, null);
+        extraData.set(PREGNANCY_FATHER_DATA, null);
+    }
+
     public Collection<Person> birth() {
         int size = extraData.get(PREGNANCY_CHILDREN_DATA, 1);
         String fatherIdString = extraData.get(PREGNANCY_FATHER_DATA);
-        UUID fatherId = (null != fatherIdString) ? UUID.fromString(fatherIdString) : getSpouseId();
+        UUID fatherId = (fatherIdString != null) ? UUID.fromString(fatherIdString) : null;
         Ancestors anc = campaign.getAncestors(fatherId, id);
         if(null == anc) {
             anc = campaign.createAncestors(fatherId, id);
         }
         final UUID ancId = anc.getId();
-        final String surname = getName().contains(" ") ? getName().split(" ", 2)[1] : "";
+        final String surname = generateBabySurname();
 
         // Cleanup
-        setDueDate(null);
-        extraData.set(PREGNANCY_CHILDREN_DATA, 0);
-        extraData.set(PREGNANCY_FATHER_DATA, null);
+        removePregnancy();
 
         return IntStream.range(0, size).mapToObj(i -> {
             Person baby = campaign.newDependent(T_NONE);
@@ -1087,72 +1140,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }).collect(Collectors.toList());
     }
 
-    public void procreate() {
-        if(!isFemale() || isPregnant()) {
-            return;
-        }
-
-        if (!isDeployed()) {
-            // Age limitations...
-            if (!isChild() && getAge(campaign.getCalendar()) < 51) {
-                boolean conceived = false;
-                if (!hasSpouse() && campaign.getCampaignOptions().useUnofficialProcreationNoRelationship()) {
-                    // 0.005% chance that this procreation attempt will create a child
-                    conceived = (Compute.randomInt(100000) < 2);
-                } else if (hasSpouse()) {
-                    if (getSpouse().isActive() && !getSpouse().isDeployed() && !getSpouse().isChild()) {
-                        // 0.05% chance that this procreation attempt will create a child
-                        conceived = (Compute.randomInt(10000) < 2);
-                    }
-                }
-
-                if(conceived) {
-                    GregorianCalendar tCal = (GregorianCalendar) campaign.getCalendar().clone();
-                    tCal.add(GregorianCalendar.DAY_OF_YEAR, PREGNANCY_DURATION.getAsInt());
-                    setDueDate(tCal);
-                    int size = PREGNANCY_SIZE.getAsInt();
-                    extraData.set(PREGNANCY_CHILDREN_DATA, size);
-                    extraData.set(PREGNANCY_FATHER_DATA,
-                        (hasSpouse()) ? getSpouseId().toString() : null);
-
-                    String sizeString = (size < PREGNANCY_MULTIPLE_NAMES.length) ? PREGNANCY_MULTIPLE_NAMES[size] : null;
-                    if(null == sizeString) {
-                        campaign.addReport(getHyperlinkedName()+" has conceived");
-                    } else {
-                        campaign.addReport(getHyperlinkedName()+" has conceived " + sizeString);
-                    }
-                    if (campaign.getCampaignOptions().logConception()) {
-                        MedicalLogger.hasConceived(this, campaign.getDate(), sizeString);
-                    }
-                }
-            }
-        }
-    }
-
-    public void addPregnancy() {
-        GregorianCalendar tCal = (GregorianCalendar) campaign.getCalendar().clone();
-        tCal.add(GregorianCalendar.DAY_OF_YEAR, PREGNANCY_DURATION.getAsInt());
-        setDueDate(tCal);
-        int size = PREGNANCY_SIZE.getAsInt();
-        extraData.set(PREGNANCY_CHILDREN_DATA, size);
-        extraData.set(PREGNANCY_FATHER_DATA,
-            (hasSpouse()) ? getSpouseId().toString() : null);
-
-        String sizeString = (size < PREGNANCY_MULTIPLE_NAMES.length) ? PREGNANCY_MULTIPLE_NAMES[size] : null;
-        if(null == sizeString) {
-            campaign.addReport(getHyperlinkedName()+" has conceived");
-        } else {
-            campaign.addReport(getHyperlinkedName()+" has conceived " + sizeString);
-        }
-        if (campaign.getCampaignOptions().logConception()) {
-            MedicalLogger.hasConceived(this, campaign.getDate(), sizeString);
-        }
-    }
-
-    public void removePregnancy() {
-        setDueDate(null);
-        extraData.set(PREGNANCY_CHILDREN_DATA, 0);
-        extraData.set(PREGNANCY_FATHER_DATA, null);
+    private String generateBabySurname() {
+        String surname;
+        surname = getName().contains(" ") ? getName().split(" ", 2)[1] : "";
+        return surname;
     }
 
     public boolean safeSpouse(Person p) {
@@ -1162,7 +1153,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 && (getAncestorsId() == null
                 || !campaign.getAncestors(getAncestorsId()).checkMutualAncestors(campaign.getAncestors(p.getAncestorsId())))
                 && !p.hasSpouse()
-                && getGender() != p.getGender()
                 && !p.isChild()
         );
     }
@@ -1354,6 +1344,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         + "<spouse>"
                         + this.spouse.toString()
                         + "</spouse>");
+        }
+        if (!formerSpouses.isEmpty()) {
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<formerSpouses>");
+            for (FormerSpouse ex : formerSpouses) {
+                ex.writeToXml(pw1, indent + 2);
+            }
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "</formerSpouses>");
         }
         if (dueDate != null) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
@@ -1635,6 +1632,24 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     retVal.ancestorsId = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("spouse")) {
                     retVal.spouse = UUID.fromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("formerSpouses")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y = 0; y < nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        // If it's not an element node, we ignore it.
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+
+                        if (!wn3.getNodeName().equalsIgnoreCase("formerSpouse")) {
+                            // Error condition of sorts!
+                            // Errr, what should we do here?
+                            MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
+                                    "Unknown node type not loaded in formerSpouses nodes: " + wn3.getNodeName()); //$NON-NLS-1$
+                            continue;
+                        }
+                        retVal.formerSpouses.add(FormerSpouse.generateInstanceFromXML(wn3));
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("duedate")) {
                     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                     retVal.dueDate = (GregorianCalendar) GregorianCalendar.getInstance();
@@ -2660,7 +2675,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return " <font color='red'><b>Failed to heal.</b></font>";
     }
 
-
+    //region skill
     public boolean hasSkill(String skillName) {
         return skills.hasSkill(skillName);
     }
@@ -2736,6 +2751,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             return -1;
         }
     }
+    //endregion skill
 
     public int getHits() {
         return hits;
@@ -2883,6 +2899,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return adv.toString();
     }
 
+    //region edge
     public int getEdge() {
         return getOptions().intOption("edge");
     }
@@ -2975,6 +2992,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
         return "<html>" + edgett + "</html>";
     }
+    //endregion edge
 
     /**
      * This function returns an html-coded list that says what abilities are enabled for this pilot
@@ -3881,6 +3899,20 @@ public class Person implements Serializable, MekHqXmlSerializable {
         engineer = b;
     }
 
+    /**
+     *
+     * @return the ransom value of this individual
+     * Useful for prisoner who you want to ransom or hand off to your employer in an AtB context
+     */
+    public Money getRansomValue() {
+        // MechWarriors and aero pilots are worth more than the other types of scrubs
+        if ((primaryRole == T_MECHWARRIOR) || (primaryRole == T_AERO_PILOT)) {
+            return MECHWARRIOR_AERO_RANSOM_VALUES.get(getExperienceLevel(false));
+        } else {
+            return OTHER_RANSOM_VALUES.get(getExperienceLevel(false));
+        }
+    }
+
     //region Family
     //region hasFamily
     /**
@@ -3905,7 +3937,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * @return true if the person has a former spouse, false otherwise
      */
     public boolean hasFormerSpouse() {
-        return formerSpouses != null;
+        return !formerSpouses.isEmpty();
     }
 
     /**
@@ -4080,11 +4112,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     /**
      *
-     * @return a list of Person objects for all the former spouses of the current person
+     * @return a list of FormerSpouse objects for all the former spouses of the current person
      */
-    @Nullable
-    public List<Person> getFormerSpouses() {
-        return campaign.getPeople(formerSpouses);
+    public List<FormerSpouse> getFormerSpouses() {
+        return formerSpouses;
     }
 
     /**
@@ -4323,18 +4354,4 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
     //endregion getFamily
     //endregion Family
-
-    /**
-     *
-     * @return the ransom value of this individual
-     * Useful for prisoner who you want to ransom or hand off to your employer in an AtB context
-     */
-    public Money getRansomValue() {
-        // MechWarriors and aero pilots are worth more than the other types of scrubs
-        if ((primaryRole == T_MECHWARRIOR) || (primaryRole == T_AERO_PILOT)) {
-            return MECHWARRIOR_AERO_RANSOM_VALUES.get(getExperienceLevel(false));
-        } else {
-            return OTHER_RANSOM_VALUES.get(getExperienceLevel(false));
-        }
-    }
 }

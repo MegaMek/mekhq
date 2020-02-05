@@ -44,36 +44,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.Vector;
 
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.DefaultCellEditor;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JSlider;
-import javax.swing.JSpinner;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.JViewport;
-import javax.swing.ListSelectionModel;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -262,7 +233,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JSpinner spnOriginSearchRadius;
     //Family
     private JCheckBox chkUseUnofficialProcreation;
+    private JSpinner spnChanceProcreation;
     private JCheckBox chkUseUnofficialProcreationNoRelationship;
+    private JSpinner spnChanceProcreationNoRelationship;
     private JSpinner spnCheckMutualAncestorsDepth;
     private JCheckBox chkUseParentage;
     private JComboBox<String> comboDisplayFamilyLevel;
@@ -1763,11 +1736,33 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             gridBagConstraints.gridy = ++gridy;
             panFamily.add(chkUseUnofficialProcreation, gridBagConstraints);
 
+            spnChanceProcreation = new JSpinner(new SpinnerNumberModel(options.getChanceProcreation(), 0.001, 1, 0.001));
+            Dimension dimensionChanceProcreation = spnChanceProcreation.getPreferredSize();
+            dimensionChanceProcreation.width = 50;
+            spnChanceProcreation.setPreferredSize(dimensionChanceProcreation);
+            JPanel panChanceProcreation = new JPanel();
+            panChanceProcreation.add(new JLabel(resourceMap.getString("chanceProcreation.text")));
+            panChanceProcreation.setToolTipText(resourceMap.getString("chanceProcreation.toolTipText"));
+            panChanceProcreation.add(spnChanceProcreation);
+            gridBagConstraints.gridy = ++gridy;
+            panFamily.add(panChanceProcreation, gridBagConstraints);
+
             chkUseUnofficialProcreationNoRelationship = new JCheckBox(resourceMap.getString("useUnofficialProcreationNoRelationship.text")); // NOI18N
             chkUseUnofficialProcreationNoRelationship.setSelected(options.useUnofficialProcreationNoRelationship());
             chkUseUnofficialProcreationNoRelationship.setToolTipText(resourceMap.getString("useUnofficialProcreationNoRelationship.toolTipText")); // NOI18N
             gridBagConstraints.gridy = ++gridy;
             panFamily.add(chkUseUnofficialProcreationNoRelationship, gridBagConstraints);
+
+            spnChanceProcreationNoRelationship = new JSpinner(new SpinnerNumberModel(options.getChanceProcreationNoRelationship(), 0.001, 1, 0.001));
+            Dimension dimensionChanceProcreationNoRelationship = spnChanceProcreationNoRelationship.getPreferredSize();
+            dimensionChanceProcreationNoRelationship.width = 50;
+            spnChanceProcreationNoRelationship.setPreferredSize(dimensionChanceProcreationNoRelationship);
+            JPanel panChanceProcreationNoRelationship = new JPanel();
+            panChanceProcreationNoRelationship.add(new JLabel(resourceMap.getString("chanceProcreationNoRelationship.text")));
+            panChanceProcreationNoRelationship.setToolTipText(resourceMap.getString("chanceProcreationNoRelationship.toolTipText"));
+            panChanceProcreationNoRelationship.add(spnChanceProcreationNoRelationship);
+            gridBagConstraints.gridy = ++gridy;
+            panFamily.add(panChanceProcreationNoRelationship, gridBagConstraints);
 
             spnCheckMutualAncestorsDepth = new JSpinner(new SpinnerNumberModel(options.checkMutualAncestorsDepth(), 0, 20, 1));
             JPanel panCheckMutualAncestorsDepth = new JPanel();
@@ -4744,7 +4739,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setOriginSearchRadius((Integer)spnOriginSearchRadius.getModel().getValue());
         //Family
         options.setUseUnofficialProcreation(chkUseUnofficialProcreation.isSelected());
+        options.setChanceProcreation((Float) spnChanceProcreation.getModel().getValue());
         options.setUseUnofficialProcreationNoRelationship(chkUseUnofficialProcreationNoRelationship.isSelected());
+        options.setChanceProcreationNoRelationship((Float) spnChanceProcreationNoRelationship.getModel().getValue());
         options.setCheckMutualAncestorsDepth((Integer) spnCheckMutualAncestorsDepth.getModel().getValue());
         options.setUseParentage(chkUseParentage.isSelected());
         options.setDisplayFamilyLevel(comboDisplayFamilyLevel.getSelectedIndex());

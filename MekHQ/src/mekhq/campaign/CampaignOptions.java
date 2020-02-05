@@ -121,7 +121,9 @@ public class CampaignOptions implements Serializable {
     private double originDistanceScale;
     //family
     private boolean useUnofficialProcreation; // Unofficial
+    private float chanceProcreation; // Unofficial
     private boolean useUnofficialProcreationNoRelationship; // Unofficial
+    private float chanceProcreationNoRelationship; // Unofficial
     private int checkMutualAncestorsDepth;
     private boolean useParentage;
     private int displayFamilyLevel;
@@ -481,7 +483,9 @@ public class CampaignOptions implements Serializable {
         originDistanceScale = 0.6;
         //Family
         useUnofficialProcreation = false;
+        chanceProcreation = (float) 0.05;
         useUnofficialProcreationNoRelationship = false;
+        chanceProcreationNoRelationship = (float) 0.005;
         checkMutualAncestorsDepth = 4;
         useParentage = false;
         displayFamilyLevel = 0;
@@ -760,12 +764,28 @@ public class CampaignOptions implements Serializable {
         useUnofficialProcreation = b;
     }
 
+    public float getChanceProcreation() {
+        return chanceProcreation;
+    }
+
+    public void setChanceProcreation(float b) {
+        chanceProcreation = b;
+    }
+
     public boolean useUnofficialProcreationNoRelationship() {
         return useUnofficialProcreationNoRelationship;
     }
 
     public void setUseUnofficialProcreationNoRelationship(boolean b) {
         useUnofficialProcreationNoRelationship = b;
+    }
+
+    public float getChanceProcreationNoRelationship() {
+        return chanceProcreationNoRelationship;
+    }
+
+    public void setChanceProcreationNoRelationship(float b) {
+        chanceProcreationNoRelationship = b;
     }
 
     public int checkMutualAncestorsDepth() {
@@ -2483,7 +2503,9 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "minimumHitsForVees", minimumHitsForVees);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maxAcquisitions", maxAcquisitions);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnofficialProcreation", useUnofficialProcreation);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "chanceProcreation", chanceProcreation);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnofficialProcreationNoRelationship", useUnofficialProcreationNoRelationship);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "chanceProcreationNoRelationship", chanceProcreationNoRelationship);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "checkMutualAncestorsDepth", checkMutualAncestorsDepth);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useParentage", useParentage);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "displayFamilyLevel", displayFamilyLevel);
@@ -2914,8 +2936,12 @@ public class CampaignOptions implements Serializable {
                 retVal.maxAcquisitions = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreation")) {
             	retVal.useUnofficialProcreation = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("chanceProcreation")) {
+            	retVal.chanceProcreation = Float.parseFloat(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreationNoRelationship")) {
             	retVal.useUnofficialProcreationNoRelationship = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("chanceProcreationNoRelationship")) {
+                retVal.chanceProcreationNoRelationship = Float.parseFloat(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("checkMutualAncestorsDepth")) {
                 retVal.checkMutualAncestorsDepth = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useParentage")) {
