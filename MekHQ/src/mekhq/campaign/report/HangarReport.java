@@ -2293,7 +2293,7 @@ public class HangarReport extends Report {
         return overviewHangarTree;
     }
 
-    public String createNodeName(Unit u) {
+    private String createNodeName(Unit u) {
         String name = u.getName();
 
         if (u.isMothballed()) {
