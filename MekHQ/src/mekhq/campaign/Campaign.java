@@ -37,6 +37,7 @@ import javax.swing.JOptionPane;
 import mekhq.*;
 import mekhq.campaign.finances.*;
 import mekhq.campaign.log.*;
+import mekhq.campaign.personnel.FormerSpouse;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 import org.joda.time.DateTime;
@@ -5931,6 +5932,8 @@ public class Campaign implements Serializable, ITechManager {
             // Don't forget to tell the spouse
             if (person.hasSpouse()) {
                 Person spouse = person.getSpouse();
+                spouse.addFormerSpouse(new FormerSpouse(person.getId(), FormerSpouse.REASON_WIDOWED));
+                person.addFormerSpouse(new FormerSpouse(spouse.getId(), FormerSpouse.REASON_WIDOWED));
                 PersonalLogger.spouseKia(spouse, person, getDate());
                 spouse.setSpouseId(null);
             }

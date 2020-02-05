@@ -23,6 +23,7 @@ package mekhq.campaign.personnel;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.text.Normalizer;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.IntSupplier;
@@ -1014,14 +1015,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return id;
     }
 
-    @Nullable
-    public UUID getSpouseId() {
-        return spouse;
+    public boolean isChild() {
+        // TODO : Ask if we want this to be a setting, with a required minimum value
+        return getAge(campaign.getCalendar()) <= 13;
     }
 
-    public void setSpouseId(UUID spouse) {
-        this.spouse = spouse;
-    }
 
     public GregorianCalendar getDueDate() {
         return dueDate;
@@ -1033,23 +1031,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public boolean isPregnant() {
         return dueDate != null;
-    }
-
-    public boolean isChild() {
-        // TODO : Ask if we want this to be a setting, with a required minimum value
-        return getAge(campaign.getCalendar()) <= 13;
-    }
-
-    public UUID getAncestorsId() {
-        return ancestorsId;
-    }
-
-    public void setAncestorsId(UUID id) {
-        ancestorsId = id;
-    }
-
-    public Ancestors getAncestors() {
-        return campaign.getAncestors(ancestorsId);
     }
 
     public void procreate() {
@@ -3541,6 +3522,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         missionLog.add(entry);
     }
 
+    //region injuries
     /**
      * All methods below are for the Advanced Medical option **
      */
@@ -3763,6 +3745,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             campaign.getUnit(getUnitId()).resetPilotAndEntity();
         }
     }
+    //endregion injuries
 
     public int getProfession() {
         return getProfessionFromPrimaryRole(primaryRole);
@@ -3914,6 +3897,39 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     //region Family
+    //region setFamily
+    /**
+     *
+     * @param id is the new ancestor id for the current person
+     */
+    public void setAncestorsId(UUID id) {
+        ancestorsId = id;
+    }
+
+    /**
+     *
+     * @param spouse the new spouse id for the current person
+     */
+    public void setSpouseId(UUID spouse) {
+        this.spouse = spouse;
+    }
+
+    /**
+     *
+     * @param formerSpouses a list of the current person's former spouses
+     */
+    public void setFormerSpouses(List<FormerSpouse> formerSpouses) {
+        this.formerSpouses = formerSpouses;
+    }
+
+    /**
+     *
+     * @param formerSpouse a former spouse to add the the current person's list
+     */
+    public void addFormerSpouse(FormerSpouse formerSpouse) {
+        formerSpouses.add(formerSpouse);
+    }
+    //endregion setFamily
     //region hasFamily
     /**
      *
@@ -4103,11 +4119,36 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     /**
      *
+     * @return the person's ancestor id
+     */
+    public UUID getAncestorsId() {
+        return ancestorsId;
+    }
+
+    /**
+     *
+     * @return the person's ancestors
+     */
+    public Ancestors getAncestors() {
+        return campaign.getAncestors(ancestorsId);
+    }
+
+    /**
+     *
      * @return the current person's spouse
      */
     @Nullable
     public Person getSpouse() {
         return campaign.getPerson(spouse);
+    }
+
+    /**
+     *
+     * @return the current person's spouse's id
+     */
+    @Nullable
+    public UUID getSpouseId() {
+        return spouse;
     }
 
     /**

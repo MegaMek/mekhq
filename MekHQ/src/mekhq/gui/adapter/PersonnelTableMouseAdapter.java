@@ -501,6 +501,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             case CMD_REMOVE_SPOUSE:
             {
+                int reason = FormerSpouse.REASON_WIDOWED;
                 if (!selectedPerson.getSpouse().isDeadOrMIA()) {
 
                     PersonalLogger.divorcedFrom(selectedPerson, selectedPerson.getSpouse(), gui.getCampaign().getDate());
@@ -517,7 +518,12 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                                 + SPACE
                                 + spouse.getMaidenName());
                     }
+                    reason = FormerSpouse.REASON_DIVORCE;
                 }
+                //add to former spouse list
+                selectedPerson.getSpouse().addFormerSpouse(new FormerSpouse(selectedPerson.getId(), reason));
+                selectedPerson.addFormerSpouse(new FormerSpouse(selectedPerson.getSpouse().getId(), reason));
+
                 selectedPerson.getSpouse().setSpouseId(null);
                 MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson.getSpouse()));
                 selectedPerson.setSpouseId(null);
@@ -1846,9 +1852,11 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 GregorianCalendar calendar = gui.getCampaign().getCalendar();
 
                 if (!person.isChild() && (!person.hasSpouse())) {
-                    menu = new JMenu(resourceMap.getString("changeSpouse.text")); //$NON-NLS-1$
-                    JMenuItem surnameMenu;
+                    menu = new JMenu(resourceMap.getString("chooseSpouse.text")); //$NON-NLS-1$
+                    JMenu maleMenu = new JMenu(resourceMap.getString("spouseMenuMale.text"));
+                    JMenu femaleMenu = new JMenu(resourceMap.getString("spouseMenuFemale.text"));
                     JMenu spouseMenu;
+                    JMenuItem surnameMenu;
                     String type;
 
                     List<Person> personnel = new ArrayList(gui.getCampaign().getPersonnel());
@@ -1900,9 +1908,30 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                                 surnameMenu.addActionListener(this);
                                 spouseMenu.add(surnameMenu);
                             }
-                            menu.add(spouseMenu);
+                            if (ps.isMale()) {
+                                maleMenu.add(spouseMenu);
+                            } else {
+                                femaleMenu.add(spouseMenu);
+                            }
                         }
                     }
+
+                    if (person.isMale()) {
+                        if (femaleMenu.getItemCount() > 0) {
+                            menu.add(femaleMenu);
+                        }
+                        if (maleMenu.getItemCount() > 0) {
+                            menu.add(maleMenu);
+                        }
+                    } else {
+                        if (maleMenu.getItemCount() > 0) {
+                            menu.add(maleMenu);
+                        }
+                        if (femaleMenu.getItemCount() > 0) {
+                            menu.add(femaleMenu);
+                        }
+                    }
+
                     if (menu.getItemCount() > MAX_POPUP_ITEMS) {
                         MenuScroller.setScrollerFor(menu, MAX_POPUP_ITEMS);
                     }
