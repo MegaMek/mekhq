@@ -70,7 +70,7 @@ public class HangarReport extends Report {
 
     public JTree getHangarTree() {
         //region Variable Declarations
-        // BattleMechs
+        //region BattleMechs
         // boolean expandMechs = false;
         int countMechs = 0;
 
@@ -89,8 +89,9 @@ public class HangarReport extends Report {
         int mediumOmniMech = 0;
         int lightOmniMech = 0;
         int ultralightOmniMech = 0;
+        //endregion BattleMechs
 
-        // ASF
+        //region ASF
         //boolean expandASF = false;
         int countASF = 0;
 
@@ -103,8 +104,9 @@ public class HangarReport extends Report {
         int countOmniHeavyASF = 0;
         int countOmniMediumASF = 0;
         int countOmniLightASF = 0;
+        //endregion ASF
 
-        // Vehicles
+        //region Vehicles
         //boolean expandVees = false;
         int countVees = 0;
 
@@ -203,8 +205,9 @@ public class HangarReport extends Report {
         int countOmniHydrofoilHeavy = 0;
         int countOmniHydrofoilMedium = 0;
         int countOmniHydrofoilLight = 0;
+        //endregion Vehicles
 
-        // Support Vees
+        //region Support Vehicles
         //boolean expandSupportVees = false;
         int countSupportVees = 0;
 
@@ -338,8 +341,9 @@ public class HangarReport extends Report {
         int countSupportOmniMaglevLarge = 0;
         int countSupportOmniMaglevMedium = 0;
         int countSupportOmniMaglevSmall = 0;
+        //endregion Vehicles
 
-        // Battle Armor and Infantry
+        //region Battle Armor and Infantry
         //boolean expandInfantry = false;
         int countInfantry = 0;
 
@@ -354,22 +358,24 @@ public class HangarReport extends Report {
         int countBAMedium = 0;
         int countBALight = 0;
         int countBAPAL = 0;
+        //endregion Battle Armor and Infantry
 
         // Conventional Fighter
         int countConv = 0;
 
-        // Protomechs
+        //region ProtoMechs
         //boolean expandProtos = false;
         int countProtos = 0;
         int countAssaultProtos = 0;
         int countHeavyProtos = 0;
         int countMediumProtos = 0;
         int countLightProtos = 0;
+        //endregion ProtoMechs
 
         // Turrets
         int countGE = 0;
 
-        // Jumpships, Warships, Dropships, and SmallCraft
+        //region JumpShips, WarShips, DropShips, and SmallCraft
         //boolean expandSpace = false;
         int countSpace = 0;
 
@@ -380,11 +386,12 @@ public class HangarReport extends Report {
         int countMediumDS = 0;
         int countSmallDS = 0;
 
-        int countJumpships = 0;
+        int countJumpShips = 0;
 
-        int countWarships = 0;
+        int countWarShips = 0;
         int countLargeWS = 0;
         int countSmallWS = 0;
+        //endregion JumpShips, WarShips, DropShips, and SmallCraft
 
         // Space Stations
         int countSpaceStations = 0;
@@ -992,27 +999,27 @@ public class HangarReport extends Report {
                     switch(e.getWeightClass()) {
                         case EntityWeightClass.WEIGHT_COLOSSAL:
                             colossalOmniMech++;
-                            colossalOmniMechs.add(new DefaultMutableTreeNode(u.getName()));
+                            colossalOmniMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                         case EntityWeightClass.WEIGHT_ASSAULT:
                             assaultOmniMech++;
-                            assaultOmniMechs.add(new DefaultMutableTreeNode(u.getName()));
+                            assaultOmniMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                         case EntityWeightClass.WEIGHT_HEAVY:
                             heavyOmniMech++;
-                            heavyOmniMechs.add(new DefaultMutableTreeNode(u.getName()));
+                            heavyOmniMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                         case EntityWeightClass.WEIGHT_MEDIUM:
                             mediumOmniMech++;
-                            mediumOmniMechs.add(new DefaultMutableTreeNode(u.getName()));
+                            mediumOmniMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                         case EntityWeightClass.WEIGHT_LIGHT:
                             lightOmniMech++;
-                            lightOmniMechs.add(new DefaultMutableTreeNode(u.getName()));
+                            lightOmniMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                         case EntityWeightClass.WEIGHT_ULTRA_LIGHT:
                             ultralightOmniMech++;
-                            ultralightOmniMechs.add(new DefaultMutableTreeNode(u.getName()));
+                            ultralightOmniMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                     }
                 } else {
@@ -1020,27 +1027,27 @@ public class HangarReport extends Report {
                     switch (e.getWeightClass()) {
                         case EntityWeightClass.WEIGHT_COLOSSAL:
                             colossalMech++;
-                            colossalMechs.add(new DefaultMutableTreeNode(u.getName()));
+                            colossalMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                         case EntityWeightClass.WEIGHT_ASSAULT:
                             assaultMech++;
-                            assaultMechs.add(new DefaultMutableTreeNode(u.getName()));
+                            assaultMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                         case EntityWeightClass.WEIGHT_HEAVY:
                             heavyMech++;
-                            heavyMechs.add(new DefaultMutableTreeNode(u.getName()));
+                            heavyMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                         case EntityWeightClass.WEIGHT_MEDIUM:
                             mediumMech++;
-                            mediumMechs.add(new DefaultMutableTreeNode(u.getName()));
+                            mediumMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                         case EntityWeightClass.WEIGHT_LIGHT:
                             lightMech++;
-                            lightMechs.add(new DefaultMutableTreeNode(u.getName()));
+                            lightMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                         case EntityWeightClass.WEIGHT_ULTRA_LIGHT:
                             ultralightMech++;
-                            ultralightMechs.add(new DefaultMutableTreeNode(u.getName()));
+                            ultralightMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                     }
                 }
@@ -1055,15 +1062,15 @@ public class HangarReport extends Report {
                         switch(e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportOmniWheeledLarge++;
-                                oSupportWheeledLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportWheeledLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
                                 countSupportOmniWheeledMedium++;
-                                oSupportWheeledMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportWheeledMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
                                 countSupportOmniWheeledSmall++;
-                                oSupportWheeledSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportWheeledSmall.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.TRACKED) {
@@ -1071,15 +1078,15 @@ public class HangarReport extends Report {
                         switch(e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportOmniTrackedLarge++;
-                                oSupportTrackedLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportTrackedLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
                                 countSupportOmniTrackedSmall++;
-                                oSupportTrackedSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportTrackedSmall.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
                                 countSupportOmniTrackedMedium++;
-                                oSupportTrackedMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportTrackedMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.HOVER) {
@@ -1087,15 +1094,15 @@ public class HangarReport extends Report {
                         switch(e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportOmniHoverLarge++;
-                                oSupportHoverLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportHoverLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
                                 countSupportOmniHoverMedium++;
-                                oSupportHoverMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportHoverMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
                                 countSupportOmniHoverSmall++;
-                                oSupportHoverSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportHoverSmall.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.VTOL) {
@@ -1103,15 +1110,15 @@ public class HangarReport extends Report {
                         switch(e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportOmniVTOLLarge++;
-                                oSupportVTOLLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportVTOLLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
                                 countSupportOmniVTOLMedium++;
-                                oSupportVTOLMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportVTOLMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
                                 countSupportOmniVTOLSmall++;
-                                oSupportVTOLSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportVTOLSmall.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.WIGE) {
@@ -1119,15 +1126,15 @@ public class HangarReport extends Report {
                         switch(e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportOmniWiGELarge++;
-                                oSupportWiGELarge.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportWiGELarge.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
                                 countSupportOmniWiGEMedium++;
-                                oSupportWiGEMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportWiGEMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
                                 countSupportOmniWiGESmall++;
-                                oSupportWiGESmall.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportWiGESmall.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.AIRSHIP) {
@@ -1135,15 +1142,15 @@ public class HangarReport extends Report {
                         switch(e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportOmniAirshipLarge++;
-                                oSupportAirshipLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportAirshipLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
                                 countSupportOmniAirshipMedium++;
-                                oSupportAirshipMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportAirshipMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
                                 countSupportOmniAirshipSmall++;
-                                oSupportAirshipSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportAirshipSmall.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.isFighter()) {
@@ -1151,15 +1158,15 @@ public class HangarReport extends Report {
                         switch(e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportOmniFixedWingLarge++;
-                                oSupportFixedWingLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportFixedWingLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
                                 countSupportOmniFixedWingMedium++;
-                                oSupportFixedWingMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportFixedWingMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
                                 countSupportOmniFixedWingSmall++;
-                                oSupportFixedWingSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportFixedWingSmall.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.NAVAL) {
@@ -1167,15 +1174,15 @@ public class HangarReport extends Report {
                         switch(e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportOmniNavalLarge++;
-                                oSupportNavalLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportNavalLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
                                 countSupportOmniNavalMedium++;
-                                oSupportNavalMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportNavalMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
                                 countSupportOmniNavalSmall++;
-                                oSupportNavalSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportNavalSmall.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.SUBMARINE) {
@@ -1183,15 +1190,15 @@ public class HangarReport extends Report {
                         switch(e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportOmniSubLarge++;
-                                oSupportSubLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportSubLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
                                 countSupportOmniSubMedium++;
-                                oSupportSubMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportSubMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
                                 countSupportOmniSubSmall++;
-                                oSupportSubSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportSubSmall.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.HYDROFOIL) {
@@ -1199,15 +1206,15 @@ public class HangarReport extends Report {
                         switch(e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportOmniHydrofoilLarge++;
-                                oSupportHydrofoilLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportHydrofoilLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
                                 countSupportOmniHydrofoilMedium++;
-                                oSupportHydrofoilMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportHydrofoilMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
                                 countSupportOmniHydrofoilSmall++;
-                                oSupportHydrofoilSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportHydrofoilSmall.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.STATION_KEEPING) {
@@ -1215,15 +1222,15 @@ public class HangarReport extends Report {
                         switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportOmniSatelliteLarge++;
-                                oSupportSatelliteLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportSatelliteLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
                                 countSupportOmniSatelliteMedium++;
-                                oSupportSatelliteMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportSatelliteMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
                                 countSupportOmniSatelliteSmall++;
-                                oSupportSatelliteSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportSatelliteSmall.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.RAIL) {
@@ -1231,15 +1238,15 @@ public class HangarReport extends Report {
                         switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportOmniRailLarge++;
-                                oSupportRailLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportRailLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
                                 countSupportOmniRailMedium++;
-                                oSupportRailMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportRailMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
                                 countSupportOmniRailSmall++;
-                                oSupportRailSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportRailSmall.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.MAGLEV) {
@@ -1247,15 +1254,15 @@ public class HangarReport extends Report {
                         switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportOmniMaglevLarge++;
-                                oSupportMaglevLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportMaglevLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
                                 countSupportOmniMaglevMedium++;
-                                oSupportMaglevMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportMaglevMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
                                 countSupportOmniMaglevSmall++;
-                                oSupportMaglevSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                oSupportMaglevSmall.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     }
@@ -1266,15 +1273,15 @@ public class HangarReport extends Report {
                         switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportWheeledLarge++;
-                                sSupportWheeledLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportWheeledLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
                                 countSupportWheeledMedium++;
-                                sSupportWheeledMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportWheeledMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
                                 countSupportWheeledSmall++;
-                                sSupportWheeledSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportWheeledSmall.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.TRACKED) {
@@ -1282,15 +1289,15 @@ public class HangarReport extends Report {
                         switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportTrackedLarge++;
-                                sSupportTrackedLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportTrackedLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
                                 countSupportTrackedMedium++;
-                                sSupportTrackedMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportTrackedMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
                                 countSupportTrackedSmall++;
-                                sSupportTrackedSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportTrackedSmall.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.HOVER) {
@@ -1298,15 +1305,15 @@ public class HangarReport extends Report {
                         switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportHoverLarge++;
-                                sSupportHoverLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportHoverLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
                                 countSupportHoverMedium++;
-                                sSupportHoverMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportHoverMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
                                 countSupportHoverSmall++;
-                                sSupportHoverSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportHoverSmall.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.VTOL) {
@@ -1314,15 +1321,15 @@ public class HangarReport extends Report {
                         switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportVTOLLarge++;
-                                sSupportVTOLLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportVTOLLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
                                 countSupportVTOLMedium++;
-                                sSupportVTOLMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportVTOLMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
                                 countSupportVTOLSmall++;
-                                sSupportVTOLSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportVTOLSmall.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.WIGE) {
@@ -1330,15 +1337,15 @@ public class HangarReport extends Report {
                         switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportWiGELarge++;
-                                sSupportWiGELarge.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportWiGELarge.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
                                 countSupportWiGEMedium++;
-                                sSupportWiGEMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportWiGEMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
                                 countSupportWiGESmall++;
-                                sSupportWiGESmall.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportWiGESmall.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.AIRSHIP) {
@@ -1346,15 +1353,15 @@ public class HangarReport extends Report {
                         switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportAirshipLarge++;
-                                sSupportAirshipLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportAirshipLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
                                 countSupportAirshipSmall++;
-                                sSupportAirshipSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportAirshipSmall.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
                                 countSupportAirshipMedium++;
-                                sSupportAirshipMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportAirshipMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.isFighter()) {
@@ -1362,15 +1369,15 @@ public class HangarReport extends Report {
                         switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportFixedWingLarge++;
-                                sSupportFixedWingLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportFixedWingLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
                                 countSupportFixedWingMedium++;
-                                sSupportFixedWingMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportFixedWingMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
                                 countSupportFixedWingSmall++;
-                                sSupportFixedWingSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportFixedWingSmall.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.NAVAL) {
@@ -1378,15 +1385,15 @@ public class HangarReport extends Report {
                         switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportNavalSmall++;
-                                sSupportNavalSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportNavalSmall.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
                                 countSupportNavalMedium++;
-                                sSupportNavalMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportNavalMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
                                 countSupportNavalLarge++;
-                                sSupportNavalLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportNavalLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.SUBMARINE) {
@@ -1394,15 +1401,15 @@ public class HangarReport extends Report {
                         switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportSubLarge++;
-                                sSupportSubLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportSubLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
                                 countSupportSubMedium++;
-                                sSupportSubMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportSubMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
                                 countSupportSubSmall++;
-                                sSupportSubSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportSubSmall.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.HYDROFOIL) {
@@ -1410,15 +1417,15 @@ public class HangarReport extends Report {
                         switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportHydrofoilLarge++;
-                                sSupportHydrofoilLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportHydrofoilLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
                                 countSupportHydrofoilMedium++;
-                                sSupportHydrofoilMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportHydrofoilMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
                                 countSupportHydrofoilSmall++;
-                                sSupportHydrofoilSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportHydrofoilSmall.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.STATION_KEEPING) {
@@ -1426,15 +1433,15 @@ public class HangarReport extends Report {
                         switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportSatelliteLarge++;
-                                sSupportSatelliteLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportSatelliteLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
                                 countSupportSatelliteMedium++;
-                                sSupportSatelliteMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportSatelliteMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
                                 countSupportSatelliteSmall++;
-                                sSupportSatelliteSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportSatelliteSmall.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.RAIL) {
@@ -1442,15 +1449,15 @@ public class HangarReport extends Report {
                         switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportRailLarge++;
-                                sSupportRailLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportRailLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
                                 countSupportRailMedium++;
-                                sSupportRailMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportRailMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
                                 countSupportRailSmall++;
-                                sSupportRailSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportRailSmall.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.MAGLEV) {
@@ -1458,63 +1465,63 @@ public class HangarReport extends Report {
                         switch (e.getWeightClass()) {
                             case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
                                 countSupportMaglevLarge++;
-                                sSupportMaglevLarge.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportMaglevLarge.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
                                 countSupportMaglevMedium++;
-                                sSupportMaglevMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportMaglevMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
                                 countSupportMaglevSmall++;
-                                sSupportMaglevSmall.add(new DefaultMutableTreeNode(u.getName()));
+                                sSupportMaglevSmall.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     }
                 }
             } else if (e instanceof ConvFighter) {
                 countConv++;
-                conv.add(new DefaultMutableTreeNode(u.getName()));
+                conv.add(new DefaultMutableTreeNode(createNodeName(u)));
             } else if (e instanceof SpaceStation) {
                 countSpaceStations++;
-                spaceStation.add(new DefaultMutableTreeNode(u.getName()));
+                spaceStation.add(new DefaultMutableTreeNode(createNodeName(u)));
             } else if (e instanceof Warship) {
                 countSpace++;
-                countWarships++;
+                countWarShips++;
                 switch(e.getWeightClass()){
                     case EntityWeightClass.WEIGHT_LARGE_WAR:
                         countLargeWS++;
-                        lgws.add(new DefaultMutableTreeNode(u.getName()));
+                        lgws.add(new DefaultMutableTreeNode(createNodeName(u)));
                         break;
                     case EntityWeightClass.WEIGHT_SMALL_WAR:
                         countSmallWS++;
-                        smws.add(new DefaultMutableTreeNode(u.getName()));
+                        smws.add(new DefaultMutableTreeNode(createNodeName(u)));
                         break;
                 }
             } else if (e instanceof Jumpship) {
                 countSpace++;
-                countJumpships++;
-                js.add(new DefaultMutableTreeNode(u.getName()));
+                countJumpShips++;
+                js.add(new DefaultMutableTreeNode(createNodeName(u)));
             } else if (e instanceof Dropship) {
                 countSpace++;
                 countDropships++;
                 switch(e.getWeightClass()) {
                     case EntityWeightClass.WEIGHT_LARGE_DROP:
                         countLargeDS++;
-                        lgds.add(new DefaultMutableTreeNode(u.getName()));
+                        lgds.add(new DefaultMutableTreeNode(createNodeName(u)));
                         break;
                     case EntityWeightClass.WEIGHT_MEDIUM_DROP:
                         countMediumDS++;
-                        mdds.add(new DefaultMutableTreeNode(u.getName()));
+                        mdds.add(new DefaultMutableTreeNode(createNodeName(u)));
                         break;
                     case EntityWeightClass.WEIGHT_SMALL_DROP:
                         countSmallDS++;
-                        smds.add(new DefaultMutableTreeNode(u.getName()));
+                        smds.add(new DefaultMutableTreeNode(createNodeName(u)));
                         break;
                 }
             } else if (e instanceof SmallCraft) {
                 countSpace++;
                 countSmallCraft++;
-                sc.add(new DefaultMutableTreeNode(u.getName()));
+                sc.add(new DefaultMutableTreeNode(createNodeName(u)));
             } else if (e instanceof Aero) {
                 countASF++;
                 if (e.isOmni()) {
@@ -1522,15 +1529,15 @@ public class HangarReport extends Report {
                     switch(e.getWeightClass()) {
                         case EntityWeightClass.WEIGHT_HEAVY:
                             countOmniHeavyASF++;
-                            oHeavyASF.add(new DefaultMutableTreeNode(u.getName()));
+                            oHeavyASF.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                         case EntityWeightClass.WEIGHT_MEDIUM:
                             countOmniMediumASF++;
-                            oMediumASF.add(new DefaultMutableTreeNode(u.getName()));
+                            oMediumASF.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                         case EntityWeightClass.WEIGHT_LIGHT:
                             countOmniLightASF++;
-                            oLightASF.add(new DefaultMutableTreeNode(u.getName()));
+                            oLightASF.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                     }
                 } else {
@@ -1538,15 +1545,15 @@ public class HangarReport extends Report {
                     switch(e.getWeightClass()) {
                         case EntityWeightClass.WEIGHT_HEAVY:
                             countHeavyASF++;
-                            sHeavyASF.add(new DefaultMutableTreeNode(u.getName()));
+                            sHeavyASF.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                         case EntityWeightClass.WEIGHT_MEDIUM:
                             countMediumASF++;
-                            sMediumASF.add(new DefaultMutableTreeNode(u.getName()));
+                            sMediumASF.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                         case EntityWeightClass.WEIGHT_LIGHT:
                             countLightASF++;
-                            sLightASF.add(new DefaultMutableTreeNode(u.getName()));
+                            sLightASF.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                     }
                 }
@@ -1555,24 +1562,24 @@ public class HangarReport extends Report {
                 switch(e.getWeightClass()) {
                     case EntityWeightClass.WEIGHT_ASSAULT:
                         countAssaultProtos++;
-                        pAssault.add(new DefaultMutableTreeNode(u.getName()));
+                        pAssault.add(new DefaultMutableTreeNode(createNodeName(u)));
                         break;
                     case EntityWeightClass.WEIGHT_HEAVY:
                         countHeavyProtos++;
-                        pHeavy.add(new DefaultMutableTreeNode(u.getName()));
+                        pHeavy.add(new DefaultMutableTreeNode(createNodeName(u)));
                         break;
                     case EntityWeightClass.WEIGHT_MEDIUM:
                         countMediumProtos++;
-                        pMedium.add(new DefaultMutableTreeNode(u.getName()));
+                        pMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                         break;
                     case EntityWeightClass.WEIGHT_LIGHT:
                         countLightProtos++;
-                        pLight.add(new DefaultMutableTreeNode(u.getName()));
+                        pLight.add(new DefaultMutableTreeNode(createNodeName(u)));
                         break;
                 }
             } else if (e instanceof GunEmplacement) {
                 countGE++;
-                ge.add(new DefaultMutableTreeNode(u.getName()));
+                ge.add(new DefaultMutableTreeNode(createNodeName(u)));
             } else if (e instanceof Tank) {
                 countVees++;
                 if (e.isOmni()) {
@@ -1582,23 +1589,23 @@ public class HangarReport extends Report {
                         switch(e.getWeightClass()){
                             case EntityWeightClass.WEIGHT_COLOSSAL:
                                 countOmniTrackedColossal++;
-                                oTrackedColossal.add(new DefaultMutableTreeNode(u.getName()));
+                                oTrackedColossal.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_ASSAULT:
                                 countOmniTrackedAssault++;
-                                oTrackedAssault.add(new DefaultMutableTreeNode(u.getName()));
+                                oTrackedAssault.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_HEAVY:
                                 countOmniTrackedHeavy++;
-                                oTrackedHeavy.add(new DefaultMutableTreeNode(u.getName()));
+                                oTrackedHeavy.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM:
                                 countOmniTrackedMedium++;
-                                oTrackedMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                oTrackedMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_LIGHT:
                                 countOmniTrackedLight++;
-                                oTrackedLight.add(new DefaultMutableTreeNode(u.getName()));
+                                oTrackedLight.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.WHEELED) {
@@ -1606,19 +1613,19 @@ public class HangarReport extends Report {
                         switch(e.getWeightClass()){
                             case EntityWeightClass.WEIGHT_ASSAULT:
                                 countOmniWheeledAssault++;
-                                oWheeledAssault.add(new DefaultMutableTreeNode(u.getName()));
+                                oWheeledAssault.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_HEAVY:
                                 countOmniWheeledHeavy++;
-                                oWheeledHeavy.add(new DefaultMutableTreeNode(u.getName()));
+                                oWheeledHeavy.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM:
                                 countOmniWheeledMedium++;
-                                oWheeledMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                oWheeledMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_LIGHT:
                                 countOmniWheeledLight++;
-                                oWheeledLight.add(new DefaultMutableTreeNode(u.getName()));
+                                oWheeledLight.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.HOVER) {
@@ -1626,37 +1633,37 @@ public class HangarReport extends Report {
                         switch(e.getWeightClass()){
                             case EntityWeightClass.WEIGHT_MEDIUM:
                                 countOmniHoverMedium++;
-                                oHoverMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                oHoverMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_LIGHT:
                                 countOmniHoverLight++;
-                                oHoverLight.add(new DefaultMutableTreeNode(u.getName()));
+                                oHoverLight.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.VTOL) {
                         countOmniVTOL++;
                         if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
                             countOmniVTOLLight++;
-                            oVTOLLight.add(new DefaultMutableTreeNode(u.getName()));
+                            oVTOLLight.add(new DefaultMutableTreeNode(createNodeName(u)));
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.WIGE) {
                         countOmniWiGE++;
                         switch(e.getWeightClass()){
                             case EntityWeightClass.WEIGHT_ASSAULT:
                                 countOmniWiGEAssault++;
-                                oWiGEAssault.add(new DefaultMutableTreeNode(u.getName()));
+                                oWiGEAssault.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_HEAVY:
                                 countOmniWiGEHeavy++;
-                                oWiGEHeavy.add(new DefaultMutableTreeNode(u.getName()));
+                                oWiGEHeavy.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM:
                                 countOmniWiGEMedium++;
-                                oWiGEMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                oWiGEMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_LIGHT:
                                 countOmniWiGELight++;
-                                oWiGELight.add(new DefaultMutableTreeNode(u.getName()));
+                                oWiGELight.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.NAVAL) {
@@ -1664,23 +1671,23 @@ public class HangarReport extends Report {
                         switch(e.getWeightClass()){
                             case EntityWeightClass.WEIGHT_COLOSSAL:
                                 countOmniNavalColossal++;
-                                oNavalColossal.add(new DefaultMutableTreeNode(u.getName()));
+                                oNavalColossal.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_ASSAULT:
                                 countOmniNavalAssault++;
-                                oNavalAssault.add(new DefaultMutableTreeNode(u.getName()));
+                                oNavalAssault.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_HEAVY:
                                 countOmniNavalHeavy++;
-                                oNavalHeavy.add(new DefaultMutableTreeNode(u.getName()));
+                                oNavalHeavy.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM:
                                 countOmniNavalMedium++;
-                                oNavalMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                oNavalMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_LIGHT:
                                 countOmniNavalLight++;
-                                oNavalLight.add(new DefaultMutableTreeNode(u.getName()));
+                                oNavalLight.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.SUBMARINE) {
@@ -1688,23 +1695,23 @@ public class HangarReport extends Report {
                         switch(e.getWeightClass()){
                             case EntityWeightClass.WEIGHT_COLOSSAL:
                                 countOmniSubColossal++;
-                                oSubColossal.add(new DefaultMutableTreeNode(u.getName()));
+                                oSubColossal.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_ASSAULT:
                                 countOmniSubAssault++;
-                                oSubAssault.add(new DefaultMutableTreeNode(u.getName()));
+                                oSubAssault.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_HEAVY:
                                 countOmniSubHeavy++;
-                                oSubHeavy.add(new DefaultMutableTreeNode(u.getName()));
+                                oSubHeavy.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM:
                                 countOmniSubMedium++;
-                                oSubMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                oSubMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_LIGHT:
                                 countOmniSubLight++;
-                                oSubLight.add(new DefaultMutableTreeNode(u.getName()));
+                                oSubLight.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.HYDROFOIL) {
@@ -1712,19 +1719,19 @@ public class HangarReport extends Report {
                         switch(e.getWeightClass()){
                             case EntityWeightClass.WEIGHT_ASSAULT:
                                 countOmniHydrofoilAssault++;
-                                oHydrofoilAssault.add(new DefaultMutableTreeNode(u.getName()));
+                                oHydrofoilAssault.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_HEAVY:
                                 countOmniHydrofoilHeavy++;
-                                oHydrofoilHeavy.add(new DefaultMutableTreeNode(u.getName()));
+                                oHydrofoilHeavy.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM:
                                 countOmniHydrofoilMedium++;
-                                oHydrofoilMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                oHydrofoilMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_LIGHT:
                                 countOmniHydrofoilLight++;
-                                oHydrofoilLight.add(new DefaultMutableTreeNode(u.getName()));
+                                oHydrofoilLight.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     }
@@ -1735,23 +1742,23 @@ public class HangarReport extends Report {
                         switch(e.getWeightClass()){
                             case EntityWeightClass.WEIGHT_COLOSSAL:
                                 countTrackedColossal++;
-                                sTrackedColossal.add(new DefaultMutableTreeNode(u.getName()));
+                                sTrackedColossal.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_ASSAULT:
                                 countTrackedAssault++;
-                                sTrackedAssault.add(new DefaultMutableTreeNode(u.getName()));
+                                sTrackedAssault.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_HEAVY:
                                 countTrackedHeavy++;
-                                sTrackedHeavy.add(new DefaultMutableTreeNode(u.getName()));
+                                sTrackedHeavy.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM:
                                 countTrackedMedium++;
-                                sTrackedMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                sTrackedMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_LIGHT:
                                 countTrackedLight++;
-                                sTrackedLight.add(new DefaultMutableTreeNode(u.getName()));
+                                sTrackedLight.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.WHEELED) {
@@ -1759,19 +1766,19 @@ public class HangarReport extends Report {
                         switch(e.getWeightClass()){
                             case EntityWeightClass.WEIGHT_ASSAULT:
                                 countWheeledAssault++;
-                                sWheeledAssault.add(new DefaultMutableTreeNode(u.getName()));
+                                sWheeledAssault.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_HEAVY:
                                 countWheeledHeavy++;
-                                sWheeledHeavy.add(new DefaultMutableTreeNode(u.getName()));
+                                sWheeledHeavy.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM:
                                 countWheeledMedium++;
-                                sWheeledMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                sWheeledMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_LIGHT:
                                 countWheeledLight++;
-                                sWheeledLight.add(new DefaultMutableTreeNode(u.getName()));
+                                sWheeledLight.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.HOVER) {
@@ -1779,37 +1786,37 @@ public class HangarReport extends Report {
                         switch(e.getWeightClass()){
                             case EntityWeightClass.WEIGHT_MEDIUM:
                                 countHoverMedium++;
-                                sHoverMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                sHoverMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_LIGHT:
                                 countHoverLight++;
-                                sHoverLight.add(new DefaultMutableTreeNode(u.getName()));
+                                sHoverLight.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.VTOL) {
                         countVTOL++;
                         if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
                             countVTOLLight++;
-                            sVTOLLight.add(new DefaultMutableTreeNode(u.getName()));
+                            sVTOLLight.add(new DefaultMutableTreeNode(createNodeName(u)));
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.WIGE) {
                         countWiGE++;
                         switch(e.getWeightClass()){
                             case EntityWeightClass.WEIGHT_ASSAULT:
                                 countWiGEAssault++;
-                                sWiGEAssault.add(new DefaultMutableTreeNode(u.getName()));
+                                sWiGEAssault.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_HEAVY:
                                 countWiGEHeavy++;
-                                sWiGEHeavy.add(new DefaultMutableTreeNode(u.getName()));
+                                sWiGEHeavy.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM:
                                 countWiGEMedium++;
-                                sWiGEMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                sWiGEMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_LIGHT:
                                 countWiGELight++;
-                                sWiGELight.add(new DefaultMutableTreeNode(u.getName()));
+                                sWiGELight.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.NAVAL) {
@@ -1817,23 +1824,23 @@ public class HangarReport extends Report {
                         switch(e.getWeightClass()){
                             case EntityWeightClass.WEIGHT_COLOSSAL:
                                 countNavalColossal++;
-                                sNavalColossal.add(new DefaultMutableTreeNode(u.getName()));
+                                sNavalColossal.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_ASSAULT:
                                 countNavalAssault++;
-                                sNavalAssault.add(new DefaultMutableTreeNode(u.getName()));
+                                sNavalAssault.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_HEAVY:
                                 countNavalHeavy++;
-                                sNavalHeavy.add(new DefaultMutableTreeNode(u.getName()));
+                                sNavalHeavy.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM:
                                 countNavalMedium++;
-                                sNavalMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                sNavalMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_LIGHT:
                                 countNavalLight++;
-                                sNavalLight.add(new DefaultMutableTreeNode(u.getName()));
+                                sNavalLight.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.SUBMARINE) {
@@ -1841,23 +1848,23 @@ public class HangarReport extends Report {
                         switch(e.getWeightClass()){
                             case EntityWeightClass.WEIGHT_COLOSSAL:
                                 countSubColossal++;
-                                sSubColossal.add(new DefaultMutableTreeNode(u.getName()));
+                                sSubColossal.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_ASSAULT:
                                 countSubAssault++;
-                                sSubAssault.add(new DefaultMutableTreeNode(u.getName()));
+                                sSubAssault.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_HEAVY:
                                 countSubHeavy++;
-                                sSubHeavy.add(new DefaultMutableTreeNode(u.getName()));
+                                sSubHeavy.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM:
                                 countSubMedium++;
-                                sSubMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                sSubMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_LIGHT:
                                 countSubLight++;
-                                sSubLight.add(new DefaultMutableTreeNode(u.getName()));
+                                sSubLight.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     } else if (e.getMovementMode() == EntityMovementMode.HYDROFOIL) {
@@ -1865,19 +1872,19 @@ public class HangarReport extends Report {
                         switch(e.getWeightClass()){
                             case EntityWeightClass.WEIGHT_ASSAULT:
                                 countHydrofoilAssault++;
-                                sHydrofoilAssault.add(new DefaultMutableTreeNode(u.getName()));
+                                sHydrofoilAssault.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_HEAVY:
                                 countHydrofoilHeavy++;
-                                sHydrofoilHeavy.add(new DefaultMutableTreeNode(u.getName()));
+                                sHydrofoilHeavy.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_MEDIUM:
                                 countHydrofoilMedium++;
-                                sHydrofoilMedium.add(new DefaultMutableTreeNode(u.getName()));
+                                sHydrofoilMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                             case EntityWeightClass.WEIGHT_LIGHT:
                                 countHydrofoilLight++;
-                                sHydrofoilLight.add(new DefaultMutableTreeNode(u.getName()));
+                                sHydrofoilLight.add(new DefaultMutableTreeNode(createNodeName(u)));
                                 break;
                         }
                     }
@@ -1887,39 +1894,39 @@ public class HangarReport extends Report {
                 switch(e.getWeightClass()){
                     case EntityWeightClass.WEIGHT_ASSAULT:
                         countBAAssault++;
-                        baAssault.add(new DefaultMutableTreeNode(u.getName()));
+                        baAssault.add(new DefaultMutableTreeNode(createNodeName(u)));
                         break;
                     case EntityWeightClass.WEIGHT_HEAVY:
                         countBAHeavy++;
-                        baHeavy.add(new DefaultMutableTreeNode(u.getName()));
+                        baHeavy.add(new DefaultMutableTreeNode(createNodeName(u)));
                         break;
                     case EntityWeightClass.WEIGHT_MEDIUM:
                         countBAMedium++;
-                        baMedium.add(new DefaultMutableTreeNode(u.getName()));
+                        baMedium.add(new DefaultMutableTreeNode(createNodeName(u)));
                         break;
                     case EntityWeightClass.WEIGHT_LIGHT:
                         countBALight++;
-                        baLight.add(new DefaultMutableTreeNode(u.getName()));
+                        baLight.add(new DefaultMutableTreeNode(createNodeName(u)));
                         break;
                     case EntityWeightClass.WEIGHT_ULTRA_LIGHT:
                         countBAPAL++;
-                        baPAL.add(new DefaultMutableTreeNode(u.getName()));
+                        baPAL.add(new DefaultMutableTreeNode(createNodeName(u)));
                         break;
                 }
             } else if (e instanceof Infantry) {
                 countInfantry++;
                 if (((Infantry) e).isMechanized()) {
                     countMechanizedInfantry++;
-                    infMechanized.add(new DefaultMutableTreeNode(u.getName()));
+                    infMechanized.add(new DefaultMutableTreeNode(createNodeName(u)));
                 } else if (e.getMovementMode() == EntityMovementMode.INF_JUMP) {
                     countJumpInfantry++;
-                    infJump.add(new DefaultMutableTreeNode(u.getName()));
+                    infJump.add(new DefaultMutableTreeNode(createNodeName(u)));
                 } else if (e.getMovementMode() == EntityMovementMode.INF_LEG) {
                     countFootInfantry++;
-                    infFoot.add(new DefaultMutableTreeNode(u.getName()));
+                    infFoot.add(new DefaultMutableTreeNode(createNodeName(u)));
                 } else if (e.getMovementMode() == EntityMovementMode.INF_MOTORIZED) {
                     countMotorizedInfantry++;
-                    infMotorized.add(new DefaultMutableTreeNode(u.getName()));
+                    infMotorized.add(new DefaultMutableTreeNode(createNodeName(u)));
                 }
             }
         }
@@ -2236,9 +2243,9 @@ public class HangarReport extends Report {
         mdds.setUserObject("Medium DropShips: " + countMediumDS);
         smds.setUserObject("Small DropShips: " + countSmallDS);
 
-        js.setUserObject("JumpShips: " + countJumpships);
+        js.setUserObject("JumpShips: " + countJumpShips);
 
-        ws.setUserObject("WarShips: " + countWarships);
+        ws.setUserObject("WarShips: " + countWarShips);
         lgws.setUserObject("Large WarShips: " + countLargeWS);
         smws.setUserObject("Small WarShips: " + countSmallWS);
 
@@ -2284,6 +2291,16 @@ public class HangarReport extends Report {
         */
 
         return overviewHangarTree;
+    }
+
+    public String createNodeName(Unit u) {
+        String name = u.getName();
+
+        if (u.isMothballed()) {
+            name += " (Mothballed)";
+        }
+
+        return name;
     }
 
     public String getHangarTotals() {
