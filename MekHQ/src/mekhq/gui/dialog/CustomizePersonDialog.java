@@ -204,7 +204,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         panDemog.add(lblName, gridBagConstraints);
 
-        textGivenName.setMinimumSize(new java.awt.Dimension(60, 28));
+        textGivenName.setMinimumSize(new java.awt.Dimension(100, 28));
         textGivenName.setName("textGivenName"); // NOI18N
         textGivenName.setPreferredSize(new java.awt.Dimension(100, 28));
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -216,14 +216,14 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         textGivenName.setText(person.getGivenName());
         panName.add(textGivenName, gridBagConstraints);
 
-        textSurname.setMinimumSize(new java.awt.Dimension(60, 28));
+        textSurname.setMinimumSize(new java.awt.Dimension(100, 28));
         textSurname.setName("textSurname"); // NOI18N
         textSurname.setPreferredSize(new java.awt.Dimension(100, 28));
         gridBagConstraints.gridx = 2;
         textSurname.setText(person.getSurname());
         panName.add(textSurname, gridBagConstraints);
 
-        textHonorific.setMinimumSize(new java.awt.Dimension(30, 28));
+        textHonorific.setMinimumSize(new java.awt.Dimension(50, 28));
         textHonorific.setName("textHonorific"); // NOI18N
         textHonorific.setPreferredSize(new java.awt.Dimension(50, 28));
         gridBagConstraints.gridx = 3;
