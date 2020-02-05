@@ -22,6 +22,9 @@ package mekhq.campaign.report;
 
 import java.awt.Dimension;
 import java.awt.Font;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 import javax.swing.JTextPane;
 import javax.swing.JTree;
@@ -974,7 +977,9 @@ public class HangarReport extends Report {
 
         //region UnitList Processing
         // Gather data and load it into the tree
-        for (Unit u : getCampaign().getUnits()) {
+        List<Unit> unitList = new ArrayList(getCampaign().getUnits());
+        unitList.sort(Comparator.comparing(Unit::getName));
+        for (Unit u : unitList) {
             Entity e = u.getEntity();
 
             // Create general stats
