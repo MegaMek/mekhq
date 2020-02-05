@@ -35,7 +35,7 @@ public class PersonalLogger {
 
     public static void spouseKia(Person spouse, Person person, Date date){
         String message = logEntriesResourceMap.getString("spouseKia.text");
-        spouse.addLogEntry(new PersonalLogEntry(date, MessageFormat.format(message, person.getName())));
+        spouse.addLogEntry(new PersonalLogEntry(date, MessageFormat.format(message, person.getFullName())));
     }
 
     public static void divorcedFrom(Person person, Person spouse, Date date){

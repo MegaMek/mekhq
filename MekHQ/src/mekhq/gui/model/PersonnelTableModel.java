@@ -39,7 +39,7 @@ import mekhq.gui.BasicInfo;
         private PersonnelMarket personnelMarket;
         private boolean loadAssignmentFromMarket;
         private boolean groupByUnit;
-        
+
         public final static int COL_RANK     =    0;
         public final static int COL_NAME     =    1;
         public final static int COL_CALL     =    2;
@@ -300,7 +300,7 @@ import mekhq.gui.BasicInfo;
             }
             if(col == COL_NAME) {
                 if (!getGroupByUnit()) {
-                    return p.getName();
+                    return p.getFullName();
                 } else {
                     // If we're grouping by unit, determine the number of persons under
                     // their command.
@@ -308,14 +308,14 @@ import mekhq.gui.BasicInfo;
 
                     // If the personnel does not have a unit, return their name
                     if (unitId == null) {
-                        return p.getName();
+                        return p.getFullName();
                     }
 
                     // Get the actual unit
                     Unit u = getCampaign().getUnit(unitId);
                     if (u == null) {
                         // This should not happen, but if it does, just return their name
-                        return p.getName();
+                        return p.getFullName();
                     }
 
                     // Get the crew for the unit
@@ -326,10 +326,10 @@ import mekhq.gui.BasicInfo;
                     int crewCount = crew.size() - 1;
                     if (crewCount <= 0) {
                         // If there is only one crew member, just return their name
-                        return p.getName();
+                        return p.getFullName();
                     }
 
-                    StringBuilder builder = new StringBuilder(p.getName());
+                    StringBuilder builder = new StringBuilder(p.getFullName());
                     builder.append(" (+");
                     builder.append(crewCount);
                     if (u.usesSoldiers()) {
@@ -583,11 +583,11 @@ import mekhq.gui.BasicInfo;
             if(col == COL_ASSIGN) {
             	if (loadAssignmentFromMarket) {
             		Entity en = personnelMarket.getAttachedEntity(p);
-            		
+
             		if (null == en) {
             			return "-";
             		}
-            		
+
             		return en.getDisplayName();
             	} else {
 	                Unit u = getCampaign().getUnit(p.getUnitId());

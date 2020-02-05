@@ -4739,9 +4739,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setOriginSearchRadius((Integer)spnOriginSearchRadius.getModel().getValue());
         //Family
         options.setUseUnofficialProcreation(chkUseUnofficialProcreation.isSelected());
-        options.setChanceProcreation((Float) spnChanceProcreation.getModel().getValue());
+        options.setChanceProcreation((Double) spnChanceProcreation.getModel().getValue());
         options.setUseUnofficialProcreationNoRelationship(chkUseUnofficialProcreationNoRelationship.isSelected());
-        options.setChanceProcreationNoRelationship((Float) spnChanceProcreationNoRelationship.getModel().getValue());
+        options.setChanceProcreationNoRelationship((Double) spnChanceProcreationNoRelationship.getModel().getValue());
         options.setCheckMutualAncestorsDepth((Integer) spnCheckMutualAncestorsDepth.getModel().getValue());
         options.setUseParentage(chkUseParentage.isSelected());
         options.setDisplayFamilyLevel(comboDisplayFamilyLevel.getSelectedIndex());

@@ -221,7 +221,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
 
                                     u.setTech(tech);
                                 } else {
-                                    cantTech += tech.getName() + " cannot maintain " + u.getName() + "\n";
+                                    cantTech += tech.getFullName() + " cannot maintain " + u.getName() + "\n";
                                 }
                             }
                         }
@@ -1400,7 +1400,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                         popup.add(menu);
                     }
 
-                    
+
                     //First, only display the Assign to Ship command if your command has at least 1 valid transport
                     //and if your selection does not include a transport
                     boolean shipInSelection = false;

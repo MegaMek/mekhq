@@ -907,7 +907,7 @@ public class Campaign implements Serializable, ITechManager {
 
                     u.setTech(forceTech);
                 } else {
-                    String cantTech = forceTech.getName() + " cannot maintain " + u.getName() + "\n"
+                    String cantTech = forceTech.getFullName() + " cannot maintain " + u.getName() + "\n"
                             + "You will need to assign a tech manually.";
                     JOptionPane.showMessageDialog(null, cantTech, "Warning", JOptionPane.WARNING_MESSAGE);
                 }
@@ -4733,7 +4733,7 @@ public class Campaign implements Serializable, ITechManager {
         // Person already has a bloodname?
         if (person.getBloodname().length() > 0) {
             int result = JOptionPane.showConfirmDialog(null,
-                    person.getName() + " already has the bloodname " + person.getBloodname()
+                    person.getFullName() + " already has the bloodname " + person.getBloodname()
                             + "\nDo you wish to remove that bloodname and generate a new one?",
                     "Already Has Bloodname", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (result == JOptionPane.NO_OPTION) {

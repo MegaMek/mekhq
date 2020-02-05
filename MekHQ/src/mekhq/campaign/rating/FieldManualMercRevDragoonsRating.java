@@ -118,7 +118,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             if (null != p) {
                 getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                                 "Unit " + u.getName() +
-                                " -- Adding commander (" + p.getName() + "" +
+                                " -- Adding commander (" + p.getFullName() + "" +
                                 ") to commander list.");
                 getCommanderList().add(p);
             }
@@ -382,7 +382,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             hours = (int) Math.floor(hours / 2.0);
         }
         getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
-                        "Person, " + p.getName() + ", provides " +
+                        "Person, " + p.getFullName() + ", provides " +
                         hours + " tech support hours.");
         techSupportHours += hours;
     }
@@ -399,7 +399,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             hours = (int) Math.floor(hours / 2.0);
         }
         getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
-                        "Person, " + p.getName() + " provides " +
+                        "Person, " + p.getFullName() + " provides " +
                         hours + " medical support hours.");
         medSupportHours += hours;
     }
@@ -416,7 +416,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             hours = (int) Math.floor(hours / 2.0);
         }
         getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
-                        "Person, " + p.getName() + ", provides " +
+                        "Person, " + p.getFullName() + ", provides " +
                         hours + " admin support hours.");
         adminSupportHours += hours;
     }
@@ -437,7 +437,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         Crew p = u.getEntity().getCrew();
         BigDecimal combatSkillAverage;
 
-        //Infantry and Protos do not have a piloting skill.
+        //Infantry and ProtoMechs do not have a piloting skill.
         if ((u.getEntity() instanceof Infantry) ||
             (u.getEntity() instanceof Protomech)) {
             combatSkillAverage = new BigDecimal(p.getGunnery());
@@ -737,7 +737,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         StringBuilder out = new StringBuilder();
         Person commander = getCommander();
         String commanderName = (null == commander) ? "" :
-                               " (" + commander.getName() + ")";
+                               " (" + commander.getFullName() + ")";
         out.append(String.format("%-" + HEADER_LENGTH + "s %3d %s",
                                  "Command:", getCommanderValue(),
                                  commanderName)).append("\n");

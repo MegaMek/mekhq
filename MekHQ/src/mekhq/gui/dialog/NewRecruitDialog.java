@@ -67,7 +67,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
 
     private void initComponents() {
         scrollView = new JScrollPane();
-        choiceRanks = new javax.swing.JComboBox<String>();
+        choiceRanks = new javax.swing.JComboBox<>();
 
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewRecruitDialog", new EncodeControl());
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -217,7 +217,11 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     }
 
     private void randomName() {
-        person.setName(hqView.getCampaign().getRNG().generate(person.getGender() == Person.G_FEMALE));
+        // TODO : Windchild reimplement
+        //String[] name = getNameGenerator().generateGivenNameSurnameSplit(isFemale);
+        String[] name = {"initial", "tests"};
+        person.setGivenName(name[0]);
+        person.setSurname(name[1]);
         refreshView();
     }
 
@@ -264,7 +268,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     }
 
     private void refreshRanksCombo() {
-        DefaultComboBoxModel<String> ranksModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> ranksModel = new DefaultComboBoxModel<>();
 
         // Determine correct profession to pass into the loop
         int profession = person.getProfession();

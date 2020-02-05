@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import megamek.common.util.EncodeControl;
+import megamek.common.util.StringUtil;
 import mekhq.campaign.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.*;
@@ -213,7 +214,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
     protected UUID id;
     protected int oldId;
 
-    private String name;
+    private String fullName;
+    private String givenName;
+    private String surname;
+    private String honorific;
     private String maidenName;
     private String callsign;
     private int gender;
@@ -359,19 +363,20 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     //default constructor
     public Person(Campaign c) {
-        this("Biff the Understudy", c);
+        this("Biff", "the Understudy", c);
     }
 
     public Person(Campaign c, String factionCode) {
-        this("Biff the Understudy", c, factionCode);
+        this("Biff", "the Understudy", c, factionCode);
     }
 
-    public Person(String name, Campaign c) {
-        this(name, c, c.getFactionCode());
+    public Person(String givenName, String surname, Campaign c) {
+        this(givenName, surname, c, c.getFactionCode());
     }
 
-    public Person(String name, Campaign c, String factionCode) {
-        this.name = name;
+    public Person(String givenName, String surname, Campaign c, String factionCode) {
+        this.givenName = givenName;
+        this.surname = surname;
         callsign = "";
         portraitCategory = Crew.ROOT_PORTRAIT;
         portraitFile = Crew.PORTRAIT_NONE;
@@ -411,6 +416,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
         primaryDesignator = DESIG_NONE;
         secondaryDesignator = DESIG_NONE;
         awardController = new PersonAwardController(this);
+        setFullName();
+    }
+
+    public Person(String givenName, String surname, String honorific, Campaign c, String factionCode) {
+        this(givenName, surname, c, factionCode);
+        this.honorific = honorific;
+        setFullName();
     }
 
     public Campaign getCampaign(){return campaign;}
@@ -671,12 +683,31 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return getPrisonerStatusName(prisonerStatus);
     }
 
-    public String getName() {
-        return name;
+    public String getGivenName() {
+        return givenName;
     }
 
-    public void setName(String n) {
-        this.name = n;
+    public void setGivenName(String n) {
+        this.givenName = n;
+        setFullName();
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String n) {
+        this.surname = n;
+        setFullName();
+    }
+
+    public String getHonorific() {
+        return honorific;
+    }
+
+    public void setHonorific(String n) {
+        this.honorific = n;
+        setFullName();
     }
 
     public String getMaidenName() {
@@ -688,10 +719,65 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public String getFullName() {
-        if (bloodname.length() > 0) {
-            return name + " " + bloodname;
+        return fullName;
+    }
+
+    public void setFullName() {
+        if (!StringUtil.isNullOrEmpty(surname)) {
+            fullName = givenName + " " + surname;
+        } else {
+            if (isClanner()) {
+                if (bloodname.length() > 0) {
+                    fullName = givenName + " " + bloodname;
+                } else {
+                    fullName = givenName;
+                }
+            } else {
+                fullName = givenName;
+            }
         }
-        return name;
+
+        if (!StringUtil.isNullOrEmpty(honorific)) {
+            fullName += " " + honorific;
+        }
+    }
+
+    /**
+     * This method is used to migrate names from being a joined name to split between given name and surname,
+     * as part of the Personnel changes in MekHQ 0.47.4.
+     * @param n the name to be migrated
+     */
+    public void migrateName(String n) {
+        // How this works is that it takes the input name, and splits it into individual parts.
+        // Depending on the length of the resulting array, the name is processed differently
+        // Array of length 1: the name is assumed to not have a surname, just a given name
+        // Array of length 2: the name is assumed to be a given name and a surname
+        // Array of length 3: the name is assumed to be a given name and two surnames
+        // Array of length 4+: the name is assumed to be as many given names as possible and two surnames
+        //
+        // Then, the full name is set
+        String[] name = n.split(" ");
+
+        if (name.length == 1) {
+            givenName = name[0];
+            surname = null;
+        } else if (name.length == 2) {
+            givenName = name[0];
+            surname = name[1];
+        } else if (name.length == 3) {
+            givenName = name[0];
+            surname = name[1] + " " + name[2];
+        } else if (name.length > 3) {
+            int i = 0;
+            givenName = name[i];
+            for (i = 1; i < name.length - 2; i++) {
+                givenName += " " + name[i];
+            }
+
+            surname = name[i + 1] + " " + name[i + 2];
+        }
+
+        setFullName();
     }
 
    public String getHyperlinkedName() {
@@ -1105,7 +1191,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
         return IntStream.range(0, size).mapToObj(i -> {
             Person baby = campaign.newDependent(T_NONE);
-            baby.setName(baby.getName().split(" ", 2)[0] + " " + surname);
+            baby.setSurname(surname);
             baby.setBirthday((GregorianCalendar) campaign.getCalendar().clone());
             UUID babyId = UUID.randomUUID();
             while (null != campaign.getPerson(babyId)) {
@@ -1123,7 +1209,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     private String generateBabySurname() {
         String surname;
-        surname = getName().contains(" ") ? getName().split(" ", 2)[1] : "";
+        if (hasSpouse() && campaign.getCampaignOptions().getBabySurnameStyle() == CampaignOptions.BABY_SURNAME_SPOUSE) {
+            surname = getSpouse().getSurname();
+        } else {
+            surname = getSurname();
+        }
         return surname;
     }
 
@@ -1236,14 +1326,26 @@ public class Person implements Serializable, MekHqXmlSerializable {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<person id=\""
-                    + id.toString()
-                    + "\" type=\""
-                    + this.getClass().getName()
-                    + "\">");
+                + id.toString()
+                + "\" type=\""
+                + this.getClass().getName()
+                + "\">");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "<name>"
-                    + MekHqXmlUtil.escape(name)
-                    + "</name>");
+                + "<givenName>"
+                + MekHqXmlUtil.escape(givenName)
+                + "</givenName>");
+        if (surname != null) {
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                    + "<surname>"
+                    + MekHqXmlUtil.escape(surname)
+                    + "</surname>");
+        }
+        if (honorific != null) {
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                    + "<honorific>"
+                    + MekHqXmlUtil.escape(honorific)
+                    + "</honorific>");
+        }
         if (maidenName != null) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<maidenName>"
@@ -1564,8 +1666,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
 
-                if (wn2.getNodeName().equalsIgnoreCase("name")) {
-                    retVal.name = wn2.getTextContent();
+                if (wn2.getNodeName().equalsIgnoreCase("name")) { //included for backwards compatibility
+                    retVal.migrateName(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("givenName")) {
+                    retVal.setGivenName(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("surname")) {
+                    retVal.setSurname(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("honorific")) {
+                    retVal.setHonorific(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("maidenName")) {
                     retVal.maidenName = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("callsign")) {
@@ -1631,7 +1739,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         }
                         retVal.formerSpouses.add(FormerSpouse.generateInstanceFromXML(wn3));
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("duedate")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("dueDate")) {
                     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                     retVal.dueDate = (GregorianCalendar) GregorianCalendar.getInstance();
                     retVal.dueDate.setTime(df.parse(wn2.getTextContent().trim()));
@@ -1966,8 +2074,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 }
                 retVal.addSkill(SkillType.S_TACTICS, pilotCommandBonus, 0);
             }
-            if (null != pilotName) {
-                retVal.setName(pilotName);
+            if (pilotName != null) {
+                retVal.migrateName(pilotName);
             }
             if (null != pilotNickname) {
                 retVal.setCallsign(pilotNickname);
@@ -2038,7 +2146,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         totalBase = totalBase.multipliedBy(getRank().getPayMultiplier());
 
         return totalBase;
-        //TODO: distinguish dropship, jumpship, and warship crew
+        //TODO: distinguish DropShip, JumpShip, and WarShip crew
         //TODO: Add era mod to salary calc..
     }
 

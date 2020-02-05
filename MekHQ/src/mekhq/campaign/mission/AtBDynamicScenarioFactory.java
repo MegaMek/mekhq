@@ -1103,7 +1103,7 @@ public class AtBDynamicScenarioFactory {
 
         RandomNameGenerator rng = RandomNameGenerator.getInstance();
         rng.setChosenFaction(f.getNameGenerator());
-        String crewName = rng.generate();
+        String crewName = rng.generate(); //TODO : Windchild Fix me
 
         RandomSkillsGenerator rsg = new RandomSkillsGenerator();
         rsg.setMethod(RandomSkillsGenerator.M_TAHARQA);
@@ -1195,7 +1195,7 @@ public class AtBDynamicScenarioFactory {
         int[] skills = rsg.getRandomSkills(en);
         en.setCrew(new Crew(en.getCrew().getCrewType(), rng.generate(),
                             Compute.getFullCrewSize(en),
-                            skills[0], skills[1]));
+                            skills[0], skills[1])); //todo : Windchild Fix ME
 
         UUID id = UUID.randomUUID();
         en.setExternalIdAsString(id.toString());

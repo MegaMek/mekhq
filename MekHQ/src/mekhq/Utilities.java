@@ -612,7 +612,7 @@ public class Utilities {
 
         // Generate solo crews
         if (u.usesSoloPilot()) {
-            Person p = null;
+            Person p;
             if (u.getEntity() instanceof LandAirMech) {
                 p = c.newPerson(Person.T_MECHWARRIOR, factionCode);
                 p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget() - oldCrew.getPiloting(), 0);
@@ -663,7 +663,8 @@ public class Utilities {
                     p.addSkill(SkillType.S_GUN_AERO, SkillType.getType(SkillType.S_GUN_AERO).getTarget() - oldCrew.getGunnery(slot), 0);
                 }
                 if (null != p) {
-                    p.setName(oldCrew.getName(slot));
+                    //p.setName(oldCrew.getName(slot)); // TODO: Windchild fix me
+                    p.migrateName(oldCrew.getName(slot));
                     if (!oldCrew.getExternalIdAsString().equals("-1")) {
                         p.setId(UUID.fromString(oldCrew.getExternalIdAsString(slot)));
                     }
@@ -809,7 +810,8 @@ public class Utilities {
             Person p = c.newPerson(u.getEntity().isSupportVehicle() ?
                     Person.T_VEHICLE_CREW : Person.T_SPACE_CREW, factionCode);
             if (!nameset) {
-                p.setName(commanderName);
+                //p.setName(commanderName);//TODO Windchild fix me
+                p.migrateName(commanderName);//TODO Windchild fix me
                 nameset = true;
             }
             vesselCrew.add(p);
@@ -827,35 +829,40 @@ public class Utilities {
 
         for(Person p : drivers) {
             if (!nameset) {
-                p.setName(commanderName);
+                //p.setName(commanderName);//TODO Windchild fix me
+                p.migrateName(commanderName);//TODO Windchild fix me
                 nameset = true;
             }
         }
 
         for(Person p : gunners) {
             if (!nameset) {
-                p.setName(commanderName);
+                //p.setName(commanderName);//TODO Windchild fix me
+                p.migrateName(commanderName);
                 nameset = true;
             }
         }
 
         for(Person p : vesselCrew) {
             if (!nameset) {
-                p.setName(commanderName);
+                //p.setName(commanderName);
+                p.migrateName(commanderName); //TODO Windchild fix me
                 nameset = true;
             }
         }
 
         if (null != navigator) {
             if (!nameset) {
-                navigator.setName(commanderName);
+                //navigator.setName(commanderName); //TODO Windchild fix me
+                navigator.migrateName(commanderName); //TODO Windchild fix me
                 nameset = true;
             }
         }
 
         if (null != consoleCmdr) {
             if (!nameset) {
-                consoleCmdr.setName(commanderName);
+                //consoleCmdr.setName(commanderName);//TODO Windchild fix me
+                consoleCmdr.migrateName(commanderName);//TODO Windchild fix me
                 nameset = true;
             }
         }
@@ -1569,7 +1576,7 @@ public class Utilities {
         // Return the buffered image
         return bimage;
     }
-    
+
     /**
      * Handles loading a player's transported units onto their transports once a megamek scenario has actually started.
      * This separates loading air and ground units, since map type and planetary conditions may prohibit ground unit deployment
@@ -1623,7 +1630,7 @@ public class Utilities {
             }
         }
     }
-    
+
     /**
      * Method that loops through a Transport ship's bays and finds one with enough available space to load the Cargo unit
      * Helps assign a bay number to the Unit record so that transport bays can be automatically filled once a game of MegaMek is started
@@ -1636,14 +1643,14 @@ public class Utilities {
             // Try to load ASF bays first, so as not to hog SC bays
             for (Bay b: transport.getTransportBays()) {
                 if (b instanceof ASFBay && b.canLoad(cargo)) {
-                    //Load 1 unit into the bay 
+                    //Load 1 unit into the bay
                     b.setCurrentSpace(1);
                     return b.getBayNumber();
                 }
             }
             for (Bay b: transport.getTransportBays()) {
                 if (b instanceof SmallCraftBay && b.canLoad(cargo)) {
-                    //Load 1 unit into the bay 
+                    //Load 1 unit into the bay
                     b.setCurrentSpace(1);
                     return b.getBayNumber();
                 }
@@ -1652,21 +1659,21 @@ public class Utilities {
             // Try to fit lighter tanks into smaller bays first
             for (Bay b: transport.getTransportBays()) {
                 if (b instanceof LightVehicleBay && b.canLoad(cargo)) {
-                    //Load 1 unit into the bay 
+                    //Load 1 unit into the bay
                     b.setCurrentSpace(1);
                     return b.getBayNumber();
                 }
             }
             for (Bay b: transport.getTransportBays()) {
                 if (b instanceof HeavyVehicleBay && b.canLoad(cargo)) {
-                    //Load 1 unit into the bay 
+                    //Load 1 unit into the bay
                     b.setCurrentSpace(1);
                     return b.getBayNumber();
                 }
             }
             for (Bay b: transport.getTransportBays()) {
                 if (b instanceof SuperHeavyVehicleBay && b.canLoad(cargo)) {
-                    //Load 1 unit into the bay 
+                    //Load 1 unit into the bay
                     b.setCurrentSpace(1);
                     return b.getBayNumber();
                 }
@@ -1683,7 +1690,7 @@ public class Utilities {
             // Just return the first available bay
             for (Bay b : transport.getTransportBays()) {
                 if (b.canLoad(cargo)) {
-                    //Load 1 unit into the bay 
+                    //Load 1 unit into the bay
                     b.setCurrentSpace(1);
                     return b.getBayNumber();
                 }

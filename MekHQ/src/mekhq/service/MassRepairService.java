@@ -441,10 +441,10 @@ public class MassRepairService {
 			if (!parts.isEmpty()) {
 				return new MassRepairUnitAction(unit, salvaging, MassRepairUnitAction.STATUS.ALL_PARTS_IN_PROCESS);
 			}
-			
+
 			return new MassRepairUnitAction(unit, salvaging, MassRepairUnitAction.STATUS.NO_PARTS);
 		}
-		
+
 		for (IPartWork partWork : parts) {
 			if (partWork instanceof Part) {
 				Part part = (Part) partWork;
@@ -487,7 +487,7 @@ public class MassRepairService {
 				if ((p instanceof Part) && ((Part) p).isOmniPodded()) {
 					if (!(p instanceof AmmoBin) || ((p instanceof AmmoBin) && salvaging)) {
 						MissingPart m = ((Part) p).getMissingPart();
-	
+
 						if (m != null && m.isReplacementAvailable()) {
 							continue;
 						}
@@ -693,11 +693,11 @@ public class MassRepairService {
 
 		Campaign campaign = campaignGUI.getCampaign();
 		TechSorter sorter = new TechSorter(partWork);
-		Map<String, WorkTime> techSkillToWorktimeMap = new HashMap<String, WorkTime>();
-		List<Person> sameDayTechs = new ArrayList<Person>();
-		List<Person> overflowDayTechs = new ArrayList<Person>();
-		List<Person> sameDayAssignedTechs = new ArrayList<Person>();
-		List<Person> overflowDayAssignedTechs = new ArrayList<Person>();
+		Map<String, WorkTime> techSkillToWorktimeMap = new HashMap<>();
+		List<Person> sameDayTechs = new ArrayList<>();
+		List<Person> overflowDayTechs = new ArrayList<>();
+		List<Person> sameDayAssignedTechs = new ArrayList<>();
+		List<Person> overflowDayAssignedTechs = new ArrayList<>();
 		int highestAvailableTechSkill = -1;
 
 		for (Person tech : techs) {
@@ -721,10 +721,10 @@ public class MassRepairService {
 
 			Person tech = techs.get(i);
 
-			debugLog("Checking tech %s", "repairPart", tech.getName());
+			debugLog("Checking tech %s", "repairPart", tech.getFullName());
 
 			Skill skill = tech.getSkillForWorkingOn(partWork);
-			
+
 			if (partWork instanceof Part) {
 			    ((Part) partWork).resetModeToNormal();
 			}
@@ -796,7 +796,7 @@ public class MassRepairService {
 				}
 			}
 
-			boolean isSameDayTech = false;
+			boolean isSameDayTech;
 
 			if ((tech.getMinutesLeft() < partWork.getActualTime())) {
 				if (!configuredOptions.isAllowCarryover()) {
@@ -805,11 +805,7 @@ public class MassRepairService {
 					continue;
 				}
 
-				if (configuredOptions.isOptimizeToCompleteToday()) {
-					isSameDayTech = false;
-				} else {
-					isSameDayTech = true;
-				}
+                isSameDayTech = !configuredOptions.isOptimizeToCompleteToday();
 			} else {
 				isSameDayTech = true;
 			}
@@ -831,25 +827,25 @@ public class MassRepairService {
 			debugLog("... time to check tech: %s ns", "repairPart", (System.nanoTime() - time));
 		}
 
-		List<Person> validTechs = new ArrayList<Person>();
+		List<Person> validTechs = new ArrayList<>();
 
 		if (!sameDayAssignedTechs.isEmpty()) {
-			Collections.sort(sameDayAssignedTechs, sorter);
+			sameDayAssignedTechs.sort(sorter);
 			validTechs.addAll(sameDayAssignedTechs);
 		}
 
 		if (!sameDayTechs.isEmpty()) {
-			Collections.sort(sameDayTechs, sorter);
+			sameDayTechs.sort(sorter);
 			validTechs.addAll(sameDayTechs);
 		}
 
 		if (!overflowDayAssignedTechs.isEmpty()) {
-			Collections.sort(overflowDayAssignedTechs, sorter);
+			overflowDayAssignedTechs.sort(sorter);
 			validTechs.addAll(overflowDayAssignedTechs);
 		}
 
 		if (!overflowDayTechs.isEmpty()) {
-			Collections.sort(overflowDayTechs, sorter);
+			overflowDayTechs.sort(sorter);
 			validTechs.addAll(overflowDayTechs);
 		}
 
@@ -866,7 +862,7 @@ public class MassRepairService {
 			WorkTime wt = techSkillToWorktimeMap.get(skill.getType().getName() + "-" + skill.getLevel());
 
 			if (null == wt) {
-				debugLog("[ERROR] Null work-time from techToWorktimeMap for %s", "repairPart", tech.getName());
+				debugLog("[ERROR] Null work-time from techToWorktimeMap for %s", "repairPart", tech.getFullName());
 				wt = WorkTime.NORMAL;
 			}
 
@@ -951,7 +947,7 @@ public class MassRepairService {
 				// Create a dummy elite tech with the proper skill and 1
 				// minute and put it in our cache for later use
 
-				tech = new Person(String.format("Temp Tech (%s)", skillName), campaign);
+				tech = new Person("Temp", String.format("Tech (%s)", skillName), campaign);
 				tech.addSkill(skillName, partSkill.getType().getEliteLevel(), 1);
 				tech.setMinutesLeft(1);
 

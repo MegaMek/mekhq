@@ -121,9 +121,12 @@ public class CampaignOptions implements Serializable {
     private double originDistanceScale;
     //family
     private boolean useUnofficialProcreation; // Unofficial
-    private float chanceProcreation; // Unofficial
+    private double chanceProcreation; // Unofficial
     private boolean useUnofficialProcreationNoRelationship; // Unofficial
-    private float chanceProcreationNoRelationship; // Unofficial
+    private double chanceProcreationNoRelationship; // Unofficial
+    private int babySurnameStyle; //Unofficial
+    public final static int BABY_SURNAME_MINE = 0; //baby uses mother's surname
+    public final static int BABY_SURNAME_SPOUSE = 1; //baby uses father's surname
     private int checkMutualAncestorsDepth;
     private boolean useParentage;
     private int displayFamilyLevel;
@@ -483,9 +486,10 @@ public class CampaignOptions implements Serializable {
         originDistanceScale = 0.6;
         //Family
         useUnofficialProcreation = false;
-        chanceProcreation = (float) 0.05;
+        chanceProcreation = 0.05;
         useUnofficialProcreationNoRelationship = false;
-        chanceProcreationNoRelationship = (float) 0.005;
+        chanceProcreationNoRelationship = 0.005;
+        babySurnameStyle = BABY_SURNAME_MINE;
         checkMutualAncestorsDepth = 4;
         useParentage = false;
         displayFamilyLevel = 0;
@@ -764,11 +768,11 @@ public class CampaignOptions implements Serializable {
         useUnofficialProcreation = b;
     }
 
-    public float getChanceProcreation() {
+    public double getChanceProcreation() {
         return chanceProcreation;
     }
 
-    public void setChanceProcreation(float b) {
+    public void setChanceProcreation(double b) {
         chanceProcreation = b;
     }
 
@@ -780,12 +784,20 @@ public class CampaignOptions implements Serializable {
         useUnofficialProcreationNoRelationship = b;
     }
 
-    public float getChanceProcreationNoRelationship() {
+    public double getChanceProcreationNoRelationship() {
         return chanceProcreationNoRelationship;
     }
 
-    public void setChanceProcreationNoRelationship(float b) {
+    public void setChanceProcreationNoRelationship(double b) {
         chanceProcreationNoRelationship = b;
+    }
+
+    public int getBabySurnameStyle() {
+        return babySurnameStyle;
+    }
+
+    public void setBabySurnameStyle(int b) {
+        babySurnameStyle = b;
     }
 
     public int checkMutualAncestorsDepth() {
@@ -2506,6 +2518,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "chanceProcreation", chanceProcreation);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnofficialProcreationNoRelationship", useUnofficialProcreationNoRelationship);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "chanceProcreationNoRelationship", chanceProcreationNoRelationship);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "babySurnameStyle", babySurnameStyle);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "checkMutualAncestorsDepth", checkMutualAncestorsDepth);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useParentage", useParentage);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "displayFamilyLevel", displayFamilyLevel);
@@ -2937,11 +2950,13 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreation")) {
             	retVal.useUnofficialProcreation = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("chanceProcreation")) {
-            	retVal.chanceProcreation = Float.parseFloat(wn2.getTextContent().trim());
+            	retVal.chanceProcreation = Double.parseDouble(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreationNoRelationship")) {
             	retVal.useUnofficialProcreationNoRelationship = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("chanceProcreationNoRelationship")) {
-                retVal.chanceProcreationNoRelationship = Float.parseFloat(wn2.getTextContent().trim());
+                retVal.chanceProcreationNoRelationship = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("babySurnameStyle")) {
+                retVal.babySurnameStyle = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("checkMutualAncestorsDepth")) {
                 retVal.checkMutualAncestorsDepth = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useParentage")) {

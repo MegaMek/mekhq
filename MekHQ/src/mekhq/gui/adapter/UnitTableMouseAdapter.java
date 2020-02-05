@@ -582,7 +582,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 Person tech = gui.getCampaign().getPerson(id);
                 if (tech.getTechUnitIDs().size() > 0) {
                     if (JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(gui.getFrame(),
-                            tech.getName() + " will not be able to perform maintenance on "
+                            tech.getFullName() + " will not be able to perform maintenance on "
                                     + tech.getTechUnitIDs().size() + " assigned units. Proceed?",
                                     "Unmaintained unit warning",
                                     JOptionPane.YES_NO_OPTION)) {

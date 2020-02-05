@@ -841,13 +841,13 @@ public class CampaignXmlParser {
                     unitDesc = u.getName();
                     tech.removeTechUnitId(id);
                 } else if (!tech.getId().equals(u.getTechId())) {
-                    reason = String.format("referenced tech %s's maintained unit", u.getTech().getName());
+                    reason = String.format("referenced tech %s's maintained unit", u.getTech().getFullName());
                     unitDesc = u.getName();
                     tech.removeTechUnitId(id);
                 }
                 if (null != reason) {
                     MekHQ.getLogger().log(CampaignXmlParser.class, METHOD_NAME, LogLevel.WARNING,
-                            String.format("Tech %s %s %s (fixed)", tech.getName(), reason, unitDesc));
+                            String.format("Tech %s %s %s (fixed)", tech.getFullName(), reason, unitDesc));
                 }
             }
         }
@@ -1809,11 +1809,11 @@ public class CampaignXmlParser {
     }
 
     private static void updatePlanetaryEventsFromXML(Node wn) {
-    	
+
         Systems.reload(true);
 
         List<Planet.PlanetaryEvent> events;
-        Map<Integer, List<Planet.PlanetaryEvent>> eventsMap = new HashMap<>();; 
+        Map<Integer, List<Planet.PlanetaryEvent>> eventsMap = new HashMap<>();;
 
         NodeList wList = wn.getChildNodes();
         for (int x = 0; x < wList.getLength(); x++) {
@@ -1828,7 +1828,7 @@ public class CampaignXmlParser {
                 NodeList systemNodes = wn2.getChildNodes();
                 String systemId = null;
                 List<PlanetarySystem.PlanetarySystemEvent> sysEvents = new ArrayList<>();
-                eventsMap.clear(); 
+                eventsMap.clear();
                 for(int n = 0; n < systemNodes.getLength(); ++n) {
                     Node systemNode = systemNodes.item(n);
                     if(systemNode.getNodeType() != Node.ELEMENT_NODE) {
@@ -1859,7 +1859,7 @@ public class CampaignXmlParser {
                                     event.custom = true;
                                     events.add(event);
                                 }
-                            } 
+                            }
                         }
                         if(sysPos > 0 && !events.isEmpty()) {
                         	eventsMap.put(sysPos, events);
@@ -1868,18 +1868,18 @@ public class CampaignXmlParser {
                 }
                 if(null != systemId) {
                 	//iterate through events hash and assign events to planets
-                	Iterator<Map.Entry<Integer, List<PlanetaryEvent>>> it = eventsMap.entrySet().iterator();           
-                    while (it.hasNext()) { 
-                        Map.Entry<Integer, List<PlanetaryEvent>> pair = it.next(); 
+                	Iterator<Map.Entry<Integer, List<PlanetaryEvent>>> it = eventsMap.entrySet().iterator();
+                    while (it.hasNext()) {
+                        Map.Entry<Integer, List<PlanetaryEvent>> pair = it.next();
                         Systems.getInstance().updatePlanetaryEvents(systemId, pair.getValue(), true, pair.getKey());
-                    } 
+                    }
                     //check for system-wide events
                     if(!sysEvents.isEmpty()) {
                     	Systems.getInstance().updatePlanetarySystemEvents(systemId, sysEvents, true);
                     }
                 }
             }
-            
+
             //legacy code for before switch to planetary systems if planet is at top level
             if (wn2.getNodeName().equalsIgnoreCase("planet")) {
                 NodeList planetNodes = wn2.getChildNodes();

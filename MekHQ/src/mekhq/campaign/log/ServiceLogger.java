@@ -114,7 +114,7 @@ public class ServiceLogger {
 
     public static void successfullyTreated(Person doctor, Person patient, Date date, int injuries){
         String message = logEntriesResourceMap.getString("successfullyTreatedForXInjuries.text");
-        doctor.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message, patient.getName(), injuries)));
+        doctor.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message, patient.getFullName(), injuries)));
     }
 
     public static void assignedTo(Person person, Date date, String unitName){
