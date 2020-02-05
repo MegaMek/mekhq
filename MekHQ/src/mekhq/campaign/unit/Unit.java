@@ -325,7 +325,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     // A set of methods for working with transport ship assignment for this unit
 
     public boolean hasTransportShipId() {
-        return transportShipId != null;
+        return !transportShipId.isEmpty();
     }
 
     public Map<UUID,Integer> getTransportShipId() {
@@ -1825,16 +1825,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         
         //Temp storage for used bay capacities
-        double asfCap = 0.0;
-        double baCap = 0.0;
-        int dockCap = 0;
-        double hVeeCap = 0.0;
-        double infCap = 0.0;
-        double lVeeCap = 0.0;
-        double mechCap = 0.0;
-        double protoCap = 0.0;
-        double shVeeCap = 0.0;
-        double scCap = 0.0;
+        boolean needsBayInitialization = true;
 
         // Okay, now load Part-specific fields!
         NodeList nl = wn.getChildNodes();
@@ -1903,34 +1894,44 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     retVal.addTransportedUnit(UUID.fromString(wn2.getTextContent()));
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("asfCapacity")) {
-                    asfCap = Double.parseDouble(wn2.getTextContent());
+                    retVal.setASFCapacity(Double.parseDouble(wn2.getTextContent()));
+                    needsBayInitialization = false;
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("baCapacity")) {
-                    baCap = Double.parseDouble(wn2.getTextContent());
+                    retVal.setBattleArmorCapacity(Double.parseDouble(wn2.getTextContent()));
+                    needsBayInitialization = false;
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("dockCapacity")) {
-                    dockCap = Integer.parseInt(wn2.getTextContent());
+                    retVal.setDocks(Integer.parseInt(wn2.getTextContent()));
+                    needsBayInitialization = false;
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("hVeeCapacity")) {
-                   hVeeCap = Double.parseDouble(wn2.getTextContent());
+                    retVal.setHeavyVehicleCapacity(Double.parseDouble(wn2.getTextContent()));
+                   needsBayInitialization = false;
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("infCapacity")) {
-                    infCap = Double.parseDouble(wn2.getTextContent());
+                    retVal.setInfantryCapacity(Double.parseDouble(wn2.getTextContent()));
+                    needsBayInitialization = false;
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("lVeeCapacity")) {
-                    lVeeCap = Double.parseDouble(wn2.getTextContent());
+                    retVal.setLightVehicleCapacity(Double.parseDouble(wn2.getTextContent()));
+                    needsBayInitialization = false;
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("mechCapacity")) {
-                    mechCap = Double.parseDouble(wn2.getTextContent());
+                    retVal.setMechCapacity(Double.parseDouble(wn2.getTextContent()));
+                    needsBayInitialization = false;
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("protoCapacity")) {
-                    protoCap = Double.parseDouble(wn2.getTextContent());
+                    retVal.setProtoCapacity(Double.parseDouble(wn2.getTextContent()));
+                    needsBayInitialization = false;
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("scCapacity")) {
-                    scCap = Double.parseDouble(wn2.getTextContent());
+                    retVal.setSmallCraftCapacity(Double.parseDouble(wn2.getTextContent()));
+                    needsBayInitialization = false;
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("shVeeCapacity")) {
-                    shVeeCap = Double.parseDouble(wn2.getTextContent());
+                    retVal.setSuperHeavyVehicleCapacity(Double.parseDouble(wn2.getTextContent()));
+                    needsBayInitialization = false;
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("forceId")) {
                     retVal.forceId = Integer.parseInt(wn2.getTextContent());
@@ -1954,19 +1955,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     retVal.mothballInfo = MothballInfo.generateInstanceFromXML(wn2, version);
                 }
                 // Set up bay space values after we've loaded everything from the unit record
-                // Otherwise you can get some initialized values where they shouldn't be
-                if (retVal.entity != null && !retVal.getEntity().getTransportBays().isEmpty()) {
+                // Used for older campaign 
+                if (retVal.entity != null && retVal.getEntity().isLargeCraft() && needsBayInitialization) {
                     retVal.initializeBaySpace();
-                    retVal.setASFCapacity(asfCap);
-                    retVal.setBattleArmorCapacity(baCap);
-                    retVal.setDocks(dockCap);
-                    retVal.setHeavyVehicleCapacity(hVeeCap);
-                    retVal.setInfantryCapacity(infCap);
-                    retVal.setLightVehicleCapacity(lVeeCap);
-                    retVal.setMechCapacity(mechCap);
-                    retVal.setProtoCapacity(protoCap);
-                    retVal.setSmallCraftCapacity(scCap);
-                    retVal.setSuperHeavyVehicleCapacity(shVeeCap);
                 }
             }
         } catch (Exception ex) {

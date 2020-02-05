@@ -252,11 +252,13 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                             Unit oldShip = gui.getCampaign().getUnit(oldShipId);
                             if (oldShip != null) {
                                 oldShip.unloadFromTransportShip(u);
+                                MekHQ.triggerEvent(new UnitChangedEvent(oldShip));
                             }
                         }
                     }
                     //now load the units
                     ship.loadTransportShip(units);
+                    MekHQ.triggerEvent(new UnitChangedEvent(ship));
                 }
             }
         }
@@ -267,6 +269,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                         Unit oldShip = gui.getCampaign().getUnit(oldShipId);
                         if (oldShip != null) {
                             oldShip.unloadFromTransportShip(u);
+                            MekHQ.triggerEvent(new UnitChangedEvent(oldShip));
                         }
                     }
                 }
@@ -1149,20 +1152,28 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                 if (unitsInForces.size() > 0) {
                     Unit unit = unitsInForces.get(0);
                     String unitIds = "" + unit.getId().toString();
+                    boolean shipInSelection = false;
                     for (int i = 1; i < unitsInForces.size(); i++) {
                         unitIds += "|" + unitsInForces.get(i).getId().toString();
-                    }
-
-                    for (UUID id : gui.getCampaign().getTransportShips()) {
-                        Unit ship = gui.getCampaign().getUnit(id);
-                        if (ship == null || ship.isSalvage() || ship.getCommander() == null) {
-                            continue;
+                        unit = unitsInForces.get(i);
+                        if (unit != null && (unit.getEntity() != null && unit.getEntity().isLargeCraft())) {
+                            shipInSelection = true;
                         }
-                        menuItem = new JMenuItem(ship.getName());
-                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ASSIGN_TO_SHIP + id + "|" + unitIds);
-                        menuItem.addActionListener(this);
-                        menuItem.setEnabled(true);
-                        menu.add(menuItem);
+                    }
+                    //Only display the Assign to Ship command if your command has at least 1 valid transport
+                    //and if your selection does not include a transport
+                    if (!shipInSelection && !gui.getCampaign().getTransportShips().isEmpty()) {
+                        for (UUID id : gui.getCampaign().getTransportShips()) {
+                            Unit ship = gui.getCampaign().getUnit(id);
+                            if (ship == null || ship.isSalvage() || ship.getCommander() == null) {
+                                continue;
+                            }
+                            menuItem = new JMenuItem(ship.getName());
+                            menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ASSIGN_TO_SHIP + id + "|" + unitIds);
+                            menuItem.addActionListener(this);
+                            menuItem.setEnabled(true);
+                            menu.add(menuItem);
+                        }
                     }
                     if (menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
                         popup.add(menu);
@@ -1389,21 +1400,33 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                         popup.add(menu);
                     }
 
-                    //Attempt to Assign unit to a transport ship. This checks to see if the ship
-                    //is in a basic state that can accept units. Capacity gets checked once the action
-                    //is submitted.
-                    menu = new JMenu("Assign Unit to Transport Ship");
-                    for (UUID id : gui.getCampaign().getTransportShips()) {
-                        Unit ship = gui.getCampaign().getUnit(id);
-                        if (ship == null || ship.isSalvage() || ship.getCommander() == null) {
-                            continue;
+                    
+                    //First, only display the Assign to Ship command if your command has at least 1 valid transport
+                    //and if your selection does not include a transport
+                    boolean shipInSelection = false;
+                    for (Unit u : units) {
+                        if (u.getEntity() != null && u.getEntity().isLargeCraft()) {
+                            shipInSelection = true;
+                            break;
                         }
-                        menuItem = new JMenuItem(ship.getName());
-                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ASSIGN_TO_SHIP
-                                + id + "|" + unitIds);
-                        menuItem.addActionListener(this);
-                        menuItem.setEnabled(true);
-                        menu.add(menuItem);
+                    }
+                    if (!shipInSelection && !gui.getCampaign().getTransportShips().isEmpty()) {
+                        //Attempt to Assign unit to a transport ship. This checks to see if the ship
+                        //is in a basic state that can accept units. Capacity gets checked once the action
+                        //is submitted.
+                        menu = new JMenu("Assign Unit to Transport Ship");
+                        for (UUID id : gui.getCampaign().getTransportShips()) {
+                            Unit ship = gui.getCampaign().getUnit(id);
+                            if (ship == null || ship.isSalvage() || ship.getCommander() == null) {
+                                continue;
+                            }
+                            menuItem = new JMenuItem(ship.getName());
+                            menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ASSIGN_TO_SHIP
+                                    + id + "|" + unitIds);
+                            menuItem.addActionListener(this);
+                            menuItem.setEnabled(true);
+                            menu.add(menuItem);
+                        }
                     }
                     if (menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
                         popup.add(menu);
