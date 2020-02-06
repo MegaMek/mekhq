@@ -1,20 +1,20 @@
 /*
  * NewContractDialog.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -77,7 +77,7 @@ public class NewContractDialog extends javax.swing.JDialog {
     /** Creates new form NewTeamDialog */
     public NewContractDialog(java.awt.Frame parent, boolean modal, Campaign c) {
         super(parent, modal);
-        this.frame = parent;  
+        this.frame = parent;
         campaign = c;
         contract = new Contract("New Contract", "New Employer");
         contract.calculateContract(campaign);
@@ -94,8 +94,8 @@ public class NewContractDialog extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("Form.title"));
-        
-        getContentPane().setLayout(new java.awt.GridBagLayout());
+
+        JPanel newContractPanel = new JPanel(new java.awt.GridBagLayout());
 
         JPanel descPanel = new JPanel();
 		descPanel.setLayout(new java.awt.GridBagLayout());
@@ -108,7 +108,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        getContentPane().add(descPanel, gridBagConstraints);
+        newContractPanel.add(descPanel, gridBagConstraints);
 
         JPanel contractPanel = new JPanel();
 		contractPanel.setLayout(new java.awt.GridBagLayout());
@@ -123,7 +123,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        getContentPane().add(contractPanel, gridBagConstraints);
+        newContractPanel.add(contractPanel, gridBagConstraints);
 
         JPanel totalsPanel = new JPanel();
 		totalsPanel.setLayout(new java.awt.GridBagLayout());
@@ -138,36 +138,39 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        getContentPane().add(totalsPanel, gridBagConstraints);
-        
+        newContractPanel.add(totalsPanel, gridBagConstraints);
+
         initDescPanel(resourceMap, descPanel);
 
         initPaymentBreakdownPanel(totalsPanel);
 
         initContractPanel(resourceMap, contractPanel);
-        
-     
+
         btnOK.setText(resourceMap.getString("btnOkay.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
-        btnOK.addActionListener(evt -> btnOKActionPerformed(evt));
+        btnOK.addActionListener(this::btnOKActionPerformed);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        getContentPane().add(btnOK, gridBagConstraints);
+        newContractPanel.add(btnOK, gridBagConstraints);
 
         btnClose.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
-        btnClose.addActionListener(evt -> btnCloseActionPerformed(evt));
+        btnClose.addActionListener(this::btnCloseActionPerformed);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        getContentPane().add(btnClose, gridBagConstraints);
+        newContractPanel.add(btnClose, gridBagConstraints);
+
+        JScrollPane scrollPane = new JScrollPane(newContractPanel);
+
+        getContentPane().add(scrollPane);
 
         pack();
     }
@@ -192,7 +195,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         btnClose = new javax.swing.JButton();
         txtDesc = new MarkdownEditorPanel("Contract Description");
         JLabel lblPlanetName = new JLabel();
-          
+
         lblName.setText(resourceMap.getString("lblName.text")); // NOI18N
         lblName.setName("lblName"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -202,7 +205,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(lblName, gridBagConstraints);
-        
+
         txtName.setText(contract.getName());
         txtName.setName("txtName"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -213,7 +216,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(txtName, gridBagConstraints);
-        
+
         lblPlanetName.setText(resourceMap.getString("lblPlanetName.text")); // NOI18N
         lblPlanetName.setName("lblPlanetName"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -223,7 +226,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(lblPlanetName, gridBagConstraints);
-        
+
         suggestPlanet = new JSuggestField(this, campaign.getSystemNames());
         /*suggestPlanet.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -247,7 +250,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(suggestPlanet, gridBagConstraints);
-        
+
         lblType.setText(resourceMap.getString("lblType.text")); // NOI18N
         lblType.setName("lblType"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -257,7 +260,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(lblType, gridBagConstraints);
-        
+
         txtType.setText(contract.getType());
         txtType.setName("txtType"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -268,7 +271,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(txtType, gridBagConstraints);
-        
+
         lblEmployer.setText(resourceMap.getString("lblEmployer.text")); // NOI18N
         lblEmployer.setName("lblEmployer"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -278,7 +281,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(lblEmployer, gridBagConstraints);
-        
+
         txtEmployer.setText(contract.getEmployer());
         txtEmployer.setName("txtEmployer"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -314,7 +317,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(cboNegotiator, gridBagConstraints);
- 
+
         txtDesc.setText(contract.getDescription());
         txtDesc.setPreferredSize(new Dimension(400, 200));
         txtDesc.setMinimumSize(new Dimension(400, 200));
@@ -329,7 +332,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(txtDesc, gridBagConstraints);
 	}
-    
+
 	protected void initPaymentBreakdownPanel(JPanel totalsPanel) {
         contractPaymentBreakdown = new ContractPaymentBreakdown(totalsPanel, contract, campaign);
         contractPaymentBreakdown.display(0);
@@ -349,8 +352,8 @@ public class NewContractDialog extends javax.swing.JDialog {
         JLabel lblBattleLossComp = new JLabel(resourceMap.getString("lblBattleLossComp.text"));
         JLabel lblSignBonus = new JLabel(resourceMap.getString("lblSignBonus.text"));
         JLabel lblAdvance = new JLabel(resourceMap.getString("lblAdvance.text"));
-        
-        
+
+
         btnDate = new javax.swing.JButton();
         btnDate.setText(dateFormatter.format(contract.getStartDate()));
         //btnDate.setMinimumSize(new java.awt.Dimension(400, 30));
@@ -361,18 +364,18 @@ public class NewContractDialog extends javax.swing.JDialog {
         checkMRBC = new JCheckBox(resourceMap.getString("checkMRBC.text"));
         checkMRBC.setSelected(contract.payMRBCFee());
         checkMRBC.addItemListener(contractUpdateItemListener);
-        
+
 
         checkSalvageExchange = new JCheckBox(resourceMap.getString("checkSalvageExchange.text"));
         checkSalvageExchange.setSelected(contract.isSalvageExchange());
         checkSalvageExchange.addItemListener(contractUpdateItemListener);
-        
+
         spnLength = new JSpinner(new SpinnerNumberModel(contract.getLength(), 1, 120, 1));
         spnLength.addChangeListener(contractUpdateChangeListener);
-        
+
         spnMultiplier = new JSpinner(new SpinnerNumberModel(contract.getMultiplier(), 0.5, 10.0, 0.1));
         spnMultiplier.addChangeListener(contractUpdateChangeListener);
-        
+
         DefaultComboBoxModel<String> overheadModel = new DefaultComboBoxModel<>();
 		for (int i = 0; i < Contract.OH_NUM; i++) {
 			overheadModel.addElement(Contract.getOverheadCompName(i));
@@ -381,7 +384,7 @@ public class NewContractDialog extends javax.swing.JDialog {
 		choiceOverhead.setSelectedIndex(contract.getOverheadComp());
         choiceOverhead.addActionListener(contractUpdateActionListener);
         choiceOverhead.addFocusListener(contractUpdateFocusListener);
-        
+
         DefaultComboBoxModel<String> commandModel = new DefaultComboBoxModel<>();
 		for (int i = 0; i < Contract.COM_NUM; i++) {
 			commandModel.addElement(Contract.getCommandRightsName(i));
@@ -389,24 +392,24 @@ public class NewContractDialog extends javax.swing.JDialog {
 		choiceCommand = new JComboBox<>(commandModel);
 		choiceCommand.setSelectedIndex(contract.getCommandRights());
 		choiceCommand.addActionListener(contractUpdateActionListener);
-		
+
 		spnTransport = new JSpinner(new SpinnerNumberModel(contract.getTransportComp(), 0, 100, 10));
 		spnTransport.addChangeListener(contractUpdateChangeListener);
 
 		spnSalvageRights = new JSpinner(new SpinnerNumberModel(contract.getSalvagePct(), 0, 100, 10));
 		spnSalvageRights.addChangeListener(contractUpdateChangeListener);
-        
+
         spnStraightSupport = new JSpinner(new SpinnerNumberModel(contract.getStraightSupport(), 0, 100, 10));
         spnStraightSupport.addChangeListener(contractUpdateChangeListener);
-        
+
         spnBattleLossComp = new JSpinner(new SpinnerNumberModel(contract.getBattleLossComp(), 0, 100, 10));
         spnBattleLossComp.addChangeListener(contractUpdateChangeListener);
-        
+
         spnSignBonus = new JSpinner(new javax.swing.SpinnerNumberModel(contract.getSigningBonusPct(), 0, 10, 1));
         spnSignBonus.addChangeListener(contractUpdateChangeListener);
         spnAdvance = new JSpinner(new javax.swing.SpinnerNumberModel(contract.getAdvancePct(), 0, 25, 5));
         spnAdvance.addChangeListener(contractUpdateChangeListener);
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -414,7 +417,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         contractPanel.add(checkMRBC, gridBagConstraints);
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -424,7 +427,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         contractPanel.add(lblDate, gridBagConstraints);
-   
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -432,7 +435,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         contractPanel.add(btnDate, gridBagConstraints);
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -442,7 +445,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         contractPanel.add(lblLength, gridBagConstraints);
-   
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
@@ -452,7 +455,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         contractPanel.add(spnLength, gridBagConstraints);
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
@@ -462,7 +465,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         contractPanel.add(lblMultiplier, gridBagConstraints);
-   
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
@@ -472,7 +475,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         contractPanel.add(spnMultiplier, gridBagConstraints);
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
@@ -482,7 +485,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         contractPanel.add(lblCommandRights, gridBagConstraints);
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
@@ -492,7 +495,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         contractPanel.add(choiceCommand, gridBagConstraints);
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
@@ -502,7 +505,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         contractPanel.add(lblOverhead, gridBagConstraints);
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 5;
@@ -512,7 +515,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         contractPanel.add(choiceOverhead, gridBagConstraints);
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
@@ -522,7 +525,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         contractPanel.add(lblTransport, gridBagConstraints);
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 6;
@@ -532,7 +535,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         contractPanel.add(spnTransport, gridBagConstraints);
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 7;
@@ -542,7 +545,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         contractPanel.add(lblSalvageRights, gridBagConstraints);
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 7;
@@ -560,7 +563,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         contractPanel.add(checkSalvageExchange, gridBagConstraints);
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 9;
@@ -570,7 +573,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         contractPanel.add(lblBattleLossComp, gridBagConstraints);
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 9;
@@ -580,7 +583,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         contractPanel.add(spnBattleLossComp, gridBagConstraints);
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 10;
@@ -590,7 +593,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         contractPanel.add(lblStraightSupport, gridBagConstraints);
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 10;
@@ -610,7 +613,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         contractPanel.add(lblSignBonus, gridBagConstraints);
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 11;
@@ -631,7 +634,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         contractPanel.add(lblAdvance, gridBagConstraints);
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 12;
@@ -648,7 +651,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         if (!btnOK.equals(evt.getSource())) {
             return;
         }
-        
+
         String chosenName = txtName.getText();
     	for(Mission m : campaign.getMissions()) {
     		if(m.getName().equals(chosenName)) {
@@ -668,16 +671,16 @@ public class NewContractDialog extends javax.swing.JDialog {
     	contract.setCommandRights(choiceCommand.getSelectedIndex());
     	campaign.getFinances().credit(contract.getTotalAdvanceAmount(), Transaction.C_CONTRACT, "Advance monies for " + contract.getName(), campaign.getCalendar().getTime());
     	campaign.addMission(contract);
-    	
+
     	// Negotiator XP
     	Person negotiator = (Person)cboNegotiator.getSelectedItem();
     	if (negotiator != null && campaign.getCampaignOptions().getContractNegotiationXP() > 0) {
     	    negotiator.awardXP(campaign.getCampaignOptions().getContractNegotiationXP());
     	}
-    	
+
     	this.setVisible(false);
     }
-    
+
     private void changeStartDate() {
         // show the date chooser
     	GregorianCalendar cal = new GregorianCalendar();
@@ -697,7 +700,7 @@ public class NewContractDialog extends javax.swing.JDialog {
             btnDate.setText(dateFormatter.format(contract.getStartDate()));
         }
     }
-    
+
     public int getContractId() {
     	return contract.getId();
     }
