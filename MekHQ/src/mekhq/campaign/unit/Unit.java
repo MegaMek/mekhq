@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import megamek.common.*;
+import megamek.common.InfantryBay.PlatoonType;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.parts.*;
@@ -1452,7 +1453,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         double bays = 0;
         for (Bay b : getEntity().getTransportBays()) {
             if (b instanceof InfantryBay) {
-                bays += b.getCapacity() / ((InfantryBay) b).getPlatoonType().getWeight();
+                bays += b.getCapacity();
             }
         }
         return bays;
@@ -1559,11 +1560,30 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     public void loadTransportShip(Vector<Unit> units) {
         for (Unit u : units) {
             int unitType = u.getEntity().getUnitType();
-            double unitWeight = u.getEntity().getWeight();
+            double unitWeight;
+            if (u.getEntity().getUnitType() == UnitType.INFANTRY) {
+                unitWeight = calcInfantryBayWeight(u.getEntity());
+            } else {
+                unitWeight = u.getEntity().getWeight();
+            }
             int bayNumber = Utilities.selectBestBayFor(u.getEntity(), getEntity());
             u.setTransportShipId(getId(),bayNumber);
             addTransportedUnit(u.getId());
             updateBayCapacity(unitType, unitWeight, false, bayNumber);
+        }
+    }
+    
+    /**
+     * Calculates transport bay space required by an infantry platoon,
+     * which is not the same as the flat weight of that platoon
+     * @param unit The Entity that we need the weight for
+     */
+    public double calcInfantryBayWeight(Entity unit) {
+        PlatoonType type = PlatoonType.getPlatoonType(unit);
+        if ((unit instanceof Infantry) && (type == PlatoonType.MECHANIZED)) {
+            return type.getWeight() * ((Infantry)unit).getSquadN();
+        } else {
+            return type.getWeight();
         }
     }
 
@@ -1574,7 +1594,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      */
     public void unloadFromTransportShip(Unit u) {
         int unitType = u.getEntity().getUnitType();
-        double unitWeight = u.getEntity().getWeight();
+        double unitWeight;
+        if (u.getEntity().getUnitType() == UnitType.INFANTRY) {
+            unitWeight = calcInfantryBayWeight(u.getEntity());
+        } else {
+            unitWeight = u.getEntity().getWeight();
+        }
         for (UUID id : u.getTransportShipId().keySet()) {
             int bayNumber = u.getTransportShipId().get(id);
             updateBayCapacity(unitType, unitWeight, true, bayNumber);

@@ -1682,7 +1682,7 @@ public class Utilities {
             for (Bay b: transport.getTransportBays()) {
                 if (b instanceof InfantryBay && b.canLoad(cargo)) {
                     //Update bay tonnage based on platoon/squad weight
-                    b.setCurrentSpace(cargo.getWeight());
+                    b.setCurrentSpace(b.spaceForUnit(cargo));
                     return b.getBayNumber();
                 }
             }
