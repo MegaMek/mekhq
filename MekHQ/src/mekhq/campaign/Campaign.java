@@ -2103,6 +2103,51 @@ public class Campaign implements Serializable, ITechManager {
         return admin;
     }
 
+    /**
+     * Gets a list of applicable logistics personnel, or an empty list
+     * if acquisitions automatically succeed.
+     * @return A {@see List} of personnel who can perform logistical actions.
+     */
+    public List<Person> getLogisticsPersonnel() {
+        String skill = getCampaignOptions().getAcquisitionSkill();
+        if (skill.equals(CampaignOptions.S_AUTO)) {
+            return Collections.emptyList();
+        } else {
+            List<Person> logisticsPersonnel = new ArrayList<>();
+            int maxAcquisitions = getCampaignOptions().getMaxAcquisitions();
+            for (Person p : getPersonnel()) {
+                if (!p.isActive()) {
+                    continue;
+                }
+                if (getCampaignOptions().isAcquisitionSupportStaffOnly()
+                        && !p.isSupport()) {
+                    continue;
+                }
+                if (maxAcquisitions > 0 && p.getAcquisitions() >= maxAcquisitions) {
+                    continue;
+                }
+                if (skill.equals(CampaignOptions.S_TECH)) {
+                    if (null != p.getBestTechSkill()) {
+                        logisticsPersonnel.add(p);
+                    }
+                } else if (p.hasSkill(skill)) {
+                    logisticsPersonnel.add(p);
+                }
+            }
+
+            // Sort by their skill level, descending.
+            logisticsPersonnel.sort((a, b) -> {
+                if (skill.equals(CampaignOptions.S_TECH)) {
+                    return Integer.compare(b.getBestTechSkill().getLevel(), a.getBestTechSkill().getLevel());
+                } else {
+                    return Integer.compare(b.getSkill(skill).getLevel(), a.getSkill(skill).getLevel());
+                }
+            });
+
+            return logisticsPersonnel;
+        }
+    }
+
     /***
      * This is the main function for getting stuff (parts, units, etc.) All non-GM
      * acquisition should go through this function to ensure the campaign rules for
@@ -2119,35 +2164,70 @@ public class Campaign implements Serializable, ITechManager {
             shoppingItem.decrementDaysToWait();
         }
 
-        if (!getCampaignOptions().usesPlanetaryAcquisition()) {
+        if (getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
+            return goShoppingAutomatically(sList);
+        } else if (!getCampaignOptions().usesPlanetaryAcquisition()) {
             return goShoppingStandard(sList);
         } else {
             return goShoppingByPlanet(sList);
         }
     }
 
-    private ShoppingList goShoppingStandard(ShoppingList sList) {
-        // loop through shopping list. If its time to check, then check as appropriate.
-        // Items not found get added to the remaining item list
+    /**
+     * Shops for items on the {@link ShoppingList}, where each acquisition
+     * automatically succeeds.
+     *
+     * @param sList The shopping list to use when shopping.
+     * @return The new shopping list containing the items that were not
+     *         acquired.
+     */
+    private ShoppingList goShoppingAutomatically(ShoppingList sList) {
         List<IAcquisitionWork> currentList = new ArrayList<>(sList.getAllShoppingItems());
 
-        Set<Person> seen = new HashSet<>();
-        while (!currentList.isEmpty()) {
-            Person person = getLogisticsPerson();
-            if (null == person && !getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
-                addReport("Your force has no one capable of acquiring equipment.");
-                break;
-            } else if (null != person && !seen.add(person)) {
-                // if we've already tried with this logistics person
-                // don't try again; they won't succeed.
+        List<IAcquisitionWork> remainingItems = new ArrayList<>(currentList.size());
+        for (IAcquisitionWork shoppingItem : currentList) {
+            if (shoppingItem.getDaysToWait() <= 0) {
+                while (shoppingItem.getQuantity() > 0) {
+                    if (!acquireEquipment(shoppingItem, null)) {
+                        shoppingItem.resetDaysToWait();
+                        break;
+                    }
+                }
+            }
+            if (shoppingItem.getQuantity() > 0 || shoppingItem.getDaysToWait() > 0) {
+                remainingItems.add(shoppingItem);
+            }
+        }
+
+        return new ShoppingList(remainingItems);
+    }
+
+    /**
+     * Shops for items on the {@link ShoppingList}, where each acquisition
+     * is performed by available logistics personnel.
+     *
+     * @param sList The shopping list to use when shopping.
+     * @return The new shopping list containing the items that were not
+     *         acquired.
+     */
+    private ShoppingList goShoppingStandard(ShoppingList sList) {
+        List<Person> logisticsPersonnel = getLogisticsPersonnel();
+        if (logisticsPersonnel.isEmpty()) {
+            addReport("Your force has no one capable of acquiring equipment.");
+            return sList;
+        }
+
+        List<IAcquisitionWork> currentList = new ArrayList<>(sList.getAllShoppingItems());
+        for (Person person : logisticsPersonnel) {
+            if (currentList.isEmpty()) {
+                // Nothing left to shop for!
                 break;
             }
 
-            List<IAcquisitionWork> remainingItems = new ArrayList<>();
+            List<IAcquisitionWork> remainingItems = new ArrayList<>(currentList.size());
             for (IAcquisitionWork shoppingItem : currentList) {
                 if (shoppingItem.getDaysToWait() <= 0) {
-                    while (canAcquireParts(person)
-                            && shoppingItem.getQuantity() > 0) {
+                    while (canAcquireParts(person) && shoppingItem.getQuantity() > 0) {
                         if (!acquireEquipment(shoppingItem, person)) {
                             shoppingItem.resetDaysToWait();
                             break;
@@ -2160,17 +2240,26 @@ public class Campaign implements Serializable, ITechManager {
             }
 
             currentList = remainingItems;
-
-            if (null == person) {
-                // If we have no logistics person make no attempt to loop
-                break;
-            }
         }
 
         return new ShoppingList(currentList);
     }
 
+    /**
+     * Shops for items on the {@link ShoppingList}, where each acquisition
+     * is attempted on nearby planets by available logistics personnel.
+     *
+     * @param sList The shopping list to use when shopping.
+     * @return The new shopping list containing the items that were not
+     *         acquired.
+     */
     private ShoppingList goShoppingByPlanet(ShoppingList sList) {
+        List<Person> logisticsPersonnel = getLogisticsPersonnel();
+        if (logisticsPersonnel.isEmpty()) {
+            addReport("Your force has no one capable of acquiring equipment.");
+            return sList;
+        }
+
         // we are shopping by planets, so more involved
         List<IAcquisitionWork> currentList = sList.getAllShoppingItems();
         DateTime currentDate = Utilities.getDateTimeDay(getCalendar());
@@ -2184,22 +2273,13 @@ public class Campaign implements Serializable, ITechManager {
                 getCampaignOptions().getMaxJumpsPlanetaryAcquisition(),
                 currentDate);
 
-        Set<Person> seen = new HashSet<>();
-        while (!currentList.isEmpty()) {
-            Person person = getLogisticsPerson();
-            if (null == person && !getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
-                addReport("Your force has no one capable of acquiring equipment.");
-                break;
-            } else if (null != person && !seen.add(person)) {
-                // if we've already tried with this logistics person
-                // don't try again; they won't succeed.
+        for (Person person : logisticsPersonnel) {
+            if (currentList.isEmpty()) {
+                // Nothing left to shop for!
                 break;
             }
 
-            String personTitle = "";
-            if (null != person) {
-                personTitle = person.getHyperlinkedFullTitle() + " ";
-            }
+            String personTitle = person.getHyperlinkedFullTitle() + " ";
 
             for (PlanetarySystem system: systems) {
                 List<IAcquisitionWork> remainingItems = new ArrayList<>();
@@ -2224,7 +2304,11 @@ public class Campaign implements Serializable, ITechManager {
                                 totalQuantity++;
                             }
                             if (totalQuantity > 0) {
-                                addReport(personTitle + "<font color='green'><b> found " + shoppingItem.getQuantityName(totalQuantity) + " on " + system.getPrintableName(currentDate) + ". Delivery in " + transitTime + " days.</b></font>");
+                                addReport(personTitle + "<font color='green'><b> found "
+                                        + shoppingItem.getQuantityName(totalQuantity)
+                                        + " on "
+                                        + system.getPrintableName(currentDate)
+                                        + ". Delivery in " + transitTime + " days.</b></font>");
                             }
                         }
                     }
@@ -2249,11 +2333,6 @@ public class Campaign implements Serializable, ITechManager {
                 if (done) {
                     break;
                 }
-            }
-
-            if (null == person) {
-                // If we have no logistics person make no attempt to loop
-                break;
             }
         }
 
@@ -7906,16 +7985,16 @@ public class Campaign implements Serializable, ITechManager {
             astechPoolMinutes -= astechsUsed * minutesUsed;
         }
         u.incrementDaysSinceMaintenance(maintained, astechsUsed);
-        
+
         int ruggedMultiplier = 1;
         if(u.getEntity().hasQuirk(OptionsConstants.QUIRK_POS_RUGGED_1)) {
             ruggedMultiplier = 2;
         }
-        
+
         if(u.getEntity().hasQuirk(OptionsConstants.QUIRK_POS_RUGGED_2)) {
             ruggedMultiplier = 3;
         }
-        
+
         if (u.getDaysSinceMaintenance() >= getCampaignOptions().getMaintenanceCycleDays() * ruggedMultiplier) {
             // maybe use the money
             if (campaignOptions.payForMaintain()) {
