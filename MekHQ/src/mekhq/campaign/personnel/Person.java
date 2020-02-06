@@ -1133,14 +1133,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
                             && !(getSpouse().getGender() == getGender())) {
                         // setting is the chance that this procreation attempt will create a child, base is 0.05%
                         // the setting is divided by 100 because we are running a float from 0 to 1 instead of 0 to 100
-                        conceived = (Compute.randomInt(10000) < 2);
-                        //conceived = (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceProcreation()/100));
+                        conceived = (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceProcreation()/100));
                     }
                 } else if (campaign.getCampaignOptions().useUnofficialProcreationNoRelationship()) {
                     // setting is the chance that this procreation attempt will create a child, base is 0.005%
                     // the setting is divided by 100 because we are running a float from 0 to 1 instead of 0 to 100
-                    conceived = (Compute.randomInt(100000) < 2);
-                    //conceived = (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceProcreationNoRelationship()/100));
+                    conceived = (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceProcreationNoRelationship()/100));
                 }
 
                 if(conceived) {
@@ -1334,13 +1332,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 + "<givenName>"
                 + MekHqXmlUtil.escape(givenName)
                 + "</givenName>");
-        if (surname != null) {
+        if (!StringUtil.isNullOrEmpty(surname)) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<surname>"
                     + MekHqXmlUtil.escape(surname)
                     + "</surname>");
         }
-        if (honorific != null) {
+        if (!StringUtil.isNullOrEmpty(honorific)) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<honorific>"
                     + MekHqXmlUtil.escape(honorific)

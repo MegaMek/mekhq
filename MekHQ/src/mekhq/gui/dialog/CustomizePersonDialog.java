@@ -971,7 +971,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
 
     private void randomName() {
         // TODO : Windchild reimplement
-        //String[] name = campaign.getRNG().generate(choiceGender.getSelectedIndex() == Person.G_FEMALE);
+        //String[] name = campaign.getRNG().generateGivenNameSurnameSplit(choiceGender.getSelectedIndex() == Person.G_FEMALE);
         String[] name = {"initial", "tests"};
         textGivenName.setText(name[0]);
         textSurname.setText(name[1]);

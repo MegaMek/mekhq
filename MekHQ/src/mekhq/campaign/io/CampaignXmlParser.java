@@ -921,7 +921,7 @@ public class CampaignXmlParser {
                             retVal.getRNG().setChosenFaction(wn2.getTextContent().trim());
                         } else if (wn2.getNodeName().equalsIgnoreCase(
                                 "percentFemale")) {
-                            retVal.getRNG().setPerentFemale(Integer.parseInt(wn2.getTextContent().trim()));
+                            retVal.getRNG().setPercentFemale(Integer.parseInt(wn2.getTextContent().trim()));
                         }
                     }
                 } else if (xn.equalsIgnoreCase("currentReport")) {
