@@ -236,6 +236,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JSpinner spnChanceProcreation;
     private JCheckBox chkUseUnofficialProcreationNoRelationship;
     private JSpinner spnChanceProcreationNoRelationship;
+    private JComboBox<String> comboBabySurnameStyle;
     private JSpinner spnCheckMutualAncestorsDepth;
     private JCheckBox chkUseParentage;
     private JComboBox<String> comboDisplayFamilyLevel;
@@ -1763,6 +1764,19 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             panChanceProcreationNoRelationship.add(spnChanceProcreationNoRelationship);
             gridBagConstraints.gridy = ++gridy;
             panFamily.add(panChanceProcreationNoRelationship, gridBagConstraints);
+
+
+            DefaultComboBoxModel<String> babySurnameStyleModel = new DefaultComboBoxModel<>();
+            babySurnameStyleModel.addElement(resourceMap.getString("babySurnameStyle.Mother"));
+            babySurnameStyleModel.addElement(resourceMap.getString("babySurnameStyle.Father"));
+            comboBabySurnameStyle = new JComboBox<>(babySurnameStyleModel);
+            comboBabySurnameStyle.setSelectedIndex(options.getBabySurnameStyle());
+            JPanel pnlBabySurnameStyle = new JPanel();
+            pnlBabySurnameStyle.add(new JLabel(resourceMap.getString("babySurnameStyle.text")));
+            pnlBabySurnameStyle.setToolTipText(resourceMap.getString("babySurnameStyle.toolTipText"));
+            pnlBabySurnameStyle.add(comboBabySurnameStyle);
+            gridBagConstraints.gridy = ++gridy;
+            panFamily.add(pnlBabySurnameStyle, gridBagConstraints);
 
             spnCheckMutualAncestorsDepth = new JSpinner(new SpinnerNumberModel(options.checkMutualAncestorsDepth(), 0, 20, 1));
             JPanel panCheckMutualAncestorsDepth = new JPanel();
@@ -4742,6 +4756,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setChanceProcreation((Double) spnChanceProcreation.getModel().getValue());
         options.setUseUnofficialProcreationNoRelationship(chkUseUnofficialProcreationNoRelationship.isSelected());
         options.setChanceProcreationNoRelationship((Double) spnChanceProcreationNoRelationship.getModel().getValue());
+        options.setBabySurnameStyle(comboBabySurnameStyle.getSelectedIndex());
         options.setCheckMutualAncestorsDepth((Integer) spnCheckMutualAncestorsDepth.getModel().getValue());
         options.setUseParentage(chkUseParentage.isSelected());
         options.setDisplayFamilyLevel(comboDisplayFamilyLevel.getSelectedIndex());
