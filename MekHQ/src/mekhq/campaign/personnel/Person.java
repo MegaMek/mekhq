@@ -409,7 +409,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         commander = false;
         isClanTech = false;
         techUnitIds = new ArrayList<>();
-        phenotype = PHENOTYPE_NONE;
+        phenotype = Bloodname.P_NONE;
         originFaction = Faction.getFaction(factionCode);
         clan = originFaction.isClan();
         bloodname = "";
@@ -629,7 +629,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public static String getPhenotypeName(int pheno) {
         switch (pheno) {
-            case PHENOTYPE_NONE:
+            case Bloodname.P_NONE:
                 return "Freeborn";
             case PHENOTYPE_MW:
                 return "Trueborn Mechwarrior";

@@ -64,7 +64,16 @@ public class Bloodname implements Serializable {
 	public static final int P_PROTOMECH = 4;
 	public static final int P_NAVAL = 5;
 	public static final int P_NUM = 6;
-
+/*
+	public static final int P_NONE = 0;
+	public static final int P_GENERAL = 1;
+	public static final int P_MECHWARRIOR = 2;
+	public static final int P_AEROSPACE = 3;
+	public static final int P_ELEMENTAL = 4;
+	public static final int P_PROTOMECH = 5;
+	public static final int P_NAVAL = 6;
+	public static final int P_NUM = 7;
+*/
 	public static final String[] phenotypeNames = {
 		"General", "MechWarrior", "Aerospace Pilot", "Elemental",
 		"ProtoMech Pilot", "Naval Commander"
@@ -94,8 +103,8 @@ public class Bloodname implements Serializable {
 		reactivated = 0;
 		startDate = 2807;
 		phenotype = P_GENERAL;
-		postReavingClans = new ArrayList<Clan>();
-		acquiringClans = new ArrayList<NameAcquired>();
+		postReavingClans = new ArrayList<>();
+		acquiringClans = new ArrayList<>();
 		absorbed = null;
 	}
 
@@ -179,7 +188,7 @@ public class Bloodname implements Serializable {
 			return (warriorType == P_NAVAL)?3:0;
 		case P_GENERAL:
 		default:
-			return 1;
+		    return 1;
 		}
 	}
 
@@ -235,17 +244,17 @@ public class Bloodname implements Serializable {
 					retVal.postReavingClans.add(Clan.getClan(c));
 				}
 			} else if (wn.getNodeName().equalsIgnoreCase("acquired")) {
-				retVal.acquiringClans.add(retVal.new NameAcquired(
-						Integer.parseInt(wn.getAttributes().getNamedItem("date").getTextContent()) + 10,
-						wn.getTextContent().trim()));
+				retVal.acquiringClans.add(new NameAcquired(
+                        Integer.parseInt(wn.getAttributes().getNamedItem("date").getTextContent()) + 10,
+                        wn.getTextContent().trim()));
 			} else if (wn.getNodeName().equalsIgnoreCase("shared")) {
-				retVal.acquiringClans.add(retVal.new NameAcquired(
-						Integer.parseInt(wn.getAttributes().getNamedItem("date").getTextContent()),
-						wn.getTextContent().trim()));
+				retVal.acquiringClans.add(new NameAcquired(
+                        Integer.parseInt(wn.getAttributes().getNamedItem("date").getTextContent()),
+                        wn.getTextContent().trim()));
 			} else if (wn.getNodeName().equalsIgnoreCase("absorbed")) {
-				retVal.absorbed = retVal.new NameAcquired(
-						Integer.parseInt(wn.getAttributes().getNamedItem("date").getTextContent()),
-						wn.getTextContent().trim());
+				retVal.absorbed = new NameAcquired(
+                        Integer.parseInt(wn.getAttributes().getNamedItem("date").getTextContent()),
+                        wn.getTextContent().trim());
 			} else if (wn.getNodeName().equalsIgnoreCase("created")) {
 				retVal.startDate = Integer.parseInt(wn.getTextContent().trim()) + 20;
 			}
@@ -253,6 +262,22 @@ public class Bloodname implements Serializable {
 
 		return retVal;
 	}
+
+    /**
+     * Determines a likely Bloodname based on Clan, phenotype, and year.
+     *
+     * @param factionCode The faction code for the Clan; must exist in data/names/bloodnames/clans.xml
+     * @param person One of the Person.PHENOTYPE_* constants
+     * @param year The current campaign year
+     * @return An object representing the chosen Bloodname
+     *
+     * Though based as much as possible on official sources, the method employed here involves a
+     * considerable amount of speculation.
+     */
+    public static @Nullable Bloodname randomBloodname(String factionCode, Person person, int year) {
+        int phenotype = determinePhenotype(person);
+        return randomBloodname(Clan.getClan(factionCode), phenotype, year);
+    }
 
     /**
      * Determines a likely Bloodname based on Clan, phenotype, and year.
@@ -302,9 +327,9 @@ public class Bloodname implements Serializable {
 		}
 
 		/* The relative probability of the various Bloodnames that are original to this Clan */
-		HashMap<Bloodname, Fraction> weights = new HashMap<Bloodname, Fraction>();
+		HashMap<Bloodname, Fraction> weights = new HashMap<>();
 		/* A list of non-exclusive Bloodnames from other Clans */
-		ArrayList<Bloodname> nonExclusives = new ArrayList<Bloodname>();
+		ArrayList<Bloodname> nonExclusives = new ArrayList<>();
 		/* The relative probability that a warrior in this Clan will have a non-exclusive
 		 * Bloodname that originally belonged to another Clan; the smaller the number
 		 * of exclusive Bloodnames of this Clan, the larger this chance.
@@ -324,7 +349,7 @@ public class Bloodname implements Serializable {
 			Fraction weight = null;
 
 			/* Effects of the Wars of Reaving would take a generation to show up
-			 * in the breeding programs, so the tables given in the WoR sourcebook
+			 * in the breeding programs, so the tables given in the WoR source book
 			 * are in effect from about 3100 on.
 			 */
 			if (year < 3100) {
@@ -373,8 +398,7 @@ public class Bloodname implements Serializable {
 				}
 			} else {
 				if (name.getPostReavingClans().contains(faction)) {
-					weight = new Fraction(name.phenotypeMultiplier(phenotype, year),
-							name.getPostReavingClans().size());
+					weight = new Fraction(name.phenotypeMultiplier(phenotype, year), name.getPostReavingClans().size());
 					/* Assume that Bloodnames that were exclusive before the Wars of Reaving
 					 * are more numerous (higher bloodcount).
 					 */
@@ -401,7 +425,7 @@ public class Bloodname implements Serializable {
 		for (Fraction f : weights.values()) {
 			f.mul(lcd);
 		}
-		ArrayList<Bloodname> nameList = new ArrayList<Bloodname>();
+		ArrayList<Bloodname> nameList = new ArrayList<>();
 		for (Bloodname b : weights.keySet()) {
 			for (int i = 0; i < weights.get(b).value(); i++) {
 				nameList.add(b);
@@ -446,10 +470,10 @@ public class Bloodname implements Serializable {
 	    final String METHOD_NAME = "loadBloodnameData()"; //$NON-NLS-1$
 
 		Clan.loadClanData();
-		bloodnames = new ArrayList<Bloodname>();
+		bloodnames = new ArrayList<>();
 
 		File f = new File("data/names/bloodnames/bloodnames.xml");
-		FileInputStream fis = null;
+		FileInputStream fis;
 		try {
 			fis = new FileInputStream(f);
 		} catch (FileNotFoundException e) {
@@ -458,7 +482,7 @@ public class Bloodname implements Serializable {
 			return;
 		}
 
-		Document doc = null;
+		Document doc;
 
 		try {
 			DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
@@ -485,7 +509,7 @@ public class Bloodname implements Serializable {
                 "Loaded " + bloodnames.size() + " Bloodname records."); //$NON-NLS-1$
 	}
 
-	public class NameAcquired {
+	public static class NameAcquired {
 		public int year;
 		public String clan;
 		public NameAcquired(int y, String c) {
@@ -499,12 +523,12 @@ public class Bloodname implements Serializable {
 class DatedRecord {
 	public int startDate;
 	public int endDate;
-	public String descr;
+	public String description;
 
 	public DatedRecord(int s, int e, String d) {
 		startDate = s;
 		endDate = e;
-		descr = d;
+        description = d;
 	}
 
 }
@@ -523,8 +547,8 @@ class Clan {
 
 	public Clan() {
 		startDate = endDate = abjurationDate = 0;
-		rivals = new ArrayList<DatedRecord>();
-		nameChanges = new ArrayList<DatedRecord>();
+		rivals = new ArrayList<>();
+		nameChanges = new ArrayList<>();
 	}
 
 	@Override
@@ -533,7 +557,7 @@ class Clan {
 			return code.equals(((Clan)o).code);
 		}
 		if (o instanceof String) {
-			return code.equals((String)o);
+			return code.equals(o);
 		}
 		return false;
     }
@@ -555,7 +579,7 @@ class Clan {
 		for (DatedRecord r : nameChanges) {
 			if (r.startDate < year &&
 					(r.endDate == 0 || r.endDate > year)) {
-				return r.descr;
+				return r.description;
 			}
 		}
 		return fullName;
@@ -571,10 +595,10 @@ class Clan {
 	}
 
 	public ArrayList<Clan> getRivals(int year) {
-		ArrayList<Clan> retVal = new ArrayList<Clan>();
+		ArrayList<Clan> retVal = new ArrayList<>();
 		for (DatedRecord r : rivals) {
 			if (r.startDate < year && (endDate == 0) || endDate > year) {
-				Clan c = allClans.get(r.descr);
+				Clan c = allClans.get(r.description);
 				if (c.isActive(year)) {
 					retVal.add(c);
 				}
@@ -597,7 +621,7 @@ class Clan {
 	}
 
 	public static Clan randomClan(int year, boolean homeClan) {
-		ArrayList<Clan> list = new ArrayList<Clan>();
+		ArrayList<Clan> list = new ArrayList<>();
 		for (Clan c : allClans.values()) {
 			if (year > 3075 && homeClan != c.homeClan) {
 				continue;
@@ -610,9 +634,9 @@ class Clan {
 	}
 
 	public static void loadClanData() {
-		allClans = new HashMap<String, Clan>();
+		allClans = new HashMap<>();
 		File f = new File("data/names/bloodnames/clans.xml");
-		FileInputStream fis = null;
+		FileInputStream fis;
 		try {
 			fis = new FileInputStream(f);
 		} catch (FileNotFoundException e) {
@@ -621,7 +645,7 @@ class Clan {
 			return;
 		}
 
-		Document doc = null;
+		Document doc;
 
 		try {
 			DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
