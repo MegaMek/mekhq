@@ -124,9 +124,7 @@ public abstract class AbstractPersonnelGenerator {
         if (isFemale) {
             person.setGender(Person.G_FEMALE);
         }
-        // TODO : Windchild reimplement
-        //String[] name = getNameGenerator().generateGivenNameSurnameSplit(isFemale);
-        String[] name = {"initial", "tests"};
+        String[] name = getNameGenerator().generateGivenNameSurnameSplit(isFemale);
         person.setGivenName(name[0]);
         person.setSurname(name[1]);
     }

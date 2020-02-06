@@ -217,9 +217,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     }
 
     private void randomName() {
-        // TODO : Windchild reimplement
-        //String[] name = getNameGenerator().generateGivenNameSurnameSplit(isFemale);
-        String[] name = {"initial", "tests"};
+        String[] name = hqView.getCampaign().getRNG().generateGivenNameSurnameSplit(person.isFemale());
         person.setGivenName(name[0]);
         person.setSurname(name[1]);
         refreshView();
