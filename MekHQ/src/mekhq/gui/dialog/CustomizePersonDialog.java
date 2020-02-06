@@ -275,11 +275,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
 
             btnRandomBloodname.setText(resourceMap.getString("btnRandomBloodname.text")); // NOI18N
             btnRandomBloodname.setName("btnRandomBloodname"); // NOI18N
-            btnRandomBloodname.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                	randomBloodname();
-                 }
-            });
+            btnRandomBloodname.addActionListener(evt -> randomBloodname());
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 2;
             gridBagConstraints.gridy = y;
@@ -319,7 +315,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         panDemog.add(lblGender, gridBagConstraints);
 
-        DefaultComboBoxModel<String> genderModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> genderModel = new DefaultComboBoxModel<>();
         genderModel.addElement(Person.getGenderName(Person.G_MALE));
         genderModel.addElement(Person.getGenderName(Person.G_FEMALE));
         choiceGender.setModel(genderModel);
@@ -506,17 +502,13 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         panDemog.add(new JLabel("Phenotype:"), gridBagConstraints);
 
-        DefaultComboBoxModel<String> phenoModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> phenoModel = new DefaultComboBoxModel<>();
         for(int i = 0; i < Person.PHENOTYPE_NUM; i++) {
             phenoModel.addElement(Person.getPhenotypeName(i));
         }
-        choicePheno = new JComboBox<String>(phenoModel);
+        choicePheno = new JComboBox<>(phenoModel);
         choicePheno.setSelectedIndex(person.getPhenotype());
-        choicePheno.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                backgroundChanged();
-            }
-        });
+        choicePheno.addActionListener(evt -> backgroundChanged());
         choicePheno.setEnabled(person.isClanner());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -529,12 +521,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
 
         chkClan = new JCheckBox("Clanner");
         chkClan.setSelected(person.isClanner());
-        chkClan.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent et) {
-                backgroundChanged();
-            }
-        });
+        chkClan.addItemListener(et -> backgroundChanged());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y;
@@ -557,11 +544,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
 
         btnDate.setText(getDateAsString());
         btnDate.setName("btnDate"); // NOI18N
-        btnDate.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	btnDateActionPerformed(evt);
-            }
-        });
+        btnDate.addActionListener(this::btnDateActionPerformed);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y;

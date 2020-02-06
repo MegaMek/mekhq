@@ -1737,7 +1737,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             gridBagConstraints.gridy = ++gridy;
             panFamily.add(chkUseUnofficialProcreation, gridBagConstraints);
 
-            spnChanceProcreation = new JSpinner(new SpinnerNumberModel(options.getChanceProcreation(), 0.001, 1, 0.001));
+            spnChanceProcreation = new JSpinner(new SpinnerNumberModel(options.getChanceProcreation(), 0.001, 100, 0.001));
             Dimension dimensionChanceProcreation = spnChanceProcreation.getPreferredSize();
             dimensionChanceProcreation.width = 50;
             spnChanceProcreation.setPreferredSize(dimensionChanceProcreation);
@@ -1754,7 +1754,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             gridBagConstraints.gridy = ++gridy;
             panFamily.add(chkUseUnofficialProcreationNoRelationship, gridBagConstraints);
 
-            spnChanceProcreationNoRelationship = new JSpinner(new SpinnerNumberModel(options.getChanceProcreationNoRelationship(), 0.001, 1, 0.001));
+            spnChanceProcreationNoRelationship = new JSpinner(new SpinnerNumberModel(options.getChanceProcreationNoRelationship(), 0.001, 100, 0.001));
             Dimension dimensionChanceProcreationNoRelationship = spnChanceProcreationNoRelationship.getPreferredSize();
             dimensionChanceProcreationNoRelationship.width = 50;
             spnChanceProcreationNoRelationship.setPreferredSize(dimensionChanceProcreationNoRelationship);

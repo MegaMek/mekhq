@@ -1101,9 +1101,17 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return id;
     }
 
+    public boolean isTeenagerOrChild() {
+        return (getAge(campaign.getCalendar()) <= 19);
+    }
+
+    public boolean isTeenager() {
+        return (!isChild() && isTeenagerOrChild());
+    }
+
     public boolean isChild() {
         // TODO : Ask if we want this to be a setting, with a required minimum value
-        return getAge(campaign.getCalendar()) <= 13;
+        return (getAge(campaign.getCalendar()) <= 13);
     }
 
 

@@ -1103,7 +1103,7 @@ public class AtBDynamicScenarioFactory {
 
         RandomNameGenerator rng = RandomNameGenerator.getInstance();
         rng.setChosenFaction(f.getNameGenerator());
-        String crewName = rng.generate(); //TODO : Windchild Fix me
+        String[] crewName = rng.generate(); //TODO : Wi
 
         RandomSkillsGenerator rsg = new RandomSkillsGenerator();
         rsg.setMethod(RandomSkillsGenerator.M_TAHARQA);
