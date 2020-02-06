@@ -4,7 +4,7 @@ v0.47.4-SNAPSHOT
 + PR #1440: Implement "Rugged" quirk (2x or 3x between maintenance rolls)
 + Issue #1447: Bug: Don't infinite loop in acquisition logic
 + Issue #1413/15: Hangar report displays units in alphabetical order and reflects mothball status
-+ PR #1449/52: Fixes for multiple unit assignment issues; sorting of unit assignment destinations by unit bay type
++ PR #1449/52: Fixes for multiple unit transport assignment issues; sorting of unit assignment destinations by unit bay type
 
 v0.47.3 (2020-2-11 2200 UTC) 
 + Issue #1344: Ensure techs show the right skill for Protomechs
