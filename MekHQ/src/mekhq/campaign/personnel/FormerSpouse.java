@@ -36,7 +36,7 @@ public class FormerSpouse implements Serializable, MekHqXmlSerializable {
     //region Variables
     //mutable private variables
     private UUID formerSpouseId;
-    private LocalDate date = LocalDate.now();
+    private LocalDate date;
     private int reason; //why the spouse became a former spouse
     //constants
     private final static long serialVersionUID = 19161521195L; //spouse in a letter-number cypher
