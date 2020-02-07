@@ -761,6 +761,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         // Then, the full name is set
         String[] name = n.split(" ");
 
+        // TODO: Windchild implement clanner name migration
+
         if (name.length == 1) {
             givenName = name[0];
             surname = null;
@@ -1104,19 +1106,66 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return id;
     }
 
-    public boolean isTeenagerOrChild() {
-        return (getAge(campaign.getCalendar()) <= 19);
-    }
-
-    public boolean isTeenager() {
-        return (!isChild() && isTeenagerOrChild());
-    }
-
     public boolean isChild() {
         // TODO : Ask if we want this to be a setting, with a required minimum value
         return (getAge(campaign.getCalendar()) <= 13);
     }
 
+    // TODO : Windchild Implement Me fully
+    //idea : have a method that allows you to determine what a person's age range would be, as this could be useful
+    //       in implementing a way to display ages instead of unknown for children
+    public final static int AGE_BABY = 0;
+    public final static int AGE_TODDLER = 1;
+    public final static int AGE_CHILD = 2;
+    public final static int AGE_PRETEEN = 3;
+    public final static int AGE_TEENAGER = 4;
+    public final static int AGE_ADULT = 5;
+    public final static int AGE_ELDER = 6;
+    public final static int AGE_NUM = 7;
+
+    public final static String[] AGE_NAMES = {
+        "Baby",
+        "Toddler",
+        "Child",
+        "Pre-teen",
+        "Teenager",
+        "Adult",
+        "Elder"
+    };
+
+    public String getAgeRangeName() {
+        return getAgeRangeName(getAgeRangeIndex());
+    }
+
+    public String getAgeRangeName(int ageRangeIndex) {
+        if (ageRangeIndex < AGE_NUM) {
+            return AGE_NAMES[ageRangeIndex];
+        } else {
+            return "Error In Age Range";
+        }
+    }
+
+    public int getAgeRangeIndex() {
+        int age = getAge(campaign.getCalendar());
+
+        if (age >= 65) {
+            return AGE_ELDER;
+        } else if (age >= 20) {
+            return AGE_ADULT;
+        } else if (age >= 13) {
+            return AGE_TEENAGER;
+        } else if (age >= 10) {
+            return AGE_PRETEEN;
+        } else if (age >= 3) {
+            return AGE_CHILD;
+        } else if (age >= 1) {
+            return AGE_TODDLER;
+        } else {
+            return AGE_BABY;
+        }
+    }
+
+    // TODO : End Implement fully from above
 
     public GregorianCalendar getDueDate() {
         return dueDate;
@@ -4095,7 +4144,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public boolean hasGrandchildren() {
         for (Ancestors a : campaign.getAncestors()) {
             if (getId().equals(a.getMotherId()) || getId().equals(a.getFatherId())) {
-                for(Person p : campaign.getPersonnel()) {
+                for (Person p : campaign.getPersonnel()) {
                     if (a.getId().equals(p.getAncestorsId())) {
                         if (p.hasChildren()) {
                             return true;
@@ -4285,8 +4334,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public List<Person> getChildren() {
         List<UUID> ancestors = new ArrayList<>();
         for (Ancestors a : campaign.getAncestors()) {
-            if ((a != null)
-                    && (getId().equals(a.getMotherId()) || getId().equals(a.getFatherId()))) {
+            if ((a != null) && (getId().equals(a.getMotherId()) || getId().equals(a.getFatherId()))) {
                 ancestors.add(a.getId());
             }
         }
@@ -4304,13 +4352,16 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public List<Person> getGrandchildren() {
         List<Person> grandchildren = new ArrayList<>();
         List<Person> tempChildList;
+
         for (Ancestors a : campaign.getAncestors()) {
-            if (getId().equals(a.getMotherId()) || getId().equals(a.getFatherId())) {
-                if (campaign.getPerson(a.getId()).hasChildren()) {
-                    tempChildList = campaign.getPerson(a.getId()).getChildren();
-                    //prevents duplicates, if anyone uses a small number of depth for their ancestry
-                    tempChildList.removeAll(grandchildren);
-                    grandchildren.addAll(tempChildList);
+            if ((a != null) && (getId().equals(a.getMotherId()) || getId().equals(a.getFatherId()))) {
+                for (Person p : campaign.getPersonnel()) {
+                    if ((a.getId().equals(p.getAncestorsId())) && p.hasChildren()) {
+                        tempChildList = p.getChildren();
+                        //prevents duplicates, if anyone uses a small number of depth for their ancestry
+                        tempChildList.removeAll(grandchildren);
+                        grandchildren.addAll(tempChildList);
+                    }
                 }
             }
         }
@@ -4351,15 +4402,15 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public List<Person> getSiblings() {
         List<UUID> parents = new ArrayList<>();
         List<Person> siblings = new ArrayList<>();
+        Person father = getFather();
+        Person mother = getMother();
 
         for (Ancestors a : campaign.getAncestors()) {
-            if ((a != null) && (getAncestorsId() != a.getId())) {
-                Person father = getFather();
-                Person mother = getMother();
-                if (((father != null) && father.getId().equals(a.getFatherId()))
-                        || ((mother != null) && mother.getId().equals(a.getMotherId()))) {
-                    parents.add(a.getId());
-                }
+            if ((a != null)
+                    && (((father != null) && father.getId().equals(a.getFatherId()))
+                        || ((mother != null) && mother.getId().equals(a.getMotherId())))) {
+
+                parents.add(a.getId());
             }
         }
 
@@ -4380,12 +4431,16 @@ public class Person implements Serializable, MekHqXmlSerializable {
         List<UUID> parents = new ArrayList<>();
         List<Person> siblingsAndSpouses = new ArrayList<>();
 
-        if (hasFather()) {
-            parents.add(getFather().getId());
-        }
+        Person father = getFather();
+        Person mother = getMother();
 
-        if (hasMother()) {
-            parents.add(getMother().getId());
+        for (Ancestors a : campaign.getAncestors()) {
+            if ((a != null)
+                    && (((father != null) && father.getId().equals(a.getFatherId()))
+                        || ((mother != null) && mother.getId().equals(a.getMotherId())))) {
+
+                parents.add(a.getId());
+            }
         }
 
         for (Person p : campaign.getPersonnel()) {

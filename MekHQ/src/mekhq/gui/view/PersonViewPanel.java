@@ -839,7 +839,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 }
             }
 
-            if (person.hasGrandchildren() && (campaign.getCampaignOptions().displayFamilyLevel() > CampaignOptions.PARENTS_CHILDREN_SIBLINGS)) {
+            if (person.hasGrandchildren() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.GRANDPARENTS_GRANDCHILDREN)) {
                 lblGrandchildren1.setName("lblGrandchildren1"); // NOI18N //$NON-NLS-1$
                 lblGrandchildren1.setText(resourceMap.getString("lblGrandchildren1.text")); //$NON-NLS-1$
                 gridBagConstraints = new GridBagConstraints();
@@ -967,7 +967,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 }
             }
 
-            if (person.hasGrandparent() && (campaign.getCampaignOptions().displayFamilyLevel() > CampaignOptions.PARENTS_CHILDREN_SIBLINGS)) {
+            if (person.hasGrandparent() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.GRANDPARENTS_GRANDCHILDREN)) {
                 lblGrandparents1.setName("lblGrandparents1"); // NOI18N //$NON-NLS-1$
                 lblGrandparents1.setText(resourceMap.getString("lblGrandparents1.text")); //$NON-NLS-1$
                 gridBagConstraints = new GridBagConstraints();
@@ -1001,7 +1001,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 }
             }
 
-            if (person.hasAuntOrUncle() && (campaign.getCampaignOptions().displayFamilyLevel() > CampaignOptions.GRANDPARENTS_GRANDCHILDREN)) {
+            if (person.hasAuntOrUncle() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.AUNTS_UNCLES_COUSINS)) {
                 lblAuntsOrUncles1.setName("lblAuntsOrUncles1"); // NOI18N //$NON-NLS-1$
                 lblAuntsOrUncles1.setText(resourceMap.getString("lblAuntsOrUncles1.text")); //$NON-NLS-1$
                 gridBagConstraints = new GridBagConstraints();
@@ -1035,7 +1035,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 }
             }
 
-            if (person.hasCousins() && (campaign.getCampaignOptions().displayFamilyLevel() > CampaignOptions.GRANDPARENTS_GRANDCHILDREN)) {
+            if (person.hasCousins() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.AUNTS_UNCLES_COUSINS)) {
                 lblCousins1.setName("lblCousins1"); // NOI18N //$NON-NLS-1$
                 lblCousins1.setText(resourceMap.getString("lblCousins1.text")); //$NON-NLS-1$
                 gridBagConstraints = new GridBagConstraints();
