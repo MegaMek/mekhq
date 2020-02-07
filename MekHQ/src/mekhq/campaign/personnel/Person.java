@@ -1134,7 +1134,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     };
 
     public String getAgeRangeName() {
-        return getAgeRangeName(getAgeRangeIndex());
+        return getAgeRangeName(determineAgeRangeIndex());
     }
 
     public String getAgeRangeName(int ageRangeIndex) {
@@ -1145,7 +1145,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
 
-    public int getAgeRangeIndex() {
+    public int determineAgeRangeIndex() {
         int age = getAge(campaign.getCalendar());
 
         if (age >= 65) {
@@ -1165,7 +1165,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
 
-    // TODO : End Implement fully from above
+    // TODO : Implement the above full
 
     public GregorianCalendar getDueDate() {
         return dueDate;
@@ -1217,13 +1217,16 @@ public class Person implements Serializable, MekHqXmlSerializable {
         extraData.set(PREGNANCY_FATHER_DATA, (hasSpouse()) ? getSpouseId().toString() : null);
 
         String sizeString = (size < PREGNANCY_MULTIPLE_NAMES.length) ? PREGNANCY_MULTIPLE_NAMES[size] : null;
-        if(null == sizeString) {
+        if (null == sizeString) {
             campaign.addReport(getHyperlinkedName()+" has conceived");
         } else {
             campaign.addReport(getHyperlinkedName()+" has conceived " + sizeString);
         }
         if (campaign.getCampaignOptions().logConception()) {
             MedicalLogger.hasConceived(this, campaign.getDate(), sizeString);
+            if (hasSpouse()) {
+                PersonalLogger.spouseConceived(getSpouse(), getFullName(), campaign.getDate(), sizeString);
+            }
         }
     }
 
@@ -1238,7 +1241,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         String fatherIdString = extraData.get(PREGNANCY_FATHER_DATA);
         UUID fatherId = (fatherIdString != null) ? UUID.fromString(fatherIdString) : null;
         Ancestors anc = campaign.getAncestors(fatherId, id);
-        if(null == anc) {
+        if (null == anc) {
             anc = campaign.createAncestors(fatherId, id);
         }
         final UUID ancId = anc.getId();
@@ -1258,9 +1261,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
             baby.setId(babyId);
             baby.setAncestorsId(ancId);
-            campaign.addReport(getHyperlinkedName() + " has given birth to " + baby.getHyperlinkedName() + ", a baby " + (baby.getGender() == G_MALE ? "boy!" : "girl!"));
+            campaign.addReport(getHyperlinkedName() + " has given birth to " + baby.getHyperlinkedName() + ", a baby " + baby.getGenderName());
             if (campaign.getCampaignOptions().logConception()) {
                 MedicalLogger.deliveredBaby(this, baby, campaign.getDate());
+                if (fatherId != null) {
+                    PersonalLogger.ourChildBorn(campaign.getPerson(fatherId), baby, getFullName(), campaign.getDate());
+                }
             }
             return baby;
         }).collect(Collectors.toList());

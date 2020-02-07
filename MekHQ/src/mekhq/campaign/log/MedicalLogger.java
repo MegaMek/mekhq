@@ -35,7 +35,7 @@ import java.util.ResourceBundle;
 public class MedicalLogger {
     private static ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries", new EncodeControl());;
 
-    public static MedicalLogEntry severedSpine(Person person, Date date){
+    public static MedicalLogEntry severedSpine(Person person, Date date) {
         String message = logEntriesResourceMap.getString("severedSpine.text");
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, MessageFormat.format(message,
                         person.getGenderPronoun(Person.PRONOUN_HISHER),
@@ -44,7 +44,7 @@ public class MedicalLogger {
         return medicalLogEntry;
     }
 
-    public static MedicalLogEntry brokenRibPunctureDead(Person person, Date date){
+    public static MedicalLogEntry brokenRibPunctureDead(Person person, Date date) {
         String message = logEntriesResourceMap.getString("brokenRibPunctureDead.text");
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, MessageFormat.format(message,
                 person.getGenderPronoun(Person.PRONOUN_HISHER)));
@@ -52,7 +52,7 @@ public class MedicalLogger {
         return medicalLogEntry;
     }
 
-    public static MedicalLogEntry brokenRibPuncture(Person person, Date date){
+    public static MedicalLogEntry brokenRibPuncture(Person person, Date date) {
         String message = logEntriesResourceMap.getString("brokenRibPuncture.text");
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, MessageFormat.format(message,
                 person.getGenderPronoun(Person.PRONOUN_HISHER)));
@@ -60,120 +60,120 @@ public class MedicalLogger {
         return medicalLogEntry;
     }
 
-    public static MedicalLogEntry developedEncephalopatyh(Person person, Date date){
+    public static MedicalLogEntry developedEncephalopathy(Person person, Date date) {
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, logEntriesResourceMap.getString("developedEncephalopathy.text"));
         person.addLogEntry(medicalLogEntry);
         return medicalLogEntry;
     }
 
-    public static MedicalLogEntry concussionWorsned(Person person, Date date){
+    public static MedicalLogEntry concussionWorsened(Person person, Date date) {
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, logEntriesResourceMap.getString("concussionWorsened.text"));
         person.addLogEntry(medicalLogEntry);
         return medicalLogEntry;
     }
 
-    public static MedicalLogEntry developedCerbralContusion(Person person, Date date){
+    public static MedicalLogEntry developedCerebralContusion(Person person, Date date) {
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, logEntriesResourceMap.getString("developedCerebralContusion.text"));
         person.addLogEntry(medicalLogEntry);
         return medicalLogEntry;
     }
 
-    public static MedicalLogEntry diedDueToBrainTrauma(Person person, Date date){
+    public static MedicalLogEntry diedDueToBrainTrauma(Person person, Date date) {
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, logEntriesResourceMap.getString("diedDueToBrainTrauma.text"));
         person.addLogEntry(medicalLogEntry);
         return medicalLogEntry;
     }
 
-    public static MedicalLogEntry diedOfInternalBleeding(Person person, Date date){
+    public static MedicalLogEntry diedOfInternalBleeding(Person person, Date date) {
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, logEntriesResourceMap.getString("diedOfInternalBleeding.text"));
         person.addLogEntry(medicalLogEntry);
         return medicalLogEntry;
     }
 
-    public static MedicalLogEntry internalBleedingWorsened(Person person, Date date){
+    public static MedicalLogEntry internalBleedingWorsened(Person person, Date date) {
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, logEntriesResourceMap.getString("internalBleedingWorsened.text"));
         person.addLogEntry(medicalLogEntry);
         return medicalLogEntry;
     }
 
-    public static void returnedWithInjuries(Person person, Date date, Collection<Injury> newInjuries){
+    public static void returnedWithInjuries(Person person, Date date, Collection<Injury> newInjuries) {
         StringBuilder sb = new StringBuilder(logEntriesResourceMap.getString("returnedWithInjuries.text"));
         newInjuries.forEach((inj) -> sb.append("\n\t\t").append(inj.getFluff()));
         MedicalLogEntry entry = new MedicalLogEntry(date, sb.toString());
         person.addLogEntry(entry);
     }
 
-    public static void docMadeAMistake(Person doctor, Person patient, Injury injury, Date date){
+    public static void docMadeAMistake(Person doctor, Person patient, Injury injury, Date date) {
         String message = logEntriesResourceMap.getString("docMadeAMistake.text");
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date,
                 MessageFormat.format(message, doctor.getFullTitle(), injury.getName()));
         patient.addLogEntry(medicalLogEntry);
     }
 
-    public static void docAmazingWork(Person doctor, Person patient, Injury injury, Date date, int critTimeReduction){
+    public static void docAmazingWork(Person doctor, Person patient, Injury injury, Date date, int critTimeReduction) {
         String message = logEntriesResourceMap.getString("docAmazingWork.text");
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date,
                 MessageFormat.format(message, doctor.getFullTitle(), injury.getName(), critTimeReduction));
         patient.addLogEntry(medicalLogEntry);
     }
 
-    public static void successfullyTreated(Person doctor, Person patient, Date date, Injury injury){
+    public static void successfullyTreated(Person doctor, Person patient, Date date, Injury injury) {
         String message = logEntriesResourceMap.getString("successfullyTreated.text");
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date,
                 MessageFormat.format(message, doctor.getFullTitle(), injury.getName()));
         patient.addLogEntry(medicalLogEntry);
     }
 
-    public static void injuryDidntHealProperly(Person patient, Date date, Injury injury){
+    public static void injuryDidntHealProperly(Person patient, Date date, Injury injury) {
         String message = logEntriesResourceMap.getString("didntHealProperly.text");
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, MessageFormat.format(message, injury.getName()));
         patient.addLogEntry(medicalLogEntry);
     }
 
-    public static void injuryHealed(Person patient, Date date, Injury injury){
+    public static void injuryHealed(Person patient, Date date, Injury injury) {
         String message = logEntriesResourceMap.getString("healed.text");
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, MessageFormat.format(message, injury.getName()));
         patient.addLogEntry(medicalLogEntry);
     }
 
-    public static void injuryBecamePermanent(Person patient, Date date, Injury injury){
+    public static void injuryBecamePermanent(Person patient, Date date, Injury injury) {
         String message = logEntriesResourceMap.getString("becamePermanent.text");
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, MessageFormat.format(message, injury.getName()));
         patient.addLogEntry(medicalLogEntry);
     }
 
-    public static void diedInInfirmary(Person person, Date date){
+    public static void diedInInfirmary(Person person, Date date) {
         person.addLogEntry(new MedicalLogEntry(date, logEntriesResourceMap.getString("diedInInfirmary.text")));
     }
 
-    public static void abductedFromInfirmary(Person person, Date date){
+    public static void abductedFromInfirmary(Person person, Date date) {
         person.addLogEntry(new MedicalLogEntry(date, logEntriesResourceMap.getString("abductedFromInfirmary.text")));
     }
 
-    public static void retiredAndTransferedFromInfirmary(Person person, Date date){
-        person.addLogEntry(new MedicalLogEntry(date, logEntriesResourceMap.getString("retiredAndTransferedFromInfirmary.text")));
+    public static void retiredAndTransferredFromInfirmary(Person person, Date date) {
+        person.addLogEntry(new MedicalLogEntry(date, logEntriesResourceMap.getString("retiredAndTransferredFromInfirmary.text")));
     }
-    public static void dismissedFromInfirmary(Person person, Date date){
+    public static void dismissedFromInfirmary(Person person, Date date) {
         person.addLogEntry(new MedicalLogEntry(date, logEntriesResourceMap.getString("dismissedFromInfirmary.text")));
     }
 
-    public static void deliveredBaby(Person patient, Person baby, Date date){
+    public static void deliveredBaby(Person patient, Person baby, Date date) {
         String message = logEntriesResourceMap.getString("deliveredBaby.text");
-        MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, MessageFormat.format(message, (baby.getGender() == Person.G_MALE ? "boy!" : "girl!")));
+        MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, MessageFormat.format(message, baby.getGenderName()));
         patient.addLogEntry(medicalLogEntry);
     }
 
-    public static void hasConceived(Person patient, Date date, String sizeString){
+    public static void hasConceived(Person patient, Date date, String sizeString) {
         String message = logEntriesResourceMap.getString("hasConceived.text");
 
-        if(null != sizeString)
+        if (null != sizeString) {
             message += " " + sizeString;
+        }
 
-        MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, message);
-        patient.addLogEntry(medicalLogEntry);
+        patient.addLogEntry(new MedicalLogEntry(date, message));
     }
 
-    public static void diedFromWounds(Person patient, Date date){
+    public static void diedFromWounds(Person patient, Date date) {
         String message = logEntriesResourceMap.getString("diedFromWounds.text");
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, MessageFormat.format(message, patient.getGenderPronoun(Person.PRONOUN_HISHER)));
         patient.addLogEntry(medicalLogEntry);
