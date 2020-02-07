@@ -12,6 +12,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.Image;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -55,6 +56,7 @@ import mekhq.gui.model.PersonnelKillLogModel;
 import mekhq.gui.utilities.ImageHelpers;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.gui.utilities.WrapLayout;
+import org.joda.time.format.DateTimeFormat;
 
 /**
  * A custom panel that gets filled in with goodies from a Person record
@@ -140,7 +142,7 @@ public class PersonViewPanel extends ScrollablePanel {
             gridy++;
         }
 
-        if (person.hasAnyFamily()) {
+        if (person.hasAnyFamily() || person.hasFormerSpouse()) {
             JPanel pnlFamily = fillFamily();
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -788,7 +790,9 @@ public class PersonViewPanel extends ScrollablePanel {
                 lblFormerSpouses2 = new JLabel();
                 lblFormerSpouses2.setName("lblFormerSpouses2"); // NOI18N //$NON-NLS-1$
                 lblFormerSpouses2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                lblFormerSpouses2.setText(String.format("<html><a href='#'>%s, %s</a></html>", ex.getFullName(), formerSpouse.getReasonString()));
+                lblFormerSpouses2.setText(String.format("<html><a href='#'>%s</a>, %s, %s</html>", ex.getFullName(),
+                        formerSpouse.getReasonString(), formerSpouse.getDateAsString(FormerSpouse.getDisplayDateFormat())));
+                //TODO : Windchild fix this format so it is standardized
                 lblFormerSpouses2.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {

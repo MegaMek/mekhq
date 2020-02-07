@@ -192,6 +192,10 @@ public class Bloodname implements Serializable {
 		}
 	}
 
+	public static int determinePhenotype(Person person) {
+	    return 0; // TODO : Windchild Fix Me
+    }
+
 	public static Bloodname loadFromXml(Node node) {
 		Bloodname retVal = new Bloodname();
 		NodeList nl = node.getChildNodes();
@@ -264,10 +268,10 @@ public class Bloodname implements Serializable {
 	}
 
     /**
-     * Determines a likely Bloodname based on Clan, phenotype, and year.
+     * Determines a likely Bloodname based on Clan, person, and year.
      *
      * @param factionCode The faction code for the Clan; must exist in data/names/bloodnames/clans.xml
-     * @param person One of the Person.PHENOTYPE_* constants
+     * @param person the person to generate a Bloodname for
      * @param year The current campaign year
      * @return An object representing the chosen Bloodname
      *
@@ -517,7 +521,6 @@ public class Bloodname implements Serializable {
 			clan = c;
 		}
 	}
-
 }
 
 class DatedRecord {

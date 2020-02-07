@@ -522,8 +522,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
 
                 //add to former spouse list
-                selectedPerson.getSpouse().addFormerSpouse(new FormerSpouse(selectedPerson.getId(), reason));
-                selectedPerson.addFormerSpouse(new FormerSpouse(selectedPerson.getSpouse().getId(), reason));
+                selectedPerson.getSpouse().addFormerSpouse(new FormerSpouse(selectedPerson.getId(), FormerSpouse.convertDateTimeToLocalDate(gui.getCampaign().getDateTime()), reason));
+                selectedPerson.addFormerSpouse(new FormerSpouse(selectedPerson.getSpouse().getId(), FormerSpouse.convertDateTimeToLocalDate(gui.getCampaign().getDateTime()), reason));
 
                 selectedPerson.getSpouse().setSpouseId(null);
                 MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson.getSpouse()));
@@ -568,7 +568,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     case OPT_SURNAME_HYP_YOURS:
                         if (!StringUtil.isNullOrEmpty(selectedSurname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
                             selectedPerson.setSurname(selectedSurname + HYPHEN + spouseSurname);
-                        } else if (!StringUtil.isNullOrEmpty(spouseSurname)) {
+                        } else {
                             selectedPerson.setSurname(spouseSurname);
                         }
                         //both null or "" is ignored as a case, as it would lead to no changes
@@ -588,10 +588,11 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 
                         selectedPerson.setMaidenName(selectedSurname); //"" is handled in the divorce code
                         spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
+                        break;
                     case OPT_SURNAME_HYP_SPOUSE:
                         if (!StringUtil.isNullOrEmpty(selectedSurname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
                             spouse.setSurname(spouseSurname + HYPHEN + selectedSurname);
-                        } else if (!StringUtil.isNullOrEmpty(selectedSurname)) {
+                        } else {
                             spouse.setSurname(selectedSurname);
                         }
                         //both null or "" is ignored as a case, as it would lead to no changes
@@ -609,6 +610,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         }
                         //both null or "" is ignored as a case, as it would lead to no changes
 
+                        selectedPerson.setMaidenName(selectedSurname); //"" is handled in the divorce code
                         spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
                         break;
                     default:

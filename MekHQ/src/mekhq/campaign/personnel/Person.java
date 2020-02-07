@@ -718,6 +718,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
         this.maidenName = n;
     }
 
+    public String getFullNameAndRank() {
+        return "temp0"; //TODO Windchild implement me
+    }
+
     public String getFullName() {
         return fullName;
     }
@@ -1190,7 +1194,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
             anc = campaign.createAncestors(fatherId, id);
         }
         final UUID ancId = anc.getId();
-        final String surname = generateBabySurname();
+
+        final String surname = generateBabySurname(fatherId);
 
         // Cleanup
         removePregnancy();
@@ -1213,14 +1218,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }).collect(Collectors.toList());
     }
 
-    private String generateBabySurname() {
-        String surname;
-        if (hasSpouse() && campaign.getCampaignOptions().getBabySurnameStyle() == CampaignOptions.BABY_SURNAME_SPOUSE) {
-            surname = getSpouse().getSurname();
-        } else {
-            surname = getSurname();
+    private String generateBabySurname(UUID fatherId) {
+        if (campaign.getCampaignOptions().getBabySurnameStyle() == CampaignOptions.BABY_SURNAME_SPOUSE) {
+            if (fatherId != null) {
+                return campaign.getPerson(fatherId).getSurname();
+            }
         }
-        return surname;
+        return surname = getSurname();
     }
 
     public boolean safeSpouse(Person p) {
@@ -4075,9 +4079,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * @return true if the person has at least one kid, false otherwise
      */
     public boolean hasChildren() {
-        for (Ancestors a : campaign.getAncestors()) {
-            if (getId().equals(a.getMotherId()) || getId().equals(a.getFatherId())) {
-                return true;
+        if (getId() != null) {
+            for (Ancestors a : campaign.getAncestors()) {
+                if (getId().equals(a.getMotherId()) || getId().equals(a.getFatherId())) {
+                    return true;
+                }
             }
         }
         return false;
