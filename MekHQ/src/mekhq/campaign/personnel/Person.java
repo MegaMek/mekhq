@@ -557,6 +557,21 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
 
+    public String getChildGenderName() {
+        return getChildGenderName(gender);
+    }
+
+    public static String getChildGenderName(int gender) {
+        switch (gender) {
+            case G_MALE:
+                return "boy";
+            case G_FEMALE:
+                return "girl";
+            default:
+                return "?";
+        }
+    }
+
     public String getGenderPronoun(int variant) {
         return getGenderPronoun(gender, variant);
     }
@@ -1261,7 +1276,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
             baby.setId(babyId);
             baby.setAncestorsId(ancId);
-            campaign.addReport(getHyperlinkedName() + " has given birth to " + baby.getHyperlinkedName() + ", a baby " + baby.getGenderName());
+            campaign.addReport(String.format("%s has given birth to %s, a baby %s!", getHyperlinkedName(),
+                    baby.getHyperlinkedName(), baby.getChildGenderName()));
             if (campaign.getCampaignOptions().logConception()) {
                 MedicalLogger.deliveredBaby(this, baby, campaign.getDate());
                 if (fatherId != null) {
