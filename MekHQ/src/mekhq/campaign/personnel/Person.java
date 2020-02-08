@@ -76,6 +76,7 @@ import mekhq.campaign.universe.Planet;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Person implements Serializable, MekHqXmlSerializable {
+    //region Variable Declarations
     private static final long serialVersionUID = -847642980395311152L;
 
     public static final int G_MALE = 0;
@@ -359,7 +360,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
         OTHER_RANSOM_VALUES.put(SkillType.EXP_VETERAN, Money.of(25000));
         OTHER_RANSOM_VALUES.put(SkillType.EXP_ELITE, Money.of(50000));
     }
+    //endregion Variable Declarations
 
+    //region Constructors
     //default constructor
     public Person(Campaign c) {
         this("Biff", "the Understudy", c);
@@ -423,6 +426,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         this.honorific = honorific;
         setFullName();
     }
+    //endregion Constructors
 
     public Campaign getCampaign(){return campaign;}
 
@@ -542,6 +546,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         this.willingToDefect = willingToDefect && (prisonerStatus == PRISONER_YES);
     }
 
+    //region Text Getters
+    //TODO : Rename and Localize region
     public String getGenderName() {
         return getGenderName(gender);
     }
@@ -618,6 +624,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
 
+    public String getStatusName() {
+        return getStatusName(status);
+    }
+
     public static String getStatusName(int status) {
         switch (status) {
             case S_ACTIVE:
@@ -637,8 +647,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return isPregnant() ? " (Pregnant)" : "";
     }
 
-    public String getStatusName() {
-        return getStatusName(status);
+    public String getPhenotypeName() {
+        return getPhenotypeName(phenotype);
     }
 
     public static String getPhenotypeName(int pheno) {
@@ -658,6 +668,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
 
+    public String getPhenotypeShortName() {
+        return getPhenotypeShortName(phenotype);
+    }
+
     public static String getPhenotypeShortName(int pheno) {
         switch (pheno) {
             case PHENOTYPE_NONE:
@@ -672,12 +686,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
 
-    public String getPhenotypeName() {
-        return getPhenotypeName(phenotype);
-    }
-
-    public String getPhenotypeShortName() {
-        return getPhenotypeShortName(phenotype);
+    public String getPrisonerStatusName() {
+        return getPrisonerStatusName(prisonerStatus);
     }
 
     public static String getPrisonerStatusName(int status) {
@@ -692,11 +702,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 return "?";
         }
     }
+    //endregion Text Getters
+    //TODO : Rename and Localize region
 
-    public String getPrisonerStatusName() {
-        return getPrisonerStatusName(prisonerStatus);
-    }
-
+    //region Names
     public String getGivenName() {
         return givenName;
     }
@@ -730,10 +739,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void setMaidenName(String n) {
         this.maidenName = n;
-    }
-
-    public String getFullNameAndRank() {
-        return "temp0"; //TODO Windchild implement me
     }
 
     public String getFullName() {
@@ -811,6 +816,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public void setCallsign(String n) {
         this.callsign = n;
     }
+    //endregion Names
 
     public String getPortraitCategory() {
         return Utilities.nonNull(portraitCategoryOverride, portraitCategory);
@@ -1182,6 +1188,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     // TODO : Implement the above full
 
+    //region Pregnancy
     public GregorianCalendar getDueDate() {
         return dueDate;
     }
@@ -1296,7 +1303,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
         return surname = getSurname();
     }
+    //endregion Pregnancy
 
+    //region Marriage
     public boolean safeSpouse(Person p) {
         // Huge convoluted return statement
         return (
@@ -1307,6 +1316,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 && !p.isChild()
         );
     }
+
+    //endregion Marriage
 
     public boolean isFemale() {
         return gender == G_FEMALE;
@@ -4118,6 +4129,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         formerSpouses.add(formerSpouse);
     }
     //endregion setFamily
+
     //region hasFamily
     /**
      *
@@ -4306,7 +4318,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //endregion hasFamily
 
     //region getFamily
-
     /**
      *
      * @return the person's ancestor id
