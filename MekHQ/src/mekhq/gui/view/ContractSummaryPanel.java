@@ -68,7 +68,7 @@ public class ContractSummaryPanel extends JPanel {
 	private JLabel lblName;
 	private JTextField txtName;
 	private JLabel lblLocation;
-	private JTextArea txtLocation;
+	private JLabel txtLocation;
 	private JLabel lblDistance;
 	private JTextArea txtDistance;
 	private JLabel lblMissionType;
@@ -161,7 +161,7 @@ public class ContractSummaryPanel extends JPanel {
 		lblName = new JLabel();
 		txtName = new JTextField();
 		lblLocation = new JLabel();
-		txtLocation = new JTextArea();
+		txtLocation = new JLabel();
 		lblDistance = new JLabel();
 		txtDistance = new JTextArea();
 		lblEmployer = new JLabel();
@@ -315,9 +315,6 @@ public class ContractSummaryPanel extends JPanel {
                 gui.setSelectedTab(GuiTabType.MAP);
             }
         });
-		txtLocation.setEditable(false);
-		txtLocation.setLineWrap(true);
-		txtLocation.setWrapStyleWord(true);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = y++;
