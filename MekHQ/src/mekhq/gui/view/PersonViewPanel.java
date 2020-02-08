@@ -476,8 +476,8 @@ public class PersonViewPanel extends ScrollablePanel {
         JLabel lblAge2 = new JLabel();
         JLabel lblGender1 = new JLabel();
         JLabel lblGender2 = new JLabel();
-        JLabel lblDuedate1 = new JLabel();
-        JLabel lblDuedate2 = new JLabel();
+        JLabel lblDueDate1 = new JLabel();
+        JLabel lblDueDate2 = new JLabel();
         JLabel lblRecruited1 = new JLabel();
         JLabel lblRecruited2 = new JLabel();
         JLabel lblTimeServed1 = new JLabel();
@@ -592,51 +592,25 @@ public class PersonViewPanel extends ScrollablePanel {
             firsty++;
         }
 
-        //report either due date or age
-        if (person.getDueDate() != null) {
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-            String DueDate = df.format(person.getDueDate().getTime());
+        lblAge1.setName("lblAge1"); // NOI18N
+        lblAge1.setText(resourceMap.getString("lblAge1.text")); //$NON-NLS-1$
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = firsty;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlInfo.add(lblAge1, gridBagConstraints);
 
-            lblDuedate1.setName("lblDuedate1");
-            lblDuedate1.setText(resourceMap.getString("lblDuedate1.text")); //$NON-NLS-1$
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = firsty;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlInfo.add(lblDuedate1, gridBagConstraints);
-
-            lblDuedate2.setName("lblDuedate2"); // NOI18N
-            lblDuedate2.setText(DueDate);
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = firsty;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlInfo.add(lblDuedate2, gridBagConstraints);
-        } else {
-            lblAge1.setName("lblAge1"); // NOI18N
-            lblAge1.setText(resourceMap.getString("lblAge1.text")); //$NON-NLS-1$
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = firsty;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlInfo.add(lblAge1, gridBagConstraints);
-
-            lblAge2.setName("lblAge2"); // NOI18N
-            lblAge2.setText(Integer.toString(person.getAge(campaign.getCalendar())));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = firsty;
-            gridBagConstraints.weightx = 0.5;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlInfo.add(lblAge2, gridBagConstraints);
-        }
+        lblAge2.setName("lblAge2"); // NOI18N
+        lblAge2.setText(Integer.toString(person.getAge(campaign.getCalendar())));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = firsty;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlInfo.add(lblAge2, gridBagConstraints);
         firsty++;
 
         lblGender1.setName("lblGender1"); // NOI18N
@@ -659,9 +633,13 @@ public class PersonViewPanel extends ScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlInfo.add(lblGender2, gridBagConstraints);
 
-        firsty--;
+        // We don't change firsty here as we will either change it for Time in Service or pregnancy, and as such it isn't required
+
         if (campaign.getCampaignOptions().getUseTimeInService()) {
             if ((null != person.getRecruitmentAsString()) && !person.isDependent() && !person.isPrisoner() && !person.isBondsman()) {
+                //need to subtract 1 from firsty to properly line the recruited date up with age on the display
+                firsty--;
+
                 lblRecruited1.setName("lblRecruited1"); // NOI18N
                 lblRecruited1.setText(resourceMap.getString("lblRecruited1.text"));
                 gridBagConstraints = new GridBagConstraints();
@@ -702,7 +680,38 @@ public class PersonViewPanel extends ScrollablePanel {
                 gridBagConstraints.fill = GridBagConstraints.NONE;
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 pnlInfo.add(lblTimeServed2, gridBagConstraints);
+
+                // We don't change firsty here because we want to ensure it works properly if this is included or not included
             }
+        }
+
+        // We are adding 1 to firsty here to ensure that the pregnancy information is displayed below gender without
+        // caring if Time in Service is enabled
+        firsty++;
+
+        if (person.isPregnant()) {
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+            String DueDate = df.format(person.getDueDate().getTime());
+
+            lblDueDate1.setName("lblDueDate1");
+            lblDueDate1.setText(resourceMap.getString("lblDueDate1.text")); //$NON-NLS-1$
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlInfo.add(lblDueDate1, gridBagConstraints);
+
+            lblDueDate2.setName("lblDueDate2"); // NOI18N
+            lblDueDate2.setText(DueDate);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlInfo.add(lblDueDate2, gridBagConstraints);
         }
 
         return pnlInfo;
