@@ -2,6 +2,8 @@
 /logs/
 /data/mechfiles/units.cache
 /data/mechfiles/customs/
+/data/images/portraits/Male
+/data/images/portraits/Female
 /savegames/
 /mmconf/clientsettings.xml
 /mmconf/gameoptions.xml
