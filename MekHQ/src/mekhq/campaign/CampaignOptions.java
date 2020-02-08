@@ -120,20 +120,29 @@ public class CampaignOptions implements Serializable {
     private boolean isOriginExtraRandom;
     private double originDistanceScale;
     //family
-    private boolean useUnofficialProcreation; // Unofficial
-    private double chanceProcreation; // Unofficial
-    private boolean useUnofficialProcreationNoRelationship; // Unofficial
-    private double chanceProcreationNoRelationship; // Unofficial
-    private int babySurnameStyle; //Unofficial
+    private boolean useRandomMarriages;
+    private double chanceRandomMarriages;
+    private int minimumMarriageAge;
+    private int marriageAgeRange;
+    private boolean useRandomSameSexMarriages;
+    private double chanceRandomSameSexMarriages;
+    private int checkMutualAncestorsDepth;
+    private boolean useUnofficialProcreation;
+    private double chanceProcreation;
+    private boolean useUnofficialProcreationNoRelationship;
+    private double chanceProcreationNoRelationship;
+    private boolean displayExpectedDueDate;
+    private boolean logConception;
+    private int babySurnameStyle;
     public final static int BABY_SURNAME_MINE = 0; //baby uses mother's surname
     public final static int BABY_SURNAME_SPOUSE = 1; //baby uses father's surname
-    private int checkMutualAncestorsDepth;
     private boolean useParentage;
     private int displayFamilyLevel;
     public final static int PARENTS_CHILDREN_SIBLINGS = 0;
     public final static int GRANDPARENTS_GRANDCHILDREN = 1;
     public final static int AUNTS_UNCLES_COUSINS = 2;
-    private boolean logConception;
+    private boolean useRandomDeaths;
+    private boolean keepMarriedNameUponSpouseDeath;
     //salary
     private double salaryCommissionMultiplier;
     private double salaryEnlistedMultiplier;
@@ -485,15 +494,24 @@ public class CampaignOptions implements Serializable {
         isOriginExtraRandom = false;
         originDistanceScale = 0.6;
         //Family
+        useRandomMarriages = false;
+        chanceRandomMarriages = 0.05;
+        minimumMarriageAge = 18;
+        marriageAgeRange = 20;
+        useRandomSameSexMarriages = false;
+        chanceRandomSameSexMarriages = 0.005;
+        checkMutualAncestorsDepth = 4;
         useUnofficialProcreation = false;
         chanceProcreation = 0.05;
         useUnofficialProcreationNoRelationship = false;
         chanceProcreationNoRelationship = 0.005;
-        babySurnameStyle = BABY_SURNAME_MINE;
-        checkMutualAncestorsDepth = 4;
-        useParentage = false;
-        displayFamilyLevel = 0;
+        displayExpectedDueDate = true;
         logConception = false;
+        babySurnameStyle = BABY_SURNAME_MINE;
+        useParentage = false;
+        displayFamilyLevel = PARENTS_CHILDREN_SIBLINGS;
+        useRandomDeaths = true;
+        keepMarriedNameUponSpouseDeath = true;
         //Salary
         salaryAntiMekMultiplier = 1.5;
         salaryEnlistedMultiplier = 1.0;
@@ -760,6 +778,63 @@ public class CampaignOptions implements Serializable {
         tougherHealing = b;
     }
 
+    //region family
+    public boolean useRandomMarriages() {
+        return useRandomMarriages;
+    }
+
+    public void setUseRandomMarriages(boolean b) {
+        useRandomMarriages = b;
+    }
+
+    public double getChanceRandomMarriages() {
+        return chanceRandomMarriages;
+    }
+
+    public void setChanceRandomMarriages(double b) {
+        chanceRandomMarriages = b;
+    }
+
+    public int getMinimumMarriageAge() {
+        return minimumMarriageAge;
+    }
+
+    public void setMinimumMarriageAge(int b) {
+        minimumMarriageAge = b;
+    }
+
+    public int getMarriageAgeRange() {
+        return marriageAgeRange;
+    }
+
+    public void setMarriageAgeRange(int b) {
+        marriageAgeRange = b;
+    }
+
+    public boolean useRandomSameSexMarriages() {
+        return useRandomSameSexMarriages;
+    }
+
+    public void setUseRandomSameSexMarriages(boolean b) {
+        useRandomSameSexMarriages = b;
+    }
+
+    public double getChanceRandomSameSexMarriages() {
+        return chanceRandomSameSexMarriages;
+    }
+
+    public void setChanceRandomSameSexMarriages(double b) {
+        chanceRandomSameSexMarriages = b;
+    }
+
+    public int checkMutualAncestorsDepth() {
+        return checkMutualAncestorsDepth;
+    }
+
+    public void setCheckMutualAncestorsDepth(int b) {
+        checkMutualAncestorsDepth = b;
+    }
+
     public boolean useUnofficialProcreation() {
         return useUnofficialProcreation;
     }
@@ -792,20 +867,28 @@ public class CampaignOptions implements Serializable {
         chanceProcreationNoRelationship = b;
     }
 
+    public boolean getDisplayExpectedDueDate() {
+        return displayExpectedDueDate;
+    }
+
+    public void setDisplayExpectedDueDate(boolean b) {
+        displayExpectedDueDate = b;
+    }
+
+    public boolean logConception() {
+        return logConception;
+    }
+
+    public void setLogConception(boolean b) {
+        logConception = b;
+    }
+
     public int getBabySurnameStyle() {
         return babySurnameStyle;
     }
 
     public void setBabySurnameStyle(int b) {
         babySurnameStyle = b;
-    }
-
-    public int checkMutualAncestorsDepth() {
-        return checkMutualAncestorsDepth;
-    }
-
-    public void setCheckMutualAncestorsDepth(int b) {
-        checkMutualAncestorsDepth = b;
     }
 
     public boolean useParentage() {
@@ -824,13 +907,22 @@ public class CampaignOptions implements Serializable {
         displayFamilyLevel = b;
     }
 
-    public boolean logConception() {
-        return logConception;
+    public boolean useRandomDeaths() {
+        return useRandomDeaths;
     }
 
-    public void setLogConception(boolean b) {
-        logConception = b;
+    public void setUseRandomDeaths(boolean b) {
+        useRandomMarriages = b;
     }
+
+    public boolean getKeepMarriedNameUponSpouseDeath() {
+        return keepMarriedNameUponSpouseDeath;
+    }
+
+    public void setKeepMarriedNameUponSpouseDeath(boolean b) {
+        keepMarriedNameUponSpouseDeath = b;
+    }
+    //endregion family
 
     public boolean useTransfers() {
         return useTransfers;
@@ -2514,15 +2606,26 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomHitsForVees", useRandomHitsForVees);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "minimumHitsForVees", minimumHitsForVees);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maxAcquisitions", maxAcquisitions);
+        //region family
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomMarriages", useRandomMarriages);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "chanceRandomMarriages", chanceRandomMarriages);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "minimumMarriageAge", minimumMarriageAge);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "marriageAgeRange", marriageAgeRange);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomSameSexMarriages", useRandomSameSexMarriages);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "chanceRandomSameSexMarriages", chanceRandomSameSexMarriages);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "checkMutualAncestorsDepth", checkMutualAncestorsDepth);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnofficialProcreation", useUnofficialProcreation);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "chanceProcreation", chanceProcreation);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnofficialProcreationNoRelationship", useUnofficialProcreationNoRelationship);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "chanceProcreationNoRelationship", chanceProcreationNoRelationship);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "displayExpectedDueDate", displayExpectedDueDate);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "logConception", logConception);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "babySurnameStyle", babySurnameStyle);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "checkMutualAncestorsDepth", checkMutualAncestorsDepth);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useParentage", useParentage);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "displayFamilyLevel", displayFamilyLevel);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "logConception", logConception);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomDeaths", useRandomDeaths);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "keepMarriedNameUponSpouseDeath", keepMarriedNameUponSpouseDeath);
+        //endregion family
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTransfers", useTransfers);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTimeInService", useTimeInService);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "capturePrisoners", capturePrisoners);
@@ -2947,6 +3050,21 @@ public class CampaignOptions implements Serializable {
                 retVal.minimumHitsForVees = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("maxAcquisitions")) {
                 retVal.maxAcquisitions = Integer.parseInt(wn2.getTextContent().trim());
+            //region Family
+            } else if (wn2.getNodeName().equalsIgnoreCase("useRandomMarriages")) {
+                retVal.useRandomMarriages = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomMarriages")) {
+                retVal.chanceRandomMarriages = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("minimumMarriageAge")) {
+                retVal.minimumMarriageAge = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("marriageAgeRange")) {
+                retVal.marriageAgeRange = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useRandomSameSexMarriages")) {
+                retVal.useRandomSameSexMarriages = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomSameSexMarriages")) {
+                retVal.chanceRandomSameSexMarriages = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("checkMutualAncestorsDepth")) {
+                retVal.checkMutualAncestorsDepth = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreation")) {
             	retVal.useUnofficialProcreation = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("chanceProcreation")) {
@@ -2955,16 +3073,21 @@ public class CampaignOptions implements Serializable {
             	retVal.useUnofficialProcreationNoRelationship = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("chanceProcreationNoRelationship")) {
                 retVal.chanceProcreationNoRelationship = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("displayExpectedDueDate")) {
+                retVal.displayExpectedDueDate = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("logConception")) {
+                retVal.logConception = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("babySurnameStyle")) {
                 retVal.babySurnameStyle = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("checkMutualAncestorsDepth")) {
-                retVal.checkMutualAncestorsDepth = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useParentage")) {
                 retVal.useParentage = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("displayFamilyLevel")) {
                 retVal.displayFamilyLevel = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("logConception")) {
-                retVal.logConception = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useRandomDeaths")) {
+                retVal.useRandomDeaths = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("keepMarriedNameUponSpouseDeath")) {
+                retVal.keepMarriedNameUponSpouseDeath = Boolean.parseBoolean(wn2.getTextContent().trim());
+            //endregion Family
             } else if (wn2.getNodeName().equalsIgnoreCase("useTransfers")) {
             	retVal.useTransfers = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useTimeInService")) {

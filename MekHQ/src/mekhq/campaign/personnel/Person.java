@@ -1132,9 +1132,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return (getAge(campaign.getCalendar()) <= 13);
     }
 
+    //region Age Range Identification
     // TODO : Windchild Implement Me fully
-    //idea : have a method that allows you to determine what a person's age range would be, as this could be useful
-    //       in implementing a way to display ages instead of unknown for children
+    // idea : have a method that allows you to determine what a person's age range would be, as this could be useful
+    // in implementing a way to display ages instead of unknown for children
     public final static int AGE_BABY = 0;
     public final static int AGE_TODDLER = 1;
     public final static int AGE_CHILD = 2;
@@ -1162,7 +1163,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (ageRangeIndex < AGE_NUM) {
             return AGE_NAMES[ageRangeIndex];
         } else {
-            return "Error In Age Range";
+            return String.format("Error In Age Range - Illegal Index %d", ageRangeIndex);
         }
     }
 
@@ -1185,8 +1186,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
             return AGE_BABY;
         }
     }
-
-    // TODO : Implement the above full
+    //endregion Age Range Identification
+    // TODO : Implement the above fully
 
     //region Pregnancy
     public GregorianCalendar getDueDate() {
@@ -1313,8 +1314,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 && (getAncestorsId() == null
                 || !campaign.getAncestors(getAncestorsId()).checkMutualAncestors(campaign.getAncestors(p.getAncestorsId())))
                 && !p.hasSpouse()
-                && !p.isChild()
+                && p.oldEnoughToMarry()
         );
+    }
+
+    public boolean oldEnoughToMarry() {
+        return (getAge(campaign.getCalendar()) >= campaign.getCampaignOptions().getMinimumMarriageAge());
     }
 
     //endregion Marriage
