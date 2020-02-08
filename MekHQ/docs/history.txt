@@ -10,6 +10,7 @@ v0.47.4-SNAPSHOT
 + Issue #925: Fixing Zombie Time in Service
 + Issue #1455: Possible fix for failure to generate units from RAT files due to said RAT files not loading fast enough
 + PR #1467: Made the Standard Value for Double Enemy Vehicles False
++ Issue #280: Adding Portrait folder documentation
 
 v0.47.3 (2020-2-11 2200 UTC) 
 + Issue #1344: Ensure techs show the right skill for Protomechs
