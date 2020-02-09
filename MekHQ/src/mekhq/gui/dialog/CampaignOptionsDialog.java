@@ -243,7 +243,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JSpinner spnChanceProcreation;
     private JCheckBox chkUseUnofficialProcreationNoRelationship;
     private JSpinner spnChanceProcreationNoRelationship;
-    private JCheckBox chkDisplayExpectedDueDate;
+    private JCheckBox chkDisplayTrueDueDate;
     private JCheckBox chkLogConception;
     private JComboBox<String> comboBabySurnameStyle;
     private JCheckBox chkUseParentage;
@@ -1830,11 +1830,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             gridBagConstraints.gridy = ++gridy;
             panFamily.add(panChanceProcreationNoRelationship, gridBagConstraints);
 
-            chkDisplayExpectedDueDate = new JCheckBox(resourceMap.getString("displayExpectedDueDate.text"));
-            chkDisplayExpectedDueDate.setToolTipText(resourceMap.getString("displayExpectedDueDate.toolTipText"));
-            chkDisplayExpectedDueDate.setSelected(options.getDisplayExpectedDueDate());
+            chkDisplayTrueDueDate = new JCheckBox(resourceMap.getString("displayTrueDueDate.text"));
+            chkDisplayTrueDueDate.setToolTipText(resourceMap.getString("displayTrueDueDate.toolTipText"));
+            chkDisplayTrueDueDate.setSelected(options.getDisplayTrueDueDate());
             gridBagConstraints.gridy = ++gridy;
-            panFamily.add(chkDisplayExpectedDueDate, gridBagConstraints);
+            panFamily.add(chkDisplayTrueDueDate, gridBagConstraints);
 
             chkLogConception = new JCheckBox(resourceMap.getString("logConception.text"));
             chkLogConception.setSelected(options.logConception());
@@ -4836,7 +4836,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setChanceProcreation((Double) spnChanceProcreation.getModel().getValue());
         options.setUseUnofficialProcreationNoRelationship(chkUseUnofficialProcreationNoRelationship.isSelected());
         options.setChanceProcreationNoRelationship((Double) spnChanceProcreationNoRelationship.getModel().getValue());
-        options.setDisplayExpectedDueDate(chkDisplayExpectedDueDate.isSelected());
+        options.setDisplayTrueDueDate(chkDisplayTrueDueDate.isSelected());
         options.setLogConception(chkLogConception.isSelected());
         options.setBabySurnameStyle(comboBabySurnameStyle.getSelectedIndex());
         options.setUseParentage(chkUseParentage.isSelected());

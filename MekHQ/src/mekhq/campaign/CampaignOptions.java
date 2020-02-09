@@ -131,7 +131,7 @@ public class CampaignOptions implements Serializable {
     private double chanceProcreation;
     private boolean useUnofficialProcreationNoRelationship;
     private double chanceProcreationNoRelationship;
-    private boolean displayExpectedDueDate;
+    private boolean displayTrueDueDate;
     private boolean logConception;
     private int babySurnameStyle;
     public final static int BABY_SURNAME_MINE = 0; //baby uses mother's surname
@@ -505,7 +505,7 @@ public class CampaignOptions implements Serializable {
         chanceProcreation = 0.05;
         useUnofficialProcreationNoRelationship = false;
         chanceProcreationNoRelationship = 0.005;
-        displayExpectedDueDate = true;
+        displayTrueDueDate = false;
         logConception = false;
         babySurnameStyle = BABY_SURNAME_MINE;
         useParentage = false;
@@ -867,12 +867,12 @@ public class CampaignOptions implements Serializable {
         chanceProcreationNoRelationship = b;
     }
 
-    public boolean getDisplayExpectedDueDate() {
-        return displayExpectedDueDate;
+    public boolean getDisplayTrueDueDate() {
+        return displayTrueDueDate;
     }
 
-    public void setDisplayExpectedDueDate(boolean b) {
-        displayExpectedDueDate = b;
+    public void setDisplayTrueDueDate(boolean b) {
+        displayTrueDueDate = b;
     }
 
     public boolean logConception() {

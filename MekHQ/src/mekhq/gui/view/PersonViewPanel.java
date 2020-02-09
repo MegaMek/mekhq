@@ -642,7 +642,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 //need to subtract 1 from firsty to properly line the recruited date up with age on the display
                 firsty--;
 
-                lblRecruited1.setName("lblRecruited1"); // NOI18N
+                lblRecruited1.setName("lblRecruited1");
                 lblRecruited1.setText(resourceMap.getString("lblRecruited1.text"));
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 2;
@@ -651,7 +651,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 pnlInfo.add(lblRecruited1, gridBagConstraints);
 
-                lblRecruited2.setName("lblRecruited2"); // NOI18N
+                lblRecruited2.setName("lblRecruited2");
                 lblRecruited2.setText(person.getRecruitmentAsString());
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 3;
@@ -663,7 +663,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 pnlInfo.add(lblRecruited2, gridBagConstraints);
 
                 firsty++;
-                lblTimeServed1.setName("lblTimeServed1"); // NOI18N
+                lblTimeServed1.setName("lblTimeServed1");
                 lblTimeServed1.setText(resourceMap.getString("lblTimeServed1.text"));
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 2;
@@ -672,7 +672,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 pnlInfo.add(lblTimeServed1, gridBagConstraints);
 
-                lblTimeServed2.setName("lblTimeServed2"); // NOI18N
+                lblTimeServed2.setName("lblTimeServed2");
                 lblTimeServed2.setText(person.getTimeInService(campaign.getCalendar()) + " years");
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 3;
@@ -693,10 +693,10 @@ public class PersonViewPanel extends ScrollablePanel {
 
         if (person.isPregnant()) {
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-            String DueDate = df.format(person.getDueDate().getTime());
+            String dueDate;
 
             lblDueDate1.setName("lblDueDate1");
-            lblDueDate1.setText(resourceMap.getString("lblDueDate1.text")); //$NON-NLS-1$
+            lblDueDate1.setText(resourceMap.getString("lblDueDate1.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = firsty;
@@ -704,8 +704,14 @@ public class PersonViewPanel extends ScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblDueDate1, gridBagConstraints);
 
-            lblDueDate2.setName("lblDueDate2"); // NOI18N
-            lblDueDate2.setText(DueDate);
+            if (campaign.getCampaignOptions().getDisplayTrueDueDate()) {
+                dueDate = df.format(person.getDueDate().getTime());
+            } else {
+                dueDate = df.format(person.getExpectedDueDate().getTime());
+            }
+
+            lblDueDate2.setName("lblDueDate2");
+            lblDueDate2.setText(dueDate);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = firsty;
