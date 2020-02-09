@@ -1854,7 +1854,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     String type;
 
                     List<Person> personnel = new ArrayList(gui.getCampaign().getPersonnel());
-                    personnel.sort(Comparator.comparing((Person p) -> p.getAge(calendar)).thenComparing(Person::getFullName));
+                    personnel.sort(Comparator.comparing((Person p) -> p.getAge(calendar)).thenComparing(Person::getSurname));
 
                     for (Person ps : personnel) {
                         if (person.safeSpouse(ps) && !ps.isDeadOrMIA()) {

@@ -3230,6 +3230,7 @@ public class Campaign implements Serializable, ITechManager {
                         }
                     } else {
                         p.setDueDate(null);
+                        p.setExpectedDueDate(null);
                     }
                 } else if (getCampaignOptions().useUnofficialProcreation()) {
                     p.procreate();

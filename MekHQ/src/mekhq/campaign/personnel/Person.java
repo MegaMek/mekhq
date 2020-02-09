@@ -174,13 +174,17 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     //region Procreation
     protected GregorianCalendar dueDate;
+    protected GregorianCalendar expectedDueDate;
 
-    private static final IntSupplier PREGNANCY_DURATION = () -> {
+    private static final int PREGNANCY_STANDARD_DURATION = 268;
+
+    // This creates a random range of approximately six weeks with which to modify the standard pregnancy duration
+    // To create randomized pregnancy duration
+    private static final IntSupplier PREGNANCY_MODIFY_DURATION = () -> {
         double gaussian = Math.sqrt(-2 * Math.log(Math.nextUp(Math.random())))
             * Math.cos(2.0 * Math.PI * Math.random());
         // To not get weird results, we limit the values to +/- 4.0 (almost 6 weeks)
-        gaussian = Math.max(-4.0, Math.min(4.0, gaussian));
-        return (int) Math.round(gaussian * 10 + 38 * 7);
+        return (int) Math.round(Math.max(-4.0, Math.min(4.0, gaussian)) * 10);
     };
 
     private static final IntSupplier PREGNANCY_SIZE = () -> {
@@ -1136,16 +1140,16 @@ public class Person implements Serializable, MekHqXmlSerializable {
     // TODO : Windchild Implement Me fully
     // idea : have a method that allows you to determine what a person's age range would be, as this could be useful
     // in implementing a way to display ages instead of unknown for children
-    public final static int AGE_BABY = 0;
-    public final static int AGE_TODDLER = 1;
-    public final static int AGE_CHILD = 2;
-    public final static int AGE_PRETEEN = 3;
-    public final static int AGE_TEENAGER = 4;
-    public final static int AGE_ADULT = 5;
-    public final static int AGE_ELDER = 6;
-    public final static int AGE_NUM = 7;
+    public static final int AGE_BABY = 0;
+    public static final int AGE_TODDLER = 1;
+    public static final int AGE_CHILD = 2;
+    public static final int AGE_PRETEEN = 3;
+    public static final int AGE_TEENAGER = 4;
+    public static final int AGE_ADULT = 5;
+    public static final int AGE_ELDER = 6;
+    public static final int AGE_NUM = 7;
 
-    public final static String[] AGE_NAMES = {
+    public static final String[] AGE_NAMES = {
         "Baby",
         "Toddler",
         "Child",
@@ -1198,6 +1202,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
         this.dueDate = dueDate;
     }
 
+    public GregorianCalendar getExpectedDueDate() {
+        return expectedDueDate;
+    }
+
+    public void setExpectedDueDate(GregorianCalendar expectedDueDate) {
+        this.expectedDueDate = expectedDueDate;
+    }
+
     public boolean isPregnant() {
         return dueDate != null;
     }
@@ -1233,8 +1245,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void addPregnancy() {
         GregorianCalendar tCal = (GregorianCalendar) campaign.getCalendar().clone();
-        tCal.add(GregorianCalendar.DAY_OF_YEAR, PREGNANCY_DURATION.getAsInt());
+
+        tCal.add(GregorianCalendar.DAY_OF_YEAR, PREGNANCY_STANDARD_DURATION);
+        setExpectedDueDate(tCal);
+        tCal.add(GregorianCalendar.DAY_OF_YEAR, PREGNANCY_MODIFY_DURATION.getAsInt());
         setDueDate(tCal);
+
         int size = PREGNANCY_SIZE.getAsInt();
         extraData.set(PREGNANCY_CHILDREN_DATA, size);
         extraData.set(PREGNANCY_FATHER_DATA, (hasSpouse()) ? getSpouseId().toString() : null);
@@ -1255,6 +1271,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void removePregnancy() {
         setDueDate(null);
+        setExpectedDueDate(null);
         extraData.set(PREGNANCY_CHILDREN_DATA, null);
         extraData.set(PREGNANCY_FATHER_DATA, null);
     }
@@ -1311,10 +1328,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
         // Huge convoluted return statement
         return (
                 !this.equals(p)
-                && (getAncestorsId() == null
-                || !campaign.getAncestors(getAncestorsId()).checkMutualAncestors(campaign.getAncestors(p.getAncestorsId())))
                 && !p.hasSpouse()
                 && p.oldEnoughToMarry()
+                && ((getAncestorsId() == null)
+                    || !campaign.getAncestors(getAncestorsId()).checkMutualAncestors(campaign.getAncestors(p.getAncestorsId())))
         );
     }
 
