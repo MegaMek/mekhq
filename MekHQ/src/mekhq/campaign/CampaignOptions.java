@@ -496,7 +496,7 @@ public class CampaignOptions implements Serializable {
         //Family
         useRandomMarriages = false;
         chanceRandomMarriages = 0.05;
-        minimumMarriageAge = 18;
+        minimumMarriageAge = 16;
         marriageAgeRange = 20;
         useRandomSameSexMarriages = false;
         chanceRandomSameSexMarriages = 0.005;

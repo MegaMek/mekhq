@@ -1755,7 +1755,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             gridBagConstraints.gridy = ++gridy;
             panFamily.add(panChanceRandomMarriages, gridBagConstraints);
 
-            spnMinimumMarriageAge = new JSpinner(new SpinnerNumberModel(options.getMinimumMarriageAge(), 0, 20, 1));
+            spnMinimumMarriageAge = new JSpinner(new SpinnerNumberModel(options.getMinimumMarriageAge(), 16, 500, 1));
             JPanel panMinimumMarriageAge = new JPanel();
             panMinimumMarriageAge.add(new JLabel(resourceMap.getString("minimumMarriageAge.text")));
             panMinimumMarriageAge.setToolTipText(resourceMap.getString("minimumMarriageAge.toolTipText"));
@@ -1763,7 +1763,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             gridBagConstraints.gridy = ++gridy;
             panFamily.add(panMinimumMarriageAge, gridBagConstraints);
 
-            spnMarriageAgeRange = new JSpinner(new SpinnerNumberModel(options.getMarriageAgeRange(), 0, 20, 1));
+            spnMarriageAgeRange = new JSpinner(new SpinnerNumberModel(options.getMarriageAgeRange(), 0, 500, 1));
             JPanel panMarriageAgeRange = new JPanel();
             panMarriageAgeRange.add(new JLabel(resourceMap.getString("marriageAgeRange.text")));
             panMarriageAgeRange.setToolTipText(resourceMap.getString("marriageAgeRange.toolTipText"));
@@ -4825,15 +4825,24 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setRandomizeOrigin(chkRandomizeOrigin.isSelected());
         options.setOriginSearchRadius((Integer)spnOriginSearchRadius.getModel().getValue());
         //Family
+        options.setUseRandomMarriages(chkUseRandomMarriages.isSelected());
+        options.setChanceRandomMarriages((Double) spnChanceRandomMarriages.getModel().getValue());
+        options.setMinimumMarriageAge((Integer) spnMinimumMarriageAge.getModel().getValue());
+        options.setMarriageAgeRange((Integer) spnMarriageAgeRange.getModel().getValue());
+        options.setUseRandomSameSexMarriages(chkUseRandomSameSexMarriages.isSelected());
+        options.setChanceRandomSameSexMarriages((Double) spnChanceRandomSameSexMarriages.getModel().getValue());
+        options.setCheckMutualAncestorsDepth((Integer) spnCheckMutualAncestorsDepth.getModel().getValue());
         options.setUseUnofficialProcreation(chkUseUnofficialProcreation.isSelected());
         options.setChanceProcreation((Double) spnChanceProcreation.getModel().getValue());
         options.setUseUnofficialProcreationNoRelationship(chkUseUnofficialProcreationNoRelationship.isSelected());
         options.setChanceProcreationNoRelationship((Double) spnChanceProcreationNoRelationship.getModel().getValue());
+        options.setDisplayExpectedDueDate(chkDisplayExpectedDueDate.isSelected());
+        options.setLogConception(chkLogConception.isSelected());
         options.setBabySurnameStyle(comboBabySurnameStyle.getSelectedIndex());
-        options.setCheckMutualAncestorsDepth((Integer) spnCheckMutualAncestorsDepth.getModel().getValue());
         options.setUseParentage(chkUseParentage.isSelected());
         options.setDisplayFamilyLevel(comboDisplayFamilyLevel.getSelectedIndex());
-        options.setLogConception(chkLogConception.isSelected());
+        options.setUseRandomDeaths(chkUseRandomDeaths.isSelected());
+        options.setKeepMarriedNameUponSpouseDeath(chkKeepMarriedNameUponSpouseDeath.isSelected());
         //Salary
         options.setSalaryCommissionMultiplier((Double) spnSalaryCommission.getModel().getValue());
         options.setSalaryEnlistedMultiplier((Double) spnSalaryEnlisted.getModel().getValue());
