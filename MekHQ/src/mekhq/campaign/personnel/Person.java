@@ -1111,16 +1111,22 @@ public class Person implements Serializable, MekHqXmlSerializable {
             return -1;
         }
 
-        int timeinservice = today.get(Calendar.YEAR) - recruitment.get(Calendar.YEAR);
+        // If the person is dead, we only care about how long they spent in service to the company
+        if (dateOfDeath != null) {
+            //use date of death instead of the current day
+            today = dateOfDeath;
+        }
+
+        int timeInService = today.get(Calendar.YEAR) - recruitment.get(Calendar.YEAR);
 
         // Add the tentative time in service to the date of recruitment to get this year's service history
         GregorianCalendar tmpDate = (GregorianCalendar) recruitment.clone();
-        tmpDate.add(Calendar.YEAR, timeinservice);
+        tmpDate.add(Calendar.YEAR, timeInService);
 
         if (today.before(tmpDate)) {
-            timeinservice--;
+            timeInService--;
         }
-        return timeinservice;
+        return timeInService;
     }
 
     public void setId(UUID id) {

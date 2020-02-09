@@ -573,7 +573,7 @@ public class CampaignOptions implements Serializable {
     	useAero = false;
     	useVehicles = true;
     	clanVehicles = false;
-    	doubleVehicles = true;
+    	doubleVehicles = false;
         adjustPlayerVehicles = false;
         opforLanceTypeMechs = 1;
         opforLanceTypeMixed = 2;

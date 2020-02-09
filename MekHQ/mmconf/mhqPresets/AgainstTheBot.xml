@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gamePreset>
 	<title>Official AtB Options</title>
-	<description>(Release 2)These are the default settings for the Against the Bot campaign system. As always change them to what you like for your style of play.</description>
+	<description>(Release 2) These are the default settings for the Against the Bot campaign system. As always change them to what you like for your style of play.</description>
 	<campaignOptions>
 		<clanPriceModifier>1.0</clanPriceModifier>
 		<useFactionForNames>true</useFactionForNames>
@@ -118,7 +118,7 @@
 		<useAero>true</useAero>
 		<useVehicles>true</useVehicles>
 		<clanVehicles>true</clanVehicles>
-		<doubleVehicles>true</doubleVehicles>
+		<doubleVehicles>false</doubleVehicles>
 		<adjustPlayerVehicles>true</adjustPlayerVehicles>
 		<opforLanceTypeMechs>1</opforLanceTypeMechs>
 		<opforLanceTypeMixed>2</opforLanceTypeMixed>
