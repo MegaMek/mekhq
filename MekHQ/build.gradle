@@ -1,3 +1,5 @@
+import edu.sc.seis.launch4j.tasks.Launch4jLibraryTask
+
 plugins {
     id 'application'
     id 'maven-publish'
@@ -98,7 +100,7 @@ task compileMM (type: GradleBuild) {
 task mmJar (type: Jar, dependsOn: compileMM) {
     description = 'Builds a MegaMek jar from the current source'
 
-    archiveName = "MegaMek.jar"
+    archiveFileName = "MegaMek.jar"
     from "${mmDir}/megamek/build/classes/java/main"
     from "${mmDir}/megamek/build/resources/main"
     manifest {
@@ -107,7 +109,7 @@ task mmJar (type: Jar, dependsOn: compileMM) {
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }
             .collect { "${lib}/${it.name}" }.join(' ')
     }
-    ext.jarLocation = "${buildDir}/libs/${archiveName}"
+    ext.jarLocation = "${buildDir}/libs/${archiveFileName}"
     inputs.dir "${mmDir}/build/classes/java/main"
     inputs.dir "${mmDir}/build/resources/main"
     outputs.file jarLocation
@@ -116,7 +118,7 @@ task mmJar (type: Jar, dependsOn: compileMM) {
 task mmJarLibDir (type: Jar, dependsOn: compileMM) {
     description = 'Builds a MegaMek jar from the current source, with dependencies on the classpath in the same directory'
 
-    archiveName = "MegaMek.jar"
+    archiveFileName = "MegaMek.jar"
     from "${mmDir}/megamek/build/classes/java/main"
     from "${mmDir}/megamek/build/resources/main"
     manifest {
@@ -125,7 +127,7 @@ task mmJarLibDir (type: Jar, dependsOn: compileMM) {
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }
             .collect { it.name }.join(' ')
     }
-    ext.jarLocation = "${buildDir}/libs/${archiveName}"
+    ext.jarLocation = "${buildDir}/libs/${archiveFileName}"
     inputs.dir "${mmDir}/build/classes/java/main"
     inputs.dir "${mmDir}/build/resources/main"
     outputs.file jarLocation
@@ -140,26 +142,26 @@ task compileMML (type: GradleBuild) {
 }
 
 task mmlJar (type: Jar, dependsOn: compileMML) {
-    archiveName = "MegaMekLab.jar"
+    archiveFileName = "MegaMekLab.jar"
     from "${mmlDir}/build/classes/java/main"
     from "${mmlDir}/build/resources/main"
     manifest {
         attributes "Main-Class": 'megameklab.com.MegaMekLab'
-        attributes 'Class-Path' : "${mmJar.archiveName} " + (project.sourceSets.main.runtimeClasspath.files
+        attributes 'Class-Path' : "${mmJar.archiveFileName} " + (project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
             .collect { "${lib}/${it.name}" }.join(' '))
     }
-    ext.jarLocation = "${buildDir}/libs/${archiveName}"
+    ext.jarLocation = "${buildDir}/libs/${archiveFileName}"
     inputs.dir "${mmlDir}/build/classes/java/main"
     inputs.dir "${mmlDir}/build/resources/main"
     outputs.file jarLocation
 }
 
 jar {
-    archiveName = "MekHQ.jar"
+    archiveFileName = "MekHQ.jar"
     manifest {
         attributes "Main-Class": mainClassName
-        attributes 'Class-Path' : "${mmJar.archiveName} ${mmlJar.archiveName} " + (project.sourceSets.main.runtimeClasspath.files
+        attributes 'Class-Path' : "${mmJar.archiveFileName} ${mmlJar.archiveFileName} " + (project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }
             .collect { "${lib}/${it.name}" }.join(' '))
     }
@@ -244,7 +246,7 @@ task createOSXBundle (dependsOn: jar) {
                 mainClass: project.mainClassName,
                 stubfile: osxApplicationStub,
                 dir: osxBundleDir,
-                jar: "${jar.destinationDir}/${jar.archiveName}",
+                jar: "${jar.destinationDirectory}/${jar.archiveFileName}",
                 jvmversion: '1.8+',
                 icon: "${projectDir}/${data}/images/misc/mekhq.icns",
                 useJavaXKey: 'true',
@@ -366,10 +368,10 @@ distributions {
 createExe {
     description = 'Create Windows executable that wraps MekHQ jar'
     mainClassName = project.mainClassName
-    jar = 'lib/MekHQ.jar'
+    jar = "${project.tasks.getByName("jar").archiveFile.get()}"
     icon = "${projectDir}/data/images/misc/mekhq.ico"
     internalName = 'MekHQ'
-	classpath = ["lib/${mmJar.archiveName}", "lib/${mmlJar.archiveName}"] + project.sourceSets.main.runtimeClasspath.files
+	classpath = ["lib/${mmJar.archiveFileName}", "lib/${mmlJar.archiveFileName}"] + project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
             .collect { "${lib}/${it.name}" }
     def inifile = outfile.replace('.exe', '.l4j.ini')
@@ -383,11 +385,11 @@ ${project.ext.jvmOptions.join('\n')}
     }
 }
 
-task createMMExe (type: edu.sc.seis.launch4j.tasks.Launch4jLibraryTask, dependsOn: mmJar) {
+task createMMExe (type: Launch4jLibraryTask, dependsOn: mmJar) {
     description = 'Create Windows executable stub for MM jar'
     outfile = 'MegaMek.exe'
     mainClassName = 'megamek.MegaMek'
-    jar = "lib/${mmJar.archiveName}"
+    jar = "lib/${mmJar.archiveFileName}"
 	classpath = project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
             .collect { "${lib}/${it.name}" }
@@ -405,12 +407,12 @@ ${project.ext.jvmOptions.join('\n')}
     }
 }
 
-task createMMLExe (type: edu.sc.seis.launch4j.tasks.Launch4jLibraryTask, dependsOn: mmlJar) {
+task createMMLExe (type: Launch4jLibraryTask, dependsOn: mmlJar) {
     description = 'Create Windows executable stub for MML jar'
     outfile = 'MegaMekLab.exe'
     mainClassName = 'megameklab.com.MegaMekLab'
-    jar = "lib/${mmlJar.archiveName}"
-	classpath = ["lib/${mmJar.archiveName}"] + project.sourceSets.main.runtimeClasspath.files
+    jar = "lib/${mmlJar.archiveFileName}"
+	classpath = ["lib/${mmJar.archiveFileName}"] + project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
             .collect { "${lib}/${it.name}" }
     icon = "${mmlDir}/data/images/misc/megameklab.ico"
@@ -461,7 +463,7 @@ unixDistTar {
     dependsOn stageMM
     dependsOn stageMML
     dependsOn startScripts
-    extension = 'tar.gz'
+    archiveExtension = 'tar.gz'
     compression = Compression.GZIP
 }
 
@@ -469,7 +471,7 @@ macDistTar {
     description = 'Creates mac OSX distribution'
     dependsOn stageFiles
     dependsOn createOSXBundle
-    extension = 'tar.bz2'
+    archiveExtension = 'tar.bz2'
     compression = Compression.BZIP2
 }
 
@@ -515,8 +517,8 @@ task sourceZip (type: Zip) {
         exclude "**/build/**"
         exclude "**/.*"
     }
-    archiveName "mekhq-${version}-source.zip"
-    destinationDir file(distributionDir)
+    archiveFileName = "mekhq-${archiveVersion}-source.zip"
+    destinationDirectory = file(distributionDir)
 }
 
 task sourceTar (type: Tar) {
@@ -525,9 +527,9 @@ task sourceTar (type: Tar) {
         exclude "**/build/**"
         exclude "**/.*"
     }
-    archiveName "mekhq-${version}-source.tar.gz"
+    archiveFileName = "mekhq-${archiveVersion}-source.tar.gz"
     compression = Compression.GZIP
-    destinationDir file(distributionDir)
+    destinationDirectory = file(distributionDir)
 }
 
 // The distribution plugin adds the distro packages to the assemble task, which causes the build task
@@ -612,13 +614,13 @@ task releaseAll (type: Copy) {
 task sourcesJar(type: Jar) {
     description = 'Creates a source archive for publication to a maven repository'
     from sourceSets.main.allJava
-    classifier = 'sources'
+    archiveClassifier = 'sources'
 }
 
 task javadocJar(type: Jar) {
     description = 'Creates a documentation archive for publication to a maven repository'
     from javadoc
-    classifier = 'javadoc'
+    archiveClassifier = 'javadoc'
 }
 
 publishing {
