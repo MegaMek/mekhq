@@ -2260,35 +2260,63 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 }
             }  else if(part instanceof StructuralIntegrity) {
                 structuralIntegrity = part;
-            } else if (part instanceof MekLocation && ((MekLocation) part).getLoc() < locations.length) {
-                locations[((MekLocation)part).getLoc()] = part;
-            } else if (part instanceof MissingMekLocation && part.getLocation() < locations.length) {
-                locations[part.getLocation()] = part;
-            } else if (part instanceof TankLocation && ((TankLocation) part).getLoc() < locations.length) {
-                locations[((TankLocation)part).getLoc()] = part;
+            } else if (part instanceof MekLocation) {
+                if (((MekLocation) part).getLoc() < locations.length) {
+                    locations[((MekLocation) part).getLoc()] = part;
+                } else {
+                    partsToRemove.add(part);
+                }
+            } else if (part instanceof TankLocation) {
+                if (((TankLocation) part).getLoc() < locations.length) {
+                    locations[((TankLocation) part).getLoc()] = part;
+                } else {
+                    partsToRemove.add(part);
+                }
             } else if (part instanceof MissingRotor) {
                 locations[VTOL.LOC_ROTOR] = part;
             } else if (part instanceof MissingTurret && Tank.LOC_TURRET < locations.length) {
                 locations[Tank.LOC_TURRET] = part;
-            } else if (part instanceof ProtomekLocation && ((ProtomekLocation) part).getLoc() < locations.length) {
-                locations[((ProtomekLocation)part).getLoc()] = part;
-            } else if (part instanceof MissingProtomekLocation
-                    && ((MissingProtomekLocation) part).getLoc() < locations.length) {
-                locations[((MissingProtomekLocation)part).getLoc()] = part;
-            } else if (part instanceof BattleArmorSuit && ((BattleArmorSuit) part).getTrooper() < locations.length) {
-                locations[((BattleArmorSuit)part).getTrooper()] = part;
-            } else if (part instanceof MissingBattleArmorSuit
-                    && ((MissingBattleArmorSuit) part).getTrooper() < locations.length) {
-                locations[((MissingBattleArmorSuit)part).getTrooper()] = part;
-            } else if (part instanceof Armor && part.getLocation() < armor.length) {
-                if(((Armor)part).isRearMounted()) {
-                    armorRear[part.getLocation()] = part;
+            } else if (part instanceof ProtomekLocation) {
+                if (((ProtomekLocation) part).getLoc() < locations.length) {
+                    locations[((ProtomekLocation) part).getLoc()] = part;
                 } else {
-                    armor[part.getLocation()] = part;
+                    partsToRemove.add(part);
                 }
-            } else if ((part instanceof VeeStabiliser || part instanceof MissingVeeStabiliser)
-                    && part.getLocation() < stabilisers.length) {
-                stabilisers[part.getLocation()] = part;
+            } else if (part instanceof MissingMekLocation
+                    || part instanceof MissingProtomekLocation) {
+                if (part.getLocation() < locations.length) {
+                    locations[part.getLocation()] = part;
+                } else {
+                    partsToRemove.add(part);
+                }
+            } else if (part instanceof BattleArmorSuit) {
+                if (((BattleArmorSuit) part).getTrooper() < locations.length) {
+                    locations[((BattleArmorSuit) part).getTrooper()] = part;
+                } else {
+                    partsToRemove.add(part);
+                }
+            } else if (part instanceof MissingBattleArmorSuit) {
+                if (((MissingBattleArmorSuit) part).getTrooper() < locations.length) {
+                    locations[((MissingBattleArmorSuit) part).getTrooper()] = part;
+                } else {
+                    partsToRemove.add(part);
+                }
+            } else if (part instanceof Armor) {
+                if (part.getLocation() < armor.length) {
+                    if (((Armor) part).isRearMounted()) {
+                        armorRear[part.getLocation()] = part;
+                    } else {
+                        armor[part.getLocation()] = part;
+                    }
+                } else {
+                    partsToRemove.add(part);
+                }
+            } else if ((part instanceof VeeStabiliser || part instanceof MissingVeeStabiliser)) {
+                if (part.getLocation() < stabilisers.length) {
+                    stabilisers[part.getLocation()] = part;
+                } else {
+                    partsToRemove.add(part);
+                }
             } else if(part instanceof AmmoBin) {
                 ammoParts.put(((AmmoBin)part).getEquipmentNum(), part);
             } else if(part instanceof MissingAmmoBin) {
