@@ -405,6 +405,24 @@ public class StaticChecks {
         return true;
 
     }
+    
+    /**
+     * Used to test a selection of Units provided by the player and determine whether they all share a designated unitType. 
+     * @param units Vector of units that the player has selected
+     * @return false if any unit in the passed-in Vector does not have the specified unit type
+     */
+    public static boolean areAllUnitsSameType(Vector<Unit> units, int unitType) {
+        for (Unit unit : units) {
+            if (unit.getEntity() == null) {
+                //No bueno.
+                continue;
+            }
+            if (unit.getEntity().getUnitType() != unitType) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     public static boolean areAllInfantry(Person[] people) {
         for (Person person : people) {
