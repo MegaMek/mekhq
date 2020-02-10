@@ -110,8 +110,8 @@ task mmJar (type: Jar, dependsOn: compileMM) {
             .collect { "${lib}/${it.name}" }.join(' ')
     }
     ext.jarLocation = "${buildDir}/libs/${archiveFileName}"
-    inputs.dir "${mmDir}/build/classes/java/main"
-    inputs.dir "${mmDir}/build/resources/main"
+    inputs.dir "${mmDir}/megamek/build/classes/java/main"
+    inputs.dir "${mmDir}/megamek/build/resources/main"
     outputs.file jarLocation
 }
 
