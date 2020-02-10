@@ -371,7 +371,7 @@ createExe {
     jar = "${project.tasks.getByName("jar").archiveFile.get()}"
     icon = "${projectDir}/data/images/misc/mekhq.ico"
     internalName = 'MekHQ'
-	classpath = ["lib/${mmJar.archiveFileName}", "lib/${mmlJar.archiveFileName}"] + project.sourceSets.main.runtimeClasspath.files
+	classpath = ["lib/${mmJar.archiveFileName.get()}", "lib/${mmlJar.archiveFileName.get()}"] + project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
             .collect { "${lib}/${it.name}" }
     def inifile = outfile.replace('.exe', '.l4j.ini')
@@ -412,7 +412,7 @@ task createMMLExe (type: Launch4jLibraryTask, dependsOn: mmlJar) {
     outfile = 'MegaMekLab.exe'
     mainClassName = 'megameklab.com.MegaMekLab'
     jar = "lib/${mmlJar.archiveFileName}"
-	classpath = ["lib/${mmJar.archiveFileName}"] + project.sourceSets.main.runtimeClasspath.files
+	classpath = ["lib/${mmJar.archiveFileName.get()}"] + project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
             .collect { "${lib}/${it.name}" }
     icon = "${mmlDir}/data/images/misc/megameklab.ico"
