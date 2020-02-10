@@ -412,10 +412,28 @@ public class StaticChecks {
      * @return false if any unit in the passed-in Vector does not have the specified unit type
      */
     public static boolean areAllUnitsSameType(Vector<Unit> units, int unitType) {
+        // For our purposes, a selection of tanks isn't the same unless they're all the same weight class
+        // Set this based on the first unit in the selection
+        double firstUnitWeight = units.get(0).getEntity() != null ? units.get(0).getEntity().getWeight() : 0;
+        boolean light = firstUnitWeight > 0 && firstUnitWeight <= 50;
+        boolean heavy = firstUnitWeight > 50 && firstUnitWeight <= 100;
+        boolean superheavy = firstUnitWeight > 100 && firstUnitWeight <= 200;
         for (Unit unit : units) {
             if (unit.getEntity() == null) {
                 //No bueno.
                 continue;
+            }
+            if (unitType == UnitType.TANK || unitType == UnitType.VTOL || unitType == UnitType.NAVAL) {
+                if (light && unit.getEntity().getWeight() > 50) {
+                    return false;
+                }
+                if (heavy && (unit.getEntity().getWeight() <= 50 || unit.getEntity().getWeight() > 100)) {
+                    return false;
+                }
+                if (superheavy && (unit.getEntity().getWeight() <= 100 || unit.getEntity().getWeight() > 200)) {
+                    return false;
+                }
+                
             }
             if (unit.getEntity().getUnitType() != unitType) {
                 return false;
