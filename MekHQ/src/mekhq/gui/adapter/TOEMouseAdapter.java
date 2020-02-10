@@ -1206,39 +1206,39 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                                 //Add this ship to the appropriate submenu(s). Most transports will fit into multiple
                                 //categories
                                 if (ship.getASFCapacity() > 0) {
-                                    a_trn.add(transportMenuItem(ship.getName(),id,unitIds,ship.getASFCapacity()));
+                                    a_trn.add(transportMenuItem(ship.getName(),id,unitIds,ship.getCurrentASFCapacity()));
                                     a_trn.setEnabled(true);
                                 }
                                 if (ship.getBattleArmorCapacity() > 0) {
-                                    ba_trn.add(transportMenuItem(ship.getName(),id,unitIds,ship.getBattleArmorCapacity()));
+                                    ba_trn.add(transportMenuItem(ship.getName(),id,unitIds,ship.getCurrentBattleArmorCapacity()));
                                     ba_trn.setEnabled(true);
                                 }
                                 if (ship.getInfantryCapacity() > 0) {
-                                    i_trn.add(transportMenuItem(ship.getName(),id,unitIds,ship.getInfantryCapacity()));
+                                    i_trn.add(transportMenuItem(ship.getName(),id,unitIds,ship.getCurrentInfantryCapacity()));
                                     i_trn.setEnabled(true);
                                 }
                                 if (ship.getMechCapacity() > 0) {
-                                    m_trn.add(transportMenuItem(ship.getName(),id,unitIds,ship.getMechCapacity()));
+                                    m_trn.add(transportMenuItem(ship.getName(),id,unitIds,ship.getCurrentMechCapacity()));
                                     m_trn.setEnabled(true);
                                 }
                                 if (ship.getProtomechCapacity() > 0) {
-                                    pm_trn.add(transportMenuItem(ship.getName(),id,unitIds,ship.getProtomechCapacity()));
+                                    pm_trn.add(transportMenuItem(ship.getName(),id,unitIds,ship.getCurrentProtomechCapacity()));
                                     pm_trn.setEnabled(true);
                                 }
                                 if (ship.getSmallCraftCapacity() > 0) {
-                                    sc_trn.add(transportMenuItem(ship.getName(),id,unitIds,ship.getSmallCraftCapacity()));
+                                    sc_trn.add(transportMenuItem(ship.getName(),id,unitIds,ship.getCurrentSmallCraftCapacity()));
                                     sc_trn.setEnabled(true);
                                 }
                                 if (ship.getLightVehicleCapacity() > 0) {
-                                    lv_trn.add(transportMenuItem(ship.getName(),id,unitIds,ship.getLightVehicleCapacity()));
+                                    lv_trn.add(transportMenuItem(ship.getName(),id,unitIds,ship.getCurrentLightVehicleCapacity()));
                                     lv_trn.setEnabled(true);
                                 }
                                 if (ship.getHeavyVehicleCapacity() > 0) {
-                                    hv_trn.add(transportMenuItem(ship.getName(),id,unitIds,ship.getHeavyVehicleCapacity()));
+                                    hv_trn.add(transportMenuItem(ship.getName(),id,unitIds,ship.getCurrentHeavyVehicleCapacity()));
                                     hv_trn.setEnabled(true);
                                 }
                                 if (ship.getSuperHeavyVehicleCapacity() > 0) {
-                                    shv_trn.add(transportMenuItem(ship.getName(),id,unitIds,ship.getSuperHeavyVehicleCapacity()));
+                                    shv_trn.add(transportMenuItem(ship.getName(),id,unitIds,ship.getCurrentSuperHeavyVehicleCapacity()));
                                     shv_trn.setEnabled(true);
                                 }
                             }
