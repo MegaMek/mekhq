@@ -262,12 +262,14 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                             if (oldShip != null) {
                                 oldShip.unloadFromTransportShip(u);
                                 MekHQ.triggerEvent(new UnitChangedEvent(oldShip));
+                                gui.getTOETab().refreshForceView();
                             }
                         }
                     }
                     //now load the units
                     ship.loadTransportShip(units);
                     MekHQ.triggerEvent(new UnitChangedEvent(ship));
+                    gui.getTOETab().refreshForceView();
                 }
             }
         }
@@ -279,6 +281,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                         if (oldShip != null) {
                             oldShip.unloadFromTransportShip(u);
                             MekHQ.triggerEvent(new UnitChangedEvent(oldShip));
+                            gui.getTOETab().refreshForceView();
                         }
                     }
                 }
