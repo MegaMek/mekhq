@@ -1582,7 +1582,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public void showContractMarket() {
-        ContractMarketDialog cmd = new ContractMarketDialog(getFrame(), getCampaign());
+        ContractMarketDialog cmd = new ContractMarketDialog(getFrame(), this, getCampaign());
         cmd.setVisible(true);
     }
 
@@ -2352,7 +2352,7 @@ public class CampaignGUI extends JPanel {
                             + p.getFullName() + ")"); //$NON-NLS-1$
                     p = null;
                 }
-                
+
                 if (p != null) {
                     getCampaign().addPersonWithoutId(p, true);
 
