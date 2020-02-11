@@ -1,6 +1,7 @@
 VERSION HISTORY:
 ----------------
 0.47.5-SNAPSHOT
++ Issue #1470: Thumper artillery vehicle causes array index out of bounds exception error 
 
 v0.47.4 (2020-2-09 2200 UTC)
 + PR #1440: Implement "Rugged" quirk (2x or 3x between maintenance rolls)
