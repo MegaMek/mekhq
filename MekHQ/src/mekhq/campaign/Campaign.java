@@ -6043,8 +6043,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         person.setStatus(status);
         if (status != Person.S_ACTIVE) {
-            person.setDoctorId(null, getCampaignOptions()
-                    .getNaturalHealingWaitingPeriod());
+            person.setDoctorId(null, getCampaignOptions().getNaturalHealingWaitingPeriod());
             // If we're assigned to a unit, remove us from it
             if (null != u) {
                 u.remove(person, true);
