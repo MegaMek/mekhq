@@ -38,7 +38,6 @@ import megamek.common.UnitType;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.StringUtil;
 import mekhq.IconPackage;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.market.PersonnelMarket;
