@@ -522,8 +522,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     if (!gui.getCampaign().getCampaignOptions().getKeepMarriedNameUponSpouseDeath()
                             && (selectedPerson.getMaidenName() != null)) {
                         selectedPerson.setSurname(selectedPerson.getMaidenName());
-                        selectedPerson.setMaidenName(null);
                     }
+                    selectedPerson.setMaidenName(null);
                 }
 
                 //add to former spouse list

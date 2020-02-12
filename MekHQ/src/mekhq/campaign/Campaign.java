@@ -6019,11 +6019,11 @@ public class Campaign implements Serializable, ITechManager {
                 if (!getCampaignOptions().getKeepMarriedNameUponSpouseDeath()
                         && (spouse.getMaidenName() != null)) {
                     spouse.setSurname(spouse.getMaidenName());
-                    spouse.setMaidenName(null);
                 }
 
                 PersonalLogger.spouseKia(spouse, person, getDate());
                 spouse.setSpouseId(null);
+                spouse.setMaidenName(null);
             }
             // set the date of death
             person.setDateOfDeath((GregorianCalendar) calendar.clone());
