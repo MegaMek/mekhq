@@ -233,12 +233,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JSpinner spnOriginSearchRadius;
     //Family
     private JSpinner spnMinimumMarriageAge;
+    private JSpinner spnCheckMutualAncestorsDepth;
     private JCheckBox chkUseRandomMarriages;
     private JSpinner spnChanceRandomMarriages;
     private JSpinner spnMarriageAgeRange;
     private JCheckBox chkUseRandomSameSexMarriages;
     private JSpinner spnChanceRandomSameSexMarriages;
-    private JSpinner spnCheckMutualAncestorsDepth;
     private JCheckBox chkUseUnofficialProcreation;
     private JSpinner spnChanceProcreation;
     private JCheckBox chkUseUnofficialProcreationNoRelationship;
@@ -1746,6 +1746,14 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             gridBagConstraints.gridy = ++gridy;
             panFamily.add(panMinimumMarriageAge, gridBagConstraints);
 
+            spnCheckMutualAncestorsDepth = new JSpinner(new SpinnerNumberModel(options.checkMutualAncestorsDepth(), 0, 20, 1));
+            JPanel panCheckMutualAncestorsDepth = new JPanel();
+            panCheckMutualAncestorsDepth.add(new JLabel(resourceMap.getString("checkMutualAncestorsDepth.text")));
+            panCheckMutualAncestorsDepth.setToolTipText(resourceMap.getString("checkMutualAncestorsDepth.toolTipText"));
+            panCheckMutualAncestorsDepth.add(spnCheckMutualAncestorsDepth);
+            gridBagConstraints.gridy = ++gridy;
+            panFamily.add(panCheckMutualAncestorsDepth, gridBagConstraints);
+
             chkUseRandomMarriages = new JCheckBox(resourceMap.getString("useRandomMarriages.text"));
             chkUseRandomMarriages.setToolTipText(resourceMap.getString("useRandomMarriages.toolTipText"));
             chkUseRandomMarriages.setSelected(options.useRandomMarriages());
@@ -1787,14 +1795,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             panChanceRandomSameSexMarriages.add(spnChanceRandomSameSexMarriages);
             gridBagConstraints.gridy = ++gridy;
             panFamily.add(panChanceRandomSameSexMarriages, gridBagConstraints);
-
-            spnCheckMutualAncestorsDepth = new JSpinner(new SpinnerNumberModel(options.checkMutualAncestorsDepth(), 0, 20, 1));
-            JPanel panCheckMutualAncestorsDepth = new JPanel();
-            panCheckMutualAncestorsDepth.add(new JLabel(resourceMap.getString("checkMutualAncestorsDepth.text")));
-            panCheckMutualAncestorsDepth.setToolTipText(resourceMap.getString("checkMutualAncestorsDepth.toolTipText"));
-            panCheckMutualAncestorsDepth.add(spnCheckMutualAncestorsDepth);
-            gridBagConstraints.gridy = ++gridy;
-            panFamily.add(panCheckMutualAncestorsDepth, gridBagConstraints);
 
             chkUseUnofficialProcreation = new JCheckBox(resourceMap.getString("useUnofficialProcreation.text"));
             chkUseUnofficialProcreation.setSelected(options.useUnofficialProcreation());
@@ -4826,12 +4826,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setOriginSearchRadius((Integer)spnOriginSearchRadius.getModel().getValue());
         //Family
         options.setMinimumMarriageAge((Integer) spnMinimumMarriageAge.getModel().getValue());
+        options.setCheckMutualAncestorsDepth((Integer) spnCheckMutualAncestorsDepth.getModel().getValue());
         options.setUseRandomMarriages(chkUseRandomMarriages.isSelected());
         options.setChanceRandomMarriages((Double) spnChanceRandomMarriages.getModel().getValue());
         options.setMarriageAgeRange((Integer) spnMarriageAgeRange.getModel().getValue());
         options.setUseRandomSameSexMarriages(chkUseRandomSameSexMarriages.isSelected());
         options.setChanceRandomSameSexMarriages((Double) spnChanceRandomSameSexMarriages.getModel().getValue());
-        options.setCheckMutualAncestorsDepth((Integer) spnCheckMutualAncestorsDepth.getModel().getValue());
         options.setUseUnofficialProcreation(chkUseUnofficialProcreation.isSelected());
         options.setChanceProcreation((Double) spnChanceProcreation.getModel().getValue());
         options.setUseUnofficialProcreationNoRelationship(chkUseUnofficialProcreationNoRelationship.isSelected());
