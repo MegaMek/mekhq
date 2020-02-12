@@ -436,7 +436,6 @@ public final class PersonnelTab extends CampaignGuiTab {
     }
 
     private void changePersonnelView() {
-
         int view = choicePersonView.getSelectedIndex();
         XTableColumnModel columnModel = (XTableColumnModel) personnelTable.getColumnModel();
         personnelTable.setRowHeight(15);
