@@ -750,15 +750,15 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void setFullName() {
-        if (!StringUtil.isNullOrEmpty(surname)) {
-            fullName = givenName + " " + surname;
+        if (isClanner()) {
+            if (bloodname.length() > 0) {
+                fullName = givenName + " " + bloodname;
+            } else {
+                fullName = givenName;
+            }
         } else {
-            if (isClanner()) {
-                if (bloodname.length() > 0) {
-                    fullName = givenName + " " + bloodname;
-                } else {
-                    fullName = givenName;
-                }
+            if (!StringUtil.isNullOrEmpty(surname)) {
+                fullName = givenName + " " + surname;
             } else {
                 fullName = givenName;
             }
@@ -1821,6 +1821,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     retVal.phenotype = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("bloodname")) {
                     retVal.bloodname = wn2.getTextContent();
+                    retVal.setFullName();
                 } else if (wn2.getNodeName().equalsIgnoreCase("biography")) {
                     retVal.biography = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("primaryRole")) {
