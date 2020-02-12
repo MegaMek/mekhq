@@ -231,17 +231,20 @@ public class PersonnelMarketDialog extends JDialog {
         sortKeys.add(new RowSorter.SortKey(PersonnelTableModel.COL_SKILL, SortOrder.DESCENDING));
         sorter.setSortKeys(sortKeys);
         tablePersonnel.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        tablePersonnel.getSelectionModel().addListSelectionListener(evt -> personChanged(evt));
+        tablePersonnel.getSelectionModel().addListSelectionListener(this::personChanged);
         TableColumn column = null;
         for (int i = 0; i < PersonnelTableModel.N_COL; i++) {
-            column = ((XTableColumnModel)tablePersonnel.getColumnModel()).getColumnByModelIndex(i);
+            column = ((XTableColumnModel) tablePersonnel.getColumnModel()).getColumnByModelIndex(i);
             column.setPreferredWidth(personnelModel.getColumnWidth(i));
             column.setCellRenderer(personnelModel.getRenderer(false, null));
-            if(i != PersonnelTableModel.COL_NAME && i != PersonnelTableModel.COL_TYPE
-                    && i != PersonnelTableModel.COL_SKILL && i != PersonnelTableModel.COL_AGE
-                    && i != PersonnelTableModel.COL_GENDER
+
+            if (i != PersonnelTableModel.COL_GIVEN_NAME
+                    && ((!campaign.getFaction().isClan() && i != PersonnelTableModel.COL_SURNAME)
+                        || (campaign.getFaction().isClan() && i != PersonnelTableModel.COL_BLOODNAME))
+                    && i != PersonnelTableModel.COL_TYPE && i != PersonnelTableModel.COL_SKILL
+                    && i != PersonnelTableModel.COL_AGE && i != PersonnelTableModel.COL_GENDER
                     && i != PersonnelTableModel.COL_ASSIGN) {
-                ((XTableColumnModel)tablePersonnel.getColumnModel()).setColumnVisible(column, false);
+                ((XTableColumnModel) tablePersonnel.getColumnModel()).setColumnVisible(column, false);
             }
         }
 
@@ -268,7 +271,7 @@ public class PersonnelMarketDialog extends JDialog {
 
         btnHire.setText("Hire");
         btnHire.setName("btnHire"); // NOI18N
-        btnHire.addActionListener(evt -> hirePerson(evt));
+        btnHire.addActionListener(this::hirePerson);
         panelOKBtns.add(btnHire, new java.awt.GridBagConstraints());
 
         btnAdd = new JButton("Add (GM)");
@@ -279,7 +282,7 @@ public class PersonnelMarketDialog extends JDialog {
 
         btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
-        btnClose.addActionListener(evt -> btnCloseActionPerformed(evt));
+        btnClose.addActionListener(this::btnCloseActionPerformed);
         panelOKBtns.add(btnClose, new java.awt.GridBagConstraints());
 
         javax.swing.JPanel panel = new javax.swing.JPanel();
@@ -412,7 +415,7 @@ public class PersonnelMarketDialog extends JDialog {
 	}//GEN-LAST:event_btnCloseActionPerformed
 
     private void filterPersonnel() {
-        RowFilter<PersonnelTableModel, Integer> personTypeFilter = null;
+        RowFilter<PersonnelTableModel, Integer> personTypeFilter;
         final int nGroup = comboPersonType.getSelectedIndex();
         //If current expression doesn't parse, don't update.
         try {

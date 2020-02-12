@@ -778,6 +778,105 @@ public class CampaignOptions implements Serializable {
         tougherHealing = b;
     }
 
+    public boolean useTransfers() {
+        return useTransfers;
+    }
+
+    public void setUseTransfers(boolean b) {
+        useTransfers = b;
+    }
+
+    public boolean getUseTimeInService() {
+        return useTimeInService;
+    }
+
+    public void setUseTimeInService(boolean b) {
+        useTimeInService = b;
+    }
+
+    /**
+     * Gets a value indicating whether or not to show a person's
+     * origin faction when displaying their details.
+     */
+    public boolean showOriginFaction() {
+        return showOriginFaction;
+    }
+
+    /**
+     * Sets a value indicating whether or not to show a person's
+     * origin faction when displaying their details.
+     */
+    public void setShowOriginFaction(boolean b) {
+        showOriginFaction = b;
+    }
+
+    /**
+     * Gets a value indicating whether or not to randomize the
+     * origin of personnel.
+     */
+    public boolean randomizeOrigin() {
+        return randomizeOrigin;
+    }
+
+    /**
+     * Sets a value indicating whether or not to randomize
+     * the origin of personnel.
+     */
+    public void setRandomizeOrigin(boolean b) {
+        randomizeOrigin = b;
+    }
+
+    /**
+     * Gets the search radius to use for randomizing
+     * personnel origins.
+     */
+    public int getOriginSearchRadius() {
+        return originSearchRadius;
+    }
+
+    /**
+     * Sets the search radius to use for randomizing
+     * personnel origins.
+     * @param r The search radius.
+     */
+    public void setOriginSearchRadius(int r) {
+        originSearchRadius = r;
+    }
+
+    /**
+     * Gets a value indicating whether or not to randomize
+     * origin to the planetary level, rather than just the
+     * system level.
+     */
+    public boolean isOriginExtraRandom() {
+        return isOriginExtraRandom;
+    }
+
+    /**
+     * Sets a value indicating whether or not to randomize
+     * origin to the planetary level, rather than just the
+     * system level.
+     */
+    public void setOriginExtraRandom(boolean b) {
+        isOriginExtraRandom = b;
+    }
+
+    /**
+     * Gets the distance scale factor to apply when weighting
+     * random origin planets.
+     */
+    public double getOriginDistanceScale() {
+        return originDistanceScale;
+    }
+
+    /**
+     * Sets the distance scale factor to apply when weighting
+     * random origin planets (should be between 0.1 and 2).
+     */
+    public void setOriginDistanceScale(double v) {
+        originDistanceScale = v;
+    }
+
     //region family
     public boolean useRandomMarriages() {
         return useRandomMarriages;
@@ -924,109 +1023,7 @@ public class CampaignOptions implements Serializable {
     }
     //endregion family
 
-    public boolean useTransfers() {
-        return useTransfers;
-    }
-
-    public void setUseTransfers(boolean b) {
-        useTransfers = b;
-    }
-
-    public boolean getUseTimeInService() {
-        return useTimeInService;
-    }
-
-    public void setUseTimeInService(boolean b) {
-        useTimeInService = b;
-    }
-
-    /**
-     * Gets a value indicating whether or not to show a person's
-     * origin faction when displaying their details.
-     */
-    public boolean showOriginFaction() {
-        return showOriginFaction;
-    }
-
-    /**
-     * Sets a value indicating whether or not to show a person's
-     * origin faction when displaying their details.
-     */
-    public void setShowOriginFaction(boolean b) {
-        showOriginFaction = b;
-    }
-
-    /**
-     * Gets a value indicating whether or not to randomize the
-     * origin of personnel.
-     */
-    public boolean randomizeOrigin() {
-        return randomizeOrigin;
-    }
-
-    /**
-     * Sets a value indicating whether or not to randomize
-     * the origin of personnel.
-     */
-    public void setRandomizeOrigin(boolean b) {
-        randomizeOrigin = b;
-    }
-
-    /**
-     * Gets the search radius to use for randomizing
-     * personnel origins.
-     */
-    public int getOriginSearchRadius() {
-        return originSearchRadius;
-    }
-
-    /**
-     * Sets the search radius to use for randomizing
-     * personnel origins.
-     * @param r The search radius.
-     */
-    public void setOriginSearchRadius(int r) {
-        originSearchRadius = r;
-    }
-
-    /**
-     * Gets a value indicating whether or not to randomize
-     * origin to the planetary level, rather than just the
-     * system level.
-     */
-    public boolean isOriginExtraRandom() {
-        return isOriginExtraRandom;
-    }
-
-    /**
-     * Sets a value indicating whether or not to randomize
-     * origin to the planetary level, rather than just the
-     * system level.
-     */
-    public void setOriginExtraRandom(boolean b) {
-        isOriginExtraRandom = b;
-    }
-
-    /**
-     * Gets the distance scale factor to apply when weighting
-     * random origin planets.
-     */
-    public double getOriginDistanceScale() {
-        return originDistanceScale;
-    }
-
-    /**
-     * Sets the distance scale factor to apply when weighting
-     * random origin planets (should be between 0.1 and 2).
-     */
-    public void setOriginDistanceScale(double v) {
-        originDistanceScale = v;
-    }
-
-    //Family
-
-
-    //Salary
+    //region salary
     public double getSalaryCommissionMultiplier() {
         return salaryCommissionMultiplier;
     }
@@ -1078,6 +1075,7 @@ public class CampaignOptions implements Serializable {
         }
         this.salaryTypeBase[type] = base;
     }
+    //endregion salary
     //endregion Personnel Tab
 
     public UnitRatingMethod getUnitRatingMethod() {
@@ -2618,7 +2616,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "chanceProcreation", chanceProcreation);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnofficialProcreationNoRelationship", useUnofficialProcreationNoRelationship);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "chanceProcreationNoRelationship", chanceProcreationNoRelationship);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "displayExpectedDueDate", displayExpectedDueDate);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "displayExpectedDueDate", displayTrueDueDate);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "logConception", logConception);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "babySurnameStyle", babySurnameStyle);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useParentage", useParentage);
@@ -3074,7 +3072,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("chanceProcreationNoRelationship")) {
                 retVal.chanceProcreationNoRelationship = Double.parseDouble(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("displayExpectedDueDate")) {
-                retVal.displayExpectedDueDate = Boolean.parseBoolean(wn2.getTextContent().trim());
+                retVal.displayTrueDueDate = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("logConception")) {
                 retVal.logConception = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("babySurnameStyle")) {
