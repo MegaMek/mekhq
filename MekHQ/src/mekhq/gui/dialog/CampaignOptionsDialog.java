@@ -232,9 +232,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox chkRandomizeOrigin;
     private JSpinner spnOriginSearchRadius;
     //Family
+    private JSpinner spnMinimumMarriageAge;
     private JCheckBox chkUseRandomMarriages;
     private JSpinner spnChanceRandomMarriages;
-    private JSpinner spnMinimumMarriageAge;
     private JSpinner spnMarriageAgeRange;
     private JCheckBox chkUseRandomSameSexMarriages;
     private JSpinner spnChanceRandomSameSexMarriages;
@@ -1738,13 +1738,21 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             panFamily.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("FamilyTab.text")));
             int panFamilyGridY = ++gridy;
 
+            spnMinimumMarriageAge = new JSpinner(new SpinnerNumberModel(options.getMinimumMarriageAge(), 16, null, 1));
+            JPanel panMinimumMarriageAge = new JPanel();
+            panMinimumMarriageAge.add(new JLabel(resourceMap.getString("minimumMarriageAge.text")));
+            panMinimumMarriageAge.setToolTipText(resourceMap.getString("minimumMarriageAge.toolTipText"));
+            panMinimumMarriageAge.add(spnMinimumMarriageAge);
+            gridBagConstraints.gridy = ++gridy;
+            panFamily.add(panMinimumMarriageAge, gridBagConstraints);
+
             chkUseRandomMarriages = new JCheckBox(resourceMap.getString("useRandomMarriages.text"));
             chkUseRandomMarriages.setToolTipText(resourceMap.getString("useRandomMarriages.toolTipText"));
             chkUseRandomMarriages.setSelected(options.useRandomMarriages());
             gridBagConstraints.gridy = ++gridy;
             panFamily.add(chkUseRandomMarriages, gridBagConstraints);
 
-            spnChanceRandomMarriages = new JSpinner(new SpinnerNumberModel(options.getChanceRandomMarriages(), 0.001, 100, 0.001));
+            spnChanceRandomMarriages = new JSpinner(new SpinnerNumberModel(options.getChanceRandomMarriages(), 0.0001, 100, 0.0001));
             Dimension dimensionChanceRandomMarriages = spnChanceRandomMarriages.getPreferredSize();
             dimensionChanceRandomMarriages.width = 50;
             spnChanceRandomMarriages.setPreferredSize(dimensionChanceRandomMarriages);
@@ -1755,15 +1763,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             gridBagConstraints.gridy = ++gridy;
             panFamily.add(panChanceRandomMarriages, gridBagConstraints);
 
-            spnMinimumMarriageAge = new JSpinner(new SpinnerNumberModel(options.getMinimumMarriageAge(), 16, 500, 1));
-            JPanel panMinimumMarriageAge = new JPanel();
-            panMinimumMarriageAge.add(new JLabel(resourceMap.getString("minimumMarriageAge.text")));
-            panMinimumMarriageAge.setToolTipText(resourceMap.getString("minimumMarriageAge.toolTipText"));
-            panMinimumMarriageAge.add(spnMinimumMarriageAge);
-            gridBagConstraints.gridy = ++gridy;
-            panFamily.add(panMinimumMarriageAge, gridBagConstraints);
-
-            spnMarriageAgeRange = new JSpinner(new SpinnerNumberModel(options.getMarriageAgeRange(), 0, 500, 1));
+            spnMarriageAgeRange = new JSpinner(new SpinnerNumberModel(options.getMarriageAgeRange(), 0, null, 1));
             JPanel panMarriageAgeRange = new JPanel();
             panMarriageAgeRange.add(new JLabel(resourceMap.getString("marriageAgeRange.text")));
             panMarriageAgeRange.setToolTipText(resourceMap.getString("marriageAgeRange.toolTipText"));
@@ -1777,7 +1777,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             gridBagConstraints.gridy = ++gridy;
             panFamily.add(chkUseRandomSameSexMarriages, gridBagConstraints);
 
-            spnChanceRandomSameSexMarriages = new JSpinner(new SpinnerNumberModel(options.getChanceRandomSameSexMarriages(), 0.001, 100, 0.001));
+            spnChanceRandomSameSexMarriages = new JSpinner(new SpinnerNumberModel(options.getChanceRandomSameSexMarriages(), 0.0001, 100, 0.0001));
             Dimension dimensionChanceRandomSameSexMarriages = spnChanceRandomSameSexMarriages.getPreferredSize();
             dimensionChanceRandomSameSexMarriages.width = 50;
             spnChanceRandomSameSexMarriages.setPreferredSize(dimensionChanceRandomSameSexMarriages);
@@ -4825,9 +4825,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setRandomizeOrigin(chkRandomizeOrigin.isSelected());
         options.setOriginSearchRadius((Integer)spnOriginSearchRadius.getModel().getValue());
         //Family
+        options.setMinimumMarriageAge((Integer) spnMinimumMarriageAge.getModel().getValue());
         options.setUseRandomMarriages(chkUseRandomMarriages.isSelected());
         options.setChanceRandomMarriages((Double) spnChanceRandomMarriages.getModel().getValue());
-        options.setMinimumMarriageAge((Integer) spnMinimumMarriageAge.getModel().getValue());
         options.setMarriageAgeRange((Integer) spnMarriageAgeRange.getModel().getValue());
         options.setUseRandomSameSexMarriages(chkUseRandomSameSexMarriages.isSelected());
         options.setChanceRandomSameSexMarriages((Double) spnChanceRandomSameSexMarriages.getModel().getValue());

@@ -120,9 +120,9 @@ public class CampaignOptions implements Serializable {
     private boolean isOriginExtraRandom;
     private double originDistanceScale;
     //family
+    private int minimumMarriageAge;
     private boolean useRandomMarriages;
     private double chanceRandomMarriages;
-    private int minimumMarriageAge;
     private int marriageAgeRange;
     private boolean useRandomSameSexMarriages;
     private double chanceRandomSameSexMarriages;
@@ -494,12 +494,12 @@ public class CampaignOptions implements Serializable {
         isOriginExtraRandom = false;
         originDistanceScale = 0.6;
         //Family
-        useRandomMarriages = false;
-        chanceRandomMarriages = 0.05;
         minimumMarriageAge = 16;
+        useRandomMarriages = false;
+        chanceRandomMarriages = 0.025;
         marriageAgeRange = 20;
         useRandomSameSexMarriages = false;
-        chanceRandomSameSexMarriages = 0.005;
+        chanceRandomSameSexMarriages = 0.0025;
         checkMutualAncestorsDepth = 4;
         useUnofficialProcreation = false;
         chanceProcreation = 0.05;
@@ -878,6 +878,14 @@ public class CampaignOptions implements Serializable {
     }
 
     //region family
+    public int getMinimumMarriageAge() {
+        return minimumMarriageAge;
+    }
+
+    public void setMinimumMarriageAge(int b) {
+        minimumMarriageAge = b;
+    }
+
     public boolean useRandomMarriages() {
         return useRandomMarriages;
     }
@@ -892,14 +900,6 @@ public class CampaignOptions implements Serializable {
 
     public void setChanceRandomMarriages(double b) {
         chanceRandomMarriages = b;
-    }
-
-    public int getMinimumMarriageAge() {
-        return minimumMarriageAge;
-    }
-
-    public void setMinimumMarriageAge(int b) {
-        minimumMarriageAge = b;
     }
 
     public int getMarriageAgeRange() {
@@ -2605,9 +2605,9 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "minimumHitsForVees", minimumHitsForVees);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maxAcquisitions", maxAcquisitions);
         //region family
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "minimumMarriageAge", minimumMarriageAge);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomMarriages", useRandomMarriages);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "chanceRandomMarriages", chanceRandomMarriages);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "minimumMarriageAge", minimumMarriageAge);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "marriageAgeRange", marriageAgeRange);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomSameSexMarriages", useRandomSameSexMarriages);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "chanceRandomSameSexMarriages", chanceRandomSameSexMarriages);
@@ -3049,12 +3049,12 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("maxAcquisitions")) {
                 retVal.maxAcquisitions = Integer.parseInt(wn2.getTextContent().trim());
             //region Family
+            } else if (wn2.getNodeName().equalsIgnoreCase("minimumMarriageAge")) {
+                retVal.minimumMarriageAge = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomMarriages")) {
                 retVal.useRandomMarriages = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomMarriages")) {
                 retVal.chanceRandomMarriages = Double.parseDouble(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("minimumMarriageAge")) {
-                retVal.minimumMarriageAge = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("marriageAgeRange")) {
                 retVal.marriageAgeRange = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomSameSexMarriages")) {
