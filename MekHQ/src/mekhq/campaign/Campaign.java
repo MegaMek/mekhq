@@ -6012,12 +6012,18 @@ public class Campaign implements Serializable, ITechManager {
             // Don't forget to tell the spouse
             if (person.hasSpouse()) {
                 Person spouse = person.getSpouse();
+
                 spouse.addFormerSpouse(new FormerSpouse(person.getId(), FormerSpouse.convertDateTimeToLocalDate(getDateTime()), FormerSpouse.REASON_WIDOWED));
                 person.addFormerSpouse(new FormerSpouse(spouse.getId(), FormerSpouse.convertDateTimeToLocalDate(getDateTime()), FormerSpouse.REASON_WIDOWED));
+
+                if (!getCampaignOptions().getKeepMarriedNameUponSpouseDeath()
+                        && (spouse.getMaidenName() != null)) {
+                    spouse.setSurname(spouse.getMaidenName());
+                    spouse.setMaidenName(null);
+                }
+
                 PersonalLogger.spouseKia(spouse, person, getDate());
                 spouse.setSpouseId(null);
-
-                //TODO : Windchild add widowed name change option here
             }
             // set the date of death
             person.setDateOfDeath((GregorianCalendar) calendar.clone());

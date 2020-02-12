@@ -505,7 +505,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             {
                 int reason = FormerSpouse.REASON_WIDOWED;
                 if (!selectedPerson.getSpouse().isDeadOrMIA()) {
-
                     PersonalLogger.divorcedFrom(selectedPerson, selectedPerson.getSpouse(), gui.getCampaign().getDate());
                     PersonalLogger.divorcedFrom(selectedPerson.getSpouse(), selectedPerson, gui.getCampaign().getDate());
 
@@ -519,11 +518,19 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         spouse.setMaidenName(null);
                     }
                     reason = FormerSpouse.REASON_DIVORCE;
+                } else {
+                    if (!gui.getCampaign().getCampaignOptions().getKeepMarriedNameUponSpouseDeath()
+                            && (selectedPerson.getMaidenName() != null)) {
+                        selectedPerson.setSurname(selectedPerson.getMaidenName());
+                        selectedPerson.setMaidenName(null);
+                    }
                 }
 
                 //add to former spouse list
-                selectedPerson.getSpouse().addFormerSpouse(new FormerSpouse(selectedPerson.getId(), FormerSpouse.convertDateTimeToLocalDate(gui.getCampaign().getDateTime()), reason));
-                selectedPerson.addFormerSpouse(new FormerSpouse(selectedPerson.getSpouse().getId(), FormerSpouse.convertDateTimeToLocalDate(gui.getCampaign().getDateTime()), reason));
+                selectedPerson.getSpouse().addFormerSpouse(new FormerSpouse(selectedPerson.getId(),
+                        FormerSpouse.convertDateTimeToLocalDate(gui.getCampaign().getDateTime()), reason));
+                selectedPerson.addFormerSpouse(new FormerSpouse(selectedPerson.getSpouse().getId(),
+                        FormerSpouse.convertDateTimeToLocalDate(gui.getCampaign().getDateTime()), reason));
 
                 selectedPerson.getSpouse().setSpouseId(null);
                 MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson.getSpouse()));
