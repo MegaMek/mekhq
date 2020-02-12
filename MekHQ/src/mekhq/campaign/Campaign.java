@@ -6013,11 +6013,12 @@ public class Campaign implements Serializable, ITechManager {
             if (person.hasSpouse()) {
                 Person spouse = person.getSpouse();
 
-                spouse.addFormerSpouse(new FormerSpouse(person.getId(), FormerSpouse.convertDateTimeToLocalDate(getDateTime()), FormerSpouse.REASON_WIDOWED));
-                person.addFormerSpouse(new FormerSpouse(spouse.getId(), FormerSpouse.convertDateTimeToLocalDate(getDateTime()), FormerSpouse.REASON_WIDOWED));
+                spouse.addFormerSpouse(new FormerSpouse(person.getId(),
+                        FormerSpouse.convertDateTimeToLocalDate(getDateTime()), FormerSpouse.REASON_WIDOWED));
+                person.addFormerSpouse(new FormerSpouse(spouse.getId(),
+                        FormerSpouse.convertDateTimeToLocalDate(getDateTime()), FormerSpouse.REASON_WIDOWED));
 
-                if (!getCampaignOptions().getKeepMarriedNameUponSpouseDeath()
-                        && (spouse.getMaidenName() != null)) {
+                if (!getCampaignOptions().getKeepMarriedNameUponSpouseDeath() && (spouse.getMaidenName() != null)) {
                     spouse.setSurname(spouse.getMaidenName());
                 }
 

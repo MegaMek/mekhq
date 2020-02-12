@@ -153,6 +153,11 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
         resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelTableMouseAdapter", new EncodeControl()); //$NON-NLS-1$
     }
 
+    //Divorce options
+    private static final String OPT_CHANGE_SURNAME = "change_surname";
+    private static final String OPT_KEEP_SURNAME = "keep_surname";
+
+    //Marriage options
     private static final String OPT_SURNAME_NO_CHANGE = "no_change"; //$NON-NLS-1$
     private static final String OPT_SURNAME_YOURS = "yours"; //$NON-NLS-1$
     private static final String OPT_SURNAME_SPOUSE = "spouse"; //$NON-NLS-1$
@@ -503,28 +508,47 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             case CMD_REMOVE_SPOUSE:
             {
-                int reason = FormerSpouse.REASON_WIDOWED;
-                if (!selectedPerson.getSpouse().isDeadOrMIA()) {
-                    PersonalLogger.divorcedFrom(selectedPerson, selectedPerson.getSpouse(), gui.getCampaign().getDate());
-                    PersonalLogger.divorcedFrom(selectedPerson.getSpouse(), selectedPerson, gui.getCampaign().getDate());
+                String divorceOption = data[1];
+                int reason;
+                Person spouse = selectedPerson.getSpouse();
 
-                    if (selectedPerson.getMaidenName() != null) {
-                        selectedPerson.setSurname(selectedPerson.getMaidenName());
-                        selectedPerson.setMaidenName(null);
+                if (spouse.isDeadOrMIA()) {
+                    reason = FormerSpouse.REASON_WIDOWED;
+
+                    switch(divorceOption) {
+                        case OPT_CHANGE_SURNAME:
+                            if (selectedPerson.getMaidenName() != null) {
+                                selectedPerson.setSurname(selectedPerson.getMaidenName());
+
+                            }
+                            if (spouse.getMaidenName() != null) {
+                                spouse.setSurname(spouse.getMaidenName());
+                            }
+                            break;
+                        case OPT_KEEP_SURNAME:
+                        default:
+                            break;
                     }
-                    if (selectedPerson.getSpouse().getMaidenName() != null) {
-                        Person spouse = selectedPerson.getSpouse();
-                        spouse.setSurname(spouse.getMaidenName());
-                        spouse.setMaidenName(null);
-                    }
-                    reason = FormerSpouse.REASON_DIVORCE;
                 } else {
-                    if (!gui.getCampaign().getCampaignOptions().getKeepMarriedNameUponSpouseDeath()
-                            && (selectedPerson.getMaidenName() != null)) {
-                        selectedPerson.setSurname(selectedPerson.getMaidenName());
+                    reason = FormerSpouse.REASON_DIVORCE;
+
+                    PersonalLogger.divorcedFrom(selectedPerson, selectedPerson.getSpouse(), gui.getCampaign().getDate());
+                    PersonalLogger.divorcedFrom(spouse, selectedPerson, gui.getCampaign().getDate());
+
+                    switch(divorceOption) {
+                        case OPT_CHANGE_SURNAME:
+                            if (selectedPerson.getMaidenName() != null) {
+                                selectedPerson.setSurname(selectedPerson.getMaidenName());
+                            }
+                            break;
+                        case OPT_KEEP_SURNAME:
+                        default:
+                            break;
                     }
-                    selectedPerson.setMaidenName(null);
+                    spouse.setMaidenName(null);
                 }
+
+                selectedPerson.setMaidenName(null);
 
                 //add to former spouse list
                 selectedPerson.getSpouse().addFormerSpouse(new FormerSpouse(selectedPerson.getId(),
@@ -532,8 +556,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 selectedPerson.addFormerSpouse(new FormerSpouse(selectedPerson.getSpouse().getId(),
                         FormerSpouse.convertDateTimeToLocalDate(gui.getCampaign().getDateTime()), reason));
 
-                selectedPerson.getSpouse().setSpouseId(null);
-                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson.getSpouse()));
+                spouse.setSpouseId(null);
+                MekHQ.triggerEvent(new PersonChangedEvent(spouse));
                 selectedPerson.setSpouseId(null);
                 MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 break;
@@ -1953,6 +1977,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 if (person.hasSpouse()) {
                     menuItem = new JMenuItem(resourceMap.getString("removeSpouse.text")); //$NON-NLS-1$
                     menuItem.setActionCommand(CMD_REMOVE_SPOUSE);
+                    //OPT_CHANGE_SURNAME
+                    //OPT_KEEP_SURNAME
                     menuItem.addActionListener(this);
                     popup.add(menuItem);
                 }
