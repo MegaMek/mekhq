@@ -1254,6 +1254,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
         tCal.add(GregorianCalendar.DAY_OF_YEAR, PREGNANCY_STANDARD_DURATION);
         setExpectedDueDate(tCal);
+        tCal = (GregorianCalendar) tCal.clone();
         tCal.add(GregorianCalendar.DAY_OF_YEAR, PREGNANCY_MODIFY_DURATION.getAsInt());
         setDueDate(tCal);
 
@@ -1559,6 +1560,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         + "<dueDate>"
                         + df.format(dueDate.getTime())
                         + "</dueDate>");
+        }
+        if (expectedDueDate != null) {
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                        + "<expectedDueDate>"
+                        + df.format(expectedDueDate.getTime())
+                        + "</expectedDueDate>");
         }
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<portraitCategory>"

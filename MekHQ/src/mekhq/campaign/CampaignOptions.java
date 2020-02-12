@@ -2616,7 +2616,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "chanceProcreation", chanceProcreation);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnofficialProcreationNoRelationship", useUnofficialProcreationNoRelationship);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "chanceProcreationNoRelationship", chanceProcreationNoRelationship);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "displayExpectedDueDate", displayTrueDueDate);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "displayTrueDueDate", displayTrueDueDate);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "logConception", logConception);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "babySurnameStyle", babySurnameStyle);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useParentage", useParentage);
@@ -3071,7 +3071,7 @@ public class CampaignOptions implements Serializable {
             	retVal.useUnofficialProcreationNoRelationship = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("chanceProcreationNoRelationship")) {
                 retVal.chanceProcreationNoRelationship = Double.parseDouble(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("displayExpectedDueDate")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("displayTrueDueDate")) {
                 retVal.displayTrueDueDate = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("logConception")) {
                 retVal.logConception = Boolean.parseBoolean(wn2.getTextContent().trim());
