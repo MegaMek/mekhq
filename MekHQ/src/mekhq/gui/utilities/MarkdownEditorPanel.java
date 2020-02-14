@@ -176,7 +176,6 @@ public class MarkdownEditorPanel extends JPanel {
         tabPane.add("Write", editorPanel);
 
         viewer = new JTextPane();
-        viewer.setBackground(Color.WHITE);
         viewer.setEditable(false);
         viewer.setContentType("text/html");
         scrollViewer = new JScrollPane(viewer);

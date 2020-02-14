@@ -151,7 +151,6 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         scrollPlanetView.setMinimumSize(new java.awt.Dimension(400, 600));
         scrollPlanetView.setPreferredSize(new java.awt.Dimension(400, 600));
         scrollPlanetView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPlanetView.getViewport().setBackground(Color.WHITE);
         scrollPlanetView.setViewportView(null);
         splitMap = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, mapView, scrollPlanetView);
         splitMap.setOneTouchExpandable(true);

@@ -150,7 +150,7 @@ public class CrewListModel extends AbstractListModel<Person> {
                 sb.append("-");
             }
             sb.append(")</font></html>");
-            setText(sb.toString(), "black");
+            setText(sb.toString());
             if (isSelected) {
                 highlightBorder();
             } else {

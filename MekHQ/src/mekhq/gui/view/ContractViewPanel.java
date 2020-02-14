@@ -86,11 +86,8 @@ public class ContractViewPanel extends ScrollablePanel {
 
         setLayout(new GridBagLayout());
 
-        setBackground(Color.WHITE);
-
         pnlStats.setName("pnlStats");
         pnlStats.setBorder(BorderFactory.createTitledBorder(contract.getName()));
-        pnlStats.setBackground(Color.WHITE);
         fillStats();
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -377,11 +374,11 @@ public class ContractViewPanel extends ScrollablePanel {
                         .intValue();
             }
 
-            String lead = "<html><font color='black'>";
+            String lead = "<html><font>";
             if(currentSalvagePct > maxSalvagePct) {
                 lead = "<html><font color='red'>";
             }
-            lblSalvagePct2.setText(lead + currentSalvagePct + "%</font> <font color='black'>(max " + maxSalvagePct + "%)</font></html>");
+            lblSalvagePct2.setText(lead + currentSalvagePct + "%</font> <span>(max " + maxSalvagePct + "%)</span></html>");
         }
 
         gridBagConstraints = new GridBagConstraints();

@@ -6,7 +6,6 @@
 
 package mekhq.gui.dialog;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -30,6 +29,7 @@ import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.gui.preferences.JWindowPreference;
+import mekhq.gui.utilities.MekHqTableCellRenderer;
 import mekhq.preferences.PreferencesNode;
 
 /**
@@ -321,7 +321,6 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
             return new CamoTableModel.Renderer(camos);
         }
 
-
         public class Renderer extends CamoPanel implements TableCellRenderer {
 			
         	public Renderer(DirectoryItems camos) {
@@ -331,18 +330,12 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
 			private static final long serialVersionUID = -7106605749246434963L;
 
 			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                Component c = this;
-                setOpaque(true);
                 String name = getValueAt(row, column).toString();
                 setText(getValueAt(row, column).toString());
                 setImage(category, name, row);
-                if(isSelected) {
-                    setBackground(new Color(220,220,220));
-                } else {
-                    setBackground(Color.WHITE);
-                }
-
-                return c;
+                
+                MekHqTableCellRenderer.setupTableColors(this, table, isSelected, hasFocus, row);
+                return this;
             }
        }
     }

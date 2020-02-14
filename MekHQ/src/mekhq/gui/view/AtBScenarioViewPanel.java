@@ -171,14 +171,12 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
 
         setLayout(new GridBagLayout());
 
-        setBackground(Color.WHITE);
         setScrollableTracksViewportWidth(false);
 
         int y = 0;
 
         panStats.setName("pnlStats");
         panStats.setBorder(BorderFactory.createTitledBorder(scenario.getName()));
-        panStats.setBackground(Color.WHITE);
         fillStats();
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;

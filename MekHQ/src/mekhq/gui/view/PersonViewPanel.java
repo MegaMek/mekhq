@@ -90,7 +90,6 @@ public class PersonViewPanel extends ScrollablePanel {
         GridBagConstraints gridBagConstraints;
 
         setLayout(new GridBagLayout());
-        setBackground(Color.WHITE);
 
         JPanel pnlPortrait = setPortrait();
         GridBagConstraints gbc_pnlPortrait = new GridBagConstraints();
@@ -168,12 +167,10 @@ public class PersonViewPanel extends ScrollablePanel {
             JPanel pnlAllAwards = new JPanel();
             pnlAllAwards.setLayout(new BoxLayout(pnlAllAwards, BoxLayout.PAGE_AXIS));
             pnlAllAwards.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlAwards.title")));
-            pnlAllAwards.setBackground(Color.WHITE);
 
             if (person.awardController.hasAwardsWithMedals()) {
                 JPanel pnlMedals = drawMedals();
                 pnlMedals.setName("pnlMedals");
-                pnlMedals.setBackground(Color.WHITE);
                 pnlMedals.setLayout(new WrapLayout(FlowLayout.LEFT));
                 pnlAllAwards.add(pnlMedals);
             }
@@ -181,7 +178,6 @@ public class PersonViewPanel extends ScrollablePanel {
             if (person.awardController.hasAwardsWithMiscs()) {
                 JPanel pnlMiscAwards = drawMiscAwards();
                 pnlMiscAwards.setName("pnlMiscAwards");
-                pnlMiscAwards.setBackground(Color.WHITE);
                 pnlMiscAwards.setLayout(new WrapLayout(FlowLayout.LEFT));
                 pnlAllAwards.add(pnlMiscAwards);
             }
@@ -202,7 +198,6 @@ public class PersonViewPanel extends ScrollablePanel {
         if (person.getBiography().length() > 0) {
             JTextPane txtDesc = new JTextPane();
             txtDesc.setName("txtDesc"); //$NON-NLS-1$
-            txtDesc.setBackground(Color.WHITE);
             txtDesc.setEditable(false);
             txtDesc.setContentType("text/html");
             txtDesc.setText(MarkdownRenderer.getRenderedHtml(person.getBiography()));
@@ -224,7 +219,6 @@ public class PersonViewPanel extends ScrollablePanel {
             JPanel pnlLog = fillLog();
             pnlLog.setName("pnlLog"); //$NON-NLS-1$
             pnlLog.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlLog.title"))); //$NON-NLS-1$
-            pnlLog.setBackground(Color.WHITE);
 
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -244,7 +238,6 @@ public class PersonViewPanel extends ScrollablePanel {
             pnlMissionsLog.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createTitledBorder(resourceMap.getString("missionLog.title")), //$NON-NLS-1$
                     BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-            pnlMissionsLog.setBackground(Color.WHITE);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridy;
@@ -264,7 +257,6 @@ public class PersonViewPanel extends ScrollablePanel {
                     BorderFactory.createTitledBorder(resourceMap.getString("pnlKills.title")), //$NON-NLS-1$
                     BorderFactory.createEmptyBorder(5, 5, 5, 5)));
             gridBagConstraints = new GridBagConstraints();
-            pnlKills.setBackground(Color.WHITE);
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridy;
             gridBagConstraints.gridwidth = 2;
@@ -414,12 +406,10 @@ public class PersonViewPanel extends ScrollablePanel {
 
         // Panel portrait will include the person picture and the ribbons
         pnlPortrait.setName("pnlPortrait");
-        pnlPortrait.setBackground(Color.WHITE);
         pnlPortrait.setLayout(new GridBagLayout());
 
         JLabel lblPortrait = new JLabel();
         lblPortrait.setName("lblPortrait"); // NOI18N
-        lblPortrait.setBackground(Color.WHITE);
 
         String category = person.getPortraitCategory();
         String filename = person.getPortraitFileName();
@@ -464,7 +454,6 @@ public class PersonViewPanel extends ScrollablePanel {
     private JPanel fillInfo() {
         JPanel pnlInfo = new JPanel(new GridBagLayout());
         pnlInfo.setBorder(BorderFactory.createTitledBorder(person.getFullTitle()));
-        pnlInfo.setBackground(Color.WHITE);
         JLabel lblType = new JLabel();
         JLabel lblStatus1 = new JLabel();
         JLabel lblStatus2 = new JLabel();
@@ -720,7 +709,6 @@ public class PersonViewPanel extends ScrollablePanel {
     private JPanel fillFamily() {
         JPanel pnlFamily = new JPanel(new GridBagLayout());
         pnlFamily.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlFamily.title")));
-        pnlFamily.setBackground(Color.WHITE);
 
         //family panel
         JLabel lblSpouse1 = new JLabel();
@@ -869,7 +857,6 @@ public class PersonViewPanel extends ScrollablePanel {
         //skill panel
         JPanel pnlSkills = new JPanel(new GridBagLayout());
         pnlSkills.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlSkills.title")));
-        pnlSkills.setBackground(Color.WHITE);
 
         //abilities and implants
         JLabel lblAbility1 = new JLabel();
@@ -1135,7 +1122,6 @@ public class PersonViewPanel extends ScrollablePanel {
 
         JPanel pnlInjuries = new JPanel(new BorderLayout());
         pnlInjuries.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlInjuries.title"))); //$NON-NLS-1$
-        pnlInjuries.setBackground(Color.WHITE);
 
         JButton medicalButton = new JButton(new ImageIcon("data/images/misc/medical.png")); //$NON-NLS-1$
         medicalButton.addActionListener(event -> {
@@ -1151,14 +1137,12 @@ public class PersonViewPanel extends ScrollablePanel {
             MekHQ.triggerEvent(new PersonChangedEvent(person));
         });
         medicalButton.setMaximumSize(new Dimension(32, 32));
-        medicalButton.setBackground(Color.WHITE);
         medicalButton.setMargin(new Insets(0, 0, 0, 0));
         medicalButton.setToolTipText(resourceMap.getString("btnMedical.tooltip")); //$NON-NLS-1$
         medicalButton.setAlignmentY(Component.TOP_ALIGNMENT);
         pnlInjuries.add(medicalButton, BorderLayout.LINE_START);
 
         JPanel pnlInjuryDetails = new JPanel(new GridBagLayout());
-        pnlInjuryDetails.setBackground(Color.WHITE);
         pnlInjuryDetails.setAlignmentY(Component.TOP_ALIGNMENT);
 
 

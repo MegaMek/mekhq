@@ -26,6 +26,7 @@ import javax.swing.table.TableColumnModel;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.parts.PartInUse;
+import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 public class PartsInUseTableModel extends DataTableModel {
     private static final long serialVersionUID = -7166100476703184175L;
@@ -226,7 +227,7 @@ public class PartsInUseTableModel extends DataTableModel {
         return new PartsInUseTableModel.Renderer();
     }
 
-    public static class Renderer extends DefaultTableCellRenderer {
+    public static class Renderer extends MekHqTableCellRenderer {
         private static final long serialVersionUID = 1403740113670268591L;
 
         @Override
@@ -235,19 +236,6 @@ public class PartsInUseTableModel extends DataTableModel {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setOpaque(true);
             setHorizontalAlignment(((PartsInUseTableModel)table.getModel()).getAlignment(column));
-
-            setForeground(Color.BLACK);
-            if (isSelected) {
-                setBackground(Color.DARK_GRAY);
-                setForeground(Color.WHITE);
-            } else {
-                // tiger stripes
-                if (row % 2 == 1) {
-                    setBackground(new Color(230,230,230));
-                } else {
-                    setBackground(Color.WHITE);
-                }
-            }
             return this;
         }
     }

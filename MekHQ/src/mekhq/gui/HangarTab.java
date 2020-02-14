@@ -295,7 +295,6 @@ public final class HangarTab extends CampaignGuiTab {
         });
 
         JScrollPane scrollAcquireUnitTable = new JScrollPane(acquireUnitsTable);
-        scrollAcquireUnitTable.getViewport().setBackground(Color.WHITE);
         JPanel panAcquireUnit = new JPanel(new GridLayout(0, 1));
         panAcquireUnit.setBorder(BorderFactory.createTitledBorder("Procurement List"));
         panAcquireUnit.add(scrollAcquireUnitTable);
@@ -303,7 +302,6 @@ public final class HangarTab extends CampaignGuiTab {
         panAcquireUnit.setPreferredSize(new Dimension(200, 200));
 
         JScrollPane scrollUnitTable = new JScrollPane(unitTable);
-        scrollUnitTable.getViewport().setBackground(Color.WHITE);
         JSplitPane splitLeftUnit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scrollUnitTable,
                 panAcquireUnit);
         splitLeftUnit.setOneTouchExpandable(true);
@@ -313,7 +311,6 @@ public final class HangarTab extends CampaignGuiTab {
         scrollUnitView.setMinimumSize(new java.awt.Dimension(UNIT_VIEW_WIDTH, 600));
         scrollUnitView.setPreferredSize(new java.awt.Dimension(UNIT_VIEW_WIDTH, 600));
         scrollUnitView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollUnitView.getViewport().setBackground(Color.WHITE);
         scrollUnitView.setViewportView(null);
 
         splitUnit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitLeftUnit, scrollUnitView);
