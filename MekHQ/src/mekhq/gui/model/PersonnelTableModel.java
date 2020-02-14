@@ -688,7 +688,6 @@ public class PersonnelTableModel extends DataTableModel {
                 setBackground(UIManager.getColor("Table.selectionBackground"));
                 setForeground(UIManager.getColor("Table.selectionForeground"));
             } else {
-                // tiger stripes
                 if (isDeployed(actualRow)) {
                     setBackground(Color.LIGHT_GRAY);
                 } else if ((Integer.parseInt((String) getValueAt(actualRow,COL_HITS)) > 0) || getPerson(actualRow).hasInjuries(true)) {
@@ -720,21 +719,18 @@ public class PersonnelTableModel extends DataTableModel {
             int actualCol = table.convertColumnIndexToModel(column);
             int actualRow = table.convertRowIndexToModel(row);
             Person p = getPerson(actualRow);
-            String color = "black";
-            if (isSelected) {
-                color = "white";
-            }
-            setText(getValueAt(actualRow, actualCol).toString(), color);
+
+            setText(getValueAt(actualRow, actualCol).toString());
 
             switch(actualCol) {
                 case COL_RANK:
                     setPortrait(p);
-                    setText(p.getFullDesc(false), color);
+                    setText(p.getFullDesc(false));
                     break;
                 case COL_ASSIGN:
                     if (loadAssignmentFromMarket) {
                         Entity en = personnelMarket.getAttachedEntity(p);
-                        setText(en != null ? en.getDisplayName() : "-", color);
+                        setText(en != null ? en.getDisplayName() : "-");
                     } else {
                         Unit u = getCampaign().getUnit(p.getUnitId());
                         if (!p.getTechUnitIDs().isEmpty()) {
@@ -747,7 +743,7 @@ public class PersonnelTableModel extends DataTableModel {
                                 desc += " " + UnitType.getTypeDisplayableName(u.getEntity().getUnitType());
                             }
                             desc += "<br>" + u.getStatus() + "";
-                            setText(desc, color);
+                            setText(desc);
                             Image mekImage = getImageFor(u);
                             if (null != mekImage) {
                                 setImage(mekImage);
@@ -772,7 +768,7 @@ public class PersonnelTableModel extends DataTableModel {
                             parent = parent.getParentForce();
                         }
                         desc += "</html>";
-                        setText(desc, color);
+                        setText(desc);
                         Image forceImage = getImageFor(force);
                         if (null != forceImage) {
                             setImage(forceImage);
@@ -790,7 +786,7 @@ public class PersonnelTableModel extends DataTableModel {
                     } else {
                         clearImage();
                     }
-                    setText("", color);
+                    setText("");
                     break;
             }
 

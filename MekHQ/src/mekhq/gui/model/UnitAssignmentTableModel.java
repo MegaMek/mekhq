@@ -1,6 +1,5 @@
 package mekhq.gui.model;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Image;
 import java.util.ArrayList;
@@ -9,7 +8,6 @@ import java.util.UUID;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
 import megamek.common.Jumpship;
@@ -169,11 +167,7 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
             int actualCol = table.convertColumnIndexToModel(column);
             int actualRow = table.convertRowIndexToModel(row);
             Unit u = getUnit(actualRow);
-            String color = "black";
-            if(isSelected) {
-                color = "white";
-            }
-            setText(getValueAt(actualRow, actualCol).toString(), color);
+            setText(getValueAt(actualRow, actualCol).toString());
             if (actualCol == COL_UNIT) {
                 if(null != u) {
                     String desc = "<b>" + u.getName() + "</b><br>";
@@ -182,7 +176,7 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
                         desc += " " + UnitType.getTypeDisplayableName(u.getEntity().getUnitType());
                     }
                     desc += "<br>" + u.getStatus() + "";
-                    setText(desc, color);
+                    setText(desc);
                     Image mekImage = getImageFor(u);
                     if(null != mekImage) {
                         setImage(mekImage);

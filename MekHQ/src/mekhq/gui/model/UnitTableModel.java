@@ -364,17 +364,15 @@ public class UnitTableModel extends DataTableModel {
             Component c = this;
             int actualCol = table.convertColumnIndexToModel(column);
             int actualRow = table.convertRowIndexToModel(row);
-            String color = "black";
-            if(isSelected) {
-                color = "white";
-            }
-            setText(getValueAt(actualRow, actualCol).toString(), color);
+
+            setText(getValueAt(actualRow, actualCol).toString());
+
             Unit u = getUnit(actualRow);
             if (actualCol == COL_PILOT) {
                 Person p = u.getCommander();
                 if(null != p) {
                     setPortrait(p);
-                    setText(p.getFullDesc(false), color);
+                    setText(p.getFullDesc(false));
                 } else {
                     clearImage();
                 }
@@ -383,7 +381,7 @@ public class UnitTableModel extends DataTableModel {
                 Person p = u.getTech();
                 if(null != p) {
                     setPortrait(p);
-                    setText(p.getFullDesc(false), color);
+                    setText(p.getFullDesc(false));
                 } else {
                     clearImage();
                 }
@@ -396,7 +394,7 @@ public class UnitTableModel extends DataTableModel {
                         desc += " " + UnitType.getTypeDisplayableName(u.getEntity().getUnitType());
                     }
                     desc += "<br>" + u.getStatus() + "</html>";
-                    setText(desc, color);
+                    setText(desc);
                     Image mekImage = getImageFor(u);
                     if(null != mekImage) {
                         setImage(mekImage);

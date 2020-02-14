@@ -10,7 +10,6 @@ import java.util.UUID;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
 import megamek.common.EntityWeightClass;
@@ -427,14 +426,10 @@ public class RetirementTableModel extends AbstractTableModel {
             int actualCol = table.convertColumnIndexToModel(column);
             int actualRow = table.convertRowIndexToModel(row);
             Person p = getPerson(actualRow);
-            String color = "black";
-            if(isSelected) {
-                color = "white";
-            }
-            setText(getValueAt(actualRow, actualCol).toString(), color);
+            setText(getValueAt(actualRow, actualCol).toString());
             if (actualCol == COL_PERSON) {
                 setPortrait(p);
-                setText(p.getFullDesc(false), color);
+                setText(p.getFullDesc(false));
             }
             if(actualCol == COL_ASSIGN) {
                 Unit u = campaign.getUnit(p.getUnitId());
@@ -448,7 +443,7 @@ public class RetirementTableModel extends AbstractTableModel {
                         desc += " " + UnitType.getTypeDisplayableName(u.getEntity().getUnitType());
                     }
                     desc += "<br>" + u.getStatus() + "";
-                    setText(desc, color);
+                    setText(desc);
                     Image mekImage = getImageFor(u);
                     if(null != mekImage) {
                         setImage(mekImage);
@@ -472,7 +467,7 @@ public class RetirementTableModel extends AbstractTableModel {
                         parent = parent.getParentForce();
                     }
                     desc += "</html>";
-                    setText(desc, color);
+                    setText(desc);
                     Image forceImage = getImageFor(force);
                     if(null != forceImage) {
                         setImage(forceImage);
