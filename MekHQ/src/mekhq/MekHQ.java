@@ -236,7 +236,7 @@ public class MekHQ implements GameListener {
 	 * Default to log level 3.
 	 *
 	 * @param msg The message you want to log.
-	 * @deprecated Use {@link #getLogger()} instead.              
+	 * @deprecated Use {@link #getLogger()} instead.
 	 */
 	@Deprecated
 	public static void logMessage(String msg) {
@@ -248,7 +248,7 @@ public class MekHQ implements GameListener {
 	 *
 	 * @param msg The message you want to log.
 	 * @param logLevel The log level of the message.
-	 * @deprecated Use {@link #getLogger()} instead.              
+	 * @deprecated Use {@link #getLogger()} instead.
 	 */
 	@Deprecated
 	public static void logMessage(String msg, int logLevel) {
@@ -454,7 +454,7 @@ public class MekHQ implements GameListener {
     public void joinGame(Scenario scenario, ArrayList<Unit> meks) {
 		LaunchGameDialog lgd = new LaunchGameDialog(campaigngui.getFrame(), false, campaign);
 		lgd.setVisible(true);
-		
+
 		if(lgd.cancelled) {
 		    return;
 		}
@@ -490,7 +490,7 @@ public class MekHQ implements GameListener {
                 port = lgd.port;
                 playerName = lgd.playerName;
             }
-            lgd.dispose(); // Force cleanup of the current modal, since we are 
+            lgd.dispose(); // Force cleanup of the current modal, since we are
                            // (possibly) about to display a new one and MacOS
                            // seems to struggle with that.
                            // (see https://github.com/MegaMek/mekhq/issues/953)
@@ -687,7 +687,7 @@ public class MekHQ implements GameListener {
 
 	}
 
-	public void gameClientFeedbackRquest(GameCFREvent e) {
+	public void gameClientFeedbackRequest(GameCFREvent e) {
 		// TODO Auto-generated method stub
 
 	}
@@ -695,7 +695,7 @@ public class MekHQ implements GameListener {
 	public IconPackage getIconPackage() {
 	    return iconPackage;
 	}
-	
+
     /**
      * Helper function that calculates the maximum screen width available locally.
      * @return Maximum screen width.
@@ -704,27 +704,27 @@ public class MekHQ implements GameListener {
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice[] gs = ge.getScreenDevices();
         double maxWidth = 0;
-        for (int i = 0; i < gs.length; i++) {
-            Rectangle b = gs[i].getDefaultConfiguration().getBounds();
+        for (GraphicsDevice g : gs) {
+            Rectangle b = g.getDefaultConfiguration().getBounds();
             if (b.getWidth() > maxWidth) {   // Update the max size found on this monitor
                 maxWidth = b.getWidth();
             }
         }
-        
+
         return maxWidth;
     }
-	
+
 	/*
 	 * Access methods for event bus.
 	 */
 	static public void registerHandler(Object handler) {
 	    EVENT_BUS.register(handler);
 	}
-	
+
 	static public boolean triggerEvent(MMEvent event) {
 	    return EVENT_BUS.trigger(event);
 	}
-	
+
 	static public void unregisterHandler(Object handler) {
 	    EVENT_BUS.unregister(handler);
 	}
@@ -770,7 +770,7 @@ public class MekHQ implements GameListener {
             }
         }
     }
-    
+
     private static void addOSXKeyStrokes(InputMap inputMap) {
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.META_DOWN_MASK), DefaultEditorKit.copyAction);
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, KeyEvent.META_DOWN_MASK), DefaultEditorKit.cutAction);
