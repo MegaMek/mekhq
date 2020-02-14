@@ -742,7 +742,7 @@ public class MekHQ implements GameListener {
 	    EVENT_BUS.register(new XPHandler());
 	}
 
-    private static void setLookAndFeel(String themeName, Frame window) {
+    private static void setLookAndFeel(String themeName) {
 	    final String METHOD_NAME = "setLookAndFeel";
         Runnable runnable = () -> {
             try {
@@ -755,7 +755,10 @@ public class MekHQ implements GameListener {
                     addOSXKeyStrokes((InputMap) UIManager.get("TextPane.focusInputMap"));
                     addOSXKeyStrokes((InputMap) UIManager.get("TextArea.focusInputMap"));
                   }
-                if (window != null) {
+                for (Frame frame : Frame.getFrames()) {
+                    SwingUtilities.updateComponentTreeUI(frame);
+                }
+                for (Window window : Window.getWindows()) {
                     SwingUtilities.updateComponentTreeUI(window);
                 }
             } catch (ClassNotFoundException |
@@ -774,7 +777,7 @@ public class MekHQ implements GameListener {
     private class MekHqPropertyChangedListener implements PropertyChangeListener {
         public void propertyChange(PropertyChangeEvent evt) {
             if (evt.getSource() == selectedTheme) {
-                setLookAndFeel((String)evt.getNewValue(), window);
+                setLookAndFeel((String)evt.getNewValue());
             }
         }
     }
