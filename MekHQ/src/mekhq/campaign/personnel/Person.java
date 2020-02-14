@@ -176,7 +176,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     protected GregorianCalendar dueDate;
     protected GregorianCalendar expectedDueDate;
 
-    private static final int PREGNANCY_STANDARD_DURATION = 268;
+    private static final int PREGNANCY_STANDARD_DURATION = 268; //standard duration of a pregnancy in days
 
     // This creates a random range of approximately six weeks with which to modify the standard pregnancy duration
     // To create randomized pregnancy duration
@@ -783,27 +783,30 @@ public class Person implements Serializable, MekHqXmlSerializable {
         // Array of length 4+: the name is assumed to be as many given names as possible and two surnames
         //
         // Then, the full name is set
-        String[] name = n.split(" ");
+        String space = " ";
+        String[] name = n.split(space);
 
-        // TODO: Windchild implement clanner name migration
+        if (isClanner()) {
+            // TODO : Windchild Implement clanner name migration
+        } else {
+            if (name.length == 1) {
+                givenName = name[0];
+                surname = null;
+            } else if (name.length == 2) {
+                givenName = name[0];
+                surname = name[1];
+            } else if (name.length == 3) {
+                givenName = name[0];
+                surname = name[1] + space + name[2];
+            } else if (name.length > 3) {
+                int i = 0;
+                givenName = name[i];
+                for (i = 1; i < name.length - 2; i++) {
+                    givenName += space + name[i];
+                }
 
-        if (name.length == 1) {
-            givenName = name[0];
-            surname = null;
-        } else if (name.length == 2) {
-            givenName = name[0];
-            surname = name[1];
-        } else if (name.length == 3) {
-            givenName = name[0];
-            surname = name[1] + " " + name[2];
-        } else if (name.length > 3) {
-            int i = 0;
-            givenName = name[i];
-            for (i = 1; i < name.length - 2; i++) {
-                givenName += " " + name[i];
+                surname = name[i + 1] + space + name[i + 2];
             }
-
-            surname = name[i + 1] + " " + name[i + 2];
         }
 
         setFullName();
@@ -1220,30 +1223,28 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void procreate() {
-        if(!isFemale() || isPregnant()) {
+        if (!isFemale() || isPregnant() || isDeployed()) {
             return;
         }
 
-        if (!isDeployed()) {
-            // Age limitations...
-            if (!isChild() && getAge(campaign.getCalendar()) < 51) {
-                boolean conceived = false;
-                if (hasSpouse()) {
-                    if (getSpouse().isActive() && !getSpouse().isDeployed() && !getSpouse().isChild()
-                            && !(getSpouse().getGender() == getGender())) {
-                        // setting is the chance that this procreation attempt will create a child, base is 0.05%
-                        // the setting is divided by 100 because we are running a float from 0 to 1 instead of 0 to 100
-                        conceived = (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceProcreation()/100));
-                    }
-                } else if (campaign.getCampaignOptions().useUnofficialProcreationNoRelationship()) {
-                    // setting is the chance that this procreation attempt will create a child, base is 0.005%
+        // Age limitations...
+        if (!isChild() && getAge(campaign.getCalendar()) < 51) {
+            boolean conceived = false;
+            if (hasSpouse()) {
+                if (getSpouse().isActive() && !getSpouse().isDeployed() && !getSpouse().isChild()
+                        && !(getSpouse().getGender() == getGender())) {
+                    // setting is the chance that this procreation attempt will create a child, base is 0.05%
                     // the setting is divided by 100 because we are running a float from 0 to 1 instead of 0 to 100
-                    conceived = (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceProcreationNoRelationship()/100));
+                    conceived = (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceProcreation() / 100));
                 }
+            } else if (campaign.getCampaignOptions().useUnofficialProcreationNoRelationship()) {
+                // setting is the chance that this procreation attempt will create a child, base is 0.005%
+                // the setting is divided by 100 because we are running a float from 0 to 1 instead of 0 to 100
+                conceived = (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceProcreationNoRelationship() / 100));
+            }
 
-                if(conceived) {
-                    addPregnancy();
-                }
+            if (conceived) {
+                addPregnancy();
             }
         }
     }
@@ -1263,9 +1264,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
         String sizeString = (size < PREGNANCY_MULTIPLE_NAMES.length) ? PREGNANCY_MULTIPLE_NAMES[size] : null;
         if (null == sizeString) {
-            campaign.addReport(getHyperlinkedName()+" has conceived");
+            campaign.addReport(getHyperlinkedName() + " has conceived");
         } else {
-            campaign.addReport(getHyperlinkedName()+" has conceived " + sizeString);
+            campaign.addReport(getHyperlinkedName() + " has conceived " + sizeString);
         }
         if (campaign.getCampaignOptions().logConception()) {
             MedicalLogger.hasConceived(this, campaign.getDate(), sizeString);
@@ -1275,6 +1276,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
 
+    /**
+     * Removes a pregnancy and clears all related data from the current person
+     */
     public void removePregnancy() {
         setDueDate(null);
         setExpectedDueDate(null);
@@ -1330,6 +1334,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //endregion Pregnancy
 
     //region Marriage
+    /**
+     * Determines if another person is a safe spouse for the current person
+     * @param p the person to determine if they are a safe spouse
+     */
     public boolean safeSpouse(Person p) {
         // Huge convoluted return statement
         return (
@@ -1343,6 +1351,26 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public boolean oldEnoughToMarry() {
         return (getAge(campaign.getCalendar()) >= campaign.getCampaignOptions().getMinimumMarriageAge());
+    }
+
+    public void randomMarriage() {
+        if (hasSpouse() || !oldEnoughToMarry() || isDeployed()) {
+            return;
+        }
+
+        // setting is the chance that this attempt at finding a marriage will result in one
+        // the setting is divided by 100 because we are running a float from 0 to 1 instead of 0 to 100
+        if (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceRandomMarriages() / 100)) {
+            addRandomSpouse(false);
+        } else if (campaign.getCampaignOptions().useRandomSameSexMarriages()) {
+            if (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceRandomSameSexMarriages() / 100)) {
+                addRandomSpouse(true);
+            }
+        }
+    }
+
+    public void addRandomSpouse(boolean sameSex) {
+
     }
 
     //endregion Marriage
@@ -1415,7 +1443,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public boolean isDeployed() {
         Unit u = campaign.getUnit(unitId);
         if (null != u) {
-            return u.getScenarioId() != -1;
+            return (u.getScenarioId() != -1);
         }
         return false;
     }

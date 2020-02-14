@@ -134,7 +134,7 @@ public class Bloodname implements Serializable {
 	}
 
 	public boolean isAbjured(int year) {
-		return abjured > 0 && abjured < year;
+		return ((abjured > 0) && (abjured < year));
 	}
 
 	public int getPhenotype() {
@@ -170,9 +170,9 @@ public class Bloodname implements Serializable {
 	public int phenotypeMultiplier(int warriorType, int year) {
 		switch (phenotype) {
 		case P_MECHWARRIOR:
-			return (warriorType == P_MECHWARRIOR)?3:0;
+			return (warriorType == P_MECHWARRIOR) ? 3 : 0;
 		case P_AEROSPACE:
-			return (warriorType == P_AEROSPACE || warriorType == P_PROTOMECH)?3:0;
+			return (warriorType == P_AEROSPACE || warriorType == P_PROTOMECH) ? 3 : 0;
 		case P_ELEMENTAL:
 			if (year < 2870) {
 				return 1;
@@ -180,12 +180,15 @@ public class Bloodname implements Serializable {
 			return (warriorType == P_ELEMENTAL)?3:0;
 		case P_PROTOMECH:
 			switch (warriorType) {
-			case P_PROTOMECH:return 9;
-			case P_AEROSPACE:return 1;
-			default:return 0;
+			case P_PROTOMECH:
+			    return 9;
+			case P_AEROSPACE:
+			    return 1;
+			default:
+			    return 0;
 			}
 		case P_NAVAL:
-			return (warriorType == P_NAVAL)?3:0;
+			return (warriorType == P_NAVAL) ? 3 : 0;
 		case P_GENERAL:
 		default:
 		    return 1;

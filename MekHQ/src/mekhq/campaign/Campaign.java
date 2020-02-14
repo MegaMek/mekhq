@@ -3229,8 +3229,7 @@ public class Campaign implements Serializable, ITechManager {
                             babies.addAll(p.birth());
                         }
                     } else {
-                        p.setDueDate(null);
-                        p.setExpectedDueDate(null);
+                        p.removePregnancy();
                     }
                 } else if (getCampaignOptions().useUnofficialProcreation()) {
                     p.procreate();
