@@ -2573,20 +2573,24 @@ public class CampaignOptions implements Serializable {
                     + StringUtils.join(salaryXpMultiplier, ',')
                     + "</salaryXpMultiplier>");
 
+
+        // cannot use StringUtils.join for a boolean array, so we are using this instead
+        StringBuilder csv = new StringBuilder();
+        for (int i = 0; i < usePortraitForType.length; i++) {
+            csv.append(usePortraitForType[i]);
+            if (i < usePortraitForType.length - 1) {
+                csv.append(",");
+            }
+        }
+
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<usePortraitForType>"
-                    + StringUtils.join(usePortraitForType, ',')
+                    + csv.toString()
                     + "</usePortraitForType>");
-        StringBuilder csv = new StringBuilder();
-        for (int i = 0; i < rats.length; i++) {
-        	csv.append(rats[i]);
-        	if (i < rats.length - 1) {
-        		csv.append(",");
-        	}
-        }
+
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                 + "<rats>"
-                + MekHqXmlUtil.escape(csv.toString())
+                + MekHqXmlUtil.escape(StringUtils.join(rats, ','))
                 + "</rats>");
         if (staticRATs) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<staticRATs/>");
