@@ -131,11 +131,8 @@ public class ContractSummaryPanel extends JPanel {
 
 		setLayout(new java.awt.GridBagLayout());
 
-		setBackground(Color.WHITE);
-
 		mainPanel.setName("pnlStats");
 		mainPanel.setBorder(BorderFactory.createTitledBorder(contract.getName()));
-		mainPanel.setBackground(Color.WHITE);
         contractPaymentBreakdown = new ContractPaymentBreakdown(mainPanel, contract, campaign);
 
 		fillStats();

@@ -29,6 +29,7 @@ import mekhq.campaign.personnel.RetirementDefectionTracker;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.dialog.RetirementDefectionDialog;
+import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 public class RetirementTableModel extends AbstractTableModel {
     /**
@@ -383,7 +384,7 @@ public class RetirementTableModel extends AbstractTableModel {
         } else return new TextRenderer();
     }
 
-    public class TextRenderer extends DefaultTableCellRenderer {
+    public class TextRenderer extends MekHqTableCellRenderer {
         /**
          *
          */
@@ -398,18 +399,10 @@ public class RetirementTableModel extends AbstractTableModel {
             int actualCol = table.convertColumnIndexToModel(column);
             Person p = getPerson(actualRow);
             setHorizontalAlignment(getAlignment(actualCol));
-            setForeground(isSelected?Color.WHITE:Color.BLACK);
-            if (isSelected) {
-                setBackground(Color.DARK_GRAY);
-            } else if (null != campaign.getRetirementDefectionTracker().getPayout(p.getId()) &&
+            if (!isSelected) {
+                if (null != campaign.getRetirementDefectionTracker().getPayout(p.getId()) &&
                     campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() > 0) {
-                setBackground(Color.LIGHT_GRAY);
-            } else {
-                // tiger stripes
-                if ((row % 2) == 0) {
-                    setBackground(new Color(220, 220, 220));
-                } else {
-                    setBackground(Color.WHITE);
+                    setBackground(Color.LIGHT_GRAY);
                 }
             }
             return this;

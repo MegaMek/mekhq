@@ -59,11 +59,9 @@ public class JumpPathViewPanel extends ScrollablePanel {
                
         setLayout(new java.awt.GridBagLayout());
 
-        setBackground(Color.WHITE);
 
         pnlStats.setName("pnlStats");
         pnlStats.setBorder(BorderFactory.createTitledBorder("Summary"));
-        pnlStats.setBackground(Color.WHITE);
         fillStats();
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -77,7 +75,6 @@ public class JumpPathViewPanel extends ScrollablePanel {
         
         pnlPath.setName("pnlPath");
         pnlPath.setBorder(BorderFactory.createTitledBorder("Full Path"));
-        pnlPath.setBackground(Color.WHITE);
         getPath();
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;

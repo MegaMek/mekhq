@@ -27,6 +27,7 @@ import java.util.UUID;
 
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
@@ -681,10 +682,10 @@ public class PersonnelTableModel extends DataTableModel {
             setHorizontalAlignment(getAlignment(actualCol));
             setToolTipText(getTooltip(actualRow, actualCol));
 
-            setForeground(Color.BLACK);
+            setForeground(UIManager.getColor("Table.foreground"));
             if (isSelected) {
-                setBackground(Color.DARK_GRAY);
-                setForeground(Color.WHITE);
+                setBackground(UIManager.getColor("Table.selectionBackground"));
+                setForeground(UIManager.getColor("Table.selectionForeground"));
             } else {
                 // tiger stripes
                 if (isDeployed(actualRow)) {
@@ -694,7 +695,7 @@ public class PersonnelTableModel extends DataTableModel {
                 } else if (getPerson(actualRow).hasOnlyHealedPermanentInjuries()) {
                     setBackground(new Color(0xee9a00));
                 } else {
-                    setBackground(Color.WHITE);
+                    setBackground(UIManager.getColor("Table.background"));
                 }
             }
             return this;

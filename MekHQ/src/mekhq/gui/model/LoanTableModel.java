@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import mekhq.campaign.finances.Finances;
@@ -155,15 +156,15 @@ public class LoanTableModel extends DataTableModel {
             setHorizontalAlignment(getAlignment(column));
             Loan loan = getLoan(table.convertRowIndexToModel(row));
 
-            setForeground(Color.BLACK);
+            setForeground(UIManager.getColor("Table.foreground"));
             if (isSelected) {
-                setBackground(Color.DARK_GRAY);
-                setForeground(Color.WHITE);
+                setBackground(UIManager.getColor("Table.selectionBackground"));
+                setForeground(UIManager.getColor("Table.selectionForeground"));
             } else {
                 if(loan.isOverdue()) {
                     setBackground(Color.RED);
                 } else {
-                    setBackground(Color.WHITE);
+                    setBackground(UIManager.getColor("Table.background"));
                 }
             }
 

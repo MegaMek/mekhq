@@ -89,11 +89,8 @@ public class ScenarioViewPanel extends ScrollablePanel {
                
         setLayout(new java.awt.GridBagLayout());
 
-        setBackground(Color.WHITE);
-
         pnlStats.setName("pnlStats");
         pnlStats.setBorder(BorderFactory.createTitledBorder(scenario.getName()));
-        pnlStats.setBackground(Color.WHITE);
         fillStats();
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;

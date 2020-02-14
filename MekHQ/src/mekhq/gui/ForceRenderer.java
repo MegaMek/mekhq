@@ -8,6 +8,7 @@ import java.util.UUID;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JTree;
+import javax.swing.UIManager;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import megamek.client.ui.Messages;
@@ -42,12 +43,11 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 tree, value, sel,
                 expanded, leaf, row,
                 hasFocus);
-        setOpaque(true);
-        setBackground(Color.WHITE);
-        setForeground(Color.BLACK);
+        setBackground(UIManager.getColor("Tree.background"));
+        setForeground(UIManager.getColor("Tree.textForeground"));
         if(sel) {
-            setBackground(Color.DARK_GRAY);
-            setForeground(Color.WHITE);
+            setBackground(UIManager.getColor("Tree.selectionBackground"));
+            setForeground(UIManager.getColor("Tree.selectionForeground"));
         }
 
         if(value instanceof Unit) {
