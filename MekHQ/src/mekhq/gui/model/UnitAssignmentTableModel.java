@@ -194,16 +194,7 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
                 }
             }
 
-            if (isSelected) {
-                c.setBackground(Color.DARK_GRAY);
-            } else {
-                // tiger stripes
-                if ((row % 2) == 0) {
-                    c.setBackground(new Color(220, 220, 220));
-                } else {
-                    c.setBackground(Color.WHITE);
-                }
-            }
+            MekHqTableCellRenderer.setupTableColors(c, table, isSelected, hasFocus, row);
             return c;
         }
     }

@@ -22,6 +22,7 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
+import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 /**
  * A table Model for displaying information about units
@@ -407,19 +408,8 @@ public class UnitTableModel extends DataTableModel {
                 }
             }
 
-            if (isSelected) {
-                c.setBackground(Color.DARK_GRAY);
-            } else {
-                // tiger stripes
-                if ((row % 2) == 0) {
-                    c.setBackground(new Color(220, 220, 220));
-                } else {
-                    c.setBackground(Color.WHITE);
-
-                }
-            }
+            MekHqTableCellRenderer.setupTableColors(c, table, isSelected, hasFocus, row);
             return c;
         }
     }
-
 }

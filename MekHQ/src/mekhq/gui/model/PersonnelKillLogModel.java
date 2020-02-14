@@ -18,6 +18,7 @@ import javax.swing.text.StyleConstants;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.Kill;
+import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 public class PersonnelKillLogModel extends DataTableModel {
     private static final long serialVersionUID = 2930826794853379579L;
@@ -159,13 +160,7 @@ public class PersonnelKillLogModel extends DataTableModel {
                 table.setRowHeight(row, height);
             }
 
-            setForeground(Color.BLACK);
-            // tiger stripes
-            if (row % 2 == 0) {
-                setBackground(new Color(230,230,230));
-            } else {
-                setBackground(Color.WHITE);
-            }
+            MekHqTableCellRenderer.setupTableColors(this, table, isSelected, hasFocus, row);
             return this;
         }
     }

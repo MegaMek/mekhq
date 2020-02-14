@@ -17,7 +17,7 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
- package mekhq.gui.utilities;
+package mekhq.gui.utilities;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -25,6 +25,7 @@ import java.awt.Component;
 import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
 
 public class MekHqTableCellRenderer extends DefaultTableCellRenderer {
     private static final long serialVersionUID = -1L;
@@ -36,39 +37,48 @@ public class MekHqTableCellRenderer extends DefaultTableCellRenderer {
         super.getTableCellRendererComponent(table, value, isSelected,
                 hasFocus, row, column);
 
+        setupTableColors(this, table, isSelected, hasFocus, row);
+
+        return this;
+    }
+
+    public static void setupTableColors(Component c, JTable table, boolean isSelected, 
+            boolean hasFocus, int row) {
         if (isSelected) {
-            setForeground(table.getSelectionForeground());
-            setBackground(table.getSelectionBackground());
+            c.setForeground(table.getSelectionForeground());
+            c.setBackground(table.getSelectionBackground());
         } else {
-            Color background = table.getBackground();
-            if (row % 2 != 0) {
-                Color alternateColor = UIManager.getColor("Table.alternateRowColor");
-                if (alternateColor == null) {
-                    // If we don't have an alternate row color, use 'controlHighlight'
-                    // as it is pretty reasonable across the various themes.
-                    alternateColor = UIManager.getColor("controlHighlight");
-                }
-                if (alternateColor != null) {
-                    background = alternateColor;
-                }
-            }
-            setForeground(table.getForeground());
-            setBackground(background);
+            setupTigerStripes(c, table, row);
         }
 
         if (hasFocus) {
             if (!isSelected ) {
-                Color col = UIManager.getColor("Table.focusCellForeground");
-                if (col != null) {
-                    setForeground(col);
+                Color color = UIManager.getColor("Table.focusCellForeground");
+                if (color != null) {
+                    c.setForeground(color);
                 }
-                col = UIManager.getColor("Table.focusCellBackground");
-                if (col != null) {
-                    setBackground(col);
+                color = UIManager.getColor("Table.focusCellBackground");
+                if (color != null) {
+                    c.setBackground(color);
                 }
             }
         }
+    }
 
-        return this;
+    public static void setupTigerStripes(Component c, JTable table, int row) {
+        Color background = table.getBackground();
+        if (row % 2 != 0) {
+            Color alternateColor = UIManager.getColor("Table.alternateRowColor");
+            if (alternateColor == null) {
+                // If we don't have an alternate row color, use 'controlHighlight'
+                // as it is pretty reasonable across the various themes.
+                alternateColor = UIManager.getColor("controlHighlight");
+            }
+            if (alternateColor != null) {
+                background = alternateColor;
+            }
+        }
+        c.setForeground(table.getForeground());
+        c.setBackground(background);
     }
 }

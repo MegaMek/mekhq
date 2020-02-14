@@ -484,19 +484,14 @@ public class RetirementTableModel extends AbstractTableModel {
                 }
             }
 
-            if (isSelected) {
-                c.setBackground(Color.DARK_GRAY);
-            } else if (null != campaign.getRetirementDefectionTracker().getPayout(p.getId()) &&
+            MekHqTableCellRenderer.setupTableColors(c, table, isSelected, hasFocus, row);
+            if (!isSelected) {
+                if (null != campaign.getRetirementDefectionTracker().getPayout(p.getId()) &&
                         campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() > 0) {
-                c.setBackground(Color.LIGHT_GRAY);
-            } else {
-                // tiger stripes
-                if ((row % 2) == 0) {
-                    c.setBackground(new Color(220, 220, 220));
-                } else {
-                    c.setBackground(Color.WHITE);
+                    c.setBackground(Color.LIGHT_GRAY);
                 }
             }
+            
             return c;
         }
     }

@@ -35,6 +35,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -49,6 +50,7 @@ import mekhq.IconPackage;
 import mekhq.MekHQ;
 import mekhq.campaign.force.Force;
 import mekhq.gui.preferences.JWindowPreference;
+import mekhq.gui.utilities.MekHqTableCellRenderer;
 import mekhq.preferences.PreferencesNode;
 
 /**
@@ -737,18 +739,12 @@ public class ImageChoiceDialog extends JDialog {
 
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                Component c = this;
-                setOpaque(true);
                 String name = getValueAt(row, column).toString();
                 setText(getValueAt(row, column).toString());
                 setImage(category, name);
-                if(isSelected) {
-                    setBackground(new Color(220,220,220));
-                } else {
-                    setBackground(Color.WHITE);
-                }
-
-                return c;
+                
+                MekHqTableCellRenderer.setupTableColors(this, table, isSelected, hasFocus, row);
+                return this;
             }
         }
     }
