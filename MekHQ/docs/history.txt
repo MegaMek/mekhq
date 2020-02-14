@@ -5,6 +5,7 @@ VERSION HISTORY:
 + Issue #1261: RFE: In Contract Market, hyperlink the system/location to the Interstellar Map
 + Issue #1090: Feature Request: Add Origin Faction to Fluff Information display of Personnel
 + Issue #1476: Settings in portrait generation is not saved.
++ Issue #1385: Add dark themes to MekHQ.
 
 v0.47.4 (2020-2-09 2200 UTC)
 + PR #1440: Implement "Rugged" quirk (2x or 3x between maintenance rolls)
