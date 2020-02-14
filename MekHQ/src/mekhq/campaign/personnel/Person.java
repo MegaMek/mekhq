@@ -1344,6 +1344,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 !this.equals(p)
                 && !p.hasSpouse()
                 && p.oldEnoughToMarry()
+                && (!p.isPrisoner() || (p.isPrisoner() && isPrisoner()))
                 && ((getAncestorsId() == null)
                     || !campaign.getAncestors(getAncestorsId()).checkMutualAncestors(campaign.getAncestors(p.getAncestorsId())))
         );
