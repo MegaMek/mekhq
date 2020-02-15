@@ -23,6 +23,7 @@ import mekhq.campaign.work.IPartWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.ITechWorkPanel;
 import mekhq.gui.RepairTaskInfo;
+import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 /**
  * A table model for displaying work items
@@ -85,13 +86,16 @@ public class TaskTableModel extends DataTableModel {
             int actualCol = table.convertColumnIndexToModel(column);
             int actualRow = table.convertRowIndexToModel(row);
 
-            setOpaque(true);
-            setText("<html>" + getValueAt(actualRow, actualCol).toString() + "</html>", "black");
+            setText("<html>" + getValueAt(actualRow, actualCol).toString() + "</html>");
+
             if (isSelected) {
                 highlightBorder();
             } else {
                 unhighlightBorder();
-            }
+			}
+
+            c.setBackground(table.getBackground());
+            c.setForeground(table.getForeground());
 
             IPartWork part = getTaskAt(actualRow);
 

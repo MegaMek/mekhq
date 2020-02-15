@@ -108,11 +108,8 @@ public class AtBContractViewPanel extends ScrollablePanel {
 
         setLayout(new GridBagLayout());
 
-        setBackground(Color.WHITE);
-
         pnlStats.setName("pnlStats");
         pnlStats.setBorder(BorderFactory.createTitledBorder(contract.getName()));
-        pnlStats.setBackground(Color.WHITE);
         fillStats();
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;

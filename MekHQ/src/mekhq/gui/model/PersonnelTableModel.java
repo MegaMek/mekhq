@@ -27,6 +27,7 @@ import java.util.UUID;
 
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
@@ -46,6 +47,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.gui.BasicInfo;
+import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 /**
  * A table Model for displaying information about personnel
@@ -709,12 +711,11 @@ public class PersonnelTableModel extends DataTableModel {
             setHorizontalAlignment(getAlignment(actualCol));
             setToolTipText(getTooltip(actualRow, actualCol));
 
-            setForeground(Color.BLACK);
+            setForeground(UIManager.getColor("Table.foreground"));
             if (isSelected) {
-                setBackground(Color.DARK_GRAY);
-                setForeground(Color.WHITE);
+                setBackground(UIManager.getColor("Table.selectionBackground"));
+                setForeground(UIManager.getColor("Table.selectionForeground"));
             } else {
-                // tiger stripes
                 if (isDeployed(actualRow)) {
                     setBackground(Color.LIGHT_GRAY);
                 } else if ((Integer.parseInt((String) getValueAt(actualRow,COL_HITS)) > 0) || getPerson(actualRow).hasInjuries(true)) {
@@ -722,7 +723,7 @@ public class PersonnelTableModel extends DataTableModel {
                 } else if (getPerson(actualRow).hasOnlyHealedPermanentInjuries()) {
                     setBackground(new Color(0xee9a00));
                 } else {
-                    setBackground(Color.WHITE);
+                    setBackground(UIManager.getColor("Table.background"));
                 }
             }
             return this;
@@ -746,21 +747,18 @@ public class PersonnelTableModel extends DataTableModel {
             int actualCol = table.convertColumnIndexToModel(column);
             int actualRow = table.convertRowIndexToModel(row);
             Person p = getPerson(actualRow);
-            String color = "black";
-            if (isSelected) {
-                color = "white";
-            }
-            setText(getValueAt(actualRow, actualCol).toString(), color);
+
+            setText(getValueAt(actualRow, actualCol).toString());
 
             switch(actualCol) {
                 case COL_RANK:
                     setPortrait(p);
-                    setText(p.getFullDesc(false), color);
+                    setText(p.getFullDesc(false));
                     break;
                 case COL_ASSIGN:
                     if (loadAssignmentFromMarket) {
                         Entity en = personnelMarket.getAttachedEntity(p);
-                        setText(en != null ? en.getDisplayName() : "-", color);
+                        setText(en != null ? en.getDisplayName() : "-");
                     } else {
                         Unit u = getCampaign().getUnit(p.getUnitId());
                         if (!p.getTechUnitIDs().isEmpty()) {
@@ -773,7 +771,7 @@ public class PersonnelTableModel extends DataTableModel {
                                 desc += " " + UnitType.getTypeDisplayableName(u.getEntity().getUnitType());
                             }
                             desc += "<br>" + u.getStatus() + "";
-                            setText(desc, color);
+                            setText(desc);
                             Image mekImage = getImageFor(u);
                             if (null != mekImage) {
                                 setImage(mekImage);
@@ -798,7 +796,7 @@ public class PersonnelTableModel extends DataTableModel {
                             parent = parent.getParentForce();
                         }
                         desc += "</html>";
-                        setText(desc, color);
+                        setText(desc);
                         Image forceImage = getImageFor(force);
                         if (null != forceImage) {
                             setImage(forceImage);
@@ -816,20 +814,11 @@ public class PersonnelTableModel extends DataTableModel {
                     } else {
                         clearImage();
                     }
-                    setText("", color);
+                    setText("");
                     break;
             }
 
-            if (isSelected) {
-                c.setBackground(Color.DARK_GRAY);
-            } else {
-                // tiger stripes
-                if ((row % 2) == 0) {
-                    c.setBackground(new Color(220, 220, 220));
-                } else {
-                    c.setBackground(Color.WHITE);
-                }
-            }
+            MekHqTableCellRenderer.setupTableColors(c, table, isSelected, hasFocus, row);
             return c;
         }
 

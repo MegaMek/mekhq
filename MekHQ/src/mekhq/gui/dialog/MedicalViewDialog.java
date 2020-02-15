@@ -203,7 +203,6 @@ public class MedicalViewDialog extends JDialog {
 
         };
 
-        setBackground(Color.WHITE);
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
         Container scrollPanel = new JPanel();
         getContentPane().add(new JScrollPane(scrollPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));
@@ -223,7 +222,6 @@ public class MedicalViewDialog extends JDialog {
     }
 
     private void initComponents(Container cont) {
-        cont.setBackground(Color.WHITE);
         cont.setLayout(new GridBagLayout());
 
         GridBagConstraints gbc;

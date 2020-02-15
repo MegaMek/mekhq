@@ -67,11 +67,9 @@ public class PlanetViewPanel extends ScrollablePanel {
 
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PlanetViewPanel", new EncodeControl()); //$NON-NLS-1
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setBackground(Color.WHITE);
 
         pnlSystem = getSystemPanel();
         pnlSystem.setBorder(BorderFactory.createTitledBorder(system.getPrintableName(Utilities.getDateTimeDay(campaign.getCalendar())) + " " + resourceMap.getString("system.text")));
-        pnlSystem.setBackground(Color.WHITE);
         add(pnlSystem);
 
         Planet planet = system.getPlanet(planetPos);
@@ -82,7 +80,6 @@ public class PlanetViewPanel extends ScrollablePanel {
         if(null != planet) {
             pnlPlanet = getPlanetPanel(planet);
             pnlPlanet.setBorder(BorderFactory.createTitledBorder(planet.getPrintableName(Utilities.getDateTimeDay(campaign.getCalendar()))));
-            pnlPlanet.setBackground(Color.WHITE);
             add(pnlPlanet);
         };
     }

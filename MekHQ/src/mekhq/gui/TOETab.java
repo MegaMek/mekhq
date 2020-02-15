@@ -102,7 +102,6 @@ public final class TOETab extends CampaignGuiTab {
         panForceView.setLayout(new BorderLayout());
 
         JScrollPane scrollOrg = new JScrollPane(orgTree);
-        scrollOrg.getViewport().setBackground(Color.WHITE);
         splitOrg = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollOrg, panForceView);
         splitOrg.setOneTouchExpandable(true);
         splitOrg.setResizeWeight(1.0);
@@ -143,7 +142,6 @@ public final class TOETab extends CampaignGuiTab {
             if (crewSize > 0) {
                 JPanel crewPanel = new JPanel(new BorderLayout());
                 final JScrollPane scrollPerson = new JScrollPane();
-                scrollPerson.getViewport().setBackground(Color.WHITE);
                 crewPanel.add(scrollPerson, BorderLayout.CENTER);
                 CrewListModel model = new CrewListModel();
                 model.setData(u);
@@ -185,7 +183,6 @@ public final class TOETab extends CampaignGuiTab {
                 });
             }
             final JScrollPane scrollUnit = new JScrollPane(new UnitViewPanel(u, getCampaign(), getIconPackage().getCamos(), getIconPackage().getMechTiles()));
-            scrollUnit.getViewport().setBackground(Color.WHITE);
             tabUnit.add("Unit", scrollUnit);
             panForceView.add(tabUnit, BorderLayout.CENTER);
             javax.swing.SwingUtilities.invokeLater(() -> {
@@ -193,7 +190,6 @@ public final class TOETab extends CampaignGuiTab {
             });
         } else if (node instanceof Force) {
             final JScrollPane scrollForce = new JScrollPane(new ForceViewPanel((Force) node, getCampaign(), getIconPackage()));
-            scrollForce.getViewport().setBackground(Color.WHITE);
             panForceView.add(scrollForce, BorderLayout.CENTER);
             javax.swing.SwingUtilities.invokeLater(() -> {
                 scrollForce.getVerticalScrollBar().setValue(0);

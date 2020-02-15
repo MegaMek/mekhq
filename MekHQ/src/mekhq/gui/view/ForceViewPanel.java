@@ -89,10 +89,8 @@ public class ForceViewPanel extends ScrollablePanel {
 
 		setLayout(new java.awt.GridBagLayout());
 
-		setBackground(Color.WHITE);
 
 		lblIcon.setName("lblPortrait"); // NOI18N
-		lblIcon.setBackground(Color.WHITE);
 		setIcon(force, lblIcon, 150);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
@@ -104,7 +102,6 @@ public class ForceViewPanel extends ScrollablePanel {
 
 		pnlStats.setName("pnlStats");
 		pnlStats.setBorder(BorderFactory.createTitledBorder(force.getName()));
-		pnlStats.setBackground(Color.WHITE);
 		fillStats();
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
@@ -117,7 +114,6 @@ public class ForceViewPanel extends ScrollablePanel {
 		add(pnlStats, gridBagConstraints);
 
 		pnlSubUnits.setName("pnlSubUnits");
-		pnlSubUnits.setBackground(Color.WHITE);
 		fillSubUnits();
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;

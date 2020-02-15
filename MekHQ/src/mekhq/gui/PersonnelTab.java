@@ -267,11 +267,9 @@ public final class PersonnelTab extends CampaignGuiTab {
         scrollPersonnelView.setMinimumSize(new java.awt.Dimension(PERSONNEL_VIEW_WIDTH, 600));
         scrollPersonnelView.setPreferredSize(new java.awt.Dimension(PERSONNEL_VIEW_WIDTH, 600));
         scrollPersonnelView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPersonnelView.getViewport().setBackground(Color.WHITE);
         scrollPersonnelView.setViewportView(null);
 
         JScrollPane scrollPersonnelTable = new JScrollPane(personnelTable);
-        scrollPersonnelTable.getViewport().setBackground(Color.WHITE);
         splitPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPersonnelTable,
                 scrollPersonnelView);
         splitPersonnel.setOneTouchExpandable(true);

@@ -1,6 +1,5 @@
 package mekhq.gui.model;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Image;
 import java.util.ArrayList;
@@ -9,7 +8,6 @@ import java.util.UUID;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
 import megamek.common.Jumpship;
@@ -20,6 +18,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.dialog.RetirementDefectionDialog;
+import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 public class UnitAssignmentTableModel extends AbstractTableModel {
 
@@ -132,7 +131,7 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
         } else return new TextRenderer();
     }
 
-    public class TextRenderer extends DefaultTableCellRenderer {
+    public class TextRenderer extends MekHqTableCellRenderer {
 
         /**
          *
@@ -146,17 +145,6 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
                     hasFocus, row, column);
             int actualCol = table.convertColumnIndexToModel(column);
             setHorizontalAlignment(getAlignment(actualCol));
-            setForeground(isSelected?Color.WHITE:Color.BLACK);
-            if (isSelected) {
-                setBackground(Color.DARK_GRAY);
-            } else {
-                // tiger stripes
-                if ((row % 2) == 0) {
-                    setBackground(new Color(220, 220, 220));
-                } else {
-                    setBackground(Color.WHITE);
-                }
-            }
             return this;
         }
     }
@@ -179,11 +167,7 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
             int actualCol = table.convertColumnIndexToModel(column);
             int actualRow = table.convertRowIndexToModel(row);
             Unit u = getUnit(actualRow);
-            String color = "black";
-            if(isSelected) {
-                color = "white";
-            }
-            setText(getValueAt(actualRow, actualCol).toString(), color);
+            setText(getValueAt(actualRow, actualCol).toString());
             if (actualCol == COL_UNIT) {
                 if(null != u) {
                     String desc = "<b>" + u.getName() + "</b><br>";
@@ -192,7 +176,7 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
                         desc += " " + UnitType.getTypeDisplayableName(u.getEntity().getUnitType());
                     }
                     desc += "<br>" + u.getStatus() + "";
-                    setText(desc, color);
+                    setText(desc);
                     Image mekImage = getImageFor(u);
                     if(null != mekImage) {
                         setImage(mekImage);
@@ -204,16 +188,7 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
                 }
             }
 
-            if (isSelected) {
-                c.setBackground(Color.DARK_GRAY);
-            } else {
-                // tiger stripes
-                if ((row % 2) == 0) {
-                    c.setBackground(new Color(220, 220, 220));
-                } else {
-                    c.setBackground(Color.WHITE);
-                }
-            }
+            MekHqTableCellRenderer.setupTableColors(c, table, isSelected, hasFocus, row);
             return c;
         }
     }

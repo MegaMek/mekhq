@@ -90,8 +90,6 @@ public class UnitViewPanel extends ScrollablePanel {
 
 		setLayout(new java.awt.GridBagLayout());
 
-		setBackground(Color.WHITE);
-
         int compWidth = 1;
         Image image = FluffImageHelper.getFluffImage(entity);
         if(null != image) {
@@ -110,7 +108,6 @@ public class UnitViewPanel extends ScrollablePanel {
             //no fluff image, so just use image icon from top-down view
             compWidth=2;
             lblImage = new JLabel();
-            lblImage.setBackground(Color.WHITE);
             image = getImageFor(unit, lblImage);
             if(null != image) {
                 ImageIcon icon = new ImageIcon(image);
@@ -128,7 +125,6 @@ public class UnitViewPanel extends ScrollablePanel {
         
 		pnlStats.setName("pnlBasic");
 		pnlStats.setBorder(BorderFactory.createTitledBorder(unit.getName()));
-		pnlStats.setBackground(Color.WHITE);
 		fillStats(resourceMap);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;

@@ -1,6 +1,5 @@
 package mekhq.gui;
 
-import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
@@ -10,6 +9,8 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
+import javax.swing.border.LineBorder;
 
 import mekhq.IconPackage;
 
@@ -64,14 +65,13 @@ public class RepairTaskInfo extends JPanel {
         this.setBorder(BorderFactory.createEmptyBorder());
     }
 
-    public void setText(String s, String color) {
-        lblImage.setText("<html><font size='2' color='" + color + "'>" + s
-                + "</font></html>");
+    public void setText(String s) {
+        lblImage.setText("<html><font size='2'>" + s + "</font></html>");
     }
-    
 
     public void highlightBorder() {
-    	this.setBorder(new javax.swing.border.LineBorder(Color.BLACK, 5, true));
+    	this.setBorder(new LineBorder(
+            UIManager.getColor("Tree.selectionBorderColor"), 4, true));
     }
 
     public void unhighlightBorder() {

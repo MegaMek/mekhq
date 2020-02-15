@@ -59,11 +59,8 @@ public class MissionViewPanel extends ScrollablePanel {
 
 		setLayout(new GridBagLayout());
 
-		setBackground(Color.WHITE);
-
 		pnlStats.setName("pnlStats");
 		pnlStats.setBorder(BorderFactory.createTitledBorder(mission.getName()));
-		pnlStats.setBackground(Color.WHITE);
 		fillStats();
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;

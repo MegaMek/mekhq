@@ -61,16 +61,15 @@ public class TechTableModel extends DataTableModel {
             int actualRow = table.convertRowIndexToModel(row);
             setOpaque(true);
             setPortrait(getTechAt(actualRow));
-            setText(getTechAt(actualRow).getTechDesc(getCampaign().isOvertimeAllowed(), panel.getSelectedTask()),
-                    "black");
+            setText(getTechAt(actualRow).getTechDesc(getCampaign().isOvertimeAllowed(), panel.getSelectedTask()));
             if (isSelected) {
                 highlightBorder();
             } else {
                 unhighlightBorder();
             }
-            c.setBackground(new Color(220, 220, 220));
+            c.setBackground(table.getBackground());
+            c.setForeground(table.getForeground());
             return c;
         }
-
     }
 }
