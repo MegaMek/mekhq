@@ -1172,6 +1172,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                 JMenu i_trn = new JMenu(TOEMouseAdapter.INFANTRY_CARRIERS);
                 JMenu a_trn = new JMenu(TOEMouseAdapter.ASF_CARRIERS);
                 JMenu sc_trn = new JMenu(TOEMouseAdapter.SC_CARRIERS);
+                JMenu singleUnitMenu = new JMenu("");
                 if (unitsInForces.size() > 0) {
                     Unit unit = unitsInForces.get(0);
                     String unitIds = "" + unit.getId().toString();
@@ -1192,12 +1193,10 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                         if (StaticChecks.areAllUnitsSameType(unitsInForces, i)) {
                             singleUnitType = i;
                             allUnitsSameType = true;
+                            singleUnitMenu.setText(String.format(TOEMouseAdapter.VARIABLE_TRANSPORT,UnitType.getTypeName(singleUnitType)));
                             break;
                         }
                     }
-                    //Initialize this here so we can set the title correctly
-                    JMenu singleUnitMenu = new JMenu(String.format(TOEMouseAdapter.VARIABLE_TRANSPORT,UnitType.getTypeName(singleUnitType)));
-                    
                     //Only display the Assign to Ship command if your command has at least 1 valid transport
                     //and if your selection does not include a transport
                     if (!shipInSelection && !gui.getCampaign().getTransportShips().isEmpty()) {
