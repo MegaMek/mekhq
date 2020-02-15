@@ -294,7 +294,14 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
             });
             panBtn.add(btnLoad);
         } else if (mission instanceof AtBContract && scenario instanceof AtBDynamicScenario) {
-            JButton btnFinalize = new JButton("Finalize");
+            JButton btnFinalize = new JButton();
+            
+            if(((AtBDynamicScenario) scenario).getNumBots() > 0) {
+                btnFinalize.setText("Regenerate Bot Forces");
+            } else {
+                btnFinalize.setText("Generate Bot Forces");
+            }
+            
             btnFinalize.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(ActionEvent evt) {
                     btnFinalizeActionPerformed(evt);
