@@ -1159,22 +1159,21 @@ public class ResolveScenarioTracker {
             }
         }
         // update prisoners
-        for(UUID pid : prisonerStatus.keySet()) {
+        for (UUID pid : prisonerStatus.keySet()) {
             PrisonerStatus status = prisonerStatus.get(pid);
             Person person = status.getPerson();
-            if(null == person) {
+            if (null == person) {
                 continue;
             }
             MekHQ.triggerEvent(new PersonBattleFinishedEvent(person, status));
-            if(status.isDead()) {
+            if (status.isDead()) {
                 continue;
             }
             if (status.isCaptured()) {
-                getCampaign().recruitPerson(person, true, false, true);
+                getCampaign().recruitPerson(person, true, false, false, true);
                 if (getCampaign().getCampaignOptions().getUseAtB() &&
                         getCampaign().getCampaignOptions().getUseAtBCapture() &&
-                        m instanceof AtBContract &&
-                        status.isCaptured()) {
+                        m instanceof AtBContract && status.isCaptured()) {
                     if (Compute.d6(2) >= 10 + ((AtBContract)m).getEnemySkill() - getCampaign().getUnitRatingMod()) {
                         getCampaign().addReport(String.format(
                             "You have convinced %s to defect.", person.getHyperlinkedName())); //$NON-NLS-1$
@@ -1185,19 +1184,19 @@ public class ResolveScenarioTracker {
                 continue;
             }
             person.setXp(person.getXp() + status.getXP());
-            if(status.getHits() > person.getHits()) {
+            if (status.getHits() > person.getHits()) {
                 person.setHits(status.getHits());
             }
 
             ServiceLogger.participatedInMission(person, campaign.getDate(), scenario.getName(), m.getName());
 
-            for(Kill k : status.getKills()) {
+            for (Kill k : status.getKills()) {
                 campaign.addKill(k);
             }
-            //if(status.isMissing()) {
+            //if (status.isMissing()) {
               //  campaign.changeStatus(person, Person.S_MIA);
             //}
-            if(status.isDead()) {
+            if (status.isDead()) {
                 campaign.changeStatus(person, Person.S_KIA);
                 if (campaign.getCampaignOptions().getUseAtB() &&
                         m instanceof AtBContract) {

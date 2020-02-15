@@ -2342,11 +2342,9 @@ public class CampaignGUI extends JPanel {
                     continue;
                 }
 
-                Person p = Person.generateInstanceFromXML(wn2, getCampaign(),
-                        version);
+                Person p = Person.generateInstanceFromXML(wn2, getCampaign(), version);
                 if (getCampaign().getPerson(p.getId()) != null
-                        && getCampaign().getPerson(p.getId()).getFullName()
-                                .equals(p.getFullName())) {
+                        && getCampaign().getPerson(p.getId()).getFullName().equals(p.getFullName())) {
                     MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR, //$NON-NLS-1$
                             "ERROR: Cannot load person who exists, ignoring. (Name: " //$NON-NLS-1$
                             + p.getFullName() + ")"); //$NON-NLS-1$
@@ -2354,7 +2352,7 @@ public class CampaignGUI extends JPanel {
                 }
 
                 if (p != null) {
-                    getCampaign().addPersonWithoutId(p, true);
+                    getCampaign().recruitPersonWithoutId(p, p.isPrisoner(), p.isDependent(), true, true);
 
                     // Clear some values we no longer should have set in case this
                     // has transferred campaigns or things in the campaign have

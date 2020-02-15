@@ -323,22 +323,18 @@ public class PersonnelMarketDialog extends JDialog {
 	}
 
 	private void hirePerson(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
-	    if(null != selectedPerson) {
+	    if (null != selectedPerson) {
 	    	if (campaign.getFunds().isLessThan(
                     (campaign.getCampaignOptions().payForRecruitment() ? selectedPerson.getSalary().multipliedBy(2) : Money.zero())
-                            .plus(unitCost))){
+                            .plus(unitCost))) {
 				 campaign.addReport("<font color='red'><b>Insufficient funds. Transaction cancelled</b>.</font>");
 	    	} else {
 	    		/* Adding person to campaign changes pid; grab the old one to
 	    		 * use as a key to any attached entity
 	    		 */
 	    		UUID pid = selectedPerson.getId();
-	    		if(campaign.recruitPerson(selectedPerson)) {
+	    		if (campaign.recruitPerson(selectedPerson)) {
 	    			Entity en = personnelMarket.getAttachedEntity(pid);
-	    			if (campaign.getCampaignOptions().getUseTimeInService()) {
-                        GregorianCalendar rawrecruit = (GregorianCalendar) campaign.getCalendar().clone();
-                        selectedPerson.setRecruitment(rawrecruit);
-                    }
 	    			if (null != en) {
 	    				addUnit(en, true);
 	    				personnelMarket.removeAttachedEntity(pid);
@@ -355,18 +351,14 @@ public class PersonnelMarketDialog extends JDialog {
 		if (selectedPerson != null) {
 			Entity en = personnelMarket.getAttachedEntity(selectedPerson);
 			UUID pid = selectedPerson.getId();
-		    if(null != selectedPerson) {
-		    	campaign.addPersonWithoutId(selectedPerson, true);
-				addUnit(en, false);
-                if (campaign.getCampaignOptions().getUseTimeInService()) {
-                    GregorianCalendar rawrecruit = (GregorianCalendar) campaign.getCalendar().clone();
-                    selectedPerson.setRecruitment(rawrecruit);
-                }
-		    	personnelMarket.removePerson(selectedPerson);
-	    		personnelModel.setData(personnelMarket.getPersonnel());
-				personnelMarket.removeAttachedEntity(pid);
-		    	refreshPersonView();
-		    }
+
+            if (campaign.recruitPerson(selectedPerson, false, false, true, true)) {
+                addUnit(en, false);
+                personnelMarket.removePerson(selectedPerson);
+                personnelModel.setData(personnelMarket.getPersonnel());
+                personnelMarket.removeAttachedEntity(pid);
+            }
+            refreshPersonView();
 		}
 	}
 

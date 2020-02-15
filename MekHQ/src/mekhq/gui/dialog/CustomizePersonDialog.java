@@ -11,23 +11,11 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Enumeration;
-import java.util.GregorianCalendar;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import org.joda.time.DateTime;
 
@@ -142,9 +130,9 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     }
 
     private void initializePilotAndOptions () {
-        this.birthdate = (GregorianCalendar)person.getBirthday().clone();
-    	if(campaign.getCampaignOptions().getUseTimeInService() && person.getRecruitment() != null) {
-            this.recruitment = (GregorianCalendar)person.getRecruitment().clone();
+        this.birthdate = (GregorianCalendar) person.getBirthday().clone();
+    	if (campaign.getCampaignOptions().getUseTimeInService() && (person.getRecruitment() != null)) {
+            this.recruitment = (GregorianCalendar) person.getRecruitment().clone();
         }
     	this.options = person.getOptions();
     	initComponents();
@@ -362,18 +350,16 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
             }
         });
         choiceFaction.setSelectedIndex(factionsModel.getIndexOf(person.getOriginFaction()));
-        choiceFaction.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                // Update the clan check box based on the new selected faction
-                Faction selectedFaction = (Faction)choiceFaction.getSelectedItem();
-                chkClan.setSelected(selectedFaction.is(Tag.CLAN));
+        choiceFaction.addActionListener(evt -> {
+            // Update the clan check box based on the new selected faction
+            Faction selectedFaction = (Faction)choiceFaction.getSelectedItem();
+            chkClan.setSelected(selectedFaction.is(Tag.CLAN));
 
-                // We don't have to call backgroundChanged because it is already
-                // called when we update the chkClan checkbox.
+            // We don't have to call backgroundChanged because it is already
+            // called when we update the chkClan checkbox.
 
-                if (chkOnlyOurFaction.isSelected()) {
-                    filterPlanetarySystemsForOurFaction(true);
-                }
+            if (chkOnlyOurFaction.isSelected()) {
+                filterPlanetarySystemsForOurFaction(true);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -421,14 +407,12 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
             choiceSystem.setSelectedIndex(allSystems.getIndexOf(planetarySystem));
             updatePlanetsComboBoxModel(planetsModel, planetarySystem);
         }
-        choiceSystem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                // Update the clan check box based on the new selected faction
-                PlanetarySystem selectedSystem = (PlanetarySystem)choiceSystem.getSelectedItem();
+        choiceSystem.addActionListener(evt -> {
+            // Update the clan check box based on the new selected faction
+            PlanetarySystem selectedSystem = (PlanetarySystem)choiceSystem.getSelectedItem();
 
-                choicePlanet.setSelectedIndex(-1);
-                updatePlanetsComboBoxModel(planetsModel, selectedSystem);
-            }
+            choicePlanet.setSelectedIndex(-1);
+            updatePlanetsComboBoxModel(planetsModel, selectedSystem);
         });
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -441,9 +425,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         panDemog.add(choiceSystem, gridBagConstraints);
 
         chkOnlyOurFaction = new JCheckBox("Faction Specific");
-        chkOnlyOurFaction.addActionListener(e -> {
-            filterPlanetarySystemsForOurFaction(chkOnlyOurFaction.isSelected());
-        });
+        chkOnlyOurFaction.addActionListener(e -> filterPlanetarySystemsForOurFaction(chkOnlyOurFaction.isSelected()));
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -562,7 +544,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
 
         y++;
 
-        if (campaign.getCampaignOptions().getUseTimeInService() && recruitment != null) {
+        if (campaign.getCampaignOptions().getUseTimeInService() && (recruitment != null)) {
             lblRecruitment.setText(resourceMap.getString("lblRecruitment.text")); // NOI18N
             lblRecruitment.setName("lblRecruitment"); // NOI18N
             gridBagConstraints = new java.awt.GridBagConstraints();
@@ -591,7 +573,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         textToughness.setText(Integer.toString(person.getToughness()));
         textToughness.setName("textToughness"); // NOI18N
 
-        if(campaign.getCampaignOptions().useToughness()) {
+        if (campaign.getCampaignOptions().useToughness()) {
         	gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
@@ -610,7 +592,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         lblUnit.setText("Original unit:"); // NOI18N
         lblUnit.setName("lblUnit"); // NOI18N
 
-        choiceUnitWeight = new JComboBox<String>();
+        choiceUnitWeight = new JComboBox<>();
         choiceUnitWeight.addItem("None");
         choiceUnitWeight.addItem("Light");
         choiceUnitWeight.addItem("Medium");
@@ -618,7 +600,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         choiceUnitWeight.addItem("Assault");
         choiceUnitWeight.setSelectedIndex(person.getOriginalUnitWeight());
 
-        choiceUnitTech = new JComboBox<String>();
+        choiceUnitTech = new JComboBox<>();
         choiceUnitTech.addItem("IS1");
         choiceUnitTech.addItem("IS2");
         choiceUnitTech.addItem("Clan");
@@ -630,7 +612,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         chkFounder = new JCheckBox("Founding member");
         chkFounder.setSelected(person.isFounder());
 
-        choiceOriginalUnit = new JComboBox<Unit>();
+        choiceOriginalUnit = new JComboBox<>();
         choiceOriginalUnit.setRenderer(new DefaultListCellRenderer() {
 			@Override
         	public Component getListCellRendererComponent(JList<?> list,
@@ -653,24 +635,21 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         } else {
         	choiceOriginalUnit.setSelectedItem(campaign.getUnit(person.getOriginalUnitId()));
         }
-        choiceOriginalUnit.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent ev) {
-				if (null == choiceOriginalUnit.getSelectedItem()) {
-					choiceUnitWeight.setSelectedIndex(0);
-					choiceUnitTech.setSelectedIndex(0);
-				} else {
-					Unit unit = (Unit)choiceOriginalUnit.getSelectedItem();
-					choiceUnitWeight.setSelectedIndex(unit.getEntity().getWeightClass());
-					if (unit.getEntity().isClan()) {
-						choiceUnitTech.setSelectedIndex(2);
-					} else if (unit.getEntity().getTechLevel() > megamek.common.TechConstants.T_INTRO_BOXSET) {
-						choiceUnitTech.setSelectedIndex(1);
-					} else {
-						choiceUnitTech.setSelectedIndex(0);
-					}
-				}
-			}
+        choiceOriginalUnit.addActionListener(ev -> {
+            if (null == choiceOriginalUnit.getSelectedItem()) {
+                choiceUnitWeight.setSelectedIndex(0);
+                choiceUnitTech.setSelectedIndex(0);
+            } else {
+                Unit unit = (Unit)choiceOriginalUnit.getSelectedItem();
+                choiceUnitWeight.setSelectedIndex(unit.getEntity().getWeightClass());
+                if (unit.getEntity().isClan()) {
+                    choiceUnitTech.setSelectedIndex(2);
+                } else if (unit.getEntity().getTechLevel() > megamek.common.TechConstants.T_INTRO_BOXSET) {
+                    choiceUnitTech.setSelectedIndex(1);
+                } else {
+                    choiceUnitTech.setSelectedIndex(0);
+                }
+            }
         });
 
         y++;
@@ -756,8 +735,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         scrOptions.setPreferredSize(new java.awt.Dimension(500, 500));
 
         tabStats.addTab(resourceMap.getString("scrSkills.TabConstraints.tabTitle"),scrSkills); // NOI18N
-        if(campaign.getCampaignOptions().useAbilities()
-        		|| campaign.getCampaignOptions().useEdge()
+        if(campaign.getCampaignOptions().useAbilities() || campaign.getCampaignOptions().useEdge()
         		|| campaign.getCampaignOptions().useImplants()) {
         	tabStats.addTab(resourceMap.getString("scrOptions.TabConstraints.tabTitle"),scrOptions); // NOI18N
         }
@@ -779,11 +757,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
 
         btnOk.setText(resourceMap.getString("btnOk.text")); // NOI18N
         btnOk.setName("btnOk"); // NOI18N
-        btnOk.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOkActionPerformed(evt);
-            }
-        });
+        btnOk.addActionListener(this::btnOkActionPerformed);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -794,11 +768,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
 
         btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
-        btnClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCloseActionPerformed(evt);
-            }
-        });
+        btnClose.addActionListener(this::btnCloseActionPerformed);
         panButtons.add(btnClose, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -824,7 +794,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
             .sorted((a, b) -> a.getFullName(year).compareToIgnoreCase(b.getFullName(year)))
             .collect(Collectors.toList());
 
-        DefaultComboBoxModel<Faction> factionsModel = new DefaultComboBoxModel<Faction>();
+        DefaultComboBoxModel<Faction> factionsModel = new DefaultComboBoxModel<>();
         for (Faction faction : orderedFactions) {
             // Always include the person's faction
             if (faction == person.getOriginFaction()) {
@@ -854,7 +824,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
 
         DateTime currentYear = new DateTime(campaign.getCalendar());
         List<PlanetarySystem> orderedSystems = campaign.getSystems().stream()
-            .sorted((a, b) -> a.getName(currentYear).compareTo(b.getName(currentYear)))
+            .sorted(Comparator.comparing(a -> a.getName(currentYear)))
             .collect(Collectors.toList());
         for (PlanetarySystem system : orderedSystems) {
             model.addElement(system);
@@ -868,7 +838,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         DateTime birthYear = new DateTime(person.getBirthday());
         List<PlanetarySystem> orderedSystems = campaign.getSystems().stream()
             .filter(a -> a.getFactionSet(birthYear).contains(faction))
-            .sorted((a, b) -> a.getName(birthYear).compareTo(b.getName(birthYear)))
+            .sorted(Comparator.comparing(a -> a.getName(birthYear)))
             .collect(Collectors.toList());
         for (PlanetarySystem system : orderedSystems) {
             model.addElement(system);
@@ -997,9 +967,9 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
 	    JSpinner spnLevel;
 	    JSpinner spnBonus;
 
-        GridBagLayout gridbag = new GridBagLayout();
+        GridBagLayout gridBag = new GridBagLayout();
         GridBagConstraints c = new GridBagConstraints();
-        panSkills.setLayout(gridbag);
+        panSkills.setLayout(gridBag);
 
         c.gridwidth = 1;
         c.fill = GridBagConstraints.NONE;
@@ -1013,13 +983,10 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         	chkSkill = new JCheckBox();
         	chkSkill.setSelected(person.hasSkill(type));
         	skillChks.put(type, chkSkill);
-        	chkSkill.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(ItemEvent e) {
-					changeSkillValue(type);
-					changeValueEnabled(type);
-				}
-    		});
+        	chkSkill.addItemListener(e -> {
+                changeSkillValue(type);
+                changeValueEnabled(type);
+            });
         	lblName = new JLabel(type);
         	lblValue = new JLabel();
     		if(person.hasSkill(type)) {
@@ -1037,20 +1004,10 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     			bonus = person.getSkill(type).getBonus();
     		}
     		spnLevel = new JSpinner(new SpinnerNumberModel(level, 0, 10, 1));
-    		spnLevel.addChangeListener(new ChangeListener() {
-    			@Override
-    			public void stateChanged(ChangeEvent evt) {
-    				changeSkillValue(type);
-    			}
-    		});
+    		spnLevel.addChangeListener(evt -> changeSkillValue(type));
     		spnLevel.setEnabled(chkSkill.isSelected());
     		spnBonus = new JSpinner(new SpinnerNumberModel(bonus, -8, 8, 1));
-    		spnBonus.addChangeListener(new ChangeListener() {
-    			@Override
-    			public void stateChanged(ChangeEvent evt) {
-    				changeSkillValue(type);
-    			}
-    		});
+    		spnBonus.addChangeListener(evt -> changeSkillValue(type));
     		spnBonus.setEnabled(chkSkill.isSelected());
             skillLvls.put(type, spnLevel);
             skillBonus.put(type, spnBonus);
@@ -1113,11 +1070,11 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
 
     public void refreshOptions() {
         panOptions.removeAll();
-        optionComps = new ArrayList<DialogOptionComponent>();
+        optionComps = new ArrayList<>();
 
-        GridBagLayout gridbag = new GridBagLayout();
+        GridBagLayout gridBag = new GridBagLayout();
         GridBagConstraints c = new GridBagConstraints();
-        panOptions.setLayout(gridbag);
+        panOptions.setLayout(gridBag);
 
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -1144,28 +1101,27 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
                 continue;
             }
 
-            addGroup(group, gridbag, c);
+            addGroup(group, gridBag, c);
 
             for (Enumeration<IOption> j = group.getOptions(); j
             .hasMoreElements();) {
                 IOption option = j.nextElement();
 
-                addOption(option, gridbag, c, true);
+                addOption(option, gridBag, c, true);
             }
         }
     }
 
-    private void addGroup(IOptionGroup group, GridBagLayout gridbag,
+    private void addGroup(IOptionGroup group, GridBagLayout gridBag,
             GridBagConstraints c) {
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizePersonDialog", new EncodeControl()); //$NON-NLS-1$
         JLabel groupLabel = new JLabel(resourceMap.getString("optionGroup." + group.getKey())); //$NON-NLS-1$
 
-        gridbag.setConstraints(groupLabel, c);
+        gridBag.setConstraints(groupLabel, c);
         panOptions.add(groupLabel);
     }
 
-    private void addOption(IOption option, GridBagLayout gridbag,
-            GridBagConstraints c, boolean editable) {
+    private void addOption(IOption option, GridBagLayout gridBag, GridBagConstraints c, boolean editable) {
         DialogOptionComponent optionComp = new DialogOptionComponent(this,
                 option, editable);
 
@@ -1208,7 +1164,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
             }
         }
 
-        gridbag.setConstraints(optionComp, c);
+        gridBag.setConstraints(optionComp, c);
         panOptions.add(optionComp);
 
         optionComps.add(optionComp);

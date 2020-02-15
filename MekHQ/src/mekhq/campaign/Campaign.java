@@ -1218,10 +1218,26 @@ public class Campaign implements Serializable, ITechManager {
     /**
      *
      * @param p         the person being added
+     * @param prisoner  if the person is a prisoner or not. True means they are a prisoner
+     * @param dependent if the person is a dependent or not. True means they are a dependent
+     * @param gmAdd     false means that they need to pay to hire this person, true means it is added without paying
+     * @param log       whether or not to write to logs
+     */
+    public void recruitPersonWithoutId(Person p, boolean prisoner, boolean dependent, boolean gmAdd, boolean log) {
+        UUID id = UUID.randomUUID();
+        p.setId(id);
+        personnel.put(id, p);
+
+        recruitPerson(p, prisoner, dependent, gmAdd, log);
+    }
+
+    /**
+     *
+     * @param p         the person being added
      * @return          true if the person is hired successfully, otherwise false
      */
     public boolean recruitPerson(Person p) {
-        return recruitPerson(p, false, false,true);
+        return recruitPerson(p, false, false, false, true);
     }
 
     /**
@@ -1231,23 +1247,24 @@ public class Campaign implements Serializable, ITechManager {
      * @return          true if the person is hired successfully, otherwise false
      */
     public boolean recruitPerson(Person p, boolean gmAdd) {
-        return recruitPerson(p, false, gmAdd, true);
+        return recruitPerson(p, false, false, gmAdd, true);
     }
 
     /**
      *
      * @param p         the person being added
      * @param prisoner  if the person is a prisoner or not. True means they are a prisoner
+     * @param dependent if the person is a dependent or not. True means they are a dependent
      * @param gmAdd     false means that they need to pay to hire this person, true means it is added without paying
      * @param log       whether or not to write to logs
      * @return          true if the person is hired successfully, otherwise false
      */
-    public boolean recruitPerson(Person p, boolean prisoner, boolean gmAdd, boolean log) {
+    public boolean recruitPerson(Person p, boolean prisoner, boolean dependent, boolean gmAdd, boolean log) {
         if (p == null) {
             return false;
         }
-        // Only pay if option set, they weren't GM added, and they aren't a prisoner or bondsman
-        if (getCampaignOptions().payForRecruitment() && !gmAdd && !prisoner) {
+        // Only pay if option set, they weren't GM added, and they aren't a dependent, prisoner or bondsman
+        if (getCampaignOptions().payForRecruitment() && !dependent && !gmAdd && !prisoner) {
             if (!getFinances().debit(p.getSalary().multipliedBy(2), Transaction.C_SALARY,
                     "recruitment of " + p.getFullName(), getCalendar().getTime())) {
                 addReport("<font color='red'><b>Insufficient funds to recruit "
@@ -1273,6 +1290,7 @@ public class Campaign implements Serializable, ITechManager {
             astechPoolOvertime += 120;
         }
         String rankEntry = LogEntryController.generateRankEntryString(p);
+
         if (prisoner) {
             if (getCampaignOptions().getDefaultPrisonerStatus() == CampaignOptions.BONDSMAN_RANK) {
                 p.setBondsman();
@@ -1291,20 +1309,22 @@ public class Campaign implements Serializable, ITechManager {
                 ServiceLogger.joined(p, getDate(), getName(), rankEntry);
             }
         }
+
+        // Add their recruitment date if using track time in service
+        if (getCampaignOptions().getUseTimeInService() && !prisoner && !dependent) {
+            GregorianCalendar recruitmentDate = (GregorianCalendar) getCalendar().clone();
+            p.setRecruitment(recruitmentDate);
+        }
+
         MekHQ.triggerEvent(new PersonNewEvent(p));
         return true;
     }
-
 
     /**
      * Imports a {@link Person} into a campaign.
      * @param p A {@link Person} to import into the campaign.
      */
     public void importPerson(Person p) {
-        addPersonWithoutId(p);
-    }
-
-    private void addPersonWithoutId(Person p) {
         personnel.put(p.getId(), p);
         MekHQ.triggerEvent(new PersonNewEvent(p));
     }
@@ -1319,24 +1339,6 @@ public class Campaign implements Serializable, ITechManager {
 
     private void addAncestorsWithoutId(Ancestors a) {
         ancestors.put(a.getId(), a);
-    }
-
-    public void addPersonWithoutId(Person p, boolean log) {
-        p.setId(UUID.randomUUID());
-        addPersonWithoutId(p);
-        if (log) {
-            addReport(p.getHyperlinkedName() + " has been added to the personnel roster.");
-        }
-        if (p.getPrimaryRole() == Person.T_ASTECH) {
-            astechPoolMinutes += 480;
-            astechPoolOvertime += 240;
-        }
-        if (p.getSecondaryRole() == Person.T_ASTECH) {
-            astechPoolMinutes += 240;
-            astechPoolOvertime += 120;
-        }
-        String rankEntry = LogEntryController.generateRankEntryString(p);
-        ServiceLogger.joined(p, getDate(), getName(), rankEntry);
     }
 
     @Deprecated
@@ -3168,8 +3170,7 @@ public class Campaign implements Serializable, ITechManager {
             }
             for (int i = 0; i < change; i++) {
                 Person p = newDependent(Person.T_ASTECH);
-                p.setId(UUID.randomUUID());
-                addPersonWithoutId(p, true);
+                recruitPersonWithoutId(p, false, true, false, true);
             }
         }
 
@@ -3271,7 +3272,7 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         for (Person baby : babies) {
-            addPersonWithoutId(baby, false);
+            recruitPersonWithoutId(baby, false, true, false, false);
         }
     }
 
@@ -5961,9 +5962,7 @@ public class Campaign implements Serializable, ITechManager {
                 }
                 p.setPrisoner();
                 ServiceLogger.madePrisoner(p, getDate());
-                if (getCampaignOptions().getUseTimeInService()) {
-                    p.setRecruitment(null);
-                }
+                p.setRecruitment(null); //more efficient to just set it to null instead of checking if the setting is enabled
                 break;
             case Person.PRISONER_BONDSMAN:
                 if (p.getRankNumeric() > 0) {
@@ -5972,9 +5971,7 @@ public class Campaign implements Serializable, ITechManager {
                 }
                 p.setBondsman();
                 ServiceLogger.madeBondsman(p, getDate());
-                if (getCampaignOptions().getUseTimeInService()) {
-                    p.setRecruitment(null);
-                }
+                p.setRecruitment(null); //more efficient to just set it to null instead of checking if the setting is enabled
                 break;
             default:
                 break;
