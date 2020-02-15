@@ -140,6 +140,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
     private static final String INFANTRY_CARRIERS = "Infantry Transports";
     private static final String ASF_CARRIERS = "Aerospace Fighter Transports";
     private static final String SC_CARRIERS = "Small Craft Transports";
+    private static final String VARIABLE_TRANSPORT = "%s Transports";
 
     @Override
     public void actionPerformed(ActionEvent action) {
@@ -1194,6 +1195,9 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                             break;
                         }
                     }
+                    //Initialize this here so we can set the title correctly
+                    JMenu singleUnitMenu = new JMenu(String.format(TOEMouseAdapter.VARIABLE_TRANSPORT,UnitType.getTypeName(singleUnitType)));
+                    
                     //Only display the Assign to Ship command if your command has at least 1 valid transport
                     //and if your selection does not include a transport
                     if (!shipInSelection && !gui.getCampaign().getTransportShips().isEmpty()) {
@@ -1204,7 +1208,15 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                             }
                             
                             if (allUnitsSameType) {
-                                //ship.getCorrectBayCapacity(singleUnitType, unitWeight)
+                                double capacity = ship.getCorrectBayCapacity(singleUnitType, unitWeight);
+                                if (capacity > 0) {
+                                    JMenuItem shipMenuItem = new JMenuItem(ship.getName() + " , Space available: " + capacity);
+                                    shipMenuItem.setActionCommand(TOEMouseAdapter.COMMAND_ASSIGN_TO_SHIP + id + "|" + unitIds);
+                                    shipMenuItem.addActionListener(this);
+                                    shipMenuItem.setEnabled(true);
+                                    singleUnitMenu.add(shipMenuItem);
+                                    singleUnitMenu.setEnabled(true);
+                                }
                             } else {
                                 //Add this ship to the appropriate submenu(s). Most transports will fit into multiple
                                 //categories
@@ -1273,6 +1285,9 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     }
                     if (shv_trn.getMenuComponentCount() > 0 || shv_trn.getItemCount() > 0) {
                         menu.add(shv_trn);
+                    }
+                    if (singleUnitMenu.getMenuComponentCount() > 0 || singleUnitMenu.getItemCount() > 0) {
+                        menu.add(singleUnitMenu);
                     }
                     if (menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
                         popup.add(menu);
@@ -1639,14 +1654,14 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
             }
         }
     }
-    
+        
     /**
      * Worker function that creates a new instance of a JMenuItem for a set of transport ship characteristics
      * Used to have a single ship appear on multiple menu entries defined by type of unit transported
      * Displays the remaining capacity in bays of the specified type
      * 
      * @param shipName String name of this ship. 
-     * @param shipId 
+     * @param shipId Unique id of this ship. Used to fill out actionPerformed(ActionEvent)
      * @param unitIds  String of units delimited by | used to fill out actionPerformed(ActionEvent)
      * @param capacity Double representing the capacity of the designated bay type
      */
