@@ -1243,9 +1243,8 @@ public class Campaign implements Serializable, ITechManager {
         p.setId(id);
         personnel.put(id, p);
 
-        //TODO: implement a boolean check based on campaign options
-        boolean bondsman = false;
-        String add = prisoner ? " as a prisoner" : bondsman ? " as a bondsman" : "";
+        boolean bondsman = campaignOptions.getDefaultPrisonerStatus() == CampaignOptions.BONDSMAN_RANK;
+        String add = prisoner ? (bondsman ? " as a bondsman" : " as a prisoner") : "";
         if (log) {
             addReport(String.format("%s has been added to the personnel roster%s.", p.getHyperlinkedName(), add));
         }
