@@ -30,6 +30,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import megamek.common.util.StringUtil;
 import org.joda.time.DateTime;
 
 import megamek.client.Client;
@@ -1086,7 +1087,7 @@ public class AtBDynamicScenarioFactory {
      */
     public static Entity createEntityWithCrew(String faction, int skill, Campaign campaign, MechSummary ms) {
         final String METHOD_NAME = "createEntityWithCrew(String,int,Campaign,MechSummary)"; //$NON-NLS-1$
-        Entity en = null;
+        Entity en;
         try {
             en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
         } catch (Exception ex) {
@@ -1103,8 +1104,15 @@ public class AtBDynamicScenarioFactory {
 
         RandomNameGenerator rng = RandomNameGenerator.getInstance();
         rng.setChosenFaction(f.getNameGenerator());
-        //String[] crewName = rng.generateGivenNameSurnameSplit(); //TODO : Windchild fix me!
-        String crewName = rng.generate();
+        boolean gender = rng.isFemale();
+        String[] crewNameArray = rng.generateGivenNameSurnameSplit(gender);
+        String crewName = crewNameArray[0];
+        crewName += !StringUtil.isNullOrEmpty(crewNameArray[1]) ?  " " + crewNameArray[1] : "";
+
+        Map<Integer, Map<String, String>> extraData = new HashMap<>();
+        Map<String, String> innerMap = new HashMap<>();
+        innerMap.put(Crew.MAP_GIVEN_NAME, crewNameArray[0]);
+        innerMap.put(Crew.MAP_SURNAME, crewNameArray[1]);
 
         RandomSkillsGenerator rsg = new RandomSkillsGenerator();
         rsg.setMethod(RandomSkillsGenerator.M_TAHARQA);
@@ -1134,13 +1142,17 @@ public class AtBDynamicScenarioFactory {
                 phenotype = -1;
             }
             if (phenotype >= 0) {
-                crewName += " " + Bloodname.randomBloodname(faction, phenotype, campaign.getCalendar().get(Calendar.YEAR)).getName();
+                String bloodname = Bloodname.randomBloodname(faction, phenotype, campaign.getCalendar().get(Calendar.YEAR)).getName();
+                crewName += " " + bloodname;
+                innerMap.put(Crew.MAP_BLOODNAME, bloodname);
+                innerMap.put(Crew.MAP_PHENOTYPE, Integer.toString(phenotype));
             }
         }
 
-        en.setCrew(new Crew(en.getCrew().getCrewType(), crewName,
-                            Compute.getFullCrewSize(en),
-                            skills[0], skills[1]));
+        extraData.put(0, innerMap);
+
+        en.setCrew(new Crew(en.getCrew().getCrewType(), crewName, Compute.getFullCrewSize(en),
+                skills[0], skills[1], Crew.getGenderAsInt(gender), extraData));
 
         UUID id = UUID.randomUUID();
         en.setExternalIdAsString(id.toString());
@@ -1157,6 +1169,7 @@ public class AtBDynamicScenarioFactory {
      * @param campaign
      * @return                A new Entity
      */
+    @Deprecated //Deprecated 15-Feb-2020 as unused, needs the current name system to be implemented if activated
     private static Entity getEntityByName(String name, String fName, int skill, Campaign campaign) {
         final String METHOD_NAME = "getEntityByName(String,String,int,Campaign"; //$NON-NLS-1$
 
@@ -1196,7 +1209,7 @@ public class AtBDynamicScenarioFactory {
         int[] skills = rsg.getRandomSkills(en);
         en.setCrew(new Crew(en.getCrew().getCrewType(), rng.generate(),
                             Compute.getFullCrewSize(en),
-                            skills[0], skills[1])); //todo : Windchild Fix ME
+                            skills[0], skills[1]));
 
         UUID id = UUID.randomUUID();
         en.setExternalIdAsString(id.toString());

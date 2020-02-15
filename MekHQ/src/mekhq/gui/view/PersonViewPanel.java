@@ -793,7 +793,6 @@ public class PersonViewPanel extends ScrollablePanel {
                 lblFormerSpouses2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 lblFormerSpouses2.setText(String.format("<html><a href='#'>%s</a>, %s, %s</html>", ex.getFullName(),
                         formerSpouse.getReasonString(), formerSpouse.getDateAsString(FormerSpouse.getDisplayDateFormat())));
-                //TODO : Windchild fix this format so it is standardized
                 lblFormerSpouses2.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {

@@ -775,7 +775,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * @param n the name to be migrated
      */
     public void migrateName(String n) {
-        // How this works is that it takes the input name, and splits it into individual parts.
+        // How this works:
+        // Takes the input name, and splits it into individual parts.
+        // Then, it depends on whether the person is a Clanner or not.
+        // For Clan names:
+        // Takes the input name, and assumes that person does not have a surname
+        // Bloodnames are assumed to have been assigned either through the
+        // For Inner Sphere names:
         // Depending on the length of the resulting array, the name is processed differently
         // Array of length 1: the name is assumed to not have a surname, just a given name
         // Array of length 2: the name is assumed to be a given name and a surname
@@ -787,7 +793,17 @@ public class Person implements Serializable, MekHqXmlSerializable {
         String[] name = n.split(space);
 
         if (isClanner()) {
-            // TODO : Windchild Implement clanner name migration
+            int i = 0;
+            givenName = name[i];
+            for (i = 1; i < name.length - 1; i++) {
+                givenName += space + name[i];
+            }
+
+            if (!(!StringUtil.isNullOrEmpty(getBloodname()) && getBloodname().equals(name[i]))) {
+                givenName += space + name[i];
+            }
+
+            surname = null;
         } else {
             if (name.length == 1) {
                 givenName = name[0];
@@ -1063,7 +1079,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return birthday;
     }
 
-    public GregorianCalendar GetDateOfDeath() {
+    public GregorianCalendar getDateOfDeath() {
         return dateOfDeath;
     }
 
@@ -1372,6 +1388,18 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void addRandomSpouse(boolean sameSex) {
 
+    }
+
+    public boolean isPotentialRandomSpouse(Person p, int gender) {
+        if (p.getGender() != gender) {
+            return false;
+        } else if (!safeSpouse(p)) {
+            return false;
+        }
+
+        int ageDifference = p.getAge(campaign.getCalendar()) - getAge(campaign.getCalendar());
+
+        return true;
     }
 
     //endregion Marriage

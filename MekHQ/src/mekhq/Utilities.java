@@ -556,7 +556,7 @@ public class Utilities {
      */
     public static ArrayList<Person> doCrewInjuries(Entity e, Campaign c, ArrayList<Person> newCrew) {
         int casualties = 0;
-        if(null != e && e instanceof Infantry) {
+        if(e instanceof Infantry) {
             e.applyDamage();
             casualties = newCrew.size() - ((Infantry)e).getShootingStrength();
             for (Person p : newCrew) {
@@ -579,11 +579,7 @@ public class Utilities {
     }
 
     public static boolean isDeadCrew(Entity e) {
-        if (Compute.getFullCrewSize(e) == 0 || e.getCrew().isDead()) {
-            return true;
-        }
-
-        return false;
+        return Compute.getFullCrewSize(e) == 0 || e.getCrew().isDead();
     }
 
     public static Map<CrewType, Collection<Person>> genRandomCrewWithCombinedSkill(Campaign c, Unit u, String factionCode) {
@@ -664,6 +660,12 @@ public class Utilities {
                 }
                 if (null != p) {
                     //p.setName(oldCrew.getName(slot)); // TODO: Windchild fix me
+/*                    if () {
+
+                    } else {
+                        p.migrateName(oldCrew.getName(slot));
+                    }
+ */
                     p.migrateName(oldCrew.getName(slot));
                     if (!oldCrew.getExternalIdAsString().equals("-1")) {
                         p.setId(UUID.fromString(oldCrew.getExternalIdAsString(slot)));
@@ -900,8 +902,8 @@ public class Utilities {
      */
     private static void populateOptionsFromCrew(Person p, Crew oldCrew) {
         Enumeration<IOption> optionsEnum = oldCrew.getOptions().getOptions();
-        while(optionsEnum.hasMoreElements()) {
-            IOption currentOption = (IOption) optionsEnum.nextElement();
+        while (optionsEnum.hasMoreElements()) {
+            IOption currentOption = optionsEnum.nextElement();
             p.getOptions().getOption(currentOption.getName()).setValue(currentOption.getValue());
         }
     }
