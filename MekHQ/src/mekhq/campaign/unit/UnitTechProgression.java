@@ -42,7 +42,7 @@ import mekhq.MekHQ;
  */
 public class UnitTechProgression {
 
-    private final static UnitTechProgression instance = new UnitTechProgression();
+    private static final UnitTechProgression instance = new UnitTechProgression();
 
     private Map<Integer, FutureTask<Map<MechSummary,ITechnology>>> techMap = new HashMap<>();
 

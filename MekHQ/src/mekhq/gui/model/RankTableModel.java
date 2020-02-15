@@ -14,21 +14,21 @@ import mekhq.gui.utilities.MekHqTableCellRenderer;
 public class RankTableModel extends DefaultTableModel {
     private static final long serialVersionUID = 534443424190075264L;
 
-    public final static int COL_NAME_RATE	= 0;
-    public final static int COL_NAME_MW		= 1;
-    public final static int COL_NAME_ASF	= 2;
-    public final static int COL_NAME_VEE	= 3;
-    public final static int COL_NAME_NAVAL	= 4;
-    public final static int COL_NAME_INF	= 5;
-    public final static int COL_NAME_TECH	= 6;
-    public final static int COL_OFFICER		= 7;
-    public final static int COL_PAYMULT		= 8;
-    public final static int COL_NUM			= 9;
+    public static final int COL_NAME_RATE	= 0;
+    public static final int COL_NAME_MW		= 1;
+    public static final int COL_NAME_ASF	= 2;
+    public static final int COL_NAME_VEE	= 3;
+    public static final int COL_NAME_NAVAL	= 4;
+    public static final int COL_NAME_INF	= 5;
+    public static final int COL_NAME_TECH	= 6;
+    public static final int COL_OFFICER		= 7;
+    public static final int COL_PAYMULT		= 8;
+    public static final int COL_NUM			= 9;
 
     public RankTableModel(Object[][] ranksArray, String[] rankColNames) {
         super(ranksArray, rankColNames);
     }
-    
+
     @Override
     public boolean isCellEditable(int row, int column) {
     	return !(column == COL_NAME_RATE || column == COL_OFFICER);
@@ -53,7 +53,7 @@ public class RankTableModel extends DefaultTableModel {
     			return getValueAt(0, c).getClass();
     	}
     }
-    
+
     public int getColumnWidth(int c) {
     	switch (c) {
     		case COL_NAME_RATE:

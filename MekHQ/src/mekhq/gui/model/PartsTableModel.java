@@ -15,17 +15,17 @@ import mekhq.campaign.parts.Part;
 public class PartsTableModel extends DataTableModel {
     private static final long serialVersionUID = 534443424190075264L;
 
-    public final static int COL_QUANTITY   = 0;
-    public final static int COL_NAME    =    1;
-    public final static int COL_DETAIL   =   2;
-    public final static int COL_TECH_BASE  = 3;
-    public final static int COL_QUALITY    = 4;
-    public final static int COL_STATUS   =   5;
-    public final static int COL_REPAIR   =   6;
-    public final static int COL_COST     =   7;
-    public final static int COL_TOTAL_COST = 8;
-    public final static int COL_TON       =  9;
-    public final static int N_COL          = 10;
+    public static final int COL_QUANTITY   = 0;
+    public static final int COL_NAME    =    1;
+    public static final int COL_DETAIL   =   2;
+    public static final int COL_TECH_BASE  = 3;
+    public static final int COL_QUALITY    = 4;
+    public static final int COL_STATUS   =   5;
+    public static final int COL_REPAIR   =   6;
+    public static final int COL_COST     =   7;
+    public static final int COL_TOTAL_COST = 8;
+    public static final int COL_TON       =  9;
+    public static final int N_COL          = 10;
 
     public PartsTableModel() {
         data = new ArrayList<Part>();

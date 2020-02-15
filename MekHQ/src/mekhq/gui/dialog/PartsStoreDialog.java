@@ -563,16 +563,16 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         protected String[] columnNames;
         protected ArrayList<PartProxy> data;
 
-        public final static int COL_NAME    =    0;
-        public final static int COL_DETAIL   =   1;
-        public final static int COL_TECH_BASE  = 2;
-        public final static int COL_COST     =   3;
-        public final static int COL_TON       =  4;
-        public final static int COL_TARGET    =  5;
-        public final static int COL_SUPPLY    =  6;
-        public final static int COL_TRANSIT   =  7;
-        public final static int COL_QUEUE     =  8;
-        public final static int N_COL          = 9;
+        public static final int COL_NAME    =    0;
+        public static final int COL_DETAIL   =   1;
+        public static final int COL_TECH_BASE  = 2;
+        public static final int COL_COST     =   3;
+        public static final int COL_TON       =  4;
+        public static final int COL_TARGET    =  5;
+        public static final int COL_SUPPLY    =  6;
+        public static final int COL_TRANSIT   =  7;
+        public static final int COL_QUEUE     =  8;
+        public static final int N_COL          = 9;
 
         /**
          * Provides a lazy view to a {@link TargetRoll} for use in a UI (e.g. sorting in a table).
@@ -672,7 +672,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
             private T value;
             private String formatted;
 
-            /** 
+            /**
              * Creates a wrapper around a value and a
              * formatted string representing the value.
              */

@@ -33,10 +33,10 @@ public class KillTableModel extends AbstractTableModel {
 
     protected java.util.List<Kill> data;
 
-    public final static int COL_DATE    = 0;
-    public final static int COL_KILLED  = 1;
-    public final static int COL_KILLER  = 2;
-    public final static int N_COL       = 3;
+    public static final int COL_DATE    = 0;
+    public static final int COL_KILLED  = 1;
+    public static final int COL_KILLER  = 2;
+    public static final int N_COL       = 3;
 
     public KillTableModel(java.util.List<Kill> entries) {
         assert entries != null;

@@ -18,13 +18,13 @@ public class ProcurementTableModel extends DataTableModel {
 
     Campaign campaign;
 
-    public final static int COL_NAME    =    0;
-    public final static int COL_COST     =   1;
-    public final static int COL_TOTAL_COST = 2;
-    public final static int COL_TARGET    =  3;
-    public final static int COL_NEXT      =  4;
-    public final static int COL_QUEUE     =  5;
-    public final static int N_COL          = 6;
+    public static final int COL_NAME    =    0;
+    public static final int COL_COST     =   1;
+    public static final int COL_TOTAL_COST = 2;
+    public static final int COL_TARGET    =  3;
+    public static final int COL_NEXT      =  4;
+    public static final int COL_QUEUE     =  5;
+    public static final int N_COL          = 6;
 
     public ProcurementTableModel(Campaign c) {
         data = c.getShoppingList().getPartList();

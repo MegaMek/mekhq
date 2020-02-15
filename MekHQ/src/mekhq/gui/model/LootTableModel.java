@@ -41,11 +41,11 @@ public class LootTableModel extends AbstractTableModel {
     protected String[] columnNames;
     protected ArrayList<Loot> data;
 
-    public final static int COL_NAME    = 0;
-    public final static int COL_MONEY   = 1;
-    public final static int COL_MECHS   = 2;
-    public final static int COL_PARTS   = 3;
-    public final static int N_COL       = 4;
+    public static final int COL_NAME    = 0;
+    public static final int COL_MONEY   = 1;
+    public static final int COL_MECHS   = 2;
+    public static final int COL_PARTS   = 3;
+    public static final int N_COL       = 4;
 
     public LootTableModel(ArrayList<Loot> entries) {
         data = entries;

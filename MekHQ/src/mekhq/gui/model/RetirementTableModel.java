@@ -36,20 +36,20 @@ public class RetirementTableModel extends AbstractTableModel {
      */
     private static final long serialVersionUID = 7461821036790309952L;
 
-    public final static int COL_PERSON = 0;
-    public final static int COL_ASSIGN = 1;
-    public final static int COL_FORCE = 2;
-    public final static int COL_TARGET = 3;
-    public final static int COL_SHARES = 4;
-    public final static int COL_BONUS_COST = 5;
-    public final static int COL_PAY_BONUS = 6;
-    public final static int COL_MISC_MOD = 7;
-    public final static int COL_PAYOUT = 8;
-    public final static int COL_RECRUIT = 9;
-    public final static int COL_UNIT = 10;
-    public final static int N_COL = 11;
+    public static final int COL_PERSON = 0;
+    public static final int COL_ASSIGN = 1;
+    public static final int COL_FORCE = 2;
+    public static final int COL_TARGET = 3;
+    public static final int COL_SHARES = 4;
+    public static final int COL_BONUS_COST = 5;
+    public static final int COL_PAY_BONUS = 6;
+    public static final int COL_MISC_MOD = 7;
+    public static final int COL_PAYOUT = 8;
+    public static final int COL_RECRUIT = 9;
+    public static final int COL_UNIT = 10;
+    public static final int N_COL = 11;
 
-    private final static String[] colNames = {
+    private static final String[] colNames = {
         "Person", "Assignment", "Force", "Target",
         "Shares", "Bonus Cost", "Pay Bonus", "Misc Modifier",
         "Payout", "Recruit", "Unit"
@@ -486,7 +486,7 @@ public class RetirementTableModel extends AbstractTableModel {
                     c.setBackground(Color.LIGHT_GRAY);
                 }
             }
-            
+
             return c;
         }
     }

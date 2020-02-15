@@ -68,8 +68,8 @@ public class NewPlanetaryEventDialog extends JDialog {
     private static final String FIELD_POPULATION = "population"; //$NON-NLS-1$
     private static final String FIELD_GOVERNMENT = "government"; //$NON-NLS-1$
 
-    private final static DateTimeFormatter DATE_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd"); //$NON-NLS-1$
-    private final static SocioIndustrialDataAdapter SOCIO_INDUSTRIAL_ADAPTER = new SocioIndustrialDataAdapter();
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd"); //$NON-NLS-1$
+    private static final SocioIndustrialDataAdapter SOCIO_INDUSTRIAL_ADAPTER = new SocioIndustrialDataAdapter();
 
     ResourceBundle resourceMap;
 

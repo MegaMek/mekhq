@@ -66,11 +66,11 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
     private UnitTableModel unitModel;
     private ResourceBundle resourceMap;
 
-    public final static String COMMAND_MOTHBALL = "MOTHBALL";
-    public final static String COMMAND_ACTIVATE = "ACTIVATE";
-    public final static String COMMAND_CANCEL_MOTHBALL = "CANCEL_MOTHBALL";
-    public final static String COMMAND_GM_MOTHBALL = "GM_MOTHBALL";
-    public final static String COMMAND_GM_ACTIVATE = "GM_ACTIVATE";
+    public static final String COMMAND_MOTHBALL = "MOTHBALL";
+    public static final String COMMAND_ACTIVATE = "ACTIVATE";
+    public static final String COMMAND_CANCEL_MOTHBALL = "CANCEL_MOTHBALL";
+    public static final String COMMAND_GM_MOTHBALL = "GM_MOTHBALL";
+    public static final String COMMAND_GM_ACTIVATE = "GM_ACTIVATE";
 
     public UnitTableMouseAdapter(CampaignGUI gui, JTable unitTable,
             UnitTableModel unitModel) {

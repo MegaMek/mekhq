@@ -58,18 +58,18 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
      */
     private static final long serialVersionUID   = 4606932545119410453L;
 
-    public final static int   OH_NONE            = 0;
-    public final static int   OH_HALF            = 1;
-    public final static int   OH_FULL            = 2;
-    public final static int   OH_NUM             = 3;
+    public static final int   OH_NONE            = 0;
+    public static final int   OH_HALF            = 1;
+    public static final int   OH_FULL            = 2;
+    public static final int   OH_NUM             = 3;
 
-    public final static int   COM_INTEGRATED     = 0;
-    public final static int   COM_HOUSE          = 1;
-    public final static int   COM_LIAISON        = 2;
-    public final static int   COM_INDEP          = 3;
-    public final static int   COM_NUM            = 4;
+    public static final int   COM_INTEGRATED     = 0;
+    public static final int   COM_HOUSE          = 1;
+    public static final int   COM_LIAISON        = 2;
+    public static final int   COM_INDEP          = 3;
+    public static final int   COM_NUM            = 4;
 
-    public final static int   MRBC_FEE_PERCENTAGE = 5;
+    public static final int   MRBC_FEE_PERCENTAGE = 5;
 
     private Date startDate;
     private Date endDate;
@@ -94,7 +94,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
     // runs through initial calculations, as the same jump path is referenced multiple times
     // and calculating it each time is expensive. No need to preserve it in save date.
     private JumpPath cachedJumpPath;
-    
+
     // need to keep track of total value salvaged for salvage rights
     private Money salvagedByUnit = Money.zero();
     private Money salvagedByEmployer = Money.zero();
@@ -397,13 +397,13 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         super.setSystemId(n);
         cachedJumpPath = null;
     }
-    
+
     /**
      * Gets the currently calculated jump path for this contract,
      * only recalculating if it's not valid any longer or hasn't been calculated yet.
      */
     public JumpPath getJumpPath(Campaign c) {
-        // if we don't have a cached jump path, or if the jump path's starting/ending point 
+        // if we don't have a cached jump path, or if the jump path's starting/ending point
         // no longer match the campaign's current location or contract's destination
         if((cachedJumpPath == null) ||
                 (cachedJumpPath.size() == 0) ||
@@ -411,14 +411,14 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
                 !cachedJumpPath.getLastSystem().getId().equals(getSystem().getId())) {
             cachedJumpPath = c.calculateJumpPath(c.getCurrentSystem(), getSystem());
         }
-        
+
         return cachedJumpPath;
     }
-    
+
     public void setJumpPath(JumpPath path) {
         cachedJumpPath = path;
     }
-    
+
     public Money getMonthlyPayOut() {
         if (getLength() <= 0) {
             return Money.zero();

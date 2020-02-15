@@ -1,20 +1,20 @@
 /*
  * ManageAssetsDialog.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -62,14 +62,14 @@ public class ManageAssetsDialog extends JDialog {
     private Frame frame;
     private Campaign campaign;
     private AssetTableModel assetModel;
-    
+
     private JButton btnAdd;
     private JButton btnEdit;
     private JButton btnDelete;
     private JButton btnOK;
     private JTable assetTable;
     private JScrollPane scrollAssetTable;
-    
+
     /** Creates new form EditPersonnelLogDialog */
     public ManageAssetsDialog(Frame parent, Campaign c) {
         super(parent, true);
@@ -90,7 +90,7 @@ public class ManageAssetsDialog extends JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(resourceMap.getString("dialogTitle.text"));
         getContentPane().setLayout(new java.awt.BorderLayout());
-        
+
         JPanel panBtns = new JPanel(new GridLayout(1,0));
         btnAdd.setText(resourceMap.getString("btnAddAsset.text")); // NOI18N
         btnAdd.addActionListener(evt -> addAsset());
@@ -104,7 +104,7 @@ public class ManageAssetsDialog extends JDialog {
         btnDelete.addActionListener(evt -> deleteAsset());
         panBtns.add(btnDelete);
         getContentPane().add(panBtns, BorderLayout.PAGE_START);
-        
+
         assetTable = new JTable(assetModel);
         TableColumn column;
         for (int i = 0; i <AssetTableModel.N_COL; i++) {
@@ -138,13 +138,13 @@ public class ManageAssetsDialog extends JDialog {
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {
         this.setVisible(false);
     }
-    
+
     private void assetTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
         int row = assetTable.getSelectedRow();
         btnDelete.setEnabled(row != -1);
         btnEdit.setEnabled(row != -1);
     }
-    
+
     private void addAsset() {
         Asset a = new Asset();
         EditAssetDialog ead = new EditAssetDialog(frame, a);
@@ -158,7 +158,7 @@ public class ManageAssetsDialog extends JDialog {
 
         ead.dispose();
     }
-    
+
     private void editAsset() {
         // TODO: fix this to use a cloned asset and the user has to confirm edits with OK
         Asset a = assetModel.getAssetAt(assetTable.getSelectedRow());
@@ -170,13 +170,13 @@ public class ManageAssetsDialog extends JDialog {
             refreshTable();
         }
     }
-    
+
     private void deleteAsset() {
         campaign.getFinances().getAllAssets().remove(assetTable.getSelectedRow());
         MekHQ.triggerEvent(new AssetRemovedEvent(assetModel.getAssetAt(assetTable.getSelectedRow())));
         refreshTable();
     }
-    
+
     private void refreshTable() {
         int selectedRow = assetTable.getSelectedRow();
         assetModel.setData(campaign.getFinances().getAllAssets());
@@ -190,23 +190,23 @@ public class ManageAssetsDialog extends JDialog {
             }
         }
     }
-    
+
     /**
      * A table model for displaying parts - similar to the one in CampaignGUI, but not exactly
      */
     public class AssetTableModel extends DataTableModel {
         private static final long serialVersionUID = 534443424190075264L;
 
-        public final static int COL_NAME    =    0;
-        public final static int COL_VALUE    =   1;
-        public final static int COL_SCHEDULE =   2;
-        public final static int COL_INCOME   =   3;
-        public final static int N_COL          = 4;
-        
+        public static final int COL_NAME    =    0;
+        public static final int COL_VALUE    =   1;
+        public static final int COL_SCHEDULE =   2;
+        public static final int COL_INCOME   =   3;
+        public static final int N_COL          = 4;
+
         public AssetTableModel(ArrayList<Asset> assets) {
             data = assets;
         }
-        
+
         public int getRowCount() {
             return data.size();
         }
@@ -253,7 +253,7 @@ public class ManageAssetsDialog extends JDialog {
             }
             return "?";
         }
-        
+
         @Override
         public boolean isCellEditable(int row, int col) {
             return false;
@@ -262,7 +262,7 @@ public class ManageAssetsDialog extends JDialog {
         public Asset getAssetAt(int row) {
             return (Asset) data.get(row);
         }
-        
+
         public int getColumnWidth(int c) {
             switch(c) {
             default:

@@ -49,7 +49,7 @@ public class AeroSensor extends Part {
      */
     private static final long serialVersionUID = -717866644605314883L;
 
-    final static TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_ALL)
+    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_ALL)
             .setISAdvancement(DATE_ES, DATE_ES, DATE_ES)
             .setTechRating(RATING_C).setAvailability(RATING_C, RATING_C, RATING_C, RATING_C)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);

@@ -19,22 +19,22 @@ import mekhq.campaign.finances.Loan;
 public class LoanTableModel extends DataTableModel {
     private static final long serialVersionUID = 534443424190075264L;
 
-    public final static int COL_DESC      =    0;
-    public final static int COL_RATE       =   1;
-    public final static int COL_PRINCIPAL  =   2;
-    public final static int COL_COLLATERAL =   3;
-    public final static int COL_VALUE        = 4;
-    public final static int COL_PAYMENT     =  5;
-    public final static int COL_SCHEDULE   =   6;
-    public final static int COL_NLEFT      =   7;
-    public final static int COL_NEXT_PAY   =   8;
-    public final static int N_COL            = 9;
+    public static final int COL_DESC      =    0;
+    public static final int COL_RATE       =   1;
+    public static final int COL_PRINCIPAL  =   2;
+    public static final int COL_COLLATERAL =   3;
+    public static final int COL_VALUE        = 4;
+    public static final int COL_PAYMENT     =  5;
+    public static final int COL_SCHEDULE   =   6;
+    public static final int COL_NLEFT      =   7;
+    public static final int COL_NEXT_PAY   =   8;
+    public static final int N_COL            = 9;
 
 
     public LoanTableModel() {
         data = new ArrayList<Loan>();
     }
-    
+
     public int getRowCount() {
         return data.size();
     }
@@ -70,7 +70,7 @@ public class LoanTableModel extends DataTableModel {
     }
 
     public Object getValueAt(int row, int col) {
-        Loan loan = getLoan(row);           
+        Loan loan = getLoan(row);
         if(col == COL_DESC) {
             return loan.getDescription();
         }

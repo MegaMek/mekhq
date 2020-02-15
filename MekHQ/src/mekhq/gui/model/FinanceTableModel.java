@@ -20,13 +20,13 @@ import mekhq.gui.utilities.MekHqTableCellRenderer;
 public class FinanceTableModel extends DataTableModel {
     private static final long serialVersionUID = 534443424190075264L;
 
-    public final static int COL_DATE = 0;
-    public final static int COL_CATEGORY = 1;
-    public final static int COL_DESC = 2;
-    public final static int COL_DEBIT = 3;
-    public final static int COL_CREDIT = 4;
-    public final static int COL_BALANCE = 5;
-    public final static int N_COL = 6;
+    public static final int COL_DATE = 0;
+    public static final int COL_CATEGORY = 1;
+    public static final int COL_DESC = 2;
+    public static final int COL_DEBIT = 3;
+    public static final int COL_CREDIT = 4;
+    public static final int COL_BALANCE = 5;
+    public static final int N_COL = 6;
 
     public FinanceTableModel() {
         data = new ArrayList<Transaction>();

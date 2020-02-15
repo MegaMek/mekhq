@@ -27,12 +27,12 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
      */
     private static final long serialVersionUID = 7740627991191879456L;
 
-    public final static int COL_UNIT = 0;
-    public final static int COL_CLASS = 1;
-    public final static int COL_COST = 2;
-    public final static int N_COL = 3;
+    public static final int COL_UNIT = 0;
+    public static final int COL_CLASS = 1;
+    public static final int COL_COST = 2;
+    public static final int N_COL = 3;
 
-    private final static String[] colNames = {
+    private static final String[] colNames = {
         "Unit", "Class", "Cost"
     };
 

@@ -50,45 +50,45 @@ import mekhq.campaign.rating.UnitRatingMethod;
 public class CampaignOptions implements Serializable {
     private static final long serialVersionUID = 5698008431749303602L;
 
-    public final static int TECH_INTRO = 0;
-    public final static int TECH_STANDARD = 1;
-    public final static int TECH_ADVANCED = 2;
-    public final static int TECH_EXPERIMENTAL = 3;
-    public final static int TECH_UNOFFICIAL = 4;
+    public static final int TECH_INTRO = 0;
+    public static final int TECH_STANDARD = 1;
+    public static final int TECH_ADVANCED = 2;
+    public static final int TECH_EXPERIMENTAL = 3;
+    public static final int TECH_UNOFFICIAL = 4;
     // This must always be the highest tech level in order to hide parts
     // that haven't been invented yet, or that are completely extinct
-    public final static int TECH_UNKNOWN = 5;
+    public static final int TECH_UNKNOWN = 5;
 
-    public final static int TRANSIT_UNIT_DAY = 0;
-    public final static int TRANSIT_UNIT_WEEK = 1;
-    public final static int TRANSIT_UNIT_MONTH = 2;
-    public final static int TRANSIT_UNIT_NUM = 3;
+    public static final int TRANSIT_UNIT_DAY = 0;
+    public static final int TRANSIT_UNIT_WEEK = 1;
+    public static final int TRANSIT_UNIT_MONTH = 2;
+    public static final int TRANSIT_UNIT_NUM = 3;
 
 
-    public final static String S_TECH = "Tech";
-    public final static String S_AUTO = "Automatic Success";
+    public static final String S_TECH = "Tech";
+    public static final String S_AUTO = "Automatic Success";
 
-    public final static int PRISONER_RANK = 0;
-    public final static int BONDSMAN_RANK = 1;
+    public static final int PRISONER_RANK = 0;
+    public static final int BONDSMAN_RANK = 1;
 
-    public final static int REPAIR_SYSTEM_STRATOPS = 0;
-    public final static int REPAIR_SYSTEM_WARCHEST_CUSTOM = 1;
-    public final static int REPAIR_SYSTEM_GENERIC_PARTS = 2;
+    public static final int REPAIR_SYSTEM_STRATOPS = 0;
+    public static final int REPAIR_SYSTEM_WARCHEST_CUSTOM = 1;
+    public static final int REPAIR_SYSTEM_GENERIC_PARTS = 2;
 
-    public final static int MAXIMUM_D6_VALUE = 6;
+    public static final int MAXIMUM_D6_VALUE = 6;
 
     //FIXME: This needs to be localized
-    public final static String[] REPAIR_SYSTEM_NAMES = {"Strat Ops", "Warchest Custom", "Generic Spare Parts"};
+    public static final String[] REPAIR_SYSTEM_NAMES = {"Strat Ops", "Warchest Custom", "Generic Spare Parts"};
 
-    public final static double MAXIMUM_COMBAT_EQUIPMENT_PERCENT = 5.0;
-    public final static double MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT = 1.0;
-    public final static double MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT = 1.0;
-    public final static double MAXIMUM_WARSHIP_EQUIPMENT_PERCENT = 1.0;
+    public static final double MAXIMUM_COMBAT_EQUIPMENT_PERCENT = 5.0;
+    public static final double MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT = 1.0;
+    public static final double MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT = 1.0;
+    public static final double MAXIMUM_WARSHIP_EQUIPMENT_PERCENT = 1.0;
 
-    public final static int PLANET_ACQUISITION_ALL = 0;
-    public final static int PLANET_ACQUISITION_NEUTRAL = 1;
-    public final static int PLANET_ACQUISITION_ALLY = 2;
-    public final static int PLANET_ACQUISITION_SELF = 3;
+    public static final int PLANET_ACQUISITION_ALL = 0;
+    public static final int PLANET_ACQUISITION_NEUTRAL = 1;
+    public static final int PLANET_ACQUISITION_ALLY = 2;
+    public static final int PLANET_ACQUISITION_SELF = 3;
 
 
     private boolean useFactionForNames;

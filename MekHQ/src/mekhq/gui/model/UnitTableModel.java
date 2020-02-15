@@ -33,33 +33,33 @@ public class UnitTableModel extends DataTableModel {
     private static final long serialVersionUID = -5207167419079014157L;
 
     private Campaign campaign;
-    
-    public final static int COL_NAME    =    0;
-    public final static int COL_TYPE    =    1;
-    public final static int COL_WCLASS    =  2;
-    public final static int COL_TECH     =   3;
-    public final static int COL_WEIGHT =     4;
-    public final static int COL_COST    =    5;
-    public final static int COL_STATUS   =   6;
-    public final static int COL_QUALITY  =   7;
-    public final static int COL_PILOT    =   8;
-    public final static int COL_FORCE    =   9;
-    public final static int COL_CREW     =   10;
-    public final static int COL_TECH_CRW =   11;
-    public final static int COL_MAINTAIN  =  12;
-    public final static int COL_BV        =  13;
-    public final static int COL_REPAIR  =    14;
-    public final static int COL_PARTS    =   15;
-    public final static int COL_SITE     =   16;
-    public final static int COL_QUIRKS   =   17;
-    public final static int COL_RSTATUS   =  18;
-    public final static int N_COL =          19;
+
+    public static final int COL_NAME    =    0;
+    public static final int COL_TYPE    =    1;
+    public static final int COL_WCLASS    =  2;
+    public static final int COL_TECH     =   3;
+    public static final int COL_WEIGHT =     4;
+    public static final int COL_COST    =    5;
+    public static final int COL_STATUS   =   6;
+    public static final int COL_QUALITY  =   7;
+    public static final int COL_PILOT    =   8;
+    public static final int COL_FORCE    =   9;
+    public static final int COL_CREW     =   10;
+    public static final int COL_TECH_CRW =   11;
+    public static final int COL_MAINTAIN  =  12;
+    public static final int COL_BV        =  13;
+    public static final int COL_REPAIR  =    14;
+    public static final int COL_PARTS    =   15;
+    public static final int COL_SITE     =   16;
+    public static final int COL_QUIRKS   =   17;
+    public static final int COL_RSTATUS   =  18;
+    public static final int N_COL =          19;
 
     public UnitTableModel(Campaign c) {
         data = new ArrayList<Unit>();
         campaign = c;
     }
-    
+
     public int getRowCount() {
         return data.size();
     }
@@ -275,11 +275,11 @@ public class UnitTableModel extends DataTableModel {
         }
         return "?";
     }
-    
+
     public Campaign getCampaign() {
         return campaign;
     }
-    
+
     public void refreshData() {
         setData(getCampaign().getCopyOfUnits());
     }
@@ -325,11 +325,11 @@ public class UnitTableModel extends DataTableModel {
                 else if ((null != u)
                         && (u.isMothballing())) {
                     setBackground(new Color(153,153,255));
-                } 
+                }
                 else if ((null != u)
                         && (u.isMothballed())) {
                     setBackground(new Color(204, 204, 255));
-                } 
+                }
                 else if (null != u && !u.isRepairable()) {
                     setBackground(new Color(190, 150, 55));
                 } else if ((null != u) && !u.isFunctional()) {

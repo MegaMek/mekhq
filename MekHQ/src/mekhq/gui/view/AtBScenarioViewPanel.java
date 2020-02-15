@@ -122,12 +122,12 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
 
     private JTextArea txtDetails = new JTextArea();
 
-    private final static int REROLL_TERRAIN = 0;
-    private final static int REROLL_MAP = 1;
-    private final static int REROLL_MAPSIZE = 2;
-    private final static int REROLL_LIGHT = 3;
-    private final static int REROLL_WEATHER = 4;
-    private final static int REROLL_NUM = 5;
+    private static final int REROLL_TERRAIN = 0;
+    private static final int REROLL_MAP = 1;
+    private static final int REROLL_MAPSIZE = 2;
+    private static final int REROLL_LIGHT = 3;
+    private static final int REROLL_WEATHER = 4;
+    private static final int REROLL_NUM = 5;
     private JCheckBox[] chkReroll = new JCheckBox[REROLL_NUM];
     JButton btnReroll;
 
@@ -320,7 +320,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
             if (null != scenario.getLance(campaign)) {
                 lblForceDesc.setText(campaign.getForce(scenario.getLanceForceId()).getFullName());
             } else if(scenario instanceof AtBDynamicScenario){
-            
+
                 StringBuilder forceBuilder = new StringBuilder();
                 forceBuilder.append("<html>");
                 boolean chop = false;
@@ -335,14 +335,14 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
                     }
                     chop = true;
                 }
-                
+
                 if(chop) {
                     forceBuilder.delete(forceBuilder.length() - 5, forceBuilder.length());
                 }
                 forceBuilder.append("</html>");
                 lblForceDesc.setText(forceBuilder.toString());
             }
-            
+
             gridBagConstraints.gridx = 2;
             gridBagConstraints.gridy = y++;
             gridBagConstraints.gridwidth = 1;
@@ -363,7 +363,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
             gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 1;
             panStats.add(lblPlayerStart, gridBagConstraints);
-    
+
             lblPlayerStartPos.setText(IStartingPositions.START_LOCATION_NAMES[scenario.getStart()]);
             gridBagConstraints.gridx = 2;
             gridBagConstraints.gridy = y++;
@@ -386,7 +386,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
                 }
             });
         }
-        
+
         txtDesc.setName("txtDesc");
         txtDesc.setText(scenario.getDescription());
         txtDesc.setEditable(false);
@@ -401,25 +401,25 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panStats.add(txtDesc, gridBagConstraints);
-        
+
         StringBuilder objectiveBuilder = new StringBuilder();
         objectiveBuilder.append(scenario.getDeploymentInstructions());
-        
+
         for(ScenarioObjective objective : scenario.getScenarioObjectives()) {
             objectiveBuilder.append(objective.getDescription());
             objectiveBuilder.append("\n");
-            
+
             for(String forceName : objective.getAssociatedForceNames()) {
                 objectiveBuilder.append("\t");
                 objectiveBuilder.append(forceName);
                 objectiveBuilder.append("\n");
             }
-            
+
             for(String associatedUnitID : objective.getAssociatedUnitIDs()) {
                 String associatedUnitName = "";
                 UUID uid = UUID.fromString(associatedUnitID);
-                
-                // "logic": try to get a hold of the unit with the given UUID, 
+
+                // "logic": try to get a hold of the unit with the given UUID,
                 // either from the list of bot units or from the list of player units
                 if(scenario.getExternalIDLookup().containsKey(associatedUnitID)) {
                     associatedUnitName = scenario.getExternalIDLookup().get(associatedUnitID).getShortName();
@@ -434,27 +434,27 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
                 objectiveBuilder.append(associatedUnitName);
                 objectiveBuilder.append("\n");
             }
-            
+
             for(String detail : objective.getDetails()) {
                 objectiveBuilder.append("\t");
                 objectiveBuilder.append(detail);
                 objectiveBuilder.append("\n");
             }
-            
+
             objectiveBuilder.append("\t");
             objectiveBuilder.append(objective.getTimeLimitString());
             objectiveBuilder.append("\n");
-            
+
             objectiveBuilder.append("\n");
         }
-        
+
         objectiveBuilder.append(((AtBScenario) scenario).getBattlefieldControlDescription());
-        
+
         txtDetails.setText(objectiveBuilder.toString());
         txtDetails.setLineWrap(true);
         txtDetails.setWrapStyleWord(true);
         txtDetails.setEditable(false);
-        
+
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y++;
         gridBagConstraints.gridwidth = 3;
@@ -658,10 +658,10 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
         panStats.add(lblAtmosphereDesc, gridBagConstraints);
         lblAtmosphere.setVisible(scenario.getAtmosphere() != PlanetaryConditions.ATMO_STANDARD);
         lblAtmosphereDesc.setVisible(scenario.getAtmosphere() != PlanetaryConditions.ATMO_STANDARD);
-        
+
         return y;
     }
-    
+
     /**
      * Worker function that generates UI elements appropriate for space scenarios
      * @param gridBagConstraints Current grid bag constraints in use
@@ -680,7 +680,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblTerrainDesc, gridBagConstraints);
-        
+
         lblMapSize.setText(resourceMap.getString("lblMapSize.text"));
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
@@ -701,10 +701,10 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblMapSizeDesc, gridBagConstraints);
-        
+
         return y;
     }
-    
+
     /**
      * Worker function that generates UI elements appropriate for low atmosphere scenarios
      * @param gridBagConstraints Current grid bag constraints in use
@@ -723,7 +723,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblTerrainDesc, gridBagConstraints);
-        
+
         lblMapSize.setText(resourceMap.getString("lblMapSize.text"));
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
@@ -744,10 +744,10 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblMapSizeDesc, gridBagConstraints);
-        
+
         return y;
     }
-    
+
     private ItemListener checkBoxListener = new ItemListener() {
         @Override
         public void itemStateChanged(ItemEvent e) {
@@ -766,7 +766,7 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
          * If the number falls below that, all are re-enabled.
          */
         for (int i = 0; i < REROLL_NUM; i++) {
-            if(chkReroll[i] != null) {            
+            if(chkReroll[i] != null) {
                 chkReroll[i].setEnabled(checkedBoxes < scenario.getRerollsRemaining() ||
                         chkReroll[i].isSelected());
             }

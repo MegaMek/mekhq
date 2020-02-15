@@ -68,17 +68,17 @@ import mekhq.preferences.PreferencesNode;
 public class ResolveScenarioWizardDialog extends JDialog {
     private static final long serialVersionUID = -8038099101234445018L;
 
-    final static String UNITSPANEL   = "Unit Status";
-    final static String PILOTPANEL   = "Pilot Status";
-    final static String SALVAGEPANEL = "Claim Salvage";
-    final static String PRISONERPANEL= "Captured Personnel Status";
-    final static String KILLPANEL    = "Assign Kills";
-    final static String REWARDPANEL  = "Collect Rewards";
-    final static String PREVIEWPANEL = "Preview";
+    static final String UNITSPANEL   = "Unit Status";
+    static final String PILOTPANEL   = "Pilot Status";
+    static final String SALVAGEPANEL = "Claim Salvage";
+    static final String PRISONERPANEL= "Captured Personnel Status";
+    static final String KILLPANEL    = "Assign Kills";
+    static final String REWARDPANEL  = "Collect Rewards";
+    static final String PREVIEWPANEL = "Preview";
     /* Used by AtB to determine minor contract breaches and bonus rolls */
-    final static String OBJECTIVEPANEL    = "Objective Status";
+    static final String OBJECTIVEPANEL    = "Objective Status";
 
-    final static String[] panelOrder = {UNITSPANEL,PILOTPANEL,SALVAGEPANEL,PRISONERPANEL,KILLPANEL,REWARDPANEL,OBJECTIVEPANEL,PREVIEWPANEL};
+    static final String[] panelOrder = {UNITSPANEL,PILOTPANEL,SALVAGEPANEL,PRISONERPANEL,KILLPANEL,REWARDPANEL,OBJECTIVEPANEL,PREVIEWPANEL};
 
     private JFrame frame;
 

@@ -36,9 +36,9 @@ public class LogTableModel extends AbstractTableModel {
 
     protected java.util.List<LogEntry> data;
 
-    public final static int COL_DATE    =    0;
-    public final static int COL_DESC     =   1;
-    public final static int N_COL          = 2;
+    public static final int COL_DATE    =    0;
+    public static final int COL_DESC     =   1;
+    public static final int N_COL          = 2;
 
     public LogTableModel(java.util.List<LogEntry> entries) {
         assert entries != null;

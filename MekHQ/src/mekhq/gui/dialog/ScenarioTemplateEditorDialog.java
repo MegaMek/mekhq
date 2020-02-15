@@ -95,11 +95,11 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
     private final Dimension spinnerSize = new Dimension(55, 25);
 
-    private final static String ADD_FORCE_COMMAND = "ADDFORCE";
-    private final static String REMOVE_FORCE_COMMAND = "REMOVE_FORCE_";
-    private final static String EDIT_FORCE_COMMAND = "EDIT_FORCE_";
-    private final static String SAVE_TEMPLATE_COMMAND = "SAVE_TEMPLATE";
-    private final static String LOAD_TEMPLATE_COMMAND = "LOAD_TEMPLATE";
+    private static final String ADD_FORCE_COMMAND = "ADDFORCE";
+    private static final String REMOVE_FORCE_COMMAND = "REMOVE_FORCE_";
+    private static final String EDIT_FORCE_COMMAND = "EDIT_FORCE_";
+    private static final String SAVE_TEMPLATE_COMMAND = "SAVE_TEMPLATE";
+    private static final String LOAD_TEMPLATE_COMMAND = "LOAD_TEMPLATE";
 
     // controls which need to be accessible across the lifetime of this dialog
     JComboBox<String> cboAlignment;
@@ -1135,8 +1135,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
                 panForceList.add(lblWeightClass, gbc);
             }
 
-            JLabel lblArrivalTurn = new JLabel(sft.getArrivalTurn() < 0 
-                    ? ScenarioForceTemplate.SPECIAL_ARRIVAL_TURNS.get(sft.getArrivalTurn()) 
+            JLabel lblArrivalTurn = new JLabel(sft.getArrivalTurn() < 0
+                    ? ScenarioForceTemplate.SPECIAL_ARRIVAL_TURNS.get(sft.getArrivalTurn())
                     : Integer.toString(sft.getArrivalTurn()));
             gbc.gridx++;
             panForceList.add(lblArrivalTurn, gbc);

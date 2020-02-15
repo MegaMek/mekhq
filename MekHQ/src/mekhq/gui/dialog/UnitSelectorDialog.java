@@ -614,13 +614,13 @@ public class UnitSelectorDialog extends JDialog {
      */
     public class MechTableModel extends AbstractTableModel {
         private static final long serialVersionUID = 8472587304279640434L;
-        private final static int COL_MODEL = 0;
-        private final static int COL_CHASSIS = 1;
-        private final static int COL_WEIGHT = 2;
-        private final static int COL_BV = 3;
-        private final static int COL_YEAR = 4;
-        private final static int COL_COST = 5;
-        private final static int N_COL = 6;
+        private static final int COL_MODEL = 0;
+        private static final int COL_CHASSIS = 1;
+        private static final int COL_WEIGHT = 2;
+        private static final int COL_BV = 3;
+        private static final int COL_YEAR = 4;
+        private static final int COL_COST = 5;
+        private static final int N_COL = 6;
 
         private MechSummary[] data = new MechSummary[0];
 

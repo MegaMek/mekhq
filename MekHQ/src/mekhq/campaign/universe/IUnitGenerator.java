@@ -41,21 +41,21 @@ public interface IUnitGenerator {
     /*
      * For convenience in generating traditional ground + vtol units.
      */
-    final static EnumSet<EntityMovementMode> MIXED_TANK_VTOL = EnumSet.of(EntityMovementMode.TRACKED,
+    static final EnumSet<EntityMovementMode> MIXED_TANK_VTOL = EnumSet.of(EntityMovementMode.TRACKED,
             EntityMovementMode.WHEELED, EntityMovementMode.HOVER, EntityMovementMode.WIGE,
             EntityMovementMode.VTOL);
 
     /**
      * For convenience in generating infantry units.
      */
-    final static EnumSet<EntityMovementMode> ALL_INFANTRY_MODES = EnumSet.of(EntityMovementMode.INF_JUMP,
+    static final EnumSet<EntityMovementMode> ALL_INFANTRY_MODES = EnumSet.of(EntityMovementMode.INF_JUMP,
             EntityMovementMode.INF_LEG, EntityMovementMode.INF_MOTORIZED, EntityMovementMode.INF_UMU,
             EntityMovementMode.TRACKED, EntityMovementMode.WHEELED, EntityMovementMode.HOVER);
 
     /**
      * For convenience in generating infantry units, the maximum tonnage of a foot infantry platoon.
      */
-    final static double FOOT_PLATOON_INFANTRY_WEIGHT = 3.0;
+    static final double FOOT_PLATOON_INFANTRY_WEIGHT = 3.0;
 
     /**
      * Convenience function to let us know whether a unit type supports weight class selection.
