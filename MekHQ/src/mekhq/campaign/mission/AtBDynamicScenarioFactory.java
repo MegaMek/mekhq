@@ -30,6 +30,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.apache.xalan.xsltc.compiler.Pattern;
 import org.joda.time.DateTime;
 
 import megamek.client.Client;
@@ -367,7 +368,8 @@ public class AtBDynamicScenarioFactory {
                 // in artillery unit weight classes, so we ignore that specification
                 if(!forceTemplate.getUseArtillery()) {
                     String unitWeights = generateUnitWeights(unitTypes, factionCode,
-                            AtBConfiguration.decodeWeightStr(currentLanceWeightString, 0), forceTemplate.getMaxWeightClass(), campaign);
+                            AtBConfiguration.decodeWeightStr(currentLanceWeightString, 0), 
+                            forceTemplate.getMaxWeightClass(), forceTemplate.getMinWeightClass(), campaign);
 
                     generatedLance = generateLance(factionCode, skill,
                             quality, unitTypes, unitWeights, false, campaign);
@@ -1220,7 +1222,26 @@ public class AtBDynamicScenarioFactory {
             //Probe, Recon Raid (attacker)
             retVal = weights.replaceAll("A", "MM");
             retVal = retVal.replaceAll("H", "LM");
+        } else if (maxWeight == EntityWeightClass.WEIGHT_LIGHT) {
+            retVal = weights.replaceAll(".", "L");
         }
+        return retVal;
+    }
+    
+    /**
+     * Adjust a weight string for a minimum weight value
+     */
+    private static String adjustForMinWeight(String weights, int minWeight) {
+        String retVal = weights;
+        
+        if(minWeight == EntityWeightClass.WEIGHT_MEDIUM) {
+            retVal = weights.replaceAll("L", "M");
+        } else if(minWeight == EntityWeightClass.WEIGHT_HEAVY) {
+            retVal = weights.replaceAll("[LM]", "H");
+        } else if(minWeight == EntityWeightClass.WEIGHT_ASSAULT) {
+            retVal = weights.replaceAll("[LMH]", "A");
+        }
+        
         return retVal;
     }
 
@@ -1320,7 +1341,7 @@ public class AtBDynamicScenarioFactory {
      * @param campaign Current campaign
      * @return Unit weight string.
      */
-    private static String generateUnitWeights(List<Integer> unitTypes, String faction, int weightClass, int maxWeight, Campaign campaign) {
+    private static String generateUnitWeights(List<Integer> unitTypes, String faction, int weightClass, int maxWeight, int minWeight, Campaign campaign) {
         Faction genFaction = Faction.getFaction(faction);
         String factionWeightString = AtBConfiguration.ORG_IS;
         if(genFaction.isClan() || faction.equals("MH")) {
@@ -1331,6 +1352,7 @@ public class AtBDynamicScenarioFactory {
 
         String weights = adjustForMaxWeight(campaign.getAtBConfig()
                 .selectBotUnitWeights(factionWeightString, weightClass), maxWeight);
+        weights = adjustForMinWeight(weights, minWeight);
 
         weights = adjustWeightsForFaction(weights, faction);
 

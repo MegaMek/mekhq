@@ -75,6 +75,13 @@ public class AtBConfiguration implements Serializable {
     public static final String ORG_IS = "IS";
     public static final String ORG_CLAN = "CLAN";
     public static final String ORG_CS = "CS";
+    
+    public static final char WEIGHT_ULTRA_LIGHT = 'U';
+    public static final char WEIGHT_LIGHT = 'L';
+    public static final char WEIGHT_MEDIUM = 'M';
+    public static final char WEIGHT_HEAVY = 'H';
+    public static final char WEIGHT_ASSAULT = 'A';
+    public static final char WEIGHT_SUPER_HEAVY = 'V';
 
     /* Scenario generation */
     private HashMap<String,ArrayList<WeightedTable<String>>> botForceTables = new HashMap<>();
@@ -284,10 +291,12 @@ public class AtBConfiguration implements Serializable {
      */
     public static int decodeWeightStr(String s, int i) {
         switch (s.charAt(i)) {
-        case 'L': return EntityWeightClass.WEIGHT_LIGHT;
-        case 'M': return EntityWeightClass.WEIGHT_MEDIUM;
-        case 'H': return EntityWeightClass.WEIGHT_HEAVY;
-        case 'A': return EntityWeightClass.WEIGHT_ASSAULT;
+        case WEIGHT_ULTRA_LIGHT : return EntityWeightClass.WEIGHT_ULTRA_LIGHT;
+        case WEIGHT_LIGHT : return EntityWeightClass.WEIGHT_LIGHT;
+        case WEIGHT_MEDIUM : return EntityWeightClass.WEIGHT_MEDIUM;
+        case WEIGHT_HEAVY : return EntityWeightClass.WEIGHT_HEAVY;
+        case WEIGHT_ASSAULT : return EntityWeightClass.WEIGHT_ASSAULT;
+        case WEIGHT_SUPER_HEAVY : return EntityWeightClass.WEIGHT_SUPER_HEAVY;
         }
         return 0;
     }
