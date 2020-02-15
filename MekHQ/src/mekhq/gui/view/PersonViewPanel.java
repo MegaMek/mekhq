@@ -1258,7 +1258,7 @@ public class PersonViewPanel extends ScrollablePanel {
     }
 
     private JPanel fillLog() {
-        ArrayList<LogEntry> logs = person.getPersonnelLog();
+        List<LogEntry> logs = person.getPersonnelLog();
 
         JPanel pnlLog = new JPanel(new GridBagLayout());
 
@@ -1401,7 +1401,7 @@ public class PersonViewPanel extends ScrollablePanel {
         JLabel lblInjury;
         JLabel txtInjury;
         int row = 1;
-        ArrayList<Injury> injuries = person.getInjuries();
+        List<Injury> injuries = person.getInjuries();
         for(Injury injury : injuries) {
             lblInjury = new JLabel(injury.getFluff());
             gridBagConstraints = new GridBagConstraints();

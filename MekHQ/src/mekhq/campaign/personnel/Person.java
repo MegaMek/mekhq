@@ -236,7 +236,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     protected GregorianCalendar birthday;
     protected GregorianCalendar dateOfDeath;
     protected GregorianCalendar recruitment;
-    protected ArrayList<LogEntry> personnelLog;
+    protected List<LogEntry> personnelLog;
     protected List<LogEntry> missionLog;
 
     private Skills skills = new Skills();
@@ -272,7 +272,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //assignments
     private UUID unitId;
     protected UUID doctorId;
-    private ArrayList<UUID> techUnitIds;
+    private List<UUID> techUnitIds;
     //for reverse compatibility v0.1.8 and earlier
     protected int teamId = -1;
 
@@ -319,7 +319,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     protected boolean engineer;
 
     //region Advanced Medical
-    private ArrayList<Injury> injuries = new ArrayList<>();
+    private List<Injury> injuries = new ArrayList<>();
     private Map<BodyLocation, Integer> hitsPerLocation = new EnumMap<>(BodyLocation.class);
     //endregion Advanced Medical
 
@@ -3433,7 +3433,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         techUnitIds.clear();
     }
 
-    public ArrayList<UUID> getTechUnitIDs() {
+    public List<UUID> getTechUnitIDs() {
         return techUnitIds;
     }
 
@@ -3795,7 +3795,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         nTasks = n;
     }
 
-    public ArrayList<LogEntry> getPersonnelLog() {
+    public List<LogEntry> getPersonnelLog() {
         personnelLog.sort(Comparator.comparing(LogEntry::getDate));
         return personnelLog;
     }
@@ -3818,7 +3818,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * All methods below are for the Advanced Medical option **
      */
 
-    public ArrayList<Injury> getInjuries() {
+    public List<Injury> getInjuries() {
         return new ArrayList<>(injuries);
     }
 

@@ -1215,20 +1215,39 @@ public class Campaign implements Serializable, ITechManager {
         return units.get(id);
     }
 
+    /**
+     *
+     * @param p         the person being added
+     * @return          true if the person is hired successfully, otherwise false
+     */
     public boolean recruitPerson(Person p) {
-        return recruitPerson(p, false, true);
+        return recruitPerson(p, false, false,true);
     }
 
-    public boolean recruitPerson(Person p, boolean log) {
-        return recruitPerson(p, false, log);
+    /**
+     *
+     * @param p         the person being added
+     * @param gmAdd     false means that they need to pay to hire this person, true means it is added without paying
+     * @return          true if the person is hired successfully, otherwise false
+     */
+    public boolean recruitPerson(Person p, boolean gmAdd) {
+        return recruitPerson(p, false, gmAdd, true);
     }
 
-    public boolean recruitPerson(Person p, boolean prisoner, boolean log) {
+    /**
+     *
+     * @param p         the person being added
+     * @param prisoner  if the person is a prisoner or not. True means they are a prisoner
+     * @param gmAdd     false means that they need to pay to hire this person, true means it is added without paying
+     * @param log       whether or not to write to logs
+     * @return          true if the person is hired successfully, otherwise false
+     */
+    public boolean recruitPerson(Person p, boolean prisoner, boolean gmAdd, boolean log) {
         if (p == null) {
             return false;
         }
-        // Only pay if option set and this isn't a prisoner or bondsman
-        if (getCampaignOptions().payForRecruitment() && !prisoner) {
+        // Only pay if option set, they weren't GM added, and they aren't a prisoner or bondsman
+        if (getCampaignOptions().payForRecruitment() && !gmAdd && !prisoner) {
             if (!getFinances().debit(p.getSalary().multipliedBy(2), Transaction.C_SALARY,
                     "recruitment of " + p.getFullName(), getCalendar().getTime())) {
                 addReport("<font color='red'><b>Insufficient funds to recruit "
@@ -1237,9 +1256,6 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
         UUID id = UUID.randomUUID();
-        while (null != personnel.get(id)) {
-            id = UUID.randomUUID();
-        }
         p.setId(id);
         personnel.put(id, p);
 
@@ -1279,35 +1295,6 @@ public class Campaign implements Serializable, ITechManager {
         return true;
     }
 
-    /** Adds a person to the campaign unconditionally, without paying for the person. */
-    public void addPerson(Person p) {
-        if (p == null) {
-            return;
-        }
-
-        UUID id = UUID.randomUUID();
-        while (null != personnel.get(id)) {
-            id = UUID.randomUUID();
-        }
-        p.setId(id);
-        personnel.put(id, p);
-
-        //TODO: implement a boolean check based on campaign options
-        addReport(p.getHyperlinkedName() + " has been added to the personnel roster.");
-        if (p.getPrimaryRole() == Person.T_ASTECH) {
-            astechPoolMinutes += 480;
-            astechPoolOvertime += 240;
-        }
-        if (p.getSecondaryRole() == Person.T_ASTECH) {
-            astechPoolMinutes += 240;
-            astechPoolOvertime += 120;
-        }
-        String rankEntry = LogEntryController.generateRankEntryString(p);
-
-        p.setFreeMan();
-        ServiceLogger.joined(p, getDate(), getName(), rankEntry);
-        MekHQ.triggerEvent(new PersonNewEvent(p));
-    }
 
     /**
      * Imports a {@link Person} into a campaign.
@@ -1335,9 +1322,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void addPersonWithoutId(Person p, boolean log) {
-        while((null == p.getId()) || (null != personnel.get(p.getId()))) {
-            p.setId(UUID.randomUUID());
-        }
+        p.setId(UUID.randomUUID());
         addPersonWithoutId(p);
         if (log) {
             addReport(p.getHyperlinkedName() + " has been added to the personnel roster.");
@@ -1369,10 +1354,10 @@ public class Campaign implements Serializable, ITechManager {
 
     /**
      * Provides a filtered list of personnel including only active Persons.
-     * @return ArrayList<Person>
+     * @return List<Person>
      */
-    public ArrayList<Person> getActivePersonnel() {
-        ArrayList<Person> activePersonnel = new ArrayList<>();
+    public List<Person> getActivePersonnel() {
+        List<Person> activePersonnel = new ArrayList<>();
         for (Person p : getPersonnel()) {
             if (p.isActive()) {activePersonnel.add(p);}
         }
@@ -1394,8 +1379,8 @@ public class Campaign implements Serializable, ITechManager {
         return null;
     }
 
-    public ArrayList<Person> getPatients() {
-        ArrayList<Person> patients = new ArrayList<>();
+    public List<Person> getPatients() {
+        List<Person> patients = new ArrayList<>();
         for (Person p : getPersonnel()) {
             if (p.needsFixing()
                     || (getCampaignOptions().useAdvancedMedical() && p.hasInjuries(true) && p.isActive())) {
@@ -6048,10 +6033,9 @@ public class Campaign implements Serializable, ITechManager {
             }
             // If we're assigned as a tech for any unit, remove us from it/them
             if (!person.getTechUnitIDs().isEmpty()) {
-                @SuppressWarnings("unchecked") // Broken assed Java returning Object from clone
-                ArrayList<UUID> techIDs = (ArrayList<UUID>) person.getTechUnitIDs().clone();
-                for (UUID tuuid : techIDs) {
-                    Unit t = getUnit(tuuid);
+                List<UUID> techIds = person.getTechUnitIDs();
+                for (UUID tUUID : techIds) {
+                    Unit t = getUnit(tUUID);
                     t.remove(person, true);
                 }
             }
@@ -6091,11 +6075,9 @@ public class Campaign implements Serializable, ITechManager {
 
     public Vector<IBasicOption> getGameOptionsVector() {
         Vector<IBasicOption> options = new Vector<>();
-        for (Enumeration<IOptionGroup> i = gameOptions.getGroups(); i
-                .hasMoreElements(); ) {
+        for (Enumeration<IOptionGroup> i = gameOptions.getGroups(); i.hasMoreElements(); ) {
             IOptionGroup group = i.nextElement();
-            for (Enumeration<IOption> j = group.getOptions(); j
-                    .hasMoreElements(); ) {
+            for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements(); ) {
                 IOption option = j.nextElement();
                 options.add(option);
             }
@@ -6267,13 +6249,11 @@ public class Campaign implements Serializable, ITechManager {
             if (null == p) {
                 break;
             }
-            if (!isGM) {
-                if (!recruitPerson(p)) {
-                    return;
-                }
-            } else {
-                addPerson(p);
+
+            if (!recruitPerson(p, isGM)) {
+                return;
             }
+
             if (unit.usesSoloPilot() || unit.usesSoldiers()) {
                 unit.addPilotOrSoldier(p);
             } else {
@@ -6291,34 +6271,22 @@ public class Campaign implements Serializable, ITechManager {
             } else if (unit.getEntity() instanceof Mech) {
                 p = newPerson(Person.T_MECHWARRIOR);
             }
-            if (!isGM) {
-                if (!recruitPerson(p)) {
-                    return;
-                }
-            } else {
-                addPerson(p);
+            if (!recruitPerson(p, isGM)) {
+                return;
             }
             unit.addGunner(p);
         }
         while (unit.canTakeMoreVesselCrew()) {
             Person p = newPerson(unit.getEntity().isSupportVehicle() ? Person.T_VEHICLE_CREW : Person.T_SPACE_CREW);
-            if (!isGM) {
-                if (!recruitPerson(p)) {
-                    return;
-                }
-            } else {
-                addPerson(p);
+            if (!recruitPerson(p, isGM)) {
+                return;
             }
             unit.addVesselCrew(p);
         }
         if (unit.canTakeNavigator()) {
             Person p = newPerson(Person.T_NAVIGATOR);
-            if (!isGM) {
-                if (!recruitPerson(p)) {
-                    return;
-                }
-            } else {
-                addPerson(p);
+            if (!recruitPerson(p, isGM)) {
+                return;
             }
             unit.setNavigator(p);
         }
@@ -6330,12 +6298,8 @@ public class Campaign implements Serializable, ITechManager {
             } else {
                 p = newPerson(Person.T_MECHWARRIOR);
             }
-            if (!isGM) {
-                if (!recruitPerson(p)) {
-                    return;
-                }
-            } else {
-                addPerson(p);
+            if (!recruitPerson(p, isGM)) {
+                return;
             }
             unit.setTechOfficer(p);
         }
@@ -7857,21 +7821,17 @@ public class Campaign implements Serializable, ITechManager {
                     && !p.isBondsman() && p.isActive()) {
                 countPersonByType[p.getPrimaryRole()]++;
                 countTotal++;
-                if (getCampaignOptions().useAdvancedMedical()
-                        && p.getInjuries().size() > 0) {
+                if (getCampaignOptions().useAdvancedMedical() && p.getInjuries().size() > 0) {
                     countInjured++;
                 } else if (p.getHits() > 0) {
                     countInjured++;
                 }
                 salary = salary.plus(p.getSalary());
-            } else if (Person.isCombatRole(p.getPrimaryRole())
-                    && p.getStatus() == Person.S_RETIRED) {
+            } else if (Person.isCombatRole(p.getPrimaryRole()) && p.getStatus() == Person.S_RETIRED) {
                 countRetired++;
-            } else if (Person.isCombatRole(p.getPrimaryRole())
-                    && p.getStatus() == Person.S_MIA) {
+            } else if (Person.isCombatRole(p.getPrimaryRole()) && p.getStatus() == Person.S_MIA) {
                 countMIA++;
-            } else if (Person.isCombatRole(p.getPrimaryRole())
-                    && p.getStatus() == Person.S_KIA) {
+            } else if (Person.isCombatRole(p.getPrimaryRole()) && p.getStatus() == Person.S_KIA) {
                 countKIA++;
             }
         }

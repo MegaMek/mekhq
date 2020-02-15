@@ -326,10 +326,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                             "Do you really want to disband this unit "
                                     + unit.getName() + "?",
                             "Disband Unit?", JOptionPane.YES_NO_OPTION)) {
-                        Vector<Part> parts = new Vector<>();
-                        for (Part p : unit.getParts()) {
-                            parts.add(p);
-                        }
+                        Vector<Part> parts = new Vector<>(unit.getParts());
                         for (Part p : parts) {
                             p.remove(true);
                         }
