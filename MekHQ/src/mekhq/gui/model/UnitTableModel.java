@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
@@ -17,12 +18,15 @@ import megamek.common.SmallCraft;
 import megamek.common.TechConstants;
 import megamek.common.UnitType;
 import mekhq.IconPackage;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
+import mekhq.gui.preferences.ColorPreference;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
+import mekhq.preferences.PreferencesNode;
 
 /**
  * A table Model for displaying information about units
@@ -32,8 +36,6 @@ public class UnitTableModel extends DataTableModel {
 
     private static final long serialVersionUID = -5207167419079014157L;
 
-    private Campaign campaign;
-    
     public final static int COL_NAME    =    0;
     public final static int COL_TYPE    =    1;
     public final static int COL_WCLASS    =  2;
@@ -55,11 +57,48 @@ public class UnitTableModel extends DataTableModel {
     public final static int COL_RSTATUS   =  18;
     public final static int N_COL =          19;
 
+    private Campaign campaign;
+
+    public static ColorPreference normalColors;
+    public static ColorPreference selectedColors;
+    public static ColorPreference deployedColors;
+    public static ColorPreference inTransitColors;
+    public static ColorPreference refittingColors;
+    public static ColorPreference mothballingColors;
+    public static ColorPreference mothballedColors;
+    public static ColorPreference notRepairableColors;
+    public static ColorPreference nonfunctionalColors;
+    public static ColorPreference needsPartsFixedColors;
+    public static ColorPreference uncrewedColors;
+
     public UnitTableModel(Campaign c) {
         data = new ArrayList<Unit>();
         campaign = c;
+        setUserPreferences();
     }
-    
+
+    private synchronized void setUserPreferences() {
+        if (normalColors == null) {
+            PreferencesNode preferences = MekHQ.getPreferences().forClass(UnitTableModel.class);
+
+            normalColors = new ColorPreference("normal", UIManager.getColor("Table.background"), UIManager.getColor("Table.foreground"));
+            selectedColors = new ColorPreference("selected", UIManager.getColor("Table.selectionBackground"), UIManager.getColor("Table.selectionFackground"));
+            deployedColors = new ColorPreference("deployed", Color.LIGHT_GRAY, Color.BLACK);
+            inTransitColors = new ColorPreference("inTransit", Color.ORANGE, Color.BLACK);
+            refittingColors = new ColorPreference("refitting", Color.CYAN, Color.BLACK);
+            mothballingColors = new ColorPreference("mothballing", new Color(153,153,255), Color.BLACK);
+            mothballedColors = new ColorPreference("mothballed", new Color(204, 204, 255), Color.BLACK);
+            notRepairableColors = new ColorPreference("notRepairable", new Color(190, 150, 55), Color.BLACK);
+            nonfunctionalColors = new ColorPreference("nonfunctional", new Color(205, 92, 92), Color.BLACK);
+            needsPartsFixedColors = new ColorPreference("needsPartsFixed", new Color(238, 238, 0), Color.BLACK);
+            uncrewedColors = new ColorPreference("uncrewed", Color.RED, Color.BLACK);
+
+            preferences.manage(normalColors, selectedColors, deployedColors, inTransitColors, refittingColors,
+                mothballingColors, mothballedColors, notRepairableColors, nonfunctionalColors, needsPartsFixedColors,
+                uncrewedColors);
+        }
+    }
+
     public int getRowCount() {
         return data.size();
     }
@@ -275,11 +314,11 @@ public class UnitTableModel extends DataTableModel {
         }
         return "?";
     }
-    
+
     public Campaign getCampaign() {
         return campaign;
     }
-    
+
     public void refreshData() {
         setData(getCampaign().getCopyOfUnits());
     }
@@ -307,47 +346,46 @@ public class UnitTableModel extends DataTableModel {
             setToolTipText(getTooltip(actualRow, actualCol));
             Unit u = getUnit(actualRow);
 
-            setForeground(Color.BLACK);
             if (isSelected) {
-                setBackground(Color.DARK_GRAY);
-                setForeground(Color.WHITE);
+                applyColors(selectedColors, isSelected);
             } else {
-
                 if (u.isDeployed()) {
-                    setBackground(Color.LIGHT_GRAY);
-                }
-                else if(!u.isPresent()) {
-                    setBackground(Color.ORANGE);
-                }
-                else if(u.isRefitting()) {
-                    setBackground(Color.CYAN);
-                }
-                else if ((null != u)
-                        && (u.isMothballing())) {
-                    setBackground(new Color(153,153,255));
-                } 
-                else if ((null != u)
-                        && (u.isMothballed())) {
-                    setBackground(new Color(204, 204, 255));
-                } 
-                else if (null != u && !u.isRepairable()) {
-                    setBackground(new Color(190, 150, 55));
-                } else if ((null != u) && !u.isFunctional()) {
-                    setBackground(new Color(205, 92, 92));
-                } else if ((null != u)
-                        && u.hasPartsNeedingFixing()) {
-                    setBackground(new Color(238, 238, 0));
+                    applyColors(deployedColors);
+                } else if(!u.isPresent()) {
+                    applyColors(inTransitColors);
+                } else if(u.isRefitting()) {
+                    applyColors(refittingColors);
+                } else if (u.isMothballing()) {
+                    applyColors(mothballingColors);
+                } else if (u.isMothballed()) {
+                    applyColors(mothballedColors);
+                } else if (!u.isRepairable()) {
+                    applyColors(notRepairableColors);
+                } else if (!u.isFunctional()) {
+                    applyColors(nonfunctionalColors);
+                } else if (u.hasPartsNeedingFixing()) {
+                    applyColors(needsPartsFixedColors);
                 } else if (u.getEntity() instanceof Infantry
                         && u.getActiveCrew().size() < u.getFullCrewSize()) {
-                    setBackground(Color.RED);
-                }
-                else {
-                    setBackground(Color.WHITE);
+                    applyColors(uncrewedColors);
+                } else {
+                    applyColors(normalColors);
                 }
             }
             return this;
         }
 
+        private void applyColors(ColorPreference c) {
+            applyColors(c, false);
+        }
+
+        private void applyColors(ColorPreference c, boolean isSelected) {
+            setBackground(c.getColor()
+                    .orElseGet(() -> UIManager.getColor(isSelected ? "Table.selectionBackground" : "Table.background")));
+
+            setForeground(c.getAlternateColor()
+                    .orElseGet(() -> UIManager.getColor(isSelected ? "Table.selectionForeground" : "Table.foreground")));
+        }
     }
 
     public class VisualRenderer extends BasicInfo implements TableCellRenderer {
