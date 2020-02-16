@@ -226,7 +226,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
         "Yours-Spouse", "Both Yours-Spouse", "Spouse-Yours",
         "Both Spouse-Yours", "Male", "Female"
     };
-    //endregion Marriage
+    //endregion Marriage Variables
+
+    //region Divorce Variables
+    public static final String OPT_SELECTED_CHANGE_SURNAME = "selected_change_surname";
+    public static final String OPT_SPOUSE_CHANGE_SURNAME = "spouse_change_surname";
+    public static final String OPT_BOTH_CHANGE_SURNAME = "both_change_surname";
+    public static final String OPT_KEEP_SURNAME = "keep_surname";
+    //endregion Divorce Variables
     //endregion Family Variables
 
     /** Contains the skill levels to be displayed in a tech's description */
@@ -1300,11 +1307,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         extraData.set(PREGNANCY_FATHER_DATA, (hasSpouse()) ? getSpouseId().toString() : null);
 
         String sizeString = (size < PREGNANCY_MULTIPLE_NAMES.length) ? PREGNANCY_MULTIPLE_NAMES[size] : null;
-        if (null == sizeString) {
-            campaign.addReport(getHyperlinkedName() + " has conceived");
-        } else {
-            campaign.addReport(getHyperlinkedName() + " has conceived " + sizeString);
-        }
+
+        campaign.addReport(getHyperlinkedName() + " has conceived" + (sizeString == null ? "" : (" " + sizeString)));
         if (campaign.getCampaignOptions().logConception()) {
             MedicalLogger.hasConceived(this, campaign.getDate(), sizeString);
             if (hasSpouse()) {
@@ -1343,9 +1347,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             baby.setSurname(surname);
             baby.setBirthday((GregorianCalendar) campaign.getCalendar().clone());
             UUID babyId = UUID.randomUUID();
-            while (null != campaign.getPerson(babyId)) {
-                babyId = UUID.randomUUID();
-            }
+
             baby.setId(babyId);
             baby.setAncestorsId(ancId);
             campaign.addReport(String.format("%s has given birth to %s, a baby %s!", getHyperlinkedName(),
@@ -1575,6 +1577,64 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return map;
     }
     //endregion Marriage
+
+    //region Divorce
+    public void divorce(String divorceOption) {
+        Person spouse = getSpouse();
+        int reason = FormerSpouse.REASON_WIDOWED;
+
+        switch (divorceOption) {
+            case OPT_SELECTED_CHANGE_SURNAME:
+                if (getMaidenName() != null) {
+                    setSurname(getMaidenName());
+                }
+                break;
+            case OPT_SPOUSE_CHANGE_SURNAME:
+                if (spouse.getMaidenName() != null) {
+                    spouse.setSurname(spouse.getMaidenName());
+                }
+                break;
+            case OPT_BOTH_CHANGE_SURNAME:
+                if (getMaidenName() != null) {
+                    setSurname(getMaidenName());
+                }
+                if (spouse.getMaidenName() != null) {
+                    spouse.setSurname(spouse.getMaidenName());
+                }
+                break;
+            case OPT_KEEP_SURNAME:
+            default:
+                break;
+        }
+
+        if (spouse.isDeadOrMIA() && isDeadOrMIA()) {
+            //Ignore, we want to keep the maiden names for fallen/missing members of the company
+        } else if (spouse.isDeadOrMIA()) {
+            setMaidenName(null);
+        } else if (isDeadOrMIA()) {
+            spouse.setMaidenName(null);
+        } else {
+            reason = FormerSpouse.REASON_DIVORCE;
+
+            PersonalLogger.divorcedFrom(this, getSpouse(), getCampaign().getDate());
+            PersonalLogger.divorcedFrom(spouse, this, getCampaign().getDate());
+
+            spouse.setMaidenName(null);
+            setMaidenName(null);
+        }
+
+        //add to former spouse list
+        getSpouse().addFormerSpouse(new FormerSpouse(getId(),
+                FormerSpouse.convertDateTimeToLocalDate(getCampaign().getDateTime()), reason));
+        addFormerSpouse(new FormerSpouse(getSpouse().getId(),
+                FormerSpouse.convertDateTimeToLocalDate(getCampaign().getDateTime()), reason));
+
+        spouse.setSpouseId(null);
+        MekHQ.triggerEvent(new PersonChangedEvent(spouse));
+        setSpouseId(null);
+        MekHQ.triggerEvent(new PersonChangedEvent(this));
+    }
+    //endregion Divorce
 
     public boolean isFemale() {
         return gender == G_FEMALE;

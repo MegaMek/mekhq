@@ -154,12 +154,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
         resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelTableMouseAdapter", new EncodeControl()); //$NON-NLS-1$
     }
 
-    //Divorce options
-    private static final String OPT_SELECTED_CHANGE_SURNAME = "selected_change_surname";
-    private static final String OPT_SPOUSE_CHANGE_SURNAME = "spouse_change_surname";
-    private static final String OPT_BOTH_CHANGE_SURNAME = "both_change_surname";
-    private static final String OPT_KEEP_SURNAME = "keep_surname";
-
     //Mechwarrior Edge Options
     private static final String OPT_EDGE_MASC_FAILURE = "edge_when_masc_fails"; //$NON-NLS-1$
     private static final String OPT_EDGE_EXPLOSION = "edge_when_explosion"; //$NON-NLS-1$
@@ -499,60 +493,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 break;
             }
             case CMD_REMOVE_SPOUSE: {
-                String divorceOption = data[1];
-                int reason = FormerSpouse.REASON_WIDOWED;
-                Person spouse = selectedPerson.getSpouse();
-
-                switch (divorceOption) {
-                    case OPT_SELECTED_CHANGE_SURNAME:
-                        if (selectedPerson.getMaidenName() != null) {
-                            selectedPerson.setSurname(selectedPerson.getMaidenName());
-                        }
-                        break;
-                    case OPT_SPOUSE_CHANGE_SURNAME:
-                        if (spouse.getMaidenName() != null) {
-                            spouse.setSurname(spouse.getMaidenName());
-                        }
-                        break;
-                    case OPT_BOTH_CHANGE_SURNAME:
-                        if (selectedPerson.getMaidenName() != null) {
-                            selectedPerson.setSurname(selectedPerson.getMaidenName());
-                        }
-                        if (spouse.getMaidenName() != null) {
-                            spouse.setSurname(spouse.getMaidenName());
-                        }
-                        break;
-                    case OPT_KEEP_SURNAME:
-                    default:
-                        break;
-                }
-
-                if (spouse.isDeadOrMIA() && selectedPerson.isDeadOrMIA()) {
-                    //Ignore, we want to keep the maiden names for fallen/missing members of the company
-                } else if (spouse.isDeadOrMIA()) {
-                    selectedPerson.setMaidenName(null);
-                } else if (selectedPerson.isDeadOrMIA()) {
-                    spouse.setMaidenName(null);
-                } else {
-                    reason = FormerSpouse.REASON_DIVORCE;
-
-                    PersonalLogger.divorcedFrom(selectedPerson, selectedPerson.getSpouse(), gui.getCampaign().getDate());
-                    PersonalLogger.divorcedFrom(spouse, selectedPerson, gui.getCampaign().getDate());
-
-                    spouse.setMaidenName(null);
-                    selectedPerson.setMaidenName(null);
-                }
-
-                //add to former spouse list
-                selectedPerson.getSpouse().addFormerSpouse(new FormerSpouse(selectedPerson.getId(),
-                        FormerSpouse.convertDateTimeToLocalDate(gui.getCampaign().getDateTime()), reason));
-                selectedPerson.addFormerSpouse(new FormerSpouse(selectedPerson.getSpouse().getId(),
-                        FormerSpouse.convertDateTimeToLocalDate(gui.getCampaign().getDateTime()), reason));
-
-                spouse.setSpouseId(null);
-                MekHQ.triggerEvent(new PersonChangedEvent(spouse));
-                selectedPerson.setSpouseId(null);
-                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                selectedPerson.divorce(data[1]);
                 break;
             }
             case CMD_ADD_SPOUSE: {
@@ -1873,25 +1814,25 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 
                     type = resourceMap.getString("removeSpouseKeepSurname.text");
                     divorceMenu = new JMenuItem(type);
-                    divorceMenu.setActionCommand(makeCommand(CMD_REMOVE_SPOUSE, OPT_KEEP_SURNAME));
+                    divorceMenu.setActionCommand(makeCommand(CMD_REMOVE_SPOUSE, Person.OPT_KEEP_SURNAME));
                     divorceMenu.addActionListener(this);
                     menu.add(divorceMenu);
 
                     type = resourceMap.getString("removeSpouseSpouseChangeSurname.text");
                     divorceMenu = new JMenuItem(type);
-                    divorceMenu.setActionCommand(makeCommand(CMD_REMOVE_SPOUSE, OPT_SPOUSE_CHANGE_SURNAME));
+                    divorceMenu.setActionCommand(makeCommand(CMD_REMOVE_SPOUSE, Person.OPT_SPOUSE_CHANGE_SURNAME));
                     divorceMenu.addActionListener(this);
                     menu.add(divorceMenu);
 
                     type = resourceMap.getString("removeSpouseSelectedChangeSurname.text");
                     divorceMenu = new JMenuItem(type);
-                    divorceMenu.setActionCommand(makeCommand(CMD_REMOVE_SPOUSE, OPT_SELECTED_CHANGE_SURNAME));
+                    divorceMenu.setActionCommand(makeCommand(CMD_REMOVE_SPOUSE, Person.OPT_SELECTED_CHANGE_SURNAME));
                     divorceMenu.addActionListener(this);
                     menu.add(divorceMenu);
 
                     type = resourceMap.getString("removeSpouseBothChangeSurname.text");
                     divorceMenu = new JMenuItem(type);
-                    divorceMenu.setActionCommand(makeCommand(CMD_REMOVE_SPOUSE, OPT_BOTH_CHANGE_SURNAME));
+                    divorceMenu.setActionCommand(makeCommand(CMD_REMOVE_SPOUSE, Person.OPT_BOTH_CHANGE_SURNAME));
                     divorceMenu.addActionListener(this);
                     menu.add(divorceMenu);
 

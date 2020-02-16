@@ -753,9 +753,6 @@ public class ResolveScenarioTracker {
                 UUID id = p.getId();
                 if (null == id) {
                     id = UUID.randomUUID();
-                    while (prisonerStatus.get(id) != null) {
-                        id = UUID.randomUUID();
-                    }
                     p.setId(id);
                 }
                 PrisonerStatus status = new PrisonerStatus(p.getFullName(), u.getEntity().getDisplayName(), p);

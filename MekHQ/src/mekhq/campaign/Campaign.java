@@ -1090,10 +1090,7 @@ public class Campaign implements Serializable, ITechManager {
         unit.getEntity().setGame(game);
 
         UUID id = UUID.randomUUID();
-        // check for the very rare chance of getting same id
-        while (null != units.get(id)) {
-            id = UUID.randomUUID();
-        }
+
         unit.getEntity().setExternalIdAsString(id.toString());
         unit.setId(id);
         units.put(id, unit);
@@ -1132,10 +1129,6 @@ public class Campaign implements Serializable, ITechManager {
         en.setGame(game);
 
         UUID id = UUID.randomUUID();
-        // check for the very rare chance of getting same id
-        while (null != units.get(id)) {
-            id = UUID.randomUUID();
-        }
         en.setExternalIdAsString(id.toString());
         Unit unit = new Unit(en, this);
         unit.setId(id);
