@@ -31,6 +31,7 @@ import java.util.stream.IntStream;
 
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
+import megamek.common.util.WeightedMap;
 import mekhq.campaign.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.*;
@@ -204,6 +205,28 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public static final ExtraData.IntKey PREGNANCY_CHILDREN_DATA = new ExtraData.IntKey("procreation:children");
     public static final ExtraData.StringKey PREGNANCY_FATHER_DATA = new ExtraData.StringKey("procreation:father");
     //endregion Procreation
+
+    //region Marriage
+    // Marriage Surnames
+    public static final int SURNAME_NO_CHANGE = 0;
+    public static final int SURNAME_YOURS = 1;
+    public static final int SURNAME_SPOUSE = 2;
+    public static final int SURNAME_HYP_YOURS = 3;
+    public static final int SURNAME_BOTH_HYP_YOURS = 4;
+    public static final int SURNAME_HYP_SPOUSE = 5;
+    public static final int SURNAME_BOTH_HYP_SPOUSE = 6;
+    public static final int SURNAME_MALE = 7;
+    public static final int SURNAME_FEMALE = 8;
+    public static final int SURNAME_WEIGHTED = 9; //should be equal to NUM_SURNAME at all times
+    public static final int NUM_SURNAME = 9; //number of surname options not counting the SURNAME_WEIGHTED OPTION
+
+    // TODO : Localize me
+    public static final String[] SURNAME_TYPE_NAMES = new String[] {
+        "No Change", "Yours", "Spouse",
+        "Yours-Spouse", "Both Yours-Spouse", "Spouse-Yours",
+        "Both Spouse-Yours", "Male", "Female"
+    };
+    //endregion Marriage
     //endregion Family Variables
 
     /** Contains the skill levels to be displayed in a tech's description */
@@ -707,7 +730,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
     //endregion Text Getters
-    //TODO : Rename and Localize region
 
     //region Names
     public String getGivenName() {
@@ -1215,7 +1237,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
     //endregion Age Range Identification
-    // TODO : Implement the above fully
 
     //region Pregnancy
     public GregorianCalendar getDueDate() {
@@ -1400,7 +1421,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             Compute.randomInt(n);
         }
 
-        marry(potentials.get(n), CampaignOptions.SURNAME_WEIGHTED);
+        marry(potentials.get(n), SURNAME_WEIGHTED);
     }
 
     public boolean isPotentialRandomSpouse(Person p, int gender) {
@@ -1428,28 +1449,29 @@ public class Person implements Serializable, MekHqXmlSerializable {
             spouseSurname = "";
         }
 
-        if (surnameOption == CampaignOptions.SURNAME_WEIGHTED) {
-            surnameOption = randomWeightedSurname();
+        if (surnameOption == SURNAME_WEIGHTED) {
+            WeightedMap<Integer> map = createWeightedSurnameMap();
+            surnameOption = map.randomItem();
         }
 
         switch(surnameOption) {
-            case CampaignOptions.SURNAME_NO_CHANGE:
+            case SURNAME_NO_CHANGE:
                 break;
-            case CampaignOptions.SURNAME_SPOUSE:
+            case SURNAME_SPOUSE:
                 if (!StringUtil.isNullOrEmpty(spouseSurname)) {
                     setSurname(spouseSurname);
                 }
 
                 setMaidenName(surname); //"" is handled in the divorce code
                 break;
-            case CampaignOptions.SURNAME_YOURS:
+            case SURNAME_YOURS:
                 if (!StringUtil.isNullOrEmpty(surname)) {
                     spouse.setSurname(surname);
                 }
 
                 spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
                 break;
-            case CampaignOptions.SURNAME_HYP_YOURS:
+            case SURNAME_HYP_YOURS:
                 if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
                     setSurname(surname + "-" + spouseSurname);
                 } else {
@@ -1459,7 +1481,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
                 setMaidenName(surname); //"" is handled in the divorce code
                 break;
-            case CampaignOptions.SURNAME_BOTH_HYP_YOURS:
+            case SURNAME_BOTH_HYP_YOURS:
                 if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
                     setSurname(surname + "-" + spouseSurname);
                     spouse.setSurname(surname + "-" + spouseSurname);
@@ -1473,7 +1495,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 setMaidenName(surname); //"" is handled in the divorce code
                 spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
                 break;
-            case CampaignOptions.SURNAME_HYP_SPOUSE:
+            case SURNAME_HYP_SPOUSE:
                 if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
                     spouse.setSurname(spouseSurname + "-" + surname);
                 } else {
@@ -1483,7 +1505,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
                 spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
                 break;
-            case CampaignOptions.SURNAME_BOTH_HYP_SPOUSE:
+            case SURNAME_BOTH_HYP_SPOUSE:
                 if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
                     setSurname(spouseSurname + "-" + surname);
                     spouse.setSurname(spouseSurname + "-" + surname);
@@ -1497,7 +1519,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 setMaidenName(surname); //"" is handled in the divorce code
                 spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
                 break;
-            case CampaignOptions.SURNAME_MALE:
+            case SURNAME_MALE:
                 if (isMale()) {
                     if (!StringUtil.isNullOrEmpty(surname)) {
                         spouse.setSurname(surname);
@@ -1512,7 +1534,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     setMaidenName(surname); //"" is handled in the divorce code
                 }
                 break;
-            case CampaignOptions.SURNAME_FEMALE:
+            case SURNAME_FEMALE:
                 if (isMale()) {
                     if (!StringUtil.isNullOrEmpty(spouseSurname)) {
                         setSurname(spouseSurname);
@@ -1541,8 +1563,16 @@ public class Person implements Serializable, MekHqXmlSerializable {
         MekHQ.triggerEvent(new PersonChangedEvent(spouse));
     }
 
-    private int randomWeightedSurname() {
-        return 0;
+    private WeightedMap<Integer> createWeightedSurnameMap() {
+        WeightedMap<Integer> map = new WeightedMap<>();
+
+        int[] weights = campaign.getCampaignOptions().getRandomMarriageSurnameWeights();
+
+        for (int i = 0; i < NUM_SURNAME; i++) {
+            map.add(weights[i], i);
+        }
+
+        return map;
     }
     //endregion Marriage
 

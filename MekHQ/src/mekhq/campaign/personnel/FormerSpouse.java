@@ -1,5 +1,5 @@
 /*
- * FormerSpouse.java
+ * Copyright (c) 2020 The MegaMek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.personnel;
 
 import mekhq.MekHQ;

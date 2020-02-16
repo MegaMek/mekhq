@@ -125,18 +125,7 @@ public class CampaignOptions implements Serializable {
     private boolean useRandomMarriages;
     private double chanceRandomMarriages;
     private int marriageAgeRange;
-    private double[] randomMarriageSurnameWeights;
-    public static final int SURNAME_NO_CHANGE = 0;
-    public static final int SURNAME_YOURS = 1;
-    public static final int SURNAME_SPOUSE = 2;
-    public static final int SURNAME_HYP_YOURS = 3;
-    public static final int SURNAME_BOTH_HYP_YOURS = 4;
-    public static final int SURNAME_HYP_SPOUSE = 5;
-    public static final int SURNAME_BOTH_HYP_SPOUSE = 6;
-    public static final int SURNAME_MALE = 7;
-    public static final int SURNAME_FEMALE = 8;
-    public static final int SURNAME_WEIGHTED = 9; //should be equal to NUM_SURNAME at all times
-    public static final int NUM_SURNAME = 9; //number of surname options not counting the SURNAME_WEIGHTED OPTION
+    private int[] randomMarriageSurnameWeights;
     private boolean useRandomSameSexMarriages;
     private double chanceRandomSameSexMarriages;
     private boolean useUnofficialProcreation;
@@ -511,16 +500,16 @@ public class CampaignOptions implements Serializable {
         useRandomMarriages = false;
         chanceRandomMarriages = 0.025;
         marriageAgeRange = 10;
-        randomMarriageSurnameWeights = new double[NUM_SURNAME];
-        randomMarriageSurnameWeights[SURNAME_NO_CHANGE] = 0.10;
-        randomMarriageSurnameWeights[SURNAME_YOURS] = 0.06;
-        randomMarriageSurnameWeights[SURNAME_SPOUSE] = 0.06;
-        randomMarriageSurnameWeights[SURNAME_HYP_YOURS] = 0.035;
-        randomMarriageSurnameWeights[SURNAME_BOTH_HYP_YOURS] = 0.025;
-        randomMarriageSurnameWeights[SURNAME_HYP_SPOUSE] = 0.035;
-        randomMarriageSurnameWeights[SURNAME_BOTH_HYP_SPOUSE] = 0.025;
-        randomMarriageSurnameWeights[SURNAME_MALE] = 0.5;
-        randomMarriageSurnameWeights[SURNAME_FEMALE] = 0.16;
+        randomMarriageSurnameWeights = new int[Person.NUM_SURNAME];
+        randomMarriageSurnameWeights[Person.SURNAME_NO_CHANGE] = 100;
+        randomMarriageSurnameWeights[Person.SURNAME_YOURS] = 60;
+        randomMarriageSurnameWeights[Person.SURNAME_SPOUSE] = 60;
+        randomMarriageSurnameWeights[Person.SURNAME_HYP_YOURS] = 35;
+        randomMarriageSurnameWeights[Person.SURNAME_BOTH_HYP_YOURS] = 25;
+        randomMarriageSurnameWeights[Person.SURNAME_HYP_SPOUSE] = 35;
+        randomMarriageSurnameWeights[Person.SURNAME_BOTH_HYP_SPOUSE] = 25;
+        randomMarriageSurnameWeights[Person.SURNAME_MALE] = 500;
+        randomMarriageSurnameWeights[Person.SURNAME_FEMALE] = 160;
         useRandomSameSexMarriages = false;
         chanceRandomSameSexMarriages = 0.002;
         useUnofficialProcreation = false;
@@ -940,19 +929,19 @@ public class CampaignOptions implements Serializable {
         marriageAgeRange = b;
     }
 
-    public double[] getRandomMarriageSurnameWeights() {
+    public int[] getRandomMarriageSurnameWeights() {
         return randomMarriageSurnameWeights;
     }
 
-    public double getRandomMarriageSurnameWeight(int pos) {
+    public int getRandomMarriageSurnameWeights(int pos) {
         return randomMarriageSurnameWeights[pos];
     }
 
-    public void setRandomMarriageSurnameWeights(double[] b) {
+    public void setRandomMarriageSurnameWeights(int[] b) {
         randomMarriageSurnameWeights = b;
     }
 
-    public void setRandomMarriageSurnameWeight(int pos, double b) {
+    public void setRandomMarriageSurnameWeight(int pos, int b) {
         randomMarriageSurnameWeights[pos] = b;
     }
 
@@ -3108,7 +3097,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageSurnameWeights")) {
                 String[] values = wn2.getTextContent().split(",");
                 for (int i = 0; i < values.length; i++) {
-                    retVal.randomMarriageSurnameWeights[i] = Double.parseDouble(values[i]);
+                    retVal.randomMarriageSurnameWeights[i] = Integer.parseInt(values[i]);
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomSameSexMarriages")) {
                 retVal.useRandomSameSexMarriages = Boolean.parseBoolean(wn2.getTextContent().trim());

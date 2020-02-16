@@ -1779,61 +1779,61 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             type = resourceMap.getString("marriageNoNameChange.text"); //$NON-NLS-1$
                             surnameMenu = new JMenuItem(type);
                             surnameMenu.setActionCommand(
-                                makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(CampaignOptions.SURNAME_NO_CHANGE)));
+                                makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_NO_CHANGE)));
                             surnameMenu.addActionListener(this);
                             spouseMenu.add(surnameMenu);
                             type = resourceMap.getString("marriageRenameSpouse.text"); //$NON-NLS-1$
                             surnameMenu = new JMenuItem(type);
                             surnameMenu.setActionCommand(
-                                   makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(CampaignOptions.SURNAME_YOURS)));
+                                   makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_YOURS)));
                             surnameMenu.addActionListener(this);
                             spouseMenu.add(surnameMenu);
                             type = resourceMap.getString("marriageRenameYourself.text"); //$NON-NLS-1$
                             surnameMenu = new JMenuItem(type);
                             surnameMenu.setActionCommand(
-                                  makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(CampaignOptions.SURNAME_SPOUSE)));
+                                  makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_SPOUSE)));
                             surnameMenu.addActionListener(this);
                             spouseMenu.add(surnameMenu);
                             type = resourceMap.getString("marriageHyphenateYourself.text"); //$NON-NLS-1$
                             surnameMenu = new JMenuItem(type);
                             surnameMenu.setActionCommand(
-                                makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(CampaignOptions.SURNAME_HYP_YOURS)));
+                                makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_HYP_YOURS)));
                             surnameMenu.addActionListener(this);
                             spouseMenu.add(surnameMenu);
                             type = resourceMap.getString("marriageBothHyphenateYourself.text"); //$NON-NLS-1$
                             surnameMenu = new JMenuItem(type);
                             surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(CampaignOptions.SURNAME_BOTH_HYP_YOURS)));
+                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_BOTH_HYP_YOURS)));
                             surnameMenu.addActionListener(this);
                             spouseMenu.add(surnameMenu);
                             type = resourceMap.getString("marriageHyphenateSpouse.text"); //$NON-NLS-1$
                             surnameMenu = new JMenuItem(type);
                             surnameMenu.setActionCommand(
-                                makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(CampaignOptions.SURNAME_HYP_SPOUSE)));
+                                makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_HYP_SPOUSE)));
                             surnameMenu.addActionListener(this);
                             spouseMenu.add(surnameMenu);
                             type = resourceMap.getString("marriageBothHyphenateSpouse.text"); //$NON-NLS-1$
                             surnameMenu = new JMenuItem(type);
                             surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(),Integer.toString(CampaignOptions.SURNAME_BOTH_HYP_SPOUSE)));
+                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(),Integer.toString(Person.SURNAME_BOTH_HYP_SPOUSE)));
                             surnameMenu.addActionListener(this);
                             spouseMenu.add(surnameMenu);
                             type = resourceMap.getString("marriageMale.text"); //$NON-NLS-1$
                             surnameMenu = new JMenuItem(type);
                             surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(),Integer.toString(CampaignOptions.SURNAME_MALE)));
+                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(),Integer.toString(Person.SURNAME_MALE)));
                             surnameMenu.addActionListener(this);
                             spouseMenu.add(surnameMenu);
                             type = resourceMap.getString("marriageFemale.text"); //$NON-NLS-1$
                             surnameMenu = new JMenuItem(type);
                             surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(),Integer.toString(CampaignOptions.SURNAME_FEMALE)));
+                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(),Integer.toString(Person.SURNAME_FEMALE)));
                             surnameMenu.addActionListener(this);
                             spouseMenu.add(surnameMenu);
                             type = resourceMap.getString("marriageRandomWeighted.text"); //$NON-NLS-1$
                             surnameMenu = new JMenuItem(type);
                             surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(),Integer.toString(CampaignOptions.SURNAME_WEIGHTED)));
+                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(),Integer.toString(Person.SURNAME_WEIGHTED)));
                             surnameMenu.addActionListener(this);
                             spouseMenu.add(surnameMenu);
 
