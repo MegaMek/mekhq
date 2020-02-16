@@ -46,6 +46,7 @@ import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 import mekhq.Utilities;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Award;
@@ -142,7 +143,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private CampaignGUI gui;
     private JTable personnelTable;
     private PersonnelTableModel personnelModel;
-    private ResourceBundle resourceMap = null;
+    private ResourceBundle resourceMap;
 
     public PersonnelTableMouseAdapter(CampaignGUI gui, JTable personnelTable,
             PersonnelTableModel personnelModel) {
@@ -158,15 +159,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String OPT_SPOUSE_CHANGE_SURNAME = "spouse_change_surname";
     private static final String OPT_BOTH_CHANGE_SURNAME = "both_change_surname";
     private static final String OPT_KEEP_SURNAME = "keep_surname";
-
-    //Marriage options
-    private static final String OPT_SURNAME_NO_CHANGE = "no_change"; //$NON-NLS-1$
-    private static final String OPT_SURNAME_YOURS = "yours"; //$NON-NLS-1$
-    private static final String OPT_SURNAME_SPOUSE = "spouse"; //$NON-NLS-1$
-    private static final String OPT_SURNAME_HYP_YOURS = "hyp_yours"; //$NON-NLS-1$
-    private static final String OPT_SURNAME_HYP_SPOUSE = "hyp_spouse"; //$NON-NLS-1$
-    private static final String OPT_SURNAME_BOTH_HYP_YOURS = "hyp_both_yours"; //$NON-NLS-1$
-    private static final String OPT_SURNAME_BOTH_HYP_SPOUSE = "hyp_both_spouse"; //$NON-NLS-1$
 
     //Mechwarrior Edge Options
     private static final String OPT_EDGE_MASC_FAILURE = "edge_when_masc_fails"; //$NON-NLS-1$
@@ -508,7 +500,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             case CMD_REMOVE_SPOUSE: {
                 String divorceOption = data[1];
-                int reason = FormerSpouse.REASON_WIDOWED;;
+                int reason = FormerSpouse.REASON_WIDOWED;
                 Person spouse = selectedPerson.getSpouse();
 
                 switch (divorceOption) {
@@ -565,97 +557,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             case CMD_ADD_SPOUSE: {
                 Person spouse = gui.getCampaign().getPerson(UUID.fromString(data[1]));
-                String surnameOption = data[2];
-
-                String selectedSurname = selectedPerson.getSurname();
-                String spouseSurname = spouse.getSurname();
-
-                // these are used in the divorce code, as a null name will be ignored while a
-                // "" name is used to set an empty last name
-                if (selectedSurname == null) {
-                    selectedSurname = "";
-                }
-                if (spouseSurname == null) {
-                    spouseSurname = "";
-                }
-
-                switch (surnameOption) {
-                    case OPT_SURNAME_NO_CHANGE:
-                        break;
-                    case OPT_SURNAME_SPOUSE:
-                        if (!StringUtil.isNullOrEmpty(spouseSurname)) {
-                            selectedPerson.setSurname(spouseSurname);
-                        }
-
-                        selectedPerson.setMaidenName(selectedSurname); //"" is handled in the divorce code
-                        break;
-                    case OPT_SURNAME_YOURS:
-                        if (!StringUtil.isNullOrEmpty(selectedSurname)) {
-                            spouse.setSurname(selectedSurname);
-                        }
-
-                        spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
-                        break;
-                    case OPT_SURNAME_HYP_YOURS:
-                        if (!StringUtil.isNullOrEmpty(selectedSurname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
-                            selectedPerson.setSurname(selectedSurname + HYPHEN + spouseSurname);
-                        } else {
-                            selectedPerson.setSurname(spouseSurname);
-                        }
-                        //both null or "" is ignored as a case, as it would lead to no changes
-
-                        selectedPerson.setMaidenName(selectedSurname); //"" is handled in the divorce code
-                        break;
-                    case OPT_SURNAME_BOTH_HYP_YOURS:
-                        if (!StringUtil.isNullOrEmpty(selectedSurname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
-                            selectedPerson.setSurname(selectedSurname + HYPHEN + spouseSurname);
-                            spouse.setSurname(selectedSurname + HYPHEN + spouseSurname);
-                        } else if (!StringUtil.isNullOrEmpty(spouseSurname)) {
-                            selectedPerson.setSurname(spouseSurname);
-                        } else if (!StringUtil.isNullOrEmpty(selectedSurname)) {
-                            spouse.setSurname(selectedSurname);
-                        }
-                        //both null or "" is ignored as a case, as it would lead to no changes
-
-                        selectedPerson.setMaidenName(selectedSurname); //"" is handled in the divorce code
-                        spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
-                        break;
-                    case OPT_SURNAME_HYP_SPOUSE:
-                        if (!StringUtil.isNullOrEmpty(selectedSurname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
-                            spouse.setSurname(spouseSurname + HYPHEN + selectedSurname);
-                        } else {
-                            spouse.setSurname(selectedSurname);
-                        }
-                        //both null or "" is ignored as a case, as it would lead to no changes
-
-                        spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
-                        break;
-                    case OPT_SURNAME_BOTH_HYP_SPOUSE:
-                        if (!StringUtil.isNullOrEmpty(selectedSurname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
-                            selectedPerson.setSurname(spouseSurname + HYPHEN + selectedSurname);
-                            spouse.setSurname(spouseSurname + HYPHEN + selectedSurname);
-                        } else if (!StringUtil.isNullOrEmpty(spouseSurname)) {
-                            selectedPerson.setSurname(spouseSurname);
-                        } else if (!StringUtil.isNullOrEmpty(selectedSurname)) {
-                            spouse.setSurname(selectedSurname);
-                        }
-                        //both null or "" is ignored as a case, as it would lead to no changes
-
-                        selectedPerson.setMaidenName(selectedSurname); //"" is handled in the divorce code
-                        spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
-                        break;
-                    default:
-                        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR, String.format("Unknown error in Surname chooser between \"%s\" and \"%s\"", //$NON-NLS-1$
-                                selectedPerson.getFullName(), spouse.getFullName()));
-                        break;
-                }
-
-                spouse.setSpouseId(selectedPerson.getId());
-                PersonalLogger.marriage(spouse, selectedPerson, gui.getCampaign().getDate());
-                selectedPerson.setSpouseId(spouse.getId());
-                PersonalLogger.marriage(selectedPerson, spouse, gui.getCampaign().getDate());
-                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
-                MekHQ.triggerEvent(new PersonChangedEvent(spouse));
+                selectedPerson.marry(spouse, Integer.parseInt(data[2]));
                 break;
             }
             case CMD_ADD_AWARD: {
@@ -1877,43 +1779,61 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             type = resourceMap.getString("marriageNoNameChange.text"); //$NON-NLS-1$
                             surnameMenu = new JMenuItem(type);
                             surnameMenu.setActionCommand(
-                                makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), OPT_SURNAME_NO_CHANGE));
+                                makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(CampaignOptions.SURNAME_NO_CHANGE)));
                             surnameMenu.addActionListener(this);
                             spouseMenu.add(surnameMenu);
                             type = resourceMap.getString("marriageRenameSpouse.text"); //$NON-NLS-1$
                             surnameMenu = new JMenuItem(type);
                             surnameMenu.setActionCommand(
-                                   makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), OPT_SURNAME_YOURS));
+                                   makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(CampaignOptions.SURNAME_YOURS)));
                             surnameMenu.addActionListener(this);
                             spouseMenu.add(surnameMenu);
                             type = resourceMap.getString("marriageRenameYourself.text"); //$NON-NLS-1$
                             surnameMenu = new JMenuItem(type);
                             surnameMenu.setActionCommand(
-                                  makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), OPT_SURNAME_SPOUSE));
+                                  makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(CampaignOptions.SURNAME_SPOUSE)));
                             surnameMenu.addActionListener(this);
                             spouseMenu.add(surnameMenu);
                             type = resourceMap.getString("marriageHyphenateYourself.text"); //$NON-NLS-1$
                             surnameMenu = new JMenuItem(type);
                             surnameMenu.setActionCommand(
-                                makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), OPT_SURNAME_HYP_YOURS));
+                                makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(CampaignOptions.SURNAME_HYP_YOURS)));
                             surnameMenu.addActionListener(this);
                             spouseMenu.add(surnameMenu);
                             type = resourceMap.getString("marriageBothHyphenateYourself.text"); //$NON-NLS-1$
                             surnameMenu = new JMenuItem(type);
                             surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), OPT_SURNAME_BOTH_HYP_YOURS));
+                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(CampaignOptions.SURNAME_BOTH_HYP_YOURS)));
                             surnameMenu.addActionListener(this);
                             spouseMenu.add(surnameMenu);
                             type = resourceMap.getString("marriageHyphenateSpouse.text"); //$NON-NLS-1$
                             surnameMenu = new JMenuItem(type);
                             surnameMenu.setActionCommand(
-                                makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), OPT_SURNAME_HYP_SPOUSE));
+                                makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(CampaignOptions.SURNAME_HYP_SPOUSE)));
                             surnameMenu.addActionListener(this);
                             spouseMenu.add(surnameMenu);
                             type = resourceMap.getString("marriageBothHyphenateSpouse.text"); //$NON-NLS-1$
                             surnameMenu = new JMenuItem(type);
                             surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), OPT_SURNAME_BOTH_HYP_SPOUSE));
+                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(),Integer.toString(CampaignOptions.SURNAME_BOTH_HYP_SPOUSE)));
+                            surnameMenu.addActionListener(this);
+                            spouseMenu.add(surnameMenu);
+                            type = resourceMap.getString("marriageMale.text"); //$NON-NLS-1$
+                            surnameMenu = new JMenuItem(type);
+                            surnameMenu.setActionCommand(
+                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(),Integer.toString(CampaignOptions.SURNAME_MALE)));
+                            surnameMenu.addActionListener(this);
+                            spouseMenu.add(surnameMenu);
+                            type = resourceMap.getString("marriageFemale.text"); //$NON-NLS-1$
+                            surnameMenu = new JMenuItem(type);
+                            surnameMenu.setActionCommand(
+                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(),Integer.toString(CampaignOptions.SURNAME_FEMALE)));
+                            surnameMenu.addActionListener(this);
+                            spouseMenu.add(surnameMenu);
+                            type = resourceMap.getString("marriageRandomWeighted.text"); //$NON-NLS-1$
+                            surnameMenu = new JMenuItem(type);
+                            surnameMenu.setActionCommand(
+                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(),Integer.toString(CampaignOptions.SURNAME_WEIGHTED)));
                             surnameMenu.addActionListener(this);
                             spouseMenu.add(surnameMenu);
 

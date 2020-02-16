@@ -50,42 +50,42 @@ import mekhq.campaign.rating.UnitRatingMethod;
 public class CampaignOptions implements Serializable {
     private static final long serialVersionUID = 5698008431749303602L;
 
-    public final static int TECH_INTRO = 0;
-    public final static int TECH_STANDARD = 1;
-    public final static int TECH_ADVANCED = 2;
-    public final static int TECH_EXPERIMENTAL = 3;
-    public final static int TECH_UNOFFICIAL = 4;
+    public static final int TECH_INTRO = 0;
+    public static final int TECH_STANDARD = 1;
+    public static final int TECH_ADVANCED = 2;
+    public static final int TECH_EXPERIMENTAL = 3;
+    public static final int TECH_UNOFFICIAL = 4;
     // This must always be the highest tech level in order to hide parts
     // that haven't been invented yet, or that are completely extinct
-    public final static int TECH_UNKNOWN = 5;
+    public static final int TECH_UNKNOWN = 5;
 
-    public final static int TRANSIT_UNIT_DAY = 0;
-    public final static int TRANSIT_UNIT_WEEK = 1;
-    public final static int TRANSIT_UNIT_MONTH = 2;
-    public final static int TRANSIT_UNIT_NUM = 3;
+    public static final int TRANSIT_UNIT_DAY = 0;
+    public static final int TRANSIT_UNIT_WEEK = 1;
+    public static final int TRANSIT_UNIT_MONTH = 2;
+    public static final int TRANSIT_UNIT_NUM = 3;
 
 
-    public final static String S_TECH = "Tech";
-    public final static String S_AUTO = "Automatic Success";
+    public static final String S_TECH = "Tech";
+    public static final String S_AUTO = "Automatic Success";
 
-    public final static int REPAIR_SYSTEM_STRATOPS = 0;
-    public final static int REPAIR_SYSTEM_WARCHEST_CUSTOM = 1;
-    public final static int REPAIR_SYSTEM_GENERIC_PARTS = 2;
+    public static final int REPAIR_SYSTEM_STRATOPS = 0;
+    public static final int REPAIR_SYSTEM_WARCHEST_CUSTOM = 1;
+    public static final int REPAIR_SYSTEM_GENERIC_PARTS = 2;
 
-    public final static int MAXIMUM_D6_VALUE = 6;
+    public static final int MAXIMUM_D6_VALUE = 6;
 
     //FIXME: This needs to be localized
-    public final static String[] REPAIR_SYSTEM_NAMES = {"Strat Ops", "Warchest Custom", "Generic Spare Parts"};
+    public static final String[] REPAIR_SYSTEM_NAMES = {"Strat Ops", "Warchest Custom", "Generic Spare Parts"};
 
-    public final static double MAXIMUM_COMBAT_EQUIPMENT_PERCENT = 5.0;
-    public final static double MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT = 1.0;
-    public final static double MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT = 1.0;
-    public final static double MAXIMUM_WARSHIP_EQUIPMENT_PERCENT = 1.0;
+    public static final double MAXIMUM_COMBAT_EQUIPMENT_PERCENT = 5.0;
+    public static final double MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT = 1.0;
+    public static final double MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT = 1.0;
+    public static final double MAXIMUM_WARSHIP_EQUIPMENT_PERCENT = 1.0;
 
-    public final static int PLANET_ACQUISITION_ALL = 0;
-    public final static int PLANET_ACQUISITION_NEUTRAL = 1;
-    public final static int PLANET_ACQUISITION_ALLY = 2;
-    public final static int PLANET_ACQUISITION_SELF = 3;
+    public static final int PLANET_ACQUISITION_ALL = 0;
+    public static final int PLANET_ACQUISITION_NEUTRAL = 1;
+    public static final int PLANET_ACQUISITION_ALLY = 2;
+    public static final int PLANET_ACQUISITION_SELF = 3;
 
 
     private boolean useFactionForNames;
@@ -102,8 +102,8 @@ public class CampaignOptions implements Serializable {
     private boolean useImplants;
     private boolean capturePrisoners;
     private int defaultPrisonerStatus;
-    public final static int PRISONER_RANK = 0;
-    public final static int BONDSMAN_RANK = 1;
+    public static final int PRISONER_RANK = 0;
+    public static final int BONDSMAN_RANK = 1;
 	private boolean altQualityAveraging;
     private boolean useAdvancedMedical; // Unofficial
     private boolean useDylansRandomXp; // Unofficial
@@ -125,6 +125,18 @@ public class CampaignOptions implements Serializable {
     private boolean useRandomMarriages;
     private double chanceRandomMarriages;
     private int marriageAgeRange;
+    private double[] randomMarriageSurnameWeights;
+    public static final int SURNAME_NO_CHANGE = 0;
+    public static final int SURNAME_YOURS = 1;
+    public static final int SURNAME_SPOUSE = 2;
+    public static final int SURNAME_HYP_YOURS = 3;
+    public static final int SURNAME_BOTH_HYP_YOURS = 4;
+    public static final int SURNAME_HYP_SPOUSE = 5;
+    public static final int SURNAME_BOTH_HYP_SPOUSE = 6;
+    public static final int SURNAME_MALE = 7;
+    public static final int SURNAME_FEMALE = 8;
+    public static final int SURNAME_WEIGHTED = 9; //should be equal to NUM_SURNAME at all times
+    public static final int NUM_SURNAME = 9; //number of surname options not counting the SURNAME_WEIGHTED OPTION
     private boolean useRandomSameSexMarriages;
     private double chanceRandomSameSexMarriages;
     private boolean useUnofficialProcreation;
@@ -134,13 +146,13 @@ public class CampaignOptions implements Serializable {
     private boolean displayTrueDueDate;
     private boolean logConception;
     private int babySurnameStyle;
-    public final static int BABY_SURNAME_MINE = 0; //baby uses mother's surname
-    public final static int BABY_SURNAME_SPOUSE = 1; //baby uses father's surname
+    public static final int BABY_SURNAME_MINE = 0; //baby uses mother's surname
+    public static final int BABY_SURNAME_SPOUSE = 1; //baby uses father's surname
     private boolean useParentage;
     private int displayFamilyLevel;
-    public final static int PARENTS_CHILDREN_SIBLINGS = 0;
-    public final static int GRANDPARENTS_GRANDCHILDREN = 1;
-    public final static int AUNTS_UNCLES_COUSINS = 2;
+    public static final int PARENTS_CHILDREN_SIBLINGS = 0;
+    public static final int GRANDPARENTS_GRANDCHILDREN = 1;
+    public static final int AUNTS_UNCLES_COUSINS = 2;
     private boolean useRandomDeaths;
     private boolean keepMarriedNameUponSpouseDeath;
     //salary
@@ -498,9 +510,19 @@ public class CampaignOptions implements Serializable {
         checkMutualAncestorsDepth = 4;
         useRandomMarriages = false;
         chanceRandomMarriages = 0.025;
-        marriageAgeRange = 20;
+        marriageAgeRange = 10;
+        randomMarriageSurnameWeights = new double[NUM_SURNAME];
+        randomMarriageSurnameWeights[SURNAME_NO_CHANGE] = 0.10;
+        randomMarriageSurnameWeights[SURNAME_YOURS] = 0.06;
+        randomMarriageSurnameWeights[SURNAME_SPOUSE] = 0.06;
+        randomMarriageSurnameWeights[SURNAME_HYP_YOURS] = 0.035;
+        randomMarriageSurnameWeights[SURNAME_BOTH_HYP_YOURS] = 0.025;
+        randomMarriageSurnameWeights[SURNAME_HYP_SPOUSE] = 0.035;
+        randomMarriageSurnameWeights[SURNAME_BOTH_HYP_SPOUSE] = 0.025;
+        randomMarriageSurnameWeights[SURNAME_MALE] = 0.5;
+        randomMarriageSurnameWeights[SURNAME_FEMALE] = 0.16;
         useRandomSameSexMarriages = false;
-        chanceRandomSameSexMarriages = 0.0025;
+        chanceRandomSameSexMarriages = 0.002;
         useUnofficialProcreation = false;
         chanceProcreation = 0.05;
         useUnofficialProcreationNoRelationship = false;
@@ -916,6 +938,22 @@ public class CampaignOptions implements Serializable {
 
     public void setMarriageAgeRange(int b) {
         marriageAgeRange = b;
+    }
+
+    public double[] getRandomMarriageSurnameWeights() {
+        return randomMarriageSurnameWeights;
+    }
+
+    public double getRandomMarriageSurnameWeight(int pos) {
+        return randomMarriageSurnameWeights[pos];
+    }
+
+    public void setRandomMarriageSurnameWeights(double[] b) {
+        randomMarriageSurnameWeights = b;
+    }
+
+    public void setRandomMarriageSurnameWeight(int pos, double b) {
+        randomMarriageSurnameWeights[pos] = b;
     }
 
     public boolean useRandomSameSexMarriages() {
@@ -2610,6 +2648,10 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomMarriages", useRandomMarriages);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "chanceRandomMarriages", chanceRandomMarriages);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "marriageAgeRange", marriageAgeRange);
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                + "<randomMarriageSurnameWeights>"
+                + StringUtils.join(randomMarriageSurnameWeights, ',')
+                + "</randomMarriageSurnameWeights>");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomSameSexMarriages", useRandomSameSexMarriages);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "chanceRandomSameSexMarriages", chanceRandomSameSexMarriages);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnofficialProcreation", useUnofficialProcreation);
@@ -3063,6 +3105,11 @@ public class CampaignOptions implements Serializable {
                 retVal.chanceRandomMarriages = Double.parseDouble(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("marriageAgeRange")) {
                 retVal.marriageAgeRange = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageSurnameWeights")) {
+                String[] values = wn2.getTextContent().split(",");
+                for (int i = 0; i < values.length; i++) {
+                    retVal.randomMarriageSurnameWeights[i] = Double.parseDouble(values[i]);
+                }
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomSameSexMarriages")) {
                 retVal.useRandomSameSexMarriages = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomSameSexMarriages")) {

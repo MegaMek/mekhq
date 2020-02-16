@@ -1747,6 +1747,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             panFamily.add(panMinimumMarriageAge, gridBagConstraints);
 
             spnCheckMutualAncestorsDepth = new JSpinner(new SpinnerNumberModel(options.checkMutualAncestorsDepth(), 0, 20, 1));
+            Dimension dimensionCheckMutualAncestorsDepth = spnCheckMutualAncestorsDepth.getPreferredSize();
+            dimensionCheckMutualAncestorsDepth.width = 50;
+            spnCheckMutualAncestorsDepth.setPreferredSize(dimensionCheckMutualAncestorsDepth);
             JPanel panCheckMutualAncestorsDepth = new JPanel();
             panCheckMutualAncestorsDepth.add(new JLabel(resourceMap.getString("checkMutualAncestorsDepth.text")));
             panCheckMutualAncestorsDepth.setToolTipText(resourceMap.getString("checkMutualAncestorsDepth.toolTipText"));
@@ -1760,9 +1763,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             gridBagConstraints.gridy = ++gridy;
             panFamily.add(chkUseRandomMarriages, gridBagConstraints);
 
-            spnChanceRandomMarriages = new JSpinner(new SpinnerNumberModel(options.getChanceRandomMarriages(), 0.0001, 100, 0.0001));
+            spnChanceRandomMarriages = new JSpinner(new SpinnerNumberModel(options.getChanceRandomMarriages(), 0, 100, 0.001));
             Dimension dimensionChanceRandomMarriages = spnChanceRandomMarriages.getPreferredSize();
-            dimensionChanceRandomMarriages.width = 50;
+            dimensionChanceRandomMarriages.width = 75;
             spnChanceRandomMarriages.setPreferredSize(dimensionChanceRandomMarriages);
             JPanel panChanceRandomMarriages = new JPanel();
             panChanceRandomMarriages.add(new JLabel(resourceMap.getString("chanceRandomMarriages.text")));
@@ -1785,9 +1788,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             gridBagConstraints.gridy = ++gridy;
             panFamily.add(chkUseRandomSameSexMarriages, gridBagConstraints);
 
-            spnChanceRandomSameSexMarriages = new JSpinner(new SpinnerNumberModel(options.getChanceRandomSameSexMarriages(), 0.0001, 100, 0.0001));
+            spnChanceRandomSameSexMarriages = new JSpinner(new SpinnerNumberModel(options.getChanceRandomSameSexMarriages(), 0, 100, 0.001));
             Dimension dimensionChanceRandomSameSexMarriages = spnChanceRandomSameSexMarriages.getPreferredSize();
-            dimensionChanceRandomSameSexMarriages.width = 50;
+            dimensionChanceRandomSameSexMarriages.width = 75;
             spnChanceRandomSameSexMarriages.setPreferredSize(dimensionChanceRandomSameSexMarriages);
             JPanel panChanceRandomSameSexMarriages = new JPanel();
             panChanceRandomSameSexMarriages.add(new JLabel(resourceMap.getString("chanceRandomSameSexMarriages.text")));
@@ -1802,7 +1805,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             gridBagConstraints.gridy = ++gridy;
             panFamily.add(chkUseUnofficialProcreation, gridBagConstraints);
 
-            spnChanceProcreation = new JSpinner(new SpinnerNumberModel(options.getChanceProcreation(), 0.001, 100, 0.001));
+            spnChanceProcreation = new JSpinner(new SpinnerNumberModel(options.getChanceProcreation(), 0, 100, 0.001));
             Dimension dimensionChanceProcreation = spnChanceProcreation.getPreferredSize();
             dimensionChanceProcreation.width = 50;
             spnChanceProcreation.setPreferredSize(dimensionChanceProcreation);
@@ -1819,7 +1822,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             gridBagConstraints.gridy = ++gridy;
             panFamily.add(chkUseUnofficialProcreationNoRelationship, gridBagConstraints);
 
-            spnChanceProcreationNoRelationship = new JSpinner(new SpinnerNumberModel(options.getChanceProcreationNoRelationship(), 0.001, 100, 0.001));
+            spnChanceProcreationNoRelationship = new JSpinner(new SpinnerNumberModel(options.getChanceProcreationNoRelationship(), 0, 100, 0.001));
             Dimension dimensionChanceProcreationNoRelationship = spnChanceProcreationNoRelationship.getPreferredSize();
             dimensionChanceProcreationNoRelationship.width = 50;
             spnChanceProcreationNoRelationship.setPreferredSize(dimensionChanceProcreationNoRelationship);

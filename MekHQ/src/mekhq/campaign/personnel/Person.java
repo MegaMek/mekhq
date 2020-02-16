@@ -828,7 +828,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         setFullName();
     }
 
-   public String getHyperlinkedName() {
+    public String getHyperlinkedName() {
         return String.format("<a href='PERSON:%s'>%s</a>", getId().toString(), getFullName());
     }
 
@@ -1387,7 +1387,20 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void addRandomSpouse(boolean sameSex) {
+        List<Person> potentials = new ArrayList<>();
+        int gender = sameSex ? getGender() : (isMale() ? G_MALE : G_FEMALE);
+        for (Person p : campaign.getPersonnel()) {
+            if (isPotentialRandomSpouse(p, gender)) {
+                potentials.add(p);
+            }
+        }
 
+        int n = potentials.size();
+        if (n > 0) {
+            Compute.randomInt(n);
+        }
+
+        marry(potentials.get(n), CampaignOptions.SURNAME_WEIGHTED);
     }
 
     public boolean isPotentialRandomSpouse(Person p, int gender) {
@@ -1397,11 +1410,140 @@ public class Person implements Serializable, MekHqXmlSerializable {
             return false;
         }
 
-        int ageDifference = p.getAge(campaign.getCalendar()) - getAge(campaign.getCalendar());
+        int ageDifference = Math.abs(p.getAge(campaign.getCalendar()) - getAge(campaign.getCalendar()));
 
-        return true;
+        return (ageDifference <= campaign.getCampaignOptions().getMarriageAgeRange());
     }
 
+    public void marry(Person spouse, int surnameOption) {
+        String surname = getSurname();
+        String spouseSurname = spouse.getSurname();
+
+        // these are used in the divorce code, as a null name will be ignored while a
+        // "" name is used to set an empty last name
+        if (surname == null) {
+            surname = "";
+        }
+        if (spouseSurname == null) {
+            spouseSurname = "";
+        }
+
+        if (surnameOption == CampaignOptions.SURNAME_WEIGHTED) {
+            surnameOption = randomWeightedSurname();
+        }
+
+        switch(surnameOption) {
+            case CampaignOptions.SURNAME_NO_CHANGE:
+                break;
+            case CampaignOptions.SURNAME_SPOUSE:
+                if (!StringUtil.isNullOrEmpty(spouseSurname)) {
+                    setSurname(spouseSurname);
+                }
+
+                setMaidenName(surname); //"" is handled in the divorce code
+                break;
+            case CampaignOptions.SURNAME_YOURS:
+                if (!StringUtil.isNullOrEmpty(surname)) {
+                    spouse.setSurname(surname);
+                }
+
+                spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
+                break;
+            case CampaignOptions.SURNAME_HYP_YOURS:
+                if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
+                    setSurname(surname + "-" + spouseSurname);
+                } else {
+                    setSurname(spouseSurname);
+                }
+                //both null or "" is ignored as a case, as it would lead to no changes
+
+                setMaidenName(surname); //"" is handled in the divorce code
+                break;
+            case CampaignOptions.SURNAME_BOTH_HYP_YOURS:
+                if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
+                    setSurname(surname + "-" + spouseSurname);
+                    spouse.setSurname(surname + "-" + spouseSurname);
+                } else if (!StringUtil.isNullOrEmpty(spouseSurname)) {
+                    setSurname(spouseSurname);
+                } else if (!StringUtil.isNullOrEmpty(surname)) {
+                    spouse.setSurname(surname);
+                }
+                //both null or "" is ignored as a case, as it would lead to no changes
+
+                setMaidenName(surname); //"" is handled in the divorce code
+                spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
+                break;
+            case CampaignOptions.SURNAME_HYP_SPOUSE:
+                if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
+                    spouse.setSurname(spouseSurname + "-" + surname);
+                } else {
+                    spouse.setSurname(surname);
+                }
+                //both null or "" is ignored as a case, as it would lead to no changes
+
+                spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
+                break;
+            case CampaignOptions.SURNAME_BOTH_HYP_SPOUSE:
+                if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
+                    setSurname(spouseSurname + "-" + surname);
+                    spouse.setSurname(spouseSurname + "-" + surname);
+                } else if (!StringUtil.isNullOrEmpty(spouseSurname)) {
+                    setSurname(spouseSurname);
+                } else if (!StringUtil.isNullOrEmpty(surname)) {
+                    spouse.setSurname(surname);
+                }
+                //both null or "" is ignored as a case, as it would lead to no changes
+
+                setMaidenName(surname); //"" is handled in the divorce code
+                spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
+                break;
+            case CampaignOptions.SURNAME_MALE:
+                if (isMale()) {
+                    if (!StringUtil.isNullOrEmpty(surname)) {
+                        spouse.setSurname(surname);
+                    }
+
+                    spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
+                } else {
+                    if (!StringUtil.isNullOrEmpty(spouseSurname)) {
+                        setSurname(spouseSurname);
+                    }
+
+                    setMaidenName(surname); //"" is handled in the divorce code
+                }
+                break;
+            case CampaignOptions.SURNAME_FEMALE:
+                if (isMale()) {
+                    if (!StringUtil.isNullOrEmpty(spouseSurname)) {
+                        setSurname(spouseSurname);
+                    }
+
+                    setMaidenName(surname); //"" is handled in the divorce code
+                } else {
+                    if (!StringUtil.isNullOrEmpty(surname)) {
+                        spouse.setSurname(surname);
+                    }
+
+                    spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
+                }
+                break;
+            default:
+                MekHQ.getLogger().log(getClass(), "marry", LogLevel.ERROR, String.format("Unknown error in Surname chooser between \"%s\" and \"%s\"", //$NON-NLS-1$
+                        getFullName(), spouse.getFullName()));
+                break;
+        }
+
+        spouse.setSpouseId(getId());
+        PersonalLogger.marriage(spouse, this, getCampaign().getDate());
+        setSpouseId(spouse.getId());
+        PersonalLogger.marriage(this, spouse, getCampaign().getDate());
+        MekHQ.triggerEvent(new PersonChangedEvent(this));
+        MekHQ.triggerEvent(new PersonChangedEvent(spouse));
+    }
+
+    private int randomWeightedSurname() {
+        return 0;
+    }
     //endregion Marriage
 
     public boolean isFemale() {
@@ -1410,11 +1552,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public boolean isMale() {
         return gender == G_MALE;
-    }
-
-    // Currently this isn't used
-    public boolean isNeuter() {
-        return !isMale() && !isFemale();
     }
 
     public int getXp() {
