@@ -3206,6 +3206,11 @@ public class Campaign implements Serializable, ITechManager {
                 continue;
             }
 
+            // Random Marriages
+            if (campaignOptions.useRandomMarriages()) {
+                p.randomMarriage();
+            }
+
             // Procreation
             if (p.isFemale()) {
                 if (p.isPregnant()) {
