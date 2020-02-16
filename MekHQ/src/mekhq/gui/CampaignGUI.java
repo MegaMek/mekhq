@@ -154,7 +154,7 @@ public class CampaignGUI extends JPanel {
     private JMenuItem miRetirementDefectionDialog;
     private JCheckBoxMenuItem miShowOverview;
 
-    private EnumMap<GuiTabType,CampaignGuiTab> standardTabs;
+    private EnumMap<GuiTabType, CampaignGuiTab> standardTabs;
 
     /* Components for the status panel */
     private JPanel statusPanel;
@@ -329,7 +329,7 @@ public class CampaignGUI extends JPanel {
         add(btnPanel, BorderLayout.PAGE_START);
         add(statusPanel, BorderLayout.PAGE_END);
 
-        standardTabs.values().forEach(t -> t.refreshAll());
+        standardTabs.values().forEach(CampaignGuiTab::refreshAll);
 
         refreshCalendar();
         initReport();
@@ -590,42 +590,83 @@ public class CampaignGUI extends JPanel {
         int index = tabMain.indexOfTab(tabName);
         if (index >= 0) {
             CampaignGuiTab tab = (CampaignGuiTab)tabMain.getComponentAt(index);
-            if (standardTabs.containsKey(tab.tabType())) {
-                standardTabs.remove(tab.tabType());
-            }
+            standardTabs.remove(tab.tabType());
             tabMain.removeTabAt(index);
         }
     }
 
     private void initMenu() {
-
         menuBar = new JMenuBar();
 
-        /* File Menu */
+        //region File Menu
         JMenu menuFile = new JMenu(resourceMap.getString("fileMenu.text")); // NOI18N
 
-        JMenuItem menuLoad = new JMenuItem(
-                resourceMap.getString("menuLoad.text")); // NOI18N
-        menuLoad.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuLoadXmlActionPerformed(evt);
-            }
-        });
+        JMenuItem menuLoad = new JMenuItem(resourceMap.getString("menuLoad.text")); // NOI18N
+        menuLoad.addActionListener(this::menuLoadXmlActionPerformed);
         menuFile.add(menuLoad);
 
-        JMenuItem menuSave = new JMenuItem(
-                resourceMap.getString("menuSave.text")); // NOI18N
-        menuSave.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuSaveXmlActionPerformed(evt);
-            }
-        });
+        JMenuItem menuSave = new JMenuItem(resourceMap.getString("menuSave.text")); // NOI18N
+        menuSave.addActionListener(this::menuSaveXmlActionPerformed);
         menuFile.add(menuSave);
 
+        //region menuImport
         JMenu menuImport = new JMenu(resourceMap.getString("menuImport.text")); // NOI18N
+
+        JMenuItem miImportOptions = new JMenuItem(resourceMap.getString("miImportOptions.text")); // NOI18N
+        miImportOptions.addActionListener(this::miImportOptionsActionPerformed);
+        menuImport.add(miImportOptions);
+
+        JMenuItem miImportPerson = new JMenuItem(resourceMap.getString("miImportPerson.text")); // NOI18N
+        miImportPerson.addActionListener(this::miImportPersonActionPerformed);
+        menuImport.add(miImportPerson);
+
+        JMenuItem miImportParts = new JMenuItem(resourceMap.getString("miImportParts.text")); // NOI18N
+        miImportParts.addActionListener(this::miImportPartsActionPerformed);
+        menuImport.add(miImportParts);
+
+        JMenuItem miLoadForces = new JMenuItem(resourceMap.getString("miLoadForces.text")); // NOI18N
+        miLoadForces.addActionListener(this::miLoadForcesActionPerformed);
+        // miLoadForces.setEnabled(false);
+        menuImport.add(miLoadForces);
+
+        menuFile.add(menuImport);
+        //endregion menuImport
+
+        //region menuExport
         JMenu menuExport = new JMenu(resourceMap.getString("menuExport.text")); // NOI18N
+
+        JMenu miExportCSVFile = new JMenu(resourceMap.getString("menuExportCSV.text")); // NOI18N
+        menuExport.add(miExportCSVFile);
+
+        JMenu miExportXMLFile = new JMenu(resourceMap.getString("menuExportXML.text")); // NOI18N
+        menuExport.add(miExportXMLFile);
+
+        JMenuItem miExportOptions = new JMenuItem(resourceMap.getString("miExportOptions.text")); // NOI18N
+        miExportOptions.addActionListener(this::miExportOptionsActionPerformed);
+        miExportXMLFile.add(miExportOptions);
+
+        JMenuItem miExportPersonCSV = new JMenuItem(resourceMap.getString("miExportPersonnel.text")); // NOI18N
+        miExportPersonCSV.addActionListener(this::miExportPersonnelCSVActionPerformed);
+        miExportCSVFile.add(miExportPersonCSV);
+
+        JMenuItem miExportUnitCSV = new JMenuItem(resourceMap.getString("miExportUnit.text")); // NOI18N
+        miExportUnitCSV.addActionListener(this::miExportUnitCSVActionPerformed);
+        miExportCSVFile.add(miExportUnitCSV);
+
+        JMenuItem miExportPlanetsXML = new JMenuItem(resourceMap.getString("miExportPlanets.text"));
+        miExportPlanetsXML.addActionListener(this::miExportPlanetsXMLActionPerformed);
+        miExportXMLFile.add(miExportPlanetsXML);
+
+        JMenuItem miExportFinancesCSV = new JMenuItem(resourceMap.getString("miExportFinances.text")); // NOI18N
+        miExportFinancesCSV.addActionListener(this::miExportFinancesCSVActionPerformed);
+        miExportCSVFile.add(miExportFinancesCSV);
+
+        JMenuItem miExportCampaignSubset = new JMenuItem(resourceMap.getString("miExportCampaignSubset.text"));
+        miExportCampaignSubset.addActionListener(evt -> {
+            CampaignExportWizard cew = new CampaignExportWizard(getCampaign());
+            cew.display(CampaignExportWizard.CampaignExportWizardState.ForceSelection);
+        });
+        menuExport.add(miExportCampaignSubset);
 
         /*
          * TODO: Implement these as "Export All" versions
@@ -643,144 +684,19 @@ public class CampaignGUI extends JPanel {
          * menuExport.add(miExportParts);
          */
 
-        JMenu miExportCSVFile = new JMenu(resourceMap.getString("menuExportCSV.text")); // NOI18N
-        JMenu miExportXMLFile = new JMenu(resourceMap.getString("menuExportXML.text")); // NOI18N
-
-        menuExport.add(miExportCSVFile);
-        menuExport.add(miExportXMLFile);
-
-        JMenuItem miExportOptions = new JMenuItem(
-                resourceMap.getString("miExportOptions.text")); // NOI18N
-        miExportOptions.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                miExportOptionsActionPerformed(evt);
-            }
-        });
-        miExportXMLFile.add(miExportOptions);
-
-        JMenuItem miExportPersonCSV = new JMenuItem(
-                resourceMap.getString("miExportPersonnel.text")); // NOI18N
-        miExportPersonCSV.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                miExportPersonnelCSVActionPerformed(evt);
-            }
-        });
-        miExportCSVFile.add(miExportPersonCSV);
-
-        JMenuItem miExportUnitCSV = new JMenuItem(
-                resourceMap.getString("miExportUnit.text")); // NOI18N
-        miExportUnitCSV.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                miExportUnitCSVActionPerformed(evt);
-            }
-        });
-        miExportCSVFile.add(miExportUnitCSV);
-
-        JMenuItem miExportPlanetsXML = new JMenuItem(
-                resourceMap.getString("miExportPlanets.text"));
-        miExportPlanetsXML.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                miExportPlanetsXMLActionPerformed(evt);
-            }
-        });
-        miExportXMLFile.add(miExportPlanetsXML);
-
-        JMenuItem miExportFinancesCSV = new JMenuItem(
-                resourceMap.getString("miExportFinances.text")); // NOI18N
-        miExportFinancesCSV.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                miExportFinancesCSVActionPerformed(evt);
-            }
-        });
-        miExportCSVFile.add(miExportFinancesCSV);
-
-        JMenuItem miExportCampaignSubset = new JMenuItem("Export Campaign Subset");
-        miExportCampaignSubset.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                CampaignExportWizard cew = new CampaignExportWizard(getCampaign());
-                cew.display(CampaignExportWizard.CampaignExportWizardState.ForceSelection);
-            }
-        });
-        menuExport.add(miExportCampaignSubset);
-
-        JMenuItem miImportOptions = new JMenuItem(
-                resourceMap.getString("miImportOptions.text")); // NOI18N
-        miImportOptions.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                miImportOptionsActionPerformed(evt);
-            }
-        });
-        menuImport.add(miImportOptions);
-
-        JMenuItem miImportPerson = new JMenuItem(
-                resourceMap.getString("miImportPerson.text")); // NOI18N
-        miImportPerson.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                miImportPersonActionPerformed(evt);
-            }
-        });
-        menuImport.add(miImportPerson);
-
-        JMenuItem miImportParts = new JMenuItem(
-                resourceMap.getString("miImportParts.text")); // NOI18N
-        miImportParts.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                miImportPartsActionPerformed(evt);
-            }
-        });
-        menuImport.add(miImportParts);
-
-        JMenuItem miLoadForces = new JMenuItem(
-                resourceMap.getString("miLoadForces.text")); // NOI18N
-        miLoadForces.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                miLoadForcesActionPerformed(evt);
-            }
-        });
-        // miLoadForces.setEnabled(false);
-        menuImport.add(miLoadForces);
-
-        menuFile.add(menuImport);
         menuFile.add(menuExport);
+        //endregion menuExport
 
-        JMenuItem miMercRoster = new JMenuItem(
-                resourceMap.getString("miMercRoster.text")); // NOI18N
-        miMercRoster.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                showMercRosterDialog();
-            }
-        });
+        JMenuItem miMercRoster = new JMenuItem(resourceMap.getString("miMercRoster.text")); // NOI18N
+        miMercRoster.addActionListener(evt -> showMercRosterDialog());
         menuFile.add(miMercRoster);
 
-        JMenuItem menuOptions = new JMenuItem(
-                resourceMap.getString("menuOptions.text")); // NOI18N
-        menuOptions.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuOptionsActionPerformed(evt);
-            }
-        });
+        JMenuItem menuOptions = new JMenuItem(resourceMap.getString("menuOptions.text")); // NOI18N
+        menuOptions.addActionListener(this::menuOptionsActionPerformed);
         menuFile.add(menuOptions);
 
-        JMenuItem menuOptionsMM = new JMenuItem(
-                resourceMap.getString("menuOptionsMM.text")); // NOI18N
-        menuOptionsMM.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuOptionsMMActionPerformed(evt);
-            }
-        });
+        JMenuItem menuOptionsMM = new JMenuItem(resourceMap.getString("menuOptionsMM.text")); // NOI18N
+        menuOptionsMM.addActionListener(this::menuOptionsMMActionPerformed);
         menuFile.add(menuOptionsMM);
 
         JMenuItem menuMekHqOptions = new JMenuItem(resourceMap.getString("menuMekHqOptions.text"));
@@ -788,422 +704,272 @@ public class CampaignGUI extends JPanel {
         menuMekHqOptions.addActionListener(this::menuMekHqOptionsActionPerformed);
         menuFile.add(menuMekHqOptions);
 
-        menuThemes = new JMenu("Themes");
+        menuThemes = new JMenu(resourceMap.getString("menuThemes.text"));
 
         refreshThemeChoices();
         menuFile.add(menuThemes);
 
-        JMenuItem menuExitItem = new JMenuItem("Exit");
-        menuExitItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                getApplication().exit();
-            }
-        });
+        JMenuItem menuExitItem = new JMenuItem(resourceMap.getString("menuExit.text"));
+        menuExitItem.addActionListener(evt -> getApplication().exit());
         menuFile.add(menuExitItem);
 
         menuBar.add(menuFile);
+        //endregion File Menu
 
+        //region Marketplace Menu
         JMenu menuMarket = new JMenu(resourceMap.getString("menuMarket.text")); // NOI18N
 
         // Personnel Market
-        JMenuItem miPersonnelMarket = new JMenuItem("Personnel Market");
-        miPersonnelMarket.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                hirePersonMarket();
-            }
-        });
+        JMenuItem miPersonnelMarket = new JMenuItem(resourceMap.getString("miPersonnelMarket.text"));
+        miPersonnelMarket.addActionListener(evt -> hirePersonMarket());
         menuMarket.add(miPersonnelMarket);
 
         // Contract Market
-        miContractMarket = new JMenuItem("Contract Market...");
-        miContractMarket.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                showContractMarket();
-            }
-        });
+        miContractMarket = new JMenuItem(resourceMap.getString("miContractMarket.text"));
+        miContractMarket.addActionListener(evt -> showContractMarket());
         menuMarket.add(miContractMarket);
-        miContractMarket.setVisible(getCampaign().getCampaignOptions()
-                .getUseAtB());
+        miContractMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
 
-        miUnitMarket = new JMenuItem("Unit Market...");
-        miUnitMarket.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                showUnitMarket();
-            }
-        });
+        miUnitMarket = new JMenuItem(resourceMap.getString("miUnitMarket.text"));
+        miUnitMarket.addActionListener(evt -> showUnitMarket());
         menuMarket.add(miUnitMarket);
         miUnitMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
 
-        miShipSearch = new JMenuItem("Ship Search...");
+        miShipSearch = new JMenuItem(resourceMap.getString("miShipSearch.text"));
         miShipSearch.addActionListener(ev -> showShipSearch());
         menuMarket.add(miShipSearch);
         miShipSearch.setVisible(getCampaign().getCampaignOptions().getUseAtB());
 
-        JMenuItem miPurchaseUnit = new JMenuItem(
-                resourceMap.getString("miPurchaseUnit.text")); // NOI18N
-        miPurchaseUnit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                miPurchaseUnitActionPerformed(evt);
-            }
-        });
+        JMenuItem miPurchaseUnit = new JMenuItem(resourceMap.getString("miPurchaseUnit.text")); // NOI18N
+        miPurchaseUnit.addActionListener(this::miPurchaseUnitActionPerformed);
         menuMarket.add(miPurchaseUnit);
 
-        JMenuItem miBuyParts = new JMenuItem(
-                resourceMap.getString("miBuyParts.text")); // NOI18N
-        miBuyParts.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buyParts();
-            }
-        });
+        JMenuItem miBuyParts = new JMenuItem(resourceMap.getString("miBuyParts.text")); // NOI18N
+        miBuyParts.addActionListener(evt -> buyParts());
         menuMarket.add(miBuyParts);
-        JMenuItem miHireBulk = new JMenuItem("Hire Personnel in Bulk");
-        miHireBulk.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                hireBulkPersonnel();
-            }
-        });
+
+        JMenuItem miHireBulk = new JMenuItem(resourceMap.getString("miHireBulk.text"));
+        miHireBulk.addActionListener(evt -> hireBulkPersonnel());
         menuMarket.add(miHireBulk);
 
         JMenu menuHire = new JMenu(resourceMap.getString("menuHire.text")); // NOI18N
 
         JMenuItem miHire;
         for (int i = Person.T_MECHWARRIOR; i < Person.T_NUM; i++) {
-            miHire = new JMenuItem(Person.getRoleDesc(i, getCampaign()
-                    .getFaction().isClan()));
+            miHire = new JMenuItem(Person.getRoleDesc(i, getCampaign().getFaction().isClan()));
             miHire.setActionCommand(Integer.toString(i));
-            miHire.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    hirePerson(evt);
-                }
-            });
+            miHire.addActionListener(this::hirePerson);
             menuHire.add(miHire);
         }
         menuMarket.add(menuHire);
 
-        JMenu menuAstechPool = new JMenu("Astech Pool");
+        JMenu menuAstechPool = new JMenu(resourceMap.getString("menuAstechPool.text"));
 
-        JMenuItem miHireAstechs = new JMenuItem("Hire Astechs");
-        miHireAstechs.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
-                        getFrame(), true, "Hire How Many Astechs?", 1, 0, CampaignGUI.MAX_QUANTITY_SPINNER);
-                pvcd.setVisible(true);
-                if (pvcd.getValue() < 0) {
-                    return;
-                }
-                getCampaign().increaseAstechPool(pvcd.getValue());
+        JMenuItem miHireAstechs = new JMenuItem(resourceMap.getString("miHireAstechs.text"));
+        miHireAstechs.addActionListener(evt -> {
+            PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
+                    getFrame(), true, resourceMap.getString("popupHireAstechsNum.text"),
+                    1, 0, CampaignGUI.MAX_QUANTITY_SPINNER);
+            pvcd.setVisible(true);
+            if (pvcd.getValue() < 0) {
+                return;
             }
+            getCampaign().increaseAstechPool(pvcd.getValue());
         });
         menuAstechPool.add(miHireAstechs);
 
-        JMenuItem miFireAstechs = new JMenuItem("Release Astechs");
-        miFireAstechs.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
-                        getFrame(), true, "Release How Many Astechs?", 1, 0,
-                        getCampaign().getAstechPool());
-                pvcd.setVisible(true);
-                if (pvcd.getValue() < 0) {
-                    return;
-                }
-                getCampaign().decreaseAstechPool(pvcd.getValue());
+        JMenuItem miFireAstechs = new JMenuItem(resourceMap.getString("miFireAstechs.text"));
+        miFireAstechs.addActionListener(evt -> {
+            PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
+                    getFrame(), true, resourceMap.getString("popupFireAstechsNum.text"),
+                    1, 0, getCampaign().getAstechPool());
+            pvcd.setVisible(true);
+            if (pvcd.getValue() < 0) {
+                return;
             }
+            getCampaign().decreaseAstechPool(pvcd.getValue());
         });
         menuAstechPool.add(miFireAstechs);
 
-        JMenuItem miFullStrengthAstechs = new JMenuItem(
-                "Bring All Tech Teams to Full Strength");
-        miFullStrengthAstechs.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                int need = (getCampaign().getTechs().size() * 6)
-                        - getCampaign().getNumberAstechs();
-                if (need > 0) {
-                    getCampaign().increaseAstechPool(need);
-                }
+        JMenuItem miFullStrengthAstechs = new JMenuItem(resourceMap.getString("miFullStrengthAstechs.text"));
+        miFullStrengthAstechs.addActionListener(evt -> {
+            int need = (getCampaign().getTechs().size() * 6)
+                    - getCampaign().getNumberAstechs();
+            if (need > 0) {
+                getCampaign().increaseAstechPool(need);
             }
         });
         menuAstechPool.add(miFullStrengthAstechs);
 
-        JMenuItem miFireAllAstechs = new JMenuItem(
-                "Release All Astechs from Pool");
-        miFireAllAstechs.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                getCampaign().decreaseAstechPool(getCampaign().getAstechPool());
-            }
-        });
+        JMenuItem miFireAllAstechs = new JMenuItem(resourceMap.getString("miFireAllAstechs.text"));
+        miFireAllAstechs.addActionListener(evt -> getCampaign().decreaseAstechPool(getCampaign().getAstechPool()));
         menuAstechPool.add(miFireAllAstechs);
         menuMarket.add(menuAstechPool);
 
-        JMenu menuMedicPool = new JMenu("Medic Pool");
-        JMenuItem miHireMedics = new JMenuItem("Hire Medics");
-        miHireMedics.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
-                        getFrame(), true, "Hire How Many Medics?", 1, 0, CampaignGUI.MAX_QUANTITY_SPINNER);
-                pvcd.setVisible(true);
-                if (pvcd.getValue() < 0) {
-                    return;
-                }
-                getCampaign().increaseMedicPool(pvcd.getValue());
+        JMenu menuMedicPool = new JMenu(resourceMap.getString("menuMedicPool.text"));
+        JMenuItem miHireMedics = new JMenuItem(resourceMap.getString("miHireMedics.text"));
+        miHireMedics.addActionListener(evt -> {
+            PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
+                    getFrame(), true, resourceMap.getString("popupHireMedicsNum.text"),
+                    1, 0, CampaignGUI.MAX_QUANTITY_SPINNER);
+            pvcd.setVisible(true);
+            if (pvcd.getValue() < 0) {
+                return;
             }
+            getCampaign().increaseMedicPool(pvcd.getValue());
         });
         menuMedicPool.add(miHireMedics);
 
-        JMenuItem miFireMedics = new JMenuItem("Release Medics");
-        miFireMedics.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
-                        getFrame(), true, "Release How Many Medics?", 1, 0,
-                        getCampaign().getMedicPool());
-                pvcd.setVisible(true);
-                if (pvcd.getValue() < 0) {
-                    return;
-                }
-                getCampaign().decreaseMedicPool(pvcd.getValue());
+        JMenuItem miFireMedics = new JMenuItem(resourceMap.getString("miFireMedics.text"));
+        miFireMedics.addActionListener(evt -> {
+            PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
+                    getFrame(), true, resourceMap.getString("popupFireMedicsNum.text"),
+                    1, 0, getCampaign().getMedicPool());
+            pvcd.setVisible(true);
+            if (pvcd.getValue() < 0) {
+                return;
             }
+            getCampaign().decreaseMedicPool(pvcd.getValue());
         });
         menuMedicPool.add(miFireMedics);
-        JMenuItem miFullStrengthMedics = new JMenuItem(
-                "Bring All Medical Teams to Full Strength");
-        miFullStrengthMedics.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                int need = (getCampaign().getDoctors().size() * 4)
-                        - getCampaign().getNumberMedics();
-                if (need > 0) {
-                    getCampaign().increaseMedicPool(need);
-                }
+        JMenuItem miFullStrengthMedics = new JMenuItem(resourceMap.getString("miFullStrengthMedics.text"));
+        miFullStrengthMedics.addActionListener(evt -> {
+            int need = (getCampaign().getDoctors().size() * 4)
+                    - getCampaign().getNumberMedics();
+            if (need > 0) {
+                getCampaign().increaseMedicPool(need);
             }
         });
         menuMedicPool.add(miFullStrengthMedics);
-        JMenuItem miFireAllMedics = new JMenuItem(
-                "Release All Medics from Pool");
-        miFireAllMedics.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                getCampaign().decreaseMedicPool(getCampaign().getMedicPool());
-            }
-        });
+        JMenuItem miFireAllMedics = new JMenuItem(resourceMap.getString("miFireAllMedics.text"));
+        miFireAllMedics.addActionListener(evt -> getCampaign().decreaseMedicPool(getCampaign().getMedicPool()));
         menuMedicPool.add(miFireAllMedics);
         menuMarket.add(menuMedicPool);
-        menuBar.add(menuMarket);
 
+        menuBar.add(menuMarket);
+        //endregion Marketplace Menu
+
+        //region Reports Menu
         JMenu menuReports = new JMenu(resourceMap.getString("menuReports.text")); // NOI18N
 
-        JMenuItem miDragoonsRating = new JMenuItem(
-                resourceMap.getString("miDragoonsRating.text")); // NOI18N
-        miDragoonsRating.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                showReport(new RatingReport(getCampaign()));
-            }
-        });
+        JMenuItem miDragoonsRating = new JMenuItem(resourceMap.getString("miDragoonsRating.text")); // NOI18N
+        miDragoonsRating.addActionListener(evt -> showReport(new RatingReport(getCampaign())));
         menuReports.add(miDragoonsRating);
 
-        JMenuItem miPersonnelReport = new JMenuItem(
-                resourceMap.getString("miPersonnelReport.text")); // NOI18N
-        miPersonnelReport.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                showReport(new PersonnelReport(getCampaign()));
-            }
-        });
+        JMenuItem miPersonnelReport = new JMenuItem(resourceMap.getString("miPersonnelReport.text")); // NOI18N
+        miPersonnelReport.addActionListener(evt -> showReport(new PersonnelReport(getCampaign())));
         menuReports.add(miPersonnelReport);
 
-        JMenuItem miHangarBreakdown = new JMenuItem(
-                resourceMap.getString("miHangarBreakdown.text")); // NOI18N
-        miHangarBreakdown.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                showReport(new HangarReport(getCampaign()));
-            }
-        });
+        JMenuItem miHangarBreakdown = new JMenuItem(resourceMap.getString("miHangarBreakdown.text")); // NOI18N
+        miHangarBreakdown.addActionListener(evt -> showReport(new HangarReport(getCampaign())));
         menuReports.add(miHangarBreakdown);
 
-        JMenuItem miTransportReport = new JMenuItem(
-                resourceMap.getString("miTransportReport.text")); // NOI18N
-        miTransportReport.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                showReport(new TransportReport(getCampaign()));
-            }
-        });
+        JMenuItem miTransportReport = new JMenuItem(resourceMap.getString("miTransportReport.text")); // NOI18N
+        miTransportReport.addActionListener(evt -> showReport(new TransportReport(getCampaign())));
         menuReports.add(miTransportReport);
 
-        JMenuItem miCargoReport = new JMenuItem(
-                resourceMap.getString("miCargoReport.text")); // NOI18N
-        miCargoReport.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                showReport(new CargoReport(getCampaign()));
-            }
-        });
+        JMenuItem miCargoReport = new JMenuItem(resourceMap.getString("miCargoReport.text")); // NOI18N
+        miCargoReport.addActionListener(evt -> showReport(new CargoReport(getCampaign())));
         menuReports.add(miCargoReport);
 
         menuBar.add(menuReports);
+        //endregion Reports Menu
 
-        JMenu menuCommunity = new JMenu(
-                resourceMap.getString("menuCommunity.text")); // NOI18N
+        //region Community Menu
+        JMenu menuCommunity = new JMenu(resourceMap.getString("menuCommunity.text")); // NOI18N
 
         JMenuItem miChat = new JMenuItem(resourceMap.getString("miChat.text")); // NOI18N
-        miChat.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                miChatActionPerformed(evt);
-            }
-        });
+        miChat.addActionListener(this::miChatActionPerformed);
         menuCommunity.add(miChat);
 
         // menuBar.add(menuCommunity);
+        //endregion Community Menu
 
-        JMenu menuView = new JMenu("View"); // NOI18N
+        //region View Menu
+        JMenu menuView = new JMenu(resourceMap.getString("menuView.text")); // NOI18N
 
         miHistoricalDailyReportDialog = new JMenuItem(resourceMap.getString("miShowHistoricalReportLog.text")); // NOI18N
         miHistoricalDailyReportDialog.setEnabled(true);
-        miHistoricalDailyReportDialog.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                showHistoricalDailyReportDialog();
-            }
-        });
+        miHistoricalDailyReportDialog.addActionListener(evt -> showHistoricalDailyReportDialog());
         menuView.add(miHistoricalDailyReportDialog);
 
-        miDetachLog = new JMenuItem("Detach Daily Report Log"); // NOI18N
-        miDetachLog.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                showDailyReportDialog();
-            }
-        });
+        miDetachLog = new JMenuItem(resourceMap.getString("miDetachLog.text")); // NOI18N
+        miDetachLog.addActionListener(evt -> showDailyReportDialog());
         menuView.add(miDetachLog);
 
-        miAttachLog = new JMenuItem("Attach Daily Report Log"); // NOI18N
+        miAttachLog = new JMenuItem(resourceMap.getString("miAttachLog.text")); // NOI18N
         miAttachLog.setEnabled(false);
-        miAttachLog.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                hideDailyReportDialog();
-            }
-        });
+        miAttachLog.addActionListener(evt -> hideDailyReportDialog());
         menuView.add(miAttachLog);
 
-        JMenuItem miBloodnameDialog = new JMenuItem("Show Bloodname Dialog...");
+        JMenuItem miBloodnameDialog = new JMenuItem(resourceMap.getString("miBloodnameDialog.text"));
         miBloodnameDialog.setEnabled(true);
-        miBloodnameDialog.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                showBloodnameDialog();
-            }
-        });
+        miBloodnameDialog.addActionListener(evt -> showBloodnameDialog());
         menuView.add(miBloodnameDialog);
 
-        miRetirementDefectionDialog = new JMenuItem(
-                "Show Retirement/Defection Dialog...");
+        miRetirementDefectionDialog = new JMenuItem(resourceMap.getString("miRetirementDefectionDialog.text"));
         miRetirementDefectionDialog.setEnabled(true);
-        miRetirementDefectionDialog.setVisible(getCampaign()
-                .getCampaignOptions().getUseAtB());
-        miRetirementDefectionDialog.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                showRetirementDefectionDialog();
-            }
-        });
+        miRetirementDefectionDialog.setVisible(getCampaign().getCampaignOptions().getUseAtB());
+        miRetirementDefectionDialog.addActionListener(evt -> showRetirementDefectionDialog());
         menuView.add(miRetirementDefectionDialog);
 
-        miShowOverview = new JCheckBoxMenuItem("Show Overview Tab");
+        miShowOverview = new JCheckBoxMenuItem(resourceMap.getString("miShowOverview.text"));
         miShowOverview.setSelected(hasTab(GuiTabType.OVERVIEW));
-        miShowOverview.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                toggleOverviewTab();
-            }
-        });
+        miShowOverview.addActionListener(evt -> toggleOverviewTab());
         menuView.add(miShowOverview);
 
         menuBar.add(menuView);
+        //endregion View Menu
 
-        JMenu menuManage = new JMenu("Manage Campaign");
+        //region Manage Campaign Menu
+        JMenu menuManage = new JMenu(resourceMap.getString("menuManageCampaign.text"));
         menuManage.setName("manageMenu");
-        JMenuItem miGMToolsDialog = new JMenuItem("Show GM Tools Dialog");
+
+        JMenuItem miGMToolsDialog = new JMenuItem(resourceMap.getString("miGMToolsDialog.text"));
         miGMToolsDialog.setEnabled(true);
-        miGMToolsDialog.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                showGMToolsDialog();
-            }
-        });
+        miGMToolsDialog.addActionListener(evt -> showGMToolsDialog());
         menuManage.add(miGMToolsDialog);
-        JMenuItem miAdvanceMultipleDays = new JMenuItem("Advance Multiple Days");
+
+        JMenuItem miAdvanceMultipleDays = new JMenuItem(resourceMap.getString("miAdvanceMultipleDays.text"));
         miAdvanceMultipleDays.setEnabled(true);
-        miAdvanceMultipleDays.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                showAdvanceDaysDialog();
-            }
-        });
+        miAdvanceMultipleDays.addActionListener(evt -> showAdvanceDaysDialog());
         menuManage.add(miAdvanceMultipleDays);
-        JMenuItem miBloodnames = new JMenuItem("Randomize Bloodnames All Personnel");
+
+        JMenuItem miBloodnames = new JMenuItem(resourceMap.getString("miRandomBloodnames.text"));
         miBloodnames.setEnabled(true);
-        miBloodnames.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                randomizeAllBloodnames();
-            }
-        });
+        miBloodnames.addActionListener(evt -> randomizeAllBloodnames());
         menuManage.add(miBloodnames);
-        JMenuItem miBatchXP = new JMenuItem("Mass training");
+
+        JMenuItem miBatchXP = new JMenuItem(resourceMap.getString("miBatchXP.text"));
         miBatchXP.setEnabled(true);
-        miBatchXP.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                spendBatchXP();
-            }
-        });
+        miBatchXP.addActionListener(evt -> spendBatchXP());
         menuManage.add(miBatchXP);
 
-        JMenuItem miScenarioEditor = new JMenuItem("Scenario Template Editor");
+        JMenuItem miScenarioEditor = new JMenuItem(resourceMap.getString("miScenarioEditor.text"));
         miScenarioEditor.setEnabled(true);
-        miScenarioEditor.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                ScenarioTemplateEditorDialog sted = new ScenarioTemplateEditorDialog(getFrame());
-                sted.setVisible(true);
-            }
+        miScenarioEditor.addActionListener(evt -> {
+            ScenarioTemplateEditorDialog sted = new ScenarioTemplateEditorDialog(getFrame());
+            sted.setVisible(true);
         });
         menuManage.add(miScenarioEditor);
 
         menuBar.add(menuManage);
+        //endregion Manage Campaign Menu
 
-        JMenu menuHelp = new JMenu(resourceMap.getString("helpMenu.text")); // NOI18N
+        //region Help Menu
+        JMenu menuHelp = new JMenu(resourceMap.getString("menuHelp.text")); // NOI18N
         menuHelp.setName("helpMenu"); // NOI18N
+
         JMenuItem menuAboutItem = new JMenuItem("aboutMenuItem"); // NOI18N
-        menuAboutItem.setText("About");
-        menuAboutItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                showAboutBox();
-            }
-        });
+        menuAboutItem.setText(resourceMap.getString("menuAbout.text"));
+        menuAboutItem.addActionListener(evt -> showAboutBox());
         menuHelp.add(menuAboutItem);
+
         menuBar.add(menuHelp);
+        //endregion Help Menu
     }
 
     private void initMain() {
-
         panLog = new DailyReportLogPanel(reportHLL);
         panLog.setMinimumSize(new java.awt.Dimension(150, 100));
         logDialog = new DailyReportLogDialog(getFrame(), this, reportHLL);
@@ -1214,7 +980,6 @@ public class CampaignGUI extends JPanel {
     }
 
     private void initStatusBar() {
-
         statusPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 20, 4));
 
         lblRating = new JLabel();
@@ -1231,8 +996,7 @@ public class CampaignGUI extends JPanel {
     private void initTopButtons() {
         GridBagConstraints gridBagConstraints;
 
-        lblLocation = new JLabel(getCampaign().getLocation().getReport(
-                getCampaign().getCalendar().getTime())); // NOI18N
+        lblLocation = new JLabel(getCampaign().getLocation().getReport(getCampaign().getCalendar().getTime())); // NOI18N
 
         btnPanel = new JPanel(new GridBagLayout());
 
@@ -1248,15 +1012,9 @@ public class CampaignGUI extends JPanel {
         btnPanel.add(lblLocation, gridBagConstraints);
 
         btnGMMode = new JToggleButton(resourceMap.getString("btnGMMode.text")); // NOI18N
-        btnGMMode
-                .setToolTipText(resourceMap.getString("btnGMMode.toolTipText")); // NOI18N
+        btnGMMode.setToolTipText(resourceMap.getString("btnGMMode.toolTipText")); // NOI18N
         btnGMMode.setSelected(getCampaign().isGM());
-        btnGMMode.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGMModeActionPerformed(evt);
-            }
-        });
+        btnGMMode.addActionListener(this::btnGMModeActionPerformed);
         btnGMMode.setMinimumSize(new Dimension(150, 25));
         btnGMMode.setPreferredSize(new Dimension(150, 25));
         btnGMMode.setMaximumSize(new Dimension(150, 25));
@@ -1270,16 +1028,9 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
         btnPanel.add(btnGMMode, gridBagConstraints);
 
-        btnOvertime = new JToggleButton(
-                resourceMap.getString("btnOvertime.text")); // NOI18N
-        btnOvertime.setToolTipText(resourceMap
-                .getString("btnOvertime.toolTipText")); // NOI18N
-        btnOvertime.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOvertimeActionPerformed(evt);
-            }
-        });
+        btnOvertime = new JToggleButton(resourceMap.getString("btnOvertime.text")); // NOI18N
+        btnOvertime.setToolTipText(resourceMap.getString("btnOvertime.toolTipText")); // NOI18N
+        btnOvertime.addActionListener(this::btnOvertimeActionPerformed);
         btnOvertime.setMinimumSize(new Dimension(150, 25));
         btnOvertime.setPreferredSize(new Dimension(150, 25));
         btnOvertime.setMaximumSize(new Dimension(150, 25));
@@ -1294,14 +1045,8 @@ public class CampaignGUI extends JPanel {
         btnPanel.add(btnOvertime, gridBagConstraints);
 
         btnAdvanceDay = new JButton(resourceMap.getString("btnAdvanceDay.text")); // NOI18N
-        btnAdvanceDay.setToolTipText(resourceMap
-                .getString("btnAdvanceDay.toolTipText")); // NOI18N
-        btnAdvanceDay.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                advanceDay();
-            }
-        });
+        btnAdvanceDay.setToolTipText(resourceMap.getString("btnAdvanceDay.toolTipText")); // NOI18N
+        btnAdvanceDay.addActionListener(evt -> advanceDay());
         btnAdvanceDay.setPreferredSize(new Dimension(250, 50));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -1331,7 +1076,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private static boolean isMacOSX() {
-        return System.getProperty("os.name").indexOf("Mac OS X") >= 0;
+        return System.getProperty("os.name").contains("Mac OS X");
     }
 
     private void miChatActionPerformed(ActionEvent evt) {
@@ -1361,7 +1106,7 @@ public class CampaignGUI extends JPanel {
 
             menuThemes.add(miPlaf);
             miPlaf.setActionCommand(laf.getClassName());
-            miPlaf.addActionListener(evt -> changeTheme(evt));
+            miPlaf.addActionListener(this::changeTheme);
         }
     }
     //TODO: trigger from event
@@ -1378,8 +1123,7 @@ public class CampaignGUI extends JPanel {
         }
         if (mainPanel.getDividerLocation() < 700) {
             if (mainPanel.getLastDividerLocation() > 700) {
-                mainPanel
-                        .setDividerLocation(mainPanel.getLastDividerLocation());
+                mainPanel.setDividerLocation(mainPanel.getLastDividerLocation());
             } else {
                 mainPanel.resetToPreferredSizes();
             }
@@ -1396,8 +1140,7 @@ public class CampaignGUI extends JPanel {
         if (getTab(GuiTabType.REPAIR) != null) {
             if (mainPanel.getDividerLocation() < 700) {
                 if (mainPanel.getLastDividerLocation() > 700) {
-                    mainPanel
-                            .setDividerLocation(mainPanel.getLastDividerLocation());
+                    mainPanel.setDividerLocation(mainPanel.getLastDividerLocation());
                 } else {
                     mainPanel.resetToPreferredSizes();
                 }
@@ -1417,8 +1160,7 @@ public class CampaignGUI extends JPanel {
         }
         if (mainPanel.getDividerLocation() < 700) {
             if (mainPanel.getLastDividerLocation() > 700) {
-                mainPanel
-                        .setDividerLocation(mainPanel.getLastDividerLocation());
+                mainPanel.setDividerLocation(mainPanel.getLastDividerLocation());
             } else {
                 mainPanel.resetToPreferredSizes();
             }
