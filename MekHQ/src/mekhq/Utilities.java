@@ -1339,11 +1339,11 @@ public class Utilities {
 
     /**
      * Export a JTable to a CSV file
-     * @param table
-     * @param file
+     * @param table     the table to save to csv
+     * @param file      the file to save to
      * @return report
      */
-    public static String exportTabletoCSV(JTable table, File file) {
+    public static String exportTableToCSV(JTable table, File file) {
         String report;
         try {
             TableModel model = table.getModel();
@@ -1355,12 +1355,12 @@ public class Utilities {
             CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader(columns));
 
             for (int i = 0; i < model.getRowCount(); i++) {
-                Object[] towrite = new String[model.getColumnCount()];
+                Object[] toWrite = new String[model.getColumnCount()];
                 for (int j = 0; j < model.getColumnCount(); j++) {
                     // use regex to remove any HTML tags
-                    towrite[j] = model.getValueAt(i,j).toString().replaceAll("\\<[^>]*>", "");
+                    toWrite[j] = model.getValueAt(i,j).toString().replaceAll("<[^>]*>", "");
                 }
-                csvPrinter.printRecord(towrite);
+                csvPrinter.printRecord(toWrite);
             }
 
             csvPrinter.flush();
@@ -1368,7 +1368,7 @@ public class Utilities {
 
             report = model.getRowCount() + " " + resourceMap.getString("RowsWritten.text");
         } catch(Exception ioe) {
-            MekHQ.getLogger().log(Utilities.class, "exportTabletoCSV", LogLevel.INFO, "Error exporting JTable");
+            MekHQ.getLogger().log(Utilities.class, "exportTableToCSV", LogLevel.INFO, "Error exporting JTable");
             report = "Error exporting JTable. See log for details.";
         }
         return report;

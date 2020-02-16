@@ -1877,12 +1877,12 @@ public class CampaignGUI extends JPanel {
 
     /**
      * Exports Personnel to a file (CSV, XML, etc.)
-     * @param format
-     * @param dialogTitle
-     * @param filename
+     * @param format        file format to export to
+     * @param dialogTitle   title of the dialog frame
+     * @param filename      file name to save to
      */
     protected void exportPersonnel(FileType format, String dialogTitle, String filename) {
-        if (((PersonnelTab)getTab(GuiTabType.PERSONNEL)).getPersonnelTable().getRowCount() != 0) {
+        if (((PersonnelTab) getTab(GuiTabType.PERSONNEL)).getPersonnelTable().getRowCount() != 0) {
             GUI.fileDialogSave(
                     frame,
                     dialogTitle,
@@ -1893,11 +1893,14 @@ public class CampaignGUI extends JPanel {
                         MekHQ.getPersonnelDirectory().setValue(f.getParent());
                         File file = checkFileEnding(f, format.getRecommendedExtension());
                         checkToBackupFile(file, file.getPath());
-                        String report = "";
+                        String report;
                         // TODO add support for xml and json export
                         if (format.equals(FileType.CSV)) {
-                            JOptionPane.showMessageDialog(mainPanel, report);
+                            report = Utilities.exportTableToCSV(((PersonnelTab) getTab(GuiTabType.PERSONNEL)).getPersonnelTable(), file);
+                        } else {
+                            report = "Unsupported FileType in Export Personnel";
                         }
+                        JOptionPane.showMessageDialog(mainPanel, report);
                     });
         } else {
             JOptionPane.showMessageDialog(mainPanel, resourceMap.getString("dlgNoPersonnel.text"));
@@ -1906,12 +1909,12 @@ public class CampaignGUI extends JPanel {
 
     /**
      * Exports Units to a file (CSV, XML, etc.)
-     * @param format
-     * @param dialogTitle
-     * @param filename
+     * @param format        file format to export to
+     * @param dialogTitle   title of the dialog frame
+     * @param filename      file name to save to
      */
     protected void exportUnits(FileType format, String dialogTitle, String filename) {
-        if (((HangarTab)getTab(GuiTabType.HANGAR)).getUnitTable().getRowCount() != 0) {
+        if (((HangarTab) getTab(GuiTabType.HANGAR)).getUnitTable().getRowCount() != 0) {
             GUI.fileDialogSave(
                     frame,
                     dialogTitle,
@@ -1922,19 +1925,25 @@ public class CampaignGUI extends JPanel {
                         MekHQ.getUnitsDirectory().setValue(f.getParent());
                         File file = checkFileEnding(f, format.getRecommendedExtension());
                         checkToBackupFile(file, file.getPath());
-                        String report = "";
+                        String report;
                         // TODO add support for xml and json export
                         if (format.equals(FileType.CSV)) {
-                            JOptionPane.showMessageDialog(mainPanel, report);
+                            report = Utilities.exportTableToCSV(((HangarTab) getTab(GuiTabType.HANGAR)).getUnitTable(), file);
+                        } else {
+                            report = "Unsupported FileType in Export Units";
                         }
+                        JOptionPane.showMessageDialog(mainPanel, report);
                     });
         } else {
             JOptionPane.showMessageDialog(mainPanel, resourceMap.getString("dlgNoUnits"));
         }
     }
 
-    /**
+     /**
      * Exports Finances to a file (CSV, XML, etc.)
+     * @param format        file format to export to
+     * @param dialogTitle   title of the dialog frame
+     * @param filename      file name to save to
      */
     protected void exportFinances(FileType format, String dialogTitle, String filename) {
         if (!getCampaign().getFinances().getAllTransactions().isEmpty()) {
@@ -1948,12 +1957,17 @@ public class CampaignGUI extends JPanel {
                         MekHQ.getFinancesDirectory().setValue(f.getParent());
                         File file = checkFileEnding(f, format.getRecommendedExtension());
                         checkToBackupFile(file, file.getPath());
-                        String report = getCampaign().getFinances().exportFinances(file.getPath(), format.getRecommendedExtension());
+                        String report;
+                        // TODO add support for xml and json export
+                        if (format.equals(FileType.CSV)) {
+                            report = getCampaign().getFinances().exportFinancesToCSV(file.getPath(), format.getRecommendedExtension());
+                        } else {
+                            report = "Unsupported FileType in Export Finances";
+                        }
                         JOptionPane.showMessageDialog(mainPanel, report);
                     });
         } else {
             JOptionPane.showMessageDialog(mainPanel, resourceMap.getString("dlgNoFinances.text"));
-            return;
         }
     }
 
