@@ -1738,7 +1738,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             panFamily.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("FamilyTab.text")));
             int panFamilyGridY = ++gridy;
 
-            spnMinimumMarriageAge = new JSpinner(new SpinnerNumberModel(options.getMinimumMarriageAge(), 16, null, 1));
+            spnMinimumMarriageAge = new JSpinner(new SpinnerNumberModel(options.getMinimumMarriageAge(), 14, null, 1));
+            Dimension dimensionMinimumMarriageAge = spnMinimumMarriageAge.getPreferredSize();
+            dimensionMinimumMarriageAge.width = 40;
+            spnMinimumMarriageAge.setPreferredSize(dimensionMinimumMarriageAge);
             JPanel panMinimumMarriageAge = new JPanel();
             panMinimumMarriageAge.add(new JLabel(resourceMap.getString("minimumMarriageAge.text")));
             panMinimumMarriageAge.setToolTipText(resourceMap.getString("minimumMarriageAge.toolTipText"));
@@ -1748,7 +1751,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
             spnCheckMutualAncestorsDepth = new JSpinner(new SpinnerNumberModel(options.checkMutualAncestorsDepth(), 0, 20, 1));
             Dimension dimensionCheckMutualAncestorsDepth = spnCheckMutualAncestorsDepth.getPreferredSize();
-            dimensionCheckMutualAncestorsDepth.width = 50;
+            dimensionCheckMutualAncestorsDepth.width = 40;
             spnCheckMutualAncestorsDepth.setPreferredSize(dimensionCheckMutualAncestorsDepth);
             JPanel panCheckMutualAncestorsDepth = new JPanel();
             panCheckMutualAncestorsDepth.add(new JLabel(resourceMap.getString("checkMutualAncestorsDepth.text")));
@@ -1765,7 +1768,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
             spnChanceRandomMarriages = new JSpinner(new SpinnerNumberModel(options.getChanceRandomMarriages(), 0, 100, 0.001));
             Dimension dimensionChanceRandomMarriages = spnChanceRandomMarriages.getPreferredSize();
-            dimensionChanceRandomMarriages.width = 75;
+            dimensionChanceRandomMarriages.width = 50;
             spnChanceRandomMarriages.setPreferredSize(dimensionChanceRandomMarriages);
             JPanel panChanceRandomMarriages = new JPanel();
             panChanceRandomMarriages.add(new JLabel(resourceMap.getString("chanceRandomMarriages.text")));
@@ -1775,6 +1778,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             panFamily.add(panChanceRandomMarriages, gridBagConstraints);
 
             spnMarriageAgeRange = new JSpinner(new SpinnerNumberModel(options.getMarriageAgeRange(), 0, null, 1));
+            Dimension dimensionMarriageAgeRange = spnMarriageAgeRange.getPreferredSize();
+            dimensionMarriageAgeRange.width = 40;
+            spnMarriageAgeRange.setPreferredSize(dimensionMarriageAgeRange);
             JPanel panMarriageAgeRange = new JPanel();
             panMarriageAgeRange.add(new JLabel(resourceMap.getString("marriageAgeRange.text")));
             panMarriageAgeRange.setToolTipText(resourceMap.getString("marriageAgeRange.toolTipText"));
@@ -1790,7 +1796,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
             spnChanceRandomSameSexMarriages = new JSpinner(new SpinnerNumberModel(options.getChanceRandomSameSexMarriages(), 0, 100, 0.001));
             Dimension dimensionChanceRandomSameSexMarriages = spnChanceRandomSameSexMarriages.getPreferredSize();
-            dimensionChanceRandomSameSexMarriages.width = 75;
+            dimensionChanceRandomSameSexMarriages.width = 50;
             spnChanceRandomSameSexMarriages.setPreferredSize(dimensionChanceRandomSameSexMarriages);
             JPanel panChanceRandomSameSexMarriages = new JPanel();
             panChanceRandomSameSexMarriages.add(new JLabel(resourceMap.getString("chanceRandomSameSexMarriages.text")));
