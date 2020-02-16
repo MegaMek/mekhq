@@ -1,6 +1,5 @@
 package mekhq.gui.model;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Image;
 import java.util.ArrayList;
@@ -18,15 +17,14 @@ import megamek.common.SmallCraft;
 import megamek.common.TechConstants;
 import megamek.common.UnitType;
 import mekhq.IconPackage;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
+import mekhq.gui.MekHqColors;
 import mekhq.gui.preferences.ColorPreference;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
-import mekhq.preferences.PreferencesNode;
 
 /**
  * A table Model for displaying information about units
@@ -59,44 +57,11 @@ public class UnitTableModel extends DataTableModel {
 
     private Campaign campaign;
 
-    public static ColorPreference normalColors;
-    public static ColorPreference selectedColors;
-    public static ColorPreference deployedColors;
-    public static ColorPreference inTransitColors;
-    public static ColorPreference refittingColors;
-    public static ColorPreference mothballingColors;
-    public static ColorPreference mothballedColors;
-    public static ColorPreference notRepairableColors;
-    public static ColorPreference nonfunctionalColors;
-    public static ColorPreference needsPartsFixedColors;
-    public static ColorPreference uncrewedColors;
+    private final MekHqColors colors = new MekHqColors();
 
     public UnitTableModel(Campaign c) {
         data = new ArrayList<Unit>();
         campaign = c;
-        setUserPreferences();
-    }
-
-    private synchronized void setUserPreferences() {
-        if (normalColors == null) {
-            PreferencesNode preferences = MekHQ.getPreferences().forClass(UnitTableModel.class);
-
-            normalColors = new ColorPreference("normal", UIManager.getColor("Table.background"), UIManager.getColor("Table.foreground"));
-            selectedColors = new ColorPreference("selected", UIManager.getColor("Table.selectionBackground"), UIManager.getColor("Table.selectionFackground"));
-            deployedColors = new ColorPreference("deployed", Color.LIGHT_GRAY, Color.BLACK);
-            inTransitColors = new ColorPreference("inTransit", Color.ORANGE, Color.BLACK);
-            refittingColors = new ColorPreference("refitting", Color.CYAN, Color.BLACK);
-            mothballingColors = new ColorPreference("mothballing", new Color(153,153,255), Color.BLACK);
-            mothballedColors = new ColorPreference("mothballed", new Color(204, 204, 255), Color.BLACK);
-            notRepairableColors = new ColorPreference("notRepairable", new Color(190, 150, 55), Color.BLACK);
-            nonfunctionalColors = new ColorPreference("nonfunctional", new Color(205, 92, 92), Color.BLACK);
-            needsPartsFixedColors = new ColorPreference("needsPartsFixed", new Color(238, 238, 0), Color.BLACK);
-            uncrewedColors = new ColorPreference("uncrewed", Color.RED, Color.BLACK);
-
-            preferences.manage(normalColors, selectedColors, deployedColors, inTransitColors, refittingColors,
-                mothballingColors, mothballedColors, notRepairableColors, nonfunctionalColors, needsPartsFixedColors,
-                uncrewedColors);
-        }
     }
 
     public int getRowCount() {
@@ -347,44 +312,42 @@ public class UnitTableModel extends DataTableModel {
             Unit u = getUnit(actualRow);
 
             if (isSelected) {
-                applyColors(selectedColors, isSelected);
+                setBackground(UIManager.getColor("Table.selectionBackground"));
+                setForeground(UIManager.getColor("Table.selectionForeground"));
             } else {
                 if (u.isDeployed()) {
-                    applyColors(deployedColors);
+                    applyColors(colors.getDeployed());
                 } else if(!u.isPresent()) {
-                    applyColors(inTransitColors);
+                    applyColors(colors.getInTransit());
                 } else if(u.isRefitting()) {
-                    applyColors(refittingColors);
+                    applyColors(colors.getRefitting());
                 } else if (u.isMothballing()) {
-                    applyColors(mothballingColors);
+                    applyColors(colors.getMothballing());
                 } else if (u.isMothballed()) {
-                    applyColors(mothballedColors);
+                    applyColors(colors.getMothballed());
                 } else if (!u.isRepairable()) {
-                    applyColors(notRepairableColors);
+                    applyColors(colors.getNotRepairable());
                 } else if (!u.isFunctional()) {
-                    applyColors(nonfunctionalColors);
+                    applyColors(colors.getNonFunctional());
                 } else if (u.hasPartsNeedingFixing()) {
-                    applyColors(needsPartsFixedColors);
+                    applyColors(colors.getNeedsPartsFixed());
                 } else if (u.getEntity() instanceof Infantry
                         && u.getActiveCrew().size() < u.getFullCrewSize()) {
-                    applyColors(uncrewedColors);
+                    applyColors(colors.getUncrewed());
                 } else {
-                    applyColors(normalColors);
+                    setBackground(UIManager.getColor("Table.background"));
+                    setForeground(UIManager.getColor("Table.foreground"));
                 }
             }
             return this;
         }
 
         private void applyColors(ColorPreference c) {
-            applyColors(c, false);
-        }
-
-        private void applyColors(ColorPreference c, boolean isSelected) {
             setBackground(c.getColor()
-                    .orElseGet(() -> UIManager.getColor(isSelected ? "Table.selectionBackground" : "Table.background")));
+                    .orElseGet(() -> UIManager.getColor("Table.background")));
 
             setForeground(c.getAlternateColor()
-                    .orElseGet(() -> UIManager.getColor(isSelected ? "Table.selectionForeground" : "Table.foreground")));
+                    .orElseGet(() -> UIManager.getColor("Table.foreground")));
         }
     }
 

@@ -21,7 +21,6 @@
 
 package mekhq.gui.view;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.util.ArrayList;
@@ -40,10 +39,8 @@ import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
@@ -53,9 +50,11 @@ import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.gui.MekHqColors;
 import mekhq.gui.model.DataTableModel;
 import mekhq.gui.model.UnitMarketTableModel;
 import mekhq.gui.model.XTableColumnModel;
+import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 /**
  * Against the Bot
@@ -79,7 +78,8 @@ public class LanceAssignmentView extends JPanel {
         public static final int ROLE_TRAINING = 4;
         public static final int ROLE_NUM = 5;
 
-        private Campaign campaign;
+        private final Campaign campaign;
+        private final MekHqColors colors = new MekHqColors();
 
         private JTable tblRequiredLances;
         private JTable tblAssignments;
@@ -119,7 +119,7 @@ public class LanceAssignmentView extends JPanel {
         for (int i = 0; i < UnitMarketTableModel.COL_NUM; i++) {
             column = ((XTableColumnModel)tblRequiredLances.getColumnModel()).getColumnByModelIndex(i);
             column.setPreferredWidth(rlModel.getColumnWidth(i));
-            column.setCellRenderer(new DefaultTableCellRenderer() {
+            column.setCellRenderer(new MekHqTableCellRenderer() {
                                 public Component getTableCellRendererComponent(JTable table,
                         Object value, boolean isSelected, boolean hasFocus,
                         int row, int column) {
@@ -129,9 +129,7 @@ public class LanceAssignmentView extends JPanel {
                                 getAlignment(table.convertColumnIndexToModel(column)));
                     if (table.convertColumnIndexToModel(column) > RequiredLancesTableModel.COL_CONTRACT) {
                         if (((String)value).indexOf('/') >= 0) {
-                                setForeground(Color.RED);
-                        } else {
-                                setForeground(UIManager.getColor(isSelected ? "Table.selectionForeground" : "Table.foreground"));
+                            colors.getBelowContractMinimum().getAlternateColor().ifPresent(c -> setForeground(c));
                         }
                     }
                     return this;
@@ -153,7 +151,7 @@ public class LanceAssignmentView extends JPanel {
         for (int i = 0; i < LanceAssignmentTableModel.COL_NUM; i++) {
             column = ((XTableColumnModel)tblAssignments.getColumnModel()).getColumnByModelIndex(i);
             column.setPreferredWidth(rlModel.getColumnWidth(i));
-            column.setCellRenderer(new DefaultTableCellRenderer() {
+            column.setCellRenderer(new MekHqTableCellRenderer() {
                                 public Component getTableCellRendererComponent(JTable table,
                         Object value, boolean isSelected, boolean hasFocus,
                         int row, int column) {

@@ -18,7 +18,6 @@
  */
 package mekhq.gui.model;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -46,6 +45,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.gui.BasicInfo;
+import mekhq.gui.MekHqColors;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 /**
@@ -60,6 +60,8 @@ public class PersonnelTableModel extends DataTableModel {
     private PersonnelMarket personnelMarket;
     private boolean loadAssignmentFromMarket;
     private boolean groupByUnit;
+
+    private final MekHqColors colors = new MekHqColors();
 
     public static final int COL_RANK            = 0;
     public static final int COL_NAME            = 1;
@@ -689,11 +691,14 @@ public class PersonnelTableModel extends DataTableModel {
                 setForeground(UIManager.getColor("Table.selectionForeground"));
             } else {
                 if (isDeployed(actualRow)) {
-                    setBackground(Color.LIGHT_GRAY);
+                    colors.getDeployed().getColor().ifPresent(c -> setBackground(c));
+                    colors.getDeployed().getAlternateColor().ifPresent(c -> setForeground(c));
                 } else if ((Integer.parseInt((String) getValueAt(actualRow,COL_HITS)) > 0) || getPerson(actualRow).hasInjuries(true)) {
-                    setBackground(Color.RED);
+                    colors.getInjured().getColor().ifPresent(c -> setBackground(c));
+                    colors.getInjured().getAlternateColor().ifPresent(c -> setForeground(c));
                 } else if (getPerson(actualRow).hasOnlyHealedPermanentInjuries()) {
-                    setBackground(new Color(0xee9a00));
+                    colors.getHealedInjuries().getColor().ifPresent(c -> setBackground(c));
+                    colors.getHealedInjuries().getAlternateColor().ifPresent(c -> setForeground(c));
                 } else {
                     setBackground(UIManager.getColor("Table.background"));
                 }

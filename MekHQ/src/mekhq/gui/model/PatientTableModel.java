@@ -1,6 +1,5 @@
 package mekhq.gui.model;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.util.ArrayList;
 
@@ -12,6 +11,7 @@ import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.BasicInfo;
+import mekhq.gui.MekHqColors;
 
 /**
  * A table model for displaying personnel in the infirmary
@@ -19,9 +19,10 @@ import mekhq.gui.BasicInfo;
 public class PatientTableModel extends AbstractListModel<Person> {
     private static final long serialVersionUID = -1615929049408417297L;
 
-    ArrayList<Person> patients;
-    Campaign campaign;
-    
+    private ArrayList<Person> patients;
+    private final Campaign campaign;
+    private final MekHqColors colors = new MekHqColors();
+
     public PatientTableModel(Campaign c) {
         patients = new ArrayList<Person>();
         campaign = c;
@@ -46,11 +47,11 @@ public class PatientTableModel extends AbstractListModel<Person> {
     public int getSize() {
         return patients.size();
     }
-    
+
     private Campaign getCampaign() {
         return campaign;
     }
-    
+
     public PatientTableModel.Renderer getRenderer(IconPackage icons) {
         return new PatientTableModel.Renderer(icons);
     }
@@ -68,7 +69,6 @@ public class PatientTableModel extends AbstractListModel<Person> {
                 int index,
                 boolean isSelected,
                 boolean cellHasFocus) {
-            Component c = this;
             setOpaque(true);
             Person p = (Person)getElementAt(index);
             if (getCampaign().getCampaignOptions().useAdvancedMedical()) {
@@ -82,8 +82,10 @@ public class PatientTableModel extends AbstractListModel<Person> {
                 unhighlightBorder();
             }
             setPortrait(p);
-            c.setBackground(new Color(220, 220, 220));
-            return c;
+
+            colors.getIconButton().getColor().ifPresent(c -> setBackground(c));
+            colors.getIconButton().getAlternateColor().ifPresent(c -> setForeground(c));
+            return this;
         }
     }
 }
