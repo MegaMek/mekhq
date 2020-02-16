@@ -588,8 +588,8 @@ public class Utilities {
         Objects.requireNonNull(u.getEntity(), "Unit needs to have a valid Entity attached");
         Crew oldCrew = u.getEntity().getCrew();
         String commanderName = oldCrew.getName();
-        int averageGunnery = 0;
-        int averagePiloting = 0;
+        int averageGunnery;
+        int averagePiloting;
         List<Person> drivers = new ArrayList<>();
         List<Person> gunners = new ArrayList<>();
         List<Person> vesselCrew = new ArrayList<>();
@@ -649,11 +649,11 @@ public class Utilities {
         } else if (oldCrew.getSlotCount() > 1) {
             for (int slot = 0; slot < oldCrew.getSlotCount(); slot++) {
                 Person p = null;
-                if(u.getEntity() instanceof Mech) {
+                if (u.getEntity() instanceof Mech) {
                     p = c.newPerson(Person.T_MECHWARRIOR, factionCode);
                     p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget() - oldCrew.getPiloting(slot), 0);
                     p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget() - oldCrew.getGunnery(slot), 0);
-                } else if(u.getEntity() instanceof Aero) {
+                } else if (u.getEntity() instanceof Aero) {
                     p = c.newPerson(Person.T_AERO_PILOT, factionCode);
                     p.addSkill(SkillType.S_PILOT_AERO, SkillType.getType(SkillType.S_PILOT_AERO).getTarget() - oldCrew.getPiloting(slot), 0);
                     p.addSkill(SkillType.S_GUN_AERO, SkillType.getType(SkillType.S_GUN_AERO).getTarget() - oldCrew.getGunnery(slot), 0);
@@ -791,7 +791,7 @@ public class Utilities {
                                 p.addSkill(SkillType.S_GUN_VEE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery()), 0);
                                 totalGunnery += p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue();
                             }
-                            averageGunnery = (int)Math.round(((double)totalGunnery)/gunners.size());
+                            averageGunnery = (int) Math.round(((double) totalGunnery) / gunners.size());
                         }
                     } else if (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
                         while (averageGunnery != oldCrew.getGunnery()) {
@@ -800,7 +800,7 @@ public class Utilities {
                                 p.addSkill(SkillType.S_GUN_SPACE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_SPACE).getTarget() - oldCrew.getGunnery()), 0);
                                 totalGunnery += p.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue();
                             }
-                            averageGunnery = (int)Math.round(((double)totalGunnery)/gunners.size());
+                            averageGunnery = (int) Math.round(((double) totalGunnery) / gunners.size());
                         }
                     }
                 }
@@ -808,7 +808,7 @@ public class Utilities {
         }
         //Multi-slot crews already have the names set. Single-slot multi-crew units need to assign the commander's name.
         boolean nameset = oldCrew.getSlotCount() > 1;
-        while(vesselCrew.size() < u.getTotalCrewNeeds()) {
+        while (vesselCrew.size() < u.getTotalCrewNeeds()) {
             Person p = c.newPerson(u.getEntity().isSupportVehicle() ?
                     Person.T_VEHICLE_CREW : Person.T_SPACE_CREW, factionCode);
             if (!nameset) {
@@ -819,14 +819,12 @@ public class Utilities {
             vesselCrew.add(p);
         }
 
-        if(u.canTakeNavigator()) {
-            Person p = c.newPerson(Person.T_NAVIGATOR, factionCode);
-            navigator = p;
+        if (u.canTakeNavigator()) {
+            navigator = c.newPerson(Person.T_NAVIGATOR, factionCode);
         }
 
         if (u.canTakeTechOfficer()) {
-            Person p = c.newPerson(Person.T_VEE_GUNNER, factionCode);
-            consoleCmdr = p;
+            consoleCmdr = c.newPerson(Person.T_VEE_GUNNER, factionCode);
         }
 
         for(Person p : drivers) {
@@ -872,9 +870,9 @@ public class Utilities {
         // Gather the data
         Map<CrewType, Collection<Person>> result = new HashMap<>();
         if (!drivers.isEmpty()) {
-            if(u.usesSoloPilot()) {
+            if (u.usesSoloPilot()) {
                 result.put(CrewType.PILOT, drivers);
-            } else if(u.usesSoldiers()) {
+            } else if (u.usesSoldiers()) {
                 result.put(CrewType.SOLDIER, drivers);
             } else {
                 result.put(CrewType.DRIVER, drivers);
@@ -918,19 +916,18 @@ public class Utilities {
             return 2;
         } else if (roll < 80) { // 20% chance of 1 xp
             return 1;
+        } else {
+            return 0; // 20% chance of no xp
         }
-        return 0; // 20% chance of no xp
     }
 
     public static int rollSpecialAbilities(int bonus) {
         int roll = Compute.d6(2) + bonus;
-        if(roll < 10) {
+        if (roll < 10) {
             return 0;
-        }
-        else if(roll < 12) {
+        } else if (roll < 12) {
             return 1;
-        }
-        else {
+        } else {
             return 2;
         }
     }
@@ -955,14 +952,14 @@ public class Utilities {
         }
 
         int age = baseage;
-        while(ndice > 0) {
+        while (ndice > 0) {
             int roll = Compute.d6();
             //reroll all sixes once
-            if(roll == 6) {
-                roll += (Compute.d6()-1);
+            if (roll == 6) {
+                roll += (Compute.d6() - 1);
             }
-            if(clan) {
-                roll = (int)Math.ceil(roll/2.0);
+            if (clan) {
+                roll = (int) Math.ceil(roll / 2.0);
             }
             age += roll;
             ndice--;
@@ -1000,9 +997,6 @@ public class Utilities {
 
     public static int getSimpleTechLevel(int level) {
         switch(level) {
-            case TechConstants.T_ALLOWED_ALL:
-            case TechConstants.T_INTRO_BOXSET:
-                return CampaignOptions.TECH_INTRO;
             case TechConstants.T_IS_TW_NON_BOX:
             case TechConstants.T_CLAN_TW:
             case TechConstants.T_IS_TW_ALL:
@@ -1019,6 +1013,8 @@ public class Utilities {
                 return CampaignOptions.TECH_UNOFFICIAL;
             case TechConstants.T_TECH_UNKNOWN:
                 return CampaignOptions.TECH_UNKNOWN;
+            case TechConstants.T_ALLOWED_ALL:
+            case TechConstants.T_INTRO_BOXSET:
             default:
                 return CampaignOptions.TECH_INTRO;
         }
@@ -1026,7 +1022,7 @@ public class Utilities {
 
     //copied from http://www.roseindia.net/java/beginners/copyfile.shtml
     public static void copyfile(File inFile, File outFile){
-        try{
+        try {
             InputStream in = new FileInputStream(inFile);
 
             //For Append the file.
@@ -1043,11 +1039,9 @@ public class Utilities {
             in.close();
             out.close();
             System.out.println("File copied."); //$NON-NLS-1$
-        }
-        catch(FileNotFoundException ex){
+        } catch(FileNotFoundException ex) {
             System.out.println(ex.getMessage() + " in the specified directory."); //$NON-NLS-1$
-        }
-        catch(IOException e){
+        } catch(IOException e) {
             System.out.println(e.getMessage());
         }
     }
@@ -1060,7 +1054,7 @@ public class Utilities {
             return;
         }
         List<Integer> equipNums = new ArrayList<>();
-        for(Mounted m : unit.getEntity().getEquipment()) {
+        for (Mounted m : unit.getEntity().getEquipment()) {
             equipNums.add(unit.getEntity().getEquipmentNum(m));
         }
         List<Part> remaining = new ArrayList<>();
@@ -1077,7 +1071,7 @@ public class Utilities {
             if (null != etype) {
                 if (equipNums.contains(eqnum)
                         && etype.equals(unit.getEntity().getEquipment(eqnum).getType())) {
-                    equipNums.remove(equipNums.indexOf(eqnum));
+                    equipNums.remove((Integer) eqnum);
                 } else {
                     remaining.add(part);
                 }
@@ -1088,7 +1082,7 @@ public class Utilities {
         // However, if we've just done a refit we may very well have changed ammo types,
         // so we need to set the equipment numbers in this case.
         List<Part> notFound = new ArrayList<>();
-        for(Part part : remaining) {
+        for (Part part : remaining) {
             boolean found = false;
             int i = -1;
 
@@ -1104,7 +1098,7 @@ public class Utilities {
                             if (m.getType().equals(epart.getType())
                                     && !m.isDestroyed()) {
                                 epart.setEquipmentNum(equipNum);
-                                ((AmmoBin) epart).changeMunition(((AmmoType) m.getType()));
+                                ((AmmoBin) epart).changeMunition(m.getType());
                                 found = true;
                                 break;
                             }
@@ -1115,8 +1109,7 @@ public class Utilities {
                                         != ((AmmoType) m.getType()).getMunitionType()) {
                                     continue;
                                 }
-                                if (m.getType().equals(epart.getType())
-                                        && !m.isDestroyed()) {
+                                if (m.getType().equals(epart.getType()) && !m.isDestroyed()) {
                                     epart.setEquipmentNum(equipNum);
                                     found = true;
                                     break;
@@ -1124,8 +1117,7 @@ public class Utilities {
                             }
                         }
                     } else {
-                        if (m.getType().equals(epart.getType())
-                                && !m.isDestroyed()) {
+                        if (m.getType().equals(epart.getType()) && !m.isDestroyed()) {
                             epart.setEquipmentNum(equipNum);
                             found = true;
                             break;
@@ -1134,7 +1126,7 @@ public class Utilities {
                 }
             } else if (part instanceof MissingEquipmentPart) {
                 MissingEquipmentPart epart = (MissingEquipmentPart)part;
-                for(int equipNum : equipNums) {
+                for (int equipNum : equipNums) {
                     i++;
                     Mounted m = unit.getEntity().getEquipment(equipNum);
                     if (part instanceof MissingAmmoBin
@@ -1143,8 +1135,7 @@ public class Utilities {
                             != ((AmmoType) m.getType()).getMunitionType()))) {
                         continue;
                     }
-                    if (m.getType().equals(epart.getType())
-                            && !m.isDestroyed()) {
+                    if (m.getType().equals(epart.getType()) && !m.isDestroyed()) {
                         epart.setEquipmentNum(equipNum);
                         found = true;
                         break;
