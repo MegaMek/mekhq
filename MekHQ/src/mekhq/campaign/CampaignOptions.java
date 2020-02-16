@@ -1096,7 +1096,7 @@ public class CampaignOptions implements Serializable {
         return salaryTypeBase[type];
     }
 
-    public void setBaseSalary(Money base, int type) {
+    public void setBaseSalary(int type, Money base) {
         if (type < 0 || type >= salaryTypeBase.length) {
             return;
         }

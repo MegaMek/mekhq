@@ -4820,6 +4820,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setUseRandomMarriages(chkUseRandomMarriages.isSelected());
         options.setChanceRandomMarriages((Double) spnChanceRandomMarriages.getModel().getValue());
         options.setMarriageAgeRange((Integer) spnMarriageAgeRange.getModel().getValue());
+        for (int i = 0; i < Person.NUM_SURNAME; i++) {
+            int val = (int) Math.round(((Double) spnRandomMarriageSurnameWeights[i].getModel().getValue()) * 10);
+            options.setRandomMarriageSurnameWeight(i, val);
+        }
         options.setUseRandomSameSexMarriages(chkUseRandomSameSexMarriages.isSelected());
         options.setChanceRandomSameSexMarriages((Double) spnChanceRandomSameSexMarriages.getModel().getValue());
         options.setUseUnofficialProcreation(chkUseUnofficialProcreation.isSelected());
@@ -4842,11 +4846,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         }
         for (int i = 1; i < Person.T_NUM; i++) {
             try {
-                Money salary = txtSalaryBase[i].getMoney();
-                options.setBaseSalary(salary, i);
-            } catch (Exception ignored) {
-
-            }
+                options.setBaseSalary(i, txtSalaryBase[i].getMoney());
+            } catch (Exception ignored) { }
         }
         //endregion Personnel Tab
 
