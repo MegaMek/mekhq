@@ -1173,6 +1173,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                 JMenu a_trn = new JMenu(TOEMouseAdapter.ASF_CARRIERS);
                 JMenu sc_trn = new JMenu(TOEMouseAdapter.SC_CARRIERS);
                 JMenu singleUnitMenu = new JMenu("");
+                
                 if (unitsInForces.size() > 0) {
                     Unit unit = unitsInForces.get(0);
                     String unitIds = "" + unit.getId().toString();
@@ -1517,9 +1518,35 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     //First, only display the Assign to Ship command if your command has at least 1 valid transport
                     //and if your selection does not include a transport
                     boolean shipInSelection = false;
+                    boolean allUnitsSameType = false;
+                    double unitWeight = 0;
+                    int singleUnitType = -1;
+                    
+                    // Add submenus for different types of transports
+                    JMenu m_trn = new JMenu(TOEMouseAdapter.MECH_CARRIERS);
+                    JMenu pm_trn = new JMenu(TOEMouseAdapter.PROTOMECH_CARRIERS);
+                    JMenu lv_trn = new JMenu(TOEMouseAdapter.LVEE_CARRIERS);
+                    JMenu hv_trn = new JMenu(TOEMouseAdapter.HVEE_CARRIERS);
+                    JMenu shv_trn = new JMenu(TOEMouseAdapter.SHVEE_CARRIERS);
+                    JMenu ba_trn = new JMenu(TOEMouseAdapter.BA_CARRIERS);
+                    JMenu i_trn = new JMenu(TOEMouseAdapter.INFANTRY_CARRIERS);
+                    JMenu a_trn = new JMenu(TOEMouseAdapter.ASF_CARRIERS);
+                    JMenu sc_trn = new JMenu(TOEMouseAdapter.SC_CARRIERS);
+                    JMenu singleUnitMenu = new JMenu("");
+                    
                     for (Unit u : units) {
                         if (u.getEntity() != null && u.getEntity().isLargeCraft()) {
                             shipInSelection = true;
+                            break;
+                        }
+                    }
+                    
+                    //Check to see if all selected units are of the same type
+                    for (int i = 0; i < UnitType.SIZE; i++) {
+                        if (StaticChecks.areAllUnitsSameType(units, i)) {
+                            singleUnitType = i;
+                            allUnitsSameType = true;
+                            singleUnitMenu.setText(String.format(TOEMouseAdapter.VARIABLE_TRANSPORT,UnitType.getTypeName(singleUnitType)));
                             break;
                         }
                     }
@@ -1533,13 +1560,87 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                             if (ship == null || ship.isSalvage() || ship.getCommander() == null) {
                                 continue;
                             }
-                            menuItem = new JMenuItem(ship.getName());
-                            menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ASSIGN_TO_SHIP
-                                    + id + "|" + unitIds);
-                            menuItem.addActionListener(this);
-                            menuItem.setEnabled(true);
-                            menu.add(menuItem);
+                            if (allUnitsSameType) {
+                                double capacity = ship.getCorrectBayCapacity(singleUnitType, unitWeight);
+                                if (capacity > 0) {
+                                    JMenuItem shipMenuItem = new JMenuItem(ship.getName() + " , Space available: " + capacity);
+                                    shipMenuItem.setActionCommand(TOEMouseAdapter.COMMAND_ASSIGN_TO_SHIP + id + "|" + unitIds);
+                                    shipMenuItem.addActionListener(this);
+                                    shipMenuItem.setEnabled(true);
+                                    singleUnitMenu.add(shipMenuItem);
+                                    singleUnitMenu.setEnabled(true);
+                                }
+                            } else {
+                                //Add this ship to the appropriate submenu(s). Most transports will fit into multiple
+                                //categories
+                                if (ship.getASFCapacity() > 0) {
+                                    a_trn.add(transportMenuItem(ship.getName(),id,unitIds,ship.getCurrentASFCapacity()));
+                                    a_trn.setEnabled(true);
+                                }
+                                if (ship.getBattleArmorCapacity() > 0) {
+                                    ba_trn.add(transportMenuItem(ship.getName(),id,unitIds,ship.getCurrentBattleArmorCapacity()));
+                                    ba_trn.setEnabled(true);
+                                }
+                                if (ship.getInfantryCapacity() > 0) {
+                                    i_trn.add(transportMenuItem(ship.getName(),id,unitIds,ship.getCurrentInfantryCapacity()));
+                                    i_trn.setEnabled(true);
+                                }
+                                if (ship.getMechCapacity() > 0) {
+                                    m_trn.add(transportMenuItem(ship.getName(),id,unitIds,ship.getCurrentMechCapacity()));
+                                    m_trn.setEnabled(true);
+                                }
+                                if (ship.getProtomechCapacity() > 0) {
+                                    pm_trn.add(transportMenuItem(ship.getName(),id,unitIds,ship.getCurrentProtomechCapacity()));
+                                    pm_trn.setEnabled(true);
+                                }
+                                if (ship.getSmallCraftCapacity() > 0) {
+                                    sc_trn.add(transportMenuItem(ship.getName(),id,unitIds,ship.getCurrentSmallCraftCapacity()));
+                                    sc_trn.setEnabled(true);
+                                }
+                                if (ship.getLightVehicleCapacity() > 0) {
+                                    lv_trn.add(transportMenuItem(ship.getName(),id,unitIds,ship.getCurrentLightVehicleCapacity()));
+                                    lv_trn.setEnabled(true);
+                                }
+                                if (ship.getHeavyVehicleCapacity() > 0) {
+                                    hv_trn.add(transportMenuItem(ship.getName(),id,unitIds,ship.getCurrentHeavyVehicleCapacity()));
+                                    hv_trn.setEnabled(true);
+                                }
+                                if (ship.getSuperHeavyVehicleCapacity() > 0) {
+                                    shv_trn.add(transportMenuItem(ship.getName(),id,unitIds,ship.getCurrentSuperHeavyVehicleCapacity()));
+                                    shv_trn.setEnabled(true);
+                                }
+                            }
                         }
+                    }
+                    if (a_trn.getMenuComponentCount() > 0 || a_trn.getItemCount() > 0) {
+                        menu.add(a_trn);
+                    }
+                    if (ba_trn.getMenuComponentCount() > 0 || ba_trn.getItemCount() > 0) {
+                        menu.add(ba_trn);
+                    }
+                    if (i_trn.getMenuComponentCount() > 0 || i_trn.getItemCount() > 0) {
+                        menu.add(i_trn);
+                    }
+                    if (m_trn.getMenuComponentCount() > 0 || m_trn.getItemCount() > 0) {
+                        menu.add(m_trn);
+                    }
+                    if (pm_trn.getMenuComponentCount() > 0 || pm_trn.getItemCount() > 0) {
+                        menu.add(pm_trn);
+                    }
+                    if (sc_trn.getMenuComponentCount() > 0 || sc_trn.getItemCount() > 0) {
+                        menu.add(sc_trn);
+                    }
+                    if (lv_trn.getMenuComponentCount() > 0 || lv_trn.getItemCount() > 0) {
+                        menu.add(lv_trn);
+                    }
+                    if (hv_trn.getMenuComponentCount() > 0 || hv_trn.getItemCount() > 0) {
+                        menu.add(hv_trn);
+                    }
+                    if (shv_trn.getMenuComponentCount() > 0 || shv_trn.getItemCount() > 0) {
+                        menu.add(shv_trn);
+                    }
+                    if (singleUnitMenu.getMenuComponentCount() > 0 || singleUnitMenu.getItemCount() > 0) {
+                        menu.add(singleUnitMenu);
                     }
                     if (menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
                         popup.add(menu);
