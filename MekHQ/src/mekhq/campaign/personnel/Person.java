@@ -1418,7 +1418,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
         int n = potentials.size();
         if (n > 0) {
-            Compute.randomInt(n);
+            n = Compute.randomInt(n);
         }
 
         marry(potentials.get(n), SURNAME_WEIGHTED);
