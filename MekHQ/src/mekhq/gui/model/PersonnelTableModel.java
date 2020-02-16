@@ -22,7 +22,13 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 import java.util.UUID;
 
 import javax.swing.JTable;
@@ -36,10 +42,15 @@ import megamek.common.Jumpship;
 import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.UnitType;
+import megamek.common.logging.LogLevel;
 import megamek.common.options.PilotOptions;
+import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
 import mekhq.IconPackage;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
@@ -48,6 +59,8 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 
 /**
  * A table Model for displaying information about personnel
@@ -108,6 +121,8 @@ public class PersonnelTableModel extends DataTableModel {
     public static final int COL_ORIGIN_PLANET   = 43;
     public static final int N_COL               = 44;
 
+    private ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.PersonnelTableModel", new EncodeControl());
+
     public PersonnelTableModel(Campaign c) {
         data = new ArrayList<Person>();
         campaign = c;
@@ -143,95 +158,95 @@ public class PersonnelTableModel extends DataTableModel {
     public String getColumnName(int column) {
         switch(column) {
             case COL_RANK:
-                return "Rank";
+                return resources.getString("col_rank.text");
             case COL_GIVEN_NAME:
-                return "Given Name";
+                return resources.getString("col_given_name.text");
             case COL_SURNAME:
-                return "Surname";
+                return resources.getString("col_surname.text");
             case COL_HONORIFIC:
-                return "Honorific";
+                return resources.getString("col_honorific.text");
             case COL_CALL:
-                return "Callsign";
+                return resources.getString("col_call.text");
             case COL_BLOODNAME:
-                return "Bloodname";
+                return resources.getString("col_bloodname.text");
             case COL_AGE:
-                return "Age";
+                return resources.getString("col_age.text");
             case COL_GENDER:
-                return "Gender";
+                return resources.getString("col_gender.text");
             case COL_TYPE:
-                return "Role";
+                return resources.getString("col_type.text");
             case COL_MECH:
-                return "Mech";
+                return resources.getString("col_mech.text");
             case COL_AERO:
-                return "Aero";
+                return resources.getString("col_aero.text");
             case COL_JET:
-                return "Aircraft";
+                return resources.getString("col_jet.text");
             case COL_VEE:
-                return "Vehicle";
+                return resources.getString("col_vee.text");
             case COL_VTOL:
-                return "VTOL";
+                return resources.getString("col_vtol.text");
             case COL_NVEE:
-                return "Naval";
+                return resources.getString("col_nvee.text");
             case COL_SPACE:
-                return "Spacecraft";
+                return resources.getString("col_space.text");
             case COL_ARTY:
-                return "Artillery";
+                return resources.getString("col_arty.text");
             case COL_GUN_BA:
-                return "G/Battlesuit";
+                return resources.getString("col_gun_ba.text");
             case COL_SMALL_ARMS:
-                return "Small Arms";
+                return resources.getString("col_small_arms.text");
             case COL_ANTI_MECH:
-                return "Anti-Mech";
+                return resources.getString("col_anti_mech.text");
             case COL_TACTICS:
-                return "Tactics";
+                return resources.getString("col_tactics.text");
             case COL_STRATEGY:
-                return "Strategy";
+                return resources.getString("col_strategy.text");
             case COL_TECH_MECH:
-                return "Tech/Mech";
+                return resources.getString("col_tech_mech.text");
             case COL_TECH_AERO:
-                return "Tech/Aero";
+                return resources.getString("col_tech_aero.text");
             case COL_TECH_VEE:
-                return "Mechanic";
+                return resources.getString("col_tech_vee.text");
             case COL_TECH_BA:
-                return "Tech/BA";
+                return resources.getString("col_tech_ba.text");
             case COL_MEDICAL:
-                return "Medical";
+                return resources.getString("col_medical.text");
             case COL_ADMIN:
-                return "Admin";
+                return resources.getString("col_admin.text");
             case COL_NEG:
-                return "Negotiation";
+                return resources.getString("col_neg.text");
             case COL_SCROUNGE:
-                return "Scrounge";
+                return resources.getString("col_scrounge.text");
             case COL_TOUGH:
-                return "Toughness";
+                return resources.getString("col_tough.text");
             case COL_SKILL:
-                return "Skill Level";
+                return resources.getString("col_skill.text");
             case COL_ASSIGN:
-                return "Unit Assignment";
+                return resources.getString("col_assign.text");
             case COL_EDGE:
-                return "Edge";
+                return resources.getString("col_edge.text");
             case COL_NABIL:
-                return "# Abilities";
+                return resources.getString("col_nabil.text");
             case COL_NIMP:
-                return "# Implants";
+                return resources.getString("col_nimp.text");
             case COL_HITS:
-                return "Hits";
+                return resources.getString("col_hits.text");
             case COL_XP:
-                return "XP";
+                return resources.getString("col_xp.text");
             case COL_DEPLOY:
-                return "Deployed";
+                return resources.getString("col_deploy.text");
             case COL_FORCE:
-                return "Force";
+                return resources.getString("col_force.text");
             case COL_SALARY:
-                return "Salary";
+                return resources.getString("col_salary.text");
             case COL_KILLS:
-                return "Kills";
+                return resources.getString("col_kills.text");
             case COL_ORIGIN_FACTION:
-                return "Origin Faction";
+                return resources.getString("col_origin_faction.text");
             case COL_ORIGIN_PLANET:
-                return "Origin Planet";
+                return resources.getString("col_origin_planet.text");
             default:
-                return "?";
+                return resources.getString("col_unknown.text");
         }
     }
 
@@ -375,15 +390,10 @@ public class PersonnelTableModel extends DataTableModel {
                         return toReturn;
                     }
 
-                    StringBuilder builder = new StringBuilder(toReturn);
-                    builder.append(" (+");
-                    builder.append(crewCount);
-                    if (u.usesSoldiers()) {
-                        builder.append(" soldiers)");
-                    } else {
-                        builder.append(" crew)");
-                    }
-                    return builder.toString();
+                    return toReturn + " (+" + crewCount +
+                            (u.usesSoldiers()
+                                    ? resources.getString("surname_soldiers.text")
+                                    : resources.getString("surname_crew.text"));
                 }
             case COL_HONORIFIC:
                 toReturn = p.getHonorific();
@@ -638,7 +648,7 @@ public class PersonnelTableModel extends DataTableModel {
                 if (null != force) {
                     return force.getName();
                 } else {
-                    return "None";
+                    return resources.getString("force_none.text");
                 }
             case COL_SALARY:
                 return p.getSalary().toAmountAndSymbolString();
@@ -654,7 +664,7 @@ public class PersonnelTableModel extends DataTableModel {
                 break;
             case COL_TOUGH:
             default:
-               return "?";
+               return resources.getString("col_unknown.text");
         }
 
         return "-";
