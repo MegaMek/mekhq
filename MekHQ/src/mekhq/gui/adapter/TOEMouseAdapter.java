@@ -1172,7 +1172,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                 JMenu i_trn = new JMenu(TOEMouseAdapter.INFANTRY_CARRIERS);
                 JMenu a_trn = new JMenu(TOEMouseAdapter.ASF_CARRIERS);
                 JMenu sc_trn = new JMenu(TOEMouseAdapter.SC_CARRIERS);
-                JMenu singleUnitMenu = new JMenu("");
+                JMenu singleUnitMenu = new JMenu();
                 
                 if (unitsInForces.size() > 0) {
                     Unit unit = unitsInForces.get(0);
@@ -1532,7 +1532,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     JMenu i_trn = new JMenu(TOEMouseAdapter.INFANTRY_CARRIERS);
                     JMenu a_trn = new JMenu(TOEMouseAdapter.ASF_CARRIERS);
                     JMenu sc_trn = new JMenu(TOEMouseAdapter.SC_CARRIERS);
-                    JMenu singleUnitMenu = new JMenu("");
+                    JMenu singleUnitMenu = new JMenu();
                     
                     for (Unit u : units) {
                         if (u.getEntity() != null && u.getEntity().isLargeCraft()) {
