@@ -1,6 +1,5 @@
 package mekhq.gui.model;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.FontMetrics;
 import java.text.SimpleDateFormat;
@@ -38,7 +37,7 @@ public class PersonnelEventLogModel extends DataTableModel {
         data = new ArrayList<LogEntry>();
         dateTextWidth = getRenderer().metrics.stringWidth(shortDateFormat.format(new Date())) + 10;
     }
-   
+
     @Override
     public int getRowCount() {
         return data.size();
@@ -60,7 +59,7 @@ public class PersonnelEventLogModel extends DataTableModel {
                 return EMPTY_CELL;
         }
     }
-    
+
     @Override
     public Object getValueAt(int row, int column) {
         LogEntry event = getEvent(row);
@@ -73,24 +72,24 @@ public class PersonnelEventLogModel extends DataTableModel {
                 return EMPTY_CELL;
         }
     }
-    
+
     @Override
     public Class<?> getColumnClass(int c) {
         return String.class;
     }
-    
+
     @Override
     public boolean isCellEditable(int row, int col) {
         return false;
     }
-    
+
     public LogEntry getEvent(int row) {
         if((row < 0) || (row >= data.size())) {
             return null;
         }
         return (LogEntry) data.get(row);
     }
-    
+
     public int getAlignment(int column) {
         switch(column) {
             case COL_DATE:
@@ -101,7 +100,7 @@ public class PersonnelEventLogModel extends DataTableModel {
                 return StyleConstants.ALIGN_CENTER;
         }
     }
-    
+
     public int getPreferredWidth(int column) {
         switch(column) {
             case COL_DATE:
@@ -112,7 +111,7 @@ public class PersonnelEventLogModel extends DataTableModel {
                 return 100;
         }
     }
-    
+
     public boolean hasConstantWidth(int col) {
         switch(col) {
             case COL_DATE:
@@ -121,11 +120,11 @@ public class PersonnelEventLogModel extends DataTableModel {
                 return false;
         }
     }
-    
+
     public PersonnelEventLogModel.Renderer getRenderer() {
         return new PersonnelEventLogModel.Renderer();
     }
-    
+
     public static class Renderer extends JTextPane implements TableCellRenderer {
         private static final long serialVersionUID = -2201201114822098877L;
 

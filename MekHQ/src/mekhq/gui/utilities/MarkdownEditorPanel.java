@@ -20,7 +20,6 @@
 package mekhq.gui.utilities;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -48,18 +47,18 @@ import javax.swing.event.ChangeListener;
  *
  */
 public class MarkdownEditorPanel extends JPanel {
-    
+
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 7534667332172721918L;
-    
+
     private JTabbedPane tabPane;
     private JTextArea editor;
     private JScrollPane scrollEditor;
     private JScrollPane scrollViewer;
     private JTextPane viewer;
-    
+
     private JButton btnH1;
     private JButton btnH2;
     private JButton btnH3;
@@ -81,9 +80,9 @@ public class MarkdownEditorPanel extends JPanel {
      * @param title - a <code>String</code> to show up as the title of the editor at the top
      */
     public MarkdownEditorPanel(String title) {
-      
+
         tabPane = new JTabbedPane();
-        
+
         //set up editor
         setLayout(new BorderLayout());
         editor = new JTextArea();
@@ -92,7 +91,7 @@ public class MarkdownEditorPanel extends JPanel {
         editor.setWrapStyleWord(true);
         scrollEditor = new JScrollPane(editor);
         scrollEditor.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        
+
         //set up buttons
         JPanel pnlButtons = new JPanel(new WrapLayout(FlowLayout.LEFT));
         btnH1 = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_header_1608924.png"));
@@ -102,7 +101,7 @@ public class MarkdownEditorPanel extends JPanel {
             insertHeader(1);
         });
         pnlButtons.add(btnH1);
-        
+
         btnH2 = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_header_1608924_20px.png"));
         btnH2.setToolTipText("Header 2");
         btnH2.setPreferredSize(new Dimension(36, 36));
@@ -110,7 +109,7 @@ public class MarkdownEditorPanel extends JPanel {
             insertHeader(2);
         });
         pnlButtons.add(btnH2);
-        
+
         btnH3 = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_header_1608924_16px.png"));
         btnH3.setToolTipText("Header 3");
         btnH3.setPreferredSize(new Dimension(36, 36));
@@ -118,7 +117,7 @@ public class MarkdownEditorPanel extends JPanel {
             insertHeader(3);
         });
         pnlButtons.add(btnH3);
-        
+
         btnBold = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_ic_format_bold_48px_352381.png"));
         btnBold.setToolTipText("Bold");
         btnBold.setPreferredSize(new Dimension(36, 36));
@@ -126,7 +125,7 @@ public class MarkdownEditorPanel extends JPanel {
             boldText();
         });
         pnlButtons.add(btnBold);
-        
+
         btnItalic = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_ic_format_italic_48px_352387.png"));
         btnItalic.setToolTipText("Italicize");
         btnItalic.setPreferredSize(new Dimension(36, 36));
@@ -134,7 +133,7 @@ public class MarkdownEditorPanel extends JPanel {
             italicizeText();
         });
         pnlButtons.add(btnItalic);
-        
+
         btnHR = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_ic_remove_48px_352440.png"));
         btnHR.setToolTipText("Horizontal line");
         btnHR.setPreferredSize(new Dimension(36, 36));
@@ -142,7 +141,7 @@ public class MarkdownEditorPanel extends JPanel {
             insertHR();
         });
         pnlButtons.add(btnHR);
-        
+
         btnUL = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_ic_format_list_bulleted_48px_352389.png"));
         btnUL.setToolTipText("Unordered list");
         btnUL.setPreferredSize(new Dimension(36, 36));
@@ -150,7 +149,7 @@ public class MarkdownEditorPanel extends JPanel {
             insertBullet(false);
         });
         pnlButtons.add(btnUL);
-        
+
         btnOL = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_ic_format_list_numbered_48px_352390.png"));
         btnOL.setToolTipText("Ordered list");
         btnOL.setPreferredSize(new Dimension(36, 36));
@@ -158,7 +157,7 @@ public class MarkdownEditorPanel extends JPanel {
             insertBullet(true);
         });
         pnlButtons.add(btnOL);
-        
+
         btnQuestion = new JButton(new ImageIcon("data/images/misc/markdown_editor/iconfinder_ic_help_48px_352423.png"));
         btnQuestion.setToolTipText("More information");
         btnQuestion.setPreferredSize(new Dimension(36, 36));
@@ -167,9 +166,9 @@ public class MarkdownEditorPanel extends JPanel {
                     "<html>You can use the CommonMark markdown syntax to add rich text features such as bolding, heading, and italicizing.<br>To learn more about all of the features available go to https://commonmark.org/help/</html>");
         });
         pnlButtons.add(btnQuestion);
-        
-        
-        
+
+
+
         JPanel editorPanel = new JPanel(new BorderLayout());
         editorPanel.add(pnlButtons, BorderLayout.NORTH);
         editorPanel.add(scrollEditor, BorderLayout.CENTER);
@@ -181,7 +180,7 @@ public class MarkdownEditorPanel extends JPanel {
         scrollViewer = new JScrollPane(viewer);
         scrollViewer.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         tabPane.add("Preview", scrollViewer);
-        
+
         tabPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 if(tabPane.getSelectedIndex()==1) {
@@ -196,7 +195,7 @@ public class MarkdownEditorPanel extends JPanel {
         if(null != title) {
             add(new JLabel("<html><h4>" + title + "</h4></html>"), BorderLayout.NORTH);
         }
-        
+
         //set up key bindings
         editor.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_DOWN_MASK), "bold");
         editor.getActionMap().put("bold", new AbstractAction() {
@@ -204,7 +203,7 @@ public class MarkdownEditorPanel extends JPanel {
                 boldText();
             }
         });
-        
+
         editor.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_I, KeyEvent.CTRL_DOWN_MASK), "italic");
         editor.getActionMap().put("italic", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -212,7 +211,7 @@ public class MarkdownEditorPanel extends JPanel {
             }
         });
     }
-    
+
     /**
      * Set the text for the editor. This can be used when called up on existing text to initially
      * fill the editor.
@@ -224,7 +223,7 @@ public class MarkdownEditorPanel extends JPanel {
             scrollEditor.getVerticalScrollBar().setValue(0);
         });
     }
-    
+
     /**
      * Get the text of the editor
      * @return <code>String</code> of the text in the editor
@@ -232,9 +231,9 @@ public class MarkdownEditorPanel extends JPanel {
     public String getText() {
         return editor.getText();
     }
-    
+
     /**
-     * Insert bold (**) markup on the selection. If an existing word or phrase is highlighted, this will put 
+     * Insert bold (**) markup on the selection. If an existing word or phrase is highlighted, this will put
      * the markup at either ends. Otherwise it will put an empty markup (****) with the cursor in the middle.
      */
     private void boldText() {
@@ -243,15 +242,15 @@ public class MarkdownEditorPanel extends JPanel {
         editor.insert("**", start);
         editor.insert("**", end+2);
         if(start==end) {
-            editor.setCaretPosition(start+2); 
+            editor.setCaretPosition(start+2);
         } else {
             editor.setCaretPosition(end+4);
         }
         editor.requestFocusInWindow();
     }
-    
+
     /**
-     * Insert italic (*) markup on the selection. If an existing word or phrase is highlighted, this will put 
+     * Insert italic (*) markup on the selection. If an existing word or phrase is highlighted, this will put
      * the markup at either ends. Otherwise it will put an empty markup (**) with the cursor in the middle.
      */
     private void italicizeText() {
@@ -260,13 +259,13 @@ public class MarkdownEditorPanel extends JPanel {
         editor.insert("*", start);
         editor.insert("*", end+1);
         if(start==end) {
-            editor.setCaretPosition(start+1); 
+            editor.setCaretPosition(start+1);
         } else {
             editor.setCaretPosition(end+2);
         }
         editor.requestFocusInWindow();
     }
-    
+
     /**
      * Insert a header (#) into the text at the currently selected start
      * @param level - the level of heading
@@ -282,7 +281,7 @@ public class MarkdownEditorPanel extends JPanel {
         editor.setCaretPosition(start+toInsert.length());
         editor.requestFocusInWindow();
     }
-    
+
     /**
      * Insert a horizontal rule (---) into the text at the currently selected start
      */
@@ -293,11 +292,11 @@ public class MarkdownEditorPanel extends JPanel {
         editor.setCaretPosition(start+toInsert.length());
         editor.requestFocusInWindow();
     }
-    
+
     /**
      * Insert a bullet point into the text. To ensure it looks correct, the bullet point is surrounded
      * by two carriage returns on either side.
-     * @param ordered - a <code>boolean</code> for whether the bullet point should be ordered or not. 
+     * @param ordered - a <code>boolean</code> for whether the bullet point should be ordered or not.
      */
     private void insertBullet(boolean ordered) {
         String toInsert = "\n\n- ";

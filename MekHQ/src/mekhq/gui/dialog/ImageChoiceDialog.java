@@ -6,7 +6,6 @@
 
 package mekhq.gui.dialog;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
@@ -35,7 +34,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -61,7 +59,7 @@ public class ImageChoiceDialog extends JDialog {
 
     private static final String PANEL_IMAGES = "panel_images";
     private static final String PANEL_LAYERED = "panel_layered";
-    
+
     /**
      *
      */
@@ -73,7 +71,7 @@ public class ImageChoiceDialog extends JDialog {
     private ImageTableModel imageTableModel = new ImageTableModel();
     private String category;
     private String filename;
-    private LinkedHashMap<String, Vector<String>> iconMap; // Key = Image Category, Value = Vector of Image Filenames 
+    private LinkedHashMap<String, Vector<String>> iconMap; // Key = Image Category, Value = Vector of Image Filenames
     private ImageTableMouseAdapter imagesMouseAdapter;
     private boolean force = false;
     private JButton btnCancel;
@@ -82,7 +80,7 @@ public class ImageChoiceDialog extends JDialog {
     private JScrollPane scrImages;
     private JTable tableImages;
     private boolean changed = false;
-    
+
     // BEGIN: Layered Images Support
     private ImageIcon imageIcon = null;
     private JLabel preview = new JLabel();
@@ -414,7 +412,7 @@ public class ImageChoiceDialog extends JDialog {
                 logosModel.addImage(imageNamesLogos.next());
             }
             layerTabs.addTab(resourceMap.getString("Force.logos"), panelLogos);
-            
+
             // Put it all together nice and pretty on the layerPanel
             layerPanel.setLayout(new GridBagLayout());
             layerPanel.add(layerTabs, gbc);
@@ -545,7 +543,7 @@ public class ImageChoiceDialog extends JDialog {
     public void setIconMap(LinkedHashMap<String, Vector<String>> iconMap) {
         this.iconMap = iconMap;
     }
-    
+
     private void refreshLayeredPreview() {
         // Add the image frame
         iconMap.clear();
@@ -742,7 +740,7 @@ public class ImageChoiceDialog extends JDialog {
                 String name = getValueAt(row, column).toString();
                 setText(getValueAt(row, column).toString());
                 setImage(category, name);
-                
+
                 MekHqTableCellRenderer.setupTableColors(this, table, isSelected, hasFocus, row);
                 return this;
             }

@@ -1,6 +1,5 @@
 package mekhq.gui.model;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.util.ArrayList;
 

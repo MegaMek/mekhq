@@ -80,7 +80,6 @@ import mekhq.gui.model.TechTableModel;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.model.XTableColumnModel;
 import mekhq.gui.preferences.JTablePreference;
-import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.sorter.TaskSorter;
 import mekhq.gui.sorter.TechSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
@@ -113,7 +112,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     private JComboBox<String> choiceLocation;
     private JButton btnAcquisitions;
     private JScrollPane scrollServicedUnitView;
-    
+
     private UnitTableModel servicedUnitModel;
     private TaskTableModel taskModel;
     private TechTableModel techsModel;
@@ -121,7 +120,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     private TableRowSorter<UnitTableModel> servicedUnitSorter;
     private TableRowSorter<TaskTableModel> taskSorter;
     private TableRowSorter<TechTableModel> techSorter;
-    
+
     //Maintain selections after refresh
     private int selectedRow = -1;
     private int selectedLocation = -1;
@@ -184,7 +183,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				String txt = "Parts Acquisition";
-				
+
 				if (PartsAcquisitionService.getMissingCount() > 0) {
 					if (PartsAcquisitionService.getUnavailableCount() > 0) {
 						txt += String.format(" (%s missing, %s unavailable)", PartsAcquisitionService.getMissingCount(), PartsAcquisitionService.getUnavailableCount());
@@ -192,13 +191,13 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 						txt += String.format(" (%s missing)", PartsAcquisitionService.getMissingCount());
 					}
 				}
-				
+
 				btnAcquisitions.setText(txt);
-				
+
 				btnAcquisitions.repaint();
 			}
 		});
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -212,7 +211,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         actionButtons.add(btnMRMSInstantAll, gridBagConstraints);
-        
+
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 1;
@@ -805,7 +804,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 
     public void refreshTaskList() {
         selectedRow = taskTable.getSelectedRow();
-        
+
         UUID uuid = null;
         if (null != getSelectedServicedUnit()) {
             uuid = getSelectedServicedUnit().getId();
@@ -837,7 +836,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             choiceLocation.setEnabled(false);
         }
         filterTasks();
-        
+
         if (selectedRow != -1 && taskTable.getRowCount() > 0) {
             if (taskTable.getRowCount() <= selectedRow) {
                 selectedRow = taskTable.getRowCount() - 1;
@@ -888,7 +887,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     public void refreshPartsAcquisition() {
         refreshPartsAcquisitionService(true);
     }
-    
+
 	public void refreshPartsAcquisitionService(boolean rebuildPartsList) {
 		if (rebuildPartsList) {
 			PartsAcquisitionService.buildPartsList(getCampaign());
@@ -906,7 +905,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     public void handle(DeploymentChangedEvent ev) {
         servicedUnitListScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(ScenarioResolvedEvent ev) {
         servicedUnitListScheduler.schedule();
@@ -936,19 +935,19 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             servicedUnitListScheduler.schedule();
         }
     }
-    
+
     @Subscribe
     public void handle(AcquisitionEvent ev) {
         acquireScheduler.schedule();
         taskScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(ProcurementEvent ev) {
         filterTasks();
         acquireScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(PartWorkEvent ev) {
         if (ev.getPartWork().getUnit() == null) {
@@ -959,12 +958,12 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         }
         techsScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(OvertimeModeEvent ev) {
         filterTechs();
     }
-    
+
     @Subscribe
     public void handle(AstechPoolChangedEvent ev) {
         filterTechs();
