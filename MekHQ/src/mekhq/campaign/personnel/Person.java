@@ -1420,10 +1420,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
         int n = potentials.size();
         if (n > 0) {
-            n = Compute.randomInt(n);
+            marry(potentials.get(Compute.randomInt(n)), SURNAME_WEIGHTED);
         }
-
-        marry(potentials.get(n), SURNAME_WEIGHTED);
     }
 
     public boolean isPotentialRandomSpouse(Person p, int gender) {
@@ -1561,6 +1559,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
         PersonalLogger.marriage(spouse, this, getCampaign().getDate());
         setSpouseId(spouse.getId());
         PersonalLogger.marriage(this, spouse, getCampaign().getDate());
+
+        campaign.addReport(String.format("%s has married %s!", getHyperlinkedName(),
+                spouse.getHyperlinkedName()));
+
         MekHQ.triggerEvent(new PersonChangedEvent(this));
         MekHQ.triggerEvent(new PersonChangedEvent(spouse));
     }
@@ -1618,6 +1620,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
             PersonalLogger.divorcedFrom(this, getSpouse(), getCampaign().getDate());
             PersonalLogger.divorcedFrom(spouse, this, getCampaign().getDate());
+
+            campaign.addReport(String.format("%s has divorced %s!", getHyperlinkedName(),
+                    spouse.getHyperlinkedName()));
 
             spouse.setMaidenName(null);
             setMaidenName(null);

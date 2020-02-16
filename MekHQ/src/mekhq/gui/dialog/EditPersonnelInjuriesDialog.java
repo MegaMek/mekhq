@@ -59,10 +59,8 @@ import mekhq.preferences.PreferencesNode;
 public class EditPersonnelInjuriesDialog extends JDialog {
     private static final long serialVersionUID = -8038099101234445018L;
     private Frame frame;
-    /*private Campaign campaign;
-    private int days;*/
+    private Campaign campaign;
     private Person person;
-    private List<Injury> injuries;
     private InjuryTableModel injuryModel;
 
     private JButton btnAdd;
@@ -76,10 +74,9 @@ public class EditPersonnelInjuriesDialog extends JDialog {
     public EditPersonnelInjuriesDialog(Frame parent, boolean modal, Campaign c, Person p) {
         super(parent, modal);
         this.frame = parent;
-        //campaign = c;
+        campaign = c;
         person = p;
-        injuries = p.getInjuries();
-        injuryModel = new InjuryTableModel(injuries);
+        injuryModel = new InjuryTableModel(p.getInjuries());
         initComponents();
         setLocationRelativeTo(parent);
         setUserPreferences();
@@ -162,10 +159,10 @@ public class EditPersonnelInjuriesDialog extends JDialog {
     }
 
     private void addEntry() {
-        EditInjuryEntryDialog eied = new EditInjuryEntryDialog(frame, true, new Injury());
+        EditInjuryEntryDialog eied = new EditInjuryEntryDialog(frame, true, new Injury(campaign.getDateTime()));
         eied.setAlwaysOnTop(true);
         eied.setVisible(true);
-        if(null != eied.getEntry()) {
+        if (null != eied.getEntry()) {
             person.addInjury(eied.getEntry());
         }
         refreshTable();
@@ -173,7 +170,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
 
     private void editEntry() {
         Injury entry = injuryModel.getEntryAt(injuriesTable.getSelectedRow());
-        if(null != entry) {
+        if (null != entry) {
             EditInjuryEntryDialog eied = new EditInjuryEntryDialog(frame, true, entry);
             eied.setAlwaysOnTop(true);
             eied.setVisible(true);
@@ -190,10 +187,10 @@ public class EditPersonnelInjuriesDialog extends JDialog {
     private void refreshTable() {
         int selectedRow = injuriesTable.getSelectedRow();
         injuryModel.setData(person.getInjuries());
-        if(selectedRow != -1) {
-            if(injuriesTable.getRowCount() > 0) {
-                if(injuriesTable.getRowCount() == selectedRow) {
-                    injuriesTable.setRowSelectionInterval(selectedRow-1, selectedRow-1);
+        if (selectedRow != -1) {
+            if (injuriesTable.getRowCount() > 0) {
+                if (injuriesTable.getRowCount() == selectedRow) {
+                    injuriesTable.setRowSelectionInterval(selectedRow - 1, selectedRow - 1);
                 } else {
                     injuriesTable.setRowSelectionInterval(selectedRow, selectedRow);
                 }
@@ -261,36 +258,32 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         @Override
         public Object getValueAt(int row, int col) {
             Injury entry;
-            if(data.isEmpty()) {
+            if (data.isEmpty()) {
                 return "";
             } else {
                 entry = data.get(row);
             }
-            if(col == COL_DAYS) {
-                return Integer.toString(entry.getTime());
+
+            switch (col) {
+                case COL_DAYS:
+                    return Integer.toString(entry.getTime());
+                case COL_LOCATION:
+                    return entry.getLocationName();
+                case COL_TYPE:
+                    return entry.getType().getName(entry.getLocation(), entry.getHits());
+                case COL_FLUFF:
+                    return entry.getFluff();
+                case COL_HITS:
+                    return Integer.toString(entry.getHits());
+                case COL_PERMANENT:
+                    return Boolean.toString(entry.isPermanent());
+                case COL_WORKEDON:
+                    return Boolean.toString(entry.isWorkedOn());
+                case COL_EXTENDED:
+                    return Boolean.toString(entry.getExtended());
+                default:
+                    return "?";
             }
-            if(col == COL_LOCATION) {
-                return entry.getLocationName();
-            }
-            if(col == COL_TYPE) {
-                return entry.getType().getName(entry.getLocation(), entry.getHits());
-            }
-            if(col == COL_FLUFF) {
-                return entry.getFluff();
-            }
-            if(col == COL_HITS) {
-                return Integer.toString(entry.getHits());
-            }
-            if(col == COL_PERMANENT) {
-                return Boolean.toString(entry.isPermanent());
-            }
-            if(col == COL_WORKEDON) {
-                return Boolean.toString(entry.isWorkedOn());
-            }
-            if(col == COL_EXTENDED) {
-                return Boolean.toString(entry.getExtended());
-            }
-            return "?";
         }
 
         @Override
@@ -353,7 +346,6 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         }
 
         public class Renderer extends DefaultTableCellRenderer {
-
             private static final long serialVersionUID = 9054581142945717303L;
 
             @Override

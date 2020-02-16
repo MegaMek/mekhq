@@ -1764,7 +1764,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             JPanel panRandomMarriageSurnameWeight;
             for (int i = 0; i < Person.NUM_SURNAME; i++) {
                 spnRandomMarriageSurnameWeight = new JSpinner(new SpinnerNumberModel((options.getRandomMarriageSurnameWeights(i) / 10.0), 0, 100, 0.1));
-                ((JSpinner.DefaultEditor) spnRandomMarriageSurnameWeight.getEditor()).getTextField().setEditable(false);
                 panRandomMarriageSurnameWeight = new JPanel();
                 panRandomMarriageSurnameWeight.add(spnRandomMarriageSurnameWeight);
                 panRandomMarriageSurnameWeight.add(new JLabel(Person.SURNAME_TYPE_NAMES[i]));

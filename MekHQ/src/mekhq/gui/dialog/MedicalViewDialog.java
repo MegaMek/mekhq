@@ -480,11 +480,11 @@ public class MedicalViewDialog extends JDialog {
                             inj.getType().getSimpleName(), inj.getStart().toString(DATE_FORMATTER)));
                     } else if (inj.isPermanent() || (inj.getTime() <= 0)) {
                         injLabel = genWrittenText(String.format(resourceMap.getString("injuriesPermanent.format"), //$NON-NLS-1$
-                            inj.getType().getSimpleName(),
-                                inj.getStart().toString(DATE_FORMATTER)));
+                            inj.getType().getSimpleName(), inj.getStart().toString(DATE_FORMATTER)));
                     } else {
                         injLabel = genWrittenText(String.format(resourceMap.getString("injuriesTextAndDuration.format"), //$NON-NLS-1$
-                            inj.getType().getSimpleName(), inj.getStart().toString(DATE_FORMATTER), genTimePeriod(inj.getTime())));
+                            inj.getType().getSimpleName(), inj.getStart().toString(DATE_FORMATTER),
+                                genTimePeriod(inj.getTime())));
                     }
                     if (isGMMode()) {
                         injLabel.addMouseListener(new InjuryLabelMouseAdapter(injLabel, p, inj));

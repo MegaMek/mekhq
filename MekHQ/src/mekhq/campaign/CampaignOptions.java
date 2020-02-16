@@ -937,10 +937,6 @@ public class CampaignOptions implements Serializable {
         return randomMarriageSurnameWeights[pos];
     }
 
-    public void setRandomMarriageSurnameWeights(int[] b) {
-        randomMarriageSurnameWeights = b;
-    }
-
     public void setRandomMarriageSurnameWeight(int pos, int b) {
         randomMarriageSurnameWeights[pos] = b;
     }
