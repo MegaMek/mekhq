@@ -2664,7 +2664,7 @@ public class CampaignOptions implements Serializable {
                 retVal.showOriginFaction = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("randomizeOrigin")) {
                 retVal.randomizeOrigin = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("originSearchRaidus")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("originSearchRadius")) {
                 retVal.originSearchRadius = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("isOriginExtraRandom")) {
                 retVal.isOriginExtraRandom = Boolean.parseBoolean(wn2.getTextContent());
