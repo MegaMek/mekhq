@@ -825,7 +825,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
             int i = 0;
             givenName = name[i];
             for (i = 1; i < name.length - 1; i++) {
-                givenName += space + name[i];
+                if (!name[i].equals(space)) {
+                    givenName += space + name[i];
+                }
             }
 
             if (!(!StringUtil.isNullOrEmpty(getBloodname()) && getBloodname().equals(name[i]))) {
@@ -842,15 +844,25 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 surname = name[1];
             } else if (name.length == 3) {
                 givenName = name[0];
-                surname = name[1] + space + name[2];
+                if (name[1].equals(space)) {
+                    surname = name[2];
+                } else {
+                    surname = name[1] + space + name[2];
+                }
             } else if (name.length > 3) {
                 int i = 0;
                 givenName = name[i];
                 for (i = 1; i < name.length - 2; i++) {
-                    givenName += space + name[i];
+                    if (!name[i].equals(space)) {
+                        givenName += space + name[i];
+                    }
                 }
 
-                surname = name[i] + space + name[i + 1];
+                if (name[i].equals(space)) {
+                    surname = name[i + 1];
+                } else {
+                    surname = name[i] + space + name[i + 1];
+                }
             }
         }
 
