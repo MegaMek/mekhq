@@ -713,7 +713,6 @@ public class Utilities {
                 // Not really any way around it
                 populateOptionsFromCrew(p, oldCrew);
                 setName(p, oldCrew, slot);
-                p.setGender(oldCrew.getGender(slot));
                 drivers.add(p);
             }
 
@@ -773,7 +772,6 @@ public class Utilities {
 
                     populateOptionsFromCrew(p, oldCrew);
                     setName(p, oldCrew, slot);
-                    p.setGender(oldCrew.getGender(slot));
 
                     gunners.add(p);
                 }
@@ -812,7 +810,6 @@ public class Utilities {
                     oldCrew.getGender(slot));
             if (!nameSet) {
                 setName(p, oldCrew, slot);
-                p.setGender(oldCrew.getGender(slot));
                 nameSet = true;
             }
             vesselCrew.add(p);
@@ -843,7 +840,6 @@ public class Utilities {
 
             if (p != null) {
                 setName(p, oldCrew, 0);
-                p.setGender(oldCrew.getGender());
             }
         }
 
