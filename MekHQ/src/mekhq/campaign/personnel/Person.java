@@ -850,7 +850,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     givenName += space + name[i];
                 }
 
-                surname = name[i + 1] + space + name[i + 2];
+                surname = name[i] + space + name[i + 1];
             }
         }
 

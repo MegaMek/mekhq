@@ -19,7 +19,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq;
 
 import java.awt.Graphics2D;
@@ -66,6 +65,7 @@ import java.util.stream.Collectors;
 import javax.swing.JTable;
 import javax.swing.table.TableModel;
 
+import megamek.common.util.StringUtil;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.*;
 import org.apache.commons.csv.CSVFormat;
@@ -125,7 +125,7 @@ public class Utilities {
     private static ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Utilities", new EncodeControl()); //$NON-NLS-1$
 
     // A couple of arrays for use in the getLevelName() method
-    private static int[]    arabicNumbers = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+    private static int[] arabicNumbers = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
     private static String[] romanNumerals = "M,CM,D,CD,C,XC,L,XL,X,IX,V,IV,I".split(","); //$NON-NLS-1$ //$NON-NLS-2$
 
     public static int roll3d6() {
@@ -166,12 +166,12 @@ public class Utilities {
      *
      */
     public static <T> T getRandomItem(Collection<? extends T> collection) {
-        if((null == collection) || collection.isEmpty()) {
+        if ((null == collection) || collection.isEmpty()) {
             return null;
         }
         int index = Compute.randomInt(collection.size());
         Iterator<? extends T> iterator = collection.iterator();
-        for(int i = 0; i < index; ++ i) {
+        for (int i = 0; i < index; ++ i) {
             iterator.next();
         }
         return iterator.next();
@@ -191,7 +191,7 @@ public class Utilities {
      *
      */
     public static <T> T getRandomItem(List<? extends T> list) {
-        if((null == list) || list.isEmpty() ) {
+        if ((null == list) || list.isEmpty() ) {
             return null;
         }
         int index = Compute.randomInt(list.size());
@@ -238,15 +238,15 @@ public class Utilities {
      */
     @SafeVarargs
     public static <T> T nonNull(T first, T second, T ... others) {
-        if(null != first) {
+        if (null != first) {
             return first;
         }
-        if(null != second) {
+        if (null != second) {
             return second;
         }
         T result = others[0];
         int index = 1;
-        while((null == result) && (index < others.length)) {
+        while ((null == result) && (index < others.length)) {
             result = others[index];
             ++ index;
         }
@@ -255,7 +255,7 @@ public class Utilities {
 
     public static ArrayList<AmmoType> getMunitionsFor(Entity entity, AmmoType cur_atype, int techLvl) {
         ArrayList<AmmoType> atypes = new ArrayList<>();
-        for(AmmoType atype : AmmoType.getMunitionsFor(cur_atype.getAmmoType())) {
+        for (AmmoType atype : AmmoType.getMunitionsFor(cur_atype.getAmmoType())) {
             //this is an abbreviated version of setupMunitions in the CustomMechDialog
             //TODO: clan/IS limitations?
 
@@ -265,13 +265,13 @@ public class Utilities {
             }
 
             int lvl = atype.getTechLevel(entity.getTechLevelYear());
-            if(lvl < 0) {
+            if (lvl < 0) {
                 lvl = 0;
             }
-            if(techLvl < Utilities.getSimpleTechLevel(lvl)) {
+            if (techLvl < Utilities.getSimpleTechLevel(lvl)) {
                 continue;
             }
-            if(TechConstants.isClan(cur_atype.getTechLevel(entity.getTechLevelYear())) != TechConstants.isClan(lvl)) {
+            if (TechConstants.isClan(cur_atype.getTechLevel(entity.getTechLevelYear())) != TechConstants.isClan(lvl)) {
                 continue;
             }
 
@@ -314,17 +314,15 @@ public class Utilities {
             return false;
         if (!a.getName().equals(b.getName()))
             return false;
-        if (a.getLocation()!=b.getLocation())
-            return false;
-        return true;
+        return a.getLocation() == b.getLocation();
     }
 
     /**
      * Returns the last file modified in a directory and all subdirectories
      * that conforms to a FilenameFilter
-     * @param dir
-     * @param filter
-     * @return
+     * @param dir       direction name
+     * @param filter    filter for the file's name
+     * @return          the last file modified in that dir that fits the filter
      */
     public static File lastFileModified(String dir, FilenameFilter filter) {
         File fl = new File(dir);
@@ -362,8 +360,7 @@ public class Utilities {
 
     public static File[] getAllFiles(String dir, FilenameFilter filter) {
         File fl = new File(dir);
-        File[] files = fl.listFiles(filter);
-        return files;
+        return fl.listFiles(filter);
     }
 
     public static ArrayList<String> getAllVariants(Entity en, Campaign campaign) {
@@ -587,7 +584,7 @@ public class Utilities {
         Objects.requireNonNull(u);
         Objects.requireNonNull(u.getEntity(), "Unit needs to have a valid Entity attached");
         Crew oldCrew = u.getEntity().getCrew();
-        String commanderName = oldCrew.getName();
+
         int averageGunnery;
         int averagePiloting;
         List<Person> drivers = new ArrayList<>();
@@ -645,6 +642,9 @@ public class Utilities {
 
             populateOptionsFromCrew(p, oldCrew);
 
+            setName(p, oldCrew, 0);
+            p.setGender(oldCrew.getGender(0));
+
             drivers.add(p);
         } else if (oldCrew.getSlotCount() > 1) {
             for (int slot = 0; slot < oldCrew.getSlotCount(); slot++) {
@@ -659,14 +659,9 @@ public class Utilities {
                     p.addSkill(SkillType.S_GUN_AERO, SkillType.getType(SkillType.S_GUN_AERO).getTarget() - oldCrew.getGunnery(slot), 0);
                 }
                 if (null != p) {
-                    //p.setName(oldCrew.getName(slot)); // TODO: Windchild fix me
-/*                    if () {
+                    setName(p, oldCrew, slot);
+                    p.setGender(oldCrew.getGender(slot));
 
-                    } else {
-                        p.migrateName(oldCrew.getName(slot));
-                    }
- */
-                    p.migrateName(oldCrew.getName(slot));
                     if (!oldCrew.getExternalIdAsString().equals("-1")) {
                         p.setId(UUID.fromString(oldCrew.getExternalIdAsString(slot)));
                     }
@@ -682,27 +677,25 @@ public class Utilities {
             //but we can't change that because lots of other stuff needs that to be right, so we will hack
             //it here to make it the starting squad size
             int driversNeeded  = u.getTotalDriverNeeds();
-            if(u.getEntity() instanceof BattleArmor) {
+            if (u.getEntity() instanceof BattleArmor) {
                 driversNeeded = ((BattleArmor)u.getEntity()).getSquadSize();
             }
-            while(drivers.size() < driversNeeded) {
-                Person p = null;
-                if(u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
+
+            for (int slot = 0; slot < driversNeeded; slot++) {
+                Person p;
+                if (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
                     p = c.newPerson(Person.T_SPACE_PILOT, factionCode);
                     p.addSkill(SkillType.S_PILOT_SPACE, randomSkillFromTarget(SkillType.getType(SkillType.S_PILOT_SPACE).getTarget() - oldCrew.getPiloting()), 0);
                     totalPiloting += p.getSkill(SkillType.S_PILOT_SPACE).getFinalSkillValue();
-                }
-                else if(u.getEntity() instanceof BattleArmor) {
+                } else if(u.getEntity() instanceof BattleArmor) {
                     p = c.newPerson(Person.T_BA, factionCode);
                     p.addSkill(SkillType.S_GUN_BA, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_BA).getTarget() - oldCrew.getGunnery()), 0);
                     totalGunnery += p.getSkill(SkillType.S_GUN_BA).getFinalSkillValue();
-                }
-                else if(u.getEntity() instanceof Infantry) {
+                } else if(u.getEntity() instanceof Infantry) {
                     p = c.newPerson(Person.T_INFANTRY, factionCode);
                     p.addSkill(SkillType.S_SMALL_ARMS, randomSkillFromTarget(SkillType.getType(SkillType.S_SMALL_ARMS).getTarget() - oldCrew.getGunnery()), 0);
                     totalGunnery += p.getSkill(SkillType.S_SMALL_ARMS).getFinalSkillValue();
-                }
-                else if(u.getEntity() instanceof VTOL) {
+                } else if(u.getEntity() instanceof VTOL) {
                     p = c.newPerson(Person.T_VTOL_PILOT, factionCode);
                     p.addSkill(SkillType.S_PILOT_VTOL, SkillType.getType(SkillType.S_PILOT_VTOL).getTarget() - oldCrew.getPiloting(), 0);
                     p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(), 0);
@@ -721,13 +714,15 @@ public class Utilities {
                 // the SPAs from the entity's crew.
                 // Not really any way around it
                 populateOptionsFromCrew(p, oldCrew);
+                setName(p, oldCrew, slot);
+                p.setGender(oldCrew.getGender(slot));
                 drivers.add(p);
             }
 
             // Regenerate as needed to balance
             if (drivers.size() != 0) {
-                averageGunnery = (int)Math.round(((double)totalGunnery)/drivers.size());
-                averagePiloting = (int)Math.round(((double)totalPiloting)/drivers.size());
+                averageGunnery = (int) Math.round(((double) totalGunnery) / drivers.size());
+                averagePiloting = (int) Math.round(((double) totalPiloting) / drivers.size());
                 if (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
                     while (averagePiloting != oldCrew.getPiloting()) {
                         totalPiloting = 0;
@@ -735,7 +730,7 @@ public class Utilities {
                             p.addSkill(SkillType.S_PILOT_SPACE, randomSkillFromTarget(SkillType.getType(SkillType.S_PILOT_SPACE).getTarget() - oldCrew.getPiloting()), 0);
                             totalPiloting += p.getSkill(SkillType.S_PILOT_SPACE).getFinalSkillValue();
                         }
-                        averagePiloting = (int)Math.round(((double)totalPiloting)/drivers.size());
+                        averagePiloting = (int) Math.round(((double) totalPiloting) / drivers.size());
                     }
                 } else if (u.getEntity() instanceof BattleArmor) {
                     while (averageGunnery != oldCrew.getGunnery()) {
@@ -744,7 +739,7 @@ public class Utilities {
                             p.addSkill(SkillType.S_GUN_BA, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_BA).getTarget() - oldCrew.getGunnery()), 0);
                             totalGunnery += p.getSkill(SkillType.S_GUN_BA).getFinalSkillValue();
                         }
-                        averageGunnery = (int)Math.round(((double)totalGunnery)/drivers.size());
+                        averageGunnery = (int) Math.round(((double) totalGunnery) / drivers.size());
                     }
                 } else if (u.getEntity() instanceof Infantry) {
                     while (averageGunnery != oldCrew.getGunnery()) {
@@ -753,14 +748,15 @@ public class Utilities {
                             p.addSkill(SkillType.S_SMALL_ARMS, randomSkillFromTarget(SkillType.getType(SkillType.S_SMALL_ARMS).getTarget() - oldCrew.getGunnery()), 0);
                             totalGunnery += p.getSkill(SkillType.S_SMALL_ARMS).getFinalSkillValue();
                         }
-                        averageGunnery = (int)Math.round(((double)totalGunnery)/drivers.size());
+                        averageGunnery = (int) Math.round(((double) totalGunnery) / drivers.size());
                     }
                 }
             }
-            if(!u.usesSoldiers()) {
+
+            if (!u.usesSoldiers()) {
                 // Generate gunners for multi-crew vehicles
-                while(gunners.size() < u.getTotalGunnerNeeds()) {
-                    Person p = null;
+                for (int slot = 0; slot < u.getTotalGunnerNeeds(); slot++) {
+                    Person p;
                     if (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
                         p = c.newPerson(Person.T_SPACE_GUNNER, factionCode);
                         p.addSkill(SkillType.S_GUN_SPACE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_SPACE).getTarget() - oldCrew.getGunnery()), 0);
@@ -778,12 +774,15 @@ public class Utilities {
                     }
 
                     populateOptionsFromCrew(p, oldCrew);
+                    setName(p, oldCrew, slot);
+                    p.setGender(oldCrew.getGender(slot));
+
                     gunners.add(p);
                 }
 
                 // Regenerate gunners as needed to balance
                 if (gunners.size() != 0) {
-                    averageGunnery = (int)Math.round(((double)totalGunnery)/gunners.size());
+                    averageGunnery = (int) Math.round(((double) totalGunnery) / gunners.size());
                     if (u.getEntity() instanceof Tank) {
                         while (averageGunnery != oldCrew.getGunnery()) {
                             totalGunnery = 0;
@@ -806,15 +805,16 @@ public class Utilities {
                 }
             }
         }
+
         //Multi-slot crews already have the names set. Single-slot multi-crew units need to assign the commander's name.
-        boolean nameset = oldCrew.getSlotCount() > 1;
-        while (vesselCrew.size() < u.getTotalCrewNeeds()) {
+        boolean nameSet = oldCrew.getSlotCount() > 1;
+        for (int slot = 0; slot < u.getTotalCrewNeeds(); slot++) {
             Person p = c.newPerson(u.getEntity().isSupportVehicle() ?
                     Person.T_VEHICLE_CREW : Person.T_SPACE_CREW, factionCode);
-            if (!nameset) {
-                //p.setName(commanderName);//TODO Windchild fix me
-                p.migrateName(commanderName);//TODO Windchild fix me
-                nameset = true;
+            if (!nameSet) {
+                setName(p, oldCrew, slot);
+                p.setGender(oldCrew.getGender(slot));
+                nameSet = true;
             }
             vesselCrew.add(p);
         }
@@ -827,43 +827,24 @@ public class Utilities {
             consoleCmdr = c.newPerson(Person.T_VEE_GUNNER, factionCode);
         }
 
-        for(Person p : drivers) {
-            if (!nameset) {
-                //p.setName(commanderName);//TODO Windchild fix me
-                p.migrateName(commanderName);//TODO Windchild fix me
-                nameset = true;
-            }
-        }
+        if (nameSet) {
+            Person p = null;
 
-        for(Person p : gunners) {
-            if (!nameset) {
-                //p.setName(commanderName);//TODO Windchild fix me
-                p.migrateName(commanderName);
-                nameset = true;
+            if (!drivers.isEmpty()) {
+                p = drivers.get(0);
+            } else if (!gunners.isEmpty()) {
+                p = gunners.get(0);
+            } else if (!vesselCrew.isEmpty()) {
+                p = vesselCrew.get(0);
+            } else if (navigator != null) {
+                p = navigator;
+            } else if (consoleCmdr != null) {
+                p = consoleCmdr;
             }
-        }
 
-        for(Person p : vesselCrew) {
-            if (!nameset) {
-                //p.setName(commanderName);
-                p.migrateName(commanderName); //TODO Windchild fix me
-                nameset = true;
-            }
-        }
-
-        if (null != navigator) {
-            if (!nameset) {
-                //navigator.setName(commanderName); //TODO Windchild fix me
-                navigator.migrateName(commanderName); //TODO Windchild fix me
-                nameset = true;
-            }
-        }
-
-        if (null != consoleCmdr) {
-            if (!nameset) {
-                //consoleCmdr.setName(commanderName);//TODO Windchild fix me
-                consoleCmdr.migrateName(commanderName);//TODO Windchild fix me
-                nameset = true;
+            if (p != null) {
+                setName(p, oldCrew, 0);
+                p.setGender(oldCrew.getGender(0));
             }
         }
 
@@ -903,6 +884,23 @@ public class Utilities {
         while (optionsEnum.hasMoreElements()) {
             IOption currentOption = optionsEnum.nextElement();
             p.getOptions().getOption(currentOption.getName()).setValue(currentOption.getValue());
+        }
+    }
+
+    private static void setName(Person p, Crew oldCrew, int crewIndex) {
+        String givenName = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_GIVEN_NAME);
+        if (givenName == null) {
+            p.migrateName(oldCrew.getName(crewIndex));
+        } else {
+            p.setGivenName(givenName);
+            p.setSurname(oldCrew.getExtraDataValue(crewIndex, Crew.MAP_SURNAME));
+
+            String bloodname = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_BLOODNAME);
+            p.setBloodname(bloodname);
+
+            if (!StringUtil.isNullOrEmpty(bloodname)) {
+                p.setPhenotype(Integer.parseInt(oldCrew.getExtraDataValue(crewIndex, Crew.MAP_PHENOTYPE)));
+            }
         }
     }
 
