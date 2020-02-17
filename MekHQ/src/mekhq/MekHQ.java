@@ -695,7 +695,7 @@ public class MekHQ implements GameListener {
 
 	}
 
-	public void gameClientFeedbackRquest(GameCFREvent e) {
+	public void gameClientFeedbackRequest(GameCFREvent e) {
 		// TODO Auto-generated method stub
 
 	}
@@ -712,8 +712,8 @@ public class MekHQ implements GameListener {
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice[] gs = ge.getScreenDevices();
         double maxWidth = 0;
-        for (int i = 0; i < gs.length; i++) {
-            Rectangle b = gs[i].getDefaultConfiguration().getBounds();
+        for (GraphicsDevice g : gs) {
+            Rectangle b = g.getDefaultConfiguration().getBounds();
             if (b.getWidth() > maxWidth) {   // Update the max size found on this monitor
                 maxWidth = b.getWidth();
             }
