@@ -225,6 +225,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox chkUseTimeInService;
     private JCheckBox chkShowOriginFaction;
     private JCheckBox chkRandomizeOrigin;
+    private JCheckBox chkRandomizeDependentsOrigin;
     private JSpinner spnOriginSearchRadius;
     //Family
     private JSpinner spnMinimumMarriageAge;
@@ -1693,6 +1694,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             chkRandomizeOrigin.setSelected(options.randomizeOrigin());
             gridBagConstraints.gridy = ++gridy;
             panPersonnel.add(chkRandomizeOrigin, gridBagConstraints);
+
+            chkRandomizeDependentsOrigin = new JCheckBox(resourceMap.getString("randomizeDependentsOrigin.text")); // NOI18N
+            chkRandomizeDependentsOrigin.setSelected(options.getRandomizeDependentOrigin());
+            gridBagConstraints.gridy = ++gridy;
+            panPersonnel.add(chkRandomizeDependentsOrigin, gridBagConstraints);
 
             spnOriginSearchRadius = new JSpinner(new SpinnerNumberModel(options.getOriginSearchRadius(), 10, 250, 10));
             JPanel panOriginSearchRadius = new JPanel();
@@ -4812,6 +4818,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setUseTimeInService(chkUseTimeInService.isSelected());
         options.setShowOriginFaction(chkShowOriginFaction.isSelected());
         options.setRandomizeOrigin(chkRandomizeOrigin.isSelected());
+        options.setRandomizeDependentOrigin(chkRandomizeDependentsOrigin.isSelected());
         options.setOriginSearchRadius((Integer)spnOriginSearchRadius.getModel().getValue());
         //Family
         options.setMinimumMarriageAge((Integer) spnMinimumMarriageAge.getModel().getValue());
