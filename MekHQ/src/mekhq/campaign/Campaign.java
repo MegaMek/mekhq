@@ -4666,34 +4666,28 @@ public class Campaign implements Serializable, ITechManager {
      * @return A new {@link Person} of the given primary role, who is a dependent.
      */
     public Person newDependent(int type, boolean baby) {
-        Person person= newPerson(type, Person.T_NONE, new DefaultFactionSelector());;
+        Person person;
 
-        /*
         if (!baby && campaignOptions.getRandomizeDependentOrigin()) {
-            person
+            person = newPerson(type);
         } else {
-
+            person = newPerson(type, Person.T_NONE, new DefaultFactionSelector(),
+                    new DefaultPlanetSelector(), Person.G_RANDOMIZE);
         }
-        */
+
         person.setDependent(true);
         return person;
     }
 
+    /**
+     * Generate a new pilotPerson of the given type using whatever randomization options have been given in the
+     * CampaignOptions
+     *
+     * @param type The primary role
+     * @return A new {@link Person}.
+     */
     public Person newPerson(int type) {
         return newPerson(type, Person.T_NONE);
-    }
-
-    public Person newPerson(int type, String factionCode) {
-        return newPerson(type, Person.T_NONE, new DefaultFactionSelector(factionCode));
-    }
-
-    public Person newPerson(int type, int secondary) {
-        return newPerson(type, secondary, getFactionSelector());
-    }
-
-    public Person newPerson(int type, String factionCode, int gender) {
-        // TODO: Implement gender as a check here
-        return newPerson(type, Person.T_NONE, new DefaultFactionSelector(factionCode));
     }
 
     /**
@@ -4702,11 +4696,24 @@ public class Campaign implements Serializable, ITechManager {
      *
      * @param type The primary role
      * @param secondary A secondary role; used for LAM pilots to generate MW + Aero pilot
-     * @param factionSelector The faction selector to use for the person.
      * @return A new {@link Person}.
      */
-    public Person newPerson(int type, int secondary, AbstractFactionSelector factionSelector) {
-        return newPerson(type, secondary, factionSelector, getPlanetSelector());
+    public Person newPerson(int type, int secondary) {
+        return newPerson(type, secondary, getFactionSelector(), getPlanetSelector(), Person.G_RANDOMIZE);
+    }
+
+    /**
+     * Generate a new pilotPerson of the given type using whatever randomization options have been given in the
+     * CampaignOptions
+     *
+     * @param type The primary role
+     * @param secondary A secondary role; used for LAM pilots to generate MW + Aero pilot
+     * @param factionCode The code for the faction this person is to be generated from
+     * @param gender The gender of the person to be generated, or a randomize it value
+     * @return A new {@link Person}.
+     */
+    public Person newPerson(int type, int secondary, String factionCode, int gender) {
+        return newPerson(type, secondary, new DefaultFactionSelector(factionCode), getPlanetSelector(), gender);
     }
 
     /**
@@ -4717,11 +4724,13 @@ public class Campaign implements Serializable, ITechManager {
      * @param secondary A secondary role; used for LAM pilots to generate MW + Aero pilot
      * @param factionSelector The faction selector to use for the person.
      * @param planetSelector The planet selector for the person.
+     * @param gender The gender of the person to be generated, or a randomize it value
      * @return A new {@link Person}.
      */
-    public Person newPerson(int type, int secondary, AbstractFactionSelector factionSelector, AbstractPlanetSelector planetSelector) {
+    public Person newPerson(int type, int secondary, AbstractFactionSelector factionSelector,
+                            AbstractPlanetSelector planetSelector, int gender) {
         AbstractPersonnelGenerator personnelGenerator = getPersonnelGenerator(factionSelector, planetSelector);
-        return newPerson(type, secondary, personnelGenerator);
+        return newPerson(type, secondary, personnelGenerator, gender);
     }
 
     /**
@@ -4729,15 +4738,16 @@ public class Campaign implements Serializable, ITechManager {
      * @param type The primary role of the {@link Person}.
      * @param secondary The secondary role, or {@link Person#T_NONE}, of the {@link Person}.
      * @param personnelGenerator The {@link AbstractPersonnelGenerator} to use when creating the {@link Person}.
+     * @param gender The gender of the person to be generated, or a randomize it value
      * @return A new {@link Person} configured using {@code personnelGenerator}.
      */
-    public Person newPerson(int type, int secondary, AbstractPersonnelGenerator personnelGenerator) {
+    public Person newPerson(int type, int secondary, AbstractPersonnelGenerator personnelGenerator, int gender) {
         if (type == Person.T_LAM_PILOT) {
             type = Person.T_MECHWARRIOR;
             secondary = Person.T_AERO_PILOT;
         }
 
-        Person person = personnelGenerator.generate(this, type, secondary);
+        Person person = personnelGenerator.generate(this, type, secondary, gender);
 
         // Assign a random portrait after we generate a new person
         if (getCampaignOptions().usePortraitForType(type)) {

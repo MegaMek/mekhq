@@ -74,18 +74,13 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
     }
 
     @Override
-    public Person generate(Campaign campaign, int primaryRole) {
-        return generate(campaign, primaryRole, Person.T_NONE);
-    }
-
-    @Override
-    public Person generate(Campaign campaign, int primaryRole, int secondaryRole) {
+    public Person generate(Campaign campaign, int primaryRole, int secondaryRole, int gender) {
         Person person = createPerson(campaign);
 
         person.setPrimaryRole(primaryRole);
         person.setSecondaryRole(secondaryRole);
 
-        generateName(campaign, person);
+        generateName(campaign, person, gender);
 
         int expLvl = generateExperienceLevel(campaign, person);
 

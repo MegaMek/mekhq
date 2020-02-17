@@ -80,6 +80,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //region Variable Declarations
     private static final long serialVersionUID = -847642980395311152L;
 
+    public static final int G_RANDOMIZE = -1; //this is used in generation methods to randomize the gender
     public static final int G_MALE = 0;
     public static final int G_FEMALE = 1;
 

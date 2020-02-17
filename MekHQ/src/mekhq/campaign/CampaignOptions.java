@@ -26,6 +26,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import mekhq.campaign.finances.Money;
 
 import org.apache.commons.lang3.StringUtils;
@@ -116,6 +117,7 @@ public class CampaignOptions implements Serializable {
     private boolean useTimeInService;
     private boolean showOriginFaction;
     private boolean randomizeOrigin;
+    private boolean randomizeDependentOrigin;
     private int originSearchRadius;
     private boolean isOriginExtraRandom;
     private double originDistanceScale;
@@ -491,6 +493,7 @@ public class CampaignOptions implements Serializable {
         useTimeInService = false;
         showOriginFaction = true;
         randomizeOrigin = false;
+        randomizeDependentOrigin = false;
         originSearchRadius = 45;
         isOriginExtraRandom = false;
         originDistanceScale = 0.6;
@@ -832,9 +835,25 @@ public class CampaignOptions implements Serializable {
     /**
      * Sets a value indicating whether or not to randomize
      * the origin of personnel.
+     * @param b true for randomize, otherwise false
      */
     public void setRandomizeOrigin(boolean b) {
         randomizeOrigin = b;
+    }
+
+    /**
+     * Gets a value indicating whether or not to randomize the origin of dependents
+     */
+    public boolean getRandomizeDependentOrigin() {
+        return randomizeDependentOrigin;
+    }
+
+    /**
+     * Sets a value indicating whether or not to randomize the origin of dependents
+     * @param b true for randomize, otherwise false
+     */
+    public void setRandomizeDependentOrigin(boolean b) {
+        randomizeDependentOrigin = b;
     }
 
     /**
@@ -2537,6 +2556,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useQuirks", useQuirks);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "showOriginFaction", showOriginFaction);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "randomizeOrigin", randomizeOrigin);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "randomizeDependentOrigin", randomizeDependentOrigin);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "originSearchRadius", originSearchRadius);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "isOriginExtraRandom", isOriginExtraRandom);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForParts", payForParts);
@@ -2866,6 +2886,8 @@ public class CampaignOptions implements Serializable {
                 retVal.showOriginFaction = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("randomizeOrigin")) {
                 retVal.randomizeOrigin = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("randomizeDependentOrigin")) {
+                retVal.randomizeDependentOrigin = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("originSearchRadius")) {
                 retVal.originSearchRadius = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("isOriginExtraRandom")) {
