@@ -1355,7 +1355,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         removePregnancy();
 
         return IntStream.range(0, size).mapToObj(i -> {
-            Person baby = campaign.newDependent(T_NONE);
+            Person baby = campaign.newDependent(T_NONE, true);
             baby.setSurname(surname);
             baby.setBirthday((GregorianCalendar) campaign.getCalendar().clone());
             UUID babyId = UUID.randomUUID();
@@ -2062,6 +2062,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if(null != extraData) {
             extraData.writeToXml(pw1);
         }
+        pw1.println(); //TODO : Fix the above check, thereby removing the need for this to format the output
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</person>");
     }
 

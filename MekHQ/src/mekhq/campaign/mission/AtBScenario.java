@@ -40,6 +40,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 
+import megamek.common.util.StringUtil;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -1662,48 +1663,47 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     public static String writeEntityWithCrewToXmlString(Entity tgtEnt, int indentLvl, ArrayList<Entity> list) {
         String retVal = MekHqXmlUtil.writeEntityToXmlString(tgtEnt, indentLvl, list);
 
-        String crew = MekHqXmlUtil.indentStr(indentLvl+1) + "<crew crewType=\""
-                    + tgtEnt.getCrew().getCrewType().toString().toLowerCase()
-                    + "\" size=\"" + tgtEnt.getCrew().getSize();
+        StringBuilder crew = new StringBuilder(MekHqXmlUtil.indentStr(indentLvl + 1));
+        crew.append("<crew crewType=\"").append(tgtEnt.getCrew().getCrewType().toString().toLowerCase())
+                .append("\" size=\"").append(tgtEnt.getCrew().getSize());
         if (tgtEnt.getCrew().getInitBonus() != 0) {
-            crew += "\" initB=\""
-                + String.valueOf(tgtEnt.getCrew().getInitBonus());
+            crew.append("\" initB=\"").append(tgtEnt.getCrew().getInitBonus());
         }
         if (tgtEnt.getCrew().getCommandBonus() != 0) {
-            crew += "\" commandB=\""
-                + String.valueOf(tgtEnt.getCrew().getCommandBonus());
+            crew.append("\" commandB=\"").append(tgtEnt.getCrew().getCommandBonus());
         }
         if (tgtEnt instanceof Mech) {
-            crew += "\" autoeject=\"" + ((Mech)tgtEnt).isAutoEject();
+            crew.append("\" autoeject=\"").append(((Mech) tgtEnt).isAutoEject());
         }
-        crew += "\" ejected=\"" + tgtEnt.getCrew().isEjected() + "\">\n";
-        for (int i = 0; i < tgtEnt.getCrew().getSlotCount(); i++) {
-            crew += MekHqXmlUtil.indentStr(indentLvl+2) + "<crewMember slot=\"" + i
-                    + "\" name=\""
-                    + MekHqXmlUtil.escape(tgtEnt.getCrew().getName(i))
-                    + "\" nick=\""
-                    + MekHqXmlUtil.escape(tgtEnt.getCrew().getNickname(i))
-                    + "\" gunnery=\""
-                    + tgtEnt.getCrew().getGunnery(i)
-                    + "\" piloting=\""
-                    + tgtEnt.getCrew().getPiloting(i);
+        crew.append("\" ejected=\"").append(tgtEnt.getCrew().isEjected()).append("\">\n");
 
-            if (tgtEnt.getCrew().getToughness(i) != 0) {
-                crew += "\" toughness=\""
-                    + String.valueOf(tgtEnt.getCrew().getToughness(i));
+        for (int pos = 0; pos < tgtEnt.getCrew().getSlotCount(); pos++) {
+            crew.append(MekHqXmlUtil.indentStr(indentLvl + 2)).append("<crewMember slot=\"")
+                    .append(pos).append("\" name=\"").append(MekHqXmlUtil.escape(tgtEnt.getCrew().getName(pos)))
+                    .append("\" nick=\"").append(MekHqXmlUtil.escape(tgtEnt.getCrew().getNickname(pos)))
+                    .append("\" gender=\"").append(tgtEnt.getCrew().getGender(pos))
+                    .append("\" gunnery=\"").append(tgtEnt.getCrew().getGunnery(pos))
+                    .append("\" piloting=\"").append(tgtEnt.getCrew().getPiloting(pos));
+
+            if (tgtEnt.getCrew().getToughness(pos) != 0) {
+                crew.append("\" toughness=\"").append(tgtEnt.getCrew().getToughness(pos));
             }
-            if (tgtEnt.getCrew().isDead(i) || tgtEnt.getCrew().getHits(i) >= Crew.DEATH) {
-                crew +="\" hits=\"Dead";
-            } else if (tgtEnt.getCrew().getHits(i) > 0) {
-                crew += "\" hits=\""
-                    + String.valueOf(tgtEnt.getCrew().getHits(i));
+            if (tgtEnt.getCrew().isDead(pos) || tgtEnt.getCrew().getHits(pos) >= Crew.DEATH) {
+                crew.append("\" hits=\"Dead");
+            } else if (tgtEnt.getCrew().getHits(pos) > 0) {
+                crew.append("\" hits=\"").append(tgtEnt.getCrew().getHits(pos));
             }
 
-            crew += "\" externalId=\""
-                     + tgtEnt.getCrew().getExternalIdAsString(i);
-            crew += "\"/>\n";
+            crew.append("\" externalId=\"").append(tgtEnt.getCrew().getExternalIdAsString(pos));
+
+            String extraData = tgtEnt.getCrew().writeExtraDataToXMLLine(pos);
+            if (!StringUtil.isNullOrEmpty(extraData)) {
+                crew.append(extraData);
+            }
+
+            crew.append("\"/>\n");
         }
-        crew += MekHqXmlUtil.indentStr(indentLvl+1) + "</crew>\n";
+        crew.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("</crew>\n");
 
         return retVal.replaceFirst(">", ">\n" + crew + "\n");
     }

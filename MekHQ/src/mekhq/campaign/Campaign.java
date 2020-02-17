@@ -794,7 +794,7 @@ public class Campaign implements Serializable, ITechManager {
                     }
                     int dependents = getRetirementDefectionTracker().getPayout(pid).getDependents();
                     while (dependents > 0) {
-                        Person p = newDependent(Person.T_ASTECH);
+                        Person p = newDependent(Person.T_ASTECH, false);
                         if (recruitPerson(p)) {
                             dependents--;
                         } else {
@@ -1208,6 +1208,7 @@ public class Campaign implements Serializable, ITechManager {
         return units.get(id);
     }
 
+    //region Personnel Recruitment
     /**
      *
      * @param p         the person being added
@@ -1312,6 +1313,7 @@ public class Campaign implements Serializable, ITechManager {
         MekHQ.triggerEvent(new PersonNewEvent(p));
         return true;
     }
+    //endregion Personnel Recruitment
 
     /**
      * Imports a {@link Person} into a campaign.
@@ -3162,7 +3164,7 @@ public class Campaign implements Serializable, ITechManager {
                 change++;
             }
             for (int i = 0; i < change; i++) {
-                Person p = newDependent(Person.T_ASTECH);
+                Person p = newDependent(Person.T_ASTECH, false);
                 recruitPersonWithoutId(p, false, true, false, true);
             }
         }
@@ -4614,16 +4616,6 @@ public class Campaign implements Serializable, ITechManager {
         return Systems.getInstance().getSystemByName(name, getDateTime());
     }
 
-    /**
-     * Creates a new {@link Person}, who is a dependent, of a given primary role.
-     * @param type The primary role of the {@link Person}, e.g. {@link Person#T_MECHWARRIOR}.
-     * @return A new {@link Person} of the given primary role, who is a dependent.
-     */
-    public Person newDependent(int type) {
-        Person person = newPerson(type, new DefaultFactionSelector(), new DefaultPlanetSelector());
-        person.setDependent(true);
-        return person;
-    }
 
     /**
      * Gets the {@link AbstractFactionSelector} to use with this campaign.
@@ -4668,24 +4660,40 @@ public class Campaign implements Serializable, ITechManager {
         return generator;
     }
 
+    /**
+     * Creates a new {@link Person}, who is a dependent, of a given primary role.
+     * @param type The primary role of the {@link Person}, e.g. {@link Person#T_MECHWARRIOR}.
+     * @return A new {@link Person} of the given primary role, who is a dependent.
+     */
+    public Person newDependent(int type, boolean baby) {
+        Person person= newPerson(type, Person.T_NONE, new DefaultFactionSelector());;
+
+        /*
+        if (!baby && campaignOptions.getRandomizeDependentOrigin()) {
+            person
+        } else {
+
+        }
+        */
+        person.setDependent(true);
+        return person;
+    }
+
     public Person newPerson(int type) {
         return newPerson(type, Person.T_NONE);
+    }
+
+    public Person newPerson(int type, String factionCode) {
+        return newPerson(type, Person.T_NONE, new DefaultFactionSelector(factionCode));
     }
 
     public Person newPerson(int type, int secondary) {
         return newPerson(type, secondary, getFactionSelector());
     }
 
-    public Person newPerson(int type, String factionCode) {
-        return newPerson(type, new DefaultFactionSelector(factionCode));
-    }
-
-    public Person newPerson(int type, AbstractFactionSelector factionSelector) {
-        return newPerson(type, Person.T_NONE, factionSelector);
-    }
-
-    public Person newPerson(int type, AbstractFactionSelector factionSelector, AbstractPlanetSelector planetSelector) {
-        return newPerson(type, Person.T_NONE, factionSelector, planetSelector);
+    public Person newPerson(int type, String factionCode, int gender) {
+        // TODO: Implement gender as a check here
+        return newPerson(type, Person.T_NONE, new DefaultFactionSelector(factionCode));
     }
 
     /**
