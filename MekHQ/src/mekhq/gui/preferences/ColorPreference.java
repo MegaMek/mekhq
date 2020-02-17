@@ -74,7 +74,7 @@ public class ColorPreference extends PreferenceElement {
 
     /**
      * Gets the alternate color.
-     * @param color The alternate color.
+     * @return The alternate color.
      */
     public Optional<Color> getAlternateColor() {
         return Optional.ofNullable(alternateColor.orElse(defaultAlternateColor));
@@ -82,7 +82,7 @@ public class ColorPreference extends PreferenceElement {
 
     /**
      * Sets the alternate color.
-     * @param color The alternate color.
+     * @param alternateColor The alternate color.
      */
     public void setAlternateColor(Optional<Color> alternateColor) {
         this.alternateColor = alternateColor;
@@ -130,6 +130,5 @@ public class ColorPreference extends PreferenceElement {
 
     @Override
     protected void dispose() {
-        // TODO Auto-generated method stub
     }
 }
