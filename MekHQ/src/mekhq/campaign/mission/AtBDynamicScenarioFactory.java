@@ -47,6 +47,7 @@ import megamek.common.EntityMovementMode;
 import megamek.common.EntityWeightClass;
 import megamek.common.IBomber;
 import megamek.common.Infantry;
+import megamek.common.Mech;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
@@ -409,7 +410,10 @@ public class AtBDynamicScenarioFactory {
             if(forceTemplate.getContributesToMapSize()) {
                 generatedLanceCount++;
             }
-
+            
+            // if appropriate, generate an extra BA unit for clan novas
+            generatedLance.addAll(generateBAForNova(scenario, generatedLance, factionCode, skill, quality, campaign));
+            
             for(Entity ent : generatedLance) {
                 forceBV += ent.calculateBattleValue();
                 generatedEntities.add(ent);
@@ -1013,25 +1017,26 @@ public class AtBDynamicScenarioFactory {
      * @return Generated infantry unit, or null if one cannot be generated
      */
     private static Entity generateTransportedInfantryUnit(UnitGeneratorParameters params, double bayCapacity, int skill, Campaign campaign) {
-        params.setUnitType(UnitType.INFANTRY);
+        UnitGeneratorParameters newParams = params.clone();
+        newParams.setUnitType(UnitType.INFANTRY);
 
         // to save ourselves having to re-generate a bunch of infantry for smaller bays (3 tons and lower)
         // we will limit ourselves to generating low-weight foot platoons
         if(bayCapacity <= IUnitGenerator.FOOT_PLATOON_INFANTRY_WEIGHT) {
-            params.getMovementModes().add(EntityMovementMode.INF_LEG);
-            params.setFilter(inf -> inf.getTons() <= IUnitGenerator.FOOT_PLATOON_INFANTRY_WEIGHT);
+            newParams.getMovementModes().add(EntityMovementMode.INF_LEG);
+            newParams.setFilter(inf -> inf.getTons() <= IUnitGenerator.FOOT_PLATOON_INFANTRY_WEIGHT);
         } else {
-            params.getMovementModes().addAll(IUnitGenerator.ALL_INFANTRY_MODES);
-            params.setFilter(inf -> inf.getTons() <= bayCapacity);
+            newParams.getMovementModes().addAll(IUnitGenerator.ALL_INFANTRY_MODES);
+            newParams.setFilter(inf -> inf.getTons() <= bayCapacity);
         }
 
-        MechSummary ms = campaign.getUnitGenerator().generate(params);
+        MechSummary ms = campaign.getUnitGenerator().generate(newParams);
 
         if (ms == null) {
             return null;
         }
 
-        Entity infantry = createEntityWithCrew(params.getFaction(), skill, campaign, ms);
+        Entity infantry = createEntityWithCrew(newParams.getFaction(), skill, campaign, ms);
 
         // if we're dealing with a *really* small bay, drop the # squads down until we can fit it in
         while(infantry.getWeight() > bayCapacity) {
@@ -1052,24 +1057,28 @@ public class AtBDynamicScenarioFactory {
      * @return Generated battle armor unit, null if one cannot be generated
      */
     private static Entity generateTransportedBAUnit(UnitGeneratorParameters params, double bayCapacity, int skill, Campaign campaign) {
-        params.setUnitType(UnitType.BATTLE_ARMOR);
+        UnitGeneratorParameters newParams = params.clone();
+        newParams.setUnitType(UnitType.BATTLE_ARMOR);
 
         // battle armor needs a minimum amount of transport capacity if specified
         // if our bay does not have that capacity, we cannot generate BA and return null
         if(bayCapacity >= IUnitGenerator.BATTLE_ARMOR_MIN_WEIGHT || bayCapacity == IUnitGenerator.NO_WEIGHT_LIMIT) {
-            params.getMovementModes().addAll(IUnitGenerator.ALL_BATTLE_ARMOR_MODES);
-            params.setFilter(inf -> inf.getTons() <= bayCapacity);
+            newParams.getMovementModes().addAll(IUnitGenerator.ALL_BATTLE_ARMOR_MODES);
+            
+            if(bayCapacity != IUnitGenerator.NO_WEIGHT_LIMIT) {
+                newParams.setFilter(inf -> inf.getTons() <= bayCapacity);
+            }
         } else {
             return null;
         }
 
-        MechSummary ms = campaign.getUnitGenerator().generate(params);
+        MechSummary ms = campaign.getUnitGenerator().generate(newParams);
 
         if (ms == null) {
             return null;
         }
 
-        Entity battleArmor = createEntityWithCrew(params.getFaction(), skill, campaign, ms);
+        Entity battleArmor = createEntityWithCrew(newParams.getFaction(), skill, campaign, ms);
         
         return battleArmor;
     }
@@ -1096,6 +1105,64 @@ public class AtBDynamicScenarioFactory {
         for(Entity transport : transports) {
             transportedUnits.addAll(fillTransport(scenario, transport, params, skill, campaign));
         }
+
+        return transportedUnits;
+    }
+    
+    /**
+     * Worker function that generates a battle armor unit to attach to a unit of clan mechs
+     */
+    public static List<Entity> generateBAForNova(AtBScenario scenario, List<Entity> starUnits, String factionCode, int skill, int quality, Campaign campaign) {
+        List<Entity> transportedUnits = new ArrayList<>();
+        
+        // determine if this should be a nova
+        // if yes, then pick the fastest mech and load it up, adding the generated BA to the transport relationships.
+        
+        // non-clan forces and units that aren't stars don't become novas
+        if(!Faction.getFaction(factionCode).isClan() && (starUnits.size() != 5)) {
+            return transportedUnits;
+        }
+        
+        // logic copied from AtBScenario.addStar() to randomly determine if the given unit is actually going to be a nova
+        // adjusted from 11/8 to 8/6 (distribution of novas in newest AtB doc is a lot higher) so that players actually encounter novas
+        // whatever CBS is still gets no novas, so there
+        int roll = Compute.d6(2);
+        int novaTarget = 8;
+        if (factionCode.equals("CHH") || factionCode.equals("CSL")) {
+            novaTarget = 6;
+        } else if (factionCode.equals("CBS")) {
+            novaTarget = 13;
+        }
+        
+        if(roll < novaTarget) {
+            return transportedUnits;
+        }
+        
+        Entity actualTransport = null;
+        for(Entity transport : starUnits) {
+            if(transport instanceof Mech && transport.isOmni()) {
+                if((actualTransport == null) || (actualTransport.getWalkMP() < transport.getWalkMP())) {
+                    actualTransport = transport;
+                }
+            }
+        }
+        
+        if(actualTransport == null) {
+            return transportedUnits;
+        }
+        
+        // if we're generating a riding BA, do so now, then associate it with the designated transport
+        UnitGeneratorParameters params = new UnitGeneratorParameters();
+        params.setFaction(factionCode);
+        params.setQuality(quality);
+        params.setYear(campaign.getGameYear());
+        params.addMissionRole(MissionRole.MECHANIZED_BA);
+        params.setWeightClass(UNIT_WEIGHT_UNSPECIFIED);
+
+        Entity transportedUnit = generateTransportedBAUnit(params, IUnitGenerator.NO_WEIGHT_LIMIT, skill, campaign);
+        transportedUnit.setDeployRound(actualTransport.getDeployRound());
+        scenario.addTransportRelationship(actualTransport.getExternalIdAsString(), transportedUnit.getExternalIdAsString());
+        transportedUnits.add(transportedUnit);
 
         return transportedUnits;
     }
