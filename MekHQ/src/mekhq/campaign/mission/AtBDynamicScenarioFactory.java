@@ -74,6 +74,7 @@ import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.IUnitGenerator;
@@ -365,7 +366,7 @@ public class AtBDynamicScenarioFactory {
             // meks, asf and tanks support weight class specification, as does the "standard atb mix"
             } else if(IUnitGenerator.unitTypeSupportsWeightClass(actualUnitType) ||
                     (actualUnitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX)) {
-                List<Integer> unitTypes = generateUnitTypes(actualUnitType, lanceSize, factionCode, campaign);
+                List<Integer> unitTypes = generateUnitTypes(actualUnitType, lanceSize, quality, factionCode, campaign);
 
                 // special case: if we're generating artillery, there's not a lot of variety
                 // in artillery unit weight classes, so we ignore that specification
@@ -382,7 +383,7 @@ public class AtBDynamicScenarioFactory {
                 }
             // everything else doesn't support weight class specification
             } else {
-                List<Integer> unitTypes = generateUnitTypes(actualUnitType, lanceSize, factionCode, campaign);
+                List<Integer> unitTypes = generateUnitTypes(actualUnitType, lanceSize, quality, factionCode, campaign);
                 generatedLance = generateLance(factionCode, skill, quality, unitTypes, forceTemplate.getUseArtillery(), campaign);
             }
 
@@ -1400,12 +1401,13 @@ public class AtBDynamicScenarioFactory {
      * @param campaign Current campaign
      * @return Array list of unit type integers.
      */
-    private static List<Integer> generateUnitTypes(int unitTypeCode, int unitCount, String factionCode, Campaign campaign) {
+    private static List<Integer> generateUnitTypes(int unitTypeCode, int unitCount, int forceQuality, String factionCode, Campaign campaign) {
         List<Integer> unitTypes = new ArrayList<>(unitCount);
         int actualUnitType = unitTypeCode;
 
         if(unitTypeCode == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX) {
             Faction faction = Faction.getFaction(factionCode);
+            
             // "AtB Mix" will skip vehicles if the "use vehicles" checkbox is turned off
             // or if the faction is clan and "clan opfors use vehicles" is turned off
             boolean useVehicles = campaign.getCampaignOptions().getUseVehicles() &&
@@ -1413,6 +1415,16 @@ public class AtBDynamicScenarioFactory {
 
             // logic mostly lifted from AtBScenario.java, uses campaign config to determine tank/mech mixture
             if (useVehicles) {
+                // some specialized logic for clan opfors
+                int era = Era.getEra(campaign.getGameYear());
+                
+                // if we're in the late republic or dark ages, clans no longer have the luxury of mech only stars
+                boolean clanEquipmentScarcity = era == Era.E_LATE_REPUBLIC || era == Era.E_DARK_AGES;
+                
+                if(faction.isClan() && !clanEquipmentScarcity) {
+                    return generateClanUnitTypes(unitCount, forceQuality, factionCode, campaign);
+                }
+                
                 int totalWeight = campaign.getCampaignOptions().getOpforLanceTypeMechs() +
                         campaign.getCampaignOptions().getOpforLanceTypeMixed() +
                         campaign.getCampaignOptions().getOpforLanceTypeVehicles();
@@ -1451,6 +1463,36 @@ public class AtBDynamicScenarioFactory {
 
         return unitTypes;
     }
+    
+    /**
+     * Specialized logic for generating clan units
+     * @return
+     */
+    private static List<Integer> generateClanUnitTypes(int unitCount, int forceQuality, String factionCode, Campaign campaign) {        
+        // per AtB, we have a 1/6 odds of encountering a vehicle star
+        // for fluff reasons, hell's horses + pals use more vehicles
+        // higher-rated clan units become increasingly unlikely to use vehicles
+        int vehicleTarget = 6;
+        if(factionCode.equals("CHH") || factionCode.equals("CSL") || factionCode.equals("CBS")) {
+            vehicleTarget = 8;
+        } else {
+            vehicleTarget -= forceQuality;
+        }
+        
+        // we randomly determine tank or mek
+        int roll = Compute.d6(2); 
+        int unitType = campaign.getCampaignOptions().getClanVehicles() && (roll <= vehicleTarget) ? 
+                UnitType.TANK : UnitType.MEK;
+        
+        List<Integer> unitTypes = new ArrayList<>();
+        
+        for(int x = 0; x < unitCount; x++) {
+            unitTypes.add(unitType);
+        }
+
+        return unitTypes;
+        
+    }
 
     /**
      * Logic that generates a "unit weights" string according to AtB rules.
@@ -1474,7 +1516,9 @@ public class AtBDynamicScenarioFactory {
                 .selectBotUnitWeights(factionWeightString, weightClass), maxWeight);
         weights = adjustForMinWeight(weights, minWeight);
 
-        weights = adjustWeightsForFaction(weights, faction);
+        if(campaign.getCampaignOptions().getRegionalMechVariations()) {
+            weights = adjustWeightsForFaction(weights, faction);
+        }
 
         return weights;
     }
