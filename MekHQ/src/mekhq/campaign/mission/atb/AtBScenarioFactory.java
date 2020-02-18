@@ -129,141 +129,166 @@ public class AtBScenarioFactory {
 		return true;
 	}
 
-	/* Iterate through the list of lances and make a battle roll for each,
+	/**
+     *  Iterate through the list of lances and make a battle roll for each,
 	 * then sort them by date before adding them to the campaign.
 	 * Contracts with enemy morale level of invincible have a base attack
 	 * (defender) battle each week. If there is a base attack (attacker)
-	 * battle, that is the only one for the week on that contract.
+	 * battle, that is the only one for the week on that mission.
+     * @param c the campaign for which to generate scenarios
 	 */
-	public static void createScenariosForNewWeek(Campaign c, boolean allowLancesToBeDuplicated) {
+	public static void createScenariosForNewWeek(Campaign c) {
 		Hashtable<Integer, Lance> lances = c.getLances();
 
-		ArrayList<AtBScenario> sList = new ArrayList<>();
-		AtBScenario baseAttack = null;
-		Map<Integer, Integer> assignedLances = new HashMap<>();
+        AtBContract atbContract;
+        List<AtBScenario> sList;
+		List<Integer> assignedLances = new ArrayList<>();
+		boolean hasBaseAttack;
+		boolean hasBaseAttackAttacker;
 
-		if (!allowLancesToBeDuplicated) {
-			for (Mission m : c.getMissions()) {
-				if (!m.isActive()) {
-					continue;
-				}
+		// Determine active missions
+        for (Mission mission : c.getMissions()) {
+            if (!mission.isActive() || !(mission instanceof AtBContract) ) {
+                continue; //if not active or an AtBContract, we don't care about the mission
+            }
 
-				for (Scenario s : m.getScenarios()) {
-					if (!s.isCurrent() || !AtBScenario.class.isAssignableFrom(s.getClass())) {
-						continue;
-					}
+            //region Value Initialization
+            atbContract = (AtBContract) mission;
+            sList = new ArrayList<>();
+            hasBaseAttack = false;
+            hasBaseAttackAttacker = false;
+            //endregion Value Initialization
 
-					AtBScenario atbScenario = (AtBScenario) s;
+            //region Current Scenarios
+            // Determine active scenarios
+            for (Scenario scenario : atbContract.getScenarios()) {
+                if (!scenario.isCurrent() || !AtBScenario.class.isAssignableFrom(scenario.getClass())) {
+                    continue; //if not current or not assignable to an AtB scenario, then we don't care about it
+                }
 
-					if (atbScenario.getLanceForceId() == AtBScenario.NO_LANCE) {
-						continue;
-					}
+                AtBScenario atbScenario = (AtBScenario) scenario;
 
-					assignedLances.put(atbScenario.getLanceForceId(), atbScenario.getLanceForceId());
-				}
-			}
-		}
+                // Add any currently assigned lances to the assignedLances
+                assignedLances.add(atbScenario.getLanceForceId());
 
-		for (Lance l : lances.values()) {
-			if (assignedLances.containsKey(l.getForceId())) {
-				continue;
-			}
+                // Remove any active scenarios from the contract, and add them to the current scenarios list instead
+                atbContract.removeScenario(atbScenario.getId());
+                sList.add(atbScenario);
 
-			if ((l.getContract(c) == null) || !l.getContract(c).isActive() || !l.isEligible(c) || c.getDate().before(l.getContract(c).getStartDate())) {
-				continue;
-			}
+                // If we have a current base attack (attacker) scenario, no other scenarios should be generated
+                // for that contract
+                if ((atbScenario.getScenarioType() == AtBScenario.BASEATTACK)) {
+                    hasBaseAttack = true;
+                    if (atbScenario.isAttacker()) {
+                        hasBaseAttackAttacker = true;
+                    }
+                }
+            }
+            //endregion Current Scenarios
 
-			if (l.getRole() == Lance.ROLE_TRAINING) {
-				c.awardTrainingXP(l);
-			}
+            //region Generate Scenarios
+            // Generate scenarios for lances based on whether the situation fits
+            for (Lance lance : lances.values()) {
+                // Don't generate again for any lances assigned to this mission
+                if (assignedLances.contains(lance.getForceId())) {
+                    continue;
+                }
 
-			if (l.getContract(c).getMoraleLevel() <= AtBContract.MORALE_VERYLOW) {
-				continue;
-			}
+                if ((lance.getContract(c) == null) || !lance.getContract(c).isActive() || !lance.isEligible(c)
+                        || c.getDate().before(lance.getContract(c).getStartDate())) {
+                    continue;
+                }
 
-			AtBScenario scenario = l.checkForBattle(c);
-			if (scenario != null) {
-				sList.add(scenario);
-				if ((scenario.getScenarioType() == AtBScenario.BASEATTACK) && scenario.isAttacker()) {
-					baseAttack = scenario;
-					break;
-				}
-			}
-		}
+                if (lance.getRole() == Lance.ROLE_TRAINING) {
+                    c.awardTrainingXP(lance);
+                }
 
-		/* If there is a base attack (attacker), all other battles on
-		 * that contract are cleared.
-		 */
-		if (baseAttack != null) {
-			ArrayList<Scenario> sameContract = new ArrayList<>();
-			for (AtBScenario s : sList) {
-				if ((s != baseAttack) && (s.getMissionId() == baseAttack.getMissionId())) {
-					sameContract.add(s);
-				}
-			}
-			sList.removeAll(sameContract);
-		}
+                if (lance.getContract(c).getMoraleLevel() <= AtBContract.MORALE_VERYLOW) {
+                    continue;
+                }
 
-		/* Make sure invincible morale has base attack */
-		for (Mission m : c.getMissions()) {
-			if (m.isActive() && (m instanceof AtBContract) && (((AtBContract) m).getMoraleLevel() == AtBContract.MORALE_INVINCIBLE)) {
-				boolean hasBaseAttack = false;
-				for (AtBScenario s : sList) {
-					if ((s.getMissionId() == m.getId()) && (s.getScenarioType() == AtBScenario.BASEATTACK) && !s.isAttacker()) {
-						hasBaseAttack = true;
-						break;
-					}
-				}
-				if (!hasBaseAttack) {
-					/* find a lance to act as defender, giving preference
-					 * first to those assigned to the same contract,
-					 * then to those assigned to defense roles
-					 */
-					ArrayList<Lance> lList = new ArrayList<>();
-    				for (Lance l : lances.values()) {
-    					if ((l.getMissionId() == m.getId()) && (l.getRole() == Lance.ROLE_DEFEND) && l.isEligible(c)) {
-    						lList.add(l);
-    					}
-    				}
-    				if (lList.size() == 0) {
-    					for (Lance l : lances.values()) {
-    						if (l.getMissionId() == m.getId() && l.isEligible(c)) {
-    							lList.add(l);
-    						}
-    					}
-    				}
-    				if (lList.size() == 0) {
-    					for (Lance l : lances.values()) {
-    						if (l.isEligible(c)) {
-    							lList.add(l);
-    						}
-    					}
-    				}
-    				if (lList.size() > 0) {
-    					Lance lance = Utilities.getRandomItem(lList);
-    					AtBScenario scenario = AtBScenarioFactory.createScenario(c, lance, AtBScenario.BASEATTACK, false,
-    							Lance.getBattleDate(c.getCalendar()));
-    					for (int i = 0; i < sList.size(); i++) {
-    						if (sList.get(i).getLanceForceId() == lance.getForceId()) {
-    							sList.set(i, scenario);
-    							break;
-    						}
-    					}
-    					if (!sList.contains(scenario)) {
-    						sList.add(scenario);
-    					}
-    				} else {
-    					//TODO: What to do if there are no lances assigned to this contract?
-    				}
-				}
-			}
-		}
+                AtBScenario atbScenario = lance.checkForBattle(c);
+                if (atbScenario != null) {
+                    sList.add(atbScenario);
+                    assignedLances.add(lance.getForceId());
+                    if (atbScenario.getScenarioType() == AtBScenario.BASEATTACK) {
+                        hasBaseAttack = true;
+                        if (atbScenario.isAttacker()) {
+                            hasBaseAttackAttacker = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            //endregion Generate Scenarios
 
-		/* Sort by date and add to the campaign */
-		sList.sort(Comparator.comparing(Scenario::getDate));
-		for (AtBScenario s : sList) {
-			c.addScenario(s, c.getMission(s.getMissionId()));
-			s.setForces(c);
-		}
+            //region Invincible Morale Missions
+            // Make sure invincible morale missions have a base attack scenario generated
+            if (!hasBaseAttack && (atbContract.getMoraleLevel() == AtBContract.MORALE_INVINCIBLE)) {
+                /* find a lance to act as defender, giving preference
+                 * first to those assigned to the same contract,
+                 * then to those assigned to defense roles
+                 */
+                List<Lance> lList = new ArrayList<>();
+                for (Lance l : lances.values()) {
+                    if ((l.getMissionId() == atbContract.getId()) && (l.getRole() == Lance.ROLE_DEFEND) && l.isEligible(c)) {
+                        lList.add(l);
+                    }
+                }
+                if (lList.size() == 0) {
+                    for (Lance l : lances.values()) {
+                        if (l.getMissionId() == atbContract.getId() && l.isEligible(c)) {
+                            lList.add(l);
+                        }
+                    }
+                }
+                if (lList.size() == 0) {
+                    for (Lance l : lances.values()) {
+                        if (l.isEligible(c)) {
+                            lList.add(l);
+                        }
+                    }
+                }
+                if (lList.size() > 0) {
+                    Lance lance = Utilities.getRandomItem(lList);
+                    AtBScenario scenario = AtBScenarioFactory.createScenario(c, lance, AtBScenario.BASEATTACK, false,
+                            Lance.getBattleDate(c.getCalendar()));
+                    for (int i = 0; i < sList.size(); i++) {
+                        if (sList.get(i).getLanceForceId() == lance.getForceId()) {
+                            sList.set(i, scenario);
+                            break;
+                        }
+                    }
+                    if (!sList.contains(scenario)) {
+                        sList.add(scenario);
+                    }
+                    if (!assignedLances.contains(lance.getForceId())) {
+                        assignedLances.add(lance.getForceId());
+                    }
+                } else {
+                    MekHQ.getLogger().warning(AtBScenarioFactory.class, "createScenariosForNewWeek",
+                            "No lances assigned to mission " + atbContract.getName() +
+                                    ". Can't generate an Invincible Morale base defence mission for this force.");
+                }
+            }
+            //endregion Invincible Morale Missions
+
+            //region Base Attack (Attacker) Generated
+            // If there is a base attack (attacker), all other currently generated scenarios are cleared
+            if (hasBaseAttackAttacker) {
+                sList.removeIf(atbScenario ->
+                        !(atbScenario.isAttacker() && (atbScenario.getScenarioType() == AtBScenario.BASEATTACK)));
+            }
+            //endregion Base Attack (Attacker) Generated
+
+            //region Add to Campaign
+            // Finally, sort the scenarios by date and add to the campaign
+            sList.sort(Comparator.comparing(Scenario::getDate));
+            for (AtBScenario atbScenario : sList) {
+                c.addScenario(atbScenario, atbContract);
+                atbScenario.setForces(c);
+            }
+            //endregion Add to Campaign
+        }
 	}
 }
