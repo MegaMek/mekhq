@@ -882,20 +882,30 @@ public class Utilities {
         }
     }
 
+    /**
+     * Function that determines what name should be used by a person that is created through crew
+     * @param p         the person to be renamed, if applicable
+     * @param oldCrew   the crew object they were a part of
+     * @param crewIndex the index of the person in the crew
+     */
     private static void setName(Person p, Crew oldCrew, int crewIndex) {
         String givenName = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_GIVEN_NAME);
         if (givenName == null) {
-            p.migrateName(oldCrew.getName(crewIndex));
+            String name = oldCrew.getName(crewIndex);
+
+            if (!name.equalsIgnoreCase(Crew.UNNAMED)) {
+                p.migrateName(name);
+            }
         } else {
             p.setGivenName(givenName);
             p.setSurname(oldCrew.getExtraDataValue(crewIndex, Crew.MAP_SURNAME));
 
-            String bloodname = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_BLOODNAME);
-            p.setBloodname(bloodname);
-
-            if (!StringUtil.isNullOrEmpty(bloodname)) {
-                p.setPhenotype(Integer.parseInt(oldCrew.getExtraDataValue(crewIndex, Crew.MAP_PHENOTYPE)));
+            String phenotype = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_PHENOTYPE);
+            if (phenotype != null) {
+                p.setPhenotype(Integer.parseInt(phenotype));
             }
+
+            p.setBloodname(oldCrew.getExtraDataValue(crewIndex, Crew.MAP_BLOODNAME));
         }
     }
 

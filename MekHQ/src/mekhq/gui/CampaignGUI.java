@@ -1973,8 +1973,8 @@ public class CampaignGUI extends JPanel {
 
     /**
      * Checks if a file already exists, if so it makes a backup copy.
-     * @param file
-     * @param path
+     * @param file to determine if there is an existing file with that name
+     * @param path path to the file
      */
     private void checkToBackupFile(File file, String path) {
         // check for existing file and make a back-up if found
@@ -1987,9 +1987,9 @@ public class CampaignGUI extends JPanel {
 
     /**
      * Checks to make sure the file has the appropriate ending / extension.
-     * @param file
-     * @param format
-     * @return File
+     * @param file   the file to check
+     * @param format proper format for the ending/extension
+     * @return File  with the appropriate ending/ extension
      */
     private File checkFileEnding(File file, String format) {
         String path = file.getPath();
@@ -2020,8 +2020,6 @@ public class CampaignGUI extends JPanel {
                 listStream.close();
             } catch (Exception excep) {
                 excep.printStackTrace(System.err);
-                // throw new IOException("Unable to read from: " +
-                // unitFile.getName());
             }
 
             // Was there any error in parsing?

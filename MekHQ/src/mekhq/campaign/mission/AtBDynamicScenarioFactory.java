@@ -1207,9 +1207,9 @@ public class AtBDynamicScenarioFactory {
 
         if (faction.isClan()) rsg.setType(RandomSkillsGenerator.T_CLAN);
         int[] skills = rsg.getRandomSkills(en);
-        en.setCrew(new Crew(en.getCrew().getCrewType(), rng.generate(),
-                            Compute.getFullCrewSize(en),
-                            skills[0], skills[1]));
+        boolean isFemale = rng.isFemale();
+        en.setCrew(new Crew(en.getCrew().getCrewType(), rng.generate(isFemale),
+                Compute.getFullCrewSize(en),skills[0], skills[1], Crew.getGenderAsInt(isFemale), null));
 
         UUID id = UUID.randomUUID();
         en.setExternalIdAsString(id.toString());

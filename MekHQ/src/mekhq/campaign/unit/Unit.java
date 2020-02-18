@@ -3494,6 +3494,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
             entity.getCrew().setName(commander.getFullTitle(), 0);
             entity.getCrew().setNickname(commander.getCallsign(), 0);
+            entity.getCrew().setGender(commander.getGender(), 0);
             entity.getCrew().setPortraitCategory(commander.getPortraitCategory(), 0);
             entity.getCrew().setPortraitFileName(commander.getPortraitFileName(), 0);
             entity.getCrew().setExternalIdAsString(commander.getId().toString(), 0);
@@ -3915,6 +3916,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     private void assignToCrewSlot(Person p, int slot, String gunType, String driveType) {
         entity.getCrew().setName(p.getFullTitle(), slot);
         entity.getCrew().setNickname(p.getCallsign(), slot);
+        entity.getCrew().setGender(p.getGender(), slot);
         entity.getCrew().setPortraitCategory(p.getPortraitCategory(), slot);
         entity.getCrew().setPortraitFileName(p.getPortraitFileName(), slot);
         entity.getCrew().setHits(p.getHits(), slot);
