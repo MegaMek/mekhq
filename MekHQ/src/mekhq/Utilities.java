@@ -1614,8 +1614,6 @@ public class Utilities {
                 }
             } else if(loadGround && transport.canLoad(cargo, false) && cargo.getTargetBay() != -1) {
                 client.sendLoadEntity(id, trnId, cargo.getTargetBay());
-                //update the Transport's passenger count with the loaded entity's crew count
-                transport.setNPassenger(transport.getNPassenger() + cargo.getCrew().getSize());
                 // Add a wait to make sure that we don't start processing client.sendLoadEntity out of order
                 try {
                     Thread.sleep(500);
