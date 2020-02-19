@@ -997,8 +997,14 @@ public class AtBDynamicScenarioFactory {
                     transportedUnit = generateTransportedBAUnit(newParams, bayCapacity, skill, campaign);
                 }
                 
+                // if we can't or won't generate battle armor, try to generate infantry
                 if(transportedUnit == null) {
                     transportedUnit = generateTransportedInfantryUnit(newParams, bayCapacity, skill, campaign);
+                }
+                
+                // if we can't generate anything to transport, move on to the next transport
+                if(transportedUnit == null) {
+                    continue;
                 }
 
                 // sometimes something crazy will happen and we will not be able to load the unit into the transport
@@ -1148,6 +1154,7 @@ public class AtBDynamicScenarioFactory {
             }
         }
         
+        // no extra battle armor if there's nothing to put it on
         if(actualTransport == null) {
             return transportedUnits;
         }
@@ -1161,6 +1168,11 @@ public class AtBDynamicScenarioFactory {
         params.setWeightClass(UNIT_WEIGHT_UNSPECIFIED);
 
         Entity transportedUnit = generateTransportedBAUnit(params, IUnitGenerator.NO_WEIGHT_LIMIT, skill, campaign);
+        // if we fail to generate battle armor, the rest is meaningless
+        if(transportedUnit == null) {
+            return transportedUnits;
+        }
+        
         transportedUnit.setDeployRound(actualTransport.getDeployRound());
         scenario.addTransportRelationship(actualTransport.getExternalIdAsString(), transportedUnit.getExternalIdAsString());
         transportedUnits.add(transportedUnit);
@@ -1469,7 +1481,7 @@ public class AtBDynamicScenarioFactory {
      * @return
      */
     private static List<Integer> generateClanUnitTypes(int unitCount, int forceQuality, String factionCode, Campaign campaign) {        
-        // per AtB, we have a 1/6 odds of encountering a vehicle star
+        // logic inspired by AtBScenario.addStar
         // for fluff reasons, hell's horses + pals use more vehicles
         // higher-rated clan units become increasingly unlikely to use vehicles
         int vehicleTarget = 6;
