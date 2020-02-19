@@ -35,7 +35,6 @@ import megamek.client.Client;
 import megamek.client.bot.BotClient;
 import megamek.client.bot.princess.Princess;
 import megamek.client.ui.swing.ClientGUI;
-import megamek.common.Aero;
 import megamek.common.Entity;
 import megamek.common.IGame;
 import megamek.common.MapSettings;
@@ -202,10 +201,9 @@ public class AtBGameThread extends GameThread {
                     }
                     // If this unit is a spacecraft, set the crew size and marine size values
                     if (entity.isLargeCraft() || entity.getUnitType() == UnitType.SMALL_CRAFT) {
-                        Aero ship = (Aero) entity;
-                        ship.setNCrew(unit.getActiveCrew().size());
+                        entity.setNCrew(unit.getActiveCrew().size());
                         //TODO: Change this when marines are fully implemented
-                        ship.setNMarines(unit.getMarineCount());
+                        entity.setNMarines(unit.getMarineCount());
                     }
                     // Calculate deployment round
                     int deploymentRound = entity.getDeployRound();
@@ -357,10 +355,7 @@ public class AtBGameThread extends GameThread {
                             }
                             Utilities.loadPlayerTransports(transport.getEntity().getId(), toLoad, client, loadFighters, loadGround);
                             //Update the transport's passenger count with assigned techs
-                            if (transport.getEntity() instanceof Aero) {
-                                Aero ship = (Aero) transport.getEntity();
-                                ship.setNPassenger(ship.getNPassenger() + cargoTechs.size());
-                            }
+                            transport.getEntity().setNPassenger(transport.getEntity().getNPassenger() + cargoTechs.size());
                         }
                     }
                 }
