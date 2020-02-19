@@ -118,7 +118,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     // Convenience data used by GameThread
     private boolean carryingAero = false;
     private boolean carryingGround = false;
-
+    
     //assignments
     private int forceId;
     protected int scenarioId;
@@ -126,6 +126,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     private ArrayList<UUID> drivers;
     private ArrayList<UUID> gunners;
     private ArrayList<UUID> vesselCrew;
+    // Contains unique Id of each Infantry/BA Entity assigned to this unit as marines
+    // Used to calculate marine points (which are based on equipment) as well as Personnel IDs
+    private Set<UUID> marines;
     //this is the id of the tech officer in a superheavy tripod
     private UUID techOfficer;
     private UUID navigator;
@@ -186,6 +189,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         this.drivers = new ArrayList<>();
         this.gunners = new ArrayList<>();
         this.vesselCrew = new ArrayList<>();
+        this.marines =  new HashSet<>();
         this.navigator = null;
         this.tech = null;
         this.mothballTime = 0;
@@ -4650,6 +4654,21 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
         }
         return crew;
+    }
+    
+    /**
+     * Returns a personnel count for each marine platoon/squad assigned to this unit
+     * @return The number of marines aboard
+     */
+    public int getMarineCount() {
+        int count = 0;
+        for (UUID id : marines) {
+            Unit marine = campaign.getUnit(id);
+            if (marine != null) {
+                count += marine.getGunnerIDs().size();
+            }
+        }
+        return count;
     }
 
     public boolean isDriver(Person person) {
