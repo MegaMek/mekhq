@@ -267,11 +267,9 @@ public final class PersonnelTab extends CampaignGuiTab {
         scrollPersonnelView.setMinimumSize(new java.awt.Dimension(PERSONNEL_VIEW_WIDTH, 600));
         scrollPersonnelView.setPreferredSize(new java.awt.Dimension(PERSONNEL_VIEW_WIDTH, 600));
         scrollPersonnelView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPersonnelView.getViewport().setBackground(Color.WHITE);
         scrollPersonnelView.setViewportView(null);
 
         JScrollPane scrollPersonnelTable = new JScrollPane(personnelTable);
-        scrollPersonnelTable.getViewport().setBackground(Color.WHITE);
         splitPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPersonnelTable,
                 scrollPersonnelView);
         splitPersonnel.setOneTouchExpandable(true);
@@ -500,6 +498,8 @@ public final class PersonnelTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SALARY), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_KILLS), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_FACTION), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_PLANET), false);
         } else if (view == PV_GENERAL) {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
@@ -542,6 +542,8 @@ public final class PersonnelTab extends CampaignGuiTab {
                     getCampaign().getCampaignOptions().payForSalaries());
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_KILLS), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), true);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_FACTION), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_PLANET), false);
         } else if (view == PV_PILOT) {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
@@ -583,6 +585,8 @@ public final class PersonnelTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SALARY), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_KILLS), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_FACTION), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_PLANET), false);
         } else if (view == PV_INF) {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
@@ -624,6 +628,8 @@ public final class PersonnelTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SALARY), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_KILLS), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_FACTION), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_PLANET), false);
         } else if (view == PV_TACTIC) {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
@@ -665,6 +671,8 @@ public final class PersonnelTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SALARY), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_KILLS), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_FACTION), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_PLANET), false);
         } else if (view == PV_TECH) {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
@@ -706,6 +714,8 @@ public final class PersonnelTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SALARY), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_KILLS), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_FACTION), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_PLANET), false);
         } else if (view == PV_ADMIN) {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
@@ -747,6 +757,8 @@ public final class PersonnelTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SALARY), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_KILLS), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_FACTION), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_PLANET), false);
         } else if (view == PV_FLUFF) {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
@@ -788,6 +800,8 @@ public final class PersonnelTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SALARY), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_KILLS), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_FACTION), true);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_PLANET), true);
         }
     }
 

@@ -9,6 +9,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
+import mekhq.gui.utilities.MekHqTableCellRenderer;
+
 public class RankTableModel extends DefaultTableModel {
     private static final long serialVersionUID = 534443424190075264L;
 
@@ -111,7 +113,7 @@ public class RankTableModel extends DefaultTableModel {
         return new RankTableModel.Renderer();
     }
 
-    public class Renderer extends DefaultTableCellRenderer {
+    public class Renderer extends MekHqTableCellRenderer {
 
         private static final long serialVersionUID = 9054581142945717303L;
 
@@ -125,18 +127,6 @@ public class RankTableModel extends DefaultTableModel {
             int actualRow = table.convertRowIndexToModel(row);
             setHorizontalAlignment(getAlignment(actualCol));
             setToolTipText(getTooltip(actualRow, actualCol));
-            setForeground(Color.BLACK);
-            if (isSelected) {
-                setBackground(Color.DARK_GRAY);
-                setForeground(Color.WHITE);
-            } else {
-            	// tiger stripes
-                if ((row % 2) == 0) {
-                    setBackground(new Color(220, 220, 220));
-                } else {
-                    setBackground(Color.WHITE);
-                }
-            }
             return this;
         }
 

@@ -1,5 +1,6 @@
 package mekhq.gui.model;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.util.ArrayList;
 
@@ -81,6 +82,7 @@ public class PatientTableModel extends AbstractListModel<Person> {
                 unhighlightBorder();
             }
             setPortrait(p);
+            c.setBackground(new Color(220, 220, 220));
             return c;
         }
     }

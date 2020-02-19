@@ -22,6 +22,7 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
+import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 /**
  * A table Model for displaying information about units
@@ -363,17 +364,15 @@ public class UnitTableModel extends DataTableModel {
             Component c = this;
             int actualCol = table.convertColumnIndexToModel(column);
             int actualRow = table.convertRowIndexToModel(row);
-            String color = "black";
-            if(isSelected) {
-                color = "white";
-            }
-            setText(getValueAt(actualRow, actualCol).toString(), color);
+
+            setText(getValueAt(actualRow, actualCol).toString());
+
             Unit u = getUnit(actualRow);
             if (actualCol == COL_PILOT) {
                 Person p = u.getCommander();
                 if(null != p) {
                     setPortrait(p);
-                    setText(p.getFullDesc(false), color);
+                    setText(p.getFullDesc(false));
                 } else {
                     clearImage();
                 }
@@ -382,7 +381,7 @@ public class UnitTableModel extends DataTableModel {
                 Person p = u.getTech();
                 if(null != p) {
                     setPortrait(p);
-                    setText(p.getFullDesc(false), color);
+                    setText(p.getFullDesc(false));
                 } else {
                     clearImage();
                 }
@@ -395,7 +394,7 @@ public class UnitTableModel extends DataTableModel {
                         desc += " " + UnitType.getTypeDisplayableName(u.getEntity().getUnitType());
                     }
                     desc += "<br>" + u.getStatus() + "</html>";
-                    setText(desc, color);
+                    setText(desc);
                     Image mekImage = getImageFor(u);
                     if(null != mekImage) {
                         setImage(mekImage);
@@ -407,19 +406,8 @@ public class UnitTableModel extends DataTableModel {
                 }
             }
 
-            if (isSelected) {
-                c.setBackground(Color.DARK_GRAY);
-            } else {
-                // tiger stripes
-                if ((row % 2) == 0) {
-                    c.setBackground(new Color(220, 220, 220));
-                } else {
-                    c.setBackground(Color.WHITE);
-
-                }
-            }
+            MekHqTableCellRenderer.setupTableColors(c, table, isSelected, hasFocus, row);
             return c;
         }
     }
-
 }
