@@ -1,13 +1,7 @@
 package mekhq.campaign.mission.atb;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.awt.event.ActionListener;
+import java.util.*;
 
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
@@ -130,11 +124,13 @@ public class AtBScenarioFactory {
 	}
 
 	/**
-     *  Iterate through the list of lances and make a battle roll for each,
+     * Iterate through the list of lances and make a battle roll for each,
 	 * then sort them by date before adding them to the campaign.
 	 * Contracts with enemy morale level of invincible have a base attack
 	 * (defender) battle each week. If there is a base attack (attacker)
 	 * battle, that is the only one for the week on that mission.
+     *
+     * Note that this handles having multiple missions at the same time
      * @param c the campaign for which to generate scenarios
 	 */
 	public static void createScenariosForNewWeek(Campaign c) {
@@ -161,7 +157,9 @@ public class AtBScenarioFactory {
 
             //region Current Scenarios
             // Determine active scenarios
-            for (Scenario scenario : atbContract.getScenarios()) {
+            Iterator<Scenario> iter = atbContract.getScenarios().iterator();
+            while (iter.hasNext()) {
+                Scenario scenario = iter.next();
                 if (!scenario.isCurrent() || !AtBScenario.class.isAssignableFrom(scenario.getClass())) {
                     continue; //if not current or not assignable to an AtB scenario, then we don't care about it
                 }
@@ -172,7 +170,7 @@ public class AtBScenarioFactory {
                 assignedLances.add(atbScenario.getLanceForceId());
 
                 // Remove any active scenarios from the contract, and add them to the current scenarios list instead
-                atbContract.removeScenario(atbScenario.getId());
+                iter.remove();
                 sList.add(atbScenario);
 
                 // If we have a current base attack (attacker) scenario, no other scenarios should be generated
