@@ -98,29 +98,19 @@ public class AtBScenarioFactory {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static boolean registerScenario(IAtBScenario scenario) {
+	public static void registerScenario(IAtBScenario scenario) {
 	    final String METHOD_NAME = "registerScenario(IAtBScenario)"; //$NON-NLS-1$
-
-		if (!IAtBScenario.class.isAssignableFrom(scenario.getClass())) {
-	        MekHQ.getLogger().log(AtBScenarioFactory.class, METHOD_NAME, LogLevel.ERROR,
-	                String.format("Unable to register an AtBScenario of class '%s' because is does not implement '%s'.", //$NON-NLS-1$
-	                        scenario.getClass().getName(), IAtBScenario.class.getName()));
-			return false;
-		}
 
 		if (!scenario.getClass().isAnnotationPresent(AtBScenarioEnabled.class)) {
             MekHQ.getLogger().log(AtBScenarioFactory.class, METHOD_NAME, LogLevel.ERROR,
                     String.format("Unable to register an AtBScenario of class '%s' because is does not have the '%s' annotation.", //$NON-NLS-1$
                             scenario.getClass().getName(), AtBScenarioEnabled.class.getName()));
-			return false;
-		}
+		} else {
+            int type = scenario.getScenarioType();
+            List<Class<IAtBScenario>> list = scenarioMap.computeIfAbsent(type, k -> new ArrayList<>());
 
-		int type = scenario.getScenarioType();
-        List<Class<IAtBScenario>> list = scenarioMap.computeIfAbsent(type, k -> new ArrayList<>());
-
-        list.add((Class<IAtBScenario>) scenario.getClass());
-
-		return true;
+            list.add((Class<IAtBScenario>) scenario.getClass());
+        }
 	}
 
 	/**
@@ -139,6 +129,7 @@ public class AtBScenarioFactory {
         AtBContract atbContract;
         List<AtBScenario> sList;
 		List<Integer> assignedLances = new ArrayList<>();
+		List<Integer> generateForces;
 		boolean hasBaseAttack;
 		boolean hasBaseAttackAttacker;
 
@@ -151,6 +142,7 @@ public class AtBScenarioFactory {
             //region Value Initialization
             atbContract = (AtBContract) mission;
             sList = new ArrayList<>();
+            generateForces = new ArrayList<>();
             hasBaseAttack = false;
             hasBaseAttackAttacker = false;
             //endregion Value Initialization
@@ -179,6 +171,7 @@ public class AtBScenarioFactory {
                     hasBaseAttack = true;
                     if (atbScenario.isAttacker()) {
                         hasBaseAttackAttacker = true;
+                        break;
                     }
                 }
             }
@@ -186,34 +179,36 @@ public class AtBScenarioFactory {
 
             //region Generate Scenarios
             // Generate scenarios for lances based on whether the situation fits
-            for (Lance lance : lances.values()) {
-                // Don't generate again for any lances assigned to this mission
-                if (assignedLances.contains(lance.getForceId())) {
-                    continue;
-                }
+            if (!hasBaseAttackAttacker) {
+                for (Lance lance : lances.values()) {
+                    // Don't generate again for any lances already assigned, assigned to a different
+                    // mission, or illegible lances
+                    if (assignedLances.contains(lance.getForceId()) || (lance.getContract(c) == null)
+                            || !lance.isEligible(c) || !lance.getContract(c).isActive()
+                            || !(lance.getMissionId() == atbContract.getId())
+                            || c.getDate().before(lance.getContract(c).getStartDate())) {
+                        continue;
+                    }
 
-                if ((lance.getContract(c) == null) || !lance.getContract(c).isActive() || !lance.isEligible(c)
-                        || c.getDate().before(lance.getContract(c).getStartDate())) {
-                    continue;
-                }
+                    if (lance.getRole() == Lance.ROLE_TRAINING) {
+                        c.awardTrainingXP(lance);
+                    }
 
-                if (lance.getRole() == Lance.ROLE_TRAINING) {
-                    c.awardTrainingXP(lance);
-                }
+                    if (lance.getContract(c).getMoraleLevel() <= AtBContract.MORALE_VERYLOW) {
+                        continue;
+                    }
 
-                if (lance.getContract(c).getMoraleLevel() <= AtBContract.MORALE_VERYLOW) {
-                    continue;
-                }
-
-                AtBScenario atbScenario = lance.checkForBattle(c);
-                if (atbScenario != null) {
-                    sList.add(atbScenario);
-                    assignedLances.add(lance.getForceId());
-                    if (atbScenario.getScenarioType() == AtBScenario.BASEATTACK) {
-                        hasBaseAttack = true;
-                        if (atbScenario.isAttacker()) {
-                            hasBaseAttackAttacker = true;
-                            break;
+                    AtBScenario atbScenario = lance.checkForBattle(c);
+                    if (atbScenario != null) {
+                        sList.add(atbScenario);
+                        generateForces.add(atbScenario.getId());
+                        assignedLances.add(lance.getForceId());
+                        if (atbScenario.getScenarioType() == AtBScenario.BASEATTACK) {
+                            hasBaseAttack = true;
+                            if (atbScenario.isAttacker()) {
+                                hasBaseAttackAttacker = true;
+                                break;
+                            }
                         }
                     }
                 }
@@ -249,19 +244,27 @@ public class AtBScenarioFactory {
                 }
                 if (lList.size() > 0) {
                     Lance lance = Utilities.getRandomItem(lList);
-                    AtBScenario scenario = AtBScenarioFactory.createScenario(c, lance, AtBScenario.BASEATTACK, false,
-                            Lance.getBattleDate(c.getCalendar()));
-                    for (int i = 0; i < sList.size(); i++) {
-                        if (sList.get(i).getLanceForceId() == lance.getForceId()) {
-                            sList.set(i, scenario);
-                            break;
+                    AtBScenario scenario = AtBScenarioFactory.createScenario(c, lance,
+                            AtBScenario.BASEATTACK, false, Lance.getBattleDate(c.getCalendar()));
+                    if (scenario != null) {
+                        for (int i = 0; i < sList.size(); i++) {
+                            if (sList.get(i).getLanceForceId() == lance.getForceId()) {
+                                generateForces.remove((Integer) sList.get(i).getId());
+                                generateForces.add(scenario.getId());
+                                sList.set(i, scenario);
+                                break;
+                            }
                         }
-                    }
-                    if (!sList.contains(scenario)) {
-                        sList.add(scenario);
-                    }
-                    if (!assignedLances.contains(lance.getForceId())) {
-                        assignedLances.add(lance.getForceId());
+                        if (!sList.contains(scenario)) {
+                            sList.add(scenario);
+                            generateForces.add(scenario.getId());
+                        }
+                        if (!assignedLances.contains(lance.getForceId())) {
+                            assignedLances.add(lance.getForceId());
+                        }
+                    } else {
+                        MekHQ.getLogger().error(AtBScenarioFactory.class, "createScenariosForNewWeek",
+                                "Unable to generate Base Attack scenario.");
                     }
                 } else {
                     MekHQ.getLogger().warning(AtBScenarioFactory.class, "createScenariosForNewWeek",
@@ -284,7 +287,9 @@ public class AtBScenarioFactory {
             sList.sort(Comparator.comparing(Scenario::getDate));
             for (AtBScenario atbScenario : sList) {
                 c.addScenario(atbScenario, atbContract);
-                atbScenario.setForces(c);
+                if (generateForces.contains(atbScenario.getId())) {
+                    atbScenario.setForces(c);
+                }
             }
             //endregion Add to Campaign
         }
