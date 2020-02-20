@@ -5,6 +5,7 @@ import java.util.*;
 
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Lance;
@@ -129,7 +130,7 @@ public class AtBScenarioFactory {
         AtBContract atbContract;
         List<AtBScenario> sList;
 		List<Integer> assignedLances = new ArrayList<>();
-		List<Integer> generateForces;
+		List<Integer> dontGenerateForces;
 		boolean hasBaseAttack;
 		boolean hasBaseAttackAttacker;
 
@@ -142,7 +143,7 @@ public class AtBScenarioFactory {
             //region Value Initialization
             atbContract = (AtBContract) mission;
             sList = new ArrayList<>();
-            generateForces = new ArrayList<>();
+            dontGenerateForces = new ArrayList<>();
             hasBaseAttack = false;
             hasBaseAttackAttacker = false;
             //endregion Value Initialization
@@ -164,6 +165,10 @@ public class AtBScenarioFactory {
                 // Remove any active scenarios from the contract, and add them to the current scenarios list instead
                 iter.remove();
                 sList.add(atbScenario);
+                dontGenerateForces.add(atbScenario.getId());
+
+                MekHQ.getLogger().error(AtBScenarioFactory.class, "createScenariosForNewWeek",
+                        "generateForces shouldn't contain " + atbScenario.getId());
 
                 // If we have a current base attack (attacker) scenario, no other scenarios should be generated
                 // for that contract
@@ -201,7 +206,6 @@ public class AtBScenarioFactory {
                     AtBScenario atbScenario = lance.checkForBattle(c);
                     if (atbScenario != null) {
                         sList.add(atbScenario);
-                        generateForces.add(atbScenario.getId());
                         assignedLances.add(lance.getForceId());
                         if (atbScenario.getScenarioType() == AtBScenario.BASEATTACK) {
                             hasBaseAttack = true;
@@ -249,15 +253,15 @@ public class AtBScenarioFactory {
                     if (scenario != null) {
                         for (int i = 0; i < sList.size(); i++) {
                             if (sList.get(i).getLanceForceId() == lance.getForceId()) {
-                                generateForces.remove((Integer) sList.get(i).getId());
-                                generateForces.add(scenario.getId());
+                                if (dontGenerateForces.contains(scenario.getId())) {
+                                    dontGenerateForces.remove(scenario.getId());
+                                }
                                 sList.set(i, scenario);
                                 break;
                             }
                         }
                         if (!sList.contains(scenario)) {
                             sList.add(scenario);
-                            generateForces.add(scenario.getId());
                         }
                         if (!assignedLances.contains(lance.getForceId())) {
                             assignedLances.add(lance.getForceId());
@@ -287,7 +291,9 @@ public class AtBScenarioFactory {
             sList.sort(Comparator.comparing(Scenario::getDate));
             for (AtBScenario atbScenario : sList) {
                 c.addScenario(atbScenario, atbContract);
-                if (generateForces.contains(atbScenario.getId())) {
+                MekHQ.getLogger().error(AtBScenarioFactory.class, "createScenariosForNewWeek",
+                        "dontGenerateForces contains " + dontGenerateForces + " and the scenario id is " + atbScenario.getId());
+                if (!dontGenerateForces.contains(atbScenario.getId())) {
                     atbScenario.setForces(c);
                 }
             }
