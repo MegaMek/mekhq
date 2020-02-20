@@ -167,9 +167,6 @@ public class AtBScenarioFactory {
                 sList.add(atbScenario);
                 dontGenerateForces.add(atbScenario.getId());
 
-                MekHQ.getLogger().error(AtBScenarioFactory.class, "createScenariosForNewWeek",
-                        "generateForces shouldn't contain " + atbScenario.getId());
-
                 // If we have a current base attack (attacker) scenario, no other scenarios should be generated
                 // for that contract
                 if ((atbScenario.getScenarioType() == AtBScenario.BASEATTACK)) {
@@ -291,8 +288,6 @@ public class AtBScenarioFactory {
             sList.sort(Comparator.comparing(Scenario::getDate));
             for (AtBScenario atbScenario : sList) {
                 c.addScenario(atbScenario, atbContract);
-                MekHQ.getLogger().error(AtBScenarioFactory.class, "createScenariosForNewWeek",
-                        "dontGenerateForces contains " + dontGenerateForces + " and the scenario id is " + atbScenario.getId());
                 if (!dontGenerateForces.contains(atbScenario.getId())) {
                     atbScenario.setForces(c);
                 }

@@ -1001,11 +1001,17 @@ public class Campaign implements Serializable, ITechManager {
      * @param m - the mission to add the new scenario to
      */
     public void addScenario(Scenario s, Mission m) {
-        int id = lastScenarioId + 1;
-        s.setId(id);
+        int id;
+        if (s.getId() == Scenario.S_DEFAULT_ID) {
+            id = lastScenarioId + 1;
+            lastScenarioId = id;
+            s.setId(id);
+        } else {
+            // Scenario has already been assigned an Id, so just use its assigned value
+            id = s.getId();
+        }
         m.addScenario(s);
         scenarios.put(id, s);
-        lastScenarioId = id;
         MekHQ.triggerEvent(new ScenarioNewEvent(s));
     }
 
