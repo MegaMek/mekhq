@@ -245,20 +245,32 @@ public class AtBScenarioFactory {
                 }
                 if (lList.size() > 0) {
                     Lance lance = Utilities.getRandomItem(lList);
-                    AtBScenario scenario = AtBScenarioFactory.createScenario(c, lance,
+                    AtBScenario atbScenario = AtBScenarioFactory.createScenario(c, lance,
                             AtBScenario.BASEATTACK, false, Lance.getBattleDate(c.getCalendar()));
-                    if (scenario != null) {
-                        for (int i = 0; i < sList.size(); i++) {
-                            if (sList.get(i).getLanceForceId() == lance.getForceId()) {
-                                if (dontGenerateForces.contains(scenario.getId())) {
-                                    dontGenerateForces.remove(scenario.getId());
+                    if (atbScenario != null) {
+                        if ((lance.getMissionId() == atbScenario.getMissionId())
+                                || (lance.getMissionId() == Lance.NO_MISSION)) {
+                            for (int i = 0; i < sList.size(); i++) {
+                                if (sList.get(i).getLanceForceId() == lance.getForceId()) {
+                                    if (dontGenerateForces.contains(atbScenario.getId())) {
+                                        dontGenerateForces.remove(atbScenario.getId());
+                                    }
+                                    sList.set(i, atbScenario);
+                                    break;
                                 }
-                                sList.set(i, scenario);
-                                break;
+                            }
+                        } else {
+                            // edge case: lance assigned to another mission gets assigned the scenario,
+                            // we need to remove any scenario they are assigned to already
+                            for (Scenario scenario : c.getMission(lance.getMissionId()).getScenarios()) {
+                                if ((scenario instanceof AtBScenario)
+                                        && (((AtBScenario) scenario).getLanceForceId() == lance.getForceId())) {
+                                    c.getMission(lance.getMissionId()).removeScenario(scenario.getId());
+                                }
                             }
                         }
-                        if (!sList.contains(scenario)) {
-                            sList.add(scenario);
+                        if (!sList.contains(atbScenario)) {
+                            sList.add(atbScenario);
                         }
                         if (!assignedLances.contains(lance.getForceId())) {
                             assignedLances.add(lance.getForceId());
