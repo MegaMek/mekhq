@@ -128,7 +128,8 @@ public class AutosaveService implements IAutosaveService {
                     .collect(Collectors.toList());
 
             // Delete older autosave files if needed
-            int maxNumberAutosaves = this.userPreferences.getInt(MekHqConstants.MAXIMUM_NUMBER_SAVES_KEY, MekHqConstants.DEFAULT_NUMBER_SAVES);
+            int maxNumberAutosaves = this.userPreferences.getInt(MekHqConstants.MAXIMUM_NUMBER_SAVES_KEY,
+                    MekHqConstants.DEFAULT_NUMBER_SAVES);
             while (autosaveFiles.size() >= maxNumberAutosaves && autosaveFiles.size() > 0) {
                 autosaveFiles.get(0).delete();
                 autosaveFiles.remove(0);
@@ -138,7 +139,7 @@ public class AutosaveService implements IAutosaveService {
             String fileName = null;
 
             boolean repeatedName = true;
-            int index = 0;
+            int index = 1;
             while (repeatedName) {
                 fileName = String.format(
                         "Autosave-%d-%s-%s.cpnx.gz",
