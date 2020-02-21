@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2020  - The MegaMek Team
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui.adapter;
 
 import java.awt.event.ActionEvent;
@@ -218,7 +236,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
 
                     ServiceLogger.assignedTo(tech, gui.getCampaign().getDate(), singleForce.getName());
 
-                    if (singleForce.getAllUnits() !=null) {
+                    if (singleForce.getAllUnits() != null) {
                         String cantTech = "";
                         for (UUID uuid : singleForce.getAllUnits()) {
                             Unit u = gui.getCampaign().getUnit(uuid);
@@ -246,7 +264,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
         }
         if (command.contains(TOEMouseAdapter.ASSIGN_TO_SHIP)) {
             Unit ship = gui.getCampaign().getUnit(UUID.fromString(target));
-            if ((units != null) && (ship != null)) {
+            if (ship != null) {
                 StringJoiner cantLoad = new StringJoiner(", ");
                 String cantLoadReasons = StaticChecks.canTransportShipCarry(units, ship);
                 if (cantLoadReasons != null) {
@@ -272,14 +290,12 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
             }
         }
         if (command.contains(UNASSIGN_FROM_SHIP)) {
-            if (units != null) {
-                for (Unit u : units) {
-                    for (UUID oldShipId : u.getTransportShipId().keySet()) {
-                        Unit oldShip = gui.getCampaign().getUnit(oldShipId);
-                        if (oldShip != null) {
-                            oldShip.unloadFromTransportShip(u);
-                            MekHQ.triggerEvent(new UnitChangedEvent(oldShip));
-                        }
+            for (Unit u : units) {
+                for (UUID oldShipId : u.getTransportShipId().keySet()) {
+                    Unit oldShip = gui.getCampaign().getUnit(oldShipId);
+                    if (oldShip != null) {
+                        oldShip.unloadFromTransportShip(u);
+                        MekHQ.triggerEvent(new UnitChangedEvent(oldShip));
                     }
                 }
             }
@@ -300,7 +316,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
             int sid = Integer.parseInt(target);
             Scenario scenario = gui.getCampaign().getScenario(sid);
 
-            if(scenario instanceof AtBDynamicScenario) {
+            if (scenario instanceof AtBDynamicScenario) {
                 ForceTemplateAssignmentDialog ftad = new ForceTemplateAssignmentDialog(gui, forces, null, (AtBDynamicScenario) scenario);
             } else {
                 for (Force force : forces) {
@@ -465,7 +481,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                 }
                 // Now add the extras, if there are any
                 for (Unit extra : extraUnits) {
-                    if (null != extra && null != scenario) {
+                    if (null != extra) {
                         scenario.addUnit(extra.getId());
                         extra.setScenarioId(scenario.getId());
                         MekHQ.triggerEvent(new DeploymentChangedEvent(extra, scenario));
@@ -1479,7 +1495,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                         popup.add(menu);
                     }
 
-                    
+
                     //First, only display the Assign to Ship command if your command has at least 1 valid transport
                     //and if your selection does not include a transport
                     boolean shipInSelection = false;
@@ -1619,22 +1635,22 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
             }
         }
     }
-    
+
     /**
      * Worker function that creates a new instance of a JMenuItem for a set of transport ship characteristics
      * Used to have a single ship appear on multiple menu entries defined by type of unit transported
-     * 
-     * @param shipName String name of this ship. 
-     * @param shipId 
+     *
+     * @param shipName String name of this ship.
+     * @param shipId
      * @param unitIds  String of units delimited by | used to fill out actionPerformed(ActionEvent)
      */
-    
+
     private JMenuItem transportMenuItem(String shipName, UUID shipId, String unitIds) {
         JMenuItem menuItem = new JMenuItem(shipName);
         menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ASSIGN_TO_SHIP + shipId + "|" + unitIds);
         menuItem.addActionListener(this);
         menuItem.setEnabled(true);
-        
+
         return menuItem;
     }
 }

@@ -1,9 +1,21 @@
 /*
- * UnitSelectorDialog.java
+ * Copyright (c) 2020  - The MegaMek Team
  *
- * Created on August 21, 2009, 4:26 PM
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
@@ -231,7 +243,7 @@ public class PersonnelMarketDialog extends JDialog {
         sortKeys.add(new RowSorter.SortKey(PersonnelTableModel.COL_SKILL, SortOrder.DESCENDING));
         sorter.setSortKeys(sortKeys);
         tablePersonnel.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        tablePersonnel.getSelectionModel().addListSelectionListener(evt -> personChanged(evt));
+        tablePersonnel.getSelectionModel().addListSelectionListener(this::personChanged);
         TableColumn column = null;
         for (int i = 0; i < PersonnelTableModel.N_COL; i++) {
             column = ((XTableColumnModel)tablePersonnel.getColumnModel()).getColumnByModelIndex(i);
@@ -268,7 +280,7 @@ public class PersonnelMarketDialog extends JDialog {
 
         btnHire.setText("Hire");
         btnHire.setName("btnHire"); // NOI18N
-        btnHire.addActionListener(evt -> hirePerson(evt));
+        btnHire.addActionListener(this::hirePerson);
         panelOKBtns.add(btnHire, new java.awt.GridBagConstraints());
 
         btnAdd = new JButton("Add (GM)");
@@ -279,7 +291,7 @@ public class PersonnelMarketDialog extends JDialog {
 
         btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
-        btnClose.addActionListener(evt -> btnCloseActionPerformed(evt));
+        btnClose.addActionListener(this::btnCloseActionPerformed);
         panelOKBtns.add(btnClose, new java.awt.GridBagConstraints());
 
         javax.swing.JPanel panel = new javax.swing.JPanel();
@@ -352,18 +364,16 @@ public class PersonnelMarketDialog extends JDialog {
 		if (selectedPerson != null) {
 			Entity en = personnelMarket.getAttachedEntity(selectedPerson);
 			UUID pid = selectedPerson.getId();
-		    if(null != selectedPerson) {
-		    	campaign.addPersonWithoutId(selectedPerson, true);
-				addUnit(en, false);
-                if (campaign.getCampaignOptions().getUseTimeInService()) {
-                    GregorianCalendar rawrecruit = (GregorianCalendar) campaign.getCalendar().clone();
-                    selectedPerson.setRecruitment(rawrecruit);
-                }
-		    	personnelMarket.removePerson(selectedPerson);
-	    		personnelModel.setData(personnelMarket.getPersonnel());
-				personnelMarket.removeAttachedEntity(pid);
-		    	refreshPersonView();
-		    }
+            campaign.addPersonWithoutId(selectedPerson, true);
+            addUnit(en, false);
+            if (campaign.getCampaignOptions().getUseTimeInService()) {
+                GregorianCalendar rawrecruit = (GregorianCalendar) campaign.getCalendar().clone();
+                selectedPerson.setRecruitment(rawrecruit);
+            }
+            personnelMarket.removePerson(selectedPerson);
+            personnelModel.setData(personnelMarket.getPersonnel());
+            personnelMarket.removeAttachedEntity(pid);
+            refreshPersonView();
 		}
 	}
 
@@ -412,7 +422,7 @@ public class PersonnelMarketDialog extends JDialog {
 	}//GEN-LAST:event_btnCloseActionPerformed
 
     private void filterPersonnel() {
-        RowFilter<PersonnelTableModel, Integer> personTypeFilter = null;
+        RowFilter<PersonnelTableModel, Integer> personTypeFilter;
         final int nGroup = comboPersonType.getSelectedIndex();
         //If current expression doesn't parse, don't update.
         try {

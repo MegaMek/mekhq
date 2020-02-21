@@ -1,5 +1,5 @@
 /*
- * UniMarket.java
+ * UnitMarket.java
  *
  * Copyright (c) 2014 Carl Spain. All rights reserved.
  *
@@ -52,18 +52,18 @@ import mekhq.campaign.universe.UnitGeneratorParameters;
 
 /**
  * Generates units available for sale.
- * 
+ *
  * @author Neoancient
  *
  */
 public class UnitMarket implements Serializable {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -2085002038852079114L;
 
-    public class MarketOffer {
+    public static class MarketOffer {
         public int market;
         public int unitType;
         public int unitWeight;
@@ -102,7 +102,7 @@ public class UnitMarket implements Serializable {
     private ArrayList<MarketOffer> offers;
 
     public UnitMarket() {
-        offers = new ArrayList<MarketOffer>();
+        offers = new ArrayList<>();
     }
 
     public ArrayList<MarketOffer> getOffers() {
@@ -207,7 +207,7 @@ public class UnitMarket implements Serializable {
                 campaign.addReport("<a href='UNIT_MARKET'>Unit market updated</a>");
             }
         }
-    }	
+    }
 
     private void addOffers(Campaign campaign, int num, int market,
             int unitType, String faction, int quality, int priceTarget) {
@@ -235,11 +235,10 @@ public class UnitMarket implements Serializable {
                 params.setMovementModes(IUnitGenerator.MIXED_TANK_VTOL);
                 params.addMissionRole(MissionRole.MIXED_ARTILLERY);
 
-                ms = campaign.getUnitGenerator().generate(params);
             } else {
                 params.clearMovementModes();
-                ms = campaign.getUnitGenerator().generate(params);
             }
+            ms = campaign.getUnitGenerator().generate(params);
             if (ms != null) {
                 if (campaign.getCampaignOptions().limitByYear() &&
                         campaign.getCalendar().get(Calendar.YEAR) < ms.getYear()) {
@@ -251,8 +250,7 @@ public class UnitMarket implements Serializable {
                     /*Some RATs, particularly ASF, group multiple weight classes together
                      * so we need to get the actual weight class from the generated unit
                      * (-1 because EntityWeightClass starts with ultra-light).*/
-                    offers.add(new MarketOffer(market, unitType, ms.getWeightClass(),
-                            ms, pct));
+                    offers.add(new MarketOffer(market, unitType, ms.getWeightClass(), ms, pct));
                 }
             }
         }
@@ -296,21 +294,22 @@ public class UnitMarket implements Serializable {
 
     public static int getRegionalMechWeight(String faction) {
         int roll = Compute.randomInt(100);
-        if (faction.equals("DC")) {
-            if (roll < 40) return EntityWeightClass.WEIGHT_LIGHT;
-            if (roll < 60) return EntityWeightClass.WEIGHT_MEDIUM;
-            if (roll < 90) return EntityWeightClass.WEIGHT_HEAVY;
-            return EntityWeightClass.WEIGHT_ASSAULT;
-        } else if (faction.equals("LA")) {
-            if (roll < 20) return EntityWeightClass.WEIGHT_LIGHT;
-            if (roll < 50) return EntityWeightClass.WEIGHT_MEDIUM;
-            if (roll < 85) return EntityWeightClass.WEIGHT_HEAVY;
-            return EntityWeightClass.WEIGHT_ASSAULT;
-        } else if (faction.equals("FWL")) {
-            if (roll < 30) return EntityWeightClass.WEIGHT_LIGHT;
-            if (roll < 70) return EntityWeightClass.WEIGHT_MEDIUM;
-            if (roll < 92) return EntityWeightClass.WEIGHT_HEAVY;
-            return EntityWeightClass.WEIGHT_ASSAULT;
+        switch (faction) {
+            case "DC":
+                if (roll < 40) return EntityWeightClass.WEIGHT_LIGHT;
+                if (roll < 60) return EntityWeightClass.WEIGHT_MEDIUM;
+                if (roll < 90) return EntityWeightClass.WEIGHT_HEAVY;
+                return EntityWeightClass.WEIGHT_ASSAULT;
+            case "LA":
+                if (roll < 20) return EntityWeightClass.WEIGHT_LIGHT;
+                if (roll < 50) return EntityWeightClass.WEIGHT_MEDIUM;
+                if (roll < 85) return EntityWeightClass.WEIGHT_HEAVY;
+                return EntityWeightClass.WEIGHT_ASSAULT;
+            case "FWL":
+                if (roll < 30) return EntityWeightClass.WEIGHT_LIGHT;
+                if (roll < 70) return EntityWeightClass.WEIGHT_MEDIUM;
+                if (roll < 92) return EntityWeightClass.WEIGHT_HEAVY;
+                return EntityWeightClass.WEIGHT_ASSAULT;
         }
         if (roll < 30) return EntityWeightClass.WEIGHT_LIGHT;
         if (roll < 70) return EntityWeightClass.WEIGHT_MEDIUM;
@@ -376,7 +375,7 @@ public class UnitMarket implements Serializable {
                     continue;
                 }
 
-                MarketOffer o = retVal.new MarketOffer();
+                MarketOffer o = new MarketOffer();
                 NodeList nl2 = wn2.getChildNodes();
                 for (int i = 0; i < nl2.getLength(); i++) {
                     Node wn3 = nl2.item(i);
@@ -396,9 +395,7 @@ public class UnitMarket implements Serializable {
                     }
                 }
 
-                if (o != null) {
-                    retVal.offers.add(o);
-                }
+                retVal.offers.add(o);
             }
         } catch (Exception ex) {
             // Errrr, apparently either the class name was invalid...

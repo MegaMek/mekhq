@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2020  - The MegaMek Team
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui.adapter;
 
 import java.awt.event.ActionEvent;
@@ -30,7 +48,7 @@ import mekhq.service.MassRepairService;
 
 public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
         implements ActionListener {
-    
+
     private CampaignGUI gui;
     private JTable servicedUnitTable;
     private UnitTableModel servicedUnitModel;
@@ -80,7 +98,7 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
             String sel = command.split(":")[1];
             int selAmmoId = Integer.parseInt(sel);
             Part part = gui.getCampaign().getPart(selAmmoId);
-            if (null == part || !(part instanceof AmmoBin)) {
+            if (!(part instanceof AmmoBin)) {
                 return;
             }
             AmmoBin ammo = (AmmoBin) part;
@@ -115,11 +133,11 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
             }
         } else if (command.contains("MASS_REPAIR_SALVAGE")) {
             Unit unit = null;
-            
-            if ((null != units) && (units.length > 0)) {
+
+            if (units.length > 0) {
             	unit = units[0];
             }
-            
+
             if (unit.isDeployed()) {
     			JOptionPane.showMessageDialog(gui.getFrame(),
     					"Unit is currently deployed and can not be repaired.",
@@ -157,13 +175,13 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
                 units[i] = servicedUnitModel.getUnit(servicedUnitTable
                         .convertRowIndexToModel(rows[i]));
             }
-            JMenuItem menuItem = null;
-            JMenu menu = null;
-            JCheckBoxMenuItem cbMenuItem = null;
+            JMenuItem menuItem;
+            JMenu menu;
+            JCheckBoxMenuItem cbMenuItem;
             // **lets fill the pop up menu**//
             // change the location
             menu = new JMenu("Change site");
-            int i = 0;
+            int i;
             for (i = 0; i < Unit.SITE_N; i++) {
                 cbMenuItem = new JCheckBoxMenuItem(Unit.getSiteName(i));
                 if (StaticChecks.areAllSameSite(units) && unit.getSite() == i) {
@@ -198,7 +216,7 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
                     popup.add(menuItem);
                 } else {
                     menu = new JMenu("Swap ammo");
-                    JMenu ammoMenu = null;
+                    JMenu ammoMenu;
                     for (AmmoBin ammo : unit.getWorkingAmmoBins()) {
                         ammoMenu = new JMenu(ammo.getType().getDesc());
                         AmmoType curType = (AmmoType) ammo.getType();
@@ -241,20 +259,20 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
                     menuItem.setEnabled(unit.isAvailable());
                     popup.add(menuItem);
                 }
-                
+
                 if (!unit.isSelfCrewed() && unit.isAvailable() && !unit.isDeployed()) {
                 	String title = String.format("Mass %s", unit.isSalvage() ? "Salvage" : "Repair");
-                	
+
                     menuItem = new JMenuItem(title);
                     menuItem.setActionCommand("MASS_REPAIR_SALVAGE");
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(unit.isAvailable());
                     popup.add(menuItem);
                 }
-                
+
                 popup.show(e.getComponent(), e.getX(), e.getY());
             }
         }
     }
-    
+
 }
