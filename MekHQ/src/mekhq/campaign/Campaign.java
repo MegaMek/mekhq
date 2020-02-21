@@ -6053,9 +6053,9 @@ public class Campaign implements Serializable, ITechManager {
         personUpdated(person);
         MekHQ.triggerEvent(new PersonChangedEvent(person));
         if (report) {
-            if (rank > oldRank || (rank == oldRank && rankLevel > oldRankLevel)) {
+            if (rank > oldRank || ((rank == oldRank) && (rankLevel > oldRankLevel))) {
                 ServiceLogger.promotedTo(person, getDate());
-            } else if (rank < oldRank || (rank == oldRank && rankLevel < oldRankLevel)) {
+            } else if ((rank < oldRank) || (rankLevel < oldRankLevel)) {
                 ServiceLogger.demotedTo(person, getDate());
             }
         }
