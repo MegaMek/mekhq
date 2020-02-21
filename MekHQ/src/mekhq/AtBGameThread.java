@@ -128,15 +128,13 @@ public class AtBGameThread extends GameThread {
                 MapSettings mapSettings = MapSettings.getInstance();
 
                 // if the scenario is taking place in space, do space settings instead
-                if((scenario instanceof AtBScenario) &&
+                if ((scenario instanceof AtBScenario) &&
                         scenario.getTerrainType() == AtBScenario.TER_SPACE) {
                     mapSettings.setMedium(MapSettings.MEDIUM_SPACE);
                 } else {
                     File mapgenFile = new File("data/mapgen/" + scenario.getMap() + ".xml");
-                    try {
-                        InputStream is = new FileInputStream(mapgenFile);
+                    try (InputStream is = new FileInputStream(mapgenFile)) {
                         mapSettings = MapSettings.getInstance(is);
-                        is.close();
                     } catch (FileNotFoundException ex) {
                         MekHQ.getLogger().log(getClass(), "run", LogLevel.ERROR, //$NON-NLS-1$
                                 "Could not load map file data/mapgen/" + scenario.getMap() + ".xml"); //$NON-NLS-1$
