@@ -54,7 +54,7 @@ import mekhq.campaign.mission.atb.scenario.StandUpBuiltInScenario;
 import mekhq.campaign.mission.atb.scenario.StarLeagueCache1BuiltInScenario;
 import mekhq.campaign.mission.atb.scenario.StarLeagueCache2BuiltInScenario;
 
-    public class AtBScenarioFactory {
+public class AtBScenarioFactory {
     private static Map<Integer, List<Class<IAtBScenario>>> scenarioMap = new HashMap<>();
 
     static {
