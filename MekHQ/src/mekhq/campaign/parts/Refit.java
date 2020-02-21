@@ -1503,7 +1503,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         oldUnit.getCampaign().addCustom(newEntity.getChassis() + " " + newEntity.getModel());
         MechSummaryCache.getInstance().loadMechData();
         //I need to change the new entity to the one from the mtf file now, so that equip
-        //nums will match
+        //numbers will match
         MechSummary summary = MechSummaryCache.getInstance().getMech(newEntity.getChassis() + " " + newEntity.getModel());
         if(null == summary) {
             throw(new EntityLoadingException());
@@ -1520,27 +1520,28 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
     private int getTimeMultiplier() {
         int mult;
         switch(refitClass) {
-        case NO_CHANGE:
-            mult = 0;
-            break;
-        case CLASS_C:
-            mult = 2;
-            break;
-        case CLASS_D:
-            mult = 3;
-            break;
-        case CLASS_E:
-            mult = 4;
-            break;
-        case CLASS_F:
-            mult = 5;
-            break;
-        case CLASS_A:
-        case CLASS_B:
-        default:
-            mult = 1;
+            case NO_CHANGE:
+                mult = 0;
+                break;
+            case CLASS_C:
+                mult = 2;
+                break;
+            case CLASS_D:
+                mult = 3;
+                break;
+            case CLASS_E:
+                mult = 4;
+                break;
+            case CLASS_F:
+                mult = 5;
+                break;
+            case CLASS_A:
+            case CLASS_B:
+            default:
+                mult = 1;
+                break;
         }
-        if(customJob) {
+        if (customJob) {
             mult *= 2;
         }
         return mult;
@@ -1570,21 +1571,21 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
     @Override
     public int getDifficulty() {
         switch(refitClass) {
-        case NO_CHANGE:
-            return 0;
-        case CLASS_C:
-        case CLASS_D:
-            return 2;
-        case CLASS_E:
-            return 3;
-        case CLASS_F:
-            return 4;
-        case CLASS_OMNI:
-            return -2;
-        case CLASS_A:
-        case CLASS_B:
-        default:
-            return 1;
+            case NO_CHANGE:
+                return 0;
+            case CLASS_C:
+            case CLASS_D:
+                return 2;
+            case CLASS_E:
+                return 3;
+            case CLASS_F:
+                return 4;
+            case CLASS_OMNI:
+                return -2;
+            case CLASS_A:
+            case CLASS_B:
+            default:
+                return 1;
         }
     }
 

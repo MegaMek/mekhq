@@ -5250,7 +5250,7 @@ public class Campaign implements Serializable, ITechManager {
 
         // If we're transporting more than a company, Overlord analogues are more efficient.
         if (noMech > 12) {
-            leasedLargeMechDropships = (noMech / (largeDropshipMechCapacity * 1.0));
+            leasedLargeMechDropships = noMech / (double) largeDropshipMechCapacity;
             noMech -= leasedLargeMechDropships * largeDropshipMechCapacity;
             mechCollars += (int) Math.ceil(leasedLargeMechDropships);
 
@@ -5268,7 +5268,7 @@ public class Campaign implements Serializable, ITechManager {
 
         // Unions
         if (noMech > 0) {
-            leasedAverageMechDropships = (noMech / (averageDropshipMechCapacity * 1.0));
+            leasedAverageMechDropships = noMech / (double) averageDropshipMechCapacity;
             noMech -= leasedAverageMechDropships * averageDropshipMechCapacity;
             mechCollars += (int) Math.ceil(leasedAverageMechDropships);
 
@@ -5291,7 +5291,7 @@ public class Campaign implements Serializable, ITechManager {
             noASF -= leasedASFCapacity;
 
             if (noASF > 0) {
-                leasedAverageASFDropships = (noASF / (averageDropshipASFCapacity * 1.0));
+                leasedAverageASFDropships = noASF / (double) averageDropshipASFCapacity;
                 noASF -= leasedAverageASFDropships * averageDropshipASFCapacity;
                 asfCollars += (int) Math.ceil(leasedAverageASFDropships);
 
@@ -5310,7 +5310,7 @@ public class Campaign implements Serializable, ITechManager {
 
         // Triumphs
         if (noVehicles > averageDropshipVehicleCapacity) {
-            leasedLargeVehicleDropships = (noVehicles / (largeDropshipVehicleCapacity * 1.0));
+            leasedLargeVehicleDropships = noVehicles / (double) largeDropshipVehicleCapacity;
             noVehicles -= leasedLargeVehicleDropships * largeDropshipVehicleCapacity;
             vehicleCollars += (int) Math.ceil(leasedLargeVehicleDropships);
 
@@ -5325,7 +5325,7 @@ public class Campaign implements Serializable, ITechManager {
 
         // Gazelles
         if (noVehicles > 0) {
-            leasedAverageVehicleDropships = ((nohv + newNolv) / (averageDropshipVehicleCapacity * 1.0));
+            leasedAverageVehicleDropships = (nohv + newNolv) / (double) averageDropshipVehicleCapacity;
             noVehicles = (int) ((nohv + newNolv) - leasedAverageVehicleDropships * averageDropshipVehicleCapacity);
             vehicleCollars += (int) Math.ceil(leasedAverageVehicleDropships);
 
@@ -5345,7 +5345,7 @@ public class Campaign implements Serializable, ITechManager {
 
         // Mules
         if (noCargo > averageDropshipCargoCapacity) {
-            leasedLargeCargoDropships = (noCargo / (largeDropshipCargoCapacity * 1.0));
+            leasedLargeCargoDropships = noCargo / (double) largeDropshipCargoCapacity;
             noCargo -= leasedLargeCargoDropships * largeDropshipCargoCapacity;
             cargoCollars += (int) Math.ceil(leasedLargeCargoDropships);
 
@@ -5358,7 +5358,7 @@ public class Campaign implements Serializable, ITechManager {
 
         // Buccaneers
         if (noCargo > 0) {
-            leasedAverageCargoDropships = (noCargo / (averageDropshipCargoCapacity * 1.0));
+            leasedAverageCargoDropships = noCargo / (double) averageDropshipCargoCapacity;
             cargoCollars += (int) Math.ceil(leasedAverageCargoDropships);
             noCargo -= leasedAverageCargoDropships * averageDropshipCargoCapacity;
 
