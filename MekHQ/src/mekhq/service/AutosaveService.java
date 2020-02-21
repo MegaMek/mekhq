@@ -130,16 +130,23 @@ public class AutosaveService implements IAutosaveService {
             // Delete older autosave files if needed
             int maxNumberAutosaves = this.userPreferences.getInt(MekHqConstants.MAXIMUM_NUMBER_SAVES_KEY,
                     MekHqConstants.DEFAULT_NUMBER_SAVES);
-            while (autosaveFiles.size() >= maxNumberAutosaves && autosaveFiles.size() > 0) {
-                autosaveFiles.get(0).delete();
-                autosaveFiles.remove(0);
+
+            int index = 0;
+            while (autosaveFiles.size() >= maxNumberAutosaves && autosaveFiles.size() > index) {
+                if (autosaveFiles.get(index).delete()) {
+                    autosaveFiles.remove(index);
+                } else {
+                    this.logger.error(this.getClass(), "getAutosaveFilename",
+                            "Unable to delete file " + autosaveFiles.get(index).getName());
+                    index++;
+                }
             }
 
             // Find a unique name for this autosave
             String fileName = null;
 
             boolean repeatedName = true;
-            int index = 1;
+            index = 1;
             while (repeatedName) {
                 fileName = String.format(
                         "Autosave-%d-%s-%s.cpnx.gz",
