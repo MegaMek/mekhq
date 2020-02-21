@@ -141,17 +141,14 @@ public class AwardsFactory {
         File dir = new File(AWARDS_XML_ROOT_PATH);
         File[] files =  dir.listFiles((dir1, filename) -> filename.endsWith(".xml"));
 
-        if(files == null) {
+        if (files == null) {
             return;
         }
 
-        for(File file : files) {
-            try{
-                InputStream inputStream = new FileInputStream(file);
+        for (File file : files) {
+            try (InputStream inputStream = new FileInputStream(file)) {
                 loadAwardsFromStream(inputStream, file.getName());
-                inputStream.close();
-            }
-            catch (IOException e){
+            } catch (IOException e){
                 MekHQ.getLogger().error(AwardsFactory.class, "loadAwards", e);
             }
         }

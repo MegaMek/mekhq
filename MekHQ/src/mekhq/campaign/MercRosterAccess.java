@@ -419,13 +419,10 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             e.printStackTrace();
         }
         //retrieve the MercRoster id of this force
-        ResultSet rs;
         int id = parent;
-        try {
-            rs = statement.executeQuery("SELECT id FROM " + table + ".unit ORDER BY id DESC LIMIT 1");
+        try (ResultSet rs = statement.executeQuery("SELECT id FROM " + table + ".unit ORDER BY id DESC LIMIT 1")) {
             rs.next();
             id = rs.getInt("id");
-            rs.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -449,14 +446,12 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
 
     private void writePersonnelData() {
         //check for a uuid column
-        try {
+        try (ResultSet rs = statement.executeQuery("SELECT * FROM " + table + ".crew")) {
             //add in a UUID column if not already present
-            ResultSet rs = statement.executeQuery("SELECT * FROM " + table + ".crew");
             if (!hasColumn(rs, "uuid")) {
                 statement.execute("TRUNCATE TABLE " + table + ".crew");
                 statement.execute("ALTER TABLE " + table + ".crew ADD uuid VARCHAR(40)");
             }
-            rs.close();
             statement.execute("TRUNCATE TABLE " + table + ".personnelpositions");
             statement.execute("TRUNCATE TABLE " + table + ".skills");
             statement.execute("TRUNCATE TABLE " + table + ".kills");
@@ -466,7 +461,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
 
         progressNote = "Uploading personnel data";
         determineProgress();
-        for(Person p: campaign.getPersonnel()) {
+        for (Person p: campaign.getPersonnel()) {
             int forceId = 0;
             //assign parent id from force hash
             if (null != forceHash.get(p.getId())) {

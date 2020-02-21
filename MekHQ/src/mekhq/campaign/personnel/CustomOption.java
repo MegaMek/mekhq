@@ -94,14 +94,12 @@ public class CustomOption {
         Document xmlDoc = null;
 
 
-        try {
-            InputStream is = new FileInputStream("data/universe/customspa.xml");
+        try (InputStream is = new FileInputStream("data/universe/customspa.xml")) {
             // Using factory get an instance of document builder
             DocumentBuilder db = MekHqXmlUtil.newUnsafeDocumentBuilder();
 
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(is);
-            is.close();
         } catch (Exception ex) {
             MekHQ.getLogger().error(CustomOption.class, METHOD_NAME, ex);
         }

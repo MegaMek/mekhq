@@ -57,10 +57,8 @@ public class GUI {
     private static Properties mhqPreferences;
     static {
         mhqPreferences = new Properties();
-        try {
-            InputStream is = new FileInputStream(MekHQ.PREFERENCES_FILE);
+        try (InputStream is = new FileInputStream(MekHQ.PREFERENCES_FILE)) {
             mhqPreferences.load(is);
-            is.close();
         } catch (IOException ignored) { }
     }
 

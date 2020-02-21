@@ -398,12 +398,10 @@ public class AtBConfiguration implements Serializable {
                 "Starting load of AtB configuration data from XML..."); //$NON-NLS-1$
 
         Document xmlDoc;
-        try {
-            InputStream is = new FileInputStream("data/universe/atbconfig.xml");
+        try (InputStream is = new FileInputStream("data/universe/atbconfig.xml")) {
             DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
             xmlDoc = db.parse(is);
-            is.close();
         } catch (FileNotFoundException ex) {
             MekHQ.getLogger().log(AtBConfiguration.class, METHOD_NAME, LogLevel.INFO,
                     "File data/universe/atbconfig.xml not found. Loading defaults."); //$NON-NLS-1$

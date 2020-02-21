@@ -130,14 +130,12 @@ public class Ranks {
         // Initialize variables.
         Document xmlDoc = null;
 
-        try {
-            InputStream is = new FileInputStream("data/universe/ranks.xml");
+        try (InputStream is = new FileInputStream("data/universe/ranks.xml")) {
             // Using factory get an instance of document builder
             DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(is);
-            is.close();
         } catch (Exception ex) {
             MekHQ.getLogger().error(Ranks.class, METHOD_NAME, ex);
         }

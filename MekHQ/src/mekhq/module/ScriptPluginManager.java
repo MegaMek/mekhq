@@ -84,8 +84,7 @@ public class ScriptPluginManager {
                     "Could not find script engine for extension " + extension);
             return;
         }
-        try {
-            Reader fileReader = new FileReader(script);
+        try (Reader fileReader = new FileReader(script)) {
             engine.eval(fileReader);
             Iterable<?> plugins = (Iterable<?>) engine.eval("getPlugins()");
             for (Object p : plugins) {
@@ -93,7 +92,6 @@ public class ScriptPluginManager {
                     modules.add((MekHQModule) p);
                 }
             }
-            fileReader.close();
         } catch (IOException | ScriptException e) {
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                     "While parsing script " + script.getName());

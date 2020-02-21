@@ -457,12 +457,10 @@ public class FactionHints {
                 "Starting load of faction hint data from XML..."); //$NON-NLS-1$
         Document xmlDoc = null;
 
-        try {
-            InputStream is = new FileInputStream(FACTION_HINTS_FILE); //$NON-NLS-1$
+        try (InputStream is = new FileInputStream(FACTION_HINTS_FILE)) {
             DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
             xmlDoc = db.parse(is);
-            is.close();
         } catch (Exception ex) {
             MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
         }
