@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2017, 2020 The Megamek Team. All rights reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.campaign.mission.atb;
 
 import java.awt.event.ActionListener;
@@ -36,105 +54,105 @@ import mekhq.campaign.mission.atb.scenario.StandUpBuiltInScenario;
 import mekhq.campaign.mission.atb.scenario.StarLeagueCache1BuiltInScenario;
 import mekhq.campaign.mission.atb.scenario.StarLeagueCache2BuiltInScenario;
 
-public class AtBScenarioFactory {
-	private static Map<Integer, List<Class<IAtBScenario>>> scenarioMap = new HashMap<>();
+    public class AtBScenarioFactory {
+    private static Map<Integer, List<Class<IAtBScenario>>> scenarioMap = new HashMap<>();
 
-	static {
-		registerScenario(new AceDuelBuiltInScenario());
-		registerScenario(new AlliedTraitorsBuiltInScenario());
-		registerScenario(new AllyRescueBuiltInScenario());
-		registerScenario(new AmbushBuiltInScenario());
-		registerScenario(new BaseAttackBuiltInScenario());
-		registerScenario(new BreakthroughBuiltInScenario());
-		registerScenario(new ChaseBuiltInScenario());
-		registerScenario(new CivilianHelpBuiltInScenario());
-		registerScenario(new CivilianRiotBuiltInScenario());
-		registerScenario(new ConvoyAttackBuiltInScenario());
-		registerScenario(new ConvoyRescueBuiltInScenario());
-		registerScenario(new ExtractionBuiltInScenario());
-		registerScenario(new HideAndSeekBuiltInScenario());
-		registerScenario(new HoldTheLineBuiltInScenario());
-		registerScenario(new OfficerDualBuiltInScenario());
-		registerScenario(new PirateFreeForAllBuiltInScenario());
-		registerScenario(new PrisonBreakBuiltInScenario());
-		registerScenario(new ProbeBuiltInScenario());
-		registerScenario(new ReconRaidBuiltInScenario());
-		registerScenario(new StandUpBuiltInScenario());
-		registerScenario(new StarLeagueCache1BuiltInScenario());
-		registerScenario(new StarLeagueCache2BuiltInScenario());
-	}
+    static {
+        registerScenario(new AceDuelBuiltInScenario());
+        registerScenario(new AlliedTraitorsBuiltInScenario());
+        registerScenario(new AllyRescueBuiltInScenario());
+        registerScenario(new AmbushBuiltInScenario());
+        registerScenario(new BaseAttackBuiltInScenario());
+        registerScenario(new BreakthroughBuiltInScenario());
+        registerScenario(new ChaseBuiltInScenario());
+        registerScenario(new CivilianHelpBuiltInScenario());
+        registerScenario(new CivilianRiotBuiltInScenario());
+        registerScenario(new ConvoyAttackBuiltInScenario());
+        registerScenario(new ConvoyRescueBuiltInScenario());
+        registerScenario(new ExtractionBuiltInScenario());
+        registerScenario(new HideAndSeekBuiltInScenario());
+        registerScenario(new HoldTheLineBuiltInScenario());
+        registerScenario(new OfficerDualBuiltInScenario());
+        registerScenario(new PirateFreeForAllBuiltInScenario());
+        registerScenario(new PrisonBreakBuiltInScenario());
+        registerScenario(new ProbeBuiltInScenario());
+        registerScenario(new ReconRaidBuiltInScenario());
+        registerScenario(new StandUpBuiltInScenario());
+        registerScenario(new StarLeagueCache1BuiltInScenario());
+        registerScenario(new StarLeagueCache2BuiltInScenario());
+    }
 
-	private AtBScenarioFactory() {
-	}
+    private AtBScenarioFactory() {
+    }
 
-	public static List<Class<IAtBScenario>> getScenarios(int type) {
-		return scenarioMap.get(type);
-	}
+    public static List<Class<IAtBScenario>> getScenarios(int type) {
+        return scenarioMap.get(type);
+    }
 
-	public static AtBScenario createScenario(Campaign c, Lance lance, int type, boolean attacker, Date date) {
-		List<Class<IAtBScenario>> classList = getScenarios(type);
-		Class<IAtBScenario> selectedClass;
+    public static AtBScenario createScenario(Campaign c, Lance lance, int type, boolean attacker, Date date) {
+        List<Class<IAtBScenario>> classList = getScenarios(type);
+        Class<IAtBScenario> selectedClass;
 
-		if ((classList == null) || classList.isEmpty()) {
-			return null;
-		}
-
-		if (classList.size() > 1) {
-			Random randomGenerator = new Random();
-			selectedClass = classList.get(randomGenerator.nextInt(classList.size()));
-		} else {
-			selectedClass = classList.get(0);
-		}
-
-		try {
-			AtBScenario s = (AtBScenario) selectedClass.newInstance();
-			s.initialize(c, lance, attacker, date);
-
-			return s;
-		} catch (InstantiationException | IllegalAccessException e) {
-			e.printStackTrace();
-		}
-
-		return null;
-	}
-
-	@SuppressWarnings("unchecked")
-	public static void registerScenario(IAtBScenario scenario) {
-	    final String METHOD_NAME = "registerScenario(IAtBScenario)"; //$NON-NLS-1$
-
-		if (!scenario.getClass().isAnnotationPresent(AtBScenarioEnabled.class)) {
-            MekHQ.getLogger().log(AtBScenarioFactory.class, METHOD_NAME, LogLevel.ERROR,
-                    String.format("Unable to register an AtBScenario of class '%s' because is does not have the '%s' annotation.", //$NON-NLS-1$
-                            scenario.getClass().getName(), AtBScenarioEnabled.class.getName()));
-		} else {
-            int type = scenario.getScenarioType();
-            List<Class<IAtBScenario>> list = scenarioMap.computeIfAbsent(type, k -> new ArrayList<>());
-
-            list.add((Class<IAtBScenario>) scenario.getClass());
+        if ((classList == null) || classList.isEmpty()) {
+            return null;
         }
-	}
 
-	/**
+        if (classList.size() > 1) {
+            Random randomGenerator = new Random();
+            selectedClass = classList.get(randomGenerator.nextInt(classList.size()));
+        } else {
+            selectedClass = classList.get(0);
+        }
+
+        try {
+            AtBScenario s = (AtBScenario) selectedClass.newInstance();
+            s.initialize(c, lance, attacker, date);
+
+            return s;
+        } catch (InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static void registerScenario(IAtBScenario scenario) {
+    final String METHOD_NAME = "registerScenario(IAtBScenario)"; //$NON-NLS-1$
+
+    if (!scenario.getClass().isAnnotationPresent(AtBScenarioEnabled.class)) {
+        MekHQ.getLogger().log(AtBScenarioFactory.class, METHOD_NAME, LogLevel.ERROR,
+                String.format("Unable to register an AtBScenario of class '%s' because is does not have the '%s' annotation.", //$NON-NLS-1$
+        scenario.getClass().getName(), AtBScenarioEnabled.class.getName()));
+    } else {
+        int type = scenario.getScenarioType();
+        List<Class<IAtBScenario>> list = scenarioMap.computeIfAbsent(type, k -> new ArrayList<>());
+
+        list.add((Class<IAtBScenario>) scenario.getClass());
+        }
+    }
+
+    /**
      * Iterate through the list of lances and make a battle roll for each,
-	 * then sort them by date before adding them to the campaign.
-	 * Contracts with enemy morale level of invincible have a base attack
-	 * (defender) battle each week. If there is a base attack (attacker)
-	 * battle, that is the only one for the week on that mission.
+     * then sort them by date before adding them to the campaign.
+     * Contracts with enemy morale level of invincible have a base attack
+     * (defender) battle each week. If there is a base attack (attacker)
+     * battle, that is the only one for the week on that mission.
      *
      * Note that this handles having multiple missions at the same time
      * @param c the campaign for which to generate scenarios
-	 */
-	public static void createScenariosForNewWeek(Campaign c) {
-		Hashtable<Integer, Lance> lances = c.getLances();
+     */
+    public static void createScenariosForNewWeek(Campaign c) {
+        Hashtable<Integer, Lance> lances = c.getLances();
 
         AtBContract atbContract;
         List<AtBScenario> sList;
-		List<Integer> assignedLances = new ArrayList<>();
-		List<Integer> dontGenerateForces;
-		boolean hasBaseAttack;
-		boolean hasBaseAttackAttacker;
+        List<Integer> assignedLances = new ArrayList<>();
+        List<Integer> dontGenerateForces;
+        boolean hasBaseAttack;
+        boolean hasBaseAttackAttacker;
 
-		// Determine active missions
+        // Determine active missions
         for (Mission mission : c.getMissions()) {
             if (!mission.isActive() || !(mission instanceof AtBContract) ) {
                 continue; //if not active or an AtBContract, we don't care about the mission
@@ -306,5 +324,5 @@ public class AtBScenarioFactory {
             }
             //endregion Add to Campaign
         }
-	}
+    }
 }
