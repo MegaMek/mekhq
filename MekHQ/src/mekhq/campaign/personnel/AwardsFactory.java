@@ -16,13 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.personnel;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -148,13 +144,14 @@ public class AwardsFactory {
         if(files == null) {
             return;
         }
-        
+
         for(File file : files) {
             try{
                 InputStream inputStream = new FileInputStream(file);
                 loadAwardsFromStream(inputStream, file.getName());
+                inputStream.close();
             }
-            catch (FileNotFoundException e){
+            catch (IOException e){
                 MekHQ.getLogger().error(AwardsFactory.class, "loadAwards", e);
             }
         }

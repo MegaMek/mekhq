@@ -825,8 +825,7 @@ public class CampaignGUI extends JPanel {
             }
         });
         menuMarket.add(miContractMarket);
-        miContractMarket.setVisible(getCampaign().getCampaignOptions()
-                .getUseAtB());
+        miContractMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
 
         miUnitMarket = new JMenuItem("Unit Market...");
         miUnitMarket.addActionListener(new java.awt.event.ActionListener() {
@@ -2296,7 +2295,7 @@ public class CampaignGUI extends JPanel {
 
         if (personnelFile != null) {
             // Open up the file.
-            InputStream fis = new FileInputStream(personnelFile);
+            InputStream is = new FileInputStream(personnelFile);
 
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                     "Starting load of personnel file from XML..."); //$NON-NLS-1$
@@ -2308,7 +2307,8 @@ public class CampaignGUI extends JPanel {
                 DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
                 // Parse using builder to get DOM representation of the XML file
-                xmlDoc = db.parse(fis);
+                xmlDoc = db.parse(is);
+                is.close();
             } catch (Exception ex) {
                 MekHQ.getLogger().error(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
             }
@@ -2548,7 +2548,7 @@ public class CampaignGUI extends JPanel {
 
         if (partsFile != null) {
             // Open up the file.
-            InputStream fis = new FileInputStream(partsFile);
+            InputStream is = new FileInputStream(partsFile);
 
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                     "Starting load of parts file from XML..."); //$NON-NLS-1$
@@ -2560,7 +2560,8 @@ public class CampaignGUI extends JPanel {
                 DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
                 // Parse using builder to get DOM representation of the XML file
-                xmlDoc = db.parse(fis);
+                xmlDoc = db.parse(is);
+                is.close();
             } catch (Exception ex) {
                 MekHQ.getLogger().error(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
             }
@@ -2618,7 +2619,7 @@ public class CampaignGUI extends JPanel {
 
         if (optionsFile != null) {
             // Open up the file.
-            InputStream fis = new FileInputStream(optionsFile);
+            InputStream is = new FileInputStream(optionsFile);
 
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                     "Starting load of options file from XML..."); //$NON-NLS-1$
@@ -2630,7 +2631,8 @@ public class CampaignGUI extends JPanel {
                 DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
                 // Parse using builder to get DOM representation of the XML file
-                xmlDoc = db.parse(fis);
+                xmlDoc = db.parse(is);
+                is.close();
             } catch (Exception ex) {
                 MekHQ.getLogger().error(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
             }

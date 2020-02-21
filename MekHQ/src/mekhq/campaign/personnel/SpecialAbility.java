@@ -22,6 +22,7 @@
 package mekhq.campaign.personnel;
 
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -111,11 +112,11 @@ public class SpecialAbility implements MekHqXmlSerializable {
         lookupName = name;
         displayName = display;
         desc = description;
-        prereqAbilities = new Vector<String>();
-        invalidAbilities = new Vector<String>();
-        removeAbilities = new Vector<String>();
+        prereqAbilities = new Vector<>();
+        invalidAbilities = new Vector<>();
+        removeAbilities = new Vector<>();
         choiceValues = new Vector<>();
-        prereqSkills = new Vector<SkillPrereq>();
+        prereqSkills = new Vector<>();
         prereqMisc = new HashMap<>();
         xpCost = 1;
         weight = 1;
@@ -155,11 +156,8 @@ public class SpecialAbility implements MekHqXmlSerializable {
                 return false;
             }
         }
-        if (prereqMisc.containsKey(PREREQ_MISC_CLANNER)
-                && (p.isClanner() != Boolean.parseBoolean(prereqMisc.get(PREREQ_MISC_CLANNER)))) {
-            return false;
-        }
-        return true;
+        return !prereqMisc.containsKey(PREREQ_MISC_CLANNER)
+                || (p.isClanner() == Boolean.parseBoolean(prereqMisc.get(PREREQ_MISC_CLANNER)));
     }
 
     public boolean isEligible(boolean isClanner, Skills skills, PersonnelOptions options) {
@@ -180,11 +178,8 @@ public class SpecialAbility implements MekHqXmlSerializable {
                 return false;
             }
         }
-        if (prereqMisc.containsKey(PREREQ_MISC_CLANNER)
-                && (isClanner != Boolean.parseBoolean(prereqMisc.get(PREREQ_MISC_CLANNER)))) {
-            return false;
-        }
-        return true;
+        return !prereqMisc.containsKey(PREREQ_MISC_CLANNER)
+                || (isClanner == Boolean.parseBoolean(prereqMisc.get(PREREQ_MISC_CLANNER)));
     }
 
     public boolean isEligible(int unitType) {
@@ -274,7 +269,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
     }
 
     public void clearPrereqSkills() {
-        prereqSkills = new Vector<SkillPrereq>();
+        prereqSkills = new Vector<>();
     }
 
     public void clearPrereqMisc() {
@@ -484,12 +479,13 @@ public class SpecialAbility implements MekHqXmlSerializable {
         Document xmlDoc = null;
 
         try {
-            FileInputStream fis = new FileInputStream("data/universe/defaultspa.xml");
+            InputStream is = new FileInputStream("data/universe/defaultspa.xml");
             // Using factory get an instance of document builder
             DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
             // Parse using builder to get DOM representation of the XML file
-            xmlDoc = db.parse(fis);
+            xmlDoc = db.parse(is);
+            is.close();
         } catch (Exception ex) {
             MekHQ.getLogger().error(SpecialAbility.class, METHOD_NAME, ex);
         }
@@ -587,7 +583,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
     }
 
     public static String chooseWeaponSpecialization(int type, boolean isClan, int techLvl, int year) {
-        ArrayList<String> candidates = new ArrayList<String>();
+        ArrayList<String> candidates = new ArrayList<>();
         for (Enumeration<EquipmentType> e = EquipmentType.getAllTypes(); e.hasMoreElements();) {
             EquipmentType et = e.nextElement();
             if(!(et instanceof WeaponType)) {

@@ -16,13 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui;
 
 import java.awt.FileDialog;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -58,10 +58,10 @@ public class GUI {
     static {
         mhqPreferences = new Properties();
         try {
-            mhqPreferences.load(new FileInputStream(MekHQ.PREFERENCES_FILE));
-        } catch (@SuppressWarnings("unused") IOException e) {
-            // ignored
-        }
+            InputStream is = new FileInputStream(MekHQ.PREFERENCES_FILE);
+            mhqPreferences.load(is);
+            is.close();
+        } catch (IOException ignored) { }
     }
 
     private GUI() {

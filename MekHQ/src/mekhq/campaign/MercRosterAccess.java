@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2020 MegaMek team
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.campaign;
 
 import java.sql.Connection;
@@ -51,9 +69,9 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
       this.port = port;
       passwd = p;
       campaign = c;
-      skillHash = new HashMap<String, Integer>();
-      personHash = new HashMap<UUID, Integer>();
-      forceHash = new HashMap<UUID, Integer>();
+      skillHash = new HashMap<>();
+      personHash = new HashMap<>();
+      forceHash = new HashMap<>();
       progressNote = "";
       progressTicker = 0;
     }
@@ -400,13 +418,14 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        //retrieve the mercroster id of this force
+        //retrieve the MercRoster id of this force
         ResultSet rs;
         int id = parent;
         try {
             rs = statement.executeQuery("SELECT id FROM " + table + ".unit ORDER BY id DESC LIMIT 1");
             rs.next();
             id = rs.getInt("id");
+            rs.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -417,8 +436,8 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
         for(Force sub : force.getSubForces()) {
             writeForce(sub, id);
         }
-        //assign personnel uuids to hash
 
+        //assign personnel uuids to hash
         for(UUID uid : force.getUnits()) {
             Unit u = campaign.getUnit(uid);
             if(u != null && u.getCommander() != null) {
@@ -429,19 +448,18 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
     }
 
     private void writePersonnelData() {
-
-
         //check for a uuid column
         try {
             //add in a UUID column if not already present
-            if(!hasColumn(statement.executeQuery("SELECT * FROM " + table + ".crew"), "uuid")) {
+            ResultSet rs = statement.executeQuery("SELECT * FROM " + table + ".crew");
+            if (!hasColumn(rs, "uuid")) {
                 statement.execute("TRUNCATE TABLE " + table + ".crew");
                 statement.execute("ALTER TABLE " + table + ".crew ADD uuid VARCHAR(40)");
             }
+            rs.close();
             statement.execute("TRUNCATE TABLE " + table + ".personnelpositions");
             statement.execute("TRUNCATE TABLE " + table + ".skills");
             statement.execute("TRUNCATE TABLE " + table + ".kills");
-
         } catch (SQLException e1) {
             e1.printStackTrace();
         }
@@ -451,7 +469,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
         for(Person p: campaign.getPersonnel()) {
             int forceId = 0;
             //assign parent id from force hash
-            if(null != forceHash.get(p.getId())) {
+            if (null != forceHash.get(p.getId())) {
                 forceId = forceHash.get(p.getId());
             }
             try {
@@ -485,12 +503,13 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                     preparedStatement.setString(11, p.getId().toString());
                     preparedStatement.executeUpdate();
                 }
-                //retrieve the mercroster id of this person
+                //retrieve the MercRoster id of this person
                 preparedStatement = connect.prepareStatement("SELECT id FROM " + table + ".crew WHERE uuid=?");
                 preparedStatement.setString(1, p.getId().toString());
                 ResultSet rs = preparedStatement.executeQuery();
                 rs.next();
                 int id = rs.getInt("id");
+                rs.close();
                 //put id in a hash for equipment assignment
                 personHash.put(p.getId(), id);
                 //assign the personnel position
@@ -534,9 +553,11 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
         //check for a uuid column
         try {
             //add in a UUID column if not already present
-            if(!hasColumn(statement.executeQuery("SELECT * FROM " + table + ".equipment"), "uuid")) {
+            ResultSet rs = statement.executeQuery("SELECT * FROM " + table + ".equipment");
+            if(!hasColumn(rs, "uuid")) {
                 statement.execute("ALTER TABLE " + table + ".equipment ADD uuid VARCHAR(40)");
             }
+            rs.close();
         } catch (SQLException e1) {
             e1.printStackTrace();
         }
@@ -593,9 +614,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             if (connect != null) {
                 connect.close();
             }
-        } catch (Exception e) {
-
-        }
+        } catch (Exception ignored) { }
     }
 
     private static String parseFirstName(String name) {
