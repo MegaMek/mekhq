@@ -455,38 +455,36 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
         } else if (command.contains(TOEMouseAdapter.DEPLOY_UNIT)) {
             int sid = Integer.parseInt(target);
             Scenario scenario = gui.getCampaign().getScenario(sid);
-            if(scenario instanceof AtBDynamicScenario) {
+            if (scenario instanceof AtBDynamicScenario) {
                 ForceTemplateAssignmentDialog ftad = new ForceTemplateAssignmentDialog(gui, null, units, (AtBDynamicScenario) scenario);
-            } else {
-                if (scenario != null) {
-                    HashSet<Unit> extraUnits = new HashSet<>();
-                    for (Unit unit : units) {
-                        if (null != unit) {
-                            if (!unit.getTransportedUnits().isEmpty()) {
-                                // Prompt the player to also deploy any units transported by this one
-                                int optionChoice = JOptionPane.showConfirmDialog(null, TOEMouseAdapter.LOAD_UNITS_DIALOG_TEXT,
-                                        TOEMouseAdapter.LOAD_UNITS_DIALOG_TITLE, JOptionPane.YES_NO_OPTION);
-                                if (optionChoice == JOptionPane.YES_OPTION) {
-                                    for (UUID id : unit.getTransportedUnits()) {
-                                        Unit cargo = gui.getCampaign().getUnit(id);
-                                        if (cargo != null) {
-                                            extraUnits.add(cargo);
-                                        }
+            } else if (scenario != null) {
+                HashSet<Unit> extraUnits = new HashSet<>();
+                for (Unit unit : units) {
+                    if (null != unit) {
+                        if (!unit.getTransportedUnits().isEmpty()) {
+                            // Prompt the player to also deploy any units transported by this one
+                            int optionChoice = JOptionPane.showConfirmDialog(null, TOEMouseAdapter.LOAD_UNITS_DIALOG_TEXT,
+                                    TOEMouseAdapter.LOAD_UNITS_DIALOG_TITLE, JOptionPane.YES_NO_OPTION);
+                            if (optionChoice == JOptionPane.YES_OPTION) {
+                                for (UUID id : unit.getTransportedUnits()) {
+                                    Unit cargo = gui.getCampaign().getUnit(id);
+                                    if (cargo != null) {
+                                        extraUnits.add(cargo);
                                     }
                                 }
                             }
-                            scenario.addUnit(unit.getId());
-                            unit.setScenarioId(scenario.getId());
-                            MekHQ.triggerEvent(new DeploymentChangedEvent(unit, scenario));
                         }
+                        scenario.addUnit(unit.getId());
+                        unit.setScenarioId(scenario.getId());
+                        MekHQ.triggerEvent(new DeploymentChangedEvent(unit, scenario));
                     }
-                    // Now add the extras, if there are any
-                    for (Unit extra : extraUnits) {
-                        if (null != extra) {
-                            scenario.addUnit(extra.getId());
-                            extra.setScenarioId(scenario.getId());
-                            MekHQ.triggerEvent(new DeploymentChangedEvent(extra, scenario));
-                        }
+                }
+                // Now add the extras, if there are any
+                for (Unit extra : extraUnits) {
+                    if (null != extra) {
+                        scenario.addUnit(extra.getId());
+                        extra.setScenarioId(scenario.getId());
+                        MekHQ.triggerEvent(new DeploymentChangedEvent(extra, scenario));
                     }
                 }
             }
