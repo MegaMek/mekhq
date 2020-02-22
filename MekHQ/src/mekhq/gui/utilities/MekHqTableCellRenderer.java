@@ -25,7 +25,6 @@ import java.awt.Component;
 import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellRenderer;
 
 public class MekHqTableCellRenderer extends DefaultTableCellRenderer {
     private static final long serialVersionUID = -1L;
@@ -42,7 +41,7 @@ public class MekHqTableCellRenderer extends DefaultTableCellRenderer {
         return this;
     }
 
-    public static void setupTableColors(Component c, JTable table, boolean isSelected, 
+    public static void setupTableColors(Component c, JTable table, boolean isSelected,
             boolean hasFocus, int row) {
         if (isSelected) {
             c.setForeground(table.getSelectionForeground());

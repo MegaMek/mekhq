@@ -1,11 +1,9 @@
 package mekhq.gui.model;
 
-import java.awt.Color;
 import java.awt.Component;
 
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
@@ -28,7 +26,7 @@ public class RankTableModel extends DefaultTableModel {
     public RankTableModel(Object[][] ranksArray, String[] rankColNames) {
         super(ranksArray, rankColNames);
     }
-    
+
     @Override
     public boolean isCellEditable(int row, int column) {
     	return !(column == COL_NAME_RATE || column == COL_OFFICER);
@@ -53,7 +51,7 @@ public class RankTableModel extends DefaultTableModel {
     			return getValueAt(0, c).getClass();
     	}
     }
-    
+
     public int getColumnWidth(int c) {
     	switch (c) {
     		case COL_NAME_RATE:
