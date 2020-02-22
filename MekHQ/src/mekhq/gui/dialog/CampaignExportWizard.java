@@ -226,7 +226,7 @@ public class CampaignExportWizard extends JDialog {
                     if (destinationCampaignFile.isPresent()) {
                         if (!exportToCampaign(destinationCampaignFile.get())) {
                             MekHQ.getLogger().error(getClass(), "display",
-                                    "");
+                                    "Failed to export campaign to new campaign file");
                         }
                         setVisible(false);
                     }
@@ -238,7 +238,10 @@ public class CampaignExportWizard extends JDialog {
                 btnExistingCampaign.addActionListener(e -> {
                     destinationCampaignFile = FileDialogs.openCampaign(null);
                     if(destinationCampaignFile.isPresent()) {
-                        exportToCampaign(destinationCampaignFile.get());
+                        if (!exportToCampaign(destinationCampaignFile.get())) {
+                            MekHQ.getLogger().error(getClass(), "display",
+                                    "Failed to export campaign to existing campaign file");
+                        }
                         setVisible(false);
                     }
                 });
