@@ -1,7 +1,20 @@
 /*
- * AlertPopup.java
+ * Copyright (c) 2013 The MegaMek Team. All rights reserved.
  *
- * Created on Jan 6, 2010, 10:46:02 PM
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
@@ -22,12 +35,10 @@ import megamek.common.util.EncodeControl;
  * @author natit
  */
 public class PopupValueChoiceDialog extends JDialog implements WindowListener {
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variable Declarations
     private JButton btnDone;
     private JSpinner value;
     private SpinnerNumberModel model;
-    // End of variables declaration//GEN-END:variables
 
     /**
 	 * This was originally set up as a text entry dialog, but there is
