@@ -6,11 +6,8 @@
 
 package mekhq.gui.view;
 
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.Image;
 import java.util.ResourceBundle;
 
@@ -38,25 +35,25 @@ import mekhq.gui.utilities.MarkdownRenderer;
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class UnitViewPanel extends ScrollablePanel {
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 7004741688464105277L;
 
 	private Unit unit;
 	private Entity entity;
 	private Campaign campaign;
-	
+
 	private MechTileset mt;
     private DirectoryItems camos;
-	
+
 	private JLabel lblImage;
 	//private javax.swing.JPanel pnlStats;
 	private javax.swing.JTextPane txtReadout;
-	private javax.swing.JTextPane txtFluff;	
+	private javax.swing.JTextPane txtFluff;
 	private javax.swing.JPanel pnlStats;
-	
+
 	private javax.swing.JLabel lblType;
 	private javax.swing.JLabel lblTech;
 	private javax.swing.JLabel txtTech;
@@ -68,7 +65,7 @@ public class UnitViewPanel extends ScrollablePanel {
 	private javax.swing.JLabel txtCost;
 	private javax.swing.JLabel lblQuirk;
 	private javax.swing.JLabel txtQuirk;
-	
+
 	public UnitViewPanel(Unit u, Campaign c, DirectoryItems camos, MechTileset mt) {
 		unit = u;
 		entity = u.getEntity();
@@ -78,19 +75,17 @@ public class UnitViewPanel extends ScrollablePanel {
 		initComponents();
 		//setMinimumSize(new Dimension(400, 200));
 	}
-	
+
 	private void initComponents() {
 		java.awt.GridBagConstraints gridBagConstraints;
 
 		txtReadout = new javax.swing.JTextPane();
 		txtFluff = new javax.swing.JTextPane();
 		pnlStats = new javax.swing.JPanel();
-		
+
     	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitViewPanel", new EncodeControl()); //$NON-NLS-1$
 
 		setLayout(new java.awt.GridBagLayout());
-
-		setBackground(Color.WHITE);
 
         int compWidth = 1;
         Image image = FluffImageHelper.getFluffImage(entity);
@@ -110,7 +105,6 @@ public class UnitViewPanel extends ScrollablePanel {
             //no fluff image, so just use image icon from top-down view
             compWidth=2;
             lblImage = new JLabel();
-            lblImage.setBackground(Color.WHITE);
             image = getImageFor(unit, lblImage);
             if(null != image) {
                 ImageIcon icon = new ImageIcon(image);
@@ -125,10 +119,9 @@ public class UnitViewPanel extends ScrollablePanel {
                 add(lblImage, gridBagConstraints);
             }
         }
-        
+
 		pnlStats.setName("pnlBasic");
 		pnlStats.setBorder(BorderFactory.createTitledBorder(unit.getName()));
-		pnlStats.setBackground(Color.WHITE);
 		fillStats(resourceMap);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
@@ -137,10 +130,10 @@ public class UnitViewPanel extends ScrollablePanel {
 		gridBagConstraints.gridwidth = 1;
 		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;	
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		add(pnlStats, gridBagConstraints);
-		
-		
+
+
 		MechView mview = new MechView(entity, false, true);
 		txtReadout.setName("txtReadout");
 		txtReadout.setContentType(resourceMap.getString("txtReadout.contentType")); // NOI18N
@@ -162,7 +155,7 @@ public class UnitViewPanel extends ScrollablePanel {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		add(txtReadout, gridBagConstraints);
-		
+
 		if(unit.getHistory().length() > 0) {
 			txtFluff.setName("txtFluff");
 			txtFluff.setEditable(false);
@@ -183,9 +176,9 @@ public class UnitViewPanel extends ScrollablePanel {
 			add(txtFluff, gridBagConstraints);
 		}
 	}
-	
+
 	private void fillStats(ResourceBundle resourceMap) {
-		
+
 		lblType = new javax.swing.JLabel();
     	lblTech = new javax.swing.JLabel();
 		txtTech = new javax.swing.JLabel();
@@ -197,10 +190,10 @@ public class UnitViewPanel extends ScrollablePanel {
 		txtCost = new javax.swing.JLabel();
 		lblQuirk = new javax.swing.JLabel();
 		txtQuirk = new javax.swing.JLabel();
-		
+
 		java.awt.GridBagConstraints gridBagConstraints;
 		pnlStats.setLayout(new java.awt.GridBagLayout());
-		
+
 		lblType.setName("lblType"); // NOI18N
 		lblType.setText("<html><i>" + UnitType.getTypeDisplayableName(entity.getUnitType()) + "</i></html>");
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -213,7 +206,7 @@ public class UnitViewPanel extends ScrollablePanel {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblType, gridBagConstraints);
-		
+
 		lblTech.setName("lblTech1"); // NOI18N
 		lblTech.setText(resourceMap.getString("lblTech1.text"));
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -222,7 +215,7 @@ public class UnitViewPanel extends ScrollablePanel {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblTech, gridBagConstraints);
-		
+
 		txtTech.setName("lblTech2"); // NOI18N
 		txtTech.setText(TechConstants.getLevelDisplayableName(entity.getTechLevel()));
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -242,7 +235,7 @@ public class UnitViewPanel extends ScrollablePanel {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblTonnage, gridBagConstraints);
-		
+
 		txtTonnage.setName("lblTonnage2"); // NOI18N
 		txtTonnage.setText(Double.toString(entity.getWeight()));
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -262,7 +255,7 @@ public class UnitViewPanel extends ScrollablePanel {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblBV, gridBagConstraints);
-		
+
 		txtBV.setName("lblBV2"); // NOI18N
 		txtBV.setText(Integer.toString(entity.calculateBattleValue(true, true)));
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -274,12 +267,12 @@ public class UnitViewPanel extends ScrollablePanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(txtBV, gridBagConstraints);
 
-		
+
 		double weight = 1.0;
 		if(campaign.getCampaignOptions().useQuirks() && entity.countQuirks() > 0) {
 			weight = 0.0;
 		}
-		
+
 		lblCost.setName("lblCost1"); // NOI18N
 		lblCost.setText(resourceMap.getString("lblCost1.text"));
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -288,7 +281,7 @@ public class UnitViewPanel extends ScrollablePanel {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblCost, gridBagConstraints);
-		
+
 		txtCost.setName("lblCost2"); // NOI18N
 		txtCost.setText(unit.getSellValue().toAmountAndSymbolString());
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -300,7 +293,7 @@ public class UnitViewPanel extends ScrollablePanel {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(txtCost, gridBagConstraints);
-		
+
 		if(campaign.getCampaignOptions().useQuirks() && entity.countQuirks() > 0) {
 			lblQuirk.setName("lblQuirk1"); // NOI18N
 			lblQuirk.setText(resourceMap.getString("lblQuirk1.text"));
@@ -310,7 +303,7 @@ public class UnitViewPanel extends ScrollablePanel {
 			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 			pnlStats.add(lblQuirk, gridBagConstraints);
-			
+
 			txtQuirk.setName("lblQuirk2"); // NOI18N
 			txtQuirk.setText(unit.getQuirksList());
 			gridBagConstraints = new java.awt.GridBagConstraints();
@@ -323,12 +316,12 @@ public class UnitViewPanel extends ScrollablePanel {
 			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 			pnlStats.add(txtQuirk, gridBagConstraints);
 		}
-		
+
 	}
-	
+
 	private Image getImageFor(Unit u, Component c) {
-        
-		if(null == mt) { 
+
+		if(null == mt) {
 			return null;
 		}
         Image base = mt.imageFor(u.getEntity(), c, -1);
@@ -336,7 +329,7 @@ public class UnitViewPanel extends ScrollablePanel {
         EntityImage entityImage = new EntityImage(base, tint, getCamo(u), c);
         return entityImage.loadPreviewImage();
     }
-    
+
     private Image getCamo(Unit unit) {
         // Try to get the player's camo file.
         Image camo = null;

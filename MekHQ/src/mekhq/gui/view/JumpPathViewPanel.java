@@ -6,7 +6,6 @@
 
 package mekhq.gui.view;
 
-import java.awt.Color;
 import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
@@ -50,20 +49,18 @@ public class JumpPathViewPanel extends ScrollablePanel {
         this.campaign = c;
         initComponents();
     }
-    
+
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
         pnlStats = new javax.swing.JPanel();
         pnlPath = new javax.swing.JPanel();
-               
+
         setLayout(new java.awt.GridBagLayout());
 
-        setBackground(Color.WHITE);
 
         pnlStats.setName("pnlStats");
         pnlStats.setBorder(BorderFactory.createTitledBorder("Summary"));
-        pnlStats.setBackground(Color.WHITE);
         fillStats();
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -72,12 +69,11 @@ public class JumpPathViewPanel extends ScrollablePanel {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;    
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         add(pnlStats, gridBagConstraints);
-        
+
         pnlPath.setName("pnlPath");
         pnlPath.setBorder(BorderFactory.createTitledBorder("Full Path"));
-        pnlPath.setBackground(Color.WHITE);
         getPath();
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -87,7 +83,7 @@ public class JumpPathViewPanel extends ScrollablePanel {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;    
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         add(pnlPath, gridBagConstraints);
     }
 
@@ -106,7 +102,7 @@ public class JumpPathViewPanel extends ScrollablePanel {
             gridBagConstraints.weightx = 1.0;
             if(i >= (path.getSystems().size()-1)) {
                 gridBagConstraints.weighty = 1.0;
-            }        
+            }
             gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
             gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -114,11 +110,11 @@ public class JumpPathViewPanel extends ScrollablePanel {
             i++;
         }
     }
-    
+
     private void fillStats() {
-        
+
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.JumpPathViewPanel", new EncodeControl()); //$NON-NLS-1$
-        
+
         lblJumps = new javax.swing.JLabel();
         txtJumps = new javax.swing.JLabel();
         lblTimeStart = new javax.swing.JLabel();
@@ -131,14 +127,14 @@ public class JumpPathViewPanel extends ScrollablePanel {
         txtTotalTime = new javax.swing.JLabel();
         lblCost = new javax.swing.JLabel();
         txtCost = new javax.swing.JLabel();
-        
+
         DateTime currentDate = Utilities.getDateTimeDay(campaign.getCalendar());
         String startName = (path.getFirstSystem() == null) ? "?" : path.getFirstSystem().getPrintableName(currentDate);
         String endName = (path.getLastSystem() == null) ? "?" : path.getLastSystem().getPrintableName(currentDate);
-        
+
         java.awt.GridBagConstraints gridBagConstraints;
         pnlStats.setLayout(new java.awt.GridBagLayout());
-        
+
         lblJumps.setName("lblJumps"); // NOI18N
         lblJumps.setText(resourceMap.getString("lblJumps1.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -147,7 +143,7 @@ public class JumpPathViewPanel extends ScrollablePanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(lblJumps, gridBagConstraints);
-        
+
         txtJumps.setName("lblJumps2"); // NOI18N
         txtJumps.setText("<html>" + path.getJumps() + " jumps" + "</html>");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -158,7 +154,7 @@ public class JumpPathViewPanel extends ScrollablePanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(txtJumps, gridBagConstraints);
-        
+
         lblTimeStart.setName("lblTimeStart"); // NOI18N
         lblTimeStart.setText(resourceMap.getString("lblTimeStart1.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -167,7 +163,7 @@ public class JumpPathViewPanel extends ScrollablePanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(lblTimeStart, gridBagConstraints);
-        
+
         txtTimeStart.setName("lblTimeStart2"); // NOI18N
         txtTimeStart.setText("<html>" + Math.round(path.getStartTime(campaign.getLocation().getTransitTime())*100.0)/100.0 + " days from "+ startName + " to jump point" + "</html>");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -178,7 +174,7 @@ public class JumpPathViewPanel extends ScrollablePanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(txtTimeStart, gridBagConstraints);
-        
+
         lblTimeEnd.setName("lblTimeEnd"); // NOI18N
         lblTimeEnd.setText(resourceMap.getString("lblTimeEnd1.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -187,7 +183,7 @@ public class JumpPathViewPanel extends ScrollablePanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(lblTimeEnd, gridBagConstraints);
-        
+
         txtTimeEnd.setName("lblTimeEnd2"); // NOI18N
         txtTimeEnd.setText("<html>" + Math.round(path.getEndTime()*100.0)/100.0 + " days from final jump point to " + endName + "</html>");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -198,7 +194,7 @@ public class JumpPathViewPanel extends ScrollablePanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(txtTimeEnd, gridBagConstraints);
-        
+
         lblRechargeTime.setName("lblRechargeTime1"); // NOI18N
         lblRechargeTime.setText(resourceMap.getString("lblRechargeTime1.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -207,7 +203,7 @@ public class JumpPathViewPanel extends ScrollablePanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(lblRechargeTime, gridBagConstraints);
-        
+
         txtRechargeTime.setName("lblRechargeTime2"); // NOI18N
         txtRechargeTime.setText("<html>" + Math.round(path.getTotalRechargeTime(currentDate)*100.0)/100.0 + " days" + "</html>");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -218,7 +214,7 @@ public class JumpPathViewPanel extends ScrollablePanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(txtRechargeTime, gridBagConstraints);
-        
+
         lblTotalTime.setName("lblTotalTime1"); // NOI18N
         lblTotalTime.setText(resourceMap.getString("lblTotalTime1.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -227,7 +223,7 @@ public class JumpPathViewPanel extends ScrollablePanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(lblTotalTime, gridBagConstraints);
-        
+
         txtTotalTime.setName("lblTotalTime2"); // NOI18N
         txtTotalTime.setText("<html>" + Math.round(path.getTotalTime(currentDate, campaign.getLocation().getTransitTime())*100.0)/100.0 + " days" + "</html>");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -238,7 +234,7 @@ public class JumpPathViewPanel extends ScrollablePanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(txtTotalTime, gridBagConstraints);
-        
+
         if(campaign.getCampaignOptions().payForTransport()) {
             lblCost.setName("lblCost1"); // NOI18N
             lblCost.setText(resourceMap.getString("lblCost1.text"));
@@ -250,7 +246,7 @@ public class JumpPathViewPanel extends ScrollablePanel {
             pnlStats.add(lblCost, gridBagConstraints);
 
             txtCost.setName("lblCost2"); // NOI18N
-            txtCost.setText("<html>" + 
+            txtCost.setText("<html>" +
                     campaign.calculateCostPerJump(
                                 true,
                                 campaign.getCampaignOptions().useEquipmentContractBase())

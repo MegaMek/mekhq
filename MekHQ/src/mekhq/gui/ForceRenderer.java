@@ -1,6 +1,5 @@
 package mekhq.gui;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Image;
 import java.util.UUID;
@@ -8,6 +7,7 @@ import java.util.UUID;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JTree;
+import javax.swing.UIManager;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import megamek.client.ui.Messages;
@@ -23,7 +23,8 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
 
     private static final long serialVersionUID = -553191867660269247L;
 
-    private IconPackage icons;
+    private final IconPackage icons;
+    private final MekHqColors colors = new MekHqColors();
 
     public ForceRenderer(IconPackage i) {
         icons = i;
@@ -42,12 +43,11 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 tree, value, sel,
                 expanded, leaf, row,
                 hasFocus);
-        setOpaque(true);
-        setBackground(Color.WHITE);
-        setForeground(Color.BLACK);
+        setBackground(UIManager.getColor("Tree.background"));
+        setForeground(UIManager.getColor("Tree.textForeground"));
         if(sel) {
-            setBackground(Color.DARK_GRAY);
-            setForeground(Color.WHITE);
+            setBackground(UIManager.getColor("Tree.selectionBackground"));
+            setForeground(UIManager.getColor("Tree.selectionForeground"));
         }
 
         if(value instanceof Unit) {
@@ -133,12 +133,14 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             }
             setText("<html>" + name + ", " + uname + c3network + transport + "</html>");
             if(u.isDeployed() && !sel) {
-                setBackground(Color.LIGHT_GRAY);
+                colors.getDeployed().getColor().ifPresent(c -> setBackground(c));
+                colors.getDeployed().getAlternateColor().ifPresent(c -> setForeground(c));
             }
         }
         if(value instanceof Force) {
             if(!hasFocus && ((Force)value).isDeployed()) {
-                setBackground(Color.LIGHT_GRAY);
+                colors.getDeployed().getColor().ifPresent(c -> setBackground(c));
+                colors.getDeployed().getAlternateColor().ifPresent(c -> setForeground(c));
             }
         }
         setIcon(getIcon(value));

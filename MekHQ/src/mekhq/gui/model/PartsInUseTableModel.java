@@ -1,6 +1,5 @@
 package mekhq.gui.model;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,17 +18,17 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.parts.PartInUse;
+import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 public class PartsInUseTableModel extends DataTableModel {
     private static final long serialVersionUID = -7166100476703184175L;
-    
+
     private static final DecimalFormat FORMATTER = new DecimalFormat();
     static {
         FORMATTER.setMaximumFractionDigits(3);
@@ -53,7 +52,7 @@ public class PartsInUseTableModel extends DataTableModel {
         resourceMap = ResourceBundle.getBundle("mekhq.resources.PartsInUseTableModel", new EncodeControl()); //$NON-NLS-1$
         data = new ArrayList<PartInUse>();
     }
-    
+
     @Override
     public int getRowCount() {
         return data.size();
@@ -137,11 +136,11 @@ public class PartsInUseTableModel extends DataTableModel {
                 return false;
         }
     }
-    
+
     public void setData(Set<PartInUse> data) {
         setData(new ArrayList<>(data));
     }
-    
+
     @SuppressWarnings("unchecked")
     public void updateRow(int row, PartInUse piu) {
         ((ArrayList<PartInUse>) data).set(row, piu);
@@ -154,7 +153,7 @@ public class PartsInUseTableModel extends DataTableModel {
         }
         return (PartInUse) data.get(row);
     }
-    
+
     public boolean isBuyable(int row) {
         return (row >= 0) && (row < data.size())
             && (null != ((PartInUse) data.get(row)).getPartToBuy());
@@ -174,7 +173,7 @@ public class PartsInUseTableModel extends DataTableModel {
                 return SwingConstants.CENTER;
         }
     }
-    
+
     public int getPreferredWidth(int column) {
         switch(column) {
             case COL_PART:
@@ -195,7 +194,7 @@ public class PartsInUseTableModel extends DataTableModel {
                 return 100;
         }
     }
-    
+
     public boolean hasConstantWidth(int col) {
         switch(col) {
             case COL_BUTTON_BUY:
@@ -207,7 +206,7 @@ public class PartsInUseTableModel extends DataTableModel {
                 return false;
         }
     }
-    
+
     public int getWidth(int col) {
         switch(col) {
             case COL_BUTTON_BUY:
@@ -221,12 +220,12 @@ public class PartsInUseTableModel extends DataTableModel {
                 return Integer.MAX_VALUE;
         }
     }
-    
+
     public PartsInUseTableModel.Renderer getRenderer() {
         return new PartsInUseTableModel.Renderer();
     }
 
-    public static class Renderer extends DefaultTableCellRenderer {
+    public static class Renderer extends MekHqTableCellRenderer {
         private static final long serialVersionUID = 1403740113670268591L;
 
         @Override
@@ -235,28 +234,15 @@ public class PartsInUseTableModel extends DataTableModel {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setOpaque(true);
             setHorizontalAlignment(((PartsInUseTableModel)table.getModel()).getAlignment(column));
-
-            setForeground(Color.BLACK);
-            if (isSelected) {
-                setBackground(Color.DARK_GRAY);
-                setForeground(Color.WHITE);
-            } else {
-                // tiger stripes
-                if (row % 2 == 1) {
-                    setBackground(new Color(230,230,230));
-                } else {
-                    setBackground(Color.WHITE);
-                }
-            }
             return this;
         }
     }
-    
+
     public static class ButtonColumn extends AbstractCellEditor
         implements TableCellRenderer, TableCellEditor, ActionListener, MouseListener {
 
         private static final long serialVersionUID = 5632710519408125751L;
-        
+
         private JTable table;
         private Action action;
         private Border originalBorder;
@@ -284,7 +270,7 @@ public class PartsInUseTableModel extends DataTableModel {
             columnModel.getColumn(column).setCellEditor(this);
             table.addMouseListener(this);
         }
-        
+
         public Border getFocusBorder()
         {
             return focusBorder;
@@ -301,7 +287,7 @@ public class PartsInUseTableModel extends DataTableModel {
             editButton.setEnabled(enabled);
             renderButton.setEnabled(enabled);
         }
-        
+
         @Override
         public Object getCellEditorValue() {
             return editorValue;
@@ -339,7 +325,7 @@ public class PartsInUseTableModel extends DataTableModel {
         @Override
         public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
             boolean buyable = ((PartsInUseTableModel) table.getModel()).isBuyable(table.getRowSorter().convertRowIndexToModel(row));
-            
+
             if(value == null) {
                 editButton.setText(EMPTY_CELL);
                 editButton.setIcon(null);
@@ -351,7 +337,7 @@ public class PartsInUseTableModel extends DataTableModel {
                 editButton.setIcon(null);
             }
             editButton.setEnabled(enabled && buyable);
-            
+
             this.editorValue = value;
             return editButton;
         }
@@ -359,7 +345,7 @@ public class PartsInUseTableModel extends DataTableModel {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             boolean buyable = ((PartsInUseTableModel) table.getModel()).isBuyable(table.getRowSorter().convertRowIndexToModel(row));
-            
+
             if(isSelected && enabled && buyable) {
                 renderButton.setForeground(table.getSelectionForeground());
                  renderButton.setBackground(table.getSelectionBackground());
@@ -386,7 +372,7 @@ public class PartsInUseTableModel extends DataTableModel {
                 renderButton.setIcon(null);
             }
             renderButton.setEnabled(enabled && buyable);
-            
+
             return renderButton;
         }
     }

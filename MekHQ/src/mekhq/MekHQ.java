@@ -18,18 +18,13 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -236,7 +231,7 @@ public class MekHQ implements GameListener {
 	 * Default to log level 3.
 	 *
 	 * @param msg The message you want to log.
-	 * @deprecated Use {@link #getLogger()} instead.              
+	 * @deprecated Use {@link #getLogger()} instead.
 	 */
 	@Deprecated
 	public static void logMessage(String msg) {
@@ -248,7 +243,7 @@ public class MekHQ implements GameListener {
 	 *
 	 * @param msg The message you want to log.
 	 * @param logLevel The log level of the message.
-	 * @deprecated Use {@link #getLogger()} instead.              
+	 * @deprecated Use {@link #getLogger()} instead.
 	 */
 	@Deprecated
 	public static void logMessage(String msg, int logLevel) {
@@ -289,6 +284,11 @@ public class MekHQ implements GameListener {
      * At startup create and show the main frame of the application.
      */
     protected void startup() {
+        UIManager.installLookAndFeel("Flat Light", "com.formdev.flatlaf.FlatLightLaf");
+        UIManager.installLookAndFeel("Flat IntelliJ", "com.formdev.flatlaf.FlatIntelliJLaf");
+        UIManager.installLookAndFeel("Flat Dark", "com.formdev.flatlaf.FlatDarkLaf");
+        UIManager.installLookAndFeel("Flat Darcula", "com.formdev.flatlaf.FlatDarculaLaf");
+
         showInfo();
 
         //Setup user preferences
@@ -362,9 +362,12 @@ public class MekHQ implements GameListener {
     public static void main(String[] args) {
     	System.setProperty("apple.laf.useScreenMenuBar", "true");
         System.setProperty("com.apple.mrj.application.apple.menu.about.name","MekHQ");
-        //redirect output to log file
-        redirectOutput();
-        MekHQ.getInstance().startup();
+
+        SwingUtilities.invokeLater(() -> {
+            //redirect output to log file
+            redirectOutput();
+            MekHQ.getInstance().startup();
+        });
     }
 
     private void showInfo() {
@@ -412,13 +415,14 @@ public class MekHQ implements GameListener {
             }
 			final String logFilename = "logs" + File.separator + "mekhqlog.txt";
 			MegaMek.resetLogFile(logFilename);
-			PrintStream ps = new PrintStream(
-					new BufferedOutputStream(
-							new FileOutputStream(logFilename,
-												 true),
-							64));
-			System.setOut(ps);
+            OutputStream os = new FileOutputStream(logFilename, true);
+            BufferedOutputStream bos = new BufferedOutputStream(os, 64);
+			PrintStream ps = new PrintStream(bos);
+            System.setOut(ps);
             System.setErr(ps);
+            ps.close();
+            bos.close();
+            os.close();
         } catch (Exception e) {
             System.err.println("Unable to redirect output to mekhqlog.txt"); //$NON-NLS-1$
             e.printStackTrace();
@@ -454,7 +458,7 @@ public class MekHQ implements GameListener {
     public void joinGame(Scenario scenario, ArrayList<Unit> meks) {
 		LaunchGameDialog lgd = new LaunchGameDialog(campaigngui.getFrame(), false, campaign);
 		lgd.setVisible(true);
-		
+
 		if(lgd.cancelled) {
 		    return;
 		}
@@ -490,7 +494,7 @@ public class MekHQ implements GameListener {
                 port = lgd.port;
                 playerName = lgd.playerName;
             }
-            lgd.dispose(); // Force cleanup of the current modal, since we are 
+            lgd.dispose(); // Force cleanup of the current modal, since we are
                            // (possibly) about to display a new one and MacOS
                            // seems to struggle with that.
                            // (see https://github.com/MegaMek/mekhq/issues/953)
@@ -687,7 +691,7 @@ public class MekHQ implements GameListener {
 
 	}
 
-	public void gameClientFeedbackRquest(GameCFREvent e) {
+	public void gameClientFeedbackRequest(GameCFREvent e) {
 		// TODO Auto-generated method stub
 
 	}
@@ -695,7 +699,7 @@ public class MekHQ implements GameListener {
 	public IconPackage getIconPackage() {
 	    return iconPackage;
 	}
-	
+
     /**
      * Helper function that calculates the maximum screen width available locally.
      * @return Maximum screen width.
@@ -704,27 +708,27 @@ public class MekHQ implements GameListener {
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice[] gs = ge.getScreenDevices();
         double maxWidth = 0;
-        for (int i = 0; i < gs.length; i++) {
-            Rectangle b = gs[i].getDefaultConfiguration().getBounds();
+        for (GraphicsDevice g : gs) {
+            Rectangle b = g.getDefaultConfiguration().getBounds();
             if (b.getWidth() > maxWidth) {   // Update the max size found on this monitor
                 maxWidth = b.getWidth();
             }
         }
-        
+
         return maxWidth;
     }
-	
+
 	/*
 	 * Access methods for event bus.
 	 */
 	static public void registerHandler(Object handler) {
 	    EVENT_BUS.register(handler);
 	}
-	
+
 	static public boolean triggerEvent(MMEvent event) {
 	    return EVENT_BUS.trigger(event);
 	}
-	
+
 	static public void unregisterHandler(Object handler) {
 	    EVENT_BUS.unregister(handler);
 	}
@@ -734,7 +738,7 @@ public class MekHQ implements GameListener {
 	    EVENT_BUS.register(new XPHandler());
 	}
 
-    private static void setLookAndFeel(String themeName, Frame window) {
+    private static void setLookAndFeel(String themeName) {
 	    final String METHOD_NAME = "setLookAndFeel";
         Runnable runnable = () -> {
             try {
@@ -747,7 +751,10 @@ public class MekHQ implements GameListener {
                     addOSXKeyStrokes((InputMap) UIManager.get("TextPane.focusInputMap"));
                     addOSXKeyStrokes((InputMap) UIManager.get("TextArea.focusInputMap"));
                   }
-                if (window != null) {
+                for (Frame frame : Frame.getFrames()) {
+                    SwingUtilities.updateComponentTreeUI(frame);
+                }
+                for (Window window : Window.getWindows()) {
                     SwingUtilities.updateComponentTreeUI(window);
                 }
             } catch (ClassNotFoundException |
@@ -763,14 +770,14 @@ public class MekHQ implements GameListener {
         SwingUtilities.invokeLater(runnable);
     }
 
-    private class MekHqPropertyChangedListener implements PropertyChangeListener {
+    private static class MekHqPropertyChangedListener implements PropertyChangeListener {
         public void propertyChange(PropertyChangeEvent evt) {
             if (evt.getSource() == selectedTheme) {
-                setLookAndFeel((String)evt.getNewValue(), window);
+                setLookAndFeel((String)evt.getNewValue());
             }
         }
     }
-    
+
     private static void addOSXKeyStrokes(InputMap inputMap) {
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.META_DOWN_MASK), DefaultEditorKit.copyAction);
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, KeyEvent.META_DOWN_MASK), DefaultEditorKit.cutAction);

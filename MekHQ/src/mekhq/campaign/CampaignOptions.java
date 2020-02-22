@@ -531,7 +531,7 @@ public class CampaignOptions implements Serializable {
     	useAero = false;
     	useVehicles = true;
     	clanVehicles = false;
-    	doubleVehicles = true;
+    	doubleVehicles = false;
         adjustPlayerVehicles = false;
         opforLanceTypeMechs = 1;
         opforLanceTypeMixed = 2;
@@ -2573,20 +2573,24 @@ public class CampaignOptions implements Serializable {
                     + StringUtils.join(salaryXpMultiplier, ',')
                     + "</salaryXpMultiplier>");
 
+
+        // cannot use StringUtils.join for a boolean array, so we are using this instead
+        StringBuilder csv = new StringBuilder();
+        for (int i = 0; i < usePortraitForType.length; i++) {
+            csv.append(usePortraitForType[i]);
+            if (i < usePortraitForType.length - 1) {
+                csv.append(",");
+            }
+        }
+
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<usePortraitForType>"
-                    + StringUtils.join(usePortraitForType, ',')
+                    + csv.toString()
                     + "</usePortraitForType>");
-        StringBuilder csv = new StringBuilder();
-        for (int i = 0; i < rats.length; i++) {
-        	csv.append(rats[i]);
-        	if (i < rats.length - 1) {
-        		csv.append(",");
-        	}
-        }
+
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                 + "<rats>"
-                + MekHqXmlUtil.escape(csv.toString())
+                + MekHqXmlUtil.escape(StringUtils.join(rats, ','))
                 + "</rats>");
         if (staticRATs) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<staticRATs/>");
@@ -2660,7 +2664,7 @@ public class CampaignOptions implements Serializable {
                 retVal.showOriginFaction = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("randomizeOrigin")) {
                 retVal.randomizeOrigin = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("originSearchRaidus")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("originSearchRadius")) {
                 retVal.originSearchRadius = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("isOriginExtraRandom")) {
                 retVal.isOriginExtraRandom = Boolean.parseBoolean(wn2.getTextContent());

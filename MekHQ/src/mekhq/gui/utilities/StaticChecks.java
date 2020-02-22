@@ -66,9 +66,9 @@ public class StaticChecks {
         }
         return false;
     }
-    
+
     /**
-     * Used to test a selection of Units provided by the player and determine whether or not they have a 
+     * Used to test a selection of Units provided by the player and determine whether or not they have a
      * Transport ship assignment
      * @param units Vector of units that the player has selected
      * @return false if any unit in the passed-in Vector has not been assigned to a Transport ship
@@ -81,13 +81,13 @@ public class StaticChecks {
         }
         return true;
     }
-    
+
     /**
-     * Used to test a selection of Units provided by the player and a larger Transport to determine 
-     * whether or not the Transport can carry all of the selected units 
+     * Used to test a selection of Units provided by the player and a larger Transport to determine
+     * whether or not the Transport can carry all of the selected units
      * @param units Vector of units that the player has selected
      * @param ship A single Transport-Bay-equipped Unit whose capacity we want to test the selection against
-     * @returns a String  indicating why the Transport cannot carry all of the selected units, or a blank result if it can
+     * @return a String  indicating why the Transport cannot carry all of the selected units, or a blank result if it can
      */
     public static String canTransportShipCarry(Vector<Unit> units, Unit ship) {
         StringJoiner reason = new StringJoiner("");
@@ -108,7 +108,7 @@ public class StaticChecks {
                 return "    Selection of Units includes a large spacecraft. \n";
             } else if (unit.getEntity().getUnitType() == UnitType.SMALL_CRAFT) {
                 numberSC++;
-            } else if (unit.getEntity().getUnitType() == UnitType.AERO 
+            } else if (unit.getEntity().getUnitType() == UnitType.AERO
                         || unit.getEntity().getUnitType() == UnitType.CONV_FIGHTER) {
                 // Includes conventional fighters
                 numberASF++;
@@ -116,14 +116,14 @@ public class StaticChecks {
                 numberBA++;
             } else if (unit.getEntity().getUnitType() == UnitType.INFANTRY) {
                 //Make sure we account for space consumed by different platoon types
-                numberInfantry+= unit.getEntity().getWeight();
+                numberInfantry += (int) Math.ceil(unit.getEntity().getWeight());
             } else if (unit.getEntity().getUnitType() == UnitType.MEK) {
                 // Includes LAMs and Quadvees
                 numberMech++;
             } else if (unit.getEntity().getUnitType() == UnitType.PROTOMEK) {
                 numberProto++;
-            } else if (unit.getEntity().getUnitType() == UnitType.TANK 
-                        || unit.getEntity().getUnitType() == UnitType.VTOL 
+            } else if (unit.getEntity().getUnitType() == UnitType.TANK
+                        || unit.getEntity().getUnitType() == UnitType.VTOL
                         || unit.getEntity().getUnitType() == UnitType.NAVAL) {
                 // Tanks, VTOLs and wet naval vessels
                 double weight = unit.getEntity().getWeight();
@@ -172,16 +172,16 @@ public class StaticChecks {
             loadOK = false;
         }
         // Light vehicles can fit into any unused vehicle bays
-        if (numberLVee > 
-            (ship.getCurrentLightVehicleCapacity() + 
-                    (ship.getCurrentSuperHeavyVehicleCapacity() - numberSHVee) + 
+        if (numberLVee >
+            (ship.getCurrentLightVehicleCapacity() +
+                    (ship.getCurrentSuperHeavyVehicleCapacity() - numberSHVee) +
                     (ship.getCurrentHeavyVehicleCapacity() - numberHVee))) {
             reason.add("    Selection of Units includes too many Light Vehicles. \n");
             loadOK = false;
         }
         if (!loadOK) {
             return reason.toString();
-        }        
+        }
         // Everything's ok to load. Return a blank string.
         return null;
     }
@@ -246,7 +246,7 @@ public class StaticChecks {
         }
         return true;
     }
-    
+
     /**
      * Tests a selection of units to see if all of them have Naval C3 equipment
      * @param units A vector of units to test for Naval C3 equipment

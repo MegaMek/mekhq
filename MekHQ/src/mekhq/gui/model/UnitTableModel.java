@@ -1,12 +1,12 @@
 package mekhq.gui.model;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Image;
 import java.util.ArrayList;
 
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
@@ -22,6 +22,9 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
+import mekhq.gui.MekHqColors;
+import mekhq.gui.preferences.ColorPreference;
+import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 /**
  * A table Model for displaying information about units
@@ -31,8 +34,6 @@ public class UnitTableModel extends DataTableModel {
 
     private static final long serialVersionUID = -5207167419079014157L;
 
-    private Campaign campaign;
-    
     public final static int COL_NAME    =    0;
     public final static int COL_TYPE    =    1;
     public final static int COL_WCLASS    =  2;
@@ -54,11 +55,15 @@ public class UnitTableModel extends DataTableModel {
     public final static int COL_RSTATUS   =  18;
     public final static int N_COL =          19;
 
+    private Campaign campaign;
+
+    private final MekHqColors colors = new MekHqColors();
+
     public UnitTableModel(Campaign c) {
         data = new ArrayList<Unit>();
         campaign = c;
     }
-    
+
     public int getRowCount() {
         return data.size();
     }
@@ -274,11 +279,11 @@ public class UnitTableModel extends DataTableModel {
         }
         return "?";
     }
-    
+
     public Campaign getCampaign() {
         return campaign;
     }
-    
+
     public void refreshData() {
         setData(getCampaign().getCopyOfUnits());
     }
@@ -306,47 +311,44 @@ public class UnitTableModel extends DataTableModel {
             setToolTipText(getTooltip(actualRow, actualCol));
             Unit u = getUnit(actualRow);
 
-            setForeground(Color.BLACK);
             if (isSelected) {
-                setBackground(Color.DARK_GRAY);
-                setForeground(Color.WHITE);
+                setBackground(UIManager.getColor("Table.selectionBackground"));
+                setForeground(UIManager.getColor("Table.selectionForeground"));
             } else {
-
                 if (u.isDeployed()) {
-                    setBackground(Color.LIGHT_GRAY);
-                }
-                else if(!u.isPresent()) {
-                    setBackground(Color.ORANGE);
-                }
-                else if(u.isRefitting()) {
-                    setBackground(Color.CYAN);
-                }
-                else if ((null != u)
-                        && (u.isMothballing())) {
-                    setBackground(new Color(153,153,255));
-                } 
-                else if ((null != u)
-                        && (u.isMothballed())) {
-                    setBackground(new Color(204, 204, 255));
-                } 
-                else if (null != u && !u.isRepairable()) {
-                    setBackground(new Color(190, 150, 55));
-                } else if ((null != u) && !u.isFunctional()) {
-                    setBackground(new Color(205, 92, 92));
-                } else if ((null != u)
-                        && u.hasPartsNeedingFixing()) {
-                    setBackground(new Color(238, 238, 0));
+                    applyColors(colors.getDeployed());
+                } else if(!u.isPresent()) {
+                    applyColors(colors.getInTransit());
+                } else if(u.isRefitting()) {
+                    applyColors(colors.getRefitting());
+                } else if (u.isMothballing()) {
+                    applyColors(colors.getMothballing());
+                } else if (u.isMothballed()) {
+                    applyColors(colors.getMothballed());
+                } else if (!u.isRepairable()) {
+                    applyColors(colors.getNotRepairable());
+                } else if (!u.isFunctional()) {
+                    applyColors(colors.getNonFunctional());
+                } else if (u.hasPartsNeedingFixing()) {
+                    applyColors(colors.getNeedsPartsFixed());
                 } else if (u.getEntity() instanceof Infantry
                         && u.getActiveCrew().size() < u.getFullCrewSize()) {
-                    setBackground(Color.RED);
-                }
-                else {
-                    setBackground(Color.WHITE);
+                    applyColors(colors.getUncrewed());
+                } else {
+                    setBackground(UIManager.getColor("Table.background"));
+                    setForeground(UIManager.getColor("Table.foreground"));
                 }
             }
             return this;
         }
 
+        private void applyColors(ColorPreference c) {
+            setBackground(c.getColor()
+                    .orElseGet(() -> UIManager.getColor("Table.background")));
+
+            setForeground(c.getAlternateColor()
+                    .orElseGet(() -> UIManager.getColor("Table.foreground")));
+        }
     }
 
     public class VisualRenderer extends BasicInfo implements TableCellRenderer {
@@ -363,17 +365,15 @@ public class UnitTableModel extends DataTableModel {
             Component c = this;
             int actualCol = table.convertColumnIndexToModel(column);
             int actualRow = table.convertRowIndexToModel(row);
-            String color = "black";
-            if(isSelected) {
-                color = "white";
-            }
-            setText(getValueAt(actualRow, actualCol).toString(), color);
+
+            setText(getValueAt(actualRow, actualCol).toString());
+
             Unit u = getUnit(actualRow);
             if (actualCol == COL_PILOT) {
                 Person p = u.getCommander();
                 if(null != p) {
                     setPortrait(p);
-                    setText(p.getFullDesc(false), color);
+                    setText(p.getFullDesc(false));
                 } else {
                     clearImage();
                 }
@@ -382,7 +382,7 @@ public class UnitTableModel extends DataTableModel {
                 Person p = u.getTech();
                 if(null != p) {
                     setPortrait(p);
-                    setText(p.getFullDesc(false), color);
+                    setText(p.getFullDesc(false));
                 } else {
                     clearImage();
                 }
@@ -395,7 +395,7 @@ public class UnitTableModel extends DataTableModel {
                         desc += " " + UnitType.getTypeDisplayableName(u.getEntity().getUnitType());
                     }
                     desc += "<br>" + u.getStatus() + "</html>";
-                    setText(desc, color);
+                    setText(desc);
                     Image mekImage = getImageFor(u);
                     if(null != mekImage) {
                         setImage(mekImage);
@@ -407,19 +407,8 @@ public class UnitTableModel extends DataTableModel {
                 }
             }
 
-            if (isSelected) {
-                c.setBackground(Color.DARK_GRAY);
-            } else {
-                // tiger stripes
-                if ((row % 2) == 0) {
-                    c.setBackground(new Color(220, 220, 220));
-                } else {
-                    c.setBackground(Color.WHITE);
-
-                }
-            }
+            MekHqTableCellRenderer.setupTableColors(c, table, isSelected, hasFocus, row);
             return c;
         }
     }
-
 }

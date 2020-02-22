@@ -1,6 +1,5 @@
 package mekhq.gui.model;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.util.ArrayList;
 
@@ -11,6 +10,7 @@ import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.BasicInfo;
+import mekhq.gui.MekHqColors;
 
 /**
  * A table model for displaying doctors
@@ -18,8 +18,9 @@ import mekhq.gui.BasicInfo;
 public class DocTableModel extends DataTableModel {
     private static final long serialVersionUID = -6934834363013004894L;
 
-    private Campaign campaign;
-    
+    private final Campaign campaign;
+    private final MekHqColors colors = new MekHqColors();
+
     public DocTableModel(Campaign c) {
         columnNames = new String[] { "Doctors" };
         data = new ArrayList<Person>();
@@ -33,7 +34,7 @@ public class DocTableModel extends DataTableModel {
     public Person getDoctorAt(int row) {
         return (Person) data.get(row);
     }
-    
+
     public Campaign getCampaign() {
         return campaign;
     }
@@ -52,18 +53,18 @@ public class DocTableModel extends DataTableModel {
         public Component getTableCellRendererComponent(JTable table,
                 Object value, boolean isSelected, boolean hasFocus,
                 int row, int column) {
-            Component c = this;
             setOpaque(true);
             setPortrait(getDoctorAt(row));
-            setText(getValueAt(row, column).toString(), "black");
+            setText(getValueAt(row, column).toString());
             //setToolTipText(getCampaign().getTargetFor(getDoctorAt(row), getDoctorAt(row)).getDesc());
             if (isSelected) {
                 highlightBorder();
             } else {
                 unhighlightBorder();
             }
-            c.setBackground(new Color(220, 220, 220));
-            return c;
+            colors.getIconButton().getColor().ifPresent(c -> setBackground(c));
+            colors.getIconButton().getAlternateColor().ifPresent(c -> setForeground(c));
+            return this;
         }
 
     }

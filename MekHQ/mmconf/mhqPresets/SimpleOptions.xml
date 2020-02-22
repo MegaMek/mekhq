@@ -111,7 +111,7 @@
 		<useAero>false</useAero>
 		<useVehicles>true</useVehicles>
 		<clanVehicles>true</clanVehicles>
-		<doubleVehicles>true</doubleVehicles>
+		<doubleVehicles>false</doubleVehicles>
 		<adjustPlayerVehicles>false</adjustPlayerVehicles>
 		<opforLanceTypeMechs>1</opforLanceTypeMechs>
 		<opforLanceTypeMixed>2</opforLanceTypeMixed>

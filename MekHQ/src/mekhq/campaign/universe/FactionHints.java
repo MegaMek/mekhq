@@ -16,10 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.universe;
 
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -176,7 +176,7 @@ public class FactionHints {
     }
 
     /**
-     * Indicates a faction is neutral (e.g. Comstar) or non-combatant and should not be chosen as an
+     * Indicates a faction is neutral (e.g. ComStar) or non-combatant and should not be chosen as an
      * employer or enemy unless at war at the time.
      *
      * @param faction  Any faction
@@ -368,9 +368,9 @@ public class FactionHints {
     protected void addNeutralExceptions(String exceptionName, @Nullable Date start, @Nullable Date end,
             Faction faction, Faction... exceptions) {
         neutralExceptions.putIfAbsent(faction, new HashMap<>());
-        for (int i = 0; i < exceptions.length; i++) {
-            neutralExceptions.get(faction).putIfAbsent(exceptions[i], new ArrayList<>());
-            neutralExceptions.get(faction).get(exceptions[i]).add(new FactionHint("", start, end));
+        for (Faction exception : exceptions) {
+            neutralExceptions.get(faction).putIfAbsent(exception, new ArrayList<>());
+            neutralExceptions.get(faction).get(exception).add(new FactionHint("", start, end));
         }
     }
 
@@ -457,11 +457,10 @@ public class FactionHints {
                 "Starting load of faction hint data from XML..."); //$NON-NLS-1$
         Document xmlDoc = null;
 
-        try {
-            FileInputStream fis = new FileInputStream(FACTION_HINTS_FILE); //$NON-NLS-1$
+        try (InputStream is = new FileInputStream(FACTION_HINTS_FILE)) {
             DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
-            xmlDoc = db.parse(fis);
+            xmlDoc = db.parse(is);
         } catch (Exception ex) {
             MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
         }
@@ -607,7 +606,6 @@ public class FactionHints {
 
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
-        Date start = null;
         Date end = null;
         if (node.getAttributes().getNamedItem("end") != null) {
             end = df.parse(node.getAttributes().getNamedItem("end").getTextContent().trim());
@@ -615,7 +613,7 @@ public class FactionHints {
         for (int n = 0; n < node.getChildNodes().getLength(); n++) {
             Node wn = node.getChildNodes().item(n);
             if (wn.getNodeName().equals("exceptions")) {
-                Date localStart = start;
+                Date localStart = null;
                 Date localEnd = end;
                 if (wn.getAttributes().getNamedItem("start") != null) {
                     localStart = df.parse(wn.getAttributes().getNamedItem("start").getTextContent().trim());
@@ -626,11 +624,11 @@ public class FactionHints {
 
                 String[] parties = wn.getTextContent().trim().split(",");
 
-                for (int i = 0; i < parties.length; i++) {
-                    final Faction f = Faction.getFaction(parties[i]);
+                for (String party : parties) {
+                    final Faction f = Faction.getFaction(party);
                     if (null == f) {
                         MekHQ.getLogger().error(getClass(), METHOD_NAME,
-                                "Invalid faction code in factionhints.xml: " + parties[i]); //$NON-NLS-1$
+                                "Invalid faction code in factionhints.xml: " + party); //$NON-NLS-1$
                         continue;
                     }
                     addNeutralExceptions("", localStart, localEnd, faction, f);
@@ -655,8 +653,7 @@ public class FactionHints {
         }
 
         public boolean isInDateRange(Date date) {
-            return ((start == null) || date.after(start))
-                    && ((end == null) || date.before(end));
+            return ((start == null) || date.after(start)) && ((end == null) || date.before(end));
         }
     }
 

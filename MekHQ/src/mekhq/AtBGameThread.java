@@ -18,12 +18,12 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -51,7 +51,7 @@ import mekhq.campaign.unit.Unit;
 
 /**
  * @author Neoancient
- * 
+ *
  * Enhanced version of GameThread which imports settings and non-player
  * units into the MM game
  *
@@ -68,7 +68,7 @@ public class AtBGameThread extends GameThread {
         super(name, c, app, units, started);
         this.scenario = scenario;
     }
-    
+
     // String tokens for dialog boxes used for transport loading
     private static final String LOAD_FTR_DIALOG_TEXT = "Would you like the fighters assigned to %s to deploy loaded into its bays?";
     private static final String LOAD_FTR_DIALOG_TITLE = "Load Fighters on Transport?";
@@ -128,13 +128,13 @@ public class AtBGameThread extends GameThread {
                 MapSettings mapSettings = MapSettings.getInstance();
 
                 // if the scenario is taking place in space, do space settings instead
-                if((scenario instanceof AtBScenario) &&
+                if ((scenario instanceof AtBScenario) &&
                         scenario.getTerrainType() == AtBScenario.TER_SPACE) {
                     mapSettings.setMedium(MapSettings.MEDIUM_SPACE);
                 } else {
                     File mapgenFile = new File("data/mapgen/" + scenario.getMap() + ".xml");
-                    try {
-                        mapSettings = MapSettings.getInstance(new FileInputStream(mapgenFile));
+                    try (InputStream is = new FileInputStream(mapgenFile)) {
+                        mapSettings = MapSettings.getInstance(is);
                     } catch (FileNotFoundException ex) {
                         MekHQ.getLogger().log(getClass(), "run", LogLevel.ERROR, //$NON-NLS-1$
                                 "Could not load map file data/mapgen/" + scenario.getMap() + ".xml"); //$NON-NLS-1$
@@ -153,7 +153,7 @@ public class AtBGameThread extends GameThread {
                 client.sendMapSettings(mapSettings);
                 Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
 
-                PlanetaryConditions planetaryConditions = new PlanetaryConditions(); 
+                PlanetaryConditions planetaryConditions = new PlanetaryConditions();
                 planetaryConditions.setLight(scenario.getLight());
                 planetaryConditions.setWeather(scenario.getWeather());
                 planetaryConditions.setWindStrength(scenario.getWind());
@@ -191,13 +191,13 @@ public class AtBGameThread extends GameThread {
                 for (Unit unit : units) {
                     // Get the Entity
                     Entity entity = unit.getEntity();
-                    // Set the TempID for autoreporting
+                    // Set the TempID for auto reporting
                     entity.setExternalIdAsString(unit.getId().toString());
                     // Set the owner
                     entity.setOwner(client.getLocalPlayer());
                     if (!unit.getTransportedUnits().isEmpty()) {
                         //Store this unit as a potential transport to load
-                        scenario.getPlayerTransportLinkages().put(unit.getId(), new ArrayList<UUID>());
+                        scenario.getPlayerTransportLinkages().put(unit.getId(), new ArrayList<>());
                     }
                     // Calculate deployment round
                     int deploymentRound = entity.getDeployRound();
@@ -223,7 +223,7 @@ public class AtBGameThread extends GameThread {
                     entity.setDeployRound(deploymentRound);
                     // Add Mek to game
                     client.sendAddEntity(entity);
-                    // Wait a few secs to not overuse bandwith
+                    // Wait a few secs to not overuse bandwidth
                     Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
                 }
                 // Run through the units again. This time add transported units to the correct linkage,
@@ -234,7 +234,7 @@ public class AtBGameThread extends GameThread {
                             if (!scenario.getPlayerTransportLinkages().containsKey(trnId)) {
                                 continue;
                             }
-                        
+
                             scenario.addPlayerTransportRelationship(trnId, unit.getId());
                             // Set these flags so we know what prompts to display later
                             if (unit.getEntity().isAero()) {
@@ -311,13 +311,13 @@ public class AtBGameThread extends GameThread {
                     swingGui.getBots().put(name, botClient);
 
                     configureBot(botClient, bf);
-                    
+
                     // we need to wait until the game has actually started to do transport loading
                     // This will load the bot's infantry into APCs
                     if(scenario instanceof AtBScenario) {
                         AtBDynamicScenarioFactory.loadTransports((AtBScenario) scenario, botClient);
                     }
-                    
+
                     // Prompt the player to auto-load units into transports
                     if (!scenario.getPlayerTransportLinkages().isEmpty()) {
                         boolean loadFighters = false;
@@ -367,7 +367,7 @@ public class AtBGameThread extends GameThread {
     /**
      * wait for the server to add the bot client, then send starting position,
      * camo, and entities
-     * 
+     *
      * @param botClient
      * @param botForce
      */
@@ -395,7 +395,7 @@ public class AtBGameThread extends GameThread {
                 botClient.getLocalPlayer().setTeam(botForce.getTeam());
                 botClient.getLocalPlayer().setStartingPos(botForce.getStart());
 
-                if (botForce.getCamoCategory() == Player.NO_CAMO) {
+                if (botForce.getCamoCategory().equals(Player.NO_CAMO)) {
                     if (botForce.getColorIndex() >= 0) {
                         botClient.getLocalPlayer().setColorIndex(botForce.getColorIndex());
                     }
@@ -408,6 +408,6 @@ public class AtBGameThread extends GameThread {
             }
         } catch (Exception e) {
             MekHQ.getLogger().error(getClass(), "configureBot", e); //$NON-NLS-1$
-        }    	
+        }
     }
 }

@@ -1,16 +1,17 @@
 package mekhq.gui.model;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.text.DateFormat;
 import java.util.ArrayList;
 
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
+import mekhq.gui.MekHqColors;
 
 /**
  * A table model for displaying active loans
@@ -29,11 +30,12 @@ public class LoanTableModel extends DataTableModel {
     public final static int COL_NEXT_PAY   =   8;
     public final static int N_COL            = 9;
 
+    private final MekHqColors colors = new MekHqColors();
 
     public LoanTableModel() {
         data = new ArrayList<Loan>();
     }
-    
+
     public int getRowCount() {
         return data.size();
     }
@@ -69,7 +71,7 @@ public class LoanTableModel extends DataTableModel {
     }
 
     public Object getValueAt(int row, int col) {
-        Loan loan = getLoan(row);           
+        Loan loan = getLoan(row);
         if(col == COL_DESC) {
             return loan.getDescription();
         }
@@ -155,15 +157,16 @@ public class LoanTableModel extends DataTableModel {
             setHorizontalAlignment(getAlignment(column));
             Loan loan = getLoan(table.convertRowIndexToModel(row));
 
-            setForeground(Color.BLACK);
+            setForeground(UIManager.getColor("Table.foreground"));
             if (isSelected) {
-                setBackground(Color.DARK_GRAY);
-                setForeground(Color.WHITE);
+                setBackground(UIManager.getColor("Table.selectionBackground"));
+                setForeground(UIManager.getColor("Table.selectionForeground"));
             } else {
                 if(loan.isOverdue()) {
-                    setBackground(Color.RED);
+                    colors.getLoanOverdue().getColor().ifPresent(c -> setBackground(c));
+                    colors.getLoanOverdue().getAlternateColor().ifPresent(c -> setForeground(c));
                 } else {
-                    setBackground(Color.WHITE);
+                    setBackground(UIManager.getColor("Table.background"));
                 }
             }
 

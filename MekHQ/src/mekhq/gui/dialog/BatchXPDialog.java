@@ -1,8 +1,6 @@
 package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -31,7 +29,6 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SortOrder;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
@@ -52,6 +49,7 @@ import mekhq.gui.preferences.JToggleButtonPreference;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.RankSorter;
+import mekhq.gui.utilities.MekHqTableCellRenderer;
 import mekhq.preferences.PreferencesNode;
 
 public final class BatchXPDialog extends JDialog {
@@ -150,7 +148,7 @@ public final class BatchXPDialog extends JDialog {
             TableColumn column = personnelTable.getColumnModel().getColumn(i);
             if(personnelColumns.contains(Integer.valueOf(i))) {
                 column.setPreferredWidth(personnelModel.getColumnWidth(i));
-                column.setCellRenderer(new CellRenderer());
+                column.setCellRenderer(new MekHqTableCellRenderer());
             } else {
                 personnelTable.removeColumn(column);
             }
@@ -347,28 +345,6 @@ public final class BatchXPDialog extends JDialog {
 
     public boolean hasDataChanged() {
         return dataChanged;
-    }
-
-    public static class CellRenderer extends DefaultTableCellRenderer {
-        private static final long serialVersionUID = 8387527228725524653L;
-
-        @Override
-        public Component getTableCellRendererComponent(JTable table,
-                Object value, boolean isSelected, boolean hasFocus,
-                int row, int column) {
-            super.getTableCellRendererComponent(table, value, isSelected,
-                    hasFocus, row, column);
-            setOpaque(true);
-
-            setForeground(Color.BLACK);
-            if((row % 2) == 0) {
-                setBackground(new Color(220, 220, 220));
-            } else {
-                setBackground(Color.WHITE);
-            }
-
-            return this;
-        }
     }
 
     public static class PersonnelFilter extends RowFilter<PersonnelTableModel, Integer> {

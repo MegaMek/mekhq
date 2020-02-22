@@ -7,21 +7,20 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.view;
 
-import java.awt.Color;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.text.SimpleDateFormat;
 import java.util.ResourceBundle;
 
@@ -32,6 +31,8 @@ import javax.swing.JTextPane;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.mission.Contract;
+import mekhq.gui.CampaignGUI;
+import mekhq.gui.GuiTabType;
 import mekhq.gui.utilities.MarkdownRenderer;
 
 /**
@@ -42,10 +43,11 @@ public class ContractViewPanel extends ScrollablePanel {
     private static final long serialVersionUID = 7004741688464105277L;
 
     private Contract contract;
-    
+    private CampaignGUI gui;
+
     private JPanel pnlStats;
     private JTextPane txtDesc;
-    
+
     private JLabel lblStatus;
     private JLabel lblLocation;
     private JLabel txtLocation;
@@ -69,25 +71,23 @@ public class ContractViewPanel extends ScrollablePanel {
     private JLabel txtSalvageValueEmployer;
     private JLabel lblSalvagePct1;
     private JLabel lblSalvagePct2;
-    
-    public ContractViewPanel(Contract c) {
+
+    public ContractViewPanel(Contract c, CampaignGUI gui) {
         this.contract = c;
+        this.gui = gui;
         initComponents();
     }
-    
+
     private void initComponents() {
         GridBagConstraints gridBagConstraints;
 
         pnlStats = new JPanel();
         txtDesc = new JTextPane();
-               
-        setLayout(new GridBagLayout());
 
-        setBackground(Color.WHITE);
+        setLayout(new GridBagLayout());
 
         pnlStats.setName("pnlStats");
         pnlStats.setBorder(BorderFactory.createTitledBorder(contract.getName()));
-        pnlStats.setBackground(Color.WHITE);
         fillStats();
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -97,7 +97,7 @@ public class ContractViewPanel extends ScrollablePanel {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;    
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(pnlStats, gridBagConstraints);
     }
 
@@ -123,9 +123,9 @@ public class ContractViewPanel extends ScrollablePanel {
 
         GridBagConstraints gridBagConstraints;
         pnlStats.setLayout(new GridBagLayout());
-        
+
         SimpleDateFormat shortDateFormat = new SimpleDateFormat("MM/dd/yyyy");
-        
+
         lblStatus.setName("lblOwner"); // NOI18N
         lblStatus.setText("<html><b>" + contract.getStatusName() + "</b></html>");
         gridBagConstraints = new GridBagConstraints();
@@ -138,7 +138,7 @@ public class ContractViewPanel extends ScrollablePanel {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblStatus, gridBagConstraints);
-        
+
         if(null != contract.getSystemName(null) && !contract.getSystemName(null).isEmpty()) {
             lblLocation.setName("lblLocation"); // NOI18N
             lblLocation.setText(resourceMap.getString("lblLocation.text"));
@@ -150,7 +150,17 @@ public class ContractViewPanel extends ScrollablePanel {
             pnlStats.add(lblLocation, gridBagConstraints);
 
             txtLocation.setName("txtLocation"); // NOI18N
-            txtLocation.setText(contract.getSystemName(null));
+            String systemName = contract.getSystemName(null);
+            txtLocation.setText(String.format("<html><a href='#'>%s</a></html>", systemName));
+            txtLocation.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            txtLocation.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    // Display where it is on the interstellar map
+                    gui.getMapTab().switchSystemsMap(contract.getSystem());
+                    gui.setSelectedTab(GuiTabType.MAP);
+                }
+            });
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = 1;
@@ -160,7 +170,7 @@ public class ContractViewPanel extends ScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(txtLocation, gridBagConstraints);
         }
-        
+
         if(null != contract.getEmployer() && !contract.getEmployer().isEmpty()) {
             lblEmployer.setName("lblEmployer"); // NOI18N
             lblEmployer.setText(resourceMap.getString("lblEmployer.text"));
@@ -170,7 +180,7 @@ public class ContractViewPanel extends ScrollablePanel {
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblEmployer, gridBagConstraints);
-            
+
             txtEmployer.setName("txtEmployer"); // NOI18N
             txtEmployer.setText(contract.getEmployer());
             gridBagConstraints = new GridBagConstraints();
@@ -182,7 +192,7 @@ public class ContractViewPanel extends ScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(txtEmployer, gridBagConstraints);
         }
-        
+
         if(null != contract.getType() && !contract.getType().isEmpty()) {
             lblType.setName("lblType"); // NOI18N
             lblType.setText(resourceMap.getString("lblType.text"));
@@ -192,9 +202,9 @@ public class ContractViewPanel extends ScrollablePanel {
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblType, gridBagConstraints);
-            
+
             txtType.setName("txtType"); // NOI18N
-            txtType.setText(contract.getType());;
+            txtType.setText(contract.getType());
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = 3;
@@ -204,7 +214,7 @@ public class ContractViewPanel extends ScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(txtType, gridBagConstraints);
         }
-        
+
         lblStartDate.setName("lblStartDate"); // NOI18N
         lblStartDate.setText(resourceMap.getString("lblStartDate.text"));
         gridBagConstraints = new GridBagConstraints();
@@ -213,7 +223,7 @@ public class ContractViewPanel extends ScrollablePanel {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblStartDate, gridBagConstraints);
-        
+
         txtStartDate.setName("txtStartDate"); // NOI18N
         txtStartDate.setText(shortDateFormat.format(contract.getStartDate()));
         gridBagConstraints = new GridBagConstraints();
@@ -224,7 +234,7 @@ public class ContractViewPanel extends ScrollablePanel {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtStartDate, gridBagConstraints);
-        
+
         lblEndDate.setName("lblEndDate"); // NOI18N
         lblEndDate.setText(resourceMap.getString("lblEndDate.text"));
         gridBagConstraints = new GridBagConstraints();
@@ -233,7 +243,7 @@ public class ContractViewPanel extends ScrollablePanel {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblEndDate, gridBagConstraints);
-        
+
         txtEndDate.setName("txtEndDate"); // NOI18N
         txtEndDate.setText(shortDateFormat.format(contract.getEndingDate()));
         gridBagConstraints = new GridBagConstraints();
@@ -244,7 +254,7 @@ public class ContractViewPanel extends ScrollablePanel {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtEndDate, gridBagConstraints);
-        
+
         lblPayout.setName("lblPayout"); // NOI18N
         lblPayout.setText(resourceMap.getString("lblPayout.text"));
         gridBagConstraints = new GridBagConstraints();
@@ -264,7 +274,7 @@ public class ContractViewPanel extends ScrollablePanel {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtPayout, gridBagConstraints);
-        
+
         lblCommand.setName("lblCommand"); // NOI18N
         lblCommand.setText(resourceMap.getString("lblCommand.text"));
         gridBagConstraints = new GridBagConstraints();
@@ -273,7 +283,7 @@ public class ContractViewPanel extends ScrollablePanel {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblCommand, gridBagConstraints);
-        
+
         txtCommand.setName("txtCommand"); // NOI18N
         txtCommand.setText(Contract.getCommandRightsName(contract.getCommandRights()));
         gridBagConstraints = new GridBagConstraints();
@@ -284,7 +294,7 @@ public class ContractViewPanel extends ScrollablePanel {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtCommand, gridBagConstraints);
-        
+
         lblBLC.setName("lblBLC"); // NOI18N
         lblBLC.setText(resourceMap.getString("lblBLC.text"));
         gridBagConstraints = new GridBagConstraints();
@@ -293,7 +303,7 @@ public class ContractViewPanel extends ScrollablePanel {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblBLC, gridBagConstraints);
-        
+
         txtBLC.setName("txtBLC"); // NOI18N
         txtBLC.setText(contract.getBattleLossComp() + "%");
         gridBagConstraints = new GridBagConstraints();
@@ -307,7 +317,7 @@ public class ContractViewPanel extends ScrollablePanel {
 
         int i = 9;
         if(contract.getSalvagePct() > 0 && !contract.isSalvageExchange()) {
-            lblSalvageValueMerc = new JLabel(resourceMap.getString("lblSalvageValueMerc.text"));       
+            lblSalvageValueMerc = new JLabel(resourceMap.getString("lblSalvageValueMerc.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
@@ -325,7 +335,7 @@ public class ContractViewPanel extends ScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(txtSalvageValueMerc, gridBagConstraints);
             i++;
-            lblSalvageValueEmployer = new JLabel(resourceMap.getString("lblSalvageValueEmployer.text"));       
+            lblSalvageValueEmployer = new JLabel(resourceMap.getString("lblSalvageValueEmployer.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
@@ -348,11 +358,11 @@ public class ContractViewPanel extends ScrollablePanel {
         lblSalvagePct2 = new JLabel();
 
         if(contract.isSalvageExchange()) {
-            lblSalvagePct2.setText(resourceMap.getString("exchange") + " (" + contract.getSalvagePct() + "%)"); 
+            lblSalvagePct2.setText(resourceMap.getString("exchange") + " (" + contract.getSalvagePct() + "%)");
         } else if(contract.getSalvagePct() == 0) {
-            lblSalvagePct2.setText(resourceMap.getString("none")); 
+            lblSalvagePct2.setText(resourceMap.getString("none"));
         } else {
-            lblSalvagePct1.setText(resourceMap.getString("lblSalvagePct.text"));   
+            lblSalvagePct1.setText(resourceMap.getString("lblSalvagePct.text"));
             int maxSalvagePct = contract.getSalvagePct();
 
             int currentSalvagePct = 0;
@@ -364,19 +374,19 @@ public class ContractViewPanel extends ScrollablePanel {
                         .intValue();
             }
 
-            String lead = "<html><font color='black'>";
+            String lead = "<html><font>";
             if(currentSalvagePct > maxSalvagePct) {
                 lead = "<html><font color='red'>";
             }
-            lblSalvagePct2.setText(lead + currentSalvagePct + "%</font> <font color='black'>(max " + maxSalvagePct + "%)</font></html>");       
+            lblSalvagePct2.setText(lead + currentSalvagePct + "%</font> <span>(max " + maxSalvagePct + "%)</span></html>");
         }
-           
+
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = i;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblSalvagePct1, gridBagConstraints); 
+        pnlStats.add(lblSalvagePct1, gridBagConstraints);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = i;
@@ -400,6 +410,6 @@ public class ContractViewPanel extends ScrollablePanel {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtDesc, gridBagConstraints);
-        
+
     }
 }

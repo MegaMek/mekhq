@@ -1,16 +1,15 @@
 package mekhq.gui.model;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
-import javax.swing.table.DefaultTableCellRenderer;
 
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
+import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 /**
  * A table model for displaying financial transactions (i.e. a ledger)
@@ -18,13 +17,13 @@ import mekhq.campaign.finances.Transaction;
 public class FinanceTableModel extends DataTableModel {
     private static final long serialVersionUID = 534443424190075264L;
 
-    public final static int COL_DATE    =    0;
-    public final static int COL_CATEGORY =   1;
-    public final static int COL_DESC       = 2;
-    public final static int COL_DEBIT     =  3;
-    public final static int COL_CREDIT   =   4;
-    public final static int COL_BALANCE  =   5;
-    public final static int N_COL          = 6;
+    public final static int COL_DATE = 0;
+    public final static int COL_CATEGORY = 1;
+    public final static int COL_DESC = 2;
+    public final static int COL_DEBIT = 3;
+    public final static int COL_CREDIT = 4;
+    public final static int COL_BALANCE = 5;
+    public final static int N_COL = 6;
 
     public FinanceTableModel() {
         data = new ArrayList<Transaction>();
@@ -41,7 +40,7 @@ public class FinanceTableModel extends DataTableModel {
 
     @Override
     public String getColumnName(int column) {
-        switch(column) {
+        switch (column) {
         case COL_DATE:
             return "Date";
         case COL_CATEGORY:
@@ -63,33 +62,33 @@ public class FinanceTableModel extends DataTableModel {
         Transaction transaction = getTransaction(row);
         Money amount = transaction.getAmount();
         Money balance = Money.zero();
-        for(int i = 0; i <= row; i++) {
+        for (int i = 0; i <= row; i++) {
             balance = balance.plus(getTransaction(i).getAmount());
         }
-        if(col == COL_CATEGORY) {
+        if (col == COL_CATEGORY) {
             return transaction.getCategoryName();
         }
-        if(col == COL_DESC) {
+        if (col == COL_DESC) {
             return transaction.getDescription();
         }
-        if(col == COL_DEBIT) {
-            if(amount.isNegative()) {
+        if (col == COL_DEBIT) {
+            if (amount.isNegative()) {
                 return amount.absolute().toAmountAndSymbolString();
             } else {
                 return "";
             }
         }
-        if(col == COL_CREDIT) {
-            if(amount.isPositive()) {
+        if (col == COL_CREDIT) {
+            if (amount.isPositive()) {
                 return amount.toAmountAndSymbolString();
             } else {
                 return "";
             }
         }
-        if(col == COL_BALANCE) {
+        if (col == COL_BALANCE) {
             return balance.toAmountAndSymbolString();
         }
-        if(col == COL_DATE) {
+        if (col == COL_DATE) {
             SimpleDateFormat shortDateFormat = new SimpleDateFormat("MM/dd/yyyy");
             return shortDateFormat.format(transaction.getDate());
         }
@@ -97,7 +96,7 @@ public class FinanceTableModel extends DataTableModel {
     }
 
     public int getColumnWidth(int c) {
-        switch(c) {
+        switch (c) {
         case COL_DESC:
             return 150;
         case COL_CATEGORY:
@@ -108,7 +107,7 @@ public class FinanceTableModel extends DataTableModel {
     }
 
     public int getAlignment(int col) {
-        switch(col) {
+        switch (col) {
         case COL_DEBIT:
         case COL_CREDIT:
         case COL_BALANCE:
@@ -129,12 +128,12 @@ public class FinanceTableModel extends DataTableModel {
     }
 
     public Transaction getTransaction(int row) {
-        return (Transaction)data.get(row);
+        return (Transaction) data.get(row);
     }
 
     public void setTransaction(int row, Transaction transaction) {
-        //FIXME
-        //data.set(row, transaction);
+        // FIXME
+        // data.set(row, transaction);
     }
 
     public void deleteTransaction(int row) {
@@ -145,7 +144,7 @@ public class FinanceTableModel extends DataTableModel {
         return new FinanceTableModel.Renderer();
     }
 
-    public class Renderer extends DefaultTableCellRenderer {
+    public class Renderer extends MekHqTableCellRenderer {
 
         private static final long serialVersionUID = 9054581142945717303L;
 
@@ -154,23 +153,9 @@ public class FinanceTableModel extends DataTableModel {
                 int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected,
                     hasFocus, row, column);
-            setOpaque(true);
             setHorizontalAlignment(getAlignment(column));
 
-            setForeground(Color.BLACK);
-            if (isSelected) {
-                setBackground(Color.DARK_GRAY);
-                setForeground(Color.WHITE);
-            } else {
-                // tiger stripes
-                if (row % 2 == 1) {
-                    setBackground(new Color(230,230,230));
-                } else {
-                    setBackground(Color.WHITE);
-                }
-            }
             return this;
         }
-
     }
 }

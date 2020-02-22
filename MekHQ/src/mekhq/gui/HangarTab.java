@@ -18,7 +18,6 @@
  */
 package mekhq.gui;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -76,7 +75,6 @@ import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.model.XTableColumnModel;
 import mekhq.gui.preferences.JComboBoxPreference;
 import mekhq.gui.preferences.JTablePreference;
-import mekhq.gui.preferences.JToggleButtonPreference;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.TargetSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
@@ -126,7 +124,7 @@ public final class HangarTab extends CampaignGuiTab {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see mekhq.gui.CampaignGuiTab#initTab()
      */
     @Override
@@ -217,7 +215,7 @@ public final class HangarTab extends CampaignGuiTab {
                         splitUnit.setDividerLocation(1.0);
                     }
                 }
-            }            
+            }
         });
         unitTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         TableColumn column = null;
@@ -295,7 +293,6 @@ public final class HangarTab extends CampaignGuiTab {
         });
 
         JScrollPane scrollAcquireUnitTable = new JScrollPane(acquireUnitsTable);
-        scrollAcquireUnitTable.getViewport().setBackground(Color.WHITE);
         JPanel panAcquireUnit = new JPanel(new GridLayout(0, 1));
         panAcquireUnit.setBorder(BorderFactory.createTitledBorder("Procurement List"));
         panAcquireUnit.add(scrollAcquireUnitTable);
@@ -303,7 +300,6 @@ public final class HangarTab extends CampaignGuiTab {
         panAcquireUnit.setPreferredSize(new Dimension(200, 200));
 
         JScrollPane scrollUnitTable = new JScrollPane(unitTable);
-        scrollUnitTable.getViewport().setBackground(Color.WHITE);
         JSplitPane splitLeftUnit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scrollUnitTable,
                 panAcquireUnit);
         splitLeftUnit.setOneTouchExpandable(true);
@@ -313,7 +309,6 @@ public final class HangarTab extends CampaignGuiTab {
         scrollUnitView.setMinimumSize(new java.awt.Dimension(UNIT_VIEW_WIDTH, 600));
         scrollUnitView.setPreferredSize(new java.awt.Dimension(UNIT_VIEW_WIDTH, 600));
         scrollUnitView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollUnitView.getViewport().setBackground(Color.WHITE);
         scrollUnitView.setViewportView(null);
 
         splitUnit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitLeftUnit, scrollUnitView);
@@ -349,7 +344,7 @@ public final class HangarTab extends CampaignGuiTab {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see mekhq.gui.CampaignGuiTab#refreshAll()
      */
     @Override
@@ -561,7 +556,7 @@ public final class HangarTab extends CampaignGuiTab {
         }
         getCampaignGui().refreshLab();
     }
-    
+
     private void refreshAcquisitionList() {
         acquireUnitsModel.setData(getCampaign().getShoppingList().getUnitList());
     }
@@ -574,12 +569,12 @@ public final class HangarTab extends CampaignGuiTab {
     public void handle(DeploymentChangedEvent ev) {
         filterUnitScheduler.schedule();;
     }
-    
+
     @Subscribe
     public void handle(PersonChangedEvent ev) {
         filterUnitScheduler.schedule();;
     }
-    
+
     @Subscribe
     public void handle(ScenarioResolvedEvent ev) {
         unitListScheduler.schedule();
@@ -589,17 +584,17 @@ public final class HangarTab extends CampaignGuiTab {
     public void handle(UnitChangedEvent ev) {
         filterUnitScheduler.schedule();;
     }
-    
+
     @Subscribe
     public void handle(UnitNewEvent ev) {
         unitListScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(UnitRemovedEvent ev) {
         unitListScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(RepairStatusChangedEvent ev) {
         filterUnitScheduler.schedule();
@@ -612,28 +607,28 @@ public final class HangarTab extends CampaignGuiTab {
             acquisitionListScheduler.schedule();
         }
     }
-    
+
     @Subscribe
     public void handle(ProcurementEvent ev) {
         if (ev.getAcquisition() instanceof UnitOrder) {
             acquisitionListScheduler.schedule();
         }
     }
-    
+
     @Subscribe
     public void handle(PartEvent ev) {
         if (ev.getPart().getUnit() != null) {
             filterUnitScheduler.schedule();
         }
     }
-    
+
     @Subscribe
     public void handle(PartWorkEvent ev) {
         if (ev.getPartWork().getUnit() != null) {
             filterUnitScheduler.schedule();
         }
     }
-    
+
     @Subscribe
     public void handle(OvertimeModeEvent ev) {
         filterUnitScheduler.schedule();

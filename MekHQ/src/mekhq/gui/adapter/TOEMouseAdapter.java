@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2018, 2020  - The MegaMek Team
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui.adapter;
 
 import java.awt.event.ActionEvent;
@@ -219,7 +237,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
 
                     ServiceLogger.assignedTo(tech, gui.getCampaign().getDate(), singleForce.getName());
 
-                    if (singleForce.getAllUnits() !=null) {
+                    if (singleForce.getAllUnits() != null) {
                         String cantTech = "";
                         for (UUID uuid : singleForce.getAllUnits()) {
                             Unit u = gui.getCampaign().getUnit(uuid);
@@ -247,7 +265,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
         }
         if (command.contains(TOEMouseAdapter.ASSIGN_TO_SHIP)) {
             Unit ship = gui.getCampaign().getUnit(UUID.fromString(target));
-            if ((units != null) && (ship != null)) {
+            if ((!units.isEmpty()) && (ship != null)) {
                 StringJoiner cantLoad = new StringJoiner(", ");
                 String cantLoadReasons = StaticChecks.canTransportShipCarry(units, ship);
                 if (cantLoadReasons != null) {
@@ -275,7 +293,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
             }
         }
         if (command.contains(UNASSIGN_FROM_SHIP)) {
-            if (units != null) {
+            if (!units.isEmpty()) {
                 for (Unit u : units) {
                     for (UUID oldShipId : u.getTransportShipId().keySet()) {
                         Unit oldShip = gui.getCampaign().getUnit(oldShipId);
@@ -1754,7 +1772,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
             }
         }
     }
-        
+
     /**
      * Worker function that creates a new instance of a JMenuItem for a set of transport ship characteristics
      * Used to have a single ship appear on multiple menu entries defined by type of unit transported
@@ -1765,7 +1783,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
      * @param unitIds  String of units delimited by | used to fill out actionPerformed(ActionEvent)
      * @param capacity Double representing the capacity of the designated bay type
      */
-    
+
     private JMenuItem transportMenuItem(String shipName, UUID shipId, String unitIds, double capacity) {
         JMenuItem menuItem = new JMenuItem(shipName + " , Space available: " + capacity);
         menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ASSIGN_TO_SHIP + shipId + "|" + unitIds);
