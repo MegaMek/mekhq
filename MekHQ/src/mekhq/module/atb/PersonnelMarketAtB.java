@@ -82,7 +82,7 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                 p = c.newPerson(Person.T_AERO_PILOT);
             } else if (roll == 5 && c.getFaction().isClan()) {
                 p = c.newPerson(Person.T_MECHWARRIOR);
-            } else if (roll == 5 || roll == 10) {
+            } else if (roll == 5) {
                 int r = Compute.d6(2);
                 if (r == 2) {
                     p = c.newPerson(Person.T_VTOL_PILOT);
@@ -118,12 +118,7 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                      * chances of being drivers or gunners */
                     retVal.remove(p);
                     for (int i = 0; i < Compute.d6(); i++) {
-                        if (Compute.d6() < 4) {
-                            p = c.newPerson(Person.T_GVEE_DRIVER);
-                        } else {
-                            p = c.newPerson(Person.T_VEE_GUNNER);
-                        }
-                        p = c.newPerson((Compute.d6() < 4)?Person.T_GVEE_DRIVER:Person.T_VEE_GUNNER);
+                        p = c.newPerson((Compute.d6() < 4) ? Person.T_GVEE_DRIVER : Person.T_VEE_GUNNER);
                         id = UUID.randomUUID();
                         p.setId(id);
                         retVal.add(p);
