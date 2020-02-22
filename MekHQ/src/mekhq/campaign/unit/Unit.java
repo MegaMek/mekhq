@@ -1158,6 +1158,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             partsValue = partsValue.plus(2000.0 * sinks);
         }
 
+        // Scale the final value by the entity's price multiplier
+        partsValue = partsValue.multipliedBy(entity.getPriceMultiplier());
+
         return partsValue;
     }
 
@@ -1572,7 +1575,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             updateBayCapacity(unitType, unitWeight, false, bayNumber);
         }
     }
-    
+
     /**
      * Calculates transport bay space required by an infantry platoon,
      * which is not the same as the flat weight of that platoon
@@ -1848,7 +1851,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         } else {
             retVal.id = UUID.fromString(idNode.getTextContent());
         }
-        
+
         //Temp storage for used bay capacities
         boolean needsBayInitialization = true;
 
@@ -1980,7 +1983,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     retVal.mothballInfo = MothballInfo.generateInstanceFromXML(wn2, version);
                 }
                 // Set up bay space values after we've loaded everything from the unit record
-                // Used for older campaign 
+                // Used for older campaign
                 if (retVal.entity != null && retVal.getEntity().isLargeCraft() && needsBayInitialization) {
                     retVal.initializeBaySpace();
                 }
