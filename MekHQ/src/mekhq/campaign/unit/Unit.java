@@ -19,7 +19,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.unit;
 
 import java.io.PrintWriter;
@@ -104,7 +103,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     // This is the ID of the large craft assigned to transport this unit
     private Map<UUID,Integer> transportShipId = new HashMap<>();
     // If this unit is a transport, list all other units assigned to it
-    private Set<UUID> transportedUnits = new HashSet<UUID>();
+    private Set<UUID> transportedUnits = new HashSet<>();
     private double aeroCapacity;
     private double baCapacity;
     private int dockCapacity;
@@ -3384,13 +3383,18 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         //take first by rank
         //if rank is tied, take gunners over drivers
         //if two of the same type are tie rank, take the first one
+        if (entity == null) {
+            return null;
+        }
+
         Person commander = null;
-        for (UUID id : vesselCrew) {
-            if (id == null) {
+
+        for (UUID pid : vesselCrew) {
+            if (pid == null) {
                 continue;
             }
-            Person p = getCampaign().getPerson(id);
-            if ((null != p) && p.outRanks(commander)){
+            Person p = getCampaign().getPerson(pid);
+            if ((p != null) && p.outRanks(commander)) {
                 commander = p;
             }
         }
@@ -3399,10 +3403,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 continue;
             }
             Person p = getCampaign().getPerson(pid);
-            if (p != null && entity != null && (entity instanceof Tank || entity instanceof Infantry) && p.getHits() > 0) {
-                continue;
-            }
-            if ((null != p) && p.outRanks(commander)) {
+            if ((p != null) && p.outRanks(commander)) {
                 commander = p;
             }
         }
@@ -3411,16 +3412,13 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 continue;
             }
             Person p = getCampaign().getPerson(pid);
-            if (p != null && entity != null && (entity instanceof Tank || entity instanceof Infantry) && p.getHits() > 0) {
-                continue;
-            }
-            if ((null != p) && p.outRanks(commander)) {
+            if ((p != null) && p.outRanks(commander)) {
                 commander = p;
             }
         }
         if (navigator != null) {
             Person p = getCampaign().getPerson(navigator);
-            if(null != p && p.outRanks(commander)) {
+            if ((p != null) && p.outRanks(commander)) {
                 commander = p;
             }
         }
