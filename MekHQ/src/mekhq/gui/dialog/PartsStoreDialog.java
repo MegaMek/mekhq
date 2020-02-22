@@ -264,20 +264,23 @@ public class PartsStoreDialog extends javax.swing.JDialog {
             JButton btnBuyBulk = new JButton(resourceMap.getString("btnBuyBulk.text"));
             btnBuyBulk.addActionListener(evt -> {
                 if (partsTable.getSelectedRowCount() > 0) {
-                    int quantity = 1;
-                    PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(campaignGUI.getFrame(), true, "How Many?", quantity, 1, CampaignGUI.MAX_QUANTITY_SPINNER);
-                    pcd.setVisible(true);
-                    quantity = pcd.getValue();
-
                     int[] selectedRow = partsTable.getSelectedRows();
                     for (int i : selectedRow) {
                         PartProxy partProxy = partsModel.getPartProxyAt(partsTable.convertRowIndexToModel(i));
-                        addPart(true, false, partProxy.getPart(), quantity);
-                        partProxy.updateTargetAndInventories();
-                        partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TARGET);
-                        partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TRANSIT);
-                        partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_SUPPLY);
-                        partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_QUEUE);
+                        int quantity = 1;
+                        PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(campaignGUI.getFrame(),
+                                true, "How Many " + partProxy.getName() + "?", quantity, 1, CampaignGUI.MAX_QUANTITY_SPINNER);
+                        pcd.setVisible(true);
+                        quantity = pcd.getValue();
+
+                        if (quantity > 0) {
+                            addPart(true, false, partProxy.getPart(), quantity);
+                            partProxy.updateTargetAndInventories();
+                            partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TARGET);
+                            partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TRANSIT);
+                            partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_SUPPLY);
+                            partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_QUEUE);
+                        }
                     }
                 }
             });
@@ -336,6 +339,30 @@ public class PartsStoreDialog extends javax.swing.JDialog {
             //endregion Add
 
             //region Add Bulk
+            JButton btnAddBulk = new JButton(resourceMap.getString("btnAddBulk.text"));
+            btnAddBulk.addActionListener(evt -> {
+                if (partsTable.getSelectedRowCount() > 0) {
+                    int[] selectedRow = partsTable.getSelectedRows();
+                    for (int i : selectedRow) {
+                        PartProxy partProxy = partsModel.getPartProxyAt(partsTable.convertRowIndexToModel(i));
+
+                        int quantity = 1;
+                        PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(campaignGUI.getFrame(),
+                                true, "How Many " + partProxy.getName() + "?", quantity, 1, CampaignGUI.MAX_QUANTITY_SPINNER);
+                        pcd.setVisible(true);
+                        quantity = pcd.getValue();
+
+                        if (quantity > 0) {
+                            addPart(false, partProxy.getPart(), quantity);
+                            partProxy.updateTargetAndInventories();
+                            partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TARGET);
+                            partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TRANSIT);
+                            partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_SUPPLY);
+                            partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_QUEUE);
+                        }
+                    }
+                }
+            });
             if (campaign.isGM()) {
                 panButtons.add(btnAddBulk, new GridBagConstraints());
             }
