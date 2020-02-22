@@ -6079,6 +6079,10 @@ public class Campaign implements Serializable, ITechManager {
         return options;
     }
 
+    public void setGameOptions(GameOptions gameOptions) {
+        this.gameOptions = gameOptions;
+    }
+
     public void setGameOptions(Vector<IBasicOption> options) {
         for (IBasicOption option : options) {
             gameOptions.getOption(option.getName()).setValue(option.getValue());

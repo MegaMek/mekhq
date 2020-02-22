@@ -459,8 +459,9 @@ public class CampaignExportWizard extends JDialog {
         Campaign destinationCampaign;
         if (newCampaign) {
             destinationCampaign = new Campaign();
-
             destinationCampaign.setApp(sourceCampaign.getApp());
+            destinationCampaign.setCampaignOptions(sourceCampaign.getCampaignOptions());
+            destinationCampaign.setGameOptions(sourceCampaign.getGameOptions());
         } else {
             try {
                 FileInputStream fis = new FileInputStream(file);
