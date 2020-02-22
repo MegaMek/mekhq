@@ -18,10 +18,10 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.personnel;
 
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -124,20 +124,18 @@ public class Ranks {
     public static void initializeRankSystems() {
         final String METHOD_NAME = "initializeRankSystems()"; //$NON-NLS-1$
 
-        rankSystems = new Hashtable<Integer, Ranks>();
+        rankSystems = new Hashtable<>();
         MekHQ.getLogger().log(Ranks.class, METHOD_NAME, LogLevel.INFO,
                 "Starting load of Rank Systems from XML..."); //$NON-NLS-1$
         // Initialize variables.
         Document xmlDoc = null;
 
-
-        try {
-            FileInputStream fis = new FileInputStream("data/universe/ranks.xml");
+        try (InputStream is = new FileInputStream("data/universe/ranks.xml")) {
             // Using factory get an instance of document builder
             DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
             // Parse using builder to get DOM representation of the XML file
-            xmlDoc = db.parse(fis);
+            xmlDoc = db.parse(is);
         } catch (Exception ex) {
             MekHQ.getLogger().error(Ranks.class, METHOD_NAME, ex);
         }
@@ -286,10 +284,7 @@ public class Ranks {
     }
 
     public boolean useAlternateProfession(int profession) {
-    	if (ranks.get(0).getName(profession).startsWith("--")) {
-    		return true;
-    	}
-    	return false;
+        return ranks.get(0).getName(profession).startsWith("--");
     }
 
     public int getAlternateProfession(int profession) {
@@ -298,8 +293,6 @@ public class Ranks {
 
     public int getAlternateProfession(String name) {
     	switch (name.replaceAll("--", "")) {
-    		case "MW":
-    			return RPROF_MW;
     		case "ASF":
     			return RPROF_ASF;
     		case "VEE":
@@ -310,6 +303,7 @@ public class Ranks {
     			return RPROF_INF;
     		case "TECH":
     			return RPROF_TECH;
+            case "MW":
     		default:
     			return RPROF_MW;
     	}
@@ -323,7 +317,7 @@ public class Ranks {
 		// If we've got an invalid rank system, default to Star League
 		if(system >= rankSystems.size()) {
 			if (rankSystems.isEmpty()) {
-				ranks = new ArrayList<Rank>();
+				ranks = new ArrayList<>();
 			} else {
 				ranks = rankSystems.get(RS_SL).getAllRanks();
 			}
@@ -335,7 +329,7 @@ public class Ranks {
 	}
 
 	public void setCustomRanks(ArrayList<ArrayList<String>> customRanks, int offCut) {
-	    ranks = new ArrayList<Rank>();
+	    ranks = new ArrayList<>();
         for (int i = 0; i < customRanks.size(); i++) {
             ranks.add(new Rank(customRanks.get(i), offCut <= i,  1.0));
         }
@@ -397,12 +391,12 @@ public class Ranks {
 		return joiner.toString();
 	}
 
-	//Keep this for reverse compatability in loading campaigns
+	//Keep this for reverse compatibility in loading campaigns
 	public void setRanksFromList(String names, int officerCut) {
-		ArrayList<ArrayList<String>> rankNames = new ArrayList<ArrayList<String>>();
+		ArrayList<ArrayList<String>> rankNames = new ArrayList<>();
 		String[] rnames = names.split(",");
 		for(String rname : rnames) {
-			ArrayList<String> temp = new ArrayList<String>(RPROF_NUM);
+			ArrayList<String> temp = new ArrayList<>(RPROF_NUM);
 			for (int i = 0; i < RPROF_NUM; i++) {
 				temp.add(rname);
 			}
@@ -454,7 +448,7 @@ public class Ranks {
 		boolean showMessage = false;
 
         // Dump the ranks ArrayList so we can re-use it.
-        retVal.ranks = new ArrayList<Rank>();
+        retVal.ranks = new ArrayList<>();
 
         try {
             NodeList nl = wn.getChildNodes();
@@ -545,7 +539,7 @@ public class Ranks {
     }
 
 	public void setRanksFromModel(RankTableModel model) {
-        ranks = new ArrayList<Rank>();
+        ranks = new ArrayList<>();
 	    @SuppressWarnings("rawtypes") // Broken java doesn't have typed vectors in the DefaultTableModel
 		Vector<Vector> vectors = model.getDataVector();
 	    for(@SuppressWarnings("rawtypes") Vector row : vectors) {

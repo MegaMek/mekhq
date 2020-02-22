@@ -5259,109 +5259,107 @@ public class Campaign implements Serializable, ITechManager {
         // to transport the force. Smaller dropships are represented by half-dropships.
 
         // If we're transporting more than a company, Overlord analogues are more efficient.
-        if(noMech > 12) {
-            leasedLargeMechDropships = noMech / largeDropshipMechCapacity;
+        if (noMech > 12) {
+            leasedLargeMechDropships = noMech / (double) largeDropshipMechCapacity;
             noMech -= leasedLargeMechDropships * largeDropshipMechCapacity;
-            mechCollars += leasedLargeMechDropships;
+            mechCollars += (int) Math.ceil(leasedLargeMechDropships);
 
             // If there's more than a company left over, lease another Overlord. Otherwise
             // fall through and get a Union.
-            if(noMech > 12) {
+            if (noMech > 12) {
                 leasedLargeMechDropships += 1;
                 noMech -= largeDropshipMechCapacity;
                 mechCollars += 1;
             }
 
             leasedASFCapacity += leasedLargeMechDropships * largeMechDropshipASFCapacity;
-            leasedCargoCapacity += largeMechDropshipCargoCapacity;
+            leasedCargoCapacity += (int) Math.floor(largeMechDropshipCargoCapacity);
         }
 
         // Unions
-        if(noMech > 0) {
-            leasedAverageMechDropships = noMech / averageDropshipMechCapacity;
+        if (noMech > 0) {
+            leasedAverageMechDropships = noMech / (double) averageDropshipMechCapacity;
             noMech -= leasedAverageMechDropships * averageDropshipMechCapacity;
-            mechCollars += leasedAverageMechDropships;
+            mechCollars += (int) Math.ceil(leasedAverageMechDropships);
 
-            // If we can fit in a smaller dropship, lease one of those instead.
-            if(noMech > 0 && noMech < (averageDropshipMechCapacity / 2)) {
+            // If we can fit in a smaller DropShip, lease one of those instead.
+            if ((noMech > 0) && (noMech < (averageDropshipMechCapacity / 2))) {
                 leasedAverageMechDropships += 0.5;
                 mechCollars += 1;
-            }
-            else if(noMech > 0){
+            } else if (noMech > 0) {
                 leasedAverageMechDropships += 1;
                 mechCollars += 1;
             }
 
-            // Our Union-ish dropship can carry some ASFs and cargo.
+            // Our Union-ish DropShip can carry some ASFs and cargo.
             leasedASFCapacity += (int) Math.floor(leasedAverageMechDropships * mechDropshipASFCapacity);
             leasedCargoCapacity += (int) Math.floor(leasedAverageMechDropships * mechDropshipCargoCapacity);
         }
 
         // Leopard CVs
-        if(noASF > leasedASFCapacity) {
+        if (noASF > leasedASFCapacity) {
             noASF -= leasedASFCapacity;
 
-            if(noASF > 0) {
-                leasedAverageASFDropships = noASF / averageDropshipASFCapacity;
+            if (noASF > 0) {
+                leasedAverageASFDropships = noASF / (double) averageDropshipASFCapacity;
                 noASF -= leasedAverageASFDropships * averageDropshipASFCapacity;
-                asfCollars += leasedAverageASFDropships;
+                asfCollars += (int) Math.ceil(leasedAverageASFDropships);
 
-                if (noASF > 0 && noASF < (averageDropshipASFCapacity / 2)) {
+                if ((noASF > 0) && (noASF < (averageDropshipASFCapacity / 2))) {
                     leasedAverageASFDropships += 0.5;
                     asfCollars += 1;
-                }
-                else if (noASF > 0) {
+                } else if (noASF > 0) {
                     leasedAverageASFDropships += 1;
                     asfCollars += 1;
                 }
             }
 
-            // Our Leopard-ish dropship can carry some cargo.
-            leasedCargoCapacity += (asfDropshipCargoCapacity * leasedAverageASFDropships);
+            // Our Leopard-ish DropShip can carry some cargo.
+            leasedCargoCapacity += (int) Math.floor(asfDropshipCargoCapacity * leasedAverageASFDropships);
         }
 
         // Triumphs
-        if(noVehicles > averageDropshipVehicleCapacity) {
-            leasedLargeVehicleDropships = noVehicles / largeDropshipVehicleCapacity;
+        if (noVehicles > averageDropshipVehicleCapacity) {
+            leasedLargeVehicleDropships = noVehicles / (double) largeDropshipVehicleCapacity;
             noVehicles -= leasedLargeVehicleDropships * largeDropshipVehicleCapacity;
-            vehicleCollars += leasedLargeVehicleDropships;
+            vehicleCollars += (int) Math.ceil(leasedLargeVehicleDropships);
 
-            if(noVehicles > averageDropshipVehicleCapacity) {
+            if (noVehicles > averageDropshipVehicleCapacity) {
                 leasedLargeVehicleDropships += 1;
                 noVehicles -= largeDropshipVehicleCapacity;
                 vehicleCollars += 1;
             }
 
-            leasedCargoCapacity += leasedLargeVehicleDropships * largeVehicleDropshipCargoCapacity;
+            leasedCargoCapacity += (int) Math.floor(leasedLargeVehicleDropships * largeVehicleDropshipCargoCapacity);
         }
 
         // Gazelles
-        if(noVehicles > 0) {
-            leasedAverageVehicleDropships = (nohv + newNolv) / averageDropshipVehicleCapacity;
-            noVehicles = (int)((nohv + newNolv) - leasedAverageVehicleDropships * averageDropshipVehicleCapacity);
-            vehicleCollars += leasedAverageVehicleDropships;
+        if (noVehicles > 0) {
+            leasedAverageVehicleDropships = (nohv + newNolv) / (double) averageDropshipVehicleCapacity;
+            noVehicles = (int) ((nohv + newNolv) - leasedAverageVehicleDropships * averageDropshipVehicleCapacity);
+            vehicleCollars += (int) Math.ceil(leasedAverageVehicleDropships);
 
             // Gazelles are pretty minimal, so no half-measures.
-            if(noVehicles > 0) {
+            if (noVehicles > 0) {
                 leasedAverageVehicleDropships += 1;
                 noVehicles -= averageDropshipVehicleCapacity;
                 vehicleCollars += 1;
             }
 
-            // Our Gazelle-ish dropship can carry some cargo.
-            leasedCargoCapacity += (vehicleDropshipCargoCapacity * leasedAverageVehicleDropships);
+            // Our Gazelle-ish DropShip can carry some cargo.
+            leasedCargoCapacity += (int) Math.floor(vehicleDropshipCargoCapacity * leasedAverageVehicleDropships);
         }
 
         // Do we have any leftover cargo?
         noCargo -= leasedCargoCapacity;
 
         // Mules
-        if(noCargo > averageDropshipCargoCapacity) {
-            leasedLargeCargoDropships = noCargo / largeDropshipCargoCapacity;
+        if (noCargo > averageDropshipCargoCapacity) {
+            leasedLargeCargoDropships = noCargo / (double) largeDropshipCargoCapacity;
             noCargo -= leasedLargeCargoDropships * largeDropshipCargoCapacity;
-            cargoCollars += leasedLargeCargoDropships;
+            cargoCollars += (int) Math.ceil(leasedLargeCargoDropships);
 
-            if(noCargo > averageDropshipCargoCapacity) {
+            if (noCargo > averageDropshipCargoCapacity) {
                 leasedLargeCargoDropships += 1;
                 noCargo -= largeDropshipCargoCapacity;
                 cargoCollars += 1;
@@ -5369,16 +5367,15 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         // Buccaneers
-        if(noCargo > 0) {
-            leasedAverageCargoDropships = noCargo / averageDropshipCargoCapacity;
-            cargoCollars += leasedAverageCargoDropships;
+        if (noCargo > 0) {
+            leasedAverageCargoDropships = noCargo / (double) averageDropshipCargoCapacity;
+            cargoCollars += (int) Math.ceil(leasedAverageCargoDropships);
             noCargo -= leasedAverageCargoDropships * averageDropshipCargoCapacity;
 
-            if(noCargo > 0 && noCargo < (averageDropshipCargoCapacity / 2)) {
+            if (noCargo > 0 && noCargo < (averageDropshipCargoCapacity / 2)) {
                 leasedAverageCargoDropships += 0.5;
                 cargoCollars += 1;
-            }
-            else if(noCargo > 0) {
+            } else if (noCargo > 0) {
                 leasedAverageCargoDropships += 1;
                 cargoCollars += 1;
             }
@@ -5395,31 +5392,30 @@ public class Campaign implements Serializable, ITechManager {
         dropshipCost = dropshipCost.plus(cargoDropshipCost.multipliedBy(leasedAverageCargoDropships));
         dropshipCost = dropshipCost.plus(largeCargoDropshipCost.multipliedBy(leasedLargeCargoDropships));
 
-        // Smaller/half-dropships are cheaper to rent, but still take one collar each
+        // Smaller/half-DropShips are cheaper to rent, but still take one collar each
         int collarsNeeded = mechCollars + asfCollars + vehicleCollars + cargoCollars;
 
-        // add owned dropships
+        // add owned DropShips
         collarsNeeded += nDropship;
 
-        // now factor in owned jumpships
+        // now factor in owned JumpShips
         collarsNeeded = Math.max(0, collarsNeeded - nCollars);
 
         Money totalCost = dropshipCost.plus(collarCost.multipliedBy(collarsNeeded));
 
         // FM:Mercs reimburses for owned transport (CamOps handles it in peacetime costs)
-        if(!excludeOwnTransports) {
+        if (!excludeOwnTransports) {
             Money ownDropshipCost = Money.zero();
             Money ownJumpshipCost = Money.zero();
-            for(Unit u : getUnits()) {
-                if(!u.isMothballed()) {
+            for (Unit u : getUnits()) {
+                if (!u.isMothballed()) {
                     Entity e = u.getEntity();
-                    if((e.getEntityType() & Entity.ETYPE_DROPSHIP) != 0) {
+                    if ((e.getEntityType() & Entity.ETYPE_DROPSHIP) != 0) {
                         ownDropshipCost = ownDropshipCost.plus(mechDropshipCost.multipliedBy(u.getMechCapacity()).dividedBy(averageDropshipMechCapacity));
                         ownDropshipCost = ownDropshipCost.plus(asfDropshipCost.multipliedBy(u.getASFCapacity()).dividedBy(averageDropshipASFCapacity));
                         ownDropshipCost = ownDropshipCost.plus(vehicleDropshipCost.multipliedBy(u.getHeavyVehicleCapacity() + u.getLightVehicleCapacity()).dividedBy(averageDropshipVehicleCapacity));
                         ownDropshipCost = ownDropshipCost.plus(cargoDropshipCost.multipliedBy(u.getCargoCapacity()).dividedBy(averageDropshipCargoCapacity));
-                    }
-                    else if((e.getEntityType() & Entity.ETYPE_JUMPSHIP) != 0) {
+                    } else if ((e.getEntityType() & Entity.ETYPE_JUMPSHIP) != 0) {
                         ownJumpshipCost = ownDropshipCost.plus(collarCost.multipliedBy(e.getDockingCollars().size()));
                     }
                 }
@@ -6067,9 +6063,9 @@ public class Campaign implements Serializable, ITechManager {
         personUpdated(person);
         MekHQ.triggerEvent(new PersonChangedEvent(person));
         if (report) {
-            if (rank > oldRank || (rank == oldRank && rankLevel > oldRankLevel)) {
+            if (rank > oldRank || ((rank == oldRank) && (rankLevel > oldRankLevel))) {
                 ServiceLogger.promotedTo(person, getDate());
-            } else if (rank < oldRank || (rank == oldRank && rankLevel < oldRankLevel)) {
+            } else if ((rank < oldRank) || (rankLevel < oldRankLevel)) {
                 ServiceLogger.demotedTo(person, getDate());
             }
         }

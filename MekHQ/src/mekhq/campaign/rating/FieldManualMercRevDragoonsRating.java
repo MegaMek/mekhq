@@ -182,7 +182,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
         getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG, "Unit " + u.getName() + " updating tech support needs.");
 
-        double timeMult = 1;
+        double timeMult = 1.0;
         int needed = 0;
         if (getCampaign().getCampaignOptions().useQuirks()) {
             if (en.hasQuirk("easy_maintain")) {
@@ -197,8 +197,9 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                 timeMult = 1.2;
             }
         }
+
         if (en instanceof Mech) {
-            needed += (Math.floor(en.getWeight() / 5) + 40) * timeMult;
+            needed += (int) Math.ceil((Math.floor(en.getWeight() / 5) + 40) * timeMult);
             getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                             "Unit " + u.getName() + " needs " +
                             needed + " mech tech hours.");
@@ -209,42 +210,42 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             updateDropJumpShipSupportNeeds(en);
         } else if ((en instanceof SmallCraft)) {
             if (en.getWeight() >= 50000) {
-                needed += (Math.floor(en.getWeight() / 50) + 20) * timeMult;
+                needed += (int) Math.ceil((Math.floor(en.getWeight() / 50) + 20) * timeMult);
             } else if (en.getWeight() >= 16000) {
-                needed += (Math.floor(en.getWeight() / 25) + 40) * timeMult;
+                needed += (int) Math.ceil((Math.floor(en.getWeight() / 25) + 40) * timeMult);
             } else {
-                needed += (Math.floor(en.getWeight() / 10) + 80) * timeMult;
+                needed += (int) Math.ceil((Math.floor(en.getWeight() / 10) + 80) * timeMult);
             }
             getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                             "Unit " + u.getName() + " needs " +
                             needed + " small craft tech hours.");
             smallCraftSupportNeeded += needed;
         } else if (en instanceof ConvFighter) {
-            needed += (Math.floor(en.getWeight() / 2.5) + 20) * timeMult;
+            needed += (int) Math.ceil((Math.floor(en.getWeight() / 2.5) + 20) * timeMult);
             getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                             "Unit " + u.getName() + " needs " +
                             needed + " conv. fighter tech hours.");
             convFighterSupportNeeded += needed;
         } else if (en instanceof Aero) {
-            needed += (Math.floor(en.getWeight() / 2.5) + 40) * timeMult;
+            needed += (int) Math.ceil((Math.floor(en.getWeight() / 2.5) + 40) * timeMult);
             getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                             "Unit " + u.getName() + " needs " +
                             needed + " aero tech hours.");
             aeroFighterSupportNeeded += needed;
         } else if (en instanceof VTOL) {
-            needed += (Math.floor(en.getWeight() / 5) + 30) * timeMult;
+            needed += (int) Math.ceil((Math.floor(en.getWeight() / 5) + 30) * timeMult);
             getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                             "Unit " + u.getName() + " needs " +
                             needed + " VTOL tech hours.");
             vtolSupportNeeded += needed;
         } else if (en instanceof Tank) {
-            needed += (Math.floor(en.getWeight() / 5) + 20) * timeMult;
+            needed += (int) Math.ceil((Math.floor(en.getWeight() / 5) + 20) * timeMult);
             getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                             "Unit " + u.getName() + " needs " +
                             needed + " tank tech hours.");
             tankSupportNeeded += needed;
         } else if (en instanceof BattleArmor) {
-            needed += ((en.getTotalArmor() * 2) + 5) * timeMult;
+            needed += (int) Math.ceil(((en.getTotalArmor() * 2) + 5) * timeMult);
             getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                             "Unit " + u.getName() + " needs " +
                             needed + " BA tech hours.");
@@ -289,7 +290,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                         "Unit " + en.getId() + " needs " + hours +
                         " ship tech hours.");
 
-        dropJumpShipSupportNeeded += hours;
+        dropJumpShipSupportNeeded += (int) Math.ceil(hours);
     }
 
     // The wording on this in FM:Mr is rather confusing.  Near as I can parse
@@ -305,7 +306,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         int activePersonnelCount = getCampaign().getActivePersonnel().size();
 
         // Calculated based on 7-person squads
-        int numSquads = (int) (activePersonnelCount / 7); // integer division intended
+        int numSquads = activePersonnelCount / 7; // integer division intended
         // each squad takes 4.4 hours (3 + 7/5) rounded to the nearest hour
         medSupportNeeded = numSquads * 4;
         int leftOver = activePersonnelCount - (numSquads * 7);

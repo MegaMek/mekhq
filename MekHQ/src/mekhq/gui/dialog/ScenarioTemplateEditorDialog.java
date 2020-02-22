@@ -1277,6 +1277,14 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
             valBuilder.append("Non-artillery units cannot be deployed off board.");
         }
+        
+        if(cboMinWeightClass.getSelectedIndex() > cboMaxWeightClass.getSelectedIndex()) {
+            if(valBuilder.length() > 0) {
+                valBuilder.append("\n");
+            }
+
+            valBuilder.append("Min weight class is greater than max weight class.");
+        }
 
         /*if(scenarioTemplate.scenarioForces.containsKey(txtForceName.getText())) {
             if(valBuilder.length() > 0) {

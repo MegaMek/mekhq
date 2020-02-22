@@ -18,18 +18,13 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -420,13 +415,14 @@ public class MekHQ implements GameListener {
             }
 			final String logFilename = "logs" + File.separator + "mekhqlog.txt";
 			MegaMek.resetLogFile(logFilename);
-			PrintStream ps = new PrintStream(
-					new BufferedOutputStream(
-							new FileOutputStream(logFilename,
-												 true),
-							64));
-			System.setOut(ps);
+            OutputStream os = new FileOutputStream(logFilename, true);
+            BufferedOutputStream bos = new BufferedOutputStream(os, 64);
+			PrintStream ps = new PrintStream(bos);
+            System.setOut(ps);
             System.setErr(ps);
+            ps.close();
+            bos.close();
+            os.close();
         } catch (Exception e) {
             System.err.println("Unable to redirect output to mekhqlog.txt"); //$NON-NLS-1$
             e.printStackTrace();
@@ -774,7 +770,7 @@ public class MekHQ implements GameListener {
         SwingUtilities.invokeLater(runnable);
     }
 
-    private class MekHqPropertyChangedListener implements PropertyChangeListener {
+    private static class MekHqPropertyChangedListener implements PropertyChangeListener {
         public void propertyChange(PropertyChangeEvent evt) {
             if (evt.getSource() == selectedTheme) {
                 setLookAndFeel((String)evt.getNewValue());

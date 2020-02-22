@@ -1,6 +1,5 @@
 package mekhq.gui;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Image;
 import java.util.UUID;
@@ -24,7 +23,8 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
 
     private static final long serialVersionUID = -553191867660269247L;
 
-    private IconPackage icons;
+    private final IconPackage icons;
+    private final MekHqColors colors = new MekHqColors();
 
     public ForceRenderer(IconPackage i) {
         icons = i;
@@ -133,12 +133,14 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             }
             setText("<html>" + name + ", " + uname + c3network + transport + "</html>");
             if(u.isDeployed() && !sel) {
-                setBackground(Color.LIGHT_GRAY);
+                colors.getDeployed().getColor().ifPresent(c -> setBackground(c));
+                colors.getDeployed().getAlternateColor().ifPresent(c -> setForeground(c));
             }
         }
         if(value instanceof Force) {
             if(!hasFocus && ((Force)value).isDeployed()) {
-                setBackground(Color.LIGHT_GRAY);
+                colors.getDeployed().getColor().ifPresent(c -> setBackground(c));
+                colors.getDeployed().getAlternateColor().ifPresent(c -> setForeground(c));
             }
         }
         setIcon(getIcon(value));

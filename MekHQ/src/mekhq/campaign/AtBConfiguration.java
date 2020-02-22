@@ -22,6 +22,7 @@ package mekhq.campaign;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -57,7 +58,7 @@ import mekhq.campaign.universe.Faction;
 
 /**
  * @author Neoancient
- * 
+ *
  * Class that handles configuration options for Against the Bot campaigns
  * more extensive than what is handled by CampaignOptions. Most of the options
  * fall into one of two categories: they allow users to customize the various
@@ -67,7 +68,7 @@ import mekhq.campaign.universe.Faction;
 public class AtBConfiguration implements Serializable {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 515628415152924457L;
 
@@ -75,6 +76,13 @@ public class AtBConfiguration implements Serializable {
     public static final String ORG_IS = "IS";
     public static final String ORG_CLAN = "CLAN";
     public static final String ORG_CS = "CS";
+    
+    public static final char WEIGHT_ULTRA_LIGHT = 'U';
+    public static final char WEIGHT_LIGHT = 'L';
+    public static final char WEIGHT_MEDIUM = 'M';
+    public static final char WEIGHT_HEAVY = 'H';
+    public static final char WEIGHT_ASSAULT = 'A';
+    public static final char WEIGHT_SUPER_HEAVY = 'V';
 
     /* Scenario generation */
     private HashMap<String,ArrayList<WeightedTable<String>>> botForceTables = new HashMap<>();
@@ -284,10 +292,12 @@ public class AtBConfiguration implements Serializable {
      */
     public static int decodeWeightStr(String s, int i) {
         switch (s.charAt(i)) {
-        case 'L': return EntityWeightClass.WEIGHT_LIGHT;
-        case 'M': return EntityWeightClass.WEIGHT_MEDIUM;
-        case 'H': return EntityWeightClass.WEIGHT_HEAVY;
-        case 'A': return EntityWeightClass.WEIGHT_ASSAULT;
+        case WEIGHT_ULTRA_LIGHT : return EntityWeightClass.WEIGHT_ULTRA_LIGHT;
+        case WEIGHT_LIGHT : return EntityWeightClass.WEIGHT_LIGHT;
+        case WEIGHT_MEDIUM : return EntityWeightClass.WEIGHT_MEDIUM;
+        case WEIGHT_HEAVY : return EntityWeightClass.WEIGHT_HEAVY;
+        case WEIGHT_ASSAULT : return EntityWeightClass.WEIGHT_ASSAULT;
+        case WEIGHT_SUPER_HEAVY : return EntityWeightClass.WEIGHT_SUPER_HEAVY;
         }
         return 0;
     }
@@ -367,7 +377,7 @@ public class AtBConfiguration implements Serializable {
         target.addModifier(SkillType.EXP_REGULAR - adminLogExp, "Admin/Logistics");
         target.addModifier(IUnitRating.DRAGOON_C - campaign.getUnitRatingMod(),
                 "Unit Rating");
-        return target;    	
+        return target;
     }
 
     public MechSummary findShip(int unitType) {
@@ -397,11 +407,10 @@ public class AtBConfiguration implements Serializable {
                 "Starting load of AtB configuration data from XML..."); //$NON-NLS-1$
 
         Document xmlDoc;
-        try {
-            FileInputStream fis = new FileInputStream("data/universe/atbconfig.xml");
+        try (InputStream is = new FileInputStream("data/universe/atbconfig.xml")) {
             DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
-            xmlDoc = db.parse(fis);
+            xmlDoc = db.parse(is);
         } catch (FileNotFoundException ex) {
             MekHQ.getLogger().log(AtBConfiguration.class, METHOD_NAME, LogLevel.INFO,
                     "File data/universe/atbconfig.xml not found. Loading defaults."); //$NON-NLS-1$
@@ -487,7 +496,7 @@ public class AtBConfiguration implements Serializable {
                     MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                             "Could not parse weight class attribute for enemy forces table"); //$NON-NLS-1$
                     MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
-                }							
+                }
             }
         }
         return retVal;
@@ -538,7 +547,7 @@ public class AtBConfiguration implements Serializable {
                 break;
             case "target":
                 if (wn.getAttributes().getNamedItem("unitType") != null) {
-                    Integer target = Integer.valueOf(wn.getTextContent());
+                    int target = Integer.parseInt(wn.getTextContent());
                     switch (wn.getAttributes().getNamedItem("unitType").getTextContent()) {
                     case "Dropship":
                         dropshipSearchTarget = target;
@@ -648,8 +657,8 @@ public class AtBConfiguration implements Serializable {
         }
 
         /**
-         * 
-         * @param d
+         *
+         * @param d date to check
          * @return true if d is between the start and end date, inclusive
          */
         public boolean fitsDate(Date d) {
@@ -660,7 +669,7 @@ public class AtBConfiguration implements Serializable {
 
     static class WeightedTable<T> implements Serializable {
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = 1984759212668176620L;
 

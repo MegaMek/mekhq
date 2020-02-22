@@ -825,8 +825,7 @@ public class CampaignGUI extends JPanel {
             }
         });
         menuMarket.add(miContractMarket);
-        miContractMarket.setVisible(getCampaign().getCampaignOptions()
-                .getUseAtB());
+        miContractMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
 
         miUnitMarket = new JMenuItem("Unit Market...");
         miUnitMarket.addActionListener(new java.awt.event.ActionListener() {
@@ -1797,19 +1796,11 @@ public class CampaignGUI extends JPanel {
     }
 
     private void miLoadForcesActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miLoadForcesActionPerformed
-        try {
-            loadListFile(true);
-        } catch (IOException ex) {
-            MekHQ.getLogger().error(getClass(), "miLoadForcesActionPerformed(ActionEvent)", ex);
-        }
+        loadListFile(true);
     }// GEN-LAST:event_miLoadForcesActionPerformed
 
     private void miImportPersonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miImportPersonActionPerformed
-        try {
-            loadPersonFile();
-        } catch (IOException ex) {
-            MekHQ.getLogger().error(getClass(), "miImportPersonActionPerformed(ActionEvent)", ex);
-        }
+        loadPersonFile();
     }// GEN-LAST:event_miImportPersonActionPerformed
 
     public void miExportPersonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miExportPersonActionPerformed
@@ -1861,19 +1852,11 @@ public class CampaignGUI extends JPanel {
     }
 
     private void miImportOptionsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miExportPersonActionPerformed
-        try {
-            loadOptionsFile();
-        } catch (IOException ex) {
-            MekHQ.getLogger().error(getClass(), "miImportOptionsActionPerformed(ActionEvent)", ex);
-        }
+        loadOptionsFile();
     }// GEN-LAST:event_miExportPersonActionPerformed
 
     private void miImportPartsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miImportPersonActionPerformed
-        try {
-            loadPartsFile();
-        } catch (IOException ex) {
-            MekHQ.getLogger().error(getClass(), "miImportPartsActionPerformed(ActionEvent)", ex);
-        }
+        loadPartsFile();
     }// GEN-LAST:event_miImportPersonActionPerformed
 
     public void miExportPartsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miExportPersonActionPerformed
@@ -2244,7 +2227,7 @@ public class CampaignGUI extends JPanel {
         return file;
     }
 
-    protected void loadListFile(boolean allowNewPilots) throws IOException {
+    protected void loadListFile(boolean allowNewPilots) {
         final String METHOD_NAME = "loadListFile(boolean)";
 
         File unitFile = FileDialogs.openUnits(frame).orElse(null);
@@ -2256,16 +2239,10 @@ public class CampaignGUI extends JPanel {
             MULParser parser = new MULParser();
 
             // Open up the file.
-            InputStream listStream = new FileInputStream(unitFile);
-
-            // Read a Vector from the file.
-            try {
+            try (InputStream listStream = new FileInputStream(unitFile)) {
                 parser.parse(listStream);
-                listStream.close();
             } catch (Exception excep) {
                 excep.printStackTrace(System.err);
-                // throw new IOException("Unable to read from: " +
-                // unitFile.getName());
             }
 
             // Was there any error in parsing?
@@ -2279,36 +2256,34 @@ public class CampaignGUI extends JPanel {
                 getCampaign().addUnit(entity, allowNewPilots, 0);
             }
 
-            // add any ejected pilots
-            for (Crew pilot : parser.getPilots()) {
-                if (pilot.isEjected()) {
+            // TODO : re-add any ejected pilots
+//            for (Crew pilot : parser.getPilots()) {
+//                if (pilot.isEjected()) {
                     // getCampaign().addPilot(pilot, PilotPerson.T_MECHWARRIOR,
                     // false);
-                }
-            }
+//                }
+//            }
         }
     }
 
-    protected void loadPersonFile() throws IOException {
+    protected void loadPersonFile() {
         final String METHOD_NAME = "loadPersonFile()";
 
         File personnelFile = FileDialogs.openPersonnel(frame).orElse(null);
 
         if (personnelFile != null) {
-            // Open up the file.
-            InputStream fis = new FileInputStream(personnelFile);
-
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                     "Starting load of personnel file from XML..."); //$NON-NLS-1$
             // Initialize variables.
             Document xmlDoc = null;
 
-            try {
+            // Open up the file.
+            try (InputStream is = new FileInputStream(personnelFile)) {
                 // Using factory get an instance of document builder
                 DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
                 // Parse using builder to get DOM representation of the XML file
-                xmlDoc = db.parse(fis);
+                xmlDoc = db.parse(is);
             } catch (Exception ex) {
                 MekHQ.getLogger().error(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
             }
@@ -2535,7 +2510,7 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    protected void loadPartsFile() throws IOException {
+    protected void loadPartsFile() {
         final String METHOD_NAME = "loadPartsFile()";
 
         Optional<File> maybeFile = FileDialogs.openParts(frame);
@@ -2546,66 +2521,61 @@ public class CampaignGUI extends JPanel {
 
         File partsFile = maybeFile.get();
 
-        if (partsFile != null) {
-            // Open up the file.
-            InputStream fis = new FileInputStream(partsFile);
+        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
+                "Starting load of parts file from XML..."); //$NON-NLS-1$
+        // Initialize variables.
+        Document xmlDoc = null;
 
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
-                    "Starting load of parts file from XML..."); //$NON-NLS-1$
-            // Initialize variables.
-            Document xmlDoc = null;
+        try (InputStream is = new FileInputStream(partsFile)) {
+            // Using factory get an instance of document builder
+            DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
-            try {
-                // Using factory get an instance of document builder
-                DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
-
-                // Parse using builder to get DOM representation of the XML file
-                xmlDoc = db.parse(fis);
-            } catch (Exception ex) {
-                MekHQ.getLogger().error(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
-            }
-
-            Element partsEle = xmlDoc.getDocumentElement();
-            NodeList nl = partsEle.getChildNodes();
-
-            // Get rid of empty text nodes and adjacent text nodes...
-            // Stupid weird parsing of XML. At least this cleans it up.
-            partsEle.normalize();
-
-            Version version = new Version(partsEle.getAttribute("version"));
-
-            // we need to iterate through three times, the first time to collect
-            // any custom units that might not be written yet
-            for (int x = 0; x < nl.getLength(); x++) {
-                Node wn2 = nl.item(x);
-
-                // If it's not an element node, we ignore it.
-                if (wn2.getNodeType() != Node.ELEMENT_NODE) {
-                    continue;
-                }
-
-                if (!wn2.getNodeName().equalsIgnoreCase("part")) {
-                    // Error condition of sorts!
-                    // Errr, what should we do here?
-                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR, //$NON-NLS-1$
-                            "Unknown node type not loaded in Parts nodes: " //$NON-NLS-1$
-                            + wn2.getNodeName());
-
-                    continue;
-                }
-
-                Part p = Part.generateInstanceFromXML(wn2, version);
-                if (p != null) {
-                    p.setCampaign(getCampaign());
-                    getCampaign().addPartWithoutId(p);
-                }
-            }
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
-                    "Finished load of parts file"); //$NON-NLS-1$
+            // Parse using builder to get DOM representation of the XML file
+            xmlDoc = db.parse(is);
+        } catch (Exception ex) {
+            MekHQ.getLogger().error(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
         }
+
+        Element partsEle = xmlDoc.getDocumentElement();
+        NodeList nl = partsEle.getChildNodes();
+
+        // Get rid of empty text nodes and adjacent text nodes...
+        // Stupid weird parsing of XML. At least this cleans it up.
+        partsEle.normalize();
+
+        Version version = new Version(partsEle.getAttribute("version"));
+
+        // we need to iterate through three times, the first time to collect
+        // any custom units that might not be written yet
+        for (int x = 0; x < nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
+
+            // If it's not an element node, we ignore it.
+            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            if (!wn2.getNodeName().equalsIgnoreCase("part")) {
+                // Error condition of sorts!
+                // Errr, what should we do here?
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR, //$NON-NLS-1$
+                        "Unknown node type not loaded in Parts nodes: " //$NON-NLS-1$
+                        + wn2.getNodeName());
+
+                continue;
+            }
+
+            Part p = Part.generateInstanceFromXML(wn2, version);
+            if (p != null) {
+                p.setCampaign(getCampaign());
+                getCampaign().addPartWithoutId(p);
+            }
+        }
+        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
+                "Finished load of parts file"); //$NON-NLS-1$
     }
 
-    protected void loadOptionsFile() throws IOException {
+    protected void loadOptionsFile() {
         final String METHOD_NAME = "loadOptionsFile()";
 
         Optional<File> maybeFile = FileDialogs.openCampaignOptions(frame);
@@ -2616,124 +2586,119 @@ public class CampaignGUI extends JPanel {
 
         File optionsFile = maybeFile.get();
 
-        if (optionsFile != null) {
-            // Open up the file.
-            InputStream fis = new FileInputStream(optionsFile);
+        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
+                "Starting load of options file from XML..."); //$NON-NLS-1$
+        // Initialize variables.
+        Document xmlDoc = null;
 
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
-                    "Starting load of options file from XML..."); //$NON-NLS-1$
-            // Initialize variables.
-            Document xmlDoc = null;
+        try (InputStream is = new FileInputStream(optionsFile)) {
+            // Using factory get an instance of document builder
+            DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
-            try {
-                // Using factory get an instance of document builder
-                DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
-
-                // Parse using builder to get DOM representation of the XML file
-                xmlDoc = db.parse(fis);
-            } catch (Exception ex) {
-                MekHQ.getLogger().error(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
-            }
-
-            Element partsEle = xmlDoc.getDocumentElement();
-            NodeList nl = partsEle.getChildNodes();
-
-            // Get rid of empty text nodes and adjacent text nodes...
-            // Stupid weird parsing of XML. At least this cleans it up.
-            partsEle.normalize();
-
-            Version version = new Version(partsEle.getAttribute("version"));
-
-            CampaignOptions options = null;
-            RandomSkillPreferences rsp = null;
-
-            // we need to iterate through three times, the first time to collect
-            // any custom units that might not be written yet
-            for (int x = 0; x < nl.getLength(); x++) {
-                Node wn = nl.item(x);
-
-                // If it's not an element node, we ignore it.
-                if (wn.getNodeType() != Node.ELEMENT_NODE) {
-                    continue;
-                }
-
-                String xn = wn.getNodeName();
-
-                if (xn.equalsIgnoreCase("campaignOptions")) {
-                    options = CampaignOptions
-                            .generateCampaignOptionsFromXml(wn);
-                } else if (xn.equalsIgnoreCase("randomSkillPreferences")) {
-                    rsp = RandomSkillPreferences
-                            .generateRandomSkillPreferencesFromXml(wn);
-                } else if (xn.equalsIgnoreCase("skillTypes")) {
-                    NodeList wList = wn.getChildNodes();
-
-                    // Okay, lets iterate through the children, eh?
-                    for (int x2 = 0; x2 < wList.getLength(); x2++) {
-                        Node wn2 = wList.item(x2);
-
-                        // If it's not an element node, we ignore it.
-                        if (wn2.getNodeType() != Node.ELEMENT_NODE) {
-                            continue;
-                        }
-
-                        if (wn2.getNodeName().startsWith("ability-")) {
-                            continue;
-                        } else if (!wn2.getNodeName().equalsIgnoreCase(
-                                "skillType")) {
-                            // Error condition of sorts!
-                            // Errr, what should we do here?
-                            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR, //$NON-NLS-1$
-                                    "Unknown node type not loaded in Skill Type nodes: " //$NON-NLS-1$
-                                    + wn2.getNodeName());
-
-                            continue;
-                        }
-                        SkillType.generateInstanceFromXML(wn2, version);
-                    }
-                } else if (xn.equalsIgnoreCase("specialAbilities")) {
-                    PilotOptions poptions = new PilotOptions();
-                    SpecialAbility.clearSPA();
-
-                    NodeList wList = wn.getChildNodes();
-
-                    // Okay, lets iterate through the children, eh?
-                    for (int x2 = 0; x2 < wList.getLength(); x2++) {
-                        Node wn2 = wList.item(x2);
-
-                        // If it's not an element node, we ignore it.
-                        if (wn2.getNodeType() != Node.ELEMENT_NODE) {
-                            continue;
-                        }
-
-                        if (!wn2.getNodeName().equalsIgnoreCase("ability")) {
-                            // Error condition of sorts!
-                            // Errr, what should we do here?
-                            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR, //$NON-NLS-1$
-                                    "Unknown node type not loaded in Special Ability nodes: " //$NON-NLS-1$
-                                    + wn2.getNodeName());
-
-                            continue;
-                        }
-
-                        SpecialAbility.generateInstanceFromXML(wn2, poptions,
-                                null);
-                    }
-                }
-
-            }
-
-            if (null != options) {
-                this.getCampaign().setCampaignOptions(options);
-            }
-            if (null != rsp) {
-                this.getCampaign().setRandomSkillPreferences(rsp);
-            }
-
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
-                    "Finished load of campaign options file"); //$NON-NLS-1$
-            MekHQ.triggerEvent(new OptionsChangedEvent(getCampaign(), options));
+            // Parse using builder to get DOM representation of the XML file
+            xmlDoc = db.parse(is);
+        } catch (Exception ex) {
+            MekHQ.getLogger().error(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
         }
+
+        Element partsEle = xmlDoc.getDocumentElement();
+        NodeList nl = partsEle.getChildNodes();
+
+        // Get rid of empty text nodes and adjacent text nodes...
+        // Stupid weird parsing of XML. At least this cleans it up.
+        partsEle.normalize();
+
+        Version version = new Version(partsEle.getAttribute("version"));
+
+        CampaignOptions options = null;
+        RandomSkillPreferences rsp = null;
+
+        // we need to iterate through three times, the first time to collect
+        // any custom units that might not be written yet
+        for (int x = 0; x < nl.getLength(); x++) {
+            Node wn = nl.item(x);
+
+            // If it's not an element node, we ignore it.
+            if (wn.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            String xn = wn.getNodeName();
+
+            if (xn.equalsIgnoreCase("campaignOptions")) {
+                options = CampaignOptions
+                        .generateCampaignOptionsFromXml(wn);
+            } else if (xn.equalsIgnoreCase("randomSkillPreferences")) {
+                rsp = RandomSkillPreferences
+                        .generateRandomSkillPreferencesFromXml(wn);
+            } else if (xn.equalsIgnoreCase("skillTypes")) {
+                NodeList wList = wn.getChildNodes();
+
+                // Okay, lets iterate through the children, eh?
+                for (int x2 = 0; x2 < wList.getLength(); x2++) {
+                    Node wn2 = wList.item(x2);
+
+                    // If it's not an element node, we ignore it.
+                    if (wn2.getNodeType() != Node.ELEMENT_NODE) {
+                        continue;
+                    }
+
+                    if (wn2.getNodeName().startsWith("ability-")) {
+                        continue;
+                    } else if (!wn2.getNodeName().equalsIgnoreCase(
+                            "skillType")) {
+                        // Error condition of sorts!
+                        // Errr, what should we do here?
+                        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR, //$NON-NLS-1$
+                                "Unknown node type not loaded in Skill Type nodes: " //$NON-NLS-1$
+                                + wn2.getNodeName());
+
+                        continue;
+                    }
+                    SkillType.generateInstanceFromXML(wn2, version);
+                }
+            } else if (xn.equalsIgnoreCase("specialAbilities")) {
+                PilotOptions poptions = new PilotOptions();
+                SpecialAbility.clearSPA();
+
+                NodeList wList = wn.getChildNodes();
+
+                // Okay, lets iterate through the children, eh?
+                for (int x2 = 0; x2 < wList.getLength(); x2++) {
+                    Node wn2 = wList.item(x2);
+
+                    // If it's not an element node, we ignore it.
+                    if (wn2.getNodeType() != Node.ELEMENT_NODE) {
+                        continue;
+                    }
+
+                    if (!wn2.getNodeName().equalsIgnoreCase("ability")) {
+                        // Error condition of sorts!
+                        // Errr, what should we do here?
+                        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR, //$NON-NLS-1$
+                                "Unknown node type not loaded in Special Ability nodes: " //$NON-NLS-1$
+                                + wn2.getNodeName());
+
+                        continue;
+                    }
+
+                    SpecialAbility.generateInstanceFromXML(wn2, poptions,
+                            null);
+                }
+            }
+
+        }
+
+        if (null != options) {
+            this.getCampaign().setCampaignOptions(options);
+        }
+        if (null != rsp) {
+            this.getCampaign().setRandomSkillPreferences(rsp);
+        }
+
+        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
+                "Finished load of campaign options file"); //$NON-NLS-1$
+        MekHQ.triggerEvent(new OptionsChangedEvent(getCampaign(), options));
 
         refreshCalendar();
         getCampaign().reloadNews();
