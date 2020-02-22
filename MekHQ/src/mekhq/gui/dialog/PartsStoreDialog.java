@@ -239,13 +239,16 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         JButton btnAdd;
         JButton btnClose;
         if (addToCampaign) {
-            btnAdd = new JButton(resourceMap.getString("btnAdd.text"));
-            btnAdd.addActionListener(evt -> {
+            panButtons.setLayout(new GridBagLayout());
+
+            //region Buy
+            JButton btnBuy = new JButton(resourceMap.getString("btnBuy.text"));
+            btnBuy.addActionListener(evt -> {
                 if (partsTable.getSelectedRowCount() > 0) {
                     int[] selectedRow = partsTable.getSelectedRows();
                     for (int i : selectedRow) {
                         PartProxy partProxy = partsModel.getPartProxyAt(partsTable.convertRowIndexToModel(i));
-                        addPart(false, partProxy.getPart(), 1);
+                        addPart(true, partProxy.getPart(), 1);
                         partProxy.updateTargetAndInventories();
                         partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TARGET);
                         partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TRANSIT);
@@ -254,7 +257,10 @@ public class PartsStoreDialog extends javax.swing.JDialog {
                     }
                 }
             });
-            btnAdd.setEnabled(campaign.isGM());
+            panButtons.add(btnBuy, new GridBagConstraints());
+            //endregion Buy
+
+            //region Buy Bulk
             JButton btnBuyBulk = new JButton(resourceMap.getString("btnBuyBulk.text"));
             btnBuyBulk.addActionListener(evt -> {
                 if (partsTable.getSelectedRowCount() > 0) {
@@ -275,22 +281,12 @@ public class PartsStoreDialog extends javax.swing.JDialog {
                     }
                 }
             });
-            JButton btnBuy = new JButton(resourceMap.getString("btnBuy.text"));
-            btnBuy.addActionListener(evt -> {
-                if (partsTable.getSelectedRowCount() > 0) {
-                    int[] selectedRow = partsTable.getSelectedRows();
-                    for (int i : selectedRow) {
-                        PartProxy partProxy = partsModel.getPartProxyAt(partsTable.convertRowIndexToModel(i));
-                        addPart(true, partProxy.getPart(), 1);
-                        partProxy.updateTargetAndInventories();
-                        partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TARGET);
-                        partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TRANSIT);
-                        partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_SUPPLY);
-                        partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_QUEUE);            }
-                    }
-                });
-            btnUseBonusPart = new JButton();
+            panButtons.add(btnBuyBulk, new GridBagConstraints());
+            //endregion Buy Bulk
+
+            //region Bonus Part
             if (campaign.getCampaignOptions().getUseAtB()) {
+                btnUseBonusPart = new JButton();
                 btnUseBonusPart.setText(resourceMap.getString("useBonusPart.text") + " (" + campaign.totalBonusParts() + ")");
                 btnUseBonusPart.addActionListener(evt -> {
                     if (partsTable.getSelectedRowCount() > 0) {
@@ -313,16 +309,43 @@ public class PartsStoreDialog extends javax.swing.JDialog {
                     }
                 });
                 btnUseBonusPart.setVisible(campaign.totalBonusParts() > 0);
-            }
-            btnClose = new JButton(resourceMap.getString("btnClose.text"));
-            btnClose.addActionListener(evt -> setVisible(false));
-            panButtons.setLayout(new GridBagLayout());
-            panButtons.add(btnBuyBulk, new GridBagConstraints());
-            panButtons.add(btnBuy, new GridBagConstraints());
-            if (campaign.getCampaignOptions().getUseAtB()) {
+
                 panButtons.add(btnUseBonusPart, new GridBagConstraints());
             }
-            panButtons.add(btnAdd, new GridBagConstraints());
+            //endregion Bonus Part
+
+            //region Add
+            btnAdd = new JButton(resourceMap.getString("btnAdd.text"));
+            btnAdd.addActionListener(evt -> {
+                if (partsTable.getSelectedRowCount() > 0) {
+                    int[] selectedRow = partsTable.getSelectedRows();
+                    for (int i : selectedRow) {
+                        PartProxy partProxy = partsModel.getPartProxyAt(partsTable.convertRowIndexToModel(i));
+                        addPart(false, partProxy.getPart(), 1);
+                        partProxy.updateTargetAndInventories();
+                        partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TARGET);
+                        partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_TRANSIT);
+                        partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_SUPPLY);
+                        partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i), PartsTableModel.COL_QUEUE);
+                    }
+                }
+            });
+            if (campaign.isGM()) {
+                panButtons.add(btnAdd, new GridBagConstraints());
+            }
+            //endregion Add
+
+            //region Add Bulk
+            if (campaign.isGM()) {
+                panButtons.add(btnAddBulk, new GridBagConstraints());
+            }
+            //endregion Add Bulk
+
+            //region Button Close
+            btnClose = new JButton(resourceMap.getString("btnClose.text"));
+            btnClose.addActionListener(evt -> setVisible(false));
+            panButtons.add(btnClose, new GridBagConstraints());
+            //endregion Button Close
         } else {
             //if we aren't adding the unit to the campaign, then different buttons
             btnAdd = new JButton("Add");
@@ -337,8 +360,9 @@ public class PartsStoreDialog extends javax.swing.JDialog {
                 selectedPart = null;
                 setVisible(false);
             });
+            panButtons.add(btnClose, new GridBagConstraints());
         }
-        panButtons.add(btnClose, new GridBagConstraints());
+
         getContentPane().add(panButtons, BorderLayout.PAGE_END);
         this.setPreferredSize(new Dimension(700,600));
         pack();
