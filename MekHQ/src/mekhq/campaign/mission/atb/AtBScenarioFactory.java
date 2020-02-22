@@ -133,13 +133,13 @@ public class AtBScenarioFactory {
     }
 
     /**
-     * Iterate through the list of lances and make a battle roll for each,
+     * Iterate through the list of lances and make a scenario roll for each,
      * then sort them by date before adding them to the campaign.
      * Contracts with enemy morale level of invincible have a base attack
-     * (defender) battle each week. If there is a base attack (attacker)
-     * battle, that is the only one for the week on that mission.
+     * (defender) scenario each week. If there is a base attack (attacker)
+     * scenario, that is the only one for the week on that contracts.
      *
-     * Note that this handles having multiple missions at the same time
+     * Note that this handles having multiple active contracts at the same time
      * @param c the campaign for which to generate scenarios
      */
     public static void createScenariosForNewWeek(Campaign c) {
@@ -167,10 +167,12 @@ public class AtBScenarioFactory {
             //endregion Value Initialization
 
             //region Current Scenarios
-            // Determine active scenarios
-            Iterator<Scenario> iter = atbContract.getScenarios().iterator();
-            while (iter.hasNext()) {
-                Scenario scenario = iter.next();
+            // Determine active scenarios, to ensure we don't generate a scenario for an already
+            // assigned lance and to remove any currently active scenarios from the contract, so that
+            // the generation rules are followed for all active scenarios not just new scenarios
+            Iterator<Scenario> iterator = atbContract.getScenarios().iterator();
+            while (iterator.hasNext()) {
+                Scenario scenario = iterator.next();
                 if (!scenario.isCurrent() || !AtBScenario.class.isAssignableFrom(scenario.getClass())) {
                     continue; //if not current or not assignable to an AtB scenario, then we don't care about it
                 }
@@ -181,7 +183,7 @@ public class AtBScenarioFactory {
                 assignedLances.add(atbScenario.getLanceForceId());
 
                 // Remove any active scenarios from the contract, and add them to the current scenarios list instead
-                iter.remove();
+                iterator.remove();
                 sList.add(atbScenario);
                 dontGenerateForces.add(atbScenario.getId());
 
@@ -198,32 +200,44 @@ public class AtBScenarioFactory {
             //endregion Current Scenarios
 
             //region Generate Scenarios
-            // Generate scenarios for lances based on whether the situation fits
+            // Generate scenarios for lances based on their current situation
             if (!hasBaseAttackAttacker) {
                 for (Lance lance : lances.values()) {
-                    // Don't generate again for any lances already assigned, assigned to a different
-                    // mission, or illegible lances
+                    // Don't generate scenarios for any lances already assigned, those assigned to a
+                    // different contract, those not assigned to a contract, or for illegible lances
                     if (assignedLances.contains(lance.getForceId()) || (lance.getContract(c) == null)
                             || !lance.isEligible(c) || !lance.getContract(c).isActive()
-                            || !(lance.getMissionId() == atbContract.getId())
+                            || (lance.getMissionId() != atbContract.getId())
                             || c.getDate().before(lance.getContract(c).getStartDate())) {
                         continue;
                     }
 
+                    // Assign training experience
                     if (lance.getRole() == Lance.ROLE_TRAINING) {
                         c.awardTrainingXP(lance);
                     }
 
-                    if (lance.getContract(c).getMoraleLevel() <= AtBContract.MORALE_VERYLOW) {
+                    // Don't generate scenarios for contracts with morale below the morale limit
+                    if (atbContract.getMoraleLevel() <= AtBContract.MORALE_VERYLOW) {
                         continue;
                     }
 
+                    // Attempt to generate a scenario for the lance
                     AtBScenario atbScenario = lance.checkForBattle(c);
+
+                    // If one is generated, then add it to the scenario list
                     if (atbScenario != null) {
                         sList.add(atbScenario);
                         assignedLances.add(lance.getForceId());
+
+                        // We care if the scenario is a Base Attack, as one must be generated if the
+                        // current contract's morale is Invincible
                         if (atbScenario.getScenarioType() == AtBScenario.BASEATTACK) {
                             hasBaseAttack = true;
+
+                            // If a Base Attack (Attacker) scenario is generated, this is the only
+                            // scenario that will take place this week for this contract. We can
+                            // therefore break out of the loop
                             if (atbScenario.isAttacker()) {
                                 hasBaseAttackAttacker = true;
                                 break;
@@ -243,7 +257,8 @@ public class AtBScenarioFactory {
                  */
                 List<Lance> lList = new ArrayList<>();
                 for (Lance l : lances.values()) {
-                    if ((l.getMissionId() == atbContract.getId()) && (l.getRole() == Lance.ROLE_DEFEND) && l.isEligible(c)) {
+                    if ((l.getMissionId() == atbContract.getId()) && (l.getRole() == Lance.ROLE_DEFEND)
+                            && l.isEligible(c)) {
                         lList.add(l);
                     }
                 }
@@ -306,7 +321,8 @@ public class AtBScenarioFactory {
             //endregion Invincible Morale Missions
 
             //region Base Attack (Attacker) Generated
-            // If there is a base attack (attacker), all other currently generated scenarios are cleared
+            // If there is a base attack (attacker), it is the only one for this contract until it happens.
+            // Therefore, all other currently generated scenarios need to be cleared
             if (hasBaseAttackAttacker) {
                 sList.removeIf(atbScenario ->
                         !(atbScenario.isAttacker() && (atbScenario.getScenarioType() == AtBScenario.BASEATTACK)));
@@ -314,7 +330,8 @@ public class AtBScenarioFactory {
             //endregion Base Attack (Attacker) Generated
 
             //region Add to Campaign
-            // Finally, sort the scenarios by date and add to the campaign
+            // Finally, sort the scenarios by date and add to the campaign, and generate forces
+            // for the scenario if required
             sList.sort(Comparator.comparing(Scenario::getDate));
             for (AtBScenario atbScenario : sList) {
                 c.addScenario(atbScenario, atbContract);
