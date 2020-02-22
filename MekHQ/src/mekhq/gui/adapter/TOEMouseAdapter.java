@@ -293,15 +293,13 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
             }
         }
         if (command.contains(UNASSIGN_FROM_SHIP)) {
-            if (!units.isEmpty()) {
-                for (Unit u : units) {
-                    for (UUID oldShipId : u.getTransportShipId().keySet()) {
-                        Unit oldShip = gui.getCampaign().getUnit(oldShipId);
-                        if (oldShip != null) {
-                            oldShip.unloadFromTransportShip(u);
-                            MekHQ.triggerEvent(new UnitChangedEvent(oldShip));
-                            gui.getTOETab().refreshForceView();
-                        }
+            for (Unit u : units) {
+                for (UUID oldShipId : u.getTransportShipId().keySet()) {
+                    Unit oldShip = gui.getCampaign().getUnit(oldShipId);
+                    if (oldShip != null) {
+                       oldShip.unloadFromTransportShip(u);
+                        MekHQ.triggerEvent(new UnitChangedEvent(oldShip));
+                        gui.getTOETab().refreshForceView();
                     }
                 }
             }
