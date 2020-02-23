@@ -1860,11 +1860,14 @@ public class CampaignGUI extends JPanel {
                         MekHQ.getPersonnelDirectory().setValue(f.getParent());
                         File file = checkFileEnding(f, format.getRecommendedExtension());
                         checkToBackupFile(file, file.getPath());
-                        String report = "";
+                        String report;
                         // TODO add support for xml and json export
                         if (format.equals(FileType.CSV)) {
-                            JOptionPane.showMessageDialog(mainPanel, report);
+                            report = Utilities.exportTableToCSV(((PersonnelTab) getTab(GuiTabType.PERSONNEL)).getPersonnelTable(), file);
+                        } else {
+                            report = "Unsupported FileType in Export Personnel";
                         }
+                        JOptionPane.showMessageDialog(mainPanel, report);
                     });
         } else {
             JOptionPane.showMessageDialog(mainPanel, resourceMap.getString("dlgNoPersonnel.text"));
@@ -1889,11 +1892,15 @@ public class CampaignGUI extends JPanel {
                         MekHQ.getUnitsDirectory().setValue(f.getParent());
                         File file = checkFileEnding(f, format.getRecommendedExtension());
                         checkToBackupFile(file, file.getPath());
-                        String report = "";
+                        String report;
                         // TODO add support for xml and json export
                         if (format.equals(FileType.CSV)) {
-                            JOptionPane.showMessageDialog(mainPanel, report);
+                            report = Utilities.exportTableToCSV(((HangarTab) getTab(GuiTabType.HANGAR)).getUnitTable(), file);
+                        } else {
+                            report = "Unsupported FileType in Export Units";
                         }
+                        JOptionPane.showMessageDialog(mainPanel, report);
+
                     });
         } else {
             JOptionPane.showMessageDialog(mainPanel, resourceMap.getString("dlgNoUnits"));
@@ -1918,7 +1925,13 @@ public class CampaignGUI extends JPanel {
                         MekHQ.getFinancesDirectory().setValue(f.getParent());
                         File file = checkFileEnding(f, format.getRecommendedExtension());
                         checkToBackupFile(file, file.getPath());
-                        String report = getCampaign().getFinances().exportFinances(file.getPath(), format.getRecommendedExtension());
+                        String report;
+                        // TODO add support for xml and json export
+                        if (format.equals(FileType.CSV)) {
+                            report = getCampaign().getFinances().exportFinancesToCSV(file.getPath(), format.getRecommendedExtension());
+                        } else {
+                            report = "Unsupported FileType in Export Finances";
+                        }
                         JOptionPane.showMessageDialog(mainPanel, report);
                     });
         } else {
