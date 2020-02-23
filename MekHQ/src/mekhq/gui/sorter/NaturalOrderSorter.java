@@ -77,7 +77,7 @@ public class NaturalOrderSorter implements Comparator<String> {
     /** This is used to determine if a character is a number or not, based on its ASCII value
      *
      * @param c the character to check
-     * @return
+     * @return true if it is a number, otherwise false
      */
     private boolean isNumber(char c) {
         return (((int) c <= 57) && ((int) c >= 48));
