@@ -18,8 +18,7 @@
  */
 package mekhq.gui.sorter;
 
-import sun.nio.cs.US_ASCII;
-
+import java.text.Collator;
 import java.util.Comparator;
 
 /**
@@ -42,39 +41,80 @@ import java.util.Comparator;
  */
 public class NaturalOrderSorter implements Comparator<String> {
     // Variable Declarations
-    String a;
-    int indexA;
-    int aLength;
-    String b;
-    int indexB;
-    int bLength;
+    private char[] a;
+    private int aLength;
+    private int indexA = 0;
+    private char[] b;
+    private int bLength;
+    private int indexB = 0;
 
+    private static Collator collator = Collator.getInstance();
+
+    /**
+     * Compares its two arguments for order.
+     *
+     * @param stringA the first string to compare by
+     * @param stringB the second string to compare by
+     * @return negative integer if the first argument is less than the second
+     *         zero if they are the same
+     *         positive integer if the first argument is greater than the second
+     */
     public int compare(String stringA, String stringB) {
-        this.a = stringA;
-        this.indexA = 0;
+        this.a = stringA.toCharArray();
         this.aLength = stringA.length();
-        this.b = stringB;
-        this.indexB = 0;
+        this.b = stringB.toCharArray();
         this.bLength = stringB.length();
 
+        while ((indexA < aLength) && (indexB < bLength)) {
+            int comparison;
+            if (isNumber(a[indexA]) && isNumber(b[indexB])) {
+                comparison = compareIntSections();
+            } else {
+                comparison = collator.compare(a[indexA], b[indexB]);
+            }
 
+            if (comparison != 0) {
+                return comparison;
+            }
 
-        return stringA.length() - stringB.length();
+            indexA++;
+            indexB++;
+        }
+
+        return aLength - bLength;
+    }
+
+    private int compareStringSections() {
+        return 0;
     }
 
     /**
-     *
-     * @return 0 if the two are the same, 1 if the A should be sorted first, or 2 if B should be
-     *         sorted first
+     * this compares integer section of a string to determine sorting order
+     * @return negative integer if the first argument is less than the second
+     *         zero if they are the same
+     *         positive integer if the first argument is greater than the second
      */
-    public byte compareIntSections() {
-        int incA;
-        int incB;
+    private int compareIntSections() {
+        StringBuilder sbA = new StringBuilder();
+        sbA.append(a[indexA]);
+        StringBuilder sbB = new StringBuilder();
+        sbB.append(b[indexB]);
 
-        if ()
+        // Here we are incrementing the index, then comparing it to the length
+        // Then, we determine if the char is a number, and continue adding to the StringBuilder
+        // until we've got the two numbers to compare
+        while ((++indexA < aLength) && (isNumber(a[indexA]))) {
+            sbA.append(a[indexA]);
+        }
+        while ((++indexB < bLength) && (isNumber(b[indexB]))) {
+            sbB.append(b[indexB]);
+        }
+
+        return Integer.compare(Integer.parseInt(sbA.toString()), Integer.parseInt(sbB.toString()));
     }
 
-    /** This is used to determine if a character is a number or not, based on its ASCII value
+    /**
+     * This is used to determine if a character is a number or not, based on its ASCII value
      *
      * @param c the character to check
      * @return true if it is a number, otherwise false
