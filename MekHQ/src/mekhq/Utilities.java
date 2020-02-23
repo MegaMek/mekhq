@@ -1330,11 +1330,11 @@ public class Utilities {
 
     /**
      * Export a JTable to a CSV file
-     * @param table
-     * @param file
-     * @return report
+     * @param table     the table to save to csv
+     * @param file      the file to save to
+     * @return a csv formatted export of the table
      */
-    public static String exportTabletoCSV(JTable table, File file) {
+    public static String exportTableToCSV(JTable table, File file) {
         String report;
         try {
             TableModel model = table.getModel();
@@ -1346,12 +1346,12 @@ public class Utilities {
             CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader(columns));
 
             for (int i = 0; i < model.getRowCount(); i++) {
-                Object[] towrite = new String[model.getColumnCount()];
+                Object[] toWrite = new String[model.getColumnCount()];
                 for (int j = 0; j < model.getColumnCount(); j++) {
                     // use regex to remove any HTML tags
-                    towrite[j] = model.getValueAt(i,j).toString().replaceAll("\\<[^>]*>", "");
+                    toWrite[j] = model.getValueAt(i,j).toString().replaceAll("<[^>]*>", "");
                 }
-                csvPrinter.printRecord(towrite);
+                csvPrinter.printRecord(toWrite);
             }
 
             csvPrinter.flush();
@@ -1359,7 +1359,7 @@ public class Utilities {
 
             report = model.getRowCount() + " " + resourceMap.getString("RowsWritten.text");
         } catch(Exception ioe) {
-            MekHQ.getLogger().log(Utilities.class, "exportTabletoCSV", LogLevel.INFO, "Error exporting JTable");
+            MekHQ.getLogger().log(Utilities.class, "exportTableToCSV", LogLevel.INFO, "Error exporting JTable");
             report = "Error exporting JTable. See log for details.";
         }
         return report;
@@ -1569,7 +1569,7 @@ public class Utilities {
         // Return the buffered image
         return bimage;
     }
-    
+
     /**
      * Handles loading a player's transported units onto their transports once a megamek scenario has actually started.
      * This separates loading air and ground units, since map type and planetary conditions may prohibit ground unit deployment
@@ -1623,7 +1623,7 @@ public class Utilities {
             }
         }
     }
-    
+
     /**
      * Method that loops through a Transport ship's bays and finds one with enough available space to load the Cargo unit
      * Helps assign a bay number to the Unit record so that transport bays can be automatically filled once a game of MegaMek is started
@@ -1636,14 +1636,14 @@ public class Utilities {
             // Try to load ASF bays first, so as not to hog SC bays
             for (Bay b: transport.getTransportBays()) {
                 if (b instanceof ASFBay && b.canLoad(cargo)) {
-                    //Load 1 unit into the bay 
+                    //Load 1 unit into the bay
                     b.setCurrentSpace(1);
                     return b.getBayNumber();
                 }
             }
             for (Bay b: transport.getTransportBays()) {
                 if (b instanceof SmallCraftBay && b.canLoad(cargo)) {
-                    //Load 1 unit into the bay 
+                    //Load 1 unit into the bay
                     b.setCurrentSpace(1);
                     return b.getBayNumber();
                 }
@@ -1652,21 +1652,21 @@ public class Utilities {
             // Try to fit lighter tanks into smaller bays first
             for (Bay b: transport.getTransportBays()) {
                 if (b instanceof LightVehicleBay && b.canLoad(cargo)) {
-                    //Load 1 unit into the bay 
+                    //Load 1 unit into the bay
                     b.setCurrentSpace(1);
                     return b.getBayNumber();
                 }
             }
             for (Bay b: transport.getTransportBays()) {
                 if (b instanceof HeavyVehicleBay && b.canLoad(cargo)) {
-                    //Load 1 unit into the bay 
+                    //Load 1 unit into the bay
                     b.setCurrentSpace(1);
                     return b.getBayNumber();
                 }
             }
             for (Bay b: transport.getTransportBays()) {
                 if (b instanceof SuperHeavyVehicleBay && b.canLoad(cargo)) {
-                    //Load 1 unit into the bay 
+                    //Load 1 unit into the bay
                     b.setCurrentSpace(1);
                     return b.getBayNumber();
                 }
@@ -1683,7 +1683,7 @@ public class Utilities {
             // Just return the first available bay
             for (Bay b : transport.getTransportBays()) {
                 if (b.canLoad(cargo)) {
-                    //Load 1 unit into the bay 
+                    //Load 1 unit into the bay
                     b.setCurrentSpace(1);
                     return b.getBayNumber();
                 }
