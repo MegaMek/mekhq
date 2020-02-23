@@ -60,19 +60,19 @@ public class MedicalLogger {
         return medicalLogEntry;
     }
 
-    public static MedicalLogEntry developedEncephalopatyh(Person person, Date date){
+    public static MedicalLogEntry developedEncephalopathy(Person person, Date date){
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, logEntriesResourceMap.getString("developedEncephalopathy.text"));
         person.addLogEntry(medicalLogEntry);
         return medicalLogEntry;
     }
 
-    public static MedicalLogEntry concussionWorsned(Person person, Date date){
+    public static MedicalLogEntry concussionWorsened(Person person, Date date){
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, logEntriesResourceMap.getString("concussionWorsened.text"));
         person.addLogEntry(medicalLogEntry);
         return medicalLogEntry;
     }
 
-    public static MedicalLogEntry developedCerbralContusion(Person person, Date date){
+    public static MedicalLogEntry developedCerebralContusion(Person person, Date date){
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, logEntriesResourceMap.getString("developedCerebralContusion.text"));
         person.addLogEntry(medicalLogEntry);
         return medicalLogEntry;
@@ -150,8 +150,8 @@ public class MedicalLogger {
         person.addLogEntry(new MedicalLogEntry(date, logEntriesResourceMap.getString("abductedFromInfirmary.text")));
     }
 
-    public static void retiredAndTransferedFromInfirmary(Person person, Date date){
-        person.addLogEntry(new MedicalLogEntry(date, logEntriesResourceMap.getString("retiredAndTransferedFromInfirmary.text")));
+    public static void retiredAndTransferredFromInfirmary(Person person, Date date){
+        person.addLogEntry(new MedicalLogEntry(date, logEntriesResourceMap.getString("retiredAndTransferredFromInfirmary.text")));
     }
     public static void dismissedFromInfirmary(Person person, Date date){
         person.addLogEntry(new MedicalLogEntry(date, logEntriesResourceMap.getString("dismissedFromInfirmary.text")));
@@ -166,11 +166,11 @@ public class MedicalLogger {
     public static void hasConceived(Person patient, Date date, String sizeString){
         String message = logEntriesResourceMap.getString("hasConceived.text");
 
-        if(null != sizeString)
+        if (null != sizeString) {
             message += " " + sizeString;
+        }
 
-        MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, message);
-        patient.addLogEntry(medicalLogEntry);
+        patient.addLogEntry(new MedicalLogEntry(date, message));
     }
 
     public static void diedFromWounds(Person patient, Date date){

@@ -128,7 +128,7 @@ public class LogEntryController {
                 foundExpressionWithOneVariable("becamePermanent.text", description) ||
                 foundSingleExpression("diedInInfirmary.text", description) ||
                 foundSingleExpression("abductedFromInfirmary.text", description) ||
-                foundSingleExpression("retiredAndTransferedFromInfirmary.text", description) ||
+                foundSingleExpression("retiredAndTransferredFromInfirmary.text", description) ||
                 foundSingleExpression("dismissedFromInfirmary.text", description) ||
                 foundExpressionWithOneVariable("deliveredBaby.text", description) ||
                 foundSingleExpression("hasConceived.text", description) ||
@@ -140,7 +140,7 @@ public class LogEntryController {
     }
 
     private static boolean foundSingleExpression(String logEntryProperty, String description) {
-        Pattern pattern = compilePattern(logEntryProperty, 
+        Pattern pattern = compilePattern(logEntryProperty,
             () -> logEntriesResourceMap.getString(logEntryProperty));
         Matcher matcher = pattern.matcher(description);
 

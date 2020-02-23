@@ -65,12 +65,9 @@ public class EditPersonnelInjuriesDialog extends JDialog {
     private Person person;
     private InjuryTableModel injuryModel;
 
-    private JButton btnAdd;
     private JButton btnEdit;
     private JButton btnDelete;
-    private JButton btnOK;
     private JTable injuriesTable;
-    private JScrollPane scrollInjuryTable;
 
     /** Creates new form EditPersonnelInjuriesDialog */
     public EditPersonnelInjuriesDialog(Frame parent, boolean modal, Campaign c, Person p) {
@@ -86,8 +83,8 @@ public class EditPersonnelInjuriesDialog extends JDialog {
 
     private void initComponents() {
 
-        btnOK = new JButton();
-        btnAdd = new JButton();
+        JButton btnOK = new JButton();
+        JButton btnAdd = new JButton();
         btnEdit = new JButton();
         btnDelete = new JButton();
 
@@ -100,38 +97,23 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         JPanel panBtns = new JPanel(new GridLayout(1,0));
         btnAdd.setText(resourceMap.getString("btnAdd.text")); // NOI18N
         btnAdd.setName("btnAdd"); // NOI18N
-        btnAdd.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                addEntry();
-            }
-        });
+        btnAdd.addActionListener(evt -> addEntry());
         panBtns.add(btnAdd);
         btnEdit.setText(resourceMap.getString("btnEdit.text")); // NOI18N
         btnEdit.setName("btnEdit"); // NOI18N
         btnEdit.setEnabled(false);
-        btnEdit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                editEntry();
-            }
-        });
+        btnEdit.addActionListener(evt -> editEntry());
         panBtns.add(btnEdit);
         btnDelete.setText(resourceMap.getString("btnDelete.text")); // NOI18N
         btnDelete.setName("btnDelete"); // NOI18N
         btnDelete.setEnabled(false);
-        btnDelete.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                deleteEntry();
-            }
-        });
+        btnDelete.addActionListener(evt -> deleteEntry());
         panBtns.add(btnDelete);
         getContentPane().add(panBtns, BorderLayout.PAGE_START);
 
         injuriesTable = new JTable(injuryModel);
         injuriesTable.setName("injuriesTable"); // NOI18N
-        TableColumn column = null;
+        TableColumn column;
         int width = 0;
         for (int i = 0; i < InjuryTableModel.N_COL; i++) {
             column = injuriesTable.getColumnModel().getColumn(i);
@@ -143,15 +125,8 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         injuriesTable.setIntercellSpacing(new Dimension(0, 0));
         injuriesTable.setShowGrid(false);
         injuriesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        injuriesTable.getSelectionModel().addListSelectionListener(
-                new ListSelectionListener() {
-                    @Override
-                    public void valueChanged(
-                            ListSelectionEvent evt) {
-                        injuriesTableValueChanged(evt);
-                    }
-                });
-        scrollInjuryTable = new JScrollPane();
+        injuriesTable.getSelectionModel().addListSelectionListener(this::injuriesTableValueChanged);
+        JScrollPane scrollInjuryTable = new JScrollPane();
         scrollInjuryTable.setName("scrollInjuryTable"); // NOI18N
         scrollInjuryTable.setViewportView(injuriesTable);
         getContentPane().add(scrollInjuryTable, BorderLayout.CENTER);
@@ -159,12 +134,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
 
         btnOK.setText(resourceMap.getString("btnOK.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
-        btnOK.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                btnOKActionPerformed(evt);
-            }
-        });
+        btnOK.addActionListener(this::btnOKActionPerformed);
         getContentPane().add(btnOK, BorderLayout.PAGE_END);
 
         pack();
@@ -230,7 +200,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
     /**
      * A table model for displaying parts - similar to the one in CampaignGUI, but not exactly
      */
-    public class InjuryTableModel extends AbstractTableModel {
+    public static class InjuryTableModel extends AbstractTableModel {
         private static final long serialVersionUID = 534443424190075264L;
 
         protected String[] columnNames;
@@ -287,36 +257,31 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         @Override
         public Object getValueAt(int row, int col) {
             Injury entry;
-            if(data.isEmpty()) {
+            if (data.isEmpty()) {
                 return "";
             } else {
-                entry = (Injury)data.get(row);
+                entry = data.get(row);
             }
-            if(col == COL_DAYS) {
+
+            if (col == COL_DAYS) {
                 return Integer.toString(entry.getTime());
-            }
-            if(col == COL_LOCATION) {
+            } else if (col == COL_LOCATION) {
                 return entry.getLocationName();
-            }
-            if(col == COL_TYPE) {
+            } else if (col == COL_TYPE) {
                 return entry.getType().getName(entry.getLocation(), entry.getHits());
-            }
-            if(col == COL_FLUFF) {
+            } else if (col == COL_FLUFF) {
                 return entry.getFluff();
-            }
-            if(col == COL_HITS) {
+            } else if (col == COL_HITS) {
                 return Integer.toString(entry.getHits());
-            }
-            if(col == COL_PERMANENT) {
+            } else if (col == COL_PERMANENT) {
                 return Boolean.toString(entry.isPermanent());
-            }
-            if(col == COL_WORKEDON) {
+            } else if (col == COL_WORKEDON) {
                 return Boolean.toString(entry.isWorkedOn());
-            }
-            if(col == COL_EXTENDED) {
+            } else if (col == COL_EXTENDED) {
                 return Boolean.toString(entry.getExtended());
+            } else {
+                return "?";
             }
-            return "?";
         }
 
         @Override
@@ -325,50 +290,47 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         }
 
         @Override
-        public Class<? extends Object> getColumnClass(int c) {
+        public Class<?> getColumnClass(int c) {
             return getValueAt(0, c).getClass();
         }
 
         public Injury getEntryAt(int row) {
-            return (Injury) data.get(row);
+            return data.get(row);
         }
 
          public int getColumnWidth(int c) {
             switch(c) {
-            case COL_DAYS:
-            case COL_HITS:
-            case COL_PERMANENT:
-            case COL_WORKEDON:
-            case COL_EXTENDED:
-                return 110;
-            case COL_TYPE:
-                return 150;
-            case COL_FLUFF:
-            case COL_LOCATION:
-                return 200;
-            default:
-                return 50;
+                case COL_DAYS:
+                case COL_HITS:
+                case COL_PERMANENT:
+                case COL_WORKEDON:
+                case COL_EXTENDED:
+                    return 110;
+                case COL_TYPE:
+                    return 150;
+                case COL_FLUFF:
+                case COL_LOCATION:
+                    return 200;
+                default:
+                    return 50;
             }
         }
 
         public int getAlignment(int col) {
             switch(col) {
-            case COL_DAYS:
-            case COL_HITS:
-            case COL_PERMANENT:
-            case COL_WORKEDON:
-            case COL_EXTENDED:
-                return SwingConstants.CENTER;
-            default:
-                return SwingConstants.LEFT;
+                case COL_DAYS:
+                case COL_HITS:
+                case COL_PERMANENT:
+                case COL_WORKEDON:
+                case COL_EXTENDED:
+                    return SwingConstants.CENTER;
+                default:
+                    return SwingConstants.LEFT;
             }
         }
 
         public String getTooltip(int row, int col) {
-            switch(col) {
-            default:
-                return null;
-            }
+            return null;
         }
 
         //fill table with values
@@ -386,11 +348,10 @@ public class EditPersonnelInjuriesDialog extends JDialog {
             private static final long serialVersionUID = 9054581142945717303L;
 
             @Override
-            public Component getTableCellRendererComponent(JTable table,
-                    Object value, boolean isSelected, boolean hasFocus,
-                    int row, int column) {
-                super.getTableCellRendererComponent(table, value, isSelected,
-                        hasFocus, row, column);
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                                                           boolean isSelected, boolean hasFocus,
+                                                           int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 setOpaque(true);
                 int actualCol = table.convertColumnIndexToModel(column);
                 int actualRow = table.convertRowIndexToModel(row);
