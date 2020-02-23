@@ -18,6 +18,8 @@
  */
 package mekhq.gui.sorter;
 
+import mekhq.MekHQ;
+
 import java.text.Collator;
 import java.util.Comparator;
 
@@ -43,12 +45,9 @@ public class NaturalOrderSorter implements Comparator<String> {
     // Variable Declarations
     private char[] a;
     private int aLength;
-    private int indexA = 0;
     private char[] b;
     private int bLength;
-    private int indexB = 0;
-
-    private static Collator collator = Collator.getInstance();
+    private int index;
 
     /**
      * Compares its two arguments for order.
@@ -61,31 +60,28 @@ public class NaturalOrderSorter implements Comparator<String> {
      */
     public int compare(String stringA, String stringB) {
         this.a = stringA.toCharArray();
-        this.aLength = stringA.length();
+        this.aLength = a.length;
         this.b = stringB.toCharArray();
-        this.bLength = stringB.length();
+        this.bLength = b.length;
+        int comparison;
 
-        while ((indexA < aLength) && (indexB < bLength)) {
-            int comparison;
-            if (isNumber(a[indexA]) && isNumber(b[indexB])) {
+        for (index = 0; (index < aLength) && (index < bLength); index++) {
+            if (isNumber(a[index]) && isNumber(b[index])) {
                 comparison = compareIntSections();
+            } else if (a[index] == b[index]) {
+                continue;
             } else {
-                comparison = collator.compare(a[indexA], b[indexB]);
+                MekHQ.getLogger().warning(this.getClass(), "compare", "Hit string comparison");
+                comparison = Collator.getInstance().compare(a[index], b[index]);
+                MekHQ.getLogger().warning(this.getClass(), "compare", "finished string comparison");
             }
 
             if (comparison != 0) {
                 return comparison;
             }
-
-            indexA++;
-            indexB++;
         }
 
         return aLength - bLength;
-    }
-
-    private int compareStringSections() {
-        return 0;
     }
 
     /**
@@ -96,9 +92,12 @@ public class NaturalOrderSorter implements Comparator<String> {
      */
     private int compareIntSections() {
         StringBuilder sbA = new StringBuilder();
-        sbA.append(a[indexA]);
+        sbA.append(a[index]);
         StringBuilder sbB = new StringBuilder();
-        sbB.append(b[indexB]);
+        sbB.append(b[index]);
+
+        int indexA = index;
+        int indexB = index;
 
         // Here we are incrementing the index, then comparing it to the length
         // Then, we determine if the char is a number, and continue adding to the StringBuilder
@@ -110,6 +109,8 @@ public class NaturalOrderSorter implements Comparator<String> {
             sbB.append(b[indexB]);
         }
 
+        index = indexA;
+
         return Integer.compare(Integer.parseInt(sbA.toString()), Integer.parseInt(sbB.toString()));
     }
 
@@ -120,6 +121,6 @@ public class NaturalOrderSorter implements Comparator<String> {
      * @return true if it is a number, otherwise false
      */
     private boolean isNumber(char c) {
-        return (((int) c <= 57) && ((int) c >= 48));
+        return ((c >= 48) && (c <= 57));
     }
 }
