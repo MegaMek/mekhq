@@ -278,15 +278,15 @@ public class PersonnelTableModel extends DataTableModel {
             return p.getAbilityList(PilotOptions.MD_ADVANTAGES);
         case COL_ASSIGN:
             if ((p.getTechUnitIDs().size() > 1) && !loadAssignmentFromMarket) {
-                String toReturn = "<html>";
+                StringBuilder toReturn = new StringBuilder("<html>");
                 for (UUID id : p.getTechUnitIDs()) {
                     Unit u = getCampaign().getUnit(id);
                     if (null != u) {
-                        toReturn += u.getName() + "<br>";
+                        toReturn.append(u.getName()).append("<br>");
                     }
                 }
-                toReturn += "</html>";
-                return toReturn;
+                toReturn.append("</html>");
+                return toReturn.toString();
             } else {
                 return null;
             }
@@ -687,14 +687,14 @@ public class PersonnelTableModel extends DataTableModel {
                 setForeground(UIManager.getColor("Table.selectionForeground"));
             } else {
                 if (isDeployed(actualRow)) {
-                    colors.getDeployed().getColor().ifPresent(c -> setBackground(c));
-                    colors.getDeployed().getAlternateColor().ifPresent(c -> setForeground(c));
+                    colors.getDeployed().getColor().ifPresent(this::setBackground);
+                    colors.getDeployed().getAlternateColor().ifPresent(this::setForeground);
                 } else if ((Integer.parseInt((String) getValueAt(actualRow,COL_HITS)) > 0) || getPerson(actualRow).hasInjuries(true)) {
-                    colors.getInjured().getColor().ifPresent(c -> setBackground(c));
-                    colors.getInjured().getAlternateColor().ifPresent(c -> setForeground(c));
+                    colors.getInjured().getColor().ifPresent(this::setBackground);
+                    colors.getInjured().getAlternateColor().ifPresent(this::setForeground);
                 } else if (getPerson(actualRow).hasOnlyHealedPermanentInjuries()) {
-                    colors.getHealedInjuries().getColor().ifPresent(c -> setBackground(c));
-                    colors.getHealedInjuries().getAlternateColor().ifPresent(c -> setForeground(c));
+                    colors.getHealedInjuries().getColor().ifPresent(this::setBackground);
+                    colors.getHealedInjuries().getAlternateColor().ifPresent(this::setForeground);
                 } else {
                     setBackground(UIManager.getColor("Table.background"));
                 }
@@ -759,17 +759,18 @@ public class PersonnelTableModel extends DataTableModel {
                 case COL_FORCE:
                     Force force = getCampaign().getForceFor(p);
                     if (null != force) {
-                        String desc = "<html><b>" + force.getName() + "</b>";
+                        StringBuilder desc = new StringBuilder("<html><b>").append(force.getName())
+                                .append("</b>");
                         Force parent = force.getParentForce();
                         //cut off after three lines and don't include the top level
                         int lines = 1;
                         while ((parent != null) && (parent.getParentForce() != null) && (lines < 4)) {
-                            desc += "<br>" + parent.getName();
+                            desc.append("<br>").append(parent.getName());
                             lines++;
                             parent = parent.getParentForce();
                         }
-                        desc += "</html>";
-                        setText(desc);
+                        desc.append("</html>");
+                        setText(desc.toString());
                         Image forceImage = getImageFor(force);
                         if (null != forceImage) {
                             setImage(forceImage);
