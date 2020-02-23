@@ -1648,7 +1648,7 @@ public class Utilities {
                     return b.getBayNumber();
                 }
             }
-        } else if (cargo.getEntityType() == Entity.ETYPE_TANK) {
+        } else if (cargo.getUnitType() == UnitType.TANK) {
             // Try to fit lighter tanks into smaller bays first
             for (Bay b: transport.getTransportBays()) {
                 if (b instanceof LightVehicleBay && b.canLoad(cargo)) {

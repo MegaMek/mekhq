@@ -1241,6 +1241,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             return getCurrentSmallCraftCapacity();
         case UnitType.BATTLE_ARMOR:
             return getCurrentBattleArmorCapacity();
+        case UnitType.INFANTRY:
+            return getCurrentInfantryCapacity();
         case UnitType.TANK:
         case UnitType.NAVAL:
         case UnitType.VTOL:
