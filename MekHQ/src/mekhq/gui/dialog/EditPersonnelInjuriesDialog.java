@@ -1,21 +1,21 @@
 /*
  * EditPersonnelInjuriesDialog.java
- * 
+ *
  * Copyright (C) 2009-2018 MegaMek team
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -61,27 +61,24 @@ import mekhq.preferences.PreferencesNode;
 public class EditPersonnelInjuriesDialog extends JDialog {
     private static final long serialVersionUID = -8038099101234445018L;
     private Frame frame;
-    /*private Campaign campaign;
-    private int days;*/
+    private Campaign campaign;
     private Person person;
-    private ArrayList<Injury> injuries;
     private InjuryTableModel injuryModel;
-    
+
     private JButton btnAdd;
     private JButton btnEdit;
     private JButton btnDelete;
     private JButton btnOK;
     private JTable injuriesTable;
     private JScrollPane scrollInjuryTable;
-    
+
     /** Creates new form EditPersonnelInjuriesDialog */
     public EditPersonnelInjuriesDialog(Frame parent, boolean modal, Campaign c, Person p) {
         super(parent, modal);
         this.frame = parent;
-        //campaign = c;
+        campaign = c;
         person = p;
-        injuries = p.getInjuries();
-        injuryModel = new InjuryTableModel(injuries);
+        injuryModel = new InjuryTableModel(p.getInjuries());
         initComponents();
         setLocationRelativeTo(parent);
         setUserPreferences();
@@ -99,7 +96,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("Form.title") + " " + person.getName());
         getContentPane().setLayout(new BorderLayout());
-        
+
         JPanel panBtns = new JPanel(new GridLayout(1,0));
         btnAdd.setText(resourceMap.getString("btnAdd.text")); // NOI18N
         btnAdd.setName("btnAdd"); // NOI18N
@@ -131,7 +128,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         });
         panBtns.add(btnDelete);
         getContentPane().add(panBtns, BorderLayout.PAGE_START);
-        
+
         injuriesTable = new JTable(injuryModel);
         injuriesTable.setName("injuriesTable"); // NOI18N
         TableColumn column = null;
@@ -159,7 +156,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         scrollInjuryTable.setViewportView(injuriesTable);
         getContentPane().add(scrollInjuryTable, BorderLayout.CENTER);
 
-        
+
         btnOK.setText(resourceMap.getString("btnOK.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
         btnOK.addActionListener(new ActionListener() {
@@ -183,15 +180,15 @@ public class EditPersonnelInjuriesDialog extends JDialog {
     private void btnOKActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
         this.setVisible(false);
     }
-    
+
     private void injuriesTableValueChanged(ListSelectionEvent evt) {
         int row = injuriesTable.getSelectedRow();
         btnDelete.setEnabled(row != -1);
         btnEdit.setEnabled(row != -1);
     }
-    
+
     private void addEntry() {
-        EditInjuryEntryDialog eied = new EditInjuryEntryDialog(frame, true, new Injury());
+        EditInjuryEntryDialog eied = new EditInjuryEntryDialog(frame, true, new Injury(campaign.getDateTime()));
         eied.setAlwaysOnTop(true);
         eied.setVisible(true);
         if(null != eied.getEntry()) {
@@ -199,7 +196,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         }
         refreshTable();
     }
-    
+
     private void editEntry() {
         Injury entry = injuryModel.getEntryAt(injuriesTable.getSelectedRow());
         if(null != entry) {
@@ -209,13 +206,13 @@ public class EditPersonnelInjuriesDialog extends JDialog {
             refreshTable();
         }
     }
-    
+
     private void deleteEntry() {
         Injury entry = injuryModel.getEntryAt(injuriesTable.getSelectedRow());
         person.removeInjury(entry);
         refreshTable();
     }
-    
+
     private void refreshTable() {
         int selectedRow = injuriesTable.getSelectedRow();
         injuryModel.setData(person.getInjuries());
@@ -229,7 +226,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
             }
         }
     }
-    
+
     /**
      * A table model for displaying parts - similar to the one in CampaignGUI, but not exactly
      */
@@ -248,11 +245,11 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         public final static int COL_WORKEDON =	6;
         public final static int COL_EXTENDED =	7;
         public final static int N_COL		=	8;
-        
+
         public InjuryTableModel(ArrayList<Injury> entries) {
             data = entries;
         }
-        
+
         @Override
         public int getRowCount() {
             return data.size();
@@ -321,12 +318,12 @@ public class EditPersonnelInjuriesDialog extends JDialog {
             }
             return "?";
         }
-        
+
         @Override
         public boolean isCellEditable(int row, int col) {
             return false;
         }
-        
+
         @Override
         public Class<? extends Object> getColumnClass(int c) {
             return getValueAt(0, c).getClass();
@@ -335,7 +332,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         public Injury getEntryAt(int row) {
             return (Injury) data.get(row);
         }
-        
+
          public int getColumnWidth(int c) {
             switch(c) {
             case COL_DAYS:
@@ -348,12 +345,12 @@ public class EditPersonnelInjuriesDialog extends JDialog {
                 return 150;
             case COL_FLUFF:
             case COL_LOCATION:
-                return 200;     
+                return 200;
             default:
                 return 50;
             }
         }
-        
+
         public int getAlignment(int col) {
             switch(col) {
             case COL_DAYS:
@@ -373,13 +370,13 @@ public class EditPersonnelInjuriesDialog extends JDialog {
                 return null;
             }
         }
-        
+
         //fill table with values
         public void setData(ArrayList<Injury> entries) {
             data = entries;
             fireTableDataChanged();
         }
-        
+
         public InjuryTableModel.Renderer getRenderer() {
             return new InjuryTableModel.Renderer();
         }
@@ -399,7 +396,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
                 int actualRow = table.convertRowIndexToModel(row);
                 setHorizontalAlignment(getAlignment(actualCol));
                 setToolTipText(getTooltip(actualRow, actualCol));
-                
+
                 return this;
             }
 
