@@ -553,15 +553,10 @@ public class PersonnelTableModel extends DataTableModel {
             case COL_ASSIGN:
                 if (loadAssignmentFromMarket) {
                     Entity en = personnelMarket.getAttachedEntity(p);
-
-                    if (null == en) {
-                        return "-";
-                    }
-
-                    return en.getDisplayName();
+                    return ((en != null) ?  en.getDisplayName() : "-");
                 } else {
                     Unit u = getCampaign().getUnit(p.getUnitId());
-                    if (null != u) {
+                    if (u != null) {
                         String name = u.getName();
                         if (u.getEntity() instanceof Tank) {
                             if (u.isDriver(p)) {
@@ -583,11 +578,12 @@ public class PersonnelTableModel extends DataTableModel {
                         }
                         return name;
                     }
+
                     //check for tech
                     if (!p.getTechUnitIDs().isEmpty()) {
                         if (p.getTechUnitIDs().size() == 1) {
                             u = getCampaign().getUnit(p.getTechUnitIDs().get(0));
-                            if (null != u) {
+                            if (u != null) {
                                 return u.getName() + " (" + p.getMaintenanceTimeUsing() + "m)";
                             }
                         } else {
@@ -738,10 +734,10 @@ public class PersonnelTableModel extends DataTableModel {
                         setText(en != null ? en.getDisplayName() : "-");
                     } else {
                         Unit u = getCampaign().getUnit(p.getUnitId());
-                        if (!p.getTechUnitIDs().isEmpty()) {
+                        if ((u == null) && !p.getTechUnitIDs().isEmpty()) {
                             u = getCampaign().getUnit(p.getTechUnitIDs().get(0));
                         }
-                        if (null != u) {
+                        if (u != null) {
                             String desc = "<b>" + u.getName() + "</b><br>";
                             desc += u.getEntity().getWeightClassName();
                             if ((!(u.getEntity() instanceof SmallCraft) || !(u.getEntity() instanceof Jumpship))) {
@@ -750,7 +746,7 @@ public class PersonnelTableModel extends DataTableModel {
                             desc += "<br>" + u.getStatus() + "";
                             setText(desc);
                             Image mekImage = getImageFor(u);
-                            if (null != mekImage) {
+                            if (mekImage != null) {
                                 setImage(mekImage);
                             } else {
                                 clearImage();
