@@ -11,6 +11,7 @@ VERSION HISTORY:
 + Issue #1480: Add customization for colors used throughout MekHQ.
 + PR #1490: Fix some bugs with the Assign to Ship menu item
 + Issue #1495: Export Campaign Subset to New Campaign Now Copies Options
++ Issue #1508: Injured personnel Keep Command of their Vehicles and Infantry units
 
 v0.47.4 (2020-2-09 2200 UTC)
 + PR #1440: Implement "Rugged" quirk (2x or 3x between maintenance rolls)
