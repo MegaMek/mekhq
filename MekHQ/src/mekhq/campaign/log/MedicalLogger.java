@@ -159,7 +159,7 @@ public class MedicalLogger {
 
     public static void deliveredBaby(Person patient, Person baby, Date date){
         String message = logEntriesResourceMap.getString("deliveredBaby.text");
-        MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, MessageFormat.format(message, (baby.getGender() == Person.G_MALE ? "boy!" : "girl!")));
+        MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, MessageFormat.format(message, baby.getChildGenderName()));
         patient.addLogEntry(medicalLogEntry);
     }
 
