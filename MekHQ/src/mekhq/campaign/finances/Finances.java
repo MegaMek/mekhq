@@ -485,7 +485,8 @@ public class Finances implements Serializable {
         String report;
 
         try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(path));
-             CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader("Date", "Category", "Description", "Amount", "RunningTotal"))) {
+             CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT
+                     .withHeader("Date", "Category", "Description", "Amount", "RunningTotal"))) {
 
             SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd"); //TODO : Remove inline date format
 
