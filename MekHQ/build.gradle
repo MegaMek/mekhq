@@ -110,7 +110,7 @@ task mmJar (type: Jar, dependsOn: compileMM) {
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }
             .collect { "${lib}/${it.name}" }.join(' ')
     }
-    ext.jarLocation = "${buildDir}/libs/${archiveFileName}"
+    ext.jarLocation = "${buildDir}/libs/${archiveFileName.get()}"
     inputs.dir "${mmDir}/megamek/build/classes/java/main"
     inputs.dir "${mmDir}/megamek/build/resources/main"
     outputs.file jarLocation
@@ -128,7 +128,7 @@ task mmJarLibDir (type: Jar, dependsOn: compileMM) {
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }
             .collect { it.name }.join(' ')
     }
-    ext.jarLocation = "${buildDir}/libs/${archiveFileName}"
+    ext.jarLocation = "${buildDir}/libs/${archiveFileName.get()}"
     inputs.dir "${mmDir}/build/classes/java/main"
     inputs.dir "${mmDir}/build/resources/main"
     outputs.file jarLocation
@@ -148,11 +148,11 @@ task mmlJar (type: Jar, dependsOn: compileMML) {
     from "${mmlDir}/build/resources/main"
     manifest {
         attributes "Main-Class": 'megameklab.com.MegaMekLab'
-        attributes 'Class-Path' : "${mmJar.archiveFileName} " + (project.sourceSets.main.runtimeClasspath.files
+        attributes 'Class-Path' : "${mmJar.archiveFileName.get()} " + (project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
             .collect { "${lib}/${it.name}" }.join(' '))
     }
-    ext.jarLocation = "${buildDir}/libs/${archiveFileName}"
+    ext.jarLocation = "${buildDir}/libs/${archiveFileName.get()}"
     inputs.dir "${mmlDir}/build/classes/java/main"
     inputs.dir "${mmlDir}/build/resources/main"
     outputs.file jarLocation
@@ -162,7 +162,7 @@ jar {
     archiveFileName = "MekHQ.jar"
     manifest {
         attributes "Main-Class": mainClassName
-        attributes 'Class-Path' : "${mmJar.archiveFileName} ${mmlJar.archiveFileName} " + (project.sourceSets.main.runtimeClasspath.files
+        attributes 'Class-Path' : "${mmJar.archiveFileName.get()} ${mmlJar.archiveFileName.get()} " + (project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }
             .collect { "${lib}/${it.name}" }.join(' '))
     }
@@ -247,7 +247,7 @@ task createOSXBundle (dependsOn: jar) {
                 mainClass: project.mainClassName,
                 stubfile: osxApplicationStub,
                 dir: osxBundleDir,
-                jar: "${jar.destinationDirectory}/${jar.archiveFileName}",
+                jar: "${jar.destinationDirectory.get()}/${jar.archiveFileName.get()}",
                 jvmversion: '1.8+',
                 icon: "${projectDir}/${data}/images/misc/mekhq.icns",
                 useJavaXKey: 'true',
@@ -390,7 +390,7 @@ task createMMExe (type: Launch4jLibraryTask, dependsOn: mmJar) {
     description = 'Create Windows executable stub for MM jar'
     outfile = 'MegaMek.exe'
     mainClassName = 'megamek.MegaMek'
-    jar = "lib/${mmJar.archiveFileName}"
+    jar = "lib/${mmJar.archiveFileName.get()}"
 	classpath = project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
             .collect { "${lib}/${it.name}" }
@@ -412,7 +412,7 @@ task createMMLExe (type: Launch4jLibraryTask, dependsOn: mmlJar) {
     description = 'Create Windows executable stub for MML jar'
     outfile = 'MegaMekLab.exe'
     mainClassName = 'megameklab.com.MegaMekLab'
-    jar = "lib/${mmlJar.archiveFileName}"
+    jar = "lib/${mmlJar.archiveFileName.get()}"
 	classpath = ["lib/${mmJar.archiveFileName.get()}"] + project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
             .collect { "${lib}/${it.name}" }

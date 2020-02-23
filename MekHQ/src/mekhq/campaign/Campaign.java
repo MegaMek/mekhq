@@ -976,22 +976,6 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     /**
-     * Add scenario to an existing mission. This method will also assign the scenario an id and place it in the scenarioId
-     * hash
-     *
-     * @param s - the Scenario to add
-     * @param m - the mission to add the new scenario to
-     */
-    public void addScenario(Scenario s, Mission m) {
-        int id = lastScenarioId + 1;
-        s.setId(id);
-        m.addScenario(s);
-        scenarios.put(id, s);
-        lastScenarioId = id;
-        MekHQ.triggerEvent(new ScenarioNewEvent(s));
-    }
-
-    /**
      * @return missions ArrayList sorted with complete missions at the bottom
      */
     public ArrayList<Mission> getSortedMissions() {
@@ -1007,6 +991,32 @@ public class Campaign implements Serializable, ITechManager {
      */
     public Mission getMission(int id) {
         return missions.get(id);
+    }
+
+    /**
+     * Add scenario to an existing mission. This method will also assign the scenario an id, provided
+     * that it is a new scenario. It then adds the scenario to the scenarioId hash.
+     *
+     * Scenarios with previously set ids can be sent to this mission, allowing one to remove
+     * and then re-add scenarios if needed. This functionality is used in the
+     * <code>AtBScenarioFactory</code> class in method <code>createScenariosForNewWeek</code> to
+     * ensure that scenarios are generated properly.
+     *
+     * @param s - the Scenario to add
+     * @param m - the mission to add the new scenario to
+     */
+    public void addScenario(Scenario s, Mission m) {
+        int id;
+        if (s.getId() == Scenario.S_DEFAULT_ID) {
+            id = ++lastScenarioId;
+            s.setId(id);
+        } else {
+            // Scenario has already been assigned an Id, so just use its assigned value
+            id = s.getId();
+        }
+        m.addScenario(s);
+        scenarios.put(id, s);
+        MekHQ.triggerEvent(new ScenarioNewEvent(s));
     }
 
     public Scenario getScenario(int id) {
@@ -3053,7 +3063,7 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
-            AtBScenarioFactory.createScenariosForNewWeek(this, true);
+            AtBScenarioFactory.createScenariosForNewWeek(this);
         }
 
         for (Mission m : getMissions()) {
@@ -6077,6 +6087,10 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
         return options;
+    }
+
+    public void setGameOptions(GameOptions gameOptions) {
+        this.gameOptions = gameOptions;
     }
 
     public void setGameOptions(Vector<IBasicOption> options) {
