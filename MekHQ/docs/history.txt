@@ -13,6 +13,7 @@ VERSION HISTORY:
 + Issue #1495: Export Campaign Subset to New Campaign Now Copies Options
 + Issue #1508: Injured personnel Keep Command of their Vehicles and Infantry units
 + Issue #1429: Adding Bulk Add to the Parts Marketplace.
++ PR #1500: Scenario Generation properly handles GM Generation and Multiple Missions
 
 v0.47.4 (2020-2-09 2200 UTC)
 + PR #1440: Implement "Rugged" quirk (2x or 3x between maintenance rolls)
