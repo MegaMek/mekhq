@@ -105,27 +105,13 @@ public class Injury {
     @XmlAttribute(name="v")
     private int version;
 
-    // Base constructor, in reality should never be used
-    public Injury() {
-        setTime(0);
-        setOriginalTime(0);
-        setFluff("");
-        setLocation(BodyLocation.GENERIC);
-        setType(InjuryType.BAD_HEALTH);
-        setHits(1);
-        setPermanent(false);
-        setWorkedOn(false);
-        setExtended(false);
-        id = UUID.randomUUID();
-    }
-
     public Injury(DateTime start) {
-        this(0, "", BodyLocation.GENERIC, InjuryType.BAD_HEALTH, 1, start, false, false);
+        this(0, "", BodyLocation.GENERIC, InjuryType.BAD_HEALTH, 1, start, false, false, false);
     }
 
     // Normal constructor for a new injury that has not been treated by a doctor & does not have extended time
     public Injury(int time, String text, BodyLocation loc, InjuryType type, int num, DateTime start, boolean perm) {
-        this(time, text, loc, type, num, start, perm, false);
+        this(time, text, loc, type, num, start, perm, false, false);
     }
 
     // Constructor if this injury has been treated by a doctor, but without extended time
@@ -134,7 +120,8 @@ public class Injury {
     }
 
     // Constructor for when this injury has extended time, full options including worked on by a doctor
-    public Injury(int time, String text, BodyLocation loc, InjuryType type, int num, DateTime start, boolean perm, boolean workedOn, boolean extended) {
+    public Injury(int time, String text, BodyLocation loc, InjuryType type, int num, DateTime start,
+                  boolean perm, boolean workedOn, boolean extended) {
         setTime(time);
         setOriginalTime(time);
         setFluff(text);

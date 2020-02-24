@@ -63,12 +63,9 @@ public class EditPersonnelInjuriesDialog extends JDialog {
     private Person person;
     private InjuryTableModel injuryModel;
 
-    private JButton btnAdd;
     private JButton btnEdit;
     private JButton btnDelete;
-    private JButton btnOK;
     private JTable injuriesTable;
-    private JScrollPane scrollInjuryTable;
 
     /** Creates new form EditPersonnelInjuriesDialog */
     public EditPersonnelInjuriesDialog(Frame parent, boolean modal, Campaign c, Person p) {
@@ -84,8 +81,8 @@ public class EditPersonnelInjuriesDialog extends JDialog {
 
     private void initComponents() {
 
-        btnOK = new JButton();
-        btnAdd = new JButton();
+        JButton btnOK = new JButton();
+        JButton btnAdd = new JButton();
         btnEdit = new JButton();
         btnDelete = new JButton();
 
@@ -127,7 +124,8 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         injuriesTable.setShowGrid(false);
         injuriesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         injuriesTable.getSelectionModel().addListSelectionListener(this::injuriesTableValueChanged);
-        scrollInjuryTable = new JScrollPane();
+
+        JScrollPane scrollInjuryTable = new JScrollPane();
         scrollInjuryTable.setName("scrollInjuryTable"); // NOI18N
         scrollInjuryTable.setViewportView(injuriesTable);
         getContentPane().add(scrollInjuryTable, BorderLayout.CENTER);
@@ -302,32 +300,32 @@ public class EditPersonnelInjuriesDialog extends JDialog {
 
          public int getColumnWidth(int c) {
             switch(c) {
-            case COL_DAYS:
-            case COL_HITS:
-            case COL_PERMANENT:
-            case COL_WORKEDON:
-            case COL_EXTENDED:
-                return 110;
-            case COL_TYPE:
-                return 150;
-            case COL_FLUFF:
-            case COL_LOCATION:
-                return 200;
-            default:
-                return 50;
+                case COL_DAYS:
+                case COL_HITS:
+                case COL_PERMANENT:
+                case COL_WORKEDON:
+                case COL_EXTENDED:
+                    return 110;
+                case COL_TYPE:
+                    return 150;
+                case COL_FLUFF:
+                case COL_LOCATION:
+                    return 200;
+                default:
+                    return 50;
             }
         }
 
         public int getAlignment(int col) {
             switch(col) {
-            case COL_DAYS:
-            case COL_HITS:
-            case COL_PERMANENT:
-            case COL_WORKEDON:
-            case COL_EXTENDED:
-                return SwingConstants.CENTER;
-            default:
-                return SwingConstants.LEFT;
+                case COL_DAYS:
+                case COL_HITS:
+                case COL_PERMANENT:
+                case COL_WORKEDON:
+                case COL_EXTENDED:
+                    return SwingConstants.CENTER;
+                default:
+                    return SwingConstants.LEFT;
             }
         }
 
@@ -349,11 +347,10 @@ public class EditPersonnelInjuriesDialog extends JDialog {
             private static final long serialVersionUID = 9054581142945717303L;
 
             @Override
-            public Component getTableCellRendererComponent(JTable table,
-                    Object value, boolean isSelected, boolean hasFocus,
-                    int row, int column) {
-                super.getTableCellRendererComponent(table, value, isSelected,
-                        hasFocus, row, column);
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                                                           boolean isSelected, boolean hasFocus,
+                                                           int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 setOpaque(true);
                 int actualCol = table.convertColumnIndexToModel(column);
                 int actualRow = table.convertRowIndexToModel(row);

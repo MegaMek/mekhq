@@ -28,7 +28,6 @@ import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.*;
-import mekhq.campaign.log.LogEntryController;
 import mekhq.campaign.log.MedicalLogEntry;
 import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.personnel.BodyLocation;

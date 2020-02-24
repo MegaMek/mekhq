@@ -1363,6 +1363,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
             baby.setId(babyId);
             baby.setAncestorsId(ancId);
+
             campaign.addReport(String.format("%s has given birth to %s, a baby %s!", getHyperlinkedName(),
                     baby.getHyperlinkedName(), baby.getChildGenderName()));
             if (campaign.getCampaignOptions().logConception()) {

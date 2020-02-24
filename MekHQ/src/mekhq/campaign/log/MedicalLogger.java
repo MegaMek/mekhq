@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.log;
 
 import megamek.common.util.EncodeControl;
@@ -33,7 +32,8 @@ import java.util.ResourceBundle;
  * @author Miguel Azevedo
  */
 public class MedicalLogger {
-    private static ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries", new EncodeControl());;
+    private static ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries",
+            new EncodeControl());
 
     public static MedicalLogEntry severedSpine(Person person, Date date) {
         String message = logEntriesResourceMap.getString("severedSpine.text");
@@ -153,6 +153,7 @@ public class MedicalLogger {
     public static void retiredAndTransferredFromInfirmary(Person person, Date date) {
         person.addLogEntry(new MedicalLogEntry(date, logEntriesResourceMap.getString("retiredAndTransferredFromInfirmary.text")));
     }
+
     public static void dismissedFromInfirmary(Person person, Date date) {
         person.addLogEntry(new MedicalLogEntry(date, logEntriesResourceMap.getString("dismissedFromInfirmary.text")));
     }

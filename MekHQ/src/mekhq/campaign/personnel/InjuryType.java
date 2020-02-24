@@ -18,16 +18,7 @@
  */
 package mekhq.campaign.personnel;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -56,40 +47,38 @@ public class InjuryType {
 
     public static InjuryType byKey(String key) {
         InjuryType result = REGISTRY.get(key);
-        if(null == result) {
+        if (null == result) {
             try {
                 result = ID_REGISTRY.get(Integer.valueOf(key));
-            } catch(NumberFormatException nfex) {
-                // Do nothing
-            }
+            } catch(NumberFormatException ignored) { }
         }
         return result;
     }
 
     public static InjuryType byId(int id) {
-        return ID_REGISTRY.get(Integer.valueOf(id));
+        return ID_REGISTRY.get(id);
     }
 
     public static void register(int id, String key, InjuryType injType) {
         Objects.requireNonNull(injType);
-        if(id >= 0) {
-            if(ID_REGISTRY.containsKey(Integer.valueOf(id))) {
+        if  (id >= 0) {
+            if (ID_REGISTRY.containsKey(id)) {
                 throw new IllegalArgumentException("Injury type ID " + id + " is already registered.");
             }
         }
-        if(REGISTRY.containsKey(Objects.requireNonNull(key))) {
+        if (REGISTRY.containsKey(Objects.requireNonNull(key))) {
             throw new IllegalArgumentException("Injury type key \"" + key + "\" is already registered.");
         }
-        if(key.isEmpty()) {
+        if (key.isEmpty()) {
             throw new IllegalArgumentException("Injury type key can't be an empty string.");
         }
-        if(REV_REGISTRY.containsKey(injType)) {
+        if (REV_REGISTRY.containsKey(injType)) {
             throw new IllegalArgumentException("Injury type " + injType + " is already registered");
         }
         // All checks done
-        if(id >= 0) {
-            ID_REGISTRY.put(Integer.valueOf(id), injType);
-            REV_ID_REGISTRY.put(injType, Integer.valueOf(id));
+        if (id >= 0) {
+            ID_REGISTRY.put(id, injType);
+            REV_ID_REGISTRY.put(injType, id);
         }
         REGISTRY.put(key, injType);
         REV_REGISTRY.put(injType, key);
@@ -107,7 +96,7 @@ public class InjuryType {
 
     public static List<InjuryType> getAllTypes() {
         List<InjuryType> result = new ArrayList<>(REGISTRY.values());
-        Collections.sort(result, (it1, it2) -> it1.getKey().compareTo(it2.getKey()));
+        result.sort(Comparator.comparing(InjuryType::getKey));
         return result;
     }
 
@@ -134,7 +123,7 @@ public class InjuryType {
     }
 
     public final int getId() {
-        return Utilities.nonNull(InjuryType.REV_ID_REGISTRY.get(this), Integer.valueOf(-1)).intValue();
+        return Utilities.nonNull(InjuryType.REV_ID_REGISTRY.get(this), -1);
     }
 
     public final String getKey() {
@@ -203,7 +192,7 @@ public class InjuryType {
     }
 
     public Injury newInjury(Campaign c, Person p, BodyLocation loc, int severity) {
-        if(!isValidInLocation(loc)) {
+        if (!isValidInLocation(loc)) {
             return null;
         }
         final int recoveryTime = getRecoveryTime(severity);
@@ -214,7 +203,7 @@ public class InjuryType {
     }
 
     public Collection<Modifier> getModifiers(Injury inj) {
-        return Arrays.asList();
+        return Collections.emptyList();
     }
 
     /**
@@ -226,33 +215,25 @@ public class InjuryType {
      * implement their own.
      */
     public List<GameEffect> genStressEffect(Campaign c, Person p, Injury i, int hits) {
-        return Arrays.asList();
+        return Collections.emptyList();
     }
 
     // Standard actions generators
 
     protected GameEffect newResetRecoveryTimeAction(Injury i) {
-        return new GameEffect(
-            i.getFluff() + ": recovery timer reset",
-            rnd -> i.setTime(i.getOriginalTime()));
+        return new GameEffect(i.getFluff() + ": recovery timer reset",
+                rnd -> i.setTime(i.getOriginalTime()));
     }
 
     // Helper classes and interfaces
-
-    /** Why you no have this in java.util.function?!? */
-    @FunctionalInterface
-    public static interface ToBooleanFunction<T> {
-        boolean applyAsBoolean(T value);
-    }
-
     public static final class XMLAdapter extends XmlAdapter<String, InjuryType> {
         @Override
-        public InjuryType unmarshal(String v) throws Exception {
+        public InjuryType unmarshal(String v) {
             return (null == v) ? null : InjuryType.byKey(v);
         }
 
         @Override
-        public String marshal(InjuryType v) throws Exception {
+        public String marshal(InjuryType v) {
             return (null == v) ? null : v.getKey();
         }
 

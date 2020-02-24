@@ -45,9 +45,8 @@ import mekhq.campaign.unit.Unit;
  */
 public final class InjuryUtil {
     // Fumble and critical success limits for doctor skills levels 0-10, on a d100
-    private static final int FUMBLE_LIMITS[] = {50, 40, 30, 20, 12, 6, 5, 4, 3, 2, 1};
-    private static final int CRIT_LIMITS[] = {98, 97, 94, 89, 84, 79, 74, 69, 64, 59, 49};
-
+    private static final int[] FUMBLE_LIMITS = {50, 40, 30, 20, 12, 6, 5, 4, 3, 2, 1};
+    private static final int[] CRIT_LIMITS = {98, 97, 94, 89, 84, 79, 74, 69, 64, 59, 49};
     /*
     private static AMEventHandler eventHandler = null;
 
@@ -90,7 +89,7 @@ public final class InjuryUtil {
     /** Resolve effects of damage suffered during combat */
     public static void resolveCombatDamage(Campaign c, Person person, int hits) {
         Collection<Injury> newInjuries = genInjuries(c, person, hits);
-        newInjuries.forEach((inj) -> person.addInjury(inj));
+        newInjuries.forEach(person::addInjury);
         if (newInjuries.size() > 0) {
             MedicalLogger.returnedWithInjuries(person, c.getDate(), newInjuries);
         }
@@ -98,7 +97,7 @@ public final class InjuryUtil {
 
     private static void addHitToAccumulator(Map<BodyLocation, Integer> acc, BodyLocation loc) {
         if(!acc.containsKey(loc)) {
-            acc.put(loc, Integer.valueOf(1));
+            acc.put(loc, 1);
         } else {
             acc.put(loc, acc.get(loc) + 1);
         }
@@ -110,7 +109,7 @@ public final class InjuryUtil {
     public static Collection<Injury> genInjuries(Campaign c, Person p, int hits) {
         final Unit u = c.getUnit(p.getUnitId());
         final Entity en = (null != u) ? u.getEntity() : null;
-        final boolean mwasf = (null != en) && ((en instanceof Mech) || (en instanceof Aero));
+        final boolean mwasf = ((en instanceof Mech) || (en instanceof Aero));
         final int critMod = mwasf ? 0 : 2;
         final BiFunction<IntUnaryOperator, Function<BodyLocation, Boolean>, BodyLocation> generator
             = mwasf ? HitLocationGen::mechAndAsf : HitLocationGen::generic;
@@ -130,17 +129,15 @@ public final class InjuryUtil {
         }
         List<Injury> newInjuries = new ArrayList<>();
         for(Entry<BodyLocation, Integer> accEntry : hitAccumulator.entrySet()) {
-            newInjuries.addAll(genInjuries(c, p, accEntry.getKey(), accEntry.getValue().intValue()));
+            newInjuries.addAll(genInjuries(c, p, accEntry.getKey(), accEntry.getValue()));
         }
         return newInjuries;
     }
 
     /** Generate combat injuries for a specific body location */
     public static Collection<Injury> genInjuries(Campaign c, Person p, BodyLocation loc, int hits) {
-        List<Injury> newInjuries = new ArrayList<Injury>();
-        final BiFunction<InjuryType, Integer, Injury> gen = (it, severity) -> {
-            return it.newInjury(c, p, loc, severity);
-        };
+        List<Injury> newInjuries = new ArrayList<>();
+        final BiFunction<InjuryType, Integer, Injury> gen = (it, severity) -> it.newInjury(c, p, loc, severity);
 
         switch(loc) {
             case LEFT_ARM: case LEFT_HAND: case LEFT_LEG: case LEFT_FOOT:
@@ -253,7 +250,7 @@ public final class InjuryUtil {
         Skill skill = doc.getSkill(SkillType.S_DOCTOR);
         int level = skill.getLevel();
         final int fumbleLimit = FUMBLE_LIMITS[(level >= 0) && (level <= 10) ? level : 0];
-        final int critLimt = CRIT_LIMITS[(level >= 0) && (level <= 10) ? level : 0];
+        final int critLimit = CRIT_LIMITS[(level >= 0) && (level <= 10) ? level : 0];
         int xpGained = 0;
         int mistakeXP = 0;
         int successXP = 0;
@@ -269,7 +266,7 @@ public final class InjuryUtil {
                 if (roll < Math.max(1, fumbleLimit / 10)) {
                     mistakeXP += c.getCampaignOptions().getMistakeXP();
                     xpGained += mistakeXP;
-                } else if (roll > Math.min(98, 99 - (int)Math.round((99 - critLimt) / 10.0))) {
+                } else if (roll > Math.min(98, 99 - (int)Math.round((99 - critLimit) / 10.0))) {
                     successXP += c.getCampaignOptions().getSuccessXP();
                     xpGained += successXP;
                 }
@@ -292,14 +289,15 @@ public final class InjuryUtil {
                             int time = i.getTime();
                             i.setTime((int) Math.max(Math.ceil(time * 1.2), time + 5));
                             MedicalLogger.docMadeAMistake(doc, p, i, c.getDate());
-                            if(rnd.applyAsInt(100) < (fumbleLimit / 4)) {
-                                // TODO: Add in special handling of the critical
+
+                            // TODO: Add in special handling of the critical
+                            //if (rnd.applyAsInt(100) < (fumbleLimit / 4)) {
                                 // injuries like broken back (make perm),
                                 // broken ribs (punctured lung/death chance) internal
                                 // bleeding (death chance)
-                            }
+                            //}
                         }));
-                } else if((roll > critLimt) && (critTimeReduction > 0)) {
+                } else if((roll > critLimit) && (critTimeReduction > 0)) {
                     result.add(new GameEffect(
                         String.format("%s performed some amazing work in treating %s of %s (%d fewer day(s) to heal).",
                             doc.getHyperlinkedFullTitle(), i.getName(), p.getHyperlinkedName(), critTimeReduction),
@@ -415,9 +413,7 @@ public final class InjuryUtil {
             } else if(i.getTime() > 1) {
                 result.add(new GameEffect(
                     String.format("%s continues healing", i.getName()),
-                    rnd -> {
-                        i.setTime(Math.max(i.getTime() - 1, 0));
-                    }));
+                    rnd -> i.setTime(Math.max(i.getTime() - 1, 0))));
             } else if((i.getTime() == 1) && i.isPermanent()) {
                 result.add(new GameEffect(
                     String.format("%s becomes permanent", i.getName()),
