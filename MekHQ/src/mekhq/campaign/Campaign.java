@@ -794,8 +794,7 @@ public class Campaign implements Serializable, ITechManager {
                     }
                     int dependents = getRetirementDefectionTracker().getPayout(pid).getDependents();
                     while (dependents > 0) {
-                        Person p = newDependent(Person.T_ASTECH, false);
-                        if (recruitPerson(p)) {
+                        if (recruitNewDependent(Person.T_ASTECH, false)) {
                             dependents--;
                         } else {
                             dependents = 0;
@@ -3282,7 +3281,7 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         for (Person baby : babies) {
-            recruitPersonWithoutId(baby, false, true, false, false);
+            recruitPerson(baby, false, true, false, false);
         }
     }
 
@@ -4626,6 +4625,7 @@ public class Campaign implements Serializable, ITechManager {
         return Systems.getInstance().getSystemByName(name, getDateTime());
     }
 
+    //region Person Hiring and Addition
 
     /**
      * Gets the {@link AbstractFactionSelector} to use with this campaign.
@@ -4687,6 +4687,16 @@ public class Campaign implements Serializable, ITechManager {
 
         person.setDependent(true);
         return person;
+    }
+
+    /**
+     *
+     * @param type
+     * @param baby
+     * @return
+     */
+    public boolean recruitNewDependent(int type, boolean baby) {
+
     }
 
     /**
