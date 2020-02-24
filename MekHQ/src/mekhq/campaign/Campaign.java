@@ -1217,6 +1217,106 @@ public class Campaign implements Serializable, ITechManager {
         return units.get(id);
     }
 
+    //region Personnel
+    //region Person Creation
+    /**
+     * Creates a new {@link Person}, who is a dependent, of a given primary role.
+     * @param type The primary role of the {@link Person}, e.g. {@link Person#T_MECHWARRIOR}.
+     * @return A new {@link Person} of the given primary role, who is a dependent.
+     */
+    public Person newDependent(int type, boolean baby) {
+        Person person;
+
+        if (!baby && campaignOptions.getRandomizeDependentOrigin()) {
+            person = newPerson(type);
+        } else {
+            person = newPerson(type, Person.T_NONE, new DefaultFactionSelector(),
+                    new DefaultPlanetSelector(), Person.G_RANDOMIZE);
+        }
+
+        person.setDependent(true);
+        return person;
+    }
+
+    /**
+     * Generate a new pilotPerson of the given type using whatever randomization options have been given in the
+     * CampaignOptions
+     *
+     * @param type The primary role
+     * @return A new {@link Person}.
+     */
+    public Person newPerson(int type) {
+        return newPerson(type, Person.T_NONE);
+    }
+
+    /**
+     * Generate a new pilotPerson of the given type using whatever randomization options have been given in the
+     * CampaignOptions
+     *
+     * @param type The primary role
+     * @param secondary A secondary role; used for LAM pilots to generate MW + Aero pilot
+     * @return A new {@link Person}.
+     */
+    public Person newPerson(int type, int secondary) {
+        return newPerson(type, secondary, getFactionSelector(), getPlanetSelector(), Person.G_RANDOMIZE);
+    }
+
+    /**
+     * Generate a new pilotPerson of the given type using whatever randomization options have been given in the
+     * CampaignOptions
+     *
+     * @param type The primary role
+     * @param secondary A secondary role; used for LAM pilots to generate MW + Aero pilot
+     * @param factionCode The code for the faction this person is to be generated from
+     * @param gender The gender of the person to be generated, or a randomize it value
+     * @return A new {@link Person}.
+     */
+    public Person newPerson(int type, int secondary, String factionCode, int gender) {
+        return newPerson(type, secondary, new DefaultFactionSelector(factionCode), getPlanetSelector(), gender);
+    }
+
+    /**
+     * Generate a new pilotPerson of the given type using whatever randomization options have been given in the
+     * CampaignOptions
+     *
+     * @param type The primary role
+     * @param secondary A secondary role; used for LAM pilots to generate MW + Aero pilot
+     * @param factionSelector The faction selector to use for the person.
+     * @param planetSelector The planet selector for the person.
+     * @param gender The gender of the person to be generated, or a randomize it value
+     * @return A new {@link Person}.
+     */
+    public Person newPerson(int type, int secondary, AbstractFactionSelector factionSelector,
+                            AbstractPlanetSelector planetSelector, int gender) {
+        AbstractPersonnelGenerator personnelGenerator = getPersonnelGenerator(factionSelector, planetSelector);
+        return newPerson(type, secondary, personnelGenerator, gender);
+    }
+
+    /**
+     * Generate a new {@link Person} of the given type, using the supplied {@link AbstractPersonnelGenerator}
+     * @param type The primary role of the {@link Person}.
+     * @param secondary The secondary role, or {@link Person#T_NONE}, of the {@link Person}.
+     * @param personnelGenerator The {@link AbstractPersonnelGenerator} to use when creating the {@link Person}.
+     * @param gender The gender of the person to be generated, or a randomize it value
+     * @return A new {@link Person} configured using {@code personnelGenerator}.
+     */
+    public Person newPerson(int type, int secondary, AbstractPersonnelGenerator personnelGenerator, int gender) {
+        if (type == Person.T_LAM_PILOT) {
+            type = Person.T_MECHWARRIOR;
+            secondary = Person.T_AERO_PILOT;
+        }
+
+        Person person = personnelGenerator.generate(this, type, secondary, gender);
+
+        // Assign a random portrait after we generate a new person
+        if (getCampaignOptions().usePortraitForType(type)) {
+            assignRandomPortraitFor(person);
+        }
+
+        return person;
+    }
+    //endregion Person Creation
+
     //region Personnel Recruitment
     /**
      *
@@ -1232,6 +1332,36 @@ public class Campaign implements Serializable, ITechManager {
         personnel.put(id, p);
 
         recruitPerson(p, prisoner, dependent, gmAdd, log);
+    }
+
+    /**
+     * Creates a new {@link Person}, who is a dependent, of a given primary role.
+     * @param type The primary role of the {@link Person}, e.g. {@link Person#T_MECHWARRIOR}.
+     * @return A new {@link Person} of the given primary role, who is a dependent.
+     *
+     public Person newDependent(int type, boolean baby) {
+        Person person;
+
+        if (!baby && campaignOptions.getRandomizeDependentOrigin()) {
+            person = newPerson(type);
+        } else {
+            person = newPerson(type, Person.T_NONE, new DefaultFactionSelector(),
+                    new DefaultPlanetSelector(), Person.G_RANDOMIZE);
+        }
+
+        person.setDependent(true);
+        return person;
+     }
+*/
+
+    /**
+     *
+     * @param type
+     * @param baby
+     * @return
+     */
+    public boolean recruitNewDependent(int type, boolean baby) {
+        return true;
     }
 
     /**
@@ -1324,15 +1454,183 @@ public class Campaign implements Serializable, ITechManager {
     }
     //endregion Personnel Recruitment
 
+    //region Bloodnames
     /**
-     * Imports a {@link Person} into a campaign.
-     * @param p A {@link Person} to import into the campaign.
+     * If the person does not already have a bloodname, assigns a chance of having one based on
+     * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
+     * appropriate to the person's phenotype and the player's faction.
+     *
+     * @param person       The Bloodname candidate
+     * @param type         The phenotype index
      */
-    public void importPerson(Person p) {
-        personnel.put(p.getId(), p);
-        MekHQ.triggerEvent(new PersonNewEvent(p));
+    public void checkBloodnameAdd(Person person, int type) {
+        checkBloodnameAdd(person, type, false, this.factionCode);
     }
 
+    /**
+     * If the person does not already have a bloodname, assigns a chance of having one based on
+     * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
+     * appropriate to Clan and phenotype.
+     *
+     * @param person       The Bloodname candidate
+     * @param type         The phenotype index
+     * @param factionCode  The shortName of the faction the person belongs to. Note that there
+     *                     is a chance of having a Bloodname that is unique to a different Clan
+     *                     as this person could have been captured.
+     */
+    public void checkBloodnameAdd(Person person, int type, String factionCode) {
+        checkBloodnameAdd(person, type, false, factionCode);
+    }
+
+    /**
+     * If the person does not already have a bloodname, assigns a chance of having one based on
+     * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
+     * appropriate to the person's phenotype and the player's faction.
+     *
+     * @param person       The Bloodname candidate
+     * @param type         The phenotype index
+     * @param ignoreDice   If true, skips the random roll and assigns a Bloodname automatically
+     */
+    public void checkBloodnameAdd(Person person, int type, boolean ignoreDice) {
+        checkBloodnameAdd(person, type, ignoreDice, this.factionCode);
+    }
+
+    /**
+     * If the person does not already have a bloodname, assigns a chance of having one based on
+     * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
+     * appropriate to Clan and phenotype.
+     *
+     * @param person       The Bloodname candidate
+     * @param type         The phenotype index
+     * @param ignoreDice   If true, skips the random roll and assigns a Bloodname automatically
+     * @param factionCode  The shortName of the faction the person belongs to. Note that there
+     *                     is a chance of having a Bloodname that is unique to a different Clan
+     *                     as this person could have been captured.
+     */
+    public void checkBloodnameAdd(Person person, int type, boolean ignoreDice, String factionCode) {
+        // Person already has a bloodname?
+        if (person.getBloodname().length() > 0) {
+            int result = JOptionPane.showConfirmDialog(null,
+                    person.getFullName() + " already has the bloodname " + person.getBloodname()
+                            + "\nDo you wish to remove that bloodname and generate a new one?",
+                    "Already Has Bloodname", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            if (result == JOptionPane.NO_OPTION) {
+                return;
+            }
+        }
+
+        // Go ahead and generate a new bloodname
+        if (person.isClanner() && person.getPhenotype() != Person.PHENOTYPE_NONE) {
+            int bloodnameTarget = 6;
+            switch (person.getPhenotype()) {
+                case Person.PHENOTYPE_MW:
+                    bloodnameTarget += person.hasSkill(SkillType.S_GUN_MECH)
+                            ? person.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue()
+                            : 13;
+                    bloodnameTarget += person.hasSkill(SkillType.S_PILOT_MECH)
+                            ? person.getSkill(SkillType.S_PILOT_MECH).getFinalSkillValue()
+                            : 13;
+                    break;
+                case Person.PHENOTYPE_AERO:
+                    if (type == Person.T_PROTO_PILOT) {
+                        bloodnameTarget += 2 * (person.hasSkill(SkillType.S_GUN_PROTO)
+                                ? person.getSkill(SkillType.S_GUN_PROTO).getFinalSkillValue()
+                                : 13);
+
+                    } else {
+                        bloodnameTarget += person.hasSkill(SkillType.S_GUN_AERO)
+                                ? person.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue()
+                                : 13;
+                        bloodnameTarget += person.hasSkill(SkillType.S_PILOT_AERO)
+                                ? person.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue()
+                                : 13;
+                    }
+                    break;
+                case Person.PHENOTYPE_BA:
+                    bloodnameTarget += person.hasSkill(SkillType.S_GUN_BA)
+                            ? person.getSkill(SkillType.S_GUN_BA).getFinalSkillValue()
+                            : 13;
+                    bloodnameTarget += person.hasSkill(SkillType.S_ANTI_MECH)
+                            ? person.getSkill(SkillType.S_ANTI_MECH).getFinalSkillValue()
+                            : 13;
+                    break;
+                case Person.PHENOTYPE_VEE:
+                    bloodnameTarget += person.hasSkill(SkillType.S_GUN_VEE)
+                            ? person.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue()
+                            : 13;
+                    if (type == Person.T_VTOL_PILOT) {
+                        bloodnameTarget += person.hasSkill(SkillType.S_PILOT_VTOL)
+                                ? person.getSkill(SkillType.S_PILOT_VTOL).getFinalSkillValue()
+                                : 13;
+                    } else if (type == Person.T_NVEE_DRIVER) {
+                        bloodnameTarget += person.hasSkill(SkillType.S_PILOT_NVEE)
+                                ? person.getSkill(SkillType.S_PILOT_NVEE).getFinalSkillValue()
+                                : 13;
+                    } else {
+                        bloodnameTarget += person.hasSkill(SkillType.S_PILOT_GVEE)
+                                ? person.getSkill(SkillType.S_PILOT_GVEE).getFinalSkillValue()
+                                : 13;
+                    }
+                    break;
+            }
+            // Higher rated units are more likely to have Bloodnamed
+            if (campaignOptions.useDragoonRating()) {
+                IUnitRating rating = getUnitRating();
+                bloodnameTarget += IUnitRating.DRAGOON_C - (campaignOptions.getUnitRatingMethod().equals(
+                        mekhq.campaign.rating.UnitRatingMethod.FLD_MAN_MERCS_REV) ? rating.getUnitRatingAsInteger()
+                        : rating.getModifier());
+            }
+            // Reavings diminish the number of available Bloodrights in later eras
+            int year = getCalendar().get(Calendar.YEAR);
+            if (year <= 2950)
+                bloodnameTarget--;
+            if (year > 3055)
+                bloodnameTarget++;
+            if (year > 3065)
+                bloodnameTarget++;
+            if (year > 3080)
+                bloodnameTarget++;
+            // Officers have better chance; no penalty for non-officer
+            bloodnameTarget += Math.min(0, ranks.getOfficerCut() - person.getRankNumeric());
+
+            if (Compute.d6(2) >= bloodnameTarget || ignoreDice) {
+                /*
+                 * The Bloodname generator has slight differences in categories that do not map
+                 * easily onto Person constants
+                 */
+                int phenotype = Bloodname.P_GENERAL;
+                switch (type) {
+                    case Person.T_MECHWARRIOR:
+                        phenotype = Bloodname.P_MECHWARRIOR;
+                        break;
+                    case Person.T_BA:
+                        phenotype = Bloodname.P_ELEMENTAL;
+                        break;
+                    case Person.T_AERO_PILOT:
+                    case Person.T_CONV_PILOT:
+                        phenotype = Bloodname.P_AEROSPACE;
+                        break;
+                    case Person.T_SPACE_CREW:
+                    case Person.T_NAVIGATOR:
+                    case Person.T_SPACE_GUNNER:
+                    case Person.T_SPACE_PILOT:
+                        phenotype = Bloodname.P_NAVAL;
+                        break;
+                    case Person.T_PROTO_PILOT:
+                        phenotype = Bloodname.P_PROTOMECH;
+                        break;
+                }
+                Bloodname bloodname = Bloodname.randomBloodname(factionCode, phenotype, getGameYear());
+                if (null != bloodname) {
+                    person.setBloodname(bloodname.getName());
+                }
+            }
+        }
+        MekHQ.triggerEvent(new PersonChangedEvent(person));
+    }
+    //endregion Bloodnames
+
+    //region Ancestors
     /**
      * Imports an {@link Ancestors} into a campaign.
      * @param a An {@link Ancestors} to import into the campaign.
@@ -1345,13 +1643,50 @@ public class Campaign implements Serializable, ITechManager {
         ancestors.put(a.getId(), a);
     }
 
-    @Deprecated
-    public Date getDate() {
-        return calendar.getTime();
+    public Iterable<Ancestors> getAncestors() {
+        return ancestors.values();
     }
 
-    public DateTime getDateTime() {
-        return currentDateTime;
+    /** @return a matching ancestors entry for the arguments, or null if there isn't any */
+    public Ancestors getAncestors(UUID fatherId, UUID motherId) {
+        for(Map.Entry<UUID, Ancestors> m : ancestors.entrySet()) {
+            Ancestors a = m.getValue();
+            if(Objects.equals(fatherId, a.getFatherId()) && Objects.equals(motherId, a.getMotherId())) {
+                return a;
+            }
+        }
+        return null;
+    }
+
+    public Ancestors getAncestors(UUID id) {
+        if (id == null) {
+            return null;
+        }
+        return ancestors.get(id);
+    }
+
+    public Ancestors createAncestors(UUID father, UUID mother) {
+        Ancestors na = new Ancestors(father, mother, this);
+        ancestors.put(na.getId(), na);
+        return na;
+    }
+    //endregion Ancestors
+
+    //region Other Personnel Methods
+    /**
+     * Imports a {@link Person} into a campaign.
+     * @param p A {@link Person} to import into the campaign.
+     */
+    public void importPerson(Person p) {
+        personnel.put(p.getId(), p);
+        MekHQ.triggerEvent(new PersonNewEvent(p));
+    }
+
+    public Person getPerson(UUID id) {
+        if (id == null) {
+            return null;
+        }
+        return personnel.get(id);
     }
 
     public Collection<Person> getPersonnel() {
@@ -1369,20 +1704,61 @@ public class Campaign implements Serializable, ITechManager {
         }
         return activePersonnel;
     }
+    //endregion Other Personnel Methods
 
-    public Iterable<Ancestors> getAncestors() {
-        return ancestors.values();
+    //region Personnel Selectors and Generators
+    /**
+     * Gets the {@link AbstractFactionSelector} to use with this campaign.
+     * @return An {@link AbstractFactionSelector} to use when selecting a {@link Faction}.
+     */
+    public AbstractFactionSelector getFactionSelector() {
+        if (getCampaignOptions().randomizeOrigin()) {
+            RangedFactionSelector selector = new RangedFactionSelector(getCampaignOptions().getOriginSearchRadius());
+            selector.setDistanceScale(getCampaignOptions().getOriginDistanceScale());
+            return selector;
+        } else {
+            return new DefaultFactionSelector();
+        }
     }
 
-    /** @return a matching ancestors entry for the arguments, or null if there isn't any */
-    public Ancestors getAncestors(UUID fatherId, UUID motherId) {
-        for(Map.Entry<UUID, Ancestors> m : ancestors.entrySet()) {
-            Ancestors a = m.getValue();
-            if(Objects.equals(fatherId, a.getFatherId()) && Objects.equals(motherId, a.getMotherId())) {
-                return a;
-            }
+    /**
+     * Gets the {@link AbstractPlanetSelector} to use with this campaign.
+     * @return An {@link AbstractPlanetSelector} to use when selecting a {@link Planet}.
+     */
+    public AbstractPlanetSelector getPlanetSelector() {
+        if (getCampaignOptions().randomizeOrigin()) {
+            RangedPlanetSelector selector =
+                    new RangedPlanetSelector(getCampaignOptions().getOriginSearchRadius(),
+                            getCampaignOptions().isOriginExtraRandom());
+            selector.setDistanceScale(getCampaignOptions().getOriginDistanceScale());
+            return selector;
+        } else {
+            return new DefaultPlanetSelector();
         }
-        return null;
+    }
+
+    /**
+     * Gets the {@link AbstractPersonnelGenerator} to use with this campaign.
+     * @param factionSelector The {@link AbstractFactionSelector} to use when choosing a {@link Faction}.
+     * @param planetSelector The {@link AbstractPlanetSelector} to use when choosing a {@link Planet}.
+     * @return An {@link AbstractPersonnelGenerator} to use when creating new personnel.
+     */
+    public AbstractPersonnelGenerator getPersonnelGenerator(AbstractFactionSelector factionSelector, AbstractPlanetSelector planetSelector) {
+        DefaultPersonnelGenerator generator = new DefaultPersonnelGenerator(factionSelector, planetSelector);
+        generator.setNameGenerator(getRNG());
+        generator.setSkillPreferences(getRandomSkillPreferences());
+        return generator;
+    }
+    //endregion Personnel Selectors and Generators
+    //endregion Personnel
+
+    @Deprecated
+    public Date getDate() {
+        return calendar.getTime();
+    }
+
+    public DateTime getDateTime() {
+        return currentDateTime;
     }
 
     public List<Person> getPatients() {
@@ -1407,37 +1783,6 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
         return service;
-    }
-
-    public List<Person> getPeople(UUID[] ids) {
-        List<Person> people = new ArrayList<>();
-
-        if (ids != null) {
-            for (UUID id : ids) {
-                people.add(getPerson(id));
-            }
-        }
-        return people;
-    }
-
-    public Person getPerson(UUID id) {
-        if (id == null) {
-            return null;
-        }
-        return personnel.get(id);
-    }
-
-    public Ancestors getAncestors(UUID id) {
-        if (id == null) {
-            return null;
-        }
-        return ancestors.get(id);
-    }
-
-    public Ancestors createAncestors(UUID father, UUID mother) {
-        Ancestors na = new Ancestors(father, mother, this);
-        ancestors.put(na.getId(), na);
-        return na;
     }
 
     public void addPart(Part p, int transitDays) {
@@ -4623,332 +4968,6 @@ public class Campaign implements Serializable, ITechManager {
 
     public PlanetarySystem getSystemByName(String name) {
         return Systems.getInstance().getSystemByName(name, getDateTime());
-    }
-
-    //region Person Hiring and Addition
-
-    /**
-     * Gets the {@link AbstractFactionSelector} to use with this campaign.
-     * @return An {@link AbstractFactionSelector} to use when selecting a {@link Faction}.
-     */
-    public AbstractFactionSelector getFactionSelector() {
-        if (getCampaignOptions().randomizeOrigin()) {
-            RangedFactionSelector selector = new RangedFactionSelector(getCampaignOptions().getOriginSearchRadius());
-            selector.setDistanceScale(getCampaignOptions().getOriginDistanceScale());
-            return selector;
-        } else {
-            return new DefaultFactionSelector();
-        }
-    }
-
-    /**
-     * Gets the {@link AbstractPlanetSelector} to use with this campaign.
-     * @return An {@link AbstractPlanetSelector} to use when selecting a {@link Planet}.
-     */
-    public AbstractPlanetSelector getPlanetSelector() {
-        if (getCampaignOptions().randomizeOrigin()) {
-            RangedPlanetSelector selector =
-                new RangedPlanetSelector(getCampaignOptions().getOriginSearchRadius(),
-                        getCampaignOptions().isOriginExtraRandom());
-            selector.setDistanceScale(getCampaignOptions().getOriginDistanceScale());
-            return selector;
-        } else {
-            return new DefaultPlanetSelector();
-        }
-    }
-
-    /**
-     * Gets the {@link AbstractPersonnelGenerator} to use with this campaign.
-     * @param factionSelector The {@link AbstractFactionSelector} to use when choosing a {@link Faction}.
-     * @param planetSelector The {@link AbstractPlanetSelector} to use when choosing a {@link Planet}.
-     * @return An {@link AbstractPersonnelGenerator} to use when creating new personnel.
-     */
-    public AbstractPersonnelGenerator getPersonnelGenerator(AbstractFactionSelector factionSelector, AbstractPlanetSelector planetSelector) {
-        DefaultPersonnelGenerator generator = new DefaultPersonnelGenerator(factionSelector, planetSelector);
-        generator.setNameGenerator(getRNG());
-        generator.setSkillPreferences(getRandomSkillPreferences());
-        return generator;
-    }
-
-    /**
-     * Creates a new {@link Person}, who is a dependent, of a given primary role.
-     * @param type The primary role of the {@link Person}, e.g. {@link Person#T_MECHWARRIOR}.
-     * @return A new {@link Person} of the given primary role, who is a dependent.
-     */
-    public Person newDependent(int type, boolean baby) {
-        Person person;
-
-        if (!baby && campaignOptions.getRandomizeDependentOrigin()) {
-            person = newPerson(type);
-        } else {
-            person = newPerson(type, Person.T_NONE, new DefaultFactionSelector(),
-                    new DefaultPlanetSelector(), Person.G_RANDOMIZE);
-        }
-
-        person.setDependent(true);
-        return person;
-    }
-
-    /**
-     *
-     * @param type
-     * @param baby
-     * @return
-     */
-    public boolean recruitNewDependent(int type, boolean baby) {
-
-    }
-
-    /**
-     * Generate a new pilotPerson of the given type using whatever randomization options have been given in the
-     * CampaignOptions
-     *
-     * @param type The primary role
-     * @return A new {@link Person}.
-     */
-    public Person newPerson(int type) {
-        return newPerson(type, Person.T_NONE);
-    }
-
-    /**
-     * Generate a new pilotPerson of the given type using whatever randomization options have been given in the
-     * CampaignOptions
-     *
-     * @param type The primary role
-     * @param secondary A secondary role; used for LAM pilots to generate MW + Aero pilot
-     * @return A new {@link Person}.
-     */
-    public Person newPerson(int type, int secondary) {
-        return newPerson(type, secondary, getFactionSelector(), getPlanetSelector(), Person.G_RANDOMIZE);
-    }
-
-    /**
-     * Generate a new pilotPerson of the given type using whatever randomization options have been given in the
-     * CampaignOptions
-     *
-     * @param type The primary role
-     * @param secondary A secondary role; used for LAM pilots to generate MW + Aero pilot
-     * @param factionCode The code for the faction this person is to be generated from
-     * @param gender The gender of the person to be generated, or a randomize it value
-     * @return A new {@link Person}.
-     */
-    public Person newPerson(int type, int secondary, String factionCode, int gender) {
-        return newPerson(type, secondary, new DefaultFactionSelector(factionCode), getPlanetSelector(), gender);
-    }
-
-    /**
-     * Generate a new pilotPerson of the given type using whatever randomization options have been given in the
-     * CampaignOptions
-     *
-     * @param type The primary role
-     * @param secondary A secondary role; used for LAM pilots to generate MW + Aero pilot
-     * @param factionSelector The faction selector to use for the person.
-     * @param planetSelector The planet selector for the person.
-     * @param gender The gender of the person to be generated, or a randomize it value
-     * @return A new {@link Person}.
-     */
-    public Person newPerson(int type, int secondary, AbstractFactionSelector factionSelector,
-                            AbstractPlanetSelector planetSelector, int gender) {
-        AbstractPersonnelGenerator personnelGenerator = getPersonnelGenerator(factionSelector, planetSelector);
-        return newPerson(type, secondary, personnelGenerator, gender);
-    }
-
-    /**
-     * Generate a new {@link Person} of the given type, using the supplied {@link AbstractPersonnelGenerator}
-     * @param type The primary role of the {@link Person}.
-     * @param secondary The secondary role, or {@link Person#T_NONE}, of the {@link Person}.
-     * @param personnelGenerator The {@link AbstractPersonnelGenerator} to use when creating the {@link Person}.
-     * @param gender The gender of the person to be generated, or a randomize it value
-     * @return A new {@link Person} configured using {@code personnelGenerator}.
-     */
-    public Person newPerson(int type, int secondary, AbstractPersonnelGenerator personnelGenerator, int gender) {
-        if (type == Person.T_LAM_PILOT) {
-            type = Person.T_MECHWARRIOR;
-            secondary = Person.T_AERO_PILOT;
-        }
-
-        Person person = personnelGenerator.generate(this, type, secondary, gender);
-
-        // Assign a random portrait after we generate a new person
-        if (getCampaignOptions().usePortraitForType(type)) {
-            assignRandomPortraitFor(person);
-        }
-
-        return person;
-    }
-
-    /**
-     * If the person does not already have a bloodname, assigns a chance of having one based on
-     * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
-     * appropriate to the person's phenotype and the player's faction.
-     *
-     * @param person       The Bloodname candidate
-     * @param type         The phenotype index
-     */
-    public void checkBloodnameAdd(Person person, int type) {
-        checkBloodnameAdd(person, type, false, this.factionCode);
-    }
-
-    /**
-     * If the person does not already have a bloodname, assigns a chance of having one based on
-     * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
-     * appropriate to Clan and phenotype.
-     *
-     * @param person       The Bloodname candidate
-     * @param type         The phenotype index
-     * @param factionCode  The shortName of the faction the person belongs to. Note that there
-     *                     is a chance of having a Bloodname that is unique to a different Clan
-     *                     as this person could have been captured.
-     */
-    public void checkBloodnameAdd(Person person, int type, String factionCode) {
-        checkBloodnameAdd(person, type, false, factionCode);
-    }
-
-    /**
-     * If the person does not already have a bloodname, assigns a chance of having one based on
-     * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
-     * appropriate to the person's phenotype and the player's faction.
-     *
-     * @param person       The Bloodname candidate
-     * @param type         The phenotype index
-     * @param ignoreDice   If true, skips the random roll and assigns a Bloodname automatically
-     */
-    public void checkBloodnameAdd(Person person, int type, boolean ignoreDice) {
-        checkBloodnameAdd(person, type, ignoreDice, this.factionCode);
-    }
-
-    /**
-     * If the person does not already have a bloodname, assigns a chance of having one based on
-     * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
-     * appropriate to Clan and phenotype.
-     *
-     * @param person       The Bloodname candidate
-     * @param type         The phenotype index
-     * @param ignoreDice   If true, skips the random roll and assigns a Bloodname automatically
-     * @param factionCode  The shortName of the faction the person belongs to. Note that there
-     *                     is a chance of having a Bloodname that is unique to a different Clan
-     *                     as this person could have been captured.
-     */
-    public void checkBloodnameAdd(Person person, int type, boolean ignoreDice, String factionCode) {
-        // Person already has a bloodname?
-        if (person.getBloodname().length() > 0) {
-            int result = JOptionPane.showConfirmDialog(null,
-                    person.getFullName() + " already has the bloodname " + person.getBloodname()
-                            + "\nDo you wish to remove that bloodname and generate a new one?",
-                    "Already Has Bloodname", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-            if (result == JOptionPane.NO_OPTION) {
-                return;
-            }
-        }
-
-        // Go ahead and generate a new bloodname
-        if (person.isClanner() && person.getPhenotype() != Person.PHENOTYPE_NONE) {
-            int bloodnameTarget = 6;
-            switch (person.getPhenotype()) {
-                case Person.PHENOTYPE_MW:
-                    bloodnameTarget += person.hasSkill(SkillType.S_GUN_MECH)
-                            ? person.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue()
-                            : 13;
-                    bloodnameTarget += person.hasSkill(SkillType.S_PILOT_MECH)
-                            ? person.getSkill(SkillType.S_PILOT_MECH).getFinalSkillValue()
-                            : 13;
-                    break;
-                case Person.PHENOTYPE_AERO:
-                    if (type == Person.T_PROTO_PILOT) {
-                        bloodnameTarget += 2 * (person.hasSkill(SkillType.S_GUN_PROTO)
-                                ? person.getSkill(SkillType.S_GUN_PROTO).getFinalSkillValue()
-                                : 13);
-
-                    } else {
-                        bloodnameTarget += person.hasSkill(SkillType.S_GUN_AERO)
-                                ? person.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue()
-                                : 13;
-                        bloodnameTarget += person.hasSkill(SkillType.S_PILOT_AERO)
-                                ? person.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue()
-                                : 13;
-                    }
-                    break;
-                case Person.PHENOTYPE_BA:
-                    bloodnameTarget += person.hasSkill(SkillType.S_GUN_BA)
-                            ? person.getSkill(SkillType.S_GUN_BA).getFinalSkillValue()
-                            : 13;
-                    bloodnameTarget += person.hasSkill(SkillType.S_ANTI_MECH)
-                            ? person.getSkill(SkillType.S_ANTI_MECH).getFinalSkillValue()
-                            : 13;
-                    break;
-                case Person.PHENOTYPE_VEE:
-                    bloodnameTarget += person.hasSkill(SkillType.S_GUN_VEE)
-                            ? person.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue()
-                            : 13;
-                    if (type == Person.T_VTOL_PILOT) {
-                        bloodnameTarget += person.hasSkill(SkillType.S_PILOT_VTOL)
-                                ? person.getSkill(SkillType.S_PILOT_VTOL).getFinalSkillValue()
-                                : 13;
-                    } else if (type == Person.T_NVEE_DRIVER) {
-                        bloodnameTarget += person.hasSkill(SkillType.S_PILOT_NVEE)
-                                ? person.getSkill(SkillType.S_PILOT_NVEE).getFinalSkillValue()
-                                : 13;
-                    } else {
-                        bloodnameTarget += person.hasSkill(SkillType.S_PILOT_GVEE)
-                                ? person.getSkill(SkillType.S_PILOT_GVEE).getFinalSkillValue()
-                                : 13;
-                    }
-                    break;
-            }
-            // Higher rated units are more likely to have Bloodnamed
-            if (campaignOptions.useDragoonRating()) {
-                IUnitRating rating = getUnitRating();
-                bloodnameTarget += IUnitRating.DRAGOON_C - (campaignOptions.getUnitRatingMethod().equals(
-                        mekhq.campaign.rating.UnitRatingMethod.FLD_MAN_MERCS_REV) ? rating.getUnitRatingAsInteger()
-                                : rating.getModifier());
-            }
-            // Reavings diminish the number of available Bloodrights in later eras
-            int year = getCalendar().get(Calendar.YEAR);
-            if (year <= 2950)
-                bloodnameTarget--;
-            if (year > 3055)
-                bloodnameTarget++;
-            if (year > 3065)
-                bloodnameTarget++;
-            if (year > 3080)
-                bloodnameTarget++;
-            // Officers have better chance; no penalty for non-officer
-            bloodnameTarget += Math.min(0, ranks.getOfficerCut() - person.getRankNumeric());
-
-            if (Compute.d6(2) >= bloodnameTarget || ignoreDice) {
-                /*
-                 * The Bloodname generator has slight differences in categories that do not map
-                 * easily onto Person constants
-                 */
-                int phenotype = Bloodname.P_GENERAL;
-                switch (type) {
-                    case Person.T_MECHWARRIOR:
-                        phenotype = Bloodname.P_MECHWARRIOR;
-                        break;
-                    case Person.T_BA:
-                        phenotype = Bloodname.P_ELEMENTAL;
-                        break;
-                    case Person.T_AERO_PILOT:
-                    case Person.T_CONV_PILOT:
-                        phenotype = Bloodname.P_AEROSPACE;
-                        break;
-                    case Person.T_SPACE_CREW:
-                    case Person.T_NAVIGATOR:
-                    case Person.T_SPACE_GUNNER:
-                    case Person.T_SPACE_PILOT:
-                        phenotype = Bloodname.P_NAVAL;
-                        break;
-                    case Person.T_PROTO_PILOT:
-                        phenotype = Bloodname.P_PROTOMECH;
-                        break;
-                }
-                Bloodname bloodname = Bloodname.randomBloodname(factionCode, phenotype, getGameYear());
-                if (null != bloodname) {
-                    person.setBloodname(bloodname.getName());
-                }
-            }
-        }
-        MekHQ.triggerEvent(new PersonChangedEvent(person));
     }
 
     public void setRanks(Ranks r) {
