@@ -15,6 +15,7 @@ VERSION HISTORY:
 + Issue #1429: Adding Bulk Add to the Parts Marketplace.
 + PR #1500: Scenario Generation properly handles GM Generation and Multiple Missions
 + Issue #1505: Fixing Personnel Tab Graphical Unit Images for Mixed Fighter and Tech Person
++ PR #1519: Adding proper bondsman formatting when Added to Campaign
 
 v0.47.4 (2020-2-09 2200 UTC)
 + PR #1440: Implement "Rugged" quirk (2x or 3x between maintenance rolls)
