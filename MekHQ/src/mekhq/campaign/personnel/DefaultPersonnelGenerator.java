@@ -80,7 +80,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
         person.setPrimaryRole(primaryRole);
         person.setSecondaryRole(secondaryRole);
 
-        generateName(campaign, person, gender);
+        generateName(person, gender);
 
         int expLvl = generateExperienceLevel(campaign, person);
 

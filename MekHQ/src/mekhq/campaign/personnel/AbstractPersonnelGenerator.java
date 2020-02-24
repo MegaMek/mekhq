@@ -109,18 +109,13 @@ public abstract class AbstractPersonnelGenerator {
 
     /**
      * Generates a name for a {@link Person}.
-     * @param campaign The {@link Campaign} which tracks the person.
      * @param person The {@link Person} being generated.
      * @param gender The person's gender, or a randomize value
      */
-    protected void generateName(Campaign campaign, Person person, int gender) {
-        boolean isFemale;
-
-        if (gender == Person.G_RANDOMIZE) {
-            isFemale = getNameGenerator().isFemale();
-        } else {
-            isFemale = gender == Person.G_FEMALE;
-        }
+    protected void generateName(Person person, int gender) {
+        boolean isFemale = gender == Person.G_RANDOMIZE
+                ? getNameGenerator().isFemale()
+                : gender == Person.G_FEMALE;
 
         if (isFemale) {
             person.setGender(Person.G_FEMALE);
