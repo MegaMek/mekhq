@@ -191,25 +191,13 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     }
 
     private void hire() {
-        if (hqView.getCampaign().recruitPerson(person)) {
-            if (hqView.getCampaign().getCampaignOptions().getUseTimeInService()) {
-                GregorianCalendar rawRecruit = (GregorianCalendar) hqView.getCampaign().getCalendar().clone();
-                person.setRecruitment(rawRecruit);
-            }
-
-            createNewRecruit();
-        }
-
+        hqView.getCampaign().recruitPerson(person, false);
+        createNewRecruit();
         refreshView();
     }
 
     private void addGM() {
-        hqView.getCampaign().addPerson(person);
-        if (hqView.getCampaign().getCampaignOptions().getUseTimeInService()) {
-            GregorianCalendar rawRecruit = (GregorianCalendar) hqView.getCampaign().getCalendar().clone();
-            person.setRecruitment(rawRecruit);
-        }
-
+        hqView.getCampaign().recruitPerson(person, true);
         createNewRecruit();
         refreshView();
     }
