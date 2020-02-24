@@ -1413,7 +1413,7 @@ public class CampaignGUI extends JPanel {
         return ".cpnx";
     }
 
-    private void menuLoadXmlActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuLoadActionPerformed
+    private void menuLoadXmlActionPerformed(java.awt.event.ActionEvent evt) {
         File f = selectLoadCampaignFile();
         if (null == f) {
             return;
@@ -1441,15 +1441,15 @@ public class CampaignGUI extends JPanel {
         return FileDialogs.openCampaign(frame).orElse(null);
     }
 
-    private void btnOvertimeActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnOvertimeActionPerformed
+    private void btnOvertimeActionPerformed(java.awt.event.ActionEvent evt) {
         getCampaign().setOvertime(btnOvertime.isSelected());
-    }// GEN-LAST:event_btnOvertimeActionPerformed
+    }
 
-    private void btnGMModeActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnGMModeActionPerformed
+    private void btnGMModeActionPerformed(java.awt.event.ActionEvent evt) {
         getCampaign().setGMMode(btnGMMode.isSelected());
-    }// GEN-LAST:event_btnGMModeActionPerformed
+    }
 
-    private void menuOptionsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuOptionsActionPerformed
+    private void menuOptionsActionPerformed(java.awt.event.ActionEvent evt) {
         boolean atb = getCampaign().getCampaignOptions().getUseAtB();
         boolean timein = getCampaign().getCampaignOptions().getUseTimeInService();
         boolean staticRATs = getCampaign().getCampaignOptions().useStaticRATs();
@@ -1501,9 +1501,9 @@ public class CampaignGUI extends JPanel {
         }
         refreshCalendar();
         getCampaign().reloadNews();
-    }// GEN-LAST:event_menuOptionsActionPerformed
+    }
 
-    private void menuOptionsMMActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuOptionsActionPerformed
+    private void menuOptionsMMActionPerformed(java.awt.event.ActionEvent evt) {
         GameOptionsDialog god = new GameOptionsDialog(getFrame(), getCampaign().getGameOptions(), false);
         god.refreshOptions();
         god.setEditable(true);
@@ -1513,38 +1513,30 @@ public class CampaignGUI extends JPanel {
             setCampaignOptionsFromGameOptions();
             refreshCalendar();
         }
-    }// GEN-LAST:event_menuOptionsActionPerformed
+    }
 
     private void menuMekHqOptionsActionPerformed(ActionEvent evt) {
         MekHqOptionsDialog dialog = new MekHqOptionsDialog(getFrame(), MekHQ.getLogger());
         dialog.setVisible(true);
     }
 
-    private void miLoadForcesActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miLoadForcesActionPerformed
-        try {
-            loadListFile(true);
-        } catch (IOException ex) {
-            MekHQ.getLogger().error(getClass(), "miLoadForcesActionPerformed(ActionEvent)", ex);
-        }
-    }// GEN-LAST:event_miLoadForcesActionPerformed
+    private void miLoadForcesActionPerformed(java.awt.event.ActionEvent evt) {
+        loadListFile(true);
+    }
 
-    private void miImportPersonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miImportPersonActionPerformed
-        try {
-            loadPersonFile();
-        } catch (IOException ex) {
-            MekHQ.getLogger().error(getClass(), "miImportPersonActionPerformed(ActionEvent)", ex);
-        }
-    }// GEN-LAST:event_miImportPersonActionPerformed
+    private void miImportPersonActionPerformed(java.awt.event.ActionEvent evt) {
+        loadPersonFile();
+    }
 
-    public void miExportPersonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miExportPersonActionPerformed
+    public void miExportPersonActionPerformed(java.awt.event.ActionEvent evt) {
         savePersonFile();
-    }// GEN-LAST:event_miExportPersonActionPerformed
+    }
 
-    private void miExportOptionsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miExportPersonActionPerformed
+    private void miExportOptionsActionPerformed(java.awt.event.ActionEvent evt) {
         saveOptionsFile(FileType.XML, resourceMap.getString("dlgSaveCampaignXML.text"), getCampaign().getName() + getCampaign().getShortDateAsString() + "_ExportedCampaignSettings");
-    }// GEN-LAST:event_miExportPersonActionPerformed
+    }
 
-    private void miExportPlanetsXMLActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miExportPersonActionPerformed
+    private void miExportPlanetsXMLActionPerformed(java.awt.event.ActionEvent evt) {
         try {
             exportPlanets(FileType.XML, resourceMap.getString("dlgSavePlanetsXML.text"), getCampaign().getName() + getCampaign().getShortDateAsString() + "_ExportedPlanets");
         } catch (Exception ex) {
@@ -1576,31 +1568,23 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    private void miImportOptionsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miExportPersonActionPerformed
-        try {
-            loadOptionsFile();
-        } catch (IOException ex) {
-            MekHQ.getLogger().error(getClass(), "miImportOptionsActionPerformed(ActionEvent)", ex);
-        }
-    }// GEN-LAST:event_miExportPersonActionPerformed
+    private void miImportOptionsActionPerformed(java.awt.event.ActionEvent evt) {
+        loadOptionsFile();
+    }
 
-    private void miImportPartsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miImportPersonActionPerformed
-        try {
-            loadPartsFile();
-        } catch (IOException ex) {
-            MekHQ.getLogger().error(getClass(), "miImportPartsActionPerformed(ActionEvent)", ex);
-        }
-    }// GEN-LAST:event_miImportPersonActionPerformed
+    private void miImportPartsActionPerformed(java.awt.event.ActionEvent evt) {
+        loadPartsFile();
+    }
 
-    public void miExportPartsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miExportPersonActionPerformed
+    public void miExportPartsActionPerformed(java.awt.event.ActionEvent evt) {
         savePartsFile();
-    }// GEN-LAST:event_miExportPersonActionPerformed
+    }
 
-    private void miPurchaseUnitActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miPurchaseUnitActionPerformed
+    private void miPurchaseUnitActionPerformed(java.awt.event.ActionEvent evt) {
         UnitSelectorDialog usd = new UnitSelectorDialog(getFrame(), getCampaign(), true);
 
         usd.setVisible(true);
-    }// GEN-LAST:event_miPurchaseUnitActionPerformed
+    }
 
     private void buyParts() {
         PartsStoreDialog psd = new PartsStoreDialog(true, this);
@@ -1968,7 +1952,7 @@ public class CampaignGUI extends JPanel {
         return file;
     }
 
-    protected void loadListFile(boolean allowNewPilots) throws IOException {
+    protected void loadListFile(boolean allowNewPilots) {
         final String METHOD_NAME = "loadListFile(boolean)";
 
         File unitFile = FileDialogs.openUnits(frame).orElse(null);
@@ -1980,12 +1964,8 @@ public class CampaignGUI extends JPanel {
             MULParser parser = new MULParser();
 
             // Open up the file.
-            InputStream listStream = new FileInputStream(unitFile);
-
-            // Read a Vector from the file.
-            try {
-                parser.parse(listStream);
-                listStream.close();
+            try (InputStream is = new FileInputStream(unitFile)) {
+                parser.parse(is);
             } catch (Exception excep) {
                 excep.printStackTrace(System.err);
             }
@@ -2001,36 +1981,34 @@ public class CampaignGUI extends JPanel {
                 getCampaign().addUnit(entity, allowNewPilots, 0);
             }
 
-            // add any ejected pilots
-            for (Crew pilot : parser.getPilots()) {
-                if (pilot.isEjected()) {
-                    // getCampaign().addPilot(pilot, PilotPerson.T_MECHWARRIOR,
-                    // false);
-                }
-            }
+            // TODO : re-add any ejected pilots
+            //for (Crew pilot : parser.getPilots()) {
+            //    if (pilot.isEjected()) {
+            //         getCampaign().addPilot(pilot, PilotPerson.T_MECHWARRIOR,
+            //         false);
+            //    }
+            //}
         }
     }
 
-    protected void loadPersonFile() throws IOException {
+    protected void loadPersonFile() {
         final String METHOD_NAME = "loadPersonFile()";
 
         File personnelFile = FileDialogs.openPersonnel(frame).orElse(null);
 
         if (personnelFile != null) {
-            // Open up the file.
-            InputStream fis = new FileInputStream(personnelFile);
-
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                     "Starting load of personnel file from XML..."); //$NON-NLS-1$
             // Initialize variables.
             Document xmlDoc = null;
 
-            try {
+            // Open the file
+            try (InputStream is = new FileInputStream(personnelFile)) {
                 // Using factory get an instance of document builder
                 DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
                 // Parse using builder to get DOM representation of the XML file
-                xmlDoc = db.parse(fis);
+                xmlDoc = db.parse(is);
             } catch (Exception ex) {
                 MekHQ.getLogger().error(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
             }
@@ -2244,7 +2222,7 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    protected void loadPartsFile() throws IOException {
+    protected void loadPartsFile() {
         final String METHOD_NAME = "loadPartsFile()";
 
         Optional<File> maybeFile = FileDialogs.openParts(frame);
@@ -2255,20 +2233,18 @@ public class CampaignGUI extends JPanel {
 
         File partsFile = maybeFile.get();
 
-        // Open up the file.
-        InputStream fis = new FileInputStream(partsFile);
-
         MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                 "Starting load of parts file from XML..."); //$NON-NLS-1$
         // Initialize variables.
         Document xmlDoc = null;
 
-        try {
+        // Open up the file.
+        try (InputStream is = new FileInputStream(partsFile)) {
             // Using factory get an instance of document builder
             DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
             // Parse using builder to get DOM representation of the XML file
-            xmlDoc = db.parse(fis);
+            xmlDoc = db.parse(is);
         } catch (Exception ex) {
             MekHQ.getLogger().error(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
         }
@@ -2312,7 +2288,7 @@ public class CampaignGUI extends JPanel {
                 "Finished load of parts file"); //$NON-NLS-1$
     }
 
-    protected void loadOptionsFile() throws IOException {
+    protected void loadOptionsFile() {
         final String METHOD_NAME = "loadOptionsFile()";
 
         Optional<File> maybeFile = FileDialogs.openCampaignOptions(frame);
@@ -2323,20 +2299,18 @@ public class CampaignGUI extends JPanel {
 
         File optionsFile = maybeFile.get();
 
-        // Open up the file.
-        InputStream fis = new FileInputStream(optionsFile);
-
         MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                 "Starting load of options file from XML..."); //$NON-NLS-1$
         // Initialize variables.
         Document xmlDoc = null;
 
-        try {
+        // Open up the file.
+        try (InputStream is = new FileInputStream(optionsFile)) {
             // Using factory get an instance of document builder
             DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
             // Parse using builder to get DOM representation of the XML file
-            xmlDoc = db.parse(fis);
+            xmlDoc = db.parse(is);
         } catch (Exception ex) {
             MekHQ.getLogger().error(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
         }
@@ -2366,11 +2340,9 @@ public class CampaignGUI extends JPanel {
             String xn = wn.getNodeName();
 
             if (xn.equalsIgnoreCase("campaignOptions")) {
-                options = CampaignOptions
-                        .generateCampaignOptionsFromXml(wn);
+                options = CampaignOptions.generateCampaignOptionsFromXml(wn);
             } else if (xn.equalsIgnoreCase("randomSkillPreferences")) {
-                rsp = RandomSkillPreferences
-                        .generateRandomSkillPreferencesFromXml(wn);
+                rsp = RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn);
             } else if (xn.equalsIgnoreCase("skillTypes")) {
                 NodeList wList = wn.getChildNodes();
 
@@ -2398,7 +2370,7 @@ public class CampaignGUI extends JPanel {
                     SkillType.generateInstanceFromXML(wn2, version);
                 }
             } else if (xn.equalsIgnoreCase("specialAbilities")) {
-                PilotOptions poptions = new PilotOptions();
+                PilotOptions pilotOptions = new PilotOptions();
                 SpecialAbility.clearSPA();
 
                 NodeList wList = wn.getChildNodes();
@@ -2422,8 +2394,7 @@ public class CampaignGUI extends JPanel {
                         continue;
                     }
 
-                    SpecialAbility.generateInstanceFromXML(wn2, poptions,
-                            null);
+                    SpecialAbility.generateInstanceFromXML(wn2, pilotOptions, null);
                 }
             }
 
@@ -2485,8 +2456,7 @@ public class CampaignGUI extends JPanel {
                 int[] rows = partsTable.getSelectedRows();
                 Part[] parts = new Part[rows.length];
                 for (int i = 0; i < rows.length; i++) {
-                    parts[i] = partsModel.getPartAt(partsTable
-                            .convertRowIndexToModel(rows[i]));
+                    parts[i] = partsModel.getPartAt(partsTable.convertRowIndexToModel(rows[i]));
                 }
                 fos = new FileOutputStream(file);
                 pw = new PrintWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8));
@@ -2494,8 +2464,7 @@ public class CampaignGUI extends JPanel {
                 // File header
                 pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
-                ResourceBundle resourceMap = ResourceBundle
-                        .getBundle("mekhq.resources.MekHQ");
+                ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQ");
                 // Start the XML root.
                 pw.println("<parts version=\""
                         + resourceMap.getString("Application.version") + "\">");
@@ -2619,14 +2588,12 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshTempAstechs() {
-        String text = "<html><b>Temp Astechs:</b> "
-                + getCampaign().getAstechPool() + "</html>";
+        String text = "<html><b>Temp Astechs:</b> " + getCampaign().getAstechPool() + "</html>";
         lblTempAstechs.setText(text);
     }
 
     private void refreshTempMedics() {
-        String text = "<html><b>Temp Medics:</b> "
-                + getCampaign().getMedicPool() + "</html>";
+        String text = "<html><b>Temp Medics:</b> " + getCampaign().getMedicPool() + "</html>";
         lblTempMedics.setText(text);
     }
 
