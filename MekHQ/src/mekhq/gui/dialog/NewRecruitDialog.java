@@ -16,7 +16,6 @@
 package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
-import java.util.GregorianCalendar;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.ResourceBundle;
