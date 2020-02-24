@@ -20,7 +20,6 @@
 package mekhq.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -476,12 +475,12 @@ public final class BriefingTab extends CampaignGuiTab {
 			return;
     	}
 
-        if (0 != JOptionPane.showConfirmDialog(null, "Are you sure you want to generate a new set of missions?", "Generate missions?",
+        if (0 != JOptionPane.showConfirmDialog(null, "Are you sure you want to generate a new set of scenarios?", "Generate scenarios?",
                 JOptionPane.YES_NO_OPTION)) {
             return;
         }
 
-        AtBScenarioFactory.createScenariosForNewWeek(getCampaign(), false);
+        AtBScenarioFactory.createScenariosForNewWeek(getCampaign());
     }
 
     private void addScenario() {

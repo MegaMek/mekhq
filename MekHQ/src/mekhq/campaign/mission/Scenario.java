@@ -65,6 +65,8 @@ public class Scenario implements Serializable {
     public static final int S_DRAW     = 5;
     public static final int S_NUM      = 6;
 
+    public static final int S_DEFAULT_ID = -1;
+
     private String name;
     private String desc;
     private String report;
@@ -72,7 +74,7 @@ public class Scenario implements Serializable {
     private Date date;
     private ArrayList<Integer> subForceIds;
     private ArrayList<UUID> unitIds;
-    private int id = -1;
+    private int id = S_DEFAULT_ID;
     private int missionId;
     private ForceStub stub;
 

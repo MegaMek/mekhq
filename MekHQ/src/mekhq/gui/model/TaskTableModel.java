@@ -23,7 +23,6 @@ import mekhq.campaign.work.IPartWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.ITechWorkPanel;
 import mekhq.gui.RepairTaskInfo;
-import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 /**
  * A table model for displaying work items
@@ -159,7 +158,6 @@ public class TaskTableModel extends DataTableModel {
 
 	        				if (null == tech) {
 			        			//Create a dummy elite tech with the proper skill and 1 minute and put it in our cache for later use
-
 			        			tech = new Person("Temp", String.format("Tech (%s)", skillName), gui.getCampaign());
 			        			tech.addSkill(skillName, partSkill.getType().getEliteLevel(), 1);
 			        			tech.setMinutesLeft(1);

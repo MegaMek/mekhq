@@ -1,9 +1,25 @@
-/**
- * 
+/*
+ * Copyright (c) 2018, 2020 The MegaMek Team. All rights reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.personnel;
 
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,45 +39,45 @@ import mekhq.MekHqXmlUtil;
 /**
  * Parses custom SPA file and passes data to the PersonnelOption constructor so the custom
  * abilities are included.
- * 
+ *
  * @author Neoancient
  *
  */
 public class CustomOption {
-    
+
     private static List<CustomOption> customAbilities = null;
-    
+
     private String name;
     private String group;
     private int type;
     private Object defaultVal;
-    
+
     private CustomOption(String key) {
         this.name = key;
         group = PilotOptions.LVL3_ADVANTAGES;
         type = IOption.BOOLEAN;
         defaultVal = Boolean.FALSE;
     }
-    
+
     public String getName() {
         return name;
     }
-    
+
     public String getGroup() {
         return group;
     }
-    
+
     public int getType() {
         return type;
     }
-    
+
     public Object getDefault() {
         return defaultVal;
     }
-    
+
     /**
      * Loads custom abilities from the data directory the first time it is called.
-     * 
+     *
      * @return The list of user-defined special abilities.
      */
     public static List<CustomOption> getCustomAbilities() {
@@ -70,7 +86,7 @@ public class CustomOption {
         }
         return customAbilities;
     }
-    
+
     private static void initCustomAbilities() {
         final String METHOD_NAME = "initCustomAbilities()"; //$NON-NLS-1$
         customAbilities = new ArrayList<>();
@@ -78,13 +94,12 @@ public class CustomOption {
         Document xmlDoc = null;
 
 
-        try {
-            FileInputStream fis = new FileInputStream("data/universe/customspa.xml");
+        try (InputStream is = new FileInputStream("data/universe/customspa.xml")) {
             // Using factory get an instance of document builder
             DocumentBuilder db = MekHqXmlUtil.newUnsafeDocumentBuilder();
 
             // Parse using builder to get DOM representation of the XML file
-            xmlDoc = db.parse(fis);
+            xmlDoc = db.parse(is);
         } catch (Exception ex) {
             MekHQ.getLogger().error(CustomOption.class, METHOD_NAME, ex);
         }
@@ -133,7 +148,7 @@ public class CustomOption {
                     "Custom ability does not have a 'name' attribute.");
             return null;
         }
-        
+
         try {
             retVal = new CustomOption(key);
             NodeList nl = wn.getChildNodes();
@@ -152,10 +167,10 @@ public class CustomOption {
                     retVal.defaultVal = Boolean.FALSE;
                     break;
                 case IOption.INTEGER:
-                    retVal.defaultVal = Integer.valueOf(0);
+                    retVal.defaultVal = 0;
                     break;
                 case IOption.FLOAT:
-                    retVal.defaultVal = Float.valueOf(0.0f);
+                    retVal.defaultVal = 0.0f;
                     break;
                 case IOption.STRING:
                 case IOption.CHOICE:
@@ -167,10 +182,10 @@ public class CustomOption {
             MekHQ.getLogger().log(CustomOption.class, METHOD_NAME, LogLevel.ERROR,
                     "Error parsing custom ability " + retVal.name);
         }
-        
+
         return retVal;
     }
 
-    
+
 
 }

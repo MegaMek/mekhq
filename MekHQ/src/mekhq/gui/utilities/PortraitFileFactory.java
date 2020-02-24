@@ -11,7 +11,6 @@
  *  or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  *  for more details.
  */
-
 package mekhq.gui.utilities;
 
 import java.awt.Image;
@@ -33,14 +32,14 @@ import megamek.common.util.ItemFileFactory;
  * This class will produce <code>Image</code> objects from files. If an image
  * file is inside of JAR and ZIP file, then it must save the contents to a
  * temporary file. <p/> <p/> Created on January 18, 2004
- * 
+ *
  * @author James Damour
  * @version 1
  */
 public class PortraitFileFactory implements ItemFileFactory {
 
     /**
-     * Accepted image file extentions
+     * Accepted image file extensions
      */
     private final static String JPG = "JPG", JPEG = "JPEG", GIF = "GIF", PNG = "PNG"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
@@ -54,7 +53,7 @@ public class PortraitFileFactory implements ItemFileFactory {
 
     /**
      * Get the Singleton <code>ImageFileFactory</code>.
-     * 
+     *
      * @return the Singleton <code>ImageFileFactory</code>.
      */
     public static PortraitFileFactory getInstance() {
@@ -65,15 +64,13 @@ public class PortraitFileFactory implements ItemFileFactory {
 
     /**
      * Get the <code>ItemFile</code> for the given <code>File</code>.
-     * 
+     *
      * @param file - the input <code>File</code> object that will be read to
      *            produce the item. This value must not be <code>null</code>.
      * @return an <code>ItemFile</code> for the given file.
-     * @throws <code>IllegalArgumentException</code> if the <code>file</code>
-     *             is <code>null</code>.
+     * @throws IllegalArgumentException if the <code>file</code> is <code>null</code>.
      */
-    public ItemFile getItemFile(final File file)
-            throws IllegalArgumentException {
+    public ItemFile getItemFile(final File file) throws IllegalArgumentException {
 
         // Validate the input.
         if (null == file) {
@@ -103,14 +100,14 @@ public class PortraitFileFactory implements ItemFileFactory {
     /**
      * Get the <code>ItemFile</code> for the given <code>ZipEntry</code> in
      * the <code>ZipFile</code>.
-     * 
+     *
      * @param zipEntry - the <code>ZipEntry</code> that will be read to
      *            produce the item. This value must not be <code>null</code>.
      * @param zipFile - the <code>ZipFile</code> object that contains the
      *            <code>ZipEntry</code> that will produce the item. This value
      *            must not be <code>null</code>.
      * @return an <code>ItemFile</code> for the given zip file entry.
-     * @throws <code>IllegalArgumentException</code> if either the
+     * @throws IllegalArgumentException if either the
      *             <code>zipEntry</code> or the <code>zipFile</code> is
      *             <code>null</code>.
      */
@@ -137,14 +134,16 @@ public class PortraitFileFactory implements ItemFileFactory {
                 if (null == image) {
 
                     // Get ready to read from the item.
-                    InputStream in = new BufferedInputStream(zipFile
-                            .getInputStream(itemEntry), (int) itemEntry
-                            .getSize());
+                    InputStream is = new BufferedInputStream(zipFile.getInputStream(itemEntry),
+                            (int) itemEntry.getSize());
 
                     // Make a buffer big enough to hold the item,
                     // read from the ZIP file, and write it to temp.
                     byte[] buffer = new byte[(int) itemEntry.getSize()];
-                    in.read(buffer);
+                    is.read(buffer);
+
+                    //close the input stream
+                    is.close();
 
                     // Check the last 10 bytes. I've been having
                     // some problems with incomplete image files,
@@ -166,7 +165,6 @@ public class PortraitFileFactory implements ItemFileFactory {
 
                     // Create the image from the buffer.
                     image = Toolkit.getDefaultToolkit().createImage(buffer);
-
                 } // End get-image
 
                 // Return a copy of the image.
@@ -178,11 +176,11 @@ public class PortraitFileFactory implements ItemFileFactory {
     }
 
     /**
-     * The method that must be implemented by any object that filters filenames
-     * (i.e., selects a subset of filenames from a list of filenames). <p/> This
+     * The method that must be implemented by any object that filters file names
+     * (i.e., selects a subset of file names from a list of file names). <p/> This
      * definition is copied from <code>java.io.FilenameFilter</code> for
      * completeness.
-     * 
+     *
      * @param dir - the <code>File</code> object of the directory containing
      *            the named file.
      * @param name - the <code>String</code> name of the file.
@@ -197,10 +195,10 @@ public class PortraitFileFactory implements ItemFileFactory {
     }
 
     /**
-     * The method that must be implemented by any object that filters filenames
-     * within a <code>ZipFile</code> (i.e., selects a subset of filenames from
-     * a list of filenames in a ZIP archive).
-     * 
+     * The method that must be implemented by any object that filters file names
+     * within a <code>ZipFile</code> (i.e., selects a subset of file names from
+     * a list of file names in a ZIP archive).
+     *
      * @param zipFile - the <code>ZipFile</code> object that contains the
      *            named file's entry.
      * @param name - the <code>String</code> name of the file.

@@ -19,7 +19,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.unit;
 
 import java.io.PrintWriter;
@@ -104,7 +103,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     // This is the ID of the large craft assigned to transport this unit
     private Map<UUID,Integer> transportShipId = new HashMap<>();
     // If this unit is a transport, list all other units assigned to it
-    private Set<UUID> transportedUnits = new HashSet<UUID>();
+    private Set<UUID> transportedUnits = new HashSet<>();
     private double aeroCapacity;
     private double baCapacity;
     private int dockCapacity;
@@ -1241,6 +1240,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             return getCurrentSmallCraftCapacity();
         case UnitType.BATTLE_ARMOR:
             return getCurrentBattleArmorCapacity();
+        case UnitType.INFANTRY:
+            return getCurrentInfantryCapacity();
         case UnitType.TANK:
         case UnitType.NAVAL:
         case UnitType.VTOL:
@@ -3384,13 +3385,18 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         //take first by rank
         //if rank is tied, take gunners over drivers
         //if two of the same type are tie rank, take the first one
+        if (entity == null) {
+            return null;
+        }
+
         Person commander = null;
-        for (UUID id : vesselCrew) {
-            if (id == null) {
+
+        for (UUID pid : vesselCrew) {
+            if (pid == null) {
                 continue;
             }
-            Person p = getCampaign().getPerson(id);
-            if ((null != p) && p.outRanks(commander)){
+            Person p = getCampaign().getPerson(pid);
+            if ((p != null) && p.outRanks(commander)) {
                 commander = p;
             }
         }
@@ -3399,10 +3405,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 continue;
             }
             Person p = getCampaign().getPerson(pid);
-            if (p != null && entity != null && (entity instanceof Tank || entity instanceof Infantry) && p.getHits() > 0) {
-                continue;
-            }
-            if ((null != p) && p.outRanks(commander)) {
+            if ((p != null) && p.outRanks(commander)) {
                 commander = p;
             }
         }
@@ -3411,16 +3414,13 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 continue;
             }
             Person p = getCampaign().getPerson(pid);
-            if (p != null && entity != null && (entity instanceof Tank || entity instanceof Infantry) && p.getHits() > 0) {
-                continue;
-            }
-            if ((null != p) && p.outRanks(commander)) {
+            if ((p != null) && p.outRanks(commander)) {
                 commander = p;
             }
         }
         if (navigator != null) {
             Person p = getCampaign().getPerson(navigator);
-            if(null != p && p.outRanks(commander)) {
+            if ((p != null) && p.outRanks(commander)) {
                 commander = p;
             }
         }
@@ -3542,9 +3542,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     return;
                 }
                 //Combine drivers and gunners into a single list
-                List<UUID> combatCrew = new ArrayList<UUID>();
 
-                combatCrew.addAll(drivers);
+                List<UUID> combatCrew = new ArrayList<>(drivers);
 
                 //Infantry and BA troops count as both drivers and gunners
                 //only count them once.
@@ -3566,7 +3565,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         Collectors.collectingAndThen(
                             Collectors.groupingBy(IOption::getValue, Collectors.counting()),
                             m -> m.entrySet().stream().filter(e -> (cyberOptionNames.contains(e.getKey()) ? e.getValue() >= crewSize : e.getValue() > crewSize / 2))
-                                .max(Map.Entry.comparingByValue()).map(e -> e.getKey())
+                                .max(Map.Entry.comparingByValue()).map(Map.Entry::getKey)
                         )
                     ));
 
@@ -3785,7 +3784,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 //OK, we want to reorder the way we move through suits, so that we always put BA
                 //in the suits with more armor. Otherwise, we may put a soldier in a suit with no
                 //armor when a perfectly good suit is waiting further down the line.
-                Map<String, Integer> bestSuits = new HashMap<String, Integer>();
+                Map<String, Integer> bestSuits = new HashMap<>();
                 for(int i = BattleArmor.LOC_TROOPER_1; i <= ((BattleArmor)entity).getTroopers(); i++) {
                     bestSuits.put(Integer.toString(i), entity.getArmorForReal(i));
                     if(entity.getInternal(i)<0) {
@@ -4442,7 +4441,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
     /**
      * Gets the time (in minutes) remaining to mothball or activate the unit.
-     * @return The time (in minutes) remaining to mothboll or activate the unit.
+     * @return The time (in minutes) remaining to mothball or activate the unit.
      */
     public int getMothballTime() {
         return mothballTime;
@@ -4450,7 +4449,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
     /**
      * Sets the time (in minutes) remaining to mothball or activate the unit.
-     * @param t The time (in minutes) remaining to mothboll or activate the unit.
+     * @param t The time (in minutes) remaining to mothball or activate the unit.
      */
     public void setMothballTime(int t) {
         mothballTime = Math.max(t, 0);
@@ -4780,16 +4779,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public boolean isEntityCamo() {
-        if ((null != entity) && (null != entity.getCamoCategory()
-                && entity.getCamoCategory() != IPlayer.NO_CAMO
+        return (null != entity) && (null != entity.getCamoCategory()
+                && !entity.getCamoCategory().equals(IPlayer.NO_CAMO)
                 && !entity.getCamoCategory().isEmpty())
                 && (null != entity.getCamoFileName())
                 && (!Player.NO_CAMO.equals(entity.getCamoFileName()))
-                && !entity.getCamoFileName().isEmpty()) {
-            return true;
-        }
-
-        return false;
+                && !entity.getCamoFileName().isEmpty();
     }
 
     public int getAvailability(int era) {
@@ -4938,7 +4933,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public int getAstechsMaintained() {
-        return (int)Math.floor((1.0 * astechDaysMaintained) / daysSinceMaintenance);
+        return (int) Math.floor((1.0 * astechDaysMaintained) / daysSinceMaintenance);
     }
 
     public int getQuality() {
@@ -4957,7 +4952,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         if(nParts == 0) {
             return Part.QUALITY_D;
         }
-        return (int)Math.round((1.0 * sumQuality)/nParts);
+        return (int) Math.round((1.0 * sumQuality)/nParts);
     }
 
     public void setQuality(int q) {
@@ -4973,13 +4968,10 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public boolean requiresMaintenance() {
-        if(!isAvailable()) {
+        if (!isAvailable()) {
             return false;
         }
-        if(getEntity() instanceof Infantry && !(getEntity() instanceof BattleArmor)) {
-            return false;
-        }
-        return true;
+        return !(getEntity() instanceof Infantry) || getEntity() instanceof BattleArmor;
     }
 
     public boolean isSelfCrewed() {
@@ -5065,10 +5057,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public String displayMonthlyCost() {
-        String unitMonthlyCost = "<b>Spare Parts</b>: " + getSparePartsCost().toAmountAndSymbolString() + "<br>"
+        return "<b>Spare Parts</b>: " + getSparePartsCost().toAmountAndSymbolString() + "<br>"
                                + "<b>Ammunition</b>: " + getAmmoCost().toAmountAndSymbolString() + "<br>"
                                + "<b>Fuel</b>: " + getFuelCost().toAmountAndSymbolString() + "<br>";
-        return unitMonthlyCost;
     }
 
     public Money getSparePartsCost() {
