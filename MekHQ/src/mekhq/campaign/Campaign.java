@@ -794,7 +794,8 @@ public class Campaign implements Serializable, ITechManager {
                     }
                     int dependents = getRetirementDefectionTracker().getPayout(pid).getDependents();
                     while (dependents > 0) {
-                        if (recruitNewDependent(Person.T_ASTECH, false)) {
+                        Person person = newDependent(Person.T_ASTECH, false);
+                        if (recruitPerson(person)) {
                             dependents--;
                         } else {
                             dependents = 0;
@@ -1318,52 +1319,6 @@ public class Campaign implements Serializable, ITechManager {
     //endregion Person Creation
 
     //region Personnel Recruitment
-    /**
-     *
-     * @param p         the person being added
-     * @param prisoner  if the person is a prisoner or not. True means they are a prisoner
-     * @param dependent if the person is a dependent or not. True means they are a dependent
-     * @param gmAdd     false means that they need to pay to hire this person, true means it is added without paying
-     * @param log       whether or not to write to logs
-     */
-    public void recruitPersonWithoutId(Person p, boolean prisoner, boolean dependent, boolean gmAdd, boolean log) {
-        UUID id = UUID.randomUUID();
-        p.setId(id);
-        personnel.put(id, p);
-
-        recruitPerson(p, prisoner, dependent, gmAdd, log);
-    }
-
-    /**
-     * Creates a new {@link Person}, who is a dependent, of a given primary role.
-     * @param type The primary role of the {@link Person}, e.g. {@link Person#T_MECHWARRIOR}.
-     * @return A new {@link Person} of the given primary role, who is a dependent.
-     *
-     public Person newDependent(int type, boolean baby) {
-        Person person;
-
-        if (!baby && campaignOptions.getRandomizeDependentOrigin()) {
-            person = newPerson(type);
-        } else {
-            person = newPerson(type, Person.T_NONE, new DefaultFactionSelector(),
-                    new DefaultPlanetSelector(), Person.G_RANDOMIZE);
-        }
-
-        person.setDependent(true);
-        return person;
-     }
-*/
-
-    /**
-     *
-     * @param type
-     * @param baby
-     * @return
-     */
-    public boolean recruitNewDependent(int type, boolean baby) {
-        return true;
-    }
-
     /**
      *
      * @param p         the person being added
@@ -3519,7 +3474,7 @@ public class Campaign implements Serializable, ITechManager {
             }
             for (int i = 0; i < change; i++) {
                 Person p = newDependent(Person.T_ASTECH, false);
-                recruitPersonWithoutId(p, false, true, false, true);
+                recruitPerson(p, false, true, false, true);
             }
         }
 
