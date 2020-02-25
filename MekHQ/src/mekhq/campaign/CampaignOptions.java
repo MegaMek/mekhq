@@ -26,7 +26,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import mekhq.campaign.finances.Money;
 
 import org.apache.commons.lang3.StringUtils;
