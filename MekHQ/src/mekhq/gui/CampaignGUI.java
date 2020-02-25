@@ -612,7 +612,6 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miLoadForces = new JMenuItem(resourceMap.getString("miLoadForces.text")); // NOI18N
         miLoadForces.addActionListener(this::miLoadForcesActionPerformed);
-        // miLoadForces.setEnabled(false);
         menuImport.add(miLoadForces);
 
         menuFile.add(menuImport);
