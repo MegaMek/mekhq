@@ -3392,7 +3392,7 @@ public class Campaign implements Serializable, ITechManager {
             return false;
         }
 
-        this.autosaveService.requestDayAdvanceAutosave(this, this.calendar.get(Calendar.DAY_OF_WEEK));
+        this.autosaveService.requestDayAdvanceAutosave(this, this.calendar);
 
         calendar.add(Calendar.DAY_OF_MONTH, 1);
         currentDateTime = new DateTime(calendar);
