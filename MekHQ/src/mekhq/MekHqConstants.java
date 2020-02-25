@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq;
 
 public final class MekHqConstants {
@@ -26,6 +25,8 @@ public final class MekHqConstants {
     public static final String NO_SAVE_KEY = "noSave";
     public static final String SAVE_DAILY_KEY = "saveDaily";
     public static final String SAVE_WEEKLY_KEY = "saveWeekly";
+    public static final String SAVE_MONTHLY_KEY = "saveMonthly";
+    public static final String SAVE_YEARLY_KEY = "saveYearly";
     public static final String SAVE_BEFORE_MISSIONS_KEY = "saveBeforeMissions";
     public static final String MAXIMUM_NUMBER_SAVES_KEY = "maximumNumberAutoSaves";
 

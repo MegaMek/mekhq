@@ -1331,11 +1331,13 @@ public class Campaign implements Serializable, ITechManager {
     /**
      *
      * @param p         the person being added
-     * @param gmAdd     false means that they need to pay to hire this person, true means it is added without paying
+     * @param gmAdd     false means that they need to pay to hire this person, provided that
+     *                  the campaign option to pay for new hires is set, while
+     *                  true means they are added without paying
      * @return          true if the person is hired successfully, otherwise false
      */
     public boolean recruitPerson(Person p, boolean gmAdd) {
-        return recruitPerson(p, false, false, gmAdd, true);
+        return recruitPerson(p, false,  false, gmAdd, true);
     }
 
     /**
@@ -1360,6 +1362,7 @@ public class Campaign implements Serializable, ITechManager {
                 return false;
             }
         }
+
         UUID id = UUID.randomUUID();
         p.setId(id);
         personnel.put(id, p);
@@ -3689,7 +3692,7 @@ public class Campaign implements Serializable, ITechManager {
             return false;
         }
 
-        this.autosaveService.requestDayAdvanceAutosave(this, this.calendar.get(Calendar.DAY_OF_WEEK));
+        this.autosaveService.requestDayAdvanceAutosave(this, this.calendar);
 
         calendar.add(Calendar.DAY_OF_MONTH, 1);
         currentDateTime = new DateTime(calendar);

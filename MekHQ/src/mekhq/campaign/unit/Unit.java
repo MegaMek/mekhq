@@ -1157,6 +1157,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             partsValue = partsValue.plus(2000.0 * sinks);
         }
 
+        // Scale the final value by the entity's price multiplier
+        partsValue = partsValue.multipliedBy(entity.getPriceMultiplier());
+
         return partsValue;
     }
 

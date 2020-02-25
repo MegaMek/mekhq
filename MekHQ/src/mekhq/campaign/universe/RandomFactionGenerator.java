@@ -44,8 +44,8 @@ import mekhq.campaign.event.OptionsChangedEvent;
  *
  */
 
-/* TODO: Account for the de facto alliance of the invading Clans and the
- * Fortress Republic in a way that doesn't involve hard-coding them here.
+/* TODO : Account for the de facto alliance of the invading Clans and the
+ * TODO : Fortress Republic in a way that doesn't involve hard-coding them here.
  */
 public class RandomFactionGenerator {
 
