@@ -17,6 +17,7 @@ VERSION HISTORY:
 + Issue #1505: Fixing Personnel Tab Graphical Unit Images for Mixed Fighter and Tech Person
 + PR #1519: Adding proper bondsman formatting when Added to Campaign
 + Issue #1492: Medical Report Displays for Personnel with GM Added Injury
++ Issue #1497: Scale Unit sell values by their Entity's price multiplier
 
 v0.47.4 (2020-2-09 2200 UTC)
 + PR #1440: Implement "Rugged" quirk (2x or 3x between maintenance rolls)
