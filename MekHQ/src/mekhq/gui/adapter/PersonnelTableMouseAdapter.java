@@ -1704,7 +1704,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     personnel.sort(Comparator.comparing((Person p) -> p.getAge(calendar)).thenComparing(Person::getSurname));
 
                     for (Person ps : personnel) {
-                        if (person.safeSpouse(ps) && !ps.isDeadOrMIA()) {
+                        if (person.safeSpouse(ps)) {
                             String pStatus;
                             if (ps.isBondsman()) {
                                 pStatus = String.format(resourceMap.getString("marriageBondsmanDesc.format"), //$NON-NLS-1$

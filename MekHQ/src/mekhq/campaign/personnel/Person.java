@@ -1288,7 +1288,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (!isChild() && getAge(campaign.getCalendar()) < 51) {
             boolean conceived = false;
             if (hasSpouse()) {
-                if (getSpouse().isActive() && !getSpouse().isDeployed() && !getSpouse().isChild()
+                if (!getSpouse().isDeployed() && !getSpouse().isDeadOrMIA() && !getSpouse().isChild()
                         && !(getSpouse().getGender() == getGender())) {
                     // setting is the chance that this procreation attempt will create a child, base is 0.05%
                     // the setting is divided by 100 because we are running a float from 0 to 1 instead of 0 to 100
@@ -1392,12 +1392,20 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * @param p the person to determine if they are a safe spouse
      */
     public boolean safeSpouse(Person p) {
-        // Huge convoluted return statement
+        // Huge convoluted return statement, with the following restrictions
+        // can't marry yourself
+        // can't marry someone who is already married
+        // can't marry a prisoner, unless you are also a prisoner (this is purposely left open for prisoners to marry who they want)
+        // can't marry a person who is dead or MIA
+        // can't marry inactive personnel (this is to show how they aren't part of the force anymore)
+        // can't marry a close relative
         return (
                 !this.equals(p)
                 && !p.hasSpouse()
                 && p.oldEnoughToMarry()
                 && (!p.isPrisoner() || (p.isPrisoner() && isPrisoner()))
+                && !p.isDeadOrMIA()
+                && p.isActive()
                 && ((getAncestorsId() == null)
                     || !campaign.getAncestors(getAncestorsId()).checkMutualAncestors(campaign.getAncestors(p.getAncestorsId())))
         );
@@ -1408,7 +1416,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void randomMarriage() {
-        if (hasSpouse() || !oldEnoughToMarry() || isDeployed()) {
+        // Don't attempt to generate is someone has a spouse, isn't old enough to marry,
+        // is actively deployed, or is currently a prisoner
+        if (hasSpouse() || !oldEnoughToMarry() || isDeployed() || isPrisoner()) {
             return;
         }
 
