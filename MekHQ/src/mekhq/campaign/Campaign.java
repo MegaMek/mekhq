@@ -1224,20 +1224,43 @@ public class Campaign implements Serializable, ITechManager {
         return units.get(id);
     }
 
+    /**
+     *
+     * @param p         the person being added
+     * @return          true if the person is hired successfully, otherwise false
+     */
     public boolean recruitPerson(Person p) {
-        return recruitPerson(p, false, true);
+        return recruitPerson(p, false, false, false, true);
     }
 
-    public boolean recruitPerson(Person p, boolean log) {
-        return recruitPerson(p, false, log);
+    /**
+     *
+     * @param p         the person being added
+     * @param gmAdd     false means that they need to pay to hire this person, provided that
+     *                  the campaign option to pay for new hires is set, while
+     *                  true means they are added without paying
+     * @return          true if the person is hired successfully, otherwise false
+     */
+    public boolean recruitPerson(Person p, boolean gmAdd) {
+        return recruitPerson(p, false,  false, gmAdd, true);
     }
 
-    public boolean recruitPerson(Person p, boolean prisoner, boolean log) {
+    /**
+     *
+     * @param p         the person being added
+     * @param prisoner  if the person is a prisoner or not. True means they are a prisoner
+     * @param dependent if the person is a dependent or not. True means they are a dependent
+     * @param gmAdd     false means that they need to pay to hire this person, true means it is added without paying
+     * @param log       whether or not to write to logs
+     * @return          true if the person is hired successfully, otherwise false
+     */
+    public boolean recruitPerson(Person p, boolean prisoner, boolean dependent, boolean gmAdd, boolean log) {
         if (p == null) {
             return false;
         }
-        // Only pay if option set and this isn't a prisoner or bondsman
-        if (getCampaignOptions().payForRecruitment() && !prisoner) {
+
+        // Only pay if option set, they weren't GM added, and they aren't a dependent, prisoner or bondsman
+        if (getCampaignOptions().payForRecruitment() && !dependent && !gmAdd && !prisoner) {
             if (!getFinances().debit(p.getSalary().multipliedBy(2), Transaction.C_SALARY,
                     "recruitment of " + p.getFullName(), getCalendar().getTime())) {
                 addReport("<font color='red'><b>Insufficient funds to recruit "
@@ -1245,10 +1268,8 @@ public class Campaign implements Serializable, ITechManager {
                 return false;
             }
         }
+
         UUID id = UUID.randomUUID();
-        while (null != personnel.get(id)) {
-            id = UUID.randomUUID();
-        }
         p.setId(id);
         personnel.put(id, p);
 
@@ -1284,11 +1305,19 @@ public class Campaign implements Serializable, ITechManager {
                 ServiceLogger.joined(p, getDate(), getName(), rankEntry);
             }
         }
+
+        // Add their recruitment date if using track time in service
+        if (getCampaignOptions().getUseTimeInService() && !prisoner && !dependent) {
+            GregorianCalendar recruitmentDate = (GregorianCalendar) getCalendar().clone();
+            p.setRecruitment(recruitmentDate);
+        }
+
         MekHQ.triggerEvent(new PersonNewEvent(p));
         return true;
     }
 
     /** Adds a person to the campaign unconditionally, without paying for the person. */
+    @Deprecated // as part of the personnel changes, 23-Feb-2020
     public void addPerson(Person p) {
         if (p == null) {
             return;
@@ -1322,10 +1351,12 @@ public class Campaign implements Serializable, ITechManager {
      * Imports a {@link Person} into a campaign.
      * @param p A {@link Person} to import into the campaign.
      */
+    @Deprecated // as part of the personnel changes, 23-Feb-2020
     public void importPerson(Person p) {
         addPersonWithoutId(p);
     }
 
+    @Deprecated // as part of the personnel changes, 23-Feb-2020
     private void addPersonWithoutId(Person p) {
         personnel.put(p.getId(), p);
         MekHQ.triggerEvent(new PersonNewEvent(p));
