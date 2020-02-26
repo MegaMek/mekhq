@@ -1,13 +1,21 @@
 /*
- * NewRecruitDialog.java
+ * MegaMekLab - Copyright (C) 2019 - The MegaMekTeam
  *
- * Created on July 16, 2009, 5:30 PM
+ * Original author - Jay Lawson (jaylawson39 at yahoo.com)
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
  */
-
 package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
-import java.util.GregorianCalendar;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.ResourceBundle;
@@ -27,10 +35,6 @@ import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.view.PersonViewPanel;
 import mekhq.preferences.PreferencesNode;
 
-/**
- *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
- */
 public class NewRecruitDialog extends javax.swing.JDialog {
 
     /**
@@ -67,7 +71,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
 
     private void initComponents() {
         scrollView = new JScrollPane();
-        choiceRanks = new javax.swing.JComboBox<String>();
+        choiceRanks = new javax.swing.JComboBox<>();
 
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewRecruitDialog", new EncodeControl());
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -186,25 +190,13 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     }
 
     private void hire() {
-        if (hqView.getCampaign().recruitPerson(person)) {
-            if (hqView.getCampaign().getCampaignOptions().getUseTimeInService()) {
-                GregorianCalendar rawrecruit = (GregorianCalendar) hqView.getCampaign().getCalendar().clone();
-                person.setRecruitment(rawrecruit);
-            }
-
-            createNewRecruit();
-        }
-
+        hqView.getCampaign().recruitPerson(person, false);
+        createNewRecruit();
         refreshView();
     }
 
     private void addGM() {
-        hqView.getCampaign().addPerson(person);
-        if (hqView.getCampaign().getCampaignOptions().getUseTimeInService()) {
-            GregorianCalendar rawrecruit = (GregorianCalendar) hqView.getCampaign().getCalendar().clone();
-            person.setRecruitment(rawrecruit);
-        }
-
+        hqView.getCampaign().recruitPerson(person, true);
         createNewRecruit();
         refreshView();
     }
@@ -264,7 +256,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     }
 
     private void refreshRanksCombo() {
-        DefaultComboBoxModel<String> ranksModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> ranksModel = new DefaultComboBoxModel<>();
 
         // Determine correct profession to pass into the loop
         int profession = person.getProfession();

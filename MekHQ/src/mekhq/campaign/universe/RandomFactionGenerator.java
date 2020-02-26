@@ -24,6 +24,7 @@ package mekhq.campaign.universe;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import megamek.common.util.WeightedMap;
 import org.joda.time.DateTime;
 
 import megamek.common.Compute;
@@ -43,8 +44,8 @@ import mekhq.campaign.event.OptionsChangedEvent;
  *
  */
 
-/* TODO: Account for the de facto alliance of the invading Clans and the
- * Fortress Republic in a way that doesn't involve hard-coding them here.
+/* TODO : Account for the de facto alliance of the invading Clans and the
+ * TODO : Fortress Republic in a way that doesn't involve hard-coding them here.
  */
 public class RandomFactionGenerator {
 
@@ -173,7 +174,7 @@ public class RandomFactionGenerator {
     }
 
     /**
-     * Builds map of potential employers weighted by number of systems controled within the search area
+     * Builds map of potential employers weighted by number of systems controlled within the search area
      *
      * @return Map used to select employer
      */
@@ -559,35 +560,4 @@ public class RandomFactionGenerator {
         }
         return new ArrayList<>(planetSet);
     }
-
-
-    /**
-     * Constructs a table of values each with a weight that makes them more or less likely to be
-     * selected at random
-     *
-     * @param <T> The values in the table
-     */
-    static class WeightedMap<T> extends TreeMap<Integer, T> {
-
-        private static final long serialVersionUID = -568712793616821291L;
-
-        void add(int weight, T item) {
-            if (weight > 0) {
-                if (!isEmpty()) {
-                    put(lastKey() + weight, item);
-                } else {
-                    put(weight, item);
-                }
-            }
-        }
-
-        T randomItem() {
-            if (isEmpty()) {
-                return null;
-            }
-            int random = Compute.randomInt(lastKey()) + 1;
-            return ceilingEntry(random).getValue();
-        }
-    }
-
 }
