@@ -880,8 +880,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         person.setBirthday(birthdate);
         person.setRecruitment(recruitment);
         person.setOriginFaction((Faction) choiceFaction.getSelectedItem());
-        if (choiceSystem.getSelectedItem() != null
-            && choicePlanet.getSelectedItem() != null) {
+        if (choiceSystem.getSelectedItem() != null && choicePlanet.getSelectedItem() != null) {
             person.setOriginPlanet((Planet)choicePlanet.getSelectedItem());
         } else {
             person.setOriginPlanet(null);
@@ -890,9 +889,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         person.setClanner(chkClan.isSelected());
         try {
             person.setToughness(Integer.parseInt(textToughness.getText()));
-        } catch (NumberFormatException e) {
-            // dont do anything
-        }
+        } catch (NumberFormatException ignored) { }
         if (null == choiceOriginalUnit.getSelectedItem()) {
         	person.setOriginalUnitWeight(choiceUnitWeight.getSelectedIndex());
         	person.setOriginalUnitTech(choiceUnitTech.getSelectedIndex());
