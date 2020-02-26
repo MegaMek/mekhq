@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign;
 
 import java.io.File;
@@ -239,7 +238,7 @@ public class Campaign implements Serializable, ITechManager {
 
     private String name;
 
-    private RandomNameGenerator rng;
+    private RandomNameGenerator rng = RandomNameGenerator.getInstance();
 
     // hierarchically structured Force object to define TO&E
     private Force forces;
@@ -321,8 +320,6 @@ public class Campaign implements Serializable, ITechManager {
         dateFormat = "EEEE, MMMM d yyyy";
         shortDateFormat = "yyyyMMdd";
         name = "My Campaign";
-        rng = new RandomNameGenerator();
-        rng.populateNames();
         overtime = false;
         gmMode = false;
         factionCode = "MERC";
@@ -461,10 +458,6 @@ public class Campaign implements Serializable, ITechManager {
 
     public RandomNameGenerator getRNG() {
         return rng;
-    }
-
-    public void setRNG(RandomNameGenerator g) {
-        this.rng = g;
     }
 
     public String getCurrentSystemName() {
@@ -3919,12 +3912,10 @@ public class Campaign implements Serializable, ITechManager {
         shoppingList.restore();
 
         if (getCampaignOptions().getUseAtB()) {
-            RandomNameGenerator.initialize();
             RandomFactionGenerator.getInstance().startup(this);
 
             int loops = 0;
-            while (!RandomUnitGenerator.getInstance().isInitialized()
-                || !RandomNameGenerator.getInstance().isInitialized()) {
+            while (!RandomUnitGenerator.getInstance().isInitialized()) {
                 try {
                     Thread.sleep(50);
                     if (++loops > 20) {
@@ -4709,7 +4700,7 @@ public class Campaign implements Serializable, ITechManager {
      */
     public AbstractPersonnelGenerator getPersonnelGenerator(AbstractFactionSelector factionSelector, AbstractPlanetSelector planetSelector) {
         DefaultPersonnelGenerator generator = new DefaultPersonnelGenerator(factionSelector, planetSelector);
-        generator.setNameGenerator(getRNG());
+        generator.setNameGenerator(rng);
         generator.setSkillPreferences(getRandomSkillPreferences());
         return generator;
     }
@@ -8331,7 +8322,6 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         setAtBConfig(AtBConfiguration.loadFromXml());
-        RandomNameGenerator.initialize();
         RandomFactionGenerator.getInstance().startup(this);
         getContractMarket().generateContractOffers(this, newCampaign);
         getUnitMarket().generateUnitOffers(this);
@@ -8344,7 +8334,6 @@ public class Campaign implements Serializable, ITechManager {
     public void shutdownAtB() {
         RandomFactionGenerator.getInstance().dispose();
         RandomUnitGenerator.getInstance().dispose();
-        RandomNameGenerator.getInstance().dispose();
         atbEventProcessor.shutdown();
     }
 
