@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.personnel;
 
 import java.io.PrintWriter;
@@ -1576,7 +1575,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 }
                 break;
             default:
-                MekHQ.getLogger().log(getClass(), "marry", LogLevel.ERROR, String.format("Unknown error in Surname chooser between \"%s\" and \"%s\"", //$NON-NLS-1$
+                MekHQ.getLogger().log(getClass(), "marry", LogLevel.ERROR,
+                        String.format("Unknown error in Surname chooser between \"%s\" and \"%s\"",
                         getFullName(), spouse.getFullName()));
                 break;
         }
@@ -1786,10 +1786,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     + MekHqXmlUtil.escape(maidenName)
                     + "</maidenName>");
         }
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+        if (!StringUtil.isNullOrEmpty(callsign)) {
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<callsign>"
                     + MekHqXmlUtil.escape(callsign)
                     + "</callsign>");
+        }
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<primaryRole>"
                     + primaryRole
@@ -1834,14 +1836,18 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 + "<phenotype>"
                 + phenotype
                 + "</phenotype>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                + "<bloodname>"
-                + bloodname
-                + "</bloodname>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+        if (!StringUtil.isNullOrEmpty(bloodname)) {
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                    + "<bloodname>"
+                    + bloodname
+                    + "</bloodname>");
+        }
+        if (!StringUtil.isNullOrEmpty(biography)) {
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<biography>"
                     + MekHqXmlUtil.escape(biography)
                     + "</biography>");
+        }
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<idleMonths>"
                     + idleMonths
@@ -2176,7 +2182,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                             // Error condition of sorts!
                             // Errr, what should we do here?
                             MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
-                                    "Unknown node type not loaded in formerSpouses nodes: " + wn3.getNodeName()); //$NON-NLS-1$
+                                    "Unknown node type not loaded in formerSpouses nodes: "
+                                            + wn3.getNodeName());
                             continue;
                         }
                         retVal.formerSpouses.add(FormerSpouse.generateInstanceFromXML(wn3));
@@ -2203,7 +2210,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     if (version.isLowerThan("0.3.4-r1782")) {
                         RankTranslator rt = new RankTranslator(c);
                         try {
-                            retVal.rank = rt.getNewRank(c.getRanks().getOldRankSystem(), Integer.parseInt(wn2.getTextContent()));
+                            retVal.rank = rt.getNewRank(c.getRanks().getOldRankSystem(),
+                                    Integer.parseInt(wn2.getTextContent()));
                         } catch (ArrayIndexOutOfBoundsException e) {
                             // Do nothing
                         }
@@ -3510,15 +3518,15 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * @return
      */
     public String getEdgeTooltip() {
-        String edgett = "";
+        StringBuilder edgett = new StringBuilder();
         for (Enumeration<IOption> i = getOptions(PilotOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
             IOption ability = i.nextElement();
             //yuck, it would be nice to have a more fool-proof way of identifying edge triggers
             if (ability.getName().contains("edge_when") && ability.booleanValue()) {
-                edgett = edgett + ability.getDescription() + "<br>";
+                edgett.append(ability.getDescription()).append("<br>");
             }
         }
-        if (edgett.equals("")) {
+        if (edgett.toString().equals("")) {
             return "No triggers set";
         }
         return "<html>" + edgett + "</html>";
@@ -3531,14 +3539,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * @return
      */
     public String getAbilityList(String type) {
-        String abilityString = "";
+        StringBuilder abilityString = new StringBuilder();
         for (Enumeration<IOption> i = getOptions(type); i.hasMoreElements(); ) {
             IOption ability = i.nextElement();
             if (ability.booleanValue()) {
-                abilityString = abilityString + Utilities.getOptionDisplayName(ability) + "<br>";
+                abilityString.append(Utilities.getOptionDisplayName(ability)).append("<br>");
             }
         }
-        if (abilityString.equals("")) {
+        if (abilityString.toString().equals("")) {
             return null;
         }
         return "<html>" + abilityString + "</html>";
@@ -4095,19 +4103,19 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public String getInjuriesDesc() {
-        String toReturn = "<html><font size='2'><b>" + getFullTitle() + "</b><br/>";
-        toReturn += "&nbsp;&nbsp;&nbsp;Injuries:";
+        StringBuilder toReturn = new StringBuilder("<html><font size='2'><b>").append(getFullTitle())
+                .append("</b><br/>").append("&nbsp;&nbsp;&nbsp;Injuries:");
         String sep = "<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
         for (Injury injury : injuries) {
-            toReturn += sep + injury.getFluff();
+            toReturn.append(sep).append(injury.getFluff());
             if (sep.contains("<br/>")) {
                 sep = ", ";
             } else {
                 sep = ",<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
             }
         }
-        toReturn += "</font></html>";
-        return toReturn;
+        toReturn.append("</font></html>");
+        return toReturn.toString();
     }
 
     private int getHitsInLocation(BodyLocation loc) {
@@ -4227,9 +4235,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public String getInjuriesText() {
         String nl = System.getProperty("line.separator");
-        String buffer = "";
+        StringBuilder buffer = new StringBuilder();
         for (Injury injury : injuries) {
-            buffer = buffer + injury.getFluff() + nl;
+            buffer.append(injury.getFluff()).append(nl);
         }
         return buffer + getEffectString();
     }
@@ -4466,14 +4474,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     /**
      *
-     * @param formerSpouses a list of the current person's former spouses
-     */
-    public void setFormerSpouses(List<FormerSpouse> formerSpouses) {
-        this.formerSpouses = formerSpouses;
-    }
-
-    /**
-     *
      * @param formerSpouse a former spouse to add the the current person's list
      */
     public void addFormerSpouse(FormerSpouse formerSpouse) {
@@ -4585,9 +4585,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
 
         if (hasMother()) {
-            if (hasMothersParents()) {
-                return true;
-            }
+            return hasMothersParents();
         }
         return false;
     }
@@ -4620,9 +4618,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
 
         if (hasMother()) {
-            if (hasMothersSiblings()) {
-                return true;
-            }
+            return hasMothersSiblings();
         }
         return false;
     }

@@ -575,18 +575,11 @@ public class Utilities {
         return newCrew;
     }
 
-    public static boolean isDeadCrew(Entity e) {
-        return Compute.getFullCrewSize(e) == 0 || e.getCrew().isDead();
-    }
-
     public static Map<CrewType, Collection<Person>> genRandomCrewWithCombinedSkill(Campaign c, Unit u, String factionCode) {
         Objects.requireNonNull(c);
         Objects.requireNonNull(u);
         Objects.requireNonNull(u.getEntity(), "Unit needs to have a valid Entity attached");
         Crew oldCrew = u.getEntity().getCrew();
-
-        MekHQ.getLogger().warning(Utilities.class, "genrandcrew",
-                "factionCode: " + factionCode);
 
         int averageGunnery;
         int averagePiloting;
@@ -603,9 +596,6 @@ public class Utilities {
         // Actually, we do because they might not be truly dead - this will be the case for BA for example
         // Also, the user may choose to GM make them un-dead in the resolve scenario dialog. I am disabling
         // this because it is causing problems for BA.
-        /*if (isDeadCrew(unit.getEntity())) {
-            return new ArrayList<Person>();
-        }*/
 
         // Generate solo crews
         if (u.usesSoloPilot()) {
