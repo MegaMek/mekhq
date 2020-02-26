@@ -80,8 +80,6 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
         person.setPrimaryRole(primaryRole);
         person.setSecondaryRole(secondaryRole);
 
-        generateName(person, gender);
-
         int expLvl = generateExperienceLevel(campaign, person);
 
         generateXp(campaign, person, expLvl);
@@ -98,9 +96,8 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
         specialAbilityGenerator.setSkillPreferences(getSkillPreferences());
         specialAbilityGenerator.generateSpecialAbilities(person, expLvl);
 
-        //
-        // Miscellaneous (after skills and SPAs)
-        //
+        // Do naming at the end, to ensure the keys are set
+        generateName(person, gender);
 
         //check for Bloodname
         if (person.isClanner()) {

@@ -121,7 +121,8 @@ public abstract class AbstractPersonnelGenerator {
             person.setGender(Person.G_FEMALE);
         }
 
-        String[] name = getNameGenerator().generateGivenNameSurnameSplit(isFemale);
+        String[] name = getNameGenerator().generateGivenNameSurnameSplit(isFemale, person.isClanner(),
+                person.getOriginFaction().getShortName());
         person.setGivenName(name[0]);
         person.setSurname(name[1]);
     }

@@ -211,7 +211,8 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     }
 
     private void randomName() {
-        String[] name = hqView.getCampaign().getRNG().generateGivenNameSurnameSplit(person.isFemale());
+        String[] name = hqView.getCampaign().getRNG().generateGivenNameSurnameSplit(person.isFemale(),
+                person.isClanner(), person.getOriginFaction().getShortName());
         person.setGivenName(name[0]);
         person.setSurname(name[1]);
         refreshView();

@@ -923,7 +923,9 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     }//GEN-LAST:event_btnOkActionPerformed
 
     private void randomName() {
-        String[] name = campaign.getRNG().generateGivenNameSurnameSplit(choiceGender.getSelectedIndex() == Person.G_FEMALE);
+        String[] name = campaign.getRNG().generateGivenNameSurnameSplit(
+                choiceGender.getSelectedIndex() == Person.G_FEMALE,
+                person.isClanner(), person.getOriginFaction().getShortName());
         textGivenName.setText(name[0]);
         textSurname.setText(name[1]);
 	}
