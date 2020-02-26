@@ -909,11 +909,13 @@ public class Utilities {
         // this is a bit of a hack, but instead of tracking it elsewhere we only set gender to
         // male or female when a name is generated. G_RANDOMIZE will therefore only be returned for
         // crew that don't have names, so we can just leave them with their randomly generated name
+        if (p.isClanner()) {
+            p.setSurname("");
+            // TODO : Windchild remove this bandaid, and finish fixing how names get generated instead
+        }
+
         if (oldCrew.getGender(crewIndex) != Crew.G_RANDOMIZE) {
             String givenName = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_GIVEN_NAME);
-            if (p.isClanner()) {
-                p.setSurname("");
-            }
 
             if (givenName == null) {
                 String name = oldCrew.getName(crewIndex);
