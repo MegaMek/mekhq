@@ -24,3 +24,5 @@ MekHQ/.idea/
 
 MekHQ/out/
 MekHQ/mmconf/mekhq.preferences
+
+*.sav.gz

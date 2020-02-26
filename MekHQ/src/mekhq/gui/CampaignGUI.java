@@ -1425,7 +1425,6 @@ public class CampaignGUI extends JPanel {
         if (hadAtB && !getCampaign().getCampaignOptions().getUseAtB()) {
             RandomFactionGenerator.getInstance().dispose();
             RandomUnitGenerator.getInstance().dispose();
-            RandomNameGenerator.getInstance().dispose();
         }
         //Unregister event handlers for CampaignGUI and tabs
         for (int i = 0; i < tabMain.getTabCount(); i++) {
@@ -1467,18 +1466,13 @@ public class CampaignGUI extends JPanel {
                 //refresh lance assignment table
                 MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign().getForces()));
             }
-            miContractMarket.setVisible(getCampaign().getCampaignOptions()
-                    .getUseAtB());
-            miUnitMarket.setVisible(getCampaign().getCampaignOptions()
-                    .getUseAtB());
-            miShipSearch.setVisible(getCampaign().getCampaignOptions()
-                    .getUseAtB());
-            miRetirementDefectionDialog.setVisible(getCampaign()
-                    .getCampaignOptions().getUseAtB());
+            miContractMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
+            miUnitMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
+            miShipSearch.setVisible(getCampaign().getCampaignOptions().getUseAtB());
+            miRetirementDefectionDialog.setVisible(getCampaign().getCampaignOptions().getUseAtB());
             if (getCampaign().getCampaignOptions().getUseAtB()) {
                 int loops = 0;
-                while (!RandomUnitGenerator.getInstance().isInitialized()
-                        || !RandomNameGenerator.getInstance().isInitialized()) {
+                while (!RandomUnitGenerator.getInstance().isInitialized()) {
                     try {
                         Thread.sleep(50);
                         if (++loops > 20) {

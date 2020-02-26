@@ -907,8 +907,7 @@ public class CampaignXmlParser {
                         retVal.setCamoFileName(val);
                     }
                 } else if (xn.equalsIgnoreCase("colorIndex")) {
-                    retVal.setColorIndex(Integer.parseInt(wn.getTextContent()
-                            .trim()));
+                    retVal.setColorIndex(Integer.parseInt(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("nameGen")) {
                     // First, get all the child nodes;
                     NodeList nl2 = wn.getChildNodes();
@@ -919,8 +918,7 @@ public class CampaignXmlParser {
                         }
                         if (wn2.getNodeName().equalsIgnoreCase("faction")) {
                             retVal.getRNG().setChosenFaction(wn2.getTextContent().trim());
-                        } else if (wn2.getNodeName().equalsIgnoreCase(
-                                "percentFemale")) {
+                        } else if (wn2.getNodeName().equalsIgnoreCase("percentFemale")) {
                             retVal.getRNG().setPercentFemale(Integer.parseInt(wn2.getTextContent().trim()));
                         }
                     }

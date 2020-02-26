@@ -33,8 +33,7 @@ import mekhq.campaign.RandomSkillPreferences;
  * for a {@link Campaign}.
  */
 public abstract class AbstractPersonnelGenerator {
-
-    private RandomNameGenerator randomNameGenerator = new RandomNameGenerator();
+    private RandomNameGenerator randomNameGenerator = RandomNameGenerator.getInstance();
 
     private RandomSkillPreferences rSkillPrefs = new RandomSkillPreferences();
 
