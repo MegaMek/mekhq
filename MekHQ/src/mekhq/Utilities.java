@@ -276,8 +276,7 @@ public class Utilities {
             }
 
             // Only Protos can use Proto-specific ammo
-            if (atype.hasFlag(AmmoType.F_PROTOMECH)
-                    && !(entity instanceof Protomech)) {
+            if (atype.hasFlag(AmmoType.F_PROTOMECH) && !(entity instanceof Protomech)) {
                 continue;
             }
 
@@ -343,15 +342,17 @@ public class Utilities {
         //ok now we need to recursively search any subdirectories,
         //so see if they contain more recent files
         files = fl.listFiles();
-        for(File file : files) {
-            if(!file.isDirectory()) {
-                continue;
-            }
+        if (files != null) {
+            for (File file : files) {
+                if (!file.isDirectory()) {
+                    continue;
+                }
 
-            File subFile =  lastFileModified(file.getPath(), filter);
-            if (null != subFile && subFile.lastModified() > lastMod) {
-                choice = subFile;
-                lastMod = subFile.lastModified();
+                File subFile = lastFileModified(file.getPath(), filter);
+                if (null != subFile && subFile.lastModified() > lastMod) {
+                    choice = subFile;
+                    lastMod = subFile.lastModified();
+                }
             }
         }
 
@@ -366,7 +367,7 @@ public class Utilities {
     public static ArrayList<String> getAllVariants(Entity en, Campaign campaign) {
         final String METHOD_NAME = "getAllVariants(Entity, Campaign)"; // $NON-NLS-1$
         CampaignOptions options = campaign.getCampaignOptions();
-        ArrayList<String> variants = new ArrayList<String>();
+        ArrayList<String> variants = new ArrayList<>();
         for(MechSummary summary : MechSummaryCache.getInstance().getAllMechs()) {
             // If this isn't the same chassis, is our current unit, or is a different weight we continue
             if(!en.getChassis().equalsIgnoreCase(summary.getChassis())
@@ -399,35 +400,29 @@ public class Utilities {
     public static boolean isOmniVariant(Entity entity1, Entity entity2) {
         if (!entity1.isOmni() || !entity2.isOmni()) {
             return false;
-        }
-        if (entity1.getWeight() != entity2.getWeight()) {
+        } else if (entity1.getWeight() != entity2.getWeight()) {
             return false;
-        }
-        if (entity1.getClass() != entity2.getClass()) {
+        } else if (entity1.getClass() != entity2.getClass()) {
             return false;
-        }
-        if (entity1.getEngine().getRating() != entity2.getEngine().getRating()
+        } else if (entity1.getEngine().getRating() != entity2.getEngine().getRating()
                 || entity1.getEngine().getEngineType() != entity2.getEngine().getEngineType()
                 || entity1.getEngine().getFlags() != entity2.getEngine().getFlags()) {
             return false;
-        }
-        if (entity1.getStructureType() != entity2.getStructureType()) {
+        } else if (entity1.getStructureType() != entity2.getStructureType()) {
             return false;
         }
         if (entity1 instanceof Mech) {
-            if (((Mech)entity1).getCockpitType() != ((Mech)entity2).getCockpitType()) {
+            if (((Mech) entity1).getCockpitType() != ((Mech) entity2).getCockpitType()) {
                 return false;
             }
-            if (((Mech)entity1).getGyroType() != ((Mech)entity2).getGyroType()) {
+            if (entity1.getGyroType() != entity2.getGyroType()) {
                 return false;
             }
-        }
-        if (entity1 instanceof Aero) {
-            if (((Aero)entity1).getCockpitType() != ((Aero)entity2).getCockpitType()) {
+        } else if (entity1 instanceof Aero) {
+            if (((Aero) entity1).getCockpitType() != ((Aero) entity2).getCockpitType()) {
                 return false;
             }
-        }
-        if (entity1 instanceof Tank) {
+        } else if (entity1 instanceof Tank) {
             if (entity1.getMovementMode() != entity2.getMovementMode()) {
                 return false;
             }
@@ -442,7 +437,7 @@ public class Utilities {
             //Go through the base entity and make a list of all fixed equipment in this location.
             for (int slot = 0; slot < entity1.getNumberOfCriticals(loc); slot++) {
                 CriticalSlot crit = entity1.getCritical(loc, slot);
-                if (null != crit && crit.getType() == CriticalSlot.TYPE_EQUIPMENT && null != crit.getMount()) {
+                if ((null != crit) && (crit.getType() == CriticalSlot.TYPE_EQUIPMENT) && (null != crit.getMount())) {
                     if (!crit.getMount().isOmniPodMounted()) {
                         fixedEquipment.add(crit.getMount().getType());
                         if (null != crit.getMount2()) {
@@ -475,19 +470,15 @@ public class Utilities {
 
     public static int generateExpLevel(int bonus) {
         int roll = Compute.d6(2) + bonus;
-        if(roll < 2) {
+        if (roll < 2) {
             return SkillType.EXP_ULTRA_GREEN;
-        }
-        if(roll < 6) {
+        } else if (roll < 6) {
             return SkillType.EXP_GREEN;
-        }
-        else if(roll < 10) {
+        } else if(roll < 10) {
             return SkillType.EXP_REGULAR;
-        }
-        else if(roll < 12) {
+        } else if(roll < 12) {
             return SkillType.EXP_VETERAN;
-        }
-        else {
+        } else {
             return SkillType.EXP_ELITE;
         }
     }
@@ -552,7 +543,7 @@ public class Utilities {
      * If an infantry platoon or vehicle crew took damage, perform the personnel injuries
      */
     public static ArrayList<Person> doCrewInjuries(Entity e, Campaign c, ArrayList<Person> newCrew) {
-        int casualties = 0;
+        int casualties;
         if(e instanceof Infantry) {
             e.applyDamage();
             casualties = newCrew.size() - ((Infantry)e).getShootingStrength();
@@ -592,10 +583,9 @@ public class Utilities {
         int totalGunnery = 0;
         int totalPiloting = 0;
 
-        // If the entire crew is dead, we don't want to generate them.
-        // Actually, we do because they might not be truly dead - this will be the case for BA for example
-        // Also, the user may choose to GM make them un-dead in the resolve scenario dialog. I am disabling
-        // this because it is causing problems for BA.
+        // If the entire crew is dead, we still want to generate them. This is because they might
+        // not be truly dead - this will be the case for BA for example
+        // Also, the user may choose to GM make them un-dead in the resolve scenario dialog
 
         // Generate solo crews
         if (u.usesSoloPilot()) {
@@ -1237,12 +1227,12 @@ public class Utilities {
             StringBuilder builder = new StringBuilder();
             builder.append(String.format("Could not unscramble equipment for %s (%s)\r\n\r\n", unit.getName(), unit.getId()));
             for (Part part : remaining) {
-                builder.append(" - " + part.getPartName() + " equipmentNum: ");
+                builder.append(" - ").append(part.getPartName()).append(" equipmentNum: ");
                 if (part instanceof EquipmentPart) {
-                    builder.append(((EquipmentPart)part).getEquipmentNum() + "\r\n");
+                    builder.append(((EquipmentPart) part).getEquipmentNum()).append("\r\n");
                 }
                 else if (part instanceof MissingEquipmentPart) {
-                    builder.append(((MissingEquipmentPart)part).getEquipmentNum() + "\r\n");
+                    builder.append(((MissingEquipmentPart) part).getEquipmentNum()).append("\r\n");
                 }
             }
 
@@ -1252,11 +1242,11 @@ public class Utilities {
                         (!(p instanceof MissingEquipmentPart))) {
                     continue;
                 }
-                int equipNum = -1;
+                int equipNum;
                 if (p instanceof EquipmentPart) {
                     EquipmentPart ePart = (EquipmentPart)p;
                     equipNum = ePart.getEquipmentNum();
-                } else if (p instanceof MissingEquipmentPart) {
+                } else {
                     MissingEquipmentPart mePart = (MissingEquipmentPart)p;
                     equipNum = mePart.getEquipmentNum();
                 }
@@ -1497,17 +1487,17 @@ public class Utilities {
         }
 
         // Roman numeral, prepended with a space for display purposes
-        String roman = " "; //$NON-NLS-1$
+        StringBuilder roman = new StringBuilder(" "); //$NON-NLS-1$
         int num = level+1;
 
         for (int i = 0; i < arabicNumbers.length; i++) {
             while (num > arabicNumbers[i]) {
-                roman += romanNumerals[i];
+                roman.append(romanNumerals[i]);
                 num -= arabicNumbers[i];
             }
         }
 
-        return roman;
+        return roman.toString();
     }
 
     public static Map<String, Integer> sortMapByValue(Map<String, Integer> unsortMap, boolean highFirst) {
@@ -1517,13 +1507,7 @@ public class Utilities {
                 new LinkedList<>(unsortMap.entrySet());
 
         // Sort list with comparator, to compare the Map values
-        Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
-            @Override
-            public int compare(Map.Entry<String, Integer> o1,
-                               Map.Entry<String, Integer> o2) {
-                return (o1.getValue()).compareTo(o2.getValue());
-            }
-        });
+        list.sort(Map.Entry.comparingByValue());
 
         // Convert sorted map back to a Map
         Map<String, Integer> sortedMap = new LinkedHashMap<>();
@@ -1534,8 +1518,7 @@ public class Utilities {
                 sortedMap.put(entry.getKey(), entry.getValue());
             }
         } else {
-            for (Iterator<Map.Entry<String, Integer>> it = list.iterator(); it.hasNext();) {
-                Map.Entry<String, Integer> entry = it.next();
+            for (Map.Entry<String, Integer> entry : list) {
                 sortedMap.put(entry.getKey(), entry.getValue());
             }
         }
@@ -1549,10 +1532,7 @@ public class Utilities {
         if(!en.canEscape()) {
             return true;
         }
-        return en.isDestroyed()
-                || en.isDoomed()
-                || en.isStalled()
-                || en.isStuck();
+        return en.isDestroyed() || en.isDoomed() || en.isStalled() || en.isStuck();
     }
 
     /**
@@ -1568,31 +1548,23 @@ public class Utilities {
     public static void parseXMLFiles(String dirName, Consumer<FileInputStream> parser, boolean recurse) {
         final String METHOD_NAME = "parseXMLFiles(String,FileParser,boolean)"; //$NON-NLS-1$
 
-        if( null == dirName || null == parser ) {
+        if ((null == dirName) || (null == parser)) {
             throw new NullPointerException();
         }
         File dir = new File(dirName);
-        if( dir.isDirectory() ) {
-            File[] files = dir.listFiles(new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    return name.toLowerCase(Locale.ROOT).endsWith(".xml"); //$NON-NLS-1$
-                }
+        if (dir.isDirectory()) {
+            File[] files = dir.listFiles((dir1, name) -> {
+                return name.toLowerCase(Locale.ROOT).endsWith(".xml"); //$NON-NLS-1$
             });
-            if( null != files && files.length > 0 ) {
+            if ((null != files) && (files.length > 0)) {
                 // Case-insensitive sorting. Yes, even on Windows. Deal with it.
-                Arrays.sort(files, new Comparator<File>() {
-                    @Override
-                    public int compare(File f1, File f2) {
-                        return f1.getPath().compareTo(f2.getPath());
-                    }
-                });
+                Arrays.sort(files, Comparator.comparing(File::getPath));
                 // Try parsing and updating the main list, one by one
-                for( File file : files ) {
-                    if( file.isFile() ) {
-                        try(FileInputStream fis = new FileInputStream(file)) {
+                for (File file : files) {
+                    if (file.isFile()) {
+                        try (FileInputStream fis = new FileInputStream(file)) {
                             parser.accept(fis);
-                        } catch(Exception ex) {
+                        } catch (Exception ex) {
                             // Ignore this file then
                             MekHQ.getLogger().log(Utilities.class, METHOD_NAME, LogLevel.ERROR,
                                     "Exception trying to parse " + file.getPath() + " - ignoring."); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1602,27 +1574,21 @@ public class Utilities {
                 }
             }
 
-            if( !recurse ) {
+            if (!recurse) {
                 // We're done
                 return;
             }
 
             // Get subdirectories too
             File[] dirs = dir.listFiles();
-            if( null != dirs && dirs.length > 0 ) {
-                Arrays.sort(dirs, new Comparator<File>() {
-                    @Override
-                    public int compare(File f1, File f2) {
-                        return f1.getPath().compareTo(f2.getPath());
-                    }
-                });
-                for( File subDirectory : dirs ) {
-                    if( subDirectory.isDirectory() ) {
-                        parseXMLFiles(subDirectory.getPath(), parser, recurse);
+            if (null != dirs && dirs.length > 0) {
+                Arrays.sort(dirs, Comparator.comparing(File::getPath));
+                for (File subDirectory : dirs) {
+                    if (subDirectory.isDirectory() ) {
+                        parseXMLFiles(subDirectory.getPath(), parser, true);
                     }
                 }
             }
-
         }
     }
 
@@ -1633,8 +1599,7 @@ public class Utilities {
      * @return The converted BufferedImage
      */
     public static BufferedImage toBufferedImage(Image img) {
-        if (img instanceof BufferedImage)
-        {
+        if (img instanceof BufferedImage) {
             return (BufferedImage) img;
         }
 
