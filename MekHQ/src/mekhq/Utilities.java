@@ -1360,7 +1360,7 @@ public class Utilities {
      * Export a JTable to a CSV file
      * @param table     the table to save to csv
      * @param file      the file to save to
-     * @return report
+     * @return a csv formatted export of the table
      */
     public static String exportTableToCSV(JTable table, File file) {
         String report;

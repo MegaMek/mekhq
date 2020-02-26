@@ -20,6 +20,7 @@ VERSION HISTORY:
 + Issue #1497: Scale Unit sell values by their Entity's price multiplier
 + PR #1509: Adding Monthly and Yearly Autosave Options
 + Issue #1482: Hire Full Complement Now Records Time in Service
++ Issue #1486: Fixing Unit and Personnel Export to CSV and Localizing Top Menu Bar
 
 v0.47.4 (2020-2-09 2200 UTC)
 + PR #1440: Implement "Rugged" quirk (2x or 3x between maintenance rolls)

@@ -221,7 +221,6 @@ public class Finances implements Serializable {
                 try {
                     retVal.wentIntoDebt = df.parse(wn2.getTextContent().trim());
                 } catch (DOMException | ParseException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }
@@ -485,9 +484,10 @@ public class Finances implements Serializable {
     public String exportFinancesToCSV(String path, String format) {
         String report;
 
-        try {
-            BufferedWriter writer = Files.newBufferedWriter(Paths.get(path));
-            CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader("Date", "Category", "Description", "Amount", "RunningTotal"));
+        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(path));
+             CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT
+                     .withHeader("Date", "Category", "Description", "Amount", "RunningTotal"))) {
+
             SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd"); //TODO : Remove inline date format
 
             Money runningTotal = Money.zero();
@@ -502,10 +502,9 @@ public class Finances implements Serializable {
             }
 
             csvPrinter.flush();
-            csvPrinter.close();
 
             report = transactions.size() + " " + resourceMap.getString("FinanceExport.text");
-        } catch(IOException ioe) {
+        } catch (IOException ioe) {
             MekHQ.getLogger().log(getClass(), "exportFinances", LogLevel.INFO, "Error exporting finances to " + format);
             report = "Error exporting finances. See log for details.";
         }
