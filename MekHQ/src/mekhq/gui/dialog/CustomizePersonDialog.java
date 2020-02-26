@@ -951,8 +951,9 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
 			phenotype = Bloodname.P_PROTOMECH;
 			break;
 		}
-		textBloodname.setText(Bloodname.randomBloodname(campaign.getFactionCode(), phenotype,
-					campaign.getCalendar().get(Calendar.YEAR)).getName());
+		textBloodname.setText(Bloodname.randomBloodname(campaign.getFaction().isClan()
+                ? campaign.getFactionCode() : person.getOriginFaction().getShortName(),
+                phenotype, campaign.getCalendar().get(Calendar.YEAR)).getName());
     }
 
     public void refreshSkills() {
