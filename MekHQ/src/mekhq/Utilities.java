@@ -585,6 +585,9 @@ public class Utilities {
         Objects.requireNonNull(u.getEntity(), "Unit needs to have a valid Entity attached");
         Crew oldCrew = u.getEntity().getCrew();
 
+        MekHQ.getLogger().warning(Utilities.class, "genrandcrew",
+                "factionCode: " + factionCode);
+
         int averageGunnery;
         int averagePiloting;
         List<Person> drivers = new ArrayList<>();
@@ -668,7 +671,10 @@ public class Utilities {
                     drivers.add(p);
                 }
             }
-        } else {
+        }
+
+        // This is a nightmare case
+        else {
             // Generate drivers for multi-crewed vehicles.
 
             //Uggh, BA are a nightmare. The getTotalDriverNeeds will adjust for missing/destroyed suits
@@ -676,8 +682,10 @@ public class Utilities {
             //it here to make it the starting squad size
             int driversNeeded  = u.getTotalDriverNeeds();
             if (u.getEntity() instanceof BattleArmor) {
-                driversNeeded = ((BattleArmor)u.getEntity()).getSquadSize();
+                driversNeeded = ((BattleArmor) u.getEntity()).getSquadSize();
             }
+
+            boolean nameSet = true;
 
             for (int slot = 0; slot < driversNeeded; slot++) {
                 Person p;
@@ -712,7 +720,14 @@ public class Utilities {
                 // the SPAs from the entity's crew.
                 // Not really any way around it
                 populateOptionsFromCrew(p, oldCrew);
-                setName(p, oldCrew, slot);
+
+                if (nameSet) {
+                    setName(p, oldCrew, slot);
+                    nameSet = false;
+                } else {
+                    setName(p, oldCrew, -1);
+                }
+
                 drivers.add(p);
             }
 
@@ -771,7 +786,12 @@ public class Utilities {
                     }
 
                     populateOptionsFromCrew(p, oldCrew);
-                    setName(p, oldCrew, slot);
+                    if (nameSet) {
+                        setName(p, oldCrew, slot);
+                        nameSet = false;
+                    } else {
+                        setName(p, oldCrew, -1);
+                    }
 
                     gunners.add(p);
                 }
@@ -807,20 +827,23 @@ public class Utilities {
         for (int slot = 0; slot < u.getTotalCrewNeeds(); slot++) {
             Person p = c.newPerson(u.getEntity().isSupportVehicle() ?
                     Person.T_VEHICLE_CREW : Person.T_SPACE_CREW, Person.T_NONE, factionCode,
-                    oldCrew.getGender(slot));
-            if (!nameSet) {
+                    Crew.G_RANDOMIZE);
+
+            if (nameSet) {
                 setName(p, oldCrew, slot);
-                nameSet = true;
+                nameSet = false;
+            } else {
+                setName(p, oldCrew, -1);
             }
             vesselCrew.add(p);
         }
 
         if (u.canTakeNavigator()) {
-            navigator = c.newPerson(Person.T_NAVIGATOR, Person.T_NONE, factionCode, Person.G_RANDOMIZE);
+            navigator = c.newPerson(Person.T_NAVIGATOR, Person.T_NONE, factionCode, Crew.G_RANDOMIZE);
         }
 
         if (u.canTakeTechOfficer()) {
-            consoleCmdr = c.newPerson(Person.T_VEE_GUNNER, Person.T_NONE, factionCode, Person.G_RANDOMIZE);
+            consoleCmdr = c.newPerson(Person.T_VEE_GUNNER, Person.T_NONE, factionCode, Crew.G_RANDOMIZE);
         }
 
         if (!nameSet) {
@@ -830,12 +853,6 @@ public class Utilities {
                 p = drivers.get(0);
             } else if (!gunners.isEmpty()) {
                 p = gunners.get(0);
-            } else if (!vesselCrew.isEmpty()) {
-                p = vesselCrew.get(0);
-            } else if (navigator != null) {
-                p = navigator;
-            } else if (consoleCmdr != null) {
-                p = consoleCmdr;
             }
 
             if (p != null) {
@@ -889,23 +906,32 @@ public class Utilities {
      * @param crewIndex the index of the person in the crew
      */
     private static void setName(Person p, Crew oldCrew, int crewIndex) {
-        String givenName = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_GIVEN_NAME);
-        if (givenName == null) {
-            String name = oldCrew.getName(crewIndex);
-
-            if (!name.equalsIgnoreCase(Crew.UNNAMED)) {
-                p.migrateName(name);
-            }
-        } else {
-            p.setGivenName(givenName);
-            p.setSurname(oldCrew.getExtraDataValue(crewIndex, Crew.MAP_SURNAME));
-
-            String phenotype = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_PHENOTYPE);
-            if (phenotype != null) {
-                p.setPhenotype(Integer.parseInt(phenotype));
+        // this is a bit of a hack, but instead of tracking it elsewhere we only set gender to
+        // male or female when a name is generated. G_RANDOMIZE will therefore only be returned for
+        // crew that don't have names, so we can just leave them with their randomly generated name
+        if (oldCrew.getGender(crewIndex) != Crew.G_RANDOMIZE) {
+            String givenName = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_GIVEN_NAME);
+            if (p.isClanner()) {
+                p.setSurname("");
             }
 
-            p.setBloodname(oldCrew.getExtraDataValue(crewIndex, Crew.MAP_BLOODNAME));
+            if (givenName == null) {
+                String name = oldCrew.getName(crewIndex);
+
+                if (!name.equalsIgnoreCase(Crew.UNNAMED)) {
+                    p.migrateName(name);
+                }
+            } else {
+                p.setGivenName(givenName);
+                p.setSurname(oldCrew.getExtraDataValue(crewIndex, Crew.MAP_SURNAME));
+
+                String phenotype = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_PHENOTYPE);
+                if (phenotype != null) {
+                    p.setPhenotype(Integer.parseInt(phenotype));
+                }
+
+                p.setBloodname(oldCrew.getExtraDataValue(crewIndex, Crew.MAP_BLOODNAME));
+            }
         }
     }
 
