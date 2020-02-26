@@ -71,26 +71,10 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private SimpleDateFormat dateFormat;
     private Frame frame;
 
-    private javax.swing.JButton btnClose;
-    private javax.swing.JButton btnOk;
-    private javax.swing.JButton btnRandomName;
-    private javax.swing.JButton btnRandomBloodname;
     private javax.swing.JButton btnDate;
     private javax.swing.JButton btnServiceDate;
     private javax.swing.JComboBox<String> choiceGender;
-    private javax.swing.JScrollPane scrOptions;
-    private javax.swing.JScrollPane scrSkills;
-    private javax.swing.JLabel lblToughness;
-    private javax.swing.JLabel lblName;
-    private javax.swing.JLabel lblGender;
-    private javax.swing.JLabel lblBday;
-    private javax.swing.JLabel lblRecruitment;
     private javax.swing.JLabel lblAge;
-    private javax.swing.JLabel lblNickname;
-    private javax.swing.JLabel lblBloodname;
-    private javax.swing.JPanel panButtons;
-    private javax.swing.JPanel panDemog;
-    private javax.swing.JTabbedPane tabStats;
     private javax.swing.JPanel panSkills;
     private javax.swing.JPanel panOptions;
     private javax.swing.JTextField textToughness;
@@ -111,7 +95,6 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     /* Against the Bot */
     private JComboBox<String> choiceUnitWeight;
     private JComboBox<String> choiceUnitTech;
-    private JLabel lblShares;
     private JCheckBox chkFounder;
     private JComboBox<Unit> choiceOriginalUnit;
 
@@ -142,15 +125,15 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
 	private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        panDemog = new javax.swing.JPanel(new java.awt.GridBagLayout());
-        tabStats = new javax.swing.JTabbedPane();
-        lblName = new javax.swing.JLabel();
-        lblGender = new javax.swing.JLabel();
-        lblBday = new javax.swing.JLabel();
-        lblRecruitment = new javax.swing.JLabel();
+        JPanel panDemog = new JPanel(new GridBagLayout());
+        JTabbedPane tabStats = new JTabbedPane();
+        JLabel lblName = new JLabel();
+        JLabel lblGender = new JLabel();
+        JLabel lblBday = new JLabel();
+        JLabel lblRecruitment = new JLabel();
         lblAge = new javax.swing.JLabel();
-        lblNickname = new javax.swing.JLabel();
-        lblBloodname = new javax.swing.JLabel();
+        JLabel lblNickname = new JLabel();
+        JLabel lblBloodname = new JLabel();
         JPanel panName = new javax.swing.JPanel(new java.awt.GridBagLayout());
         textGivenName = new javax.swing.JTextField();
         textSurname = new javax.swing.JTextField();
@@ -158,18 +141,18 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         textNickname = new javax.swing.JTextField();
         textBloodname = new javax.swing.JTextField();
         textToughness = new javax.swing.JTextField();
-        lblToughness = new javax.swing.JLabel();
+        JLabel lblToughness = new JLabel();
         choiceGender = new javax.swing.JComboBox<>();
-        scrOptions = new javax.swing.JScrollPane();
+        JScrollPane scrOptions = new JScrollPane();
         panOptions = new javax.swing.JPanel();
-        scrSkills = new javax.swing.JScrollPane();
+        JScrollPane scrSkills = new JScrollPane();
         panSkills = new javax.swing.JPanel();
-        panButtons = new javax.swing.JPanel();
-        btnOk = new javax.swing.JButton();
+        JPanel panButtons = new JPanel();
+        JButton btnOk = new JButton();
 
-        btnClose = new javax.swing.JButton();
-        btnRandomName = new javax.swing.JButton();
-        btnRandomBloodname = new javax.swing.JButton();
+        JButton btnClose = new JButton();
+        JButton btnRandomName = new JButton();
+        JButton btnRandomBloodname = new JButton();
         btnDate = new javax.swing.JButton();
         btnServiceDate = new javax.swing.JButton();
 
@@ -606,7 +589,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         choiceUnitTech.addItem("Clan");
         choiceUnitTech.setSelectedIndex(person.getOriginalUnitTech());
 
-        lblShares = new JLabel();
+        JLabel lblShares = new JLabel();
         lblShares.setText(person.getNumShares(campaign.getCampaignOptions().getSharesForAll()) + " shares");
 
         chkFounder = new JCheckBox("Founding member");
@@ -734,10 +717,10 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         scrOptions.setMinimumSize(new java.awt.Dimension(500, 500));
         scrOptions.setPreferredSize(new java.awt.Dimension(500, 500));
 
-        tabStats.addTab(resourceMap.getString("scrSkills.TabConstraints.tabTitle"),scrSkills); // NOI18N
+        tabStats.addTab(resourceMap.getString("scrSkills.TabConstraints.tabTitle"), scrSkills); // NOI18N
         if(campaign.getCampaignOptions().useAbilities() || campaign.getCampaignOptions().useEdge()
         		|| campaign.getCampaignOptions().useImplants()) {
-        	tabStats.addTab(resourceMap.getString("scrOptions.TabConstraints.tabTitle"),scrOptions); // NOI18N
+        	tabStats.addTab(resourceMap.getString("scrOptions.TabConstraints.tabTitle"), scrOptions); // NOI18N
         }
         tabStats.add(resourceMap.getString("panLog.TabConstraints.tabTitle"), new EditPersonnelLogControl(frame, campaign, person));
         tabStats.add(resourceMap.getString("panMissions.TabConstraints.tabTitle"), new EditMissionLogControl(frame, campaign, person));
@@ -1258,33 +1241,32 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private void backgroundChanged() {
         int pheno = choicePheno.getSelectedIndex();
         boolean clanner = chkClan.isSelected();
-        if(clanner) {
-            clearAllPhenotypeBonuses();
+        clearAllPhenotypeBonuses();
+        if (clanner) {
             switch(pheno) {
-            case Person.PHENOTYPE_MW:
-                skillBonus.get(SkillType.S_GUN_MECH).setValue(1);
-                skillBonus.get(SkillType.S_PILOT_MECH).setValue(1);
-                break;
-            case Person.PHENOTYPE_AERO:
-                skillBonus.get(SkillType.S_GUN_AERO).setValue(1);
-                skillBonus.get(SkillType.S_PILOT_AERO).setValue(1);
-                skillBonus.get(SkillType.S_GUN_JET).setValue(1);
-                skillBonus.get(SkillType.S_PILOT_JET).setValue(1);
-                skillBonus.get(SkillType.S_GUN_PROTO).setValue(1);
-                break;
-            case Person.PHENOTYPE_BA:
-                skillBonus.get(SkillType.S_GUN_BA).setValue(1);
-                break;
-            case Person.PHENOTYPE_VEE:
-                skillBonus.get(SkillType.S_GUN_VEE).setValue(1);
-                skillBonus.get(SkillType.S_PILOT_GVEE).setValue(1);
-                skillBonus.get(SkillType.S_PILOT_NVEE).setValue(1);
-                skillBonus.get(SkillType.S_PILOT_VTOL).setValue(1);
-                break;
+                case Person.PHENOTYPE_MW:
+                    skillBonus.get(SkillType.S_GUN_MECH).setValue(1);
+                    skillBonus.get(SkillType.S_PILOT_MECH).setValue(1);
+                    break;
+                case Person.PHENOTYPE_AERO:
+                    skillBonus.get(SkillType.S_GUN_AERO).setValue(1);
+                    skillBonus.get(SkillType.S_PILOT_AERO).setValue(1);
+                    skillBonus.get(SkillType.S_GUN_JET).setValue(1);
+                    skillBonus.get(SkillType.S_PILOT_JET).setValue(1);
+                    skillBonus.get(SkillType.S_GUN_PROTO).setValue(1);
+                    break;
+                case Person.PHENOTYPE_BA:
+                    skillBonus.get(SkillType.S_GUN_BA).setValue(1);
+                    break;
+                case Person.PHENOTYPE_VEE:
+                    skillBonus.get(SkillType.S_GUN_VEE).setValue(1);
+                    skillBonus.get(SkillType.S_PILOT_GVEE).setValue(1);
+                    skillBonus.get(SkillType.S_PILOT_NVEE).setValue(1);
+                    skillBonus.get(SkillType.S_PILOT_VTOL).setValue(1);
+                    break;
             }
             choicePheno.setEnabled(true);
         } else {
-            clearAllPhenotypeBonuses();
             choicePheno.setSelectedIndex(0);
             choicePheno.setEnabled(false);
         }
