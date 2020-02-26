@@ -1546,65 +1546,65 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         //region Personnel Tab
         try {
-            panPersonnel.setName("panPersonnel"); // NOI18N
+            panPersonnel.setName("panPersonnel");
             panPersonnel.setLayout(new java.awt.GridBagLayout());
             gridy = 0;
 
-            useTacticsBox.setText(resourceMap.getString("useTacticsBox.text")); // NOI18N
-            useTacticsBox.setToolTipText(resourceMap.getString("useTacticsBox.toolTipText")); // NOI18N
-            useTacticsBox.setName("useTacticsBox"); // NOI18N
+            useTacticsBox.setText(resourceMap.getString("useTacticsBox.text"));
+            useTacticsBox.setToolTipText(resourceMap.getString("useTacticsBox.toolTipText"));
+            useTacticsBox.setName("useTacticsBox");
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridy;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
             panPersonnel.add(useTacticsBox, gridBagConstraints);
 
-            useInitBonusBox.setText(resourceMap.getString("useInitBonusBox.text")); // NOI18N
-            useInitBonusBox.setToolTipText(resourceMap.getString("useInitBonusBox.toolTipText")); // NOI18N
-            useInitBonusBox.setName("useInitBonusBox"); // NOI18N
+            useInitBonusBox.setText(resourceMap.getString("useInitBonusBox.text"));
+            useInitBonusBox.setToolTipText(resourceMap.getString("useInitBonusBox.toolTipText"));
+            useInitBonusBox.setName("useInitBonusBox");
             gridBagConstraints.gridy = ++gridy;
             panPersonnel.add(useInitBonusBox, gridBagConstraints);
 
-            useToughnessBox.setText(resourceMap.getString("useToughnessBox.text")); // NOI18N
-            useToughnessBox.setToolTipText(resourceMap.getString("useToughnessBox.toolTipText")); // NOI18N
-            useToughnessBox.setName("useToughnessBox"); // NOI18N
+            useToughnessBox.setText(resourceMap.getString("useToughnessBox.text"));
+            useToughnessBox.setToolTipText(resourceMap.getString("useToughnessBox.toolTipText"));
+            useToughnessBox.setName("useToughnessBox");
             gridBagConstraints.gridy = ++gridy;
             panPersonnel.add(useToughnessBox, gridBagConstraints);
 
-            useArtilleryBox.setText(resourceMap.getString("useArtilleryBox.text")); // NOI18N
-            useArtilleryBox.setToolTipText(resourceMap.getString("useArtilleryBox.toolTipText")); // NOI18N
-            useArtilleryBox.setName("useArtilleryBox"); // NOI18N
+            useArtilleryBox.setText(resourceMap.getString("useArtilleryBox.text"));
+            useArtilleryBox.setToolTipText(resourceMap.getString("useArtilleryBox.toolTipText"));
+            useArtilleryBox.setName("useArtilleryBox");
             gridBagConstraints.gridy = ++gridy;
             panPersonnel.add(useArtilleryBox, gridBagConstraints);
 
-            useAbilitiesBox.setText(resourceMap.getString("useAbilitiesBox.text")); // NOI18N
-            useAbilitiesBox.setToolTipText(resourceMap.getString("useAbilitiesBox.toolTipText")); // NOI18N
-            useAbilitiesBox.setName("useAbilitiesBox"); // NOI18N
+            useAbilitiesBox.setText(resourceMap.getString("useAbilitiesBox.text"));
+            useAbilitiesBox.setToolTipText(resourceMap.getString("useAbilitiesBox.toolTipText"));
+            useAbilitiesBox.setName("useAbilitiesBox");
             gridBagConstraints.gridy = ++gridy;
             panPersonnel.add(useAbilitiesBox, gridBagConstraints);
 
-            useEdgeBox.setText(resourceMap.getString("useEdgeBox.text")); // NOI18N
-            useEdgeBox.setToolTipText(resourceMap.getString("useEdgeBox.toolTipText")); // NOI18N
-            useEdgeBox.setName("useEdgeBox"); // NOI18N
+            useEdgeBox.setText(resourceMap.getString("useEdgeBox.text"));
+            useEdgeBox.setToolTipText(resourceMap.getString("useEdgeBox.toolTipText"));
+            useEdgeBox.setName("useEdgeBox");
             gridBagConstraints.gridy = ++gridy;
             panPersonnel.add(useEdgeBox, gridBagConstraints);
 
-            useSupportEdgeBox.setText(resourceMap.getString("useSupportEdgeBox.text")); // NOI18N
-            useSupportEdgeBox.setToolTipText(resourceMap.getString("useSupportEdgeBox.toolTipText")); // NOI18N
-            useSupportEdgeBox.setName("useSupportEdgeBox"); // NOI18N
+            useSupportEdgeBox.setText(resourceMap.getString("useSupportEdgeBox.text"));
+            useSupportEdgeBox.setToolTipText(resourceMap.getString("useSupportEdgeBox.toolTipText"));
+            useSupportEdgeBox.setName("useSupportEdgeBox");
             gridBagConstraints.gridy = ++gridy;
             panPersonnel.add(useSupportEdgeBox, gridBagConstraints);
 
-            useImplantsBox.setText(resourceMap.getString("useImplantsBox.text")); // NOI18N
-            useImplantsBox.setToolTipText(resourceMap.getString("useImplantsBox.toolTipText")); // NOI18N
-            useImplantsBox.setName("useImplantsBox"); // NOI18N
+            useImplantsBox.setText(resourceMap.getString("useImplantsBox.text"));
+            useImplantsBox.setToolTipText(resourceMap.getString("useImplantsBox.toolTipText"));
+            useImplantsBox.setName("useImplantsBox");
             gridBagConstraints.gridy = ++gridy;
             panPersonnel.add(useImplantsBox, gridBagConstraints);
 
-            chkCapturePrisoners.setText(resourceMap.getString("chkCapturePrisoners.text")); // NOI18N
-            chkCapturePrisoners.setToolTipText(resourceMap.getString("chkCapturePrisoners.toolTipText")); // NOI18N
+            chkCapturePrisoners.setText(resourceMap.getString("chkCapturePrisoners.text"));
+            chkCapturePrisoners.setToolTipText(resourceMap.getString("chkCapturePrisoners.toolTipText"));
             gridBagConstraints.gridy = ++gridy;
             panPersonnel.add(chkCapturePrisoners, gridBagConstraints);
 
@@ -1619,21 +1619,21 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             gridBagConstraints.gridy = ++gridy;
             panPersonnel.add(pnlPrisonerStatus, gridBagConstraints);
 
-            altQualityAveragingCheckBox.setText(resourceMap.getString("altQualityAveragingCheckBox.text")); // NOI18N
-            altQualityAveragingCheckBox.setToolTipText(resourceMap.getString("altQualityAveragingCheckBox.toolTipText")); // NOI18N
-            altQualityAveragingCheckBox.setName("altQualityAveragingCheckBox"); // NOI18N
+            altQualityAveragingCheckBox.setText(resourceMap.getString("altQualityAveragingCheckBox.text"));
+            altQualityAveragingCheckBox.setToolTipText(resourceMap.getString("altQualityAveragingCheckBox.toolTipText"));
+            altQualityAveragingCheckBox.setName("altQualityAveragingCheckBox");
             gridBagConstraints.gridy = ++gridy;
             panPersonnel.add(altQualityAveragingCheckBox, gridBagConstraints);
 
-            useAdvancedMedicalBox.setText(resourceMap.getString("useAdvancedMedicalBox.text")); // NOI18N
-            useAdvancedMedicalBox.setToolTipText(resourceMap.getString("useAdvancedMedicalBox.toolTipText")); // NOI18N
-            useAdvancedMedicalBox.setName("useAdvancedMedicalBox"); // NOI18N
+            useAdvancedMedicalBox.setText(resourceMap.getString("useAdvancedMedicalBox.text"));
+            useAdvancedMedicalBox.setToolTipText(resourceMap.getString("useAdvancedMedicalBox.toolTipText"));
+            useAdvancedMedicalBox.setName("useAdvancedMedicalBox");
             gridBagConstraints.gridy = ++gridy;
             panPersonnel.add(useAdvancedMedicalBox, gridBagConstraints);
 
-            useDylansRandomXpBox.setText(resourceMap.getString("useDylansRandomXpBox.text")); // NOI18N
-            useDylansRandomXpBox.setToolTipText(resourceMap.getString("useDylansRandomXpBox.toolTipText")); // NOI18N
-            useDylansRandomXpBox.setName("useDylansRandomXpBox"); // NOI18N
+            useDylansRandomXpBox.setText(resourceMap.getString("useDylansRandomXpBox.text"));
+            useDylansRandomXpBox.setToolTipText(resourceMap.getString("useDylansRandomXpBox.toolTipText"));
+            useDylansRandomXpBox.setName("useDylansRandomXpBox");
             gridBagConstraints.gridy = ++gridy;
             panPersonnel.add(useDylansRandomXpBox, gridBagConstraints);
 
@@ -1664,38 +1664,38 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
             useRandomHitsForVees = new JCheckBox();
             useRandomHitsForVees.setSelected(options.useRandomHitsForVees());
-            useRandomHitsForVees.setText(resourceMap.getString("useRandomHitsForVees.text")); // NOI18N
-            useRandomHitsForVees.setToolTipText(resourceMap.getString("useRandomHitsForVees.toolTipText")); // NOI18N
+            useRandomHitsForVees.setText(resourceMap.getString("useRandomHitsForVees.text"));
+            useRandomHitsForVees.setToolTipText(resourceMap.getString("useRandomHitsForVees.toolTipText"));
             gridBagConstraints.gridy = ++gridy;
             panPersonnel.add(useRandomHitsForVees, gridBagConstraints);
 
             useTougherHealing = new JCheckBox(resourceMap.getString("useTougherHealing.text"));
             useTougherHealing.setSelected(options.useTougherHealing());
-            useTougherHealing.setToolTipText(resourceMap.getString("useTougherHealing.toolTipText")); // NOI18N
+            useTougherHealing.setToolTipText(resourceMap.getString("useTougherHealing.toolTipText"));
             gridBagConstraints.gridy = ++gridy;
             panPersonnel.add(useTougherHealing, gridBagConstraints);
 
-            chkUseTransfers = new JCheckBox(resourceMap.getString("useTransfers.text")); // NOI18N
+            chkUseTransfers = new JCheckBox(resourceMap.getString("useTransfers.text"));
             chkUseTransfers.setSelected(options.useTransfers());
             gridBagConstraints.gridy = ++gridy;
             panPersonnel.add(chkUseTransfers, gridBagConstraints);
 
-            chkUseTimeInService = new JCheckBox(resourceMap.getString("useTimeInService.text")); // NOI18N
+            chkUseTimeInService = new JCheckBox(resourceMap.getString("useTimeInService.text"));
             chkUseTimeInService.setSelected(options.getUseTimeInService());
             gridBagConstraints.gridy = ++gridy;
             panPersonnel.add(chkUseTimeInService, gridBagConstraints);
 
-            chkShowOriginFaction = new JCheckBox(resourceMap.getString("showOriginFaction.text")); // NOI18N
+            chkShowOriginFaction = new JCheckBox(resourceMap.getString("showOriginFaction.text"));
             chkShowOriginFaction.setSelected(options.showOriginFaction());
             gridBagConstraints.gridy = ++gridy;
             panPersonnel.add(chkShowOriginFaction, gridBagConstraints);
 
-            chkRandomizeOrigin = new JCheckBox(resourceMap.getString("randomizeOrigin.text")); // NOI18N
+            chkRandomizeOrigin = new JCheckBox(resourceMap.getString("randomizeOrigin.text"));
             chkRandomizeOrigin.setSelected(options.randomizeOrigin());
             gridBagConstraints.gridy = ++gridy;
             panPersonnel.add(chkRandomizeOrigin, gridBagConstraints);
 
-            chkRandomizeDependentsOrigin = new JCheckBox(resourceMap.getString("randomizeDependentsOrigin.text")); // NOI18N
+            chkRandomizeDependentsOrigin = new JCheckBox(resourceMap.getString("randomizeDependentsOrigin.text"));
             chkRandomizeDependentsOrigin.setSelected(options.getRandomizeDependentOrigin());
             gridBagConstraints.gridy = ++gridy;
             panPersonnel.add(chkRandomizeDependentsOrigin, gridBagConstraints);
