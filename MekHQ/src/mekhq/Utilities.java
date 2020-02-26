@@ -966,9 +966,12 @@ public class Utilities {
         // this is a bit of a hack, but instead of tracking it elsewhere we only set gender to
         // male or female when a name is generated. G_RANDOMIZE will therefore only be returned for
         // crew that don't have names, so we can just leave them with their randomly generated name
+
+        // TODO : Windchild remove this bandaid, and finish fixing how names get generated instead
+        // TODO : This occurs because the RandomNameGenerator doesn't handle the faction code well
+        // TODO : At time of writing (26-Feb-2020)
         if (p.isClanner()) {
             p.setSurname("");
-            // TODO : Windchild remove this bandaid, and finish fixing how names get generated instead
         }
 
         if (oldCrew.getGender(crewIndex) != Crew.G_RANDOMIZE) {
