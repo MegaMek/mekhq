@@ -24,5 +24,5 @@ MekHQ/.idea/
 
 MekHQ/out/
 MekHQ/mmconf/mekhq.preferences
-
+MekHQ/userdata/
 *.sav.gz
