@@ -105,6 +105,13 @@ public class Injury {
     @XmlAttribute(name="v")
     private int version;
 
+    /**
+     * This should never be used, but is required for the Unmarshaller
+     */
+    public Injury() {
+        this(0, "", BodyLocation.GENERIC, InjuryType.BAD_HEALTH, 1, new DateTime(), false, false, false);
+    }
+
     public Injury(DateTime start) {
         this(0, "", BodyLocation.GENERIC, InjuryType.BAD_HEALTH, 1, start, false, false, false);
     }
