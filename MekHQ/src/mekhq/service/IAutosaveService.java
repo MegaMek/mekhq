@@ -23,6 +23,8 @@ package mekhq.service;
 
 import mekhq.campaign.Campaign;
 
+import java.util.Calendar;
+
 /**
  * Handles the possible auto-save situations
  * in MekHQ.
@@ -32,9 +34,9 @@ public interface IAutosaveService {
      * Handles auto-saving when the day of the campaign advances.
      *
      * @param campaign Campaign to save
-     * @param dayOfTheWeek Day of the week when the auto-save is requested
+     * @param calendar the calendar to determine when to save
      */
-    void requestDayAdvanceAutosave(Campaign campaign, int dayOfTheWeek);
+    void requestDayAdvanceAutosave(Campaign campaign, Calendar calendar);
 
     /**
      * Handles auto-saving before a mission starts.

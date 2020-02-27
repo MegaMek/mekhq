@@ -18,10 +18,10 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.service;
 
 import megamek.common.logging.MMLogger;
+import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 import mekhq.MekHqConstants;
 import mekhq.campaign.Campaign;
@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.prefs.Preferences;
@@ -47,16 +48,24 @@ public class AutosaveService implements IAutosaveService {
     }
 
     @Override
-    public void requestDayAdvanceAutosave(Campaign campaign, int dayOfTheWeek) {
+    public void requestDayAdvanceAutosave(Campaign campaign, Calendar calendar) {
         assert campaign != null;
 
         if (this.isDailyAutosaveEnabled()) {
             this.performAutosave(campaign);
-        } else if (dayOfTheWeek == Calendar.SUNDAY && this.isWeeklyAutosaveEnabled()) {
+        } else if (this.isWeeklyAutosaveEnabled()
+                && (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)) {
+            this.performAutosave(campaign);
+        } else if (this.isMonthlyAutosaveEnabled()
+                && (calendar.get(Calendar.DAY_OF_MONTH) == calendar.getActualMaximum(Calendar.DAY_OF_MONTH))) {
+            this.performAutosave(campaign);
+        } else if (this.isYearlyAutosaveEnabled()
+                && (calendar.get(Calendar.DAY_OF_YEAR) == calendar.getActualMaximum(Calendar.DAY_OF_YEAR))) {
             this.performAutosave(campaign);
         }
     }
 
+    @Override
     public void requestBeforeMissionAutosave(Campaign campaign) {
         assert campaign != null;
 
@@ -73,6 +82,14 @@ public class AutosaveService implements IAutosaveService {
         return this.userPreferences.getBoolean(MekHqConstants.SAVE_WEEKLY_KEY, false);
     }
 
+    private boolean isMonthlyAutosaveEnabled() {
+        return this.userPreferences.getBoolean(MekHqConstants.SAVE_MONTHLY_KEY, false);
+    }
+
+    private boolean isYearlyAutosaveEnabled() {
+        return this.userPreferences.getBoolean(MekHqConstants.SAVE_YEARLY_KEY, false);
+    }
+
     private boolean isMissionAutosaveEnabled() {
         return this.userPreferences.getBoolean(MekHqConstants.SAVE_BEFORE_MISSIONS_KEY, false);
     }
@@ -80,13 +97,17 @@ public class AutosaveService implements IAutosaveService {
     private void performAutosave(Campaign campaign) {
         try {
             String fileName = this.getAutosaveFilename(campaign);
-
-            try (FileOutputStream fos = new FileOutputStream(fileName);
-                 GZIPOutputStream output = new GZIPOutputStream(fos)) {
-                PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, "UTF-8"));
-                campaign.writeToXml(writer);
-                writer.flush();
-                writer.close();
+            if (!StringUtil.isNullOrEmpty(fileName)) {
+                try (FileOutputStream fos = new FileOutputStream(fileName);
+                     GZIPOutputStream output = new GZIPOutputStream(fos)) {
+                    PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
+                    campaign.writeToXml(writer);
+                    writer.flush();
+                    writer.close();
+                }
+            } else {
+                this.logger.error(this.getClass(), "performAutosave",
+                        "Unable to perform an autosave because of a null or empty file name");
             }
         }
         catch (Exception ex) {
@@ -98,39 +119,51 @@ public class AutosaveService implements IAutosaveService {
         // Get all autosave files in ascending order of date creation
         String savesDirectoryPath = MekHQ.getCampaignsDirectory().getValue();
         File folder = new File(savesDirectoryPath);
-        List<File> autosaveFiles = Arrays.stream(folder.listFiles())
-                .filter(f -> f.getName().startsWith("Autosave-"))
-                .sorted(Comparator.comparing(f -> f.lastModified()))
-                .collect(Collectors.toList());
+        File[] files = folder.listFiles();
+        if (files != null) {
+            List<File> autosaveFiles = Arrays.stream(files)
+                    .filter(f -> f.getName().startsWith("Autosave-"))
+                    .sorted(Comparator.comparing(File::lastModified))
+                    .collect(Collectors.toList());
 
-        // Delete older autosave files if needed
-        int maxNumberAutosaves = this.userPreferences.getInt(MekHqConstants.MAXIMUM_NUMBER_SAVES_KEY, MekHqConstants.DEFAULT_NUMBER_SAVES);
-        while (autosaveFiles.size() >= maxNumberAutosaves && autosaveFiles.size() > 0) {
-            autosaveFiles.get(0).delete();
-            autosaveFiles.remove(0);
-        }
+            // Delete older autosave files if needed
+            int maxNumberAutosaves = this.userPreferences.getInt(MekHqConstants.MAXIMUM_NUMBER_SAVES_KEY,
+                    MekHqConstants.DEFAULT_NUMBER_SAVES);
 
-        // Find a unique name for this autosave
-        String fileName = null;
-
-        boolean repeatedName = true;
-        int index = 0;
-        while (repeatedName) {
-            fileName = String.format(
-                    "Autosave-%d-%s-%s.cpnx.gz",
-                    index++,
-                    campaign.getName(),
-                    campaign.getShortDateAsString());
-
-            repeatedName = false;
-            for (File file : autosaveFiles) {
-                if (file.getName().compareToIgnoreCase(fileName) == 0) {
-                    repeatedName = true;
-                    break;
+            int index = 0;
+            while (autosaveFiles.size() >= maxNumberAutosaves && autosaveFiles.size() > index) {
+                if (autosaveFiles.get(index).delete()) {
+                    autosaveFiles.remove(index);
+                } else {
+                    this.logger.error(this.getClass(), "getAutosaveFilename",
+                            "Unable to delete file " + autosaveFiles.get(index).getName());
+                    index++;
                 }
             }
+
+            // Find a unique name for this autosave
+            String fileName = null;
+
+            boolean repeatedName = true;
+            index = 1;
+            while (repeatedName) {
+                fileName = String.format(
+                        "Autosave-%d-%s-%s.cpnx.gz",
+                        index++,
+                        campaign.getName(),
+                        campaign.getShortDateAsString());
+
+                repeatedName = false;
+                for (File file : autosaveFiles) {
+                    if (file.getName().compareToIgnoreCase(fileName) == 0) {
+                        repeatedName = true;
+                        break;
+                    }
+                }
+            }
+            return Paths.get(savesDirectoryPath, fileName).toString();
         }
 
-        return Paths.get(savesDirectoryPath, fileName).toString();
+        return null;
     }
 }
