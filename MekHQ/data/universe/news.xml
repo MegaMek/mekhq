@@ -162,7 +162,7 @@ location - an optional tag for the location of the news report
 	<newsItem>
 		<headline>Mister Watson. Come here. I want to see you.</headline>
 		<date>2630-01-01</date>
-		<desc><![CDATA[These were the first words successfully sent through the new hyperpulse generator by First Lord Nicholas Cameron himself. The message, sent through this new faster Than light communication system, was received immediately. We predict that the implementation of this revolutionary technology will vastly improve interstellar communications, as it can send messages instantaneously at distances of up to 50 light-years.]]></desc>
+		<desc><![CDATA[These were the first words successfully sent through the new hyperpulse generator by First Lord Nicholas Cameron himself. The message, sent through this new faster than light communication system, was received immediately. We predict that the implementation of this revolutionary technology will vastly improve interstellar communications, as it can send messages instantaneously at distances of up to 50 light-years.]]></desc>
 		<service>TNS</service>
 		<location>Terra</location>
 	</newsItem>
