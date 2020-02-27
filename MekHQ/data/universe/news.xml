@@ -22,6 +22,27 @@ service - an optional tag for the news service doing the reporing
 location - an optional tag for the location of the news report
  -->
 <news>
+ 	<newsItem>
+		<headline>Admiral James McKenna Made Fleet Admiral of the Alliance Navy</headline>
+		<date>2295</date>
+		<desc><![CDATA[Admiral James McKenna has been promoted to Fleet Admiral following the retirement of his predecessor, leaving him in control of the Alliance Navy. We at TNS wish Fleet Admiral McKenna the best of luck with his new position.]]></desc>
+		<service>TNS</service>
+		<location>Terra</location>
+	</newsItem>
+	<newsItem>
+		<headline>Launch of the WarShip Dreadnought</headline>
+		<date>2300</date>
+		<desc><![CDATA[There was only one opinion among those who were present at the launching of the Dreadnought to-day, and that was expressed in the three words "a great success." The ceremony was indeed a success from every point of view, and will long live in the memory of all who were priviledged to be spectators of it, sadly few they may have been. At the ceremony's conclusion Fleet Admiral McKenna declared the creation of an Alliance Navy that all can be proud of, with the TAS Dreadnought as the resurgent fleet's flagship.]]></desc>
+		<service>TNS</service>
+		<location>Terra</location>
+	</newsItem>
+	<newsItem>
+		<headline>Director-General McKenna has Fallen</headline>
+		<date>2338</date>
+		<desc><![CDATA[Director-General McKenna passed away from cancer yesterday, surrounded by the family he loved so dearly. We at TNS join the entire Hegemony in mourning the loss of a great man, and wishing his family well through the difficult days ahead.]]></desc>
+		<service>TNS</service>
+		<location>Terra</location>
+	</newsItem>
 	<newsItem>
 		<headline>A new shuttle introduced, A Life Boat</headline>
 		<date>2478</date>
@@ -137,6 +158,13 @@ location - an optional tag for the location of the news report
 		<desc><![CDATA[Coventry Defense Conglomerate seeing the tactics of pilots of their light mech has come out with a new variant which increases armor in addition to adding an SRM-4 and replacing its Large Laser with a medium one.]]></desc>
 		<service>DBC</service>
 		<location>Coventry</location>
+	</newsItem>
+	<newsItem>
+		<headline>Mister Watson. Come here. I want to see you.</headline>
+		<date>2630-01-01</date>
+		<desc><![CDATA[These were the first words successfully sent through the new hyperpulse generator by First Lord Nicholas Cameron himself. The message, sent through this new faster Than light communication system, was received immediately. We predict that the implementation of this revolutionary technology will vastly improve interstellar communications, as it can send messages instantaneously at distances of up to 50 light-years.]]></desc>
+		<service>TNS</service>
+		<location>Terra</location>
 	</newsItem>
 	<newsItem>
 		<headline>New Commander of the Otomo</headline>
