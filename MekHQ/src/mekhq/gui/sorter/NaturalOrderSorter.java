@@ -18,8 +18,6 @@
  */
 package mekhq.gui.sorter;
 
-import mekhq.MekHQ;
-
 import java.text.Collator;
 import java.util.Comparator;
 
@@ -49,6 +47,8 @@ public class NaturalOrderSorter implements Comparator<String> {
     private int bLength;
     private int index;
 
+    private static Collator collator = Collator.getInstance();
+
     /**
      * Compares its two arguments for order.
      *
@@ -71,9 +71,8 @@ public class NaturalOrderSorter implements Comparator<String> {
             } else if (a[index] == b[index]) {
                 continue;
             } else {
-                MekHQ.getLogger().warning(this.getClass(), "compare", "Hit string comparison");
-                comparison = Collator.getInstance().compare(a[index], b[index]);
-                MekHQ.getLogger().warning(this.getClass(), "compare", "finished string comparison");
+                collator.setStrength(Collator.PRIMARY);
+                comparison = collator.compare(String.valueOf(a[index]), String.valueOf(b[index]));
             }
 
             if (comparison != 0) {
