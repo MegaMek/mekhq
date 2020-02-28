@@ -26,3 +26,7 @@ MekHQ/out/
 MekHQ/mmconf/mekhq.preferences
 MekHQ/userdata/
 *.sav.gz
+/MekHQ/campaigns
+!/MekHQ/campaigns/Fist and Falcon
+!/MekHQ/campaigns/Sword and Dragon
+!/MekHQ/campaigns/Wolf and Blake
