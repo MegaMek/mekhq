@@ -201,7 +201,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public static final int SURNAME_WEIGHTED = 9; //should be equal to NUM_SURNAME at all times
     public static final int NUM_SURNAME = 9; //number of surname options not counting the SURNAME_WEIGHTED OPTION
 
-    // TODO : Localize me
     public static final String[] SURNAME_TYPE_NAMES = new String[] {
         "No Change", "Yours", "Spouse",
         "Yours-Spouse", "Both Yours-Spouse", "Spouse-Yours",
