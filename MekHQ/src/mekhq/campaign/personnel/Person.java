@@ -3506,7 +3506,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     /**
      * This will flip the boolean status of the current edge trigger
      *
-     * @param name
+     * @param name of the trigger condition
      */
     public void changeEdgeTrigger(String name) {
         for (Enumeration<IOption> i = getOptions(PilotOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
@@ -3519,9 +3519,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     /**
-     * This function returns an html-coded tooltip that says what edge will be used
      *
-     * @return
+     * @return an html-coded tooltip that says what edge will be used
      */
     public String getEdgeTooltip() {
         StringBuilder edgett = new StringBuilder();
@@ -3540,9 +3539,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //endregion edge
 
     /**
-     * This function returns an html-coded list that says what abilities are enabled for this pilot
      *
-     * @return
+     * @return an html-coded list that says what abilities are enabled for this pilot
      */
     public String getAbilityList(String type) {
         StringBuilder abilityString = new StringBuilder();
