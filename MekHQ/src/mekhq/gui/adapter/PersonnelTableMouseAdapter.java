@@ -2310,6 +2310,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 
                     popup.add(menu);
                 }
+
                 menu = new JMenu(resourceMap.getString("specialFlags.text")); //$NON-NLS-1$
                 cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("dependent.text")); //$NON-NLS-1$
                 cbMenuItem.setSelected(person.isDependent());
@@ -2472,17 +2473,40 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     menu.add(submenu);
                     popup.add(menu);
                 }
-                menu = new JMenu(resourceMap.getString("specialFlags.text")); //$NON-NLS-1$
-                submenu = new JMenu(resourceMap.getString("dependent.text")); //$NON-NLS-1$
-                menuItem = new JMenuItem(resourceMap.getString("yes.text")); //$NON-NLS-1$
-                menuItem.setActionCommand(makeCommand(CMD_DEPENDENT, TRUE));
-                menuItem.addActionListener(this);
-                submenu.add(menuItem);
-                menuItem = new JMenuItem(resourceMap.getString("no.text")); //$NON-NLS-1$
-                menuItem.setActionCommand(makeCommand(CMD_DEPENDENT, FALSE));
-                menuItem.addActionListener(this);
-                submenu.add(menuItem);
-                menu.add(submenu);
+
+                menu = new JMenu(resourceMap.getString("specialFlags.text"));
+                if (StaticChecks.areEitherAllDependentsOrNot(selected)) {
+                    cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("dependent.text"));
+                    cbMenuItem.setSelected(selected[0].isDependent());
+                    cbMenuItem.setActionCommand(CMD_DEPENDENT);
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
+                }
+                if (StaticChecks.areEitherAllTryingToMarryOrNot(selected)) {
+                    cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("tryingToMarry.text"));
+                    cbMenuItem.setToolTipText(resourceMap.getString("tryingToMarry.toolTipText"));
+                    cbMenuItem.setSelected(selected[0].isTryingToMarry());
+                    cbMenuItem.setActionCommand(CMD_TRYING_TO_MARRY);
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
+                }
+                if (gui.getCampaign().getCampaignOptions().useUnofficialProcreation()
+                        && StaticChecks.areAllFemale(selected)
+                        && StaticChecks.areEitherAllTryingToConceiveOrNot(selected)) {
+                    cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("tryingToConceive.text"));
+                    cbMenuItem.setToolTipText(resourceMap.getString("tryingToConceive.toolTipText"));
+                    cbMenuItem.setSelected(selected[0].isTryingToConceive());
+                    cbMenuItem.setActionCommand(CMD_TRYING_TO_CONCEIVE);
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
+                }
+                if (StaticChecks.areEitherAllFoundersOrNot(selected)) {
+                    cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("founder.text"));
+                    cbMenuItem.setSelected(person.isFounder());
+                    cbMenuItem.setActionCommand(CMD_FOUNDER);
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
+                }
                 popup.add(menu);
             }
             // generate new appropriate random portrait
