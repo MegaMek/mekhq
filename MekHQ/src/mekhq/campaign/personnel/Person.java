@@ -155,6 +155,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     protected List<FormerSpouse> formerSpouses;
 
     //region Procreation
+    private boolean tryingToConceive;
     protected GregorianCalendar dueDate;
     protected GregorianCalendar expectedDueDate;
 
@@ -428,6 +429,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         ancestorsId = null;
         spouse = null;
         formerSpouses = new ArrayList<>();
+        tryingToConceive = true;
         dueDate = null;
         expectedDueDate = null;
         portraitCategory = Crew.ROOT_PORTRAIT;
@@ -969,7 +971,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         this.daysToWaitForHealing = d;
     }
 
-
     public static String getRoleDesc(int type, boolean clan) {
         switch (type) {
             case (T_NONE):
@@ -1268,6 +1269,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //endregion Age Range Identification
 
     //region Pregnancy
+    public boolean getTryingToConceive() {
+        return tryingToConceive;
+    }
+
+    public void setTryingToConceive(boolean tryingToConceive) {
+        this.tryingToConceive = tryingToConceive;
+    }
+
     public GregorianCalendar getDueDate() {
         return dueDate;
     }
@@ -1289,7 +1298,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void procreate() {
-        if (!isFemale() || isPregnant() || isDeployed()) {
+        if (!isFemale() || isPregnant() || isDeployed() || !tryingToConceive) {
             return;
         }
 
