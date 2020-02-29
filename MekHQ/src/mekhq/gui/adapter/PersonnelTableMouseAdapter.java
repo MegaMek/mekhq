@@ -2323,12 +2323,14 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 cbMenuItem.addActionListener(this);
                 menu.add(cbMenuItem);
                 cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("tryingToMarry.text"));
+                cbMenuItem.setToolTipText(resourceMap.getString("tryingToMarry.toolTipText"));
                 cbMenuItem.setSelected(person.isTryingToMarry());
                 cbMenuItem.setActionCommand(CMD_TRYING_TO_MARRY);
                 cbMenuItem.addActionListener(this);
                 menu.add(cbMenuItem);
                 if (gui.getCampaign().getCampaignOptions().useUnofficialProcreation() && person.isFemale()) {
                     cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("tryingToConceive.text"));
+                    cbMenuItem.setToolTipText(resourceMap.getString("tryingToConceive.toolTipText"));
                     cbMenuItem.setSelected(person.isTryingToConceive());
                     cbMenuItem.setActionCommand(CMD_TRYING_TO_CONCEIVE);
                     cbMenuItem.addActionListener(this);
@@ -2509,7 +2511,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
                 popup.add(menu);
             }
-            
+
             // generate new appropriate random portrait
             menuItem = new JMenuItem(resourceMap.getString("randomizePortrait.text")); //$NON-NLS-1$
             menuItem.setActionCommand(CMD_RANDOM_PORTRAIT);
