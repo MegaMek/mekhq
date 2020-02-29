@@ -991,7 +991,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             case CMD_DEPENDENT: {
                 if (people.length > 1) {
-                    boolean status = Boolean.parseBoolean(data[1]);
+                    boolean status = !people[0].isDependent();
                     for (Person person : people) {
                         person.setDependent(status);
                         gui.getCampaign().personUpdated(person);
@@ -1006,7 +1006,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             case CMD_TRYING_TO_MARRY: {
                 if (people.length > 1) {
-                    boolean status = Boolean.parseBoolean(data[1]);
+                    boolean status = !people[0].isTryingToMarry();
                     for (Person person : people) {
                         person.setTryingToMarry(status);
                         gui.getCampaign().personUpdated(person);
@@ -1021,7 +1021,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             case CMD_TRYING_TO_CONCEIVE: {
                 if (people.length > 1) {
-                    boolean status = Boolean.parseBoolean(data[1]);
+                    boolean status = !people[0].isTryingToConceive();
                     for (Person person : people) {
                         person.setTryingToConceive(status);
                         gui.getCampaign().personUpdated(person);
@@ -1036,7 +1036,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             case CMD_FOUNDER: {
                 if (people.length > 1) {
-                    boolean status = Boolean.parseBoolean(data[1]);
+                    boolean status = !people[0].isFounder();
                     for (Person person : people) {
                         person.setFounder(status);
                         gui.getCampaign().personUpdated(person);
@@ -2509,6 +2509,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
                 popup.add(menu);
             }
+            
             // generate new appropriate random portrait
             menuItem = new JMenuItem(resourceMap.getString("randomizePortrait.text")); //$NON-NLS-1$
             menuItem.setActionCommand(CMD_RANDOM_PORTRAIT);
