@@ -94,6 +94,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String CMD_DEPENDENT = "DEPENDENT"; //$NON-NLS-1$
     private static final String CMD_COMMANDER = "COMMANDER"; //$NON-NLS-1$
     private static final String CMD_TRYING_TO_CONCEIVE = "TRYING_TO_CONCEIVE";
+    private static final String CMD_TRYING_TO_MARRY = "TRYING_TO_MARRY";
     private static final String CMD_FOUNDER = "FOUNDER";
     private static final String CMD_EDIT_PERSONNEL_LOG = "LOG"; //$NON-NLS-1$
     private static final String CMD_ADD_LOG_ENTRY = "ADD_PERSONNEL_LOG_SINGLE"; //$NON-NLS-1$
@@ -1004,6 +1005,51 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     }
                 } else {
                     selectedPerson.setDependent(!selectedPerson.isDependent());
+                    gui.getCampaign().personUpdated(selectedPerson);
+                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                }
+                break;
+            }
+            case CMD_TRYING_TO_MARRY: {
+                if (people.length > 1) {
+                    boolean status = Boolean.parseBoolean(data[1]);
+                    for (Person person : people) {
+                        person.setTryingToMarry(status);
+                        gui.getCampaign().personUpdated(person);
+                        MekHQ.triggerEvent(new PersonChangedEvent(person));
+                    }
+                } else {
+                    selectedPerson.setTryingToMarry(!selectedPerson.isTryingToMarry());
+                    gui.getCampaign().personUpdated(selectedPerson);
+                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                }
+                break;
+            }
+            case CMD_TRYING_TO_CONCEIVE: {
+                if (people.length > 1) {
+                    boolean status = Boolean.parseBoolean(data[1]);
+                    for (Person person : people) {
+                        person.setTryingToConceive(status);
+                        gui.getCampaign().personUpdated(person);
+                        MekHQ.triggerEvent(new PersonChangedEvent(person));
+                    }
+                } else {
+                    selectedPerson.setTryingToConceive(!selectedPerson.isTryingToConceive());
+                    gui.getCampaign().personUpdated(selectedPerson);
+                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                }
+                break;
+            }
+            case CMD_FOUNDER: {
+                if (people.length > 1) {
+                    boolean status = Boolean.parseBoolean(data[1]);
+                    for (Person person : people) {
+                        person.setFounder(status);
+                        gui.getCampaign().personUpdated(person);
+                        MekHQ.triggerEvent(new PersonChangedEvent(person));
+                    }
+                } else {
+                    selectedPerson.setFounder(!selectedPerson.isFounder());
                     gui.getCampaign().personUpdated(selectedPerson);
                     MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 }
@@ -2279,6 +2325,23 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("commander.text")); //$NON-NLS-1$
                 cbMenuItem.setSelected(person.isCommander());
                 cbMenuItem.setActionCommand(CMD_COMMANDER);
+                cbMenuItem.addActionListener(this);
+                menu.add(cbMenuItem);
+                cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("tryingToMarry.text"));
+                cbMenuItem.setSelected(person.isTryingToMarry());
+                cbMenuItem.setActionCommand(CMD_TRYING_TO_MARRY);
+                cbMenuItem.addActionListener(this);
+                menu.add(cbMenuItem);
+                if (gui.getCampaign().getCampaignOptions().useUnofficialProcreation() && person.isFemale()) {
+                    cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("tryingToConceive.text"));
+                    cbMenuItem.setSelected(person.isTryingToConceive());
+                    cbMenuItem.setActionCommand(CMD_TRYING_TO_CONCEIVE);
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
+                }
+                cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("founder.text"));
+                cbMenuItem.setSelected(person.isFounder());
+                cbMenuItem.setActionCommand(CMD_FOUNDER);
                 cbMenuItem.addActionListener(this);
                 menu.add(cbMenuItem);
                 popup.add(menu);
