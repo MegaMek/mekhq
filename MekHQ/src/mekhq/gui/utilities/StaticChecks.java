@@ -637,11 +637,7 @@ public class StaticChecks {
     }
 
     public static boolean isWillingToDefect(Person person) {
-        if (!(person.isBondsman() || person.isWillingToDefect())) {
-            return false;
-        }
-
-        return true;
+        return person.isBondsman() || person.isWillingToDefect();
     }
 
     public static boolean areAnyWillingToDefect(Person[] people) {
