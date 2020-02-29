@@ -348,7 +348,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     //region Advanced Medical
     private List<Injury> injuries = new ArrayList<>();
-    private Map<BodyLocation, Integer> hitsPerLocation = new EnumMap<>(BodyLocation.class);
     //endregion Advanced Medical
 
     //region Against the Bot
@@ -478,14 +477,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         clan = b;
     }
 
-    public String getBackgroundName() {
-        if (isClanner()) {
-            return getPhenotypeName();
-        } else {
-            return "Inner Sphere";
-        }
-    }
-
     public String getBloodname() {
         return bloodname;
     }
@@ -557,13 +548,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public void setFreeMan() {
         prisonerStatus = PRISONER_NOT;
         willingToDefect = false;
-    }
-
-    public void setPrisonerStatus(int status) {
-        prisonerStatus = status;
-        if( prisonerStatus != PRISONER_YES ) {
-            willingToDefect = false;
-        }
     }
 
     public int getPrisonerStatus() {
@@ -726,10 +710,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
             default:
                 return "?";
         }
-    }
-
-    public String getPrisonerStatusName() {
-        return getPrisonerStatusName(prisonerStatus);
     }
 
     public static String getPrisonerStatusName(int status) {
@@ -2565,10 +2545,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         salary = s;
     }
 
-    public Money getRawSalary() {
-        return salary;
-    }
-
     public Money getSalary() {
         if (isPrisoner() || isBondsman()) {
             return Money.zero();
@@ -3242,18 +3218,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         skills.addSkill(skillName, new Skill(skillName, level, bonus));
     }
 
-    public void addSkill(String skillName, int expLvl, boolean random, int bonus) {
-        addSkill(skillName, expLvl, random, bonus, 0);
-    }
-
-    public void addSkill(String skillName, int expLvl, boolean random, int bonus, int rollMod) {
-        if (random) {
-            skills.addSkill(skillName, Skill.randomizeLevel(skillName, expLvl, bonus, rollMod));
-        } else {
-            skills.addSkill(skillName, Skill.createFromExperience(skillName, expLvl, bonus));
-        }
-    }
-
     public void removeSkill(String skillName) {
         skills.removeSkill(skillName);
     }
@@ -3343,49 +3307,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return options;
     }
 
-    public List<SpecialAbility> getEligibleSPAs(boolean generation) {
-        List<SpecialAbility> eligible = new ArrayList<>();
-        for (Enumeration<IOption> i = getOptions(PilotOptions.LVL3_ADVANTAGES); i.hasMoreElements(); ) {
-            IOption ability = i.nextElement();
-            if (!ability.booleanValue()) {
-                SpecialAbility spa = SpecialAbility.getAbility(ability.getName());
-                if(null == spa) {
-                    continue;
-                }
-                if(!spa.isEligible(this)) {
-                    continue;
-                }
-                if(generation && spa.getWeight() <= 0) {
-                    continue;
-                }
-                eligible.add(spa);
-            }
-        }
-        return eligible;
-    }
-
     /**
      * Returns the options of the given category that this pilot has
      */
     public Enumeration<IOption> getOptions(String grpKey) {
         return options.getOptions(grpKey);
-    }
-
-    public int countOptions() {
-        int count = 0;
-
-        for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements(); ) {
-            IOptionGroup group = i.nextElement();
-            for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements(); ) {
-                IOption option = j.nextElement();
-
-                if (option.booleanValue()) {
-                    count++;
-                }
-            }
-        }
-
-        return count;
     }
 
     public int countOptions(String grpKey) {
@@ -3708,10 +3634,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return techUnitIds;
     }
 
-    public int getOldSupportTeamId() {
-        return teamId;
-    }
-
     public int getMinutesLeft() {
         return minutesLeft;
     }
@@ -3958,10 +3880,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
             lvl = aeroSkill.getLevel();
         }
         return lvl;
-    }
-
-    public String getTechDesc(boolean overtimeAllowed) {
-        return getTechDesc(overtimeAllowed, null);
     }
 
     public String getTechDesc(boolean overtimeAllowed, IPartWork part) {

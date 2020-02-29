@@ -5893,8 +5893,7 @@ public class Campaign implements Serializable, ITechManager {
     public int getNumberMedics() {
         int medics = medicPool;
         for (Person p : getPersonnel()) {
-            if ((p.getPrimaryRole() == Person.T_MEDIC || p.getSecondaryRole() == Person.T_MEDIC)
-                    && p.isActive() && !p.isDeployed()) {
+            if (p.isMedic() && p.isActive() && !p.isDeployed()) {
                 medics++;
             }
         }
