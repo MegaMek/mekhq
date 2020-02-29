@@ -4124,10 +4124,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return toReturn.toString();
     }
 
-    private int getHitsInLocation(BodyLocation loc) {
-        return ((null != loc) && hitsPerLocation.containsKey(loc)) ? hitsPerLocation.get(loc) : 0;
-    }
-
     public void diagnose(int hits) {
         InjuryUtil.resolveAfterCombat(campaign, this, hits);
         InjuryUtil.resolveCombatDamage(campaign, this, hits);
@@ -4183,16 +4179,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return modifier;
     }
 
-    public void applyBodyHit(BodyLocation location) {
-        hitsPerLocation.put(location, getHitsInLocation(location) + 1);
-    }
-
     public boolean hasInjury(BodyLocation loc) {
         return (null != getInjuryByLocation(loc));
-    }
-
-    public boolean hasInjury(BodyLocation loc, InjuryType type) {
-        return (null != getInjuryByLocationAndType(loc, type));
     }
 
     public boolean needsAMFixing() {
@@ -4239,20 +4227,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return sb.append("</html>").toString();
     }
 
-    public String getInjuriesText() {
-        String nl = System.getProperty("line.separator");
-        StringBuilder buffer = new StringBuilder();
-        for (Injury injury : injuries) {
-            buffer.append(injury.getFluff()).append(nl);
-        }
-        return buffer + getEffectString();
-    }
-
-    public boolean hasInjuryModifiers() {
-        return injuries.stream().flatMap(i -> i.getModifiers().stream())
-            .anyMatch(mod -> mod.tags.contains(InjuryType.MODTAG_INJURY));
-    }
-
     public boolean hasInjuries(boolean permCheck) {
         boolean tf = false;
         if (injuries.size() > 0) {
@@ -4291,16 +4265,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public Injury getInjuryByLocation(BodyLocation loc) {
         return injuries.stream()
             .filter((i) -> (i.getLocation() == loc)).findFirst().orElse(null);
-    }
-
-    public Injury getInjuryByType(InjuryType t) {
-        return injuries.stream()
-            .filter((i) -> (i.getType() == t)).findFirst().orElse(null);
-    }
-
-    public Injury getInjuryByLocationAndType(BodyLocation loc, InjuryType t) {
-        return injuries.stream()
-            .filter((i) -> (i.getLocation() == loc) && (i.getType() == t)).findFirst().orElse(null);
     }
 
     public void addInjury(Injury i) {
