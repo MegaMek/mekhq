@@ -24,6 +24,7 @@ package mekhq.campaign;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import mekhq.campaign.finances.Money;
@@ -268,7 +269,7 @@ public class CampaignOptions implements Serializable {
 	private boolean useUnofficialMaintenance;
 	private boolean reverseQualityNames;
 
-    //Dragoon's Rating
+    //Unit Rating
     private UnitRatingMethod unitRatingMethod;
 
     //phenotype related
@@ -2494,7 +2495,7 @@ public class CampaignOptions implements Serializable {
 			massRepairOptions.remove(foundIdx + 1);
 		}
 
-		massRepairOptions.sort((o1, o2) -> o1.getType() < o2.getType() ? -1 : 1);
+		massRepairOptions.sort(Comparator.comparingInt(MassRepairOption::getType));
 	}
 
 	public void setAllowOpforAeros(boolean allowOpforAeros) {
