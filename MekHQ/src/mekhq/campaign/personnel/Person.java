@@ -1191,7 +1191,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     //region Age Range Identification
-    // TODO : Windchild Implement Me fully
+    // TODO : Windchild Implement Me fully - Either add or remove in Personnel Wave 2
     // idea : have a method that allows you to determine what a person's age range would be, as this could be useful
     // in implementing a way to display ages instead of unknown for children
     public static final int AGE_BABY = 0;
