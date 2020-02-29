@@ -36,7 +36,8 @@ public class ServiceLogger {
 
     public static void retireDueToWounds(Person person, Date date){
         String message = logEntriesResourceMap.getString("retiredDueToWounds.text");
-        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message, person.getGenderPronoun(person.PRONOUN_HISHER))));
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message,
+                person.getGenderString(Person.G_DESCRIPTION_HIS_HER))));
     }
 
     public static void madeBondsman(Person person, Date date, String name, String rankEntry){

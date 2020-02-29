@@ -614,7 +614,7 @@ public class PersonViewPanel extends ScrollablePanel {
         pnlInfo.add(lblGender1, gridBagConstraints);
 
         lblGender2.setName("lblGender2"); // NOI18N
-        lblGender2.setText(person.getGenderName());
+        lblGender2.setText(person.getGenderString(Person.G_DESCRIPTION_MALE_FEMALE));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = firsty;

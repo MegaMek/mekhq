@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 
 import javax.swing.JOptionPane;
 
+import megamek.common.*;
 import mekhq.*;
 import mekhq.campaign.finances.*;
 import mekhq.campaign.log.*;
@@ -43,38 +44,6 @@ import org.joda.time.DateTime;
 
 import megamek.client.RandomNameGenerator;
 import megamek.client.RandomUnitGenerator;
-import megamek.common.Aero;
-import megamek.common.BattleArmor;
-import megamek.common.BombType;
-import megamek.common.Compute;
-import megamek.common.ConvFighter;
-import megamek.common.Coords;
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.EntityMovementMode;
-import megamek.common.EquipmentType;
-import megamek.common.FighterSquadron;
-import megamek.common.Game;
-import megamek.common.GunEmplacement;
-import megamek.common.IBomber;
-import megamek.common.ITechManager;
-import megamek.common.ITechnology;
-import megamek.common.Infantry;
-import megamek.common.Jumpship;
-import megamek.common.LandAirMech;
-import megamek.common.Mech;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
-import megamek.common.MechSummaryCache;
-import megamek.common.MiscType;
-import megamek.common.Mounted;
-import megamek.common.Player;
-import megamek.common.Protomech;
-import megamek.common.SimpleTechLevel;
-import megamek.common.SmallCraft;
-import megamek.common.Tank;
-import megamek.common.TargetRoll;
-import megamek.common.Warship;
 import megamek.common.annotations.Nullable;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
@@ -1224,7 +1193,7 @@ public class Campaign implements Serializable, ITechManager {
             person = newPerson(type);
         } else {
             person = newPerson(type, Person.T_NONE, new DefaultFactionSelector(),
-                    new DefaultPlanetSelector(), Person.G_RANDOMIZE);
+                    new DefaultPlanetSelector(), Crew.G_RANDOMIZE);
         }
 
         person.setDependent(true);
@@ -1251,7 +1220,7 @@ public class Campaign implements Serializable, ITechManager {
      * @return A new {@link Person}.
      */
     public Person newPerson(int type, int secondary) {
-        return newPerson(type, secondary, getFactionSelector(), getPlanetSelector(), Person.G_RANDOMIZE);
+        return newPerson(type, secondary, getFactionSelector(), getPlanetSelector(), Crew.G_RANDOMIZE);
     }
 
     /**
@@ -6401,7 +6370,7 @@ public class Campaign implements Serializable, ITechManager {
         // and if none are found then /gender/rolegroup, then /gender/combat or
         // /gender/support, then in /gender.
         String searchCat_Gender = "";
-        if (p.getGender() == Person.G_FEMALE) {
+        if (p.getGender() == Crew.G_FEMALE) {
             searchCat_Gender += "Female/";
         } else {
             searchCat_Gender += "Male/";

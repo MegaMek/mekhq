@@ -24,6 +24,7 @@ import java.util.Objects;
 
 import megamek.client.RandomNameGenerator;
 import megamek.common.Compute;
+import megamek.common.Crew;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomSkillPreferences;
@@ -112,12 +113,12 @@ public abstract class AbstractPersonnelGenerator {
      * @param gender The person's gender, or a randomize value
      */
     protected void generateName(Person person, int gender) {
-        boolean isFemale = gender == Person.G_RANDOMIZE
+        boolean isFemale = gender == Crew.G_RANDOMIZE
                 ? getNameGenerator().isFemale()
-                : gender == Person.G_FEMALE;
+                : gender == Crew.G_FEMALE;
 
         if (isFemale) {
-            person.setGender(Person.G_FEMALE);
+            person.setGender(Crew.G_FEMALE);
         }
 
         String[] name = getNameGenerator().generateGivenNameSurnameSplit(isFemale, person.isClanner(),

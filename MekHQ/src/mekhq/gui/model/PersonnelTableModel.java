@@ -414,7 +414,7 @@ public class PersonnelTableModel extends DataTableModel {
                     return "";
                 }
             case COL_GENDER:
-                return p.getGenderName();
+                return p.getGenderString(Person.G_DESCRIPTION_MALE_FEMALE);
             case COL_AGE:
                 return Integer.toString(p.getAge(getCampaign().getCalendar()));
             case COL_TYPE:

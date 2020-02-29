@@ -79,10 +79,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //region Variable Declarations
     private static final long serialVersionUID = -847642980395311152L;
 
-    public static final int G_RANDOMIZE = -1; //this is used in generation methods to randomize the gender
-    public static final int G_MALE = 0;
-    public static final int G_FEMALE = 1;
-
     /* If any new roles are added they should go at the end. They should also be accounted for
      * in isCombatRole(int) or isSupportRole(int). You should also increase the value of T_NUM
      * if you add new roles.
@@ -126,10 +122,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public static final int S_MIA = 3;
     public static final int S_NUM = 4;
 
-    public static final int PRONOUN_HESHE = 0;
-    public static final int PRONOUN_HIMHER = 1;
-    public static final int PRONOUN_HISHER = 2;
-    public static final int PRONOUN_HISHERS = 3;
+    public static final int G_DESCRIPTION_MALE_FEMALE = 0;
+    public static final int G_DESCRIPTION_HE_SHE = 1;
+    public static final int G_DESCRIPTION_HIM_HER = 2;
+    public static final int G_DESCRIPTION_HIS_HER = 3;
+    public static final int G_DESCRIPTION_HIS_HERS = 4;
+    public static final int G_DESCRIPTION_BOY_GIRL = 5;
 
     // Prisoners, Bondsmen, and Normal Personnel
     public static final int PRISONER_NOT = 0;
@@ -420,7 +418,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         portraitFileOverride = null;
         xp = 0;
         acquisitions = 0;
-        gender = G_MALE;
+        gender = Crew.G_MALE;
         birthday = new GregorianCalendar(3042, Calendar.JANUARY, 1);
         rank = 0;
         rankLevel = 0;
@@ -582,79 +580,89 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     //region Text Getters
     //TODO : Rename and Localize region
-    public String getGenderName() {
-        return getGenderName(gender);
+    public String getGenderString(int variant) {
+        return getGenderString(gender, variant);
     }
 
-    public static String getGenderName(int gender) {
-        switch (gender) {
-            case G_MALE:
-                return "Male";
-            case G_FEMALE:
-                return "Female";
-            default:
-                return "?";
-        }
-    }
-
-    public String getChildGenderName() {
-        return getChildGenderName(gender);
-    }
-
-    public static String getChildGenderName(int gender) {
-        switch (gender) {
-            case G_MALE:
-                return "boy";
-            case G_FEMALE:
-                return "girl";
-            default:
-                return "?";
-        }
-    }
-
-    public String getGenderPronoun(int variant) {
-        return getGenderPronoun(gender, variant);
-    }
-
-    public static String getGenderPronoun(int gender, int variant) {
-        if (variant == PRONOUN_HESHE) {
-            switch (gender) {
-                case G_MALE:
-                    return "he";
-                case G_FEMALE:
-                    return "she";
-                default:
-                    return "?";
+    public static String getGenderString(int gender, int variant) {
+        switch (variant) {
+            case G_DESCRIPTION_MALE_FEMALE: {
+                switch (gender) {
+                    case Crew.G_MALE:
+                        return "Male";
+                    case Crew.G_FEMALE:
+                        return "Female";
+                    default:
+                        MekHQ.getLogger().error(Person.class, "getGenderString",
+                                "Gender described by int " + gender + " is unknown!");
+                        return Crew.GENDER_ERROR;
+                }
             }
-        } else if (variant == PRONOUN_HIMHER) {
-            switch (gender) {
-                case G_MALE:
-                    return "him";
-                case G_FEMALE:
-                    return "her";
-                default:
-                    return "?";
+            case G_DESCRIPTION_HE_SHE: {
+                switch (gender) {
+                    case Crew.G_MALE:
+                        return "he";
+                    case Crew.G_FEMALE:
+                        return "she";
+                    default:
+                        MekHQ.getLogger().error(Person.class, "getGenderString",
+                                "Gender described by int " + gender + " is unknown!");
+                        return Crew.GENDER_ERROR;
+                }
             }
-        } else if (variant == PRONOUN_HISHER) {
-            switch (gender) {
-                case G_MALE:
-                    return "his";
-                case G_FEMALE:
-                    return "her";
-                default:
-                    return "?";
+            case G_DESCRIPTION_HIM_HER: {
+                switch (gender) {
+                    case Crew.G_MALE:
+                        return "him";
+                    case Crew.G_FEMALE:
+                        return "her";
+                    default:
+                        MekHQ.getLogger().error(Person.class, "getGenderString",
+                                "Gender described by int " + gender + " is unknown!");
+                        return Crew.GENDER_ERROR;
+                }
             }
-        } else if (variant == PRONOUN_HISHERS) {
-            switch (gender) {
-                case G_MALE:
-                    return "his";
-                case G_FEMALE:
-                    return "hers";
-                default:
-                    return "?";
+            case G_DESCRIPTION_HIS_HER: {
+                switch (gender) {
+                    case Crew.G_MALE:
+                        return "his";
+                    case Crew.G_FEMALE:
+                        return "her";
+                    default:
+                        MekHQ.getLogger().error(Person.class, "getGenderString",
+                                "Gender described by int " + gender + " is unknown!");
+                        return Crew.GENDER_ERROR;
+                }
             }
-        } else {
-            return "UNKNOWN ERROR IN GENDER PRONOUN";
+            case G_DESCRIPTION_HIS_HERS: {
+                switch (gender) {
+                    case Crew.G_MALE:
+                        return "his";
+                    case Crew.G_FEMALE:
+                        return "hers";
+                    default:
+                        MekHQ.getLogger().error(Person.class, "getGenderString",
+                                "Gender described by int " + gender + " is unknown!");
+                        return Crew.GENDER_ERROR;
+                }
+            }
+            case G_DESCRIPTION_BOY_GIRL: {
+                switch (gender) {
+                    case Crew.G_MALE:
+                        return "boy";
+                    case Crew.G_FEMALE:
+                        return "girl";
+                    default:
+                        MekHQ.getLogger().error(Person.class, "getGenderString",
+                                "Gender described by int " + gender + " is unknown!");
+                        return Crew.GENDER_ERROR;
+                }
+            }
+            default: {
+                MekHQ.getLogger().error(Person.class, "getGenderString",
+                        "Gender described by int " + gender + " is unknown!");
+                return Crew.GENDER_ERROR;
+            }
         }
     }
 
@@ -1366,7 +1374,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             baby.setAncestorsId(ancId);
 
             campaign.addReport(String.format("%s has given birth to %s, a baby %s!", getHyperlinkedName(),
-                    baby.getHyperlinkedName(), baby.getChildGenderName()));
+                    baby.getHyperlinkedName(), baby.getGenderString(Person.G_DESCRIPTION_BOY_GIRL)));
             if (campaign.getCampaignOptions().logConception()) {
                 MedicalLogger.deliveredBaby(this, baby, campaign.getDate());
                 if (fatherId != null) {
@@ -1436,7 +1444,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void addRandomSpouse(boolean sameSex) {
         List<Person> potentials = new ArrayList<>();
-        int gender = sameSex ? getGender() : (isMale() ? G_MALE : G_FEMALE);
+        int gender = sameSex ? getGender() : (isMale() ? Crew.G_MALE : Crew.G_FEMALE);
         for (Person p : campaign.getPersonnel()) {
             if (isPotentialRandomSpouse(p, gender)) {
                 potentials.add(p);
@@ -1635,13 +1643,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 break;
         }
 
-        if (spouse.isDeadOrMIA() && isDeadOrMIA()) {
-            //Ignore, we want to keep the maiden names for fallen/missing members of the company
-        } else if (spouse.isDeadOrMIA()) {
-            setMaidenName(null);
-        } else if (isDeadOrMIA()) {
-            spouse.setMaidenName(null);
-        } else {
+        if (!(spouse.isDeadOrMIA() && isDeadOrMIA())) {
             reason = FormerSpouse.REASON_DIVORCE;
 
             PersonalLogger.divorcedFrom(this, getSpouse(), getCampaign().getDate());
@@ -1652,6 +1654,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
             spouse.setMaidenName(null);
             setMaidenName(null);
+        } else if (spouse.isDeadOrMIA()) {
+            setMaidenName(null);
+        } else if (isDeadOrMIA()) {
+            spouse.setMaidenName(null);
         }
 
         //add to former spouse list
@@ -1668,11 +1674,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //endregion Divorce
 
     public boolean isFemale() {
-        return gender == G_FEMALE;
+        return gender == Crew.G_FEMALE;
     }
 
     public boolean isMale() {
-        return gender == G_MALE;
+        return gender == Crew.G_MALE;
     }
 
     public int getXp() {

@@ -38,8 +38,8 @@ public class MedicalLogger {
     public static MedicalLogEntry severedSpine(Person person, Date date) {
         String message = logEntriesResourceMap.getString("severedSpine.text");
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, MessageFormat.format(message,
-                        person.getGenderPronoun(Person.PRONOUN_HISHER),
-                        person.getGenderPronoun(Person.PRONOUN_HIMHER)));
+                        person.getGenderString(Person.G_DESCRIPTION_HIS_HER),
+                        person.getGenderString(Person.G_DESCRIPTION_HIM_HER)));
         person.addLogEntry(medicalLogEntry);
         return medicalLogEntry;
     }
@@ -47,7 +47,7 @@ public class MedicalLogger {
     public static MedicalLogEntry brokenRibPunctureDead(Person person, Date date) {
         String message = logEntriesResourceMap.getString("brokenRibPunctureDead.text");
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, MessageFormat.format(message,
-                person.getGenderPronoun(Person.PRONOUN_HISHER)));
+                person.getGenderString(Person.G_DESCRIPTION_HIS_HER)));
         person.addLogEntry(medicalLogEntry);
         return medicalLogEntry;
     }
@@ -55,7 +55,7 @@ public class MedicalLogger {
     public static MedicalLogEntry brokenRibPuncture(Person person, Date date) {
         String message = logEntriesResourceMap.getString("brokenRibPuncture.text");
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, MessageFormat.format(message,
-                person.getGenderPronoun(Person.PRONOUN_HISHER)));
+                person.getGenderString(Person.G_DESCRIPTION_HIS_HER)));
         person.addLogEntry(medicalLogEntry);
         return medicalLogEntry;
     }
@@ -160,7 +160,8 @@ public class MedicalLogger {
 
     public static void deliveredBaby(Person patient, Person baby, Date date) {
         String message = logEntriesResourceMap.getString("deliveredBaby.text");
-        MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, MessageFormat.format(message, baby.getChildGenderName()));
+        MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, MessageFormat.format(message,
+                baby.getGenderString(Person.G_DESCRIPTION_BOY_GIRL)));
         patient.addLogEntry(medicalLogEntry);
     }
 
@@ -176,7 +177,8 @@ public class MedicalLogger {
 
     public static void diedFromWounds(Person patient, Date date) {
         String message = logEntriesResourceMap.getString("diedFromWounds.text");
-        MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, MessageFormat.format(message, patient.getGenderPronoun(Person.PRONOUN_HISHER)));
+        MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, MessageFormat.format(message,
+                patient.getGenderString(Person.G_DESCRIPTION_HIS_HER)));
         patient.addLogEntry(medicalLogEntry);
     }
 }

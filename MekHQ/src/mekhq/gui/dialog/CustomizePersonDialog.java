@@ -287,8 +287,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         panDemog.add(lblGender, gridBagConstraints);
 
         DefaultComboBoxModel<String> genderModel = new DefaultComboBoxModel<>();
-        genderModel.addElement(Person.getGenderName(Person.G_MALE));
-        genderModel.addElement(Person.getGenderName(Person.G_FEMALE));
+        genderModel.addElement(Person.getGenderString(Crew.G_MALE, Person.G_DESCRIPTION_MALE_FEMALE));
+        genderModel.addElement(Person.getGenderString(Crew.G_FEMALE, Person.G_DESCRIPTION_MALE_FEMALE));
         choiceGender.setModel(genderModel);
         choiceGender.setName("choiceGender"); // NOI18N
         choiceGender.setSelectedIndex(person.getGender());
@@ -904,7 +904,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
 
     private void randomName() {
         String[] name = campaign.getRNG().generateGivenNameSurnameSplit(
-                choiceGender.getSelectedIndex() == Person.G_FEMALE,
+                choiceGender.getSelectedIndex() == Crew.G_FEMALE,
                 person.isClanner(), person.getOriginFaction().getShortName());
         textGivenName.setText(name[0]);
         textSurname.setText(name[1]);
