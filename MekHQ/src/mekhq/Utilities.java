@@ -952,7 +952,7 @@ public class Utilities {
             if (givenName == null) {
                 String name = oldCrew.getName(crewIndex);
 
-                if (!name.equalsIgnoreCase(Crew.UNNAMED)) {
+                if (!(name.equalsIgnoreCase(Crew.UNNAMED) || name.equalsIgnoreCase(Crew.UNNAMED_FULL_NAME))) {
                     p.migrateName(name);
                 }
             } else {

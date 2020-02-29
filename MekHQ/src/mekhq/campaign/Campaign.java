@@ -8217,13 +8217,10 @@ public class Campaign implements Serializable, ITechManager {
                                     || ms.getWeightClass() < megamek.common.EntityWeightClass.WEIGHT_ASSAULT)) {
                                 p.setOriginalUnitWeight(ms.getWeightClass());
                                 if (ms.isClan()) {
-                                    p.setOriginalUnitTech(2);
+                                    p.setOriginalUnitTech(Person.TECH_CLAN);
                                 } else if (ms.getYear() > 3050) {
-                                    /*
-                                    * We're only guessing anyway, so we use this hack to avoid actually loading the
-                                    * entity to check for IS2
-                                    */
-                                    p.setOriginalUnitTech(1);
+                                    // TODO : Fix this so we aren't using a hack that just assumes IS2
+                                    p.setOriginalUnitTech(Person.TECH_IS2);
                                 }
                                 if (null != p.getUnitId() && null != units.get(p.getUnitId())
                                         && ms.getName().equals(units.get(p.getUnitId()).getEntity().getShortNameRaw())) {
