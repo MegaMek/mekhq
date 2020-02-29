@@ -137,9 +137,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String CMD_RANSOM = "RANSOM";
 
     private static final String SEPARATOR = "@"; //$NON-NLS-1$
-    private static final String SPACE = " "; //$NON-NLS-1$
     private static final String HYPHEN = "-"; //$NON-NLS-1$
-    private static final String QUESTION_MARK = "?"; //$NON-NLS-1$
     private static final String TRUE = String.valueOf(true);
     private static final String FALSE = String.valueOf(false);
 
@@ -149,7 +147,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private ResourceBundle resourceMap;
 
     public PersonnelTableMouseAdapter(CampaignGUI gui, JTable personnelTable,
-            PersonnelTableModel personnelModel) {
+                                      PersonnelTableModel personnelModel) {
         super();
         this.gui = gui;
         this.personnelTable = personnelTable;
@@ -185,19 +183,15 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 
     @Override
     public void actionPerformed(ActionEvent action) {
-        final String METHOD_NAME = "actionPerformed(ActionEvent)"; //$NON-NLS-1$
-
         int row = personnelTable.getSelectedRow();
         if (row < 0) {
             return;
         }
-        Person selectedPerson = personnelModel.getPerson(personnelTable
-                .convertRowIndexToModel(row));
+        Person selectedPerson = personnelModel.getPerson(personnelTable.convertRowIndexToModel(row));
         int[] rows = personnelTable.getSelectedRows();
         Person[] people = new Person[rows.length];
         for (int i = 0; i < rows.length; i++) {
-            people[i] = personnelModel.getPerson(personnelTable
-                    .convertRowIndexToModel(rows[i]));
+            people[i] = personnelModel.getPerson(personnelTable.convertRowIndexToModel(rows[i]));
         }
 
         String[] data = action.getActionCommand().split(SEPARATOR, -1);
@@ -1748,7 +1742,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     JMenuItem surnameMenu;
                     String type;
 
-                    List<Person> personnel = new ArrayList(gui.getCampaign().getPersonnel());
+                    List<Person> personnel = new ArrayList<>(gui.getCampaign().getPersonnel());
                     personnel.sort(Comparator.comparing((Person p) -> p.getAge(calendar)).thenComparing(Person::getSurname));
 
                     for (Person ps : personnel) {
@@ -1979,7 +1973,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     JMenu abMenu = new JMenu(resourceMap.getString("spendOnSpecialAbilities.text")); //$NON-NLS-1$
                     int cost;
 
-                    List<SpecialAbility> specialAbilities = new ArrayList(SpecialAbility.getAllSpecialAbilities().values());
+                    List<SpecialAbility> specialAbilities = new ArrayList<>(SpecialAbility.getAllSpecialAbilities().values());
                     specialAbilities.sort(Comparator.comparing(SpecialAbility::getName));
 
                     for (SpecialAbility spa : specialAbilities) {
