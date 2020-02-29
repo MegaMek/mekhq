@@ -196,7 +196,7 @@ public class Bloodname implements Serializable {
 	}
 
 	public static int determinePhenotype(Person person) {
-	    return 0; // TODO : Windchild Fix Me
+	    return 0; // TODO : Windchild Fix Me During Personnel Wave 2
     }
 
 	public static Bloodname loadFromXml(Node node) {
