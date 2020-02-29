@@ -133,7 +133,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public static final int PRISONER_NOT = 0;
     public static final int PRISONER_YES = 1;
     public static final int PRISONER_BONDSMAN = 2;
-    public static final int PRISONER_NUM = 3;
 
     // Phenotypes
     public static final int PHENOTYPE_NONE = 0;
