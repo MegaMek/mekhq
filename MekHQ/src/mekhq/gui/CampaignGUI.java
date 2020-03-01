@@ -917,7 +917,7 @@ public class CampaignGUI extends JPanel {
         menuManage.add(miGMToolsDialog);
 
         JMenuItem miAdvanceMultipleDays = new JMenuItem(resourceMap.getString("miAdvanceMultipleDays.text"));
-        miAdvanceMultipleDays.setEnabled(true);
+        miAdvanceMultipleDays.setEnabled(getCampaignController().isHost());
         miAdvanceMultipleDays.addActionListener(evt -> showAdvanceDaysDialog());
         menuManage.add(miAdvanceMultipleDays);
 
