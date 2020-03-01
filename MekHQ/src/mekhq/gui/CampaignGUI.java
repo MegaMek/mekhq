@@ -75,6 +75,7 @@ import mekhq.campaign.event.AstechPoolChangedEvent;
 import mekhq.campaign.event.DayEndingEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.LoanEvent;
+import mekhq.campaign.event.LocationChangedEvent;
 import mekhq.campaign.event.MedicPoolChangedEvent;
 import mekhq.campaign.event.MissionEvent;
 import mekhq.campaign.event.NewDayEvent;
@@ -2643,6 +2644,11 @@ public class CampaignGUI extends JPanel {
     @Subscribe
     public void handle(MedicPoolChangedEvent ev) {
         refreshTempMedics();
+    }
+
+    @Subscribe
+    public void handleLocationChanged(LocationChangedEvent ev) {
+        refreshLocation();
     }
 
     public void refreshLocation() {

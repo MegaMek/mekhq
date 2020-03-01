@@ -47,7 +47,6 @@ import megamek.common.BattleArmor;
 import megamek.common.BombType;
 import megamek.common.Compute;
 import megamek.common.ConvFighter;
-import megamek.common.Coords;
 import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
@@ -92,6 +91,7 @@ import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.GMModeEvent;
 import mekhq.campaign.event.LoanNewEvent;
 import mekhq.campaign.event.LoanPaidEvent;
+import mekhq.campaign.event.LocationChangedEvent;
 import mekhq.campaign.event.MedicPoolChangedEvent;
 import mekhq.campaign.event.MissionNewEvent;
 import mekhq.campaign.event.NetworkChangedEvent;
@@ -1018,6 +1018,16 @@ public class Campaign implements Serializable, ITechManager {
 
     public void setLocation(CurrentLocation l) {
         location = l;
+    }
+
+    /**
+     * Moves immediately to a {@link PlanetarySystem}.
+     * @param s The {@link PlanetarySystem} the campaign
+     *          has been moved to.
+     */
+    public void moveToPlanetarySystem(PlanetarySystem s) {
+        setLocation(new CurrentLocation(s, 0.0));
+        MekHQ.triggerEvent(new LocationChangedEvent(getLocation(), false));
     }
 
     public CurrentLocation getLocation() {
