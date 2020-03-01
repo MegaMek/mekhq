@@ -48,10 +48,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import chat.ChatClient;
-import megamek.client.RandomNameGenerator;
 import megamek.client.RandomUnitGenerator;
 import megamek.client.ui.swing.GameOptionsDialog;
-import megamek.common.Crew;
 import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.Jumpship;
@@ -69,14 +67,18 @@ import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignController;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.event.AssetEvent;
 import mekhq.campaign.event.AstechPoolChangedEvent;
+import mekhq.campaign.event.DayEndingEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.LoanEvent;
+import mekhq.campaign.event.LocationChangedEvent;
 import mekhq.campaign.event.MedicPoolChangedEvent;
 import mekhq.campaign.event.MissionEvent;
+import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.event.PersonEvent;
@@ -916,7 +918,7 @@ public class CampaignGUI extends JPanel {
         menuManage.add(miGMToolsDialog);
 
         JMenuItem miAdvanceMultipleDays = new JMenuItem(resourceMap.getString("miAdvanceMultipleDays.text"));
-        miAdvanceMultipleDays.setEnabled(true);
+        miAdvanceMultipleDays.setEnabled(getCampaignController().isHost());
         miAdvanceMultipleDays.addActionListener(evt -> showAdvanceDaysDialog());
         menuManage.add(miAdvanceMultipleDays);
 
@@ -999,7 +1001,7 @@ public class CampaignGUI extends JPanel {
         btnGMMode = new JToggleButton(resourceMap.getString("btnGMMode.text")); // NOI18N
         btnGMMode.setToolTipText(resourceMap.getString("btnGMMode.toolTipText")); // NOI18N
         btnGMMode.setSelected(getCampaign().isGM());
-        btnGMMode.addActionListener(this::btnGMModeActionPerformed);
+        btnGMMode.addActionListener(e -> getCampaign().setGMMode(btnGMMode.isSelected()));
         btnGMMode.setMinimumSize(new Dimension(150, 25));
         btnGMMode.setPreferredSize(new Dimension(150, 25));
         btnGMMode.setMaximumSize(new Dimension(150, 25));
@@ -1031,7 +1033,7 @@ public class CampaignGUI extends JPanel {
 
         btnAdvanceDay = new JButton(resourceMap.getString("btnAdvanceDay.text")); // NOI18N
         btnAdvanceDay.setToolTipText(resourceMap.getString("btnAdvanceDay.toolTipText")); // NOI18N
-        btnAdvanceDay.addActionListener(evt -> advanceDay());
+        btnAdvanceDay.addActionListener(evt -> getCampaignController().advanceDay());
         btnAdvanceDay.setPreferredSize(new Dimension(250, 50));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -1160,45 +1162,6 @@ public class CampaignGUI extends JPanel {
             nrd.setVisible(true);
         }
     }
-
-    private void advanceDay() {
-        // first check for overdue loan payments - don't allow advancement until
-        // these are addressed
-        if (getCampaign().checkOverDueLoans()) {
-            refreshFunds();
-            refreshReport();
-            return;
-        }
-        if (getCampaign().checkRetirementDefections()) {
-            showRetirementDefectionDialog();
-            return;
-        }
-        if (getCampaign().checkYearlyRetirements()) {
-            showRetirementDefectionDialog();
-            return;
-        }
-        if (nagShortMaintenance()) {
-            return;
-        }
-        if (getCampaign().getCampaignOptions().getUseAtB()) {
-            if (nagShortDeployments()) {
-                return;
-            }
-            if (nagOutstandingScenarios()) {
-                return;
-            }
-        }
-        if(!getCampaign().newDay()) {
-            return;
-        }
-
-        refreshCalendar();
-        refreshLocation();
-        initReport();
-        refreshFunds();
-
-        refreshAllTabs();
-    }// GEN-LAST:event_btnAdvanceDayActionPerformed
 
     public boolean nagShortMaintenance() {
         if (!getCampaign().getCampaignOptions().checkMaintenance()) {
@@ -1441,10 +1404,6 @@ public class CampaignGUI extends JPanel {
 
     private void btnOvertimeActionPerformed(java.awt.event.ActionEvent evt) {
         getCampaign().setOvertime(btnOvertime.isSelected());
-    }
-
-    private void btnGMModeActionPerformed(java.awt.event.ActionEvent evt) {
-        getCampaign().setGMMode(btnGMMode.isSelected());
     }
 
     private void menuOptionsActionPerformed(java.awt.event.ActionEvent evt) {
@@ -2594,6 +2553,46 @@ public class CampaignGUI extends JPanel {
     private ActionScheduler ratingScheduler = new ActionScheduler(this::refreshRating);
 
     @Subscribe
+    public void handleDayEnding(DayEndingEvent ev) {
+        // first check for overdue loan payments - don't allow advancement until
+        // these are addressed
+        if (getCampaign().checkOverDueLoans()) {
+            refreshFunds();
+            refreshReport();
+            ev.cancel();
+        }
+        if (getCampaign().checkRetirementDefections()) {
+            showRetirementDefectionDialog();
+            ev.cancel();
+        }
+        if (getCampaign().checkYearlyRetirements()) {
+            showRetirementDefectionDialog();
+            ev.cancel();
+        }
+        if (nagShortMaintenance()) {
+            ev.cancel();
+        }
+        if (getCampaign().getCampaignOptions().getUseAtB()) {
+            if (nagShortDeployments()) {
+                ev.cancel();
+            }
+            if (nagOutstandingScenarios()) {
+                ev.cancel();
+            }
+        }
+    }
+
+    @Subscribe
+    public void handleNewDay(NewDayEvent evt) {
+        refreshCalendar();
+        refreshLocation();
+        initReport();
+        refreshFunds();
+
+        refreshAllTabs();
+    }
+
+    @Subscribe
     public void handle(ReportEvent ev) {
         refreshReport();
     }
@@ -2647,6 +2646,11 @@ public class CampaignGUI extends JPanel {
         refreshTempMedics();
     }
 
+    @Subscribe
+    public void handleLocationChanged(LocationChangedEvent ev) {
+        refreshLocation();
+    }
+
     public void refreshLocation() {
         lblLocation.setText(getCampaign().getLocation().getReport(
                 getCampaign().getCalendar().getTime()));
@@ -2658,6 +2662,10 @@ public class CampaignGUI extends JPanel {
 
     public Campaign getCampaign() {
         return getApplication().getCampaign();
+    }
+
+    public CampaignController getCampaignController() {
+        return getApplication().getCampaignController();
     }
 
     public IconPackage getIconPackage() {

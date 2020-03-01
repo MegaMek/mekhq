@@ -338,12 +338,9 @@ public class InterstellarMapPanel extends JPanel {
                         item.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent ae) {
-                                campaign.getLocation().setCurrentSystem(selectedSystem);
-                                campaign.getLocation().setTransitTime(0.0);
-                                campaign.getLocation().setJumpPath(null);
+                                campaign.moveToPlanetarySystem(selectedSystem);
                                 jumpPath = new JumpPath();
                                 center(selectedSystem);
-                                hqview.refreshLocation();
                             }
                         });
                     }
@@ -697,7 +694,7 @@ public class InterstellarMapPanel extends JPanel {
                         }
                     }
                 }
-                
+
                 Map<Faction, String> capitals = new HashMap<>();
                 for (Faction faction : Faction.getFactions()) {
                 	capitals.put(faction,faction.getStartingPlanet(campaign.getGameYear()));
