@@ -1000,7 +1000,7 @@ public class CampaignGUI extends JPanel {
         btnGMMode = new JToggleButton(resourceMap.getString("btnGMMode.text")); // NOI18N
         btnGMMode.setToolTipText(resourceMap.getString("btnGMMode.toolTipText")); // NOI18N
         btnGMMode.setSelected(getCampaign().isGM());
-        btnGMMode.addActionListener(this::btnGMModeActionPerformed);
+        btnGMMode.addActionListener(e -> getCampaign().setGMMode(btnGMMode.isSelected()));
         btnGMMode.setMinimumSize(new Dimension(150, 25));
         btnGMMode.setPreferredSize(new Dimension(150, 25));
         btnGMMode.setMaximumSize(new Dimension(150, 25));
@@ -1403,10 +1403,6 @@ public class CampaignGUI extends JPanel {
 
     private void btnOvertimeActionPerformed(java.awt.event.ActionEvent evt) {
         getCampaign().setOvertime(btnOvertime.isSelected());
-    }
-
-    private void btnGMModeActionPerformed(java.awt.event.ActionEvent evt) {
-        getCampaign().setGMMode(btnGMMode.isSelected());
     }
 
     private void menuOptionsActionPerformed(java.awt.event.ActionEvent evt) {
