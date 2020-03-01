@@ -1649,7 +1649,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (!(spouse.isDeadOrMIA() && isDeadOrMIA())) {
             reason = FormerSpouse.REASON_DIVORCE;
 
-            PersonalLogger.divorcedFrom(this, getSpouse(), getCampaign().getDate());
+            PersonalLogger.divorcedFrom(this, spouse, getCampaign().getDate());
             PersonalLogger.divorcedFrom(spouse, this, getCampaign().getDate());
 
             campaign.addReport(String.format("%s has divorced %s!", getHyperlinkedName(),
@@ -1657,21 +1657,29 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
             spouse.setMaidenName(null);
             setMaidenName(null);
+
+            spouse.setSpouseId(null);
+            setSpouseId(null);
         } else if (spouse.isDeadOrMIA()) {
             setMaidenName(null);
+            setSpouseId(null);
         } else if (isDeadOrMIA()) {
             spouse.setMaidenName(null);
+            spouse.setSpouseId(null);
         }
 
-        //add to former spouse list
-        getSpouse().addFormerSpouse(new FormerSpouse(getId(),
+        // Output a message for Spouses who are KIA
+        if (reason == FormerSpouse.REASON_WIDOWED) {
+            PersonalLogger.spouseKia(spouse, this, getCampaign().getDate());
+        }
+
+        // Add to former spouse list
+        spouse.addFormerSpouse(new FormerSpouse(getId(),
                 FormerSpouse.convertDateTimeToLocalDate(getCampaign().getDateTime()), reason));
-        addFormerSpouse(new FormerSpouse(getSpouse().getId(),
+        addFormerSpouse(new FormerSpouse(spouse.getId(),
                 FormerSpouse.convertDateTimeToLocalDate(getCampaign().getDateTime()), reason));
 
-        spouse.setSpouseId(null);
         MekHQ.triggerEvent(new PersonChangedEvent(spouse));
-        setSpouseId(null);
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
     //endregion Divorce
