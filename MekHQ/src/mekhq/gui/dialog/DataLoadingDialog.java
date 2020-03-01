@@ -56,7 +56,6 @@ import mekhq.campaign.mod.am.InjuryTypes;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.RATManager;
-import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
 import mekhq.campaign.universe.Systems;
@@ -80,7 +79,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         this.frame = frame;
         this.app = app;
         this.fileCampaign = f;
-        
+
         resourceMap = ResourceBundle.getBundle("mekhq.resources.DataLoadingDialog", new EncodeControl()); //$NON-NLS-1$
 
         setUndecorated(true);
@@ -135,7 +134,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         @Override
         public Void doInBackground() {
             final String METHOD_NAME = "doInBackground()"; //$NON-NLS-1$
-            
+
             //Initialize progress property.
             setProgress(0);
             try {
@@ -304,7 +303,8 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         public void done() {
         	setVisible(false);
         	if(!cancelled) {
-        		app.setCampaign(campaign);
+                app.setCampaign(campaign);
+                app.getCampaignController().setHost(campaign.getId());
         		frame.setVisible(false);
         		frame.dispose();
         		app.showNewView();

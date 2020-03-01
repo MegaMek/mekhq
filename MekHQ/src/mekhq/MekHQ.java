@@ -1,7 +1,8 @@
 /*
- * MekBayApp.java
+ * MekHQ.java
  *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2020 The MegaMek Team.
  *
  * This file is part of MekHQ.
  *
@@ -64,6 +65,7 @@ import megamek.common.preference.PreferenceManager;
 import megamek.common.util.EncodeControl;
 import megamek.server.Server;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignController;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.handler.XPHandler;
@@ -121,7 +123,7 @@ public class MekHQ implements GameListener {
     private Client client = null;
 
     //the actual campaign - this is where the good stuff is
-    private Campaign campaign;
+    private CampaignController campaignController;
     private CampaignGUI campaigngui;
 
     private IconPackage iconPackage = new IconPackage();
@@ -353,7 +355,7 @@ public class MekHQ implements GameListener {
 
     public void showNewView() {
     	campaigngui = new CampaignGUI(this);
-    	campaigngui.showOverviewTab(campaign.isOverviewLoadingValue());
+    	campaigngui.showOverviewTab(getCampaign().isOverviewLoadingValue());
     }
 
     /**
@@ -434,11 +436,15 @@ public class MekHQ implements GameListener {
     }
 
     public Campaign getCampaign() {
-    	return campaign;
+    	return campaignController.getLocalCampaign();
     }
 
     public void setCampaign(Campaign c) {
-    	campaign = c;
+        campaignController = new CampaignController(c);
+    }
+
+    public CampaignController getCampaignController() {
+        return campaignController;
     }
 
     /**
@@ -456,7 +462,7 @@ public class MekHQ implements GameListener {
     }
 
     public void joinGame(Scenario scenario, ArrayList<Unit> meks) {
-		LaunchGameDialog lgd = new LaunchGameDialog(campaigngui.getFrame(), false, campaign);
+		LaunchGameDialog lgd = new LaunchGameDialog(campaigngui.getFrame(), false, getCampaign());
 		lgd.setVisible(true);
 
 		if(lgd.cancelled) {
@@ -484,13 +490,13 @@ public class MekHQ implements GameListener {
         int port;
         String playerName;
         {
-            LaunchGameDialog lgd = new LaunchGameDialog(campaigngui.getFrame(), true, campaign);
+            LaunchGameDialog lgd = new LaunchGameDialog(campaigngui.getFrame(), true, getCampaign());
             lgd.setVisible(true);
             if (lgd.cancelled) {
                 stopHost();
                 return;
             } else {
-                this.autosaveService.requestBeforeMissionAutosave(this.campaign);
+                this.autosaveService.requestBeforeMissionAutosave(getCampaign());
                 port = lgd.port;
                 playerName = lgd.playerName;
             }
@@ -530,7 +536,7 @@ public class MekHQ implements GameListener {
         currentScenario = scenario;
 
         // Start the game thread
-        if (campaign.getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario) {
+        if (getCampaign().getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario) {
             gameThread = new AtBGameThread(playerName, client, this, meks, (AtBScenario) scenario);
         } else {
             gameThread = new GameThread(playerName, client, this, meks);
@@ -618,17 +624,17 @@ public class MekHQ implements GameListener {
                     JOptionPane.YES_NO_OPTION,
                     JOptionPane.QUESTION_MESSAGE) ==
                     JOptionPane.YES_OPTION;
-        	ResolveScenarioTracker tracker = new ResolveScenarioTracker(currentScenario, campaign, control);
+        	ResolveScenarioTracker tracker = new ResolveScenarioTracker(currentScenario, getCampaign(), control);
             tracker.setClient(gameThread.getClient());
             tracker.setEvent(gve);
         	tracker.processGame();
         	ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(campaigngui.getFrame(), true, tracker);
         	resolveDialog.setVisible(true);
         	if (campaigngui.getCampaign().getCampaignOptions().getUseAtB() &&
-        			campaign.getMission(currentScenario.getMissionId()) instanceof AtBContract &&
+                    campaigngui.getCampaign().getMission(currentScenario.getMissionId()) instanceof AtBContract &&
         			campaigngui.getCampaign().getRetirementDefectionTracker().getRetirees().size() > 0) {
         		RetirementDefectionDialog rdd = new RetirementDefectionDialog(campaigngui,
-        				(AtBContract)campaign.getMission(currentScenario.getMissionId()), false);
+        				(AtBContract)campaigngui.getCampaign().getMission(currentScenario.getMissionId()), false);
         		rdd.setVisible(true);
         		if (!rdd.wasAborted()) {
         			getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
