@@ -1545,464 +1545,460 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         tabOptions.addTab(resourceMap.getString("panTech.TabConstraints.tabTitle"), panTech); // NOI18N
 
         //region Personnel Tab
-        try {
-            panPersonnel.setName("panPersonnel");
-            panPersonnel.setLayout(new java.awt.GridBagLayout());
-            gridy = 0;
+        panPersonnel.setName("panPersonnel");
+        panPersonnel.setLayout(new java.awt.GridBagLayout());
+        gridy = 0;
 
-            useTacticsBox.setText(resourceMap.getString("useTacticsBox.text"));
-            useTacticsBox.setToolTipText(resourceMap.getString("useTacticsBox.toolTipText"));
-            useTacticsBox.setName("useTacticsBox");
-            gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridy;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-            panPersonnel.add(useTacticsBox, gridBagConstraints);
+        useTacticsBox.setText(resourceMap.getString("useTacticsBox.text"));
+        useTacticsBox.setToolTipText(resourceMap.getString("useTacticsBox.toolTipText"));
+        useTacticsBox.setName("useTacticsBox");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panPersonnel.add(useTacticsBox, gridBagConstraints);
 
-            useInitBonusBox.setText(resourceMap.getString("useInitBonusBox.text"));
-            useInitBonusBox.setToolTipText(resourceMap.getString("useInitBonusBox.toolTipText"));
-            useInitBonusBox.setName("useInitBonusBox");
-            gridBagConstraints.gridy = ++gridy;
-            panPersonnel.add(useInitBonusBox, gridBagConstraints);
+        useInitBonusBox.setText(resourceMap.getString("useInitBonusBox.text"));
+        useInitBonusBox.setToolTipText(resourceMap.getString("useInitBonusBox.toolTipText"));
+        useInitBonusBox.setName("useInitBonusBox");
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(useInitBonusBox, gridBagConstraints);
 
-            useToughnessBox.setText(resourceMap.getString("useToughnessBox.text"));
-            useToughnessBox.setToolTipText(resourceMap.getString("useToughnessBox.toolTipText"));
-            useToughnessBox.setName("useToughnessBox");
-            gridBagConstraints.gridy = ++gridy;
-            panPersonnel.add(useToughnessBox, gridBagConstraints);
+        useToughnessBox.setText(resourceMap.getString("useToughnessBox.text"));
+        useToughnessBox.setToolTipText(resourceMap.getString("useToughnessBox.toolTipText"));
+        useToughnessBox.setName("useToughnessBox");
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(useToughnessBox, gridBagConstraints);
 
-            useArtilleryBox.setText(resourceMap.getString("useArtilleryBox.text"));
-            useArtilleryBox.setToolTipText(resourceMap.getString("useArtilleryBox.toolTipText"));
-            useArtilleryBox.setName("useArtilleryBox");
-            gridBagConstraints.gridy = ++gridy;
-            panPersonnel.add(useArtilleryBox, gridBagConstraints);
+        useArtilleryBox.setText(resourceMap.getString("useArtilleryBox.text"));
+        useArtilleryBox.setToolTipText(resourceMap.getString("useArtilleryBox.toolTipText"));
+        useArtilleryBox.setName("useArtilleryBox");
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(useArtilleryBox, gridBagConstraints);
 
-            useAbilitiesBox.setText(resourceMap.getString("useAbilitiesBox.text"));
-            useAbilitiesBox.setToolTipText(resourceMap.getString("useAbilitiesBox.toolTipText"));
-            useAbilitiesBox.setName("useAbilitiesBox");
-            gridBagConstraints.gridy = ++gridy;
-            panPersonnel.add(useAbilitiesBox, gridBagConstraints);
+        useAbilitiesBox.setText(resourceMap.getString("useAbilitiesBox.text"));
+        useAbilitiesBox.setToolTipText(resourceMap.getString("useAbilitiesBox.toolTipText"));
+        useAbilitiesBox.setName("useAbilitiesBox");
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(useAbilitiesBox, gridBagConstraints);
 
-            useEdgeBox.setText(resourceMap.getString("useEdgeBox.text"));
-            useEdgeBox.setToolTipText(resourceMap.getString("useEdgeBox.toolTipText"));
-            useEdgeBox.setName("useEdgeBox");
-            gridBagConstraints.gridy = ++gridy;
-            panPersonnel.add(useEdgeBox, gridBagConstraints);
+        useEdgeBox.setText(resourceMap.getString("useEdgeBox.text"));
+        useEdgeBox.setToolTipText(resourceMap.getString("useEdgeBox.toolTipText"));
+        useEdgeBox.setName("useEdgeBox");
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(useEdgeBox, gridBagConstraints);
 
-            useSupportEdgeBox.setText(resourceMap.getString("useSupportEdgeBox.text"));
-            useSupportEdgeBox.setToolTipText(resourceMap.getString("useSupportEdgeBox.toolTipText"));
-            useSupportEdgeBox.setName("useSupportEdgeBox");
-            gridBagConstraints.gridy = ++gridy;
-            panPersonnel.add(useSupportEdgeBox, gridBagConstraints);
+        useSupportEdgeBox.setText(resourceMap.getString("useSupportEdgeBox.text"));
+        useSupportEdgeBox.setToolTipText(resourceMap.getString("useSupportEdgeBox.toolTipText"));
+        useSupportEdgeBox.setName("useSupportEdgeBox");
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(useSupportEdgeBox, gridBagConstraints);
 
-            useImplantsBox.setText(resourceMap.getString("useImplantsBox.text"));
-            useImplantsBox.setToolTipText(resourceMap.getString("useImplantsBox.toolTipText"));
-            useImplantsBox.setName("useImplantsBox");
-            gridBagConstraints.gridy = ++gridy;
-            panPersonnel.add(useImplantsBox, gridBagConstraints);
+        useImplantsBox.setText(resourceMap.getString("useImplantsBox.text"));
+        useImplantsBox.setToolTipText(resourceMap.getString("useImplantsBox.toolTipText"));
+        useImplantsBox.setName("useImplantsBox");
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(useImplantsBox, gridBagConstraints);
 
-            chkCapturePrisoners.setText(resourceMap.getString("chkCapturePrisoners.text"));
-            chkCapturePrisoners.setToolTipText(resourceMap.getString("chkCapturePrisoners.toolTipText"));
-            gridBagConstraints.gridy = ++gridy;
-            panPersonnel.add(chkCapturePrisoners, gridBagConstraints);
+        chkCapturePrisoners.setText(resourceMap.getString("chkCapturePrisoners.text"));
+        chkCapturePrisoners.setToolTipText(resourceMap.getString("chkCapturePrisoners.toolTipText"));
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(chkCapturePrisoners, gridBagConstraints);
 
-            DefaultComboBoxModel<String> prisonerStatusModel = new DefaultComboBoxModel<>();
-            prisonerStatusModel.addElement(resourceMap.getString("prisonerStatus.Prisoner"));
-            prisonerStatusModel.addElement(resourceMap.getString("prisonerStatus.Bondsman"));
-            comboPrisonerStatus = new JComboBox<>(prisonerStatusModel);
-            comboPrisonerStatus.setSelectedIndex(options.getDefaultPrisonerStatus());
-            JPanel pnlPrisonerStatus = new JPanel();
-            pnlPrisonerStatus.add(new JLabel(resourceMap.getString("prisonerStatus.text")));
-            pnlPrisonerStatus.add(comboPrisonerStatus);
-            gridBagConstraints.gridy = ++gridy;
-            panPersonnel.add(pnlPrisonerStatus, gridBagConstraints);
+        DefaultComboBoxModel<String> prisonerStatusModel = new DefaultComboBoxModel<>();
+        prisonerStatusModel.addElement(resourceMap.getString("prisonerStatus.Prisoner"));
+        prisonerStatusModel.addElement(resourceMap.getString("prisonerStatus.Bondsman"));
+        comboPrisonerStatus = new JComboBox<>(prisonerStatusModel);
+        comboPrisonerStatus.setSelectedIndex(options.getDefaultPrisonerStatus());
+        JPanel pnlPrisonerStatus = new JPanel();
+        pnlPrisonerStatus.add(new JLabel(resourceMap.getString("prisonerStatus.text")));
+        pnlPrisonerStatus.add(comboPrisonerStatus);
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(pnlPrisonerStatus, gridBagConstraints);
 
-            altQualityAveragingCheckBox.setText(resourceMap.getString("altQualityAveragingCheckBox.text"));
-            altQualityAveragingCheckBox.setToolTipText(resourceMap.getString("altQualityAveragingCheckBox.toolTipText"));
-            altQualityAveragingCheckBox.setName("altQualityAveragingCheckBox");
-            gridBagConstraints.gridy = ++gridy;
-            panPersonnel.add(altQualityAveragingCheckBox, gridBagConstraints);
+        altQualityAveragingCheckBox.setText(resourceMap.getString("altQualityAveragingCheckBox.text"));
+        altQualityAveragingCheckBox.setToolTipText(resourceMap.getString("altQualityAveragingCheckBox.toolTipText"));
+        altQualityAveragingCheckBox.setName("altQualityAveragingCheckBox");
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(altQualityAveragingCheckBox, gridBagConstraints);
 
-            useAdvancedMedicalBox.setText(resourceMap.getString("useAdvancedMedicalBox.text"));
-            useAdvancedMedicalBox.setToolTipText(resourceMap.getString("useAdvancedMedicalBox.toolTipText"));
-            useAdvancedMedicalBox.setName("useAdvancedMedicalBox");
-            gridBagConstraints.gridy = ++gridy;
-            panPersonnel.add(useAdvancedMedicalBox, gridBagConstraints);
+        useAdvancedMedicalBox.setText(resourceMap.getString("useAdvancedMedicalBox.text"));
+        useAdvancedMedicalBox.setToolTipText(resourceMap.getString("useAdvancedMedicalBox.toolTipText"));
+        useAdvancedMedicalBox.setName("useAdvancedMedicalBox");
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(useAdvancedMedicalBox, gridBagConstraints);
 
-            useDylansRandomXpBox.setText(resourceMap.getString("useDylansRandomXpBox.text"));
-            useDylansRandomXpBox.setToolTipText(resourceMap.getString("useDylansRandomXpBox.toolTipText"));
-            useDylansRandomXpBox.setName("useDylansRandomXpBox");
-            gridBagConstraints.gridy = ++gridy;
-            panPersonnel.add(useDylansRandomXpBox, gridBagConstraints);
+        useDylansRandomXpBox.setText(resourceMap.getString("useDylansRandomXpBox.text"));
+        useDylansRandomXpBox.setToolTipText(resourceMap.getString("useDylansRandomXpBox.toolTipText"));
+        useDylansRandomXpBox.setName("useDylansRandomXpBox");
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(useDylansRandomXpBox, gridBagConstraints);
 
-            spnHealWaitingPeriod = new JSpinner(new SpinnerNumberModel(options.getHealingWaitingPeriod(), 1, 30, 1));
-            ((JSpinner.DefaultEditor) spnHealWaitingPeriod.getEditor()).getTextField().setEditable(false);
-            JPanel pnlHealWaitingPeriod = new JPanel();
-            pnlHealWaitingPeriod.add(spnHealWaitingPeriod);
-            pnlHealWaitingPeriod.add(new JLabel(resourceMap.getString("healWaitingPeriod.text")));
-            gridBagConstraints.gridy = ++gridy;
-            panPersonnel.add(pnlHealWaitingPeriod, gridBagConstraints);
+        spnHealWaitingPeriod = new JSpinner(new SpinnerNumberModel(options.getHealingWaitingPeriod(), 1, 30, 1));
+        ((JSpinner.DefaultEditor) spnHealWaitingPeriod.getEditor()).getTextField().setEditable(false);
+        JPanel pnlHealWaitingPeriod = new JPanel();
+        pnlHealWaitingPeriod.add(spnHealWaitingPeriod);
+        pnlHealWaitingPeriod.add(new JLabel(resourceMap.getString("healWaitingPeriod.text")));
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(pnlHealWaitingPeriod, gridBagConstraints);
 
-            spnNaturalHealWaitingPeriod = new JSpinner(new SpinnerNumberModel(options.getNaturalHealingWaitingPeriod(),
-                    1, 365, 1));
-            ((JSpinner.DefaultEditor) spnNaturalHealWaitingPeriod.getEditor()).getTextField().setEditable(false);
-            JPanel pnlNaturalHealWaitingPeriod = new JPanel();
-            pnlNaturalHealWaitingPeriod.add(spnNaturalHealWaitingPeriod);
-            pnlNaturalHealWaitingPeriod.add(new JLabel(resourceMap.getString("naturalHealWaitingPeriod.text")));
-            gridBagConstraints.gridy = ++gridy;
-            panPersonnel.add(pnlNaturalHealWaitingPeriod, gridBagConstraints);
+        spnNaturalHealWaitingPeriod = new JSpinner(new SpinnerNumberModel(options.getNaturalHealingWaitingPeriod(),
+                1, 365, 1));
+        ((JSpinner.DefaultEditor) spnNaturalHealWaitingPeriod.getEditor()).getTextField().setEditable(false);
+        JPanel pnlNaturalHealWaitingPeriod = new JPanel();
+        pnlNaturalHealWaitingPeriod.add(spnNaturalHealWaitingPeriod);
+        pnlNaturalHealWaitingPeriod.add(new JLabel(resourceMap.getString("naturalHealWaitingPeriod.text")));
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(pnlNaturalHealWaitingPeriod, gridBagConstraints);
 
-            spnMinimumHitsForVees = new JSpinner(new SpinnerNumberModel(options.getMinimumHitsForVees(), 1, 5, 1));
-            ((JSpinner.DefaultEditor) spnMinimumHitsForVees.getEditor()).getTextField().setEditable(false);
-            JPanel panMinimumHitsForVees = new JPanel();
-            panMinimumHitsForVees.add(spnMinimumHitsForVees);
-            panMinimumHitsForVees.add(new JLabel(resourceMap.getString("minimumHitsForVees.text")));
-            gridBagConstraints.gridy = ++gridy;
-            panPersonnel.add(panMinimumHitsForVees, gridBagConstraints);
+        spnMinimumHitsForVees = new JSpinner(new SpinnerNumberModel(options.getMinimumHitsForVees(), 1, 5, 1));
+        ((JSpinner.DefaultEditor) spnMinimumHitsForVees.getEditor()).getTextField().setEditable(false);
+        JPanel panMinimumHitsForVees = new JPanel();
+        panMinimumHitsForVees.add(spnMinimumHitsForVees);
+        panMinimumHitsForVees.add(new JLabel(resourceMap.getString("minimumHitsForVees.text")));
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(panMinimumHitsForVees, gridBagConstraints);
 
-            useRandomHitsForVees = new JCheckBox();
-            useRandomHitsForVees.setSelected(options.useRandomHitsForVees());
-            useRandomHitsForVees.setText(resourceMap.getString("useRandomHitsForVees.text"));
-            useRandomHitsForVees.setToolTipText(resourceMap.getString("useRandomHitsForVees.toolTipText"));
-            gridBagConstraints.gridy = ++gridy;
-            panPersonnel.add(useRandomHitsForVees, gridBagConstraints);
+        useRandomHitsForVees = new JCheckBox();
+        useRandomHitsForVees.setSelected(options.useRandomHitsForVees());
+        useRandomHitsForVees.setText(resourceMap.getString("useRandomHitsForVees.text"));
+        useRandomHitsForVees.setToolTipText(resourceMap.getString("useRandomHitsForVees.toolTipText"));
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(useRandomHitsForVees, gridBagConstraints);
 
-            useTougherHealing = new JCheckBox(resourceMap.getString("useTougherHealing.text"));
-            useTougherHealing.setSelected(options.useTougherHealing());
-            useTougherHealing.setToolTipText(resourceMap.getString("useTougherHealing.toolTipText"));
-            gridBagConstraints.gridy = ++gridy;
-            panPersonnel.add(useTougherHealing, gridBagConstraints);
+        useTougherHealing = new JCheckBox(resourceMap.getString("useTougherHealing.text"));
+        useTougherHealing.setSelected(options.useTougherHealing());
+        useTougherHealing.setToolTipText(resourceMap.getString("useTougherHealing.toolTipText"));
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(useTougherHealing, gridBagConstraints);
 
-            chkUseTransfers = new JCheckBox(resourceMap.getString("useTransfers.text"));
-            chkUseTransfers.setSelected(options.useTransfers());
-            gridBagConstraints.gridy = ++gridy;
-            panPersonnel.add(chkUseTransfers, gridBagConstraints);
+        chkUseTransfers = new JCheckBox(resourceMap.getString("useTransfers.text"));
+        chkUseTransfers.setSelected(options.useTransfers());
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(chkUseTransfers, gridBagConstraints);
 
-            chkUseTimeInService = new JCheckBox(resourceMap.getString("useTimeInService.text"));
-            chkUseTimeInService.setSelected(options.getUseTimeInService());
-            gridBagConstraints.gridy = ++gridy;
-            panPersonnel.add(chkUseTimeInService, gridBagConstraints);
+        chkUseTimeInService = new JCheckBox(resourceMap.getString("useTimeInService.text"));
+        chkUseTimeInService.setSelected(options.getUseTimeInService());
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(chkUseTimeInService, gridBagConstraints);
 
-            chkShowOriginFaction = new JCheckBox(resourceMap.getString("showOriginFaction.text"));
-            chkShowOriginFaction.setSelected(options.showOriginFaction());
-            gridBagConstraints.gridy = ++gridy;
-            panPersonnel.add(chkShowOriginFaction, gridBagConstraints);
+        chkShowOriginFaction = new JCheckBox(resourceMap.getString("showOriginFaction.text"));
+        chkShowOriginFaction.setSelected(options.showOriginFaction());
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(chkShowOriginFaction, gridBagConstraints);
 
-            chkRandomizeOrigin = new JCheckBox(resourceMap.getString("randomizeOrigin.text"));
-            chkRandomizeOrigin.setSelected(options.randomizeOrigin());
-            gridBagConstraints.gridy = ++gridy;
-            panPersonnel.add(chkRandomizeOrigin, gridBagConstraints);
+        chkRandomizeOrigin = new JCheckBox(resourceMap.getString("randomizeOrigin.text"));
+        chkRandomizeOrigin.setSelected(options.randomizeOrigin());
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(chkRandomizeOrigin, gridBagConstraints);
 
-            chkRandomizeDependentsOrigin = new JCheckBox(resourceMap.getString("randomizeDependentsOrigin.text"));
-            chkRandomizeDependentsOrigin.setSelected(options.getRandomizeDependentOrigin());
-            gridBagConstraints.gridy = ++gridy;
-            panPersonnel.add(chkRandomizeDependentsOrigin, gridBagConstraints);
+        chkRandomizeDependentsOrigin = new JCheckBox(resourceMap.getString("randomizeDependentsOrigin.text"));
+        chkRandomizeDependentsOrigin.setSelected(options.getRandomizeDependentOrigin());
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(chkRandomizeDependentsOrigin, gridBagConstraints);
 
-            spnOriginSearchRadius = new JSpinner(new SpinnerNumberModel(options.getOriginSearchRadius(), 10, 250, 10));
-            JPanel panOriginSearchRadius = new JPanel();
-            panOriginSearchRadius.add(spnOriginSearchRadius);
-            panOriginSearchRadius.add(new JLabel(resourceMap.getString("originSearchRadius.text")));
-            gridBagConstraints.gridy = ++gridy;
-            panPersonnel.add(panOriginSearchRadius, gridBagConstraints);
+        spnOriginSearchRadius = new JSpinner(new SpinnerNumberModel(options.getOriginSearchRadius(), 10, 250, 10));
+        JPanel panOriginSearchRadius = new JPanel();
+        panOriginSearchRadius.add(spnOriginSearchRadius);
+        panOriginSearchRadius.add(new JLabel(resourceMap.getString("originSearchRadius.text")));
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(panOriginSearchRadius, gridBagConstraints);
 
-            //Family
-            JPanel panFamily = new JPanel(new GridBagLayout());
-            panFamily.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("FamilyTab.text")));
-            int panFamilyGridY = ++gridy;
+        //Family
+        JPanel panFamily = new JPanel(new GridBagLayout());
+        panFamily.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("FamilyTab.text")));
+        int panFamilyGridY = ++gridy;
 
-            spnMinimumMarriageAge = new JSpinner(new SpinnerNumberModel(options.getMinimumMarriageAge(), 14, null, 1));
-            Dimension dimensionMinimumMarriageAge = spnMinimumMarriageAge.getPreferredSize();
-            dimensionMinimumMarriageAge.width = 40;
-            spnMinimumMarriageAge.setPreferredSize(dimensionMinimumMarriageAge);
-            JPanel panMinimumMarriageAge = new JPanel();
-            panMinimumMarriageAge.add(new JLabel(resourceMap.getString("minimumMarriageAge.text")));
-            panMinimumMarriageAge.setToolTipText(resourceMap.getString("minimumMarriageAge.toolTipText"));
-            panMinimumMarriageAge.add(spnMinimumMarriageAge);
-            gridBagConstraints.gridy = ++gridy;
-            panFamily.add(panMinimumMarriageAge, gridBagConstraints);
+        spnMinimumMarriageAge = new JSpinner(new SpinnerNumberModel(options.getMinimumMarriageAge(), 14, null, 1));
+        Dimension dimensionMinimumMarriageAge = spnMinimumMarriageAge.getPreferredSize();
+        dimensionMinimumMarriageAge.width = 40;
+        spnMinimumMarriageAge.setPreferredSize(dimensionMinimumMarriageAge);
+        JPanel panMinimumMarriageAge = new JPanel();
+        panMinimumMarriageAge.add(new JLabel(resourceMap.getString("minimumMarriageAge.text")));
+        panMinimumMarriageAge.setToolTipText(resourceMap.getString("minimumMarriageAge.toolTipText"));
+        panMinimumMarriageAge.add(spnMinimumMarriageAge);
+        gridBagConstraints.gridy = ++gridy;
+        panFamily.add(panMinimumMarriageAge, gridBagConstraints);
 
-            spnCheckMutualAncestorsDepth = new JSpinner(new SpinnerNumberModel(options.checkMutualAncestorsDepth(), 0, 20, 1));
-            Dimension dimensionCheckMutualAncestorsDepth = spnCheckMutualAncestorsDepth.getPreferredSize();
-            dimensionCheckMutualAncestorsDepth.width = 40;
-            spnCheckMutualAncestorsDepth.setPreferredSize(dimensionCheckMutualAncestorsDepth);
-            JPanel panCheckMutualAncestorsDepth = new JPanel();
-            panCheckMutualAncestorsDepth.add(new JLabel(resourceMap.getString("checkMutualAncestorsDepth.text")));
-            panCheckMutualAncestorsDepth.setToolTipText(resourceMap.getString("checkMutualAncestorsDepth.toolTipText"));
-            panCheckMutualAncestorsDepth.add(spnCheckMutualAncestorsDepth);
-            gridBagConstraints.gridy = ++gridy;
-            panFamily.add(panCheckMutualAncestorsDepth, gridBagConstraints);
+        spnCheckMutualAncestorsDepth = new JSpinner(new SpinnerNumberModel(options.checkMutualAncestorsDepth(), 0, 20, 1));
+        Dimension dimensionCheckMutualAncestorsDepth = spnCheckMutualAncestorsDepth.getPreferredSize();
+        dimensionCheckMutualAncestorsDepth.width = 40;
+        spnCheckMutualAncestorsDepth.setPreferredSize(dimensionCheckMutualAncestorsDepth);
+        JPanel panCheckMutualAncestorsDepth = new JPanel();
+        panCheckMutualAncestorsDepth.add(new JLabel(resourceMap.getString("checkMutualAncestorsDepth.text")));
+        panCheckMutualAncestorsDepth.setToolTipText(resourceMap.getString("checkMutualAncestorsDepth.toolTipText"));
+        panCheckMutualAncestorsDepth.add(spnCheckMutualAncestorsDepth);
+        gridBagConstraints.gridy = ++gridy;
+        panFamily.add(panCheckMutualAncestorsDepth, gridBagConstraints);
 
-            chkUseRandomMarriages = new JCheckBox(resourceMap.getString("useRandomMarriages.text"));
-            chkUseRandomMarriages.setToolTipText(resourceMap.getString("useRandomMarriages.toolTipText"));
-            chkUseRandomMarriages.setSelected(options.useRandomMarriages());
-            gridBagConstraints.gridy = ++gridy;
-            panFamily.add(chkUseRandomMarriages, gridBagConstraints);
+        chkUseRandomMarriages = new JCheckBox(resourceMap.getString("useRandomMarriages.text"));
+        chkUseRandomMarriages.setToolTipText(resourceMap.getString("useRandomMarriages.toolTipText"));
+        chkUseRandomMarriages.setSelected(options.useRandomMarriages());
+        gridBagConstraints.gridy = ++gridy;
+        panFamily.add(chkUseRandomMarriages, gridBagConstraints);
 
-            spnChanceRandomMarriages = new JSpinner(new SpinnerNumberModel(options.getChanceRandomMarriages(), 0, 100, 0.001));
-            Dimension dimensionChanceRandomMarriages = spnChanceRandomMarriages.getPreferredSize();
-            dimensionChanceRandomMarriages.width = 50;
-            spnChanceRandomMarriages.setPreferredSize(dimensionChanceRandomMarriages);
-            JPanel panChanceRandomMarriages = new JPanel();
-            panChanceRandomMarriages.add(new JLabel(resourceMap.getString("chanceRandomMarriages.text")));
-            panChanceRandomMarriages.setToolTipText(resourceMap.getString("chanceRandomMarriages.toolTipText"));
-            panChanceRandomMarriages.add(spnChanceRandomMarriages);
-            gridBagConstraints.gridy = ++gridy;
-            panFamily.add(panChanceRandomMarriages, gridBagConstraints);
+        spnChanceRandomMarriages = new JSpinner(new SpinnerNumberModel(options.getChanceRandomMarriages(), 0, 100, 0.001));
+        Dimension dimensionChanceRandomMarriages = spnChanceRandomMarriages.getPreferredSize();
+        dimensionChanceRandomMarriages.width = 50;
+        spnChanceRandomMarriages.setPreferredSize(dimensionChanceRandomMarriages);
+        JPanel panChanceRandomMarriages = new JPanel();
+        panChanceRandomMarriages.add(new JLabel(resourceMap.getString("chanceRandomMarriages.text")));
+        panChanceRandomMarriages.setToolTipText(resourceMap.getString("chanceRandomMarriages.toolTipText"));
+        panChanceRandomMarriages.add(spnChanceRandomMarriages);
+        gridBagConstraints.gridy = ++gridy;
+        panFamily.add(panChanceRandomMarriages, gridBagConstraints);
 
-            spnMarriageAgeRange = new JSpinner(new SpinnerNumberModel(options.getMarriageAgeRange(), 0, null, 1));
-            Dimension dimensionMarriageAgeRange = spnMarriageAgeRange.getPreferredSize();
-            dimensionMarriageAgeRange.width = 40;
-            spnMarriageAgeRange.setPreferredSize(dimensionMarriageAgeRange);
-            JPanel panMarriageAgeRange = new JPanel();
-            panMarriageAgeRange.add(new JLabel(resourceMap.getString("marriageAgeRange.text")));
-            panMarriageAgeRange.setToolTipText(resourceMap.getString("marriageAgeRange.toolTipText"));
-            panMarriageAgeRange.add(spnMarriageAgeRange);
-            gridBagConstraints.gridy = ++gridy;
-            panFamily.add(panMarriageAgeRange, gridBagConstraints);
+        spnMarriageAgeRange = new JSpinner(new SpinnerNumberModel(options.getMarriageAgeRange(), 0, null, 1));
+        Dimension dimensionMarriageAgeRange = spnMarriageAgeRange.getPreferredSize();
+        dimensionMarriageAgeRange.width = 40;
+        spnMarriageAgeRange.setPreferredSize(dimensionMarriageAgeRange);
+        JPanel panMarriageAgeRange = new JPanel();
+        panMarriageAgeRange.add(new JLabel(resourceMap.getString("marriageAgeRange.text")));
+        panMarriageAgeRange.setToolTipText(resourceMap.getString("marriageAgeRange.toolTipText"));
+        panMarriageAgeRange.add(spnMarriageAgeRange);
+        gridBagConstraints.gridy = ++gridy;
+        panFamily.add(panMarriageAgeRange, gridBagConstraints);
 
-            JPanel panRandomMarriageSurnameWeights = new JPanel(new GridLayout((int) Math.ceil(Person.NUM_SURNAME / 3.0), 3));
-            panRandomMarriageSurnameWeights.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("randomMarriageSurnameWeights.text")));
-            panRandomMarriageSurnameWeights.setToolTipText(resourceMap.getString("randomMarriageSurnameWeights.toolTipText"));
-            spnRandomMarriageSurnameWeights = new JSpinner[Person.NUM_SURNAME];
-            JSpinner spnRandomMarriageSurnameWeight;
-            JPanel panRandomMarriageSurnameWeight;
-            for (int i = 0; i < Person.NUM_SURNAME; i++) {
-                spnRandomMarriageSurnameWeight = new JSpinner(new SpinnerNumberModel((options.getRandomMarriageSurnameWeights(i) / 10.0), 0, 100, 0.1));
-                panRandomMarriageSurnameWeight = new JPanel();
-                panRandomMarriageSurnameWeight.add(spnRandomMarriageSurnameWeight);
-                panRandomMarriageSurnameWeight.add(new JLabel(Person.SURNAME_TYPE_NAMES[i]));
-                panRandomMarriageSurnameWeights.add(panRandomMarriageSurnameWeight);
-                spnRandomMarriageSurnameWeights[i] = spnRandomMarriageSurnameWeight;
-            }
-            gridBagConstraints.gridy = ++gridy;
-            panFamily.add(panRandomMarriageSurnameWeights, gridBagConstraints);
-
-            chkUseRandomSameSexMarriages = new JCheckBox(resourceMap.getString("useRandomSameSexMarriages.text"));
-            chkUseRandomSameSexMarriages.setToolTipText(resourceMap.getString("useRandomSameSexMarriages.toolTipText"));
-            chkUseRandomSameSexMarriages.setSelected(options.useRandomSameSexMarriages());
-            gridBagConstraints.gridy = ++gridy;
-            panFamily.add(chkUseRandomSameSexMarriages, gridBagConstraints);
-
-            spnChanceRandomSameSexMarriages = new JSpinner(new SpinnerNumberModel(options.getChanceRandomSameSexMarriages(), 0, 100, 0.001));
-            Dimension dimensionChanceRandomSameSexMarriages = spnChanceRandomSameSexMarriages.getPreferredSize();
-            dimensionChanceRandomSameSexMarriages.width = 50;
-            spnChanceRandomSameSexMarriages.setPreferredSize(dimensionChanceRandomSameSexMarriages);
-            JPanel panChanceRandomSameSexMarriages = new JPanel();
-            panChanceRandomSameSexMarriages.add(new JLabel(resourceMap.getString("chanceRandomSameSexMarriages.text")));
-            panChanceRandomSameSexMarriages.setToolTipText(resourceMap.getString("chanceRandomSameSexMarriages.toolTipText"));
-            panChanceRandomSameSexMarriages.add(spnChanceRandomSameSexMarriages);
-            gridBagConstraints.gridy = ++gridy;
-            panFamily.add(panChanceRandomSameSexMarriages, gridBagConstraints);
-
-            chkUseUnofficialProcreation = new JCheckBox(resourceMap.getString("useUnofficialProcreation.text"));
-            chkUseUnofficialProcreation.setSelected(options.useUnofficialProcreation());
-            chkUseUnofficialProcreation.setToolTipText(resourceMap.getString("useUnofficialProcreation.toolTipText"));
-            gridBagConstraints.gridy = ++gridy;
-            panFamily.add(chkUseUnofficialProcreation, gridBagConstraints);
-
-            spnChanceProcreation = new JSpinner(new SpinnerNumberModel(options.getChanceProcreation(), 0, 100, 0.001));
-            Dimension dimensionChanceProcreation = spnChanceProcreation.getPreferredSize();
-            dimensionChanceProcreation.width = 50;
-            spnChanceProcreation.setPreferredSize(dimensionChanceProcreation);
-            JPanel panChanceProcreation = new JPanel();
-            panChanceProcreation.add(new JLabel(resourceMap.getString("chanceProcreation.text")));
-            panChanceProcreation.setToolTipText(resourceMap.getString("chanceProcreation.toolTipText"));
-            panChanceProcreation.add(spnChanceProcreation);
-            gridBagConstraints.gridy = ++gridy;
-            panFamily.add(panChanceProcreation, gridBagConstraints);
-
-            chkUseUnofficialProcreationNoRelationship = new JCheckBox(resourceMap.getString("useUnofficialProcreationNoRelationship.text"));
-            chkUseUnofficialProcreationNoRelationship.setToolTipText(resourceMap.getString("useUnofficialProcreationNoRelationship.toolTipText"));
-            chkUseUnofficialProcreationNoRelationship.setSelected(options.useUnofficialProcreationNoRelationship());
-            gridBagConstraints.gridy = ++gridy;
-            panFamily.add(chkUseUnofficialProcreationNoRelationship, gridBagConstraints);
-
-            spnChanceProcreationNoRelationship = new JSpinner(new SpinnerNumberModel(options.getChanceProcreationNoRelationship(), 0, 100, 0.001));
-            Dimension dimensionChanceProcreationNoRelationship = spnChanceProcreationNoRelationship.getPreferredSize();
-            dimensionChanceProcreationNoRelationship.width = 50;
-            spnChanceProcreationNoRelationship.setPreferredSize(dimensionChanceProcreationNoRelationship);
-            JPanel panChanceProcreationNoRelationship = new JPanel();
-            panChanceProcreationNoRelationship.add(new JLabel(resourceMap.getString("chanceProcreationNoRelationship.text")));
-            panChanceProcreationNoRelationship.setToolTipText(resourceMap.getString("chanceProcreationNoRelationship.toolTipText"));
-            panChanceProcreationNoRelationship.add(spnChanceProcreationNoRelationship);
-            gridBagConstraints.gridy = ++gridy;
-            panFamily.add(panChanceProcreationNoRelationship, gridBagConstraints);
-
-            chkDisplayTrueDueDate = new JCheckBox(resourceMap.getString("displayTrueDueDate.text"));
-            chkDisplayTrueDueDate.setToolTipText(resourceMap.getString("displayTrueDueDate.toolTipText"));
-            chkDisplayTrueDueDate.setSelected(options.getDisplayTrueDueDate());
-            gridBagConstraints.gridy = ++gridy;
-            panFamily.add(chkDisplayTrueDueDate, gridBagConstraints);
-
-            chkLogConception = new JCheckBox(resourceMap.getString("logConception.text"));
-            chkLogConception.setSelected(options.logConception());
-            gridBagConstraints.gridy = ++gridy;
-            panFamily.add(chkLogConception, gridBagConstraints);
-
-            DefaultComboBoxModel<String> babySurnameStyleModel = new DefaultComboBoxModel<>();
-            babySurnameStyleModel.addElement(resourceMap.getString("babySurnameStyle.Mother"));
-            babySurnameStyleModel.addElement(resourceMap.getString("babySurnameStyle.Father"));
-            comboBabySurnameStyle = new JComboBox<>(babySurnameStyleModel);
-            comboBabySurnameStyle.setSelectedIndex(options.getBabySurnameStyle());
-            JPanel pnlBabySurnameStyle = new JPanel();
-            pnlBabySurnameStyle.add(new JLabel(resourceMap.getString("babySurnameStyle.text")));
-            pnlBabySurnameStyle.setToolTipText(resourceMap.getString("babySurnameStyle.toolTipText"));
-            pnlBabySurnameStyle.add(comboBabySurnameStyle);
-            gridBagConstraints.gridy = ++gridy;
-            panFamily.add(pnlBabySurnameStyle, gridBagConstraints);
-
-            chkUseParentage = new JCheckBox(resourceMap.getString("useParentage.text"));
-            chkUseParentage.setSelected(options.useParentage());
-            gridBagConstraints.gridy = ++gridy;
-            panFamily.add(chkUseParentage, gridBagConstraints);
-
-            DefaultComboBoxModel<String> familyLevelStatusModel = new DefaultComboBoxModel<>();
-            familyLevelStatusModel.addElement(resourceMap.getString("displayFamilyLevel.ParentsChildren"));
-            familyLevelStatusModel.addElement(resourceMap.getString("displayFamilyLevel.GrandparentsGrandchildren"));
-            familyLevelStatusModel.addElement(resourceMap.getString("displayFamilyLevel.AuntsUnclesCousins"));
-            comboDisplayFamilyLevel = new JComboBox<>(familyLevelStatusModel);
-            comboDisplayFamilyLevel.setSelectedIndex(options.displayFamilyLevel());
-            JPanel pnlDisplayFamilyLevel = new JPanel();
-            pnlDisplayFamilyLevel.add(new JLabel(resourceMap.getString("displayFamilyLevel.text")));
-            pnlDisplayFamilyLevel.setToolTipText(resourceMap.getString("displayFamilyLevel.toolTipText"));
-            pnlDisplayFamilyLevel.add(comboDisplayFamilyLevel);
-            gridBagConstraints.gridy = ++gridy;
-            panFamily.add(pnlDisplayFamilyLevel, gridBagConstraints);
-
-            chkUseRandomDeaths = new JCheckBox(resourceMap.getString("useRandomDeaths.text"));
-            chkUseRandomDeaths.setToolTipText(resourceMap.getString("useRandomDeaths.toolTipText"));
-            chkUseRandomDeaths.setSelected(options.useRandomDeaths());
-            gridBagConstraints.gridy = ++gridy;
-            panFamily.add(chkUseRandomDeaths, gridBagConstraints);
-
-            chkKeepMarriedNameUponSpouseDeath = new JCheckBox(resourceMap.getString("keepMarriedNameUponSpouseDeath.text"));
-            chkKeepMarriedNameUponSpouseDeath.setSelected(options.getKeepMarriedNameUponSpouseDeath());
-            gridBagConstraints.gridy = ++gridy;
-            panFamily.add(chkKeepMarriedNameUponSpouseDeath, gridBagConstraints);
-
-            gridBagConstraints.gridy = panFamilyGridY;
-            panPersonnel.add(panFamily, gridBagConstraints);
-
-            //Salary
-            JPanel panSalary = new JPanel(new GridBagLayout());
-            panSalary.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("SalaryTab.text")));
-
-            JPanel panMultiplier = new JPanel(new GridLayout(1, 3));
-            panMultiplier.setBorder(BorderFactory.createTitledBorder("Multipliers"));
-            spnSalaryCommission = new JSpinner(new SpinnerNumberModel(options.getSalaryCommissionMultiplier(), 0, 10, 0.05));
-            ((JSpinner.DefaultEditor) spnSalaryCommission.getEditor()).getTextField().setEditable(false);
-            JPanel panSalaryCommission = new JPanel();
-            panSalaryCommission.add(spnSalaryCommission);
-            panSalaryCommission.add(new JLabel("Commissioned"));
-            panMultiplier.add(panSalaryCommission);
-
-            spnSalaryEnlisted = new JSpinner(new SpinnerNumberModel(options.getSalaryEnlistedMultiplier(), 0, 10, 0.05));
-            ((JSpinner.DefaultEditor) spnSalaryEnlisted.getEditor()).getTextField().setEditable(false);
-            JPanel panSalaryEnlisted = new JPanel();
-            panSalaryEnlisted.add(spnSalaryEnlisted);
-            panSalaryEnlisted.add(new JLabel("Enlisted"));
-            panMultiplier.add(panSalaryEnlisted);
-
-            spnSalaryAntiMek = new JSpinner(new SpinnerNumberModel(options.getSalaryAntiMekMultiplier(), 0, 10, 0.05));
-            ((JSpinner.DefaultEditor) spnSalaryAntiMek.getEditor()).getTextField().setEditable(false);
-            JPanel panSalaryAntiMek = new JPanel();
-            panSalaryAntiMek.add(spnSalaryAntiMek);
-            panSalaryAntiMek.add(new JLabel("Anti-Mek"));
-            panMultiplier.add(panSalaryAntiMek);
-
-            gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = 0;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.weighty = 0.0;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-            panSalary.add(panMultiplier, gridBagConstraints);
-
-            JPanel panXpMultiplier = new JPanel(new GridLayout(2, 3));
-            panXpMultiplier.setBorder(BorderFactory.createTitledBorder("Experience Multipliers"));
-            spnSalaryXp = new JSpinner[5];
-            JSpinner spnXpSalary;
-            JPanel panXpSalary;
-            for (int i = 0; i < 5; i++) {
-                spnXpSalary = new JSpinner(new SpinnerNumberModel(options.getSalaryXpMultiplier(i), 0, 10, 0.05));
-                ((JSpinner.DefaultEditor) spnXpSalary.getEditor()).getTextField().setEditable(false);
-                panXpSalary = new JPanel();
-                panXpSalary.add(spnXpSalary);
-                panXpSalary.add(new JLabel(SkillType.getExperienceLevelName(i)));
-                panXpMultiplier.add(panXpSalary);
-                spnSalaryXp[i] = spnXpSalary;
-            }
-            gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = 1;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.weighty = 0.0;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-            panSalary.add(panXpMultiplier, gridBagConstraints);
-
-            JPanel panAllTypes = new JPanel(new GridLayout(Person.T_NUM / 2, 2));
-            JMoneyTextField txtType;
-            JPanel panType;
-            // TODO: use JFormattedTextField with Numeric formatter
-            txtSalaryBase = new JMoneyTextField[Person.T_NUM];
-            for (int i = 1; i < Person.T_NUM; i++) {
-                txtType = new JMoneyTextField();
-                txtType.setMoney(options.getBaseSalary(i));
-                txtType.setPreferredSize(new Dimension(75, 20));
-                panType = new JPanel(new GridBagLayout());
-                gridBagConstraints = new java.awt.GridBagConstraints();
-                gridBagConstraints.gridx = 0;
-                gridBagConstraints.gridy = 0;
-                gridBagConstraints.weightx = 1.0;
-                gridBagConstraints.weighty = 0.0;
-                gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-                gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-                panType.add(new JLabel(Person.getRoleDesc(i, false)), gridBagConstraints);
-                gridBagConstraints = new java.awt.GridBagConstraints();
-                gridBagConstraints.gridx = 1;
-                gridBagConstraints.gridy = 0;
-                gridBagConstraints.weightx = 0.0;
-                gridBagConstraints.weighty = 0.0;
-                gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-                gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-                panType.add(txtType, gridBagConstraints);
-                txtSalaryBase[i] = txtType;
-                panAllTypes.add(panType);
-            }
-            JScrollPane scrSalaryBase = new JScrollPane(panAllTypes);
-            scrSalaryBase.setBorder(BorderFactory.createTitledBorder("Base Salaries"));
-            scrSalaryBase.setOpaque(false);
-            scrSalaryBase.setPreferredSize(new Dimension(200, 200));
-            gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = 2;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.weighty = 1.0;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-            panSalary.add(scrSalaryBase, gridBagConstraints);
-
-            gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 3;
-            gridBagConstraints.gridy = 0;
-            gridBagConstraints.gridheight = 23;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.weighty = 1.0;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-            panPersonnel.add(panSalary, gridBagConstraints);
-
-            JScrollPane scrollPersonnel = new JScrollPane(panPersonnel);
-            scrollPersonnel.setPreferredSize(new java.awt.Dimension(500, 400));
-
-            tabOptions.addTab(resourceMap.getString("panPersonnel.TabConstraints.tabTitle"), scrollPersonnel);
-        } catch (Exception e) {
-            MekHQ.getLogger().error(getClass(), "PersonnelTab", e);
+        JPanel panRandomMarriageSurnameWeights = new JPanel(new GridLayout((int) Math.ceil(Person.NUM_SURNAME / 3.0), 3));
+        panRandomMarriageSurnameWeights.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("randomMarriageSurnameWeights.text")));
+        panRandomMarriageSurnameWeights.setToolTipText(resourceMap.getString("randomMarriageSurnameWeights.toolTipText"));
+        spnRandomMarriageSurnameWeights = new JSpinner[Person.NUM_SURNAME];
+        JSpinner spnRandomMarriageSurnameWeight;
+        JPanel panRandomMarriageSurnameWeight;
+        for (int i = 0; i < Person.NUM_SURNAME; i++) {
+            spnRandomMarriageSurnameWeight = new JSpinner(new SpinnerNumberModel((options.getRandomMarriageSurnameWeights(i) / 10.0), 0, 100, 0.1));
+            panRandomMarriageSurnameWeight = new JPanel();
+            panRandomMarriageSurnameWeight.add(spnRandomMarriageSurnameWeight);
+            panRandomMarriageSurnameWeight.add(new JLabel(Person.SURNAME_TYPE_NAMES[i]));
+            panRandomMarriageSurnameWeights.add(panRandomMarriageSurnameWeight);
+            spnRandomMarriageSurnameWeights[i] = spnRandomMarriageSurnameWeight;
         }
+        gridBagConstraints.gridy = ++gridy;
+        panFamily.add(panRandomMarriageSurnameWeights, gridBagConstraints);
+
+        chkUseRandomSameSexMarriages = new JCheckBox(resourceMap.getString("useRandomSameSexMarriages.text"));
+        chkUseRandomSameSexMarriages.setToolTipText(resourceMap.getString("useRandomSameSexMarriages.toolTipText"));
+        chkUseRandomSameSexMarriages.setSelected(options.useRandomSameSexMarriages());
+        gridBagConstraints.gridy = ++gridy;
+        panFamily.add(chkUseRandomSameSexMarriages, gridBagConstraints);
+
+        spnChanceRandomSameSexMarriages = new JSpinner(new SpinnerNumberModel(options.getChanceRandomSameSexMarriages(), 0, 100, 0.001));
+        Dimension dimensionChanceRandomSameSexMarriages = spnChanceRandomSameSexMarriages.getPreferredSize();
+        dimensionChanceRandomSameSexMarriages.width = 50;
+        spnChanceRandomSameSexMarriages.setPreferredSize(dimensionChanceRandomSameSexMarriages);
+        JPanel panChanceRandomSameSexMarriages = new JPanel();
+        panChanceRandomSameSexMarriages.add(new JLabel(resourceMap.getString("chanceRandomSameSexMarriages.text")));
+        panChanceRandomSameSexMarriages.setToolTipText(resourceMap.getString("chanceRandomSameSexMarriages.toolTipText"));
+        panChanceRandomSameSexMarriages.add(spnChanceRandomSameSexMarriages);
+        gridBagConstraints.gridy = ++gridy;
+        panFamily.add(panChanceRandomSameSexMarriages, gridBagConstraints);
+
+        chkUseUnofficialProcreation = new JCheckBox(resourceMap.getString("useUnofficialProcreation.text"));
+        chkUseUnofficialProcreation.setSelected(options.useUnofficialProcreation());
+        chkUseUnofficialProcreation.setToolTipText(resourceMap.getString("useUnofficialProcreation.toolTipText"));
+        gridBagConstraints.gridy = ++gridy;
+        panFamily.add(chkUseUnofficialProcreation, gridBagConstraints);
+
+        spnChanceProcreation = new JSpinner(new SpinnerNumberModel(options.getChanceProcreation(), 0, 100, 0.001));
+        Dimension dimensionChanceProcreation = spnChanceProcreation.getPreferredSize();
+        dimensionChanceProcreation.width = 50;
+        spnChanceProcreation.setPreferredSize(dimensionChanceProcreation);
+        JPanel panChanceProcreation = new JPanel();
+        panChanceProcreation.add(new JLabel(resourceMap.getString("chanceProcreation.text")));
+        panChanceProcreation.setToolTipText(resourceMap.getString("chanceProcreation.toolTipText"));
+        panChanceProcreation.add(spnChanceProcreation);
+        gridBagConstraints.gridy = ++gridy;
+        panFamily.add(panChanceProcreation, gridBagConstraints);
+
+        chkUseUnofficialProcreationNoRelationship = new JCheckBox(resourceMap.getString("useUnofficialProcreationNoRelationship.text"));
+        chkUseUnofficialProcreationNoRelationship.setToolTipText(resourceMap.getString("useUnofficialProcreationNoRelationship.toolTipText"));
+        chkUseUnofficialProcreationNoRelationship.setSelected(options.useUnofficialProcreationNoRelationship());
+        gridBagConstraints.gridy = ++gridy;
+        panFamily.add(chkUseUnofficialProcreationNoRelationship, gridBagConstraints);
+
+        spnChanceProcreationNoRelationship = new JSpinner(new SpinnerNumberModel(options.getChanceProcreationNoRelationship(), 0, 100, 0.001));
+        Dimension dimensionChanceProcreationNoRelationship = spnChanceProcreationNoRelationship.getPreferredSize();
+        dimensionChanceProcreationNoRelationship.width = 50;
+        spnChanceProcreationNoRelationship.setPreferredSize(dimensionChanceProcreationNoRelationship);
+        JPanel panChanceProcreationNoRelationship = new JPanel();
+        panChanceProcreationNoRelationship.add(new JLabel(resourceMap.getString("chanceProcreationNoRelationship.text")));
+        panChanceProcreationNoRelationship.setToolTipText(resourceMap.getString("chanceProcreationNoRelationship.toolTipText"));
+        panChanceProcreationNoRelationship.add(spnChanceProcreationNoRelationship);
+        gridBagConstraints.gridy = ++gridy;
+        panFamily.add(panChanceProcreationNoRelationship, gridBagConstraints);
+
+        chkDisplayTrueDueDate = new JCheckBox(resourceMap.getString("displayTrueDueDate.text"));
+        chkDisplayTrueDueDate.setToolTipText(resourceMap.getString("displayTrueDueDate.toolTipText"));
+        chkDisplayTrueDueDate.setSelected(options.getDisplayTrueDueDate());
+        gridBagConstraints.gridy = ++gridy;
+        panFamily.add(chkDisplayTrueDueDate, gridBagConstraints);
+
+        chkLogConception = new JCheckBox(resourceMap.getString("logConception.text"));
+        chkLogConception.setSelected(options.logConception());
+        gridBagConstraints.gridy = ++gridy;
+        panFamily.add(chkLogConception, gridBagConstraints);
+
+        DefaultComboBoxModel<String> babySurnameStyleModel = new DefaultComboBoxModel<>();
+        babySurnameStyleModel.addElement(resourceMap.getString("babySurnameStyle.Mother"));
+        babySurnameStyleModel.addElement(resourceMap.getString("babySurnameStyle.Father"));
+        comboBabySurnameStyle = new JComboBox<>(babySurnameStyleModel);
+        comboBabySurnameStyle.setSelectedIndex(options.getBabySurnameStyle());
+        JPanel pnlBabySurnameStyle = new JPanel();
+        pnlBabySurnameStyle.add(new JLabel(resourceMap.getString("babySurnameStyle.text")));
+        pnlBabySurnameStyle.setToolTipText(resourceMap.getString("babySurnameStyle.toolTipText"));
+        pnlBabySurnameStyle.add(comboBabySurnameStyle);
+        gridBagConstraints.gridy = ++gridy;
+        panFamily.add(pnlBabySurnameStyle, gridBagConstraints);
+
+        chkUseParentage = new JCheckBox(resourceMap.getString("useParentage.text"));
+        chkUseParentage.setSelected(options.useParentage());
+        gridBagConstraints.gridy = ++gridy;
+        panFamily.add(chkUseParentage, gridBagConstraints);
+
+        DefaultComboBoxModel<String> familyLevelStatusModel = new DefaultComboBoxModel<>();
+        familyLevelStatusModel.addElement(resourceMap.getString("displayFamilyLevel.ParentsChildren"));
+        familyLevelStatusModel.addElement(resourceMap.getString("displayFamilyLevel.GrandparentsGrandchildren"));
+        familyLevelStatusModel.addElement(resourceMap.getString("displayFamilyLevel.AuntsUnclesCousins"));
+        comboDisplayFamilyLevel = new JComboBox<>(familyLevelStatusModel);
+        comboDisplayFamilyLevel.setSelectedIndex(options.displayFamilyLevel());
+        JPanel pnlDisplayFamilyLevel = new JPanel();
+        pnlDisplayFamilyLevel.add(new JLabel(resourceMap.getString("displayFamilyLevel.text")));
+        pnlDisplayFamilyLevel.setToolTipText(resourceMap.getString("displayFamilyLevel.toolTipText"));
+        pnlDisplayFamilyLevel.add(comboDisplayFamilyLevel);
+        gridBagConstraints.gridy = ++gridy;
+        panFamily.add(pnlDisplayFamilyLevel, gridBagConstraints);
+
+        chkUseRandomDeaths = new JCheckBox(resourceMap.getString("useRandomDeaths.text"));
+        chkUseRandomDeaths.setToolTipText(resourceMap.getString("useRandomDeaths.toolTipText"));
+        chkUseRandomDeaths.setSelected(options.useRandomDeaths());
+        gridBagConstraints.gridy = ++gridy;
+        panFamily.add(chkUseRandomDeaths, gridBagConstraints);
+
+        chkKeepMarriedNameUponSpouseDeath = new JCheckBox(resourceMap.getString("keepMarriedNameUponSpouseDeath.text"));
+        chkKeepMarriedNameUponSpouseDeath.setSelected(options.getKeepMarriedNameUponSpouseDeath());
+        gridBagConstraints.gridy = ++gridy;
+        panFamily.add(chkKeepMarriedNameUponSpouseDeath, gridBagConstraints);
+
+        gridBagConstraints.gridy = panFamilyGridY;
+        panPersonnel.add(panFamily, gridBagConstraints);
+
+        //Salary
+        JPanel panSalary = new JPanel(new GridBagLayout());
+        panSalary.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("SalaryTab.text")));
+
+        JPanel panMultiplier = new JPanel(new GridLayout(1, 3));
+        panMultiplier.setBorder(BorderFactory.createTitledBorder("Multipliers"));
+        spnSalaryCommission = new JSpinner(new SpinnerNumberModel(options.getSalaryCommissionMultiplier(), 0, 10, 0.05));
+        ((JSpinner.DefaultEditor) spnSalaryCommission.getEditor()).getTextField().setEditable(false);
+        JPanel panSalaryCommission = new JPanel();
+        panSalaryCommission.add(spnSalaryCommission);
+        panSalaryCommission.add(new JLabel("Commissioned"));
+        panMultiplier.add(panSalaryCommission);
+
+        spnSalaryEnlisted = new JSpinner(new SpinnerNumberModel(options.getSalaryEnlistedMultiplier(), 0, 10, 0.05));
+        ((JSpinner.DefaultEditor) spnSalaryEnlisted.getEditor()).getTextField().setEditable(false);
+        JPanel panSalaryEnlisted = new JPanel();
+        panSalaryEnlisted.add(spnSalaryEnlisted);
+        panSalaryEnlisted.add(new JLabel("Enlisted"));
+        panMultiplier.add(panSalaryEnlisted);
+
+        spnSalaryAntiMek = new JSpinner(new SpinnerNumberModel(options.getSalaryAntiMekMultiplier(), 0, 10, 0.05));
+        ((JSpinner.DefaultEditor) spnSalaryAntiMek.getEditor()).getTextField().setEditable(false);
+        JPanel panSalaryAntiMek = new JPanel();
+        panSalaryAntiMek.add(spnSalaryAntiMek);
+        panSalaryAntiMek.add(new JLabel("Anti-Mek"));
+        panMultiplier.add(panSalaryAntiMek);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSalary.add(panMultiplier, gridBagConstraints);
+
+        JPanel panXpMultiplier = new JPanel(new GridLayout(2, 3));
+        panXpMultiplier.setBorder(BorderFactory.createTitledBorder("Experience Multipliers"));
+        spnSalaryXp = new JSpinner[5];
+        JSpinner spnXpSalary;
+        JPanel panXpSalary;
+        for (int i = 0; i < 5; i++) {
+            spnXpSalary = new JSpinner(new SpinnerNumberModel(options.getSalaryXpMultiplier(i), 0, 10, 0.05));
+            ((JSpinner.DefaultEditor) spnXpSalary.getEditor()).getTextField().setEditable(false);
+            panXpSalary = new JPanel();
+            panXpSalary.add(spnXpSalary);
+            panXpSalary.add(new JLabel(SkillType.getExperienceLevelName(i)));
+            panXpMultiplier.add(panXpSalary);
+            spnSalaryXp[i] = spnXpSalary;
+        }
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSalary.add(panXpMultiplier, gridBagConstraints);
+
+        JPanel panAllTypes = new JPanel(new GridLayout(Person.T_NUM / 2, 2));
+        JMoneyTextField txtType;
+        JPanel panType;
+        // TODO: use JFormattedTextField with Numeric formatter
+        txtSalaryBase = new JMoneyTextField[Person.T_NUM];
+        for (int i = 1; i < Person.T_NUM; i++) {
+            txtType = new JMoneyTextField();
+            txtType.setMoney(options.getBaseSalary(i));
+            txtType.setPreferredSize(new Dimension(75, 20));
+            panType = new JPanel(new GridBagLayout());
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 0;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 0.0;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            panType.add(new JLabel(Person.getRoleDesc(i, false)), gridBagConstraints);
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = 0;
+            gridBagConstraints.weightx = 0.0;
+            gridBagConstraints.weighty = 0.0;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            panType.add(txtType, gridBagConstraints);
+            txtSalaryBase[i] = txtType;
+            panAllTypes.add(panType);
+        }
+        JScrollPane scrSalaryBase = new JScrollPane(panAllTypes);
+        scrSalaryBase.setBorder(BorderFactory.createTitledBorder("Base Salaries"));
+        scrSalaryBase.setOpaque(false);
+        scrSalaryBase.setPreferredSize(new Dimension(200, 200));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSalary.add(scrSalaryBase, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridheight = 23;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panPersonnel.add(panSalary, gridBagConstraints);
+
+        JScrollPane scrollPersonnel = new JScrollPane(panPersonnel);
+        scrollPersonnel.setPreferredSize(new java.awt.Dimension(500, 400));
+
+        tabOptions.addTab(resourceMap.getString("panPersonnel.TabConstraints.tabTitle"), scrollPersonnel);
         //endregion Personnel Tab
 
         //region Finances Tab
@@ -4847,7 +4843,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setSalaryCommissionMultiplier((Double) spnSalaryCommission.getModel().getValue());
         options.setSalaryEnlistedMultiplier((Double) spnSalaryEnlisted.getModel().getValue());
         options.setSalaryAntiMekMultiplier((Double) spnSalaryAntiMek.getModel().getValue());
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < spnSalaryXp.length; i++) {
             options.setSalaryXpMultiplier((Double) spnSalaryXp[i].getModel().getValue(), i);
         }
         for (int i = 1; i < Person.T_NUM; i++) {
