@@ -61,10 +61,10 @@ public class ContractSummaryPanel extends JPanel {
     private JPanel mainPanel;
 
     private JTextField txtName;
-    private JTextArea txtCommand;
-    private JTextArea txtTransport;
-    private JTextArea txtStraightSupport;
-    private JTextArea txtBattleLossComp;
+    private JLabel txtCommand;
+    private JLabel txtTransport;
+    private JLabel txtStraightSupport;
+    private JLabel txtBattleLossComp;
 
     private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractMarketDialog",
             new EncodeControl());
@@ -153,11 +153,8 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsA.gridy = ++y;
         mainPanel.add(lblEmployer, gridBagConstraintsA);
 
-        JTextArea txtEmployer = new JTextArea(contract.getEmployer());
+        JLabel txtEmployer = new JLabel(contract.getEmployer());
         txtEmployer.setName("txtEmployer");
-        txtEmployer.setEditable(false);
-        txtEmployer.setLineWrap(true);
-        txtEmployer.setWrapStyleWord(true);
         gridBagConstraintsB.gridy = y;
         mainPanel.add(txtEmployer, gridBagConstraintsB);
 
@@ -167,11 +164,8 @@ public class ContractSummaryPanel extends JPanel {
             gridBagConstraintsA.gridy = ++y;
             mainPanel.add(lblEnemy, gridBagConstraintsA);
 
-            JTextArea txtEnemy = new JTextArea(((AtBContract) contract).getEnemyName(campaign.getGameYear()));
+            JLabel txtEnemy = new JLabel(((AtBContract) contract).getEnemyName(campaign.getGameYear()));
             txtEnemy.setName("txtEnemy");
-            txtEnemy.setEditable(false);
-            txtEnemy.setLineWrap(true);
-            txtEnemy.setWrapStyleWord(true);
             gridBagConstraintsB.gridy = y;
             mainPanel.add(txtEnemy, gridBagConstraintsB);
         }
@@ -181,11 +175,8 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsA.gridy = ++y;
         mainPanel.add(lblMissionType, gridBagConstraintsA);
 
-        JTextArea txtMissionType = new JTextArea(contract.getType());
+        JLabel txtMissionType = new JLabel(contract.getType());
         txtMissionType.setName("txtMissionType");
-        txtMissionType.setEditable(false);
-        txtMissionType.setLineWrap(true);
-        txtMissionType.setWrapStyleWord(true);
         gridBagConstraintsB.gridy = y;
         mainPanel.add(txtMissionType, gridBagConstraintsB);
 
@@ -224,11 +215,8 @@ public class ContractSummaryPanel extends JPanel {
                 days = 0;
                 jumps = 0;
             }
-            JTextArea txtDistance = new JTextArea(days + "(" + jumps + ")");
+            JLabel txtDistance = new JLabel(days + "(" + jumps + ")");
             txtDistance.setName("txtDistance");
-            txtDistance.setEditable(false);
-            txtDistance.setLineWrap(true);
-            txtDistance.setWrapStyleWord(true);
             gridBagConstraintsB.gridy = y;
             mainPanel.add(txtDistance, gridBagConstraintsB);
         }
@@ -239,12 +227,9 @@ public class ContractSummaryPanel extends JPanel {
         mainPanel.add(lblAllyRating, gridBagConstraintsA);
 
         if (contract instanceof AtBContract) {
-            JTextArea txtAllyRating = new JTextArea(skillNames[((AtBContract) contract).getAllySkill()]
+            JLabel txtAllyRating = new JLabel(skillNames[((AtBContract) contract).getAllySkill()]
                     + "/" + ratingNames[((AtBContract) contract).getAllyQuality()]);
             txtAllyRating.setName("txtAllyRating");
-            txtAllyRating.setEditable(false);
-            txtAllyRating.setLineWrap(true);
-            txtAllyRating.setWrapStyleWord(true);
             gridBagConstraintsB.gridy = y;
             mainPanel.add(txtAllyRating, gridBagConstraintsB);
 
@@ -253,12 +238,9 @@ public class ContractSummaryPanel extends JPanel {
             gridBagConstraintsA.gridy = ++y;
             mainPanel.add(lblEnemyRating, gridBagConstraintsA);
 
-            JTextArea txtEnemyRating = new JTextArea(skillNames[((AtBContract) contract).getEnemySkill()]
+            JLabel txtEnemyRating = new JLabel(skillNames[((AtBContract) contract).getEnemySkill()]
                     + "/" + ratingNames[((AtBContract) contract).getEnemyQuality()]);
             txtEnemyRating.setName("txtEnemyRating");
-            txtEnemyRating.setEditable(false);
-            txtEnemyRating.setLineWrap(true);
-            txtEnemyRating.setWrapStyleWord(true);
             gridBagConstraintsB.gridy = y;
             mainPanel.add(txtEnemyRating, gridBagConstraintsB);
         }
@@ -268,11 +250,8 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsA.gridy = ++y;
         mainPanel.add(lblStartDate, gridBagConstraintsA);
 
-        JTextArea txtStartDate = new JTextArea(shortDateFormat.format(contract.getStartDate()));
+        JLabel txtStartDate = new JLabel(shortDateFormat.format(contract.getStartDate()));
         txtStartDate.setName("txtStartDate");
-        txtStartDate.setEditable(false);
-        txtStartDate.setLineWrap(true);
-        txtStartDate.setWrapStyleWord(true);
         gridBagConstraintsB.gridy = y;
         mainPanel.add(txtStartDate, gridBagConstraintsB);
 
@@ -281,11 +260,8 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsA.gridy = ++y;
         mainPanel.add(lblLength, gridBagConstraintsA);
 
-        JTextArea txtLength = new JTextArea(Integer.toString(contract.getLength()));
+        JLabel txtLength = new JLabel(Integer.toString(contract.getLength()));
         txtLength.setName("txtLength");
-        txtLength.setEditable(false);
-        txtLength.setLineWrap(true);
-        txtLength.setWrapStyleWord(true);
         gridBagConstraintsB.gridy = y;
         mainPanel.add(txtLength, gridBagConstraintsB);
 
@@ -294,11 +270,8 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsA.gridy = ++y;
         mainPanel.add(lblOverhead, gridBagConstraintsA);
 
-        JTextArea txtOverhead = new JTextArea(Contract.getOverheadCompName(contract.getOverheadComp()));
+        JLabel txtOverhead = new JLabel(Contract.getOverheadCompName(contract.getOverheadComp()));
         txtOverhead.setName("txtOverhead");
-        txtOverhead.setEditable(false);
-        txtOverhead.setLineWrap(true);
-        txtOverhead.setWrapStyleWord(true);
         gridBagConstraintsB.gridy = y;
         mainPanel.add(txtOverhead, gridBagConstraintsB);
 
@@ -307,11 +280,8 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsA.gridy = ++y;
         mainPanel.add(lblCommand, gridBagConstraintsA);
 
-        txtCommand = new JTextArea(Contract.getCommandRightsName(contract.getCommandRights()));
+        txtCommand = new JLabel(Contract.getCommandRightsName(contract.getCommandRights()));
         txtCommand.setName("txtCommand");
-        txtCommand.setEditable(false);
-        txtCommand.setLineWrap(true);
-        txtCommand.setWrapStyleWord(true);
         Box commandBox = Box.createHorizontalBox();
         commandBox.add(txtCommand);
 
@@ -350,11 +320,8 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsA.gridy = ++y;
         mainPanel.add(lblTransport, gridBagConstraintsA);
 
-        txtTransport = new JTextArea(contract.getTransportComp() + "%");
+        txtTransport = new JLabel(contract.getTransportComp() + "%");
         txtTransport.setName("txtTransport");
-        txtTransport.setEditable(false);
-        txtTransport.setLineWrap(true);
-        txtTransport.setWrapStyleWord(true);
         Box transportBox = Box.createHorizontalBox();
         transportBox.add(txtTransport);
 
@@ -391,12 +358,9 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsA.gridy = ++y;
         mainPanel.add(lblSalvageRights, gridBagConstraintsA);
 
-        JTextArea txtSalvageRights = new JTextArea(contract.getSalvagePct() + "%"
+        JLabel txtSalvageRights = new JLabel(contract.getSalvagePct() + "%"
                 + (contract.isSalvageExchange() ? " (Exchange)" : ""));
         txtSalvageRights.setName("txtSalvageRights");
-        txtSalvageRights.setEditable(false);
-        txtSalvageRights.setLineWrap(true);
-        txtSalvageRights.setWrapStyleWord(true);
         gridBagConstraintsB.gridy = y;
         mainPanel.add(txtSalvageRights, gridBagConstraintsB);
 
@@ -405,11 +369,8 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsA.gridy = ++y;
         mainPanel.add(lblStraightSupport, gridBagConstraintsA);
 
-        txtStraightSupport = new JTextArea(contract.getStraightSupport() + "%");
+        txtStraightSupport = new JLabel(contract.getStraightSupport() + "%");
         txtStraightSupport.setName("txtStraightSupport");
-        txtStraightSupport.setEditable(false);
-        txtStraightSupport.setLineWrap(true);
-        txtStraightSupport.setWrapStyleWord(true);
 
         Box supportBox = Box.createHorizontalBox();
         supportBox.add(txtStraightSupport);
@@ -448,11 +409,8 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsA.gridy = ++y;
         mainPanel.add(lblBattleLossComp, gridBagConstraintsA);
 
-        txtBattleLossComp = new JTextArea(contract.getBattleLossComp() + "%");
+        txtBattleLossComp = new JLabel(contract.getBattleLossComp() + "%");
         txtBattleLossComp.setName("txtBattleLossComp");
-        txtBattleLossComp.setEditable(false);
-        txtBattleLossComp.setLineWrap(true);
-        txtBattleLossComp.setWrapStyleWord(true);
         gridBagConstraintsB.gridy = y;
         mainPanel.add(txtBattleLossComp, gridBagConstraintsB);
 
@@ -462,12 +420,9 @@ public class ContractSummaryPanel extends JPanel {
             gridBagConstraintsA.gridy = ++y;
             mainPanel.add(lblRequiredLances, gridBagConstraintsA);
 
-            JTextArea txtRequiredLances = new JTextArea(((AtBContract) contract).getRequiredLances()
+            JLabel txtRequiredLances = new JLabel(((AtBContract) contract).getRequiredLances()
                     + " Lance(s)");
             txtRequiredLances.setName("txtRequiredLances");
-            txtRequiredLances.setEditable(false);
-            txtRequiredLances.setLineWrap(true);
-            txtRequiredLances.setWrapStyleWord(true);
             gridBagConstraintsB.gridy = y;
             mainPanel.add(txtRequiredLances, gridBagConstraintsB);
         }
