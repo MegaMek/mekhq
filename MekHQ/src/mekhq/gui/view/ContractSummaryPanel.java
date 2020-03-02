@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.view;
 
 import java.awt.*;
@@ -49,258 +48,226 @@ import mekhq.gui.GuiTabType;
  *
  */
 public class ContractSummaryPanel extends JPanel {
+    private static final long serialVersionUID = 8773615661962644614L;
 
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 8773615661962644614L;
+    private Campaign campaign;
+    private CampaignGUI gui;
+    private Contract contract;
+    private boolean allowRerolls;
+    private int cmdRerolls;
+    private int logRerolls;
+    private int tranRerolls;
 
-	private Campaign campaign;
-	private CampaignGUI gui;
-	private Contract contract;
-	private boolean allowRerolls;
-	private int cmdRerolls;
-	private int logRerolls;
-	private int tranRerolls;
+    private JPanel mainPanel;
 
-	private JPanel mainPanel;
-
-	private JLabel lblName;
-	private JTextField txtName;
-	private JLabel lblLocation;
-	private JLabel txtLocation;
-	private JLabel lblDistance;
-	private JTextArea txtDistance;
-	private JLabel lblMissionType;
-	private JTextArea txtMissionType;
-	private JLabel lblEmployer;
-	private JTextArea txtEmployer;
-	private JLabel lblEnemy;
-	private JTextArea txtEnemy;
-	private JLabel lblAllyRating;
-	private JTextArea txtAllyRating;
-	private JLabel lblEnemyRating;
-	private JTextArea txtEnemyRating;
-	private JLabel lblStartDate;
-	private JTextArea txtStartDate;
-	private JLabel lblLength;
-	private JTextArea txtLength;
-
-	private JLabel lblCommand;
-	private JTextArea txtCommand;
-	private JLabel lblTransport;
-	private JTextArea txtTransport;
-	private JLabel lblOverhead;
-	private JTextArea txtOverhead;
-	private JLabel lblStraightSupport;
-	private JTextArea txtStraightSupport;
-	private JLabel lblBattleLossComp;
-	private JLabel lblRequiredLances;
-	private JTextArea txtBattleLossComp;
-	private JTextArea txtRequiredLances;
-	private JLabel lblSalvageRights;
-	private JTextArea txtSalvageRights;
+    private JTextField txtName;
+    private JTextArea txtCommand;
+    private JTextArea txtTransport;
+    private JTextArea txtStraightSupport;
+    private JTextArea txtBattleLossComp;
 
     private ResourceBundle resourceMap;
     private ContractPaymentBreakdown contractPaymentBreakdown;
 
     public ContractSummaryPanel(Contract contract, Campaign campaign, CampaignGUI gui, boolean allowRerolls) {
-		this.contract = contract;
-		this.campaign = campaign;
-		this.gui = gui;
-		this.allowRerolls = allowRerolls;
-		if (allowRerolls) {
-			Person admin = campaign.findBestInRole(Person.T_ADMIN_COM, SkillType.S_NEG, SkillType.S_ADMIN);
-			cmdRerolls = (admin == null || admin.getSkill(SkillType.S_NEG) == null) ?
-					0 : admin.getSkill(SkillType.S_NEG).getLevel();
-			admin = campaign.findBestInRole(Person.T_ADMIN_LOG, SkillType.S_NEG, SkillType.S_ADMIN);
-			logRerolls = (admin == null || admin.getSkill(SkillType.S_NEG) == null) ?
-					0 : admin.getSkill(SkillType.S_NEG).getLevel();
-			admin = campaign.findBestInRole(Person.T_ADMIN_TRA, SkillType.S_NEG, SkillType.S_ADMIN);
-			tranRerolls = (admin == null || admin.getSkill(SkillType.S_NEG) == null) ?
-					0 : admin.getSkill(SkillType.S_NEG).getLevel();
-		}
+        this.contract = contract;
+        this.campaign = campaign;
+        this.gui = gui;
+        this.allowRerolls = allowRerolls;
+        if (allowRerolls) {
+            Person admin = campaign.findBestInRole(Person.T_ADMIN_COM, SkillType.S_NEG, SkillType.S_ADMIN);
+            cmdRerolls = (admin == null || admin.getSkill(SkillType.S_NEG) == null)
+                    ? 0 : admin.getSkill(SkillType.S_NEG).getLevel();
+            admin = campaign.findBestInRole(Person.T_ADMIN_LOG, SkillType.S_NEG, SkillType.S_ADMIN);
+            logRerolls = (admin == null || admin.getSkill(SkillType.S_NEG) == null)
+                    ? 0 : admin.getSkill(SkillType.S_NEG).getLevel();
+            admin = campaign.findBestInRole(Person.T_ADMIN_TRA, SkillType.S_NEG, SkillType.S_ADMIN);
+            tranRerolls = (admin == null || admin.getSkill(SkillType.S_NEG) == null)
+                    ? 0 : admin.getSkill(SkillType.S_NEG).getLevel();
+        }
 
-		initComponents();
-	}
+        initComponents();
+    }
 
-	private void initComponents() {
-		java.awt.GridBagConstraints gbc;
+    private void initComponents() {
+        java.awt.GridBagConstraints gbc;
 
-		mainPanel = new JPanel();
+        mainPanel = new JPanel();
 
-		setLayout(new java.awt.GridBagLayout());
+        setLayout(new java.awt.GridBagLayout());
 
-		mainPanel.setName("pnlStats");
-		mainPanel.setBorder(BorderFactory.createTitledBorder(contract.getName()));
+        mainPanel.setName("pnlStats");
+        mainPanel.setBorder(BorderFactory.createTitledBorder(contract.getName()));
         contractPaymentBreakdown = new ContractPaymentBreakdown(mainPanel, contract, campaign);
 
-		fillStats();
+        fillStats();
 
-		gbc = new java.awt.GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.gridheight = 1;
-		gbc.weightx = 1.0;
-		gbc.weighty = 1.0;
-		gbc.insets = new java.awt.Insets(5, 5, 5, 5);
-		gbc.fill = java.awt.GridBagConstraints.BOTH;
-		gbc.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		add(mainPanel, gbc);
+        gbc = new java.awt.GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridheight = 1;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.fill = java.awt.GridBagConstraints.BOTH;
+        gbc.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        add(mainPanel, gbc);
 
-	}
+    }
 
-	private void fillStats() {
+    private void fillStats() {
 
-		String[] skillNames = {"Green", "Regular", "Veteran", "Elite"};
-		String[] ratingNames = {"F", "D", "C", "B", "A"};
+        String[] skillNames = {"Green", "Regular", "Veteran", "Elite"};
+        String[] ratingNames = {"F", "D", "C", "B", "A"};
 
-		lblName = new JLabel();
-		txtName = new JTextField();
-		lblLocation = new JLabel();
-		txtLocation = new JLabel();
-		lblDistance = new JLabel();
-		txtDistance = new JTextArea();
-		lblEmployer = new JLabel();
-		txtEmployer = new JTextArea();
-		lblEnemy = new JLabel();
-		txtEnemy = new JTextArea();
-		lblMissionType = new JLabel();
-		txtMissionType = new JTextArea();
-		lblStartDate = new JLabel();
-		txtStartDate = new JTextArea();
-		lblLength = new JLabel();
-		txtLength = new JTextArea();
-		lblAllyRating = new JLabel();
-		txtAllyRating = new JTextArea();
-		lblEnemyRating = new JLabel();
-		txtEnemyRating = new JTextArea();
+        JLabel lblName = new JLabel();
+        txtName = new JTextField();
+        JLabel lblLocation = new JLabel();
+        JLabel txtLocation = new JLabel();
+        JLabel lblDistance = new JLabel();
+        JTextArea txtDistance = new JTextArea();
+        JLabel lblEmployer = new JLabel();
+        JTextArea txtEmployer = new JTextArea();
+        JLabel lblEnemy = new JLabel();
+        JTextArea txtEnemy = new JTextArea();
+        JLabel lblMissionType = new JLabel();
+        JTextArea txtMissionType = new JTextArea();
+        JLabel lblStartDate = new JLabel();
+        JTextArea txtStartDate = new JTextArea();
+        JLabel lblLength = new JLabel();
+        JTextArea txtLength = new JTextArea();
+        JLabel lblAllyRating = new JLabel();
+        JTextArea txtAllyRating = new JTextArea();
+        JLabel lblEnemyRating = new JLabel();
+        JTextArea txtEnemyRating = new JTextArea();
 
-		lblOverhead = new JLabel();
-		txtOverhead = new JTextArea();
-		lblCommand = new JLabel();
-		txtCommand = new JTextArea();
-		lblTransport = new JLabel();
-		txtTransport = new JTextArea();
-		lblStraightSupport = new JLabel();
-		txtStraightSupport = new JTextArea();
-		lblBattleLossComp = new JLabel();
-		txtBattleLossComp = new JTextArea();
-		lblRequiredLances = new JLabel();
-		txtRequiredLances = new JTextArea();
-		lblSalvageRights = new JLabel();
-		txtSalvageRights = new JTextArea();
+        JLabel lblOverhead = new JLabel();
+        JTextArea txtOverhead = new JTextArea();
+        JLabel lblCommand = new JLabel();
+        txtCommand = new JTextArea();
+        JLabel lblTransport = new JLabel();
+        txtTransport = new JTextArea();
+        JLabel lblStraightSupport = new JLabel();
+        txtStraightSupport = new JTextArea();
+        JLabel lblBattleLossComp = new JLabel();
+        txtBattleLossComp = new JTextArea();
+        JLabel lblRequiredLances = new JLabel();
+        JTextArea txtRequiredLances = new JTextArea();
+        JLabel lblSalvageRights = new JLabel();
+        JTextArea txtSalvageRights = new JTextArea();
 
-		resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractMarketDialog", new EncodeControl()); //$NON-NLS-1$
+        resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractMarketDialog",
+                new EncodeControl());
 
-		java.awt.GridBagConstraints gridBagConstraints;
-		mainPanel.setLayout(new java.awt.GridBagLayout());
+        java.awt.GridBagConstraints gridBagConstraints;
+        mainPanel.setLayout(new java.awt.GridBagLayout());
 
-		SimpleDateFormat shortDateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        // TODO : Remove Inline date
+        SimpleDateFormat shortDateFormat = new SimpleDateFormat("MM/dd/yyyy");
 
-		int y = 0;
+        int y = 0;
 
-		lblName.setName("lblName"); // NOI18N
-		lblName.setText(resourceMap.getString("lblName.text"));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = y;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		mainPanel.add(lblName, gridBagConstraints);
+        lblName.setName("lblName");
+        lblName.setText(resourceMap.getString("lblName.text"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        mainPanel.add(lblName, gridBagConstraints);
 
-		txtName.setName("txtName"); // NOI18N
-		txtName.setText(contract.getName());
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = y++;
-		gridBagConstraints.weightx = 0.5;
-		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		mainPanel.add(txtName, gridBagConstraints);
+        txtName.setName("txtName");
+        txtName.setText(contract.getName());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y++;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        mainPanel.add(txtName, gridBagConstraints);
 
-		lblEmployer.setName("lblEmployer"); // NOI18N
-		lblEmployer.setText(resourceMap.getString("lblEmployer.text"));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = y;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		mainPanel.add(lblEmployer, gridBagConstraints);
+        lblEmployer.setName("lblEmployer");
+        lblEmployer.setText(resourceMap.getString("lblEmployer.text"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        mainPanel.add(lblEmployer, gridBagConstraints);
 
-		txtEmployer.setName("txtEmployer"); // NOI18N
-		txtEmployer.setText(contract.getEmployer());
-		txtEmployer.setEditable(false);
-		txtEmployer.setLineWrap(true);
-		txtEmployer.setWrapStyleWord(true);
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = y++;
-		gridBagConstraints.weightx = 0.5;
-		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		mainPanel.add(txtEmployer, gridBagConstraints);
+        txtEmployer.setName("txtEmployer");
+        txtEmployer.setText(contract.getEmployer());
+        txtEmployer.setEditable(false);
+        txtEmployer.setLineWrap(true);
+        txtEmployer.setWrapStyleWord(true);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y++;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        mainPanel.add(txtEmployer, gridBagConstraints);
 
-		if (contract instanceof AtBContract) {
-			lblEnemy.setName("lblEnemy"); // NOI18N
-			lblEnemy.setText(resourceMap.getString("lblEnemy.text"));
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = y;
-			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-			mainPanel.add(lblEnemy, gridBagConstraints);
+        if (contract instanceof AtBContract) {
+            lblEnemy.setName("lblEnemy");
+            lblEnemy.setText(resourceMap.getString("lblEnemy.text"));
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            mainPanel.add(lblEnemy, gridBagConstraints);
 
-			txtEnemy.setName("txtEnemy"); // NOI18N
-			txtEnemy.setText(((AtBContract)contract).getEnemyName(campaign.getGameYear()));
-			txtEnemy.setEditable(false);
-			txtEnemy.setLineWrap(true);
-			txtEnemy.setWrapStyleWord(true);
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 1;
-			gridBagConstraints.gridy = y++;
-			gridBagConstraints.weightx = 0.5;
-			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-			gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-			mainPanel.add(txtEnemy, gridBagConstraints);
-		}
+            txtEnemy.setName("txtEnemy");
+            txtEnemy.setText(((AtBContract)contract).getEnemyName(campaign.getGameYear()));
+            txtEnemy.setEditable(false);
+            txtEnemy.setLineWrap(true);
+            txtEnemy.setWrapStyleWord(true);
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.weightx = 0.5;
+            gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            mainPanel.add(txtEnemy, gridBagConstraints);
+        }
 
-		lblMissionType.setName("lblMissionType"); // NOI18N
-		lblMissionType.setText(resourceMap.getString("lblMissionType.text"));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = y;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		mainPanel.add(lblMissionType, gridBagConstraints);
+        lblMissionType.setName("lblMissionType");
+        lblMissionType.setText(resourceMap.getString("lblMissionType.text"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        mainPanel.add(lblMissionType, gridBagConstraints);
 
-		txtMissionType.setName("txtMissionType"); // NOI18N
-		txtMissionType.setText(contract.getType());
-		txtMissionType.setEditable(false);
-		txtMissionType.setLineWrap(true);
-		txtMissionType.setWrapStyleWord(true);
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = y++;
-		gridBagConstraints.weightx = 0.5;
-		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		mainPanel.add(txtMissionType, gridBagConstraints);
+        txtMissionType.setName("txtMissionType");
+        txtMissionType.setText(contract.getType());
+        txtMissionType.setEditable(false);
+        txtMissionType.setLineWrap(true);
+        txtMissionType.setWrapStyleWord(true);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y++;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        mainPanel.add(txtMissionType, gridBagConstraints);
 
-		lblLocation.setName("lblLocation"); // NOI18N
-		lblLocation.setText(resourceMap.getString("lblLocation.text"));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = y;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		mainPanel.add(lblLocation, gridBagConstraints);
+        lblLocation.setName("lblLocation");
+        lblLocation.setText(resourceMap.getString("lblLocation.text"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        mainPanel.add(lblLocation, gridBagConstraints);
 
-		txtLocation.setName("txtLocation"); // NOI18N
+        txtLocation.setName("txtLocation");
         String systemName = contract.getSystemName(Utilities.getDateTimeDay(campaign.getCalendar()));
         txtLocation.setText(String.format("<html><a href='#'>%s</a></html>", systemName));
         txtLocation.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -312,437 +279,448 @@ public class ContractSummaryPanel extends JPanel {
                 gui.setSelectedTab(GuiTabType.MAP);
             }
         });
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = y++;
-		gridBagConstraints.weightx = 0.5;
-		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		mainPanel.add(txtLocation, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y++;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        mainPanel.add(txtLocation, gridBagConstraints);
 
-		if(Systems.getInstance().getSystems().get(contract.getSystemId()) != null) {
-			lblDistance.setName("lblDistance"); // NOI18N
-			lblDistance.setText(resourceMap.getString("lblDistance.text"));
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = y;
-			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-			mainPanel.add(lblDistance, gridBagConstraints);
+        if (Systems.getInstance().getSystems().get(contract.getSystemId()) != null) {
+            lblDistance.setName("lblDistance");
+            lblDistance.setText(resourceMap.getString("lblDistance.text"));
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            mainPanel.add(lblDistance, gridBagConstraints);
 
-			txtDistance.setName("txtDistance"); // NOI18N
-			JumpPath path = campaign.calculateJumpPath(campaign.getCurrentSystem(), contract.getSystem());
-			int days = (int)Math.ceil((path).getTotalTime(Utilities.getDateTimeDay(contract.getStartDate()), campaign.getLocation().getTransitTime()));
-			int jumps = path.getJumps();
+            txtDistance.setName("txtDistance");
+            JumpPath path = campaign.calculateJumpPath(campaign.getCurrentSystem(), contract.getSystem());
+            int days = (int)Math.ceil((path).getTotalTime(Utilities.getDateTimeDay(contract.getStartDate()),
+                    campaign.getLocation().getTransitTime()));
+            int jumps = path.getJumps();
             if (campaign.getCurrentSystem().getId().equals(contract.getSystemId())
                     && campaign.getLocation().isOnPlanet()) {
-				days = 0;
-				jumps = 0;
-			}
-			txtDistance.setText(days + "(" + jumps + ")");
-			txtDistance.setEditable(false);
-			txtDistance.setLineWrap(true);
-			txtDistance.setWrapStyleWord(true);
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 1;
-			gridBagConstraints.gridy = y++;
-			gridBagConstraints.weightx = 0.5;
-			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-			gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-			mainPanel.add(txtDistance, gridBagConstraints);
-		}
+                days = 0;
+                jumps = 0;
+            }
+            txtDistance.setText(days + "(" + jumps + ")");
+            txtDistance.setEditable(false);
+            txtDistance.setLineWrap(true);
+            txtDistance.setWrapStyleWord(true);
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.weightx = 0.5;
+            gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            mainPanel.add(txtDistance, gridBagConstraints);
+        }
 
-		lblAllyRating.setName("lblAllyRating"); // NOI18N
-		lblAllyRating.setText(resourceMap.getString("lblAllyRating.text"));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = y;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		mainPanel.add(lblAllyRating, gridBagConstraints);
+        lblAllyRating.setName("lblAllyRating");
+        lblAllyRating.setText(resourceMap.getString("lblAllyRating.text"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        mainPanel.add(lblAllyRating, gridBagConstraints);
 
-		if (contract instanceof AtBContract) {
-			txtAllyRating.setName("txtAllyRating"); // NOI18N
-			txtAllyRating.setText(skillNames[((AtBContract)contract).getAllySkill()] + "/" +
-					ratingNames[((AtBContract)contract).getAllyQuality()]);
-			txtAllyRating.setEditable(false);
-			txtAllyRating.setLineWrap(true);
-			txtAllyRating.setWrapStyleWord(true);
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 1;
-			gridBagConstraints.gridy = y++;
-			gridBagConstraints.weightx = 0.5;
-			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-			gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-			mainPanel.add(txtAllyRating, gridBagConstraints);
+        if (contract instanceof AtBContract) {
+            txtAllyRating.setName("txtAllyRating");
+            txtAllyRating.setText(skillNames[((AtBContract)contract).getAllySkill()] + "/"
+                    + ratingNames[((AtBContract)contract).getAllyQuality()]);
+            txtAllyRating.setEditable(false);
+            txtAllyRating.setLineWrap(true);
+            txtAllyRating.setWrapStyleWord(true);
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.weightx = 0.5;
+            gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            mainPanel.add(txtAllyRating, gridBagConstraints);
 
-			lblEnemyRating.setName("lblEnemyRating"); // NOI18N
-			lblEnemyRating.setText(resourceMap.getString("lblEnemyRating.text"));
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = y;
-			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-			mainPanel.add(lblEnemyRating, gridBagConstraints);
+            lblEnemyRating.setName("lblEnemyRating");
+            lblEnemyRating.setText(resourceMap.getString("lblEnemyRating.text"));
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            mainPanel.add(lblEnemyRating, gridBagConstraints);
 
-			txtEnemyRating.setName("txtEnemyRating"); // NOI18N
-			txtEnemyRating.setText(skillNames[((AtBContract)contract).getEnemySkill()] + "/" +
-					ratingNames[((AtBContract)contract).getEnemyQuality()]);
-			txtEnemyRating.setEditable(false);
-			txtEnemyRating.setLineWrap(true);
-			txtEnemyRating.setWrapStyleWord(true);
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 1;
-			gridBagConstraints.gridy = y++;
-			gridBagConstraints.weightx = 0.5;
-			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-			gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-			mainPanel.add(txtEnemyRating, gridBagConstraints);
-		}
+            txtEnemyRating.setName("txtEnemyRating");
+            txtEnemyRating.setText(skillNames[((AtBContract)contract).getEnemySkill()] + "/" +
+                    ratingNames[((AtBContract)contract).getEnemyQuality()]);
+            txtEnemyRating.setEditable(false);
+            txtEnemyRating.setLineWrap(true);
+            txtEnemyRating.setWrapStyleWord(true);
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.weightx = 0.5;
+            gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            mainPanel.add(txtEnemyRating, gridBagConstraints);
+        }
 
-		lblStartDate.setName("lblStartDate"); // NOI18N
-		lblStartDate.setText(resourceMap.getString("lblStartDate.text"));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = y;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		mainPanel.add(lblStartDate, gridBagConstraints);
+        lblStartDate.setName("lblStartDate");
+        lblStartDate.setText(resourceMap.getString("lblStartDate.text"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        mainPanel.add(lblStartDate, gridBagConstraints);
 
-		txtStartDate.setName("txtStartDate"); // NOI18N
-		txtStartDate.setText(shortDateFormat.format(contract.getStartDate()));
-		txtStartDate.setEditable(false);
-		txtStartDate.setLineWrap(true);
-		txtStartDate.setWrapStyleWord(true);
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = y++;
-		gridBagConstraints.weightx = 0.5;
-		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		mainPanel.add(txtStartDate, gridBagConstraints);
+        txtStartDate.setName("txtStartDate");
+        txtStartDate.setText(shortDateFormat.format(contract.getStartDate()));
+        txtStartDate.setEditable(false);
+        txtStartDate.setLineWrap(true);
+        txtStartDate.setWrapStyleWord(true);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y++;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        mainPanel.add(txtStartDate, gridBagConstraints);
 
-		lblLength.setName("lblLength"); // NOI18N
-		lblLength.setText(resourceMap.getString("lblLength.text"));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = y;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		mainPanel.add(lblLength, gridBagConstraints);
+        lblLength.setName("lblLength");
+        lblLength.setText(resourceMap.getString("lblLength.text"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        mainPanel.add(lblLength, gridBagConstraints);
 
-		txtLength.setName("txtLength"); // NOI18N
-		txtLength.setText(Integer.toString(contract.getLength()));
-		txtLength.setEditable(false);
-		txtLength.setLineWrap(true);
-		txtLength.setWrapStyleWord(true);
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = y++;
-		gridBagConstraints.weightx = 0.5;
-		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		mainPanel.add(txtLength, gridBagConstraints);
+        txtLength.setName("txtLength");
+        txtLength.setText(Integer.toString(contract.getLength()));
+        txtLength.setEditable(false);
+        txtLength.setLineWrap(true);
+        txtLength.setWrapStyleWord(true);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y++;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        mainPanel.add(txtLength, gridBagConstraints);
 
-		lblOverhead.setName("lblOverhead"); // NOI18N
-		lblOverhead.setText(resourceMap.getString("lblOverhead.text"));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = y;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		mainPanel.add(lblOverhead, gridBagConstraints);
+        lblOverhead.setName("lblOverhead");
+        lblOverhead.setText(resourceMap.getString("lblOverhead.text"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        mainPanel.add(lblOverhead, gridBagConstraints);
 
-		txtOverhead.setName("txtOverhead"); // NOI18N
-		txtOverhead.setText(Contract.getOverheadCompName(contract.getOverheadComp()));
-		txtOverhead.setEditable(false);
-		txtOverhead.setLineWrap(true);
-		txtOverhead.setWrapStyleWord(true);
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = y++;
-		gridBagConstraints.weightx = 0.5;
-		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		mainPanel.add(txtOverhead, gridBagConstraints);
+        txtOverhead.setName("txtOverhead");
+        txtOverhead.setText(Contract.getOverheadCompName(contract.getOverheadComp()));
+        txtOverhead.setEditable(false);
+        txtOverhead.setLineWrap(true);
+        txtOverhead.setWrapStyleWord(true);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y++;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        mainPanel.add(txtOverhead, gridBagConstraints);
 
-		lblCommand.setName("lblCommand"); // NOI18N
-		lblCommand.setText(resourceMap.getString("lblCommand.text"));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = y;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		mainPanel.add(lblCommand, gridBagConstraints);
+        lblCommand.setName("lblCommand");
+        lblCommand.setText(resourceMap.getString("lblCommand.text"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        mainPanel.add(lblCommand, gridBagConstraints);
 
-		txtCommand.setName("txtCommand"); // NOI18N
-		txtCommand.setText(Contract.getCommandRightsName(contract.getCommandRights()));
-		txtCommand.setEditable(false);
-		txtCommand.setLineWrap(true);
-		txtCommand.setWrapStyleWord(true);
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = y;
-		gridBagConstraints.weightx = 0.5;
-		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        txtCommand.setName("txtCommand");
+        txtCommand.setText(Contract.getCommandRightsName(contract.getCommandRights()));
+        txtCommand.setEditable(false);
+        txtCommand.setLineWrap(true);
+        txtCommand.setWrapStyleWord(true);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         Box commandBox = Box.createHorizontalBox();
         commandBox.add(txtCommand);
 
-		/* Only allow command clause rerolls for merc and pirates; house units are always integrated */
-		if (hasCommandRerolls()) {
+        /* Only allow command clause rerolls for mercenaries and pirates; house units are always integrated */
+        if (hasCommandRerolls()) {
             JButton btnCommand = new JButton();
             setCommandRerollButtonText(btnCommand);
-			commandBox.add(btnCommand);
+            commandBox.add(btnCommand);
 
-			btnCommand.addActionListener(ev -> {
+            btnCommand.addActionListener(ev -> {
                 JButton btn = null;
-                if(ev.getSource() instanceof JButton) {
+                if (ev.getSource() instanceof JButton) {
                     btn = (JButton)ev.getSource();
                 }
-                if(null == btn) {
+                if (null == btn) {
                     return;
                 }
                 if (contract instanceof AtBContract) {
-                    campaign.getContractMarket().rerollClause((AtBContract)contract, ContractMarket.CLAUSE_COMMAND, campaign);
-                    setCommandRerollButtonText((JButton)ev.getSource());
+                    campaign.getContractMarket().rerollClause((AtBContract) contract,
+                            ContractMarket.CLAUSE_COMMAND, campaign);
+                    setCommandRerollButtonText((JButton) ev.getSource());
                     txtCommand.setText(Contract.getCommandRightsName(contract.getCommandRights()));
-                    if (campaign.getContractMarket().getRerollsUsed(contract, ContractMarket.CLAUSE_COMMAND) >= cmdRerolls) {
+                    if (campaign.getContractMarket().getRerollsUsed(contract,
+                            ContractMarket.CLAUSE_COMMAND) >= cmdRerolls) {
                         btn.setEnabled(false);
                     }
                     refreshAmounts();
                 }
             });
-		}
+        }
         mainPanel.add(commandBox, gridBagConstraints);
         y++;
 
-		lblTransport.setName("lblTransport"); // NOI18N
-		lblTransport.setText(resourceMap.getString("lblTransport.text"));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = y;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		mainPanel.add(lblTransport, gridBagConstraints);
+        lblTransport.setName("lblTransport");
+        lblTransport.setText(resourceMap.getString("lblTransport.text"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        mainPanel.add(lblTransport, gridBagConstraints);
 
-		txtTransport.setName("txtTransport"); // NOI18N
-		txtTransport.setText(contract.getTransportComp() + "%");
-		txtTransport.setEditable(false);
-		txtTransport.setLineWrap(true);
-		txtTransport.setWrapStyleWord(true);
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = y;
-		gridBagConstraints.weightx = 0.5;
-		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        txtTransport.setName("txtTransport");
+        txtTransport.setText(contract.getTransportComp() + "%");
+        txtTransport.setEditable(false);
+        txtTransport.setLineWrap(true);
+        txtTransport.setWrapStyleWord(true);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         Box transportBox = Box.createHorizontalBox();
-		transportBox.add(txtTransport);
+        transportBox.add(txtTransport);
 
-		if (hasTransportRerolls()) {
+        if (hasTransportRerolls()) {
             JButton btnTransport = new JButton();
             setTransportRerollButtonText(btnTransport);
-			transportBox.add(btnTransport);
-			btnTransport.addActionListener(ev -> {
+            transportBox.add(btnTransport);
+            btnTransport.addActionListener(ev -> {
                 JButton btn = null;
-                if(ev.getSource() instanceof JButton) {
+                if (ev.getSource() instanceof JButton) {
                     btn = (JButton) ev.getSource();
                 }
-                if(null == btn) {
+                if (null == btn) {
                     return;
                 }
                 if (contract instanceof AtBContract) {
-                    campaign.getContractMarket().rerollClause((AtBContract)contract, ContractMarket.CLAUSE_TRANSPORT, campaign);
-                    setTransportRerollButtonText((JButton)ev.getSource());
+                    campaign.getContractMarket().rerollClause((AtBContract) contract,
+                            ContractMarket.CLAUSE_TRANSPORT, campaign);
+                    setTransportRerollButtonText((JButton) ev.getSource());
                     txtTransport.setText(contract.getTransportComp() + "%");
-                    if (campaign.getContractMarket().getRerollsUsed(contract, ContractMarket.CLAUSE_TRANSPORT) >= tranRerolls) {
+                    if (campaign.getContractMarket().getRerollsUsed(contract,
+                            ContractMarket.CLAUSE_TRANSPORT) >= tranRerolls) {
                         btn.setEnabled(false);
                     }
                     refreshAmounts();
                 }
             });
-		}
+        }
         mainPanel.add(transportBox, gridBagConstraints);
         y++;
 
-		lblSalvageRights.setName("lblSalvageRights"); // NOI18N
-		lblSalvageRights.setText(resourceMap.getString("lblSalvageRights.text"));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = y;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		mainPanel.add(lblSalvageRights, gridBagConstraints);
+        lblSalvageRights.setName("lblSalvageRights");
+        lblSalvageRights.setText(resourceMap.getString("lblSalvageRights.text"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        mainPanel.add(lblSalvageRights, gridBagConstraints);
 
-		txtSalvageRights.setName("txtSalvageRights"); // NOI18N
-		txtSalvageRights.setText(contract.getSalvagePct() + "%" + (contract.isSalvageExchange() ? " (Exchange)" : ""));
-		txtSalvageRights.setEditable(false);
-		txtSalvageRights.setLineWrap(true);
-		txtSalvageRights.setWrapStyleWord(true);
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = y++;
-		gridBagConstraints.weightx = 0.5;
-		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		mainPanel.add(txtSalvageRights, gridBagConstraints);
+        txtSalvageRights.setName("txtSalvageRights");
+        txtSalvageRights.setText(contract.getSalvagePct() + "%"
+                + (contract.isSalvageExchange() ? " (Exchange)" : ""));
+        txtSalvageRights.setEditable(false);
+        txtSalvageRights.setLineWrap(true);
+        txtSalvageRights.setWrapStyleWord(true);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y++;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        mainPanel.add(txtSalvageRights, gridBagConstraints);
 
-		lblStraightSupport.setName("lblStraightSupport"); // NOI18N
-		lblStraightSupport.setText(resourceMap.getString("lblStraightSupport.text"));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = y;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		mainPanel.add(lblStraightSupport, gridBagConstraints);
+        lblStraightSupport.setName("lblStraightSupport");
+        lblStraightSupport.setText(resourceMap.getString("lblStraightSupport.text"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        mainPanel.add(lblStraightSupport, gridBagConstraints);
 
-		txtStraightSupport.setName("txtStraightSupport"); // NOI18N
-		txtStraightSupport.setText(contract.getStraightSupport() + "%");
-		txtStraightSupport.setEditable(false);
-		txtStraightSupport.setLineWrap(true);
-		txtStraightSupport.setWrapStyleWord(true);
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = y;
-		gridBagConstraints.weightx = 0.5;
-		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        txtStraightSupport.setName("txtStraightSupport");
+        txtStraightSupport.setText(contract.getStraightSupport() + "%");
+        txtStraightSupport.setEditable(false);
+        txtStraightSupport.setLineWrap(true);
+        txtStraightSupport.setWrapStyleWord(true);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 
         Box supportBox = Box.createHorizontalBox();
-		supportBox.add(txtStraightSupport);
+        supportBox.add(txtStraightSupport);
 
-		if (hasSupportRerolls()) {
-			JButton btnSupport = new JButton();
-			setSupportRerollButtonText(btnSupport);
-			supportBox.add(btnSupport);
-			btnSupport.addActionListener(ev -> {
+        if (hasSupportRerolls()) {
+            JButton btnSupport = new JButton();
+            setSupportRerollButtonText(btnSupport);
+            supportBox.add(btnSupport);
+            btnSupport.addActionListener(ev -> {
                 JButton btn = null;
-                if(ev.getSource() instanceof JButton) {
+                if (ev.getSource() instanceof JButton) {
                     btn = (JButton) ev.getSource();
                 }
-                if(null == btn) {
+                if (null == btn) {
                     return;
                 }
                 if (contract instanceof AtBContract) {
-                    campaign.getContractMarket().rerollClause((AtBContract)contract, ContractMarket.CLAUSE_SUPPORT, campaign);
+                    campaign.getContractMarket().rerollClause((AtBContract) contract,
+                            ContractMarket.CLAUSE_SUPPORT, campaign);
                     setSupportRerollButtonText((JButton)ev.getSource());
                     txtStraightSupport.setText(contract.getStraightSupport() + "%");
                     txtBattleLossComp.setText(contract.getBattleLossComp() + "%");
-                    if (campaign.getContractMarket().getRerollsUsed(contract, ContractMarket.CLAUSE_SUPPORT) >= logRerolls) {
+                    if (campaign.getContractMarket().getRerollsUsed(contract,
+                            ContractMarket.CLAUSE_SUPPORT) >= logRerolls) {
                         btn.setEnabled(false);
                     }
                     refreshAmounts();
                 }
             });
-		}
+        }
         mainPanel.add(supportBox, gridBagConstraints);
-		y++;
+        y++;
 
-		lblBattleLossComp.setName("lblBattleLossComp"); // NOI18N
-		lblBattleLossComp.setText(resourceMap.getString("lblBattleLossComp.text"));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = y;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		mainPanel.add(lblBattleLossComp, gridBagConstraints);
+        lblBattleLossComp.setName("lblBattleLossComp");
+        lblBattleLossComp.setText(resourceMap.getString("lblBattleLossComp.text"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        mainPanel.add(lblBattleLossComp, gridBagConstraints);
 
-		txtBattleLossComp.setName("txtBattleLossComp"); // NOI18N
-		txtBattleLossComp.setText(contract.getBattleLossComp() + "%");
-		txtBattleLossComp.setEditable(false);
-		txtBattleLossComp.setLineWrap(true);
-		txtBattleLossComp.setWrapStyleWord(true);
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = y++;
-		gridBagConstraints.weightx = 0.5;
-		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		mainPanel.add(txtBattleLossComp, gridBagConstraints);
+        txtBattleLossComp.setName("txtBattleLossComp");
+        txtBattleLossComp.setText(contract.getBattleLossComp() + "%");
+        txtBattleLossComp.setEditable(false);
+        txtBattleLossComp.setLineWrap(true);
+        txtBattleLossComp.setWrapStyleWord(true);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y++;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        mainPanel.add(txtBattleLossComp, gridBagConstraints);
 
-		if(contract instanceof AtBContract) {
-			lblRequiredLances.setName("lblRequiredLances"); // NOI18N
-			lblRequiredLances.setText(resourceMap.getString("lblRequiredLances.text"));
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = y;
-			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-			mainPanel.add(lblRequiredLances, gridBagConstraints);
+        if (contract instanceof AtBContract) {
+            lblRequiredLances.setName("lblRequiredLances");
+            lblRequiredLances.setText(resourceMap.getString("lblRequiredLances.text"));
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            mainPanel.add(lblRequiredLances, gridBagConstraints);
 
-			txtRequiredLances.setName("txtRequiredLances"); // NOI18N
-			txtRequiredLances.setText(((AtBContract)contract).getRequiredLances() + " Lance(s)");
-			txtRequiredLances.setEditable(false);
-			txtRequiredLances.setLineWrap(true);
-			txtRequiredLances.setWrapStyleWord(true);
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 1;
-			gridBagConstraints.gridy = y++;
-			gridBagConstraints.weightx = 0.5;
-			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-			gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-			mainPanel.add(txtRequiredLances, gridBagConstraints);
-		}
+            txtRequiredLances.setName("txtRequiredLances");
+            txtRequiredLances.setText(((AtBContract)contract).getRequiredLances() + " Lance(s)");
+            txtRequiredLances.setEditable(false);
+            txtRequiredLances.setLineWrap(true);
+            txtRequiredLances.setWrapStyleWord(true);
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.weightx = 0.5;
+            gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            mainPanel.add(txtRequiredLances, gridBagConstraints);
+        }
 
-		contractPaymentBreakdown.display(y);
-	}
+        contractPaymentBreakdown.display(y);
+    }
 
     private boolean hasTransportRerolls() {
-        return allowRerolls && campaign.getContractMarket().getRerollsUsed(contract, ContractMarket.CLAUSE_TRANSPORT) < tranRerolls;
+        return allowRerolls && (campaign.getContractMarket().getRerollsUsed(contract,
+                ContractMarket.CLAUSE_TRANSPORT) < tranRerolls);
     }
 
     private boolean hasCommandRerolls() {
-        return allowRerolls && (campaign.getFactionCode().equals("MERC") || campaign.getFactionCode().equals("PIR")) &&
-                campaign.getContractMarket().getRerollsUsed(contract, ContractMarket.CLAUSE_COMMAND) < cmdRerolls;
+        return allowRerolls
+                && (campaign.getFactionCode().equals("MERC")
+                    || campaign.getFactionCode().equals("PIR"))
+                && (campaign.getContractMarket().getRerollsUsed(contract,
+                ContractMarket.CLAUSE_COMMAND) < cmdRerolls);
     }
 
     private boolean hasSupportRerolls(){
-        return allowRerolls &&
-                campaign.getContractMarket().getRerollsUsed(contract, ContractMarket.CLAUSE_SUPPORT) < logRerolls;
+        return allowRerolls && (campaign.getContractMarket().getRerollsUsed(contract,
+                ContractMarket.CLAUSE_SUPPORT) < logRerolls);
     }
 
     private void setCommandRerollButtonText(JButton rerollButton){
-        int rerolls = (cmdRerolls - campaign.getContractMarket().getRerollsUsed(contract, ContractMarket.CLAUSE_COMMAND));
+        int rerolls = (cmdRerolls - campaign.getContractMarket().getRerollsUsed(contract,
+                ContractMarket.CLAUSE_COMMAND));
         rerollButton.setText(generateRerollText(rerolls));
     }
 
     private void setTransportRerollButtonText(JButton rerollButton){
-        int rerolls = (tranRerolls - campaign.getContractMarket().getRerollsUsed(contract, ContractMarket.CLAUSE_TRANSPORT));
+        int rerolls = (tranRerolls - campaign.getContractMarket().getRerollsUsed(contract,
+                ContractMarket.CLAUSE_TRANSPORT));
         rerollButton.setText(generateRerollText(rerolls));
     }
 
     private void setSupportRerollButtonText(JButton rerollButton){
-        int rerolls = (logRerolls - campaign.getContractMarket().getRerollsUsed(contract, ContractMarket.CLAUSE_SUPPORT));
+        int rerolls = (logRerolls - campaign.getContractMarket().getRerollsUsed(contract,
+                ContractMarket.CLAUSE_SUPPORT));
         rerollButton.setText(generateRerollText(rerolls));
     }
 
     private String generateRerollText(int rerolls){
-        return new StringBuilder().append(resourceMap.getString("lblRenegotiate.text"))
-                .append(" (")
-                .append(rerolls)
-                .append(")")
-                .toString();
+        return resourceMap.getString("lblRenegotiate.text") + " (" + rerolls + ")";
     }
 
     public void refreshAmounts() {
         contractPaymentBreakdown.refresh();
     }
 
-	public String getContractName() {
-		return txtName.getText();
-	}
+    public String getContractName() {
+        return txtName.getText();
+    }
 }
