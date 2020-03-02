@@ -96,6 +96,7 @@ public class ContractSummaryPanel extends JPanel {
         mainPanel = new JPanel(new GridBagLayout());
         mainPanel.setName("pnlStats");
         mainPanel.setBorder(BorderFactory.createTitledBorder(contract.getName()));
+
         contractPaymentBreakdown = new ContractPaymentBreakdown(mainPanel, contract, campaign);
 
         fillStats();
@@ -134,6 +135,13 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsB.insets = new Insets(0, 10, 0, 0);
         gridBagConstraintsB.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraintsB.anchor = GridBagConstraints.NORTHWEST;
+
+        // Initializing GridBagConstraint used for the Buttons
+        GridBagConstraints gridBagConstraintsC = new GridBagConstraints();
+        gridBagConstraintsC.gridx = 2;
+        gridBagConstraintsC.weightx = 0.5;
+        gridBagConstraintsC.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraintsC.anchor = GridBagConstraints.NORTHWEST;
 
         int y = 0;
         //endregion Variable Declarations
@@ -207,7 +215,7 @@ public class ContractSummaryPanel extends JPanel {
             mainPanel.add(lblDistance, gridBagConstraintsA);
 
             JumpPath path = campaign.calculateJumpPath(campaign.getCurrentSystem(), contract.getSystem());
-            int days = (int) Math.ceil((path).getTotalTime(Utilities.getDateTimeDay(contract.getStartDate()),
+            int days = (int) Math.ceil(path.getTotalTime(Utilities.getDateTimeDay(contract.getStartDate()),
                     campaign.getLocation().getTransitTime()));
             int jumps = path.getJumps();
             if (campaign.getCurrentSystem().getId().equals(contract.getSystemId())
@@ -282,14 +290,13 @@ public class ContractSummaryPanel extends JPanel {
 
         txtCommand = new JLabel(Contract.getCommandRightsName(contract.getCommandRights()));
         txtCommand.setName("txtCommand");
-        Box commandBox = Box.createHorizontalBox();
-        commandBox.add(txtCommand);
+        gridBagConstraintsB.gridy = y;
+        mainPanel.add(txtCommand, gridBagConstraintsB);
 
-        /* Only allow command clause rerolls for mercenaries and pirates; house units are always integrated */
+        // Only allow command clause rerolls for mercenaries and pirates; house units are always integrated
         if (hasCommandRerolls()) {
             JButton btnCommand = new JButton();
             setCommandRerollButtonText(btnCommand);
-            commandBox.add(btnCommand);
 
             btnCommand.addActionListener(ev -> {
                 JButton btn = null;
@@ -311,9 +318,10 @@ public class ContractSummaryPanel extends JPanel {
                     refreshAmounts();
                 }
             });
+
+            gridBagConstraintsC.gridy = y;
+            mainPanel.add(btnCommand, gridBagConstraintsC);
         }
-        gridBagConstraintsB.gridy = y;
-        mainPanel.add(commandBox, gridBagConstraintsB);
 
         JLabel lblTransport = new JLabel(resourceMap.getString("lblTransport.text"));
         lblTransport.setName("lblTransport");
@@ -322,13 +330,13 @@ public class ContractSummaryPanel extends JPanel {
 
         txtTransport = new JLabel(contract.getTransportComp() + "%");
         txtTransport.setName("txtTransport");
-        Box transportBox = Box.createHorizontalBox();
-        transportBox.add(txtTransport);
+        gridBagConstraintsB.gridy = y;
+        mainPanel.add(txtTransport, gridBagConstraintsB);
 
         if (hasTransportRerolls()) {
             JButton btnTransport = new JButton();
             setTransportRerollButtonText(btnTransport);
-            transportBox.add(btnTransport);
+
             btnTransport.addActionListener(ev -> {
                 JButton btn = null;
                 if (ev.getSource() instanceof JButton) {
@@ -349,9 +357,10 @@ public class ContractSummaryPanel extends JPanel {
                     refreshAmounts();
                 }
             });
+
+            gridBagConstraintsC.gridy = y;
+            mainPanel.add(btnTransport, gridBagConstraintsC);
         }
-        gridBagConstraintsB.gridy = y;
-        mainPanel.add(transportBox, gridBagConstraintsB);
 
         JLabel lblSalvageRights = new JLabel(resourceMap.getString("lblSalvageRights.text"));
         lblSalvageRights.setName("lblSalvageRights");
@@ -371,14 +380,13 @@ public class ContractSummaryPanel extends JPanel {
 
         txtStraightSupport = new JLabel(contract.getStraightSupport() + "%");
         txtStraightSupport.setName("txtStraightSupport");
-
-        Box supportBox = Box.createHorizontalBox();
-        supportBox.add(txtStraightSupport);
+        gridBagConstraintsB.gridy = y;
+        mainPanel.add(txtStraightSupport, gridBagConstraintsB);
 
         if (hasSupportRerolls()) {
             JButton btnSupport = new JButton();
             setSupportRerollButtonText(btnSupport);
-            supportBox.add(btnSupport);
+
             btnSupport.addActionListener(ev -> {
                 JButton btn = null;
                 if (ev.getSource() instanceof JButton) {
@@ -400,9 +408,10 @@ public class ContractSummaryPanel extends JPanel {
                     refreshAmounts();
                 }
             });
+
+            gridBagConstraintsC.gridy = y;
+            mainPanel.add(btnSupport, gridBagConstraintsC);
         }
-        gridBagConstraintsB.gridy = y;
-        mainPanel.add(supportBox, gridBagConstraintsB);
 
         JLabel lblBattleLossComp = new JLabel(resourceMap.getString("lblBattleLossComp.text"));
         lblBattleLossComp.setName("lblBattleLossComp");
