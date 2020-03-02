@@ -68,6 +68,10 @@ public class ContractSummaryPanel extends JPanel {
             new EncodeControl());
     private ContractPaymentBreakdown contractPaymentBreakdown;
 
+    private static final int LABEL_COLUMN = 0;
+    private static final int TEXT_COLUMN = 1;
+    private static final int BUTTON_COLUMN = 2;
+
     public ContractSummaryPanel(Contract contract, Campaign campaign, boolean allowRerolls) {
         this.contract = contract;
         this.campaign = campaign;
@@ -121,27 +125,29 @@ public class ContractSummaryPanel extends JPanel {
         String[] ratingNames = {"F", "D", "C", "B", "A"};
 
         // Initializing the GridBagConstraint used for Labels
+        // To use this you MUST AND ONLY overwrite gridy
         GridBagConstraints gridBagConstraintsLabels = new GridBagConstraints();
-        gridBagConstraintsLabels.gridx = 0;
+        gridBagConstraintsLabels.gridx = LABEL_COLUMN;
         gridBagConstraintsLabels.fill = GridBagConstraints.NONE;
         gridBagConstraintsLabels.anchor = GridBagConstraints.LINE_START;
 
         // Initializing the GridBagConstraint used for the Panels
+        // To use this you MUST AND ONLY overwrite gridy
         GridBagConstraints gridBagConstraintsText = new GridBagConstraints();
-        gridBagConstraintsText.gridx = 1;
+        gridBagConstraintsText.gridx = TEXT_COLUMN;
         gridBagConstraintsText.weightx = 0.5;
         gridBagConstraintsText.gridwidth = 2; // this is used to properly separate the buttons, if they show up
         gridBagConstraintsText.insets = new Insets(0, 10, 0, 0);
         gridBagConstraintsText.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraintsText.anchor = GridBagConstraints.LINE_END;
+        gridBagConstraintsText.anchor = GridBagConstraints.LINE_START;
 
         // Initializing the GridBagConstraint used for the Buttons
+        // To use this you MUST AND ONLY overwrite gridx and/or gridy
         GridBagConstraints gridBagConstraintsButtons = new GridBagConstraints();
-        gridBagConstraintsButtons.gridx = 1;
         gridBagConstraintsButtons.weightx = 0.5;
         gridBagConstraintsButtons.insets = new Insets(0, 10, 0, 0);
         gridBagConstraintsButtons.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraintsButtons.anchor = GridBagConstraints.LINE_END;
+        gridBagConstraintsButtons.anchor = GridBagConstraints.LINE_START;
 
         int y = 0;
         //endregion Variable Declarations
@@ -290,20 +296,20 @@ public class ContractSummaryPanel extends JPanel {
 
         txtCommand = new JLabel(Contract.getCommandRightsName(contract.getCommandRights()));
         txtCommand.setName("txtCommand");
-        gridBagConstraintsText.gridy = y;
 
         // Then we determine if we just add it to the main panel, or if we combine it with a button
         // to reroll the value
         if (!hasCommandRerolls()) {
-            // just add it to the main panel, using the normal gridBagConstraints for labels
+            // just add it to the main panel, using the normal gridBagConstraints for text
+            gridBagConstraintsText.gridy = y;
             mainPanel.add(txtCommand, gridBagConstraintsText);
         } else {
-            // FIXME
+            gridBagConstraintsButtons.gridy = y;
+            gridBagConstraintsButtons.gridx = TEXT_COLUMN;
             mainPanel.add(txtCommand, gridBagConstraintsButtons);
 
             JButton btnCommand = new JButton();
             setCommandRerollButtonText(btnCommand);
-            commandBox.add(btnCommand);
 
             btnCommand.addActionListener(ev -> {
                 JButton btn = null;
@@ -326,7 +332,8 @@ public class ContractSummaryPanel extends JPanel {
                 }
             });
 
-            mainPanel.add(commandBox, gridBagConstraintsText);
+            gridBagConstraintsButtons.gridx = BUTTON_COLUMN;
+            mainPanel.add(btnCommand, gridBagConstraintsButtons);
         }
 
         JLabel lblTransport = new JLabel(resourceMap.getString("lblTransport.text"));
@@ -336,20 +343,20 @@ public class ContractSummaryPanel extends JPanel {
 
         txtTransport = new JLabel(contract.getTransportComp() + "%");
         txtTransport.setName("txtTransport");
-        gridBagConstraintsText.gridy = y;
+
         // Then we determine if we just add it to the main panel, or if we combine it with a button
         // to reroll the value
         if (!hasTransportRerolls()) {
-            // just add it to the main panel, can't use a reroll
+            // just add it to the main panel, using the normal gridBagConstraints for text
+            gridBagConstraintsText.gridy = y;
             mainPanel.add(txtTransport, gridBagConstraintsText);
         } else {
-            // FIXME
-            Box transportBox = Box.createHorizontalBox();
-            transportBox.add(txtTransport);
+            gridBagConstraintsButtons.gridy = y;
+            gridBagConstraintsButtons.gridx = TEXT_COLUMN;
+            mainPanel.add(txtTransport, gridBagConstraintsButtons);
 
             JButton btnTransport = new JButton();
             setTransportRerollButtonText(btnTransport);
-            transportBox.add(btnTransport);
 
             btnTransport.addActionListener(ev -> {
                 JButton btn = null;
@@ -372,7 +379,8 @@ public class ContractSummaryPanel extends JPanel {
                 }
             });
 
-            mainPanel.add(transportBox, gridBagConstraintsText);
+            gridBagConstraintsButtons.gridx = BUTTON_COLUMN;
+            mainPanel.add(btnTransport, gridBagConstraintsButtons);
         }
 
         JLabel lblSalvageRights = new JLabel(resourceMap.getString("lblSalvageRights.text"));
@@ -393,20 +401,20 @@ public class ContractSummaryPanel extends JPanel {
 
         txtStraightSupport = new JLabel(contract.getStraightSupport() + "%");
         txtStraightSupport.setName("txtStraightSupport");
-        gridBagConstraintsText.gridy = y;
+
         // Then we determine if we just add it to the main panel, or if we combine it with a button
         // to reroll the value
         if (!hasSupportRerolls()) {
             // just add it to the main panel, can't use a reroll
+            gridBagConstraintsText.gridy = y;
             mainPanel.add(txtStraightSupport, gridBagConstraintsText);
         } else {
-            // FIXME
-            Box supportBox = Box.createHorizontalBox();
-            supportBox.add(txtStraightSupport);
+            gridBagConstraintsButtons.gridy = y;
+            gridBagConstraintsButtons.gridx = TEXT_COLUMN;
+            mainPanel.add(txtStraightSupport, gridBagConstraintsButtons);
 
             JButton btnSupport = new JButton();
             setSupportRerollButtonText(btnSupport);
-            supportBox.add(btnSupport);
 
             btnSupport.addActionListener(ev -> {
                 JButton btn = null;
@@ -430,7 +438,8 @@ public class ContractSummaryPanel extends JPanel {
                 }
             });
 
-            mainPanel.add(supportBox, gridBagConstraintsText);
+            gridBagConstraintsButtons.gridx = BUTTON_COLUMN;
+            mainPanel.add(btnSupport, gridBagConstraintsButtons);
         }
 
         JLabel lblBattleLossComp = new JLabel(resourceMap.getString("lblBattleLossComp.text"));
@@ -456,7 +465,7 @@ public class ContractSummaryPanel extends JPanel {
             mainPanel.add(txtRequiredLances, gridBagConstraintsText);
         }
 
-        contractPaymentBreakdown.display(++y);
+        contractPaymentBreakdown.display(++y, 2);
     }
 
     private boolean hasTransportRerolls() {
