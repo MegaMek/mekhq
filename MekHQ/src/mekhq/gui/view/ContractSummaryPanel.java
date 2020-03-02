@@ -93,7 +93,7 @@ public class ContractSummaryPanel extends JPanel {
     private void initComponents() {
         setLayout(new GridBagLayout());
 
-        mainPanel = new JPanel();
+        mainPanel = new JPanel(new GridBagLayout());
         mainPanel.setName("pnlStats");
         mainPanel.setBorder(BorderFactory.createTitledBorder(contract.getName()));
         contractPaymentBreakdown = new ContractPaymentBreakdown(mainPanel, contract, campaign);
@@ -113,15 +113,21 @@ public class ContractSummaryPanel extends JPanel {
     }
 
     private void fillStats() {
-        //region Variable Declarations
+        //region Variable Initialization
         // TODO : Remove Inline date
         SimpleDateFormat shortDateFormat = new SimpleDateFormat("yyyy/MM/dd");
 
+        // TODO : These two arrays should probably be pulled from elsewhere
+        String[] skillNames = {"Green", "Regular", "Veteran", "Elite"};
+        String[] ratingNames = {"F", "D", "C", "B", "A"};
+
+        // Initializing the GridBagConstraint used for Labels
         GridBagConstraints gridBagConstraintsA = new GridBagConstraints();
         gridBagConstraintsA.gridx = 0;
         gridBagConstraintsA.fill = GridBagConstraints.NONE;
         gridBagConstraintsA.anchor = GridBagConstraints.NORTHWEST;
 
+        // Initializing GridBagConstraint used for the Panels
         GridBagConstraints gridBagConstraintsB = new GridBagConstraints();
         gridBagConstraintsB.gridx = 1;
         gridBagConstraintsB.weightx = 0.5;
@@ -130,13 +136,7 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsB.anchor = GridBagConstraints.NORTHWEST;
 
         int y = 0;
-
-        // TODO : These two arrays should probably be pulled from elsewhere
-        String[] skillNames = {"Green", "Regular", "Veteran", "Elite"};
-        String[] ratingNames = {"F", "D", "C", "B", "A"};
         //endregion Variable Declarations
-
-        mainPanel.setLayout(new GridBagLayout());
 
         JLabel lblName = new JLabel(resourceMap.getString("lblName.text"));
         lblName.setName("lblName");
@@ -240,7 +240,7 @@ public class ContractSummaryPanel extends JPanel {
 
         if (contract instanceof AtBContract) {
             JTextArea txtAllyRating = new JTextArea(skillNames[((AtBContract) contract).getAllySkill()]
-                    + "/" + ratingNames[((AtBContract)contract).getAllyQuality()]);
+                    + "/" + ratingNames[((AtBContract) contract).getAllyQuality()]);
             txtAllyRating.setName("txtAllyRating");
             txtAllyRating.setEditable(false);
             txtAllyRating.setLineWrap(true);
@@ -253,8 +253,8 @@ public class ContractSummaryPanel extends JPanel {
             gridBagConstraintsA.gridy = ++y;
             mainPanel.add(lblEnemyRating, gridBagConstraintsA);
 
-            JTextArea txtEnemyRating = new JTextArea(skillNames[((AtBContract)contract).getEnemySkill()]
-                    + "/" + ratingNames[((AtBContract)contract).getEnemyQuality()]);
+            JTextArea txtEnemyRating = new JTextArea(skillNames[((AtBContract) contract).getEnemySkill()]
+                    + "/" + ratingNames[((AtBContract) contract).getEnemyQuality()]);
             txtEnemyRating.setName("txtEnemyRating");
             txtEnemyRating.setEditable(false);
             txtEnemyRating.setLineWrap(true);
