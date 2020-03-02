@@ -1455,7 +1455,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     } else if (unit.usesSoldiers()) {
                         if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
                             cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(person.getUnitId() == unit.getId());
+                            cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
                             cbMenuItem.setActionCommand(makeCommand(CMD_ADD_SOLDIER, unit.getId().toString()));
                             cbMenuItem.addActionListener(this);
                             soldierMenu.add(cbMenuItem);
@@ -1463,7 +1463,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     } else {
                         if (unit.canTakeMoreDrivers() && person.canDrive(unit.getEntity())) {
                             cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(person.getUnitId() == unit.getId());
+                            cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
                             cbMenuItem.setActionCommand(makeCommand(CMD_ADD_DRIVER, unit.getId().toString()));
                             cbMenuItem.addActionListener(this);
                             if (unit.getEntity() instanceof Aero || unit.getEntity() instanceof Mech) {
@@ -1474,7 +1474,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         }
                         if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
                             cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(person.getUnitId() == unit.getId());
+                            cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
                             cbMenuItem.setActionCommand(makeCommand(CMD_ADD_GUNNER, unit.getId().toString()));
                             cbMenuItem.addActionListener(this);
                             gunnerMenu.add(cbMenuItem);
@@ -1483,14 +1483,14 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                                 && ((unit.getEntity().isAero() && person.hasSkill(SkillType.S_TECH_VESSEL))
                                     || ((unit.getEntity().isSupportVehicle() && person.hasSkill(SkillType.S_TECH_MECHANIC))))){
                             cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(person.getUnitId() == unit.getId());
+                            cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
                             cbMenuItem.setActionCommand(makeCommand(CMD_ADD_CREW, unit.getId().toString()));
                             cbMenuItem.addActionListener(this);
                             crewMenu.add(cbMenuItem);
                         }
                         if (unit.canTakeNavigator() && person.hasSkill(SkillType.S_NAV)) {
                             cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(person.getUnitId() == unit.getId());
+                            cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
                             cbMenuItem.setActionCommand(makeCommand(CMD_ADD_NAVIGATOR, unit.getId().toString()));
                             cbMenuItem.addActionListener(this);
                             navMenu.add(cbMenuItem);
@@ -1500,14 +1500,14 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             if (unit.getEntity() instanceof Tank) {
                                 if (person.canDrive(unit.getEntity()) || person.canGun(unit.getEntity())) {
                                     cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                                    cbMenuItem.setSelected(person.getUnitId() == unit.getId());
+                                    cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
                                     cbMenuItem.setActionCommand(makeCommand(CMD_ADD_TECH_OFFICER, unit.getId().toString()));
                                     cbMenuItem.addActionListener(this);
                                     consoleCmdrMenu.add(cbMenuItem);
                                 }
                             } else if (person.canDrive(unit.getEntity()) && person.canGun(unit.getEntity())) {
                                 cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                                cbMenuItem.setSelected(person.getUnitId() == unit.getId());
+                                cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
                                 cbMenuItem.setActionCommand(makeCommand(CMD_ADD_TECH_OFFICER, unit.getId().toString()));
                                 cbMenuItem.addActionListener(this);
                                 techOfficerMenu.add(cbMenuItem);
@@ -1518,7 +1518,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             && (person.getMaintenanceTimeUsing() + unit.getMaintenanceTime() <= 480)) {
                         cbMenuItem = new JCheckBoxMenuItem(String.format(resourceMap.getString("maintenanceTimeDesc.format"), //$NON-NLS-1$
                             unit.getName(), unit.getMaintenanceTime()));
-                        cbMenuItem.setSelected(person.getUnitId() == unit.getId());
+                        cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
                         cbMenuItem.setActionCommand(makeCommand(CMD_ADD_TECH, unit.getId().toString()));
                         cbMenuItem.addActionListener(this);
                         techMenu.add(cbMenuItem);
@@ -1591,7 +1591,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         }
                         if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
                             cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(person.getUnitId() == unit.getId());
+                            cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
                             cbMenuItem.setActionCommand(makeCommand(CMD_ADD_SOLDIER, unit.getId().toString()));
                             cbMenuItem.addActionListener(this);
                             soldierMenu.add(cbMenuItem);
@@ -1602,7 +1602,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         }
                         if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
                             cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(person.getUnitId() == unit.getId());
+                            cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
                             cbMenuItem.setActionCommand(makeCommand(CMD_ADD_SOLDIER, unit.getId().toString()));
                             cbMenuItem.addActionListener(this);
                             soldierMenu.add(cbMenuItem);
@@ -1613,7 +1613,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         }
                         if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
                             cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(person.getUnitId() == unit.getId());
+                            cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
                             cbMenuItem.setActionCommand(makeCommand(CMD_ADD_GUNNER, unit.getId().toString()));
                             cbMenuItem.addActionListener(this);
                             gunnerMenu.add(cbMenuItem);
@@ -1624,7 +1624,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         }
                         if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
                             cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(person.getUnitId() == unit.getId());
+                            cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
                             cbMenuItem.setActionCommand(makeCommand(CMD_ADD_GUNNER, unit.getId().toString()));
                             cbMenuItem.addActionListener(this);
                             gunnerMenu.add(cbMenuItem);
@@ -1637,7 +1637,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                                 && ((unit.getEntity().isAero() && person.hasSkill(SkillType.S_TECH_VESSEL))
                                 || ((unit.getEntity().isSupportVehicle() && person.hasSkill(SkillType.S_TECH_MECHANIC))))){
                             cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(person.getUnitId() == unit.getId());
+                            cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
                             cbMenuItem.setActionCommand(makeCommand(CMD_ADD_CREW, unit.getId().toString()));
                             cbMenuItem.addActionListener(this);
                             crewMenu.add(cbMenuItem);
@@ -1648,7 +1648,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         }
                         if (unit.canTakeMoreDrivers() && person.canDrive(unit.getEntity())) {
                             cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(person.getUnitId() == unit.getId());
+                            cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
                             cbMenuItem.setActionCommand(makeCommand(CMD_ADD_VESSEL_PILOT, unit.getId().toString()));
                             cbMenuItem.addActionListener(this);
                             pilotMenu.add(cbMenuItem);
@@ -1659,7 +1659,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         }
                         if (unit.canTakeNavigator() && person.hasSkill(SkillType.S_NAV)) {
                             cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setSelected(person.getUnitId() == unit.getId());
+                            cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
                             cbMenuItem.setActionCommand(makeCommand(CMD_ADD_NAVIGATOR, unit.getId().toString()));
                             cbMenuItem.addActionListener(this);
                             navMenu.add(cbMenuItem);

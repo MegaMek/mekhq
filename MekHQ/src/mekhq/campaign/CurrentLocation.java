@@ -77,11 +77,6 @@ public class CurrentLocation implements Serializable {
         this.transitTime = 0.0;
         this.jumpZenith = true;
     }
-    
-    public void setCurrentSystem(PlanetarySystem s) {
-        currentSystem = s;
-        MekHQ.triggerEvent(new LocationChangedEvent(this, false));
-    }
 
     public void setTransitTime(double time) {
         transitTime = time;
@@ -98,7 +93,7 @@ public class CurrentLocation implements Serializable {
     public double getPercentageTransit() {
         return 1- transitTime / currentSystem.getTimeToJumpPoint(1.0);
     }
-    
+
     public boolean isInTransit() {
         return !isOnPlanet() && !isAtJumpPoint();
     }
@@ -110,17 +105,17 @@ public class CurrentLocation implements Serializable {
     public double getTransitTime() {
         return transitTime;
     }
-    
+
     /**
-     * 
+     *
      * @return a <code>boolean</code> indicating whether the jumpship is at the zenith or not (nadir if false).
      */
     public boolean isJumpZenith() {
         return jumpZenith;
     }
-    
+
     /**
-     * pick the best jump point (nadir of zenith). Chooses the one with a recharge station or randomly selects if both have a 
+     * pick the best jump point (nadir of zenith). Chooses the one with a recharge station or randomly selects if both have a
      * recharge station or neither does.
      * @param now - a <code>DateTime</code> object for the present time
      * @return a <code> boolean indicating whethe the zenith position was chosen or not.

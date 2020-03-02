@@ -62,6 +62,7 @@ import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.GMModeEvent;
 import mekhq.campaign.event.LoanNewEvent;
 import mekhq.campaign.event.LoanPaidEvent;
+import mekhq.campaign.event.LocationChangedEvent;
 import mekhq.campaign.event.MedicPoolChangedEvent;
 import mekhq.campaign.event.MissionNewEvent;
 import mekhq.campaign.event.NetworkChangedEvent;
@@ -987,6 +988,16 @@ public class Campaign implements Serializable, ITechManager {
 
     public void setLocation(CurrentLocation l) {
         location = l;
+    }
+
+    /**
+     * Moves immediately to a {@link PlanetarySystem}.
+     * @param s The {@link PlanetarySystem} the campaign
+     *          has been moved to.
+     */
+    public void moveToPlanetarySystem(PlanetarySystem s) {
+        setLocation(new CurrentLocation(s, 0.0));
+        MekHQ.triggerEvent(new LocationChangedEvent(getLocation(), false));
     }
 
     public CurrentLocation getLocation() {
@@ -4170,25 +4181,25 @@ public class Campaign implements Serializable, ITechManager {
      */
     public void cleanUp(){
         // Cleans non-existing spouses
-        for(Person p : personnel.values()){
-            if(p.hasSpouse()){
-                if(!personnel.containsKey(p.getSpouseId())){
+        for (Person p : personnel.values()) {
+            if (p.hasSpouse()) {
+                if (!personnel.containsKey(p.getSpouseId())) {
                     p.setSpouseId(null);
                 }
             }
         }
 
         // clean up non-existent unit references in force unit lists
-        for(Force force : forceIds.values()) {
+        for (Force force : forceIds.values()) {
             List<UUID> orphanForceUnitIDs = new ArrayList<>();
 
-            for(UUID unitID : force.getUnits()) {
-                if(getUnit(unitID) == null) {
+            for (UUID unitID : force.getUnits()) {
+                if (getUnit(unitID) == null) {
                     orphanForceUnitIDs.add(unitID);
                 }
             }
 
-            for(UUID unitID : orphanForceUnitIDs) {
+            for (UUID unitID : orphanForceUnitIDs) {
                 force.removeUnit(unitID);
             }
         }
@@ -4442,7 +4453,7 @@ public class Campaign implements Serializable, ITechManager {
         points = Math.min(points, armor.getAmount());
         boolean sellingAllArmor = points == armor.getAmount();
         double proportion = ((double) points / armor.getAmount());
-        if(sellingAllArmor) {
+        if (sellingAllArmor) {
             // to avoid rounding error
             proportion = 1.0;
         }
@@ -4510,8 +4521,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public static Entity getBrandNewUndamagedEntity(String entityShortName) {
-        MechSummary mechSummary = MechSummaryCache.getInstance().getMech(
-                entityShortName);
+        MechSummary mechSummary = MechSummaryCache.getInstance().getMech(entityShortName);
         if (mechSummary == null) {
             return null;
         }
@@ -4706,23 +4716,23 @@ public class Campaign implements Serializable, ITechManager {
                 startedSystem = true;
             }
             //now check for planetary events
-            for(Planet p : psystem.getPlanets()) {
+            for (Planet p : psystem.getPlanets()) {
                 List<Planet.PlanetaryEvent> customEvents = p.getCustomEvents();
-	            if(!customEvents.isEmpty()) {
-	            	if(!startedSystem) {
-	            		//only write this if we haven't already started the system
-	            		pw1.println("\t\t<system><id>" + psystem.getId() + "</id>");
-	            	}
-	                pw1.println("\t\t\t<planet><sysPos>" + p.getSystemPosition() + "</sysPos>");
-	                for(Planet.PlanetaryEvent event : customEvents) {
-	                    Systems.getInstance().writePlanetaryEvent(pw1, event);
-	                    pw1.println();
-	                }
-	                pw1.println("\t\t\t</planet>");
-	                startedSystem = true;
-	            }
+                if (!customEvents.isEmpty()) {
+                    if (!startedSystem) {
+                        //only write this if we haven't already started the system
+                        pw1.println("\t\t<system><id>" + psystem.getId() + "</id>");
+                    }
+                    pw1.println("\t\t\t<planet><sysPos>" + p.getSystemPosition() + "</sysPos>");
+                    for (Planet.PlanetaryEvent event : customEvents) {
+                        Systems.getInstance().writePlanetaryEvent(pw1, event);
+                        pw1.println();
+                    }
+                    pw1.println("\t\t\t</planet>");
+                    startedSystem = true;
+                }
             }
-            if(startedSystem) {
+            if (startedSystem) {
                 //close the system
                 pw1.println("\t\t</system>");
             }
@@ -5956,25 +5966,13 @@ public class Campaign implements Serializable, ITechManager {
         Unit u = getUnit(person.getUnitId());
         if (status == Person.S_KIA) {
             ServiceLogger.kia(person, getDate());
-            // Don't forget to tell the spouse
-            if (person.hasSpouse()) {
-                Person spouse = person.getSpouse();
-
-                spouse.addFormerSpouse(new FormerSpouse(person.getId(),
-                        FormerSpouse.convertDateTimeToLocalDate(getDateTime()), FormerSpouse.REASON_WIDOWED));
-                person.addFormerSpouse(new FormerSpouse(spouse.getId(),
-                        FormerSpouse.convertDateTimeToLocalDate(getDateTime()), FormerSpouse.REASON_WIDOWED));
-
-                if (!getCampaignOptions().getKeepMarriedNameUponSpouseDeath() && (spouse.getMaidenName() != null)) {
-                    spouse.setSurname(spouse.getMaidenName());
-                }
-
-                PersonalLogger.spouseKia(spouse, person, getDate());
-                spouse.setSpouseId(null);
-                spouse.setMaidenName(null);
-            }
             // set the date of death
             person.setDateOfDeath((GregorianCalendar) calendar.clone());
+            // Don't forget to tell the spouse
+            if (person.hasSpouse()) {
+                person.divorce(getCampaignOptions().getKeepMarriedNameUponSpouseDeath()
+                        ? Person.OPT_KEEP_SURNAME : Person.OPT_SPOUSE_CHANGE_SURNAME);
+            }
         } else if (person.getStatus() == Person.S_KIA) {
             // remove date of death for resurrection
             person.setDateOfDeath(null);
