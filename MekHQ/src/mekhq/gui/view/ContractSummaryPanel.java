@@ -66,7 +66,8 @@ public class ContractSummaryPanel extends JPanel {
     private JTextArea txtStraightSupport;
     private JTextArea txtBattleLossComp;
 
-    private ResourceBundle resourceMap;
+    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractMarketDialog",
+            new EncodeControl());
     private ContractPaymentBreakdown contractPaymentBreakdown;
 
     public ContractSummaryPanel(Contract contract, Campaign campaign, CampaignGUI gui, boolean allowRerolls) {
@@ -116,9 +117,19 @@ public class ContractSummaryPanel extends JPanel {
     }
 
     private void fillStats() {
+        //region Variable Declarations
+        // TODO : Remove Inline date
+        SimpleDateFormat shortDateFormat = new SimpleDateFormat("yyyy/MM/dd/");
 
+        java.awt.GridBagConstraints gridBagConstraints;
+        int y = 0;
+
+        // TODO : These two arrays should probably be pulled from elsewhere
         String[] skillNames = {"Green", "Regular", "Veteran", "Elite"};
         String[] ratingNames = {"F", "D", "C", "B", "A"};
+        //endregion Variable Declarations
+
+        mainPanel.setLayout(new java.awt.GridBagLayout());
 
         JLabel lblName = new JLabel();
         txtName = new JTextField();
@@ -155,17 +166,6 @@ public class ContractSummaryPanel extends JPanel {
         JTextArea txtRequiredLances = new JTextArea();
         JLabel lblSalvageRights = new JLabel();
         JTextArea txtSalvageRights = new JTextArea();
-
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractMarketDialog",
-                new EncodeControl());
-
-        java.awt.GridBagConstraints gridBagConstraints;
-        mainPanel.setLayout(new java.awt.GridBagLayout());
-
-        // TODO : Remove Inline date
-        SimpleDateFormat shortDateFormat = new SimpleDateFormat("MM/dd/yyyy");
-
-        int y = 0;
 
         lblName.setName("lblName");
         lblName.setText(resourceMap.getString("lblName.text"));
@@ -474,7 +474,7 @@ public class ContractSummaryPanel extends JPanel {
             btnCommand.addActionListener(ev -> {
                 JButton btn = null;
                 if (ev.getSource() instanceof JButton) {
-                    btn = (JButton)ev.getSource();
+                    btn = (JButton) ev.getSource();
                 }
                 if (null == btn) {
                     return;
