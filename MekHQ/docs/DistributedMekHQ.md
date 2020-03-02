@@ -101,4 +101,104 @@ exists to make this mode feel interesting.
 This objective is TBD on its design details.
 
 ## Distributed MekHQ Architecture
-TBD
+Distributed MekHQ will be a standard Client-Server architecture, with one instance
+serving as the host of the session. The underlying protocol will be gRPC and the
+message flow will be roughly PUBSUB.
+
+The general message flow is as follows:
+1. A Remote Campaign connects to a Host Campaign and sends a ConnectionRequest.
+2. If the Host Campaign is compatible with the Remote Campaign, the Host Campaign responds with a ConnectionResponse.
+3. If the Remote Campaign is compatible with the Host Campaign, the Remote Campaign sends a ClientMessageBusStream.
+4. The Host Campaign responds with a ServerMessageBusStream.
+5. Gameplay messages flow over these streams.
+
+Notes:
+- If a Host Campaign cannot support the Remote Campaign version the connection is terminated.
+- If a Remote Campaign cannot support the Host Campaign version the connection is terminated.
+- If the Remote Campaign does not use the correct password the connection is terminated.
+
+### Security
+As Distributed MekHQ uses gRPC, TLS will be made available as an option to secure the underlying transport. Further, a ConnectionRequest may include an optional password. Messages sent over the streams will use Protobuf and not support arbitrary serialization.
+
+### ConnectionRequest
+The ConnectionRequest message has the following properties:
+- Remote Campaign Version
+- Remote Campaign Name
+- Remote Campaign UUID
+- Remote Campaign Date
+- Password (*OPTIONAL*)
+
+### ConnectionResponse
+The ConnectionResponse message has the following properties:
+- Host Campaign Version
+- Host Campaign Name
+- Host Campaign UUID
+- Host Campaign Date
+- Remote Campaign List
+    - Remote Campaign Name
+    - Remote Campaign UUID
+    - Remote Campaign Date
+    - Remote Campaign Team
+
+### Message Bus Messages
+The Message Bus contains all client-to-server messages to be processed by the server and either redistributed or transformed.
+
+#### CampaignDateChanged
+The CampaignDateChanged message notifies the Host Campaign that a Remote Campaign has advanced days.
+- Campaign UUID
+- Campaign Date
+
+This message is redistributed to all connected campaigns.
+
+#### GMModeChanged
+The GMModeChanged message notifies the Host Campaign that a Remote Campaign has changed their GM Mode.
+- Campaign UUID
+- Is GM?
+
+This message is redistributed to all connected campaigns.
+
+#### TeamAssignment
+The TeamAssignment message notifies a Remote Campaign of team assignments.
+- Team List
+    - Remote Campaign UUID
+    - Remote Campaign Team
+
+The Host Campaign is always Team 1.
+
+This message is only sent by the Host Campaign.
+
+#### DailyLog
+The DailyLog message notifies the Host Campaign of a daily log creation.
+- Campaign UUID
+- Log Date
+- Log List
+    - Log Entry
+
+This message is redistributed to all Remote Campaigns on the same team as the sending Campaign.
+
+#### WireTransferRequest
+The WireTransferRequest message notifies the Host Campaign of an intent to perform a wire transfer between two Campaigns.
+- Source Campaign UUID
+- Target Campaign UUID
+- Request UUID
+- Money Amount
+
+The amount may be positive (credit) or negative (debit).
+
+This message is redistributed only to the target Campaign.
+
+#### WireTransferResponse
+The WireTransferResponse message notifies the Host Campaign of the response to a wire transfer request.
+- Request UUID
+- Accepted?
+
+The Remote Campaign must send a rejection response if the request if it has insufficient funds.
+
+This message is only consumed by the Host Campaign.
+
+#### WireTransferCompleted
+The WireTransferCompleted message notifies two participating Campaigns that their wire transfer has been accepted by the Host.
+- Request UUID
+- Accepted?
+
+This message is sent to the originating source and target Campaigns upon receipt of a WireTransferResponse.
