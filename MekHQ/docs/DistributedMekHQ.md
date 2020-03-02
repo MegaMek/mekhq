@@ -185,22 +185,34 @@ The WireTransferRequest message notifies the Host Campaign of an intent to perfo
 - Request UUID
 - Money Amount
 
-The amount may be positive (credit) or negative (debit).
+The amount may be positive (debiting the source campaign) or negative (debiting the target campaign).
+
+The source Campaign must move any debited funds into a Pending account and may not use those funds until the transfer has been completed.
 
 This message is redistributed only to the target Campaign.
 
 #### WireTransferResponse
 The WireTransferResponse message notifies the Host Campaign of the response to a wire transfer request.
+- Source Campaign UUID
+- Target Campaign UUID
 - Request UUID
 - Accepted?
 
-The Remote Campaign must send a rejection response if the request if it has insufficient funds.
+The target Campaign must send a rejection response if the request if it has insufficient funds to process a debit.
+
+The target Campaign must move any debited funds into a Pending account and may not use those funds until the transfer has been completed.
+
+The Host Campaign must send a rejection WireTransferCompleted message if the request is not recognized.
 
 This message is only consumed by the Host Campaign.
 
 #### WireTransferCompleted
 The WireTransferCompleted message notifies two participating Campaigns that their wire transfer has been accepted by the Host.
+- Source Campaign UUID
+- Target Campaign UUID
 - Request UUID
 - Accepted?
+
+This message must be rejected by the source or target Campaigns if they do not recognize it.
 
 This message is sent to the originating source and target Campaigns upon receipt of a WireTransferResponse.
