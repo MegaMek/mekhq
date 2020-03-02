@@ -168,11 +168,13 @@ The Host Campaign is always Team 1.
 This message is only sent by the Host Campaign.
 
 #### DailyLog
-The DailyLog message notifies the Host Campaign of a daily log creation.
+The DailyLog message notifies the Host Campaign of a daily log activity.
 - Campaign UUID
 - Log Date
 - Log List
     - Log Entry
+
+This message may be sent at any point in a day and may be sent mulitple times, but implementations could delay sending this message until a day has completed.
 
 This message is redistributed to all Remote Campaigns on the same team as the sending Campaign.
 
