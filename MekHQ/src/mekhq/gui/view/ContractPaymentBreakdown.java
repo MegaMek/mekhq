@@ -2,6 +2,7 @@ package mekhq.gui.view;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.Contract;
 
 import javax.swing.*;
@@ -63,68 +64,53 @@ public class ContractPaymentBreakdown {
     public void display(int y, int gridWidth) {
         //region Variable Declarations and Initializations
         Font f;
-        GridBagConstraints gridBagConstraints;
+
+        // Initializing the GridBagConstraint used for Labels
+        // To use this you MUST AND ONLY overwrite gridy
+        GridBagConstraints gridBagConstraintsLabels = new GridBagConstraints();
+        gridBagConstraintsLabels.gridx = 0;
+        gridBagConstraintsLabels.gridwidth = 1;
+        gridBagConstraintsLabels.weightx = 1.0;
+        gridBagConstraintsLabels.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraintsLabels.anchor = GridBagConstraints.WEST;
+        gridBagConstraintsLabels.insets = new Insets(2, 2, 2, 2);
+
+        GridBagConstraints gridBagConstraintsText = new GridBagConstraints();
+        gridBagConstraintsText.gridx = 1;
+        gridBagConstraintsText.gridy = y++;
+        gridBagConstraintsText.gridwidth = 1;
+        gridBagConstraintsText.weightx = 1.0;
+        gridBagConstraintsText.fill = GridBagConstraints.NONE;
+        gridBagConstraintsText.anchor = GridBagConstraints.EAST;
+        gridBagConstraintsText.insets = new Insets(2, 2, 2, 2);
         //endregion Variable Declarations and Initializations
 
         JLabel lblIncome = new JLabel(resourceMap.getString("lblIncome.text"));
         f = lblIncome.getFont();
         lblIncome.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(lblIncome, gridBagConstraints);
+        gridBagConstraintsLabels.gridy = y;
+        mainPanel.add(lblIncome, gridBagConstraintsLabels);
 
         lblNetIncome2 = new JLabel();
         setLblNetIncome2();
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(lblNetIncome2, gridBagConstraints);
+        gridBagConstraintsText.gridy = y;
+        mainPanel.add(lblNetIncome2, gridBagConstraintsText);
 
         JLabel lblBaseAmount1 = new JLabel(indentation
                 + resourceMap.getString("lblBaseAmount1.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(lblBaseAmount1, gridBagConstraints);
+        gridBagConstraintsLabels.gridy = ++y;
+        mainPanel.add(lblBaseAmount1, gridBagConstraintsLabels);
+
         lblBaseAmount2 = new JLabel();
         setLblBaseAmount2();
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(lblBaseAmount2, gridBagConstraints);
+        gridBagConstraintsText.gridy = y;
+        mainPanel.add(lblBaseAmount2, gridBagConstraintsText);
 
         JLabel lblOverheadAmount1 = new JLabel(indentation
                 + resourceMap.getString("lblOverheadAmount1.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(lblOverheadAmount1, gridBagConstraints);
+        gridBagConstraintsLabels.gridy = ++y;
+        mainPanel.add(lblOverheadAmount1, gridBagConstraintsLabels);
+
         lblOverheadAmount2 = new JLabel();
         setLblOverheadAmount2();
         gridBagConstraints = new GridBagConstraints();
@@ -138,72 +124,31 @@ public class ContractPaymentBreakdown {
 
         JLabel lblSupportAmount1 = new JLabel(indentation
                 + resourceMap.getString("lblSupportAmount1.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(lblSupportAmount1, gridBagConstraints);
+        gridBagConstraintsLabels.gridy = ++y;
+        mainPanel.add(lblSupportAmount1, gridBagConstraintsLabels);
+
         lblSupportAmount2 = new JLabel();
         setLblSupportAmount2();
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(lblSupportAmount2, gridBagConstraints);
+        gridBagConstraintsText.gridy = y;
+        mainPanel.add(lblSupportAmount2, gridBagConstraintsText);
 
         JLabel lblTransportAmount1 = new JLabel(indentation
                 + resourceMap.getString("lblTransportAmount1.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(lblTransportAmount1, gridBagConstraints);
+        gridBagConstraintsLabels.gridy = ++y;
+        mainPanel.add(lblTransportAmount1, gridBagConstraintsLabels);
         lblTransportAmount2 = new JLabel();
         setLblTransportAmount2();
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(lblTransportAmount2, gridBagConstraints);
+        gridBagConstraintsText.gridy = y;
+        mainPanel.add(lblTransportAmount2, gridBagConstraintsText);
 
         JLabel lblTransitAmount1 = new JLabel(indentation
                 + resourceMap.getString("lblTransitAmount1.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(lblTransitAmount1, gridBagConstraints);
+        gridBagConstraintsLabels.gridy = ++y;
+        mainPanel.add(lblTransitAmount1, gridBagConstraintsLabels);
         lblTransitAmount2 = new JLabel();
         setLblTransitAmount2();
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(lblTransitAmount2, gridBagConstraints);
+        gridBagConstraintsText.gridy = y;
+        mainPanel.add(lblTransitAmount2, gridBagConstraintsText);
 
         JLabel lblFeeAmount1;
         if (contract.payMRBCFee()) {
@@ -213,37 +158,17 @@ public class ContractPaymentBreakdown {
         } else {
             lblFeeAmount1 = new JLabel(indentation + resourceMap.getString("lblFeeAmount1.text"));
         }
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(lblFeeAmount1, gridBagConstraints);
+        gridBagConstraintsLabels.gridy = ++y;
+        mainPanel.add(lblFeeAmount1, gridBagConstraintsLabels);
         lblFeeAmount2 = new JLabel();
         setLblFeeAmount2();
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(lblFeeAmount2, gridBagConstraints);
+        gridBagConstraintsText.gridy = y;
+        mainPanel.add(lblFeeAmount2, gridBagConstraintsText);
 
         JLabel sep1 = new JLabel("");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(sep1, gridBagConstraints);
+        gridBagConstraintsLabels.gridy = ++y;
+        mainPanel.add(sep1, gridBagConstraintsLabels);
+
         JLabel sep2 = new JLabel("");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -258,221 +183,98 @@ public class ContractPaymentBreakdown {
         JLabel lblAdvanceCashflow1 = new JLabel(resourceMap.getString("lblAdvanceCashflow.text"));
         f = lblAdvanceCashflow1.getFont();
         lblAdvanceCashflow1.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(lblAdvanceCashflow1, gridBagConstraints);
+        gridBagConstraintsLabels.gridy = ++y;
+        mainPanel.add(lblAdvanceCashflow1, gridBagConstraintsLabels);
         lblTotalAdvanceMoney2 = new JLabel();
         setLblTotalAdvanceMoney2();
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(lblTotalAdvanceMoney2, gridBagConstraints);
+        gridBagConstraintsText.gridy = y;
+        mainPanel.add(lblTotalAdvanceMoney2, gridBagConstraintsText);
 
         lblAdvanceNetIncome1 = new JLabel();
         setLblAdvanceNetIncome1();
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(lblAdvanceNetIncome1, gridBagConstraints);
+        gridBagConstraintsLabels.gridy = ++y;
+        mainPanel.add(lblAdvanceNetIncome1, gridBagConstraintsLabels);
+
         lblAdvanceNetIncome2 = new JLabel();
         setLblAdvanceNetIncome2();
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(lblAdvanceNetIncome2, gridBagConstraints);
+        gridBagConstraintsText.gridy = y;
+        mainPanel.add(lblAdvanceNetIncome2, gridBagConstraintsText);
 
         JLabel lblSignBonusAmount1 = new JLabel(indentation + resourceMap.getString("lblSignBonusAmount1.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(lblSignBonusAmount1, gridBagConstraints);
+        gridBagConstraintsLabels.gridy = ++y;
+        mainPanel.add(lblSignBonusAmount1, gridBagConstraintsLabels);
+
         lblSignBonusAmount2 = new JLabel();
         setLblSignBonusAmount2();
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(lblSignBonusAmount2, gridBagConstraints);
+        gridBagConstraintsText.gridy = y;
+        mainPanel.add(lblSignBonusAmount2, gridBagConstraintsText);
 
         JLabel lblMonthlyCashflow1 = new JLabel(resourceMap.getString("lblMonthlyCashflow.text"));
         f = lblMonthlyCashflow1.getFont();
         lblMonthlyCashflow1.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(lblMonthlyCashflow1, gridBagConstraints);
+        gridBagConstraintsLabels.gridy = ++y;
+        mainPanel.add(lblMonthlyCashflow1, gridBagConstraintsLabels);
+
         lblTotalMonthlyMoney2 = new JLabel();
         setLblTotalMonthlyMoney2();
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(lblTotalMonthlyMoney2, gridBagConstraints);
+        gridBagConstraintsText.gridy = y;
+        mainPanel.add(lblTotalMonthlyMoney2, gridBagConstraintsText);
 
         lblMonthlyNetIncome1 = new JLabel();
         setLblMonthlyNetIncome1();
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(lblMonthlyNetIncome1, gridBagConstraints);
+        gridBagConstraintsLabels.gridy = ++y;
+        mainPanel.add(lblMonthlyNetIncome1, gridBagConstraintsLabels);
+
         lblMonthlyNetIncome2 = new JLabel();
         setLblMonthlyNetIncome2();
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(lblMonthlyNetIncome2, gridBagConstraints);
+        gridBagConstraintsText.gridy = y;
+        mainPanel.add(lblMonthlyNetIncome2, gridBagConstraintsText);
 
         JLabel lblOverheadExp = new JLabel(indentation + resourceMap.getString("lblEstimatedOverheadExpenses.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(lblOverheadExp, gridBagConstraints);
+        gridBagConstraintsLabels.gridy = ++y;
+        mainPanel.add(lblOverheadExp, gridBagConstraintsLabels);
+
         lblOverheadExp2 = new JLabel();
         setLblOverheadExp2();
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(lblOverheadExp2, gridBagConstraints);
+        gridBagConstraintsText.gridy = y;
+        mainPanel.add(lblOverheadExp2, gridBagConstraintsText);
 
         JLabel lblMaintenanceExp = new JLabel(indentation + resourceMap.getString("lblEstimatedMaintenanceExpenses.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(lblMaintenanceExp, gridBagConstraints);
+        gridBagConstraintsLabels.gridy = ++y;
+        mainPanel.add(lblMaintenanceExp, gridBagConstraintsLabels);
+
         lblMaintenanceExp2 = new JLabel();
         setLblMaintenanceExp2();
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(lblMaintenanceExp2, gridBagConstraints);
+        gridBagConstraintsText.gridy = y;
+        mainPanel.add(lblMaintenanceExp2, gridBagConstraintsText);
 
         JLabel lblPayrollExp = new JLabel(indentation + resourceMap.getString("lblEstimatedPayrollExpenses.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(lblPayrollExp, gridBagConstraints);
+        gridBagConstraintsLabels.gridy = ++y;
+        mainPanel.add(lblPayrollExp, gridBagConstraintsLabels);
+
         lblPayrollExp2 = new JLabel();
         setLblPayrollExp2();
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(lblPayrollExp2, gridBagConstraints);
+        gridBagConstraintsText.gridy = y;
+        mainPanel.add(lblPayrollExp2, gridBagConstraintsText);
 
         JLabel lblTransportationExpenses1 = new JLabel(resourceMap.getString("lblTransportationExpenses.text"));
         f = lblTransportationExpenses1.getFont();
         lblTransportationExpenses1.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(lblTransportationExpenses1, gridBagConstraints);
+        gridBagConstraintsLabels.gridy = ++y;
+        mainPanel.add(lblTransportationExpenses1, gridBagConstraintsLabels);
+
         lblTransportationExpenses2 = new JLabel();
         setLblTransportationExpenses2();
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
+        gridBagConstraintsText.gridy = y;
+
         mainPanel.add(lblTransportationExpenses2, gridBagConstraints);
 
         JLabel lblEstimatedProfit1 = new JLabel(resourceMap.getString("lblEstimatedProfit.text"));
         f = lblEstimatedProfit1.getFont();
         lblEstimatedProfit1.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(lblEstimatedProfit1, gridBagConstraints);
+        gridBagConstraintsLabels.gridy = ++y;
+        mainPanel.add(lblEstimatedProfit1, gridBagConstraintsLabels);
+
         lblEstimatedProfit2 = new JLabel();
         setLblEstimatedProfit2();
         gridBagConstraints = new GridBagConstraints();
