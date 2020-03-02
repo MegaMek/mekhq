@@ -323,7 +323,6 @@ public class ContractMarketDialog extends JDialog {
 
         scrollContractView.setMinimumSize(new java.awt.Dimension(500, 600));
         scrollContractView.setPreferredSize(new java.awt.Dimension(500, 600));
-        scrollContractView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollContractView.setViewportView(null);
 
         panelTable.setLayout(new BorderLayout());
@@ -519,7 +518,7 @@ public class ContractMarketDialog extends JDialog {
              scrollContractView.setViewportView(null);
              return;
          }
-         contractView = new ContractSummaryPanel(selectedContract, campaign, gui,
+         contractView = new ContractSummaryPanel(selectedContract, campaign,
                  campaign.getCampaignOptions().getUseAtB() &&
                  selectedContract instanceof AtBContract &&
                  !((AtBContract)selectedContract).isSubcontract());

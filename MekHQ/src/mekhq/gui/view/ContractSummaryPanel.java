@@ -39,7 +39,6 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.universe.Systems;
-import mekhq.gui.CampaignGUI;
 import mekhq.gui.GuiTabType;
 
 /**
@@ -51,7 +50,6 @@ public class ContractSummaryPanel extends JPanel {
     private static final long serialVersionUID = 8773615661962644614L;
 
     private Campaign campaign;
-    private CampaignGUI gui;
     private Contract contract;
     private boolean allowRerolls;
     private int cmdRerolls;
@@ -70,10 +68,9 @@ public class ContractSummaryPanel extends JPanel {
             new EncodeControl());
     private ContractPaymentBreakdown contractPaymentBreakdown;
 
-    public ContractSummaryPanel(Contract contract, Campaign campaign, CampaignGUI gui, boolean allowRerolls) {
+    public ContractSummaryPanel(Contract contract, Campaign campaign, boolean allowRerolls) {
         this.contract = contract;
         this.campaign = campaign;
-        this.gui = gui;
         this.allowRerolls = allowRerolls;
         if (allowRerolls) {
             Person admin = campaign.findBestInRole(Person.T_ADMIN_COM, SkillType.S_NEG, SkillType.S_ADMIN);
@@ -109,7 +106,8 @@ public class ContractSummaryPanel extends JPanel {
         gbc.weighty = 1.0;
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.anchor = GridBagConstraints.LINE_START;
+
         add(mainPanel, gbc);
     }
 
@@ -126,7 +124,7 @@ public class ContractSummaryPanel extends JPanel {
         GridBagConstraints gridBagConstraintsA = new GridBagConstraints();
         gridBagConstraintsA.gridx = 0;
         gridBagConstraintsA.fill = GridBagConstraints.NONE;
-        gridBagConstraintsA.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraintsA.anchor = GridBagConstraints.LINE_START;
 
         // Initializing GridBagConstraint used for the Panels
         GridBagConstraints gridBagConstraintsB = new GridBagConstraints();
@@ -134,14 +132,14 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsB.weightx = 0.5;
         gridBagConstraintsB.insets = new Insets(0, 10, 0, 0);
         gridBagConstraintsB.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraintsB.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraintsB.anchor = GridBagConstraints.LINE_END;
 
         // Initializing GridBagConstraint used for the Buttons
         GridBagConstraints gridBagConstraintsC = new GridBagConstraints();
         gridBagConstraintsC.gridx = 2;
         gridBagConstraintsC.weightx = 0.5;
         gridBagConstraintsC.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraintsC.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraintsC.anchor = GridBagConstraints.LINE_START;
 
         int y = 0;
         //endregion Variable Declarations
@@ -201,8 +199,8 @@ public class ContractSummaryPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 // Display where it is on the interstellar map
-                gui.getMapTab().switchSystemsMap(contract.getSystem());
-                gui.setSelectedTab(GuiTabType.MAP);
+                campaign.getApp().getCampaigngui().getMapTab().switchSystemsMap(contract.getSystem());
+                campaign.getApp().getCampaigngui().setSelectedTab(GuiTabType.MAP);
             }
         });
         gridBagConstraintsB.gridy = y;
