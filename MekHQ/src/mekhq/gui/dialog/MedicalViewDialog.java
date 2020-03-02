@@ -111,8 +111,6 @@ public class MedicalViewDialog extends JDialog {
     private transient Color labelColor;
     private transient ImageIcon healImageIcon;
 
-    private boolean gmMode;
-
     public MedicalViewDialog(Window parent, Campaign c, Person p, IconPackage ip) {
         super();
         this.campaign = Objects.requireNonNull(c);
@@ -320,7 +318,7 @@ public class MedicalViewDialog extends JDialog {
                     doll.setLocColor(bl, col);
                 }
             });
-        if (isGMMode()) {
+        if (campaign.isGM()) {
             doll.addActionListener(dollActionListener);
         }
         panel.add(doll);
@@ -486,7 +484,8 @@ public class MedicalViewDialog extends JDialog {
                             inj.getType().getSimpleName(), inj.getStart().toString(DATE_FORMATTER),
                                 genTimePeriod(inj.getTime())));
                     }
-                    if (isGMMode()) {
+
+                    if (campaign.isGM()) {
                         injLabel.addMouseListener(new InjuryLabelMouseAdapter(injLabel, p, inj));
                     }
 
@@ -570,14 +569,6 @@ public class MedicalViewDialog extends JDialog {
         } else {
             return String.format(resourceMap.getString("durationYears.format"), days * 1.0 / 365.0); //$NON-NLS-1$
         }
-    }
-
-    public boolean isGMMode() {
-        return gmMode;
-    }
-
-    public void setGMMode(boolean gmMode) {
-        this.gmMode = gmMode;
     }
 
     private static class InjuryLabelMouseAdapter extends MouseAdapter {

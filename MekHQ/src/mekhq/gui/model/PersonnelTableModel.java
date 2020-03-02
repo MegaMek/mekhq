@@ -808,7 +808,7 @@ public class PersonnelTableModel extends DataTableModel {
                             parent = parent.getParentForce();
                         }
                         desc.append("</html>");
-                        setText(desc.toString());
+                        setHtmlText(desc.toString());
                         Image forceImage = getImageFor(force);
                         if (null != forceImage) {
                             setImage(forceImage);
@@ -826,7 +826,7 @@ public class PersonnelTableModel extends DataTableModel {
                     } else {
                         clearImage();
                     }
-                    setText("");
+                    setHtmlText("");
                     break;
             }
 

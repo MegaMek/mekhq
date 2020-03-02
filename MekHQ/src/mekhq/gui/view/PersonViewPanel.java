@@ -1347,7 +1347,6 @@ public class PersonViewPanel extends ScrollablePanel {
         JButton medicalButton = new JButton(new ImageIcon("data/images/misc/medical.png")); //$NON-NLS-1$
         medicalButton.addActionListener(event -> {
             MedicalViewDialog medDialog = new MedicalViewDialog(SwingUtilities.getWindowAncestor(this), campaign, person, ip);
-            medDialog.setGMMode(campaign.isGM());
             medDialog.setModalityType(ModalityType.APPLICATION_MODAL);
             medDialog.setVisible(true);
             removeAll();

@@ -468,7 +468,7 @@ public class RetirementTableModel extends AbstractTableModel {
                         parent = parent.getParentForce();
                     }
                     desc += "</html>";
-                    setText(desc);
+                    setHtmlText(desc);
                     Image forceImage = getImageFor(force);
                     if(null != forceImage) {
                         setImage(forceImage);
