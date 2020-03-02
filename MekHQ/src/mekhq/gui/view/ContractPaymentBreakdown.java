@@ -27,6 +27,7 @@ public class ContractPaymentBreakdown {
     private JLabel lblSupportAmount2;
     private JLabel lblTransportAmount2;
     private JLabel lblTransitAmount2;
+    private JLabel lblNetIncome2;
     private JLabel lblAdvanceNetIncome1;
     private JLabel lblAdvanceNetIncome2;
     private JLabel lblSignBonusAmount2;
@@ -78,7 +79,8 @@ public class ContractPaymentBreakdown {
         gridBagConstraints.insets = new Insets(2, 2, 2, 2);
         mainPanel.add(lblIncome, gridBagConstraints);
 
-        JLabel lblNetIncome2 = new JLabel(contract.getTotalAmountPlusFees().toAmountAndSymbolString());
+        lblNetIncome2 = new JLabel();
+        setLblNetIncome2();
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
@@ -533,6 +535,14 @@ public class ContractPaymentBreakdown {
         lblTransitAmount2.setText(contract.getTransitAmount().toAmountAndSymbolString());
     }
 
+    private void setLblFeeAmount2() {
+        lblFeeAmount2.setText("-" + contract.getFeeAmount().toAmountAndSymbolString());
+    }
+
+    private void setLblNetIncome2() {
+        lblNetIncome2.setText(contract.getTotalAmountPlusFees().toAmountAndSymbolString());
+    }
+
     private void setLblAdvanceNetIncome1() {
         lblAdvanceNetIncome1.setText(indentation + contract.getAdvancePct() + "% "
                 + resourceMap.getString("lblOfNetIncome.text") + ":");
@@ -554,10 +564,6 @@ public class ContractPaymentBreakdown {
     private void setLblMonthlyNetIncome2() {
         lblMonthlyNetIncome2.setText(generateMonthlyHeader(contract.getLength())
                 + contract.getMonthlyPayOut().toAmountAndSymbolString());
-    }
-
-    private void setLblFeeAmount2() {
-        lblFeeAmount2.setText("-" + contract.getFeeAmount().toAmountAndSymbolString());
     }
 
     private void setLblOverheadExp2() {
