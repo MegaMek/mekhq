@@ -84,7 +84,6 @@ public class ContractMarketDialog extends JDialog {
     private static int signingBonus = 0;
     private static int sharePct = 20;
 
-    private CampaignGUI gui;
     private Campaign campaign;
     private ContractMarket contractMarket;
     private Contract selectedContract = null;
@@ -121,9 +120,8 @@ public class ContractMarketDialog extends JDialog {
 
     private static final Logger log = Logger.getLogger(ContractMarketDialog.class);
 
-    public ContractMarketDialog(Frame frame, CampaignGUI gui, Campaign c) {
+    public ContractMarketDialog(Frame frame, Campaign c) {
         super(frame, true);
-        this.gui = gui;
         campaign = c;
         contractMarket = c.getContractMarket();
         possibleRetainerContracts = new ArrayList<>();
