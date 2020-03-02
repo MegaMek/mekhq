@@ -94,7 +94,7 @@ public class AtBDynamicScenarioFactory {
      */
     public static int UNIT_WEIGHT_UNSPECIFIED = -1;
 
-    private static int[] validBotBombs = { BombType.B_HE, BombType.B_CLUSTER, BombType.B_RL, BombType.B_INFERNO, BombType.B_THUNDER };
+    private static int[] validBotBombs = { BombType.B_HE, BombType.B_CLUSTER, BombType.B_RL, BombType.B_INFERNO, BombType.B_THUNDER, BombType.B_FAE_SMALL, BombType.B_FAE_LARGE };
     private static int[] validBotAABombs = { BombType.B_RL };
 
     private static int[] minimumBVPercentage = { 50, 60, 70, 80, 90, 100 };
