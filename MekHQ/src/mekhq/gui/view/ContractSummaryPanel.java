@@ -115,7 +115,7 @@ public class ContractSummaryPanel extends JPanel {
     private void fillStats() {
         //region Variable Declarations
         // TODO : Remove Inline date
-        SimpleDateFormat shortDateFormat = new SimpleDateFormat("yyyy/MM/dd/");
+        SimpleDateFormat shortDateFormat = new SimpleDateFormat("yyyy/MM/dd");
 
         GridBagConstraints gridBagConstraints;
         int y = 0;
@@ -180,7 +180,7 @@ public class ContractSummaryPanel extends JPanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             mainPanel.add(lblEnemy, gridBagConstraints);
 
-            JTextArea txtEnemy = new JTextArea(((AtBContract)contract).getEnemyName(campaign.getGameYear()));
+            JTextArea txtEnemy = new JTextArea(((AtBContract) contract).getEnemyName(campaign.getGameYear()));
             txtEnemy.setName("txtEnemy");
             txtEnemy.setEditable(false);
             txtEnemy.setLineWrap(true);
@@ -259,7 +259,7 @@ public class ContractSummaryPanel extends JPanel {
             mainPanel.add(lblDistance, gridBagConstraints);
 
             JumpPath path = campaign.calculateJumpPath(campaign.getCurrentSystem(), contract.getSystem());
-            int days = (int)Math.ceil((path).getTotalTime(Utilities.getDateTimeDay(contract.getStartDate()),
+            int days = (int) Math.ceil((path).getTotalTime(Utilities.getDateTimeDay(contract.getStartDate()),
                     campaign.getLocation().getTransitTime()));
             int jumps = path.getJumps();
             if (campaign.getCurrentSystem().getId().equals(contract.getSystemId())
@@ -292,7 +292,7 @@ public class ContractSummaryPanel extends JPanel {
         mainPanel.add(lblAllyRating, gridBagConstraints);
 
         if (contract instanceof AtBContract) {
-            JTextArea txtAllyRating = new JTextArea(skillNames[((AtBContract)contract).getAllySkill()]
+            JTextArea txtAllyRating = new JTextArea(skillNames[((AtBContract) contract).getAllySkill()]
                     + "/" + ratingNames[((AtBContract)contract).getAllyQuality()]);
             txtAllyRating.setName("txtAllyRating");
             txtAllyRating.setEditable(false);
@@ -573,7 +573,7 @@ public class ContractSummaryPanel extends JPanel {
                             ContractMarket.CLAUSE_SUPPORT, campaign);
                     setSupportRerollButtonText((JButton) ev.getSource());
                     txtStraightSupport.setText(contract.getStraightSupport() + "%");
-                    txtBattleLossComp = new JTextArea(contract.getBattleLossComp() + "%");
+                    txtBattleLossComp.setText(contract.getBattleLossComp() + "%");
                     if (campaign.getContractMarket().getRerollsUsed(contract,
                             ContractMarket.CLAUSE_SUPPORT) >= logRerolls) {
                         btn.setEnabled(false);
@@ -594,8 +594,8 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         mainPanel.add(lblBattleLossComp, gridBagConstraints);
 
+        txtBattleLossComp = new JTextArea(contract.getBattleLossComp() + "%");
         txtBattleLossComp.setName("txtBattleLossComp");
-        txtBattleLossComp.setText(contract.getBattleLossComp() + "%");
         txtBattleLossComp.setEditable(false);
         txtBattleLossComp.setLineWrap(true);
         txtBattleLossComp.setWrapStyleWord(true);
@@ -647,7 +647,7 @@ public class ContractSummaryPanel extends JPanel {
                 && (campaign.getFactionCode().equals("MERC")
                     || campaign.getFactionCode().equals("PIR"))
                 && (campaign.getContractMarket().getRerollsUsed(contract,
-                ContractMarket.CLAUSE_COMMAND) < cmdRerolls);
+                    ContractMarket.CLAUSE_COMMAND) < cmdRerolls);
     }
 
     private boolean hasSupportRerolls(){
