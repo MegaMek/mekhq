@@ -209,11 +209,11 @@ public class ContractPaymentBreakdown {
         gridBagConstraintsText.gridy = y;
         mainPanel.add(lblSignBonusAmount2, gridBagConstraintsText);
 
-        JLabel lblMonthlyCashflow1 = new JLabel(resourceMap.getString("lblMonthlyCashflow.text"));
-        f = lblMonthlyCashflow1.getFont();
-        lblMonthlyCashflow1.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
+        JLabel lblMonthlyCashFlow1 = new JLabel(resourceMap.getString("lblMonthlyCashFlow.text"));
+        f = lblMonthlyCashFlow1.getFont();
+        lblMonthlyCashFlow1.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
         gridBagConstraintsLabels.gridy = ++y;
-        mainPanel.add(lblMonthlyCashflow1, gridBagConstraintsLabels);
+        mainPanel.add(lblMonthlyCashFlow1, gridBagConstraintsLabels);
 
         lblTotalMonthlyMoney2 = new JLabel();
         setLblTotalMonthlyMoney2();
