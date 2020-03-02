@@ -2,6 +2,7 @@
  * ContractSummaryPanel.java
  *
  * Copyright (c) 2014 Carl Spain. All rights reserved.
+ * Copyright (c) 2020 - The MegaMek Team
  *
  * This file is part of MekHQ.
  *
@@ -45,7 +46,6 @@ import mekhq.gui.GuiTabType;
  * Contract summary view for ContractMarketDialog
  *
  * @author Neoancient
- *
  */
 public class ContractSummaryPanel extends JPanel {
     private static final long serialVersionUID = 8773615661962644614L;
@@ -91,29 +91,23 @@ public class ContractSummaryPanel extends JPanel {
     }
 
     private void initComponents() {
-        java.awt.GridBagConstraints gbc;
-
-        mainPanel = new JPanel();
-
-        setLayout(new java.awt.GridBagLayout());
-
+        mainPanel = new JPanel(new java.awt.GridBagLayout());
         mainPanel.setName("pnlStats");
         mainPanel.setBorder(BorderFactory.createTitledBorder(contract.getName()));
         contractPaymentBreakdown = new ContractPaymentBreakdown(mainPanel, contract, campaign);
 
         fillStats();
 
-        gbc = new java.awt.GridBagConstraints();
+        GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridheight = 1;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
-        gbc.fill = java.awt.GridBagConstraints.BOTH;
-        gbc.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
         add(mainPanel, gbc);
-
     }
 
     private void fillStats() {
@@ -131,44 +125,25 @@ public class ContractSummaryPanel extends JPanel {
 
         mainPanel.setLayout(new java.awt.GridBagLayout());
 
-        JLabel lblName = new JLabel();
-        txtName = new JTextField();
-        JLabel lblLocation = new JLabel();
-        JLabel txtLocation = new JLabel();
-        JLabel lblDistance = new JLabel();
         JTextArea txtDistance = new JTextArea();
-        JLabel lblEmployer = new JLabel();
         JTextArea txtEmployer = new JTextArea();
-        JLabel lblEnemy = new JLabel();
         JTextArea txtEnemy = new JTextArea();
-        JLabel lblMissionType = new JLabel();
         JTextArea txtMissionType = new JTextArea();
-        JLabel lblStartDate = new JLabel();
         JTextArea txtStartDate = new JTextArea();
-        JLabel lblLength = new JLabel();
         JTextArea txtLength = new JTextArea();
-        JLabel lblAllyRating = new JLabel();
         JTextArea txtAllyRating = new JTextArea();
-        JLabel lblEnemyRating = new JLabel();
         JTextArea txtEnemyRating = new JTextArea();
 
-        JLabel lblOverhead = new JLabel();
         JTextArea txtOverhead = new JTextArea();
-        JLabel lblCommand = new JLabel();
         txtCommand = new JTextArea();
-        JLabel lblTransport = new JLabel();
         txtTransport = new JTextArea();
-        JLabel lblStraightSupport = new JLabel();
         txtStraightSupport = new JTextArea();
-        JLabel lblBattleLossComp = new JLabel();
         txtBattleLossComp = new JTextArea();
-        JLabel lblRequiredLances = new JLabel();
         JTextArea txtRequiredLances = new JTextArea();
-        JLabel lblSalvageRights = new JLabel();
         JTextArea txtSalvageRights = new JTextArea();
 
+        JLabel lblName = new JLabel(resourceMap.getString("lblName.text"));
         lblName.setName("lblName");
-        lblName.setText(resourceMap.getString("lblName.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
@@ -176,8 +151,8 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         mainPanel.add(lblName, gridBagConstraints);
 
+        txtName = new JTextField(contract.getName());
         txtName.setName("txtName");
-        txtName.setText(contract.getName());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
@@ -187,8 +162,8 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         mainPanel.add(txtName, gridBagConstraints);
 
+        JLabel lblEmployer = new JLabel(resourceMap.getString("lblEmployer.text"));
         lblEmployer.setName("lblEmployer");
-        lblEmployer.setText(resourceMap.getString("lblEmployer.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
@@ -211,8 +186,8 @@ public class ContractSummaryPanel extends JPanel {
         mainPanel.add(txtEmployer, gridBagConstraints);
 
         if (contract instanceof AtBContract) {
+            JLabel lblEnemy = new JLabel(resourceMap.getString("lblEnemy.text"));
             lblEnemy.setName("lblEnemy");
-            lblEnemy.setText(resourceMap.getString("lblEnemy.text"));
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
@@ -235,8 +210,8 @@ public class ContractSummaryPanel extends JPanel {
             mainPanel.add(txtEnemy, gridBagConstraints);
         }
 
+        JLabel lblMissionType = new JLabel(resourceMap.getString("lblMissionType.text"));
         lblMissionType.setName("lblMissionType");
-        lblMissionType.setText(resourceMap.getString("lblMissionType.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
@@ -258,8 +233,8 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         mainPanel.add(txtMissionType, gridBagConstraints);
 
+        JLabel lblLocation = new JLabel(resourceMap.getString("lblLocation.text"));
         lblLocation.setName("lblLocation");
-        lblLocation.setText(resourceMap.getString("lblLocation.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
@@ -267,9 +242,9 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         mainPanel.add(lblLocation, gridBagConstraints);
 
+        JLabel txtLocation = new JLabel(String.format("<html><a href='#'>%s</a></html>",
+                contract.getSystemName(Utilities.getDateTimeDay(campaign.getCalendar()))));
         txtLocation.setName("txtLocation");
-        String systemName = contract.getSystemName(Utilities.getDateTimeDay(campaign.getCalendar()));
-        txtLocation.setText(String.format("<html><a href='#'>%s</a></html>", systemName));
         txtLocation.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         txtLocation.addMouseListener(new MouseAdapter() {
             @Override
@@ -289,8 +264,8 @@ public class ContractSummaryPanel extends JPanel {
         mainPanel.add(txtLocation, gridBagConstraints);
 
         if (Systems.getInstance().getSystems().get(contract.getSystemId()) != null) {
+            JLabel lblDistance = new JLabel(resourceMap.getString("lblDistance.text"));
             lblDistance.setName("lblDistance");
-            lblDistance.setText(resourceMap.getString("lblDistance.text"));
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
@@ -322,8 +297,8 @@ public class ContractSummaryPanel extends JPanel {
             mainPanel.add(txtDistance, gridBagConstraints);
         }
 
+        JLabel lblAllyRating = new JLabel(resourceMap.getString("lblAllyRating.text"));
         lblAllyRating.setName("lblAllyRating");
-        lblAllyRating.setText(resourceMap.getString("lblAllyRating.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
@@ -347,8 +322,8 @@ public class ContractSummaryPanel extends JPanel {
             gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
             mainPanel.add(txtAllyRating, gridBagConstraints);
 
+            JLabel lblEnemyRating = new JLabel(resourceMap.getString("lblEnemyRating.text"));
             lblEnemyRating.setName("lblEnemyRating");
-            lblEnemyRating.setText(resourceMap.getString("lblEnemyRating.text"));
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
@@ -372,8 +347,8 @@ public class ContractSummaryPanel extends JPanel {
             mainPanel.add(txtEnemyRating, gridBagConstraints);
         }
 
+        JLabel lblStartDate = new JLabel(resourceMap.getString("lblStartDate.text"));
         lblStartDate.setName("lblStartDate");
-        lblStartDate.setText(resourceMap.getString("lblStartDate.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
@@ -395,8 +370,8 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         mainPanel.add(txtStartDate, gridBagConstraints);
 
+        JLabel lblLength = new JLabel(resourceMap.getString("lblLength.text"));
         lblLength.setName("lblLength");
-        lblLength.setText(resourceMap.getString("lblLength.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
@@ -418,8 +393,8 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         mainPanel.add(txtLength, gridBagConstraints);
 
+        JLabel lblOverhead = new JLabel(resourceMap.getString("lblOverhead.text"));
         lblOverhead.setName("lblOverhead");
-        lblOverhead.setText(resourceMap.getString("lblOverhead.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
@@ -441,8 +416,8 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         mainPanel.add(txtOverhead, gridBagConstraints);
 
+        JLabel lblCommand = new JLabel(resourceMap.getString("lblCommand.text"));
         lblCommand.setName("lblCommand");
-        lblCommand.setText(resourceMap.getString("lblCommand.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
@@ -495,8 +470,8 @@ public class ContractSummaryPanel extends JPanel {
         mainPanel.add(commandBox, gridBagConstraints);
         y++;
 
+        JLabel lblTransport = new JLabel(resourceMap.getString("lblTransport.text"));
         lblTransport.setName("lblTransport");
-        lblTransport.setText(resourceMap.getString("lblTransport.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
@@ -547,8 +522,8 @@ public class ContractSummaryPanel extends JPanel {
         mainPanel.add(transportBox, gridBagConstraints);
         y++;
 
+        JLabel lblSalvageRights = new JLabel(resourceMap.getString("lblSalvageRights.text"));
         lblSalvageRights.setName("lblSalvageRights");
-        lblSalvageRights.setText(resourceMap.getString("lblSalvageRights.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
@@ -571,8 +546,8 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         mainPanel.add(txtSalvageRights, gridBagConstraints);
 
+        JLabel lblStraightSupport = new JLabel(resourceMap.getString("lblStraightSupport.text"));
         lblStraightSupport.setName("lblStraightSupport");
-        lblStraightSupport.setText(resourceMap.getString("lblStraightSupport.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
@@ -625,8 +600,8 @@ public class ContractSummaryPanel extends JPanel {
         mainPanel.add(supportBox, gridBagConstraints);
         y++;
 
+        JLabel lblBattleLossComp = new JLabel(resourceMap.getString("lblBattleLossComp.text"));
         lblBattleLossComp.setName("lblBattleLossComp");
-        lblBattleLossComp.setText(resourceMap.getString("lblBattleLossComp.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
@@ -649,8 +624,8 @@ public class ContractSummaryPanel extends JPanel {
         mainPanel.add(txtBattleLossComp, gridBagConstraints);
 
         if (contract instanceof AtBContract) {
+            JLabel lblRequiredLances = new JLabel(resourceMap.getString("lblRequiredLances.text"));
             lblRequiredLances.setName("lblRequiredLances");
-            lblRequiredLances.setText(resourceMap.getString("lblRequiredLances.text"));
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
