@@ -91,7 +91,9 @@ public class ContractSummaryPanel extends JPanel {
     }
 
     private void initComponents() {
-        mainPanel = new JPanel(new java.awt.GridBagLayout());
+        setLayout(new GridBagLayout());
+
+        mainPanel = new JPanel();
         mainPanel.setName("pnlStats");
         mainPanel.setBorder(BorderFactory.createTitledBorder(contract.getName()));
         contractPaymentBreakdown = new ContractPaymentBreakdown(mainPanel, contract, campaign);
@@ -115,7 +117,7 @@ public class ContractSummaryPanel extends JPanel {
         // TODO : Remove Inline date
         SimpleDateFormat shortDateFormat = new SimpleDateFormat("yyyy/MM/dd/");
 
-        java.awt.GridBagConstraints gridBagConstraints;
+        GridBagConstraints gridBagConstraints;
         int y = 0;
 
         // TODO : These two arrays should probably be pulled from elsewhere
@@ -123,35 +125,35 @@ public class ContractSummaryPanel extends JPanel {
         String[] ratingNames = {"F", "D", "C", "B", "A"};
         //endregion Variable Declarations
 
-        mainPanel.setLayout(new java.awt.GridBagLayout());
+        mainPanel.setLayout(new GridBagLayout());
 
         JLabel lblName = new JLabel(resourceMap.getString("lblName.text"));
         lblName.setName("lblName");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         mainPanel.add(lblName, gridBagConstraints);
 
         txtName = new JTextField(contract.getName());
         txtName.setName("txtName");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
         gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         mainPanel.add(txtName, gridBagConstraints);
 
         JLabel lblEmployer = new JLabel(resourceMap.getString("lblEmployer.text"));
         lblEmployer.setName("lblEmployer");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         mainPanel.add(lblEmployer, gridBagConstraints);
 
         JTextArea txtEmployer = new JTextArea(contract.getEmployer());
@@ -159,23 +161,23 @@ public class ContractSummaryPanel extends JPanel {
         txtEmployer.setEditable(false);
         txtEmployer.setLineWrap(true);
         txtEmployer.setWrapStyleWord(true);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
         gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         mainPanel.add(txtEmployer, gridBagConstraints);
 
         if (contract instanceof AtBContract) {
             JLabel lblEnemy = new JLabel(resourceMap.getString("lblEnemy.text"));
             lblEnemy.setName("lblEnemy");
-            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             mainPanel.add(lblEnemy, gridBagConstraints);
 
             JTextArea txtEnemy = new JTextArea(((AtBContract)contract).getEnemyName(campaign.getGameYear()));
@@ -183,23 +185,23 @@ public class ContractSummaryPanel extends JPanel {
             txtEnemy.setEditable(false);
             txtEnemy.setLineWrap(true);
             txtEnemy.setWrapStyleWord(true);
-            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y++;
             gridBagConstraints.weightx = 0.5;
-            gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             mainPanel.add(txtEnemy, gridBagConstraints);
         }
 
         JLabel lblMissionType = new JLabel(resourceMap.getString("lblMissionType.text"));
         lblMissionType.setName("lblMissionType");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         mainPanel.add(lblMissionType, gridBagConstraints);
 
         JTextArea txtMissionType = new JTextArea(contract.getType());
@@ -207,22 +209,22 @@ public class ContractSummaryPanel extends JPanel {
         txtMissionType.setEditable(false);
         txtMissionType.setLineWrap(true);
         txtMissionType.setWrapStyleWord(true);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
         gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         mainPanel.add(txtMissionType, gridBagConstraints);
 
         JLabel lblLocation = new JLabel(resourceMap.getString("lblLocation.text"));
         lblLocation.setName("lblLocation");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         mainPanel.add(lblLocation, gridBagConstraints);
 
         JLabel txtLocation = new JLabel(String.format("<html><a href='#'>%s</a></html>",
@@ -237,23 +239,23 @@ public class ContractSummaryPanel extends JPanel {
                 gui.setSelectedTab(GuiTabType.MAP);
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
         gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         mainPanel.add(txtLocation, gridBagConstraints);
 
         if (Systems.getInstance().getSystems().get(contract.getSystemId()) != null) {
             JLabel lblDistance = new JLabel(resourceMap.getString("lblDistance.text"));
             lblDistance.setName("lblDistance");
-            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             mainPanel.add(lblDistance, gridBagConstraints);
 
             JumpPath path = campaign.calculateJumpPath(campaign.getCurrentSystem(), contract.getSystem());
@@ -270,23 +272,23 @@ public class ContractSummaryPanel extends JPanel {
             txtDistance.setEditable(false);
             txtDistance.setLineWrap(true);
             txtDistance.setWrapStyleWord(true);
-            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y++;
             gridBagConstraints.weightx = 0.5;
-            gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             mainPanel.add(txtDistance, gridBagConstraints);
         }
 
         JLabel lblAllyRating = new JLabel(resourceMap.getString("lblAllyRating.text"));
         lblAllyRating.setName("lblAllyRating");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         mainPanel.add(lblAllyRating, gridBagConstraints);
 
         if (contract instanceof AtBContract) {
@@ -296,22 +298,22 @@ public class ContractSummaryPanel extends JPanel {
             txtAllyRating.setEditable(false);
             txtAllyRating.setLineWrap(true);
             txtAllyRating.setWrapStyleWord(true);
-            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y++;
             gridBagConstraints.weightx = 0.5;
-            gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             mainPanel.add(txtAllyRating, gridBagConstraints);
 
             JLabel lblEnemyRating = new JLabel(resourceMap.getString("lblEnemyRating.text"));
             lblEnemyRating.setName("lblEnemyRating");
-            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             mainPanel.add(lblEnemyRating, gridBagConstraints);
 
             JTextArea txtEnemyRating = new JTextArea(skillNames[((AtBContract)contract).getEnemySkill()]
@@ -320,23 +322,23 @@ public class ContractSummaryPanel extends JPanel {
             txtEnemyRating.setEditable(false);
             txtEnemyRating.setLineWrap(true);
             txtEnemyRating.setWrapStyleWord(true);
-            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y++;
             gridBagConstraints.weightx = 0.5;
-            gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             mainPanel.add(txtEnemyRating, gridBagConstraints);
         }
 
         JLabel lblStartDate = new JLabel(resourceMap.getString("lblStartDate.text"));
         lblStartDate.setName("lblStartDate");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         mainPanel.add(lblStartDate, gridBagConstraints);
 
         JTextArea txtStartDate = new JTextArea(shortDateFormat.format(contract.getStartDate()));
@@ -344,22 +346,22 @@ public class ContractSummaryPanel extends JPanel {
         txtStartDate.setEditable(false);
         txtStartDate.setLineWrap(true);
         txtStartDate.setWrapStyleWord(true);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
         gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         mainPanel.add(txtStartDate, gridBagConstraints);
 
         JLabel lblLength = new JLabel(resourceMap.getString("lblLength.text"));
         lblLength.setName("lblLength");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         mainPanel.add(lblLength, gridBagConstraints);
 
         JTextArea txtLength = new JTextArea(Integer.toString(contract.getLength()));
@@ -367,22 +369,22 @@ public class ContractSummaryPanel extends JPanel {
         txtLength.setEditable(false);
         txtLength.setLineWrap(true);
         txtLength.setWrapStyleWord(true);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
         gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         mainPanel.add(txtLength, gridBagConstraints);
 
         JLabel lblOverhead = new JLabel(resourceMap.getString("lblOverhead.text"));
         lblOverhead.setName("lblOverhead");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         mainPanel.add(lblOverhead, gridBagConstraints);
 
         JTextArea txtOverhead = new JTextArea(Contract.getOverheadCompName(contract.getOverheadComp()));
@@ -390,22 +392,22 @@ public class ContractSummaryPanel extends JPanel {
         txtOverhead.setEditable(false);
         txtOverhead.setLineWrap(true);
         txtOverhead.setWrapStyleWord(true);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
         gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         mainPanel.add(txtOverhead, gridBagConstraints);
 
         JLabel lblCommand = new JLabel(resourceMap.getString("lblCommand.text"));
         lblCommand.setName("lblCommand");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         mainPanel.add(lblCommand, gridBagConstraints);
 
         txtCommand = new JTextArea(Contract.getCommandRightsName(contract.getCommandRights()));
@@ -413,13 +415,13 @@ public class ContractSummaryPanel extends JPanel {
         txtCommand.setEditable(false);
         txtCommand.setLineWrap(true);
         txtCommand.setWrapStyleWord(true);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y;
         gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         Box commandBox = Box.createHorizontalBox();
         commandBox.add(txtCommand);
 
@@ -455,11 +457,11 @@ public class ContractSummaryPanel extends JPanel {
 
         JLabel lblTransport = new JLabel(resourceMap.getString("lblTransport.text"));
         lblTransport.setName("lblTransport");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         mainPanel.add(lblTransport, gridBagConstraints);
 
         txtTransport = new JTextArea(contract.getTransportComp() + "%");
@@ -467,13 +469,13 @@ public class ContractSummaryPanel extends JPanel {
         txtTransport.setEditable(false);
         txtTransport.setLineWrap(true);
         txtTransport.setWrapStyleWord(true);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y;
         gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         Box transportBox = Box.createHorizontalBox();
         transportBox.add(txtTransport);
 
@@ -507,11 +509,11 @@ public class ContractSummaryPanel extends JPanel {
 
         JLabel lblSalvageRights = new JLabel(resourceMap.getString("lblSalvageRights.text"));
         lblSalvageRights.setName("lblSalvageRights");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         mainPanel.add(lblSalvageRights, gridBagConstraints);
 
         JTextArea txtSalvageRights = new JTextArea(contract.getSalvagePct() + "%"
@@ -520,22 +522,22 @@ public class ContractSummaryPanel extends JPanel {
         txtSalvageRights.setEditable(false);
         txtSalvageRights.setLineWrap(true);
         txtSalvageRights.setWrapStyleWord(true);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
         gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         mainPanel.add(txtSalvageRights, gridBagConstraints);
 
         JLabel lblStraightSupport = new JLabel(resourceMap.getString("lblStraightSupport.text"));
         lblStraightSupport.setName("lblStraightSupport");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         mainPanel.add(lblStraightSupport, gridBagConstraints);
 
         txtStraightSupport = new JTextArea(contract.getStraightSupport() + "%");
@@ -543,13 +545,13 @@ public class ContractSummaryPanel extends JPanel {
         txtStraightSupport.setEditable(false);
         txtStraightSupport.setLineWrap(true);
         txtStraightSupport.setWrapStyleWord(true);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y;
         gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 
         Box supportBox = Box.createHorizontalBox();
         supportBox.add(txtStraightSupport);
@@ -585,11 +587,11 @@ public class ContractSummaryPanel extends JPanel {
 
         JLabel lblBattleLossComp = new JLabel(resourceMap.getString("lblBattleLossComp.text"));
         lblBattleLossComp.setName("lblBattleLossComp");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         mainPanel.add(lblBattleLossComp, gridBagConstraints);
 
         txtBattleLossComp.setName("txtBattleLossComp");
@@ -597,23 +599,23 @@ public class ContractSummaryPanel extends JPanel {
         txtBattleLossComp.setEditable(false);
         txtBattleLossComp.setLineWrap(true);
         txtBattleLossComp.setWrapStyleWord(true);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
         gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         mainPanel.add(txtBattleLossComp, gridBagConstraints);
 
         if (contract instanceof AtBContract) {
             JLabel lblRequiredLances = new JLabel(resourceMap.getString("lblRequiredLances.text"));
             lblRequiredLances.setName("lblRequiredLances");
-            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             mainPanel.add(lblRequiredLances, gridBagConstraints);
 
             JTextArea txtRequiredLances = new JTextArea(((AtBContract) contract).getRequiredLances()
@@ -622,13 +624,13 @@ public class ContractSummaryPanel extends JPanel {
             txtRequiredLances.setEditable(false);
             txtRequiredLances.setLineWrap(true);
             txtRequiredLances.setWrapStyleWord(true);
-            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y++;
             gridBagConstraints.weightx = 0.5;
-            gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             mainPanel.add(txtRequiredLances, gridBagConstraints);
         }
 
