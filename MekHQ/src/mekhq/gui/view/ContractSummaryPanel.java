@@ -121,75 +121,77 @@ public class ContractSummaryPanel extends JPanel {
         String[] ratingNames = {"F", "D", "C", "B", "A"};
 
         // Initializing the GridBagConstraint used for Labels
-        GridBagConstraints gridBagConstraintsA = new GridBagConstraints();
-        gridBagConstraintsA.gridx = 0;
-        gridBagConstraintsA.fill = GridBagConstraints.NONE;
-        gridBagConstraintsA.anchor = GridBagConstraints.LINE_START;
+        GridBagConstraints gridBagConstraintsLabels = new GridBagConstraints();
+        gridBagConstraintsLabels.gridx = 0;
+        gridBagConstraintsLabels.fill = GridBagConstraints.NONE;
+        gridBagConstraintsLabels.anchor = GridBagConstraints.LINE_START;
 
-        // Initializing GridBagConstraint used for the Panels
-        GridBagConstraints gridBagConstraintsB = new GridBagConstraints();
-        gridBagConstraintsB.gridx = 1;
-        gridBagConstraintsB.weightx = 0.5;
-        gridBagConstraintsB.insets = new Insets(0, 10, 0, 0);
-        gridBagConstraintsB.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraintsB.anchor = GridBagConstraints.LINE_END;
+        // Initializing the GridBagConstraint used for the Panels
+        GridBagConstraints gridBagConstraintsText = new GridBagConstraints();
+        gridBagConstraintsText.gridx = 1;
+        gridBagConstraintsText.weightx = 0.5;
+        gridBagConstraintsText.gridwidth = 2; // this is used to properly separate the buttons, if they show up
+        gridBagConstraintsText.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraintsText.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraintsText.anchor = GridBagConstraints.LINE_END;
 
-        // Initializing GridBagConstraint used for the Buttons
-        GridBagConstraints gridBagConstraintsC = new GridBagConstraints();
-        gridBagConstraintsC.gridx = 2;
-        gridBagConstraintsC.weightx = 0.5;
-        gridBagConstraintsC.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraintsC.anchor = GridBagConstraints.LINE_START;
+        // Initializing the GridBagConstraint used for the Buttons
+        GridBagConstraints gridBagConstraintsButtons = new GridBagConstraints();
+        gridBagConstraintsButtons.gridx = 1;
+        gridBagConstraintsButtons.weightx = 0.5;
+        gridBagConstraintsButtons.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraintsButtons.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraintsButtons.anchor = GridBagConstraints.LINE_END;
 
         int y = 0;
         //endregion Variable Declarations
 
         JLabel lblName = new JLabel(resourceMap.getString("lblName.text"));
         lblName.setName("lblName");
-        gridBagConstraintsA.gridy = y;
-        mainPanel.add(lblName, gridBagConstraintsA);
+        gridBagConstraintsLabels.gridy = y;
+        mainPanel.add(lblName, gridBagConstraintsLabels);
 
         txtName = new JTextField(contract.getName());
         txtName.setName("txtName");
-        gridBagConstraintsB.gridy = y;
-        mainPanel.add(txtName, gridBagConstraintsB);
+        gridBagConstraintsText.gridy = y;
+        mainPanel.add(txtName, gridBagConstraintsText);
 
         JLabel lblEmployer = new JLabel(resourceMap.getString("lblEmployer.text"));
         lblEmployer.setName("lblEmployer");
-        gridBagConstraintsA.gridy = ++y;
-        mainPanel.add(lblEmployer, gridBagConstraintsA);
+        gridBagConstraintsLabels.gridy = ++y;
+        mainPanel.add(lblEmployer, gridBagConstraintsLabels);
 
         JLabel txtEmployer = new JLabel(contract.getEmployer());
         txtEmployer.setName("txtEmployer");
-        gridBagConstraintsB.gridy = y;
-        mainPanel.add(txtEmployer, gridBagConstraintsB);
+        gridBagConstraintsText.gridy = y;
+        mainPanel.add(txtEmployer, gridBagConstraintsText);
 
         if (contract instanceof AtBContract) {
             JLabel lblEnemy = new JLabel(resourceMap.getString("lblEnemy.text"));
             lblEnemy.setName("lblEnemy");
-            gridBagConstraintsA.gridy = ++y;
-            mainPanel.add(lblEnemy, gridBagConstraintsA);
+            gridBagConstraintsLabels.gridy = ++y;
+            mainPanel.add(lblEnemy, gridBagConstraintsLabels);
 
             JLabel txtEnemy = new JLabel(((AtBContract) contract).getEnemyName(campaign.getGameYear()));
             txtEnemy.setName("txtEnemy");
-            gridBagConstraintsB.gridy = y;
-            mainPanel.add(txtEnemy, gridBagConstraintsB);
+            gridBagConstraintsText.gridy = y;
+            mainPanel.add(txtEnemy, gridBagConstraintsText);
         }
 
         JLabel lblMissionType = new JLabel(resourceMap.getString("lblMissionType.text"));
         lblMissionType.setName("lblMissionType");
-        gridBagConstraintsA.gridy = ++y;
-        mainPanel.add(lblMissionType, gridBagConstraintsA);
+        gridBagConstraintsLabels.gridy = ++y;
+        mainPanel.add(lblMissionType, gridBagConstraintsLabels);
 
         JLabel txtMissionType = new JLabel(contract.getType());
         txtMissionType.setName("txtMissionType");
-        gridBagConstraintsB.gridy = y;
-        mainPanel.add(txtMissionType, gridBagConstraintsB);
+        gridBagConstraintsText.gridy = y;
+        mainPanel.add(txtMissionType, gridBagConstraintsText);
 
         JLabel lblLocation = new JLabel(resourceMap.getString("lblLocation.text"));
         lblLocation.setName("lblLocation");
-        gridBagConstraintsA.gridy = ++y;
-        mainPanel.add(lblLocation, gridBagConstraintsA);
+        gridBagConstraintsLabels.gridy = ++y;
+        mainPanel.add(lblLocation, gridBagConstraintsLabels);
 
         JLabel txtLocation = new JLabel(String.format("<html><a href='#'>%s</a></html>",
                 contract.getSystemName(Utilities.getDateTimeDay(campaign.getCalendar()))));
@@ -203,14 +205,14 @@ public class ContractSummaryPanel extends JPanel {
                 campaign.getApp().getCampaigngui().setSelectedTab(GuiTabType.MAP);
             }
         });
-        gridBagConstraintsB.gridy = y;
-        mainPanel.add(txtLocation, gridBagConstraintsB);
+        gridBagConstraintsText.gridy = y;
+        mainPanel.add(txtLocation, gridBagConstraintsText);
 
         if (Systems.getInstance().getSystems().get(contract.getSystemId()) != null) {
             JLabel lblDistance = new JLabel(resourceMap.getString("lblDistance.text"));
             lblDistance.setName("lblDistance");
-            gridBagConstraintsA.gridy = ++y;
-            mainPanel.add(lblDistance, gridBagConstraintsA);
+            gridBagConstraintsLabels.gridy = ++y;
+            mainPanel.add(lblDistance, gridBagConstraintsLabels);
 
             JumpPath path = campaign.calculateJumpPath(campaign.getCurrentSystem(), contract.getSystem());
             int days = (int) Math.ceil(path.getTotalTime(Utilities.getDateTimeDay(contract.getStartDate()),
@@ -223,78 +225,85 @@ public class ContractSummaryPanel extends JPanel {
             }
             JLabel txtDistance = new JLabel(days + "(" + jumps + ")");
             txtDistance.setName("txtDistance");
-            gridBagConstraintsB.gridy = y;
-            mainPanel.add(txtDistance, gridBagConstraintsB);
+            gridBagConstraintsText.gridy = y;
+            mainPanel.add(txtDistance, gridBagConstraintsText);
         }
 
         JLabel lblAllyRating = new JLabel(resourceMap.getString("lblAllyRating.text"));
         lblAllyRating.setName("lblAllyRating");
-        gridBagConstraintsA.gridy = ++y;
-        mainPanel.add(lblAllyRating, gridBagConstraintsA);
+        gridBagConstraintsLabels.gridy = ++y;
+        mainPanel.add(lblAllyRating, gridBagConstraintsLabels);
 
         if (contract instanceof AtBContract) {
             JLabel txtAllyRating = new JLabel(skillNames[((AtBContract) contract).getAllySkill()]
                     + "/" + ratingNames[((AtBContract) contract).getAllyQuality()]);
             txtAllyRating.setName("txtAllyRating");
-            gridBagConstraintsB.gridy = y;
-            mainPanel.add(txtAllyRating, gridBagConstraintsB);
+            gridBagConstraintsText.gridy = y;
+            mainPanel.add(txtAllyRating, gridBagConstraintsText);
 
             JLabel lblEnemyRating = new JLabel(resourceMap.getString("lblEnemyRating.text"));
             lblEnemyRating.setName("lblEnemyRating");
-            gridBagConstraintsA.gridy = ++y;
-            mainPanel.add(lblEnemyRating, gridBagConstraintsA);
+            gridBagConstraintsLabels.gridy = ++y;
+            mainPanel.add(lblEnemyRating, gridBagConstraintsLabels);
 
             JLabel txtEnemyRating = new JLabel(skillNames[((AtBContract) contract).getEnemySkill()]
                     + "/" + ratingNames[((AtBContract) contract).getEnemyQuality()]);
             txtEnemyRating.setName("txtEnemyRating");
-            gridBagConstraintsB.gridy = y;
-            mainPanel.add(txtEnemyRating, gridBagConstraintsB);
+            gridBagConstraintsText.gridy = y;
+            mainPanel.add(txtEnemyRating, gridBagConstraintsText);
         }
 
         JLabel lblStartDate = new JLabel(resourceMap.getString("lblStartDate.text"));
         lblStartDate.setName("lblStartDate");
-        gridBagConstraintsA.gridy = ++y;
-        mainPanel.add(lblStartDate, gridBagConstraintsA);
+        gridBagConstraintsLabels.gridy = ++y;
+        mainPanel.add(lblStartDate, gridBagConstraintsLabels);
 
         JLabel txtStartDate = new JLabel(shortDateFormat.format(contract.getStartDate()));
         txtStartDate.setName("txtStartDate");
-        gridBagConstraintsB.gridy = y;
-        mainPanel.add(txtStartDate, gridBagConstraintsB);
+        gridBagConstraintsText.gridy = y;
+        mainPanel.add(txtStartDate, gridBagConstraintsText);
 
         JLabel lblLength = new JLabel(resourceMap.getString("lblLength.text"));
         lblLength.setName("lblLength");
-        gridBagConstraintsA.gridy = ++y;
-        mainPanel.add(lblLength, gridBagConstraintsA);
+        gridBagConstraintsLabels.gridy = ++y;
+        mainPanel.add(lblLength, gridBagConstraintsLabels);
 
         JLabel txtLength = new JLabel(Integer.toString(contract.getLength()));
         txtLength.setName("txtLength");
-        gridBagConstraintsB.gridy = y;
-        mainPanel.add(txtLength, gridBagConstraintsB);
+        gridBagConstraintsText.gridy = y;
+        mainPanel.add(txtLength, gridBagConstraintsText);
 
         JLabel lblOverhead = new JLabel(resourceMap.getString("lblOverhead.text"));
         lblOverhead.setName("lblOverhead");
-        gridBagConstraintsA.gridy = ++y;
-        mainPanel.add(lblOverhead, gridBagConstraintsA);
+        gridBagConstraintsLabels.gridy = ++y;
+        mainPanel.add(lblOverhead, gridBagConstraintsLabels);
 
         JLabel txtOverhead = new JLabel(Contract.getOverheadCompName(contract.getOverheadComp()));
         txtOverhead.setName("txtOverhead");
-        gridBagConstraintsB.gridy = y;
-        mainPanel.add(txtOverhead, gridBagConstraintsB);
+        gridBagConstraintsText.gridy = y;
+        mainPanel.add(txtOverhead, gridBagConstraintsText);
 
         JLabel lblCommand = new JLabel(resourceMap.getString("lblCommand.text"));
         lblCommand.setName("lblCommand");
-        gridBagConstraintsA.gridy = ++y;
-        mainPanel.add(lblCommand, gridBagConstraintsA);
+        gridBagConstraintsLabels.gridy = ++y;
+        mainPanel.add(lblCommand, gridBagConstraintsLabels);
 
         txtCommand = new JLabel(Contract.getCommandRightsName(contract.getCommandRights()));
         txtCommand.setName("txtCommand");
-        gridBagConstraintsB.gridy = y;
-        mainPanel.add(txtCommand, gridBagConstraintsB);
+        gridBagConstraintsText.gridy = y;
 
-        // Only allow command clause rerolls for mercenaries and pirates; house units are always integrated
-        if (hasCommandRerolls()) {
+        // Then we determine if we just add it to the main panel, or if we combine it with a button
+        // to reroll the value
+        if (!hasCommandRerolls()) {
+            // just add it to the main panel, using the normal gridBagConstraints for labels
+            mainPanel.add(txtCommand, gridBagConstraintsText);
+        } else {
+            // FIXME
+            mainPanel.add(txtCommand, gridBagConstraintsButtons);
+
             JButton btnCommand = new JButton();
             setCommandRerollButtonText(btnCommand);
+            commandBox.add(btnCommand);
 
             btnCommand.addActionListener(ev -> {
                 JButton btn = null;
@@ -317,23 +326,30 @@ public class ContractSummaryPanel extends JPanel {
                 }
             });
 
-            gridBagConstraintsC.gridy = y;
-            mainPanel.add(btnCommand, gridBagConstraintsC);
+            mainPanel.add(commandBox, gridBagConstraintsText);
         }
 
         JLabel lblTransport = new JLabel(resourceMap.getString("lblTransport.text"));
         lblTransport.setName("lblTransport");
-        gridBagConstraintsA.gridy = ++y;
-        mainPanel.add(lblTransport, gridBagConstraintsA);
+        gridBagConstraintsLabels.gridy = ++y;
+        mainPanel.add(lblTransport, gridBagConstraintsLabels);
 
         txtTransport = new JLabel(contract.getTransportComp() + "%");
         txtTransport.setName("txtTransport");
-        gridBagConstraintsB.gridy = y;
-        mainPanel.add(txtTransport, gridBagConstraintsB);
+        gridBagConstraintsText.gridy = y;
+        // Then we determine if we just add it to the main panel, or if we combine it with a button
+        // to reroll the value
+        if (!hasTransportRerolls()) {
+            // just add it to the main panel, can't use a reroll
+            mainPanel.add(txtTransport, gridBagConstraintsText);
+        } else {
+            // FIXME
+            Box transportBox = Box.createHorizontalBox();
+            transportBox.add(txtTransport);
 
-        if (hasTransportRerolls()) {
             JButton btnTransport = new JButton();
             setTransportRerollButtonText(btnTransport);
+            transportBox.add(btnTransport);
 
             btnTransport.addActionListener(ev -> {
                 JButton btn = null;
@@ -356,34 +372,41 @@ public class ContractSummaryPanel extends JPanel {
                 }
             });
 
-            gridBagConstraintsC.gridy = y;
-            mainPanel.add(btnTransport, gridBagConstraintsC);
+            mainPanel.add(transportBox, gridBagConstraintsText);
         }
 
         JLabel lblSalvageRights = new JLabel(resourceMap.getString("lblSalvageRights.text"));
         lblSalvageRights.setName("lblSalvageRights");
-        gridBagConstraintsA.gridy = ++y;
-        mainPanel.add(lblSalvageRights, gridBagConstraintsA);
+        gridBagConstraintsLabels.gridy = ++y;
+        mainPanel.add(lblSalvageRights, gridBagConstraintsLabels);
 
         JLabel txtSalvageRights = new JLabel(contract.getSalvagePct() + "%"
                 + (contract.isSalvageExchange() ? " (Exchange)" : ""));
         txtSalvageRights.setName("txtSalvageRights");
-        gridBagConstraintsB.gridy = y;
-        mainPanel.add(txtSalvageRights, gridBagConstraintsB);
+        gridBagConstraintsText.gridy = y;
+        mainPanel.add(txtSalvageRights, gridBagConstraintsText);
 
         JLabel lblStraightSupport = new JLabel(resourceMap.getString("lblStraightSupport.text"));
         lblStraightSupport.setName("lblStraightSupport");
-        gridBagConstraintsA.gridy = ++y;
-        mainPanel.add(lblStraightSupport, gridBagConstraintsA);
+        gridBagConstraintsLabels.gridy = ++y;
+        mainPanel.add(lblStraightSupport, gridBagConstraintsLabels);
 
         txtStraightSupport = new JLabel(contract.getStraightSupport() + "%");
         txtStraightSupport.setName("txtStraightSupport");
-        gridBagConstraintsB.gridy = y;
-        mainPanel.add(txtStraightSupport, gridBagConstraintsB);
+        gridBagConstraintsText.gridy = y;
+        // Then we determine if we just add it to the main panel, or if we combine it with a button
+        // to reroll the value
+        if (!hasSupportRerolls()) {
+            // just add it to the main panel, can't use a reroll
+            mainPanel.add(txtStraightSupport, gridBagConstraintsText);
+        } else {
+            // FIXME
+            Box supportBox = Box.createHorizontalBox();
+            supportBox.add(txtStraightSupport);
 
-        if (hasSupportRerolls()) {
             JButton btnSupport = new JButton();
             setSupportRerollButtonText(btnSupport);
+            supportBox.add(btnSupport);
 
             btnSupport.addActionListener(ev -> {
                 JButton btn = null;
@@ -407,31 +430,30 @@ public class ContractSummaryPanel extends JPanel {
                 }
             });
 
-            gridBagConstraintsC.gridy = y;
-            mainPanel.add(btnSupport, gridBagConstraintsC);
+            mainPanel.add(supportBox, gridBagConstraintsText);
         }
 
         JLabel lblBattleLossComp = new JLabel(resourceMap.getString("lblBattleLossComp.text"));
         lblBattleLossComp.setName("lblBattleLossComp");
-        gridBagConstraintsA.gridy = ++y;
-        mainPanel.add(lblBattleLossComp, gridBagConstraintsA);
+        gridBagConstraintsLabels.gridy = ++y;
+        mainPanel.add(lblBattleLossComp, gridBagConstraintsLabels);
 
         txtBattleLossComp = new JLabel(contract.getBattleLossComp() + "%");
         txtBattleLossComp.setName("txtBattleLossComp");
-        gridBagConstraintsB.gridy = y;
-        mainPanel.add(txtBattleLossComp, gridBagConstraintsB);
+        gridBagConstraintsText.gridy = y;
+        mainPanel.add(txtBattleLossComp, gridBagConstraintsText);
 
         if (contract instanceof AtBContract) {
             JLabel lblRequiredLances = new JLabel(resourceMap.getString("lblRequiredLances.text"));
             lblRequiredLances.setName("lblRequiredLances");
-            gridBagConstraintsA.gridy = ++y;
-            mainPanel.add(lblRequiredLances, gridBagConstraintsA);
+            gridBagConstraintsLabels.gridy = ++y;
+            mainPanel.add(lblRequiredLances, gridBagConstraintsLabels);
 
             JLabel txtRequiredLances = new JLabel(((AtBContract) contract).getRequiredLances()
                     + " Lance(s)");
             txtRequiredLances.setName("txtRequiredLances");
-            gridBagConstraintsB.gridy = y;
-            mainPanel.add(txtRequiredLances, gridBagConstraintsB);
+            gridBagConstraintsText.gridy = y;
+            mainPanel.add(txtRequiredLances, gridBagConstraintsText);
         }
 
         contractPaymentBreakdown.display(++y);
@@ -443,6 +465,7 @@ public class ContractSummaryPanel extends JPanel {
     }
 
     private boolean hasCommandRerolls() {
+        // Only allow command clause rerolls for mercenaries and pirates; house units are always integrated
         return allowRerolls
                 && (campaign.getFactionCode().equals("MERC")
                     || campaign.getFactionCode().equals("PIR"))
