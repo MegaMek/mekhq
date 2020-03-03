@@ -48,26 +48,6 @@ public class Bloodname implements Serializable {
 
     private static List<Bloodname> bloodnames;
 
-    public static final int P_NONE = 0; // No phenotype
-    public static final int P_GENERAL = 0;
-    public static final int P_MECHWARRIOR = 1;
-    public static final int P_AEROSPACE = 2;
-    public static final int P_ELEMENTAL = 3;
-    public static final int P_PROTOMECH = 4;
-    public static final int P_NAVAL = 5;
-    public static final int P_NUM = 6;
-/*
-    // TODO : Windchild merge these two lists
-    public static final int PHENOTYPE_MW = 1;
-    public static final int PHENOTYPE_BA = 2;
-    public static final int PHENOTYPE_AERO = 3;
-    public static final int PHENOTYPE_VEE = 4;
-*/
-    public static final String[] phenotypeNames = {
-        "General", "MechWarrior", "Aerospace Pilot", "Elemental",
-        "ProtoMech Pilot", "Naval Commander"
-    };
-
     private String name;
     private String founder;
     private Clan origClan;
@@ -92,7 +72,7 @@ public class Bloodname implements Serializable {
         abjured = 0;
         reactivated = 0;
         startDate = 2807;
-        phenotype = P_GENERAL;
+        phenotype = Phenotype.P_GENERAL;
         postReavingClans = new ArrayList<>();
         acquiringClans = new ArrayList<>();
         absorbed = null;
@@ -159,27 +139,28 @@ public class Bloodname implements Serializable {
      */
     public int phenotypeMultiplier(int warriorType, int year) {
         switch (phenotype) {
-            case P_MECHWARRIOR:
-                return (warriorType == P_MECHWARRIOR) ? 3 : 0;
-            case P_AEROSPACE:
-                return (warriorType == P_AEROSPACE || warriorType == P_PROTOMECH) ? 3 : 0;
-            case P_ELEMENTAL:
+            case Phenotype.P_MECHWARRIOR:
+                return (warriorType == Phenotype.P_MECHWARRIOR) ? 3 : 0;
+            case Phenotype.P_AEROSPACE:
+                return (warriorType == Phenotype.P_AEROSPACE || warriorType == Phenotype.P_PROTOMECH)
+                        ? 3 : 0;
+            case Phenotype.P_ELEMENTAL:
                 if (year < 2870) {
                     return 1;
                 }
-                return (warriorType == P_ELEMENTAL) ? 3 : 0;
-            case P_PROTOMECH:
+                return (warriorType == Phenotype.P_ELEMENTAL) ? 3 : 0;
+            case Phenotype.P_PROTOMECH:
                 switch (warriorType) {
-                    case P_PROTOMECH:
+                    case Phenotype.P_PROTOMECH:
                         return 9;
-                    case P_AEROSPACE:
+                    case Phenotype.P_AEROSPACE:
                         return 1;
                     default:
                         return 0;
                 }
-            case P_NAVAL:
-                return (warriorType == P_NAVAL) ? 3 : 0;
-            case P_GENERAL:
+            case Phenotype.P_NAVAL:
+                return (warriorType == Phenotype.P_NAVAL) ? 3 : 0;
+            case Phenotype.P_GENERAL:
             default:
                 return 1;
         }
@@ -214,22 +195,22 @@ public class Bloodname implements Serializable {
             } else if (wn.getNodeName().equalsIgnoreCase("phenotype")) {
                 switch (wn.getTextContent().trim()) {
                 case "General":
-                    retVal.phenotype = P_GENERAL;
+                    retVal.phenotype = Phenotype.P_GENERAL;
                     break;
                 case "MechWarrior":
-                    retVal.phenotype = P_MECHWARRIOR;
+                    retVal.phenotype = Phenotype.P_MECHWARRIOR;
                     break;
                 case "Aerospace":
-                    retVal.phenotype = P_AEROSPACE;
+                    retVal.phenotype = Phenotype.P_AEROSPACE;
                     break;
                 case "Elemental":
-                    retVal.phenotype = P_ELEMENTAL;
+                    retVal.phenotype = Phenotype.P_ELEMENTAL;
                     break;
                 case "ProtoMech":
-                    retVal.phenotype = P_PROTOMECH;
+                    retVal.phenotype = Phenotype.P_PROTOMECH;
                     break;
                 case "Naval":
-                    retVal.phenotype = P_NAVAL;
+                    retVal.phenotype = Phenotype.P_NAVAL;
                     break;
                 default:
                     System.err.println("Unknown phenotype " +
@@ -320,7 +301,7 @@ public class Bloodname implements Serializable {
              * result in a very small chance (around 1%) of a Bloodname usually associated
              * with a different phenotype.
              */
-            phenotype = Bloodname.P_GENERAL;
+            phenotype = Phenotype.P_GENERAL;
         }
 
         /* The relative probability of the various Bloodnames that are original to this Clan */

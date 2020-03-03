@@ -31,6 +31,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import megamek.common.util.StringUtil;
+import mekhq.campaign.personnel.Phenotype;
 import org.joda.time.DateTime;
 
 import megamek.client.Client;
@@ -1262,16 +1263,16 @@ public class AtBDynamicScenarioFactory {
             int phenotype;
             switch (en.getUnitType()) {
             case UnitType.MEK:
-                phenotype = Bloodname.P_MECHWARRIOR;
+                phenotype = Phenotype.P_MECHWARRIOR;
                 break;
             case UnitType.BATTLE_ARMOR:
-                phenotype = Bloodname.P_ELEMENTAL;
+                phenotype = Phenotype.P_ELEMENTAL;
                 break;
             case UnitType.AERO:
-                phenotype = Bloodname.P_AEROSPACE;
+                phenotype = Phenotype.P_AEROSPACE;
                 break;
             case UnitType.PROTOMEK:
-                phenotype = Bloodname.P_PROTOMECH;
+                phenotype = Phenotype.P_PROTOMECH;
                 break;
             default:
                 phenotype = -1;

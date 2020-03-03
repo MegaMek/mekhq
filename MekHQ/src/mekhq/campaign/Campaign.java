@@ -37,7 +37,7 @@ import megamek.common.*;
 import mekhq.*;
 import mekhq.campaign.finances.*;
 import mekhq.campaign.log.*;
-import mekhq.campaign.personnel.FormerSpouse;
+import mekhq.campaign.personnel.*;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 import org.joda.time.DateTime;
@@ -113,18 +113,6 @@ import mekhq.campaign.parts.StructuralIntegrity;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
-import mekhq.campaign.personnel.AbstractPersonnelGenerator;
-import mekhq.campaign.personnel.Ancestors;
-import mekhq.campaign.personnel.Bloodname;
-import mekhq.campaign.personnel.DefaultPersonnelGenerator;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.Rank;
-import mekhq.campaign.personnel.Ranks;
-import mekhq.campaign.personnel.RetirementDefectionTracker;
-import mekhq.campaign.personnel.Skill;
-import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.rating.CampaignOpsReputation;
 import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.IUnitRating;
@@ -1450,56 +1438,45 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         // Go ahead and generate a new bloodname
-        if (person.isClanner() && (person.getPhenotype() != Bloodname.P_NONE)) {
+        if (person.isClanner() && (person.getPhenotype() != Phenotype.P_NONE)) {
             int bloodnameTarget = 6;
             switch (person.getPhenotype()) {
-                case Person.PHENOTYPE_MW:
+                case Phenotype.P_MECHWARRIOR:
                     bloodnameTarget += person.hasSkill(SkillType.S_GUN_MECH)
-                            ? person.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue()
-                            : 13;
+                            ? person.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue() : 13;
                     bloodnameTarget += person.hasSkill(SkillType.S_PILOT_MECH)
-                            ? person.getSkill(SkillType.S_PILOT_MECH).getFinalSkillValue()
-                            : 13;
+                            ? person.getSkill(SkillType.S_PILOT_MECH).getFinalSkillValue() : 13;
                     break;
-                case Person.PHENOTYPE_AERO:
+                case Phenotype.P_AEROSPACE:
                     if (type == Person.T_PROTO_PILOT) {
                         bloodnameTarget += 2 * (person.hasSkill(SkillType.S_GUN_PROTO)
-                                ? person.getSkill(SkillType.S_GUN_PROTO).getFinalSkillValue()
-                                : 13);
+                                ? person.getSkill(SkillType.S_GUN_PROTO).getFinalSkillValue() : 13);
 
                     } else {
                         bloodnameTarget += person.hasSkill(SkillType.S_GUN_AERO)
-                                ? person.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue()
-                                : 13;
+                                ? person.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue() : 13;
                         bloodnameTarget += person.hasSkill(SkillType.S_PILOT_AERO)
-                                ? person.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue()
-                                : 13;
+                                ? person.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue() : 13;
                     }
                     break;
-                case Person.PHENOTYPE_BA:
+                case Phenotype.P_ELEMENTAL:
                     bloodnameTarget += person.hasSkill(SkillType.S_GUN_BA)
-                            ? person.getSkill(SkillType.S_GUN_BA).getFinalSkillValue()
-                            : 13;
+                            ? person.getSkill(SkillType.S_GUN_BA).getFinalSkillValue() : 13;
                     bloodnameTarget += person.hasSkill(SkillType.S_ANTI_MECH)
-                            ? person.getSkill(SkillType.S_ANTI_MECH).getFinalSkillValue()
-                            : 13;
+                            ? person.getSkill(SkillType.S_ANTI_MECH).getFinalSkillValue() : 13;
                     break;
-                case Person.PHENOTYPE_VEE:
+                case Phenotype.P_VEHICLE:
                     bloodnameTarget += person.hasSkill(SkillType.S_GUN_VEE)
-                            ? person.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue()
-                            : 13;
+                            ? person.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue() : 13;
                     if (type == Person.T_VTOL_PILOT) {
                         bloodnameTarget += person.hasSkill(SkillType.S_PILOT_VTOL)
-                                ? person.getSkill(SkillType.S_PILOT_VTOL).getFinalSkillValue()
-                                : 13;
+                                ? person.getSkill(SkillType.S_PILOT_VTOL).getFinalSkillValue() : 13;
                     } else if (type == Person.T_NVEE_DRIVER) {
                         bloodnameTarget += person.hasSkill(SkillType.S_PILOT_NVEE)
-                                ? person.getSkill(SkillType.S_PILOT_NVEE).getFinalSkillValue()
-                                : 13;
+                                ? person.getSkill(SkillType.S_PILOT_NVEE).getFinalSkillValue() : 13;
                     } else {
                         bloodnameTarget += person.hasSkill(SkillType.S_PILOT_GVEE)
-                                ? person.getSkill(SkillType.S_PILOT_GVEE).getFinalSkillValue()
-                                : 13;
+                                ? person.getSkill(SkillType.S_PILOT_GVEE).getFinalSkillValue() : 13;
                     }
                     break;
             }
@@ -1528,26 +1505,26 @@ public class Campaign implements Serializable, ITechManager {
                  * The Bloodname generator has slight differences in categories that do not map
                  * easily onto Person constants
                  */
-                int phenotype = Bloodname.P_GENERAL;
+                int phenotype = Phenotype.P_GENERAL;
                 switch (type) {
                     case Person.T_MECHWARRIOR:
-                        phenotype = Bloodname.P_MECHWARRIOR;
+                        phenotype = Phenotype.P_MECHWARRIOR;
                         break;
                     case Person.T_BA:
-                        phenotype = Bloodname.P_ELEMENTAL;
+                        phenotype = Phenotype.P_ELEMENTAL;
                         break;
                     case Person.T_AERO_PILOT:
                     case Person.T_CONV_PILOT:
-                        phenotype = Bloodname.P_AEROSPACE;
+                        phenotype = Phenotype.P_AEROSPACE;
                         break;
                     case Person.T_SPACE_CREW:
                     case Person.T_NAVIGATOR:
                     case Person.T_SPACE_GUNNER:
                     case Person.T_SPACE_PILOT:
-                        phenotype = Bloodname.P_NAVAL;
+                        phenotype = Phenotype.P_NAVAL;
                         break;
                     case Person.T_PROTO_PILOT:
-                        phenotype = Bloodname.P_PROTOMECH;
+                        phenotype = Phenotype.P_PROTOMECH;
                         break;
                 }
                 Bloodname bloodname = Bloodname.randomBloodname(factionCode, phenotype, getGameYear());

@@ -118,12 +118,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public static final int PRISONER_YES = 1;
     public static final int PRISONER_BONDSMAN = 2;
 
-    // Phenotypes
-    public static final int PHENOTYPE_MW = 1;
-    public static final int PHENOTYPE_BA = 2;
-    public static final int PHENOTYPE_AERO = 3;
-    public static final int PHENOTYPE_VEE = 4;
-
     // ROM Designations
     public static final int DESIG_NONE    = 0;
     public static final int DESIG_EPSILON = 1;
@@ -424,7 +418,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         originFaction = Faction.getFaction(factionCode);
         originPlanet = null;
         clan = originFaction.isClan();
-        phenotype = Bloodname.P_NONE;
+        phenotype = Phenotype.P_NONE;
         bloodname = "";
         biography = "";
         idleMonths = -1;
@@ -699,42 +693,19 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public String getPhenotypeName() {
-        return getPhenotypeName(phenotype);
+        return Phenotype.getPhenotypeName(phenotype);
     }
 
-    public static String getPhenotypeName(int pheno) {
-        switch (pheno) {
-            case Bloodname.P_NONE:
-                return "Freeborn";
-            case PHENOTYPE_MW:
-                return "Trueborn Mechwarrior";
-            case PHENOTYPE_AERO:
-                return "Trueborn Pilot";
-            case PHENOTYPE_VEE:
-                return "Trueborn Vehicle Crew";
-            case PHENOTYPE_BA:
-                return "Trueborn Elemental";
-            default:
-                return "?";
-        }
+    public static String getPhenotypeName(int phenotype) {
+        return Phenotype.getPhenotypeName(phenotype);
     }
 
     public String getPhenotypeShortName() {
-        return getPhenotypeShortName(phenotype);
+        return Phenotype.getPhenotypeShortName(phenotype);
     }
 
-    public static String getPhenotypeShortName(int pheno) {
-        switch (pheno) {
-            case Bloodname.P_NONE:
-                return "Freeborn";
-            case PHENOTYPE_MW:
-            case PHENOTYPE_AERO:
-            case PHENOTYPE_VEE:
-            case PHENOTYPE_BA:
-                return "Trueborn";
-            default:
-                return "?";
-        }
+    public static String getPhenotypeShortName(int phenotype) {
+        return Phenotype.getPhenotypeName(phenotype);
     }
 
     public static String getPrisonerStatusName(int status) {
@@ -1894,7 +1865,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 + "<clan>"
                 + clan
                 + "</clan>");
-        if (phenotype != Bloodname.P_NONE) {
+        if (phenotype != Phenotype.P_NONE) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<phenotype>"
                     + phenotype

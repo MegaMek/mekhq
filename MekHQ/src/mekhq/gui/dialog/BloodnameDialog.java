@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package mekhq.gui.dialog;
 
@@ -19,6 +19,7 @@ import javax.swing.JTextArea;
 
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Bloodname;
+import mekhq.campaign.personnel.Phenotype;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.preferences.JComboBoxPreference;
 import mekhq.gui.preferences.JWindowPreference;
@@ -26,7 +27,7 @@ import mekhq.preferences.PreferencesNode;
 
 /**
  * @author Neoancient
- * 
+ *
  * Randomly selects an appropriate Bloodname based on Clan, phenotype, and year
  *
  */
@@ -151,8 +152,8 @@ public class BloodnameDialog extends JDialog {
 
 		cbPhenotype = new JComboBox<String>();
 		cbPhenotype.addItem("None");
-		for (int i = 1; i < Bloodname.phenotypeNames.length; i++) {
-			cbPhenotype.addItem(Bloodname.phenotypeNames[i]);
+		for (int i = 1; i < Phenotype.phenotypeNames.length; i++) {
+			cbPhenotype.addItem(Phenotype.phenotypeNames[i]);
 		}
 		gbc.gridx = 0;
 		gbc.gridy = 2;
@@ -174,7 +175,7 @@ public class BloodnameDialog extends JDialog {
 								(Integer)cbEra.getSelectedItem());
 				lblName.setText(n.getName() + " (" + n.getFounder() + ")");
 				lblOrigClan.setText(Faction.getFaction(n.getOrigClan()).getFullName((Integer)cbEra.getSelectedItem()));
-				lblPhenotype.setText(Bloodname.phenotypeNames[n.getPhenotype()]);
+				lblPhenotype.setText(Phenotype.phenotypeNames[n.getPhenotype()]);
 			}
 		});
 

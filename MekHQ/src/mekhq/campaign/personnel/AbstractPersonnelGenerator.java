@@ -151,7 +151,7 @@ public abstract class AbstractPersonnelGenerator {
             switch (person.getPrimaryRole()) {
                 case (Person.T_MECHWARRIOR):
                     if (Utilities.rollProbability(campaign.getCampaignOptions().getProbPhenoMW())) {
-                        person.setPhenotype(Person.PHENOTYPE_MW);
+                        person.setPhenotype(Phenotype.P_MECHWARRIOR);
                     }
                     break;
                 case (Person.T_GVEE_DRIVER):
@@ -159,19 +159,19 @@ public abstract class AbstractPersonnelGenerator {
                 case (Person.T_VTOL_PILOT):
                 case (Person.T_VEE_GUNNER):
                     if (Utilities.rollProbability(campaign.getCampaignOptions().getProbPhenoVee())) {
-                        person.setPhenotype(Person.PHENOTYPE_VEE);
+                        person.setPhenotype(Phenotype.P_VEHICLE);
                     }
                     break;
                 case (Person.T_CONV_PILOT):
                 case (Person.T_AERO_PILOT):
                 case (Person.T_PROTO_PILOT):
                     if (Utilities.rollProbability(campaign.getCampaignOptions().getProbPhenoAero())) {
-                        person.setPhenotype(Person.PHENOTYPE_AERO);
+                        person.setPhenotype(Phenotype.P_AEROSPACE);
                     }
                     break;
                 case (Person.T_BA):
                     if (Utilities.rollProbability(campaign.getCampaignOptions().getProbPhenoBA())) {
-                        person.setPhenotype(Person.PHENOTYPE_BA);
+                        person.setPhenotype(Phenotype.P_ELEMENTAL);
                     }
                     break;
                 default:

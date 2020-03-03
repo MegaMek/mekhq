@@ -549,23 +549,23 @@ public class CampaignXmlParser {
                 psn.setClanner(true);
                 switch (psn.getPrimaryRole()) {
                     case Person.T_MECHWARRIOR:
-                        psn.setPhenotype(Person.PHENOTYPE_MW);
+                        psn.setPhenotype(Phenotype.P_MECHWARRIOR);
                         break;
                     case Person.T_AERO_PILOT:
                     case Person.T_CONV_PILOT:
-                        psn.setPhenotype(Person.PHENOTYPE_AERO);
+                        psn.setPhenotype(Phenotype.P_AEROSPACE);
                         break;
                     case Person.T_BA:
-                        psn.setPhenotype(Person.PHENOTYPE_BA);
+                        psn.setPhenotype(Phenotype.P_ELEMENTAL);
                         break;
                     case Person.T_VEE_GUNNER:
                     case Person.T_GVEE_DRIVER:
                     case Person.T_NVEE_DRIVER:
                     case Person.T_VTOL_PILOT:
-                        psn.setPhenotype(Person.PHENOTYPE_VEE);
+                        psn.setPhenotype(Phenotype.P_VEHICLE);
                         break;
                     default:
-                        psn.setPhenotype(Bloodname.P_NONE);
+                        psn.setPhenotype(Phenotype.P_NONE);
                         break;
                 }
             }

@@ -348,7 +348,7 @@ public class MedicalViewDialog extends JDialog {
         int ageInMonths = (now.get(Calendar.YEAR) - birthday.get(Calendar.YEAR)) * 12
             + now.get(Calendar.MONTH) - birthday.get(Calendar.MONTH);
 
-        String phenotype = (p.getPhenotype() != Bloodname.P_NONE)
+        String phenotype = (p.getPhenotype() != Phenotype.P_NONE)
                 ? p.getPhenotypeName() : resourceMap.getString("baselinePhenotype.text");
 
         Force f = c.getForceFor(p);

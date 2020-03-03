@@ -198,7 +198,7 @@ public abstract class AbstractSkillGenerator {
             // apply phenotype bonus only to primary skills
             switch (person.getPrimaryRole()) {
                 case (Person.T_MECHWARRIOR):
-                    if (person.getPhenotype() == Person.PHENOTYPE_MW) {
+                    if (person.getPhenotype() == Phenotype.P_MECHWARRIOR) {
                         return 1;
                     }
                     break;
@@ -206,19 +206,26 @@ public abstract class AbstractSkillGenerator {
                 case (Person.T_NVEE_DRIVER):
                 case (Person.T_VTOL_PILOT):
                 case (Person.T_VEE_GUNNER):
-                    if (person.getPhenotype() == Person.PHENOTYPE_VEE) {
+                    if (person.getPhenotype() == Phenotype.P_VEHICLE) {
                         return 1;
                     }
                     break;
                 case (Person.T_CONV_PILOT):
                 case (Person.T_AERO_PILOT):
+                    if (person.getPhenotype() == Phenotype.P_AEROSPACE) {
+                        return 1;
+                    }
+                    break;
                 case (Person.T_PROTO_PILOT):
-                    if (person.getPhenotype() == Person.PHENOTYPE_AERO) {
+                    if (person.getPhenotype() == Phenotype.P_PROTOMECH) {
+                        return 1;
+                    } else if (person.getPhenotype() == Phenotype.P_AEROSPACE) {
+                        person.setPhenotype(Phenotype.P_PROTOMECH);
                         return 1;
                     }
                     break;
                 case (Person.T_BA):
-                    if (person.getPhenotype() == Person.PHENOTYPE_BA) {
+                    if (person.getPhenotype() == Phenotype.P_ELEMENTAL) {
                         return 1;
                     }
                     break;
