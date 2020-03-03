@@ -1,8 +1,27 @@
+/*
+ * ContractSummaryPanel.java
+ *
+ * Copyright (c) 2018, 2020 - The MegaMek Team
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui.view;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.Contract;
 
 import javax.swing.*;
@@ -58,7 +77,7 @@ public class ContractPaymentBreakdown {
      * Draws and fill all the elements for the contract payment breakdown
      *
      * @param y         gridBagConstraint.gridy, in case it is appending to an existing grid
-     * @param gridWidth the gridBagConstraint.gridWidth to use, in case it is appending to an
+     * @param gridWidth the gridBagConstraint.gridWidth to use for text, in case it is appending to an
      *                  existing grid
      */
     public void display(int y, int gridWidth) {
@@ -75,10 +94,11 @@ public class ContractPaymentBreakdown {
         gridBagConstraintsLabels.anchor = GridBagConstraints.WEST;
         gridBagConstraintsLabels.insets = new Insets(2, 2, 2, 2);
 
+        // Initializing the GridBagConstraint used for Text
+        // To use this you MUST AND ONLY overwrite gridy
         GridBagConstraints gridBagConstraintsText = new GridBagConstraints();
         gridBagConstraintsText.gridx = 1;
-        gridBagConstraintsText.gridy = y++;
-        gridBagConstraintsText.gridwidth = 1;
+        gridBagConstraintsText.gridwidth = gridWidth;
         gridBagConstraintsText.weightx = 1.0;
         gridBagConstraintsText.fill = GridBagConstraints.NONE;
         gridBagConstraintsText.anchor = GridBagConstraints.EAST;
@@ -113,14 +133,8 @@ public class ContractPaymentBreakdown {
 
         lblOverheadAmount2 = new JLabel();
         setLblOverheadAmount2();
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(lblOverheadAmount2, gridBagConstraints);
+        gridBagConstraintsText.gridy = y;
+        mainPanel.add(lblOverheadAmount2, gridBagConstraintsText);
 
         JLabel lblSupportAmount1 = new JLabel(indentation
                 + resourceMap.getString("lblSupportAmount1.text"));
@@ -136,6 +150,7 @@ public class ContractPaymentBreakdown {
                 + resourceMap.getString("lblTransportAmount1.text"));
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblTransportAmount1, gridBagConstraintsLabels);
+
         lblTransportAmount2 = new JLabel();
         setLblTransportAmount2();
         gridBagConstraintsText.gridy = y;
@@ -145,6 +160,7 @@ public class ContractPaymentBreakdown {
                 + resourceMap.getString("lblTransitAmount1.text"));
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblTransitAmount1, gridBagConstraintsLabels);
+
         lblTransitAmount2 = new JLabel();
         setLblTransitAmount2();
         gridBagConstraintsText.gridy = y;
@@ -160,6 +176,7 @@ public class ContractPaymentBreakdown {
         }
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblFeeAmount1, gridBagConstraintsLabels);
+
         lblFeeAmount2 = new JLabel();
         setLblFeeAmount2();
         gridBagConstraintsText.gridy = y;
@@ -170,21 +187,15 @@ public class ContractPaymentBreakdown {
         mainPanel.add(sep1, gridBagConstraintsLabels);
 
         JLabel sep2 = new JLabel("");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(sep2, gridBagConstraints);
+        gridBagConstraintsText.gridy = y;
+        mainPanel.add(sep2, gridBagConstraintsText);
 
         JLabel lblAdvanceCashflow1 = new JLabel(resourceMap.getString("lblAdvanceCashflow.text"));
         f = lblAdvanceCashflow1.getFont();
         lblAdvanceCashflow1.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblAdvanceCashflow1, gridBagConstraintsLabels);
+
         lblTotalAdvanceMoney2 = new JLabel();
         setLblTotalAdvanceMoney2();
         gridBagConstraintsText.gridy = y;
@@ -266,8 +277,7 @@ public class ContractPaymentBreakdown {
         lblTransportationExpenses2 = new JLabel();
         setLblTransportationExpenses2();
         gridBagConstraintsText.gridy = y;
-
-        mainPanel.add(lblTransportationExpenses2, gridBagConstraints);
+        mainPanel.add(lblTransportationExpenses2, gridBagConstraintsText);
 
         JLabel lblEstimatedProfit1 = new JLabel(resourceMap.getString("lblEstimatedProfit.text"));
         f = lblEstimatedProfit1.getFont();
@@ -277,15 +287,8 @@ public class ContractPaymentBreakdown {
 
         lblEstimatedProfit2 = new JLabel();
         setLblEstimatedProfit2();
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
-        mainPanel.add(lblEstimatedProfit2, gridBagConstraints);
+        gridBagConstraintsText.gridy = y;
+        mainPanel.add(lblEstimatedProfit2, gridBagConstraintsText);
     }
 
     /**
