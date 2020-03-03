@@ -47,6 +47,7 @@ import mekhq.gui.GuiTabType;
  * @author Neoancient
  */
 public class ContractSummaryPanel extends JPanel {
+    //region Variable Declarations
     private static final long serialVersionUID = 8773615661962644614L;
 
     private Campaign campaign;
@@ -68,9 +69,12 @@ public class ContractSummaryPanel extends JPanel {
             "mekhq.resources.ContractMarketDialog", new EncodeControl());
     private ContractPaymentBreakdown contractPaymentBreakdown;
 
+    // These three are used locally to ensure consistent formatting
     private static final int LABEL_COLUMN = 0;
     private static final int TEXT_COLUMN = 1;
     private static final int BUTTON_COLUMN = 2;
+    //endregion Variable Declarations
+
 
     public ContractSummaryPanel(Contract contract, Campaign campaign, boolean allowRerolls) {
         this.contract = contract;
@@ -120,8 +124,9 @@ public class ContractSummaryPanel extends JPanel {
         // TODO : Remove Inline date
         SimpleDateFormat shortDateFormat = new SimpleDateFormat("yyyy/MM/dd");
 
-        // TODO : These two arrays should probably be pulled from elsewhere
+        // TODO : Switch me to use a modified RandomSkillsGenerator.levelNames
         String[] skillNames = {"Green", "Regular", "Veteran", "Elite"};
+        // TODO : Switch me to use IUnitRating
         String[] ratingNames = {"F", "D", "C", "B", "A"};
 
         // Initializing the GridBagConstraint used for Labels
