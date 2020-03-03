@@ -29,6 +29,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 
 import jdk.tools.jlink.internal.Jlink;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.FormerSpouse;
 import org.joda.time.DateTime;
@@ -404,43 +405,47 @@ public class PersonViewPanel extends ScrollablePanel {
      *         error loading it.
      */
     public JPanel setPortrait() {
-
-        JPanel pnlPortrait = new JPanel();
+        JPanel pnlPortrait = new JPanel(new GridBagLayout());
 
         // Panel portrait will include the person picture and the ribbons
         pnlPortrait.setName("pnlPortrait");
-        pnlPortrait.setLayout(new GridBagLayout());
 
         JLabel lblPortrait = new JLabel();
-        lblPortrait.setName("lblPortrait"); // NOI18N
+        lblPortrait.setName("lblPortrait");
 
         String category = person.getPortraitCategory();
         String filename = person.getPortraitFileName();
 
         if (Crew.ROOT_PORTRAIT.equals(category)) {
-            category = ""; //$NON-NLS-1$
+            category = "";
         }
 
         // Return a null if the player has selected no portrait file.
         if ((null == category) || (null == filename) || Crew.PORTRAIT_NONE.equals(filename)) {
-            filename = "default.gif"; //$NON-NLS-1$
+            filename = "default.gif";
         }
 
         // Try to get the player's portrait file.
         Image portrait;
         try {
             portrait = (Image) portraits.getItem(category, filename);
-            if (null != portrait) {
+            if (portrait != null) {
                 portrait = portrait.getScaledInstance(100, -1, Image.SCALE_DEFAULT);
             } else {
-                portrait = (Image) portraits.getItem("", "default.gif"); //$NON-NLS-1$ //$NON-NLS-2$
-                if (null != portrait) {
+                portrait = (Image) portraits.getItem("", "default.gif");
+                if (portrait != null) {
                     portrait = portrait.getScaledInstance(100, -1, Image.SCALE_DEFAULT);
                 }
             }
-            lblPortrait.setIcon(new ImageIcon(portrait));
-        } catch (Exception err) {
-            err.printStackTrace();
+            if (portrait != null) {
+                lblPortrait.setIcon(new ImageIcon(portrait));
+            } else {
+                MekHQ.getLogger().error(getClass(), "setPortrait",
+                        "Cannot locate the portrait file for " + person.getFullName()
+                                + ", which should be file " + filename + " in category " + category);
+            }
+        } catch (Exception e) {
+            MekHQ.getLogger().error(getClass(), "setPortrait", e);
         }
 
         GridBagConstraints gbc_lblPortrait = new GridBagConstraints();
