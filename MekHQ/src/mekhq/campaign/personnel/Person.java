@@ -119,12 +119,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public static final int PRISONER_BONDSMAN = 2;
 
     // Phenotypes
-    public static final int PHENOTYPE_NONE = 0;
     public static final int PHENOTYPE_MW = 1;
     public static final int PHENOTYPE_BA = 2;
     public static final int PHENOTYPE_AERO = 3;
     public static final int PHENOTYPE_VEE = 4;
-    public static final int PHENOTYPE_NUM = 5;
 
     // ROM Designations
     public static final int DESIG_NONE    = 0;
@@ -426,7 +424,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         originFaction = Faction.getFaction(factionCode);
         originPlanet = null;
         clan = originFaction.isClan();
-        phenotype = PHENOTYPE_NONE;
+        phenotype = Bloodname.P_NONE;
         bloodname = "";
         biography = "";
         idleMonths = -1;
@@ -706,7 +704,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public static String getPhenotypeName(int pheno) {
         switch (pheno) {
-            case PHENOTYPE_NONE:
+            case Bloodname.P_NONE:
                 return "Freeborn";
             case PHENOTYPE_MW:
                 return "Trueborn Mechwarrior";
@@ -727,7 +725,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public static String getPhenotypeShortName(int pheno) {
         switch (pheno) {
-            case PHENOTYPE_NONE:
+            case Bloodname.P_NONE:
                 return "Freeborn";
             case PHENOTYPE_MW:
             case PHENOTYPE_AERO:
@@ -1896,7 +1894,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 + "<clan>"
                 + clan
                 + "</clan>");
-        if (phenotype != PHENOTYPE_NONE) {
+        if (phenotype != Bloodname.P_NONE) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<phenotype>"
                     + phenotype

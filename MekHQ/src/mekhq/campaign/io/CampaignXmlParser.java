@@ -40,6 +40,7 @@ import java.util.UUID;
 
 import javax.xml.parsers.DocumentBuilder;
 
+import mekhq.campaign.personnel.*;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -102,13 +103,6 @@ import mekhq.campaign.parts.equipment.MissingAmmoBin;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.parts.equipment.MissingLargeCraftAmmoBin;
 import mekhq.campaign.parts.equipment.MissingMASC;
-import mekhq.campaign.personnel.Ancestors;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.RankTranslator;
-import mekhq.campaign.personnel.Ranks;
-import mekhq.campaign.personnel.RetirementDefectionTracker;
-import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
@@ -571,7 +565,7 @@ public class CampaignXmlParser {
                         psn.setPhenotype(Person.PHENOTYPE_VEE);
                         break;
                     default:
-                        psn.setPhenotype(Person.PHENOTYPE_NONE);
+                        psn.setPhenotype(Bloodname.P_NONE);
                         break;
                 }
             }

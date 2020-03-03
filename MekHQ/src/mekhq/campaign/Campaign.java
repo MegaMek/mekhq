@@ -1450,7 +1450,7 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         // Go ahead and generate a new bloodname
-        if (person.isClanner() && person.getPhenotype() != Person.PHENOTYPE_NONE) {
+        if (person.isClanner() && (person.getPhenotype() != Bloodname.P_NONE)) {
             int bloodnameTarget = 6;
             switch (person.getPhenotype()) {
                 case Person.PHENOTYPE_MW:

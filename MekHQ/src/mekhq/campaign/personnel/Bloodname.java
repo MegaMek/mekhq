@@ -48,6 +48,7 @@ public class Bloodname implements Serializable {
 
     private static List<Bloodname> bloodnames;
 
+    public static final int P_NONE = 0; // No phenotype
     public static final int P_GENERAL = 0;
     public static final int P_MECHWARRIOR = 1;
     public static final int P_AEROSPACE = 2;
@@ -57,14 +58,10 @@ public class Bloodname implements Serializable {
     public static final int P_NUM = 6;
 /*
     // TODO : Windchild merge these two lists
-    public static final int P_NONE = 0;
-    public static final int P_GENERAL = 1;
-    public static final int P_MECHWARRIOR = 2;
-    public static final int P_AEROSPACE = 3;
-    public static final int P_ELEMENTAL = 4;
-    public static final int P_PROTOMECH = 5;
-    public static final int P_NAVAL = 6;
-    public static final int P_NUM = 7;
+    public static final int PHENOTYPE_MW = 1;
+    public static final int PHENOTYPE_BA = 2;
+    public static final int PHENOTYPE_AERO = 3;
+    public static final int PHENOTYPE_VEE = 4;
 */
     public static final String[] phenotypeNames = {
         "General", "MechWarrior", "Aerospace Pilot", "Elemental",

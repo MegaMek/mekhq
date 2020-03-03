@@ -463,7 +463,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         panDemog.add(new JLabel("Phenotype:"), gridBagConstraints);
 
         DefaultComboBoxModel<String> phenoModel = new DefaultComboBoxModel<>();
-        for(int i = 0; i < Person.PHENOTYPE_NUM; i++) {
+        for(int i = 0; i < Bloodname.P_NUM; i++) {
             phenoModel.addElement(Person.getPhenotypeName(i));
         }
         choicePheno = new JComboBox<>(phenoModel);
