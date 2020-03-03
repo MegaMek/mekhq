@@ -97,10 +97,10 @@ public class PersonViewPanel extends ScrollablePanel {
     public PersonViewPanel(Person p, Campaign c) {
         this.person = p;
         this.campaign = c;
-        this.gui = c.getApp().getCampaigngui();
-        this.ip = gui.getIconPackage();
-        this.portraits = this.ip.getPortraits();
-        this.awardIcons = this.ip.getAwardIcons();
+        gui = c.getApp().getCampaigngui();
+        ip = gui.getIconPackage();
+        portraits = ip.getPortraits();
+        awardIcons = ip.getAwardIcons();
         initComponents();
     }
 
