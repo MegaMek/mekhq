@@ -2,7 +2,7 @@
  * Bloodname.java
  *
  * Copyright (c) 2014 Carl Spain. All rights reserved.
- *
+ * Copyright (c) 2020 The MegaMek Team
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.personnel;
 
 import java.io.File;
@@ -42,16 +41,12 @@ import mekhq.MekHqXmlUtil;
 
 /**
  * @author Neoancient
- *
- *
  */
 public class Bloodname implements Serializable {
-    /**
-     *
-     */
+    //region Variable Declarations
     private static final long serialVersionUID = 3958964485520416824L;
 
-    private static ArrayList<Bloodname> bloodnames;
+    private static List<Bloodname> bloodnames;
 
     public static final int P_GENERAL = 0;
     public static final int P_MECHWARRIOR = 1;
@@ -86,9 +81,10 @@ public class Bloodname implements Serializable {
     private int reactivated;
     private int startDate;
     private int phenotype;
-    ArrayList<Clan> postReavingClans;
-    ArrayList<NameAcquired> acquiringClans;
+    List<Clan> postReavingClans;
+    List<NameAcquired> acquiringClans;
     NameAcquired absorbed;
+    //endregion Variable Declaration
 
     public Bloodname() {
         name = "";
@@ -138,11 +134,11 @@ public class Bloodname implements Serializable {
         return phenotype;
     }
 
-    public ArrayList<Clan> getPostReavingClans() {
+    public List<Clan> getPostReavingClans() {
         return postReavingClans;
     }
 
-    public ArrayList<NameAcquired> getAcquiringClans() {
+    public List<NameAcquired> getAcquiringClans() {
         return acquiringClans;
     }
 
@@ -331,9 +327,9 @@ public class Bloodname implements Serializable {
         }
 
         /* The relative probability of the various Bloodnames that are original to this Clan */
-        HashMap<Bloodname, Fraction> weights = new HashMap<>();
+        Map<Bloodname, Fraction> weights = new HashMap<>();
         /* A list of non-exclusive Bloodnames from other Clans */
-        ArrayList<Bloodname> nonExclusives = new ArrayList<>();
+        List<Bloodname> nonExclusives = new ArrayList<>();
         /* The relative probability that a warrior in this Clan will have a non-exclusive
          * Bloodname that originally belonged to another Clan; the smaller the number
          * of exclusive Bloodnames of this Clan, the larger this chance.
@@ -429,7 +425,7 @@ public class Bloodname implements Serializable {
         for (Fraction f : weights.values()) {
             f.mul(lcd);
         }
-        ArrayList<Bloodname> nameList = new ArrayList<>();
+        List<Bloodname> nameList = new ArrayList<>();
         for (Bloodname b : weights.keySet()) {
             for (int i = 0; i < weights.get(b).value(); i++) {
                 nameList.add(b);
@@ -467,7 +463,7 @@ public class Bloodname implements Serializable {
         if (year < 3050) {
             return new Fraction(7, 10);
         }
-        return new Fraction (3, 5);
+        return new Fraction(3, 5);
     }
 
     public static void loadBloodnameData() {
@@ -513,7 +509,7 @@ public class Bloodname implements Serializable {
                 "Loaded " + bloodnames.size() + " Bloodname records."); //$NON-NLS-1$
     }
 
-    public static class NameAcquired {
+    private static class NameAcquired {
         public int year;
         public String clan;
         public NameAcquired(int y, String c) {
@@ -521,336 +517,335 @@ public class Bloodname implements Serializable {
             clan = c;
         }
     }
-}
 
-class DatedRecord {
-    public int startDate;
-    public int endDate;
-    public String description;
+    private static class DatedRecord {
+        public int startDate;
+        public int endDate;
+        public String description;
 
-    public DatedRecord(int s, int e, String d) {
-        startDate = s;
-        endDate = e;
-        description = d;
-    }
-
-}
-
-class Clan {
-    private static HashMap<String, Clan> allClans;
-
-    private String code;
-    private String fullName;
-    private int startDate;
-    private int endDate;
-    private int abjurationDate;
-    private ArrayList<DatedRecord> rivals;
-    private ArrayList<DatedRecord> nameChanges;
-    private boolean homeClan;
-
-    public Clan() {
-        startDate = endDate = abjurationDate = 0;
-        rivals = new ArrayList<>();
-        nameChanges = new ArrayList<>();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o instanceof Clan) {
-            return code.equals(((Clan)o).code);
+        public DatedRecord(int s, int e, String d) {
+            startDate = s;
+            endDate = e;
+            description = d;
         }
-        if (o instanceof String) {
-            return code.equals(o);
+
+    }
+
+    private static class Clan {
+        private static Map<String, Clan> allClans;
+
+        private String code;
+        private String fullName;
+        private int startDate;
+        private int endDate;
+        private int abjurationDate;
+        private List<DatedRecord> rivals;
+        private List<DatedRecord> nameChanges;
+        private boolean homeClan;
+
+        public Clan() {
+            startDate = endDate = abjurationDate = 0;
+            rivals = new ArrayList<>();
+            nameChanges = new ArrayList<>();
         }
-        return false;
-    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(getCode());
-    }
-
-    public static Clan getClan(String code) {
-        return allClans.get(code);
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public String getFullName(int year) {
-        for (DatedRecord r : nameChanges) {
-            if (r.startDate < year &&
-                    (r.endDate == 0 || r.endDate > year)) {
-                return r.description;
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof Clan) {
+                return code.equals(((Clan)o).code);
             }
+            if (o instanceof String) {
+                return code.equals(o);
+            }
+            return false;
         }
-        return fullName;
-    }
 
-    public boolean isActive(int year) {
-        return startDate < year && (endDate == 0 || endDate > year);
-    }
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(getCode());
+        }
 
-    public boolean isAbjured(int year) {
-        if (abjurationDate == 0) return false;
-        return abjurationDate < year;
-    }
+        public static Clan getClan(String code) {
+            return allClans.get(code);
+        }
 
-    public ArrayList<Clan> getRivals(int year) {
-        ArrayList<Clan> retVal = new ArrayList<>();
-        for (DatedRecord r : rivals) {
-            if (r.startDate < year && (endDate == 0) || endDate > year) {
-                Clan c = allClans.get(r.description);
+        public String getCode() {
+            return code;
+        }
+
+        public String getFullName(int year) {
+            for (DatedRecord r : nameChanges) {
+                if ((r.startDate < year) && (r.endDate == 0 || r.endDate > year)) {
+                    return r.description;
+                }
+            }
+            return fullName;
+        }
+
+        public boolean isActive(int year) {
+            return startDate < year && (endDate == 0 || endDate > year);
+        }
+
+        public boolean isAbjured(int year) {
+            if (abjurationDate == 0) return false;
+            return abjurationDate < year;
+        }
+
+        public List<Clan> getRivals(int year) {
+            List<Clan> retVal = new ArrayList<>();
+            for (DatedRecord r : rivals) {
+                if ((r.startDate < year) && (endDate == 0) || endDate > year) {
+                    Clan c = allClans.get(r.description);
+                    if (c.isActive(year)) {
+                        retVal.add(c);
+                    }
+                }
+            }
+            return retVal;
+        }
+
+        public boolean isHomeClan() {
+            return homeClan;
+        }
+
+        public Clan getRivalClan(int year) {
+            List<Clan> rivals = getRivals(year);
+            int roll = Compute.randomInt(rivals.size() + 1);
+            if (roll > rivals.size() - 1) {
+                return randomClan(year, homeClan);
+            }
+            return rivals.get(roll);
+        }
+
+        public static Clan randomClan(int year, boolean homeClan) {
+            List<Clan> list = new ArrayList<>();
+            for (Clan c : allClans.values()) {
+                if (year > 3075 && homeClan != c.homeClan) {
+                    continue;
+                }
                 if (c.isActive(year)) {
-                    retVal.add(c);
+                    list.add(c);
+                }
+            }
+            return list.get(Compute.randomInt(list.size()));
+        }
+
+        public static void loadClanData() {
+            allClans = new HashMap<>();
+            File f = new File("data/names/bloodnames/clans.xml");
+            FileInputStream fis;
+            try {
+                fis = new FileInputStream(f);
+            } catch (FileNotFoundException e) {
+                MekHQ.getLogger().log(Bloodname.class, "loadClanData()", LogLevel.ERROR,
+                        "Cannot find file clans.xml"); //$NON-NLS-1$
+                return;
+            }
+
+            Document doc;
+
+            try {
+                DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
+                doc = db.parse(fis);
+                fis.close();
+            } catch (Exception ex) {
+                MekHQ.getLogger().error(Bloodname.class, "loadClanData()", "Could not parse clans.xml", ex);
+                return;
+            }
+
+            Element clanElement = doc.getDocumentElement();
+            NodeList nl = clanElement.getChildNodes();
+            clanElement.normalize();
+
+            for (int i = 0; i < nl.getLength(); i++) {
+                Node wn = nl.item(i);
+                if (wn.getNodeName().equalsIgnoreCase("clan")) {
+                    Clan c = loadFromXml(wn);
+                    allClans.put(c.code, c);
                 }
             }
         }
-        return retVal;
-    }
 
-    public boolean isHomeClan() {
-        return homeClan;
-    }
+        private static Clan loadFromXml(Node node) {
+            Clan retVal = new Clan();
 
-    public Clan getRivalClan(int year) {
-        ArrayList<Clan> rivals = getRivals(year);
-        int roll = Compute.randomInt(rivals.size() + 1);
-        if (roll > rivals.size() - 1) {
-            return randomClan(year, homeClan);
-        }
-        return rivals.get(roll);
-    }
-
-    public static Clan randomClan(int year, boolean homeClan) {
-        ArrayList<Clan> list = new ArrayList<>();
-        for (Clan c : allClans.values()) {
-            if (year > 3075 && homeClan != c.homeClan) {
-                continue;
+            retVal.code = node.getAttributes().getNamedItem("code").getTextContent().trim();
+            if (null != node.getAttributes().getNamedItem("start")) {
+                retVal.startDate = Integer.parseInt(node.getAttributes().getNamedItem("start").getTextContent().trim());
             }
-            if (c.isActive(year)) {
-                list.add(c);
+            if (null != node.getAttributes().getNamedItem("end")) {
+                retVal.endDate = Integer.parseInt(node.getAttributes().getNamedItem("end").getTextContent().trim());
             }
-        }
-        return list.get(Compute.randomInt(list.size()));
-    }
+            NodeList nl = node.getChildNodes();
+            for (int i = 0; i < nl.getLength(); i++) {
+                Node wn = nl.item(i);
 
-    public static void loadClanData() {
-        allClans = new HashMap<>();
-        File f = new File("data/names/bloodnames/clans.xml");
-        FileInputStream fis;
-        try {
-            fis = new FileInputStream(f);
-        } catch (FileNotFoundException e) {
-            MekHQ.getLogger().log(Bloodname.class, "loadClanData()", LogLevel.ERROR,
-                    "Cannot find file clans.xml"); //$NON-NLS-1$
-            return;
-        }
-
-        Document doc;
-
-        try {
-            DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
-            doc = db.parse(fis);
-            fis.close();
-        } catch (Exception ex) {
-            MekHQ.getLogger().error(Bloodname.class, "loadClanData()", "Could not parse clans.xml", ex);
-            return;
-        }
-
-        Element clanElement = doc.getDocumentElement();
-        NodeList nl = clanElement.getChildNodes();
-        clanElement.normalize();
-
-        for (int i = 0; i < nl.getLength(); i++) {
-            Node wn = nl.item(i);
-            if (wn.getNodeName().equalsIgnoreCase("clan")) {
-                Clan c = loadFromXml(wn);
-                allClans.put(c.code, c);
+                if (wn.getNodeName().equalsIgnoreCase("fullName")) {
+                    retVal.fullName = wn.getTextContent().trim();
+                } else if (wn.getNodeName().equalsIgnoreCase("abjured")) {
+                    retVal.abjurationDate = Integer.parseInt(wn.getTextContent().trim());
+                } else if (wn.getNodeName().equalsIgnoreCase("nameChange")) {
+                    int start = retVal.startDate;
+                    int end = retVal.endDate;
+                    if (null != wn.getAttributes().getNamedItem("start")) {
+                        start = Integer.parseInt(wn.getAttributes().getNamedItem("start").getTextContent().trim());
+                    }
+                    if (null != wn.getAttributes().getNamedItem("end")) {
+                        end = Integer.parseInt(wn.getAttributes().getNamedItem("end").getTextContent().trim());
+                    }
+                    retVal.nameChanges.add(new DatedRecord(start, end, wn.getTextContent().trim()));
+                } else if (wn.getNodeName().equalsIgnoreCase("rivals")) {
+                    int start = retVal.startDate;
+                    int end = retVal.endDate;
+                    if (null != wn.getAttributes().getNamedItem("start")) {
+                        start = Integer.parseInt(wn.getAttributes().getNamedItem("start").getTextContent().trim());
+                    }
+                    if (null != wn.getAttributes().getNamedItem("end")) {
+                        end = Integer.parseInt(wn.getAttributes().getNamedItem("end").getTextContent().trim());
+                    }
+                    String[] rivals = wn.getTextContent().trim().split(",");
+                    for (String r : rivals) {
+                        retVal.rivals.add(new DatedRecord(start, end, r));
+                    }
+                } else if (wn.getNodeName().equalsIgnoreCase("homeClan")) {
+                    retVal.homeClan = true;
+                }
             }
+
+            return retVal;
         }
     }
 
-    private static Clan loadFromXml(Node node) {
-        Clan retVal = new Clan();
+    private static class Fraction {
+        private int numerator;
+        private int denominator;
 
-        retVal.code = node.getAttributes().getNamedItem("code").getTextContent().trim();
-        if (null != node.getAttributes().getNamedItem("start")) {
-            retVal.startDate = Integer.parseInt(node.getAttributes().getNamedItem("start").getTextContent().trim());
+        public Fraction() {
+            numerator = 0;
+            denominator = 1;
         }
-        if (null != node.getAttributes().getNamedItem("end")) {
-            retVal.endDate = Integer.parseInt(node.getAttributes().getNamedItem("end").getTextContent().trim());
-        }
-        NodeList nl = node.getChildNodes();
-        for (int i = 0; i < nl.getLength(); i++) {
-            Node wn = nl.item(i);
 
-            if (wn.getNodeName().equalsIgnoreCase("fullName")) {
-                retVal.fullName = wn.getTextContent().trim();
-            } else if (wn.getNodeName().equalsIgnoreCase("abjured")) {
-                retVal.abjurationDate = Integer.parseInt(wn.getTextContent().trim());
-            } else if (wn.getNodeName().equalsIgnoreCase("nameChange")) {
-                int start = retVal.startDate;
-                int end = retVal.endDate;
-                if (null != wn.getAttributes().getNamedItem("start")) {
-                    start = Integer.parseInt(wn.getAttributes().getNamedItem("start").getTextContent().trim());
-                }
-                if (null != wn.getAttributes().getNamedItem("end")) {
-                    end = Integer.parseInt(wn.getAttributes().getNamedItem("end").getTextContent().trim());
-                }
-                retVal.nameChanges.add(new DatedRecord(start, end, wn.getTextContent().trim()));
-            } else if (wn.getNodeName().equalsIgnoreCase("rivals")) {
-                int start = retVal.startDate;
-                int end = retVal.endDate;
-                if (null != wn.getAttributes().getNamedItem("start")) {
-                    start = Integer.parseInt(wn.getAttributes().getNamedItem("start").getTextContent().trim());
-                }
-                if (null != wn.getAttributes().getNamedItem("end")) {
-                    end = Integer.parseInt(wn.getAttributes().getNamedItem("end").getTextContent().trim());
-                }
-                String[] rivals = wn.getTextContent().trim().split(",");
-                for (String r : rivals) {
-                    retVal.rivals.add(new DatedRecord(start, end, r));
-                }
-            } else if (wn.getNodeName().equalsIgnoreCase("homeClan")) {
-                retVal.homeClan = true;
+        public Fraction(int n, int d) {
+            if (d == 0) {
+                throw new IllegalArgumentException("Denominator is zero.");
             }
+            if (d < 0) {
+                n = -n;
+                d = -d;
+            }
+            numerator = n;
+            denominator = d;
         }
 
-        return retVal;
-    }
-}
-
-class Fraction {
-    private int numerator;
-    private int denominator;
-
-    public Fraction() {
-        numerator = 0;
-        denominator = 1;
-    }
-
-    public Fraction(int n, int d) {
-        if (d == 0) {
-            throw new IllegalArgumentException("Denominator is zero.");
+        public Fraction(int i) {
+            numerator = i;
+            denominator = 1;
         }
-        if (d < 0) {
-            n = -n;
-            d = -d;
+
+        public Fraction(Fraction f) {
+            numerator = f.numerator;
+            denominator = f.denominator;
         }
-        numerator = n;
-        denominator = d;
-    }
 
-    public Fraction(int i) {
-        numerator = i;
-        denominator = 1;
-    }
+        @Override
+        public Object clone() {
+            return new Fraction(this);
+        }
 
-    public Fraction(Fraction f) {
-        numerator = f.numerator;
-        denominator = f.denominator;
-    }
+        @Override
+        public String toString() {
+            return numerator + "/" + denominator;
+        }
 
-    @Override
-    public Object clone() {
-        return new Fraction(this);
-    }
+        public boolean equals(Fraction f) {
+            return value() == f.value();
+        }
 
-    @Override
-    public String toString() {
-        return numerator + "/" + denominator;
-    }
+        public double value() {
+            return (double)numerator / (double)denominator;
+        }
 
-    public boolean equals(Fraction f) {
-        return value() == f.value();
-    }
-
-    public double value() {
-        return (double)numerator / (double)denominator;
-    }
-
-    public void reduce() {
-        if (denominator > 1) {
-            for (int i = denominator - 1; i > 1; i--) {
-                if (numerator % i == 0 && denominator % i == 0) {
-                    numerator /= i;
-                    denominator /= i;
-                    i = denominator - 1;
+        public void reduce() {
+            if (denominator > 1) {
+                for (int i = denominator - 1; i > 1; i--) {
+                    if (numerator % i == 0 && denominator % i == 0) {
+                        numerator /= i;
+                        denominator /= i;
+                        i = denominator - 1;
+                    }
                 }
             }
         }
-    }
 
-    public int getNumerator() {
-        return numerator;
-    }
-
-    public int getDenominator() {
-        return denominator;
-    }
-
-    public void add(Fraction f) {
-        numerator = numerator * f.denominator + f.numerator * denominator;
-        denominator = denominator * f.denominator;
-        reduce();
-    }
-
-    public void add(int i) {
-        numerator += i * denominator;
-        reduce();
-    }
-
-    public void sub(Fraction f) {
-        numerator = numerator * f.denominator - f.numerator * denominator;
-        denominator = denominator * f.denominator;
-        reduce();
-    }
-
-    public void sub(int i) {
-        numerator -= i * denominator;
-        reduce();
-    }
-
-    public void mul(Fraction f) {
-        numerator *= f.numerator;
-        denominator *= f.denominator;
-        reduce();
-    }
-
-    public void mul(int i) {
-        numerator *= i;
-        reduce();
-    }
-
-    public void div(Fraction f) {
-        numerator *= f.denominator;
-        denominator *= f.numerator;
-        reduce();
-    }
-
-    public void div(int i) {
-        denominator *= i;
-    }
-
-    public static int lcd(Collection<Fraction> list) {
-        Set<Integer> denominators = new HashSet<>();
-        for (Fraction f : list) {
-            denominators.add(f.denominator);
+        public int getNumerator() {
+            return numerator;
         }
-        boolean done = false;
-        int retVal = 1;
-        while (!done) {
-            done = true;
-            for (Integer d : denominators) {
-                if (d / retVal > 1 || retVal % d != 0) {
-                    retVal++;
-                    done = false;
-                    break;
+
+        public int getDenominator() {
+            return denominator;
+        }
+
+        public void add(Fraction f) {
+            numerator = numerator * f.denominator + f.numerator * denominator;
+            denominator = denominator * f.denominator;
+            reduce();
+        }
+
+        public void add(int i) {
+            numerator += i * denominator;
+            reduce();
+        }
+
+        public void sub(Fraction f) {
+            numerator = numerator * f.denominator - f.numerator * denominator;
+            denominator = denominator * f.denominator;
+            reduce();
+        }
+
+        public void sub(int i) {
+            numerator -= i * denominator;
+            reduce();
+        }
+
+        public void mul(Fraction f) {
+            numerator *= f.numerator;
+            denominator *= f.denominator;
+            reduce();
+        }
+
+        public void mul(int i) {
+            numerator *= i;
+            reduce();
+        }
+
+        public void div(Fraction f) {
+            numerator *= f.denominator;
+            denominator *= f.numerator;
+            reduce();
+        }
+
+        public void div(int i) {
+            denominator *= i;
+        }
+
+        public static int lcd(Collection<Fraction> list) {
+            Set<Integer> denominators = new HashSet<>();
+            for (Fraction f : list) {
+                denominators.add(f.denominator);
+            }
+            boolean done = false;
+            int retVal = 1;
+            while (!done) {
+                done = true;
+                for (Integer d : denominators) {
+                    if (d / retVal > 1 || retVal % d != 0) {
+                        retVal++;
+                        done = false;
+                        break;
+                    }
                 }
             }
+            return retVal;
         }
-        return retVal;
     }
 }
