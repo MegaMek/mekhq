@@ -692,22 +692,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return isPregnant() ? " (Pregnant)" : "";
     }
 
-    public String getPhenotypeName() {
-        return Phenotype.getPhenotypeName(phenotype);
-    }
-
-    public static String getPhenotypeName(int phenotype) {
-        return Phenotype.getPhenotypeName(phenotype);
-    }
-
-    public String getPhenotypeShortName() {
-        return Phenotype.getPhenotypeShortName(phenotype);
-    }
-
-    public static String getPhenotypeShortName(int phenotype) {
-        return Phenotype.getPhenotypeName(phenotype);
-    }
-
     public static String getPrisonerStatusName(int status) {
         switch (status) {
             case PRISONER_NOT:
@@ -1023,7 +1007,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public String getPrimaryRoleDesc() {
         String bgPrefix = "";
         if (isClanner()) {
-            bgPrefix = getPhenotypeShortName() + " ";
+            bgPrefix = Phenotype.getPhenotypeShortName(phenotype) + " ";
         }
         return bgPrefix + getRoleDesc(primaryRole, campaign.getFaction().isClan());
     }

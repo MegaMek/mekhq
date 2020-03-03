@@ -461,7 +461,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
 
         DefaultComboBoxModel<String> phenoModel = new DefaultComboBoxModel<>();
         for(int i = 0; i < Phenotype.P_NUM; i++) {
-            phenoModel.addElement(Person.getPhenotypeName(i));
+            phenoModel.addElement(Phenotype.getPhenotypeName(i));
         }
         choicePheno = new JComboBox<>(phenoModel);
         choicePheno.setSelectedIndex(person.getPhenotype());

@@ -349,7 +349,8 @@ public class MedicalViewDialog extends JDialog {
             + now.get(Calendar.MONTH) - birthday.get(Calendar.MONTH);
 
         String phenotype = (p.getPhenotype() != Phenotype.P_NONE)
-                ? p.getPhenotypeName() : resourceMap.getString("baselinePhenotype.text");
+                ? Phenotype.getPhenotypeName(p.getPhenotype())
+                : resourceMap.getString("baselinePhenotype.text");
 
         Force f = c.getForceFor(p);
         String force = (null != f) ? f.getFullName() : "-"; //$NON-NLS-1$
