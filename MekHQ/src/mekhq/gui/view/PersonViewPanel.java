@@ -1,9 +1,21 @@
 /*
- * PersonViewPanel
+ * Copyright (c) 2009, 2020 The MegaMek Team
  *
- * Created on July 26, 2009, 11:32 PM
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.view;
 
 import java.awt.*;
@@ -64,6 +76,7 @@ import mekhq.gui.utilities.WrapLayout;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class PersonViewPanel extends ScrollablePanel {
+    //region Variable Declarations
     private static final long serialVersionUID = 7004741688464105277L;
 
     private static final int MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW = 4;
@@ -77,16 +90,17 @@ public class PersonViewPanel extends ScrollablePanel {
     private final DirectoryItems awardIcons;
     private final IconPackage ip;
 
-    ResourceBundle resourceMap;
+    ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonViewPanel",
+            new EncodeControl());
+    //endregion Variable Declarations
 
-    public PersonViewPanel(Person p, Campaign c, CampaignGUI gui) {
+    public PersonViewPanel(Person p, Campaign c) {
         this.person = p;
         this.campaign = c;
-        this.gui = gui;
+        this.gui = c.getApp().getCampaigngui();
         this.ip = gui.getIconPackage();
         this.portraits = this.ip.getPortraits();
         this.awardIcons = this.ip.getAwardIcons();
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonViewPanel", new EncodeControl()); //$NON-NLS-1$
         initComponents();
     }
 
