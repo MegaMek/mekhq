@@ -108,8 +108,8 @@ message flow will be roughly PUBSUB.
 The general message flow is as follows:
 1. A Remote Campaign connects to a Host Campaign and sends a ConnectionRequest.
 2. If the Host Campaign is compatible with the Remote Campaign, the Host Campaign responds with a ConnectionResponse.
-3. If the Remote Campaign is compatible with the Host Campaign, the Remote Campaign sends a ClientMessageBusStream.
-4. The Host Campaign responds with a ServerMessageBusStream.
+3. If the Remote Campaign is compatible with the Host Campaign, the Remote Campaign sends a Message stream.
+4. The Host Campaign responds with a Message stream.
 5. Gameplay messages flow over these streams.
 
 Notes:
@@ -121,6 +121,8 @@ Notes:
 As Distributed MekHQ uses gRPC, TLS will be made available as an option to secure the underlying transport. Further, a ConnectionRequest may include an optional password. Messages sent over the streams will use Protobuf and not support arbitrary serialization.
 
 ### ConnectionRequest
+The ConnectionRequest message is sent by the Remote Campaign when it first connects to the Host Campaign.
+
 The ConnectionRequest message has the following properties:
 - Remote Campaign Version
 - Remote Campaign Name
@@ -128,7 +130,11 @@ The ConnectionRequest message has the following properties:
 - Remote Campaign Date
 - Password (*OPTIONAL*)
 
+The Host Campaign shall ignore additional ConnectRequest messages once a connection has been established for a Remote Campaign.
+
 ### ConnectionResponse
+The ConnectionResponse message is sent by the Host Campaign when it accepts a connection from a Remote Campaign.
+
 The ConnectionResponse message has the following properties:
 - Host Campaign Version
 - Host Campaign Name
@@ -143,8 +149,16 @@ The ConnectionResponse message has the following properties:
 ### Message Bus Messages
 The Message Bus contains all client-to-server messages to be processed by the server and either redistributed or transformed.
 
+Each message is encapsulated over a bidirectional gRPC stream with the following format:
+- Timestamp
+- Message Type
+- Metadata Map (String -> String)
+- Message Bytes (protobuf)
+
 #### CampaignDateChanged
 The CampaignDateChanged message notifies the Host Campaign that a Remote Campaign has advanced days.
+
+The CampaignDateChanged message has the following properties:
 - Campaign UUID
 - Campaign Date
 
@@ -152,6 +166,8 @@ This message is redistributed to all connected campaigns.
 
 #### GMModeChanged
 The GMModeChanged message notifies the Host Campaign that a Remote Campaign has changed their GM Mode.
+
+The GMModeChanged message has the following properties:
 - Campaign UUID
 - Is GM?
 
@@ -159,6 +175,8 @@ This message is redistributed to all connected campaigns.
 
 #### TeamAssignment
 The TeamAssignment message notifies a Remote Campaign of team assignments.
+
+The TeamAssignment message has the following properties:
 - Team List
     - Remote Campaign UUID
     - Remote Campaign Team
@@ -169,6 +187,8 @@ This message is only sent by the Host Campaign.
 
 #### DailyLog
 The DailyLog message notifies the Host Campaign of a daily log activity.
+
+The DailyLog message has the following properties:
 - Campaign UUID
 - Log Date
 - Log List
@@ -180,6 +200,8 @@ This message is redistributed to all Remote Campaigns on the same team as the se
 
 #### WireTransferRequest
 The WireTransferRequest message notifies the Host Campaign of an intent to perform a wire transfer between two Campaigns.
+
+The WireTransferRequest message has the following properties:
 - Source Campaign UUID
 - Target Campaign UUID
 - Request UUID
@@ -193,6 +215,8 @@ This message is redistributed only to the target Campaign.
 
 #### WireTransferResponse
 The WireTransferResponse message notifies the Host Campaign of the response to a wire transfer request.
+
+The WireTransferResponse message has the following properties:
 - Source Campaign UUID
 - Target Campaign UUID
 - Request UUID
@@ -208,6 +232,8 @@ This message is only consumed by the Host Campaign.
 
 #### WireTransferCompleted
 The WireTransferCompleted message notifies two participating Campaigns that their wire transfer has been accepted by the Host.
+
+The WireTransferCompleted message has the following properties:
 - Source Campaign UUID
 - Target Campaign UUID
 - Request UUID
@@ -216,3 +242,69 @@ The WireTransferCompleted message notifies two participating Campaigns that thei
 This message must be rejected by the source or target Campaigns if they do not recognize it.
 
 This message is sent to the originating source and target Campaigns upon receipt of a WireTransferResponse.
+
+#### TradeRequest
+The TradeRequest message notifies the Host Campaign of an intent to trade between two campaigns.
+
+The TradeRequest message has the following properties:
+- Source Campaign UUID
+- Target Campaign UUID
+- Request UUID
+- ?
+
+Details TBD
+
+If the Source and Target Campaign already have an active trade, the Host Campaign shall send a rejection TradeCompleted to the Source Campaign.
+
+This message is redistributed to the target campaign by the Host Campaign.
+
+#### CancelTradeRequest
+The CancelTradeRequest message notifies the Host Campaign that a trade partner has cancelled a request.
+
+The CancelTradeRequest message has the following properties:
+- Request UUID
+
+The Host Campaign accepts this message and then sends a rejection TradeCompleted message to the Source and Target of the trade request.
+
+#### TradeDetails
+The TradeDetails message notifies the Host Campaign that a trade partner has updated the details of their trade.
+
+The TradeDetails message has the following properties:
+- Campaign UUID
+- Request UUID
+- ?
+
+Details TBD
+
+If the Request UUID is not recognized this message should be ignored.
+
+If the Campaign UUID is not one of the trading partners for the request, this message should be ignored.
+
+This message is redistributed to the trading partners by the Host Campaign.
+
+#### TradeAcceptance
+The TradeAcceptance message notifies the Host Campaign that a trade partner has accepted the terms of the trade.
+
+The TradeAcceptance message has the following properties:
+- Campaign UUID
+- Request UUID
+- Accepted?
+
+If the Request UUID is not recognized this message should be ignored.
+
+If the Campaign UUID is not one of the trading partners for the request, this message should be ignored.
+
+#### TradeCompleted
+The TradeCompleted message notifies the source and target campaigns that a trade has been either succesfully completed or rejected.
+
+The TradeCompleted message has the following properties:
+- Source Campaign UUID
+- Target Campaign UUID
+- Request UUID
+- Accepted?
+
+If the Request UUID is not recognized this message should be ignored.
+
+This message is sent by the Host Campaign to the Source and Target Campaigns of a trade request after either:
+1. A trading partner has cancelled the trade (CancelTradeRequest)
+2. Or, both trading partners have accepted the trade (TradeAcceptance)
