@@ -152,8 +152,8 @@ public class BloodnameDialog extends JDialog {
 
 		cbPhenotype = new JComboBox<String>();
 		cbPhenotype.addItem("None");
-		for (int i = 1; i < Phenotype.phenotypeNames.length; i++) {
-			cbPhenotype.addItem(Phenotype.phenotypeNames[i]);
+		for (int i = 1; i < Phenotype.P_NUM; i++) {
+			cbPhenotype.addItem(Phenotype.getPhenotypeName(i));
 		}
 		gbc.gridx = 0;
 		gbc.gridy = 2;
@@ -175,7 +175,7 @@ public class BloodnameDialog extends JDialog {
 								(Integer)cbEra.getSelectedItem());
 				lblName.setText(n.getName() + " (" + n.getFounder() + ")");
 				lblOrigClan.setText(Faction.getFaction(n.getOrigClan()).getFullName((Integer)cbEra.getSelectedItem()));
-				lblPhenotype.setText(Phenotype.phenotypeNames[n.getPhenotype()]);
+				lblPhenotype.setText(Phenotype.getPhenotypeName(n.getPhenotype()));
 			}
 		});
 
