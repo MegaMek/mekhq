@@ -174,15 +174,11 @@ public class PersonViewPanel extends ScrollablePanel {
 
             if (person.awardController.hasAwardsWithMedals()) {
                 JPanel pnlMedals = drawMedals();
-                pnlMedals.setName("pnlMedals");
-                pnlMedals.setLayout(new WrapLayout(FlowLayout.LEFT));
                 pnlAllAwards.add(pnlMedals);
             }
 
             if (person.awardController.hasAwardsWithMiscs()) {
                 JPanel pnlMiscAwards = drawMiscAwards();
-                pnlMiscAwards.setName("pnlMiscAwards");
-                pnlMiscAwards.setLayout(new WrapLayout(FlowLayout.LEFT));
                 pnlAllAwards.add(pnlMiscAwards);
             }
 
@@ -282,6 +278,7 @@ public class PersonViewPanel extends ScrollablePanel {
         add(javax.swing.Box.createGlue(), gridBagConstraints);
     }
 
+    //region Ribbons and Awards
     /**
      * Draws the ribbons below the person portrait.
      */
@@ -289,42 +286,41 @@ public class PersonViewPanel extends ScrollablePanel {
         Box boxRibbons = Box.createVerticalBox();
         boxRibbons.add(Box.createRigidArea(new Dimension(100, 0)));
 
-        List<Award> awards = person.awardController.getAwards().stream().filter(a -> a.getNumberOfRibbonFiles() > 0)
-                .sorted().collect(Collectors.toList());
+        List<Award> awards = person.awardController.getAwards().stream()
+                .filter(a -> a.getNumberOfRibbonFiles() > 0).sorted().collect(Collectors.toList());
         Collections.reverse(awards);
 
         int i = 0;
         Box rowRibbonsBox = null;
-        ArrayList<Box> rowRibbonsBoxes = new ArrayList<>();
+        List<Box> rowRibbonsBoxes = new ArrayList<>();
 
         for (Award award : awards) {
-            JLabel ribbonLabel = new JLabel();
-            Image ribbon;
-
-            if (i % MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW == 0) {
+            if ((i % MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW) == 0) {
                 rowRibbonsBox = Box.createHorizontalBox();
                 rowRibbonsBox.setBackground(Color.RED);
             }
             try {
                 int numberOfAwards = person.awardController.getNumberOfAwards(award);
                 String ribbonFileName = award.getRibbonFileName(numberOfAwards);
-                ribbon = (Image) awardIcons.getItem(award.getSet() + "/ribbons/", ribbonFileName);
-                if (ribbon == null)
+                Image ribbon = (Image) awardIcons.getItem(award.getSet() + "/ribbons/",
+                        ribbonFileName);
+                if (ribbon == null) {
                     continue;
+                }
                 ribbon = ribbon.getScaledInstance(25, 8, Image.SCALE_DEFAULT);
-                ribbonLabel.setIcon(new ImageIcon(ribbon));
+                JLabel ribbonLabel = new JLabel(new ImageIcon(ribbon));
                 ribbonLabel.setToolTipText(award.getTooltip());
                 rowRibbonsBox.add(ribbonLabel, 0);
-            } catch (Exception err) {
-                err.printStackTrace();
+                i++;
+            } catch (Exception e) {
+                MekHQ.getLogger().error(getClass(), "drawRibbons", e);
             }
 
-            i++;
-            if (i % MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW == 0) {
+            if ((i % MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW) == 0) {
                 rowRibbonsBoxes.add(rowRibbonsBox);
             }
         }
-        if (i % MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW != 0) {
+        if ((i % MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW) != 0) {
             rowRibbonsBoxes.add(rowRibbonsBox);
         }
 
@@ -340,30 +336,30 @@ public class PersonViewPanel extends ScrollablePanel {
      * Draws the medals above the personal log.
      */
     private JPanel drawMedals() {
-        JPanel pnlMedals = new JPanel();
+        JPanel pnlMedals = new JPanel(new WrapLayout(FlowLayout.LEFT));
+        pnlMedals.setName("pnlMedals");
 
-        List<Award> awards = person.awardController.getAwards().stream().filter(a -> a.getNumberOfMedalFiles() > 0)
-                .sorted().collect(Collectors.toList());
+        List<Award> awards = person.awardController.getAwards().stream()
+                .filter(a -> a.getNumberOfMedalFiles() > 0).sorted().collect(Collectors.toList());
 
         for (Award award : awards) {
-            JLabel medalLabel = new JLabel();
-
-            Image medal;
             try {
                 int numberOfAwards = person.awardController.getNumberOfAwards(award);
                 String medalFileName = award.getMedalFileName(numberOfAwards);
-                medal = (Image) awardIcons.getItem(award.getSet() + "/medals/", medalFileName);
-                if (medal == null)
+                Image medal = (Image) awardIcons.getItem(award.getSet() + "/medals/",
+                        medalFileName);
+                if (medal == null) {
                     continue;
-                medal = ImageHelpers.getScaledForBoundaries(medal, new Dimension(30, 60), Image.SCALE_DEFAULT);
-                medalLabel.setIcon(new ImageIcon(medal));
+                }
+                medal = ImageHelpers.getScaledForBoundaries(medal, new Dimension(30, 60),
+                        Image.SCALE_DEFAULT);
+                JLabel medalLabel = new JLabel(new ImageIcon(medal));
                 medalLabel.setToolTipText(award.getTooltip());
                 pnlMedals.add(medalLabel);
-            } catch (Exception err) {
-                err.printStackTrace();
+            } catch (Exception e) {
+                MekHQ.getLogger().error(getClass(), "drawMedals", e);
             }
         }
-
         return pnlMedals;
     }
 
@@ -371,31 +367,33 @@ public class PersonViewPanel extends ScrollablePanel {
      * Draws the misc awards below the medals.
      */
     private JPanel drawMiscAwards() {
-        JPanel pnlMiscAwards = new JPanel();
-        ArrayList<Award> awards = person.awardController.getAwards().stream().filter(a -> a.getNumberOfMiscFiles() > 0)
-                .collect(Collectors.toCollection(ArrayList::new));
+        JPanel pnlMiscAwards = new JPanel(new WrapLayout(FlowLayout.LEFT));
+        pnlMiscAwards.setName("pnlMiscAwards");
+
+        List<Award> awards = person.awardController.getAwards().stream()
+                .filter(a -> a.getNumberOfMiscFiles() > 0).collect(Collectors.toCollection(ArrayList::new));
 
         for (Award award : awards) {
-            JLabel miscLabel = new JLabel();
-
-            Image miscAward;
             try {
                 int numberOfAwards = person.awardController.getNumberOfAwards(award);
                 String miscFileName = award.getMiscFileName(numberOfAwards);
-                Image miscAwardBufferedImage = (Image) awardIcons.getItem(award.getSet() + "/misc/", miscFileName);
-                if (miscAwardBufferedImage == null)
+                Image miscAwardBufferedImage = (Image) awardIcons.getItem(
+                        award.getSet() + "/misc/", miscFileName);
+                if (miscAwardBufferedImage == null) {
                     continue;
-                miscAward = ImageHelpers.getScaledForBoundaries(miscAwardBufferedImage, new Dimension(100, 100),
-                        Image.SCALE_DEFAULT);
-                miscLabel.setIcon(new ImageIcon(miscAward));
+                }
+                Image miscAward = ImageHelpers.getScaledForBoundaries(miscAwardBufferedImage,
+                        new Dimension(100, 100), Image.SCALE_DEFAULT);
+                JLabel miscLabel = new JLabel(new ImageIcon(miscAward));
                 miscLabel.setToolTipText(award.getTooltip());
                 pnlMiscAwards.add(miscLabel);
-            } catch (Exception err) {
-                err.printStackTrace();
+            } catch (Exception e) {
+                MekHQ.getLogger().error(getClass(), "drawMiscAwards", e);
             }
         }
         return pnlMiscAwards;
     }
+    //endregion Ribbons and Awards
 
     /**
      * set the portrait for the given person.
