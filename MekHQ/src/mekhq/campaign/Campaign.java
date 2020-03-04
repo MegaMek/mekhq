@@ -1906,7 +1906,14 @@ public class Campaign implements Serializable, ITechManager {
         // Return the tech collection sorted worst to best
         // Reverse the sort if we've been asked for best to worst
         if (sorted) {
-            //techs.sort(Comparator.comparingInt(Person::getMinutesLeft));
+            // First order by the amount of time the person has remaining, with the highest amount
+            // of time being at the top of the list
+            if (eliteFirst) {
+                techs.sort(Comparator.comparingInt(Person::getMinutesLeft));
+            } else {
+                techs.sort(Comparator.comparingInt(Person::getMinutesLeft).reversed());
+            }
+            // Then sort by the skill level
             techs.sort((person1, person2) -> {
                 // default to 0, which means they're equal
                 int retVal = 0;

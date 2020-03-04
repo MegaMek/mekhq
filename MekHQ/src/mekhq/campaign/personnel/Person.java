@@ -3443,10 +3443,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return lvl;
     }
 
-    public String getTechDesc(boolean overtimeAllowed) {
-        return getTechDesc(overtimeAllowed, null);
-    }
-
     public String getTechDesc(boolean overtimeAllowed, IPartWork part) {
         StringBuilder toReturn = new StringBuilder(128);
         toReturn.append("<html><font size='2'");
@@ -3456,16 +3452,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
         else {
             toReturn.append("><b>");
         }
-        toReturn.append(getFullName());
-        toReturn.append(String.format("</b> (%d XP)<br/>", getXp()));
+        toReturn.append(getFullTitle()).append("</b><br/>");
 
         boolean first = true;
         for (String skillName : DISPLAYED_SKILL_LEVELS) {
             Skill skill = getSkill(skillName);
             if (null == skill) {
                 continue;
-            }
-            else if (!first) {
+            } else if (!first) {
                 toReturn.append("; ");
             }
 
@@ -3474,8 +3468,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
             first = false;
         }
 
-        toReturn.append("<br/>");
-        toReturn.append(String.format("%d minutes left", getMinutesLeft()));
+        toReturn.append(String.format(" (%d XP)<br/>", getXp()))
+                .append(String.format("%d minutes left", getMinutesLeft()));
         if (overtimeAllowed) {
             toReturn.append(String.format(" + (%d overtime)", getOvertimeLeft()));
         }
