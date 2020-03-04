@@ -111,7 +111,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         gbc.gridy++;
         addTableHeaders(gbc);
 
-        for(int unitType : unitsByType.keySet()) {
+        for (int unitType : unitsByType.keySet()) {
             gbc.gridy++;
             addUnitTypePanel(unitType, gbc);
         }
@@ -133,7 +133,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
 
     /**
      * Adds the table headers to the content pane
-     * @param gbc
+     * @param gbc the input gridBagConstraints to use
      */
     private void addTableHeaders(GridBagConstraints gbc) {
         gbc.gridwidth = 1;
@@ -159,12 +159,12 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
 
     /**
      * Adds a row of units, techs and time summary to the content pane
-     * @param unitType
-     * @param gbc
+     * @param unitType the unit's type, as an int
+     * @param gbc the input gridBagConstraints to use
      */
     private void addUnitTypePanel(int unitType, GridBagConstraints gbc) {
         gbc.gridwidth = 1;
-        gbc.weightx = .3;
+        gbc.weightx = 0.3;
         gbc.gridx = 0;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -172,7 +172,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         JPanel unitPanel = new JPanel();
         unitPanel.setLayout(new GridLayout(unitsByType.get(unitType).size(), 1, 1, 0));
 
-        for(Unit unit : unitsByType.get(unitType)) {
+        for (Unit unit : unitsByType.get(unitType)) {
             JLabel unitLabel = new JLabel();
             unitLabel.setText(unit.getName());
             unitPanel.add(unitLabel);
@@ -183,8 +183,8 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
 
         gbc.gridx = 1;
 
-        JList<Person> techList = new JList<Person>();
-        DefaultListModel<Person> listModel = new DefaultListModel<Person>();
+        JList<Person> techList = new JList<>();
+        DefaultListModel<Person> listModel = new DefaultListModel<>();
 
         for(Person tech : campaign.getTechs()) {
             if(tech.canTech(unitsByType.get(unitType).get(0).getEntity())) {
@@ -218,12 +218,12 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
     /**
      * Renders the mothball/activate button on the content pane
      * @param activate Whether the button is "mothball" or "activate"
-     * @param gbc
+     * @param gbc the input gridBagConstraints to use
      */
     private void addExecuteButton(boolean activate, GridBagConstraints gbc) {
         gbc.gridx = 1;
-        gbc.weightx = .8;
-        gbc.weighty = .8;
+        gbc.weightx = 0.8;
+        gbc.weighty = 0.8;
         gbc.anchor = GridBagConstraints.CENTER;
         JButton buttonExecute = new JButton();
         buttonExecute.setText(activate ? "Activate" : "Mothball");
@@ -244,14 +244,14 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
      * @param units Units to sort
      */
     private void sortUnitsByType(Unit[] units) {
-        for(int x = 0; x < units.length; x++) {
-            int unitType = units[x].getEntity().getUnitType();
+        for (Unit unit : units) {
+            int unitType = unit.getEntity().getUnitType();
 
-            if(!unitsByType.containsKey(unitType)) {
+            if (!unitsByType.containsKey(unitType)) {
                 unitsByType.put(unitType, new ArrayList<>());
             }
 
-            unitsByType.get(unitType).add(units[x]);
+            unitsByType.get(unitType).add(unit);
         }
     }
 
@@ -260,21 +260,20 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-
-        if(e.getActionCommand() != UnitTableMouseAdapter.COMMAND_MOTHBALL &&
-                e.getActionCommand() != UnitTableMouseAdapter.COMMAND_ACTIVATE) {
+        if (!e.getActionCommand().equals(UnitTableMouseAdapter.COMMAND_MOTHBALL) &&
+                !e.getActionCommand().equals(UnitTableMouseAdapter.COMMAND_ACTIVATE)) {
             return;
         }
 
-        boolean isMothballing = e.getActionCommand() == UnitTableMouseAdapter.COMMAND_MOTHBALL;
+        boolean isMothballing = e.getActionCommand().equals(UnitTableMouseAdapter.COMMAND_MOTHBALL);
 
-        for(int unitType : unitsByType.keySet()) {
+        for (int unitType : unitsByType.keySet()) {
             List<Person> selectedTechs = techListsByUnitType.get(unitType).getSelectedValuesList();
             int techIndex = 0;
 
             // this is a "naive" approach, where we assign each of the selected techs
             // to approximately # units / # techs in mothball/reactivation tasks
-            for(Unit unit : unitsByType.get(unitType)) {
+            for (Unit unit : unitsByType.get(unitType)) {
                 UUID id = selectedTechs.get(techIndex).getId();
                 if (isMothballing) {
                     unit.startMothballing(id);
@@ -283,14 +282,13 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
                 }
                 MekHQ.triggerEvent(new UnitChangedEvent(unit));
 
-                if(techIndex == selectedTechs.size() - 1) {
+                if (techIndex == (selectedTechs.size() - 1)) {
                     techIndex = 0;
                 } else {
                     techIndex++;
                 }
             }
         }
-
         this.setVisible(false);
     }
 
@@ -306,8 +304,8 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         // this is mildly kludgy:
         // we scan the 'tech lists by unit type' dictionary to determine the unit type
         // since the number of tech lists is limited by the number of unit types, it shouldn't be too problematic for performance
-        for(int key : techListsByUnitType.keySet()) {
-            if(techListsByUnitType.get(key).equals(techList)) {
+        for (int key : techListsByUnitType.keySet()) {
+            if (techListsByUnitType.get(key).equals(techList)) {
                 unitType = key;
                 break;
             }
@@ -328,7 +326,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
      * @return Displayable text.
      */
     private String getCompletionTimeText(int completionTime) {
-        if(completionTime > 0) {
+        if (completionTime > 0) {
             return String.format("Completion Time: %d minutes", completionTime);
         } else {
             return "<html>Completion Time: <span color='red'>Never</span></html>";
@@ -340,11 +338,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
      * @author NickAragua
      *
      */
-    class TechListCellRenderer extends DefaultListCellRenderer {
-
-        /**
-         *
-         */
+    static class TechListCellRenderer extends DefaultListCellRenderer {
         private static final long serialVersionUID = -1552997620131149101L;
 
         @Override
@@ -359,6 +353,5 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
 
             return this;
         }
-
     }
 }
