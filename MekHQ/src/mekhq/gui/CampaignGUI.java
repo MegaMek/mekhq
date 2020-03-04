@@ -1725,7 +1725,7 @@ public class CampaignGUI extends JPanel {
         }
         return techHash.get(s).getId();
     }
-    
+
     /**
      * Exports Planets to a file (CSV, XML, etc.)
      * @param format

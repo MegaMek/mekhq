@@ -1854,6 +1854,17 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     /**
+     * @return The list of all active {@link Person}s who qualify as technicians ({@link Person#isTech()}));
+     */
+    public List<Person> getTechs() {
+        return getTechs(false, null, true, false);
+    }
+
+    public List<Person> getTechs(boolean noZeroMinute) {
+        return getTechs(noZeroMinute, null, true, false);
+    }
+
+    /**
      * Returns a list of active technicians.
      *
      * @param noZeroMinute
@@ -1870,8 +1881,8 @@ public class Campaign implements Serializable, ITechManager {
      * @return The list of active {@link Person}s who qualify as technicians
      *         ({@link Person#isTech()}).
      */
-    public ArrayList<Person> getTechs(boolean noZeroMinute, UUID firstTechId, boolean sorted, boolean eliteFirst) {
-        ArrayList<Person> techs = new ArrayList<>();
+    public List<Person> getTechs(boolean noZeroMinute, UUID firstTechId, boolean sorted, boolean eliteFirst) {
+        List<Person> techs = new ArrayList<>();
 
         // Get the first tech.
         Person firstTech = getPerson(firstTechId);
@@ -1887,7 +1898,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         // also need to loop through and collect engineers on self-crewed vessels
         for (Unit u : getUnits()) {
-            if (u.isSelfCrewed() && !(u.getEntity() instanceof Infantry) && null != u.getEngineer()) {
+            if (u.isSelfCrewed() && !(u.getEntity() instanceof Infantry) && (null != u.getEngineer())) {
                 techs.add(u.getEngineer());
             }
         }
@@ -1895,6 +1906,7 @@ public class Campaign implements Serializable, ITechManager {
         // Return the tech collection sorted worst to best
         // Reverse the sort if we've been asked for best to worst
         if (sorted) {
+            //techs.sort(Comparator.comparingInt(Person::getMinutesLeft));
             techs.sort((person1, person2) -> {
                 // default to 0, which means they're equal
                 int retVal = 0;
@@ -1904,14 +1916,12 @@ public class Campaign implements Serializable, ITechManager {
                 boolean p1Secondary = !person1.isTechPrimary() && person1.isTechSecondary();
                 boolean p2Secondary = !person2.isTechPrimary() && person2.isTechSecondary();
 
-                if (person1.getExperienceLevel(p1Secondary)
-                        > person2.getExperienceLevel(p2Secondary)) {
+                if (person1.getExperienceLevel(p1Secondary) > person2.getExperienceLevel(p2Secondary)) {
                     // Person 1 is better than Person 2.
-                    retVal = -1;
-                } else if (person1.getExperienceLevel(p1Secondary)
-                        < person2.getExperienceLevel(p2Secondary)) {
-                    // Person 2 is better than Person 1
                     retVal = 1;
+                } else if (person1.getExperienceLevel(p1Secondary) < person2.getExperienceLevel(p2Secondary)) {
+                    // Person 2 is better than Person 1
+                    retVal = -1;
                 }
 
                 // Return, swapping the value if we're looking to have Elites ordered first
@@ -1920,17 +1930,6 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         return techs;
-    }
-
-    public ArrayList<Person> getTechs(boolean noZeroMinute) {
-        return getTechs(noZeroMinute, null, true, false);
-    }
-
-    /**
-     * @return The list of all active {@link Person}s who qualify as technicians ({@link Person#isTech()}));
-     */
-    public ArrayList<Person> getTechs() {
-        return getTechs(false, null, true, false);
     }
 
     /**
