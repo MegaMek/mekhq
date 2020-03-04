@@ -857,7 +857,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 
     public void refreshTechsList() {
         int selected = techTable.getSelectedRow();
-        List<Person> techs = getCampaign().getTechs(true, null, false, false);
+        List<Person> techs = getCampaign().getTechs(true, null, true, true);
         techsModel.setData(techs);
         if ((selected > -1) && (selected < techs.size())) {
             techTable.setRowSelectionInterval(selected, selected);
@@ -875,8 +875,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         } else if (selectedTech != null) {
             // Or get the selected tech back
             for (int i = 0; i < techTable.getRowCount(); i++) {
-                Person p = techsModel
-                        .getTechAt(techTable.convertRowIndexToModel(i));
+                Person p = techsModel.getTechAt(techTable.convertRowIndexToModel(i));
                 if (p != null && selectedTech.getId().equals(p.getId())) {
                     techTable.setRowSelectionInterval(i, i);
                     break;
