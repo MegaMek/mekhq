@@ -393,8 +393,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
         } else if (command.equals(COMMAND_UNDEPLOY)) {
             for (Unit unit : units) {
                 if (unit.isDeployed()) {
-                    gui.undeployUnit(unit);
-                    //Event triggered from undeployUnit
+                    gui.undeployUnit(unit); // Event is triggered from undeployUnit
                 }
             }
         } else if (command.contains(COMMAND_HIRE_FULL)) {
@@ -453,20 +452,16 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
         } else if (command.equals(COMMAND_CANCEL_ORDER)) {
-            double refund = gui.getCampaign().getCampaignOptions()
-                    .GetCanceledOrderReimbursement();
-            if (null != selectedUnit) {
-                Money refundAmount = selectedUnit.getBuyCost().multipliedBy(refund);
-                gui.getCampaign().removeUnit(selectedUnit.getId());
-                gui.getCampaign().getFinances().credit(
-                        refundAmount,
-                        Transaction.C_EQUIP,
-                        "refund for cancelled equipment sale",
-                        gui.getCampaign().getDate());
+            double refund = gui.getCampaign().getCampaignOptions().GetCanceledOrderReimbursement();
+            for (Unit u : units) {
+                Money refundAmount = u.getBuyCost().multipliedBy(refund);
+                gui.getCampaign().removeUnit(u.getId());
+                gui.getCampaign().getFinances().credit(refundAmount, Transaction.C_EQUIP,
+                        "refund for cancelled equipment sale", gui.getCampaign().getDate());
             }
         } else if (command.equals(COMMAND_ARRIVE)) {
-            if (null != selectedUnit) {
-                selectedUnit.setDaysToArrival(0);
+            for (Unit u : units) {
+                u.setDaysToArrival(0);
             }
         } else if (command.equals(COMMAND_MOTHBALL)) {
             if(units.length > 1) {
@@ -607,20 +602,26 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
             }
         } else if (command.equals(COMMAND_STRIP_UNIT)) {
             IUnitAction stripUnitAction = new StripUnitAction();
-            for (Unit unit : units) {
-                stripUnitAction.Execute(gui.getCampaign(), unit);
+            for (Unit u : units) {
+                stripUnitAction.Execute(gui.getCampaign(), u);
             }
         } else if (command.equals(COMMAND_GM_MOTHBALL)) {
-            if (null != selectedUnit) {
-                MothballUnitAction mothballUnitAction = new MothballUnitAction(null, true);
-                mothballUnitAction.Execute(gui.getCampaign(), selectedUnit);
-                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+            MothballUnitAction mothballUnitAction = new MothballUnitAction(null, true);
+            for (Unit u : units) {
+                // this is so we can have this show with a mixture of Mothballed and non-Mothballed units
+                if (!u.isMothballed()) {
+                    mothballUnitAction.Execute(gui.getCampaign(), u);
+                    MekHQ.triggerEvent(new UnitChangedEvent(u));
+                }
             }
         } else if (command.equals(COMMAND_GM_ACTIVATE)) {
-            if (null != selectedUnit) {
-                ActivateUnitAction activateUnitAction = new ActivateUnitAction(null, true);
-                activateUnitAction.Execute(gui.getCampaign(), selectedUnit);
-                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+            ActivateUnitAction activateUnitAction = new ActivateUnitAction(null, true);
+            for (Unit u : units) {
+                // this is so we can have this show with a mixture of Mothballed and non-Mothballed units
+                if (u.isMothballed()) {
+                    activateUnitAction.Execute(gui.getCampaign(), u);
+                    MekHQ.triggerEvent(new UnitChangedEvent(u));
+                }
             }
         }
     }
@@ -676,8 +677,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
             }
             Unit unit = units[0];
 
-
-            boolean nonePresent = true;
+            boolean nonePresent = true; // different menu if there is at least one present unit
             for (Unit u : units) {
                 if (u.isPresent()) {
                     nonePresent = false;
@@ -693,7 +693,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                 popup.add(menuItem);
                 if (gui.getCampaign().isGM()) {
                     menu = new JMenu("GM Mode");
-                    menuItem = new JMenuItem("Deliver Part Now");
+                    menuItem = new JMenuItem("Unit Arrives Immediately");
                     menuItem.setActionCommand(COMMAND_ARRIVE);
                     menuItem.addActionListener(this);
                     menu.add(menuItem);
@@ -701,7 +701,6 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                     popup.add(menu);
                 }
             } else {
-
                 // change the location
                 menu = new JMenu("Change site");
                 int i;
@@ -796,13 +795,11 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                                 "Cancel Mothballing/Activation");
                         menuItem.setActionCommand(COMMAND_CANCEL_MOTHBALL);
                         menuItem.addActionListener(this);
-                        menuItem.setEnabled(true);
                         popup.add(menuItem);
                     } else if (unit.isMothballed()) {
                         menuItem = new JMenuItem("Activate Unit");
                         menuItem.setActionCommand(COMMAND_ACTIVATE);
                         menuItem.addActionListener(this);
-                        menuItem.setEnabled(true);
                         popup.add(menuItem);
                     } else {
                         menuItem = new JMenuItem("Mothball Unit");
@@ -876,7 +873,6 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                                             + tech.getMaintenanceTimeUsing()
                                             + "m)");
                             cbMenuItem.setActionCommand(COMMAND_ASSIGN_TECH + ":" + tech.getId());
-                            cbMenuItem.setEnabled(true);
                             if (tech.getId().equals(unit.getTechId())) {
                                 cbMenuItem.setSelected(true);
                             } else {
@@ -978,7 +974,6 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                         menuItem = new JMenuItem("Cancel Customization");
                         menuItem.setActionCommand(COMMAND_CANCEL_CUSTOMIZE);
                         menuItem.addActionListener(this);
-                        menuItem.setEnabled(true);
                         menu.add(menuItem);
                         menuItem = new JMenuItem("Complete Refit (GM)");
                         menuItem.setActionCommand(COMMAND_REFIT_GM_COMPLETE);
@@ -1011,18 +1006,15 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                         menuItem.setActionCommand(COMMAND_REMOVE_INDI_CAMO);
                     }
                     menuItem.addActionListener(this);
-                    menuItem.setEnabled(true);
                     popup.add(menuItem);
                 }
                 if (oneSelected && !gui.getCampaign().isCustom(unit)) {
                     menuItem = new JMenuItem("Tag as a custom unit");
                     menuItem.setActionCommand(COMMAND_TAG_CUSTOM);
                     menuItem.addActionListener(this);
-                    menuItem.setEnabled(true);
                     popup.add(menuItem);
                 }
-                if (oneSelected
-                        && gui.getCampaign().getCampaignOptions().useQuirks()) {
+                if (oneSelected && gui.getCampaign().getCampaignOptions().useQuirks()) {
                     menuItem = new JMenuItem("Edit Quirks");
                     menuItem.setActionCommand(COMMAND_QUIRKS);
                     menuItem.addActionListener(this);
@@ -1032,12 +1024,12 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                     menuItem = new JMenuItem("Edit Unit History...");
                     menuItem.setActionCommand(COMMAND_CHANGE_HISTORY);
                     menuItem.addActionListener(this);
-                    menuItem.setEnabled(true);
                     popup.add(menuItem);
                 }
 
                 // remove all personnel
                 // We don't show for single uncrewed units but do for any other selection type
+                // TODO : FIXME
                 if (!(oneSelected && (unit.getCrew().size() > 0))) {
                     popup.addSeparator();
                     menuItem = new JMenuItem("Remove all personnel");
@@ -1052,7 +1044,6 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                     menuItem = new JMenuItem("Name Unit");
                     menuItem.setActionCommand(COMMAND_FLUFF_NAME);
                     menuItem.addActionListener(this);
-                    menuItem.setEnabled(true);
                     popup.add(menuItem);
                 }
                 // sell unit
@@ -1072,7 +1063,8 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                     boolean oneMothballed = false;
                     boolean oneActive = false;
                     boolean oneDeployed = false;
-                    boolean oneBelowMaxCrew = false;
+                    boolean oneAvailableUnitBelowMaxCrew = false;
+                    boolean oneNotPresent = false;
                     for (Unit u : units) {
                         if (u.isMothballed()) {
                             oneMothballed = true;
@@ -1080,15 +1072,20 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                             oneActive = true;
                         }
 
-                        if (unit.getCrew().size() < unit.getFullCrewSize()) {
-                            oneBelowMaxCrew = true;
+                        if ((unit.getCrew().size() < unit.getFullCrewSize()) && unit.isAvailable()) {
+                            oneAvailableUnitBelowMaxCrew = true;
                         }
 
                         if (u.isDeployed()) {
                             oneDeployed = true;
                         }
 
-                        if (oneMothballed && oneActive && oneDeployed && oneBelowMaxCrew) {
+                        if (u.isPresent()) {
+                            oneNotPresent = true;
+                        }
+
+                        if (oneMothballed && oneActive && oneDeployed
+                                && oneAvailableUnitBelowMaxCrew && oneNotPresent) {
                             break;
                         }
                     }
@@ -1121,17 +1118,18 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                         menuItem.addActionListener(this);
                         menu.add(menuItem);
                     }
-                    if (oneBelowMaxCrew) {
+                    if (oneAvailableUnitBelowMaxCrew) {
                         menuItem = new JMenuItem("Add full complement");
                         menuItem.setActionCommand(COMMAND_HIRE_FULL_GM);
                         menuItem.addActionListener(this);
-                        menuItem.setEnabled(unit.isAvailable());
                         menu.add(menuItem);
                     }
-                    menuItem = new JMenuItem("Edit Damage...");
-                    menuItem.setActionCommand(COMMAND_EDIT_DAMAGE);
-                    menuItem.addActionListener(this);
-                    menu.add(menuItem);
+                    if (oneSelected) {
+                        menuItem = new JMenuItem("Edit Damage...");
+                        menuItem.setActionCommand(COMMAND_EDIT_DAMAGE);
+                        menuItem.addActionListener(this);
+                        menu.add(menuItem);
+                    }
                     menuItem = new JMenuItem("Restore Unit");
                     menuItem.setActionCommand(COMMAND_RESTORE_UNIT);
                     menuItem.addActionListener(this);
@@ -1140,6 +1138,14 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                     menuItem.setActionCommand(COMMAND_SET_QUALITY);
                     menuItem.addActionListener(this);
                     menu.add(menuItem);
+                    if (oneNotPresent) {
+                        menuItem = new JMenuItem("Unit Arrives Immediately");
+                        menuItem.setActionCommand(COMMAND_ARRIVE);
+                        menuItem.addActionListener(this);
+                        menu.add(menuItem);
+                    }
+                    popup.addSeparator();
+                    popup.add(menu);
                     popup.addSeparator();
                     popup.add(menu);
                 }
