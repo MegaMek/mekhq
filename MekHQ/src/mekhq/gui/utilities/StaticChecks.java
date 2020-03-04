@@ -4,7 +4,9 @@ import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.Vector;
 
+import megamek.common.BattleArmor;
 import megamek.common.Entity;
+import megamek.common.Infantry;
 import megamek.common.UnitType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
@@ -186,6 +188,7 @@ public class StaticChecks {
         return null;
     }
 
+    //region C3
     public static boolean doAllUnitsHaveC3i(Vector<Unit> units) {
         for (Unit unit : units) {
             Entity e = unit.getEntity();
@@ -405,9 +408,10 @@ public class StaticChecks {
         return true;
 
     }
-    
+    //endregion C3
+
     /**
-     * Used to test a selection of Units provided by the player and determine whether they all share a designated unitType. 
+     * Used to test a selection of Units provided by the player and determine whether they all share a designated unitType.
      * @param units Vector of units that the player has selected
      * @return false if any unit in the passed-in Vector does not have the specified unit type
      */
@@ -436,9 +440,23 @@ public class StaticChecks {
                 if (superheavy && (unit.getEntity().getWeight() <= 100 || unit.getEntity().getWeight() > 200)) {
                     return false;
                 }
-                
+
             }
             if (unit.getEntity().getUnitType() != unitType) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // TODO : Implement me instead of entity instanceof infantry and !(entity instance of protomech)
+    public static boolean isConventionalInfantryUnit(Unit unit) {
+        return unit.getEntity().isConventionalInfantry();
+    }
+
+    public static boolean areAllConventionalInfantry(Unit[] units) {
+        for (Unit unit : units) {
+            if (!unit.getEntity().isConventionalInfantry()) {
                 return false;
             }
         }
