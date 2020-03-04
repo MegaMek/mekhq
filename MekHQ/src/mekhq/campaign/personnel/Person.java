@@ -304,6 +304,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     protected int overtimeLeft;
     protected int nTasks;
     protected boolean engineer;
+    public static final int PRIMARY_ROLE_SUPPORT_TIME = 480;
+    public static final int SECONDARY_ROLE_SUPPORT_TIME = 240;
 
     /**
      * * Start Advanced Medical ***

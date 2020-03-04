@@ -59,6 +59,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.StripUnitAction;
@@ -94,7 +95,6 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
     //endregion Undelivered Unit Commands
 
     public static final String COMMAND_CHANGE_SITE = "CHANGE_SITE";
-
     // Ammo Swap Commands
     public static final String COMMAND_LC_SWAP_AMMO = "LC_SWAP_AMMO";
     public static final String COMMAND_SWAP_AMMO = "SWAP_AMMO";
@@ -107,31 +107,19 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
     public static final String COMMAND_CANCEL_MOTHBALL = "CANCEL_MOTHBALL";
     // Assign Tech Commands
     public static final String COMMAND_ASSIGN_TECH = "ASSIGN";
-    // Show Last Maintenance Report Commands
-    // Customize Commands
-    // Crew Complement Commands
-    // Individual Camo Commands
-    // Custom Unit Commands
-    // Quirks Commands
     // Unit History Commands
     public static final String COMMAND_CHANGE_HISTORY = "CHANGE_HISTORY";
     // Remove All Personnel Commands
     public static final String COMMAND_REMOVE_ALL_PERSONNEL = "REMOVE_ALL_PERSONNEL";
-    // Unit Name Commands
-
-    // Sell Unit Commands
 
     public static final String COMMAND_HIRE_FULL = "HIRE_FULL";
     public static final String COMMAND_DISBAND = "DISBAND";
-
     public static final String COMMAND_SELL = "SELL";
     public static final String COMMAND_LOSS = "LOSS";
-
     public static final String COMMAND_MAINTENANCE_REPORT = "MAINTENANCE_REPORT";
     public static final String COMMAND_QUIRKS = "QUIRKS";
     public static final String COMMAND_BOMBS = "BOMBS";
     public static final String COMMAND_SUPPLY_COST = "SUPPLY_COST";
-
     public static final String COMMAND_TAG_CUSTOM = "TAG_CUSTOM";
     public static final String COMMAND_INDI_CAMO = "INDI_CAMO";
     public static final String COMMAND_REMOVE_INDI_CAMO = "REMOVE_INDI_CAMO";
@@ -202,19 +190,20 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
             gui.showMaintenanceReport(selectedUnit.getId());
         } else if (command.equals(COMMAND_SUPPLY_COST)) { // Single Unit only
             gui.showUnitCostReport(selectedUnit.getId());
-        } else if (command.contains(COMMAND_ASSIGN_TECH)) {  // Single Unit only TODO FIX THAT
-            UUID id = UUID.fromString(command.split(":")[1]);
-            Person tech = gui.getCampaign().getPerson(id);
-            if (null != tech) {
+        } else if (command.contains(COMMAND_ASSIGN_TECH)) {
+            Person tech = gui.getCampaign().getPerson(UUID.fromString(command.split(":")[1]));
+            if (tech != null) {
                 // remove any existing techs
-                if (null != selectedUnit.getTech()) {
-                    selectedUnit.remove(selectedUnit.getTech(), true);
+                for (Unit u : units) {
+                    if (u.getTech() != null) {
+                        u.remove(u.getTech(), true);
+                    }
+                    u.setTech(tech);
                 }
-                selectedUnit.setTech(tech);
             }
         } else if (command.equals(COMMAND_SET_QUALITY)) {
             int q;
-            Object[] possibilities = { "F", "E", "D", "C", "B", "A" }; // TODO : this shouldn't be inline
+            Object[] possibilities = { "F", "E", "D", "C", "B", "A" }; // TODO : this probably shouldn't be inline
             String quality = (String) JOptionPane.showInputDialog(gui.getFrame(),
                     "Choose the new quality level", "Set Quality",
                     JOptionPane.PLAIN_MESSAGE, null, possibilities, "F");
@@ -697,34 +686,69 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                 boolean oneNotPresent = false;
                 boolean oneHasIndividualCamo = false;
                 boolean oneHasCrew = false;
+                boolean allUnitsAreRepairable = true;
+                boolean areAllConventionalInfantry = true;
+                boolean noConventionalInfantry = true;
+                boolean areAllRepairFlagged = true;
+                boolean areAllSalvageFlagged = true;
+                boolean allRequireSameTechType = true;
+                String skill = units[0].determineUnitTechSkillType();
+                int maintenanceTime = 0;
                 for (Unit u : units) {
                     if (u.isMothballed()) {
                         oneMothballed = true;
-                    } else if (unit.isMothballing()) {
+                    } else if (u.isMothballing()) {
                         oneMothballing = true;
                     } else {
                         oneActive = true;
                     }
 
-                    if (oneAvailableUnitBelowMaxCrew ||
-                            ((unit.getCrew().size() < unit.getFullCrewSize()) && unit.isAvailable())) {
+                    if ((u.getCrew().size() < u.getFullCrewSize()) && u.isAvailable()) {
                         oneAvailableUnitBelowMaxCrew = true;
                     }
 
-                    if (oneDeployed || u.isDeployed()) {
+                    if (u.isDeployed()) {
                         oneDeployed = true;
                     }
 
-                    if (oneNotPresent || !u.isPresent()) {
+                    if (!u.isPresent()) {
                         oneNotPresent = true;
                     }
 
-                    if (oneHasIndividualCamo || u.isEntityCamo()) {
+                    if (u.isEntityCamo()) {
                         oneHasIndividualCamo = true;
                     }
 
-                    if (oneHasCrew || (u.getCrew().size() > 0)) {
+                    if (u.getCrew().size() > 0) {
                         oneHasCrew = true;
+                    }
+
+                    if (!u.isRepairable()) {
+                        allUnitsAreRepairable = false;
+                    }
+
+                    if (u.isSalvage()) {
+                        areAllRepairFlagged = false;
+                    } else {
+                        areAllSalvageFlagged = false;
+                    }
+
+                    if (u.getEntity().isConventionalInfantry()) {
+                        noConventionalInfantry = false;
+                    } else {
+                        areAllConventionalInfantry = false;
+                    }
+
+                    if (!StringUtil.isNullOrEmpty(skill)) {
+                        if (!skill.equals(u.determineUnitTechSkillType())) {
+                            allRequireSameTechType = false;
+                            skill = ""; //little performance saving hack
+                            continue;
+                        }
+                        maintenanceTime += u.getMaintenanceTime();
+                        if (maintenanceTime > Person.PRIMARY_ROLE_SUPPORT_TIME) {
+                            skill = ""; //little performance saving hack
+                        }
                     }
                 }
                 //endregion Determine if to Display
@@ -793,28 +817,18 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                 }
 
                 // Salvage / Repair
-                // TODO : FIXME so I can be used with multiple units
-                if (oneSelected
-                        && !(unit.getEntity() instanceof Infantry && !(unit
-                        .getEntity() instanceof BattleArmor))) {
+                if (noConventionalInfantry) {
                     menu = new JMenu("Repair Status");
-                    menu.setEnabled(unit.isAvailable());
                     cbMenuItem = new JCheckBoxMenuItem("Repair");
-                    if (!unit.isSalvage()) {
-                        cbMenuItem.setSelected(true);
-                    }
+                    cbMenuItem.setSelected(areAllRepairFlagged);
                     cbMenuItem.setActionCommand(COMMAND_REPAIR);
                     cbMenuItem.addActionListener(this);
-                    cbMenuItem.setEnabled(unit.isAvailable()
-                            && unit.isRepairable());
+                    cbMenuItem.setEnabled(allUnitsAreRepairable);
                     menu.add(cbMenuItem);
                     cbMenuItem = new JCheckBoxMenuItem("Salvage");
-                    if (unit.isSalvage()) {
-                        cbMenuItem.setSelected(true);
-                    }
+                    cbMenuItem.setSelected(areAllSalvageFlagged);
                     cbMenuItem.setActionCommand(COMMAND_SALVAGE);
                     cbMenuItem.addActionListener(this);
-                    cbMenuItem.setEnabled(unit.isAvailable());
                     menu.add(cbMenuItem);
                     popup.add(menu);
                 }
@@ -840,8 +854,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                     popup.add(menuItem);
                 }
 
-                boolean allRequireSameTechType = true;
-                if (allRequireSameTechType) {
+                if (allRequireSameTechType && !StringUtil.isNullOrEmpty(skill)) {
                     menu = new JMenu("Assign Tech");
                     JMenu menuElite = new JMenu(SkillType.ELITE_NM);
                     JMenu menuVeteran = new JMenu(SkillType.VETERAN_NM);
@@ -851,24 +864,17 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
 
                     int techsFound = 0;
                     for (Person tech : gui.getCampaign().getTechs()) {
-                        if (tech.canTech(unit.getEntity())
-                                && (tech.getMaintenanceTimeUsing() + unit.getMaintenanceTime()) <= 480) {
+                        if (tech.hasSkill(skill)
+                                && (tech.getMaintenanceTimeUsing() + maintenanceTime)
+                                        <= Person.PRIMARY_ROLE_SUPPORT_TIME) {
+
                             String skillLvl = "Unknown";
                             if (null != tech.getSkillForWorkingOn(unit)) {
                                 skillLvl = SkillType.getExperienceLevelName(
                                         tech.getSkillForWorkingOn(unit).getExperienceLevel());
                             }
 
-                            cbMenuItem = new JCheckBoxMenuItem(tech.getFullTitle()
-                                    + " (" + tech.getMaintenanceTimeUsing() + "m)");
-                            cbMenuItem.setActionCommand(COMMAND_ASSIGN_TECH + ":" + tech.getId());
-                            if (tech.getId().equals(unit.getTechId())) {
-                                cbMenuItem.setSelected(true);
-                            } else {
-                                cbMenuItem.addActionListener(this);
-                            }
-
-                            JMenu subMenu = null;
+                            JMenu subMenu;
                             switch (skillLvl) {
                                 case SkillType.ELITE_NM:
                                     subMenu = menuElite;
@@ -885,8 +891,23 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                                 case SkillType.ULTRA_GREEN_NM:
                                     subMenu = menuUltraGreen;
                                     break;
+                                default:
+                                    subMenu = null;
+                                    break;
                             }
+
                             if (subMenu != null) {
+                                cbMenuItem = new JCheckBoxMenuItem(tech.getFullTitle()
+                                        + " (" + tech.getMaintenanceTimeUsing() + "m)");
+                                cbMenuItem.setActionCommand(COMMAND_ASSIGN_TECH + ":" + tech.getId());
+
+                                if (tech.getId().equals(unit.getTechId())) {
+                                    cbMenuItem.setSelected(true);
+                                    subMenu.setSelected(true);
+                                } else {
+                                    cbMenuItem.addActionListener(this);
+                                }
+
                                 subMenu.add(cbMenuItem);
                                 if (cbMenuItem.isSelected()) {
                                     subMenu.setIcon(UIManager.getIcon("CheckBoxMenuItem.checkIcon"));
@@ -921,7 +942,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                     popup.add(menuItem);
                 }
 
-                if (StaticChecks.areAllConventionalInfantry(units)) {
+                if (areAllConventionalInfantry) {
                     menuItem = new JMenuItem("Disband");
                     menuItem.setActionCommand(COMMAND_DISBAND);
                     menuItem.addActionListener(this);
