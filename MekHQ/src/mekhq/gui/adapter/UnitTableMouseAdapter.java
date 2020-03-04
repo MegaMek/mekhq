@@ -85,11 +85,23 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
     private ResourceBundle resourceMap = ResourceBundle
             .getBundle("mekhq.resources.UnitTableMouseAdapter", new EncodeControl());
 
+    public static final String COMMAND_ = "";
+
+    //region Commands
+    //region Standard Commands
+    public static final String COMMAND_REMOVE_ALL_PERSONNEL = "REMOVE_ALL_PERSONNEL";
+
+    // Mothball Commands
     public final static String COMMAND_MOTHBALL = "MOTHBALL";
     public final static String COMMAND_ACTIVATE = "ACTIVATE";
     public final static String COMMAND_CANCEL_MOTHBALL = "CANCEL_MOTHBALL";
+    //endregion Standard Commands
+
+    //region GM Commands
     public final static String COMMAND_GM_MOTHBALL = "GM_MOTHBALL";
     public final static String COMMAND_GM_ACTIVATE = "GM_ACTIVATE";
+    //endregion GM Commands
+    //endregion Commands
     //endregion Variable Declarations
 
     public UnitTableMouseAdapter(CampaignGUI gui, JTable unitTable, UnitTableModel unitModel) {
@@ -109,7 +121,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
             units[i] = unitModel.getUnit(unitTable
                     .convertRowIndexToModel(rows[i]));
         }
-        if (command.equalsIgnoreCase("REMOVE_ALL_PERSONNEL")) {
+        if (command.equals(COMMAND_REMOVE_ALL_PERSONNEL)) {
             for (Unit unit : units) {
                 if (unit.isDeployed()) {
                     continue;
@@ -813,8 +825,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                                     + "m)");
                         cbMenuItem.setActionCommand("ASSIGN:" + tech.getId());
                         cbMenuItem.setEnabled(true);
-                        if (null != unit.getTechId()
-                                && unit.getTechId().equals(tech.getId())) {
+                        if (tech.getId().equals(unit.getTechId())) {
                             cbMenuItem.setSelected(true);
                         } else {
                             cbMenuItem.addActionListener(this);
