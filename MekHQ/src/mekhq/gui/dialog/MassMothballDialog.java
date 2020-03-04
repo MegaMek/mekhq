@@ -137,7 +137,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
      */
     private void addTableHeaders(GridBagConstraints gbc) {
         gbc.gridwidth = 1;
-        gbc.weightx = .3;
+        gbc.weightx = 0.3;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.BOTH;
 
@@ -186,8 +186,8 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         JList<Person> techList = new JList<>();
         DefaultListModel<Person> listModel = new DefaultListModel<>();
 
-        for(Person tech : campaign.getTechs()) {
-            if(tech.canTech(unitsByType.get(unitType).get(0).getEntity())) {
+        for (Person tech : campaign.getTechs()) {
+            if (tech.canTech(unitsByType.get(unitType).get(0).getEntity())) {
                 listModel.addElement(tech);
             }
         }
@@ -338,7 +338,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
      * @author NickAragua
      *
      */
-    static class TechListCellRenderer extends DefaultListCellRenderer {
+    private static class TechListCellRenderer extends DefaultListCellRenderer {
         private static final long serialVersionUID = -1552997620131149101L;
 
         @Override
@@ -349,7 +349,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
             Person person = (Person) value;
 
             boolean maintainsUnits = person.getTechUnitIDs().size() > 0;
-            setText(person.getFullName() + (maintainsUnits ? " (*)" : ""));
+            setText(person.getFullTitle() + (maintainsUnits ? " (*)" : ""));
 
             return this;
         }
