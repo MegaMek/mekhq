@@ -448,15 +448,6 @@ public class StaticChecks {
         }
         return true;
     }
-    
-    public static boolean areAllConventionalInfantry(Unit[] units) {
-        for (Unit unit : units) {
-            if (!unit.getEntity().isConventionalInfantry()) {
-                return false;
-            }
-        }
-        return true;
-    }
 
     public static boolean areAllInfantry(Person[] people) {
         for (Person person : people) {
