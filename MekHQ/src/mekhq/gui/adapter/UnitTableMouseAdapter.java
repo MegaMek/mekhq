@@ -102,7 +102,6 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
     public static final String COMMAND_CANCEL_MOTHBALL = "CANCEL_MOTHBALL";
     // Assign Tech Commands
     public static final String COMMAND_ASSIGN_TECH = "ASSIGN";
-
     // Show Last Maintenance Report Commands
     // Customize Commands
     // Crew Complement Commands
@@ -110,18 +109,18 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
     // Custom Unit Commands
     // Quirks Commands
     // Unit History Commands
-    public static final String COMMAND_REMOVE_ALL_PERSONNEL = "REMOVE_ALL_PERSONNEL";
     public static final String COMMAND_CHANGE_HISTORY = "CHANGE_HISTORY";
-    public static final String COMMAND_UNDEPLOY = "UNDEPLOY";
+    // Remove All Personnel Commands
+    public static final String COMMAND_REMOVE_ALL_PERSONNEL = "REMOVE_ALL_PERSONNEL";
+    // Unit Name Commands
+
+    // Sell Unit Commands
+
     public static final String COMMAND_HIRE_FULL = "HIRE_FULL";
-    public static final String COMMAND_HIRE_FULL_GM = COMMAND_HIRE_FULL + "_GM";
-    public static final String COMMAND_REMOVE = "REMOVE";
     public static final String COMMAND_DISBAND = "DISBAND";
-    public static final String COMMAND_SET_QUALITY = "SET_QUALITY";
 
     public static final String COMMAND_SELL = "SELL";
     public static final String COMMAND_LOSS = "LOSS";
-
 
     public static final String COMMAND_MAINTENANCE_REPORT = "MAINTENANCE_REPORT";
     public static final String COMMAND_QUIRKS = "QUIRKS";
@@ -138,15 +137,20 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
     public static final String COMMAND_REFIT_GM_COMPLETE = "REFIT_GM_COMPLETE";
     public static final String COMMAND_REFURBISH = "REFURBISH";
     public static final String COMMAND_REFIT_KIT = "REFIT_KIT";
-    public static final String COMMAND_EDIT_DAMAGE = "EDIT_DAMAGE";
-    public static final String COMMAND_RESTORE_UNIT = "RESTORE_UNIT";
     public static final String COMMAND_FLUFF_NAME = "FLUFF_NAME";
-    public static final String COMMAND_STRIP_UNIT = "STRIP_UNIT";
     //endregion Standard Commands
 
     //region GM Commands
-    public static final String COMMAND_GM_MOTHBALL = "GM_MOTHBALL";
-    public static final String COMMAND_GM_ACTIVATE = "GM_ACTIVATE";
+    public static final String COMMAND_GM = "_GM"; // do NOT use as a command, just to create commands
+    public static final String COMMAND_REMOVE = "REMOVE";
+    public static final String COMMAND_STRIP_UNIT = "STRIP_UNIT";
+    public static final String COMMAND_GM_MOTHBALL = COMMAND_MOTHBALL + COMMAND_GM;
+    public static final String COMMAND_GM_ACTIVATE = COMMAND_ACTIVATE + COMMAND_GM;
+    public static final String COMMAND_UNDEPLOY = "UNDEPLOY";
+    public static final String COMMAND_HIRE_FULL_GM = COMMAND_HIRE_FULL + COMMAND_GM;
+    public static final String COMMAND_EDIT_DAMAGE = "EDIT_DAMAGE";
+    public static final String COMMAND_RESTORE_UNIT = "RESTORE_UNIT";
+    public static final String COMMAND_SET_QUALITY = "SET_QUALITY";
     //endregion GM Commands
     //endregion Commands
     //endregion Variable Declarations
@@ -1045,54 +1049,86 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                 menuItem.setEnabled(!unit.isDeployed());
                 popup.add(menuItem);
             }
-            // GM mode
-            menu = new JMenu("GM Mode");
-            menuItem = new JMenuItem("Remove Unit");
-            menuItem.setActionCommand(COMMAND_REMOVE);
-            menuItem.addActionListener(this);
-            menuItem.setEnabled(gui.getCampaign().isGM());
-            menu.add(menuItem);
-            menuItem = new JMenuItem("Strip Unit");
-            menuItem.setActionCommand(COMMAND_STRIP_UNIT);
-            menuItem.addActionListener(this);
-            menuItem.setEnabled(gui.getCampaign().isGM());
-            menu.add(menuItem);
-            if (oneSelected) {
-                menuItem = new JMenuItem(unit.isMothballed() ? "Activate Unit" : "Mothball Unit");
-                menuItem.setActionCommand(unit.isMothballed() ? COMMAND_GM_ACTIVATE : COMMAND_GM_MOTHBALL);
+            //region GM Mode
+            // GM mode - only show to GMs
+            if (gui.getCampaign().isGM()) {
+                //region Determine if to Display
+                // this is used to determine whether or not to show parts of the GM Menu
+                boolean oneMothballed = false;
+                boolean oneActive = false;
+                boolean oneDeployed = false;
+                boolean oneBelowMaxCrew = false;
+                for (Unit u : units) {
+                    if (u.isMothballed()) {
+                        oneMothballed = true;
+                    } else {
+                        oneActive = true;
+                    }
+
+                    if (unit.getCrew().size() < unit.getFullCrewSize()) {
+                        oneBelowMaxCrew = true;
+                    }
+
+                    if (u.isDeployed()) {
+                        oneDeployed = true;
+                    }
+
+                    if (oneMothballed && oneActive && oneDeployed && oneBelowMaxCrew) {
+                        break;
+                    }
+                }
+                //endregion Determine if to Display
+
+                menu = new JMenu("GM Mode");
+                menuItem = new JMenuItem("Remove Unit");
+                menuItem.setActionCommand(COMMAND_REMOVE);
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(gui.getCampaign().isGM());
                 menu.add(menuItem);
-            }
-            menuItem = new JMenuItem("Undeploy Unit");
-            menuItem.setActionCommand(COMMAND_UNDEPLOY);
-            menuItem.addActionListener(this);
-            menuItem.setEnabled(gui.getCampaign().isGM() && unit.isDeployed());
-            menu.add(menuItem);
-            if (unit.getCrew().size() < unit.getFullCrewSize()) {
-                menuItem = new JMenuItem("Add full complement");
-                menuItem.setActionCommand(COMMAND_HIRE_FULL_GM);
+                menuItem = new JMenuItem("Strip Unit");
+                menuItem.setActionCommand(COMMAND_STRIP_UNIT);
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(unit.isAvailable() && gui.getCampaign().isGM());
                 menu.add(menuItem);
+                if (oneMothballed) {
+                    menuItem = new JMenuItem("Mothball Unit");
+                    menuItem.setActionCommand(COMMAND_GM_MOTHBALL);
+                    menuItem.addActionListener(this);
+                    menu.add(menuItem);
+                }
+                if (oneActive) {
+                    menuItem = new JMenuItem("Activate Unit");
+                    menuItem.setActionCommand(COMMAND_GM_ACTIVATE);
+                    menuItem.addActionListener(this);
+                    menu.add(menuItem);
+                }
+                if (oneDeployed) {
+                    menuItem = new JMenuItem("Undeploy Unit");
+                    menuItem.setActionCommand(COMMAND_UNDEPLOY);
+                    menuItem.addActionListener(this);
+                    menu.add(menuItem);
+                }
+                if (oneBelowMaxCrew) {
+                    menuItem = new JMenuItem("Add full complement");
+                    menuItem.setActionCommand(COMMAND_HIRE_FULL_GM);
+                    menuItem.addActionListener(this);
+                    menuItem.setEnabled(unit.isAvailable());
+                    menu.add(menuItem);
+                }
+                menuItem = new JMenuItem("Edit Damage...");
+                menuItem.setActionCommand(COMMAND_EDIT_DAMAGE);
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
+                menuItem = new JMenuItem("Restore Unit");
+                menuItem.setActionCommand(COMMAND_RESTORE_UNIT);
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
+                menuItem = new JMenuItem("Set Quality...");
+                menuItem.setActionCommand(COMMAND_SET_QUALITY);
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
+                popup.addSeparator();
+                popup.add(menu);
             }
-            menuItem = new JMenuItem("Edit Damage...");
-            menuItem.setActionCommand(COMMAND_EDIT_DAMAGE);
-            menuItem.addActionListener(this);
-            menuItem.setEnabled(gui.getCampaign().isGM());
-            menu.add(menuItem);
-            menuItem = new JMenuItem("Restore Unit");
-            menuItem.setActionCommand(COMMAND_RESTORE_UNIT);
-            menuItem.addActionListener(this);
-            menuItem.setEnabled(gui.getCampaign().isGM());
-            menu.add(menuItem);
-            menuItem = new JMenuItem("Set Quality...");
-            menuItem.setActionCommand(COMMAND_SET_QUALITY);
-            menuItem.addActionListener(this);
-            menuItem.setEnabled(gui.getCampaign().isGM());
-            menu.add(menuItem);
-            popup.addSeparator();
-            popup.add(menu);
+            //endregion GM Mode
             popup.show(e.getComponent(), e.getX(), e.getY());
         }
     }
