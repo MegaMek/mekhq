@@ -349,7 +349,8 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
             Person person = (Person) value;
 
             boolean maintainsUnits = person.getTechUnitIDs().size() > 0;
-            setText(person.getFullTitle() + (maintainsUnits ? " (*)" : ""));
+            setText((maintainsUnits ? "(*) " : "") + person.getFullTitle() + " ("
+                    + person.getMinutesLeft() + " min)");
 
             return this;
         }
