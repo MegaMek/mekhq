@@ -182,7 +182,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         contentPanel.add(unitPanel, gbc);
 
         gbc.gridx = 1;
-
+        gbc.weightx = 2.0;
         JList<Person> techList = new JList<>();
         DefaultListModel<Person> listModel = new DefaultListModel<>();
 
@@ -206,7 +206,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         techListsByUnitType.put(unitType, techList);
 
         gbc.gridx = 2;
-        gbc.weightx = 1;
+        gbc.weightx = 0.5;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         JLabel labelTotalTime = new JLabel();
         labelTotalTime.setBorder(new LineBorder(Color.BLUE));
