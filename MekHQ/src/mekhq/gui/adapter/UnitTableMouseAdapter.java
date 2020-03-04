@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2014, 2020 The MegaMek Team. All rights reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui.adapter;
 
 import java.awt.event.ActionEvent;
@@ -58,27 +76,26 @@ import mekhq.gui.dialog.QuirksDialog;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.StaticChecks;
 
-public class UnitTableMouseAdapter extends MouseInputAdapter implements
-        ActionListener {
-
+public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionListener {
+    //region Variable Declarations
     private CampaignGUI gui;
     private JTable unitTable;
     private UnitTableModel unitModel;
-    private ResourceBundle resourceMap;
+    private ResourceBundle resourceMap = ResourceBundle
+            .getBundle("mekhq.resources.UnitTableMouseAdapter", new EncodeControl());
 
     public final static String COMMAND_MOTHBALL = "MOTHBALL";
     public final static String COMMAND_ACTIVATE = "ACTIVATE";
     public final static String COMMAND_CANCEL_MOTHBALL = "CANCEL_MOTHBALL";
     public final static String COMMAND_GM_MOTHBALL = "GM_MOTHBALL";
     public final static String COMMAND_GM_ACTIVATE = "GM_ACTIVATE";
+    //endregion Variable Declarations
 
-    public UnitTableMouseAdapter(CampaignGUI gui, JTable unitTable,
-            UnitTableModel unitModel) {
+    public UnitTableMouseAdapter(CampaignGUI gui, JTable unitTable, UnitTableModel unitModel) {
         super();
         this.gui = gui;
         this.unitTable = unitTable;
         this.unitModel = unitModel;
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitTableMouseAdapter", new EncodeControl()); //$NON-NLS-1$
     }
 
     public void actionPerformed(ActionEvent action) {
@@ -134,8 +151,8 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 selectedUnit.setTech(tech);
             }
         } else if (command.equalsIgnoreCase("SET_QUALITY")) {
-            int q = -1;
-            Object[] possibilities = { "F", "E", "D", "C", "B", "A" };
+            int q;
+            Object[] possibilities = { "F", "E", "D", "C", "B", "A" }; // TODO : this shouldn't be inline
             String quality = (String) JOptionPane.showInputDialog(gui.getFrame(),
                     "Choose the new quality level", "Set Quality",
                     JOptionPane.PLAIN_MESSAGE, null, possibilities, "F");
@@ -199,7 +216,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             String[] fields = command.split(":");
             int selAmmoId = Integer.parseInt(fields[1]);
             Part part = gui.getCampaign().getPart(selAmmoId);
-            if (null == part || !(part instanceof AmmoBin)) {
+            if (!(part instanceof AmmoBin)) {
                 return;
             }
             AmmoBin ammo = (AmmoBin) part;
@@ -246,7 +263,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             for (Unit unit : units) {
                 String fileName = unit.getEntity().getChassis() + " "
                         + unit.getEntity().getModel();
-                try {
+                try { // TODO Fixme
                     if (unit.getEntity() instanceof Mech) {
                         // if this file already exists then don't overwrite
                         // it or we will end up with a bunch of copies
@@ -326,10 +343,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                             "Do you really want to disband this unit "
                                     + unit.getName() + "?",
                             "Disband Unit?", JOptionPane.YES_NO_OPTION)) {
-                        Vector<Part> parts = new Vector<>();
-                        for (Part p : unit.getParts()) {
-                            parts.add(p);
-                        }
+                        Vector<Part> parts = new Vector<>(unit.getParts());
                         for (Part p : parts) {
                             p.remove(true);
                         }
@@ -395,7 +409,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             ccd.setLocationRelativeTo(gui.getFrame());
             ccd.setVisible(true);
 
-            if (ccd.clickedSelect() == true) {
+            if (ccd.clickedSelect()) {
                 selectedUnit.getEntity().setCamoCategory(ccd.getCategory());
                 selectedUnit.getEntity().setCamoFileName(ccd.getFileName());
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
@@ -613,16 +627,14 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             int[] rows = unitTable.getSelectedRows();
             int row = unitTable.getSelectedRow();
             boolean oneSelected = unitTable.getSelectedRowCount() == 1;
-            Unit unit = unitModel.getUnit(unitTable
-                    .convertRowIndexToModel(row));
+            Unit unit = unitModel.getUnit(unitTable.convertRowIndexToModel(row));
             Unit[] units = new Unit[rows.length];
             for (int i = 0; i < rows.length; i++) {
-                units[i] = unitModel.getUnit(unitTable
-                        .convertRowIndexToModel(rows[i]));
+                units[i] = unitModel.getUnit(unitTable.convertRowIndexToModel(rows[i]));
             }
-            JMenuItem menuItem = null;
-            JMenu menu = null;
-            JCheckBoxMenuItem cbMenuItem = null;
+            JMenuItem menuItem;
+            JMenu menu;
+            JCheckBoxMenuItem cbMenuItem;
             // **lets fill the pop up menu**//
             if (oneSelected && !unit.isPresent()) {
                 menuItem = new JMenuItem("Cancel This Delivery");
@@ -666,7 +678,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                     popup.add(menuItem);
                 } else {
                     menu = new JMenu("Swap ammo");
-                    JMenu ammoMenu = null;
+                    JMenu ammoMenu;
                     for (AmmoBin ammo : unit.getWorkingAmmoBins()) {
                         ammoMenu = new JMenu(ammo.getType().getDesc());
                         AmmoType curType = (AmmoType) ammo.getType();
@@ -755,33 +767,33 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 }
             }
 
-            if(unitTable.getSelectedRowCount() > 1) {
+            if (unitTable.getSelectedRowCount() > 1) {
                 boolean allMothballed = true;
                 boolean allAvailable = true;
 
-                for(int x = 0; x < units.length; x++) {
-                    // infantry, jumpships and warships cannot be mothballed
-                    if(units[x].isSelfCrewed()) {
+                for (Unit u : units) {
+                    // infantry, JumpShips and WarShips cannot be mothballed
+                    if (u.isSelfCrewed()) {
                         allMothballed = false;
                         allAvailable = false;
                         break;
                     }
 
-                    if(!units[x].isMothballed()) {
+                    if (!u.isMothballed()) {
                         allMothballed = false;
                     }
 
-                    if(!units[x].isAvailable()) {
+                    if (!u.isAvailable()) {
                         allAvailable = false;
                     }
                 }
 
-                if(allAvailable) {
+                if (allAvailable) {
                     menuItem = new JMenuItem("Mass Mothball");
                     menuItem.setActionCommand(COMMAND_MOTHBALL);
                     menuItem.addActionListener(this);
                     popup.add(menuItem);
-                } else if(allMothballed) {
+                } else if (allMothballed) {
                     menuItem = new JMenuItem("Mass Activate");
                     menuItem.setActionCommand(COMMAND_ACTIVATE);
                     menuItem.addActionListener(this);
@@ -945,18 +957,15 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                             gui.getResourceMap()
                                     .getString("customizeMenu.individualCamo.text"));
                     menuItem.setActionCommand("INDI_CAMO");
-                    menuItem.addActionListener(this);
-                    menuItem.setEnabled(true);
-                    popup.add(menuItem);
                 } else {
                     menuItem = new JMenuItem(
                             gui.getResourceMap()
                                     .getString("customizeMenu.removeIndividualCamo.text"));
                     menuItem.setActionCommand("REMOVE_INDI_CAMO");
-                    menuItem.addActionListener(this);
-                    menuItem.setEnabled(true);
-                    popup.add(menuItem);
                 }
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(true);
+                popup.add(menuItem);
             }
             if (oneSelected && !gui.getCampaign().isCustom(unit)) {
                 menuItem = new JMenuItem("Tag as a custom unit");
