@@ -1,5 +1,5 @@
 /*
- * Person.java
+ * MassMothballDialog.java
  *
  * Copyright (c) 2018 Megamek Team. All rights reserved.
  *
@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
 import java.awt.Color;
@@ -65,9 +64,6 @@ import mekhq.preferences.PreferencesNode;
  *
  */
 public class MassMothballDialog extends JDialog implements ActionListener, ListSelectionListener {
-    /**
-     *
-     */
     private static final long serialVersionUID = -7435381378836891774L;
 
     Map<Integer, List<Unit>> unitsByType = new HashMap<>();
@@ -106,7 +102,9 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         gbc.weightx = 3;
         JLabel instructionLabel = new JLabel();
         instructionLabel.setBorder(new LineBorder(Color.BLUE));
-        instructionLabel.setText("<html>Choose the techs to carry out mothball/reactivation operations on the displayed units. <br/>A * indicates that the tech is currently maintaining units.</html>");
+        instructionLabel.setText("<html>Choose the techs to carry out " +
+                (activate ? "activation" : "mothballing") + " operations on the displayed units. <br/>"
+                + "A * indicates that the tech is currently maintaining units.</html>");
         contentPanel.add(instructionLabel, gbc);
 
         gbc.weightx = 1;

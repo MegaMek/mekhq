@@ -456,7 +456,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
             if (units.length > 1) {
                 gui.showMassMothballDialog(units, false);
             } else {
-                UUID techId = pickTechForMothballOrActivation(selectedUnit);
+                UUID techId = pickTechForMothballOrActivation(selectedUnit, "mothballing");
                 MothballUnitAction mothballUnitAction = new MothballUnitAction(techId, false);
                 mothballUnitAction.Execute(gui.getCampaign(), selectedUnit);
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
@@ -465,7 +465,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
             if (units.length > 1) {
                 gui.showMassMothballDialog(units, true);
             } else {
-                UUID techId = pickTechForMothballOrActivation(selectedUnit);
+                UUID techId = pickTechForMothballOrActivation(selectedUnit, "activation");
                 ActivateUnitAction activateUnitAction = new ActivateUnitAction(techId, false);
                 activateUnitAction.Execute(gui.getCampaign(), selectedUnit);
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
@@ -598,10 +598,10 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
         }
     }
 
-    private UUID pickTechForMothballOrActivation(Unit unit) {
+    private UUID pickTechForMothballOrActivation(Unit unit, String description) {
         UUID id = null;
         if (!unit.isSelfCrewed()) {
-            id = gui.selectTech(unit, "activation", true);
+            id = gui.selectTech(unit, description, true);
             if (null != id) {
                 Person tech = gui.getCampaign().getPerson(id);
                 if (tech.getTechUnitIDs().size() > 0) {
@@ -903,7 +903,6 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
 
                                 if (tech.getId().equals(unit.getTechId())) {
                                     cbMenuItem.setSelected(true);
-                                    subMenu.setSelected(true);
                                 } else {
                                     cbMenuItem.addActionListener(this);
                                 }
@@ -1083,14 +1082,14 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                     menuItem.setActionCommand(COMMAND_STRIP_UNIT);
                     menuItem.addActionListener(this);
                     menu.add(menuItem);
-                    if (oneMothballed) {
-                        menuItem = new JMenuItem("Mothball Unit");
+                    if (oneActive) {
+                        menuItem = new JMenuItem(oneSelected ? "Mass Mothball Units" : "Mothball Unit");
                         menuItem.setActionCommand(COMMAND_GM_MOTHBALL);
                         menuItem.addActionListener(this);
                         menu.add(menuItem);
                     }
-                    if (oneActive) {
-                        menuItem = new JMenuItem("Activate Unit");
+                    if (oneMothballed) {
+                        menuItem = new JMenuItem(oneSelected ? "Mass Activate Units" : "Activate Unit");
                         menuItem.setActionCommand(COMMAND_GM_ACTIVATE);
                         menuItem.addActionListener(this);
                         menu.add(menuItem);

@@ -1687,17 +1687,6 @@ public class CampaignGUI extends JPanel {
     /**
      * Shows a dialog that lets the user select a tech for a task on a particular unit
      *
-     * @param u    The unit to be serviced, used to filter techs for skill on the unit.
-     * @param desc The description of the task
-     * @return     The ID of the selected tech, or null if none is selected.
-     */
-    public @Nullable UUID selectTech(Unit u, String desc) {
-        return selectTech(u, desc, false);
-    }
-
-    /**
-     * Shows a dialog that lets the user select a tech for a task on a particular unit
-     *
      * @param u                 The unit to be serviced, used to filter techs for skill on the unit.
      * @param desc              The description of the task
      * @param ignoreMaintenance If true, ignores the time required for maintenance tasks when displaying
@@ -1706,17 +1695,15 @@ public class CampaignGUI extends JPanel {
      */
     public @Nullable UUID selectTech(Unit u, String desc, boolean ignoreMaintenance) {
         String name;
-        HashMap<String, Person> techHash = new HashMap<>();
+        Map<String, Person> techHash = new HashMap<>();
         for (Person tech : getCampaign().getTechs()) {
-            if (tech.canTech(u.getEntity()) && !tech.isMothballing()) {
+            if (!tech.isMothballing() && tech.canTech(u.getEntity())) {
                 int time = tech.getMinutesLeft();
                 if (!ignoreMaintenance) {
                     time -= Math.max(0, tech.getMaintenanceTimeUsing());
                 }
-                name = tech.getFullName()
-                        + ", "
-                        + SkillType.getExperienceLevelName(tech
-                        .getSkillForWorkingOn(u).getExperienceLevel())
+                name = tech.getFullTitle() + ", "
+                        + SkillType.getExperienceLevelName(tech.getSkillForWorkingOn(u).getExperienceLevel())
                         + " (" + time + "min)";
                 techHash.put(name, tech);
             }
@@ -1727,12 +1714,7 @@ public class CampaignGUI extends JPanel {
                     JOptionPane.WARNING_MESSAGE);
             return null;
         }
-        String[] techNames = new String[techHash.keySet().size()];
-        int i = 0;
-        for (String n : techHash.keySet()) {
-            techNames[i] = n;
-            i++;
-        }
+        String[] techNames = (String[]) techHash.keySet().toArray();
         String s = (String) JOptionPane.showInputDialog(frame,
                 "Which tech should work on " + desc + "?", "Select Tech",
                 JOptionPane.PLAIN_MESSAGE, null, techNames, techNames[0]);
