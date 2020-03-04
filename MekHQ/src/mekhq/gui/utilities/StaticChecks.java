@@ -448,12 +448,7 @@ public class StaticChecks {
         }
         return true;
     }
-
-    // TODO : Implement me instead of entity instanceof infantry and !(entity instance of protomech)
-    public static boolean isConventionalInfantryUnit(Unit unit) {
-        return unit.getEntity().isConventionalInfantry();
-    }
-
+    
     public static boolean areAllConventionalInfantry(Unit[] units) {
         for (Unit unit : units) {
             if (!unit.getEntity().isConventionalInfantry()) {
