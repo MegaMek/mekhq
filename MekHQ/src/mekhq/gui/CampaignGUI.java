@@ -1695,7 +1695,7 @@ public class CampaignGUI extends JPanel {
      */
     public @Nullable UUID selectTech(Unit u, String desc, boolean ignoreMaintenance) {
         String name;
-        Map<String, Person> techHash = new HashMap<>();
+        Map<String, Person> techHash = new LinkedHashMap<>();
         for (Person tech : getCampaign().getTechs()) {
             if (!tech.isMothballing() && tech.canTech(u.getEntity())) {
                 int time = tech.getMinutesLeft();
@@ -1714,20 +1714,18 @@ public class CampaignGUI extends JPanel {
                     JOptionPane.WARNING_MESSAGE);
             return null;
         }
-        String[] techNames = (String[]) techHash.keySet().toArray();
+
+        Object[] nameArray = techHash.keySet().toArray();
+
         String s = (String) JOptionPane.showInputDialog(frame,
                 "Which tech should work on " + desc + "?", "Select Tech",
-                JOptionPane.PLAIN_MESSAGE, null, techNames, techNames[0]);
+                JOptionPane.PLAIN_MESSAGE, null, nameArray, nameArray[0]);
         if (null == s) {
             return null;
         }
         return techHash.get(s).getId();
     }
-
-    public Part getPartByNameAndDetails(String pnd) {
-        return getCampaign().getPartsStore().getByNameAndDetails(pnd);
-    }
-
+    
     /**
      * Exports Planets to a file (CSV, XML, etc.)
      * @param format
