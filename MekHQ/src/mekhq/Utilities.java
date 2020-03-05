@@ -641,7 +641,7 @@ public class Utilities {
 
             populateOptionsFromCrew(p, oldCrew);
 
-            setName(p, oldCrew, 0);
+            migrateNamePortraitExtraData(p, oldCrew, 0);
             drivers.add(p);
             //endregion Solo Pilot
         } else {
@@ -663,7 +663,7 @@ public class Utilities {
                                 - oldCrew.getGunnery(slot), 0);
                     }
                     if (null != p) {
-                        setName(p, oldCrew, numberPeopleGenerated);
+                        migrateNamePortraitExtraData(p, oldCrew, numberPeopleGenerated);
 
                         if (!oldCrew.getExternalIdAsString(numberPeopleGenerated).equals("-1")) {
                             p.setId(UUID.fromString(oldCrew.getExternalIdAsString(numberPeopleGenerated)));
@@ -753,7 +753,7 @@ public class Utilities {
                     // Not really any way around it
                     populateOptionsFromCrew(p, oldCrew);
 
-                    setName(p, oldCrew, numberPeopleGenerated);
+                    migrateNamePortraitExtraData(p, oldCrew, numberPeopleGenerated);
                     numberPeopleGenerated++;
                     drivers.add(p);
                 }
@@ -836,8 +836,7 @@ public class Utilities {
                         }
 
                         populateOptionsFromCrew(p, oldCrew);
-                        setName(p, oldCrew, numberPeopleGenerated);
-                        numberPeopleGenerated++;
+                        migrateNamePortraitExtraData(p, oldCrew, numberPeopleGenerated++);
                         gunners.add(p);
                     }
 
@@ -877,7 +876,7 @@ public class Utilities {
                                 : Person.T_SPACE_CREW,
                         Person.T_NONE, factionCode, oldCrew.getGender(numberPeopleGenerated));
 
-                setName(p, oldCrew, numberPeopleGenerated);
+                migrateNamePortraitExtraData(p, oldCrew, numberPeopleGenerated);
                 numberPeopleGenerated++;
                 vesselCrew.add(p);
             }
@@ -885,14 +884,13 @@ public class Utilities {
             if (u.canTakeNavigator()) {
                 navigator = c.newPerson(Person.T_NAVIGATOR, Person.T_NONE, factionCode,
                         oldCrew.getGender(numberPeopleGenerated));
-                setName(navigator, oldCrew, numberPeopleGenerated);
-                numberPeopleGenerated++;
+                migrateNamePortraitExtraData(navigator, oldCrew, numberPeopleGenerated++);
             }
 
             if (u.canTakeTechOfficer()) {
                 consoleCmdr = c.newPerson(Person.T_VEE_GUNNER, Person.T_NONE, factionCode,
                         oldCrew.getGender(numberPeopleGenerated));
-                setName(consoleCmdr, oldCrew, numberPeopleGenerated);
+                migrateNamePortraitExtraData(consoleCmdr, oldCrew, numberPeopleGenerated);
             }
         }
 
@@ -938,18 +936,20 @@ public class Utilities {
 
     /**
      * Function that determines what name should be used by a person that is created through crew
+     * And then assigns them a pre-selected portrait, provided one is to their index
+     * Additionally, any
      * @param p         the person to be renamed, if applicable
      * @param oldCrew   the crew object they were a part of
      * @param crewIndex the index of the person in the crew
      */
-    private static void setName(Person p, Crew oldCrew, int crewIndex) {
+    private static void migrateNamePortraitExtraData(Person p, Crew oldCrew, int crewIndex) {
         // this is a bit of a hack, but instead of tracking it elsewhere we only set gender to
         // male or female when a name is generated. G_RANDOMIZE will therefore only be returned for
         // crew that don't have names, so we can just leave them with their randomly generated name
         if (oldCrew.getGender(crewIndex) != Crew.G_RANDOMIZE) {
             String givenName = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_GIVEN_NAME);
 
-            if (givenName == null) {
+            if (StringUtil.isNullOrEmpty(givenName)) {
                 String name = oldCrew.getName(crewIndex);
 
                 if (!(name.equalsIgnoreCase(Crew.UNNAMED) || name.equalsIgnoreCase(Crew.UNNAMED_FULL_NAME))) {
@@ -965,6 +965,12 @@ public class Utilities {
                 }
 
                 p.setBloodname(oldCrew.getExtraDataValue(crewIndex, Crew.MAP_BLOODNAME));
+            }
+
+            // Only created crew can be assigned a portrait, so this is safe to put in here
+            if (!Crew.PORTRAIT_NONE.equals(oldCrew.getPortraitFileName(crewIndex))) {
+                p.setPortraitCategory(oldCrew.getPortraitCategory(crewIndex));
+                p.setPortraitFileName(oldCrew.getPortraitFileName(crewIndex));
             }
         }
     }
