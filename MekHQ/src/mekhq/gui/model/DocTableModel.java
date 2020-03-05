@@ -10,7 +10,6 @@ import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.BasicInfo;
-import mekhq.gui.MekHqColors;
 
 /**
  * A table model for displaying doctors
@@ -19,7 +18,6 @@ public class DocTableModel extends DataTableModel {
     private static final long serialVersionUID = -6934834363013004894L;
 
     private final Campaign campaign;
-    private final MekHqColors colors = new MekHqColors();
 
     public DocTableModel(Campaign c) {
         columnNames = new String[] { "Doctors" };
@@ -53,17 +51,15 @@ public class DocTableModel extends DataTableModel {
         public Component getTableCellRendererComponent(JTable table,
                 Object value, boolean isSelected, boolean hasFocus,
                 int row, int column) {
-            setOpaque(true);
             setPortrait(getDoctorAt(row));
-            setText(getValueAt(row, column).toString());
-            //setToolTipText(getCampaign().getTargetFor(getDoctorAt(row), getDoctorAt(row)).getDesc());
+            setHtmlText(getValueAt(row, column).toString());
             if (isSelected) {
                 highlightBorder();
             } else {
                 unhighlightBorder();
             }
-            colors.getIconButton().getColor().ifPresent(c -> setBackground(c));
-            colors.getIconButton().getAlternateColor().ifPresent(c -> setForeground(c));
+            setBackground(table.getBackground());
+            setForeground(table.getForeground());
             return this;
         }
 

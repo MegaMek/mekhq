@@ -24,7 +24,7 @@ import mekhq.campaign.unit.Unit;
 /**
  * An extension of JPanel that is intended to be used for visual table renderers
  * allowing for a visual image and html coded text
- * 
+ *
  * @author Jay Lawson
  *
  */
@@ -81,6 +81,10 @@ public class BasicInfo extends JPanel {
 
     public void setText(String s) {
         lblImage.setText("<html><font size='2'>" + s + "</font></html>");
+    }
+
+    public void setHtmlText(String s) {
+        lblImage.setText(s);
     }
 
     public void highlightBorder() {

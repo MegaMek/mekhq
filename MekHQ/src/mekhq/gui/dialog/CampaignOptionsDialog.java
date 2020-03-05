@@ -4591,7 +4591,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         if (null != comboFactionNames.getSelectedItem()) {
             campaign.getRNG().setChosenFaction((String) comboFactionNames.getSelectedItem());
         }
-        campaign.getRNG().setPerentFemale(sldGender.getValue());
+        campaign.getRNG().setPercentFemale(sldGender.getValue());
         campaign.setRankSystem(comboRanks.getSelectedIndex());
         if (comboRanks.getSelectedIndex() == Ranks.RS_CUSTOM)
         {

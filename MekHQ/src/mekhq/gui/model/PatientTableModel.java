@@ -11,7 +11,6 @@ import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.BasicInfo;
-import mekhq.gui.MekHqColors;
 
 /**
  * A table model for displaying personnel in the infirmary
@@ -21,7 +20,6 @@ public class PatientTableModel extends AbstractListModel<Person> {
 
     private ArrayList<Person> patients;
     private final Campaign campaign;
-    private final MekHqColors colors = new MekHqColors();
 
     public PatientTableModel(Campaign c) {
         patients = new ArrayList<Person>();
@@ -69,22 +67,20 @@ public class PatientTableModel extends AbstractListModel<Person> {
                 int index,
                 boolean isSelected,
                 boolean cellHasFocus) {
-            setOpaque(true);
             Person p = (Person)getElementAt(index);
+            setPortrait(p);
             if (getCampaign().getCampaignOptions().useAdvancedMedical()) {
-                setText(p.getInjuriesDesc(), "black");
+                setHtmlText(p.getInjuriesDesc());
             } else {
-                setText(p.getPatientDesc(), "black");
+                setHtmlText(p.getPatientDesc());
             }
             if (isSelected) {
                 highlightBorder();
             } else {
                 unhighlightBorder();
             }
-            setPortrait(p);
-
-            colors.getIconButton().getColor().ifPresent(c -> setBackground(c));
-            colors.getIconButton().getAlternateColor().ifPresent(c -> setForeground(c));
+            setBackground(list.getBackground());
+            setForeground(list.getForeground());
             return this;
         }
     }
