@@ -909,19 +909,6 @@ public class Utilities {
     }
 
     /**
-     * Worker function that takes the PilotOptions (SPAs, in other words) from the given "old crew" and sets them for a person.
-     * @param p The person whose SPAs to populate
-     * @param oldCrew The entity the SPAs of whose crew we're importing
-     */
-    private static void populateOptionsFromCrew(Person p, Crew oldCrew) {
-        Enumeration<IOption> optionsEnum = oldCrew.getOptions().getOptions();
-        while (optionsEnum.hasMoreElements()) {
-            IOption currentOption = optionsEnum.nextElement();
-            p.getOptions().getOption(currentOption.getName()).setValue(currentOption.getValue());
-        }
-    }
-
-    /**
      * Function that determines what name should be used by a person that is created through crew
      * And then assigns them a pre-selected portrait, provided one is to their index
      * Additionally, any
@@ -964,6 +951,19 @@ public class Utilities {
                 p.setPortraitCategory(oldCrew.getPortraitCategory(crewIndex));
                 p.setPortraitFileName(oldCrew.getPortraitFileName(crewIndex));
             }
+        }
+    }
+    
+    /**
+     * Worker function that takes the PilotOptions (SPAs, in other words) from the given "old crew" and sets them for a person.
+     * @param p The person whose SPAs to populate
+     * @param oldCrew The entity the SPAs of whose crew we're importing
+     */
+    private static void populateOptionsFromCrew(Person p, Crew oldCrew) {
+        Enumeration<IOption> optionsEnum = oldCrew.getOptions().getOptions();
+        while (optionsEnum.hasMoreElements()) {
+            IOption currentOption = optionsEnum.nextElement();
+            p.getOptions().getOption(currentOption.getName()).setValue(currentOption.getValue());
         }
     }
 
