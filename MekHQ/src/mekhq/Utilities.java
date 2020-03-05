@@ -639,7 +639,7 @@ public class Utilities {
                         - oldCrew.getGunnery(), 0);
             }
 
-            migrateCrewData(p, oldCrew, 0, c, false);
+            migrateCrewData(p, oldCrew, 0, true);
             drivers.add(p);
             //endregion Solo Pilot
         } else {
@@ -665,7 +665,7 @@ public class Utilities {
                             p.setId(UUID.fromString(oldCrew.getExternalIdAsString(numberPeopleGenerated)));
                         }
 
-                        migrateCrewData(p, oldCrew, numberPeopleGenerated++, c, true);
+                        migrateCrewData(p, oldCrew, numberPeopleGenerated++, true);
                         drivers.add(p);
                     }
                 }
@@ -743,7 +743,7 @@ public class Utilities {
                                 0);
                     }
 
-                    migrateCrewData(p, oldCrew, numberPeopleGenerated++, c);
+                    migrateCrewData(p, oldCrew, numberPeopleGenerated++, true);
                     drivers.add(p);
                 }
 
@@ -824,7 +824,7 @@ public class Utilities {
                             totalGunnery += p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue();
                         }
 
-                        migrateCrewData(p, oldCrew, numberPeopleGenerated++, c);
+                        migrateCrewData(p, oldCrew, numberPeopleGenerated++, true);
                         gunners.add(p);
                     }
 
@@ -864,20 +864,20 @@ public class Utilities {
                                 : Person.T_SPACE_CREW,
                         Person.T_NONE, factionCode, oldCrew.getGender(numberPeopleGenerated));
 
-                migrateCrewData(p, oldCrew, numberPeopleGenerated++, c);
+                migrateCrewData(p, oldCrew, numberPeopleGenerated++, false);
                 vesselCrew.add(p);
             }
 
             if (u.canTakeNavigator()) {
                 navigator = c.newPerson(Person.T_NAVIGATOR, Person.T_NONE, factionCode,
                         oldCrew.getGender(numberPeopleGenerated));
-                migrateCrewData(navigator, oldCrew, numberPeopleGenerated++, c);
+                migrateCrewData(navigator, oldCrew, numberPeopleGenerated++, false);
             }
 
             if (u.canTakeTechOfficer()) {
                 consoleCmdr = c.newPerson(Person.T_VEE_GUNNER, Person.T_NONE, factionCode,
                         oldCrew.getGender(numberPeopleGenerated));
-                migrateCrewData(consoleCmdr, oldCrew, numberPeopleGenerated, c);
+                migrateCrewData(consoleCmdr, oldCrew, numberPeopleGenerated, false);
             }
         }
 
@@ -911,16 +911,16 @@ public class Utilities {
     /**
      * Function that determines what name should be used by a person that is created through crew
      * And then assigns them a pre-selected portrait, provided one is to their index
-     * Additionally, any
-     * @param p         the person to be renamed, if applicable
-     * @param oldCrew   the crew object they were a part of
-     * @param crewIndex the index of the person in the crew
+     * Additionally, any extraData parameters should be migrated here
+     * @param p           the person to be renamed, if applicable
+     * @param oldCrew     the crew object they were a part of
+     * @param crewIndex   the index of the person in the crew
+     * @param crewOptions whether or not to run the populateOptionsFromCrew for this person
      */
-    private static void migrateCrewData(Person p, Crew oldCrew, int crewIndex, Campaign c) {
-        migrateCrewData(p, oldCrew, crewIndex, c, false);
-    }
-    private static void migrateCrewData(Person p, Crew oldCrew, int crewIndex, Campaign c, boolean crewOptions) {
-        populateOptionsFromCrew(p, oldCrew);
+    private static void migrateCrewData(Person p, Crew oldCrew, int crewIndex, boolean crewOptions) {
+        if (crewOptions) {
+            populateOptionsFromCrew(p, oldCrew);
+        }
 
         // this is a bit of a hack, but instead of tracking it elsewhere we only set gender to
         // male or female when a name is generated. G_RANDOMIZE will therefore only be returned for
@@ -953,7 +953,7 @@ public class Utilities {
             }
         }
     }
-    
+
     /**
      * Worker function that takes the PilotOptions (SPAs, in other words) from the given "old crew" and sets them for a person.
      * @param p The person whose SPAs to populate
