@@ -3397,20 +3397,20 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public String getDocDesc() {
         StringBuilder toReturn = new StringBuilder(128);
-        toReturn.append("<html><font size='2'><b>");
-        toReturn.append(getFullName());
-        toReturn.append(String.format("</b> (%d XP)<br/>", getXp()));
+        toReturn.append("<html><font size='2'><b>").append(getFullTitle()).append("</b><br/>");
 
         Skill skill = getSkill(SkillType.S_DOCTOR);
         if (null != skill) {
-            toReturn.append(SkillType.getExperienceLevelName(skill.getExperienceLevel()));
-            toReturn.append(" " + SkillType.S_DOCTOR);
+            toReturn.append(SkillType.getExperienceLevelName(skill.getExperienceLevel()))
+                    .append(" " + SkillType.S_DOCTOR);
         }
 
+        toReturn.append(String.format(" (%d XP)", getXp()));
+
         if (campaign.getMedicsPerDoctor() < 4) {
-            toReturn.append("</font><font size='2' color='red'>, ");
-            toReturn.append(campaign.getMedicsPerDoctor());
-            toReturn.append(" medics</font><font size='2'><br/>");
+            toReturn.append("</font><font size='2' color='red'>, ")
+                    .append(campaign.getMedicsPerDoctor())
+                    .append(" medics</font><font size='2'><br/>");
         } else {
             toReturn.append(String.format(", %d medics<br />", campaign.getMedicsPerDoctor()));
         }
