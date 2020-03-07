@@ -51,6 +51,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 
+import megamek.client.RandomGenderGenerator;
+import megamek.client.RandomNameGenerator;
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
@@ -3277,29 +3279,29 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panNameGen.add(lblFactionNames, gridBagConstraints);
 
         DefaultComboBoxModel<String> factionNamesModel = new DefaultComboBoxModel<>();
-        for (Iterator<String> i = campaign.getRNG().getFactions(); i.hasNext(); ) {
+        for (Iterator<String> i = RandomNameGenerator.getInstance().getFactions(); i.hasNext(); ) {
             String faction = i.next();
             factionNamesModel.addElement(faction);
         }
-        factionNamesModel.setSelectedItem(campaign.getRNG().getChosenFaction());
+        factionNamesModel.setSelectedItem(RandomNameGenerator.getInstance().getChosenFaction());
         comboFactionNames.setModel(factionNamesModel);
-        comboFactionNames.setMinimumSize(new java.awt.Dimension(400, 30));
+        comboFactionNames.setMinimumSize(new Dimension(400, 30));
         comboFactionNames.setName("comboFactionNames"); // NOI18N
-        comboFactionNames.setPreferredSize(new java.awt.Dimension(400, 30));
+        comboFactionNames.setPreferredSize(new Dimension(400, 30));
         comboFactionNames.setEnabled(!useFactionForNamesBox.isSelected());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = gridy;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         panNameGen.add(comboFactionNames, gridBagConstraints);
 
         JLabel lblGender = new JLabel(resourceMap.getString("lblGender.text")); // NOI18N
         lblGender.setName("lblGender"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = ++gridy;
         gridBagConstraints.insets = new Insets(10, 0, 0, 0);
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         panNameGen.add(lblGender, gridBagConstraints);
 
         sldGender.setMaximum(100);
@@ -3307,7 +3309,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         sldGender.setMajorTickSpacing(25);
         sldGender.setPaintTicks(true);
         sldGender.setPaintLabels(true);
-        sldGender.setValue(campaign.getRNG().getPercentFemale());
+        sldGender.setValue(RandomGenderGenerator.getPercentFemale());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = gridy;
@@ -4448,10 +4450,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     }
 
     private void switchFaction() {
-        String factionCode = Faction.getFactionFromFullNameAndYear(String.valueOf(comboFaction.getSelectedItem()), date.get(Calendar.YEAR))
-                                    .getNameGenerator();
+        String factionCode = Faction.getFactionFromFullNameAndYear(
+                String.valueOf(comboFaction.getSelectedItem()), date.get(Calendar.YEAR))
+                .getNameGenerator();
         boolean found = false;
-        for (Iterator<String> i = campaign.getRNG().getFactions(); i.hasNext(); ) {
+        for (Iterator<String> i = RandomNameGenerator.getInstance().getFactions(); i.hasNext(); ) {
             String nextFaction = i.next();
             if (nextFaction.equals(factionCode)) {
                 found = true;
@@ -4625,9 +4628,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         campaign.setFactionCode(Faction.getFactionFromFullNameAndYear
         		(String.valueOf(comboFaction.getSelectedItem()), date.get(Calendar.YEAR)).getShortName());
         if (null != comboFactionNames.getSelectedItem()) {
-            campaign.getRNG().setChosenFaction((String) comboFactionNames.getSelectedItem());
+            RandomNameGenerator.getInstance().setChosenFaction((String) comboFactionNames.getSelectedItem());
         }
-        campaign.getRNG().setPercentFemale(sldGender.getValue());
+        RandomGenderGenerator.setPercentFemale(sldGender.getValue());
         campaign.setRankSystem(comboRanks.getSelectedIndex());
         if (comboRanks.getSelectedIndex() == Ranks.RS_CUSTOM)
         {

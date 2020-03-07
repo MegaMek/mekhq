@@ -40,6 +40,8 @@ import java.util.UUID;
 
 import javax.xml.parsers.DocumentBuilder;
 
+import megamek.client.RandomGenderGenerator;
+import megamek.client.RandomNameGenerator;
 import mekhq.campaign.personnel.*;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -911,9 +913,9 @@ public class CampaignXmlParser {
                             continue;
                         }
                         if (wn2.getNodeName().equalsIgnoreCase("faction")) {
-                            retVal.getRNG().setChosenFaction(wn2.getTextContent().trim());
+                            RandomNameGenerator.getInstance().setChosenFaction(wn2.getTextContent().trim());
                         } else if (wn2.getNodeName().equalsIgnoreCase("percentFemale")) {
-                            retVal.getRNG().setPercentFemale(Integer.parseInt(wn2.getTextContent().trim()));
+                            RandomGenderGenerator.setPercentFemale(Integer.parseInt(wn2.getTextContent().trim()));
                         }
                     }
                 } else if (xn.equalsIgnoreCase("currentReport")) {

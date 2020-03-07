@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 
 import javax.swing.JOptionPane;
 
+import megamek.client.RandomGenderGenerator;
 import megamek.common.*;
 import mekhq.*;
 import mekhq.campaign.finances.*;
@@ -196,8 +197,6 @@ public class Campaign implements Serializable, ITechManager {
     private GameOptions gameOptions;
 
     private String name;
-
-    private RandomNameGenerator rng = RandomNameGenerator.getInstance();
 
     // hierarchically structured Force object to define TO&E
     private Force forces;
@@ -412,10 +411,6 @@ public class Campaign implements Serializable, ITechManager {
 
     public DateFormat getShortDateFormatter() {
         return new SimpleDateFormat(shortDateFormat);
-    }
-
-    public RandomNameGenerator getRNG() {
-        return rng;
     }
 
     public String getCurrentSystemName() {
@@ -1652,7 +1647,6 @@ public class Campaign implements Serializable, ITechManager {
      */
     public AbstractPersonnelGenerator getPersonnelGenerator(AbstractFactionSelector factionSelector, AbstractPlanetSelector planetSelector) {
         DefaultPersonnelGenerator generator = new DefaultPersonnelGenerator(factionSelector, planetSelector);
-        generator.setNameGenerator(rng);
         generator.setSkillPreferences(getRandomSkillPreferences());
         return generator;
     }
@@ -4548,9 +4542,9 @@ public class Campaign implements Serializable, ITechManager {
         ranks.writeToXml(pw1, 3);
 
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "nameGen",
-                rng.getChosenFaction());
+                RandomNameGenerator.getInstance().getChosenFaction());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "percentFemale",
-                rng.getPercentFemale());
+                RandomGenderGenerator.getPercentFemale());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "overtime", overtime);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "gmMode", gmMode);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "showOverview", app.getCampaigngui()
@@ -4575,10 +4569,10 @@ public class Campaign implements Serializable, ITechManager {
         {
             pw1.println("\t\t<nameGen>");
             pw1.print("\t\t\t<faction>");
-            pw1.print(MekHqXmlUtil.escape(rng.getChosenFaction()));
+            pw1.print(MekHqXmlUtil.escape(RandomNameGenerator.getInstance().getChosenFaction()));
             pw1.println("</faction>");
             pw1.print("\t\t\t<percentFemale>");
-            pw1.print(rng.getPercentFemale());
+            pw1.print(RandomGenderGenerator.getPercentFemale());
             pw1.println("</percentFemale>");
             pw1.println("\t\t</nameGen>");
         }

@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import javax.swing.*;
 
+import megamek.client.RandomNameGenerator;
 import mekhq.campaign.personnel.*;
 import org.joda.time.DateTime;
 
@@ -894,9 +895,9 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     }//GEN-LAST:event_btnOkActionPerformed
 
     private void randomName() {
-        String[] name = campaign.getRNG().generateGivenNameSurnameSplit(
-                choiceGender.getSelectedIndex() == Crew.G_FEMALE,
-                person.isClanner(), person.getOriginFaction().getShortName());
+        String[] name = RandomNameGenerator.getInstance().generateGivenNameSurnameSplit(
+                choiceGender.getSelectedIndex(), person.isClanner(),
+                person.getOriginFaction().getShortName());
         textGivenName.setText(name[0]);
         textSurname.setText(name[1]);
     }

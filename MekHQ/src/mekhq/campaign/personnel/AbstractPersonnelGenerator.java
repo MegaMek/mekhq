@@ -22,6 +22,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Objects;
 
+import megamek.client.RandomGenderGenerator;
 import megamek.client.RandomNameGenerator;
 import megamek.common.Compute;
 import megamek.common.Crew;
@@ -34,25 +35,7 @@ import mekhq.campaign.RandomSkillPreferences;
  * for a {@link Campaign}.
  */
 public abstract class AbstractPersonnelGenerator {
-    private RandomNameGenerator randomNameGenerator = RandomNameGenerator.getInstance();
-
     private RandomSkillPreferences rSkillPrefs = new RandomSkillPreferences();
-
-    /**
-     * Gets the {@link RandomNameGenerator}.
-     * @return The {@link RandomNameGenerator} to use.
-     */
-    public RandomNameGenerator getNameGenerator() {
-        return randomNameGenerator;
-    }
-
-    /**
-     * Sets the {@link RandomNameGenerator}.
-     * @param rng A {@link RandomNameGenerator} to use.
-     */
-    public void setNameGenerator(RandomNameGenerator rng) {
-        randomNameGenerator = Objects.requireNonNull(rng);
-    }
 
     /**
      * Gets the {@link RandomSkillPreferences}.
@@ -113,16 +96,13 @@ public abstract class AbstractPersonnelGenerator {
      * @param gender The person's gender, or a randomize value
      */
     protected void generateName(Person person, int gender) {
-        boolean isFemale = gender == Crew.G_RANDOMIZE
-                ? getNameGenerator().isFemale()
-                : gender == Crew.G_FEMALE;
-
-        if (isFemale) {
-            person.setGender(Crew.G_FEMALE);
+        if (gender == Crew.G_RANDOMIZE) {
+            gender = RandomGenderGenerator.generate();
         }
+        person.setGender(gender);
 
-        String[] name = getNameGenerator().generateGivenNameSurnameSplit(isFemale, person.isClanner(),
-                person.getOriginFaction().getShortName());
+        String[] name = RandomNameGenerator.getInstance().generateGivenNameSurnameSplit(gender,
+                person.isClanner(), person.getOriginFaction().getShortName());
         person.setGivenName(name[0]);
         person.setSurname(name[1]);
     }
