@@ -18,7 +18,6 @@
  */
 package mekhq.gui.model;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -46,6 +45,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.gui.BasicInfo;
+import mekhq.gui.MekHqColors;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 /**
@@ -60,6 +60,8 @@ public class PersonnelTableModel extends DataTableModel {
     private PersonnelMarket personnelMarket;
     private boolean loadAssignmentFromMarket;
     private boolean groupByUnit;
+
+    private final MekHqColors colors = new MekHqColors();
 
     public static final int COL_RANK            = 0;
     public static final int COL_NAME            = 1;
@@ -276,15 +278,15 @@ public class PersonnelTableModel extends DataTableModel {
             return p.getAbilityList(PilotOptions.MD_ADVANTAGES);
         case COL_ASSIGN:
             if ((p.getTechUnitIDs().size() > 1) && !loadAssignmentFromMarket) {
-                String toReturn = "<html>";
+                StringBuilder toReturn = new StringBuilder("<html>");
                 for (UUID id : p.getTechUnitIDs()) {
                     Unit u = getCampaign().getUnit(id);
                     if (null != u) {
-                        toReturn += u.getName() + "<br>";
+                        toReturn.append(u.getName()).append("<br>");
                     }
                 }
-                toReturn += "</html>";
-                return toReturn;
+                toReturn.append("</html>");
+                return toReturn.toString();
             } else {
                 return null;
             }
@@ -551,15 +553,10 @@ public class PersonnelTableModel extends DataTableModel {
             case COL_ASSIGN:
                 if (loadAssignmentFromMarket) {
                     Entity en = personnelMarket.getAttachedEntity(p);
-
-                    if (null == en) {
-                        return "-";
-                    }
-
-                    return en.getDisplayName();
+                    return ((en != null) ?  en.getDisplayName() : "-");
                 } else {
                     Unit u = getCampaign().getUnit(p.getUnitId());
-                    if (null != u) {
+                    if (u != null) {
                         String name = u.getName();
                         if (u.getEntity() instanceof Tank) {
                             if (u.isDriver(p)) {
@@ -581,11 +578,12 @@ public class PersonnelTableModel extends DataTableModel {
                         }
                         return name;
                     }
+
                     //check for tech
                     if (!p.getTechUnitIDs().isEmpty()) {
                         if (p.getTechUnitIDs().size() == 1) {
                             u = getCampaign().getUnit(p.getTechUnitIDs().get(0));
-                            if (null != u) {
+                            if (u != null) {
                                 return u.getName() + " (" + p.getMaintenanceTimeUsing() + "m)";
                             }
                         } else {
@@ -689,11 +687,14 @@ public class PersonnelTableModel extends DataTableModel {
                 setForeground(UIManager.getColor("Table.selectionForeground"));
             } else {
                 if (isDeployed(actualRow)) {
-                    setBackground(Color.LIGHT_GRAY);
+                    colors.getDeployed().getColor().ifPresent(this::setBackground);
+                    colors.getDeployed().getAlternateColor().ifPresent(this::setForeground);
                 } else if ((Integer.parseInt((String) getValueAt(actualRow,COL_HITS)) > 0) || getPerson(actualRow).hasInjuries(true)) {
-                    setBackground(Color.RED);
+                    colors.getInjured().getColor().ifPresent(this::setBackground);
+                    colors.getInjured().getAlternateColor().ifPresent(this::setForeground);
                 } else if (getPerson(actualRow).hasOnlyHealedPermanentInjuries()) {
-                    setBackground(new Color(0xee9a00));
+                    colors.getHealedInjuries().getColor().ifPresent(this::setBackground);
+                    colors.getHealedInjuries().getAlternateColor().ifPresent(this::setForeground);
                 } else {
                     setBackground(UIManager.getColor("Table.background"));
                 }
@@ -733,10 +734,10 @@ public class PersonnelTableModel extends DataTableModel {
                         setText(en != null ? en.getDisplayName() : "-");
                     } else {
                         Unit u = getCampaign().getUnit(p.getUnitId());
-                        if (!p.getTechUnitIDs().isEmpty()) {
+                        if ((u == null) && !p.getTechUnitIDs().isEmpty()) {
                             u = getCampaign().getUnit(p.getTechUnitIDs().get(0));
                         }
-                        if (null != u) {
+                        if (u != null) {
                             String desc = "<b>" + u.getName() + "</b><br>";
                             desc += u.getEntity().getWeightClassName();
                             if ((!(u.getEntity() instanceof SmallCraft) || !(u.getEntity() instanceof Jumpship))) {
@@ -745,7 +746,7 @@ public class PersonnelTableModel extends DataTableModel {
                             desc += "<br>" + u.getStatus() + "";
                             setText(desc);
                             Image mekImage = getImageFor(u);
-                            if (null != mekImage) {
+                            if (mekImage != null) {
                                 setImage(mekImage);
                             } else {
                                 clearImage();
@@ -758,17 +759,18 @@ public class PersonnelTableModel extends DataTableModel {
                 case COL_FORCE:
                     Force force = getCampaign().getForceFor(p);
                     if (null != force) {
-                        String desc = "<html><b>" + force.getName() + "</b>";
+                        StringBuilder desc = new StringBuilder("<html><b>").append(force.getName())
+                                .append("</b>");
                         Force parent = force.getParentForce();
                         //cut off after three lines and don't include the top level
                         int lines = 1;
                         while ((parent != null) && (parent.getParentForce() != null) && (lines < 4)) {
-                            desc += "<br>" + parent.getName();
+                            desc.append("<br>").append(parent.getName());
                             lines++;
                             parent = parent.getParentForce();
                         }
-                        desc += "</html>";
-                        setText(desc);
+                        desc.append("</html>");
+                        setHtmlText(desc.toString());
                         Image forceImage = getImageFor(force);
                         if (null != forceImage) {
                             setImage(forceImage);
@@ -786,7 +788,7 @@ public class PersonnelTableModel extends DataTableModel {
                     } else {
                         clearImage();
                     }
-                    setText("");
+                    setHtmlText("");
                     break;
             }
 

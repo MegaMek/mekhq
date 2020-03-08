@@ -18,12 +18,12 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -68,7 +68,7 @@ public class AtBGameThread extends GameThread {
         super(name, c, app, units, started);
         this.scenario = scenario;
     }
-    
+
     // String tokens for dialog boxes used for transport loading
     private static final String LOAD_FTR_DIALOG_TEXT = "Would you like the fighters assigned to %s to deploy loaded into its bays?";
     private static final String LOAD_FTR_DIALOG_TITLE = "Load Fighters on Transport?";
@@ -133,8 +133,8 @@ public class AtBGameThread extends GameThread {
                     mapSettings.setMedium(MapSettings.MEDIUM_SPACE);
                 } else {
                     File mapgenFile = new File("data/mapgen/" + scenario.getMap() + ".xml");
-                    try {
-                        mapSettings = MapSettings.getInstance(new FileInputStream(mapgenFile));
+                    try (InputStream is = new FileInputStream(mapgenFile)) {
+                        mapSettings = MapSettings.getInstance(is);
                     } catch (FileNotFoundException ex) {
                         MekHQ.getLogger().log(getClass(), "run", LogLevel.ERROR, //$NON-NLS-1$
                                 "Could not load map file data/mapgen/" + scenario.getMap() + ".xml"); //$NON-NLS-1$
@@ -191,13 +191,13 @@ public class AtBGameThread extends GameThread {
                 for (Unit unit : units) {
                     // Get the Entity
                     Entity entity = unit.getEntity();
-                    // Set the TempID for autoreporting
+                    // Set the TempID for auto reporting
                     entity.setExternalIdAsString(unit.getId().toString());
                     // Set the owner
                     entity.setOwner(client.getLocalPlayer());
                     if (!unit.getTransportedUnits().isEmpty()) {
                         //Store this unit as a potential transport to load
-                        scenario.getPlayerTransportLinkages().put(unit.getId(), new ArrayList<UUID>());
+                        scenario.getPlayerTransportLinkages().put(unit.getId(), new ArrayList<>());
                     }
                     // If this unit is a spacecraft, set the crew size and marine size values
                     if (entity.isLargeCraft() || entity.getUnitType() == UnitType.SMALL_CRAFT) {
@@ -240,7 +240,7 @@ public class AtBGameThread extends GameThread {
                             if (!scenario.getPlayerTransportLinkages().containsKey(trnId)) {
                                 continue;
                             }
-                        
+
                             scenario.addPlayerTransportRelationship(trnId, unit.getId());
                             // Set these flags so we know what prompts to display later
                             if (unit.getEntity().isAero()) {
@@ -317,7 +317,7 @@ public class AtBGameThread extends GameThread {
                     swingGui.getBots().put(name, botClient);
 
                     configureBot(botClient, bf);
-                    
+
                     // we need to wait until the game has actually started to do transport loading
                     // This will load the bot's infantry into APCs
                     if(scenario instanceof AtBScenario) {

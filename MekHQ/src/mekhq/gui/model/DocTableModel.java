@@ -1,6 +1,5 @@
 package mekhq.gui.model;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.util.ArrayList;
 
@@ -18,8 +17,8 @@ import mekhq.gui.BasicInfo;
 public class DocTableModel extends DataTableModel {
     private static final long serialVersionUID = -6934834363013004894L;
 
-    private Campaign campaign;
-    
+    private final Campaign campaign;
+
     public DocTableModel(Campaign c) {
         columnNames = new String[] { "Doctors" };
         data = new ArrayList<Person>();
@@ -33,7 +32,7 @@ public class DocTableModel extends DataTableModel {
     public Person getDoctorAt(int row) {
         return (Person) data.get(row);
     }
-    
+
     public Campaign getCampaign() {
         return campaign;
     }
@@ -52,18 +51,16 @@ public class DocTableModel extends DataTableModel {
         public Component getTableCellRendererComponent(JTable table,
                 Object value, boolean isSelected, boolean hasFocus,
                 int row, int column) {
-            Component c = this;
-            setOpaque(true);
             setPortrait(getDoctorAt(row));
-            setText(getValueAt(row, column).toString(), "black");
-            //setToolTipText(getCampaign().getTargetFor(getDoctorAt(row), getDoctorAt(row)).getDesc());
+            setHtmlText(getValueAt(row, column).toString());
             if (isSelected) {
                 highlightBorder();
             } else {
                 unhighlightBorder();
             }
-            c.setBackground(new Color(220, 220, 220));
-            return c;
+            setBackground(table.getBackground());
+            setForeground(table.getForeground());
+            return this;
         }
 
     }

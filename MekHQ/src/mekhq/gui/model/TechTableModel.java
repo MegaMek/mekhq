@@ -1,6 +1,5 @@
 package mekhq.gui.model;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.util.ArrayList;
 
@@ -61,7 +60,7 @@ public class TechTableModel extends DataTableModel {
             int actualRow = table.convertRowIndexToModel(row);
             setOpaque(true);
             setPortrait(getTechAt(actualRow));
-            setText(getTechAt(actualRow).getTechDesc(getCampaign().isOvertimeAllowed(), panel.getSelectedTask()));
+            setHtmlText(getTechAt(actualRow).getTechDesc(getCampaign().isOvertimeAllowed(), panel.getSelectedTask()));
             if (isSelected) {
                 highlightBorder();
             } else {

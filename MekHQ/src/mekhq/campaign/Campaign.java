@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign;
 
 import java.io.File;
@@ -48,7 +47,6 @@ import megamek.common.BattleArmor;
 import megamek.common.BombType;
 import megamek.common.Compute;
 import megamek.common.ConvFighter;
-import megamek.common.Coords;
 import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
@@ -93,6 +91,7 @@ import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.GMModeEvent;
 import mekhq.campaign.event.LoanNewEvent;
 import mekhq.campaign.event.LoanPaidEvent;
+import mekhq.campaign.event.LocationChangedEvent;
 import mekhq.campaign.event.MedicPoolChangedEvent;
 import mekhq.campaign.event.MissionNewEvent;
 import mekhq.campaign.event.NetworkChangedEvent;
@@ -239,7 +238,7 @@ public class Campaign implements Serializable, ITechManager {
 
     private String name;
 
-    private RandomNameGenerator rng;
+    private RandomNameGenerator rng = RandomNameGenerator.getInstance();
 
     // hierarchically structured Force object to define TO&E
     private Force forces;
@@ -321,8 +320,6 @@ public class Campaign implements Serializable, ITechManager {
         dateFormat = "EEEE, MMMM d yyyy";
         shortDateFormat = "yyyyMMdd";
         name = "My Campaign";
-        rng = new RandomNameGenerator();
-        rng.populateNames();
         overtime = false;
         gmMode = false;
         factionCode = "MERC";
@@ -461,10 +458,6 @@ public class Campaign implements Serializable, ITechManager {
 
     public RandomNameGenerator getRNG() {
         return rng;
-    }
-
-    public void setRNG(RandomNameGenerator g) {
-        this.rng = g;
     }
 
     public String getCurrentSystemName() {
@@ -976,22 +969,6 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     /**
-     * Add scenario to an existing mission. This method will also assign the scenario an id and place it in the scenarioId
-     * hash
-     *
-     * @param s - the Scenario to add
-     * @param m - the mission to add the new scenario to
-     */
-    public void addScenario(Scenario s, Mission m) {
-        int id = lastScenarioId + 1;
-        s.setId(id);
-        m.addScenario(s);
-        scenarios.put(id, s);
-        lastScenarioId = id;
-        MekHQ.triggerEvent(new ScenarioNewEvent(s));
-    }
-
-    /**
      * @return missions ArrayList sorted with complete missions at the bottom
      */
     public ArrayList<Mission> getSortedMissions() {
@@ -1009,12 +986,48 @@ public class Campaign implements Serializable, ITechManager {
         return missions.get(id);
     }
 
+    /**
+     * Add scenario to an existing mission. This method will also assign the scenario an id, provided
+     * that it is a new scenario. It then adds the scenario to the scenarioId hash.
+     *
+     * Scenarios with previously set ids can be sent to this mission, allowing one to remove
+     * and then re-add scenarios if needed. This functionality is used in the
+     * <code>AtBScenarioFactory</code> class in method <code>createScenariosForNewWeek</code> to
+     * ensure that scenarios are generated properly.
+     *
+     * @param s - the Scenario to add
+     * @param m - the mission to add the new scenario to
+     */
+    public void addScenario(Scenario s, Mission m) {
+        int id;
+        if (s.getId() == Scenario.S_DEFAULT_ID) {
+            id = ++lastScenarioId;
+            s.setId(id);
+        } else {
+            // Scenario has already been assigned an Id, so just use its assigned value
+            id = s.getId();
+        }
+        m.addScenario(s);
+        scenarios.put(id, s);
+        MekHQ.triggerEvent(new ScenarioNewEvent(s));
+    }
+
     public Scenario getScenario(int id) {
         return scenarios.get(id);
     }
 
     public void setLocation(CurrentLocation l) {
         location = l;
+    }
+
+    /**
+     * Moves immediately to a {@link PlanetarySystem}.
+     * @param s The {@link PlanetarySystem} the campaign
+     *          has been moved to.
+     */
+    public void moveToPlanetarySystem(PlanetarySystem s) {
+        setLocation(new CurrentLocation(s, 0.0));
+        MekHQ.triggerEvent(new LocationChangedEvent(getLocation(), false));
     }
 
     public CurrentLocation getLocation() {
@@ -1214,20 +1227,43 @@ public class Campaign implements Serializable, ITechManager {
         return units.get(id);
     }
 
+    /**
+     *
+     * @param p         the person being added
+     * @return          true if the person is hired successfully, otherwise false
+     */
     public boolean recruitPerson(Person p) {
-        return recruitPerson(p, false, true);
+        return recruitPerson(p, false, false, false, true);
     }
 
-    public boolean recruitPerson(Person p, boolean log) {
-        return recruitPerson(p, false, log);
+    /**
+     *
+     * @param p         the person being added
+     * @param gmAdd     false means that they need to pay to hire this person, provided that
+     *                  the campaign option to pay for new hires is set, while
+     *                  true means they are added without paying
+     * @return          true if the person is hired successfully, otherwise false
+     */
+    public boolean recruitPerson(Person p, boolean gmAdd) {
+        return recruitPerson(p, false,  false, gmAdd, true);
     }
 
-    public boolean recruitPerson(Person p, boolean prisoner, boolean log) {
+    /**
+     *
+     * @param p         the person being added
+     * @param prisoner  if the person is a prisoner or not. True means they are a prisoner
+     * @param dependent if the person is a dependent or not. True means they are a dependent
+     * @param gmAdd     false means that they need to pay to hire this person, true means it is added without paying
+     * @param log       whether or not to write to logs
+     * @return          true if the person is hired successfully, otherwise false
+     */
+    public boolean recruitPerson(Person p, boolean prisoner, boolean dependent, boolean gmAdd, boolean log) {
         if (p == null) {
             return false;
         }
-        // Only pay if option set and this isn't a prisoner or bondsman
-        if (getCampaignOptions().payForRecruitment() && !prisoner) {
+
+        // Only pay if option set, they weren't GM added, and they aren't a dependent, prisoner or bondsman
+        if (getCampaignOptions().payForRecruitment() && !dependent && !gmAdd && !prisoner) {
             if (!getFinances().debit(p.getSalary().multipliedBy(2), Transaction.C_SALARY,
                     "recruitment of " + p.getFullName(), getCalendar().getTime())) {
                 addReport("<font color='red'><b>Insufficient funds to recruit "
@@ -1235,16 +1271,13 @@ public class Campaign implements Serializable, ITechManager {
                 return false;
             }
         }
+
         UUID id = UUID.randomUUID();
-        while (null != personnel.get(id)) {
-            id = UUID.randomUUID();
-        }
         p.setId(id);
         personnel.put(id, p);
 
-        //TODO: implement a boolean check based on campaign options
-        boolean bondsman = false;
-        String add = prisoner ? " as a prisoner" : bondsman ? " as a bondsman" : "";
+        boolean bondsman = campaignOptions.getDefaultPrisonerStatus() == CampaignOptions.BONDSMAN_RANK;
+        String add = prisoner ? (bondsman ? " as a bondsman" : " as a prisoner") : "";
         if (log) {
             addReport(String.format("%s has been added to the personnel roster%s.", p.getHyperlinkedName(), add));
         }
@@ -1275,11 +1308,19 @@ public class Campaign implements Serializable, ITechManager {
                 ServiceLogger.joined(p, getDate(), getName(), rankEntry);
             }
         }
+
+        // Add their recruitment date if using track time in service
+        if (getCampaignOptions().getUseTimeInService() && !prisoner && !dependent) {
+            GregorianCalendar recruitmentDate = (GregorianCalendar) getCalendar().clone();
+            p.setRecruitment(recruitmentDate);
+        }
+
         MekHQ.triggerEvent(new PersonNewEvent(p));
         return true;
     }
 
     /** Adds a person to the campaign unconditionally, without paying for the person. */
+    @Deprecated // as part of the personnel changes, 23-Feb-2020
     public void addPerson(Person p) {
         if (p == null) {
             return;
@@ -1313,10 +1354,12 @@ public class Campaign implements Serializable, ITechManager {
      * Imports a {@link Person} into a campaign.
      * @param p A {@link Person} to import into the campaign.
      */
+    @Deprecated // as part of the personnel changes, 23-Feb-2020
     public void importPerson(Person p) {
         addPersonWithoutId(p);
     }
 
+    @Deprecated // as part of the personnel changes, 23-Feb-2020
     private void addPersonWithoutId(Person p) {
         personnel.put(p.getId(), p);
         MekHQ.triggerEvent(new PersonNewEvent(p));
@@ -3053,7 +3096,7 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
-            AtBScenarioFactory.createScenariosForNewWeek(this, true);
+            AtBScenarioFactory.createScenariosForNewWeek(this);
         }
 
         for (Mission m : getMissions()) {
@@ -3383,7 +3426,7 @@ public class Campaign implements Serializable, ITechManager {
             return false;
         }
 
-        this.autosaveService.requestDayAdvanceAutosave(this, this.calendar.get(Calendar.DAY_OF_WEEK));
+        this.autosaveService.requestDayAdvanceAutosave(this, this.calendar);
 
         calendar.add(Calendar.DAY_OF_MONTH, 1);
         currentDateTime = new DateTime(calendar);
@@ -3879,12 +3922,10 @@ public class Campaign implements Serializable, ITechManager {
         shoppingList.restore();
 
         if (getCampaignOptions().getUseAtB()) {
-            RandomNameGenerator.initialize();
             RandomFactionGenerator.getInstance().startup(this);
 
             int loops = 0;
-            while (!RandomUnitGenerator.getInstance().isInitialized()
-                || !RandomNameGenerator.getInstance().isInitialized()) {
+            while (!RandomUnitGenerator.getInstance().isInitialized()) {
                 try {
                     Thread.sleep(50);
                     if (++loops > 20) {
@@ -4669,7 +4710,7 @@ public class Campaign implements Serializable, ITechManager {
      */
     public AbstractPersonnelGenerator getPersonnelGenerator(AbstractFactionSelector factionSelector, AbstractPlanetSelector planetSelector) {
         DefaultPersonnelGenerator generator = new DefaultPersonnelGenerator(factionSelector, planetSelector);
-        generator.setNameGenerator(getRNG());
+        generator.setNameGenerator(rng);
         generator.setSkillPreferences(getRandomSkillPreferences());
         return generator;
     }
@@ -5249,109 +5290,107 @@ public class Campaign implements Serializable, ITechManager {
         // to transport the force. Smaller dropships are represented by half-dropships.
 
         // If we're transporting more than a company, Overlord analogues are more efficient.
-        if(noMech > 12) {
-            leasedLargeMechDropships = noMech / largeDropshipMechCapacity;
+        if (noMech > 12) {
+            leasedLargeMechDropships = noMech / (double) largeDropshipMechCapacity;
             noMech -= leasedLargeMechDropships * largeDropshipMechCapacity;
-            mechCollars += leasedLargeMechDropships;
+            mechCollars += (int) Math.ceil(leasedLargeMechDropships);
 
             // If there's more than a company left over, lease another Overlord. Otherwise
             // fall through and get a Union.
-            if(noMech > 12) {
+            if (noMech > 12) {
                 leasedLargeMechDropships += 1;
                 noMech -= largeDropshipMechCapacity;
                 mechCollars += 1;
             }
 
             leasedASFCapacity += leasedLargeMechDropships * largeMechDropshipASFCapacity;
-            leasedCargoCapacity += largeMechDropshipCargoCapacity;
+            leasedCargoCapacity += (int) Math.floor(largeMechDropshipCargoCapacity);
         }
 
         // Unions
-        if(noMech > 0) {
-            leasedAverageMechDropships = noMech / averageDropshipMechCapacity;
+        if (noMech > 0) {
+            leasedAverageMechDropships = noMech / (double) averageDropshipMechCapacity;
             noMech -= leasedAverageMechDropships * averageDropshipMechCapacity;
-            mechCollars += leasedAverageMechDropships;
+            mechCollars += (int) Math.ceil(leasedAverageMechDropships);
 
-            // If we can fit in a smaller dropship, lease one of those instead.
-            if(noMech > 0 && noMech < (averageDropshipMechCapacity / 2)) {
+            // If we can fit in a smaller DropShip, lease one of those instead.
+            if ((noMech > 0) && (noMech < (averageDropshipMechCapacity / 2))) {
                 leasedAverageMechDropships += 0.5;
                 mechCollars += 1;
-            }
-            else if(noMech > 0){
+            } else if (noMech > 0) {
                 leasedAverageMechDropships += 1;
                 mechCollars += 1;
             }
 
-            // Our Union-ish dropship can carry some ASFs and cargo.
+            // Our Union-ish DropShip can carry some ASFs and cargo.
             leasedASFCapacity += (int) Math.floor(leasedAverageMechDropships * mechDropshipASFCapacity);
             leasedCargoCapacity += (int) Math.floor(leasedAverageMechDropships * mechDropshipCargoCapacity);
         }
 
         // Leopard CVs
-        if(noASF > leasedASFCapacity) {
+        if (noASF > leasedASFCapacity) {
             noASF -= leasedASFCapacity;
 
-            if(noASF > 0) {
-                leasedAverageASFDropships = noASF / averageDropshipASFCapacity;
+            if (noASF > 0) {
+                leasedAverageASFDropships = noASF / (double) averageDropshipASFCapacity;
                 noASF -= leasedAverageASFDropships * averageDropshipASFCapacity;
-                asfCollars += leasedAverageASFDropships;
+                asfCollars += (int) Math.ceil(leasedAverageASFDropships);
 
-                if (noASF > 0 && noASF < (averageDropshipASFCapacity / 2)) {
+                if ((noASF > 0) && (noASF < (averageDropshipASFCapacity / 2))) {
                     leasedAverageASFDropships += 0.5;
                     asfCollars += 1;
-                }
-                else if (noASF > 0) {
+                } else if (noASF > 0) {
                     leasedAverageASFDropships += 1;
                     asfCollars += 1;
                 }
             }
 
-            // Our Leopard-ish dropship can carry some cargo.
-            leasedCargoCapacity += (asfDropshipCargoCapacity * leasedAverageASFDropships);
+            // Our Leopard-ish DropShip can carry some cargo.
+            leasedCargoCapacity += (int) Math.floor(asfDropshipCargoCapacity * leasedAverageASFDropships);
         }
 
         // Triumphs
-        if(noVehicles > averageDropshipVehicleCapacity) {
-            leasedLargeVehicleDropships = noVehicles / largeDropshipVehicleCapacity;
+        if (noVehicles > averageDropshipVehicleCapacity) {
+            leasedLargeVehicleDropships = noVehicles / (double) largeDropshipVehicleCapacity;
             noVehicles -= leasedLargeVehicleDropships * largeDropshipVehicleCapacity;
-            vehicleCollars += leasedLargeVehicleDropships;
+            vehicleCollars += (int) Math.ceil(leasedLargeVehicleDropships);
 
-            if(noVehicles > averageDropshipVehicleCapacity) {
+            if (noVehicles > averageDropshipVehicleCapacity) {
                 leasedLargeVehicleDropships += 1;
                 noVehicles -= largeDropshipVehicleCapacity;
                 vehicleCollars += 1;
             }
 
-            leasedCargoCapacity += leasedLargeVehicleDropships * largeVehicleDropshipCargoCapacity;
+            leasedCargoCapacity += (int) Math.floor(leasedLargeVehicleDropships * largeVehicleDropshipCargoCapacity);
         }
 
         // Gazelles
-        if(noVehicles > 0) {
-            leasedAverageVehicleDropships = (nohv + newNolv) / averageDropshipVehicleCapacity;
-            noVehicles = (int)((nohv + newNolv) - leasedAverageVehicleDropships * averageDropshipVehicleCapacity);
-            vehicleCollars += leasedAverageVehicleDropships;
+        if (noVehicles > 0) {
+            leasedAverageVehicleDropships = (nohv + newNolv) / (double) averageDropshipVehicleCapacity;
+            noVehicles = (int) ((nohv + newNolv) - leasedAverageVehicleDropships * averageDropshipVehicleCapacity);
+            vehicleCollars += (int) Math.ceil(leasedAverageVehicleDropships);
 
             // Gazelles are pretty minimal, so no half-measures.
-            if(noVehicles > 0) {
+            if (noVehicles > 0) {
                 leasedAverageVehicleDropships += 1;
                 noVehicles -= averageDropshipVehicleCapacity;
                 vehicleCollars += 1;
             }
 
-            // Our Gazelle-ish dropship can carry some cargo.
-            leasedCargoCapacity += (vehicleDropshipCargoCapacity * leasedAverageVehicleDropships);
+            // Our Gazelle-ish DropShip can carry some cargo.
+            leasedCargoCapacity += (int) Math.floor(vehicleDropshipCargoCapacity * leasedAverageVehicleDropships);
         }
 
         // Do we have any leftover cargo?
         noCargo -= leasedCargoCapacity;
 
         // Mules
-        if(noCargo > averageDropshipCargoCapacity) {
-            leasedLargeCargoDropships = noCargo / largeDropshipCargoCapacity;
+        if (noCargo > averageDropshipCargoCapacity) {
+            leasedLargeCargoDropships = noCargo / (double) largeDropshipCargoCapacity;
             noCargo -= leasedLargeCargoDropships * largeDropshipCargoCapacity;
-            cargoCollars += leasedLargeCargoDropships;
+            cargoCollars += (int) Math.ceil(leasedLargeCargoDropships);
 
-            if(noCargo > averageDropshipCargoCapacity) {
+            if (noCargo > averageDropshipCargoCapacity) {
                 leasedLargeCargoDropships += 1;
                 noCargo -= largeDropshipCargoCapacity;
                 cargoCollars += 1;
@@ -5359,16 +5398,15 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         // Buccaneers
-        if(noCargo > 0) {
-            leasedAverageCargoDropships = noCargo / averageDropshipCargoCapacity;
-            cargoCollars += leasedAverageCargoDropships;
+        if (noCargo > 0) {
+            leasedAverageCargoDropships = noCargo / (double) averageDropshipCargoCapacity;
+            cargoCollars += (int) Math.ceil(leasedAverageCargoDropships);
             noCargo -= leasedAverageCargoDropships * averageDropshipCargoCapacity;
 
-            if(noCargo > 0 && noCargo < (averageDropshipCargoCapacity / 2)) {
+            if (noCargo > 0 && noCargo < (averageDropshipCargoCapacity / 2)) {
                 leasedAverageCargoDropships += 0.5;
                 cargoCollars += 1;
-            }
-            else if(noCargo > 0) {
+            } else if (noCargo > 0) {
                 leasedAverageCargoDropships += 1;
                 cargoCollars += 1;
             }
@@ -5385,31 +5423,30 @@ public class Campaign implements Serializable, ITechManager {
         dropshipCost = dropshipCost.plus(cargoDropshipCost.multipliedBy(leasedAverageCargoDropships));
         dropshipCost = dropshipCost.plus(largeCargoDropshipCost.multipliedBy(leasedLargeCargoDropships));
 
-        // Smaller/half-dropships are cheaper to rent, but still take one collar each
+        // Smaller/half-DropShips are cheaper to rent, but still take one collar each
         int collarsNeeded = mechCollars + asfCollars + vehicleCollars + cargoCollars;
 
-        // add owned dropships
+        // add owned DropShips
         collarsNeeded += nDropship;
 
-        // now factor in owned jumpships
+        // now factor in owned JumpShips
         collarsNeeded = Math.max(0, collarsNeeded - nCollars);
 
         Money totalCost = dropshipCost.plus(collarCost.multipliedBy(collarsNeeded));
 
         // FM:Mercs reimburses for owned transport (CamOps handles it in peacetime costs)
-        if(!excludeOwnTransports) {
+        if (!excludeOwnTransports) {
             Money ownDropshipCost = Money.zero();
             Money ownJumpshipCost = Money.zero();
-            for(Unit u : getUnits()) {
-                if(!u.isMothballed()) {
+            for (Unit u : getUnits()) {
+                if (!u.isMothballed()) {
                     Entity e = u.getEntity();
-                    if((e.getEntityType() & Entity.ETYPE_DROPSHIP) != 0) {
+                    if ((e.getEntityType() & Entity.ETYPE_DROPSHIP) != 0) {
                         ownDropshipCost = ownDropshipCost.plus(mechDropshipCost.multipliedBy(u.getMechCapacity()).dividedBy(averageDropshipMechCapacity));
                         ownDropshipCost = ownDropshipCost.plus(asfDropshipCost.multipliedBy(u.getASFCapacity()).dividedBy(averageDropshipASFCapacity));
                         ownDropshipCost = ownDropshipCost.plus(vehicleDropshipCost.multipliedBy(u.getHeavyVehicleCapacity() + u.getLightVehicleCapacity()).dividedBy(averageDropshipVehicleCapacity));
                         ownDropshipCost = ownDropshipCost.plus(cargoDropshipCost.multipliedBy(u.getCargoCapacity()).dividedBy(averageDropshipCargoCapacity));
-                    }
-                    else if((e.getEntityType() & Entity.ETYPE_JUMPSHIP) != 0) {
+                    } else if ((e.getEntityType() & Entity.ETYPE_JUMPSHIP) != 0) {
                         ownJumpshipCost = ownDropshipCost.plus(collarCost.multipliedBy(e.getDockingCollars().size()));
                     }
                 }
@@ -6057,9 +6094,9 @@ public class Campaign implements Serializable, ITechManager {
         personUpdated(person);
         MekHQ.triggerEvent(new PersonChangedEvent(person));
         if (report) {
-            if (rank > oldRank || (rank == oldRank && rankLevel > oldRankLevel)) {
+            if (rank > oldRank || ((rank == oldRank) && (rankLevel > oldRankLevel))) {
                 ServiceLogger.promotedTo(person, getDate());
-            } else if (rank < oldRank || (rank == oldRank && rankLevel < oldRankLevel)) {
+            } else if ((rank < oldRank) || (rankLevel < oldRankLevel)) {
                 ServiceLogger.demotedTo(person, getDate());
             }
         }
@@ -6081,6 +6118,10 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
         return options;
+    }
+
+    public void setGameOptions(GameOptions gameOptions) {
+        this.gameOptions = gameOptions;
     }
 
     public void setGameOptions(Vector<IBasicOption> options) {
@@ -8291,7 +8332,6 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         setAtBConfig(AtBConfiguration.loadFromXml());
-        RandomNameGenerator.initialize();
         RandomFactionGenerator.getInstance().startup(this);
         getContractMarket().generateContractOffers(this, newCampaign);
         getUnitMarket().generateUnitOffers(this);
@@ -8304,7 +8344,6 @@ public class Campaign implements Serializable, ITechManager {
     public void shutdownAtB() {
         RandomFactionGenerator.getInstance().dispose();
         RandomUnitGenerator.getInstance().dispose();
-        RandomNameGenerator.getInstance().dispose();
         atbEventProcessor.shutdown();
     }
 

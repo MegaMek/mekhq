@@ -65,6 +65,18 @@ public class PreferencesNode {
     }
 
     /**
+     * Adds new elements to be managed by this node.
+     * If there are initial vales set for this node,
+     * we will try to set an initial value for each element.
+     * @param elements elements to manage.
+     */
+    public void manage(PreferenceElement... elements) {
+        for (PreferenceElement element : elements) {
+            manage(element);
+        }
+    }
+
+    /**
      * The class which preferences we are storing in this node.
      * @return the class stored in this node.
      */

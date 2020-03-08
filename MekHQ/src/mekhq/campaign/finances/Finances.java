@@ -197,7 +197,7 @@ public class Finances implements Serializable {
             asset.writeToXml(pw1, indent+1);
         }
         if (null != wentIntoDebt) {
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); //TODO : Remove inline date format
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "wentIntoDebt", df.format(wentIntoDebt));
         }
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</finances>");
@@ -217,11 +217,10 @@ public class Finances implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("loanDefaults")) {
                 retVal.loanDefaults = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("wentIntoDebt")) {
-                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); //TODO : Remove inline date format
                 try {
                     retVal.wentIntoDebt = df.parse(wn2.getTextContent().trim());
                 } catch (DOMException | ParseException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }
@@ -482,13 +481,14 @@ public class Finances implements Serializable {
                 .minus(getTotalLoanCollateral());
     }
 
-    public String exportFinances(String path, String format) {
+    public String exportFinancesToCSV(String path, String format) {
         String report;
 
-        try {
-            BufferedWriter writer = Files.newBufferedWriter(Paths.get(path));
-            CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader("Date", "Category", "Description", "Amount", "RunningTotal"));
-            SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(path));
+             CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT
+                     .withHeader("Date", "Category", "Description", "Amount", "RunningTotal"))) {
+
+            SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd"); //TODO : Remove inline date format
 
             Money runningTotal = Money.zero();
             for (Transaction transaction : transactions) {
@@ -502,10 +502,9 @@ public class Finances implements Serializable {
             }
 
             csvPrinter.flush();
-            csvPrinter.close();
 
             report = transactions.size() + " " + resourceMap.getString("FinanceExport.text");
-        } catch(IOException ioe) {
+        } catch (IOException ioe) {
             MekHQ.getLogger().log(getClass(), "exportFinances", LogLevel.INFO, "Error exporting finances to " + format);
             report = "Error exporting finances. See log for details.";
         }

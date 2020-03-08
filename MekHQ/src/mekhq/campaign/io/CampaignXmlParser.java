@@ -907,8 +907,7 @@ public class CampaignXmlParser {
                         retVal.setCamoFileName(val);
                     }
                 } else if (xn.equalsIgnoreCase("colorIndex")) {
-                    retVal.setColorIndex(Integer.parseInt(wn.getTextContent()
-                            .trim()));
+                    retVal.setColorIndex(Integer.parseInt(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("nameGen")) {
                     // First, get all the child nodes;
                     NodeList nl2 = wn.getChildNodes();
@@ -919,9 +918,8 @@ public class CampaignXmlParser {
                         }
                         if (wn2.getNodeName().equalsIgnoreCase("faction")) {
                             retVal.getRNG().setChosenFaction(wn2.getTextContent().trim());
-                        } else if (wn2.getNodeName().equalsIgnoreCase(
-                                "percentFemale")) {
-                            retVal.getRNG().setPerentFemale(Integer.parseInt(wn2.getTextContent().trim()));
+                        } else if (wn2.getNodeName().equalsIgnoreCase("percentFemale")) {
+                            retVal.getRNG().setPercentFemale(Integer.parseInt(wn2.getTextContent().trim()));
                         }
                     }
                 } else if (xn.equalsIgnoreCase("currentReport")) {
@@ -1809,11 +1807,11 @@ public class CampaignXmlParser {
     }
 
     private static void updatePlanetaryEventsFromXML(Node wn) {
-    	
+
         Systems.reload(true);
 
         List<Planet.PlanetaryEvent> events;
-        Map<Integer, List<Planet.PlanetaryEvent>> eventsMap = new HashMap<>();; 
+        Map<Integer, List<Planet.PlanetaryEvent>> eventsMap = new HashMap<>();;
 
         NodeList wList = wn.getChildNodes();
         for (int x = 0; x < wList.getLength(); x++) {
@@ -1828,7 +1826,7 @@ public class CampaignXmlParser {
                 NodeList systemNodes = wn2.getChildNodes();
                 String systemId = null;
                 List<PlanetarySystem.PlanetarySystemEvent> sysEvents = new ArrayList<>();
-                eventsMap.clear(); 
+                eventsMap.clear();
                 for(int n = 0; n < systemNodes.getLength(); ++n) {
                     Node systemNode = systemNodes.item(n);
                     if(systemNode.getNodeType() != Node.ELEMENT_NODE) {
@@ -1859,7 +1857,7 @@ public class CampaignXmlParser {
                                     event.custom = true;
                                     events.add(event);
                                 }
-                            } 
+                            }
                         }
                         if(sysPos > 0 && !events.isEmpty()) {
                         	eventsMap.put(sysPos, events);
@@ -1868,18 +1866,18 @@ public class CampaignXmlParser {
                 }
                 if(null != systemId) {
                 	//iterate through events hash and assign events to planets
-                	Iterator<Map.Entry<Integer, List<PlanetaryEvent>>> it = eventsMap.entrySet().iterator();           
-                    while (it.hasNext()) { 
-                        Map.Entry<Integer, List<PlanetaryEvent>> pair = it.next(); 
+                	Iterator<Map.Entry<Integer, List<PlanetaryEvent>>> it = eventsMap.entrySet().iterator();
+                    while (it.hasNext()) {
+                        Map.Entry<Integer, List<PlanetaryEvent>> pair = it.next();
                         Systems.getInstance().updatePlanetaryEvents(systemId, pair.getValue(), true, pair.getKey());
-                    } 
+                    }
                     //check for system-wide events
                     if(!sysEvents.isEmpty()) {
                     	Systems.getInstance().updatePlanetarySystemEvents(systemId, sysEvents, true);
                     }
                 }
             }
-            
+
             //legacy code for before switch to planetary systems if planet is at top level
             if (wn2.getNodeName().equalsIgnoreCase("planet")) {
                 NodeList planetNodes = wn2.getChildNodes();

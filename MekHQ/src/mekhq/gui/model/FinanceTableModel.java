@@ -1,14 +1,11 @@
 package mekhq.gui.model;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellRenderer;
 
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
