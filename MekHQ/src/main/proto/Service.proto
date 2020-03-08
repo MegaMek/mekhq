@@ -1,0 +1,103 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "mekhq.online";
+option java_outer_classname = "DistributedMekHQ";
+
+import "google/protobuf/any.proto";
+import "google/protobuf/timestamp.proto";
+
+package mekhqonline;
+
+service MekHQHost {
+    rpc Connect(ConnectionRequest) returns (ConnectionResponse) {}
+
+    rpc Disconnect(DisconnectionRequest) returns (DisconnectionResponse) {}
+
+    rpc MessageBus(stream ClientMessage) returns (stream ServerMessage) {}
+}
+
+// The request message containing the user's name.
+message ConnectionRequest {
+    string id = 1;
+    string version = 2;
+    string name = 3;
+    string date = 4;
+    string location = 5;
+    oneof password_option {
+        string password = 6;
+    }
+}
+
+// The response message containing the greetings
+message ConnectionResponse {
+    string id = 1;
+    string version = 2;
+    string name = 3;
+    string date = 4;
+    string location = 5;
+    repeated Campaign campaigns = 6;
+}
+
+message DisconnectionRequest {
+    string id = 1;
+}
+
+message DisconnectionResponse {
+    string id = 1;
+}
+
+message Campaign {
+    string id = 1;
+    string name = 2;
+    string date = 3;
+    int32 team = 4;
+    string location = 5;
+}
+
+message ClientMessage {
+    google.protobuf.Timestamp timestamp = 1;
+    string id = 2;
+    map<string, string> metadata = 3;
+    google.protobuf.Any message = 4;
+}
+
+message ServerMessage {
+    google.protobuf.Timestamp timestamp = 1;
+    string id = 2;
+    map<string, string> metadata = 3;
+    google.protobuf.Any message = 4;
+}
+
+message Ping {
+    string date = 1;
+    string location = 2;
+}
+
+message Pong {
+    string date = 1;
+    string location = 2;
+    repeated Campaign campaigns = 3;
+}
+
+message CampaignDateChanged {
+    string date = 1;
+}
+
+message GMModeChanged {
+    bool value = 1;
+}
+
+message TeamAssignmentChanged {
+    repeated TeamAssignment teams = 1;
+}
+
+message TeamAssignment {
+    string id = 1;
+    int32 team = 2;
+}
+
+message LocationChanged {
+    string location = 1;
+    bool is_gm_movement = 2;
+}
