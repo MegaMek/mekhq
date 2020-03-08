@@ -64,16 +64,17 @@ import mekhq.preferences.PreferencesNode;
  *
  */
 public class MassMothballDialog extends JDialog implements ActionListener, ListSelectionListener {
+    //region Variable Declarations
     private static final long serialVersionUID = -7435381378836891774L;
 
-    Map<Integer, List<Unit>> unitsByType = new HashMap<>();
-    Map<Integer, JList<Person>> techListsByUnitType = new HashMap<>();
-    Map<Integer, JLabel> timeLabelsByUnitType = new HashMap<>();
-    Campaign campaign;
-    boolean activating;
+    private Map<Integer, List<Unit>> unitsByType = new HashMap<>();
+    private Map<Integer, JList<Person>> techListsByUnitType = new HashMap<>();
+    private Map<Integer, JLabel> timeLabelsByUnitType = new HashMap<>();
+    private Campaign campaign;
+    private boolean activating;
 
-    JScrollPane scrollPane = new JScrollPane();
-    JPanel contentPanel = new JPanel();
+    private JPanel contentPanel = new JPanel();
+    //endregion Variable Declarations
 
     /**
      * Constructor
@@ -120,6 +121,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         gbc.gridy++;
         addExecuteButton(activating, gbc);
 
+        JScrollPane scrollPane = new JScrollPane();
         scrollPane.setViewportView(contentPanel);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setMaximumSize(new Dimension(600, 600));
