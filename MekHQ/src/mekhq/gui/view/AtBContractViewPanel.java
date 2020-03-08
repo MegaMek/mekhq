@@ -124,9 +124,10 @@ public class AtBContractViewPanel extends ScrollablePanel {
     }
 
     private void fillStats() {
+        // TODO : Switch me to use a modified RandomSkillsGenerator.levelNames
         String[] skillNames = {"Green", "Regular", "Veteran", "Elite"};
+        // TODO : Switch me to use IUnitRating
         String[] ratingNames = {"F", "D", "C", "B", "A"};
-
         lblStatus = new JLabel();
         lblLocation = new JLabel();
         txtLocation = new JLabel();

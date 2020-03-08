@@ -335,7 +335,7 @@ public class NewContractDialog extends javax.swing.JDialog {
 
 	protected void initPaymentBreakdownPanel(JPanel totalsPanel) {
         contractPaymentBreakdown = new ContractPaymentBreakdown(totalsPanel, contract, campaign);
-        contractPaymentBreakdown.display(0);
+        contractPaymentBreakdown.display(0, 1);
 	}
 
 	protected void initContractPanel(ResourceBundle resourceMap,
