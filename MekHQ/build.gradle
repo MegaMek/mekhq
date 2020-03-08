@@ -4,12 +4,17 @@ plugins {
     id 'application'
     id 'maven-publish'
     id 'edu.sc.seis.launch4j' version '2.4.4'
+    id 'com.google.protobuf' version '0.8.8'
 }
 
 sourceSets {
     main {
         java {
-            srcDirs = ['src']
+            srcDirs = [
+                'src',
+                'build/generated/source/proto/main/grpc',
+                'build/generated/source/proto/main/java'
+            ]
         }
         resources {
             srcDirs = ['resources']
@@ -61,10 +66,31 @@ dependencies {
     runtimeOnly 'org.glassfish.jaxb:jaxb-core:2.3.0'
     runtimeOnly 'com.sun.activation:javax.activation:1.2.0'
 
+    // gRPC for Distributed MekHQ
+    implementation 'io.grpc:grpc-netty-shaded:1.27.1'
+    implementation 'io.grpc:grpc-protobuf:1.27.1'
+    implementation 'io.grpc:grpc-stub:1.27.1'
+
     jarbundler 'com.ultramixer.jarbundler:jarbundler-core:3.3.0'
 
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.mockito:mockito-core:2.20.1'
+}
+
+protobuf {
+  protoc {
+    artifact = "com.google.protobuf:protoc:3.11.0"
+  }
+  plugins {
+    grpc {
+      artifact = 'io.grpc:protoc-gen-grpc-java:1.27.1'
+    }
+  }
+  generateProtoTasks {
+    all()*.plugins {
+      grpc {}
+    }
+  }
 }
 
 mainClassName = 'mekhq.MekHQ'
