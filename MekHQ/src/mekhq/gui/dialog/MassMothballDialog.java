@@ -80,7 +80,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
      * @param parent MekHQ frame
      * @param units An array of unit IDs to mothball/activate
      * @param campaign Campaign with which we're working
-     * @param activate Whether to activate or mothball
+     * @param activate true to activate, otherwise false for mothball
      */
     public MassMothballDialog(Frame parent, Unit[] units, Campaign campaign, boolean activate) {
         super(parent, "Mass Mothball/Activate");
@@ -88,6 +88,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
 
         sortUnitsByType(units);
         this.campaign = campaign;
+        this.activating = activate;
 
         contentPanel.setLayout(new GridBagLayout());
 
@@ -103,7 +104,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         JLabel instructionLabel = new JLabel();
         instructionLabel.setBorder(new LineBorder(Color.BLUE));
         instructionLabel.setText("<html>Choose the techs to carry out " +
-                (activate ? "activation" : "mothballing") + " operations on the displayed units. <br/>"
+                (activating ? "activation" : "mothballing") + " operations on the displayed units. <br/>"
                 + "A * indicates that the tech is currently maintaining units.</html>");
         contentPanel.add(instructionLabel, gbc);
 
@@ -117,7 +118,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         }
 
         gbc.gridy++;
-        addExecuteButton(activate, gbc);
+        addExecuteButton(activating, gbc);
 
         scrollPane.setViewportView(contentPanel);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -217,7 +218,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
 
     /**
      * Renders the mothball/activate button on the content pane
-     * @param activate Whether the button is "mothball" or "activate"
+     * @param activate true to activate, otherwise false for mothball
      * @param gbc the input gridBagConstraints to use
      */
     private void addExecuteButton(boolean activate, GridBagConstraints gbc) {
@@ -226,8 +227,10 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         gbc.weighty = 0.8;
         gbc.anchor = GridBagConstraints.CENTER;
         JButton buttonExecute = new JButton();
-        buttonExecute.setText(activate ? "Activate" : "Mothball");
-        buttonExecute.setActionCommand(activate ? UnitTableMouseAdapter.COMMAND_ACTIVATE : UnitTableMouseAdapter.COMMAND_MOTHBALL);
+        activating = activate;
+        buttonExecute.setText(activating ? "Activate" : "Mothball");
+        buttonExecute.setActionCommand(activating ? UnitTableMouseAdapter.COMMAND_ACTIVATE
+                : UnitTableMouseAdapter.COMMAND_MOTHBALL);
         buttonExecute.addActionListener(this);
         contentPanel.add(buttonExecute, gbc);
     }
