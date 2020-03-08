@@ -18,15 +18,28 @@
  */
 package mekhq.campaign;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.joda.time.DateTime;
+
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.Systems;
 
 /**
  * Manages the timeline of a {@link Campaign}.
  */
 public class CampaignController {
     private final Campaign localCampaign;
+    private final Map<UUID, RemoteCampaign> remoteCampaigns = new ConcurrentHashMap<>();
+    private final Map<UUID, UUID> activeCampaigns = new ConcurrentHashMap<>();
     private boolean isHost;
     private UUID host;
+    private DateTime hostDate;
+    private String hostName;
+    private PlanetarySystem hostLocation;
 
     /**
      * Creates a new {@code CampaignController} for
@@ -74,6 +87,39 @@ public class CampaignController {
         return isHost;
     }
 
+	public void setHostDate(DateTime date) {
+        hostDate = date;
+    }
+
+    public DateTime getHostDate() {
+        return hostDate;
+    }
+
+    public void setHostName(String name) {
+        hostName = name;
+    }
+
+	public void setHostLocation(String planetarySystemId) {
+        hostLocation = Systems.getInstance().getSystemById(planetarySystemId);
+	}
+
+	public void addRemoteCampaign(UUID id, String name, DateTime date, String locationId) {
+        PlanetarySystem planetarySystem = Systems.getInstance().getSystemById(locationId);
+        remoteCampaigns.put(id, new RemoteCampaign(id, name, date, planetarySystem));
+	}
+
+	public Collection<RemoteCampaign> getRemoteCampaigns() {
+		return remoteCampaigns.values();
+    }
+
+    public void addActiveCampaign(UUID id) {
+        activeCampaigns.put(id, id);
+    }
+
+	public void removeActiveCampaign(UUID id) {
+        activeCampaigns.remove(id);
+    }
+
     /**
      * Advances the local {@link Campaign} to the next day.
      */
@@ -83,7 +129,14 @@ public class CampaignController {
                 // TODO: notifyDayChangedEvent();
             }
         } else {
-            // TODO: requestNewDay();
+            if (getLocalCampaign().getDateTime().isBefore(getHostDate())) {
+                if (getLocalCampaign().newDay()) {
+                    // TODO: notifyDayChangedEvent
+                }
+            }
+            else {
+                // TODO: requestNewDay();
+            }
         }
     }
 }

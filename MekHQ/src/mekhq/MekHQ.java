@@ -34,6 +34,9 @@ import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.text.DefaultEditorKit;
 
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
+
 import megamek.MegaMek;
 import megamek.client.Client;
 import megamek.common.event.EventBus;
@@ -80,6 +83,8 @@ import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.preferences.StringPreference;
 import mekhq.gui.utilities.ObservableString;
+import mekhq.online.MekHQClient;
+import mekhq.online.MekHQServer;
 import mekhq.preferences.MekHqPreferences;
 import mekhq.preferences.PreferencesNode;
 import mekhq.service.AutosaveService;
@@ -129,6 +134,14 @@ public class MekHQ implements GameListener {
     private IconPackage iconPackage = new IconPackage();
 
     private final IAutosaveService autosaveService;
+
+    private final ResourceBundle resourceBundle = ResourceBundle.getBundle("mekhq.resources.MekHQ");
+
+    private boolean isHost;
+    private boolean isRemote;
+    private MekHQServer onlineServer;
+    private MekHQClient onlineClient;
+    private ManagedChannel channel;
 
 	/**
 	 * Converts the MekHQ {@link #VERBOSITY_LEVEL} to {@link LogLevel}.
@@ -285,11 +298,20 @@ public class MekHQ implements GameListener {
     /**
      * At startup create and show the main frame of the application.
      */
-    protected void startup() {
+    protected void startup(String[] args) {
         UIManager.installLookAndFeel("Flat Light", "com.formdev.flatlaf.FlatLightLaf");
         UIManager.installLookAndFeel("Flat IntelliJ", "com.formdev.flatlaf.FlatIntelliJLaf");
         UIManager.installLookAndFeel("Flat Dark", "com.formdev.flatlaf.FlatDarkLaf");
         UIManager.installLookAndFeel("Flat Darcula", "com.formdev.flatlaf.FlatDarculaLaf");
+
+        for (String arg : args) {
+            if ("--host".equalsIgnoreCase(arg)) {
+                setIsHosting(true);
+            }
+            else if ("--connect".equalsIgnoreCase(arg)) {
+                setIsConnecting(true);
+            }
+        }
 
         showInfo();
 
@@ -303,7 +325,27 @@ public class MekHQ implements GameListener {
         sud.setVisible(true);
     }
 
-    private void setUserPreferences() {
+    public String getVersion() {
+        return resourceBundle.getString("Application.version");
+    }
+
+    private void setIsConnecting(boolean b) {
+        isRemote = b;
+    }
+
+    public boolean isRemote() {
+        return isRemote;
+    }
+
+    private void setIsHosting(boolean b) {
+        isHost = b;
+    }
+
+    public boolean isHosting() {
+        return isHost;
+    }
+
+	private void setUserPreferences() {
         PreferencesNode preferences = getPreferences().forClass(MekHQ.class);
 
         selectedTheme = new ObservableString("selectedTheme", UIManager.getLookAndFeel().getClass().getName());
@@ -354,6 +396,21 @@ public class MekHQ implements GameListener {
     }
 
     public void showNewView() {
+        try {
+        if (isHosting()) {
+            onlineServer = new MekHQServer(3000, campaignController);
+
+            onlineServer.start();
+        } else if (isRemote()) {
+            channel = ManagedChannelBuilder.forTarget("localhost:3000").usePlaintext().build();
+            onlineClient = new MekHQClient(channel, campaignController);
+
+            onlineClient.connect();
+        }
+        } catch (IOException ex) {
+            MekHQ.getLogger().error(MekHQ.class, "showNewView()", "Could not connect to server", ex);
+        }
+
     	campaigngui = new CampaignGUI(this);
     	campaigngui.showOverviewTab(getCampaign().isOverviewLoadingValue());
     }
@@ -371,7 +428,7 @@ public class MekHQ implements GameListener {
         // redirect output to log file
         redirectOutput(logFileName); // Deprecated call required for MegaMek usage
 
-        SwingUtilities.invokeLater(() -> MekHQ.getInstance().startup());
+        SwingUtilities.invokeLater(() -> MekHQ.getInstance().startup(args));
     }
 
     private void showInfo() {
