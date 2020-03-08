@@ -305,7 +305,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
     protected int nTasks;
     protected boolean engineer;
     public static final int PRIMARY_ROLE_SUPPORT_TIME = 480;
+    public static final int PRIMARY_ROLE_OVERTIME_SUPPORT_TIME = 240;
     public static final int SECONDARY_ROLE_SUPPORT_TIME = 240;
+    public static final int SECONDARY_ROLE_OVERTIME_SUPPORT_TIME = 120;
 
     /**
      * * Start Advanced Medical ***
@@ -3230,13 +3232,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void resetMinutesLeft() {
-        if (isTechPrimary() || getPrimaryRole() == T_DOCTOR) {
-            this.minutesLeft = 480;
-            this.overtimeLeft = 240;
+        if (isTechPrimary() || (getPrimaryRole() == T_DOCTOR)) {
+            this.minutesLeft = PRIMARY_ROLE_SUPPORT_TIME;
+            this.overtimeLeft = PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
         }
-        if (isTechSecondary() || getSecondaryRole() == T_DOCTOR) {
-            this.minutesLeft = 240;
-            this.overtimeLeft = 240;
+        if (isTechSecondary() || (getSecondaryRole() == T_DOCTOR)) {
+            this.minutesLeft = SECONDARY_ROLE_SUPPORT_TIME;
+            this.overtimeLeft = SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
         }
     }
 
