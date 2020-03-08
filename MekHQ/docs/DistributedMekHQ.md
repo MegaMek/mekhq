@@ -194,7 +194,7 @@ The DailyLog message has the following properties:
 - Log List
     - Log Entry
 
-This message may be sent at any point in a day and may be sent mulitple times, but implementations could delay sending this message until a day has completed.
+This message may be sent at any point in a day and may be sent multiple times, but implementations could delay sending this message until a day has completed.
 
 This message is redistributed to all Remote Campaigns on the same team as the sending Campaign.
 
