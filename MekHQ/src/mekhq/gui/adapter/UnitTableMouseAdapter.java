@@ -678,21 +678,21 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                 //region Determine if to Display
                 // this is used to determine whether or not to show parts of the GUI, especially for
                 // bulk selections
-                boolean oneMothballed = false;
-                boolean oneMothballing = false;
-                boolean oneActive = false;
-                boolean oneDeployed = false;
+                boolean oneMothballed = false; // If at least one unit is mothballed, we want to show unit activation
+                boolean oneMothballing = false; // If at least one unit is mothballing, we want to be able to cancel it
+                boolean oneActive = false; // If at least one unit is active, we want to enable mothballing
+                boolean oneDeployed = false; // If at least one unit is deployed, we want to show the remove deployment to GMs
                 boolean allDeployed = true; // don't show sell dialog if all units are deployed
-                boolean oneAvailableUnitBelowMaxCrew = false;
-                boolean oneNotPresent = false;
-                boolean oneHasIndividualCamo = false;
-                boolean oneHasCrew = false;
-                boolean allUnitsAreRepairable = true;
-                boolean areAllConventionalInfantry = true;
-                boolean noConventionalInfantry = true;
-                boolean areAllRepairFlagged = true;
-                boolean areAllSalvageFlagged = true;
-                boolean allRequireSameTechType = true;
+                boolean oneAvailableUnitBelowMaxCrew = false; // If one unit isn't fully crewed, enable bulk hiring
+                boolean oneNotPresent = false; // If a unit isn't present, enable instant arrival for GMs
+                boolean oneHasIndividualCamo = false; // If a unit has a unique camo, allow it to be removed
+                boolean oneHasCrew = false; // If a unit has crew, enable removing it
+                boolean allUnitsAreRepairable = true;  // If all units can be repaired, allow the repair flag to be selected
+                boolean areAllConventionalInfantry = true; // Conventional infantry can be disbanded, but no others
+                boolean noConventionalInfantry = true; // Conventional infantry can't be repaired/salvaged
+                boolean areAllRepairFlagged = true; // If everyone has the repair flag, then we show the repair flag box as selected
+                boolean areAllSalvageFlagged = true;  // Same as above, but with the salvage flag
+                boolean allRequireSameTechType = true; // If everyone requires the same tech type, we can allow bulk tech assignment
                 String skill = units[0].determineUnitTechSkillType();
                 int maintenanceTime = 0;
                 for (Unit u : units) {
