@@ -682,6 +682,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                 boolean oneMothballing = false;
                 boolean oneActive = false;
                 boolean oneDeployed = false;
+                boolean allDeployed = true; // don't show sell dialog if all units are deployed
                 boolean oneAvailableUnitBelowMaxCrew = false;
                 boolean oneNotPresent = false;
                 boolean oneHasIndividualCamo = false;
@@ -709,6 +710,8 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
 
                     if (u.isDeployed()) {
                         oneDeployed = true;
+                    } else {
+                        allDeployed = false;
                     }
 
                     if (!u.isPresent()) {
@@ -1061,12 +1064,11 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                 }
 
                 // sell unit
-                if (gui.getCampaign().getCampaignOptions().canSellUnits()) {
+                if (!allDeployed && gui.getCampaign().getCampaignOptions().canSellUnits()) {
                     popup.addSeparator();
                     menuItem = new JMenuItem("Sell Unit");
                     menuItem.setActionCommand(COMMAND_SELL);
                     menuItem.addActionListener(this);
-                    menuItem.setEnabled(!unit.isDeployed());
                     popup.add(menuItem);
                 }
 
