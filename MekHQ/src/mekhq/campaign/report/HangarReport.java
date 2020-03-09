@@ -977,7 +977,7 @@ public class HangarReport extends Report {
 
         //region UnitList Processing
         // Gather data and load it into the tree
-        List<Unit> unitList = new ArrayList(getCampaign().getUnits());
+        List<Unit> unitList = new ArrayList<>(getCampaign().getUnits());
         unitList.sort(Comparator.comparing(Unit::getName));
         for (Unit u : unitList) {
             Entity e = u.getEntity();
