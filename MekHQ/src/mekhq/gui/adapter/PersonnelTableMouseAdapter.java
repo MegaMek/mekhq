@@ -1700,7 +1700,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     JMenuItem surnameMenu;
                     String type;
 
-                    List<Person> personnel = new ArrayList(gui.getCampaign().getPersonnel());
+                    List<Person> personnel = new ArrayList<>(gui.getCampaign().getPersonnel());
                     personnel.sort(Comparator.comparing((Person p) -> p.getAge(calendar)).thenComparing(Person::getSurname));
 
                     for (Person ps : personnel) {
@@ -1931,7 +1931,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     JMenu abMenu = new JMenu(resourceMap.getString("spendOnSpecialAbilities.text")); //$NON-NLS-1$
                     int cost;
 
-                    List<SpecialAbility> specialAbilities = new ArrayList(SpecialAbility.getAllSpecialAbilities().values());
+                    List<SpecialAbility> specialAbilities = new ArrayList<>(SpecialAbility.getAllSpecialAbilities().values());
                     specialAbilities.sort(Comparator.comparing(SpecialAbility::getName));
 
                     for (SpecialAbility spa : specialAbilities) {
