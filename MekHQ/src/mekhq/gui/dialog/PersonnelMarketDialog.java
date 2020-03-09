@@ -18,9 +18,7 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Frame;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
@@ -86,9 +84,6 @@ public class PersonnelMarketDialog extends JDialog {
     private DirectoryItems portraits;
     private Money unitCost = Money.zero();
 
-    private JButton btnAdd;
-    private javax.swing.JButton btnHire;
-    private javax.swing.JButton btnClose;
     private javax.swing.JComboBox<String> comboPersonType;
     private javax.swing.JLabel lblPersonChoice;
     private javax.swing.JRadioButton radioNormalRoll;
@@ -135,8 +130,6 @@ public class PersonnelMarketDialog extends JDialog {
         comboRecruitType = new javax.swing.JComboBox<>();
         lblUnitCost = new javax.swing.JLabel();
         panelOKBtns = new javax.swing.JPanel();
-        btnHire = new javax.swing.JButton();
-        btnClose = new javax.swing.JButton();
         lblPersonChoice = new javax.swing.JLabel();
         //choicePersonView = new javax.swing.JComboBox();
         //lblPersonView = new javax.swing.JLabel();
@@ -278,18 +271,23 @@ public class PersonnelMarketDialog extends JDialog {
 
         panelOKBtns.setLayout(new java.awt.GridBagLayout());
 
-        btnHire.setText("Hire");
+        JButton btnAdvDay = new JButton("Advance Day");
+        btnAdvDay.setName("buttonAdvanceDay");
+        btnAdvDay.addActionListener(evt -> hqView.getCampaignController().advanceDay());
+        btnAdvDay.setEnabled(hqView.getCampaignController().isHost());
+        panelOKBtns.add(btnAdvDay, new GridBagConstraints());
+
+        JButton btnHire = new JButton("Hire");
         btnHire.setName("btnHire"); // NOI18N
         btnHire.addActionListener(this::hirePerson);
         panelOKBtns.add(btnHire, new java.awt.GridBagConstraints());
 
-        btnAdd = new JButton("Add (GM)");
+        JButton btnAdd = new JButton("Add (GM)");
         btnAdd.addActionListener(evt -> addPerson());
         btnAdd.setEnabled(campaign.isGM());
         panelOKBtns.add(btnAdd, new java.awt.GridBagConstraints());
 
-
-        btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
+        JButton btnClose = new JButton(resourceMap.getString("btnClose.text")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
         btnClose.addActionListener(this::btnCloseActionPerformed);
         panelOKBtns.add(btnClose, new java.awt.GridBagConstraints());

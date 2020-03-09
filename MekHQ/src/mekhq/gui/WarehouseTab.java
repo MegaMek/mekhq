@@ -229,6 +229,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         partsSorter = new TableRowSorter<PartsTableModel>(partsModel);
         partsSorter.setComparator(PartsTableModel.COL_COST, new FormattedNumberSorter());
         partsSorter.setComparator(PartsTableModel.COL_DETAIL, new PartsDetailSorter());
+        partsSorter.setComparator(PartsTableModel.COL_TOTAL_COST, new FormattedNumberSorter());
         partsTable.setRowSorter(partsSorter);
         TableColumn column = null;
         for (int i = 0; i < PartsTableModel.N_COL; i++) {

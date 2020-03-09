@@ -1268,7 +1268,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public void showContractMarket() {
-        ContractMarketDialog cmd = new ContractMarketDialog(getFrame(), this, getCampaign());
+        ContractMarketDialog cmd = new ContractMarketDialog(getFrame(), getCampaign());
         cmd.setVisible(true);
     }
 
