@@ -148,6 +148,14 @@ public class MekHQServer {
             return controller.getLocalCampaign();
         }
 
+        private CampaignDetails getCampaignDetails() {
+            return CampaignDetails.newBuilder()
+                .setId(getCampaign().getId().toString())
+                .setName(getCampaign().getName())
+                .setDate(dateFormatter.print(getCampaign().getDateTime()))
+                .setLocation(getCampaign().getLocation().getCurrentSystem().getId()).build();
+        }
+
         @Override
         public void connect(ConnectionRequest request, StreamObserver<ConnectionResponse> responseObserver) {
             String version = resourceMap.getString("Application.version");
@@ -159,7 +167,9 @@ public class MekHQServer {
                 return;
             }
 
-            UUID id = UUID.fromString(request.getId());
+            CampaignDetails clientCampaign = request.getClient();
+
+            UUID id = UUID.fromString(clientCampaign.getId());
             if (getCampaign().getId().equals(id)) {
                 responseObserver.onError(Status.INVALID_ARGUMENT
                     .withDescription(String.format("Campaign %s cannot both HOST and CONNECT", id))
@@ -169,16 +179,13 @@ public class MekHQServer {
             }
 
             ConnectionResponse response = ConnectionResponse.newBuilder().setVersion(version)
-                    .setId(getCampaign().getId().toString()).setName(getCampaign().getName())
-                    .setDate(dateFormatter.print(getCampaign().getDateTime()))
-                    .setLocation(getCampaign().getLocation().getCurrentSystem().getId())
-                    .setIsGMMode(getCampaign().isGM())
+                    .setHost(getCampaignDetails())
                     .addAllCampaigns(convert(controller.getRemoteCampaigns())).build();
             responseObserver.onNext(response);
 
             controller.addActiveCampaign(id);
-            controller.addRemoteCampaign(id, request.getName(), DateTime.parse(request.getDate()),
-                    request.getLocation(), request.getIsGMMode());
+            controller.addRemoteCampaign(id, clientCampaign.getName(), DateTime.parse(clientCampaign.getDate()),
+                clientCampaign.getLocation(), clientCampaign.getIsGMMode());
 
             responseObserver.onCompleted();
         }
@@ -252,8 +259,7 @@ public class MekHQServer {
 
         public void sendPings() {
             Ping ping = Ping.newBuilder()
-                .setDate(dateFormatter.print(getCampaign().getDateTime()))
-                .setLocation(getCampaign().getLocation().getCurrentSystem().getId())
+                .setCampaign(getCampaignDetails())
                 .build();
             for (Map.Entry<UUID, StreamObserver<ServerMessage>> client : messageBus.entrySet()) {
                 MekHQ.getLogger().info(MekHQHostService.class, "handlePing()", "<- PING: " + client.getKey());
@@ -264,11 +270,12 @@ public class MekHQServer {
         private void handlePing(StreamObserver<ServerMessage> responseObserver, UUID campaignId, Ping ping) {
             addMessageBus(campaignId, responseObserver);
 
-            MekHQ.getLogger().info(MekHQHostService.class, "handlePing()", String.format("-> PING: %s %s %s", campaignId, ping.getDate(), ping.getLocation()));
+            CampaignDetails clientCampaign = ping.getCampaign();
+
+            MekHQ.getLogger().info(MekHQHostService.class, "handlePing()", String.format("-> PING: %s %s %s", campaignId, clientCampaign.getDate(), clientCampaign.getLocation()));
 
             Pong pong = Pong.newBuilder()
-                .setDate(dateFormatter.print(getCampaign().getDateTime()))
-                .setLocation(getCampaign().getLocation().getCurrentSystem().getId())
+                .setCampaign(getCampaignDetails())
                 .addAllCampaigns(convert(controller.getRemoteCampaigns()))
                 .build();
             responseObserver.onNext(buildResponse(pong));
@@ -277,7 +284,9 @@ public class MekHQServer {
         private void handlePong(StreamObserver<ServerMessage> responseObserver, UUID campaignId, Pong pong) {
             outstandingPings.remove(campaignId);
 
-            MekHQ.getLogger().info(MekHQHostService.class, "handlePing()", String.format("-> PONG: %s %s %s", campaignId, pong.getDate(), pong.getLocation()));
+            CampaignDetails clientCampaign = pong.getCampaign();
+
+            MekHQ.getLogger().info(MekHQHostService.class, "handlePing()", String.format("-> PONG: %s %s %s", campaignId, clientCampaign.getDate(), clientCampaign.getLocation()));
         }
 
         protected void handleCampaignDateChanged(StreamObserver<ServerMessage> responseObserver, UUID clientId,
@@ -364,11 +373,11 @@ public class MekHQServer {
                 .build();
         }
 
-        private Collection<Campaign> convert(Collection<RemoteCampaign> remoteCampaigns) {
-            List<Campaign> converted = new ArrayList<>();
+        private Collection<CampaignDetails> convert(Collection<RemoteCampaign> remoteCampaigns) {
+            List<CampaignDetails> converted = new ArrayList<>();
             for (RemoteCampaign remoteCampaign : remoteCampaigns) {
                 converted.add(
-                    Campaign.newBuilder()
+                    CampaignDetails.newBuilder()
                         .setId(remoteCampaign.getId().toString())
                         .setName(remoteCampaign.getName())
                         .setDate(dateFormatter.print(remoteCampaign.getDate()))

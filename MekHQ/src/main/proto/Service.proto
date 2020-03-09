@@ -51,59 +51,33 @@ service MekHQHost {
 // Represents a request to initiate a connection to a host
 // campaign.
 message ConnectionRequest {
-    // The unique identifier of the Client Campaign.
-    string id = 1;
-
     // The version of MekHQ on the Client machine.
-    string version = 2;
+    string version = 1;
 
-    // The name of the Client Campaign.
-    string name = 3;
-
-    // The date of the Client Campaign (ISO8601).
-    string date = 4;
-
-    // The location of the Client Campaign.
-    string location = 5;
-
-    // A value indicating whether or not the Client Campaign
-    // is operating under GM Mode.
-    bool isGMMode = 6;
+    // A CampaignDetails message with details of the Client Campaign.
+    CampaignDetails client = 2;
 
     // An optional password to use during connection attempts.
     oneof password_option {
         // The password required to initiate the connection.
-        string password = 7;
+        string password = 3;
     }
 }
 
 // Represents a response to a successful connection attempt
 // containing details of the Host Campaign.
 message ConnectionResponse {
-    // The unique identifier of the Host Campaign.
-    string id = 1;
-
     // The version of MekHQ on the Host machine.
-    string version = 2;
+    string version = 1;
 
-    // The name of the Host Campaign.
-    string name = 3;
+    // A CampaignDetails message with details of the Host Campaign.
+    CampaignDetails host = 2;
 
-    // The date of the Host Campaign (ISO8601).
-    string date = 4;
-
-    // The location of the Host Campaign.
-    string location = 5;
-
-    // A value indicating whether or not the Host Campaign
-    // is operating under GM Mode.
-    bool isGMMode = 6;
-
-    // Zero or more Campaign messages representing the
+    // Zero or more CampaignDetails messages representing the
     // Client Campaigns involved in the session.
     //
     // These campaigns may or may not be active.
-    repeated Campaign campaigns = 7;
+    repeated CampaignDetails campaigns = 3;
 }
 
 // Represents a request to disconnect from the Host Campaign.
@@ -120,7 +94,7 @@ message DisconnectionResponse {
 
 // Represents the details of a specific Campaign involved
 // in the session.
-message Campaign {
+message CampaignDetails {
     // The unique identifier of the Campaign.
     string id = 1;
 
@@ -185,15 +159,9 @@ message ServerMessage {
 // Any Campaign which receives a Ping message should
 // respond as soon as possible with a Pong message.
 message Ping {
-    // The date of the Campaign sending the message (ISO8601).
-    string date = 1;
-
-    // The location of the Campaign.
-    string location = 2;
-
-    // A value indicating whether or not the Campaign
-    // is operating under GM Mode.
-    bool isGMMode = 3;
+    // A CampaignDetails message which contains details
+    // from the sending campaign.
+    CampaignDetails campaign = 1;
 }
 
 // Represents a PONG being sent in response to
@@ -207,21 +175,15 @@ message Ping {
 // the other campaigns in the session, and should
 // ignore any data in the `campaigns` field.
 message Pong {
-    // The date of the Campaign sending the message (ISO8601).
-    string date = 1;
+    // A CampaignDetails message which contains details
+    // from the sending campaign.
+    CampaignDetails campaign = 1;
 
-    // The location of the Campaign.
-    string location = 2;
-
-    // A value indicating whether or not the Campaign
-    // is operating under GM Mode.
-    bool isGMMode = 3;
-
-    // Zero or more Campaign messages representing the
+    // Zero or more CampaignDetails messages representing the
     // Client Campaigns involved in the session.
     //
     // These campaigns may or may not be active.
-    repeated Campaign campaigns = 4;
+    repeated CampaignDetails campaigns = 2;
 }
 
 // Represents a message sent when a Campaign changes

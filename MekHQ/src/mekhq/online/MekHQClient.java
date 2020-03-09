@@ -71,11 +71,20 @@ public class MekHQClient {
         return controller.getLocalCampaign();
     }
 
+    protected CampaignDetails getCampaignDetails() {
+        return CampaignDetails.newBuilder()
+            .setId(getCampaign().getId().toString())
+            .setName(getCampaign().getName())
+            .setDate(dateFormatter.print(getCampaign().getDateTime()))
+            .setLocation(getCampaign().getLocation().getCurrentSystem().getId()).build();
+    }
+
     public void connect() {
-        ConnectionRequest request = ConnectionRequest.newBuilder().setId(getCampaign().getId().toString())
-                .setName(getCampaign().getName()).setVersion(resourceMap.getString("Application.version"))
-                .setDate(dateFormatter.print(getCampaign().getDateTime()))
-                .setLocation(getCampaign().getLocation().getCurrentSystem().getId()).build();
+
+        ConnectionRequest request = ConnectionRequest.newBuilder()
+            .setVersion(resourceMap.getString("Application.version"))
+            .setClient(getCampaignDetails())
+            .build();
 
         ConnectionResponse response;
         try {
@@ -85,13 +94,15 @@ public class MekHQClient {
             return;
         }
 
-        MekHQ.getLogger().info(MekHQClient.class, "connect()",
-                "Connected to Campaign: " + response.getId() + " " + response.getDate());
+        CampaignDetails hostCampaign = response.getHost();
 
-        controller.setHost(UUID.fromString(response.getId()));
-        controller.setHostName(response.getName());
-        controller.setHostDate(DateTime.parse(response.getDate(), dateFormatter));
-        controller.setHostLocation(response.getLocation());
+        MekHQ.getLogger().info(MekHQClient.class, "connect()",
+                "Connected to Campaign: " + hostCampaign.getId() + " " + hostCampaign.getDate());
+
+        controller.setHost(UUID.fromString(hostCampaign.getId()));
+        controller.setHostName(hostCampaign.getName());
+        controller.setHostDate(DateTime.parse(hostCampaign.getDate(), dateFormatter));
+        controller.setHostLocation(hostCampaign.getLocation());
 
         createMessageBus();
 
@@ -163,35 +174,37 @@ public class MekHQClient {
 
     private void sendPing() {
         Ping ping = Ping.newBuilder()
-            .setDate(dateFormatter.print(getCampaign().getDateTime()))
-            .setLocation(getCampaign().getLocation().getCurrentSystem().getId())
+            .setCampaign(getCampaignDetails())
             .build();
         messageBus.onNext(buildMessage(ping));
     }
 
     protected void handlePing(UUID id, Ping ping) {
         Pong pong = Pong.newBuilder()
-            .setDate(dateFormatter.print(getCampaign().getDateTime()))
-            .setLocation(getCampaign().getLocation().getCurrentSystem().getId())
+            .setCampaign(getCampaignDetails())
             .build();
 
-        MekHQ.getLogger().info(MekHQClient.class, "handlePing()", String.format("-> PING: %s %s %s", id, ping.getDate(), ping.getLocation()));
+        CampaignDetails hostCampaign = ping.getCampaign();
+
+        MekHQ.getLogger().info(MekHQClient.class, "handlePing()", String.format("-> PING: %s %s %s", id, hostCampaign.getDate(), hostCampaign.getLocation()));
 
         messageBus.onNext(buildMessage(pong));
     }
 
     protected void handlePong(UUID id, Pong pong) {
-        String date = pong.getDate();
+        CampaignDetails hostCampaign = pong.getCampaign();
+
+        String date = hostCampaign.getDate();
         DateTime hostDate = dateFormatter.parseDateTime(date);
-        String locationId = pong.getLocation();
+        String locationId = hostCampaign.getLocation();
 
         MekHQ.getLogger().info(MekHQClient.class, "handlePong()", String.format("-> PONG: %s %s %s (%d connected)", id, hostDate, locationId, pong.getCampaignsCount()));
 
         controller.setHostDate(hostDate);
         controller.setHostLocation(locationId);
-        controller.setHostIsGMMode(pong.getIsGMMode());
+        controller.setHostIsGMMode(hostCampaign.getIsGMMode());
 
-        for (Campaign campaign : pong.getCampaignsList()) {
+        for (CampaignDetails campaign : pong.getCampaignsList()) {
             controller.addRemoteCampaign(UUID.fromString(campaign.getId()), campaign.getName(),
                 dateFormatter.parseDateTime(campaign.getDate()), campaign.getLocation(), campaign.getIsGMMode());
         }
