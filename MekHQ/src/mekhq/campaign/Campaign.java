@@ -1906,11 +1906,16 @@ public class Campaign implements Serializable, ITechManager {
         // Return the tech collection sorted worst to best
         // Reverse the sort if we've been asked for best to worst
         if (sorted) {
-            // First order by the amount of time the person has remaining, with the highest amount
-            // of time being at the top of the list
+            // First order by the amount of time the person has remaining, based on the sorting order
+            // comparison changes because locations that use elite first will want the person with
+            // the most remaining time at the top of the list while locations that don't will want it
+            // at the bottom of the list
             if (eliteFirst) {
+                // We want the highest amount of remaining time at the top of the list, as that
+                // makes it easy to compare between the two
                 techs.sort(Comparator.comparingInt(Person::getMinutesLeft));
             } else {
+                // Otherwise, we want the highest amount of time being at the bottom of the list
                 techs.sort(Comparator.comparingInt(Person::getMinutesLeft).reversed());
             }
             // Then sort by the skill level

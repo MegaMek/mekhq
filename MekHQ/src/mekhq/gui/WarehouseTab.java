@@ -669,6 +669,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     }
 
     public void refreshTechsList() {
+        // The next gets all techs who have more than 0 minutes free, and sorted by skill descending (elites at bottom)
         techsModel.setData(getCampaign().getTechs(true, null, true, false));
         String astechString = "<html><b>Astech Pool Minutes:</> " + getCampaign().getAstechPoolMinutes();
         if (getCampaign().isOvertimeAllowed()) {
