@@ -420,6 +420,20 @@ public class MekHQ implements GameListener {
     }
 
     public void showNewView() {
+
+        // Start up the host server or connect to a remote host
+        // if indicated.
+        connectDistributedFeatures();
+
+    	campaigngui = new CampaignGUI(this);
+    	campaigngui.showOverviewTab(getCampaign().isOverviewLoadingValue());
+    }
+
+    private void connectDistributedFeatures() {
+
+        // Close any existing connections.
+        disconnectDistributedFeatures();
+
         try {
             if (isHosting()) {
                 onlineServer = new MekHQServer(hostPort, campaignController);
@@ -432,11 +446,27 @@ public class MekHQ implements GameListener {
                 onlineClient.connect();
             }
         } catch (IOException ex) {
-            MekHQ.getLogger().error(MekHQ.class, "showNewView()", "Could not connect to server", ex);
-        }
+            MekHQ.getLogger().error(MekHQ.class, "showNewView()", "Could not connect to server.", ex);
 
-    	campaigngui = new CampaignGUI(this);
-    	campaigngui.showOverviewTab(getCampaign().isOverviewLoadingValue());
+            disconnectDistributedFeatures();
+        }
+    }
+
+    private void disconnectDistributedFeatures() {
+        try {
+            if (onlineServer != null) {
+                onlineServer.stop();
+            } else if (channel != null) {
+                try {
+                    onlineClient.disconnect();
+                } catch (Exception ex) {
+                    MekHQ.getLogger().error(MekHQ.class, "disconnectDistributedFeatures()", "Could not disconnect from server.", ex);
+                }
+                channel.shutdownNow();
+            }
+        } catch (Exception ex) {
+            MekHQ.getLogger().error(MekHQ.class, "disconnectDistributedFeatures()", "Could not shut down existing online features.", ex);
+        }
     }
 
     /**
