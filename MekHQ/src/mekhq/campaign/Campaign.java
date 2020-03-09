@@ -1918,7 +1918,8 @@ public class Campaign implements Serializable, ITechManager {
                 // Otherwise, we want the highest amount of time being at the bottom of the list
                 techs.sort(Comparator.comparingInt(Person::getMinutesLeft).reversed());
             }
-            // Then sort by the skill level
+            // Then sort by the skill level, which puts Elite personnel first or last dependant on
+            // the eliteFirst value
             techs.sort((person1, person2) -> {
                 // default to 0, which means they're equal
                 int retVal = 0;
