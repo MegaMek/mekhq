@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2020 The MegaMek Team.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
 syntax = "proto3";
 
 option java_multiple_files = true;
@@ -9,103 +27,266 @@ import "google/protobuf/timestamp.proto";
 
 package mekhqonline;
 
+// The MekHQHost Service handles distributed MekHQ play
+// between a Host Campaign and one or more Client Campaigns.
 service MekHQHost {
+    //
+    // Initiates a connection to the Host Campaign.
+    //
     rpc Connect(ConnectionRequest) returns (ConnectionResponse) {}
 
+    //
+    // Advises the Host Campaign that a Client Campaign
+    // is no longer participating in the session.
+    //
     rpc Disconnect(DisconnectionRequest) returns (DisconnectionResponse) {}
 
+    //
+    // Initiates a Message Bus between the Client Campaign
+    // and Host Campaign.
+    //
     rpc MessageBus(stream ClientMessage) returns (stream ServerMessage) {}
 }
 
-// The request message containing the user's name.
+// Represents a request to initiate a connection to a host
+// campaign.
 message ConnectionRequest {
+    // The unique identifier of the Client Campaign.
     string id = 1;
+
+    // The version of MekHQ on the Client machine.
     string version = 2;
+
+    // The name of the Client Campaign.
     string name = 3;
+
+    // The date of the Client Campaign (ISO8601).
     string date = 4;
+
+    // The location of the Client Campaign.
     string location = 5;
+
+    // A value indicating whether or not the Client Campaign
+    // is operating under GM Mode.
     bool isGMMode = 6;
+
+    // An optional password to use during connection attempts.
     oneof password_option {
+        // The password required to initiate the connection.
         string password = 7;
     }
 }
 
-// The response message containing the greetings
+// Represents a response to a successful connection attempt
+// containing details of the Host Campaign.
 message ConnectionResponse {
+    // The unique identifier of the Host Campaign.
     string id = 1;
+
+    // The version of MekHQ on the Host machine.
     string version = 2;
+
+    // The name of the Host Campaign.
     string name = 3;
+
+    // The date of the Host Campaign (ISO8601).
     string date = 4;
+
+    // The location of the Host Campaign.
     string location = 5;
+
+    // A value indicating whether or not the Host Campaign
+    // is operating under GM Mode.
     bool isGMMode = 6;
+
+    // Zero or more Campaign messages representing the
+    // Client Campaigns involved in the session.
+    //
+    // These campaigns may or may not be active.
     repeated Campaign campaigns = 7;
 }
 
+// Represents a request to disconnect from the Host Campaign.
 message DisconnectionRequest {
+    // The unique identifier of the Client Campaign.
     string id = 1;
 }
 
+// Represents a response to a successful disconnection attempt.
 message DisconnectionResponse {
+    // The unique identifier of the Host Campaign.
     string id = 1;
 }
 
+// Represents the details of a specific Campaign involved
+// in the session.
 message Campaign {
+    // The unique identifier of the Campaign.
     string id = 1;
+
+    // The name of the Campaign.
     string name = 2;
+
+    // The date of the Campaign (ISO8601)
     string date = 3;
+
+    // The team number of the Campaign.
+    // NOTE: The Host Campaign is always team 1.
     int32 team = 4;
+
+    // The location of the Campaign.
     string location = 5;
+
+    // A value indicating whether or not the Campaign
+    // is operating under GM Mode.
     bool isGMMode = 6;
 }
 
+// Represents a message from a Client Campaign
+// to the Host Campaign over the message bus.
 message ClientMessage {
+    // The time when the message was generated.
     google.protobuf.Timestamp timestamp = 1;
+
+    // The unique identifier of the Client Campaign.
     string id = 2;
+
+    // An optional map of metadata associated
+    // with this message.
     map<string, string> metadata = 3;
+
+    // The eveloped message being sent to the Host Campaign.
     google.protobuf.Any message = 4;
 }
 
+// Represents a message from the Host Campaign
+// to a Client Campaign over the message bus.
 message ServerMessage {
+    // The time when the message was generated.
     google.protobuf.Timestamp timestamp = 1;
+
+    // The unique identifier of the Host Campaign.
     string id = 2;
+
+    // An optional map of metadata associated
+    // with this message.
     map<string, string> metadata = 3;
+
+    // The enveloped message being sent to a Client Campaign.
     google.protobuf.Any message = 4;
 }
 
+// Represents a PING being sent to keep-alive
+// the connection between a Host and Client Campaign.
+//
+// This message can be sent by either the Host or
+// a Client Campaign.
+//
+// Any Campaign which receives a Ping message should
+// respond as soon as possible with a Pong message.
 message Ping {
+    // The date of the Campaign sending the message (ISO8601).
     string date = 1;
+
+    // The location of the Campaign.
     string location = 2;
+
+    // A value indicating whether or not the Campaign
+    // is operating under GM Mode.
     bool isGMMode = 3;
 }
 
+// Represents a PONG being sent in response to
+// a PING message.
+//
+// This message can be sent by either the Host or
+// a Client Campaign, but only in response to a
+// previous PING message.
+//
+// Only the Host Campaign sends along data about
+// the other campaigns in the session, and should
+// ignore any data in the `campaigns` field.
 message Pong {
+    // The date of the Campaign sending the message (ISO8601).
     string date = 1;
+
+    // The location of the Campaign.
     string location = 2;
+
+    // A value indicating whether or not the Campaign
+    // is operating under GM Mode.
     bool isGMMode = 3;
+
+    // Zero or more Campaign messages representing the
+    // Client Campaigns involved in the session.
+    //
+    // These campaigns may or may not be active.
     repeated Campaign campaigns = 4;
 }
 
+// Represents a message sent when a Campaign changes
+// dates.
+//
+// This message may be sent by any Campaign, and will
+// be forwarded by the Host Campaign to everyone in
+// the current session.
 message CampaignDateChanged {
+    // The unique identifier of the Campaign.
     string id = 1;
+
+    // The new date of the Campaign (ISO8601).
     string date = 2;
 }
 
+// Represents a message sent when a Campaign changes
+// its GM Mode.
+//
+// This message may be sent by any Campaign, and will
+// be forwarded by the Host Campaign to everyone in
+// the current session.
 message GMModeChanged {
+    // The unique identifier of the Campaign.
     string id = 1;
+
+    // A value indicating whether or not the Campaign
+    // is operating under GM Mode.
     bool value = 2;
 }
 
+// Represents a message sent when Team Assignments change.
+//
+// This message is only sent by the Host Campaign to the
+// connected Client Campaigns.
 message TeamAssignmentChanged {
+    // Zero or more TeamAssignment messages detailing
+    // which team each Campaign is assigned to.
+    //
+    // If no TeamAssignment messages are sent, then every
+    // Campaign is on its own team.
     repeated TeamAssignment teams = 1;
 }
 
+// Represents a message detailing a specific Team Assignment.
 message TeamAssignment {
+    // The unique identifier of the Campaign.
     string id = 1;
+
+    // The team number of the Campaign.
+    //
+    // NOTE: The Host Campaign is always on team 1.
     int32 team = 2;
 }
 
+// Represents a message sent when a Campaign changes locations,
+// either due to a KF Jump or due to GM movement.
 message LocationChanged {
+    // The unique identifier of the Campaign.
     string id = 1;
+
+    // The new location of the Campaign.
     string location = 2;
+
+    // A value indicating whether or not the movement
+    // was due to a GM action.
     bool is_gm_movement = 3;
 }
