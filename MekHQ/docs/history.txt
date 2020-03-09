@@ -23,6 +23,7 @@ VERSION HISTORY:
 + Issue #1486: Fixing Unit and Personnel Export to CSV and Localizing Top Menu Bar
 + Issue #1530: Fixes issue in infirmary where buttons unreadable in dark mode
 + Issue #1250: Added FormattedNumberSorter to Warehouse total cost column
++ Issue #1375: Creating Localized Natural Order Sorter
 
 v0.47.4 (2020-2-09 2200 UTC)
 + PR #1440: Implement "Rugged" quirk (2x or 3x between maintenance rolls)
