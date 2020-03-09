@@ -39,6 +39,7 @@ import io.grpc.ManagedChannelBuilder;
 
 import megamek.MegaMek;
 import megamek.client.Client;
+import megamek.common.annotations.Nullable;
 import megamek.common.event.EventBus;
 import megamek.common.event.GameBoardChangeEvent;
 import megamek.common.event.GameBoardNewEvent;
@@ -137,8 +138,13 @@ public class MekHQ implements GameListener {
 
     private final ResourceBundle resourceBundle = ResourceBundle.getBundle("mekhq.resources.MekHQ");
 
+    /** A value indicating whether or not MekHQ is hosting an online session. */
     private boolean isHost;
-    private boolean isRemote;
+    /** The port to use when hosting the online session. */
+    private int hostPort = 3000;
+    /** The address of the MekHQ instance to connect to (i.e. hostname:port) */
+    private String remoteHost;
+
     private MekHQServer onlineServer;
     private MekHQClient onlineClient;
     private ManagedChannel channel;
@@ -305,11 +311,21 @@ public class MekHQ implements GameListener {
         UIManager.installLookAndFeel("Flat Darcula", "com.formdev.flatlaf.FlatDarculaLaf");
 
         for (String arg : args) {
-            if ("--host".equalsIgnoreCase(arg)) {
+            if (arg.startsWith("--host")) {
                 setIsHosting(true);
-            }
-            else if ("--connect".equalsIgnoreCase(arg)) {
-                setIsConnecting(true);
+                int equals = arg.indexOf('=');
+                if (equals > 0) {
+                    setHostPort(Integer.parseInt(arg.substring(equals + 1)));
+                }
+            } else if (arg.startsWith("--connect")) {
+                int equals = arg.indexOf('=');
+                if (equals < 0) {
+                    // for testing we're defaulting to localhost:3000
+                    // this will go away outside of prototyping
+                    setHostLocation("localhost:3000");
+                } else {
+                    setHostLocation(arg.substring(equals + 1));
+                }
             }
         }
 
@@ -329,12 +345,12 @@ public class MekHQ implements GameListener {
         return resourceBundle.getString("Application.version");
     }
 
-    private void setIsConnecting(boolean b) {
-        isRemote = b;
+    private void setHostLocation(@Nullable String host) {
+        remoteHost = host;
     }
 
     public boolean isRemote() {
-        return isRemote;
+        return remoteHost != null;
     }
 
     private void setIsHosting(boolean b) {
@@ -343,6 +359,14 @@ public class MekHQ implements GameListener {
 
     public boolean isHosting() {
         return isHost;
+    }
+
+    public void setHostPort(int port) {
+        hostPort = port;
+    }
+
+    public int getHostPort() {
+        return hostPort;
     }
 
 	private void setUserPreferences() {
@@ -397,16 +421,16 @@ public class MekHQ implements GameListener {
 
     public void showNewView() {
         try {
-        if (isHosting()) {
-            onlineServer = new MekHQServer(3000, campaignController);
+            if (isHosting()) {
+                onlineServer = new MekHQServer(hostPort, campaignController);
 
-            onlineServer.start();
-        } else if (isRemote()) {
-            channel = ManagedChannelBuilder.forTarget("localhost:3000").usePlaintext().build();
-            onlineClient = new MekHQClient(channel, campaignController);
+                onlineServer.start();
+            } else if (isRemote()) {
+                channel = ManagedChannelBuilder.forTarget(remoteHost).usePlaintext().build();
+                onlineClient = new MekHQClient(channel, campaignController);
 
-            onlineClient.connect();
-        }
+                onlineClient.connect();
+            }
         } catch (IOException ex) {
             MekHQ.getLogger().error(MekHQ.class, "showNewView()", "Could not connect to server", ex);
         }
