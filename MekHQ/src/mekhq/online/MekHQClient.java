@@ -3,7 +3,6 @@ package mekhq.online;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -25,6 +24,8 @@ import io.grpc.stub.StreamObserver;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.campaign.CampaignController;
+import mekhq.campaign.event.GMModeEvent;
+import mekhq.campaign.event.LocationChangedEvent;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.online.MekHQHostGrpc.MekHQHostBlockingStub;
 import mekhq.online.MekHQHostGrpc.MekHQHostStub;
@@ -111,9 +112,9 @@ public class MekHQClient {
                     } else if (payload.is(CampaignDateChanged.class)) {
                         handleCampaignDateChanged(id, payload.unpack(CampaignDateChanged.class));
                     } else if (payload.is(GMModeChanged.class)) {
-
+                        handleGMModeChanged(id, payload.unpack(GMModeChanged.class));
                     } else if (payload.is(LocationChanged.class)) {
-
+                        handleLocationChanged(id, payload.unpack(LocationChanged.class));
                     }
                 } catch (InvalidProtocolBufferException e) {
                     MekHQ.getLogger().error(MekHQClient.class, "messageBus::onNext()", "RPC protocol error: " + e.getMessage(), e);
@@ -132,12 +133,6 @@ public class MekHQClient {
                 finishLatch.countDown();
             }
         });
-    }
-
-    protected void handleCampaignDateChanged(UUID id, CampaignDateChanged dateChanged) {
-        String date = dateChanged.getDate();
-        controller.setHostDate(dateFormatter.parseDateTime(date));
-        MekHQ.getLogger().info(MekHQClient.class, "handleCampaignDateChanged()", String.format("<- HOST CampaignDateChanged: %s", date));
     }
 
     protected void handleRpcException(Throwable t) {
@@ -176,20 +171,78 @@ public class MekHQClient {
 
         controller.setHostDate(hostDate);
         controller.setHostLocation(locationId);
+        controller.setHostIsGMMode(pong.getIsGMMode());
 
         for (Campaign campaign : pong.getCampaignsList()) {
             controller.addRemoteCampaign(UUID.fromString(campaign.getId()), campaign.getName(),
-                dateFormatter.parseDateTime(campaign.getDate()), campaign.getLocation());
+                dateFormatter.parseDateTime(campaign.getDate()), campaign.getLocation(), campaign.getIsGMMode());
+        }
+    }
+
+    protected void handleCampaignDateChanged(UUID hostId, CampaignDateChanged dateChanged) {
+        String date = dateChanged.getDate();
+        DateTime campaignDate = dateFormatter.parseDateTime(date);
+        UUID campaignId = UUID.fromString(dateChanged.getId());
+        if (hostId.equals(campaignId)) {
+            controller.setHostDate(campaignDate);
+            MekHQ.getLogger().info(MekHQClient.class, "handleCampaignDateChanged()", String.format("<- HOST CampaignDateChanged: %s", date));
+        } else {
+            controller.setRemoteCampaignDate(campaignId, campaignDate);
+        }
+    }
+
+    protected void handleGMModeChanged(UUID hostId, GMModeChanged gmModeChanged) {
+        boolean isGMMode = gmModeChanged.getValue();
+        UUID campaignId = UUID.fromString(gmModeChanged.getId());
+        if (hostId.equals(campaignId)) {
+            controller.setHostIsGMMode(isGMMode);
+            MekHQ.getLogger().info(MekHQClient.class, "handleGMModeChanged()", String.format("<- HOST GMModeChanged: %s", isGMMode ? "ON" : "OFF"));
+        } else {
+            controller.setRemoteCampaignGMMode(campaignId, isGMMode);
+        }
+    }
+
+    protected void handleLocationChanged(UUID hostId, LocationChanged locationChanged) {
+        String locationId = locationChanged.getLocation();
+        boolean isGM = locationChanged.getIsGmMovement();
+        UUID campaignId = UUID.fromString(locationChanged.getId());
+        if (hostId.equals(campaignId)) {
+            controller.setHostLocation(locationId);
+            MekHQ.getLogger().info(MekHQClient.class, "handleLocationChanged()", String.format("<- HOST LocationChanged: %s (%s)", locationId, isGM ? "GM Moved" : "KF Jump"));
+        } else {
+            controller.setRemoteCampaignLocation(campaignId, locationId);
         }
     }
 
     @Subscribe
     public void handle(NewDayEvent evt) {
         CampaignDateChanged dateChanged = CampaignDateChanged.newBuilder()
+            .setId(getCampaign().getId().toString())
             .setDate(dateFormatter.print(getCampaign().getDateTime()))
             .build();
 
         messageBus.onNext(buildMessage(dateChanged));
+    }
+
+    @Subscribe
+    public void handle(GMModeEvent evt) {
+        GMModeChanged gmModeChanged = GMModeChanged.newBuilder()
+            .setId(getCampaign().getId().toString())
+            .setValue(evt.isGMMode())
+            .build();
+
+        messageBus.onNext(buildMessage(gmModeChanged));
+    }
+
+    @Subscribe
+    public void handle(LocationChangedEvent evt) {
+        LocationChanged locationChanged = LocationChanged.newBuilder()
+            .setId(getCampaign().getId().toString())
+            .setLocation(evt.getLocation().getCurrentSystem().getId())
+            .setIsGmMovement(!evt.isKFJump())
+            .build();
+
+        messageBus.onNext(buildMessage(locationChanged));
     }
 
     private ClientMessage buildMessage(Message payload) {

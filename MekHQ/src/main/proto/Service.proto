@@ -24,8 +24,9 @@ message ConnectionRequest {
     string name = 3;
     string date = 4;
     string location = 5;
+    bool isGMMode = 6;
     oneof password_option {
-        string password = 6;
+        string password = 7;
     }
 }
 
@@ -36,7 +37,8 @@ message ConnectionResponse {
     string name = 3;
     string date = 4;
     string location = 5;
-    repeated Campaign campaigns = 6;
+    bool isGMMode = 6;
+    repeated Campaign campaigns = 7;
 }
 
 message DisconnectionRequest {
@@ -53,6 +55,7 @@ message Campaign {
     string date = 3;
     int32 team = 4;
     string location = 5;
+    bool isGMMode = 6;
 }
 
 message ClientMessage {
@@ -72,20 +75,24 @@ message ServerMessage {
 message Ping {
     string date = 1;
     string location = 2;
+    bool isGMMode = 3;
 }
 
 message Pong {
     string date = 1;
     string location = 2;
-    repeated Campaign campaigns = 3;
+    bool isGMMode = 3;
+    repeated Campaign campaigns = 4;
 }
 
 message CampaignDateChanged {
-    string date = 1;
+    string id = 1;
+    string date = 2;
 }
 
 message GMModeChanged {
-    bool value = 1;
+    string id = 1;
+    bool value = 2;
 }
 
 message TeamAssignmentChanged {
@@ -98,6 +105,7 @@ message TeamAssignment {
 }
 
 message LocationChanged {
-    string location = 1;
-    bool is_gm_movement = 2;
+    string id = 1;
+    string location = 2;
+    bool is_gm_movement = 3;
 }
