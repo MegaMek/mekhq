@@ -49,6 +49,7 @@ import megamek.common.Tank;
 import megamek.common.Warship;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.sorter.NaturalOrderComparator;
 
 /**
  * @author Jay Lawson
@@ -978,7 +979,7 @@ public class HangarReport extends Report {
         //region UnitList Processing
         // Gather data and load it into the tree
         List<Unit> unitList = new ArrayList<>(getCampaign().getUnits());
-        unitList.sort(Comparator.comparing(Unit::getName));
+        unitList.sort(Comparator.comparing(Unit::getName, new NaturalOrderComparator()));
         for (Unit u : unitList) {
             Entity e = u.getEntity();
 
@@ -2258,8 +2259,6 @@ public class HangarReport extends Report {
         spaceStation.setUserObject("Space Station: " + countSpaceStations);
 
         //endregion Tree Description Assignment
-
-        // TODO : Implement a function that sorts the units in alphabetical order
 
         overviewHangarTree.setSelectionPath(null);
         overviewHangarTree.expandPath(new TreePath(top.getPath()));
