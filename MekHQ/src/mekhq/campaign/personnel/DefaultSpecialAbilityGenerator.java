@@ -26,11 +26,26 @@ public class DefaultSpecialAbilityGenerator extends AbstractSpecialAbilityGenera
     @Override
     public boolean generateSpecialAbilities(Person person, int expLvl) {
         if (getCampaignOptions(person).useAbilities()) {
-            SingleSpecialAbilityGenerator generator = new SingleSpecialAbilityGenerator();
-            generator.setSkillPreferences(getSkillPreferences());
+            SingleSpecialAbilityGenerator singleSpecialAbilityGenerator = new SingleSpecialAbilityGenerator();
+            singleSpecialAbilityGenerator.setSkillPreferences(getSkillPreferences());
 
+            // base number of special abilities is based on a random roll
             int nabil = Utilities.rollSpecialAbilities(getSkillPreferences().getSpecialAbilBonus(expLvl));
-            while (nabil > 0 && generator.generateSpecialAbilities(person, expLvl)) {
+
+            // Based on the AtB rules, recruits of veteran gain one and elites gain two
+            // additional special abilities
+            if (getCampaignOptions(person).getUseAtB()) {
+                switch (expLvl) {
+                    case SkillType.EXP_VETERAN:
+                        nabil += 1;
+                        break;
+                    case SkillType.EXP_ELITE:
+                        nabil += 2;
+                        break;
+                }
+            }
+
+            while (nabil > 0 && singleSpecialAbilityGenerator.generateSpecialAbilities(person, expLvl)) {
                 nabil--;
             }
 
