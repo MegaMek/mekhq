@@ -317,7 +317,7 @@ public final class BatchXPDialog extends JDialog {
                 // The next part is bollocks and doesn't belong here, but as long as we hardcode AtB ...
                 if(campaign.getCampaignOptions().getUseAtB()) {
                     if((p.getPrimaryRole() > Person.T_NONE) && (p.getPrimaryRole() <= Person.T_CONV_PILOT)
-                        && (p.getExperienceLevel(false) > experience) && (experience >= SkillType.EXP_REGULAR)) {
+                        && (p.getExperienceLevel(false) > experience) && (experience >= SkillType.EXP_VETERAN)) {
                         SingleSpecialAbilityGenerator spaGenerator = new SingleSpecialAbilityGenerator();
                         String spa = spaGenerator.rollSPA(p);
                         if(null == spa) {
