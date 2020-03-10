@@ -25,6 +25,7 @@ VERSION HISTORY:
 + Issue #1250: Added FormattedNumberSorter to Warehouse total cost column
 + Issue #1375: Creating Localized Natural Order Sorter
 + Issue #155: Adding Advance Day to Personnel Market
++ PR #1553: AtB: Adding SPA Generation for Generated Veteran and Elite Personnel
 
 v0.47.4 (2020-2-09 2200 UTC)
 + PR #1440: Implement "Rugged" quirk (2x or 3x between maintenance rolls)
