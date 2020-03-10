@@ -307,7 +307,7 @@ public final class BatchXPDialog extends JDialog {
                 } else {
                     cost = SkillType.getType(skillName).getCost(0);
                 }
-                int experience = p.getExperienceLevel(false);
+                int startingExperienceLevel = p.getExperienceLevel(false);
 
                 // Improve the skill and deduce the cost
                 p.improveSkill(skillName);
@@ -315,12 +315,13 @@ public final class BatchXPDialog extends JDialog {
                 p.setXp(p.getXp() - cost);
 
                 // The next part is bollocks and doesn't belong here, but as long as we hardcode AtB ...
-                if(campaign.getCampaignOptions().getUseAtB()) {
-                    if((p.getPrimaryRole() > Person.T_NONE) && (p.getPrimaryRole() <= Person.T_CONV_PILOT)
-                        && (p.getExperienceLevel(false) > experience) && (experience >= SkillType.EXP_VETERAN)) {
+                if (campaign.getCampaignOptions().getUseAtB()) {
+                    if ((p.getPrimaryRole() > Person.T_NONE) && (p.getPrimaryRole() <= Person.T_CONV_PILOT)
+                            && (p.getExperienceLevel(false) > startingExperienceLevel)
+                            && (startingExperienceLevel >= SkillType.EXP_REGULAR)) {
                         SingleSpecialAbilityGenerator spaGenerator = new SingleSpecialAbilityGenerator();
                         String spa = spaGenerator.rollSPA(p);
-                        if(null == spa) {
+                        if (null == spa) {
                             if(campaign.getCampaignOptions().useEdge()) {
                                 p.getOptions().acquireAbility(PilotOptions.EDGE_ADVANTAGES, "edge", p.getEdge() + 1); //$NON-NLS-1$
                                 PersonalLogger.gainedEdge(p, campaign.getDate());
