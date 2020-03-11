@@ -54,6 +54,9 @@ import mekhq.campaign.event.GMModeEvent;
 import mekhq.campaign.event.LocationChangedEvent;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.online.MekHQHostGrpc;
+import mekhq.online.events.CampaignConnectedEvent;
+import mekhq.online.events.CampaignDisconnectedEvent;
+import mekhq.online.events.CampaignListUpdatedEvent;
 
 public class MekHQServer {
     private final int port;
@@ -153,7 +156,9 @@ public class MekHQServer {
                 .setId(getCampaign().getId().toString())
                 .setName(getCampaign().getName())
                 .setDate(dateFormatter.print(getCampaign().getDateTime()))
-                .setLocation(getCampaign().getLocation().getCurrentSystem().getId()).build();
+                .setLocation(getCampaign().getLocation().getCurrentSystem().getId())
+                .setIsActive(true)
+                .build();
         }
 
         @Override
@@ -188,6 +193,9 @@ public class MekHQServer {
                 clientCampaign.getLocation(), clientCampaign.getIsGMMode());
 
             responseObserver.onCompleted();
+
+            MekHQ.triggerEvent(new CampaignConnectedEvent(id));
+            MekHQ.triggerEvent(new CampaignListUpdatedEvent());
         }
 
         @Override
@@ -196,11 +204,16 @@ public class MekHQServer {
 
             controller.removeActiveCampaign(id);
 
+            handleDisconnection(id);
+
             DisconnectionResponse response = DisconnectionResponse.newBuilder().setId(getCampaign().getId().toString())
                     .build();
 
             responseObserver.onNext(response);
             responseObserver.onCompleted();
+
+            MekHQ.triggerEvent(new CampaignDisconnectedEvent(id));
+            MekHQ.triggerEvent(new CampaignListUpdatedEvent());
         }
 
         @Override
@@ -231,6 +244,8 @@ public class MekHQServer {
                             .augmentDescription("messageBus()")
                             .withCause(e) // This can be attached to the Status locally, but NOT transmitted to the client!
                             .asRuntimeException());
+
+                        MekHQ.triggerEvent(new CampaignDisconnectedEvent(clientId));
                     }
                 }
 
@@ -238,13 +253,22 @@ public class MekHQServer {
                 public void onError(Throwable t) {
                     MekHQ.getLogger().error(MekHQHostService.class, "messageBus::onError()",
                         String.format("RPC protocol error from client %s: %s", clientId, t.getMessage()), t);
-                    removeMessageBus(clientId, responseObserver);
+
+                    messageBus.remove(clientId);
+
+                    if (clientId != null) {
+                        MekHQ.triggerEvent(new CampaignDisconnectedEvent(clientId));
+                    }
                 }
 
                 @Override
                 public void onCompleted() {
-                    removeMessageBus(clientId, responseObserver);
+                    messageBus.remove(clientId);
                     responseObserver.onCompleted();
+
+                    if (clientId != null) {
+                        MekHQ.triggerEvent(new CampaignDisconnectedEvent(clientId));
+                    }
                 }
             };
         }
@@ -253,17 +277,45 @@ public class MekHQServer {
             messageBus.putIfAbsent(Objects.requireNonNull(campaignId), responseObserver);
         }
 
-        private void removeMessageBus(UUID campaignId, StreamObserver<ServerMessage> responseObserver) {
-            messageBus.remove(campaignId);
+        private void handleDisconnection(UUID campaignId) {
+            StreamObserver<ServerMessage> existingMessageBus = messageBus.remove(campaignId);
+            if (existingMessageBus != null) {
+                existingMessageBus.onCompleted();
+            }
+
+            MekHQ.triggerEvent(new CampaignDisconnectedEvent(campaignId));
         }
 
         public void sendPings() {
             Ping ping = Ping.newBuilder()
                 .setCampaign(getCampaignDetails())
                 .build();
+
+            List<UUID> toRemove = new ArrayList<>();
             for (Map.Entry<UUID, StreamObserver<ServerMessage>> client : messageBus.entrySet()) {
-                MekHQ.getLogger().info(MekHQHostService.class, "handlePing()", "<- PING: " + client.getKey());
-                client.getValue().onNext(buildResponse(Ping.newBuilder(ping).build()));
+                UUID clientId = client.getKey();
+
+                MekHQ.getLogger().info(MekHQHostService.class, "handlePing()", "<- PING: " + clientId);
+
+                // If we have a PING without a PONG, this client is no longer active.
+                if (null != outstandingPings.put(clientId, clientId)) {
+                    controller.removeActiveCampaign(clientId);
+                }
+
+                try {
+                    client.getValue().onNext(buildResponse(Ping.newBuilder(ping).build()));
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(MekHQHostService.class, "handlePing()", "Failed to ping campaign " + clientId, e);
+                    toRemove.add(clientId);
+                }
+            }
+
+            for (UUID disconnectedCampaignId : toRemove) {
+                handleDisconnection(disconnectedCampaignId);
+            }
+
+            if (!toRemove.isEmpty()) {
+                MekHQ.triggerEvent(new CampaignListUpdatedEvent());
             }
         }
 
@@ -382,6 +434,8 @@ public class MekHQServer {
                         .setName(remoteCampaign.getName())
                         .setDate(dateFormatter.print(remoteCampaign.getDate()))
                         .setLocation(remoteCampaign.getLocation().getId())
+                        .setIsGMMode(remoteCampaign.isGMMode())
+                        .setIsActive(controller.isCampaignActive(remoteCampaign.getId()))
                         .build());
             }
             return converted;

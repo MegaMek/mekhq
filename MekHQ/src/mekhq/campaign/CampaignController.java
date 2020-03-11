@@ -19,6 +19,9 @@
 package mekhq.campaign;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -157,6 +160,14 @@ public class CampaignController {
 
 	public void removeActiveCampaign(UUID id) {
         activeCampaigns.remove(id);
+    }
+
+    public boolean isCampaignActive(UUID id) {
+        return Objects.equals(getHost(), id) || activeCampaigns.containsKey(id);
+    }
+
+    public Set<UUID> getActiveCampaigns() {
+        return Collections.unmodifiableSet(activeCampaigns.keySet());
     }
 
     /**

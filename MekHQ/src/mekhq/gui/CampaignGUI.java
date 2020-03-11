@@ -107,6 +107,7 @@ import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.io.FileType;
+import mekhq.online.events.CampaignListUpdatedEvent;
 
 /**
  * The application's main frame.
@@ -2628,6 +2629,12 @@ public class CampaignGUI extends JPanel {
     @Subscribe
     public void handleLocationChanged(LocationChangedEvent ev) {
         refreshLocation();
+    }
+
+    @Subscribe
+    public void handle(CampaignListUpdatedEvent ev) {
+        MekHQ.getLogger().info(CampaignGUI.class, "handle(CampaignListUpdatedEvent)",
+            "There are " + (getCampaignController().getRemoteCampaigns().size() + 1) + " campaigns playing, " + (getCampaignController().getActiveCampaigns().size() + 1) + " are active");
     }
 
     public void refreshLocation() {

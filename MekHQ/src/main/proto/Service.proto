@@ -114,6 +114,10 @@ message CampaignDetails {
     // A value indicating whether or not the Campaign
     // is operating under GM Mode.
     bool isGMMode = 6;
+
+    // A value indicating whether or not the Campaign
+    // is actively playing in this session.
+    bool is_active = 7;
 }
 
 // Represents a message from a Client Campaign

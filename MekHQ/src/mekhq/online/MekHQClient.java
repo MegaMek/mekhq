@@ -18,7 +18,9 @@
  */
 package mekhq.online;
 
+import java.util.HashSet;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
@@ -47,6 +49,7 @@ import mekhq.campaign.event.LocationChangedEvent;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.online.MekHQHostGrpc.MekHQHostBlockingStub;
 import mekhq.online.MekHQHostGrpc.MekHQHostStub;
+import mekhq.online.events.CampaignListUpdatedEvent;
 
 public class MekHQClient {
     private final DateTimeFormatter dateFormatter = ISODateTimeFormat.date();
@@ -60,6 +63,8 @@ public class MekHQClient {
     private StreamObserver<ClientMessage> messageBus;
     private ScheduledExecutorService pingExecutor;
     private ScheduledFuture<?> pings;
+
+    private final Set<UUID> knownCampaigns = new HashSet<>();
 
     public MekHQClient(Channel channel, CampaignController controller) {
         blockingStub = MekHQHostGrpc.newBlockingStub(channel);
@@ -101,8 +106,19 @@ public class MekHQClient {
 
         controller.setHost(UUID.fromString(hostCampaign.getId()));
         controller.setHostName(hostCampaign.getName());
-        controller.setHostDate(DateTime.parse(hostCampaign.getDate(), dateFormatter));
+        controller.setHostDate(dateFormatter.parseDateTime(hostCampaign.getDate()));
         controller.setHostLocation(hostCampaign.getLocation());
+
+        knownCampaigns.add(controller.getHost());
+        for (CampaignDetails details : response.getCampaignsList()) {
+            UUID clientId = UUID.fromString(details.getId());
+
+            knownCampaigns.add(clientId);
+
+            controller.addRemoteCampaign(clientId, details.getName(),
+                dateFormatter.parseDateTime(details.getDate()), details.getLocation(), details.getIsGMMode());
+        }
+
 
         createMessageBus();
 
@@ -204,9 +220,21 @@ public class MekHQClient {
         controller.setHostLocation(locationId);
         controller.setHostIsGMMode(hostCampaign.getIsGMMode());
 
+        Set<UUID> foundCampaigns = new HashSet<>();
+        foundCampaigns.add(id);
+
         for (CampaignDetails campaign : pong.getCampaignsList()) {
-            controller.addRemoteCampaign(UUID.fromString(campaign.getId()), campaign.getName(),
+            UUID clientId = UUID.fromString(campaign.getId());
+
+            foundCampaigns.add(clientId);
+
+            controller.addRemoteCampaign(clientId, campaign.getName(),
                 dateFormatter.parseDateTime(campaign.getDate()), campaign.getLocation(), campaign.getIsGMMode());
+        }
+
+        // Only kick off a notification if we found any new campaigns
+        if (!knownCampaigns.equals(foundCampaigns)) {
+            MekHQ.triggerEvent(new CampaignListUpdatedEvent());
         }
     }
 
