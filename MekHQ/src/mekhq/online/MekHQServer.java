@@ -157,6 +157,7 @@ public class MekHQServer {
                 .setName(getCampaign().getName())
                 .setDate(dateFormatter.print(getCampaign().getDateTime()))
                 .setLocation(getCampaign().getLocation().getCurrentSystem().getId())
+                .setIsGMMode(getCampaign().isGM())
                 .setIsActive(true)
                 .build();
         }
@@ -337,6 +338,13 @@ public class MekHQServer {
             outstandingPings.remove(campaignId);
 
             CampaignDetails clientCampaign = pong.getCampaign();
+            UUID clientId = UUID.fromString(clientCampaign.getId());
+            controller.addRemoteCampaign(clientId, clientCampaign.getName(),
+                dateFormatter.parseDateTime(clientCampaign.getDate()), clientCampaign.getLocation(),
+                clientCampaign.getIsGMMode());
+            controller.addActiveCampaign(clientId);
+
+            MekHQ.triggerEvent(new CampaignListUpdatedEvent());
 
             MekHQ.getLogger().info(MekHQHostService.class, "handlePing()", String.format("-> PONG: %s %s %s", campaignId, clientCampaign.getDate(), clientCampaign.getLocation()));
         }
@@ -345,6 +353,8 @@ public class MekHQServer {
                 CampaignDateChanged campaignDateChanged) {
 
             controller.setRemoteCampaignDate(clientId, dateFormatter.parseDateTime(campaignDateChanged.getDate()));
+
+            MekHQ.triggerEvent(new CampaignListUpdatedEvent());
 
             sendToAllExcept(clientId, campaignDateChanged);
         }
@@ -356,6 +366,8 @@ public class MekHQServer {
 
             controller.setRemoteCampaignGMMode(clientId, gmModeChanged.getValue());
 
+            MekHQ.triggerEvent(new CampaignListUpdatedEvent());
+
             sendToAllExcept(clientId, gmModeChanged);
         }
 
@@ -364,6 +376,8 @@ public class MekHQServer {
                 LocationChanged locationChanged) {
 
             controller.setRemoteCampaignLocation(clientId, locationChanged.getLocation());
+
+            MekHQ.triggerEvent(new CampaignListUpdatedEvent());
 
             sendToAllExcept(clientId, locationChanged);
         }

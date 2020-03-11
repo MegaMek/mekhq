@@ -81,7 +81,9 @@ public class MekHQClient {
             .setId(getCampaign().getId().toString())
             .setName(getCampaign().getName())
             .setDate(dateFormatter.print(getCampaign().getDateTime()))
-            .setLocation(getCampaign().getLocation().getCurrentSystem().getId()).build();
+            .setLocation(getCampaign().getLocation().getCurrentSystem().getId())
+            .setIsGMMode(getCampaign().isGM())
+            .build();
     }
 
     public void connect() {
@@ -108,6 +110,7 @@ public class MekHQClient {
         controller.setHostName(hostCampaign.getName());
         controller.setHostDate(dateFormatter.parseDateTime(hostCampaign.getDate()));
         controller.setHostLocation(hostCampaign.getLocation());
+        controller.setHostIsGMMode(hostCampaign.getIsGMMode());
 
         knownCampaigns.add(controller.getHost());
         for (CampaignDetails details : response.getCampaignsList()) {
@@ -118,7 +121,6 @@ public class MekHQClient {
             controller.addRemoteCampaign(clientId, details.getName(),
                 dateFormatter.parseDateTime(details.getDate()), details.getLocation(), details.getIsGMMode());
         }
-
 
         createMessageBus();
 
@@ -232,10 +234,7 @@ public class MekHQClient {
                 dateFormatter.parseDateTime(campaign.getDate()), campaign.getLocation(), campaign.getIsGMMode());
         }
 
-        // Only kick off a notification if we found any new campaigns
-        if (!knownCampaigns.equals(foundCampaigns)) {
-            MekHQ.triggerEvent(new CampaignListUpdatedEvent());
-        }
+        MekHQ.triggerEvent(new CampaignListUpdatedEvent());
     }
 
     protected void handleCampaignDateChanged(UUID hostId, CampaignDateChanged dateChanged) {
@@ -248,6 +247,8 @@ public class MekHQClient {
         } else {
             controller.setRemoteCampaignDate(campaignId, campaignDate);
         }
+
+        MekHQ.triggerEvent(new CampaignListUpdatedEvent());
     }
 
     protected void handleGMModeChanged(UUID hostId, GMModeChanged gmModeChanged) {
@@ -259,6 +260,8 @@ public class MekHQClient {
         } else {
             controller.setRemoteCampaignGMMode(campaignId, isGMMode);
         }
+
+        MekHQ.triggerEvent(new CampaignListUpdatedEvent());
     }
 
     protected void handleLocationChanged(UUID hostId, LocationChanged locationChanged) {
@@ -271,6 +274,8 @@ public class MekHQClient {
         } else {
             controller.setRemoteCampaignLocation(campaignId, locationId);
         }
+
+        MekHQ.triggerEvent(new CampaignListUpdatedEvent());
     }
 
     @Subscribe

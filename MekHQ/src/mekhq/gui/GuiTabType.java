@@ -41,7 +41,8 @@ public enum GuiTabType {
     MEKLAB(8, "panMekLab.TabConstraints.tabTitle"), //$NON-NLS-1$
     FINANCES(9, "panFinances.TabConstraints.tabTitle"), //$NON-NLS-1$
     OVERVIEW(10, "panOverview.TabConstraints.tabTitle"), //$NON-NLS-1$
-    CUSTOM(11, null);
+    ONLINE(11, "panOnline.TabConstraints.tabTitle"), //$NON-NLS-1$
+    CUSTOM(16, null);
 
     private int defaultPos;
     private String name;
@@ -88,6 +89,8 @@ public enum GuiTabType {
             return new FinancesTab(gui, name);
         case OVERVIEW:
             return new OverviewTab(gui, name);
+        case ONLINE:
+            return new OnlineTab(gui, name);
         default:
             return null;
 

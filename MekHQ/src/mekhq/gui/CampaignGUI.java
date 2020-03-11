@@ -240,6 +240,14 @@ public class CampaignGUI extends JPanel {
         }
     }
 
+    public void showOnlineTab(boolean show) {
+        if (show) {
+            addStandardTab(GuiTabType.ONLINE);
+        } else {
+            removeStandardTab(GuiTabType.ONLINE);
+        }
+    }
+
     public void showGMToolsDialog() {
         GMToolsDialog gmTools = new GMToolsDialog(getFrame(), this);
         gmTools.setVisible(true);
@@ -307,6 +315,14 @@ public class CampaignGUI extends JPanel {
         addStandardTab(GuiTabType.MEKLAB);
         addStandardTab(GuiTabType.FINANCES);
         addStandardTab(GuiTabType.OVERVIEW);
+
+        // If we're hosting a MekHQ session, or if we're connected to
+        // a MekHQ session, or if we've had remote campaigns previously,
+        // then we should display the ONLINE tab.
+        if (app.isHosting() || app.isRemote() 
+            || !getCampaignController().getRemoteCampaigns().isEmpty()) {
+            addStandardTab(GuiTabType.ONLINE);
+        }
 
         initMain();
         initTopButtons();
