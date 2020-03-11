@@ -162,6 +162,12 @@ public class CampaignController {
         activeCampaigns.remove(id);
     }
 
+	public void setActiveCampaigns(Collection<UUID> campaignIds) {
+        // TODO: evaluate if we can make this atomic somehow.
+        activeCampaigns.clear();
+        campaignIds.forEach(id -> activeCampaigns.put(id, id));
+	}
+
     public boolean isCampaignActive(UUID id) {
         return Objects.equals(getHost(), id) || activeCampaigns.containsKey(id);
     }

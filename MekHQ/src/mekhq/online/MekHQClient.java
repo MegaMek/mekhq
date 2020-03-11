@@ -234,6 +234,8 @@ public class MekHQClient {
                 dateFormatter.parseDateTime(campaign.getDate()), campaign.getLocation(), campaign.getIsGMMode());
         }
 
+        controller.setActiveCampaigns(foundCampaigns);
+
         MekHQ.triggerEvent(new CampaignListUpdatedEvent());
     }
 

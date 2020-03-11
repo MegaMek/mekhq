@@ -2562,7 +2562,7 @@ public class CampaignGUI extends JPanel {
         } else if (app.isRemote()) {
             lblOnline.setText(
                 String.format("<html><font color='green'><b>CONNECTED</b> (%d playing)</font></html>",
-                    getCampaignController().getActiveCampaigns().size() + 1 /*Host*/));
+                    getCampaignController().getActiveCampaigns().size()));
         } else {
             lblOnline.setVisible(false);
         }
