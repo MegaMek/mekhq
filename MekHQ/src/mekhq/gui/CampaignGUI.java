@@ -147,6 +147,7 @@ public class CampaignGUI extends JPanel {
 
     /* Components for the status panel */
     private JPanel statusPanel;
+    private JLabel lblOnline;
     private JLabel lblLocation;
     private JLabel lblRating;
     private JLabel lblFunds;
@@ -343,6 +344,7 @@ public class CampaignGUI extends JPanel {
         refreshLocation();
         refreshTempAstechs();
         refreshTempMedics();
+        refreshOnlineStatus();
 
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 
@@ -986,11 +988,13 @@ public class CampaignGUI extends JPanel {
     private void initStatusBar() {
         statusPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 20, 4));
 
+        lblOnline = new JLabel();
         lblRating = new JLabel();
         lblFunds = new JLabel();
         lblTempAstechs = new JLabel();
         lblTempMedics = new JLabel();
 
+        statusPanel.add(lblOnline);
         statusPanel.add(lblRating);
         statusPanel.add(lblFunds);
         statusPanel.add(lblTempAstechs);
@@ -2486,7 +2490,12 @@ public class CampaignGUI extends JPanel {
     }
 
     public void refreshCalendar() {
-        getFrame().setTitle(getCampaign().getTitle());
+        if (app.isHosting() || app.isRemote()) {
+            getFrame().setTitle(String.format(
+                "%s - %s", app.isHosting() ? "HOSTING" : "CONNECTED", getCampaign().getTitle()));
+        } else {
+            getFrame().setTitle(getCampaign().getTitle());
+        }
     }
 
     synchronized private void refreshReport() {
@@ -2543,6 +2552,20 @@ public class CampaignGUI extends JPanel {
     private void refreshTempMedics() {
         String text = "<html><b>Temp Medics:</b> " + getCampaign().getMedicPool() + "</html>";
         lblTempMedics.setText(text);
+    }
+
+    private void refreshOnlineStatus() {
+        if (app.isHosting()) {
+            lblOnline.setText(
+                String.format("<html><font color='green'><b>HOSTING</b> (%d connected)</font></html>",
+                    getCampaignController().getRemoteCampaigns().size()));
+        } else if (app.isRemote()) {
+            lblOnline.setText(
+                String.format("<html><font color='green'><b>CONNECTED</b> (%d playing)</font></html>",
+                    getCampaignController().getActiveCampaigns().size() + 1 /*Host*/));
+        } else {
+            lblOnline.setVisible(false);
+        }
     }
 
     private ActionScheduler fundsScheduler = new ActionScheduler(this::refreshFunds);
@@ -2649,6 +2672,8 @@ public class CampaignGUI extends JPanel {
 
     @Subscribe
     public void handle(CampaignListUpdatedEvent ev) {
+        refreshOnlineStatus();
+
         MekHQ.getLogger().info(CampaignGUI.class, "handle(CampaignListUpdatedEvent)",
             "There are " + (getCampaignController().getRemoteCampaigns().size() + 1) + " campaigns playing, " + (getCampaignController().getActiveCampaigns().size() + 1) + " are active");
     }
