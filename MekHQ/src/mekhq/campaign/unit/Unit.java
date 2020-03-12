@@ -3850,7 +3850,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             entity.getCrew().setCurrentSize(nCrew + nGunners + nDrivers);
             entity.getCrew().setSize(Compute.getFullCrewSize(entity));
             entity.getCrew().setHits(entity.getCrew().calculateHits(),0);
-        } else if (entity instanceof Infantry) {
+        } else if (entity instanceof Infantry || usesSoloPilot()) {
             //Set the crew size based on gunners, since all personnel are both gunners and drivers
             entity.getCrew().setSize(nGunners);
         } else {
