@@ -350,7 +350,7 @@ public class Campaign implements Serializable, ITechManager {
         retirementDefectionTracker = new RetirementDefectionTracker();
         fatigueLevel = 0;
         atbConfig = null;
-        autosaveService = new AutosaveService(MekHQ.getLogger());
+        autosaveService = new AutosaveService();
     }
 
     /**
