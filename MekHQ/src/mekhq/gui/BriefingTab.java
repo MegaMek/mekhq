@@ -45,8 +45,12 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 
+import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
+import megamek.common.Jumpship;
+import megamek.common.SmallCraft;
+import megamek.common.UnitType;
 import megamek.common.event.Subscribe;
 import megamek.common.logging.LogLevel;
 import megamek.common.options.GameOptions;
@@ -617,7 +621,14 @@ public final class BriefingTab extends CampaignGuiTab {
                     chosen.add(u);
 
                     // So MegaMek has correct crew sizes
-                    u.getEntity().getCrew().setSize(u.getActiveCrew().size());
+                    if (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
+                        // Large craft use current and max size to calculate hits per TacOps
+                        u.getEntity().getCrew().setCurrentSize(u.getActiveCrew().size());
+                        u.getEntity().getCrew().setSize(Compute.getFullCrewSize(u.getEntity()));
+                        u.getEntity().getCrew().setHits(u.getEntity().getCrew().calculateHits(),0);
+                    } else {
+                        u.getEntity().getCrew().setSize(u.getActiveCrew().size());
+                    }
                 } else {
                     undeployed.append("\n").append(u.getName()).append(" (").append(u.checkDeployment()).append(")");
                 }
@@ -706,7 +717,14 @@ public final class BriefingTab extends CampaignGuiTab {
                     chosen.add(u);
 
                     // So MegaMek has correct crew sizes
-                    u.getEntity().getCrew().setSize(u.getActiveCrew().size());
+                    if (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
+                        // Large craft use current and max size to calculate hits per TacOps
+                        u.getEntity().getCrew().setCurrentSize(u.getActiveCrew().size());
+                        u.getEntity().getCrew().setSize(Compute.getFullCrewSize(u.getEntity()));
+                        u.getEntity().getCrew().setHits(u.getEntity().getCrew().calculateHits(),0);
+                    } else {
+                        u.getEntity().getCrew().setSize(u.getActiveCrew().size());
+                    }
                 } else {
                     undeployed.append("\n").append(u.getName()).append(" (").append(u.checkDeployment()).append(")");
                 }
@@ -753,7 +771,14 @@ public final class BriefingTab extends CampaignGuiTab {
                     u.resetPilotAndEntity();
 
                     // So MegaMek has correct crew sizes
-                    u.getEntity().getCrew().setSize(u.getActiveCrew().size());
+                    if (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
+                        // Large craft use current and max size to calculate hits per TacOps
+                        u.getEntity().getCrew().setCurrentSize(u.getActiveCrew().size());
+                        u.getEntity().getCrew().setSize(Compute.getFullCrewSize(u.getEntity()));
+                        u.getEntity().getCrew().setHits(u.getEntity().getCrew().calculateHits(),0);
+                    } else {
+                        u.getEntity().getCrew().setSize(u.getActiveCrew().size());
+                    }
 
                     // Add the entity
                     chosen.add(u.getEntity());
