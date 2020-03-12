@@ -24,6 +24,7 @@ import megamek.common.TechConstants;
 import megamek.common.UnitType;
 import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.EntityImage;
@@ -335,8 +336,8 @@ public class UnitViewPanel extends ScrollablePanel {
         Image camo = null;
         try {
             camo = (Image) camos.getItem(unit.getCamoCategory(), unit.getCamoFileName());
-        } catch (Exception err) {
-            err.printStackTrace();
+        } catch (Exception e) {
+            MekHQ.getLogger().error(getClass(), "getCamo", e);
         }
         return camo;
     }

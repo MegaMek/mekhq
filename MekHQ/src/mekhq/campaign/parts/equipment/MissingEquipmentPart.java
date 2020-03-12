@@ -23,6 +23,7 @@ package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 
+import mekhq.MekHQ;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -67,7 +68,7 @@ public class MissingEquipmentPart extends MissingPart {
     public MissingEquipmentPart() {
     	this(0, null, -1, null, 0, false);
     }
-    
+
     public MissingEquipmentPart(int tonnage, EquipmentType et, int equipNum, Campaign c, double eTonnage) {
         this(tonnage, et, equipNum, c, eTonnage, false);
     }
@@ -110,9 +111,8 @@ public class MissingEquipmentPart extends MissingPart {
         }
 
         if (type == null) {
-            System.err
-            .println("Mounted.restore: could not restore equipment type \""
-                    + name + "\"");
+            MekHQ.getLogger().error(getClass(), "restore",
+                    "Mounted.restore: could not restore equipment type \"" + name + "\"");
         }
     }
 
@@ -155,7 +155,7 @@ public class MissingEquipmentPart extends MissingPart {
 		}
 		restore();
 	}
-	
+
 	@Override
 	public TechAdvancement getTechAdvancement() {
 	    return type.getTechAdvancement();

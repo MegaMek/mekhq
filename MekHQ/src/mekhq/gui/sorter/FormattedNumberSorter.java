@@ -1,5 +1,7 @@
 package mekhq.gui.sorter;
 
+import mekhq.MekHQ;
+
 import java.text.DecimalFormat;
 import java.util.Comparator;
 
@@ -38,15 +40,13 @@ import java.util.Comparator;
             try {
                 l0 = FORMAT.parse(s0).longValue();
             } catch (java.text.ParseException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                MekHQ.getLogger().error(getClass(), "compare", e);
             }
             long l1 = 0;
             try {
                 l1 = FORMAT.parse(s1).longValue();
             } catch (java.text.ParseException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                MekHQ.getLogger().error(getClass(), "compare", e);
             }
             return Long.compare(l0, l1);
         }

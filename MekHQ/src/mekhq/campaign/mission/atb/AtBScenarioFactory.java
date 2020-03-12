@@ -110,7 +110,7 @@ public class AtBScenarioFactory {
 
             return s;
         } catch (InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
+            MekHQ.getLogger().error(AtBScenarioFactory.class, "createScenario", e);
         }
 
         return null;

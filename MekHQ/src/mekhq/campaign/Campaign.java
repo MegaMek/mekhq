@@ -573,7 +573,7 @@ public class Campaign implements Serializable, ITechManager {
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    MekHQ.getLogger().error(getClass(), "initUnitGenerator", e);
                 }
             }
             rm.setSelectedRATs(campaignOptions.getRATs());

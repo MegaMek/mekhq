@@ -47,17 +47,17 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
     private JPasswordField txtPasswd;
     private JButton btnUpload;
     private JButton btnCancel;
-    
+
     private ProgressMonitor progressMonitor;
     private MercRosterAccess access;
-    
+
     private static final long serialVersionUID = 8376874926997734492L;
     /** Creates new form */
     public MercRosterDialog(java.awt.Frame parent, boolean modal, Campaign c) {
         super(parent, modal);
         frame = parent;
         this.campaign = c;
-        initComponents();      
+        initComponents();
         this.setLocationRelativeTo(parent);
         setUserPreferences();
     }
@@ -78,11 +78,11 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("Form.title"));
-        
+
         getContentPane().setLayout(new GridBagLayout());
-      
+
         GridBagConstraints gbc = new GridBagConstraints();
-        
+
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.NONE;
@@ -91,12 +91,12 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
         gbc.insets = new Insets(5,5,5,5);
         gbc.anchor = GridBagConstraints.WEST;
         getContentPane().add(new JLabel(resourceMap.getString("lblAddress.text")), gbc);
-        
+
         gbc.gridx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
         getContentPane().add(txtAddress, gbc);
-        
+
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.fill = GridBagConstraints.NONE;
@@ -107,7 +107,7 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
         getContentPane().add(txtPort, gbc);
-        
+
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.fill = GridBagConstraints.NONE;
@@ -118,7 +118,7 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
         getContentPane().add(txtTable, gbc);
-        
+
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.fill = GridBagConstraints.NONE;
@@ -129,7 +129,7 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
         getContentPane().add(txtUser, gbc);
-        
+
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.fill = GridBagConstraints.NONE;
@@ -140,23 +140,23 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
         getContentPane().add(txtPasswd, gbc);
-        
+
         JPanel panButtons = new JPanel(new GridLayout(0,2));
         panButtons.add(btnUpload);
         panButtons.add(btnCancel);
-        
+
         btnUpload.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 upload();
             }
         });
-        
+
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 setVisible(false);
             }
         });
-        
+
         gbc.gridx = 0;
         gbc.gridy = 5;
         gbc.gridwidth = 2;
@@ -165,7 +165,7 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
         gbc.weighty = 1.0;
         gbc.anchor = GridBagConstraints.NORTH;
         getContentPane().add(panButtons, gbc);
-        
+
         pack();
     }
 
@@ -193,15 +193,15 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
                     "Could not connect to the mysql database. Check your entries and confirm\n" +
                     "that you can connect to the database remotely.",
                     "Could not connect",
-                    JOptionPane.ERROR_MESSAGE); 
-            e.printStackTrace();
+                    JOptionPane.ERROR_MESSAGE);
+            MekHQ.getLogger().error(getClass(), "upload", e);
             return;
-        }       
+        }
         access.addPropertyChangeListener(this);
         access.execute();
         setVisible(false);
     }
-    
+
     @Override
     public void propertyChange(PropertyChangeEvent arg0) {
         progressMonitor.setProgress(access.getProgress());
@@ -209,7 +209,7 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
         if (progressMonitor.isCanceled()) {
             access.cancel(true);
             access.close();
-        } 
+        }
         if (access.isDone()) {
             //nothing
         }

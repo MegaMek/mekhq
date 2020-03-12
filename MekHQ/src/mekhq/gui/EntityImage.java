@@ -1,5 +1,7 @@
 package mekhq.gui;
 
+import mekhq.MekHQ;
+
 import java.awt.Component;
 import java.awt.Image;
 import java.awt.image.ImageObserver;
@@ -60,13 +62,13 @@ import java.awt.image.PixelGrabber;
             try {
                 pgMech.grabPixels();
             } catch (InterruptedException e) {
-                System.err
-                        .println("EntityImage.applyColor(): Failed to grab pixels for mech image." + e.getMessage()); //$NON-NLS-1$
+                MekHQ.getLogger().error(getClass(), "applyColor",
+                        "EntityImage.applyColor(): Failed to grab pixels for mech image." + e.getMessage()); //$NON-NLS-1$
                 return image;
             }
             if ((pgMech.getStatus() & ImageObserver.ABORT) != 0) {
-                System.err
-                        .println("EntityImage.applyColor(): Failed to grab pixels for mech image. ImageObserver aborted."); //$NON-NLS-1$
+                MekHQ.getLogger().error(getClass(), "applyColor",
+                        "EntityImage.applyColor(): Failed to grab pixels for mech image. ImageObserver aborted."); //$NON-NLS-1$
                 return image;
             }
 
@@ -76,13 +78,13 @@ import java.awt.image.PixelGrabber;
                 try {
                     pgCamo.grabPixels();
                 } catch (InterruptedException e) {
-                    System.err
-                            .println("EntityImage.applyColor(): Failed to grab pixels for camo image." + e.getMessage()); //$NON-NLS-1$
+                    MekHQ.getLogger().error(getClass(), "applyColor",
+                            "EntityImage.applyColor(): Failed to grab pixels for camo image." + e.getMessage()); //$NON-NLS-1$
                     return image;
                 }
                 if ((pgCamo.getStatus() & ImageObserver.ABORT) != 0) {
-                    System.err
-                            .println("EntityImage.applyColor(): Failed to grab pixels for mech image. ImageObserver aborted."); //$NON-NLS-1$
+                    MekHQ.getLogger().error(getClass(), "applyColor",
+                            "EntityImage.applyColor(): Failed to grab pixels for mech image. ImageObserver aborted."); //$NON-NLS-1$
                     return image;
                 }
             }
@@ -112,4 +114,4 @@ import java.awt.image.PixelGrabber;
                     IMG_HEIGHT, pMech, 0, IMG_WIDTH));
             return image;
         }
-    }	
+    }

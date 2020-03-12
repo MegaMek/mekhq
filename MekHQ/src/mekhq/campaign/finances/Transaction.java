@@ -1,20 +1,20 @@
 /*
  * Transaction.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.Objects;
 import java.util.Vector;
 
+import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 
 import org.w3c.dom.DOMException;
@@ -41,9 +42,9 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Transaction implements Serializable {
-	
+
 	private static final long serialVersionUID = -8772148858528954672L;
-	
+
 	public final static int C_MISC            = 0;
 	public final static int C_EQUIP           = 1;
 	public final static int C_UNIT            = 2;
@@ -71,7 +72,7 @@ public class Transaction implements Serializable {
         Collections.sort(out);
         return out;
     }
-	
+
 	public static String getCategoryName(int cat) {
 		switch(cat) {
 		case C_MISC:
@@ -115,18 +116,18 @@ public class Transaction implements Serializable {
 	private String description;
 	private Date date;
 	private int category;
-	
+
 	public Transaction() {
 		this(Money.zero(),-1,"",null);
 	}
-	
+
 	public Transaction(Money a, int c, String d, Date dt) {
 		amount = a;
 		category = c;
 		description = d;
 		date = dt;
 	}
-	
+
 	public Transaction(Transaction t) {
 	    //copy constructor
 	    this.amount = t.amount;
@@ -134,7 +135,7 @@ public class Transaction implements Serializable {
 	    this.description = t.description;
 	    this.date = t.date;
 	}
-	
+
     public static int getCategoryIndex(String name) {
         for (int i = 0; i < getCategoryList().size(); i++) {
             if (getCategoryName(i).equalsIgnoreCase(name)) {
@@ -181,31 +182,31 @@ public class Transaction implements Serializable {
     public Money getAmount() {
 		return amount;
 	}
-	
+
 	public void setAmount(Money a) {
 		this.amount = a;
 	}
-	
+
 	public String getDescription() {
 		return description;
 	}
-	
+
 	public void setDescription(String s) {
 		this.description = s;
 	}
-	
+
 	public int getCategory() {
 		return category;
 	}
-	
+
 	public void setCategory(int c) {
 		this.category = c;
 	}
-	
+
 	public String getCategoryName() {
 		return getCategoryName(getCategory());
 	}
-	
+
 	public Date getDate() {
 		return date;
 	}
@@ -238,7 +239,7 @@ public class Transaction implements Serializable {
 
 	public static Transaction generateInstanceFromXML(Node wn) {
 		Transaction retVal = new Transaction();
-		
+
 		NodeList nl = wn.getChildNodes();
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
@@ -253,8 +254,7 @@ public class Transaction implements Serializable {
 				try {
 					retVal.date = df.parse(wn2.getTextContent().trim());
 				} catch (DOMException | ParseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+                    MekHQ.getLogger().error(Transaction.class, "generateInstanceFromXml", e);
 				}
             }
 		}

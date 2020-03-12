@@ -33,6 +33,7 @@ import megamek.client.ratgenerator.UnitTable;
 import megamek.common.EntityMovementMode;
 import megamek.common.MechSummary;
 import megamek.common.UnitType;
+import mekhq.MekHQ;
 
 /**
  * Provides access to RATGenerator through IUnitGenerator interface.
@@ -49,7 +50,7 @@ public class RATGeneratorConnector extends AbstractUnitGenerator implements IUni
 			try {
 				Thread.sleep(50);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+                MekHQ.getLogger().error(getClass(), "RATGeneratorConnector", e);
 			}
 		}
 		RATGenerator.getInstance().loadYear(year);
