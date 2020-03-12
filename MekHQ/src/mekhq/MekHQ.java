@@ -366,7 +366,12 @@ public class MekHQ implements GameListener {
         System.setProperty("com.apple.mrj.application.apple.menu.about.name","MekHQ");
 
         SwingUtilities.invokeLater(() -> {
-            //redirect output to log file
+            // TODO : logFileName should probably not be inline
+            String logFileName = "logs" + File.separator + "mekhqlog.txt";
+            // Reset the log file - TODO : Maybe move this to being a call to the logger?
+            MegaMek.resetLogFile(logFileName);
+            // redirect output to log file
+            redirectOutput(logFileName); // Deprecated call required for MegaMek usage
             MekHQ.getInstance().startup();
         });
     }
@@ -390,16 +395,42 @@ public class MekHQ implements GameListener {
         msg.append("\n\tJava vendor ").append(System.getProperty("java.vendor")); //$NON-NLS-1$ //$NON-NLS-2$
         msg.append("\n\tJava version ").append(System.getProperty("java.version")); //$NON-NLS-1$ //$NON-NLS-2$
         msg.append("\n\tPlatform ") //$NON-NLS-1$
-                .append(System.getProperty("os.name")) //$NON-NLS-1$
-                .append(" ") //$NON-NLS-1$
-                .append(System.getProperty("os.version")) //$NON-NLS-1$
-                .append(" (") //$NON-NLS-1$
-                .append(System.getProperty("os.arch")) //$NON-NLS-1$
-                .append(")"); //$NON-NLS-1$
+               .append(System.getProperty("os.name")) //$NON-NLS-1$
+               .append(" ") //$NON-NLS-1$
+               .append(System.getProperty("os.version")) //$NON-NLS-1$
+               .append(" (") //$NON-NLS-1$
+               .append(System.getProperty("os.arch")) //$NON-NLS-1$
+               .append(")"); //$NON-NLS-1$
         long maxMemory = Runtime.getRuntime().maxMemory() / 1024;
         msg.append("\n\tTotal memory available to MegaMek: ")
-                .append(NumberFormat.getInstance().format(maxMemory)).append(" kB"); //$NON-NLS-1$ //$NON-NLS-2$
+            .append(NumberFormat.getInstance().format(maxMemory)).append(" kB"); //$NON-NLS-1$ //$NON-NLS-2$
         getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, msg.toString());
+    }
+
+    /**
+     * This function redirects the standard error and output streams to the
+     * given File name.
+     */
+    @Deprecated // March 12th, 2020. This is no longer used by MekHQ, but is required to hide MegaMek's
+    // output to the console for dev builds
+    private static void redirectOutput(String logFilename) {
+        try {
+            System.out.println("Redirecting output to mekhqlog.txt"); //$NON-NLS-1$
+            File logDir = new File("logs");
+            if (!logDir.exists()) {
+                logDir.mkdir();
+            }
+
+            // Note: these are not closed on purpose
+            OutputStream os = new FileOutputStream(logFilename, true);
+            BufferedOutputStream bos = new BufferedOutputStream(os, 64);
+			PrintStream ps = new PrintStream(bos);
+            System.setOut(ps);
+            System.setErr(ps);
+        } catch (Exception e) {
+            MekHQ.getLogger().error(MekHQ.class, "redirectOutput",
+                    "Unable to redirect output to mekhqlog.txt", e);
+        }
     }
 
     public Server getMyServer() {
