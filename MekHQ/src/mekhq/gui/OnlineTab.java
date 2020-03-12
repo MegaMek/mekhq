@@ -139,7 +139,8 @@ public final class OnlineTab extends CampaignGuiTab implements ActionListener {
 
         list.add(new RemoteCampaign(getCampaignController().getHost(),
             getCampaignController().getHostName(), getCampaignController().getHostDate(),
-            getCampaignController().getHostLocation(), getCampaignController().getHostIsGMMode()));
+            getCampaignController().getHostLocation(), getCampaignController().getHostIsGMMode(),
+            true/*isActive*/));
 
         return list;
     }

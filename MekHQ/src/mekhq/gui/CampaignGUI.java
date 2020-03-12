@@ -320,7 +320,7 @@ public class CampaignGUI extends JPanel {
         // If we're hosting a MekHQ session, or if we're connected to
         // a MekHQ session, or if we've had remote campaigns previously,
         // then we should display the ONLINE tab.
-        if (app.isHosting() || app.isRemote() 
+        if (app.isHosting() || app.isRemote()
             || !getCampaignController().getRemoteCampaigns().isEmpty()) {
             addStandardTab(GuiTabType.ONLINE);
         }
@@ -2562,7 +2562,7 @@ public class CampaignGUI extends JPanel {
         } else if (app.isRemote()) {
             lblOnline.setText(
                 String.format("<html><font color='green'><b>CONNECTED</b> (%d playing)</font></html>",
-                    getCampaignController().getActiveCampaigns().size()));
+                    getCampaignController().getActiveCampaignCount() + 1 /*host*/));
         } else {
             lblOnline.setVisible(false);
         }
@@ -2675,7 +2675,7 @@ public class CampaignGUI extends JPanel {
         refreshOnlineStatus();
 
         MekHQ.getLogger().info(CampaignGUI.class, "handle(CampaignListUpdatedEvent)",
-            "There are " + (getCampaignController().getRemoteCampaigns().size() + 1) + " campaigns playing, " + (getCampaignController().getActiveCampaigns().size() + 1) + " are active");
+            "There are " + (getCampaignController().getRemoteCampaigns().size() + 1) + " campaigns playing, " + (getCampaignController().getActiveCampaignCount() + 1) + " are active");
     }
 
     public void refreshLocation() {

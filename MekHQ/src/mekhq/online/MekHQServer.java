@@ -189,7 +189,6 @@ public class MekHQServer {
                     .addAllCampaigns(convert(controller.getRemoteCampaigns())).build();
             responseObserver.onNext(response);
 
-            controller.addActiveCampaign(id);
             controller.addRemoteCampaign(id, clientCampaign.getName(), DateTime.parse(clientCampaign.getDate()),
                 clientCampaign.getLocation(), clientCampaign.getIsGMMode());
 
@@ -342,7 +341,6 @@ public class MekHQServer {
             controller.addRemoteCampaign(clientId, clientCampaign.getName(),
                 dateFormatter.parseDateTime(clientCampaign.getDate()), clientCampaign.getLocation(),
                 clientCampaign.getIsGMMode());
-            controller.addActiveCampaign(clientId);
 
             MekHQ.triggerEvent(new CampaignListUpdatedEvent());
 
@@ -449,7 +447,7 @@ public class MekHQServer {
                         .setDate(dateFormatter.print(remoteCampaign.getDate()))
                         .setLocation(remoteCampaign.getLocation().getId())
                         .setIsGMMode(remoteCampaign.isGMMode())
-                        .setIsActive(controller.isCampaignActive(remoteCampaign.getId()))
+                        .setIsActive(remoteCampaign.isActive())
                         .build());
             }
             return converted;

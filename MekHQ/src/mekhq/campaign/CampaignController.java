@@ -19,8 +19,6 @@
 package mekhq.campaign;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,7 +36,6 @@ import mekhq.online.events.WaitingToAdvanceDayEvent;
 public class CampaignController {
     private final Campaign localCampaign;
     private final ConcurrentHashMap<UUID, RemoteCampaign> remoteCampaigns = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<UUID, UUID> activeCampaigns = new ConcurrentHashMap<>();
 
     private boolean isHost;
     private UUID host;
@@ -127,7 +124,7 @@ public class CampaignController {
 
 	public void addRemoteCampaign(UUID id, String name, DateTime date, String locationId, boolean isGMMode) {
         PlanetarySystem planetarySystem = Systems.getInstance().getSystemById(locationId);
-        remoteCampaigns.put(id, new RemoteCampaign(id, name, date, planetarySystem, isGMMode));
+        remoteCampaigns.put(id, new RemoteCampaign(id, name, date, planetarySystem, isGMMode, true));
     }
 
 	public Collection<RemoteCampaign> getRemoteCampaigns() {
@@ -154,27 +151,22 @@ public class CampaignController {
         remoteCampaigns.computeIfPresent(campaignId, (key, remoteCampaign) -> remoteCampaign.withGMMode(isGMMode));
     }
 
-    public void addActiveCampaign(UUID id) {
-        activeCampaigns.put(id, id);
-    }
-
 	public void removeActiveCampaign(UUID id) {
-        activeCampaigns.remove(id);
+        remoteCampaigns.computeIfPresent(id, (key, remoteCampaign) -> remoteCampaign.withActive(false));
     }
 
-	public void setActiveCampaigns(Collection<UUID> campaignIds) {
-        // TODO: evaluate if we can make this atomic somehow.
-        activeCampaigns.clear();
-        campaignIds.forEach(id -> activeCampaigns.put(id, id));
+    public int getActiveCampaignCount() {
+        return remoteCampaigns.reduceValuesToInt(Integer.MAX_VALUE, rc -> rc.isActive() ? 1 : 0, 0, (x, acc) -> x + acc);
+    }
+
+    /**
+     * Computes the set of inactive campaigns from a set of active campaign IDs.
+     */
+	public void computeInactiveCampaigns(Set<UUID> activeCampaigns) {
+        for (UUID clientId : remoteCampaigns.keySet()) {
+            remoteCampaigns.computeIfPresent(clientId, (key, rc) -> activeCampaigns.contains(clientId) ? rc : rc.withActive(false));
+        }
 	}
-
-    public boolean isCampaignActive(UUID id) {
-        return Objects.equals(getHost(), id) || activeCampaigns.containsKey(id);
-    }
-
-    public Set<UUID> getActiveCampaigns() {
-        return Collections.unmodifiableSet(activeCampaigns.keySet());
-    }
 
     /**
      * Advances the local {@link Campaign} to the next day.

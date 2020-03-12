@@ -31,17 +31,15 @@ public class RemoteCampaign {
     private final DateTime date;
     private final PlanetarySystem location;
     private final boolean isGMMode;
+    private final boolean isActive;
 
-    public RemoteCampaign(UUID id, String name, DateTime date, PlanetarySystem location) {
-        this(id, name, date, location, false);
-    }
-
-    public RemoteCampaign(UUID id, String name, DateTime date, PlanetarySystem location, boolean isGMMode) {
+    public RemoteCampaign(UUID id, String name, DateTime date, PlanetarySystem location, boolean isGMMode, boolean isActive) {
         this.id = id;
         this.name = name;
         this.date = date;
         this.location = location;
         this.isGMMode = isGMMode;
+        this.isActive = isActive;
 	}
 
 	public UUID getId() {
@@ -64,15 +62,23 @@ public class RemoteCampaign {
         return isGMMode;
     }
 
+    public boolean isActive() {
+        return isActive;
+    }
+
     public RemoteCampaign withDate(DateTime newDate) {
-        return new RemoteCampaign(id, name, newDate, location);
+        return new RemoteCampaign(id, name, newDate, location, isGMMode, isActive);
     }
 
     public RemoteCampaign withLocation(PlanetarySystem newLocation) {
-        return new RemoteCampaign(id, name, date, newLocation);
+        return new RemoteCampaign(id, name, date, newLocation, isGMMode, isActive);
     }
 
     public RemoteCampaign withGMMode(boolean isGMMode) {
-        return new RemoteCampaign(id, name, date, location, isGMMode);
+        return new RemoteCampaign(id, name, date, location, isGMMode, isActive);
+    }
+
+    public RemoteCampaign withActive(boolean isActive) {
+        return new RemoteCampaign(id, name, date, location, isGMMode, isActive);
     }
 }
