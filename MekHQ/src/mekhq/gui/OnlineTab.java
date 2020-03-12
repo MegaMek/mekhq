@@ -18,6 +18,7 @@
  */
 package mekhq.gui;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -32,6 +33,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 
 import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
@@ -45,7 +47,7 @@ import mekhq.preferences.PreferencesNode;
 public final class OnlineTab extends CampaignGuiTab implements ActionListener {
 
     private static final long serialVersionUID = 4133071018441878778L;
-    
+
     private ResourceBundle resourceMap;
 
     private OnlineCampaignsTableModel hostCampaignTableModel;
@@ -74,8 +76,10 @@ public final class OnlineTab extends CampaignGuiTab implements ActionListener {
         resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", //$NON-NLS-1$
                 new EncodeControl());
 
+        GridBagConstraints gbc;
+
         setName("panelOnline"); //$NON-NLS-1$
-        setLayout(new GridBagLayout());
+        setLayout(new GridLayout(0, 1));
 
         hostCampaignTableModel = new OnlineCampaignsTableModel(getHostCampaignAsList());
         hostCampaignTable = new JTable(hostCampaignTableModel);
@@ -84,6 +88,7 @@ public final class OnlineTab extends CampaignGuiTab implements ActionListener {
         JPanel hostCampaignTablePanel = new JPanel(new GridLayout(0, 1));
         hostCampaignTablePanel.setBorder(BorderFactory.createTitledBorder("Host Campaign"));
         hostCampaignTablePanel.add(hostCampaignScrollPane);
+        hostCampaignTablePanel.setMinimumSize(new Dimension(400, 120));
 
         campaignsTableModel = new OnlineCampaignsTableModel(getCampaignController().getRemoteCampaigns());
         campaignsTable = new JTable(campaignsTableModel);
@@ -92,28 +97,35 @@ public final class OnlineTab extends CampaignGuiTab implements ActionListener {
         JPanel campaignsTablePanel = new JPanel(new GridLayout(0, 1));
         campaignsTablePanel.setBorder(BorderFactory.createTitledBorder("Remote Campaigns"));
         campaignsTablePanel.add(campaignsTableScrollPane);
+        campaignsTablePanel.setMinimumSize(new Dimension(400, 300));
 
-        JPanel topPanel = new JPanel(new GridLayout(0, 1));
+        JPanel topPanel = new JPanel(new GridBagLayout());
         if (!getCampaignController().isHost()) {
-            topPanel.add(hostCampaignTablePanel);
+            gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            gbc.weightx = 1.0;
+            gbc.weighty = 1.0;
+            topPanel.add(hostCampaignTablePanel, gbc);
         }
-        topPanel.add(campaignsTablePanel);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        topPanel.add(campaignsTablePanel, gbc);
 
         JPanel campaignDetailsPanel = new JPanel();
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topPanel,
             campaignDetailsPanel);
         splitPane.setOneTouchExpandable(true);
-        splitPane.setResizeWeight(1.0);
+        splitPane.setResizeWeight(0.5);
 
-        GridBagConstraints gbc= new java.awt.GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.gridwidth = 6;
-        gbc.fill = java.awt.GridBagConstraints.BOTH;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        add(splitPane, gbc);
+        add(splitPane);
     }
 
     @Override
@@ -125,7 +137,7 @@ public final class OnlineTab extends CampaignGuiTab implements ActionListener {
     private List<RemoteCampaign> getHostCampaignAsList() {
         List<RemoteCampaign> list = new ArrayList<>();
 
-        list.add(new RemoteCampaign(getCampaignController().getHost(), 
+        list.add(new RemoteCampaign(getCampaignController().getHost(),
             getCampaignController().getHostName(), getCampaignController().getHostDate(),
             getCampaignController().getHostLocation(), getCampaignController().getHostIsGMMode()));
 
