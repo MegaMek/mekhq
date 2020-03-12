@@ -189,7 +189,7 @@ public class MekHQServer {
                     .addAllCampaigns(convert(controller.getRemoteCampaigns())).build();
             responseObserver.onNext(response);
 
-            controller.addRemoteCampaign(id, clientCampaign.getName(), DateTime.parse(clientCampaign.getDate()),
+            controller.addActiveRemoteCampaign(id, clientCampaign.getName(), DateTime.parse(clientCampaign.getDate()),
                 clientCampaign.getLocation(), clientCampaign.getIsGMMode());
 
             responseObserver.onCompleted();
@@ -245,6 +245,8 @@ public class MekHQServer {
                             .withCause(e) // This can be attached to the Status locally, but NOT transmitted to the client!
                             .asRuntimeException());
 
+                        controller.removeActiveCampaign(clientId);
+
                         MekHQ.triggerEvent(new CampaignDisconnectedEvent(clientId));
                     }
                 }
@@ -256,6 +258,8 @@ public class MekHQServer {
 
                     messageBus.remove(clientId);
 
+                    controller.removeActiveCampaign(clientId);
+
                     if (clientId != null) {
                         MekHQ.triggerEvent(new CampaignDisconnectedEvent(clientId));
                     }
@@ -265,6 +269,8 @@ public class MekHQServer {
                 public void onCompleted() {
                     messageBus.remove(clientId);
                     responseObserver.onCompleted();
+
+                    controller.removeActiveCampaign(clientId);
 
                     if (clientId != null) {
                         MekHQ.triggerEvent(new CampaignDisconnectedEvent(clientId));
@@ -338,7 +344,7 @@ public class MekHQServer {
 
             CampaignDetails clientCampaign = pong.getCampaign();
             UUID clientId = UUID.fromString(clientCampaign.getId());
-            controller.addRemoteCampaign(clientId, clientCampaign.getName(),
+            controller.addActiveRemoteCampaign(clientId, clientCampaign.getName(),
                 dateFormatter.parseDateTime(clientCampaign.getDate()), clientCampaign.getLocation(),
                 clientCampaign.getIsGMMode());
 

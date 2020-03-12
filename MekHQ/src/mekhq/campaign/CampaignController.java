@@ -19,6 +19,7 @@
 package mekhq.campaign;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -122,14 +123,22 @@ public class CampaignController {
         return hostIsGM;
     }
 
-	public void addRemoteCampaign(UUID id, String name, DateTime date, String locationId, boolean isGMMode) {
+	public void addActiveRemoteCampaign(UUID id, String name, DateTime date, String locationId, boolean isGMMode) {
+        addRemoteCampaign(id, name, date, locationId, isGMMode, /*isActive:*/ true);
+    }
+
+	public void addRemoteCampaign(UUID id, String name, DateTime date, String locationId, boolean isGMMode, boolean isActive) {
         PlanetarySystem planetarySystem = Systems.getInstance().getSystemById(locationId);
-        remoteCampaigns.put(id, new RemoteCampaign(id, name, date, planetarySystem, isGMMode, true));
+        remoteCampaigns.put(id, new RemoteCampaign(id, name, date, planetarySystem, isGMMode, isActive));
     }
 
 	public Collection<RemoteCampaign> getRemoteCampaigns() {
-		return remoteCampaigns.values();
+		return Collections.unmodifiableCollection(remoteCampaigns.values());
     }
+
+	public Collection<UUID> getRemoteCampaignIds() {
+		return Collections.unmodifiableSet(remoteCampaigns.keySet());
+	}
 
 	public void setRemoteCampaignDate(UUID campaignId, DateTime campaignDate) {
         // We only update this if the remote campaign is actually present

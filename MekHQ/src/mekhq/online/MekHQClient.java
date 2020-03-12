@@ -119,7 +119,8 @@ public class MekHQClient {
             knownCampaigns.add(clientId);
 
             controller.addRemoteCampaign(clientId, details.getName(),
-                dateFormatter.parseDateTime(details.getDate()), details.getLocation(), details.getIsGMMode());
+                dateFormatter.parseDateTime(details.getDate()), details.getLocation(), details.getIsGMMode(),
+                details.getIsActive());
         }
 
         createMessageBus();
@@ -222,19 +223,29 @@ public class MekHQClient {
         controller.setHostLocation(locationId);
         controller.setHostIsGMMode(hostCampaign.getIsGMMode());
 
-        Set<UUID> foundCampaigns = new HashSet<>();
-        foundCampaigns.add(id);
+        // gather the IDs of all of the campaigns we know about
+        Set<UUID> allCampaigns = new HashSet<>(controller.getRemoteCampaignIds());
 
         for (CampaignDetails campaign : pong.getCampaignsList()) {
             UUID clientId = UUID.fromString(campaign.getId());
 
-            foundCampaigns.add(clientId);
+            // remove this campaign from the list we know about
+            // so that when this ends we'll be left with a set
+            // of campaigns that our host doesn't know about
+            // or isn't active anymore. We take into account the
+            // ACTIVE status from the Host campaign below.
+            allCampaigns.remove(clientId);
 
             controller.addRemoteCampaign(clientId, campaign.getName(),
-                dateFormatter.parseDateTime(campaign.getDate()), campaign.getLocation(), campaign.getIsGMMode());
+                dateFormatter.parseDateTime(campaign.getDate()), campaign.getLocation(), campaign.getIsGMMode(),
+                campaign.getIsActive());
         }
 
-        controller.computeInactiveCampaigns(foundCampaigns);
+        // Account for any missing Campaigns on this Host
+        // they are all automatically considered INACTIVE.
+        for (UUID missingCampaignId : allCampaigns) {
+            controller.removeActiveCampaign(missingCampaignId);
+        }
 
         MekHQ.triggerEvent(new CampaignListUpdatedEvent());
     }
