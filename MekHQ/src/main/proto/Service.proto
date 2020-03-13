@@ -262,3 +262,24 @@ message LocationChanged {
     // was due to a GM action.
     bool is_gm_movement = 3;
 }
+
+// Represents a message sent when a Campaign updates its daily
+// log. Zero or more of these messages may be sent for the same
+// date.
+message LogUpdated {
+    // The unique identifier of the Campaign.
+    string id = 1;
+
+    // The date that this log entry corresponds to.
+    string date = 2;
+
+    // Zero or more LogEntry messages containing the
+    // log entries for that date.
+    repeated LogEntry entries = 3;
+}
+
+// Represents an entry in the daily log.
+message LogEntry {
+    // The daily log entry.
+    string entry = 1;
+}
