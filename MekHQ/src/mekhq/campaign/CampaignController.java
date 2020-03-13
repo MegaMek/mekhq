@@ -29,6 +29,8 @@ import mekhq.MekHQ;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.online.events.WaitingToAdvanceDayEvent;
+import mekhq.online.forces.RemoteForce;
+import mekhq.online.forces.RemoteTOE;
 
 /**
  * Manages the timeline of a {@link Campaign}.
@@ -36,6 +38,7 @@ import mekhq.online.events.WaitingToAdvanceDayEvent;
 public class CampaignController {
     private final Campaign localCampaign;
     private final ConcurrentHashMap<UUID, RemoteCampaign> remoteCampaigns = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<UUID, RemoteTOE> remoteTOEs = new ConcurrentHashMap<>();
 
     private boolean isHost;
     private UUID host;
@@ -182,5 +185,13 @@ public class CampaignController {
                 return false;
             }
         }
+    }
+
+	public void updateTOE(UUID campaignId, RemoteForce forces) {
+        remoteTOEs.put(campaignId, new RemoteTOE(forces));
+    }
+
+    public RemoteTOE getTOE(UUID campaignId) {
+        return remoteTOEs.get(campaignId);
     }
 }

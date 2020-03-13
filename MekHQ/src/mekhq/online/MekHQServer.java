@@ -53,10 +53,13 @@ import mekhq.campaign.RemoteCampaign;
 import mekhq.campaign.event.GMModeEvent;
 import mekhq.campaign.event.LocationChangedEvent;
 import mekhq.campaign.event.NewDayEvent;
+import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.online.MekHQHostGrpc;
 import mekhq.online.events.CampaignConnectedEvent;
+import mekhq.online.events.CampaignDetailsUpdatedEvent;
 import mekhq.online.events.CampaignDisconnectedEvent;
 import mekhq.online.events.CampaignListUpdatedEvent;
+import mekhq.online.forces.RemoteForce;
 
 public class MekHQServer {
     private final int port;
@@ -134,6 +137,11 @@ public class MekHQServer {
         service.notifyLocationChanged(evt.getLocation().getCurrentSystem().getId(), !evt.isKFJump());
     }
 
+    @Subscribe
+    public void handle(OrganizationChangedEvent evt) {
+        service.notifyTOEChanged();
+    }
+
     private static class MekHQHostService extends MekHQHostGrpc.MekHQHostImplBase {
         private final DateTimeFormatter dateFormatter = ISODateTimeFormat.date();
         private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQ");
@@ -152,14 +160,10 @@ public class MekHQServer {
         }
 
         private CampaignDetails getCampaignDetails() {
-            return CampaignDetails.newBuilder()
-                .setId(getCampaign().getId().toString())
-                .setName(getCampaign().getName())
-                .setDate(dateFormatter.print(getCampaign().getDateTime()))
-                .setLocation(getCampaign().getLocation().getCurrentSystem().getId())
-                .setIsGMMode(getCampaign().isGM())
-                .setIsActive(true)
-                .build();
+            return CampaignDetails.newBuilder().setId(getCampaign().getId().toString()).setName(getCampaign().getName())
+                    .setDate(dateFormatter.print(getCampaign().getDateTime()))
+                    .setLocation(getCampaign().getLocation().getCurrentSystem().getId())
+                    .setIsGMMode(getCampaign().isGM()).setIsActive(true).build();
         }
 
         @Override
@@ -167,9 +171,9 @@ public class MekHQServer {
             String version = resourceMap.getString("Application.version");
             if (!version.equalsIgnoreCase(request.getVersion())) {
                 responseObserver.onError(Status.INVALID_ARGUMENT
-                    .withDescription(String.format("Version mismatch. Host %s. Client %s.", version, request.getVersion()))
-                    .augmentDescription("connect()")
-                    .asRuntimeException());
+                        .withDescription(
+                                String.format("Version mismatch. Host %s. Client %s.", version, request.getVersion()))
+                        .augmentDescription("connect()").asRuntimeException());
                 return;
             }
 
@@ -178,19 +182,17 @@ public class MekHQServer {
             UUID id = UUID.fromString(clientCampaign.getId());
             if (getCampaign().getId().equals(id)) {
                 responseObserver.onError(Status.INVALID_ARGUMENT
-                    .withDescription(String.format("Campaign %s cannot both HOST and CONNECT", id))
-                    .augmentDescription("connect()")
-                    .asRuntimeException());
+                        .withDescription(String.format("Campaign %s cannot both HOST and CONNECT", id))
+                        .augmentDescription("connect()").asRuntimeException());
                 return;
             }
 
             ConnectionResponse response = ConnectionResponse.newBuilder().setVersion(version)
-                    .setHost(getCampaignDetails())
-                    .addAllCampaigns(convert(controller.getRemoteCampaigns())).build();
+                    .setHost(getCampaignDetails()).addAllCampaigns(convert(controller.getRemoteCampaigns())).build();
             responseObserver.onNext(response);
 
             controller.addActiveRemoteCampaign(id, clientCampaign.getName(), DateTime.parse(clientCampaign.getDate()),
-                clientCampaign.getLocation(), clientCampaign.getIsGMMode());
+                    clientCampaign.getLocation(), clientCampaign.getIsGMMode());
 
             responseObserver.onCompleted();
 
@@ -218,7 +220,7 @@ public class MekHQServer {
 
         @Override
         public StreamObserver<ClientMessage> messageBus(StreamObserver<ServerMessage> responseObserver) {
-            return new StreamObserver<ClientMessage>() {
+            StreamObserver<ClientMessage> clientMessages = new StreamObserver<ClientMessage>() {
                 private UUID clientId;
 
                 @Override
@@ -231,19 +233,23 @@ public class MekHQServer {
                         } else if (payload.is(Pong.class)) {
                             handlePong(responseObserver, clientId, payload.unpack(Pong.class));
                         } else if (payload.is(CampaignDateChanged.class)) {
-                            handleCampaignDateChanged(responseObserver, clientId, payload.unpack(CampaignDateChanged.class));
+                            handleCampaignDateChanged(responseObserver, clientId,
+                                    payload.unpack(CampaignDateChanged.class));
                         } else if (payload.is(GMModeChanged.class)) {
                             handleGMModeChanged(responseObserver, clientId, payload.unpack(GMModeChanged.class));
                         } else if (payload.is(LocationChanged.class)) {
                             handleLocationChanged(responseObserver, clientId, payload.unpack(LocationChanged.class));
+                        } else if (payload.is(TOEUpdated.class)) {
+                            handleTOEUpdated(responseObserver, clientId, payload.unpack(TOEUpdated.class));
                         }
                     } catch (InvalidProtocolBufferException e) {
-                        MekHQ.getLogger().error(MekHQHostService.class, "messageBus::onNext()", "RPC protocol error: " + e.getMessage(), e);
-                        responseObserver.onError(Status.INTERNAL
-                            .withDescription(e.getMessage())
-                            .augmentDescription("messageBus()")
-                            .withCause(e) // This can be attached to the Status locally, but NOT transmitted to the client!
-                            .asRuntimeException());
+                        MekHQ.getLogger().error(MekHQHostService.class, "messageBus::onNext()",
+                                "RPC protocol error: " + e.getMessage(), e);
+                        responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage())
+                                .augmentDescription("messageBus()").withCause(e) // This can be attached to the Status
+                                                                                 // locally, but NOT transmitted to the
+                                                                                 // client!
+                                .asRuntimeException());
 
                         controller.removeActiveCampaign(clientId);
 
@@ -254,7 +260,7 @@ public class MekHQServer {
                 @Override
                 public void onError(Throwable t) {
                     MekHQ.getLogger().error(MekHQHostService.class, "messageBus::onError()",
-                        String.format("RPC protocol error from client %s: %s", clientId, t.getMessage()), t);
+                            String.format("RPC protocol error from client %s: %s", clientId, t.getMessage()), t);
 
                     messageBus.remove(clientId);
 
@@ -277,6 +283,10 @@ public class MekHQServer {
                     }
                 }
             };
+
+            sendMessagesForInitialConnection(responseObserver);
+
+            return clientMessages;
         }
 
         private void addMessageBus(UUID campaignId, StreamObserver<ServerMessage> responseObserver) {
@@ -293,9 +303,7 @@ public class MekHQServer {
         }
 
         public void sendPings() {
-            Ping ping = Ping.newBuilder()
-                .setCampaign(getCampaignDetails())
-                .build();
+            Ping ping = Ping.newBuilder().setCampaign(getCampaignDetails()).build();
 
             List<UUID> toRemove = new ArrayList<>();
             for (Map.Entry<UUID, StreamObserver<ServerMessage>> client : messageBus.entrySet()) {
@@ -311,7 +319,8 @@ public class MekHQServer {
                 try {
                     client.getValue().onNext(buildResponse(Ping.newBuilder(ping).build()));
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(MekHQHostService.class, "handlePing()", "Failed to ping campaign " + clientId, e);
+                    MekHQ.getLogger().error(MekHQHostService.class, "handlePing()",
+                            "Failed to ping campaign " + clientId, e);
                     toRemove.add(clientId);
                 }
             }
@@ -330,12 +339,11 @@ public class MekHQServer {
 
             CampaignDetails clientCampaign = ping.getCampaign();
 
-            MekHQ.getLogger().info(MekHQHostService.class, "handlePing()", String.format("-> PING: %s %s %s", campaignId, clientCampaign.getDate(), clientCampaign.getLocation()));
+            MekHQ.getLogger().info(MekHQHostService.class, "handlePing()", String.format("-> PING: %s %s %s",
+                    campaignId, clientCampaign.getDate(), clientCampaign.getLocation()));
 
-            Pong pong = Pong.newBuilder()
-                .setCampaign(getCampaignDetails())
-                .addAllCampaigns(convert(controller.getRemoteCampaigns()))
-                .build();
+            Pong pong = Pong.newBuilder().setCampaign(getCampaignDetails())
+                    .addAllCampaigns(convert(controller.getRemoteCampaigns())).build();
             responseObserver.onNext(buildResponse(pong));
         }
 
@@ -345,12 +353,13 @@ public class MekHQServer {
             CampaignDetails clientCampaign = pong.getCampaign();
             UUID clientId = UUID.fromString(clientCampaign.getId());
             controller.addActiveRemoteCampaign(clientId, clientCampaign.getName(),
-                dateFormatter.parseDateTime(clientCampaign.getDate()), clientCampaign.getLocation(),
-                clientCampaign.getIsGMMode());
+                    dateFormatter.parseDateTime(clientCampaign.getDate()), clientCampaign.getLocation(),
+                    clientCampaign.getIsGMMode());
 
             MekHQ.triggerEvent(new CampaignListUpdatedEvent());
 
-            MekHQ.getLogger().info(MekHQHostService.class, "handlePing()", String.format("-> PONG: %s %s %s", campaignId, clientCampaign.getDate(), clientCampaign.getLocation()));
+            MekHQ.getLogger().info(MekHQHostService.class, "handlePing()", String.format("-> PONG: %s %s %s",
+                    campaignId, clientCampaign.getDate(), clientCampaign.getLocation()));
         }
 
         protected void handleCampaignDateChanged(StreamObserver<ServerMessage> responseObserver, UUID clientId,
@@ -363,9 +372,7 @@ public class MekHQServer {
             sendToAllExcept(clientId, campaignDateChanged);
         }
 
-        protected void handleGMModeChanged(
-                StreamObserver<ServerMessage> responseObserver,
-                UUID clientId,
+        protected void handleGMModeChanged(StreamObserver<ServerMessage> responseObserver, UUID clientId,
                 GMModeChanged gmModeChanged) {
 
             controller.setRemoteCampaignGMMode(clientId, gmModeChanged.getValue());
@@ -375,8 +382,7 @@ public class MekHQServer {
             sendToAllExcept(clientId, gmModeChanged);
         }
 
-        protected void handleLocationChanged(StreamObserver<ServerMessage> responseObserver,
-                UUID clientId,
+        protected void handleLocationChanged(StreamObserver<ServerMessage> responseObserver, UUID clientId,
                 LocationChanged locationChanged) {
 
             controller.setRemoteCampaignLocation(clientId, locationChanged.getLocation());
@@ -386,32 +392,56 @@ public class MekHQServer {
             sendToAllExcept(clientId, locationChanged);
         }
 
+        protected void handleTOEUpdated(StreamObserver<ServerMessage> responseObserver, UUID clientId,
+                TOEUpdated toeUpdated) {
+
+            UUID campaignId = UUID.fromString(toeUpdated.getId());
+            controller.updateTOE(campaignId, RemoteForce.build(toeUpdated.getForce()));
+
+            MekHQ.triggerEvent(new CampaignDetailsUpdatedEvent(campaignId));
+
+            MekHQ.getLogger().info(MekHQHostService.class, "handleTOEUpdated()", String.format("TOE Updated: %s ", campaignId));
+
+            sendToAllExcept(clientId, toeUpdated);
+        }
+
+        /**
+         * Sends messages to a client campaign upon its initial connection to the message bus.
+         */
+        protected void sendMessagesForInitialConnection(StreamObserver<ServerMessage> responseObserver) {
+            TOEUpdated toeUpdated = buildTOEUpdated();
+            responseObserver.onNext(buildResponse(toeUpdated));
+        }
+
         public void notifyDayChanged() {
-            CampaignDateChanged dateChanged = CampaignDateChanged.newBuilder()
-                .setId(getCampaign().getId().toString())
-                .setDate(dateFormatter.print(getCampaign().getDateTime()))
-                .build();
+            CampaignDateChanged dateChanged = CampaignDateChanged.newBuilder().setId(getCampaign().getId().toString())
+                    .setDate(dateFormatter.print(getCampaign().getDateTime())).build();
 
             sendToAll(dateChanged);
         }
 
         public void notifyGMModeChanged(boolean gmMode) {
-            GMModeChanged gmModeChanged = GMModeChanged.newBuilder()
-                .setId(getCampaign().getId().toString())
-                .setValue(gmMode)
-                .build();
+            GMModeChanged gmModeChanged = GMModeChanged.newBuilder().setId(getCampaign().getId().toString())
+                    .setValue(gmMode).build();
 
             sendToAll(gmModeChanged);
         }
 
         public void notifyLocationChanged(String locationId, boolean isGMMovement) {
-            LocationChanged locationChanged = LocationChanged.newBuilder()
-                .setId(getCampaign().getId().toString())
-                .setLocation(locationId)
-                .setIsGmMovement(isGMMovement)
-                .build();
+            LocationChanged locationChanged = LocationChanged.newBuilder().setId(getCampaign().getId().toString())
+                    .setLocation(locationId).setIsGmMovement(isGMMovement).build();
 
             sendToAll(locationChanged);
+        }
+
+        public void notifyTOEChanged() {
+            TOEUpdated toeUpdated = buildTOEUpdated();
+            sendToAll(toeUpdated);
+        }
+
+        private TOEUpdated buildTOEUpdated() {
+            return TOEUpdated.newBuilder().setId(getCampaign().getId().toString())
+                    .setForce(buildTOEForces(getCampaign().getForces())).build();
         }
 
         private void sendToAll(Message message) {
@@ -429,34 +459,53 @@ public class MekHQServer {
         }
 
         private ServerMessage buildResponse(Message payload) {
-            return ServerMessage.newBuilder()
-                .setTimestamp(getTimestamp())
-                .setId(getCampaign().getId().toString())
-                .setMessage(Any.pack(payload))
-                .build();
+            return ServerMessage.newBuilder().setTimestamp(getTimestamp()).setId(getCampaign().getId().toString())
+                    .setMessage(Any.pack(payload)).build();
         }
 
         private static Timestamp getTimestamp() {
             long millis = System.currentTimeMillis();
-            return Timestamp.newBuilder().setSeconds(millis / 1000)
-                .setNanos((int) ((millis % 1000) * 1000000))
-                .build();
+            return Timestamp.newBuilder().setSeconds(millis / 1000).setNanos((int) ((millis % 1000) * 1000000)).build();
         }
 
         private Collection<CampaignDetails> convert(Collection<RemoteCampaign> remoteCampaigns) {
             List<CampaignDetails> converted = new ArrayList<>();
             for (RemoteCampaign remoteCampaign : remoteCampaigns) {
-                converted.add(
-                    CampaignDetails.newBuilder()
-                        .setId(remoteCampaign.getId().toString())
-                        .setName(remoteCampaign.getName())
-                        .setDate(dateFormatter.print(remoteCampaign.getDate()))
-                        .setLocation(remoteCampaign.getLocation().getId())
-                        .setIsGMMode(remoteCampaign.isGMMode())
-                        .setIsActive(remoteCampaign.isActive())
-                        .build());
+                converted.add(CampaignDetails.newBuilder().setId(remoteCampaign.getId().toString())
+                        .setName(remoteCampaign.getName()).setDate(dateFormatter.print(remoteCampaign.getDate()))
+                        .setLocation(remoteCampaign.getLocation().getId()).setIsGMMode(remoteCampaign.isGMMode())
+                        .setIsActive(remoteCampaign.isActive()).build());
             }
             return converted;
+        }
+
+        private Force buildTOEForces(mekhq.campaign.force.Force forces) {
+            Force.Builder forceBuilder = Force.newBuilder()
+                .setId(forces.getId())
+                .setName(forces.getName());
+
+            for (Object object : forces.getAllChildren(getCampaign())) {
+                if (object instanceof mekhq.campaign.force.Force) {
+                    forceBuilder.addSubForces(buildTOEForces((mekhq.campaign.force.Force) object));
+                } else if (object instanceof mekhq.campaign.unit.Unit) {
+                    forceBuilder.addUnits(buildForceUnit((mekhq.campaign.unit.Unit) object));
+                }
+            }
+
+            return forceBuilder.build();
+        }
+
+        private ForceUnit buildForceUnit(mekhq.campaign.unit.Unit unit) {
+            ForceUnit.Builder forceUnitBuilder = ForceUnit.newBuilder()
+                .setId(unit.getId().toString())
+                .setName(unit.getName());
+
+            mekhq.campaign.personnel.Person commander = unit.getCommander();
+            if (commander != null) {
+                forceUnitBuilder.setCommander(commander.getName());
+            }
+
+            return forceUnitBuilder.build();
         }
     }
 }

@@ -283,3 +283,50 @@ message LogEntry {
     // The daily log entry.
     string entry = 1;
 }
+
+// Represents a message sent when the TOE for a Campaign
+// is updated.
+//
+// This message may be sent by any Campaign, and will
+// be forwarded by the Host Campaign to everyone in
+// the current session.
+//
+// This message may be restricted to campaigns on the
+// same team.
+message TOEUpdated {
+    // The unique identifier of the Campaign.
+    string id = 1;
+
+    // The top level Force in the Campaign.
+    Force force = 2;
+}
+
+// Represents a Force within a Campaign's TOE.
+message Force {
+    // The unique identifier of the Force.
+    int32 id = 1;
+
+    // The name of the force.
+    string name = 2;
+
+    // Zero or more sub-forces assigned
+    // to this Force.
+    repeated Force sub_forces = 3;
+
+    // Zero or more units attached directly
+    // to this Force.
+    repeated ForceUnit units = 4;
+}
+
+// Represents a unit within a Force in a Campaign's
+// TOE.
+message ForceUnit {
+    // The unique identifier of the Unit.
+    string id = 1;
+
+    // The name of the Unit.
+    string name = 2;
+
+    // The name of the Unit's commander.
+    string commander = 3;
+}

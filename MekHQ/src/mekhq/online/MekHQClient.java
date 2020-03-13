@@ -47,9 +47,12 @@ import mekhq.campaign.CampaignController;
 import mekhq.campaign.event.GMModeEvent;
 import mekhq.campaign.event.LocationChangedEvent;
 import mekhq.campaign.event.NewDayEvent;
+import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.online.MekHQHostGrpc.MekHQHostBlockingStub;
 import mekhq.online.MekHQHostGrpc.MekHQHostStub;
+import mekhq.online.events.CampaignDetailsUpdatedEvent;
 import mekhq.online.events.CampaignListUpdatedEvent;
+import mekhq.online.forces.RemoteForce;
 
 public class MekHQClient {
     private final DateTimeFormatter dateFormatter = ISODateTimeFormat.date();
@@ -125,6 +128,8 @@ public class MekHQClient {
 
         createMessageBus();
 
+        sendMessagesForInitialConnection();
+
         pingExecutor = Executors.newSingleThreadScheduledExecutor();
         pings = pingExecutor.scheduleAtFixedRate(() -> sendPing(), 0, 15, TimeUnit.SECONDS);
 
@@ -163,6 +168,8 @@ public class MekHQClient {
                         handleGMModeChanged(id, payload.unpack(GMModeChanged.class));
                     } else if (payload.is(LocationChanged.class)) {
                         handleLocationChanged(id, payload.unpack(LocationChanged.class));
+                    } else if (payload.is(TOEUpdated.class)) {
+                        handleTOEUpdated(id, payload.unpack(TOEUpdated.class));
                     }
                 } catch (InvalidProtocolBufferException e) {
                     MekHQ.getLogger().error(MekHQClient.class, "messageBus::onNext()", "RPC protocol error: " + e.getMessage(), e);
@@ -181,6 +188,14 @@ public class MekHQClient {
                 finishLatch.countDown();
             }
         });
+    }
+
+    /**
+     * Sends messages to the host campaign upon its initial connection to the message bus.
+     */
+    private void sendMessagesForInitialConnection() {
+        TOEUpdated toeUpdated = buildTOEUpdated();
+        messageBus.onNext(buildMessage(toeUpdated));
     }
 
     protected void handleRpcException(Throwable t) {
@@ -291,6 +306,16 @@ public class MekHQClient {
         MekHQ.triggerEvent(new CampaignListUpdatedEvent());
     }
 
+    protected void handleTOEUpdated(UUID hostId, TOEUpdated toeUpdated) {
+
+        UUID campaignId = UUID.fromString(toeUpdated.getId());
+        controller.updateTOE(campaignId, RemoteForce.build(toeUpdated.getForce()));
+
+        MekHQ.triggerEvent(new CampaignDetailsUpdatedEvent(campaignId));
+
+        MekHQ.getLogger().info(MekHQClient.class, "handleTOEUpdated()", String.format("TOE Updated: %s ", campaignId));
+    }
+
     @Subscribe
     public void handle(NewDayEvent evt) {
         CampaignDateChanged dateChanged = CampaignDateChanged.newBuilder()
@@ -322,6 +347,13 @@ public class MekHQClient {
         messageBus.onNext(buildMessage(locationChanged));
     }
 
+    @Subscribe
+    public void handle(OrganizationChangedEvent evt) {
+        TOEUpdated toeUpdated = buildTOEUpdated();
+
+        messageBus.onNext(buildMessage(toeUpdated));
+    }
+
     private ClientMessage buildMessage(Message payload) {
         return ClientMessage.newBuilder()
             .setTimestamp(getTimestamp())
@@ -335,5 +367,40 @@ public class MekHQClient {
         return Timestamp.newBuilder().setSeconds(millis / 1000)
             .setNanos((int) ((millis % 1000) * 1000000))
             .build();
+    }
+
+    private TOEUpdated buildTOEUpdated() {
+        return TOEUpdated.newBuilder().setId(getCampaign().getId().toString())
+            .setForce(buildTOEForces(getCampaign().getForces()))
+            .build();
+    }
+
+    private Force buildTOEForces(mekhq.campaign.force.Force forces) {
+        Force.Builder forceBuilder = Force.newBuilder()
+            .setId(forces.getId())
+            .setName(forces.getName());
+
+        for (Object object : forces.getAllChildren(getCampaign())) {
+            if (object instanceof mekhq.campaign.force.Force) {
+                forceBuilder.addSubForces(buildTOEForces((mekhq.campaign.force.Force) object));
+            } else if (object instanceof mekhq.campaign.unit.Unit) {
+                forceBuilder.addUnits(buildForceUnit((mekhq.campaign.unit.Unit) object));
+            }
+        }
+
+        return forceBuilder.build();
+    }
+
+    private ForceUnit buildForceUnit(mekhq.campaign.unit.Unit unit) {
+        ForceUnit.Builder forceUnitBuilder = ForceUnit.newBuilder()
+            .setId(unit.getId().toString())
+            .setName(unit.getName());
+
+        mekhq.campaign.personnel.Person commander = unit.getCommander();
+        if (commander != null) {
+            forceUnitBuilder.setCommander(commander.getName());
+        }
+
+        return forceUnitBuilder.build();
     }
 }

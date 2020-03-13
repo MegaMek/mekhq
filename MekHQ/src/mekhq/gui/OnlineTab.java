@@ -27,12 +27,14 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.UUID;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
+import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 
 import megamek.common.event.Subscribe;
@@ -41,7 +43,9 @@ import mekhq.MekHQ;
 import mekhq.campaign.CampaignController;
 import mekhq.campaign.RemoteCampaign;
 import mekhq.gui.model.OnlineCampaignsTableModel;
+import mekhq.gui.model.RemoteOrgTreeModel;
 import mekhq.online.events.CampaignListUpdatedEvent;
+import mekhq.online.forces.RemoteTOE;
 import mekhq.preferences.PreferencesNode;
 
 public final class OnlineTab extends CampaignGuiTab implements ActionListener {
@@ -54,6 +58,8 @@ public final class OnlineTab extends CampaignGuiTab implements ActionListener {
     private JTable hostCampaignTable;
     private OnlineCampaignsTableModel campaignsTableModel;
     private JTable campaignsTable;
+
+    private JTree selectedCampaignToeTree;
 
     OnlineTab(CampaignGUI gui, String name) {
         super(gui, name);
@@ -83,6 +89,10 @@ public final class OnlineTab extends CampaignGuiTab implements ActionListener {
 
         hostCampaignTableModel = new OnlineCampaignsTableModel(getHostCampaignAsList());
         hostCampaignTable = new JTable(hostCampaignTableModel);
+        hostCampaignTable.getSelectionModel().addListSelectionListener(e -> {
+            RemoteTOE toe = getCampaignController().getTOE(getCampaignController().getHost());
+            selectedCampaignToeTree.setModel(new RemoteOrgTreeModel(toe != null ? toe : RemoteTOE.EMPTY_TOE));
+        });
 
         JScrollPane hostCampaignScrollPane = new JScrollPane(hostCampaignTable);
         JPanel hostCampaignTablePanel = new JPanel(new GridLayout(0, 1));
@@ -92,6 +102,14 @@ public final class OnlineTab extends CampaignGuiTab implements ActionListener {
 
         campaignsTableModel = new OnlineCampaignsTableModel(getCampaignController().getRemoteCampaigns());
         campaignsTable = new JTable(campaignsTableModel);
+        campaignsTable.getSelectionModel().addListSelectionListener(e -> {
+            int row = e.getFirstIndex();
+            if (row >= 0) {
+                UUID id = (UUID)campaignsTableModel.getValueAt(row, OnlineCampaignsTableModel.COL_ID);
+                RemoteTOE toe = getCampaignController().getTOE(id);
+                selectedCampaignToeTree.setModel(new RemoteOrgTreeModel(toe != null ? toe : RemoteTOE.EMPTY_TOE));
+            }
+        });
 
         JScrollPane campaignsTableScrollPane = new JScrollPane(campaignsTable);
         JPanel campaignsTablePanel = new JPanel(new GridLayout(0, 1));
@@ -119,6 +137,11 @@ public final class OnlineTab extends CampaignGuiTab implements ActionListener {
         topPanel.add(campaignsTablePanel, gbc);
 
         JPanel campaignDetailsPanel = new JPanel();
+
+        selectedCampaignToeTree = new JTree();
+        selectedCampaignToeTree.setCellRenderer(new RemoteForceRenderer());
+
+        campaignDetailsPanel.add(selectedCampaignToeTree);
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topPanel,
             campaignDetailsPanel);
