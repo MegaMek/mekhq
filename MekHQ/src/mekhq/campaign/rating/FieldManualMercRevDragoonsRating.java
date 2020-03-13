@@ -118,7 +118,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             if (null != p) {
                 getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                                 "Unit " + u.getName() +
-                                " -- Adding commander (" + p.getName() + "" +
+                                " -- Adding commander (" + p.getFullTitle() + "" +
                                 ") to commander list.");
                 getCommanderList().add(p);
             }
@@ -180,7 +180,8 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             return;
         }
 
-        getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG, "Unit " + u.getName() + " updating tech support needs.");
+        getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
+                "Unit " + u.getName() + " updating tech support needs.");
 
         double timeMult = 1.0;
         int needed = 0;
@@ -383,7 +384,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             hours = (int) Math.floor(hours / 2.0);
         }
         getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
-                        "Person, " + p.getName() + ", provides " +
+                        "Person, " + p.getFullTitle() + ", provides " +
                         hours + " tech support hours.");
         techSupportHours += hours;
     }
@@ -400,7 +401,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             hours = (int) Math.floor(hours / 2.0);
         }
         getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
-                        "Person, " + p.getName() + " provides " +
+                        "Person, " + p.getFullTitle() + " provides " +
                         hours + " medical support hours.");
         medSupportHours += hours;
     }
@@ -417,7 +418,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             hours = (int) Math.floor(hours / 2.0);
         }
         getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
-                        "Person, " + p.getName() + ", provides " +
+                        "Person, " + p.getFullTitle() + ", provides " +
                         hours + " admin support hours.");
         adminSupportHours += hours;
     }
@@ -738,7 +739,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         StringBuilder out = new StringBuilder();
         Person commander = getCommander();
         String commanderName = (null == commander) ? "" :
-                               " (" + commander.getName() + ")";
+                               " (" + commander.getFullTitle() + ")";
         out.append(String.format("%-" + HEADER_LENGTH + "s %3d %s",
                                  "Command:", getCommanderValue(),
                                  commanderName)).append("\n");
@@ -781,22 +782,22 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         int excessHeavyVeeBays = Math.max(getHeavyVeeBayCount() - getHeavyVeeCount(), 0);
         int excessSmallCraftBays = Math.max(getSmallCraftBayCount() - getSmallCraftCount(), 0);
 
-        out.append(String.format(TEMPLATE, "Dropship Capacity:", getTransportPercent().toPlainString() + "%"))
-        .append("\n").append(String.format(TEMPLATE_TWO, "Mech Bays:", getMechCount(), getMechBayCount()))
+        out.append(String.format(TEMPLATE, "DropShip Capacity:", getTransportPercent().toPlainString() + "%"))
+        .append("\n").append(String.format(TEMPLATE_TWO, "BattleMech Bays:", getMechCount(), getMechBayCount()))
         .append("\n").append(String.format(TEMPLATE_TWO, "Fighter Bays:", getFighterCount(), getFighterBayCount()))
-        .append(" (plus ").append(excessSmallCraftBays).append(" excess small craft)")
+        .append(" (plus ").append(excessSmallCraftBays).append(" excess Small Craft)")
         .append("\n").append(String.format(TEMPLATE_TWO, "Small Craft Bays:", getSmallCraftCount(), getSmallCraftBayCount()))
-        .append("\n").append(String.format(TEMPLATE_TWO, "Protomech Bays:", getProtoCount(), getProtoBayCount()))
+        .append("\n").append(String.format(TEMPLATE_TWO, "ProtoMech Bays:", getProtoCount(), getProtoBayCount()))
         .append("\n").append(String.format(TEMPLATE_TWO, "Super Heavy Vehicle Bays:", getSuperHeavyVeeCount(), getSuperHeavyVeeBayCount()))
         .append("\n").append(String.format(TEMPLATE_TWO, "Heavy Vehicle Bays:", getHeavyVeeCount(), getHeavyVeeBayCount()))
-        .append(" (plus ").append(excessSuperHeavyVeeBays).append(" excess super heavy)")
+        .append(" (plus ").append(excessSuperHeavyVeeBays).append(" excess Super Heavy)")
         .append("\n").append(String.format(TEMPLATE_TWO, "Light Vehicle Bays:", getLightVeeCount(), getLightVeeBayCount()))
-        .append(" (plus ").append(excessHeavyVeeBays).append(" excess heavy and ").append(excessSuperHeavyVeeBays).append(" excess super heavy)")
-        .append("\n").append(String.format(TEMPLATE_TWO, "BA Bays:", getNumberBaSquads(), getBaBayCount()))
+        .append(" (plus ").append(excessHeavyVeeBays).append(" excess Heavy and ").append(excessSuperHeavyVeeBays).append(" excess Super Heavy)")
+        .append("\n").append(String.format(TEMPLATE_TWO, "Battle Armor Bays:", getNumberBaSquads(), getBaBayCount()))
         .append("\n").append(String.format(TEMPLATE_TWO, "Infantry Bays:", calcInfantryPlatoons(), getInfantryBayCount()))
-        .append("\n").append(String.format(TEMPLATE, "Jumpship?", (isJumpshipOwner() ? "Yes" : "No")))
-        .append("\n").append(String.format(TEMPLATE, "Warship w/out Collar?", (isWarshipOwner() ? "Yes" : "No")))
-        .append("\n").append(String.format(TEMPLATE, "Warship w/ Collar?", (isWarshipWithDocsOwner() ? "Yes" : "No")));
+        .append("\n").append(String.format(TEMPLATE, "JumpShip?", (isJumpshipOwner() ? "Yes" : "No")))
+        .append("\n").append(String.format(TEMPLATE, "WarShip w/out Collar?", (isWarshipOwner() ? "Yes" : "No")))
+        .append("\n").append(String.format(TEMPLATE, "WarShip w/ Collar?", (isWarshipWithDocsOwner() ? "Yes" : "No")));
 
         return out.toString();
     }
@@ -831,17 +832,17 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                "%" +
                "\n" + String.format(TEMPLATE_CAT, "Total Hours Needed:",
                                     getTechSupportNeeded()) +
-               "\n" + String.format(TEMPLATE_SUBCAT, "Mech:",
+               "\n" + String.format(TEMPLATE_SUBCAT, "BattleMechs:",
                                     mechSupportNeeded) +
-               "\n" + String.format(TEMPLATE_SUBCAT, "Tank:",
+               "\n" + String.format(TEMPLATE_SUBCAT, "Vehicles:",
                                     tankSupportNeeded) +
                "\n" + String.format(TEMPLATE_SUBCAT, "VTOL:",
                                     vtolSupportNeeded) +
-               "\n" + String.format(TEMPLATE_SUBCAT, "BA:",
+               "\n" + String.format(TEMPLATE_SUBCAT, "Battle Armor:",
                                     baSupportNeeded) +
-               "\n" + String.format(TEMPLATE_SUBCAT, "Conv. Fighter:",
+               "\n" + String.format(TEMPLATE_SUBCAT, "Conventional Fighters:",
                                     convFighterSupportNeeded) +
-               "\n" + String.format(TEMPLATE_SUBCAT, "Aero. Fighter:",
+               "\n" + String.format(TEMPLATE_SUBCAT, "Aerospace Fighters:",
                                     aeroFighterSupportNeeded) +
                "\n" + String.format(TEMPLATE_SUBCAT, "Small Craft:",
                                     smallCraftSupportNeeded) +
@@ -914,7 +915,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                "    Auxiliary vessels are not accounted for.\n" +
                "+ Support: Artillery weapons & Naval vessels are not accounted " +
                "for.\n" +
-               "Note: The Dragoons Rating, RAW, does not account for Protomechs " +
+               "Note: The Dragoons Rating, RAW, does not account for ProtoMechs " +
                "at all and Infantry only require admin & medical support, not " +
                "tech support.";
     }
