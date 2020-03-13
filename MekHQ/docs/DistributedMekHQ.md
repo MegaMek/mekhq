@@ -313,6 +313,20 @@ The CancelTradeRequest message has the following properties:
 
 The Host Campaign accepts this message and then sends a rejection TradeCompleted message to the Source and Target of the trade request.
 
+#### CancelledTradeRequests
+The CancelledTradeRequests message notifies the Host Campaign or a Remote Campaign of a set of trade requests that were previously cancelled.
+
+The CancelledTradeRequests message has the following properties:
+- Request UUID List
+
+This message allows a campaign to identify trade requests they have cancelled. This message helps ensure eventual consistency among
+campaigns that may not have received previous rejected TradeCompleted messages.
+
+The duration rejected trade requests should be kept in the list is not defined, but should be long enough ensure all remote campaigns
+are aware of the cancellation.
+
+This message is redistributed to every campaign by the Host Campaign.
+
 #### TradeDetails
 The TradeDetails message notifies the Host Campaign that a trade partner has updated the details of their trade.
 
@@ -340,6 +354,20 @@ The TradeAcceptance message has the following properties:
 If the Request UUID is not recognized this message should be ignored.
 
 If the Campaign UUID is not one of the trading partners for the request, this message should be ignored.
+
+#### AcceptedTradeRequests
+The AcceptedTradeRequests message notifies the Host Campaign or a Remote Campaign of a set of trade requests that were previously accepted.
+
+The AcceptedTradeRequests message has the following properties:
+- Request UUID List
+
+This message allows a campaign to identify trade requests they have been accepted. This message helps ensure eventual consistency among
+campaigns that may not have received previous acceptance TradeCompleted messages.
+
+The duration accepted trade requests should be kept in the list is not defined, but should be long enough ensure all remote campaigns
+are aware of the acceptance.
+
+This message is redistributed to every campaign by the Host Campaign.
 
 #### TradeCompleted
 The TradeCompleted message notifies the source and target campaigns that a trade has been either succesfully completed or rejected.
