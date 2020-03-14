@@ -45,12 +45,8 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 
-import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
-import megamek.common.Jumpship;
-import megamek.common.SmallCraft;
-import megamek.common.UnitType;
 import megamek.common.event.Subscribe;
 import megamek.common.logging.LogLevel;
 import megamek.common.options.GameOptions;
