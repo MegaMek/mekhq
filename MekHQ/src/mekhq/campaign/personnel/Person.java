@@ -771,8 +771,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     /**
-     * This method is used to migrate names from being a joined name to split between given name and surname,
-     * as part of the Personnel changes in MekHQ 0.47.4.
+     * This method is used to migrate names from being a joined name to split between given name and
+     * surname.
+     * This is required to migrate personnel between MegaMek and MekHQ, as MekHQ tracks divided names
+     * and MegaMek does not.
      * @param n the name to be migrated
      */
     public void migrateName(String n) {
