@@ -37,7 +37,9 @@ import mekhq.preferences.PreferencesNode;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.regex.PatternSyntaxException;
 
@@ -132,7 +134,6 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
     }
     //endregion Button Methods
 
-
     /**
      * We need to override this to add some MekHQ specific functionality, namely changing button
      * names when the selected entity is chosen
@@ -170,8 +171,15 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
     protected void filterUnits() {
         RowFilter<MechTableModel, Integer> unitTypeFilter;
 
+        List<Integer> techLevels = new ArrayList<>();
+        for (Integer selectedIdx : listTechLevel.getSelectedIndices()) {
+            techLevels.add(techLevelListToIndex.get(selectedIdx));
+        }
+        final Integer[] nTypes = new Integer[techLevels.size()];
+        techLevels.toArray(nTypes);
+
         final int nClass = comboWeight.getSelectedIndex();
-        final int nUnit = comboUnitType.getSelectedIndex();
+        final int nUnit = comboUnitType.getSelectedIndex() - 1;
         final boolean checkSupportVee = Messages.getString("MechSelectorDialog.SupportVee")
                 .equals(comboUnitType.getSelectedItem());
         //If current expression doesn't parse, don't update.
@@ -182,10 +190,18 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                     MechTableModel mechModel = entry.getModel();
                     MechSummary mech = mechModel.getMechSummary(entry.getIdentifier());
                     ITechnology tech = UnitTechProgression.getProgression(mech, campaign.getTechFaction(), true);
+                    boolean techLevelMatch = false;
+                    int type = enableYearLimits ? mech.getType(allowedYear) : mech.getType();
+                    for (int tl : nTypes) {
+                        if (type == tl) {
+                            techLevelMatch = true;
+                            break;
+                        }
+                    }
                     if (
-                            /*year limits*/
+                            /* year limits */
                             (!enableYearLimits || (mech.getYear() <= allowedYear))
-                            /*Clan/IS limits*/
+                            /* Clan/IS limits */
                             && (campaign.getCampaignOptions().allowClanPurchases() || !TechConstants.isClan(mech.getType()))
                             && (campaign.getCampaignOptions().allowISPurchases() || TechConstants.isClan(mech.getType()))
                             /* Canon */
@@ -194,11 +210,12 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                             && ((nClass == mech.getWeightClass()) || (nClass == EntityWeightClass.SIZE))
                             /* Technology Level */
                             && ((null != tech) && campaign.isLegal(tech))
+                            && (techLevelMatch)
                             /* Support Vehicles */
                             && ((nUnit == -1)
                                     || (!checkSupportVee && mech.getUnitType().equals(UnitType.getTypeName(nUnit)))
                                     || (checkSupportVee && mech.isSupport()))
-                            /*Advanced Search*/
+                            /* Advanced Search */
                             && ((searchFilter == null) || MechSearchFilter.isMatch(mech, searchFilter))
                     ) {
                         if (textFilter.getText().length() > 0) {
@@ -211,6 +228,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                 }
             };
         } catch (PatternSyntaxException e) {
+            MekHQ.getLogger().error(getClass(), "filterUnits", "I've been ignored, HELP");
             return;
         }
         sorter.setRowFilter(unitTypeFilter);
