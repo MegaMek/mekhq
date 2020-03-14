@@ -348,17 +348,16 @@ public class AtBGameThread extends GameThread {
                         if (loadFighters || loadGround) {
                             // List of technicians assigned to transported units. Several units can share a tech.
                             Set<UUID> cargoTechs = new HashSet<>();
-                            int cargoCrew = 0;
                             for (UUID cargoId : scenario.getPlayerTransportLinkages().get(id)) {
                                 //Convert the list of Unit UUIDs to MM EntityIds
                                 toLoad.add(campaign.getUnit(cargoId).getEntity().getId());
-                                cargoCrew += campaign.getUnit(cargoId).getEntity().getCrew().getSize();
                                 cargoTechs.add(campaign.getUnit(cargoId).getTech().getId());
                             }
-                            Utilities.loadPlayerTransports(transport.getEntity().getId(), toLoad, client, loadFighters, loadGround);
-                            //Update the transport's passenger count with assigned techs and unit crews
-                            transport.getEntity().setNPassenger(transport.getEntity().getNPassenger() + (cargoTechs.size() + cargoCrew));
+                            //Update the transport's passenger count with assigned techs
+                            transport.getEntity().setNPassenger(transport.getEntity().getNPassenger() + (cargoTechs.size()));
                             client.sendUpdateEntity(transport.getEntity());
+                            //And now load the units. Unit crews load as passengers here.
+                            Utilities.loadPlayerTransports(transport.getEntity().getId(), toLoad, client, loadFighters, loadGround);
                         }
                     }
                 }
