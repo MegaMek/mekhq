@@ -89,9 +89,9 @@ import mekhq.service.IAutosaveService;
  * The main class of the application.
  */
 public class MekHQ implements GameListener {
-	//TODO: This is intended as a debug/production type thing.
-	// So it should be backed down to 1 for releases...
-	// It's intended for 1 to be critical, 3 to be typical, and 5 to be debug/informational.
+	// TODO : This is intended as a debug/production type thing.
+	// TODO : So it should be backed down to 1 for releases...
+	// TODO : It's intended for 1 to be critical, 3 to be typical, and 5 to be debug/informational.
 	public static int VERBOSITY_LEVEL = 5;
 	public static String CAMPAIGN_DIRECTORY = "./campaigns/";
 	public static String PREFERENCES_FILE = "mmconf/mekhq.preferences";
@@ -365,15 +365,13 @@ public class MekHQ implements GameListener {
     	System.setProperty("apple.laf.useScreenMenuBar", "true");
         System.setProperty("com.apple.mrj.application.apple.menu.about.name","MekHQ");
 
-        SwingUtilities.invokeLater(() -> {
-            // TODO : logFileName should probably not be inline
-            String logFileName = "logs" + File.separator + "mekhqlog.txt";
-            // Reset the log file - TODO : Maybe move this to being a call to the logger?
-            MegaMek.resetLogFile(logFileName);
-            // redirect output to log file
-            redirectOutput(logFileName); // Deprecated call required for MegaMek usage
-            MekHQ.getInstance().startup();
-        });
+        // TODO : logFileName should probably not be inline
+        String logFileName = "logs" + File.separator + "mekhqlog.txt";
+        getLogger().resetLogFile(logFileName);
+        // redirect output to log file
+        redirectOutput(logFileName); // Deprecated call required for MegaMek usage
+
+        SwingUtilities.invokeLater(() -> MekHQ.getInstance().startup());
     }
 
     private void showInfo() {
