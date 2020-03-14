@@ -138,6 +138,8 @@ public class CampaignOptions implements Serializable {
     private int babySurnameStyle;
     public static final int BABY_SURNAME_MINE = 0; //baby uses mother's surname
     public static final int BABY_SURNAME_SPOUSE = 1; //baby uses father's surname
+    public static final int BABY_SURNAME_MOTHER_DASH_FATHER = 2;
+    public static final int BABY_SURNAME_FATHER_DASH_MOTHER = 3;
     private boolean useParentage;
     private int displayFamilyLevel;
     public static final int PARENTS_CHILDREN_SIBLINGS = 0;

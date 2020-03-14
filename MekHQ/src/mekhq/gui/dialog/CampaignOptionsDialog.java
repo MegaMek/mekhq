@@ -1845,6 +1845,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         DefaultComboBoxModel<String> babySurnameStyleModel = new DefaultComboBoxModel<>();
         babySurnameStyleModel.addElement(resourceMap.getString("babySurnameStyle.Mother"));
         babySurnameStyleModel.addElement(resourceMap.getString("babySurnameStyle.Father"));
+        babySurnameStyleModel.addElement(resourceMap.getString("babySurnameStyle.Mother-Father"));
+        babySurnameStyleModel.addElement(resourceMap.getString("babySurnameStyle.Father-Mother"));
         comboBabySurnameStyle = new JComboBox<>(babySurnameStyleModel);
         comboBabySurnameStyle.setSelectedIndex(options.getBabySurnameStyle());
         JPanel pnlBabySurnameStyle = new JPanel();

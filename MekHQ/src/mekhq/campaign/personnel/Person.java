@@ -1301,13 +1301,50 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }).collect(Collectors.toList());
     }
 
+    /**
+     * This determines a baby's surname based on their parents names and the selected method
+     * @param fatherId the father's UUID
+     * @return the surname to use
+     */
     private String generateBabySurname(UUID fatherId) {
-        if (campaign.getCampaignOptions().getBabySurnameStyle() == CampaignOptions.BABY_SURNAME_SPOUSE) {
-            if (fatherId != null) {
-                return campaign.getPerson(fatherId).getSurname();
+        switch (campaign.getCampaignOptions().getBabySurnameStyle()) {
+            case CampaignOptions.BABY_SURNAME_SPOUSE: {
+                Person father = campaign.getPerson(fatherId);
+                if (father != null) {
+                    return father.getSurname();
+                } else {
+                    return surname;
+                }
             }
+            case CampaignOptions.BABY_SURNAME_MOTHER_DASH_FATHER: {
+                Person father = campaign.getPerson(fatherId);
+                if (father != null) {
+                    if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(father.getSurname())) {
+                        return surname + "-" + father.getSurname();
+                    } else if (!StringUtil.isNullOrEmpty(father.getSurname())) {
+                        return father.getSurname();
+                    }
+                }
+                return surname;
+            }
+            case CampaignOptions.BABY_SURNAME_FATHER_DASH_MOTHER: {
+                Person father = campaign.getPerson(fatherId);
+                if (father != null) {
+                    if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(father.getSurname())) {
+                        return father.getSurname() + "-" + surname;
+                    } else if (!StringUtil.isNullOrEmpty(surname)) {
+                        return surname;
+                    } else {
+                        return father.getSurname();
+                    }
+                } else {
+                    return surname;
+                }
+            }
+            case CampaignOptions.BABY_SURNAME_MINE:
+            default:
+                return surname;
         }
-        return surname = getSurname();
     }
     //endregion Pregnancy
 
@@ -1414,17 +1451,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
             case SURNAME_NO_CHANGE:
                 break;
             case SURNAME_SPOUSE:
-                if (!StringUtil.isNullOrEmpty(spouseSurname)) {
-                    setSurname(spouseSurname);
-                }
-
+                setSurname(spouseSurname);
                 setMaidenName(surname); //"" is handled in the divorce code
                 break;
             case SURNAME_YOURS:
-                if (!StringUtil.isNullOrEmpty(surname)) {
-                    spouse.setSurname(surname);
-                }
-
+                spouse.setSurname(surname);
                 spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
                 break;
             case SURNAME_HYP_YOURS:
@@ -1433,7 +1464,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else {
                     setSurname(spouseSurname);
                 }
-                //both null or "" is ignored as a case, as it would lead to no changes
 
                 setMaidenName(surname); //"" is handled in the divorce code
                 break;
@@ -1457,7 +1487,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else {
                     spouse.setSurname(surname);
                 }
-                //both null or "" is ignored as a case, as it would lead to no changes
 
                 spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
                 break;
@@ -1477,31 +1506,19 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 break;
             case SURNAME_MALE:
                 if (isMale()) {
-                    if (!StringUtil.isNullOrEmpty(surname)) {
-                        spouse.setSurname(surname);
-                    }
-
+                    spouse.setSurname(surname);
                     spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
                 } else {
-                    if (!StringUtil.isNullOrEmpty(spouseSurname)) {
-                        setSurname(spouseSurname);
-                    }
-
+                    setSurname(spouseSurname);
                     setMaidenName(surname); //"" is handled in the divorce code
                 }
                 break;
             case SURNAME_FEMALE:
                 if (isMale()) {
-                    if (!StringUtil.isNullOrEmpty(spouseSurname)) {
-                        setSurname(spouseSurname);
-                    }
-
+                    setSurname(spouseSurname);
                     setMaidenName(surname); //"" is handled in the divorce code
                 } else {
-                    if (!StringUtil.isNullOrEmpty(surname)) {
-                        spouse.setSurname(surname);
-                    }
-
+                    spouse.setSurname(surname);
                     spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
                 }
                 break;
