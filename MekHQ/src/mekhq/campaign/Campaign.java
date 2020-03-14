@@ -1438,40 +1438,50 @@ public class Campaign implements Serializable, ITechManager {
             switch (person.getPhenotype()) {
                 case Phenotype.P_MECHWARRIOR:
                     bloodnameTarget += person.hasSkill(SkillType.S_GUN_MECH)
-                            ? person.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue() : 13;
+                            ? person.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue()
+                            : TargetRoll.AUTOMATIC_FAIL;
                     bloodnameTarget += person.hasSkill(SkillType.S_PILOT_MECH)
-                            ? person.getSkill(SkillType.S_PILOT_MECH).getFinalSkillValue() : 13;
+                            ? person.getSkill(SkillType.S_PILOT_MECH).getFinalSkillValue()
+                            : TargetRoll.AUTOMATIC_FAIL;
                     break;
                 case Phenotype.P_AEROSPACE:
                     if (type == Person.T_PROTO_PILOT) {
                         bloodnameTarget += 2 * (person.hasSkill(SkillType.S_GUN_PROTO)
-                                ? person.getSkill(SkillType.S_GUN_PROTO).getFinalSkillValue() : 13);
-
+                                ? person.getSkill(SkillType.S_GUN_PROTO).getFinalSkillValue()
+                                : TargetRoll.AUTOMATIC_FAIL);
                     } else {
                         bloodnameTarget += person.hasSkill(SkillType.S_GUN_AERO)
-                                ? person.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue() : 13;
+                                ? person.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue()
+                                : TargetRoll.AUTOMATIC_FAIL;
                         bloodnameTarget += person.hasSkill(SkillType.S_PILOT_AERO)
-                                ? person.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue() : 13;
+                                ? person.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue()
+                                : TargetRoll.AUTOMATIC_FAIL;
                     }
                     break;
                 case Phenotype.P_ELEMENTAL:
                     bloodnameTarget += person.hasSkill(SkillType.S_GUN_BA)
-                            ? person.getSkill(SkillType.S_GUN_BA).getFinalSkillValue() : 13;
+                            ? person.getSkill(SkillType.S_GUN_BA).getFinalSkillValue()
+                            : TargetRoll.AUTOMATIC_FAIL;
                     bloodnameTarget += person.hasSkill(SkillType.S_ANTI_MECH)
-                            ? person.getSkill(SkillType.S_ANTI_MECH).getFinalSkillValue() : 13;
+                            ? person.getSkill(SkillType.S_ANTI_MECH).getFinalSkillValue()
+                            : TargetRoll.AUTOMATIC_FAIL;
                     break;
                 case Phenotype.P_VEHICLE:
                     bloodnameTarget += person.hasSkill(SkillType.S_GUN_VEE)
-                            ? person.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue() : 13;
+                            ? person.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue()
+                            : TargetRoll.AUTOMATIC_FAIL;
                     if (type == Person.T_VTOL_PILOT) {
                         bloodnameTarget += person.hasSkill(SkillType.S_PILOT_VTOL)
-                                ? person.getSkill(SkillType.S_PILOT_VTOL).getFinalSkillValue() : 13;
+                                ? person.getSkill(SkillType.S_PILOT_VTOL).getFinalSkillValue()
+                                : TargetRoll.AUTOMATIC_FAIL;
                     } else if (type == Person.T_NVEE_DRIVER) {
                         bloodnameTarget += person.hasSkill(SkillType.S_PILOT_NVEE)
-                                ? person.getSkill(SkillType.S_PILOT_NVEE).getFinalSkillValue() : 13;
+                                ? person.getSkill(SkillType.S_PILOT_NVEE).getFinalSkillValue()
+                                : TargetRoll.AUTOMATIC_FAIL;
                     } else {
                         bloodnameTarget += person.hasSkill(SkillType.S_PILOT_GVEE)
-                                ? person.getSkill(SkillType.S_PILOT_GVEE).getFinalSkillValue() : 13;
+                                ? person.getSkill(SkillType.S_PILOT_GVEE).getFinalSkillValue()
+                                : TargetRoll.AUTOMATIC_FAIL;
                     }
                     break;
             }
@@ -1602,7 +1612,9 @@ public class Campaign implements Serializable, ITechManager {
     public List<Person> getActivePersonnel() {
         List<Person> activePersonnel = new ArrayList<>();
         for (Person p : getPersonnel()) {
-            if (p.isActive()) {activePersonnel.add(p);}
+            if (p.isActive()) {
+                activePersonnel.add(p);
+            }
         }
         return activePersonnel;
     }

@@ -18,9 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
-
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -28,34 +26,18 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.ResourceBundle;
-import java.util.Vector;
+import java.util.*;
 
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
-import javax.swing.JSplitPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SpinnerNumberModel;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
 import mekhq.MekHQ;
-import mekhq.gui.CampaignGUI;
 import mekhq.gui.preferences.JIntNumberSpinnerPreference;
 import mekhq.gui.preferences.JTablePreference;
 import mekhq.gui.preferences.JToggleButtonPreference;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
-import org.apache.log4j.Logger;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
@@ -84,34 +66,19 @@ public class ContractMarketDialog extends JDialog {
     private static int signingBonus = 0;
     private static int sharePct = 20;
 
-    private CampaignGUI gui;
     private Campaign campaign;
     private ContractMarket contractMarket;
     private Contract selectedContract = null;
-    private ArrayList<String> possibleRetainerContracts;
+    private List<String> possibleRetainerContracts;
 
-    private JScrollPane scrollTableContracts;
     private JScrollPane scrollContractView;
-    private JPanel panelTable;
-    private JPanel panelFees;
-    private JPanel panelRetainer;
-    private JPanel panelOKBtns;
     private ContractSummaryPanel contractView;
-    private JButton btnGenerate;
-    private JButton btnRemove;
-    private JButton btnAccept;
-    private JButton btnClose;
-    private JSplitPane splitMain;
 
     private JCheckBox chkMRBC;
-    private JLabel lblSigningBonus;
     private JSpinner spnSigningBonus;
-    private JLabel lblAdvance;
     private JSpinner spnAdvance;
-    private JLabel lblSharePct;
     private JSpinner spnSharePct;
     private JTable tableContracts;
-    private TableRowSorter<DefaultTableModel> sorter;
     private JLabel lblCurrentRetainer;
     private JLabel lblRetainerEmployer;
     private JButton btnEndRetainer;
@@ -119,11 +86,8 @@ public class ContractMarketDialog extends JDialog {
     private FactionComboBox cbRetainerEmployer;
     private JButton btnStartRetainer;
 
-    private static final Logger log = Logger.getLogger(ContractMarketDialog.class);
-
-    public ContractMarketDialog(Frame frame, CampaignGUI gui, Campaign c) {
+    public ContractMarketDialog(Frame frame, Campaign c) {
         super(frame, true);
-        this.gui = gui;
         campaign = c;
         contractMarket = c.getContractMarket();
         possibleRetainerContracts = new ArrayList<>();
@@ -141,11 +105,11 @@ public class ContractMarketDialog extends JDialog {
     private void countSuccessfulContracts() {
         HashMap<String, Integer> successfulContracts = new HashMap<>();
         for (Mission m : campaign.getMissions()) {
-            if (m.isActive() || !(m instanceof AtBContract) ||
-                    ((AtBContract)m).getEmployerCode().equals(campaign.getRetainerEmployerCode())) {
+            if (m.isActive() || !(m instanceof AtBContract)
+                    || ((AtBContract) m).getEmployerCode().equals(campaign.getRetainerEmployerCode())) {
                 continue;
             }
-            AtBContract contract = (AtBContract)m;
+            AtBContract contract = (AtBContract) m;
             int num;
             num = successfulContracts.getOrDefault(contract.getEmployerCode(), 0);
             successfulContracts.put(contract.getEmployerCode(),
@@ -159,17 +123,17 @@ public class ContractMarketDialog extends JDialog {
     }
 
     private void initComponents() {
-        scrollTableContracts = new JScrollPane();
+        JScrollPane scrollTableContracts = new JScrollPane();
         scrollContractView = new JScrollPane();
-        panelTable = new JPanel();
-        panelFees = new JPanel();
-        panelRetainer = new JPanel();
-        panelOKBtns = new JPanel();
+        JPanel panelTable = new JPanel();
+        JPanel panelFees = new JPanel();
+        JPanel panelRetainer = new JPanel();
+        JPanel panelOKBtns = new JPanel();
         contractView = null;
-        btnGenerate = new JButton();
-        btnRemove = new JButton();
-        btnAccept = new JButton();
-        btnClose = new JButton();
+        JButton btnGenerate = new JButton();
+        JButton btnRemove = new JButton();
+        JButton btnAccept = new JButton();
+        JButton btnClose = new JButton();
 
         chkMRBC = new JCheckBox();
         chkMRBC.addItemListener(arg0 -> {
@@ -182,10 +146,10 @@ public class ContractMarketDialog extends JDialog {
                 contractView.refreshAmounts();
             }
         });
-        lblAdvance = new JLabel();
+        JLabel lblAdvance = new JLabel();
         spnAdvance = new JSpinner(new SpinnerNumberModel(advance, 0, 25, 5));
         spnAdvance.addChangeListener(arg0 -> {
-            advance = (Integer)spnAdvance.getValue();
+            advance = (Integer) spnAdvance.getValue();
             for (Contract c : contractMarket.getContracts()) {
                 c.setAdvancePct(advance);
                 c.calculateContract(campaign);
@@ -194,10 +158,10 @@ public class ContractMarketDialog extends JDialog {
                 contractView.refreshAmounts();
             }
         });
-        lblSigningBonus = new JLabel();
+        JLabel lblSigningBonus = new JLabel();
         spnSigningBonus = new JSpinner(new SpinnerNumberModel(signingBonus, 0, 10, 1));
         spnSigningBonus.addChangeListener(arg0 -> {
-            signingBonus = (Integer)spnSigningBonus.getValue();
+            signingBonus = (Integer) spnSigningBonus.getValue();
             for (Contract c : contractMarket.getContracts()) {
                 c.setSigningBonusPct(signingBonus);
                 c.calculateContract(campaign);
@@ -207,15 +171,15 @@ public class ContractMarketDialog extends JDialog {
             }
         });
 
-        lblSharePct = new JLabel();
+        JLabel lblSharePct = new JLabel();
         spnSharePct = new JSpinner(new SpinnerNumberModel(sharePct, 20, 50, 10));
         spnSharePct.addChangeListener(arg0 -> {
-            sharePct = (Integer)spnSharePct.getValue();
+            sharePct = (Integer) spnSharePct.getValue();
             for (Contract c : contractMarket.getContracts()) {
-                if (campaign.getCampaignOptions().getUseAtB() &&
-                        campaign.getCampaignOptions().getUseShareSystem() &&
-                        c instanceof AtBContract) {
-                    ((AtBContract)c).setSharesPct(sharePct);
+                if (campaign.getCampaignOptions().getUseAtB()
+                        && campaign.getCampaignOptions().getUseShareSystem()
+                        && c instanceof AtBContract) {
+                    ((AtBContract) c).setSharesPct(sharePct);
                     c.calculateContract(campaign);
                 }
             }
@@ -233,13 +197,13 @@ public class ContractMarketDialog extends JDialog {
 
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractMarketDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle(resourceMap.getString("Form.title")); // NOI18N
-        setName("Form"); // NOI18N
+        setTitle(resourceMap.getString("Form.title"));
+        setName("Form");
         getContentPane().setLayout(new BorderLayout());
 
-        scrollTableContracts.setMinimumSize(new java.awt.Dimension(500, 400));
-        scrollTableContracts.setName("scrollTableContracts"); // NOI18N
-        scrollTableContracts.setPreferredSize(new java.awt.Dimension(500, 400));
+        scrollTableContracts.setMinimumSize(new Dimension(500, 400));
+        scrollTableContracts.setName("scrollTableContracts");
+        scrollTableContracts.setPreferredSize(new Dimension(500, 400));
 
         chkMRBC.setName("chkMRBC");
         chkMRBC.setText(resourceMap.getString("checkMRBC.text"));
@@ -261,15 +225,13 @@ public class ContractMarketDialog extends JDialog {
         Vector<Vector<String>> data = new Vector<>();
         Vector<String> colNames = new Vector<>();
         for (Contract c : contractMarket.getContracts()) {
-            /* Changes in rating or force size since creation can alter some
-             * details
-             */
+            // Changes in rating or force size since creation can alter some details
             if (c instanceof AtBContract) {
-                ((AtBContract)c).initContractDetails(campaign);
-                ((AtBContract)c).calculatePaymentMultiplier(campaign);
-                ((AtBContract)c).calculatePartsAvailabilityLevel(campaign);
-                ((AtBContract)c).setSharesPct(campaign.getCampaignOptions().getUseShareSystem()?
-                        (Integer)spnSharePct.getValue():0);
+                ((AtBContract) c).initContractDetails(campaign);
+                ((AtBContract) c).calculatePaymentMultiplier(campaign);
+                ((AtBContract) c).calculatePartsAvailabilityLevel(campaign);
+                ((AtBContract) c).setSharesPct(campaign.getCampaignOptions().getUseShareSystem()
+                        ? (Integer) spnSharePct.getValue() : 0);
             }
             c.setStartDate(null);
             c.setMRBCFee(payMRBC);
@@ -279,12 +241,12 @@ public class ContractMarketDialog extends JDialog {
             c.calculateContract(campaign);
             Vector<String> row = new Vector<>();
             if (c instanceof AtBContract) {
-                row.add(((AtBContract)c).getEmployerName(campaign.getGameYear()));
-                row.add(((AtBContract)c).getEnemyName(campaign.getGameYear()));
-                if (((AtBContract)c).isSubcontract()) {
-                    row.add(((AtBContract)c).getMissionTypeName() + " (Subcontract)");
+                row.add(((AtBContract) c).getEmployerName(campaign.getGameYear()));
+                row.add(((AtBContract) c).getEnemyName(campaign.getGameYear()));
+                if (((AtBContract) c).isSubcontract()) {
+                    row.add(((AtBContract) c).getMissionTypeName() + " (Subcontract)");
                 } else {
-                    row.add(((AtBContract)c).getMissionTypeName());
+                    row.add(((AtBContract) c).getMissionTypeName());
                 }
             } else {
                 row.add(c.getEmployer());
@@ -300,12 +262,14 @@ public class ContractMarketDialog extends JDialog {
         tableContracts = new JTable();
         DefaultTableModel tblContractsModel = new DefaultTableModel(data, colNames) {
             private static final long serialVersionUID = 1L;
-            @Override public boolean isCellEditable(int row, int column) {
+
+            @Override
+            public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
         tableContracts.setModel(tblContractsModel);
-        tableContracts.setName("tableContracts"); // NOI18N
+        tableContracts.setName("tableContracts");
         tableContracts.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tableContracts.createDefaultColumnsFromModel();
         tableContracts.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
@@ -317,13 +281,12 @@ public class ContractMarketDialog extends JDialog {
 
         tableContracts.setIntercellSpacing(new Dimension(0, 0));
         tableContracts.setShowGrid(false);
-        sorter = new TableRowSorter<>(tblContractsModel);
+        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(tblContractsModel);
         tableContracts.setRowSorter(sorter);
         scrollTableContracts.setViewportView(tableContracts);
 
-        scrollContractView.setMinimumSize(new java.awt.Dimension(500, 600));
-        scrollContractView.setPreferredSize(new java.awt.Dimension(500, 600));
-        scrollContractView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollContractView.setMinimumSize(new Dimension(500, 600));
+        scrollContractView.setPreferredSize(new Dimension(500, 600));
         scrollContractView.setViewportView(null);
 
         panelTable.setLayout(new BorderLayout());
@@ -393,26 +356,27 @@ public class ContractMarketDialog extends JDialog {
             btnStartRetainer.setVisible(possibleRetainerContracts.size() > 0);
         });
 
-        splitMain = new javax.swing.JSplitPane(JSplitPane.HORIZONTAL_SPLIT,panelTable, scrollContractView);
+        JSplitPane splitMain = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panelTable, scrollContractView);
         splitMain.setOneTouchExpandable(true);
         splitMain.setResizeWeight(0.0);
         getContentPane().add(splitMain, BorderLayout.CENTER);
 
-        panelOKBtns.setLayout(new java.awt.GridBagLayout());
+        panelOKBtns.setLayout(new GridBagLayout());
 
         btnGenerate.setText(resourceMap.getString("btnGenerate.text"));
-        btnGenerate.setName("btnGenerate"); // NOI18N
+        btnGenerate.setName("btnGenerate");
         btnGenerate.addActionListener(evt -> {
             AtBContract c = contractMarket.addAtBContract(campaign);
 
-            if(c == null) {
+            if (c == null) {
                 campaign.addReport(resourceMap.getString("report.UnableToGMContract"));
                 return;
             }
 
             c.initContractDetails(campaign);
             c.calculatePartsAvailabilityLevel(campaign);
-            c.setSharesPct(campaign.getCampaignOptions().getUseShareSystem() ? (Integer)spnSharePct.getValue() : 0);
+            c.setSharesPct(campaign.getCampaignOptions().getUseShareSystem()
+                    ? (Integer) spnSharePct.getValue() : 0);
             c.setStartDate(null);
             c.setMRBCFee(payMRBC);
             c.setAdvancePct(advance);
@@ -427,25 +391,25 @@ public class ContractMarketDialog extends JDialog {
             ((DefaultTableModel) tableContracts.getModel()).addRow(row);
         });
         btnGenerate.setEnabled(campaign.isGM());
-        panelOKBtns.add(btnGenerate, new java.awt.GridBagConstraints());
+        panelOKBtns.add(btnGenerate, new GridBagConstraints());
 
         btnRemove.setText(resourceMap.getString("btnRemove.text"));
-        btnRemove.setName("btnRemove"); // NOI18N
+        btnRemove.setName("btnRemove");
         btnRemove.addActionListener(evt -> {
             contractMarket.removeContract(selectedContract);
             ((DefaultTableModel) tableContracts.getModel()).removeRow(tableContracts.convertRowIndexToModel(tableContracts.getSelectedRow()));
         });
-        panelOKBtns.add(btnRemove, new java.awt.GridBagConstraints());
+        panelOKBtns.add(btnRemove, new GridBagConstraints());
 
         btnAccept.setText(resourceMap.getString("btnAccept.text"));
-        btnAccept.setName("btnAccept"); // NOI18N
+        btnAccept.setName("btnAccept");
         btnAccept.addActionListener(this::acceptContract);
-        panelOKBtns.add(btnAccept, new java.awt.GridBagConstraints());
+        panelOKBtns.add(btnAccept, new GridBagConstraints());
 
-        btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
-        btnClose.setName("btnClose"); // NOI18N
+        btnClose.setText(resourceMap.getString("btnClose.text"));
+        btnClose.setName("btnClose");
         btnClose.addActionListener(this::btnCloseActionPerformed);
-        panelOKBtns.add(btnClose, new java.awt.GridBagConstraints());
+        panelOKBtns.add(btnClose, new GridBagConstraints());
 
         getContentPane().add(panelOKBtns, BorderLayout.PAGE_END);
 
@@ -479,13 +443,14 @@ public class ContractMarketDialog extends JDialog {
     }
 
     private void acceptContract(ActionEvent evt) {
-        if(selectedContract != null) {
+        if (selectedContract != null) {
             selectedContract.setName(contractView.getContractName());
             campaign.getFinances().credit(selectedContract.getTotalAdvanceAmount(), Transaction.C_CONTRACT,
                     "Advance monies for " + selectedContract.getName(), campaign.getCalendar().getTime());
             campaign.addMission(selectedContract);
             contractMarket.removeContract(selectedContract);
-            ((DefaultTableModel) tableContracts.getModel()).removeRow(tableContracts.convertRowIndexToModel(tableContracts.getSelectedRow()));
+            ((DefaultTableModel) tableContracts.getModel()).removeRow(tableContracts
+                    .convertRowIndexToModel(tableContracts.getSelectedRow()));
             refreshContractView();
         }
     }
@@ -497,35 +462,35 @@ public class ContractMarketDialog extends JDialog {
 
     private void contractChanged() {
         int view = tableContracts.getSelectedRow();
-        if(view < 0) {
+        if (view < 0) {
             //selection got filtered away
             selectedContract = null;
             refreshContractView();
             return;
         }
-         /* preserve the name given to the previous contract (if any) */
-         if (selectedContract != null && contractView != null) {
-             selectedContract.setName(contractView.getContractName());
-         }
+        /* preserve the name given to the previous contract (if any) */
+        if (selectedContract != null && contractView != null) {
+            selectedContract.setName(contractView.getContractName());
+        }
 
         selectedContract = contractMarket.getContracts().get(tableContracts.convertRowIndexToModel(view));
         refreshContractView();
     }
 
-     void refreshContractView() {
-         int row = tableContracts.getSelectedRow();
-         if(row < 0) {
-             contractView = null;
-             scrollContractView.setViewportView(null);
-             return;
-         }
-         contractView = new ContractSummaryPanel(selectedContract, campaign, gui,
-                 campaign.getCampaignOptions().getUseAtB() &&
-                 selectedContract instanceof AtBContract &&
-                 !((AtBContract)selectedContract).isSubcontract());
-         scrollContractView.setViewportView(contractView);
+    void refreshContractView() {
+        int row = tableContracts.getSelectedRow();
+        if (row < 0) {
+            contractView = null;
+            scrollContractView.setViewportView(null);
+            return;
+        }
+        contractView = new ContractSummaryPanel(selectedContract, campaign,
+                campaign.getCampaignOptions().getUseAtB()
+                        && selectedContract instanceof AtBContract
+                        && !((AtBContract) selectedContract).isSubcontract());
+        scrollContractView.setViewportView(contractView);
         //This odd code is to make sure that the scrollbar stays at the top
         //I cant just call it here, because it ends up getting reset somewhere later
-        javax.swing.SwingUtilities.invokeLater(() -> scrollContractView.getVerticalScrollBar().setValue(0));
+        SwingUtilities.invokeLater(() -> scrollContractView.getVerticalScrollBar().setValue(0));
     }
 }
