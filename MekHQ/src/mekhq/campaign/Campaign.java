@@ -6338,56 +6338,61 @@ public class Campaign implements Serializable, ITechManager {
 
         String searchCat_Role = Person.getRoleDesc(p.getPrimaryRole(), false) + "/";
 
-        String searchCat_RoleGroup;
-        switch (p.getPrimaryRole()) {
-            case Person.T_DOCTOR:
-            case Person.T_MEDIC:
-                searchCat_RoleGroup = "Medical/";
-                break;
-            case Person.T_MECH_TECH:
-            case Person.T_MECHANIC:
-            case Person.T_AERO_TECH:
-            case Person.T_BA_TECH:
-                searchCat_RoleGroup = "Tech/";
-                break;
-            case Person.T_ADMIN_COM:
-            case Person.T_ADMIN_HR:
-            case Person.T_ADMIN_LOG:
-            case Person.T_ADMIN_TRA:
-                searchCat_RoleGroup = "Admin/";
-                break;
-            case Person.T_SPACE_PILOT:
-            case Person.T_SPACE_GUNNER:
-            case Person.T_SPACE_CREW:
-            case Person.T_NAVIGATOR:
-                searchCat_RoleGroup = "Vessel Crew/";
-                break;
-            default:
-                searchCat_RoleGroup = "";
-                break;
-        }
-
-        String searchCat_CombatSupport;
-        if (p.isSupport()) {
-            searchCat_CombatSupport = "Support/";
-        } else {
-            searchCat_CombatSupport = "Combat/";
-        }
-
         possiblePortraits = getPossibleRandomPortraits(portraits, existingPortraits,
                 searchCat_Gender + searchCat_Role);
 
-        if (possiblePortraits.isEmpty() && !searchCat_RoleGroup.isEmpty()) {
-            possiblePortraits = getPossibleRandomPortraits(portraits, existingPortraits,
-                    searchCat_Gender + searchCat_RoleGroup);
-        }
         if (possiblePortraits.isEmpty()) {
+            String searchCat_RoleGroup;
+            switch (p.getPrimaryRole()) {
+                case Person.T_DOCTOR:
+                case Person.T_MEDIC:
+                    searchCat_RoleGroup = "Medical/";
+                    break;
+                case Person.T_MECH_TECH:
+                case Person.T_MECHANIC:
+                case Person.T_AERO_TECH:
+                case Person.T_BA_TECH:
+                    searchCat_RoleGroup = "Tech/";
+                    break;
+                case Person.T_ADMIN_COM:
+                case Person.T_ADMIN_HR:
+                case Person.T_ADMIN_LOG:
+                case Person.T_ADMIN_TRA:
+                    searchCat_RoleGroup = "Admin/";
+                    break;
+                case Person.T_SPACE_PILOT:
+                case Person.T_SPACE_GUNNER:
+                case Person.T_SPACE_CREW:
+                case Person.T_NAVIGATOR:
+                    searchCat_RoleGroup = "Vessel Crew/";
+                    break;
+                default:
+                    searchCat_RoleGroup = "";
+                    break;
+            }
+
+            if (!searchCat_RoleGroup.isEmpty()) {
+                possiblePortraits = getPossibleRandomPortraits(portraits, existingPortraits,
+                        searchCat_Gender + searchCat_RoleGroup);
+            }
+        }
+
+        if (possiblePortraits.isEmpty()) {
+            String searchCat_CombatSupport;
+            if (p.isSupport()) {
+                searchCat_CombatSupport = "Support/";
+            } else {
+                searchCat_CombatSupport = "Combat/";
+            }
+
             possiblePortraits = getPossibleRandomPortraits(portraits, existingPortraits,
                     searchCat_Gender + searchCat_CombatSupport);
         }
+
         if (possiblePortraits.isEmpty()) {
             possiblePortraits = getPossibleRandomPortraits(portraits, existingPortraits, searchCat_Gender);
         }
+
         if (!possiblePortraits.isEmpty()) {
             String chosenPortrait = possiblePortraits.get(Compute.randomInt(possiblePortraits.size()));
             String[] temp = chosenPortrait.split(":");
