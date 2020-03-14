@@ -38,6 +38,9 @@ import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.xml.parsers.DocumentBuilder;
 
+import megamek.client.ui.swing.UnitLoadingDialog;
+import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
+import megamek.common.*;
 import mekhq.campaign.finances.Money;
 import mekhq.gui.dialog.*;
 import mekhq.gui.preferences.JWindowPreference;
@@ -50,11 +53,6 @@ import org.w3c.dom.NodeList;
 import chat.ChatClient;
 import megamek.client.RandomUnitGenerator;
 import megamek.client.ui.swing.GameOptionsDialog;
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.Jumpship;
-import megamek.common.MULParser;
-import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
@@ -1533,7 +1531,12 @@ public class CampaignGUI extends JPanel {
     }
 
     private void miPurchaseUnitActionPerformed(java.awt.event.ActionEvent evt) {
-        UnitSelectorDialog usd = new UnitSelectorDialog(getFrame(), getCampaign(), true);
+        UnitLoadingDialog unitLoadingDialog = new UnitLoadingDialog(frame);
+        if (!MechSummaryCache.getInstance().isInitialized()) {
+            unitLoadingDialog.setVisible(true);
+        }
+        AbstractUnitSelectorDialog usd = new MekHQUnitSelectorDialog(getFrame(), unitLoadingDialog,
+                getCampaign(), true);
 
         usd.setVisible(true);
     }
