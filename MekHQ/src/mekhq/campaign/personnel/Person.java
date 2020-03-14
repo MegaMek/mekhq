@@ -106,12 +106,15 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public static final int S_MIA = 3;
     public static final int S_NUM = 4;
 
-    public static final int G_DESCRIPTION_MALE_FEMALE = 0;
-    public static final int G_DESCRIPTION_HE_SHE = 1;
-    public static final int G_DESCRIPTION_HIM_HER = 2;
+    public enum GENDER_DESCRIPTOR {
+        MALE_FEMALE,
+        HE_SHE,
+        HIM_HER,
+        HIS_HER,
+        HIS_HERS,
+        BOY_GIRL
+    }
     public static final int G_DESCRIPTION_HIS_HER = 3;
-    public static final int G_DESCRIPTION_HIS_HERS = 4;
-    public static final int G_DESCRIPTION_BOY_GIRL = 5;
 
     // Prisoners, Bondsmen, and Normal Personnel
     public static final int PRISONER_NOT = 0;
@@ -584,13 +587,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     //region Text Getters
     //TODO : Rename and Localize region
-    public String getGenderString(int variant) {
+    public String getGenderString(GENDER_DESCRIPTOR variant) {
         return getGenderString(gender, variant);
     }
 
-    public static String getGenderString(int gender, int variant) {
+    public static String getGenderString(int gender, GENDER_DESCRIPTOR variant) {
         switch (variant) {
-            case G_DESCRIPTION_MALE_FEMALE: {
+            case MALE_FEMALE: {
                 switch (gender) {
                     case Crew.G_MALE:
                         return "Male";
@@ -602,7 +605,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         return Crew.GENDER_ERROR;
                 }
             }
-            case G_DESCRIPTION_HE_SHE: {
+            case HE_SHE: {
                 switch (gender) {
                     case Crew.G_MALE:
                         return "he";
@@ -614,7 +617,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         return Crew.GENDER_ERROR;
                 }
             }
-            case G_DESCRIPTION_HIM_HER: {
+            case HIM_HER: {
                 switch (gender) {
                     case Crew.G_MALE:
                         return "him";
@@ -626,7 +629,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         return Crew.GENDER_ERROR;
                 }
             }
-            case G_DESCRIPTION_HIS_HER: {
+            case HIS_HER: {
                 switch (gender) {
                     case Crew.G_MALE:
                         return "his";
@@ -638,7 +641,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         return Crew.GENDER_ERROR;
                 }
             }
-            case G_DESCRIPTION_HIS_HERS: {
+            case HIS_HERS: {
                 switch (gender) {
                     case Crew.G_MALE:
                         return "his";
@@ -650,7 +653,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         return Crew.GENDER_ERROR;
                 }
             }
-            case G_DESCRIPTION_BOY_GIRL: {
+            case BOY_GIRL: {
                 switch (gender) {
                     case Crew.G_MALE:
                         return "boy";
@@ -1211,62 +1214,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return (getAge(campaign.getCalendar()) <= 13);
     }
 
-    //region Age Range Identification
-    // TODO : Windchild Implement Me fully - Either add or remove in Personnel Wave 2
-    // idea : have a method that allows you to determine what a person's age range would be, as this could be useful
-    // in implementing a way to display ages instead of unknown for children
-    public static final int AGE_BABY = 0;
-    public static final int AGE_TODDLER = 1;
-    public static final int AGE_CHILD = 2;
-    public static final int AGE_PRETEEN = 3;
-    public static final int AGE_TEENAGER = 4;
-    public static final int AGE_ADULT = 5;
-    public static final int AGE_ELDER = 6;
-    public static final int AGE_NUM = 7;
-
-    public static final String[] AGE_NAMES = {
-        "Baby",
-        "Toddler",
-        "Child",
-        "Pre-teen",
-        "Teenager",
-        "Adult",
-        "Elder"
-    };
-
-    public String getAgeRangeName() {
-        return getAgeRangeName(determineAgeRangeIndex());
-    }
-
-    public String getAgeRangeName(int ageRangeIndex) {
-        if (ageRangeIndex < AGE_NUM) {
-            return AGE_NAMES[ageRangeIndex];
-        } else {
-            return String.format("Error In Age Range - Illegal Index %d", ageRangeIndex);
-        }
-    }
-
-    public int determineAgeRangeIndex() {
-        int age = getAge(campaign.getCalendar());
-
-        if (age >= 65) {
-            return AGE_ELDER;
-        } else if (age >= 20) {
-            return AGE_ADULT;
-        } else if (age >= 13) {
-            return AGE_TEENAGER;
-        } else if (age >= 10) {
-            return AGE_PRETEEN;
-        } else if (age >= 3) {
-            return AGE_CHILD;
-        } else if (age >= 1) {
-            return AGE_TODDLER;
-        } else {
-            return AGE_BABY;
-        }
-    }
-    //endregion Age Range Identification
-
     //region Pregnancy
     public GregorianCalendar getDueDate() {
         return dueDate;
@@ -1377,7 +1324,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             baby.setAncestorsId(ancId);
 
             campaign.addReport(String.format("%s has given birth to %s, a baby %s!", getHyperlinkedName(),
-                    baby.getHyperlinkedName(), baby.getGenderString(Person.G_DESCRIPTION_BOY_GIRL)));
+                    baby.getHyperlinkedName(), baby.getGenderString(GENDER_DESCRIPTOR.BOY_GIRL)));
             if (campaign.getCampaignOptions().logConception()) {
                 MedicalLogger.deliveredBaby(this, baby, campaign.getDate());
                 if (fatherId != null) {
@@ -2190,15 +2137,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
 
-                // TODO : reorder these based on what is most likely to show up, to improve load speed
                 if (wn2.getNodeName().equalsIgnoreCase("name")) { //included for backwards compatibility
                     retVal.migrateName(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("givenName")) {
-                    retVal.setGivenName(wn2.getTextContent());
+                    retVal.givenName = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("surname")) {
-                    retVal.setSurname(wn2.getTextContent());
+                    retVal.surname = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("honorific")) {
-                    retVal.setHonorific(wn2.getTextContent());
+                    retVal.honorific = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("maidenName")) {
                     retVal.maidenName = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("callsign")) {
@@ -2219,7 +2165,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     retVal.phenotype = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("bloodname")) {
                     retVal.bloodname = wn2.getTextContent();
-                    retVal.setFullName();
                 } else if (wn2.getNodeName().equalsIgnoreCase("biography")) {
                     retVal.biography = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("primaryRole")) {
@@ -2492,6 +2437,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     retVal.extraData = ExtraData.createFromXml(wn2);
                 }
             }
+
+            retVal.setFullName(); // this sets the name based on the loaded values
 
             if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 13) {
                 if (retVal.primaryRole > T_INFANTRY) {
@@ -3567,7 +3514,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 abilityString.append(Utilities.getOptionDisplayName(ability)).append("<br>");
             }
         }
-        if (abilityString.toString().equals("")) {
+        if (abilityString.length() == 0) {
             return null;
         }
         return "<html>" + abilityString + "</html>";
