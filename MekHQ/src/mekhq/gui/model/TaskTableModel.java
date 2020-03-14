@@ -1,9 +1,28 @@
+/*
+ * Copyright (c) 2013 The MegaMek Team. All rights reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui.model;
 
 import java.awt.Component;
 import java.awt.Image;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -134,7 +153,7 @@ public class TaskTableModel extends DataTableModel {
 
 	                if (null == tech) {
 	                	//Find a valid tech that we can copy their skill from
-	                	ArrayList<Person> techs = gui.getCampaign().getTechs(false);
+	                	List<Person> techs = gui.getCampaign().getTechs(false);
 
 	        			for (int i = techs.size() - 1; i >= 0; i--) {
 	        				Person techTemp = techs.get(i);
