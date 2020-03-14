@@ -1630,7 +1630,9 @@ public class Campaign implements Serializable, ITechManager {
     public List<Person> getActivePersonnel() {
         List<Person> activePersonnel = new ArrayList<>();
         for (Person p : getPersonnel()) {
-            if (p.isActive()) {activePersonnel.add(p);}
+            if (p.isActive()) {
+                activePersonnel.add(p);
+            }
         }
         return activePersonnel;
     }
