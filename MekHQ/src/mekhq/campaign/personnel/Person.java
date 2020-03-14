@@ -1113,7 +1113,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (recruitment == null) {
             return null;
         }
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd"); // TODO : remove inline date format
         return df.format(recruitment.getTime());
     }
 
@@ -3554,8 +3554,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * @return     Whether the role is considered a combat role
      */
     public static boolean isCombatRole(int role) {
-        return ((role > T_NONE) && (role <= T_NAVIGATOR))
-                || (role == T_VEHICLE_CREW);
+        return ((role > T_NONE) && (role <= T_NAVIGATOR)) || (role == T_VEHICLE_CREW);
     }
 
     /**
