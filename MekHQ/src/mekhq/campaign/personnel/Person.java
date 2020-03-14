@@ -114,7 +114,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         HIS_HERS,
         BOY_GIRL
     }
-    public static final int G_DESCRIPTION_HIS_HER = 3;
 
     // Prisoners, Bondsmen, and Normal Personnel
     public static final int PRISONER_NOT = 0;
@@ -1246,14 +1245,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
             if (hasSpouse()) {
                 if (!getSpouse().isDeployed() && !getSpouse().isDeadOrMIA() && !getSpouse().isChild()
                         && !(getSpouse().getGender() == getGender())) {
-                    // setting is the chance that this procreation attempt will create a child, base is 0.05%
-                    // the setting is divided by 100 because we are running a float from 0 to 1 instead of 0 to 100
-                    conceived = (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceProcreation() / 100));
+                    // setting is the decimal chance that this procreation attempt will create a child, base is 0.05%
+                    conceived = (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceProcreation()));
                 }
             } else if (campaign.getCampaignOptions().useUnofficialProcreationNoRelationship()) {
-                // setting is the chance that this procreation attempt will create a child, base is 0.005%
-                // the setting is divided by 100 because we are running a float from 0 to 1 instead of 0 to 100
-                conceived = (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceProcreationNoRelationship() / 100));
+                // setting is the decimal chance that this procreation attempt will create a child, base is 0.005%
+                conceived = (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceProcreationNoRelationship()));
             }
 
             if (conceived) {
@@ -1381,12 +1378,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
             return;
         }
 
-        // setting is the chance that this attempt at finding a marriage will result in one
-        // the setting is divided by 100 because we are running a float from 0 to 1 instead of 0 to 100
-        if (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceRandomMarriages() / 100)) {
+        // setting is the fractional chance that this attempt at finding a marriage will result in one
+        if (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceRandomMarriages())) {
             addRandomSpouse(false);
         } else if (campaign.getCampaignOptions().useRandomSameSexMarriages()) {
-            if (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceRandomSameSexMarriages() / 100)) {
+            if (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceRandomSameSexMarriages())) {
                 addRandomSpouse(true);
             }
         }
