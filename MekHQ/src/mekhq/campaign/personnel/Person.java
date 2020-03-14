@@ -393,15 +393,21 @@ public class Person implements Serializable, MekHqXmlSerializable {
         this(givenName, surname, campaign, campaign.getFactionCode());
     }
 
+    public Person(String givenName, String surname, Campaign campaign, String factionCode) {
+        this(givenName, surname, "", campaign, factionCode);
+    }
+
     /**
      * Primary Person constructor, variables are initialized in the exact same order as they are
      * saved to the XML file
      * @param givenName     the person's given name
      * @param surname       the person's surname
+     * @param honorific     the person's honorific
      * @param campaign      the campaign this person is a part of
      * @param factionCode   the faction this person was borne into
      */
-    public Person(String givenName, String surname, Campaign campaign, String factionCode) {
+    public Person(String givenName, String surname, String honorific, Campaign campaign,
+                  String factionCode) {
         // First, we assign campaign
         this.campaign = campaign;
 
@@ -409,7 +415,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         id = null;
         this.givenName = givenName;
         this.surname = surname;
-        honorific = "";
+        this.honorific = honorific;
         maidenName = null; // this is set to null to handle divorce cases
         callsign = "";
         primaryRole = T_NONE;
@@ -469,12 +475,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         extraData = null;
 
         // Initialize Data based on these settings
-        setFullName();
-    }
-
-    public Person(String givenName, String surname, String honorific, Campaign c, String factionCode) {
-        this(givenName, surname, c, factionCode);
-        this.honorific = honorific;
         setFullName();
     }
     //endregion Constructors
