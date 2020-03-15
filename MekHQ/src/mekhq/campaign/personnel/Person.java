@@ -373,6 +373,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
         OTHER_RANSOM_VALUES.put(SkillType.EXP_ELITE, Money.of(50000));
     }
 
+    // Date Formatting
+    private static final String SAVE_DATE_FORMAT = "yyyy-MM-dd"; // used for file I/O
+    private static final String DISPLAY_DATE_FORMAT = "yyyy-MM-dd"; // used for anything external
+
     //region Reverse Compatibility
     private int oldUnitId = -1;
     private int oldDoctorId = -1;
@@ -1114,7 +1118,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (recruitment == null) {
             return null;
         }
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd"); // TODO : remove inline date format
+        final SimpleDateFormat df = new SimpleDateFormat(DISPLAY_DATE_FORMAT);
         return df.format(recruitment.getTime());
     }
 
@@ -1722,7 +1726,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //region XML Save
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); // TODO : Remove inline date format
+        final SimpleDateFormat df = new SimpleDateFormat(SAVE_DATE_FORMAT);
 
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<person id=\""
                 + id.toString()
@@ -2145,11 +2149,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
             NodeList nl = wn.getChildNodes();
 
             // Create the date format we used to save with
-            final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); // TODO : remove inline date format
+            final SimpleDateFormat df = new SimpleDateFormat(SAVE_DATE_FORMAT);
 
             // Determine if we need to use any migration functions for backwards compatibility.
-            // This MUST be updated to the latest version required for any potential migration calls
-            final String minimumMigrationVersion = "0.47.5";
+            // This MUST be updated to equal the release version required for the latest potential
+            // migration calls
+            final String minimumMigrationVersion = "0.47.6";
             final boolean migrationPotentiallyRequired = version.isLowerThan(minimumMigrationVersion);
 
             for (int x = 0; x < nl.getLength(); x++) {
@@ -2547,24 +2552,68 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private static boolean checkNodeMigration(Person retVal, NodeList nl, Node wn2,
                                               Campaign campaign, Version version) {
         final String METHOD_NAME = "checkNodeMigration";
+
+        final String oldSaveDateFormat = "yyyy-MM-dd hh:mm:ss";
+        final SimpleDateFormat df = new SimpleDateFormat(oldSaveDateFormat);
+
         boolean valueChanged = false;
         if (wn2.getNodeName().equalsIgnoreCase("name")) {
             retVal.migrateName(wn2.getTextContent());
             valueChanged = true;
         } else if (wn2.getNodeName().equalsIgnoreCase("id")) {
-            if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
+            if (version.isLowerThan("0.2.14")) {
                 retVal.oldId = Integer.parseInt(wn2.getTextContent());
                 valueChanged = true;
             }
+        } else if (wn2.getNodeName().equalsIgnoreCase("dueDate")) {
+            if (version.isLowerThan("0.47.6")) {
+                try {
+                    retVal.dueDate = (GregorianCalendar) GregorianCalendar.getInstance();
+                    retVal.dueDate.setTime(df.parse(wn2.getTextContent().trim()));
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(Person.class, METHOD_NAME, e);
+                }
+                valueChanged = true;
+            }
+        } else if (wn2.getNodeName().equalsIgnoreCase("birthday")) {
+            if (version.isLowerThan("0.47.6")) {
+                try {
+                    retVal.birthday = (GregorianCalendar) GregorianCalendar.getInstance();
+                    retVal.birthday.setTime(df.parse(wn2.getTextContent().trim()));
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(Person.class, METHOD_NAME, e);
+                }
+                valueChanged = true;
+            }
+        } else if (wn2.getNodeName().equalsIgnoreCase("deathDay")) {
+            if (version.isLowerThan("0.47.6")) {
+                try {
+                    retVal.dateOfDeath = (GregorianCalendar) GregorianCalendar.getInstance();
+                    retVal.dateOfDeath.setTime(df.parse(wn2.getTextContent().trim()));
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(Person.class, METHOD_NAME, e);
+                }
+                valueChanged = true;
+            }
+        } else if (wn2.getNodeName().equalsIgnoreCase("recruitment")) {
+            if (version.isLowerThan("0.47.6")) {
+                try {
+                    retVal.recruitment = (GregorianCalendar) GregorianCalendar.getInstance();
+                    retVal.recruitment.setTime(df.parse(wn2.getTextContent().trim()));
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(Person.class, METHOD_NAME, e);
+                }
+                valueChanged = true;
+            }
         } else if (wn2.getNodeName().equalsIgnoreCase("doctorId")) {
-            if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
+            if (version.isLowerThan("0.2.14")) {
                 retVal.oldDoctorId = Integer.parseInt(wn2.getTextContent());
                 valueChanged = true;
             } else if (wn2.getTextContent().equals("null")) {
                 valueChanged = true; //handles the possibility of bad data in pre-0.47.5 saves
             }
         } else if (wn2.getNodeName().equalsIgnoreCase("unitId")) {
-            if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
+            if (version.isLowerThan("0.2.14")) {
                 retVal.oldUnitId = Integer.parseInt(wn2.getTextContent());
                 valueChanged = true;
             } else if (wn2.getTextContent().equals("null")) {
