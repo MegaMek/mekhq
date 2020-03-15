@@ -2121,8 +2121,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     + acquisitions
                     + "</acquisitions>");
         }
+        // TODO : the following should also check if it is empty, and output should be formatted properly
         if (extraData != null) {
             extraData.writeToXml(pw1);
+            pw1.println(); // end the line to improve the formatting
         }
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</person>");
     }
@@ -2324,7 +2326,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
         } catch (Exception ex) {
             MekHQ.getLogger().error(Person.class, METHOD_NAME, ex);
-            //retVal = null; // TODO : ask if this should be added
             // we shouldn't return a half instantiated person, after all
         }
 
