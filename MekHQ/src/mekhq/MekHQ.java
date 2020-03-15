@@ -409,22 +409,19 @@ public class MekHQ implements GameListener {
      *
      */
     private static void redirectOutput() {
+        System.out.println("Redirecting output to mekhqlog.txt"); //$NON-NLS-1$
+        File logDir = new File("logs");
+        if (!logDir.exists()) {
+            logDir.mkdir();
+        }
+        final String logFileName = "logs" + File.separator + "mekhqlog.txt";
+        getLogger().resetLogFile(logFileName);
         try {
-            System.out.println("Redirecting output to mekhqlog.txt"); //$NON-NLS-1$
-            File logDir = new File("logs");
-            if (!logDir.exists()) {
-                logDir.mkdir();
-            }
-			final String logFilename = "logs" + File.separator + "mekhqlog.txt";
-			MegaMek.resetLogFile(logFilename);
-            OutputStream os = new FileOutputStream(logFilename, true);
+            OutputStream os = new FileOutputStream(logFileName, true);
             BufferedOutputStream bos = new BufferedOutputStream(os, 64);
 			PrintStream ps = new PrintStream(bos);
             System.setOut(ps);
             System.setErr(ps);
-            ps.close();
-            bos.close();
-            os.close();
         } catch (Exception e) {
             System.err.println("Unable to redirect output to mekhqlog.txt"); //$NON-NLS-1$
             e.printStackTrace();
