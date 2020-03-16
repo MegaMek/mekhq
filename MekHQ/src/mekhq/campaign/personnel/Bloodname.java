@@ -190,29 +190,7 @@ public class Bloodname implements Serializable {
             } else if (wn.getNodeName().equalsIgnoreCase("reactivated")) {
                 retVal.reactivated = Integer.parseInt(wn.getTextContent().trim() + 20);
             } else if (wn.getNodeName().equalsIgnoreCase("phenotype")) {
-                switch (wn.getTextContent().trim()) {
-                    case "General":
-                        retVal.phenotype = Phenotype.P_GENERAL;
-                        break;
-                    case "MechWarrior":
-                        retVal.phenotype = Phenotype.P_MECHWARRIOR;
-                        break;
-                    case "Aerospace":
-                        retVal.phenotype = Phenotype.P_AEROSPACE;
-                        break;
-                    case "Elemental":
-                        retVal.phenotype = Phenotype.P_ELEMENTAL;
-                        break;
-                    case "ProtoMech":
-                        retVal.phenotype = Phenotype.P_PROTOMECH;
-                        break;
-                    case "Naval":
-                        retVal.phenotype = Phenotype.P_NAVAL;
-                        break;
-                    default:
-                        System.err.println("Unknown phenotype " +
-                                wn.getTextContent() + " in " + retVal.name);
-                }
+                retVal.phenotype = Integer.parseInt(wn.getTextContent().trim());
             } else if (wn.getNodeName().equalsIgnoreCase("postReaving")) {
                 String[] clans = wn.getTextContent().trim().split(",");
                 for (String c : clans) {
