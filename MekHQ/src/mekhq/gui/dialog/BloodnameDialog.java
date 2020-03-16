@@ -23,9 +23,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -37,6 +35,7 @@ import javax.swing.JTextArea;
 import chat.In;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Bloodname;
+import mekhq.campaign.personnel.Clan;
 import mekhq.campaign.personnel.Phenotype;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.preferences.JComboBoxPreference;
@@ -52,76 +51,9 @@ public class BloodnameDialog extends JDialog {
     //region Variable Declaration
     private static final long serialVersionUID = 120186090844572718L;
 
-    // TODO : these should probably not be inline
-    public static final int CBS = 0;
-    public static final int CB = 1;
-    public static final int CCC = 2;
-    public static final int CCO = 3;
-    public static final int CDS = 4;
-    public static final int CFM = 5;
-    public static final int CGB = 6;
-    public static final int CGS = 7;
-    public static final int CHH = 8;
-    public static final int CIH = 9;
-    public static final int CJF = 10;
-    public static final int CM = 11;
-    public static final int CNC = 12;
-    public static final int CSJ = 13;
-    public static final int CSR = 14;
-    public static final int CSA = 15;
-    public static final int CSV = 16;
-    public static final int CSL = 17;
-    public static final int CWI = 18;
-    public static final int CW = 19;
-    public static final int CWIE = 20;
-    public static final int CWOV = 21;
-    public static final int C_NUM = 22;
+    private List<Clan> clans = new ArrayList<>();
 
-    // TODO : these should probably not be inline
-    public static final Integer[][] terminus = {
-        {2807, 3084},
-        {2807, 3059},
-        {2807, null},
-        {2807, null},
-        {2807, null},
-        {2807, 3073},
-        {2807, null},
-        {2807, null},
-        {2807, null},
-        {2807, 3074},
-        {2807, null},
-        {2807, 2868},
-        {2807, null},
-        {2807, 3060},
-        {2807, null},
-        {2807, null},
-        {2807, 3075},
-        {3075, null},
-        {2807, 2834},
-        {2807, null},
-        {3057, null},
-        {2807, 2823}
-    };
-
-    // TODO : these should probably not be inline
-    public static final String[] clans = {
-            "CBS", "CB", "CCC", "CCO", "CDS", "CFM", "CGB",
-            "CGS", "CHH", "CIH", "CJF", "CMG", "CNC", "CSJ",
-            "CSR", "CSA", "CSV", "CSL", "CWI", "CW", "CWIE", "CWOV"
-    };
-
-    // TODO : these should probably not be inline
-    public static final String[] fullNames = {
-        "Blood Spirit", "Burrock", "Cloud Cobra", "Coyote",
-        "Diamond Shark/Sea Fox", "Fire Mandrill", "Ghost Bear",
-        "Goliath Scorpion", "Hell's Horses", "Ice Hellion",
-        "Jade Falcon", "Mongoose", "Nova Cat", "Smoke Jaguar",
-        "Snow Raven", "Star Adder", "Steel Viper",
-        "Stone Lion", "Widowmaker", "Wolf", "Wolf-in-Exile",
-        "Wolverine"
-    };
-
-    public static Integer[] eras = {
+    private static final Integer[] eras = {
         2807, 2825, 2850, 2900, 2950, 3000, 3050, 3060,
         3075, 3085, 3100
     };
@@ -142,11 +74,13 @@ public class BloodnameDialog extends JDialog {
     private int year;
     //endregion Variable Declaration
 
-    public BloodnameDialog(JFrame parent) {
+    public BloodnameDialog(JFrame parent, int year) {
         super (parent, false);
         setTitle ("Bloodname Generator");
         getContentPane().setLayout(new GridBagLayout());
         setPreferredSize(new Dimension(350,300));
+
+        this.year = year;
 
         initComponents();
 
@@ -161,7 +95,12 @@ public class BloodnameDialog extends JDialog {
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.anchor = GridBagConstraints.NORTHWEST;
 
-        cbClan = new JComboBox<>(fullNames);
+        cbClan = new JComboBox<>();
+        clans.addAll(Clan.getClans());
+        clans.sort(Comparator.comparing(o -> o.getFullName(year)));
+        for (Clan clan : clans) {
+            cbClan.addItem(clan.getFullName(year));
+        }
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
@@ -191,10 +130,12 @@ public class BloodnameDialog extends JDialog {
         gbc.gridwidth = 1;
         add(btnGo, gbc);
         btnGo.addActionListener(e -> {
-            Bloodname n = Bloodname.randomBloodname(clans[clan], phenotype, year);
-            lblName.setText(n.getName() + " (" + n.getFounder() + ")");
-            lblOrigClan.setText(Faction.getFaction(n.getOrigClan()).getFullName(year));
-            lblPhenotype.setText(Phenotype.getBloodnamePhenotypeGroupingName(n.getPhenotype()));
+            Bloodname n = Bloodname.randomBloodname(clans.get(clan).getGenerationCode(), phenotype, year);
+            if (n != null) {
+                lblName.setText(n.getName() + " (" + n.getFounder() + ")");
+                lblOrigClan.setText(Faction.getFaction(n.getOrigClan()).getFullName(year));
+                lblPhenotype.setText(Phenotype.getBloodnamePhenotypeGroupingName(n.getPhenotype()));
+            }
         });
 
         JLabel label = new JLabel("Result:");
@@ -273,37 +214,44 @@ public class BloodnameDialog extends JDialog {
             return false;
         }
 
+        Clan selectedClan = clans.get(clan);
         String txt = "<html>";
 
-        if (year < terminus[clan][0]) {
+        if (year < selectedClan.getStartDate()) {
             for (int era : eras) {
-                if (era >= terminus[clan][0]) {
-                    txt += "<div>" + fullNames[clan] + " formed in " + terminus[clan][0] + ". Using "
-                            + era + ".</div>";
+                if (era >= selectedClan.getStartDate()) {
                     year = era;
+                    txt += "<div>" + selectedClan.getFullName(year) + " formed in "
+                            + selectedClan.getStartDate() + ". Using " + year + ".</div>";
                     break;
                 }
             }
-        }
-        if ((terminus[clan][1] != null) && (year > terminus[clan][1])) {
+
+            if (year < selectedClan.getStartDate()) {
+                year = selectedClan.getStartDate();
+            }
+        } else if (year > selectedClan.getEndDate()) {
             for (int i = eras.length - 1; i >= 0; i--) {
-                if (eras[i] <= terminus[clan][1]) {
-                    txt += "<div>" + fullNames[clan] + " ceased to existed in " + terminus[clan][1]
-                            + ". Using " + eras[i] + ".</div>";
+                if (eras[i] <= selectedClan.getEndDate()) {
                     year = eras[i];
+                    txt += "<div>" + selectedClan.getFullName(year) + " ceased to existed in "
+                            + selectedClan.getEndDate() + ". Using " + year + ".</div>";
                     break;
                 }
             }
+
+            if (year > selectedClan.getEndDate()) {
+                year = selectedClan.getEndDate();
+            }
         }
+
         if ((phenotype == Phenotype.P_PROTOMECH) && (year < 3060)) {
             txt += "<div>ProtoMechs did not exist in " + year + ". Using Aerospace.</div>";
             phenotype = Phenotype.P_AEROSPACE;
-        }
-        if ((phenotype == Phenotype.P_NAVAL) && (clan != CSR)) {
+        } else if ((phenotype == Phenotype.P_NAVAL) && (!"CSR".equals(selectedClan.getGenerationCode()))) {
             txt += "<div>The Naval phenotype is unique to Clan Snow Raven. Using General.</div>";
             phenotype = Phenotype.P_GENERAL;
-        }
-        if ((phenotype == Phenotype.P_VEHICLE) && (clan != CHH)) {
+        } else if ((phenotype == Phenotype.P_VEHICLE) && (!"CHH".equals(selectedClan.getGenerationCode()))) {
              txt += "<div>The vehicle phenotype is unique to Clan Hell's Horses. Using General.</div>";
              phenotype = Phenotype.P_GENERAL;
         } else if ((phenotype == Phenotype.P_VEHICLE) && (year < 3100)) {
@@ -317,12 +265,7 @@ public class BloodnameDialog extends JDialog {
     }
 
     public void setFaction(String factionName) {
-        // We set based on the full faction name, which will have a Clan in it. We therefore need
-        // to split off the clan to ensure that the rest of the comparison is good
-        String[] split = factionName.split(" ", 2);
-        if (split.length == 2) {
-            cbClan.setSelectedItem(split[1]);
-        }
+        cbClan.setSelectedItem(factionName);
     }
 
     public void setYear(int year) {
