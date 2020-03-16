@@ -54,7 +54,9 @@ public class Clan {
     //endregion Variable Declarations
 
     public Clan() {
-        startDate = endDate = abjurationDate = 0;
+        startDate = 2807;
+        endDate = 9999;
+        abjurationDate = 0;
         rivals = new ArrayList<>();
         nameChanges = new ArrayList<>();
     }
@@ -77,6 +79,10 @@ public class Clan {
 
     public static Clan getClan(String code) {
         return allClans.get(code);
+    }
+
+    public static Collection<Clan> getClans() {
+        return allClans.values();
     }
 
     public String getCode() {
@@ -102,6 +108,14 @@ public class Clan {
 
     public boolean isActive(int year) {
         return ((startDate < year) && ((endDate == 0) || (endDate > year)));
+    }
+
+    public int getStartDate() {
+        return startDate;
+    }
+
+    public int getEndDate() {
+        return endDate;
     }
 
     public boolean isAbjured(int year) {
