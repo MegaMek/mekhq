@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.mission;
 
 import java.util.ArrayList;
@@ -1255,26 +1254,38 @@ public class AtBDynamicScenarioFactory {
         }
         int[] skills = rsg.getRandomSkills(en);
 
-        if (f.isClan() && Compute.d6(2) > 8 - skill + skills[0] + skills[1]) {
+        if (f.isClan() && (Compute.d6(2) > (8 - skill + skills[0] + skills[1]))) {
             int phenotype;
             switch (en.getUnitType()) {
-            case UnitType.MEK:
-                phenotype = Phenotype.P_MECHWARRIOR;
-                break;
-            case UnitType.BATTLE_ARMOR:
-                phenotype = Phenotype.P_ELEMENTAL;
-                break;
-            case UnitType.AERO:
-                phenotype = Phenotype.P_AEROSPACE;
-                break;
-            case UnitType.PROTOMEK:
-                phenotype = Phenotype.P_PROTOMECH;
-                break;
-            default:
-                phenotype = -1;
+                case UnitType.MEK:
+                    phenotype = Phenotype.P_MECHWARRIOR;
+                    break;
+                case UnitType.TANK:
+                case UnitType.VTOL:
+                    phenotype = Phenotype.P_VEHICLE;
+                    break;
+                case UnitType.BATTLE_ARMOR:
+                    phenotype = Phenotype.P_ELEMENTAL;
+                    break;
+                case UnitType.AERO:
+                case UnitType.CONV_FIGHTER:
+                    phenotype = Phenotype.P_AEROSPACE;
+                    break;
+                case UnitType.PROTOMEK:
+                    phenotype = Phenotype.P_PROTOMECH;
+                    break;
+                case UnitType.SMALL_CRAFT:
+                case UnitType.DROPSHIP:
+                case UnitType.JUMPSHIP:
+                case UnitType.WARSHIP:
+                    phenotype = Phenotype.P_NAVAL;
+                    break;
+                default:
+                    phenotype = Phenotype.P_NONE;
             }
-            if (phenotype >= 0) {
-                String bloodname = Bloodname.randomBloodname(faction, phenotype, campaign.getCalendar().get(Calendar.YEAR)).getName();
+            if (phenotype > 0) {
+                String bloodname = Bloodname.randomBloodname(faction, phenotype,
+                        campaign.getCalendar().get(Calendar.YEAR)).getName();
                 crewName += " " + bloodname;
                 innerMap.put(Crew.MAP_BLOODNAME, bloodname);
                 innerMap.put(Crew.MAP_PHENOTYPE, Integer.toString(phenotype));
