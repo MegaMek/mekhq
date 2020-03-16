@@ -19,6 +19,7 @@
 package mekhq.campaign.personnel;
 
 public class Phenotype {
+    // You MUST modify the values in data/names/bloodnames/bloodnames.xml if you modify these values
     public static final int P_NONE = 0; // No phenotype
     public static final int P_MECHWARRIOR = 1;
     public static final int P_ELEMENTAL = 2;
