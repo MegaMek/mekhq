@@ -2709,6 +2709,36 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 retVal.addSkill(SkillType.S_TACTICS, pilotCommandBonus, 0);
             }
             valueChanged = true;
+        } else if (wn2.getNodeName().equalsIgnoreCase("phenotype")) {
+            if (version.isLowerThan("0.47.6") && version.isHigherThan("0.3.4")) {
+
+            //versions before 0.3.4 did not have proper clan phenotypes
+            } else if (version.isLowerThan("0.3.4") && campaign.getFaction().isClan()) {
+                //assume personnel are clan and trueborn if the right role
+                retVal.setClanner(true);
+                switch (retVal.getPrimaryRole()) {
+                    case Person.T_MECHWARRIOR:
+                        retVal.setPhenotype(Phenotype.P_MECHWARRIOR);
+                        break;
+                    case Person.T_AERO_PILOT:
+                    case Person.T_CONV_PILOT:
+                        retVal.setPhenotype(Phenotype.P_AEROSPACE);
+                        break;
+                    case Person.T_BA:
+                        retVal.setPhenotype(Phenotype.P_ELEMENTAL);
+                        break;
+                    case Person.T_VEE_GUNNER:
+                    case Person.T_GVEE_DRIVER:
+                    case Person.T_NVEE_DRIVER:
+                    case Person.T_VTOL_PILOT:
+                        retVal.setPhenotype(Phenotype.P_VEHICLE);
+                        break;
+                    default:
+                        retVal.setPhenotype(Phenotype.P_NONE);
+                        break;
+                }
+                valueChanged = true;
+            }
         }
 
         return valueChanged;
