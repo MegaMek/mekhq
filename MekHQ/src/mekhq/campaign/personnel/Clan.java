@@ -19,6 +19,8 @@ package mekhq.campaign.personnel;
 
 import megamek.common.Compute;
 import megamek.common.logging.LogLevel;
+import megamek.common.util.StringUtil;
+import megameklab.com.util.StringUtils;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import org.w3c.dom.Document;
@@ -41,6 +43,7 @@ public class Clan {
     private static Map<String, Clan> allClans;
 
     private String code;
+    private String generationCode; // this is used to enable RA name generation using CSR lists
     private String fullName;
     private int startDate;
     private int endDate;
@@ -78,6 +81,14 @@ public class Clan {
 
     public String getCode() {
         return code;
+    }
+
+    public String getGenerationCode() {
+        if (!StringUtil.isNullOrEmpty(generationCode)) {
+            return generationCode;
+        } else {
+            return code;
+        }
     }
 
     public String getFullName(int year) {
@@ -216,6 +227,8 @@ public class Clan {
                 }
             } else if (wn.getNodeName().equalsIgnoreCase("homeClan")) {
                 retVal.homeClan = true;
+            } else if (wn.getNodeName().equalsIgnoreCase("generateAsIf")) {
+                retVal.generationCode = wn.getTextContent().trim();
             }
         }
 
