@@ -258,11 +258,10 @@ public class CampaignGUI extends JPanel {
 
     public void randomizeAllBloodnames() {
         for (Person p : getCampaign().getPersonnel()) {
-            if (!p.isClanner()) {
-                continue;
+            if (p.isClanner()) {
+                getCampaign().checkBloodnameAdd(p, false);
+                getCampaign().personUpdated(p);
             }
-            getCampaign().checkBloodnameAdd(p, p.getPrimaryRole());
-            getCampaign().personUpdated(p);
         }
     }
 

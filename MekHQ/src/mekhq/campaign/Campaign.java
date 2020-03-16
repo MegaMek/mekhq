@@ -1374,55 +1374,11 @@ public class Campaign implements Serializable, ITechManager {
      * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
      * appropriate to the person's phenotype and the player's faction.
      *
-     * @param person       The Bloodname candidate
-     * @param type         The phenotype index
+     * @param person     The Bloodname candidate
+     * @param ignoreDice If true, skips the random roll and assigns a Bloodname automatically
      */
-    public void checkBloodnameAdd(Person person, int type) {
-        checkBloodnameAdd(person, type, false, this.factionCode);
-    }
-
-    /**
-     * If the person does not already have a bloodname, assigns a chance of having one based on
-     * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
-     * appropriate to Clan and phenotype.
-     *
-     * @param person       The Bloodname candidate
-     * @param type         The person's primary role
-     * @param factionCode  The shortName of the faction the person belongs to. Note that there
-     *                     is a chance of having a Bloodname that is unique to a different Clan
-     *                     as this person could have been captured.
-     */
-    public void checkBloodnameAdd(Person person, int type, String factionCode) {
-        checkBloodnameAdd(person, type, false, factionCode);
-    }
-
-    /**
-     * If the person does not already have a bloodname, assigns a chance of having one based on
-     * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
-     * appropriate to the person's phenotype and the player's faction.
-     *
-     * @param person       The Bloodname candidate
-     * @param type         The person's primary role
-     * @param ignoreDice   If true, skips the random roll and assigns a Bloodname automatically
-     */
-    public void checkBloodnameAdd(Person person, int type, boolean ignoreDice) {
-        checkBloodnameAdd(person, type, ignoreDice, this.factionCode);
-    }
-
-    /**
-     * If the person does not already have a bloodname, assigns a chance of having one based on
-     * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
-     * appropriate to Clan and phenotype.
-     *
-     * @param person       The Bloodname candidate
-     * @param type         The person's primary role
-     * @param ignoreDice   If true, skips the random roll and assigns a Bloodname automatically
-     * @param factionCode  The shortName of the faction the person belongs to. Note that there
-     *                     is a chance of having a Bloodname that is unique to a different Clan
-     *                     as this person could have been captured.
-     */
-    public void checkBloodnameAdd(Person person, int type, boolean ignoreDice, String factionCode) {
-        // if a non-clanner is here, we've got an issue
+    public void checkBloodnameAdd(Person person, boolean ignoreDice) {
+        // if a non-clanner is here, we can just return
         if (!person.isClanner()) {
             return;
         }
@@ -1473,18 +1429,22 @@ public class Campaign implements Serializable, ITechManager {
                     bloodnameTarget += person.hasSkill(SkillType.S_GUN_VEE)
                             ? person.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue()
                             : TargetRoll.AUTOMATIC_FAIL;
-                    if (type == Person.T_VTOL_PILOT) {
-                        bloodnameTarget += person.hasSkill(SkillType.S_PILOT_VTOL)
-                                ? person.getSkill(SkillType.S_PILOT_VTOL).getFinalSkillValue()
-                                : TargetRoll.AUTOMATIC_FAIL;
-                    } else if (type == Person.T_NVEE_DRIVER) {
-                        bloodnameTarget += person.hasSkill(SkillType.S_PILOT_NVEE)
-                                ? person.getSkill(SkillType.S_PILOT_NVEE).getFinalSkillValue()
-                                : TargetRoll.AUTOMATIC_FAIL;
-                    } else {
-                        bloodnameTarget += person.hasSkill(SkillType.S_PILOT_GVEE)
-                                ? person.getSkill(SkillType.S_PILOT_GVEE).getFinalSkillValue()
-                                : TargetRoll.AUTOMATIC_FAIL;
+                    switch (person.getPrimaryRole()) {
+                        case Person.T_VTOL_PILOT:
+                            bloodnameTarget += person.hasSkill(SkillType.S_PILOT_VTOL)
+                                    ? person.getSkill(SkillType.S_PILOT_VTOL).getFinalSkillValue()
+                                    : TargetRoll.AUTOMATIC_FAIL;
+                            break;
+                        case Person.T_NVEE_DRIVER:
+                            bloodnameTarget += person.hasSkill(SkillType.S_PILOT_NVEE)
+                                    ? person.getSkill(SkillType.S_PILOT_NVEE).getFinalSkillValue()
+                                    : TargetRoll.AUTOMATIC_FAIL;
+                            break;
+                        case Person.T_GVEE_DRIVER:
+                            bloodnameTarget += person.hasSkill(SkillType.S_PILOT_GVEE)
+                                    ? person.getSkill(SkillType.S_PILOT_GVEE).getFinalSkillValue()
+                                    : TargetRoll.AUTOMATIC_FAIL;
+                            break;
                     }
                     break;
                 }
@@ -1495,7 +1455,7 @@ public class Campaign implements Serializable, ITechManager {
                     break;
                 }
                 case Phenotype.P_NAVAL: {
-                    switch (type) {
+                    switch (person.getPrimaryRole()) {
                         case Person.T_SPACE_CREW:
                             bloodnameTarget += 2 * (person.hasSkill(SkillType.S_TECH_VESSEL)
                                     ? person.getSkill(SkillType.S_TECH_VESSEL).getFinalSkillValue()
@@ -1543,7 +1503,7 @@ public class Campaign implements Serializable, ITechManager {
                  * easily onto Person constants
                  */
                 int phenotype = Phenotype.P_GENERAL;
-                switch (type) {
+                switch (person.getPrimaryRole()) {
                     case Person.T_MECHWARRIOR:
                         phenotype = Phenotype.P_MECHWARRIOR;
                         break;
@@ -1570,7 +1530,8 @@ public class Campaign implements Serializable, ITechManager {
                         phenotype = Phenotype.P_VEHICLE;
                         break;
                 }
-                Bloodname bloodname = Bloodname.randomBloodname(factionCode, phenotype, getGameYear());
+                Bloodname bloodname = Bloodname.randomBloodname(
+                        person.getOriginFaction().getShortName(), phenotype, getGameYear());
                 if (null != bloodname) {
                     person.setBloodname(bloodname.getName());
                 }

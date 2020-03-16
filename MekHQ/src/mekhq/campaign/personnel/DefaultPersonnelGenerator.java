@@ -102,7 +102,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
 
         //check for Bloodname
         if (person.isClanner()) {
-            campaign.checkBloodnameAdd(person, primaryRole, person.getOriginFaction().getShortName());
+            campaign.checkBloodnameAdd(person, false);
         }
 
         person.setDaysToWaitForHealing(campaign.getCampaignOptions().getNaturalHealingWaitingPeriod());
