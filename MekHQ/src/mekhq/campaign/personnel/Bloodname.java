@@ -125,7 +125,7 @@ public class Bloodname implements Serializable {
 
     /**
      *
-     * @param warriorType A Person.PHENOTYPE_* constant
+     * @param warriorType A Phenotype.P_* constant
      * @param year The current year of the campaign setting
      * @return An adjustment to the frequency of this name for the phenotype.
      *
@@ -137,7 +137,7 @@ public class Bloodname implements Serializable {
      * invention of the PM, though have a higher frequency for PM pilots than other
      * aerospace names.
      */
-    public int phenotypeMultiplier(int warriorType, int year) {
+    private int phenotypeMultiplier(int warriorType, int year) {
         switch (phenotype) {
             case Phenotype.P_MECHWARRIOR:
                 return (warriorType == Phenotype.P_MECHWARRIOR) ? 3 : 0;
@@ -160,14 +160,11 @@ public class Bloodname implements Serializable {
                 }
             case Phenotype.P_NAVAL:
                 return (warriorType == Phenotype.P_NAVAL) ? 3 : 0;
+            case Phenotype.P_VEHICLE:
             case Phenotype.P_GENERAL:
             default:
                 return 1;
         }
-    }
-
-    public static int determinePhenotype(Person person) {
-        return 0; // TODO : Windchild Fix Me During Personnel Wave 2
     }
 
     public static Bloodname loadFromXml(Node node) {
@@ -239,22 +236,6 @@ public class Bloodname implements Serializable {
         }
 
         return retVal;
-    }
-
-    /**
-     * Determines a likely Bloodname based on Clan, person, and year.
-     *
-     * @param factionCode The faction code for the Clan; must exist in data/names/bloodnames/clans.xml
-     * @param person the person to generate a Bloodname for
-     * @param year The current campaign year
-     * @return An object representing the chosen Bloodname
-     *
-     * Though based as much as possible on official sources, the method employed here involves a
-     * considerable amount of speculation.
-     */
-    public static @Nullable Bloodname randomBloodname(String factionCode, Person person, int year) {
-        int phenotype = determinePhenotype(person);
-        return randomBloodname(Clan.getClan(factionCode), phenotype, year);
     }
 
     /**
@@ -355,7 +336,7 @@ public class Bloodname implements Serializable {
                          * that non-exclusive names would suffer
                          * more reavings and have a lower Bloodcount.
                          */
-                    weight.mul(eraFraction(year));
+                        weight.mul(eraFraction(year));
                     }
                 } else {
                     /* Most non-exclusives have an unknown distribution and are estimated.
@@ -427,7 +408,6 @@ public class Bloodname implements Serializable {
      * @param year The current year of the campaign
      * @return A fraction that decreases by 10%/year
      */
-
     private static Fraction eraFraction(int year) {
         if (year < 2900) {
             return new Fraction(1);
