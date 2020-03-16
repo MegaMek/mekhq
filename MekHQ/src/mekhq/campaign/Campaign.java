@@ -1486,49 +1486,29 @@ public class Campaign implements Serializable, ITechManager {
             }
             // Reavings diminish the number of available Bloodrights in later eras
             int year = getCalendar().get(Calendar.YEAR);
-            if (year <= 2950)
+            if (year <= 2950) {
                 bloodnameTarget--;
-            if (year > 3055)
+            }
+            if (year > 3055) {
                 bloodnameTarget++;
-            if (year > 3065)
+            }
+            if (year > 3065) {
                 bloodnameTarget++;
-            if (year > 3080)
+            }
+            if (year > 3080) {
                 bloodnameTarget++;
+            }
             // Officers have better chance; no penalty for non-officer
             bloodnameTarget += Math.min(0, ranks.getOfficerCut() - person.getRankNumeric());
 
-            if (Compute.d6(2) >= bloodnameTarget || ignoreDice) {
+            if ((Compute.d6(2) >= bloodnameTarget) || ignoreDice) {
                 /*
                  * The Bloodname generator has slight differences in categories that do not map
                  * easily onto Person constants
                  */
-                int phenotype = Phenotype.P_GENERAL;
-                switch (person.getPrimaryRole()) {
-                    case Person.T_MECHWARRIOR:
-                        phenotype = Phenotype.P_MECHWARRIOR;
-                        break;
-                    case Person.T_BA:
-                        phenotype = Phenotype.P_ELEMENTAL;
-                        break;
-                    case Person.T_AERO_PILOT:
-                    case Person.T_CONV_PILOT:
-                        phenotype = Phenotype.P_AEROSPACE;
-                        break;
-                    case Person.T_PROTO_PILOT:
-                        phenotype = Phenotype.P_PROTOMECH;
-                        break;
-                    case Person.T_SPACE_PILOT:
-                    case Person.T_SPACE_CREW:
-                    case Person.T_SPACE_GUNNER:
-                    case Person.T_NAVIGATOR:
-                        phenotype = Phenotype.P_NAVAL;
-                        break;
-                    case Person.T_GVEE_DRIVER:
-                    case Person.T_NVEE_DRIVER:
-                    case Person.T_VTOL_PILOT:
-                    case Person.T_VEE_GUNNER:
-                        phenotype = Phenotype.P_VEHICLE;
-                        break;
+                int phenotype = person.getPhenotype();
+                if ((phenotype == Phenotype.P_NONE) || (phenotype > Phenotype.P_GENERAL)) {
+                    phenotype = Phenotype.P_GENERAL;
                 }
                 Bloodname bloodname = Bloodname.randomBloodname(
                         person.getOriginFaction().getShortName(), phenotype, getGameYear());

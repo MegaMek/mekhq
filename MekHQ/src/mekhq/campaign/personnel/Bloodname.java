@@ -191,27 +191,27 @@ public class Bloodname implements Serializable {
                 retVal.reactivated = Integer.parseInt(wn.getTextContent().trim() + 20);
             } else if (wn.getNodeName().equalsIgnoreCase("phenotype")) {
                 switch (wn.getTextContent().trim()) {
-                case "General":
-                    retVal.phenotype = Phenotype.P_GENERAL;
-                    break;
-                case "MechWarrior":
-                    retVal.phenotype = Phenotype.P_MECHWARRIOR;
-                    break;
-                case "Aerospace":
-                    retVal.phenotype = Phenotype.P_AEROSPACE;
-                    break;
-                case "Elemental":
-                    retVal.phenotype = Phenotype.P_ELEMENTAL;
-                    break;
-                case "ProtoMech":
-                    retVal.phenotype = Phenotype.P_PROTOMECH;
-                    break;
-                case "Naval":
-                    retVal.phenotype = Phenotype.P_NAVAL;
-                    break;
-                default:
-                    System.err.println("Unknown phenotype " +
-                            wn.getTextContent() + " in " + retVal.name);
+                    case "General":
+                        retVal.phenotype = Phenotype.P_GENERAL;
+                        break;
+                    case "MechWarrior":
+                        retVal.phenotype = Phenotype.P_MECHWARRIOR;
+                        break;
+                    case "Aerospace":
+                        retVal.phenotype = Phenotype.P_AEROSPACE;
+                        break;
+                    case "Elemental":
+                        retVal.phenotype = Phenotype.P_ELEMENTAL;
+                        break;
+                    case "ProtoMech":
+                        retVal.phenotype = Phenotype.P_PROTOMECH;
+                        break;
+                    case "Naval":
+                        retVal.phenotype = Phenotype.P_NAVAL;
+                        break;
+                    default:
+                        System.err.println("Unknown phenotype " +
+                                wn.getTextContent() + " in " + retVal.name);
                 }
             } else if (wn.getNodeName().equalsIgnoreCase("postReaving")) {
                 String[] clans = wn.getTextContent().trim().split(",");
@@ -272,6 +272,12 @@ public class Bloodname implements Serializable {
                     + "Please ensure that your clan exists in both the clans.xml and bloodnames.xml files as appropriate."); //$NON-NLS-1$
             return null;
         }
+
+        // TODO : Replace this phenotype with a
+        if (phenotype == Phenotype.P_VEHICLE) {
+
+        }
+
         if (Compute.randomInt(20) == 0) {
             /* 1 in 20 chance that warrior was taken as isorla from another Clan */
             return randomBloodname(faction.getRivalClan(year), phenotype, year);
