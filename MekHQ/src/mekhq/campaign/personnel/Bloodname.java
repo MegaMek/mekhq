@@ -251,9 +251,9 @@ public class Bloodname implements Serializable {
             return null;
         }
 
-        // TODO : Replace this phenotype with a
+        // This is required because there are currently no bloodnames specifically for vehicle phenotypes
         if (phenotype == Phenotype.P_VEHICLE) {
-
+            phenotype = Phenotype.P_GENERAL;
         }
 
         if (Compute.randomInt(20) == 0) {
