@@ -1422,6 +1422,11 @@ public class Campaign implements Serializable, ITechManager {
      *                     as this person could have been captured.
      */
     public void checkBloodnameAdd(Person person, int type, boolean ignoreDice, String factionCode) {
+        // if a non-clanner is here, we've got an issue
+        if (!person.isClanner()) {
+            return;
+        }
+
         // Person already has a bloodname?
         if (person.getBloodname().length() > 0) {
             int result = JOptionPane.showConfirmDialog(null,
@@ -1431,10 +1436,6 @@ public class Campaign implements Serializable, ITechManager {
             if (result == JOptionPane.NO_OPTION) {
                 return;
             }
-        }
-
-        if (!person.isClanner()) {
-            return;
         }
 
         // Go ahead and generate a new bloodname
