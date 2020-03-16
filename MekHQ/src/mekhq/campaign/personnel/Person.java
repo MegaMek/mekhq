@@ -2316,7 +2316,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             // This will migrate any data fields that are reliant on having the data loaded
             // completely before running migration
             if (migrationPotentiallyRequired) {
-                migrateFieldsOnLoad(retVal, version);
+                migrateFieldsOnLoad(retVal, campaign, version);
             }
 
             if (retVal.id == null) {
@@ -2711,33 +2711,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
             valueChanged = true;
         } else if (wn2.getNodeName().equalsIgnoreCase("phenotype")) {
             if (version.isLowerThan("0.47.6") && version.isHigherThan("0.3.4")) {
-
-            //versions before 0.3.4 did not have proper clan phenotypes
-            } else if (version.isLowerThan("0.3.4") && campaign.getFaction().isClan()) {
-                //assume personnel are clan and trueborn if the right role
-                retVal.setClanner(true);
-                switch (retVal.getPrimaryRole()) {
-                    case Person.T_MECHWARRIOR:
-                        retVal.setPhenotype(Phenotype.P_MECHWARRIOR);
-                        break;
-                    case Person.T_AERO_PILOT:
-                    case Person.T_CONV_PILOT:
-                        retVal.setPhenotype(Phenotype.P_AEROSPACE);
-                        break;
-                    case Person.T_BA:
-                        retVal.setPhenotype(Phenotype.P_ELEMENTAL);
-                        break;
-                    case Person.T_VEE_GUNNER:
-                    case Person.T_GVEE_DRIVER:
-                    case Person.T_NVEE_DRIVER:
-                    case Person.T_VTOL_PILOT:
-                        retVal.setPhenotype(Phenotype.P_VEHICLE);
-                        break;
-                    default:
-                        retVal.setPhenotype(Phenotype.P_NONE);
-                        break;
+                int phenotype = Integer.parseInt(wn2.getTextContent());
+                if ((retVal.getPrimaryRole() == Person.T_PROTO_PILOT) && (phenotype == Phenotype.P_AEROSPACE)) {
+                    phenotype = Phenotype.P_PROTOMECH;
                 }
-                valueChanged = true;
+                retVal.phenotype = phenotype;
             }
         }
 
@@ -2750,7 +2728,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * @param retVal the person to check for field migration
      * @param version the version number of the file being migrated
      */
-    private static void migrateFieldsOnLoad(Person retVal, Version version) {
+    private static void migrateFieldsOnLoad(Person retVal, Campaign campaign, Version version) {
         if ((version.getMajorVersion() == 0) && (version.getMinorVersion() == 3) && (version.getSnapshot() < 1)) {
             //adjust for conventional fighter pilots
             if ((retVal.primaryRole == T_CONV_PILOT) && retVal.hasSkill(SkillType.S_PILOT_SPACE)
@@ -2787,6 +2765,36 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
             if (retVal.secondaryRole > T_INFANTRY) {
                 retVal.secondaryRole += 4;
+            }
+        }
+
+        //versions before 0.3.4 did not have proper clan phenotypes
+        if (version.isLowerThan("0.3.4") && campaign.getFaction().isClan()) {
+            //assume personnel are clan and trueborn if the right role
+            retVal.setClanner(true);
+            switch (retVal.getPrimaryRole()) {
+                case Person.T_MECHWARRIOR:
+                    retVal.setPhenotype(Phenotype.P_MECHWARRIOR);
+                    break;
+                case Person.T_AERO_PILOT:
+                case Person.T_CONV_PILOT:
+                    retVal.setPhenotype(Phenotype.P_AEROSPACE);
+                    break;
+                case Person.T_BA:
+                    retVal.setPhenotype(Phenotype.P_ELEMENTAL);
+                    break;
+                case Person.T_VEE_GUNNER:
+                case Person.T_GVEE_DRIVER:
+                case Person.T_NVEE_DRIVER:
+                case Person.T_VTOL_PILOT:
+                    retVal.setPhenotype(Phenotype.P_VEHICLE);
+                    break;
+                case Person.T_PROTO_PILOT:
+                    retVal.setPhenotype(Phenotype.P_PROTOMECH);
+                    break;
+                default:
+                    retVal.setPhenotype(Phenotype.P_NONE);
+                    break;
             }
         }
 
