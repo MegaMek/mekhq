@@ -23,6 +23,9 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -31,6 +34,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
 
+import chat.In;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Phenotype;
@@ -45,8 +49,10 @@ import mekhq.preferences.PreferencesNode;
  * Randomly selects an appropriate Bloodname based on Clan, phenotype, and year
  */
 public class BloodnameDialog extends JDialog {
+    //region Variable Declaration
     private static final long serialVersionUID = 120186090844572718L;
 
+    // TODO : these should probably not be inline
     public static final int CBS = 0;
     public static final int CB = 1;
     public static final int CCC = 2;
@@ -71,6 +77,7 @@ public class BloodnameDialog extends JDialog {
     public static final int CWOV = 21;
     public static final int C_NUM = 22;
 
+    // TODO : these should probably not be inline
     public static final Integer[][] terminus = {
         {2807, 3084},
         {2807, 3059},
@@ -96,12 +103,14 @@ public class BloodnameDialog extends JDialog {
         {2807, 2823}
     };
 
+    // TODO : these should probably not be inline
     public static final String[] clans = {
-        "CBS", "CB", "CCC", "CCO", "CDS", "CFM", "CGB",
-        "CGS", "CHH", "CIH", "CJF", "CMG", "CNC", "CSJ",
-        "CSR", "CSA", "CSV", "CSL", "CWI", "CW", "CWIE", "CWOV"
+            "CBS", "CB", "CCC", "CCO", "CDS", "CFM", "CGB",
+            "CGS", "CHH", "CIH", "CJF", "CMG", "CNC", "CSJ",
+            "CSR", "CSA", "CSV", "CSL", "CWI", "CW", "CWIE", "CWOV"
     };
 
+    // TODO : these should probably not be inline
     public static final String[] fullNames = {
         "Blood Spirit", "Burrock", "Cloud Cobra", "Coyote",
         "Diamond Shark/Sea Fox", "Fire Mandrill", "Ghost Bear",
@@ -124,7 +133,14 @@ public class BloodnameDialog extends JDialog {
     private JLabel lblName;
     private JLabel lblOrigClan;
     private JLabel lblPhenotype;
-    private JTextArea txtWarning;
+    private JLabel txtWarning;
+
+    // The following are the parameters that the generation will use, and are set whenever the options
+    // are modified
+    private int clan;
+    private int phenotype;
+    private int year;
+    //endregion Variable Declaration
 
     public BloodnameDialog(JFrame parent) {
         super (parent, false);
@@ -145,24 +161,23 @@ public class BloodnameDialog extends JDialog {
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.anchor = GridBagConstraints.NORTHWEST;
 
-        cbClan = new JComboBox<String>(fullNames);
+        cbClan = new JComboBox<>(fullNames);
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
         add(cbClan, gbc);
         cbClan.addActionListener(validateActionListener);
 
-        cbEra = new JComboBox<Integer>(eras);
+        cbEra = new JComboBox<>(eras);
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 2;
         add(cbEra, gbc);
         cbEra.addActionListener(validateActionListener);
 
-        cbPhenotype = new JComboBox<String>();
-        cbPhenotype.addItem("None");
-        for (int i = 1; i < Phenotype.P_NUM; i++) {
-            cbPhenotype.addItem(Phenotype.getPhenotypeName(i));
+        cbPhenotype = new JComboBox<>();
+        for (int i = 0; i <= Phenotype.P_NUM; i++) {
+            cbPhenotype.addItem(Phenotype.getBloodnamePhenotypeGroupingName(i));
         }
         gbc.gridx = 0;
         gbc.gridy = 2;
@@ -175,17 +190,11 @@ public class BloodnameDialog extends JDialog {
         gbc.gridy = 3;
         gbc.gridwidth = 1;
         add(btnGo, gbc);
-        btnGo.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Bloodname n = Bloodname.randomBloodname
-                        (clans[cbClan.getSelectedIndex()],
-                                cbPhenotype.getSelectedIndex(),
-                                (Integer)cbEra.getSelectedItem());
-                lblName.setText(n.getName() + " (" + n.getFounder() + ")");
-                lblOrigClan.setText(Faction.getFaction(n.getOrigClan()).getFullName((Integer)cbEra.getSelectedItem()));
-                lblPhenotype.setText(Phenotype.getPhenotypeName(n.getPhenotype()));
-            }
+        btnGo.addActionListener(e -> {
+            Bloodname n = Bloodname.randomBloodname(clans[clan], phenotype, year);
+            lblName.setText(n.getName() + " (" + n.getFounder() + ")");
+            lblOrigClan.setText(Faction.getFaction(n.getOrigClan()).getFullName(year));
+            lblPhenotype.setText(Phenotype.getBloodnamePhenotypeGroupingName(n.getPhenotype()));
         });
 
         JLabel label = new JLabel("Result:");
@@ -224,10 +233,7 @@ public class BloodnameDialog extends JDialog {
         gbc.gridwidth = 1;
         add(lblPhenotype, gbc);
 
-        txtWarning = new JTextArea();
-        txtWarning.setEditable(false);
-        txtWarning.setLineWrap(true);
-        txtWarning.setWrapStyleWord(true);
+        txtWarning = new JLabel();
         gbc.gridx = 0;
         gbc.gridy = 8;
         gbc.gridwidth = 2;
@@ -259,63 +265,63 @@ public class BloodnameDialog extends JDialog {
     };
 
     private boolean validateInput() {
-        int clan = cbClan.getSelectedIndex();
-        int year = (Integer) cbEra.getSelectedItem();
-        String phenotype = (String) cbPhenotype.getSelectedItem();
+        clan = cbClan.getSelectedIndex();
+        year = eras[cbEra.getSelectedIndex()];
+        phenotype = cbPhenotype.getSelectedIndex();
 
-        if (clan < 0 || null == phenotype ||
-                year < 2807 || year > 3150) {
+        if ((clan < 0) || (phenotype == Phenotype.P_NONE) || (year < 2807) || (year > 3150)) {
             return false;
         }
 
-        String txt = "";
+        String txt = "<html>";
 
         if (year < terminus[clan][0]) {
-            for (int i = 0; i < eras.length; i++) {
-                if (eras[i] >= terminus[clan][0]) {
-                    txt += fullNames[clan]
-                            + " formed in "
-                            + terminus[clan][0]
-                            + ". Using " + eras[i] + ".\n";
+            for (int era : eras) {
+                if (era >= terminus[clan][0]) {
+                    txt += "<div>" + fullNames[clan] + " formed in " + terminus[clan][0] + ". Using "
+                            + era + ".</div>";
+                    year = era;
                     break;
                 }
             }
         }
-        if (null != terminus[clan][1] &&
-                year > terminus[clan][1]) {
+        if ((terminus[clan][1] != null) && (year > terminus[clan][1])) {
             for (int i = eras.length - 1; i >= 0; i--) {
                 if (eras[i] <= terminus[clan][1]) {
-                    txt += fullNames[clan]
-                        + " ceased to existed in "
-                        + terminus[clan][1]
-                        + ". Using " + eras[i] + ".\n";
+                    txt += "<div>" + fullNames[clan] + " ceased to existed in " + terminus[clan][1]
+                            + ". Using " + eras[i] + ".</div>";
+                    year = eras[i];
                     break;
                 }
             }
         }
-        if ("ProtoMech" == phenotype && year < 3060) {
-            txt += "ProtoMechs did not exist in "
-                    + year + ". Using Aerospace.\n";
+        if ((phenotype == Phenotype.P_PROTOMECH) && (year < 3060)) {
+            txt += "<div>ProtoMechs did not exist in " + year + ". Using Aerospace.</div>";
+            phenotype = Phenotype.P_AEROSPACE;
         }
-        if ("Naval" == phenotype && clan != CSR) {
-            txt += "The Naval phenotype is unique to Clan Snow Raven. Using General.\n";
+        if ((phenotype == Phenotype.P_NAVAL) && (clan != CSR)) {
+            txt += "<div>The Naval phenotype is unique to Clan Snow Raven. Using General.</div>";
+            phenotype = Phenotype.P_GENERAL;
         }
-        if ("TankWarrior" == phenotype && clan != CHH) {
-             txt += "The TankWarrior phenotype is unique to Clan Hell's Horses. Using General.\n";
-        } else if ("TankWarrior" == phenotype && year < 3100) {
-            txt += "The TankWarrior phenotype began development in the 32nd century. Using 3100.\n";
+        if ((phenotype == Phenotype.P_VEHICLE) && (clan != CHH)) {
+             txt += "<div>The vehicle phenotype is unique to Clan Hell's Horses. Using General.</div>";
+             phenotype = Phenotype.P_GENERAL;
+        } else if ((phenotype == Phenotype.P_VEHICLE) && (year < 3100)) {
+            txt += "<div>The vehicle phenotype began development in the 32nd century. Using 3100.</div>";
+            year = 3100;
         }
+        txt += "</html>";
         txtWarning.setText(txt);
 
         return true;
-    };
+    }
 
-    public void setFaction(String factionCode) {
-        for (int i = 0; i < C_NUM; i++) {
-            if (factionCode.equals(clans[i])) {
-                cbClan.setSelectedIndex(i);
-                return;
-            }
+    public void setFaction(String factionName) {
+        // We set based on the full faction name, which will have a Clan in it. We therefore need
+        // to split off the clan to ensure that the rest of the comparison is good
+        String[] split = factionName.split(" ", 2);
+        if (split.length == 2) {
+            cbClan.setSelectedItem(split[1]);
         }
     }
 

@@ -270,16 +270,16 @@ public class CampaignGUI extends JPanel {
         BatchXPDialog batchXPDialog = new BatchXPDialog(getFrame(), getCampaign());
         batchXPDialog.setVisible(true);
 
-        if(batchXPDialog.hasDataChanged()) {
+        if (batchXPDialog.hasDataChanged()) {
             refreshReport();
         }
     }
 
     public void showBloodnameDialog() {
         BloodnameDialog bloodnameDialog = new BloodnameDialog(getFrame());
-        bloodnameDialog.setFaction(getCampaign().getFactionCode());
-        bloodnameDialog.setYear(getCampaign().getCalendar().get(
-                java.util.Calendar.YEAR));
+        int year = getCampaign().getCalendar().get(Calendar.YEAR);
+        bloodnameDialog.setFaction(getCampaign().getFaction().getFullName(year));
+        bloodnameDialog.setYear(year);
         bloodnameDialog.setVisible(true);
     }
 
