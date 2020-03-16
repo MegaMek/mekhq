@@ -29,6 +29,10 @@ public class Phenotype {
     public static final int P_GENERAL = 7; // This is used during Bloodname generation, and shouldn't be saved to file
     public static final int P_NUM = 7; // This should be EQUAL to P_GENERAL
 
+    /**
+     * @param phenotype the phenotype to get the name for
+     * @return the name of the phenotype, or ? if unknown
+     */
     public static String getPhenotypeName(int phenotype) {
         switch (phenotype) {
             case P_NONE:
@@ -50,6 +54,38 @@ public class Phenotype {
         }
     }
 
+    /**
+     * This is used to get the name of the Phenotype grouping a Bloodname is part of
+     * @param phenotype the phenotype to get the name for
+     * @return the name of the grouping, or ? if unknown
+     */
+    public static String getBloodnamePhenotypeGroupingName(int phenotype) {
+        switch (phenotype) {
+            case P_NONE:
+                return "None";
+            case P_MECHWARRIOR:
+                return "MechWarrior";
+            case P_ELEMENTAL:
+                return "Elemental";
+            case P_AEROSPACE:
+                return "Aerospace Pilot";
+            case P_VEHICLE:
+                return "Vehicle Crew";
+            case P_PROTOMECH:
+                return "ProtoMech Pilot";
+            case P_NAVAL:
+                return "Naval Commander";
+            case P_GENERAL:
+                return "General";
+            default:
+                return "?";
+        }
+    }
+
+    /**
+     * @param phenotype the phenotype int to check
+     * @return whether the phenotype is trueborn or freeborn
+     */
     public static String getPhenotypeShortName(int phenotype) {
         switch (phenotype) {
             case P_NONE:
