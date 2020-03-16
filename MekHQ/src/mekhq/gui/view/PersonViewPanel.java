@@ -40,7 +40,6 @@ import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 
-import jdk.tools.jlink.internal.Jlink;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.FormerSpouse;
