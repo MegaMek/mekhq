@@ -42,14 +42,8 @@ import mekhq.MekHqXmlUtil;
 
 /**
  * @author Neoancient
- *
- *
  */
 public class Bloodname implements Serializable {
-<<<<<<< HEAD
-    /**
-     *
-     */
     private static final long serialVersionUID = 3958964485520416824L;
 
     private static ArrayList<Bloodname> bloodnames;

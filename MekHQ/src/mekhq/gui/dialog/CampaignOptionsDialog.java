@@ -1739,7 +1739,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(chkUseRandomMarriages, gridBagConstraints);
 
-        spnChanceRandomMarriages = new JSpinner(new SpinnerNumberModel(options.getChanceRandomMarriages(), 0, 100, 0.001));
+        spnChanceRandomMarriages = new JSpinner(new SpinnerNumberModel(options.getChanceRandomMarriages() * 100.0, 0, 100, 0.001));
         Dimension dimensionChanceRandomMarriages = spnChanceRandomMarriages.getPreferredSize();
         dimensionChanceRandomMarriages.width = 50;
         spnChanceRandomMarriages.setPreferredSize(dimensionChanceRandomMarriages);
@@ -1784,7 +1784,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(chkUseRandomSameSexMarriages, gridBagConstraints);
 
-        spnChanceRandomSameSexMarriages = new JSpinner(new SpinnerNumberModel(options.getChanceRandomSameSexMarriages(), 0, 100, 0.001));
+        spnChanceRandomSameSexMarriages = new JSpinner(new SpinnerNumberModel(options.getChanceRandomSameSexMarriages() * 100.0, 0, 100, 0.001));
         Dimension dimensionChanceRandomSameSexMarriages = spnChanceRandomSameSexMarriages.getPreferredSize();
         dimensionChanceRandomSameSexMarriages.width = 50;
         spnChanceRandomSameSexMarriages.setPreferredSize(dimensionChanceRandomSameSexMarriages);
@@ -1801,7 +1801,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(chkUseUnofficialProcreation, gridBagConstraints);
 
-        spnChanceProcreation = new JSpinner(new SpinnerNumberModel(options.getChanceProcreation(), 0, 100, 0.001));
+        spnChanceProcreation = new JSpinner(new SpinnerNumberModel(options.getChanceProcreation() * 100.0, 0, 100, 0.001));
         Dimension dimensionChanceProcreation = spnChanceProcreation.getPreferredSize();
         dimensionChanceProcreation.width = 50;
         spnChanceProcreation.setPreferredSize(dimensionChanceProcreation);
@@ -1818,7 +1818,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(chkUseUnofficialProcreationNoRelationship, gridBagConstraints);
 
-        spnChanceProcreationNoRelationship = new JSpinner(new SpinnerNumberModel(options.getChanceProcreationNoRelationship(), 0, 100, 0.001));
+        spnChanceProcreationNoRelationship = new JSpinner(new SpinnerNumberModel(options.getChanceProcreationNoRelationship() * 100.0, 0, 100, 0.001));
         Dimension dimensionChanceProcreationNoRelationship = spnChanceProcreationNoRelationship.getPreferredSize();
         dimensionChanceProcreationNoRelationship.width = 50;
         spnChanceProcreationNoRelationship.setPreferredSize(dimensionChanceProcreationNoRelationship);
@@ -4821,16 +4821,16 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setMinimumMarriageAge((Integer) spnMinimumMarriageAge.getModel().getValue());
         options.setCheckMutualAncestorsDepth((Integer) spnCheckMutualAncestorsDepth.getModel().getValue());
         options.setUseRandomMarriages(chkUseRandomMarriages.isSelected());
-        options.setChanceRandomMarriages((Double) spnChanceRandomMarriages.getModel().getValue());
+        options.setChanceRandomMarriages((Double) spnChanceRandomMarriages.getModel().getValue() / 100.0);
         options.setMarriageAgeRange((Integer) spnMarriageAgeRange.getModel().getValue());
         for (int i = 0; i < Person.NUM_SURNAME; i++) {
             int val = (int) Math.round(((Double) spnRandomMarriageSurnameWeights[i].getModel().getValue()) * 10);
             options.setRandomMarriageSurnameWeight(i, val);
         }
         options.setUseRandomSameSexMarriages(chkUseRandomSameSexMarriages.isSelected());
-        options.setChanceRandomSameSexMarriages((Double) spnChanceRandomSameSexMarriages.getModel().getValue());
+        options.setChanceRandomSameSexMarriages((Double) spnChanceRandomSameSexMarriages.getModel().getValue() / 100.0);
         options.setUseUnofficialProcreation(chkUseUnofficialProcreation.isSelected());
-        options.setChanceProcreation((Double) spnChanceProcreation.getModel().getValue());
+        options.setChanceProcreation((Double) spnChanceProcreation.getModel().getValue() / 100.0);
         options.setUseUnofficialProcreationNoRelationship(chkUseUnofficialProcreationNoRelationship.isSelected());
         options.setChanceProcreationNoRelationship((Double) spnChanceProcreationNoRelationship.getModel().getValue());
         options.setDisplayTrueDueDate(chkDisplayTrueDueDate.isSelected());
