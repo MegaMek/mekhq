@@ -63,6 +63,7 @@ import megamek.common.IStartingPositions;
 import megamek.common.PlanetaryConditions;
 import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.ForceStub;
@@ -941,8 +942,8 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
                     }
                 }
                 return new ImageIcon(portrait);
-            } catch (Exception err) {
-                err.printStackTrace();
+            } catch (Exception e) {
+                MekHQ.getLogger().error(getClass(), "getIconFrom", e);
                 return null;
             }
         }
@@ -974,8 +975,8 @@ public class AtBScenarioViewPanel extends ScrollablePanel {
                 }
                 }
                 return new ImageIcon(portrait);
-            } catch (Exception err) {
-                err.printStackTrace();
+            } catch (Exception e) {
+                MekHQ.getLogger().error(getClass(), "getIconFrom", e);
                 return null;
             }
        }

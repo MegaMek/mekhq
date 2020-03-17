@@ -4,6 +4,8 @@ package chat;
  * Code taken from http://introcs.cs.princeton.edu/java/84network/
  */
 
+import mekhq.MekHQ;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -18,7 +20,7 @@ import javax.swing.JTextField;
 public class ChatClient extends JPanel implements ActionListener {
 
     /**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -7447573101863923187L;
 
@@ -42,8 +44,9 @@ public class ChatClient extends JPanel implements ActionListener {
             socket = new Socket(hostName, 4444);
             out    = new Out(socket);
             in     = new In(socket);
+        } catch (Exception e) {
+            MekHQ.getLogger().error(getClass(), "ChatClient", e);
         }
-        catch (Exception ex) { ex.printStackTrace(); }
         this.screenName = screenName;
 
     /*    // close output stream  - this will cause listen() to stop and exit
@@ -53,7 +56,9 @@ public class ChatClient extends JPanel implements ActionListener {
                     out.close();
 //                    in.close();
 //                    try                   { socket.close();        }
-//                    catch (Exception ioe) { ioe.printStackTrace(); }
+//                    catch (Exception e) {
+//                        MekHQ.getLogger().error(getClass(), "windowClosing", e);
+//                    }
                 }
             }
         );
@@ -92,8 +97,11 @@ public class ChatClient extends JPanel implements ActionListener {
         }
         out.close();
         in.close();
-        try                 { socket.close();      }
-        catch (Exception e) { e.printStackTrace(); }
-        System.err.println("Closed client socket");
+        try {
+            socket.close();
+        } catch (Exception e) {
+            MekHQ.getLogger().error(getClass(), "listen", e);
+        }
+        MekHQ.getLogger().error(getClass(), "listen", "Closed client socket");
     }
 }

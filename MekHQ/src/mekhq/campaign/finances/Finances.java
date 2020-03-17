@@ -221,7 +221,7 @@ public class Finances implements Serializable {
                 try {
                     retVal.wentIntoDebt = df.parse(wn2.getTextContent().trim());
                 } catch (DOMException | ParseException e) {
-                    e.printStackTrace();
+                    MekHQ.getLogger().error(Finances.class, "generateInstanceFromXML", e);
                 }
             }
         }

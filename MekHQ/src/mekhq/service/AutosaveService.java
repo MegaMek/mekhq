@@ -20,7 +20,6 @@
  */
 package mekhq.service;
 
-import megamek.common.logging.MMLogger;
 import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 import mekhq.MekHqConstants;
@@ -39,13 +38,8 @@ import java.util.zip.GZIPOutputStream;
 
 public class AutosaveService implements IAutosaveService {
     private final Preferences userPreferences = Preferences.userRoot().node(MekHqConstants.AUTOSAVE_NODE);
-    private final MMLogger logger;
 
-    public AutosaveService(MMLogger logger) {
-        assert logger != null;
-
-        this.logger = logger;
-    }
+    public AutosaveService() { }
 
     @Override
     public void requestDayAdvanceAutosave(Campaign campaign, Calendar calendar) {
@@ -106,12 +100,11 @@ public class AutosaveService implements IAutosaveService {
                     writer.close();
                 }
             } else {
-                this.logger.error(this.getClass(), "performAutosave",
+                MekHQ.getLogger().error(getClass(), "performAutosave",
                         "Unable to perform an autosave because of a null or empty file name");
             }
-        }
-        catch (Exception ex) {
-            this.logger.error(this.getClass(), "performAutosave", ex);
+        } catch (Exception ex) {
+            MekHQ.getLogger().error(getClass(), "performAutosave", ex);
         }
     }
 
@@ -135,7 +128,7 @@ public class AutosaveService implements IAutosaveService {
                 if (autosaveFiles.get(index).delete()) {
                     autosaveFiles.remove(index);
                 } else {
-                    this.logger.error(this.getClass(), "getAutosaveFilename",
+                    MekHQ.getLogger().error(getClass(), "getAutosaveFilename",
                             "Unable to delete file " + autosaveFiles.get(index).getName());
                     index++;
                 }
