@@ -1280,7 +1280,8 @@ public class AtBDynamicScenarioFactory {
                 case UnitType.DROPSHIP:
                 case UnitType.JUMPSHIP:
                 case UnitType.WARSHIP:
-                    if (f.getShortName().equals("CSR")) { // this phenotype is unique to Clan Snow Raven
+                    if (f.getShortName().equals("CSR") || f.getShortName().equals("RA")) {
+                        // this phenotype is unique to Clan Snow Raven and the Raven Alliance
                         phenotype = Phenotype.P_NAVAL;
                     }
                     break;

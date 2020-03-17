@@ -26,6 +26,7 @@ import megamek.client.RandomGenderGenerator;
 import megamek.client.RandomNameGenerator;
 import megamek.common.Compute;
 import megamek.common.Crew;
+import megamek.common.TargetRoll;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomSkillPreferences;
@@ -133,12 +134,9 @@ public abstract class AbstractPersonnelGenerator {
                         person.setPhenotype(Phenotype.P_MECHWARRIOR);
                     }
                     break;
-                case Person.T_GVEE_DRIVER:
-                case Person.T_NVEE_DRIVER:
-                case Person.T_VTOL_PILOT:
-                case Person.T_VEE_GUNNER:
-                    if (Utilities.rollProbability(campaign.getCampaignOptions().getProbPhenoVee())) {
-                        person.setPhenotype(Phenotype.P_VEHICLE);
+                case Person.T_BA:
+                    if (Utilities.rollProbability(campaign.getCampaignOptions().getProbPhenoBA())) {
+                        person.setPhenotype(Phenotype.P_ELEMENTAL);
                     }
                     break;
                 case Person.T_CONV_PILOT:
@@ -147,14 +145,29 @@ public abstract class AbstractPersonnelGenerator {
                         person.setPhenotype(Phenotype.P_AEROSPACE);
                     }
                     break;
-                case Person.T_BA:
-                    if (Utilities.rollProbability(campaign.getCampaignOptions().getProbPhenoBA())) {
-                        person.setPhenotype(Phenotype.P_ELEMENTAL);
+                case Person.T_GVEE_DRIVER:
+                case Person.T_NVEE_DRIVER:
+                case Person.T_VTOL_PILOT:
+                case Person.T_VEE_GUNNER:
+                    if (Utilities.rollProbability(campaign.getCampaignOptions().getProbPhenoVee())
+                            || person.getOriginFaction().getShortName().equals("CHH")) {
+                        person.setPhenotype(Phenotype.P_VEHICLE);
                     }
                     break;
                 case Person.T_PROTO_PILOT:
-                    if (Utilities.rollProbability(campaign.getCampaignOptions().getProbPhenoProto())) {
-                        person.setPhenotype(Phenotype.P_ELEMENTAL);
+                    if (Utilities.rollProbability(campaign.getCampaignOptions().getProbPhenoProto())
+                            && (campaign.getGameYear() > 3060)) {
+                        person.setPhenotype(Phenotype.P_PROTOMECH);
+                    }
+                    break;
+                case Person.T_SPACE_CREW:
+                case Person.T_SPACE_GUNNER:
+                case Person.T_SPACE_PILOT:
+                case Person.T_NAVIGATOR:
+                    if ((person.getOriginFaction().getShortName().equals("CSR")
+                            || person.getOriginFaction().getShortName().equals("RA"))
+                            && Utilities.rollProbability(campaign.getCampaignOptions().getProbPhenoNaval())) {
+                        person.setPhenotype(Phenotype.P_NAVAL);
                     }
                     break;
                 default:
