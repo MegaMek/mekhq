@@ -457,7 +457,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
      * and this method will immediately exit.
      */
     protected void initValues() {
-        getLogger().methodBegin(getClass(), "initValues()");
+        MekHQ.getLogger().methodBegin(getClass(), "initValues()");
         setCommanderList(new ArrayList<>());
         setNumberUnits(BigDecimal.ZERO);
         setTotalSkillLevels(BigDecimal.ZERO);
@@ -500,7 +500,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
         setTransportPercent(BigDecimal.ZERO);
         setInitialized(true);
         clearSkillRatingCounts();
-        getLogger().methodEnd(getClass(), "initValues()");
+        MekHQ.getLogger().methodEnd(getClass(), "initValues()");
     }
 
     /**
@@ -899,19 +899,19 @@ public abstract class AbstractUnitRating implements IUnitRating {
         if (u.isMothballed()) {
             return;
         }
-        getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
+        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                         "Adding " + u.getName() + " to unit counts.");
 
         Entity e = u.getEntity();
         if (null == e) {
-            getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                             "Unit " + u.getName() +
                             " is not an Entity.  Skipping.");
             return;
         }
 
         int unitType = e.getUnitType();
-        getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
+        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                         "Unit " + u.getName() + " is a " +
                         UnitType.getTypeDisplayableName(unitType));
         //todo: Add Airship when Megamek supports it.
@@ -925,7 +925,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
             case UnitType.GUN_EMPLACEMENT:
             case UnitType.VTOL:
             case UnitType.TANK:
-                getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                                 "Unit " + u.getName() + " weight is " +
                                 e.getWeight());
                 if (e.getWeight() <= 50f) {
@@ -963,9 +963,5 @@ public abstract class AbstractUnitRating implements IUnitRating {
                 incrementInfantryUnitCount();
                 break;
         }
-    }
-
-    MMLogger getLogger() {
-        return MekHQ.getLogger();
     }
 }
