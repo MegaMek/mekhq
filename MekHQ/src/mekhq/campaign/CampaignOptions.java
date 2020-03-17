@@ -275,9 +275,11 @@ public class CampaignOptions implements Serializable {
 
     //phenotype related
     private int probPhenoMW;
-    private int probPhenoAero;
     private int probPhenoBA;
+    private int probPhenoAero;
     private int probPhenoVee;
+    private int probPhenoProto;
+    private int probPhenoNaval;
 
     //random portraits related
     private boolean[] usePortraitForType;
@@ -580,9 +582,11 @@ public class CampaignOptions implements Serializable {
         //endregion Personnel Market Tab
 
         probPhenoMW = 95;
-        probPhenoAero = 95;
         probPhenoBA = 100;
+        probPhenoAero = 95;
         probPhenoVee = 0;
+        probPhenoProto = 95;
+        probPhenoNaval = 95;
 
         useAtB = false;
     	useAero = false;
@@ -1745,14 +1749,6 @@ public class CampaignOptions implements Serializable {
         probPhenoMW = p;
     }
 
-    public int getProbPhenoAero() {
-        return probPhenoAero;
-    }
-
-    public void setProbPhenoAero(int p) {
-        probPhenoAero = p;
-    }
-
     public int getProbPhenoBA() {
         return probPhenoBA;
     }
@@ -1761,12 +1757,36 @@ public class CampaignOptions implements Serializable {
         probPhenoBA = p;
     }
 
+    public int getProbPhenoAero() {
+        return probPhenoAero;
+    }
+
+    public void setProbPhenoAero(int p) {
+        probPhenoAero = p;
+    }
+
     public int getProbPhenoVee() {
         return probPhenoVee;
     }
 
     public void setProbPhenoVee(int p) {
         probPhenoVee = p;
+    }
+
+    public int getProbPhenoProto() {
+        return probPhenoProto;
+    }
+
+    public void setProbPhenoProto(int p) {
+        probPhenoProto = p;
+    }
+
+    public int getProbPhenoNaval() {
+        return probPhenoNaval;
+    }
+
+    public void setProbPhenoNaval(int p) {
+        probPhenoNaval = p;
     }
 
     public boolean usePortraitForType(int type) {
@@ -2834,9 +2854,11 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "salaryCommissionMultiplier", salaryCommissionMultiplier);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "salaryAntiMekMultiplier", salaryAntiMekMultiplier);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "probPhenoMW", probPhenoMW);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "probPhenoAero", probPhenoAero);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "probPhenoBA", probPhenoBA);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "probPhenoAero", probPhenoAero);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "probPhenoVee", probPhenoVee);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "probPhenoProto", probPhenoProto);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "probPhenoNaval", probPhenoNaval);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "tougherHealing", tougherHealing);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAtB", useAtB);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAero", useAero);
@@ -3330,12 +3352,16 @@ public class CampaignOptions implements Serializable {
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoMW")) {
                 retVal.probPhenoMW = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoAero")) {
-                retVal.probPhenoAero = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoBA")) {
                 retVal.probPhenoBA = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoAero")) {
+                retVal.probPhenoAero = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoVee")) {
                 retVal.probPhenoVee = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoProto")) {
+                retVal.probPhenoProto = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoNaval")) {
+                retVal.probPhenoNaval = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("tougherHealing")) {
                 retVal.tougherHealing = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useAtB")) {

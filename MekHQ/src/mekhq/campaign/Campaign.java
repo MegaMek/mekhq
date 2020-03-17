@@ -1426,25 +1426,27 @@ public class Campaign implements Serializable, ITechManager {
                     break;
                 }
                 case Phenotype.P_VEHICLE: {
-                    bloodnameTarget += person.hasSkill(SkillType.S_GUN_VEE)
-                            ? person.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue()
-                            : TargetRoll.AUTOMATIC_FAIL;
-                    switch (person.getPrimaryRole()) {
-                        case Person.T_VTOL_PILOT:
-                            bloodnameTarget += person.hasSkill(SkillType.S_PILOT_VTOL)
-                                    ? person.getSkill(SkillType.S_PILOT_VTOL).getFinalSkillValue()
-                                    : TargetRoll.AUTOMATIC_FAIL;
-                            break;
-                        case Person.T_NVEE_DRIVER:
-                            bloodnameTarget += person.hasSkill(SkillType.S_PILOT_NVEE)
-                                    ? person.getSkill(SkillType.S_PILOT_NVEE).getFinalSkillValue()
-                                    : TargetRoll.AUTOMATIC_FAIL;
-                            break;
-                        case Person.T_GVEE_DRIVER:
-                            bloodnameTarget += person.hasSkill(SkillType.S_PILOT_GVEE)
-                                    ? person.getSkill(SkillType.S_PILOT_GVEE).getFinalSkillValue()
-                                    : TargetRoll.AUTOMATIC_FAIL;
-                            break;
+                    if (person.getOriginFaction().getShortName().equals("CHH")) {
+                        bloodnameTarget += person.hasSkill(SkillType.S_GUN_VEE)
+                                ? person.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue()
+                                : TargetRoll.AUTOMATIC_FAIL;
+                        switch (person.getPrimaryRole()) {
+                            case Person.T_VTOL_PILOT:
+                                bloodnameTarget += person.hasSkill(SkillType.S_PILOT_VTOL)
+                                        ? person.getSkill(SkillType.S_PILOT_VTOL).getFinalSkillValue()
+                                        : TargetRoll.AUTOMATIC_FAIL;
+                                break;
+                            case Person.T_NVEE_DRIVER:
+                                bloodnameTarget += person.hasSkill(SkillType.S_PILOT_NVEE)
+                                        ? person.getSkill(SkillType.S_PILOT_NVEE).getFinalSkillValue()
+                                        : TargetRoll.AUTOMATIC_FAIL;
+                                break;
+                            case Person.T_GVEE_DRIVER:
+                                bloodnameTarget += person.hasSkill(SkillType.S_PILOT_GVEE)
+                                        ? person.getSkill(SkillType.S_PILOT_GVEE).getFinalSkillValue()
+                                        : TargetRoll.AUTOMATIC_FAIL;
+                                break;
+                        }
                     }
                     break;
                 }
@@ -1455,24 +1457,26 @@ public class Campaign implements Serializable, ITechManager {
                     break;
                 }
                 case Phenotype.P_NAVAL: {
-                    switch (person.getPrimaryRole()) {
-                        case Person.T_SPACE_CREW:
-                            bloodnameTarget += 2 * (person.hasSkill(SkillType.S_TECH_VESSEL)
-                                    ? person.getSkill(SkillType.S_TECH_VESSEL).getFinalSkillValue()
-                                    : TargetRoll.AUTOMATIC_FAIL);
-                        case Person.T_SPACE_GUNNER:
-                            bloodnameTarget += 2 * (person.hasSkill(SkillType.S_GUN_SPACE)
-                                    ? person.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue()
-                                    : TargetRoll.AUTOMATIC_FAIL);
-                        case Person.T_SPACE_PILOT:
-                            bloodnameTarget += 2 * (person.hasSkill(SkillType.S_PILOT_SPACE)
-                                    ? person.getSkill(SkillType.S_PILOT_SPACE).getFinalSkillValue()
-                                    : TargetRoll.AUTOMATIC_FAIL);
-                        case Person.T_NAVIGATOR:
-                        default:
-                            bloodnameTarget += 2 * (person.hasSkill(SkillType.S_NAV)
-                                    ? person.getSkill(SkillType.S_NAV).getFinalSkillValue()
-                                    : TargetRoll.AUTOMATIC_FAIL);
+                    if (person.getOriginFaction().getShortName().equals("CSR")) {
+                        switch (person.getPrimaryRole()) {
+                            case Person.T_SPACE_CREW:
+                                bloodnameTarget += 2 * (person.hasSkill(SkillType.S_TECH_VESSEL)
+                                        ? person.getSkill(SkillType.S_TECH_VESSEL).getFinalSkillValue()
+                                        : TargetRoll.AUTOMATIC_FAIL);
+                            case Person.T_SPACE_GUNNER:
+                                bloodnameTarget += 2 * (person.hasSkill(SkillType.S_GUN_SPACE)
+                                        ? person.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue()
+                                        : TargetRoll.AUTOMATIC_FAIL);
+                            case Person.T_SPACE_PILOT:
+                                bloodnameTarget += 2 * (person.hasSkill(SkillType.S_PILOT_SPACE)
+                                        ? person.getSkill(SkillType.S_PILOT_SPACE).getFinalSkillValue()
+                                        : TargetRoll.AUTOMATIC_FAIL);
+                            case Person.T_NAVIGATOR:
+                            default:
+                                bloodnameTarget += 2 * (person.hasSkill(SkillType.S_NAV)
+                                        ? person.getSkill(SkillType.S_NAV).getFinalSkillValue()
+                                        : TargetRoll.AUTOMATIC_FAIL);
+                        }
                     }
                     break;
                 }

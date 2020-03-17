@@ -903,31 +903,9 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     }
 
     private void randomBloodname() {
-        int phenotype = Phenotype.P_GENERAL;
-        switch (person.getPrimaryRole()) {
-            case Person.T_MECHWARRIOR:
-                phenotype = Phenotype.P_MECHWARRIOR;
-                break;
-            case Person.T_BA:
-                phenotype = Phenotype.P_ELEMENTAL;
-                break;
-            case Person.T_AERO_PILOT:
-            case Person.T_CONV_PILOT:
-                phenotype = Phenotype.P_AEROSPACE;
-                break;
-            case Person.T_SPACE_CREW:
-            case Person.T_NAVIGATOR:
-            case Person.T_SPACE_GUNNER:
-            case Person.T_SPACE_PILOT:
-                phenotype = Phenotype.P_NAVAL;
-                break;
-            case Person.T_PROTO_PILOT:
-                phenotype = Phenotype.P_PROTOMECH;
-                break;
-        }
         textBloodname.setText(Bloodname.randomBloodname(campaign.getFaction().isClan()
                 ? campaign.getFactionCode() : person.getOriginFaction().getShortName(),
-                phenotype, campaign.getCalendar().get(Calendar.YEAR)).getName());
+                person.getPhenotype(), campaign.getCalendar().get(Calendar.YEAR)).getName());
     }
 
     public void refreshSkills() {

@@ -1255,14 +1255,16 @@ public class AtBDynamicScenarioFactory {
         int[] skills = rsg.getRandomSkills(en);
 
         if (f.isClan() && (Compute.d6(2) > (8 - skill + skills[0] + skills[1]))) {
-            int phenotype;
+            int phenotype = Phenotype.P_NONE;
             switch (en.getUnitType()) {
                 case UnitType.MEK:
                     phenotype = Phenotype.P_MECHWARRIOR;
                     break;
                 case UnitType.TANK:
                 case UnitType.VTOL:
-                    phenotype = Phenotype.P_VEHICLE;
+                    if (f.getShortName().equals("CHH")) { // this phenotype is unique to Clan Hell's Horses
+                        phenotype = Phenotype.P_VEHICLE;
+                    }
                     break;
                 case UnitType.BATTLE_ARMOR:
                     phenotype = Phenotype.P_ELEMENTAL;
@@ -1278,10 +1280,10 @@ public class AtBDynamicScenarioFactory {
                 case UnitType.DROPSHIP:
                 case UnitType.JUMPSHIP:
                 case UnitType.WARSHIP:
-                    phenotype = Phenotype.P_NAVAL;
+                    if (f.getShortName().equals("CSR")) { // this phenotype is unique to Clan Snow Raven
+                        phenotype = Phenotype.P_NAVAL;
+                    }
                     break;
-                default:
-                    phenotype = Phenotype.P_NONE;
             }
             if (phenotype > 0) {
                 String bloodname = Bloodname.randomBloodname(faction, phenotype,
