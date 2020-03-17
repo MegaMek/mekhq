@@ -77,6 +77,7 @@ import javax.swing.JViewport;
 import javax.swing.Timer;
 import javax.vecmath.Vector2d;
 
+import mekhq.MekHQ;
 import org.joda.time.DateTime;
 
 import megamek.common.EquipmentType;
@@ -322,7 +323,7 @@ public class InterstellarMapPanel extends JPanel {
                                     ImageIO.write(img, "png", file.get());
                                 }
                             } catch (IOException e) {
-                                e.printStackTrace();
+                                MekHQ.getLogger().error(getClass(), "maybeShowPopup", e);
                             }
                             conf.centerX = originalX;
                             conf.centerY = originalY;
