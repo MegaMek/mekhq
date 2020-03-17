@@ -313,8 +313,8 @@ public class PersonViewPanel extends ScrollablePanel {
                 ribbonLabel.setIcon(new ImageIcon(ribbon));
                 ribbonLabel.setToolTipText(award.getTooltip());
                 rowRibbonsBox.add(ribbonLabel, 0);
-            } catch (Exception err) {
-                err.printStackTrace();
+            } catch (Exception e) {
+                MekHQ.getLogger().error(getClass(), "drawRibbons", e);
             }
 
             i++;
@@ -357,8 +357,8 @@ public class PersonViewPanel extends ScrollablePanel {
                 medalLabel.setIcon(new ImageIcon(medal));
                 medalLabel.setToolTipText(award.getTooltip());
                 pnlMedals.add(medalLabel);
-            } catch (Exception err) {
-                err.printStackTrace();
+            } catch (Exception e) {
+                MekHQ.getLogger().error(getClass(), "drawMedals", e);
             }
         }
 
@@ -388,8 +388,8 @@ public class PersonViewPanel extends ScrollablePanel {
                 miscLabel.setIcon(new ImageIcon(miscAward));
                 miscLabel.setToolTipText(award.getTooltip());
                 pnlMiscAwards.add(miscLabel);
-            } catch (Exception err) {
-                err.printStackTrace();
+            } catch (Exception e) {
+                MekHQ.getLogger().error(getClass(), "drawMiscAwards", e);
             }
         }
         return pnlMiscAwards;
@@ -438,8 +438,8 @@ public class PersonViewPanel extends ScrollablePanel {
                 }
             }
             lblPortrait.setIcon(new ImageIcon(portrait));
-        } catch (Exception err) {
-            err.printStackTrace();
+        } catch (Exception e) {
+            MekHQ.getLogger().error(getClass(), "setPortrait", e);
         }
 
         GridBagConstraints gbc_lblPortrait = new GridBagConstraints();

@@ -4,6 +4,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
 import java.util.StringTokenizer;
 import java.util.UUID;
 
@@ -89,9 +90,9 @@ public class TOETransferHandler extends TransferHandler {
                 force = gui.getCampaign().getForce(Integer.parseInt(id));
             }
         } catch (UnsupportedFlavorException ufe) {
-            System.out.println("UnsupportedFlavor: " + ufe.getMessage());
-        } catch (java.io.IOException ioe) {
-            System.out.println("I/O error: " + ioe.getMessage());
+            MekHQ.getLogger().error(getClass(), "canImport", "UnsupportedFlavor: " + ufe.getMessage());
+        } catch (IOException ioe) {
+            MekHQ.getLogger().error(getClass(), "canImport", "I/O error: " + ioe.getMessage());
         }
         // Do not allow a drop on the drag source selections.
         JTree.DropLocation dl = (JTree.DropLocation) support
@@ -142,9 +143,9 @@ public class TOETransferHandler extends TransferHandler {
                 force = gui.getCampaign().getForce(Integer.parseInt(id));
             }
         } catch (UnsupportedFlavorException ufe) {
-            System.out.println("UnsupportedFlavor: " + ufe.getMessage());
-        } catch (java.io.IOException ioe) {
-            System.out.println("I/O error: " + ioe.getMessage());
+            MekHQ.getLogger().error(getClass(), "importData", "UnsupportedFlavor: " + ufe.getMessage());
+        } catch (IOException ioe) {
+            MekHQ.getLogger().error(getClass(), "importData", "I/O error: " + ioe.getMessage());
         }
         // Get drop location info.
         JTree.DropLocation dl = (JTree.DropLocation) support

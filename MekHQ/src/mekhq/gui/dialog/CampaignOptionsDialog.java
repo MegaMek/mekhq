@@ -2839,16 +2839,16 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panRollTable.add(lblUltraGreen);
         panRollTable.add(new JLabel("0"));
         panRollTable.add(new JLabel("2-5"));
-        panRollTable.add(new JLabel("Green"));
+        panRollTable.add(new JLabel(SkillType.SKILL_LEVEL_NAMES[SkillType.EXP_GREEN]));
         panRollTable.add(new JLabel("0"));
         panRollTable.add(new JLabel("6-9"));
-        panRollTable.add(new JLabel("Regular"));
+        panRollTable.add(new JLabel(SkillType.SKILL_LEVEL_NAMES[SkillType.EXP_REGULAR]));
         panRollTable.add(new JLabel("0"));
         panRollTable.add(new JLabel("10-11"));
-        panRollTable.add(new JLabel("Veteran"));
+        panRollTable.add(new JLabel(SkillType.SKILL_LEVEL_NAMES[SkillType.EXP_VETERAN]));
         panRollTable.add(new JLabel("1"));
         panRollTable.add(new JLabel("12 or more"));
-        panRollTable.add(new JLabel("Elite"));
+        panRollTable.add(new JLabel(SkillType.SKILL_LEVEL_NAMES[SkillType.EXP_ELITE]));
         panRollTable.add(new JLabel("2"));
         panRollTable.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder("2d6 + Bonus"),
@@ -3684,11 +3684,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridwidth = 1;
         panAtB.add(lblSkillLevel, gridBagConstraints);
 
-        cbSkillLevel.addItem("Ultra-green");
-        cbSkillLevel.addItem("Green");
-        cbSkillLevel.addItem("Regular");
-        cbSkillLevel.addItem("Veteran");
-        cbSkillLevel.addItem("Elite");
+        // TODO : Switch me to use a modified RandomSkillsGenerator.levelNames
+        cbSkillLevel.addItem(SkillType.SKILL_LEVEL_NAMES[SkillType.EXP_ULTRA_GREEN]);
+        cbSkillLevel.addItem(SkillType.SKILL_LEVEL_NAMES[SkillType.EXP_GREEN]);
+        cbSkillLevel.addItem(SkillType.SKILL_LEVEL_NAMES[SkillType.EXP_REGULAR]);
+        cbSkillLevel.addItem(SkillType.SKILL_LEVEL_NAMES[SkillType.EXP_VETERAN]);
+        cbSkillLevel.addItem(SkillType.SKILL_LEVEL_NAMES[SkillType.EXP_ELITE]);
         cbSkillLevel.setSelectedIndex(options.getSkillLevel());
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -5163,7 +5164,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             Image camo = (Image) camos.getItem(camoCategory, camoFileName);
             btnCamo.setIcon(new ImageIcon(camo));
         } catch (Exception err) {
-            //err.printStackTrace();
         	JOptionPane.showMessageDialog(
         			this,
         			"Cannot find your camo file.\n"
@@ -5356,9 +5356,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     }
 
     public static class SpinnerEditor extends DefaultCellEditor {
-        /**
-		 *
-		 */
 		private static final long serialVersionUID = -2711422398394960413L;
 		JSpinner spinner;
         JSpinner.NumberEditor editor;
@@ -5374,9 +5371,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             textField.addFocusListener(new FocusListener() {
                 @Override
                 public void focusGained(FocusEvent fe) {
-                    System.err.println("Got focus");
-                    //textField.setSelectionStart(0);
-                    //textField.setSelectionEnd(1);
                     SwingUtilities.invokeLater(() -> {
                         if (valueSet) {
                             textField.setCaretPosition(1);
@@ -5393,9 +5387,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         // Prepares the spinner component and returns it.
         @Override
-        public Component getTableCellEditorComponent(
-                JTable table, Object value, boolean isSelected, int row, int column
-                                                    ) {
+        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected,
+                                                     int row, int column) {
             if (!valueSet) {
                 spinner.setValue(value);
             }
@@ -5405,14 +5398,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         @Override
         public boolean isCellEditable(EventObject eo) {
-            System.err.println("isCellEditable");
             if (eo instanceof KeyEvent) {
                 KeyEvent ke = (KeyEvent) eo;
-                System.err.println("key event: " + ke.getKeyChar());
                 textField.setText(String.valueOf(ke.getKeyChar()));
-                //textField.select(1,1);
-                //textField.setCaretPosition(1);
-                //textField.moveCaretPosition(1);
                 valueSet = true;
             } else {
                 valueSet = false;
@@ -5428,13 +5416,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         @Override
         public boolean stopCellEditing() {
-            System.err.println("Stopping edit");
             try {
                 editor.commitEdit();
                 spinner.commitEdit();
             } catch (java.text.ParseException e) {
-                JOptionPane.showMessageDialog(null,
-                                              "Invalid value, discarding.");
+                JOptionPane.showMessageDialog(null, "Invalid value, discarding.");
             }
             return super.stopCellEditing();
         }

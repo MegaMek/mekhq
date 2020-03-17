@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Objects;
 
 import megamek.common.Compute;
+import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
@@ -424,8 +425,7 @@ public class Loan implements MekHqXmlSerializable {
                 try {
                     retVal.nextPayment.setTime(df.parse(wn2.getTextContent().trim()));
                 } catch (DOMException | ParseException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    MekHQ.getLogger().error(Loan.class, "generateInstanceFromXML", e);
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("overdue")) {
                 retVal.overdue = wn2.getTextContent().equalsIgnoreCase("true");

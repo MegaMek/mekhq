@@ -4,6 +4,8 @@ package chat;
  * Code taken from http://introcs.cs.princeton.edu/java/84network/
  */
 
+import mekhq.MekHQ;
+
 import java.net.Socket;
 
 public class Connection extends Thread {
@@ -27,9 +29,12 @@ public class Connection extends Thread {
         }
         out.close();
         in.close();
-        try                 { socket.close();      }
-        catch (Exception e) { e.printStackTrace(); }
-        System.err.println("closing socket");
+        try {
+            socket.close();
+        } catch (Exception e) {
+            MekHQ.getLogger().error(getClass(), "run", e);
+        }
+        MekHQ.getLogger().error(getClass(), "run", "closing socket");
     }
 
 
@@ -48,8 +53,11 @@ public class Connection extends Thread {
 
     public synchronized void setMessage(String s) {
         if (message != null) {
-            try                  { wait();               }
-            catch (Exception ex) { ex.printStackTrace(); }
+            try {
+                wait();
+            } catch (Exception e) {
+                MekHQ.getLogger().error(getClass(), "setMessage", e);
+            }
         }
         message = s;
     }
