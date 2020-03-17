@@ -28,6 +28,7 @@ import java.util.function.IntSupplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import megamek.common.*;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
@@ -192,8 +193,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //endregion Procreation
 
     //region Marriage
-    // this is a flag used in determine whether or not a person is a marriage candidate (note that
-    // other checks are still used)
+    // this is a flag used in determine whether or not a person is a potential marriage candidate
+    // provided that they are not married, are old enough, etc.
     private boolean tryingToMarry;
     // Marriage Surnames
     public static final int SURNAME_NO_CHANGE = 0;
@@ -2241,6 +2242,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         }
                         retVal.formerSpouses.add(FormerSpouse.generateInstanceFromXML(wn3));
                     }
+                } else if (wn2.getNodeName().equalsIgnoreCase("tryingToMarry")) {
+                    retVal.tryingToMarry = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("tryingToConceive")) {
+                    retVal.tryingToConceive = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("dueDate")) {
                     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                     retVal.dueDate = (GregorianCalendar) GregorianCalendar.getInstance();
