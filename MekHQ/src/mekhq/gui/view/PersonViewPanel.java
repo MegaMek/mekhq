@@ -748,7 +748,8 @@ public class PersonViewPanel extends ScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlFamily.add(lblSpouse1, gridBagConstraints);
 
-            JLabel lblSpouse2 = new JLabel(String.format("<html><a href='#'>%s</a></html>", person.getSpouse().getFullName()));
+            JLabel lblSpouse2 = new JLabel(String.format("<html>%s</html>",
+                    person.getSpouse().getHyperlinkedName()));
             lblSpouse2.setName("lblSpouse2");
             lblSpouse2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             lblSpouse2.addMouseListener(new MouseAdapter() {
@@ -782,8 +783,8 @@ public class PersonViewPanel extends ScrollablePanel {
             for (FormerSpouse formerSpouse : person.getFormerSpouses()) {
                 Person ex = campaign.getPerson(formerSpouse.getFormerSpouseId());
                 gridBagConstraints.gridy = firsty;
-                JLabel lblFormerSpouses2 = new JLabel(String.format("<html><a href='#'>%s</a>, %s, %s</html>",
-                        ex.getFullName(), formerSpouse.getReasonString(),
+                JLabel lblFormerSpouses2 = new JLabel(String.format("<html>%s, %s, %s</html>",
+                        ex.getHyperlinkedName(), formerSpouse.getReasonString(),
                         formerSpouse.getDateAsString(FormerSpouse.getDisplayDateFormat())));
                 lblFormerSpouses2.setName("lblFormerSpouses2");
                 lblFormerSpouses2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -818,7 +819,8 @@ public class PersonViewPanel extends ScrollablePanel {
 
                 for (Person child : person.getChildren()) {
                     gridBagConstraints.gridy = firsty;
-                    JLabel lblChildren2 = new JLabel(String.format("<html><a href='#'>%s</a></html>", child.getFullName()));
+                    JLabel lblChildren2 = new JLabel(String.format("<html>%s</html>",
+                            child.getHyperlinkedName()));
                     lblChildren2.setName("lblChildren2");
                     lblChildren2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     lblChildren2.addMouseListener(new MouseAdapter() {
@@ -851,8 +853,8 @@ public class PersonViewPanel extends ScrollablePanel {
 
                 for (Person grandchild : person.getGrandchildren()) {
                     gridBagConstraints.gridy = firsty;
-                    JLabel lblGrandchildren2 = new JLabel(String.format("<html><a href='#'>%s</a></html>",
-                            grandchild.getFullName()));
+                    JLabel lblGrandchildren2 = new JLabel(String.format("<html>%s</html>",
+                            grandchild.getHyperlinkedName()));
                     lblGrandchildren2.setName("lblGrandchildren2"); // NOI18N //$NON-NLS-1$
                     lblGrandchildren2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     lblGrandchildren2.addMouseListener(new MouseAdapter() {
@@ -876,7 +878,8 @@ public class PersonViewPanel extends ScrollablePanel {
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 pnlFamily.add(lblFather1, gridBagConstraints);
 
-                JLabel lblFather2 = new JLabel(String.format("<html><a href='#'>%s</a></html>", person.getFather().getFullName()));
+                JLabel lblFather2 = new JLabel(String.format("<html>%s</html>",
+                        person.getFather().getHyperlinkedName()));
                 lblFather2.setName("lblFather2");
                 lblFather2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 lblFather2.addMouseListener(new MouseAdapter() {
@@ -906,7 +909,8 @@ public class PersonViewPanel extends ScrollablePanel {
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 pnlFamily.add(lblMother1, gridBagConstraints);
 
-                JLabel lblMother2 = new JLabel(String.format("<html><a href='#'>%s</a></html>", person.getMother().getFullName()));
+                JLabel lblMother2 = new JLabel(String.format("<html>%s</html>",
+                        person.getMother().getHyperlinkedName()));
                 lblMother2.setName("lblMother2");
                 lblMother2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 lblMother2.addMouseListener(new MouseAdapter() {
@@ -945,7 +949,8 @@ public class PersonViewPanel extends ScrollablePanel {
 
                 for (Person sibling : person.getSiblings()) {
                     gridBagConstraints.gridy = firsty;
-                    JLabel lblSiblings2 = new JLabel(String.format("<html><a href='#'>%s</a></html>", sibling.getFullName()));
+                    JLabel lblSiblings2 = new JLabel(String.format("<html>%s</html>",
+                            sibling.getHyperlinkedName()));
                     lblSiblings2.setName("lblSiblings2");
                     lblSiblings2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     lblSiblings2.addMouseListener(new MouseAdapter() {
@@ -978,7 +983,8 @@ public class PersonViewPanel extends ScrollablePanel {
 
                 for (Person grandparent : person.getGrandparents()) {
                     gridBagConstraints.gridy = firsty;
-                    JLabel lblGrandparents2 = new JLabel(String.format("<html><a href='#'>%s</a></html>", grandparent.getFullName()));
+                    JLabel lblGrandparents2 = new JLabel(String.format("<html>%s</html>",
+                            grandparent.getHyperlinkedName()));
                     lblGrandparents2.setName("lblGrandparents2");
                     lblGrandparents2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     lblGrandparents2.addMouseListener(new MouseAdapter() {
@@ -1011,8 +1017,8 @@ public class PersonViewPanel extends ScrollablePanel {
 
                 for (Person auntOrUncle : person.getsAuntsAndUncles()) {
                     gridBagConstraints.gridy = firsty;
-                    JLabel lblAuntsOrUncles2 = new JLabel(String.format("<html><a href='#'>%s</a></html>",
-                            auntOrUncle.getFullName()));
+                    JLabel lblAuntsOrUncles2 = new JLabel(String.format("<html>%s</html>",
+                            auntOrUncle.getHyperlinkedName()));
                     lblAuntsOrUncles2.setName("lblAuntsOrUncles2");
                     lblAuntsOrUncles2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     lblAuntsOrUncles2.addMouseListener(new MouseAdapter() {
@@ -1045,8 +1051,8 @@ public class PersonViewPanel extends ScrollablePanel {
 
                 for (Person cousin : person.getCousins()) {
                     gridBagConstraints.gridy = firsty;
-                    JLabel lblCousins2 = new JLabel(String.format("<html><a href='#'>%s</a></html>",
-                            cousin.getFullName()));
+                    JLabel lblCousins2 = new JLabel(String.format("<html>%s</html>",
+                            cousin.getHyperlinkedName()));
                     lblCousins2.setName("lblCousins2");
                     lblCousins2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     lblCousins2.addMouseListener(new MouseAdapter() {
