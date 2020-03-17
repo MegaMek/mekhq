@@ -1557,9 +1557,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 break;
         }
 
-        setTryingToMarry(false);
-        spouse.setTryingToMarry(false);
-
         setSpouseId(spouse.getId());
         spouse.setSpouseId(getId());
 
@@ -1647,10 +1644,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 FormerSpouse.convertDateTimeToLocalDate(getCampaign().getDateTime()), reason));
         addFormerSpouse(new FormerSpouse(spouse.getId(),
                 FormerSpouse.convertDateTimeToLocalDate(getCampaign().getDateTime()), reason));
-
-        // This can be set for both parties no matter the cause
-        setTryingToMarry(true);
-        spouse.setTryingToMarry(true);
 
         MekHQ.triggerEvent(new PersonChangedEvent(this));
         MekHQ.triggerEvent(new PersonChangedEvent(spouse));
