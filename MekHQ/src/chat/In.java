@@ -1,5 +1,7 @@
 package chat;
 
+import mekhq.MekHQ;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -55,9 +57,8 @@ public final class In {
             InputStream is = socket.getInputStream();
             scanner = new Scanner(new BufferedInputStream(is), charsetName);
             scanner.useLocale(usLocale);
-        }
-        catch (IOException ioe) {
-            System.err.println("Could not open " + socket);
+        } catch (IOException e) {
+            MekHQ.getLogger().error(getClass(), "In", "Could not open " + socket);
         }
     }
 
@@ -70,9 +71,8 @@ public final class In {
             InputStream is     = site.getInputStream();
             scanner            = new Scanner(new BufferedInputStream(is), charsetName);
             scanner.useLocale(usLocale);
-        }
-        catch (IOException ioe) {
-            System.err.println("Could not open " + url);
+        } catch (IOException e) {
+            MekHQ.getLogger().error(getClass(), "In", "Could not open " + url);
         }
     }
 
@@ -80,13 +80,11 @@ public final class In {
      * Create an input stream from a file.
      */
     public In(File file) {
-
         try {
             scanner = new Scanner(file, charsetName);
             scanner.useLocale(usLocale);
-        }
-        catch (IOException ioe) {
-            System.err.println("Could not open " + file);
+        } catch (IOException e) {
+            MekHQ.getLogger().error(getClass(), "In", "Could not open " + file);
         }
     }
 
@@ -115,9 +113,8 @@ public final class In {
             InputStream is     = site.getInputStream();
             scanner            = new Scanner(new BufferedInputStream(is), charsetName);
             scanner.useLocale(usLocale);
-        }
-        catch (IOException ioe) {
-            System.err.println("Could not open " + s);
+        } catch (IOException e) {
+            MekHQ.getLogger().error(getClass(), "In", "Could not open " + s);
         }
     }
 

@@ -43,26 +43,26 @@ import mekhq.preferences.PreferencesNode;
 /**
  * Hovanes Gambaryan Henry Demirchian CSUN, CS 585 Professor Mike Barnes
  * December 06, 2000
- * 
+ *
  * DateChooser class is a general GUI based date chooser. It allows the user to
  * select an instance of GregorianCalendar defined in java.util package.
- * 
+ *
  * Programming API is similar to JFC's JColorChooser or JFileChooser. This class
  * can be used in any application to enable the user to select a date from a
  * visually displayed calendar.
- * 
+ *
  * There is a lot of improvements that can be done over this class in areas of
  * functionality, usability, and appearance. But as is, the class can be easily
  * used from within any Java program.
- * 
+ *
  * Typical usage is like:
- * 
+ *
  * // initial date GregorianCalendar date = new GregorianCalendar()
- * 
+ *
  * // The owner is the JFrame of the application ("AppClass.this")
- * 
+ *
  * // show the date chooser DateChooser dc = new DateChooser(owner, date);
- * 
+ *
  * // user can eiter choose a date or cancel by closing if (dc.showDateChooser()
  * == DateChooser.OK_OPTION) { date = dc.getDate(); }
  */
@@ -72,8 +72,8 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
     public static final int OK_OPTION = 1;
     public static final int CANCEL_OPTION = 2;
 
-    private final DateFormat MMDDYYYY = new SimpleDateFormat("MM/dd/yyyy");
-    private final DateFormat ISO8601 = new SimpleDateFormat("yyyy-MM-dd");
+    private final DateFormat MMDDYYYY = new SimpleDateFormat("MM/dd/yyyy"); // TODO : remove inline date
+    private final DateFormat ISO8601 = new SimpleDateFormat("yyyy-MM-dd"); // TODO : remove inline date
 
     private static final ArrayList<String> monthNames;
     static {
@@ -101,10 +101,10 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
 
     // Stores the user-input date.
     private JFormattedTextField dateField = null;
-    
+
     /**
      * Constructor for DateChooser
-     * 
+     *
      * @param owner
      *            JFrame instance, owner of DateChooser dialog
      * @param d
@@ -115,7 +115,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         super(owner, "Date Chooser", true);
         date = d;
         workingDate = date;
-        
+
         // Ensure the dialog isn't hidden
         setAlwaysOnTop(true);
 
@@ -231,7 +231,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
 
     /**
      * Action handler for this dialog, which handles all the button presses.
-     * 
+     *
      * @param evt
      *            ActionEvent
      */
@@ -254,7 +254,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
             try {
                 y = Integer.parseInt(yearLabel.getText());
             } catch (NumberFormatException e) {
-                System.err.println(e.toString());
+                MekHQ.getLogger().error(getClass(), "actionPerformed", e);
             }
             yearLabel.setText(String.valueOf(--y));
             updateDayGrid(false);
@@ -263,7 +263,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
             try {
                 y = Integer.parseInt(yearLabel.getText());
             } catch (NumberFormatException e) {
-                System.err.println(e.toString());
+                MekHQ.getLogger().error(getClass(), "actionPerformed", e);
             }
             yearLabel.setText(String.valueOf(++y));
             updateDayGrid(false);
@@ -275,7 +275,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                 y = Integer.parseInt(yearLabel.getText());
                 d = Integer.parseInt(label);
             } catch (NumberFormatException e) {
-                System.err.println(e.toString());
+                MekHQ.getLogger().error(getClass(), "actionPerformed", e);
             }
             date = new GregorianCalendar(y, m, d);
             date.setLenient(false);
@@ -329,7 +329,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         try {
             y = Integer.parseInt(yearLabel.getText());
         } catch (NumberFormatException e) {
-            System.err.println(e.toString());
+            MekHQ.getLogger().error(getClass(), "updateDayGrid", e);
         }
 
         // look at the first day of the month for this month
@@ -411,7 +411,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
     /**
      * Return the month following the one passed in as an argument. If the
      * argument is the las month of the year, return the first month.
-     * 
+     *
      * @param month
      *            Current month expressed as an integer (0 to 11).
      */
@@ -425,7 +425,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
     /**
      * Return the month preceding the one passed in as an argument. If the
      * argument is the first month of the year, return the last month.
-     * 
+     *
      * @param month
      *            Current month expressed as an integer (0 to 11).
      */
@@ -445,7 +445,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         try {
             y = Integer.parseInt(yearLabel.getText());
         } catch (NumberFormatException e) {
-            System.err.println(e.toString());
+            MekHQ.getLogger().error(getClass(), "getLastDay", e);
         }
 
         if ((m == 4) || (m == 6) || (m == 9) || (m == 11)) {

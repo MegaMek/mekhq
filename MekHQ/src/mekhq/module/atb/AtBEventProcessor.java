@@ -51,23 +51,23 @@ import mekhq.campaign.universe.UnitGeneratorParameters;
 
 /**
  * Main engine of the Against the Bot campaign system.
- * 
+ *
  * @author Neoancient
  *
  */
 public class AtBEventProcessor {
-    
+
     private final Campaign campaign;
-    
+
     public AtBEventProcessor(Campaign campaign) {
         this.campaign = campaign;
         MekHQ.registerHandler(this);
     }
-    
+
     public void shutdown() {
         MekHQ.unregisterHandler(this);
     }
-    
+
     @Subscribe
     public void handleNewDay(NewDayEvent ev) {
         // TODO: move code from Campaign here
@@ -144,11 +144,11 @@ public class AtBEventProcessor {
             addRecruitUnit(p);
         }
     }
-    
+
     private void addRecruitUnit(Person p) {
         final String METHOD_NAME = "addRecruitUnit(Person)"; //$NON-NLS-1$
         UnitGeneratorParameters params = new UnitGeneratorParameters();
-        
+
         int unitType;
         switch (p.getPrimaryRole()) {
             case Person.T_MECHWARRIOR:
@@ -166,13 +166,13 @@ public class AtBEventProcessor {
                 break;
             case Person.T_INFANTRY:
                 unitType = UnitType.INFANTRY;
-                
+
                 // infantry will have a 1/3 chance of being field guns
                 if(Compute.d6() <= 2) {
                     params.getMissionRoles().add(MissionRole.FIELD_GUN);
                     params.getMovementModes().addAll(IUnitGenerator.ALL_INFANTRY_MODES);
                 }
-                
+
                 break;
             case Person.T_BA:
                 unitType = UnitType.BATTLE_ARMOR;
@@ -203,19 +203,19 @@ public class AtBEventProcessor {
         Entity en;
 
         String faction = getRecruitFaction(campaign);
-        
+
         params.setFaction(faction);
         params.setUnitType(unitType);
         params.setWeightClass(weight);
         params.setYear(campaign.getCalendar().get(Calendar.YEAR));
         params.setQuality(IUnitRating.DRAGOON_F);
-        
+
         MechSummary ms = campaign.getUnitGenerator().generate(params);
         if (null != ms) {
             if (Faction.getFaction(faction).isClan() && ms.getName().matches(".*Platoon.*")) {
                 String name = "Clan " + ms.getName().replaceAll("Platoon", "Point");
                 ms = MechSummaryCache.getInstance().getMech(name);
-                System.out.println("looking for Clan infantry " + name);
+                MekHQ.getLogger().info(getClass(), METHOD_NAME, "looking for Clan infantry " + name);
             }
             try {
                 en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
@@ -288,7 +288,7 @@ public class AtBEventProcessor {
             p.removeSkill(skill2);
         }
     }
-    
+
     public static String getRecruitFaction(Campaign c) {
         if (c.getFactionCode().equals("MERC")) {
             if (c.getCalendar().get(Calendar.YEAR) > 3055 && Compute.randomInt(20) == 0) {

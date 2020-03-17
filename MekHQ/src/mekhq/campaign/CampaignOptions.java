@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign;
 
 import java.io.PrintWriter;
@@ -501,7 +500,7 @@ public class CampaignOptions implements Serializable {
         minimumMarriageAge = 16;
         checkMutualAncestorsDepth = 4;
         useRandomMarriages = false;
-        chanceRandomMarriages = 0.025;
+        chanceRandomMarriages = 0.00025;
         marriageAgeRange = 10;
         randomMarriageSurnameWeights = new int[Person.NUM_SURNAME];
         randomMarriageSurnameWeights[Person.SURNAME_NO_CHANGE] = 100;
@@ -514,11 +513,11 @@ public class CampaignOptions implements Serializable {
         randomMarriageSurnameWeights[Person.SURNAME_MALE] = 500;
         randomMarriageSurnameWeights[Person.SURNAME_FEMALE] = 160;
         useRandomSameSexMarriages = false;
-        chanceRandomSameSexMarriages = 0.002;
+        chanceRandomSameSexMarriages = 0.00002;
         useUnofficialProcreation = false;
-        chanceProcreation = 0.05;
+        chanceProcreation = 0.0005;
         useUnofficialProcreationNoRelationship = false;
-        chanceProcreationNoRelationship = 0.005;
+        chanceProcreationNoRelationship = 0.00005;
         displayTrueDueDate = false;
         logConception = false;
         babySurnameStyle = BABY_SURNAME_MINE;
@@ -908,158 +907,293 @@ public class CampaignOptions implements Serializable {
     }
 
     //region family
+    /**
+     * @return the minimum age a person can get married at
+     */
     public int getMinimumMarriageAge() {
         return minimumMarriageAge;
     }
 
+    /**
+     * @param b the minimum age a person can get married at
+     */
     public void setMinimumMarriageAge(int b) {
         minimumMarriageAge = b;
     }
 
+    /**
+     * This gets the number of recursions to use when checking mutual ancestors between two personnel
+     * @return the number of recursions to use
+     */
     public int checkMutualAncestorsDepth() {
         return checkMutualAncestorsDepth;
     }
 
+    /**
+     * This sets the number of recursions to use when checking mutual ancestors between two personnel
+     * @param b the number of recursions
+     */
     public void setCheckMutualAncestorsDepth(int b) {
         checkMutualAncestorsDepth = b;
     }
 
+    /**
+     * @return whether or not to use random marriages
+     */
     public boolean useRandomMarriages() {
         return useRandomMarriages;
     }
 
+    /**
+     * @param b whether or not to use random marriages
+     */
     public void setUseRandomMarriages(boolean b) {
         useRandomMarriages = b;
     }
 
+    /**
+     * This gets the decimal chance (between 0 and 1) of a random marriage occurring
+     * @return the chance, with a value between 0 and 1
+     */
     public double getChanceRandomMarriages() {
         return chanceRandomMarriages;
     }
 
+    /**
+     * This sets the decimal chance (between 0 and 1) of a random marriage occurring
+     * @param b the chance, with a value between 0 and 1
+     */
     public void setChanceRandomMarriages(double b) {
         chanceRandomMarriages = b;
     }
 
+    /**
+     * A random marriage can only happen between two people whose ages differ (+/-) by the returned value
+     * @return the age range ages can differ (+/-)
+     */
     public int getMarriageAgeRange() {
         return marriageAgeRange;
     }
 
+    /**
+     * A random marriage can only happen between two people whose ages differ (+/-) by this value
+     * @param b the maximum age range
+     */
     public void setMarriageAgeRange(int b) {
         marriageAgeRange = b;
     }
 
+    /**
+     * @return the array of weights of potential surname changes for weighted marriage surname generation
+     */
     public int[] getRandomMarriageSurnameWeights() {
         return randomMarriageSurnameWeights;
     }
 
+    /**
+     * This gets one of the values in the array of weights of potential surname changes for weighted marriage surname generation
+     * @param pos the position in the array to set
+     * @return the weight at index pos
+     */
     public int getRandomMarriageSurnameWeights(int pos) {
         return randomMarriageSurnameWeights[pos];
     }
 
+    /**
+     * This sets one of the values in the array of weights of potential surname changes for weighted marriage surname generation
+     * @param pos the position in the array to set
+     * @param b the weight to use
+     */
     public void setRandomMarriageSurnameWeight(int pos, int b) {
         randomMarriageSurnameWeights[pos] = b;
     }
 
+    /**
+     * @return whether or not to use random same sex marriages
+     */
     public boolean useRandomSameSexMarriages() {
         return useRandomSameSexMarriages;
     }
 
+    /**
+     * @param b whether or not to use random same sex marriages
+     */
     public void setUseRandomSameSexMarriages(boolean b) {
         useRandomSameSexMarriages = b;
     }
 
+    /**
+     * This gets the decimal chance (between 0 and 1) of a random same sex marriage occurring
+     * @return the chance, with a value between 0 and 1
+     */
     public double getChanceRandomSameSexMarriages() {
         return chanceRandomSameSexMarriages;
     }
 
+    /**
+     * This sets the decimal chance (between 0 and 1) of a random same sex marriage occurring
+     * @param b the chance, with a value between 0 and 1
+     */
     public void setChanceRandomSameSexMarriages(double b) {
         chanceRandomSameSexMarriages = b;
     }
 
+    /**
+     * @return whether or not to use unofficial procreation
+     */
     public boolean useUnofficialProcreation() {
         return useUnofficialProcreation;
     }
 
+    /**
+     * @param b  whether or not to use unofficial procreation
+     */
     public void setUseUnofficialProcreation(boolean b) {
         useUnofficialProcreation = b;
     }
 
+    /**
+     * This gets the decimal chance (between 0 and 1) of random procreation occurring
+     * @return the chance, with a value between 0 and 1
+     */
     public double getChanceProcreation() {
         return chanceProcreation;
     }
 
+    /**
+     * This sets the decimal chance (between 0 and 1) of random procreation occurring
+     * @param b the chance, with a value between 0 and 1
+     */
     public void setChanceProcreation(double b) {
         chanceProcreation = b;
     }
 
+    /**
+     * @return whether or not to use unofficial procreation without a relationship
+     */
     public boolean useUnofficialProcreationNoRelationship() {
         return useUnofficialProcreationNoRelationship;
     }
 
+    /**
+     * @param b whether or not to use unofficial procreation without a relationship
+     */
     public void setUseUnofficialProcreationNoRelationship(boolean b) {
         useUnofficialProcreationNoRelationship = b;
     }
 
+    /**
+     * This gets the decimal chance (between 0 and 1) of random procreation occurring without a relationship
+     * @return the chance, with a value between 0 and 1
+     */
     public double getChanceProcreationNoRelationship() {
         return chanceProcreationNoRelationship;
     }
 
+    /**
+     * This sets the decimal chance (between 0 and 1) of random procreation occurring without a relationship
+     * @param b the chance, with a value between 0 and 1
+     */
     public void setChanceProcreationNoRelationship(double b) {
         chanceProcreationNoRelationship = b;
     }
 
+    /**
+     * @return whether to show the expected or actual due date for personnel
+     */
     public boolean getDisplayTrueDueDate() {
         return displayTrueDueDate;
     }
 
+    /**
+     * @param b whether to show the expected or actual due date for personnel
+     */
     public void setDisplayTrueDueDate(boolean b) {
         displayTrueDueDate = b;
     }
 
+    /**
+     * @return whether to log conception
+     */
     public boolean logConception() {
         return logConception;
     }
 
+    /**
+     * @param b whether to log conception
+     */
     public void setLogConception(boolean b) {
         logConception = b;
     }
 
+    /**
+     * @return what style of surname to use for a baby
+     */
     public int getBabySurnameStyle() {
         return babySurnameStyle;
     }
 
+    /**
+     * @param b the style of surname to use for a baby
+     */
     public void setBabySurnameStyle(int b) {
         babySurnameStyle = b;
     }
 
+    /**
+     * @return whether or not to display parentage for personnel
+     */
     public boolean useParentage() {
         return useParentage;
     }
 
+    /**
+     * @param b whether or not to display parentage for personnel
+     */
     public void setUseParentage(boolean b) {
         useParentage = b;
     }
 
+    /**
+     * @return the level of familial relation to display
+     */
     public int displayFamilyLevel() {
         return displayFamilyLevel;
     }
 
+    /**
+     * @param b the level of familial relation to display
+     */
     public void setDisplayFamilyLevel(int b) {
         displayFamilyLevel = b;
     }
 
+    /**
+     * TODO : Finish implementing me
+     * @return whether or not to use random deaths
+     */
     public boolean useRandomDeaths() {
         return useRandomDeaths;
     }
 
+    /**
+     * TODO : Finish implementing me
+     * @param b whether or not to use random deaths
+     */
     public void setUseRandomDeaths(boolean b) {
-        useRandomMarriages = b;
+        useRandomDeaths = b;
     }
 
+    /**
+     * @return whether to keep ones married name upon spouse death or not
+     */
     public boolean getKeepMarriedNameUponSpouseDeath() {
         return keepMarriedNameUponSpouseDeath;
     }
 
+    /**
+     * @param b whether to keep ones married name upon spouse death or not
+     */
     public void setKeepMarriedNameUponSpouseDeath(boolean b) {
         keepMarriedNameUponSpouseDeath = b;
     }
@@ -1120,10 +1254,16 @@ public class CampaignOptions implements Serializable {
     //endregion salary
     //endregion Personnel Tab
 
+    /**
+     * @return the method of unit rating to use
+     */
     public UnitRatingMethod getUnitRatingMethod() {
         return unitRatingMethod;
     }
 
+    /**
+     * @param method the method of unit rating to use
+     */
     public void setUnitRatingMethod(UnitRatingMethod method) {
         this.unitRatingMethod = method;
     }

@@ -777,13 +777,12 @@ public class ImageChoiceDialog extends JDialog {
                     }
                 }
                 lblImage.setIcon(new ImageIcon(image));
-            } catch (Exception err) {
-                err.printStackTrace();
+            } catch (Exception e) {
+                MekHQ.getLogger().error(getClass(), "setImage", e);
             }
         }
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private JLabel lblImage;
         // End of variables declaration//GEN-END:variables
-
     }
 }
