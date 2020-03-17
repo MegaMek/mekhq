@@ -28,7 +28,6 @@ import java.util.function.IntSupplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import megamek.common.*;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
