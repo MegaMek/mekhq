@@ -50,6 +50,7 @@ import megamek.common.verifier.TestEntity;
 import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.Weapon;
 import megamek.common.weapons.bayweapons.BayWeapon;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.AeroHeatSink;
@@ -172,7 +173,7 @@ public class PartsStore implements Serializable {
             try {
                 newEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
             } catch (EntityLoadingException e) {
-                e.printStackTrace();
+                MekHQ.getLogger().error(getClass(), "stockBattleArmorSuits", e);
             }
             if(null != newEntity) {
                 BattleArmorSuit ba = new BattleArmorSuit(summary.getChassis(), summary.getModel(), (int)summary.getTons(), 1, summary.getWeightClass(), summary.getWalkMp(), summary.getJumpMp(), newEntity.entityIsQuad(), summary.isClan(), newEntity.getMovementMode(), c);

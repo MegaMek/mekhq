@@ -48,19 +48,16 @@ import java.util.ResourceBundle;
  * - cancelButton.text -> text for the cancel button
  */
 public abstract class BaseDialog extends JDialog implements WindowListener {
-    private final MMLogger logger;
     private ResourceBundle resources;
     private DialogResult result;
 
-    protected BaseDialog(JFrame parent, MMLogger logger) {
-        this(parent, logger, false);
+    protected BaseDialog(JFrame parent) {
+        this(parent, false);
     }
 
-    protected BaseDialog(JFrame parent, MMLogger logger, boolean isModal) {
+    protected BaseDialog(JFrame parent, boolean isModal) {
         super(parent);
-        assert logger != null;
 
-        this.logger = logger;
         this.addWindowListener(this);
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.setModal(isModal);
@@ -162,9 +159,8 @@ public abstract class BaseDialog extends JDialog implements WindowListener {
     private void cancelButtonActionPerformed(ActionEvent evt) {
         try {
             this.cancelAction();
-        }
-        catch (Exception ex) {
-            this.logger.error(this.getClass(), "cancelButtonActionPerformed", ex);
+        } catch (Exception e) {
+            MekHQ.getLogger().error(getClass(), "cancelButtonActionPerformed", e);
         }
         finally {
             this.result = DialogResult.CANCEL;
@@ -179,9 +175,8 @@ public abstract class BaseDialog extends JDialog implements WindowListener {
     public void windowClosing(WindowEvent e) {
         try {
             this.cancelAction();
-        }
-        catch (Exception ex) {
-            this.logger.error(this.getClass(), "windowClosing", ex);
+        } catch (Exception ex) {
+            MekHQ.getLogger().error(getClass(), "windowClosing", ex);
         }
         finally {
             this.result = DialogResult.CANCEL;

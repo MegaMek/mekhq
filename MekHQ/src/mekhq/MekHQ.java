@@ -89,9 +89,9 @@ import mekhq.service.IAutosaveService;
  * The main class of the application.
  */
 public class MekHQ implements GameListener {
-	//TODO: This is intended as a debug/production type thing.
-	// So it should be backed down to 1 for releases...
-	// It's intended for 1 to be critical, 3 to be typical, and 5 to be debug/informational.
+	// TODO : This is intended as a debug/production type thing.
+	// TODO : So it should be backed down to 1 for releases...
+	// TODO : It's intended for 1 to be critical, 3 to be typical, and 5 to be debug/informational.
 	public static int VERBOSITY_LEVEL = 5;
 	public static String CAMPAIGN_DIRECTORY = "./campaigns/";
 	public static String PREFERENCES_FILE = "mmconf/mekhq.preferences";
@@ -279,7 +279,7 @@ public class MekHQ implements GameListener {
 	}
 
 	private MekHQ() {
-	    this.autosaveService = new AutosaveService(getLogger());
+	    this.autosaveService = new AutosaveService();
     }
 
     /**
@@ -365,11 +365,13 @@ public class MekHQ implements GameListener {
     	System.setProperty("apple.laf.useScreenMenuBar", "true");
         System.setProperty("com.apple.mrj.application.apple.menu.about.name","MekHQ");
 
-        SwingUtilities.invokeLater(() -> {
-            //redirect output to log file
-            redirectOutput();
-            MekHQ.getInstance().startup();
-        });
+        // TODO : logFileName should probably not be inline
+        String logFileName = "logs" + File.separator + "mekhqlog.txt";
+        getLogger().resetLogFile(logFileName);
+        // redirect output to log file
+        redirectOutput(logFileName); // Deprecated call required for MegaMek usage
+
+        SwingUtilities.invokeLater(() -> MekHQ.getInstance().startup());
     }
 
     private void showInfo() {
@@ -406,7 +408,6 @@ public class MekHQ implements GameListener {
     /**
      * This function redirects the standard error and output streams to the
      * given File name.
-     *
      */
     private static void redirectOutput() {
         System.out.println("Redirecting output to mekhqlog.txt"); //$NON-NLS-1$
@@ -414,17 +415,19 @@ public class MekHQ implements GameListener {
         if (!logDir.exists()) {
             logDir.mkdir();
         }
+
         final String logFileName = "logs" + File.separator + "mekhqlog.txt";
         getLogger().resetLogFile(logFileName);
         try {
-            OutputStream os = new FileOutputStream(logFileName, true);
+            // Note: these are not closed on purpose
+            OutputStream os = new FileOutputStream(logFilename, true);
             BufferedOutputStream bos = new BufferedOutputStream(os, 64);
-			PrintStream ps = new PrintStream(bos);
+            PrintStream ps = new PrintStream(bos);
             System.setOut(ps);
             System.setErr(ps);
         } catch (Exception e) {
-            System.err.println("Unable to redirect output to mekhqlog.txt"); //$NON-NLS-1$
-            e.printStackTrace();
+            MekHQ.getLogger().error(MekHQ.class, "redirectOutput",
+                    "Unable to redirect output to mekhqlog.txt", e);
         }
     }
 

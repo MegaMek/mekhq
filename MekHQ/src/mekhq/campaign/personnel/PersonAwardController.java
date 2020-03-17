@@ -145,14 +145,13 @@ public class PersonAwardController {
      * @param stringDate is the date it was awarded
      */
     public void removeAward(String setName, String awardName, String stringDate){
-
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd"); // TODO : remove inline date format
 
         Date date = null;
         try {
             date = df.parse(stringDate);
         } catch (ParseException e) {
-            e.printStackTrace();
+            MekHQ.getLogger().error(getClass(), "removeAward", e);
         }
 
         for(Award award : awards){

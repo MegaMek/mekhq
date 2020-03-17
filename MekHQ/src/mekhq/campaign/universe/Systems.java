@@ -59,7 +59,7 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 
-/** 
+/**
  * This will eventually replace the Planets object as our source of system/planetary information
  * using the new XML format that places planets within systems
  * @author Taharqa
@@ -68,9 +68,9 @@ import mekhq.Utilities;
 public class Systems {
     private final static Object LOADING_LOCK = new Object[0];
     private static Systems systems;
-    
+
     //private static ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Planets", new EncodeControl()); //$NON-NLS-1$
-    
+
  // Marshaller / unmarshaller instances
     private static Marshaller marshaller;
     private static Unmarshaller unmarshaller;
@@ -87,7 +87,7 @@ public class Systems {
             MekHQ.getLogger().error(Systems.class, "<init>", e); //$NON-NLS-1$
         }
     }
-    
+
     private static Marshaller planetMarshaller;
     private static Unmarshaller planetUnmarshaller;
     static {
@@ -98,11 +98,11 @@ public class Systems {
     		planetMarshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
     		planetMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 	        planetUnmarshaller = jContext.createUnmarshaller();
-	    }catch(Exception e){
-	        e.printStackTrace();
-	    }
+	    } catch(Exception e) {
+    	    MekHQ.getLogger().error(Systems.class, "Systems", e);
+    	}
     }
-    
+
     public static Systems getInstance() {
         if(systems == null) {
             systems = new Systems();
@@ -120,29 +120,29 @@ public class Systems {
         }
         return systems;
     }
-    
+
     private ConcurrentMap<String, PlanetarySystem> systemList = new ConcurrentHashMap<>();
     /* organizes systems into a grid of 30lyx30ly squares so we can find
      * nearby systems without iterating through the entire planet list. */
     private HashMap<Integer, Map<Integer, Set<PlanetarySystem>>> systemGrid = new HashMap<>();
-    
+
     // HPG Network cache (to not recalculate all the damn time)
     private Collection<Systems.HPGLink> hpgNetworkCache = null;
     private DateTime hpgNetworkCacheDate = null;
-    
+
     private Thread loader;
     private boolean initialized = false;
     private boolean initializing = false;
-    
+
     private Systems() {}
-    
+
     private Set<PlanetarySystem> getSystemGrid(int x, int y) {
         if( !systemGrid.containsKey(x) ) {
             return null;
         }
         return systemGrid.get(x).get(y);
     }
-    
+
     /** Return the planet by given name at a given time point */
     public PlanetarySystem getSystemByName(String name, DateTime when) {
         if(null == name) {
@@ -159,7 +159,7 @@ public class Systems {
         }
         return null;
     }
-    
+
     public List<PlanetarySystem> getNearbySystems(final double centerX, final double centerY, int distance) {
     	 List<PlanetarySystem> neighbors = new ArrayList<>();
 
@@ -173,30 +173,30 @@ public class Systems {
          });
          return neighbors;
     }
-    
+
     public List<PlanetarySystem> getNearbySystems(final PlanetarySystem system, int distance) {
         return getNearbySystems(system.getX(), system.getY(), distance);
     }
-    
+
     public ConcurrentMap<String, PlanetarySystem> getSystems() {
         return systemList;
     }
-    
+
     public PlanetarySystem getSystemById(String id) {
         return( null != id ? systemList.get(id) : null);
     }
-    
+
     /**
-     * Get a list of planetary systems within a certain jump radius (30ly per jump) that 
+     * Get a list of planetary systems within a certain jump radius (30ly per jump) that
      * you can shop on, sorted by number of jumps and in system transit time
      * @param system - current <code>PlanetarySystem</code>
      * @param jumps - number of jumps out to look as an integer
      * @return a list of planets where you can go shopping
      */
     public List<PlanetarySystem> getShoppingSystems(final PlanetarySystem system, int jumps, DateTime when) {
-        
+
         List<PlanetarySystem> shoppingSystems = getNearbySystems(system, jumps*30);
-        
+
         //remove dead planets
         Iterator<PlanetarySystem> iter = shoppingSystems.iterator();
         while (iter.hasNext()) {
@@ -205,11 +205,11 @@ public class Systems {
         		iter.remove();
         	}
         }
-        
+
         Collections.sort(shoppingSystems, new Comparator<PlanetarySystem>() {
             @Override
             public int compare(final PlanetarySystem p1, final PlanetarySystem p2) {
-                
+
                 //sort first on number of jumps required
                 int jump1 = (int)Math.ceil(p1.getDistanceTo(system)/30.0);
                 int jump2 = (int)Math.ceil(p2.getDistanceTo(system)/30.0);
@@ -217,14 +217,14 @@ public class Systems {
 
                 if (sComp != 0) {
                    return sComp;
-                } 
-                
+                }
+
                 //if number of jumps the same then sort on in system transit time
                 return Double.compare(p1.getTimeToJumpPoint(1.0), p2.getTimeToJumpPoint(1.0));
-                
+
             }
         });
-        
+
         return shoppingSystems;
     }
 
@@ -247,17 +247,17 @@ public class Systems {
         }
         return news;
     }
-    
+
     /** Clean up the local HPG network cache */
     public void recalcHPGNetwork() {
         hpgNetworkCacheDate = null;
     }
-    
+
     public Collection<Systems.HPGLink> getHPGNetwork(DateTime when) {
         if((null != when) && when.equals(hpgNetworkCacheDate)) {
             return hpgNetworkCache;
         }
-        
+
         Set<HPGLink> result = new HashSet<>();
         for(PlanetarySystem system : systemList.values()) {
             Integer hpg = system.getHPG(when);
@@ -278,9 +278,9 @@ public class Systems {
         hpgNetworkCacheDate = when;
         return result;
     }
-    
+
 // Data loading methods
-    
+
     private void initialize() {
         try {
             generateSystems();
@@ -288,7 +288,7 @@ public class Systems {
             MekHQ.getLogger().error(getClass(), "initialize()", e); //$NON-NLS-1$
         }
     }
-    
+
     private void done() {
         initialized = true;
         initializing = false;
@@ -322,7 +322,7 @@ public class Systems {
                     system = oldSystem;
                 }
             }
-            
+
             // Process system deletions
             for( String systemId : systems.toDelete ) {
                 if( null != systemId ) {
@@ -335,14 +335,14 @@ public class Systems {
             MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
         }
     }
-    
+
     private void generateSystems() throws DOMException, ParseException {
         generateSystems("data/universe/planetary_systems", "data/universe/systems.xml");
     }
-     
+
     private void generateSystems(String planetsPath, String defaultFilePath) throws DOMException, ParseException {
         final String METHOD_NAME = "generateSystems()"; //NON-NLS-1$
-        
+
         MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
                 "Starting load of system data from XML..."); //$NON-NLS-1$
         long currentTime = System.currentTimeMillis();
@@ -367,17 +367,17 @@ public class Systems {
                 }
             }
             systemGrid.clear();
-            
+
             // Step 2: Read the default file
             try(FileInputStream fis = new FileInputStream(defaultFilePath)) { //$NON-NLS-1$
                 updateSystems(fis);
             } catch (Exception ex) {
                 MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
             }
-            
+
             // Step 3: Load all the xml files within the planets subdirectory, if it exists
             Utilities.parseXMLFiles(planetsPath, this::updateSystems);
-            
+
             List<PlanetarySystem> toRemove = new ArrayList<>();
             for (PlanetarySystem system : systemList.values()) {
                 if((null == system.getX()) || (null == system.getY())) {
@@ -429,15 +429,15 @@ public class Systems {
             }
         }
     }
-    
+
     @XmlRootElement(name="systems")
     private static final class LocalSystemList {
         @XmlElement(name="system")
         public List<PlanetarySystem> list;
-        
+
         @XmlTransient
         public List<String> toDelete;
-        
+
         @SuppressWarnings("unused")
         private void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
             toDelete = new ArrayList<String>();
@@ -457,25 +457,25 @@ public class Systems {
             }
         }
     }
-    
+
     /** A data class representing a HPG link between two planets */
     public static final class HPGLink {
         /** In case of HPG-A to HPG-B networks, <code>primary</code> holds the HPG-A node. Else the order doesn't matter. */
         public final PlanetarySystem primary;
         public final PlanetarySystem secondary;
         public final int rating;
-        
+
         public HPGLink(PlanetarySystem primary, PlanetarySystem secondary, int rating) {
             this.primary = primary;
             this.secondary = secondary;
             this.rating = rating;
         }
-        
+
         @Override
         public int hashCode() {
             return Objects.hash(primary, secondary, rating);
         }
-        
+
         @Override
         public boolean equals(Object obj) {
             if(this == obj) {
@@ -507,11 +507,11 @@ public class Systems {
             }
         }
     }
-    
+
     public void visitNearbySystems(final PlanetarySystem system, final int distance, Consumer<PlanetarySystem> visitor) {
         visitNearbySystems(system.getX(), system.getY(), distance, visitor);
     }
-    
+
     /**
      * Write out a planetary event to XML
      * @param out - the <code>Writer</code>
@@ -524,7 +524,7 @@ public class Systems {
             MekHQ.getLogger().error(getClass(), "writePlanet(Writer,Planet.PlanetaryEvent)", e); //$NON-NLS-1$
         }
     }
-    
+
     /**
      * Write out planetary system-wide event to XML
      * @param out - the <code>Writer</code>
@@ -537,7 +537,7 @@ public class Systems {
             MekHQ.getLogger().error(getClass(), "writePlanet(Writer,Planet.PlanetaryEvent)", e); //$NON-NLS-1$
         }
     }
-    
+
     /**
      * This is a legacy function to read custom planetary events from before the switch
      * to PlanetarySystems
@@ -552,7 +552,7 @@ public class Systems {
         }
         return null;
     }
-    
+
     /**
      * This function will read in system wide events from XML and apply them. It is designed
      * for allowind custom events
@@ -567,7 +567,7 @@ public class Systems {
         }
         return null;
     }
-    
+
     public static void reload(boolean waitForFinish) {
         systems = null;
         getInstance();
@@ -581,12 +581,12 @@ public class Systems {
             }
         }
     }
-    
+
     /** @return <code>true</code> if the planet was known and got updated, <code>false</code> otherwise */
     /*public boolean updatePlanetaryEvents(String id, Collection<Planet.PlanetaryEvent> events) {
         return updatePlanetaryEvents(id, events, false);
     }*/
-    
+
     /**
      * This is a legacy function for updating planetary events before PlanetarySystem. it will
      * assume that the planet's events to be updated is the primary planet
@@ -607,7 +607,7 @@ public class Systems {
         }
         return(updatePlanetaryEvents(id, events, replace, pos));
     }
-    
+
     /** @return <code>true</code> if the planet was known and got updated, <code>false</code> otherwise */
     public boolean updatePlanetaryEvents(String id, Collection<Planet.PlanetaryEvent> events, boolean replace, int position) {
         PlanetarySystem system = getSystemById(id);
@@ -631,13 +631,13 @@ public class Systems {
         }
         return true;
     }
-    
+
     /**
      * updates system wide events from a collection of events
      * @param id - system id
      * @param events - collection of PlanetarySystemEvents
      * @param replace - should we replace existing events
-     * @return <code>true</code> if the system was known and got updated, <code>false</code> otherwise 
+     * @return <code>true</code> if the system was known and got updated, <code>false</code> otherwise
      */
     public boolean updatePlanetarySystemEvents(String id, Collection<PlanetarySystem.PlanetarySystemEvent> events, boolean replace) {
         PlanetarySystem system = getSystemById(id);
@@ -661,5 +661,5 @@ public class Systems {
         }
         return true;
     }
-     
+
 }
