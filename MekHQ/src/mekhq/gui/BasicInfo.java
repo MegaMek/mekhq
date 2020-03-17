@@ -17,6 +17,7 @@ import javax.swing.border.LineBorder;
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Crew;
 import mekhq.IconPackage;
+import mekhq.MekHQ;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -137,8 +138,8 @@ public class BasicInfo extends JPanel {
         Image camo = null;
         try {
             camo = (Image) icons.getCamos().getItem(unit.getCamoCategory(), unit.getCamoFileName());
-        } catch (Exception err) {
-            err.printStackTrace();
+        } catch (Exception e) {
+            MekHQ.getLogger().error(getClass(), "getCamo", e);
         }
         return camo;
     }
@@ -178,8 +179,8 @@ public class BasicInfo extends JPanel {
                 portrait = portrait.getScaledInstance(-1, 58, Image.SCALE_SMOOTH);
                 setImage(portrait);
             }
-        } catch (Exception err) {
-            err.printStackTrace();
+        } catch (Exception e) {
+            MekHQ.getLogger().error(getClass(), "setPortrait", e);
         }
     }
 
@@ -211,8 +212,8 @@ public class BasicInfo extends JPanel {
                 }
             }
             return portrait;
-        } catch (Exception err) {
-            err.printStackTrace();
+        } catch (Exception e) {
+            MekHQ.getLogger().error(getClass(), "getImageFor", e);
             return null;
         }
     }

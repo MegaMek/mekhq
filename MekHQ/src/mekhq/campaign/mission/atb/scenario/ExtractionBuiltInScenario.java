@@ -27,6 +27,7 @@ import megamek.client.bot.princess.PrincessException;
 import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Entity;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
@@ -128,7 +129,7 @@ public class ExtractionBuiltInScenario extends AtBScenario {
                 addBotForce(bf);
             }
         } catch (PrincessException e) {
-            e.printStackTrace();
+            MekHQ.getLogger().error(getClass(), "setExtraMissionForces", e);
         }
     }
 
@@ -145,15 +146,15 @@ public class ExtractionBuiltInScenario extends AtBScenario {
         if (isAttacker()) {
             civilianObjective = CommonObjectiveFactory.getPreserveSpecificFriendlies(CIVILIAN_FORCE_ID, 50, false);
             keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 66, false);
-            
+
             civilianObjective.setTimeLimit(12);
             civilianObjective.setTimeLimitAtMost(false);
             civilianObjective.setTimeLimitType(TimeLimitType.Fixed);
-            
+
             keepFriendliesAlive.setTimeLimit(12);
             keepFriendliesAlive.setTimeLimitAtMost(false);
             keepFriendliesAlive.setTimeLimitType(TimeLimitType.Fixed);
-            
+
             // not losing the scenario also gets you a "bonus"
             ObjectiveEffect bonusEffect = new ObjectiveEffect();
             bonusEffect.effectType = ObjectiveEffectType.AtBBonus;
@@ -184,10 +185,10 @@ public class ExtractionBuiltInScenario extends AtBScenario {
         if (keepFriendliesAlive != null) {
             getScenarioObjectives().add(keepFriendliesAlive);
         }
-        
+
         getScenarioObjectives().add(civilianObjective);
     }
-    
+
     @Override
     public String getBattlefieldControlDescription() {
         return getResourceBundle().getString("battleDetails.common.defenderControlsBattlefield");

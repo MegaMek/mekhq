@@ -28,6 +28,7 @@ import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import megamek.common.OffBoardDirection;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
@@ -109,7 +110,7 @@ public class ChaseBuiltInScenario extends AtBScenario {
                 botForce.setDestinationEdge(destinationEdge);
             }
         } catch (PrincessException e) {
-            e.printStackTrace();
+            MekHQ.getLogger().error(getClass(), "setExtraMissionForces", e);
         }
 
         addBotForce(botForce);
@@ -164,7 +165,7 @@ public class ChaseBuiltInScenario extends AtBScenario {
 
         getScenarioObjectives().add(destroyHostiles);
     }
-    
+
     @Override
     public String getBattlefieldControlDescription() {
         return getResourceBundle().getString("battleDetails.common.defenderControlsBattlefield");

@@ -596,8 +596,8 @@ public class PlanetarySystemMapPanel extends JPanel {
         Image camo = null;
         try {
             camo = (Image) camos.getItem(campaign.getCamoCategory(), campaign.getCamoFileName());
-        } catch (Exception err) {
-            err.printStackTrace();
+        } catch (Exception e) {
+            MekHQ.getLogger().error(getClass(), "getCamo", e);
         }
         return camo;
     }

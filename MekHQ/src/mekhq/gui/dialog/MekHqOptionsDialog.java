@@ -41,8 +41,8 @@ public class MekHqOptionsDialog extends BaseDialog {
     private JCheckBox checkSaveBeforeMissions;
     private JSpinner spinnerSavedGamesCount;
 
-    public MekHqOptionsDialog(JFrame parent, MMLogger logger) {
-        super(parent, logger);
+    public MekHqOptionsDialog(JFrame parent) {
+        super(parent);
 
         this.initialize(resources);
         this.setInitialState();

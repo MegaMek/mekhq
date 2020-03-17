@@ -27,6 +27,7 @@ import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.OffBoardDirection;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
@@ -113,7 +114,7 @@ public class BreakthroughBuiltInScenario extends AtBScenario {
                 botForce.setDestinationEdge(getEnemyHome());
             }
         } catch (PrincessException e) {
-            e.printStackTrace();
+            MekHQ.getLogger().error(getClass(), "setExtraMissionForces", e);
         }
 
         addBotForce(botForce);
@@ -142,7 +143,7 @@ public class BreakthroughBuiltInScenario extends AtBScenario {
 
         getScenarioObjectives().add(destroyHostiles);
     }
-    
+
     @Override
     public String getBattlefieldControlDescription() {
         return getResourceBundle().getString("battleDetails.common.defenderControlsBattlefield");

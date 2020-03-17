@@ -33,45 +33,43 @@ import megamek.client.ratgenerator.UnitTable;
 import megamek.common.EntityMovementMode;
 import megamek.common.MechSummary;
 import megamek.common.UnitType;
+import mekhq.MekHQ;
 
 /**
  * Provides access to RATGenerator through IUnitGenerator interface.
  *
  * @author Neoancient
- *
  */
-
 public class RATGeneratorConnector extends AbstractUnitGenerator implements IUnitGenerator {
+    /* Initialize RATGenerator and load the data for the current game year */
+    public RATGeneratorConnector(int year) {
+        while (!RATGenerator.getInstance().isInitialized()) {
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                MekHQ.getLogger().error(getClass(), "RATGeneratorConnector", e);
+            }
+        }
+        RATGenerator.getInstance().loadYear(year);
+    }
 
-	/* Initialize RATGenerator and load the data for the current game year */
-	public RATGeneratorConnector(int year) {
-		while (!RATGenerator.getInstance().isInitialized()) {
-			try {
-				Thread.sleep(50);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		RATGenerator.getInstance().loadYear(year);
-	}
+    private UnitTable findTable(String faction, int unitType, int weightClass, int year, int quality, Collection<EntityMovementMode> movementModes) {
+        FactionRecord fRec = Faction.getFactionRecordOrFallback(faction);
+        if(fRec == null) {
+            return null;
+        }
 
-	private UnitTable findTable(String faction, int unitType, int weightClass, int year, int quality, Collection<EntityMovementMode> movementModes) {
-		FactionRecord fRec = Faction.getFactionRecordOrFallback(faction);
-		if(fRec == null) {
-		    return null;
-		}
+        String rating = getFactionSpecificRating(fRec, quality);
 
-		String rating = getFactionSpecificRating(fRec, quality);
+        ArrayList<Integer> wcs = new ArrayList<>();
+        if (weightClass >= 0) {
+            wcs.add(weightClass);
+        }
 
-		ArrayList<Integer> wcs = new ArrayList<>();
-		if (weightClass >= 0) {
-			wcs.add(weightClass);
-		}
+        return UnitTable.findTable(fRec, unitType, year, rating, wcs, ModelRecord.NETWORK_NONE, movementModes, new ArrayList<>(), 2, fRec);
+    }
 
-		return UnitTable.findTable(fRec, unitType, year, rating, wcs, ModelRecord.NETWORK_NONE, movementModes, new ArrayList<>(), 2, fRec);
-	}
-
-	/**
+    /**
      * Helper function that extracts the string-based unit rating from the given int-based unit-rating
      * for the given faction.
      * @param fRec Faction record
@@ -88,28 +86,28 @@ public class RATGeneratorConnector extends AbstractUnitGenerator implements IUni
         return rating;
     }
 
-	/* (non-Javadoc)
-	 * @see mekhq.campaign.universe.IUnitGenerator#isSupportedUnitType(int)
-	 */
-	@Override
-	public boolean isSupportedUnitType(int unitType) {
-		return unitType != UnitType.GUN_EMPLACEMENT
-				&& unitType != UnitType.SPACE_STATION;
-	}
+    /* (non-Javadoc)
+     * @see mekhq.campaign.universe.IUnitGenerator#isSupportedUnitType(int)
+     */
+    @Override
+    public boolean isSupportedUnitType(int unitType) {
+        return unitType != UnitType.GUN_EMPLACEMENT
+                && unitType != UnitType.SPACE_STATION;
+    }
 
-	/* (non-Javadoc)
-	 * @see mekhq.campaign.universe.IUnitGenerator#generate(java.lang.String, int, int, int, int)
-	 */
-	@Override
-	public MechSummary generate(String faction, int unitType, int weightClass, int year, int quality) {
-		UnitTable ut = findTable(faction, unitType, weightClass, year, quality,
+    /* (non-Javadoc)
+     * @see mekhq.campaign.universe.IUnitGenerator#generate(java.lang.String, int, int, int, int)
+     */
+    @Override
+    public MechSummary generate(String faction, int unitType, int weightClass, int year, int quality) {
+        UnitTable ut = findTable(faction, unitType, weightClass, year, quality,
                 EnumSet.noneOf(EntityMovementMode.class));
-		return (ut == null)? null : ut.generateUnit();
-	}
+        return (ut == null)? null : ut.generateUnit();
+    }
 
-	/* (non-Javadoc)
-	 * @see mekhq.campaign.universe.IUnitGenerator#generate(java.lang.String, int, int, int, int, java.util.function.Predicate)
-	 */
+    /* (non-Javadoc)
+     * @see mekhq.campaign.universe.IUnitGenerator#generate(java.lang.String, int, int, int, int, java.util.function.Predicate)
+     */
     @Override
     public MechSummary generate(String faction, int unitType, int weightClass, int year, int quality, Predicate<MechSummary> filter) {
         UnitTable ut = findTable(faction, unitType, weightClass, year, quality, EnumSet.noneOf(EntityMovementMode.class));
@@ -122,27 +120,27 @@ public class RATGeneratorConnector extends AbstractUnitGenerator implements IUni
         return (ut == null)? null : ut.generateUnit(filter == null?null : filter::test);
     }
 
-	/* (non-Javadoc)
-	 * @see mekhq.campaign.universe.IUnitGenerator#generate(int, java.lang.String, int, int, int, int)
-	 */
-	@Override
-	public List<MechSummary> generate(int count, String faction, int unitType, int weightClass, int year, int quality) {
-		UnitTable ut = findTable(faction, unitType, weightClass, year, quality,
+    /* (non-Javadoc)
+     * @see mekhq.campaign.universe.IUnitGenerator#generate(int, java.lang.String, int, int, int, int)
+     */
+    @Override
+    public List<MechSummary> generate(int count, String faction, int unitType, int weightClass, int year, int quality) {
+        UnitTable ut = findTable(faction, unitType, weightClass, year, quality,
                 EnumSet.noneOf(EntityMovementMode.class));
-		return ut == null? new ArrayList<>() : ut.generateUnits(count);
-	}
+        return ut == null? new ArrayList<>() : ut.generateUnits(count);
+    }
 
-	/* (non-Javadoc)
-	 * @see mekhq.campaign.universe.IUnitGenerator#generate(int, java.lang.String, int, int, int, int, java.util.function.Predicate)
-	 */
-	@Override
-	public List<MechSummary> generate(int count, String faction, int unitType, int weightClass, int year, int quality,
-			Predicate<MechSummary> filter) {
-		UnitTable ut = findTable(faction, unitType, weightClass, year, quality,
+    /* (non-Javadoc)
+     * @see mekhq.campaign.universe.IUnitGenerator#generate(int, java.lang.String, int, int, int, int, java.util.function.Predicate)
+     */
+    @Override
+    public List<MechSummary> generate(int count, String faction, int unitType, int weightClass, int year, int quality,
+            Predicate<MechSummary> filter) {
+        UnitTable ut = findTable(faction, unitType, weightClass, year, quality,
                 EnumSet.noneOf(EntityMovementMode.class));
-		return ut == null? new ArrayList<>() : ut.generateUnits(count,
-		        filter == null? null : filter::test);
-	}
+        return ut == null? new ArrayList<>() : ut.generateUnits(count,
+                filter == null? null : filter::test);
+    }
 
     @Override
     public List<MechSummary> generate(int count, String faction, int unitType, int weightClass, int year, int quality, Collection<EntityMovementMode> movementModes, Predicate<MechSummary> filter) {

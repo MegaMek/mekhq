@@ -53,7 +53,7 @@ public class LaunchGameDialog extends JDialog implements ActionListener {
         initComponents();
         setUserPreferences();
     }
-    
+
     public void initComponents() {
     	yourNameL = new JLabel(
                 Messages.getString("MegaMek.yourNameL"), SwingConstants.RIGHT); //$NON-NLS-1$
@@ -145,9 +145,9 @@ public class LaunchGameDialog extends JDialog implements ActionListener {
                 if (!server) {
                 	serverAddr = serverAddrF.getText();
                 }
-                port = Integer.decode(portF.getText().trim()).intValue();
+                port = Integer.decode(portF.getText().trim());
             } catch (NumberFormatException ex) {
-                System.err.println(ex.getMessage());
+                MekHQ.getLogger().error(getClass(), "actionPerformed", ex.getMessage());
             }
         } else {
             cancelled = true;
