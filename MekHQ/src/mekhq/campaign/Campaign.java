@@ -308,7 +308,7 @@ public class Campaign implements Serializable, ITechManager {
         retirementDefectionTracker = new RetirementDefectionTracker();
         fatigueLevel = 0;
         atbConfig = null;
-        autosaveService = new AutosaveService(MekHQ.getLogger());
+        autosaveService = new AutosaveService();
     }
 
     /**
@@ -527,7 +527,7 @@ public class Campaign implements Serializable, ITechManager {
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    MekHQ.getLogger().error(getClass(), "initUnitGenerator", e);
                 }
             }
             rm.setSelectedRATs(campaignOptions.getRATs());

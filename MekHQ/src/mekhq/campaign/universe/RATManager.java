@@ -146,7 +146,7 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
             try {
                 Thread.sleep(50);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
             }
         }
         File f = new File(RATINFO_DIR, fileNames.get(name));
@@ -161,7 +161,6 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
             xmlDoc = db.parse(fis);
             fis.close();
         } catch (Exception ex) {
-            ex.printStackTrace();
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR, "While loading RAT info from " + f.getName() + ": "); //$NON-NLS-1$
             MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
             return false;

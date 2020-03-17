@@ -589,7 +589,6 @@ public class CustomizeAtBContractDialog extends JDialog {
             Image camo = (Image) camos.getItem(camoCategory, camoFileName);
             btnCamo.setIcon(new ImageIcon(camo));
         } catch (Exception err) {
-            //err.printStackTrace();
         	JOptionPane.showMessageDialog(
         			this,
         			"Cannot find your camo file.\n"

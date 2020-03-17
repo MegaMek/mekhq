@@ -36,7 +36,7 @@ import mekhq.preferences.PreferencesNode;
 public class EditTransactionDialog extends JDialog implements ActionListener, FocusListener, MouseListener {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -8742160448355293487L;
 
@@ -192,8 +192,8 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
             newTransaction.setDescription(descriptionField.getText());
             try {
                 newTransaction.setDate(LONG_DATE.parse(dateButton.getText()));
-            } catch (ParseException e1) {
-                e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            } catch (ParseException ex) {
+                MekHQ.getLogger().error(getClass(), "actionPerformed", ex);
             }
             setVisible(false);
         } else if (cancelButton.equals(e.getSource())) {
