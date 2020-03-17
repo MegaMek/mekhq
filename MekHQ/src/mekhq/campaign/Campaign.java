@@ -1458,7 +1458,7 @@ public class Campaign implements Serializable, ITechManager {
                 }
                 case Phenotype.P_NAVAL: {
                     if (person.getOriginFaction().getShortName().equals("CSR")
-                            && person.getOriginFaction().getShortName().equals("RA")) {
+                            || person.getOriginFaction().getShortName().equals("RA")) {
                         switch (person.getPrimaryRole()) {
                             case Person.T_SPACE_CREW:
                                 bloodnameTarget += 2 * (person.hasSkill(SkillType.S_TECH_VESSEL)
