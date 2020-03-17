@@ -32,6 +32,7 @@ import java.util.UUID;
 import javax.swing.SwingWorker;
 
 import megamek.common.UnitType;
+import mekhq.MekHQ;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Rank;
@@ -86,17 +87,16 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
         } catch (SQLException e) {
             throw e;
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            MekHQ.getLogger().error(getClass(), "connect", e);
         }
     }
 
     public void writeCampaignData() {
-
         //TODO throw all SQLExceptions - but then where do they go from doInBackground?
         try {
             statement = connect.createStatement();
-        } catch (SQLException e2) {
-            e2.printStackTrace();
+        } catch (SQLException e) {
+            MekHQ.getLogger().error(getClass(), "writeCampaignData", e);
         };
 
         writeBasicData();
@@ -108,17 +108,15 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
 
         // Needed because otherwise progress isn't reaching 100 and the progress meter stays open
         setProgress(100);
-
     }
 
     private void writeBasicData() {
-
         try {
             preparedStatement = connect.prepareStatement("UPDATE " + table + ".command SET name=? where id=1");
             preparedStatement.setString(1, truncateString(campaign.getName(), 100));
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            MekHQ.getLogger().error(getClass(), "writeBasicData", e);
         }
 
         progressNote = "Uploading dates";
@@ -129,7 +127,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             preparedStatement.setDate(1, new java.sql.Date(campaign.getCalendar().getTimeInMillis()));
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            MekHQ.getLogger().error(getClass(), "writeBasicData", e);
         }
         progressTicker++;
         progressNote = "Uploading ranks";
@@ -149,7 +147,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 determineProgress();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            MekHQ.getLogger().error(getClass(), "writeBasicData", e);
         }
         //write skill types
         progressNote = "Uploading skill types";
@@ -166,7 +164,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 determineProgress();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            MekHQ.getLogger().error(getClass(), "writeBasicData", e);
         }
         //write crewtypes
         progressNote = "Uploading personnel types";
@@ -340,7 +338,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 determineProgress();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            MekHQ.getLogger().error(getClass(), "writeBasicData", e);
         }
 
         //write equipment types
@@ -370,7 +368,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 determineProgress();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            MekHQ.getLogger().error(getClass(), "writeBasicData", e);
         }
     }
 
@@ -386,8 +384,8 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             preparedStatement.setInt(4, 0);
             preparedStatement.setString(5, campaign.getForces().getDescription());
             preparedStatement.executeUpdate();
-        } catch (SQLException e1) {
-            e1.printStackTrace();
+        } catch (SQLException e) {
+            MekHQ.getLogger().error(getClass(), "writeForceData", e);
         }
 
         progressNote = "Uploading force data";
@@ -406,7 +404,6 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
     }
 
     private void writeForce(Force force, int parent) {
-
         try {
             preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".unit (type, name, parent, prefpos, text) VALUES (?, ?, ?, ?, ?)");
             preparedStatement.setString(1, "1");
@@ -416,7 +413,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             preparedStatement.setString(5, force.getDescription());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            MekHQ.getLogger().error(getClass(), "writeForce", e);
         }
         //retrieve the MercRoster id of this force
         int id = parent;
@@ -424,7 +421,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             rs.next();
             id = rs.getInt("id");
         } catch (SQLException e) {
-            e.printStackTrace();
+            MekHQ.getLogger().error(getClass(), "writeForce", e);
         }
 
         progressTicker += 2;
@@ -441,7 +438,6 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 forceHash.put(u.getCommander().getId(), id);
             }
         }
-
     }
 
     private void writePersonnelData() {
@@ -455,8 +451,8 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             statement.execute("TRUNCATE TABLE " + table + ".personnelpositions");
             statement.execute("TRUNCATE TABLE " + table + ".skills");
             statement.execute("TRUNCATE TABLE " + table + ".kills");
-        } catch (SQLException e1) {
-            e1.printStackTrace();
+        } catch (SQLException e) {
+            MekHQ.getLogger().error(getClass(), "writePersonnelData", e);
         }
 
         progressNote = "Uploading personnel data";
@@ -538,7 +534,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 progressTicker += 4;
                 determineProgress();
             } catch (SQLException e) {
-                e.printStackTrace();
+                MekHQ.getLogger().error(getClass(), "writePersonnelData", e);
             }
         }
     }
@@ -554,8 +550,8 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 statement.execute("ALTER TABLE " + table + ".equipment ADD uuid VARCHAR(40)");
             }
             rs.close();
-        } catch (SQLException e1) {
-            e1.printStackTrace();
+        } catch (SQLException e) {
+            MekHQ.getLogger().error(getClass(), "writeEquipmentData", e);
         }
 
         progressNote = "Uploading equipment data";
@@ -596,7 +592,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 progressTicker += 1;
                 determineProgress();
             } catch (SQLException e) {
-                e.printStackTrace();
+                MekHQ.getLogger().error(getClass(), "writeEquipmentData", e);
             }
         }
     }

@@ -562,16 +562,20 @@ public class NewAtBContractDialog extends NewContractDialog {
             contract.setStartDate(null);
             needUpdatePayment = true;
         } else if (source.equals(cbEmployer)) {
-        	System.out.println("Setting employer code to " + getCurrentEmployerCode());
+        	MekHQ.getLogger().info(getClass(), "doUpdateContract",
+                    "Setting employer code to " + getCurrentEmployerCode());
         	long time = System.currentTimeMillis();
     		contract.setEmployerCode(getCurrentEmployerCode(), campaign.getGameYear());
-    		System.out.println("to set employer code: " + (System.currentTimeMillis() - time));
+            MekHQ.getLogger().info(getClass(), "doUpdateContract",
+                    "to set employer code: " + (System.currentTimeMillis() - time));
         	time = System.currentTimeMillis();
     		updateEnemies();
-    		System.out.println("to update enemies: " + (System.currentTimeMillis() - time));
+            MekHQ.getLogger().info(getClass(), "doUpdateContract",
+                    "to update enemies: " + (System.currentTimeMillis() - time));
         	time = System.currentTimeMillis();
     		updatePlanets();
-    		System.out.println("to update planets: " + (System.currentTimeMillis() - time));
+            MekHQ.getLogger().info(getClass(), "doUpdateContract",
+                    "to update planets: " + (System.currentTimeMillis() - time));
     		needUpdatePayment = true;
      	} else if (source.equals(cbEnemy)) {
     		contract.setEnemyCode(getCurrentEnemyCode());

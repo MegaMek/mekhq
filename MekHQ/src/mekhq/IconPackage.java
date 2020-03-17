@@ -23,7 +23,7 @@ import mekhq.campaign.force.Force;
 import mekhq.gui.utilities.PortraitFileFactory;
 
 /**
- * This is a convenience class that will keep all the various directories and tilesets 
+ * This is a convenience class that will keep all the various directories and tilesets
  * for tracking graphics and icons
  * @author Jay Lawson
  *
@@ -35,7 +35,7 @@ public class IconPackage {
     private DirectoryItems forceIcons;
     private DirectoryItems awardIcons;
     protected static MechTileset mt;
-    
+
     // Static defines for layered force icons
     public static String FORCE_FRAME                = "Pieces/Frames/"; //$NON-NLS-1$
     public static String FORCE_TYPE                 = "Pieces/Type/"; //$NON-NLS-1$
@@ -45,12 +45,12 @@ public class IconPackage {
     public static String FORCE_SPECIAL_MODIFIERS    = "Pieces/Special Modifiers/"; //$NON-NLS-1$
     public static String FORCE_BACKGROUNDS          = "Pieces/Backgrounds/"; //$NON-NLS-1$
     public static String FORCE_LOGOS                = "Pieces/Logos/"; //$NON-NLS-1$
-    
+
     public static String[] FORCE_DRAW_ORDER = {
-            FORCE_BACKGROUNDS, FORCE_FRAME, FORCE_TYPE, FORCE_FORMATIONS, 
+            FORCE_BACKGROUNDS, FORCE_FRAME, FORCE_TYPE, FORCE_FORMATIONS,
             FORCE_ADJUSTMENTS, FORCE_ALPHANUMERICS, FORCE_SPECIAL_MODIFIERS, FORCE_LOGOS
     };
-    
+
     /** A map of keys to various gui elements, for future skinning purposes */
     private final Map<String, String> guiElements = new HashMap<>();
     {
@@ -59,7 +59,7 @@ public class IconPackage {
         guiElements.put("default_male_paperdoll", "data/images/misc/paperdoll/default_male.xml");
         guiElements.put("default_female_paperdoll", "data/images/misc/paperdoll/default_female.xml");
     }
-    
+
     /** A map of resolution widths to file names for the startup screen */
     private final TreeMap<Integer, String> startupScreenImages = new TreeMap<>();
     {
@@ -67,7 +67,7 @@ public class IconPackage {
         startupScreenImages.put(1441, "data/images/misc/MekHQ Start_spooky_fhd.png");
         startupScreenImages.put(1921, "data/images/misc/MekHQ Start_spooky_uhd.png");
     }
-    
+
     /** A map of resolution widths to file names for the loading screen */
     private final TreeMap<Integer, String> loadingScreenImages = new TreeMap<>();
     {
@@ -75,11 +75,11 @@ public class IconPackage {
         loadingScreenImages.put(1441, "data/images/misc/MekHQ Load_spooky_fhd.png");
         loadingScreenImages.put(1921, "data/images/misc/MekHQ Load_spooky_uhd.png");
     }
-    
+
     public IconPackage() {
 
     }
-    
+
     public void loadDirectories() {
         if(null == portraits) {
             try {
@@ -123,15 +123,15 @@ public class IconPackage {
             }
         }
     }
-    
+
     public DirectoryItems getPortraits() {
         return portraits;
     }
-    
+
     public DirectoryItems getCamos() {
         return camos;
     }
-    
+
     public DirectoryItems getForceIcons() {
         return forceIcons;
     }
@@ -141,11 +141,11 @@ public class IconPackage {
     public MechTileset getMechTiles() {
         return mt;
     }
-    
+
     public String getGuiElement(String key) {
         return guiElements.get(key);
     }
-    
+
     /**
      * Gets the name of the startup screen image appropriate for the given horizontal resolution.
      * @param resolutionWidth Screen width
@@ -154,7 +154,7 @@ public class IconPackage {
     public String getStartupScreenImage(int resolutionWidth) {
         return startupScreenImages.floorEntry(resolutionWidth).getValue();
     }
-    
+
     /**
      * Gets the name of the loading screen image appropriate for the given horizontal resolution.
      * @param resolutionWidth Screen width
@@ -163,11 +163,11 @@ public class IconPackage {
     public String getLoadingScreenImage(int resolutionWidth) {
         return loadingScreenImages.floorEntry(resolutionWidth).getValue();
     }
-    
+
     public static Image buildForceIcon(String category, String filename, DirectoryItems items, LinkedHashMap<String, Vector<String>> iconMap) {
         final String METHOD_NAME = "buildForceIcon(String,String, DirectoryItems,LinkedHashMap<String,Vector<String>>)"; //$NON-NLS-1$
         Image retVal = null;
-        
+
         if(Crew.ROOT_PORTRAIT.equals(category)) {
             category = "";
         }
@@ -219,7 +219,7 @@ public class IconPackage {
                     try {
                         base = (BufferedImage) items.getItem("", "empty.png");
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        MekHQ.getLogger().error(IconPackage.class, "buildForceIcon", e);
                     }
                 }
                 retVal = base;
@@ -237,7 +237,7 @@ public class IconPackage {
                 MekHQ.getLogger().error(IconPackage.class, METHOD_NAME, err);
             }
         }
-        
+
         return retVal;
     }
 }

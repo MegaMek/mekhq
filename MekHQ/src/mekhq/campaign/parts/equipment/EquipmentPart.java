@@ -51,7 +51,7 @@ import mekhq.campaign.unit.Unit;
  * needs to be subclassed. Some examples of equipment that needs to be
  * subclasses: - MASC (depends on engine rating) - AES (depends on location and
  * cost is by unit tonnage)
- * 
+ *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class EquipmentPart extends Part {
@@ -141,7 +141,8 @@ public class EquipmentPart extends Part {
         }
 
         if (type == null) {
-            System.err.println("Mounted.restore: could not restore equipment type \"" + typeName + "\"");
+            MekHQ.getLogger().error(getClass(), "restore",
+                    "Mounted.restore: could not restore equipment type \"" + typeName + "\"");
         }
     }
 
@@ -408,7 +409,7 @@ public class EquipmentPart extends Part {
          * unit.getEntity().locations(); loc++) { for (int i = 0; i <
          * unit.getEntity().getNumberOfCriticals(loc); i++) { CriticalSlot slot =
          * unit.getEntity().getCritical(loc, i);
-         * 
+         *
          * // ignore empty & system slots if ((slot == null) || (slot.getType() !=
          * CriticalSlot.TYPE_EQUIPMENT)) { continue; } Mounted equip =
          * unit.getEntity().getEquipment(equipmentNum); Mounted m1 = slot.getMount();
