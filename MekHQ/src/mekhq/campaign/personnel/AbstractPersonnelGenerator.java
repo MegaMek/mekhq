@@ -150,7 +150,7 @@ public abstract class AbstractPersonnelGenerator {
                 case Person.T_VTOL_PILOT:
                 case Person.T_VEE_GUNNER:
                     if (Utilities.rollProbability(campaign.getCampaignOptions().getProbPhenoVee())
-                            || person.getOriginFaction().getShortName().equals("CHH")) {
+                            && person.getOriginFaction().getShortName().equals("CHH")) {
                         person.setPhenotype(Phenotype.P_VEHICLE);
                     }
                     break;
