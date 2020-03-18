@@ -22,9 +22,11 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Objects;
 
+import megamek.client.RandomGenderGenerator;
 import megamek.client.RandomNameGenerator;
 import megamek.common.Compute;
 import megamek.common.Crew;
+import megamek.common.TargetRoll;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomSkillPreferences;
@@ -34,25 +36,7 @@ import mekhq.campaign.RandomSkillPreferences;
  * for a {@link Campaign}.
  */
 public abstract class AbstractPersonnelGenerator {
-    private RandomNameGenerator randomNameGenerator = RandomNameGenerator.getInstance();
-
     private RandomSkillPreferences rSkillPrefs = new RandomSkillPreferences();
-
-    /**
-     * Gets the {@link RandomNameGenerator}.
-     * @return The {@link RandomNameGenerator} to use.
-     */
-    public RandomNameGenerator getNameGenerator() {
-        return randomNameGenerator;
-    }
-
-    /**
-     * Sets the {@link RandomNameGenerator}.
-     * @param rng A {@link RandomNameGenerator} to use.
-     */
-    public void setNameGenerator(RandomNameGenerator rng) {
-        randomNameGenerator = Objects.requireNonNull(rng);
-    }
 
     /**
      * Gets the {@link RandomSkillPreferences}.
@@ -113,16 +97,13 @@ public abstract class AbstractPersonnelGenerator {
      * @param gender The person's gender, or a randomize value
      */
     protected void generateName(Person person, int gender) {
-        boolean isFemale = gender == Crew.G_RANDOMIZE
-                ? getNameGenerator().isFemale()
-                : gender == Crew.G_FEMALE;
-
-        if (isFemale) {
-            person.setGender(Crew.G_FEMALE);
+        if (gender == Crew.G_RANDOMIZE) {
+            gender = RandomGenderGenerator.generate();
         }
+        person.setGender(gender);
 
-        String[] name = getNameGenerator().generateGivenNameSurnameSplit(isFemale, person.isClanner(),
-                person.getOriginFaction().getShortName());
+        String[] name = RandomNameGenerator.getInstance().generateGivenNameSurnameSplit(gender,
+                person.isClanner(), person.getOriginFaction().getShortName());
         person.setGivenName(name[0]);
         person.setSurname(name[1]);
     }
@@ -143,35 +124,50 @@ public abstract class AbstractPersonnelGenerator {
      * Generates the clan phenotype, if applicable, for a {@link Person}.
      * @param campaign The {@link Campaign} which tracks the person.
      * @param person The {@link Person} being generated.
-     * @param expLvl The experience level of {@code person}.
      */
-    protected void generatePhenotype(Campaign campaign, Person person, int expLvl) {
+    protected void generatePhenotype(Campaign campaign, Person person) {
         //check for clan phenotypes
         if (person.isClanner()) {
             switch (person.getPrimaryRole()) {
-                case (Person.T_MECHWARRIOR):
+                case Person.T_MECHWARRIOR:
                     if (Utilities.rollProbability(campaign.getCampaignOptions().getProbPhenoMW())) {
-                        person.setPhenotype(Person.PHENOTYPE_MW);
+                        person.setPhenotype(Phenotype.P_MECHWARRIOR);
                     }
                     break;
-                case (Person.T_GVEE_DRIVER):
-                case (Person.T_NVEE_DRIVER):
-                case (Person.T_VTOL_PILOT):
-                case (Person.T_VEE_GUNNER):
-                    if (Utilities.rollProbability(campaign.getCampaignOptions().getProbPhenoVee())) {
-                        person.setPhenotype(Person.PHENOTYPE_VEE);
-                    }
-                    break;
-                case (Person.T_CONV_PILOT):
-                case (Person.T_AERO_PILOT):
-                case (Person.T_PROTO_PILOT):
-                    if (Utilities.rollProbability(campaign.getCampaignOptions().getProbPhenoAero())) {
-                        person.setPhenotype(Person.PHENOTYPE_AERO);
-                    }
-                    break;
-                case (Person.T_BA):
+                case Person.T_BA:
                     if (Utilities.rollProbability(campaign.getCampaignOptions().getProbPhenoBA())) {
-                        person.setPhenotype(Person.PHENOTYPE_BA);
+                        person.setPhenotype(Phenotype.P_ELEMENTAL);
+                    }
+                    break;
+                case Person.T_CONV_PILOT:
+                case Person.T_AERO_PILOT:
+                    if (Utilities.rollProbability(campaign.getCampaignOptions().getProbPhenoAero())) {
+                        person.setPhenotype(Phenotype.P_AEROSPACE);
+                    }
+                    break;
+                case Person.T_GVEE_DRIVER:
+                case Person.T_NVEE_DRIVER:
+                case Person.T_VTOL_PILOT:
+                case Person.T_VEE_GUNNER:
+                    if (Utilities.rollProbability(campaign.getCampaignOptions().getProbPhenoVee())
+                            && person.getOriginFaction().getShortName().equals("CHH")) {
+                        person.setPhenotype(Phenotype.P_VEHICLE);
+                    }
+                    break;
+                case Person.T_PROTO_PILOT:
+                    if (Utilities.rollProbability(campaign.getCampaignOptions().getProbPhenoProto())
+                            && (campaign.getGameYear() > 3060)) {
+                        person.setPhenotype(Phenotype.P_PROTOMECH);
+                    }
+                    break;
+                case Person.T_SPACE_CREW:
+                case Person.T_SPACE_GUNNER:
+                case Person.T_SPACE_PILOT:
+                case Person.T_NAVIGATOR:
+                    if ((person.getOriginFaction().getShortName().equals("CSR")
+                            || person.getOriginFaction().getShortName().equals("RA"))
+                            && Utilities.rollProbability(campaign.getCampaignOptions().getProbPhenoNaval())) {
+                        person.setPhenotype(Phenotype.P_NAVAL);
                     }
                     break;
                 default:

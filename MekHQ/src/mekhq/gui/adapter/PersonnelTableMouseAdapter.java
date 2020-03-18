@@ -1098,13 +1098,11 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             case CMD_BLOODNAME: {
                 for (Person p : people) {
-                    if (!p.isClanner()) {
-                        continue;
+                    if (p.isClanner()) {
+                        gui.getCampaign().checkBloodnameAdd(p, true);
+                        gui.getCampaign().personUpdated(p);
                     }
-                    gui.getCampaign()
-                            .checkBloodnameAdd(p, p.getPrimaryRole(), true);
                 }
-                gui.getCampaign().personUpdated(selectedPerson);
                 break;
             }
             case CMD_EDIT_SALARY: {

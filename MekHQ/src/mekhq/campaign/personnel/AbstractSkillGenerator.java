@@ -197,28 +197,40 @@ public abstract class AbstractSkillGenerator {
         if (person.isClanner()) {
             // apply phenotype bonus only to primary skills
             switch (person.getPrimaryRole()) {
-                case (Person.T_MECHWARRIOR):
-                    if (person.getPhenotype() == Person.PHENOTYPE_MW) {
+                case Person.T_MECHWARRIOR:
+                    if (person.getPhenotype() == Phenotype.P_MECHWARRIOR) {
                         return 1;
                     }
                     break;
-                case (Person.T_GVEE_DRIVER):
-                case (Person.T_NVEE_DRIVER):
-                case (Person.T_VTOL_PILOT):
-                case (Person.T_VEE_GUNNER):
-                    if (person.getPhenotype() == Person.PHENOTYPE_VEE) {
+                case Person.T_BA:
+                    if (person.getPhenotype() == Phenotype.P_ELEMENTAL) {
                         return 1;
                     }
                     break;
-                case (Person.T_CONV_PILOT):
-                case (Person.T_AERO_PILOT):
-                case (Person.T_PROTO_PILOT):
-                    if (person.getPhenotype() == Person.PHENOTYPE_AERO) {
+                case Person.T_CONV_PILOT:
+                case Person.T_AERO_PILOT:
+                    if (person.getPhenotype() == Phenotype.P_AEROSPACE) {
                         return 1;
                     }
                     break;
-                case (Person.T_BA):
-                    if (person.getPhenotype() == Person.PHENOTYPE_BA) {
+                case Person.T_GVEE_DRIVER:
+                case Person.T_NVEE_DRIVER:
+                case Person.T_VTOL_PILOT:
+                case Person.T_VEE_GUNNER:
+                    if (person.getPhenotype() == Phenotype.P_VEHICLE) {
+                        return 1;
+                    }
+                    break;
+                case Person.T_PROTO_PILOT:
+                    if (person.getPhenotype() == Phenotype.P_PROTOMECH) {
+                        return 1;
+                    }
+                    break;
+                case Person.T_SPACE_CREW:
+                case Person.T_SPACE_GUNNER:
+                case Person.T_SPACE_PILOT:
+                case Person.T_NAVIGATOR:
+                    if (person.getPhenotype() == Phenotype.P_NAVAL) {
                         return 1;
                     }
                     break;

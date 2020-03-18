@@ -40,6 +40,9 @@ import java.util.UUID;
 
 import javax.xml.parsers.DocumentBuilder;
 
+import megamek.client.RandomGenderGenerator;
+import megamek.client.RandomNameGenerator;
+import mekhq.campaign.personnel.*;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -102,13 +105,6 @@ import mekhq.campaign.parts.equipment.MissingAmmoBin;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.parts.equipment.MissingLargeCraftAmmoBin;
 import mekhq.campaign.parts.equipment.MissingMASC;
-import mekhq.campaign.personnel.Ancestors;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.RankTranslator;
-import mekhq.campaign.personnel.Ranks;
-import mekhq.campaign.personnel.RetirementDefectionTracker;
-import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
@@ -541,40 +537,9 @@ public class CampaignXmlParser {
                         System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
-        // All personnel need the rank reference fixed
         for (Person psn : retVal.getPersonnel()) {
             // skill types might need resetting
             psn.resetSkillTypes();
-
-            //versions before 0.3.4 did not have proper clan phenotypes
-            if (version.getMajorVersion() == 0
-                    && (version.getMinorVersion() <= 2 ||
-                            (version.getMinorVersion() <= 3 && version.getSnapshot() < 4))
-                    && retVal.getFaction().isClan()) {
-                //assume personnel are clan and trueborn if the right role
-                psn.setClanner(true);
-                switch (psn.getPrimaryRole()) {
-                    case Person.T_MECHWARRIOR:
-                        psn.setPhenotype(Person.PHENOTYPE_MW);
-                        break;
-                    case Person.T_AERO_PILOT:
-                    case Person.T_CONV_PILOT:
-                        psn.setPhenotype(Person.PHENOTYPE_AERO);
-                        break;
-                    case Person.T_BA:
-                        psn.setPhenotype(Person.PHENOTYPE_BA);
-                        break;
-                    case Person.T_VEE_GUNNER:
-                    case Person.T_GVEE_DRIVER:
-                    case Person.T_NVEE_DRIVER:
-                    case Person.T_VTOL_PILOT:
-                        psn.setPhenotype(Person.PHENOTYPE_VEE);
-                        break;
-                    default:
-                        psn.setPhenotype(Person.PHENOTYPE_NONE);
-                        break;
-                }
-            }
         }
 
         MekHQ.getLogger().log(CampaignXmlParser.class, METHOD_NAME, LogLevel.INFO,
@@ -917,9 +882,9 @@ public class CampaignXmlParser {
                             continue;
                         }
                         if (wn2.getNodeName().equalsIgnoreCase("faction")) {
-                            retVal.getRNG().setChosenFaction(wn2.getTextContent().trim());
+                            RandomNameGenerator.getInstance().setChosenFaction(wn2.getTextContent().trim());
                         } else if (wn2.getNodeName().equalsIgnoreCase("percentFemale")) {
-                            retVal.getRNG().setPercentFemale(Integer.parseInt(wn2.getTextContent().trim()));
+                            RandomGenderGenerator.setPercentFemale(Integer.parseInt(wn2.getTextContent().trim()));
                         }
                     }
                 } else if (xn.equalsIgnoreCase("currentReport")) {

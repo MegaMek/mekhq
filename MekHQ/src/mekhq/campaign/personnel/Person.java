@@ -120,14 +120,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public static final int PRISONER_YES = 1;
     public static final int PRISONER_BONDSMAN = 2;
 
-    // Phenotypes
-    public static final int PHENOTYPE_NONE = 0;
-    public static final int PHENOTYPE_MW = 1;
-    public static final int PHENOTYPE_BA = 2;
-    public static final int PHENOTYPE_AERO = 3;
-    public static final int PHENOTYPE_VEE = 4;
-    public static final int PHENOTYPE_NUM = 5;
-
     // ROM Designations
     public static final int DESIG_NONE    = 0;
     public static final int DESIG_EPSILON = 1;
@@ -381,12 +373,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
         OTHER_RANSOM_VALUES.put(SkillType.EXP_ELITE, Money.of(50000));
     }
 
+    // Date Formatting
+    private static final String SAVE_DATE_FORMAT = "yyyy-MM-dd"; // used for file I/O
+    private static final String DISPLAY_DATE_FORMAT = "yyyy-MM-dd"; // used for anything external
+
     //region Reverse Compatibility
-    // TODO : Move these so their migration is handled locally, to free the memory space (as minimal it might be)
     private int oldUnitId = -1;
     private int oldDoctorId = -1;
-    //v0.1.8 and earlier
-    protected int teamId = -1;
     //endregion Reverse Compatibility
     //endregion Variable Declarations
 
@@ -438,7 +431,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         originFaction = Faction.getFaction(factionCode);
         originPlanet = null;
         clan = originFaction.isClan();
-        phenotype = PHENOTYPE_NONE;
+        phenotype = Phenotype.P_NONE;
         bloodname = "";
         biography = "";
         idleMonths = -1;
@@ -706,45 +699,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return isPregnant() ? " (Pregnant)" : "";
     }
 
-    public String getPhenotypeName() {
-        return getPhenotypeName(phenotype);
-    }
-
-    public static String getPhenotypeName(int pheno) {
-        switch (pheno) {
-            case PHENOTYPE_NONE:
-                return "Freeborn";
-            case PHENOTYPE_MW:
-                return "Trueborn Mechwarrior";
-            case PHENOTYPE_AERO:
-                return "Trueborn Pilot";
-            case PHENOTYPE_VEE:
-                return "Trueborn Vehicle Crew";
-            case PHENOTYPE_BA:
-                return "Trueborn Elemental";
-            default:
-                return "?";
-        }
-    }
-
-    public String getPhenotypeShortName() {
-        return getPhenotypeShortName(phenotype);
-    }
-
-    public static String getPhenotypeShortName(int pheno) {
-        switch (pheno) {
-            case PHENOTYPE_NONE:
-                return "Freeborn";
-            case PHENOTYPE_MW:
-            case PHENOTYPE_AERO:
-            case PHENOTYPE_VEE:
-            case PHENOTYPE_BA:
-                return "Trueborn";
-            default:
-                return "?";
-        }
-    }
-
     public static String getPrisonerStatusName(int status) {
         switch (status) {
             case PRISONER_NOT:
@@ -822,8 +776,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     /**
-     * This method is used to migrate names from being a joined name to split between given name and surname,
-     * as part of the Personnel changes in MekHQ 0.47.4.
+     * This method is used to migrate names from being a joined name to split between given name and
+     * surname.
+     * This is required to migrate personnel between MegaMek and MekHQ, as MekHQ tracks divided names
+     * and MegaMek does not.
      * @param n the name to be migrated
      */
     public void migrateName(String n) {
@@ -1060,7 +1016,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public String getPrimaryRoleDesc() {
         String bgPrefix = "";
         if (isClanner()) {
-            bgPrefix = getPhenotypeShortName() + " ";
+            bgPrefix = Phenotype.getPhenotypeShortName(phenotype) + " ";
         }
         return bgPrefix + getRoleDesc(primaryRole, campaign.getFaction().isClan());
     }
@@ -1162,7 +1118,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (recruitment == null) {
             return null;
         }
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        final SimpleDateFormat df = new SimpleDateFormat(DISPLAY_DATE_FORMAT);
         return df.format(recruitment.getTime());
     }
 
@@ -1350,13 +1306,50 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }).collect(Collectors.toList());
     }
 
+    /**
+     * This determines a baby's surname based on their parents names and the selected method
+     * @param fatherId the father's UUID
+     * @return the surname to use
+     */
     private String generateBabySurname(UUID fatherId) {
-        if (campaign.getCampaignOptions().getBabySurnameStyle() == CampaignOptions.BABY_SURNAME_SPOUSE) {
-            if (fatherId != null) {
-                return campaign.getPerson(fatherId).getSurname();
+        switch (campaign.getCampaignOptions().getBabySurnameStyle()) {
+            case CampaignOptions.BABY_SURNAME_SPOUSE: {
+                Person father = campaign.getPerson(fatherId);
+                if (father != null) {
+                    return father.getSurname();
+                } else {
+                    return surname;
+                }
             }
+            case CampaignOptions.BABY_SURNAME_MOTHER_DASH_FATHER: {
+                Person father = campaign.getPerson(fatherId);
+                if (father != null) {
+                    if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(father.getSurname())) {
+                        return surname + "-" + father.getSurname();
+                    } else if (!StringUtil.isNullOrEmpty(father.getSurname())) {
+                        return father.getSurname();
+                    }
+                }
+                return surname;
+            }
+            case CampaignOptions.BABY_SURNAME_FATHER_DASH_MOTHER: {
+                Person father = campaign.getPerson(fatherId);
+                if (father != null) {
+                    if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(father.getSurname())) {
+                        return father.getSurname() + "-" + surname;
+                    } else if (!StringUtil.isNullOrEmpty(surname)) {
+                        return surname;
+                    } else {
+                        return father.getSurname();
+                    }
+                } else {
+                    return surname;
+                }
+            }
+            case CampaignOptions.BABY_SURNAME_MINE:
+            default:
+                return surname;
         }
-        return surname = getSurname();
     }
     //endregion Pregnancy
 
@@ -1463,17 +1456,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
             case SURNAME_NO_CHANGE:
                 break;
             case SURNAME_SPOUSE:
-                if (!StringUtil.isNullOrEmpty(spouseSurname)) {
-                    setSurname(spouseSurname);
-                }
-
+                setSurname(spouseSurname);
                 setMaidenName(surname); //"" is handled in the divorce code
                 break;
             case SURNAME_YOURS:
-                if (!StringUtil.isNullOrEmpty(surname)) {
-                    spouse.setSurname(surname);
-                }
-
+                spouse.setSurname(surname);
                 spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
                 break;
             case SURNAME_HYP_YOURS:
@@ -1482,7 +1469,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else {
                     setSurname(spouseSurname);
                 }
-                //both null or "" is ignored as a case, as it would lead to no changes
 
                 setMaidenName(surname); //"" is handled in the divorce code
                 break;
@@ -1506,7 +1492,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else {
                     spouse.setSurname(surname);
                 }
-                //both null or "" is ignored as a case, as it would lead to no changes
 
                 spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
                 break;
@@ -1526,31 +1511,19 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 break;
             case SURNAME_MALE:
                 if (isMale()) {
-                    if (!StringUtil.isNullOrEmpty(surname)) {
-                        spouse.setSurname(surname);
-                    }
-
+                    spouse.setSurname(surname);
                     spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
                 } else {
-                    if (!StringUtil.isNullOrEmpty(spouseSurname)) {
-                        setSurname(spouseSurname);
-                    }
-
+                    setSurname(spouseSurname);
                     setMaidenName(surname); //"" is handled in the divorce code
                 }
                 break;
             case SURNAME_FEMALE:
                 if (isMale()) {
-                    if (!StringUtil.isNullOrEmpty(spouseSurname)) {
-                        setSurname(spouseSurname);
-                    }
-
+                    setSurname(spouseSurname);
                     setMaidenName(surname); //"" is handled in the divorce code
                 } else {
-                    if (!StringUtil.isNullOrEmpty(surname)) {
-                        spouse.setSurname(surname);
-                    }
-
+                    spouse.setSurname(surname);
                     spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
                 }
                 break;
@@ -1742,9 +1715,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return extraData;
     }
 
+    //region XML I/O
+    //region XML Save
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); // TODO : Remove inline date format
+        final SimpleDateFormat df = new SimpleDateFormat(SAVE_DATE_FORMAT);
 
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<person id=\""
                 + id.toString()
@@ -1836,7 +1811,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 + "<clan>"
                 + clan
                 + "</clan>");
-        if (phenotype != PHENOTYPE_NONE) {
+        if (phenotype != Phenotype.P_NONE) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<phenotype>"
                     + phenotype
@@ -2139,42 +2114,57 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     + acquisitions
                     + "</acquisitions>");
         }
+        // TODO : the following should also check if it is empty, and output should be formatted properly
         if (extraData != null) {
             extraData.writeToXml(pw1);
+            pw1.println(); // end the line to improve the formatting
         }
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</person>");
     }
+    //endregion XML Save
 
-    public static Person generateInstanceFromXML(Node wn, Campaign c, Version version) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign,Version)"; //$NON-NLS-1$
+    //region XML Load
+    /**
+     * This generates a Person from an XML file
+     * @param wn the top level node of the person XML
+     * @param campaign the campaign to add this person to
+     * @param version the version of the file being loaded from
+     * @return the generated person
+     */
+    public static Person generateInstanceFromXML(Node wn, Campaign campaign, Version version) {
+        final String METHOD_NAME = "generateInstanceFromXML(Node, Campaign, Version)"; //$NON-NLS-1$
 
         Person retVal = null;
 
         try {
             // Instantiate the correct child class, and call its parsing function.
-            retVal = new Person(c);
+            retVal = new Person(campaign);
 
             // Okay, now load Person-specific fields!
             NodeList nl = wn.getChildNodes();
 
-            String advantages = null;
-            String edge = null;
-            String implants = null;
+            // Create the date format we used to save with
+            final SimpleDateFormat df = new SimpleDateFormat(SAVE_DATE_FORMAT);
 
-            //backwards compatibility
-            String pilotName = null;
-            String pilotNickname = null;
-            int pilotGunnery = -1;
-            int pilotPiloting = -1;
-            int pilotCommandBonus = -1;
-            int type = 0;
+            // Determine if we need to use any migration functions for backwards compatibility.
+            // This MUST be updated to equal the release version required for the latest potential
+            // migration calls
+            final String minimumMigrationVersion = "0.47.6";
+            final boolean migrationPotentiallyRequired = version.isLowerThan(minimumMigrationVersion);
 
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
 
-                if (wn2.getNodeName().equalsIgnoreCase("name")) { //included for backwards compatibility
-                    retVal.migrateName(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("givenName")) {
+                // This is used to move all migration cases into their own method, which will be
+                // accessed first if potentially required
+                if (migrationPotentiallyRequired) {
+                    // If we migrated the node, we can continue with the next node
+                    if (checkNodeMigration(retVal, nl, wn2, campaign, version)) {
+                        continue;
+                    }
+                }
+
+                if (wn2.getNodeName().equalsIgnoreCase("givenName")) {
                     retVal.givenName = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("surname")) {
                     retVal.surname = wn2.getTextContent();
@@ -2193,7 +2183,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("planetId")) {
                     String systemId = wn2.getAttributes().getNamedItem("systemId").getTextContent().trim();
                     String planetId = wn2.getTextContent().trim();
-                    retVal.originPlanet = c.getSystemById(systemId).getPlanetById(planetId);
+                    retVal.originPlanet = campaign.getSystemById(systemId).getPlanetById(planetId);
                 } else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
                     retVal.clan = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("phenotype")) {
@@ -2217,44 +2207,20 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("idleMonths")) {
                     retVal.idleMonths = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("id")) {
-                    if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
-                        retVal.oldId = Integer.parseInt(wn2.getTextContent());
-                    } else {
-                        retVal.id = UUID.fromString(wn2.getTextContent());
-                    }
+                    retVal.id = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("ancestors")) {
                     retVal.ancestorsId = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("spouse")) {
                     retVal.spouse = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("formerSpouses")) {
-                    NodeList nl2 = wn2.getChildNodes();
-                    for (int y = 0; y < nl2.getLength(); y++) {
-                        Node wn3 = nl2.item(y);
-                        // If it's not an element node, we ignore it.
-                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
-                            continue;
-                        }
-
-                        if (!wn3.getNodeName().equalsIgnoreCase("formerSpouse")) {
-                            // Error condition of sorts!
-                            // Errr, what should we do here?
-                            MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
-                                    "Unknown node type not loaded in formerSpouses nodes: "
-                                            + wn3.getNodeName());
-                            continue;
-                        }
-                        retVal.formerSpouses.add(FormerSpouse.generateInstanceFromXML(wn3));
-                    }
+                    loadFormerSpouses(retVal, wn2.getChildNodes());
                 } else if (wn2.getNodeName().equalsIgnoreCase("tryingToMarry")) {
                     retVal.tryingToMarry = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("tryingToConceive")) {
                     retVal.tryingToConceive = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("dueDate")) {
-                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                     retVal.dueDate = (GregorianCalendar) GregorianCalendar.getInstance();
                     retVal.dueDate.setTime(df.parse(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("teamId")) {
-                    retVal.teamId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) {
                     retVal.setPortraitCategory(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("portraitFile")) {
@@ -2268,17 +2234,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("gender")) {
                     retVal.gender = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
-                    if (version.isLowerThan("0.3.4-r1782")) {
-                        RankTranslator rt = new RankTranslator(c);
-                        try {
-                            retVal.rank = rt.getNewRank(c.getRanks().getOldRankSystem(),
-                                    Integer.parseInt(wn2.getTextContent()));
-                        } catch (ArrayIndexOutOfBoundsException e) {
-                            // Do nothing
-                        }
-                    } else {
-                        retVal.rank = Integer.parseInt(wn2.getTextContent());
-                    }
+                    retVal.rank = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rankLevel")) {
                     retVal.rankLevel = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rankSystem")) {
@@ -2288,21 +2244,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("maneiDominiClass")) {
                     retVal.maneiDominiClass = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("doctorId")) {
-                    if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
-                        retVal.oldDoctorId = Integer.parseInt(wn2.getTextContent());
-                    } else {
-                        if (!wn2.getTextContent().equals("null")) {
-                            retVal.doctorId = UUID.fromString(wn2.getTextContent());
-                        }
-                    }
+                    retVal.doctorId = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitId")) {
-                    if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
-                        retVal.oldUnitId = Integer.parseInt(wn2.getTextContent());
-                    } else {
-                        if (!wn2.getTextContent().equals("null")) {
-                            retVal.unitId = UUID.fromString(wn2.getTextContent());
-                        }
-                    }
+                    retVal.unitId = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("status")) {
                     retVal.status = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("prisonerStatus")) {
@@ -2316,154 +2260,41 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("overtimeLeft")) {
                     retVal.overtimeLeft = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("birthday")) {
-                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                     retVal.birthday = (GregorianCalendar) GregorianCalendar.getInstance();
                     retVal.birthday.setTime(df.parse(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("deathday")) {
-                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                } else if (wn2.getNodeName().equalsIgnoreCase("deathDay")) {
                     retVal.dateOfDeath = (GregorianCalendar) GregorianCalendar.getInstance();
                     retVal.dateOfDeath.setTime(df.parse(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("recruitment")) {
-                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                     retVal.recruitment = (GregorianCalendar) GregorianCalendar.getInstance();
                     retVal.recruitment.setTime(df.parse(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("advantages")) {
-                    advantages = wn2.getTextContent();
+                    loadAdvantages(retVal, wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("edge")) {
-                    edge = wn2.getTextContent();
+                    loadEdge(retVal, wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("edgeAvailable")) {
                     retVal.currentEdge = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("implants")) {
-                    implants = wn2.getTextContent();
+                    loadImplants(retVal, wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("toughness")) {
                     retVal.toughness = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("pilotGunnery")) {
-                    pilotGunnery = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("pilotPiloting")) {
-                    pilotPiloting = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("pilotHits")) {
                     retVal.hits = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("pilotCommandBonus")) {
-                    pilotCommandBonus = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("pilotName")) {
-                    pilotName = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("pilotNickname")) {
-                    pilotNickname = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("type")) {
-                    type = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("skill")) {
                     Skill s = Skill.generateInstanceFromXML(wn2);
-                    if (null != s && null != s.getType()) {
+                    if ((s != null) && (s.getType() != null)) {
                         retVal.skills.addSkill(s.getType().getName(), s);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("techUnitIds")) {
-                    NodeList nl2 = wn2.getChildNodes();
-                    for (int y = 0; y < nl2.getLength(); y++) {
-                        Node wn3 = nl2.item(y);
-                        // If it's not an element node, we ignore it.
-                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
-                            continue;
-                        }
-
-                        if (!wn3.getNodeName().equalsIgnoreCase("id")) {
-                            // Error condition of sorts!
-                            // Errr, what should we do here?
-                            MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
-                                    "Unknown node type not loaded in techUnitIds nodes: " + wn3.getNodeName()); //$NON-NLS-1$
-                            continue;
-                        }
-                        retVal.addTechUnitID(UUID.fromString(wn3.getTextContent()));
-                    }
+                    loadTechUnitIds(retVal, wn2.getChildNodes());
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelLog")) {
-                    NodeList nl2 = wn2.getChildNodes();
-                    for (int y = 0; y < nl2.getLength(); y++) {
-                        Node wn3 = nl2.item(y);
-                        // If it's not an element node, we ignore it.
-                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
-                            continue;
-                        }
-
-                        if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            // Error condition of sorts!
-                            // Errr, what should we do here?
-                            MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
-                                    "Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName()); //$NON-NLS-1$
-                            continue;
-                        }
-
-                        LogEntry entry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
-
-                        // If the version of this campaign is earlier than 0.45.4,
-                        // we didn't have the mission log separated from the personnel log,
-                        // so we need to separate the log entries manually
-                        if (version.isLowerThan("0.45.4")) {
-                            if (entry.getDesc().startsWith(getMissionParticipatedString())) {
-                                retVal.addMissionLogEntry(entry);
-                            } else {
-                                retVal.addLogEntry(entry);
-                            }
-                        } else {
-                            retVal.addLogEntry(entry);
-                        }
-                    }
+                    loadPersonnelLog(retVal, wn2.getChildNodes());
                 } else if (wn2.getNodeName().equalsIgnoreCase("missionLog")) {
-                    NodeList nl2 = wn2.getChildNodes();
-                    for (int y = 0; y < nl2.getLength(); y++) {
-                        Node wn3 = nl2.item(y);
-                        // If it's not an element node, we ignore it.
-                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
-                            continue;
-                        }
-
-                        if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            // Error condition of sorts!
-                            // Errr, what should we do here?
-                            MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
-                                    "Unknown node type not loaded in mission log nodes: " + wn3.getNodeName()); //$NON-NLS-1$
-                            continue;
-                        }
-                        retVal.addMissionLogEntry(LogEntryFactory.getInstance().generateInstanceFromXML(wn3));
-                    }
-                } else if (wn2.getNodeName().equalsIgnoreCase("awards")){
-                    NodeList nl2 = wn2.getChildNodes();
-                    for (int y = 0; y < nl2.getLength(); y++) {
-
-                        Node wn3 = nl2.item(y);
-
-                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
-                            continue;
-                        }
-
-                        if (!wn3.getNodeName().equalsIgnoreCase("award")) {
-                            MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
-                                    "Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName()); //$NON-NLS-1$
-                            continue;
-                        }
-
-                        retVal.awardController.addAwardFromXml(AwardsFactory.getInstance().generateNewFromXML(wn3));
-                    }
-
+                    loadMissionLog(retVal, wn2.getChildNodes());
+                } else if (wn2.getNodeName().equalsIgnoreCase("awards")) {
+                    loadAwards(retVal, wn2.getChildNodes());
                 } else if (wn2.getNodeName().equalsIgnoreCase("injuries")) {
-                    NodeList nl2 = wn2.getChildNodes();
-                    for (int y = 0; y < nl2.getLength(); y++) {
-                        Node wn3 = nl2.item(y);
-                        // If it's not an element node, we ignore it.
-                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
-                            continue;
-                        }
-
-                        if (!wn3.getNodeName().equalsIgnoreCase("injury")) {
-                            // Error condition of sorts!
-                            // Errr, what should we do here?
-                            MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
-                                    "Unknown node type not loaded in injury nodes: " + wn3.getNodeName()); //$NON-NLS-1$
-                            continue;
-                        }
-                        retVal.injuries.add(Injury.generateInstanceFromXML(wn3));
-                    }
-                    DateTime now = new DateTime(c.getCalendar());
-                    retVal.injuries.stream().filter(inj -> (null == inj.getStart()))
-                        .forEach(inj -> inj.setStart(now.minusDays(inj.getOriginalTime() - inj.getTime())));
+                    loadInjuries(retVal, wn2.getChildNodes(), campaign);
                 } else if (wn2.getNodeName().equalsIgnoreCase("founder")) {
                     retVal.founder = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitWeight")) {
@@ -2479,87 +2310,375 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
             retVal.setFullName(); // this sets the name based on the loaded values
 
-            if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 13) {
-                if (retVal.primaryRole > T_INFANTRY) {
-                    retVal.primaryRole += 4;
-
-                }
-                if (retVal.secondaryRole > T_INFANTRY) {
-                    retVal.secondaryRole += 4;
-                }
+            // This will migrate any data fields that are reliant on having the data loaded
+            // completely before running migration
+            if (migrationPotentiallyRequired) {
+                migrateFieldsOnLoad(retVal, campaign, version);
             }
 
-            if (version.getMajorVersion() == 0 && version.getMinorVersion() == 2) {
-                //adjust for conventional fighter pilots
-                if (retVal.primaryRole >= T_CONV_PILOT) {
-                    retVal.primaryRole += 1;
-                }
-                if (retVal.secondaryRole >= T_CONV_PILOT) {
-                    retVal.secondaryRole += 1;
-                }
+            if (retVal.id == null) {
+                MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
+                        "Id not pre-defined; generating person's Id."); //$NON-NLS-1$
+                retVal.id = UUID.randomUUID();
+            }
+        } catch (Exception ex) {
+            MekHQ.getLogger().error(Person.class, METHOD_NAME, ex);
+            // we shouldn't return a half instantiated person, after all
+        }
+
+        return retVal;
+    }
+
+    /**
+     * This loads former spouses for a person from a node list
+     * @param retVal the person to load former spouses for
+     * @param nl2 the nodes to load former spouses from
+     */
+    private static void loadFormerSpouses(Person retVal, NodeList nl2) {
+        for (int y = 0; y < nl2.getLength(); y++) {
+            Node wn3 = nl2.item(y);
+            // If it's not an element node, we ignore it.
+            if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
             }
 
-            if (version.getMajorVersion() == 0 && version.getMinorVersion() == 3 && version.getSnapshot() < 1) {
-                //adjust for conventional fighter pilots
-                if (retVal.primaryRole == T_CONV_PILOT && retVal.hasSkill(SkillType.S_PILOT_SPACE) && !retVal.hasSkill(SkillType.S_PILOT_JET)) {
-                    retVal.primaryRole += 1;
-                }
-                if (retVal.secondaryRole == T_CONV_PILOT && retVal.hasSkill(SkillType.S_PILOT_SPACE) && !retVal.hasSkill(SkillType.S_PILOT_JET)) {
-                    retVal.secondaryRole += 1;
-                }
-                if (retVal.primaryRole == T_AERO_PILOT && !retVal.hasSkill(SkillType.S_PILOT_SPACE) && retVal.hasSkill(SkillType.S_PILOT_JET)) {
-                    retVal.primaryRole += 8;
-                }
-                if (retVal.secondaryRole == T_AERO_PILOT && !retVal.hasSkill(SkillType.S_PILOT_SPACE) && retVal.hasSkill(SkillType.S_PILOT_JET)) {
-                    retVal.secondaryRole += 8;
+            if (wn3.getNodeName().equalsIgnoreCase("formerSpouse")) {
+                retVal.formerSpouses.add(FormerSpouse.generateInstanceFromXML(wn3));
+            } else {
+                MekHQ.getLogger().log(Person.class, "loadFormerSpouses", LogLevel.ERROR,
+                        "Unknown node type not loaded in formerSpouses nodes: "
+                                + wn3.getNodeName());
+            }
+        }
+    }
+
+    /**
+     * This loads the values for advantages from a string
+     * @param retVal the person to load advantages for
+     * @param advantages the string to load from
+     */
+    private static void loadAdvantages(Person retVal, String advantages) {
+        if (!StringUtil.isNullOrEmpty(advantages)) {
+            StringTokenizer st = new StringTokenizer(advantages, "::");
+            while (st.hasMoreTokens()) {
+                String adv = st.nextToken();
+                String advName = Crew.parseAdvantageName(adv);
+                Object value = Crew.parseAdvantageValue(adv);
+
+                try {
+                    retVal.getOptions().getOption(advName).setValue(value);
+                } catch (Exception e) {
+                    MekHQ.getLogger().log(Person.class, "loadAdvantages", LogLevel.ERROR,
+                            "Error restoring advantage: " + adv);
                 }
             }
+        }
+    }
 
-            if ((null != advantages) && (advantages.trim().length() > 0)) {
-                StringTokenizer st = new StringTokenizer(advantages, "::");
-                while (st.hasMoreTokens()) {
-                    String adv = st.nextToken();
-                    String advName = Crew.parseAdvantageName(adv);
-                    Object value = Crew.parseAdvantageValue(adv);
+    /**
+     * This loads the values for edge from a string
+     * @param retVal the person to load edge for
+     * @param edge the string to load from
+     */
+    private static void loadEdge(Person retVal, String edge) {
+        if (!StringUtil.isNullOrEmpty(edge)) {
+            StringTokenizer st = new StringTokenizer(edge, "::");
+            while (st.hasMoreTokens()) {
+                String adv = st.nextToken();
+                String advName = Crew.parseAdvantageName(adv);
+                Object value = Crew.parseAdvantageValue(adv);
 
-                    try {
-                        retVal.getOptions().getOption(advName).setValue(value);
-                    } catch (Exception e) {
+                try {
+                    retVal.getOptions().getOption(advName).setValue(value);
+                } catch (Exception e) {
+                    MekHQ.getLogger().log(Person.class, "loadEdge", LogLevel.ERROR,
+                            "Error restoring edge: " + adv);
+                }
+            }
+        }
+    }
+
+    /**
+     * This loads the values for implants from a string
+     * @param retVal the person to load implants for
+     * @param implants the string to load from
+     */
+    private static void loadImplants(Person retVal, String implants) {
+        if (!StringUtil.isNullOrEmpty(implants)) {
+            StringTokenizer st = new StringTokenizer(implants, "::");
+            while (st.hasMoreTokens()) {
+                String adv = st.nextToken();
+                String advName = Crew.parseAdvantageName(adv);
+                Object value = Crew.parseAdvantageValue(adv);
+
+                try {
+                    retVal.getOptions().getOption(advName).setValue(value);
+                } catch (Exception e) {
+                    MekHQ.getLogger().log(Person.class, "loadImplants", LogLevel.ERROR,
+                            "Error restoring implants: " + adv);
+                }
+            }
+        }
+    }
+
+    /**
+     * This loads tech unit ids for a person from a node list
+     * @param retVal the person to load tech unit ids for
+     * @param nl2 the nodes to load unit ids from
+     */
+    private static void loadTechUnitIds(Person retVal, NodeList nl2) {
+        for (int y = 0; y < nl2.getLength(); y++) {
+            Node wn3 = nl2.item(y);
+            // If it's not an element node, we ignore it.
+            if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            if (wn3.getNodeName().equalsIgnoreCase("id")) {
+                retVal.addTechUnitID(UUID.fromString(wn3.getTextContent()));
+            } else {
+                MekHQ.getLogger().log(Person.class, "loadTechUnitIds", LogLevel.ERROR,
+                        "Unknown node type not loaded in techUnitIds nodes: " + wn3.getNodeName());
+            }
+        }
+    }
+
+    /**
+     * This loads the personnel log for a person from a node list
+     * @param retVal the person to the personnel log for
+     * @param nl2 the nodes to load the personnel log from
+     */
+    private static void loadPersonnelLog(Person retVal, NodeList nl2) {
+        for (int y = 0; y < nl2.getLength(); y++) {
+            Node wn3 = nl2.item(y);
+            // If it's not an element node, we ignore it.
+            if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            if (wn3.getNodeName().equalsIgnoreCase("logEntry")) {
+                retVal.addLogEntry(LogEntryFactory.getInstance().generateInstanceFromXML(wn3));
+            } else {
+                MekHQ.getLogger().log(Person.class, "loadPersonnelLog", LogLevel.ERROR,
+                        "Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName());
+            }
+        }
+    }
+
+    /**
+     * This loads the mission log for a person from a node list
+     * @param retVal the person to the mission log for
+     * @param nl2 the nodes to load the mission log from
+     */
+    private static void loadMissionLog(Person retVal, NodeList nl2) {
+        for (int y = 0; y < nl2.getLength(); y++) {
+            Node wn3 = nl2.item(y);
+            // If it's not an element node, we ignore it.
+            if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            if (wn3.getNodeName().equalsIgnoreCase("logEntry")) {
+                retVal.addMissionLogEntry(LogEntryFactory.getInstance().generateInstanceFromXML(wn3));
+            } else {
+                MekHQ.getLogger().log(Person.class, "loadMissionLog", LogLevel.ERROR,
+                        "Unknown node type not loaded in mission log nodes: " + wn3.getNodeName());
+            }
+        }
+    }
+
+    /**
+     * This loads awards for a person from a node list
+     * @param retVal the person to awards for
+     * @param nl2 the nodes to load awards from
+     */
+    private static void loadAwards(Person retVal, NodeList nl2) {
+        for (int y = 0; y < nl2.getLength(); y++) {
+            Node wn3 = nl2.item(y);
+            // If it's not an element node, we ignore it.
+            if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            if (wn3.getNodeName().equalsIgnoreCase("award")) {
+                retVal.awardController.addAwardFromXml(AwardsFactory.getInstance().generateNewFromXML(wn3));
+            } else {
+                MekHQ.getLogger().log(Person.class, "loadAwards", LogLevel.ERROR,
+                        "Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName());
+            }
+        }
+    }
+
+    /**
+     * This loads injuries for a person from a node list
+     * @param retVal the person to injuries for
+     * @param nl2 the nodes to load injuries from
+     * @param campaign the campaign containing the calendar to use for the current date
+     */
+    private static void loadInjuries(Person retVal, NodeList nl2, Campaign campaign) {
+        for (int y = 0; y < nl2.getLength(); y++) {
+            Node wn3 = nl2.item(y);
+            // If it's not an element node, we ignore it.
+            if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            if (wn3.getNodeName().equalsIgnoreCase("injury")) {
+                retVal.injuries.add(Injury.generateInstanceFromXML(wn3));
+            } else {
+                MekHQ.getLogger().log(Person.class, "loadInjuries", LogLevel.ERROR,
+                        "Unknown node type not loaded in injury nodes: " + wn3.getNodeName());
+            }
+        }
+        DateTime now = new DateTime(campaign.getCalendar());
+        retVal.injuries.stream().filter(inj -> (null == inj.getStart()))
+                .forEach(inj -> inj.setStart(now.minusDays(inj.getOriginalTime() - inj.getTime())));
+    }
+
+    //region Person Version Migration
+    /**
+     * This determines if any fields contain older-style values that need to be migrated, and then
+     * migrates them. If the field does not require migration, it will instead be parsed in the
+     * {@link #generateInstanceFromXML(Node, Campaign, Version) generateInstanceFromXML} method
+     * @param retVal the person that is being generated from XML
+     * @param nl the node list of nodes being parsed (required for a 0.1.8 or earlier migration)
+     * @param wn2 the node to parse
+     * @param campaign the campaign to parse to
+     * @param version the version number that the file is from
+     * @return true if the node is migrated, otherwise false
+     */
+    private static boolean checkNodeMigration(Person retVal, NodeList nl, Node wn2,
+                                              Campaign campaign, Version version) {
+        final String METHOD_NAME = "checkNodeMigration";
+
+        final String oldSaveDateFormat = "yyyy-MM-dd hh:mm:ss";
+        final SimpleDateFormat df = new SimpleDateFormat(oldSaveDateFormat);
+
+        boolean valueChanged = false;
+        if (wn2.getNodeName().equalsIgnoreCase("name")) {
+            retVal.migrateName(wn2.getTextContent());
+            valueChanged = true;
+        } else if (wn2.getNodeName().equalsIgnoreCase("id")) {
+            if (version.isLowerThan("0.2.14")) {
+                retVal.oldId = Integer.parseInt(wn2.getTextContent());
+                valueChanged = true;
+            }
+        } else if (wn2.getNodeName().equalsIgnoreCase("dueDate")) {
+            if (version.isLowerThan("0.47.6")) {
+                try {
+                    retVal.dueDate = (GregorianCalendar) GregorianCalendar.getInstance();
+                    retVal.dueDate.setTime(df.parse(wn2.getTextContent().trim()));
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(Person.class, METHOD_NAME, e);
+                }
+                valueChanged = true;
+            }
+        } else if (wn2.getNodeName().equalsIgnoreCase("birthday")) {
+            if (version.isLowerThan("0.47.6")) {
+                try {
+                    retVal.birthday = (GregorianCalendar) GregorianCalendar.getInstance();
+                    retVal.birthday.setTime(df.parse(wn2.getTextContent().trim()));
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(Person.class, METHOD_NAME, e);
+                }
+                valueChanged = true;
+            }
+        } else if (wn2.getNodeName().equalsIgnoreCase("deathDay")) {
+            if (version.isLowerThan("0.47.6")) {
+                try {
+                    retVal.dateOfDeath = (GregorianCalendar) GregorianCalendar.getInstance();
+                    retVal.dateOfDeath.setTime(df.parse(wn2.getTextContent().trim()));
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(Person.class, METHOD_NAME, e);
+                }
+                valueChanged = true;
+            }
+        } else if (wn2.getNodeName().equalsIgnoreCase("recruitment")) {
+            if (version.isLowerThan("0.47.6")) {
+                try {
+                    retVal.recruitment = (GregorianCalendar) GregorianCalendar.getInstance();
+                    retVal.recruitment.setTime(df.parse(wn2.getTextContent().trim()));
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(Person.class, METHOD_NAME, e);
+                }
+                valueChanged = true;
+            }
+        } else if (wn2.getNodeName().equalsIgnoreCase("doctorId")) {
+            if (version.isLowerThan("0.2.14")) {
+                retVal.oldDoctorId = Integer.parseInt(wn2.getTextContent());
+                valueChanged = true;
+            } else if (wn2.getTextContent().equals("null")) {
+                valueChanged = true; //handles the possibility of bad data in pre-0.47.5 saves
+            }
+        } else if (wn2.getNodeName().equalsIgnoreCase("unitId")) {
+            if (version.isLowerThan("0.2.14")) {
+                retVal.oldUnitId = Integer.parseInt(wn2.getTextContent());
+                valueChanged = true;
+            } else if (wn2.getTextContent().equals("null")) {
+                valueChanged = true; //handles the possibility of bad data in pre-0.47.5 saves
+            }
+        } else if (wn2.getNodeName().equalsIgnoreCase("personnelLog")) {
+            if (version.isLowerThan("0.45.4")) {
+                // If the version of this campaign is earlier than 0.45.4,
+                // we didn't have the mission log separated from the personnel log,
+                // so we need to separate the log entries manually
+                NodeList nl2 = wn2.getChildNodes();
+                for (int y = 0; y < nl2.getLength(); y++) {
+                    Node wn3 = nl2.item(y);
+                    // If it's not an element node, we ignore it.
+                    if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                        continue;
+                    }
+
+                    if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
                         MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
-                                "Error restoring advantage: " + adv); //$NON-NLS-1$
+                                "Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName()); //$NON-NLS-1$
+                        continue;
+                    }
+
+                    LogEntry entry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
+
+                    if (entry.getDesc().startsWith(getMissionParticipatedString())) {
+                        retVal.addMissionLogEntry(entry);
+                    } else {
+                        retVal.addLogEntry(entry);
                     }
                 }
+                valueChanged = true;
             }
-            if ((null != edge) && (edge.trim().length() > 0)) {
-                StringTokenizer st = new StringTokenizer(edge, "::");
-                while (st.hasMoreTokens()) {
-                    String adv = st.nextToken();
-                    String advName = Crew.parseAdvantageName(adv);
-                    Object value = Crew.parseAdvantageValue(adv);
+        } else if (wn2.getNodeName().equalsIgnoreCase("pilotName")) {
+            retVal.migrateName(wn2.getTextContent());
+            valueChanged = true;
+        } else if (wn2.getNodeName().equalsIgnoreCase("pilotNickname")) {
+            retVal.setCallsign(wn2.getTextContent());
+            valueChanged = true;
+        } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
+            if (version.isLowerThan("0.3.4-r1782")) {
+                RankTranslator rt = new RankTranslator(campaign);
+                try {
+                    retVal.rank = rt.getNewRank(campaign.getRanks().getOldRankSystem(),
+                            Integer.parseInt(wn2.getTextContent()));
+                } catch (ArrayIndexOutOfBoundsException ignored) {
+                }
+                valueChanged = true;
+            }
+        } else if (wn2.getNodeName().equalsIgnoreCase("type")) {
+            int pilotGunnery = -1;
+            int pilotPiloting = -1;
+            int pilotCommandBonus = -1;
+            int type = Integer.parseInt(wn2.getTextContent());
 
-                    try {
-                        retVal.getOptions().getOption(advName).setValue(value);
-                    } catch (Exception e) {
-                        MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
-                                "Error restoring edge: " + adv); //$NON-NLS-1$
-                    }
+            for (int x = 0; x < nl.getLength(); x++) {
+                Node wn3 = nl.item(x);
+                if (wn3.getNodeName().equalsIgnoreCase("pilotGunnery")) {
+                    pilotGunnery = Integer.parseInt(wn3.getTextContent());
+                } else if (wn3.getNodeName().equalsIgnoreCase("pilotPiloting")) {
+                    pilotPiloting = Integer.parseInt(wn3.getTextContent());
+                } else if (wn3.getNodeName().equalsIgnoreCase("pilotCommandBonus")) {
+                    pilotCommandBonus = Integer.parseInt(wn3.getTextContent());
                 }
             }
-            if ((null != implants) && (implants.trim().length() > 0)) {
-                StringTokenizer st = new StringTokenizer(implants, "::");
-                while (st.hasMoreTokens()) {
-                    String adv = st.nextToken();
-                    String advName = Crew.parseAdvantageName(adv);
-                    Object value = Crew.parseAdvantageValue(adv);
 
-                    try {
-                        retVal.getOptions().getOption(advName).setValue(value);
-                    } catch (Exception e) {
-                        MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
-                                "Error restoring implants: " + adv); //$NON-NLS-1$
-                    }
-                }
-            }
             //check to see if we are dealing with a PilotPerson from 0.1.8 or earlier
             if (pilotGunnery != -1) {
                 switch (type) {
@@ -2583,40 +2702,111 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         retVal.addSkill(SkillType.S_ANTI_MECH, 8 - pilotPiloting, 0);
                         retVal.primaryRole = T_BA;
                         break;
-
                 }
                 retVal.addSkill(SkillType.S_TACTICS, pilotCommandBonus, 0);
             }
-            if (pilotName != null) {
-                retVal.migrateName(pilotName);
-            }
-            if (null != pilotNickname) {
-                retVal.setCallsign(pilotNickname);
-            }
-
-            if (retVal.id == null) {
-                MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
-                        "ID not pre-defined; generating person's ID."); //$NON-NLS-1$
-                retVal.id = UUID.randomUUID();
-            }
-
-            // Prisoner and Bondsman updating
-            if (retVal.prisonerStatus != PRISONER_NOT && retVal.rank == 0) {
-                if (retVal.prisonerStatus == PRISONER_BONDSMAN) {
-                    retVal.setRankNumeric(Ranks.RANK_BONDSMAN);
-                } else {
-                    retVal.setRankNumeric(Ranks.RANK_PRISONER);
+            valueChanged = true;
+        } else if (wn2.getNodeName().equalsIgnoreCase("phenotype")) {
+            if (version.isLowerThan("0.47.6") && version.isHigherThan("0.3.4")) {
+                int phenotype = Integer.parseInt(wn2.getTextContent());
+                if ((retVal.getPrimaryRole() == Person.T_PROTO_PILOT) && (phenotype == Phenotype.P_AEROSPACE)) {
+                    phenotype = Phenotype.P_PROTOMECH;
                 }
+                retVal.phenotype = phenotype;
             }
-        } catch (Exception ex) {
-            // Errrr, apparently either the class name was invalid...
-            // Or the listed name doesn't exist.
-            // Doh!
-            MekHQ.getLogger().error(Person.class, METHOD_NAME, ex);
         }
 
-        return retVal;
+        return valueChanged;
     }
+
+    /**
+     * This is used to migrate data fields following load based on the version supplied. Anything
+     * here is not reliant on a node, but instead modifies the data from a fully loaded person
+     * @param retVal the person to check for field migration
+     * @param version the version number of the file being migrated
+     */
+    private static void migrateFieldsOnLoad(Person retVal, Campaign campaign, Version version) {
+        if ((version.getMajorVersion() == 0) && (version.getMinorVersion() == 3) && (version.getSnapshot() < 1)) {
+            //adjust for conventional fighter pilots
+            if ((retVal.primaryRole == T_CONV_PILOT) && retVal.hasSkill(SkillType.S_PILOT_SPACE)
+                    && !retVal.hasSkill(SkillType.S_PILOT_JET)) {
+                retVal.primaryRole += 1;
+            }
+            if ((retVal.secondaryRole == T_CONV_PILOT) && retVal.hasSkill(SkillType.S_PILOT_SPACE)
+                    && !retVal.hasSkill(SkillType.S_PILOT_JET)) {
+                retVal.secondaryRole += 1;
+            }
+            if ((retVal.primaryRole == T_AERO_PILOT) && !retVal.hasSkill(SkillType.S_PILOT_SPACE)
+                    && retVal.hasSkill(SkillType.S_PILOT_JET)) {
+                retVal.primaryRole += 8;
+            }
+            if ((retVal.secondaryRole == T_AERO_PILOT) && !retVal.hasSkill(SkillType.S_PILOT_SPACE)
+                    && retVal.hasSkill(SkillType.S_PILOT_JET)) {
+                retVal.secondaryRole += 8;
+            }
+        }
+
+        if ((version.getMajorVersion() == 0) && (version.getMinorVersion() == 2)) {
+            //adjust for conventional fighter pilots
+            if (retVal.primaryRole >= T_CONV_PILOT) {
+                retVal.primaryRole += 1;
+            }
+            if (retVal.secondaryRole >= T_CONV_PILOT) {
+                retVal.secondaryRole += 1;
+            }
+        }
+
+        if ((version.getMajorVersion() == 0) && (version.getMinorVersion() < 2) && (version.getSnapshot() < 13)) {
+            if (retVal.primaryRole > T_INFANTRY) {
+                retVal.primaryRole += 4;
+            }
+            if (retVal.secondaryRole > T_INFANTRY) {
+                retVal.secondaryRole += 4;
+            }
+        }
+
+        //versions before 0.3.4 did not have proper clan phenotypes
+        if (version.isLowerThan("0.3.4") && campaign.getFaction().isClan()) {
+            //assume personnel are clan and trueborn if the right role
+            retVal.setClanner(true);
+            switch (retVal.getPrimaryRole()) {
+                case Person.T_MECHWARRIOR:
+                    retVal.setPhenotype(Phenotype.P_MECHWARRIOR);
+                    break;
+                case Person.T_AERO_PILOT:
+                case Person.T_CONV_PILOT:
+                    retVal.setPhenotype(Phenotype.P_AEROSPACE);
+                    break;
+                case Person.T_BA:
+                    retVal.setPhenotype(Phenotype.P_ELEMENTAL);
+                    break;
+                case Person.T_VEE_GUNNER:
+                case Person.T_GVEE_DRIVER:
+                case Person.T_NVEE_DRIVER:
+                case Person.T_VTOL_PILOT:
+                    retVal.setPhenotype(Phenotype.P_VEHICLE);
+                    break;
+                case Person.T_PROTO_PILOT:
+                    retVal.setPhenotype(Phenotype.P_PROTOMECH);
+                    break;
+                default:
+                    retVal.setPhenotype(Phenotype.P_NONE);
+                    break;
+            }
+        }
+
+        // Prisoner and Bondsman rank updating
+        if ((retVal.prisonerStatus != PRISONER_NOT) && (retVal.rank == 0)) {
+            if (retVal.prisonerStatus == PRISONER_BONDSMAN) {
+                retVal.setRankNumeric(Ranks.RANK_BONDSMAN);
+            } else {
+                retVal.setRankNumeric(Ranks.RANK_PRISONER);
+            }
+        }
+    }
+    //endregion Person Version Migration
+    //endregion XML Load
+    //endregion XML I/O
 
     public void setSalary(Money s) {
         salary = s;
@@ -3583,8 +3773,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * @return     Whether the role is considered a combat role
      */
     public static boolean isCombatRole(int role) {
-        return ((role > T_NONE) && (role <= T_NAVIGATOR))
-                || (role == T_VEHICLE_CREW);
+        return ((role > T_NONE) && (role <= T_NAVIGATOR)) || (role == T_VEHICLE_CREW);
     }
 
     /**

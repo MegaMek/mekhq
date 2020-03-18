@@ -51,6 +51,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 
+import megamek.client.RandomGenderGenerator;
+import megamek.client.RandomNameGenerator;
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
@@ -74,10 +76,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.Part;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.Ranks;
-import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.*;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.RATManager;
@@ -326,9 +325,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JPanel panRandomSkill;
     private JCheckBox chkExtraRandom;
     private JSpinner spnProbPhenoMW;
-    private JSpinner spnProbPhenoAero;
     private JSpinner spnProbPhenoBA;
+    private JSpinner spnProbPhenoAero;
     private JSpinner spnProbPhenoVee;
+    private JSpinner spnProbPhenoProto;
+    private JSpinner spnProbPhenoNaval;
     private JSpinner spnProbAntiMek;
     private JSpinner spnOverallRecruitBonus;
     private JSpinner[] spnTypeRecruitBonus;
@@ -1843,6 +1844,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         DefaultComboBoxModel<String> babySurnameStyleModel = new DefaultComboBoxModel<>();
         babySurnameStyleModel.addElement(resourceMap.getString("babySurnameStyle.Mother"));
         babySurnameStyleModel.addElement(resourceMap.getString("babySurnameStyle.Father"));
+        babySurnameStyleModel.addElement(resourceMap.getString("babySurnameStyle.Mother-Father"));
+        babySurnameStyleModel.addElement(resourceMap.getString("babySurnameStyle.Father-Mother"));
         comboBabySurnameStyle = new JComboBox<>(babySurnameStyleModel);
         comboBabySurnameStyle.setSelectedIndex(options.getBabySurnameStyle());
         JPanel pnlBabySurnameStyle = new JPanel();
@@ -2908,32 +2911,51 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         ((JSpinner.DefaultEditor) spnProbPhenoMW.getEditor()).getTextField().setEditable(false);
         JPanel panPhenoMW = new JPanel();
         panPhenoMW.add(spnProbPhenoMW);
-        panPhenoMW.add(new JLabel("Mechwarrior"));
+        panPhenoMW.add(new JLabel(Phenotype.getBloodnamePhenotypeGroupingName(Phenotype.P_MECHWARRIOR)));
         panPhenoMW.setToolTipText(resourceMap.getString("panPhenoMW.toolTipText"));
         panClanPheno.add(panPhenoMW);
-        spnProbPhenoAero = new JSpinner(new SpinnerNumberModel(options.getProbPhenoAero(), 0, 100, 5));
-        ((JSpinner.DefaultEditor) spnProbPhenoAero.getEditor()).getTextField().setEditable(false);
-        JPanel panPhenoAero = new JPanel();
-        panPhenoAero.add(spnProbPhenoAero);
-        panPhenoAero.add(new JLabel("Aero Pilot"));
-        panPhenoAero.setToolTipText(resourceMap.getString("panPhenoMW.toolTipText"));
-        panClanPheno.add(panPhenoAero);
+
         spnProbPhenoBA = new JSpinner(new SpinnerNumberModel(options.getProbPhenoBA(), 0, 100, 5));
         ((JSpinner.DefaultEditor) spnProbPhenoBA.getEditor()).getTextField().setEditable(false);
         JPanel panPhenoBA = new JPanel();
         panPhenoBA.add(spnProbPhenoBA);
-        panPhenoBA.add(new JLabel("Elemental"));
+        panPhenoBA.add(new JLabel(Phenotype.getBloodnamePhenotypeGroupingName(Phenotype.P_ELEMENTAL)));
         panPhenoBA.setToolTipText(resourceMap.getString("panPhenoMW.toolTipText"));
         panClanPheno.add(panPhenoBA);
+
+        spnProbPhenoAero = new JSpinner(new SpinnerNumberModel(options.getProbPhenoAero(), 0, 100, 5));
+        ((JSpinner.DefaultEditor) spnProbPhenoAero.getEditor()).getTextField().setEditable(false);
+        JPanel panPhenoAero = new JPanel();
+        panPhenoAero.add(spnProbPhenoAero);
+        panPhenoAero.add(new JLabel(Phenotype.getBloodnamePhenotypeGroupingName(Phenotype.P_AEROSPACE)));
+        panPhenoAero.setToolTipText(resourceMap.getString("panPhenoMW.toolTipText"));
+        panClanPheno.add(panPhenoAero);
+
         spnProbPhenoVee = new JSpinner(new SpinnerNumberModel(options.getProbPhenoVee(), 0, 100, 5));
         ((JSpinner.DefaultEditor) spnProbPhenoVee.getEditor()).getTextField().setEditable(false);
         JPanel panPhenoVee = new JPanel();
         panPhenoVee.add(spnProbPhenoVee);
-        panPhenoVee.add(new JLabel("Vehicle"));
-        panPhenoVee.setToolTipText(resourceMap.getString("panPhenoMW.toolTipText"));
+        panPhenoVee.add(new JLabel(Phenotype.getBloodnamePhenotypeGroupingName(Phenotype.P_VEHICLE)));
+        panPhenoVee.setToolTipText(resourceMap.getString("panPhenoVehicle.toolTipText"));
         panClanPheno.add(panPhenoVee);
 
-        panClanPheno.setBorder(BorderFactory.createTitledBorder("Trueborn Phenotype Probabilites"));
+        spnProbPhenoProto = new JSpinner(new SpinnerNumberModel(options.getProbPhenoProto(), 0, 100, 5));
+        ((JSpinner.DefaultEditor) spnProbPhenoProto.getEditor()).getTextField().setEditable(false);
+        JPanel panPhenoProto = new JPanel();
+        panPhenoProto.add(spnProbPhenoProto);
+        panPhenoProto.add(new JLabel(Phenotype.getBloodnamePhenotypeGroupingName(Phenotype.P_PROTOMECH)));
+        panPhenoProto.setToolTipText(resourceMap.getString("panPhenoProto.toolTipText"));
+        panClanPheno.add(panPhenoProto);
+
+        spnProbPhenoNaval = new JSpinner(new SpinnerNumberModel(options.getProbPhenoNaval(), 0, 100, 5));
+        ((JSpinner.DefaultEditor) spnProbPhenoNaval.getEditor()).getTextField().setEditable(false);
+        JPanel panPhenoNaval = new JPanel();
+        panPhenoNaval.add(spnProbPhenoNaval);
+        panPhenoNaval.add(new JLabel(Phenotype.getBloodnamePhenotypeGroupingName(Phenotype.P_NAVAL)));
+        panPhenoNaval.setToolTipText(resourceMap.getString("panPhenoNaval.toolTipText"));
+        panClanPheno.add(panPhenoNaval);
+
+        panClanPheno.setBorder(BorderFactory.createTitledBorder("Trueborn Phenotype Probabilities"));
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -3277,29 +3299,29 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panNameGen.add(lblFactionNames, gridBagConstraints);
 
         DefaultComboBoxModel<String> factionNamesModel = new DefaultComboBoxModel<>();
-        for (Iterator<String> i = campaign.getRNG().getFactions(); i.hasNext(); ) {
+        for (Iterator<String> i = RandomNameGenerator.getInstance().getFactions(); i.hasNext(); ) {
             String faction = i.next();
             factionNamesModel.addElement(faction);
         }
-        factionNamesModel.setSelectedItem(campaign.getRNG().getChosenFaction());
+        factionNamesModel.setSelectedItem(RandomNameGenerator.getInstance().getChosenFaction());
         comboFactionNames.setModel(factionNamesModel);
-        comboFactionNames.setMinimumSize(new java.awt.Dimension(400, 30));
+        comboFactionNames.setMinimumSize(new Dimension(400, 30));
         comboFactionNames.setName("comboFactionNames"); // NOI18N
-        comboFactionNames.setPreferredSize(new java.awt.Dimension(400, 30));
+        comboFactionNames.setPreferredSize(new Dimension(400, 30));
         comboFactionNames.setEnabled(!useFactionForNamesBox.isSelected());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = gridy;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         panNameGen.add(comboFactionNames, gridBagConstraints);
 
         JLabel lblGender = new JLabel(resourceMap.getString("lblGender.text")); // NOI18N
         lblGender.setName("lblGender"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = ++gridy;
         gridBagConstraints.insets = new Insets(10, 0, 0, 0);
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         panNameGen.add(lblGender, gridBagConstraints);
 
         sldGender.setMaximum(100);
@@ -3307,7 +3329,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         sldGender.setMajorTickSpacing(25);
         sldGender.setPaintTicks(true);
         sldGender.setPaintLabels(true);
-        sldGender.setValue(campaign.getRNG().getPercentFemale());
+        sldGender.setValue(RandomGenderGenerator.getPercentFemale());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = gridy;
@@ -4449,10 +4471,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     }
 
     private void switchFaction() {
-        String factionCode = Faction.getFactionFromFullNameAndYear(String.valueOf(comboFaction.getSelectedItem()), date.get(Calendar.YEAR))
-                                    .getNameGenerator();
+        String factionCode = Faction.getFactionFromFullNameAndYear(
+                String.valueOf(comboFaction.getSelectedItem()), date.get(Calendar.YEAR))
+                .getNameGenerator();
         boolean found = false;
-        for (Iterator<String> i = campaign.getRNG().getFactions(); i.hasNext(); ) {
+        for (Iterator<String> i = RandomNameGenerator.getInstance().getFactions(); i.hasNext(); ) {
             String nextFaction = i.next();
             if (nextFaction.equals(factionCode)) {
                 found = true;
@@ -4626,9 +4649,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         campaign.setFactionCode(Faction.getFactionFromFullNameAndYear
         		(String.valueOf(comboFaction.getSelectedItem()), date.get(Calendar.YEAR)).getShortName());
         if (null != comboFactionNames.getSelectedItem()) {
-            campaign.getRNG().setChosenFaction((String) comboFactionNames.getSelectedItem());
+            RandomNameGenerator.getInstance().setChosenFaction((String) comboFactionNames.getSelectedItem());
         }
-        campaign.getRNG().setPercentFemale(sldGender.getValue());
+        RandomGenderGenerator.setPercentFemale(sldGender.getValue());
         campaign.setRankSystem(comboRanks.getSelectedIndex());
         if (comboRanks.getSelectedIndex() == Ranks.RS_CUSTOM)
         {
@@ -4780,12 +4803,13 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         rSkillPrefs.setSpecialAbilBonus(SkillType.EXP_ELITE, (Integer) spnAbilElite.getModel().getValue());
 
         options.setProbPhenoMW((Integer) spnProbPhenoMW.getModel().getValue());
-        options.setProbPhenoAero((Integer) spnProbPhenoAero.getModel().getValue());
         options.setProbPhenoBA((Integer) spnProbPhenoBA.getModel().getValue());
+        options.setProbPhenoAero((Integer) spnProbPhenoAero.getModel().getValue());
         options.setProbPhenoVee((Integer) spnProbPhenoVee.getModel().getValue());
+        options.setProbPhenoProto((Integer) spnProbPhenoProto.getModel().getValue());
+        options.setProbPhenoProto((Integer) spnProbPhenoNaval.getModel().getValue());
 
         //region Personnel Tab
-
         options.setInitBonus(useInitBonusBox.isSelected());
         campaign.getGameOptions().getOption("individual_initiative").setValue(useInitBonusBox.isSelected());
         options.setToughness(useToughnessBox.isSelected());

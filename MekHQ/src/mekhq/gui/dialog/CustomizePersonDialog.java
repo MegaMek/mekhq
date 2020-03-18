@@ -16,6 +16,8 @@ import java.util.stream.Collectors;
 
 import javax.swing.*;
 
+import megamek.client.RandomNameGenerator;
+import mekhq.campaign.personnel.*;
 import org.joda.time.DateTime;
 
 import megamek.client.ui.swing.DialogOptionComponent;
@@ -31,10 +33,6 @@ import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Bloodname;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
@@ -463,8 +461,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         panDemog.add(new JLabel("Phenotype:"), gridBagConstraints);
 
         DefaultComboBoxModel<String> phenoModel = new DefaultComboBoxModel<>();
-        for(int i = 0; i < Person.PHENOTYPE_NUM; i++) {
-            phenoModel.addElement(Person.getPhenotypeName(i));
+        for(int i = 0; i < Phenotype.P_NUM; i++) {
+            phenoModel.addElement(Phenotype.getPhenotypeName(i));
         }
         choicePheno = new JComboBox<>(phenoModel);
         choicePheno.setSelectedIndex(person.getPhenotype());
@@ -897,39 +895,17 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     }//GEN-LAST:event_btnOkActionPerformed
 
     private void randomName() {
-        String[] name = campaign.getRNG().generateGivenNameSurnameSplit(
-                choiceGender.getSelectedIndex() == Crew.G_FEMALE,
-                person.isClanner(), person.getOriginFaction().getShortName());
+        String[] name = RandomNameGenerator.getInstance().generateGivenNameSurnameSplit(
+                choiceGender.getSelectedIndex(), person.isClanner(),
+                person.getOriginFaction().getShortName());
         textGivenName.setText(name[0]);
         textSurname.setText(name[1]);
     }
 
     private void randomBloodname() {
-        int phenotype = Bloodname.P_GENERAL;
-        switch (person.getPrimaryRole()) {
-            case Person.T_MECHWARRIOR:
-                phenotype = Bloodname.P_MECHWARRIOR;
-                break;
-            case Person.T_BA:
-                phenotype = Bloodname.P_ELEMENTAL;
-                break;
-            case Person.T_AERO_PILOT:
-            case Person.T_CONV_PILOT:
-                phenotype = Bloodname.P_AEROSPACE;
-                break;
-            case Person.T_SPACE_CREW:
-            case Person.T_NAVIGATOR:
-            case Person.T_SPACE_GUNNER:
-            case Person.T_SPACE_PILOT:
-                phenotype = Bloodname.P_NAVAL;
-                break;
-            case Person.T_PROTO_PILOT:
-                phenotype = Bloodname.P_PROTOMECH;
-                break;
-        }
         textBloodname.setText(Bloodname.randomBloodname(campaign.getFaction().isClan()
                 ? campaign.getFactionCode() : person.getOriginFaction().getShortName(),
-                phenotype, campaign.getCalendar().get(Calendar.YEAR)).getName());
+                person.getPhenotype(), campaign.getCalendar().get(Calendar.YEAR)).getName());
     }
 
     public void refreshSkills() {
@@ -1229,21 +1205,21 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         clearAllPhenotypeBonuses();
         if (clanner) {
             switch(pheno) {
-                case Person.PHENOTYPE_MW:
+                case Phenotype.P_MECHWARRIOR:
                     skillBonus.get(SkillType.S_GUN_MECH).setValue(1);
                     skillBonus.get(SkillType.S_PILOT_MECH).setValue(1);
                     break;
-                case Person.PHENOTYPE_AERO:
+                case Phenotype.P_AEROSPACE:
                     skillBonus.get(SkillType.S_GUN_AERO).setValue(1);
                     skillBonus.get(SkillType.S_PILOT_AERO).setValue(1);
                     skillBonus.get(SkillType.S_GUN_JET).setValue(1);
                     skillBonus.get(SkillType.S_PILOT_JET).setValue(1);
                     skillBonus.get(SkillType.S_GUN_PROTO).setValue(1);
                     break;
-                case Person.PHENOTYPE_BA:
+                case Phenotype.P_ELEMENTAL:
                     skillBonus.get(SkillType.S_GUN_BA).setValue(1);
                     break;
-                case Person.PHENOTYPE_VEE:
+                case Phenotype.P_VEHICLE:
                     skillBonus.get(SkillType.S_GUN_VEE).setValue(1);
                     skillBonus.get(SkillType.S_PILOT_GVEE).setValue(1);
                     skillBonus.get(SkillType.S_PILOT_NVEE).setValue(1);

@@ -33,11 +33,13 @@ import java.util.stream.Stream;
 
 import javax.swing.JOptionPane;
 
+import megamek.client.RandomGenderGenerator;
 import megamek.common.*;
+import megamek.common.util.MegaMekFile;
 import mekhq.*;
 import mekhq.campaign.finances.*;
 import mekhq.campaign.log.*;
-import mekhq.campaign.personnel.FormerSpouse;
+import mekhq.campaign.personnel.*;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 import org.joda.time.DateTime;
@@ -113,18 +115,6 @@ import mekhq.campaign.parts.StructuralIntegrity;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
-import mekhq.campaign.personnel.AbstractPersonnelGenerator;
-import mekhq.campaign.personnel.Ancestors;
-import mekhq.campaign.personnel.Bloodname;
-import mekhq.campaign.personnel.DefaultPersonnelGenerator;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.Rank;
-import mekhq.campaign.personnel.Ranks;
-import mekhq.campaign.personnel.RetirementDefectionTracker;
-import mekhq.campaign.personnel.Skill;
-import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.rating.CampaignOpsReputation;
 import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.IUnitRating;
@@ -208,8 +198,6 @@ public class Campaign implements Serializable, ITechManager {
     private GameOptions gameOptions;
 
     private String name;
-
-    private RandomNameGenerator rng = RandomNameGenerator.getInstance();
 
     // hierarchically structured Force object to define TO&E
     private Force forces;
@@ -424,10 +412,6 @@ public class Campaign implements Serializable, ITechManager {
 
     public DateFormat getShortDateFormatter() {
         return new SimpleDateFormat(shortDateFormat);
-    }
-
-    public RandomNameGenerator getRNG() {
-        return rng;
     }
 
     public String getCurrentSystemName() {
@@ -1390,54 +1374,15 @@ public class Campaign implements Serializable, ITechManager {
      * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
      * appropriate to the person's phenotype and the player's faction.
      *
-     * @param person       The Bloodname candidate
-     * @param type         The phenotype index
+     * @param person     The Bloodname candidate
+     * @param ignoreDice If true, skips the random roll and assigns a Bloodname automatically
      */
-    public void checkBloodnameAdd(Person person, int type) {
-        checkBloodnameAdd(person, type, false, this.factionCode);
-    }
+    public void checkBloodnameAdd(Person person, boolean ignoreDice) {
+        // if a non-clanner is here, we can just return
+        if (!person.isClanner()) {
+            return;
+        }
 
-    /**
-     * If the person does not already have a bloodname, assigns a chance of having one based on
-     * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
-     * appropriate to Clan and phenotype.
-     *
-     * @param person       The Bloodname candidate
-     * @param type         The phenotype index
-     * @param factionCode  The shortName of the faction the person belongs to. Note that there
-     *                     is a chance of having a Bloodname that is unique to a different Clan
-     *                     as this person could have been captured.
-     */
-    public void checkBloodnameAdd(Person person, int type, String factionCode) {
-        checkBloodnameAdd(person, type, false, factionCode);
-    }
-
-    /**
-     * If the person does not already have a bloodname, assigns a chance of having one based on
-     * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
-     * appropriate to the person's phenotype and the player's faction.
-     *
-     * @param person       The Bloodname candidate
-     * @param type         The phenotype index
-     * @param ignoreDice   If true, skips the random roll and assigns a Bloodname automatically
-     */
-    public void checkBloodnameAdd(Person person, int type, boolean ignoreDice) {
-        checkBloodnameAdd(person, type, ignoreDice, this.factionCode);
-    }
-
-    /**
-     * If the person does not already have a bloodname, assigns a chance of having one based on
-     * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
-     * appropriate to Clan and phenotype.
-     *
-     * @param person       The Bloodname candidate
-     * @param type         The phenotype index
-     * @param ignoreDice   If true, skips the random roll and assigns a Bloodname automatically
-     * @param factionCode  The shortName of the faction the person belongs to. Note that there
-     *                     is a chance of having a Bloodname that is unique to a different Clan
-     *                     as this person could have been captured.
-     */
-    public void checkBloodnameAdd(Person person, int type, boolean ignoreDice, String factionCode) {
         // Person already has a bloodname?
         if (person.getBloodname().length() > 0) {
             int result = JOptionPane.showConfirmDialog(null,
@@ -1450,10 +1395,10 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         // Go ahead and generate a new bloodname
-        if (person.isClanner() && person.getPhenotype() != Person.PHENOTYPE_NONE) {
+        if (person.getPhenotype() != Phenotype.P_NONE) {
             int bloodnameTarget = 6;
             switch (person.getPhenotype()) {
-                case Person.PHENOTYPE_MW:
+                case Phenotype.P_MECHWARRIOR: {
                     bloodnameTarget += person.hasSkill(SkillType.S_GUN_MECH)
                             ? person.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue()
                             : TargetRoll.AUTOMATIC_FAIL;
@@ -1461,22 +1406,8 @@ public class Campaign implements Serializable, ITechManager {
                             ? person.getSkill(SkillType.S_PILOT_MECH).getFinalSkillValue()
                             : TargetRoll.AUTOMATIC_FAIL;
                     break;
-                case Person.PHENOTYPE_AERO:
-                    if (type == Person.T_PROTO_PILOT) {
-                        bloodnameTarget += 2 * (person.hasSkill(SkillType.S_GUN_PROTO)
-                                ? person.getSkill(SkillType.S_GUN_PROTO).getFinalSkillValue()
-                                : TargetRoll.AUTOMATIC_FAIL);
-
-                    } else {
-                        bloodnameTarget += person.hasSkill(SkillType.S_GUN_AERO)
-                                ? person.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue()
-                                : TargetRoll.AUTOMATIC_FAIL;
-                        bloodnameTarget += person.hasSkill(SkillType.S_PILOT_AERO)
-                                ? person.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue()
-                                : TargetRoll.AUTOMATIC_FAIL;
-                    }
-                    break;
-                case Person.PHENOTYPE_BA:
+                }
+                case Phenotype.P_ELEMENTAL: {
                     bloodnameTarget += person.hasSkill(SkillType.S_GUN_BA)
                             ? person.getSkill(SkillType.S_GUN_BA).getFinalSkillValue()
                             : TargetRoll.AUTOMATIC_FAIL;
@@ -1484,24 +1415,72 @@ public class Campaign implements Serializable, ITechManager {
                             ? person.getSkill(SkillType.S_ANTI_MECH).getFinalSkillValue()
                             : TargetRoll.AUTOMATIC_FAIL;
                     break;
-                case Person.PHENOTYPE_VEE:
-                    bloodnameTarget += person.hasSkill(SkillType.S_GUN_VEE)
-                            ? person.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue()
+                }
+                case Phenotype.P_AEROSPACE: {
+                    bloodnameTarget += person.hasSkill(SkillType.S_GUN_AERO)
+                            ? person.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue()
                             : TargetRoll.AUTOMATIC_FAIL;
-                    if (type == Person.T_VTOL_PILOT) {
-                        bloodnameTarget += person.hasSkill(SkillType.S_PILOT_VTOL)
-                                ? person.getSkill(SkillType.S_PILOT_VTOL).getFinalSkillValue()
+                    bloodnameTarget += person.hasSkill(SkillType.S_PILOT_AERO)
+                            ? person.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue()
+                            : TargetRoll.AUTOMATIC_FAIL;
+                    break;
+                }
+                case Phenotype.P_VEHICLE: {
+                    if (person.getOriginFaction().getShortName().equals("CHH")) {
+                        bloodnameTarget += person.hasSkill(SkillType.S_GUN_VEE)
+                                ? person.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue()
                                 : TargetRoll.AUTOMATIC_FAIL;
-                    } else if (type == Person.T_NVEE_DRIVER) {
-                        bloodnameTarget += person.hasSkill(SkillType.S_PILOT_NVEE)
-                                ? person.getSkill(SkillType.S_PILOT_NVEE).getFinalSkillValue()
-                                : TargetRoll.AUTOMATIC_FAIL;
-                    } else {
-                        bloodnameTarget += person.hasSkill(SkillType.S_PILOT_GVEE)
-                                ? person.getSkill(SkillType.S_PILOT_GVEE).getFinalSkillValue()
-                                : TargetRoll.AUTOMATIC_FAIL;
+                        switch (person.getPrimaryRole()) {
+                            case Person.T_VTOL_PILOT:
+                                bloodnameTarget += person.hasSkill(SkillType.S_PILOT_VTOL)
+                                        ? person.getSkill(SkillType.S_PILOT_VTOL).getFinalSkillValue()
+                                        : TargetRoll.AUTOMATIC_FAIL;
+                                break;
+                            case Person.T_NVEE_DRIVER:
+                                bloodnameTarget += person.hasSkill(SkillType.S_PILOT_NVEE)
+                                        ? person.getSkill(SkillType.S_PILOT_NVEE).getFinalSkillValue()
+                                        : TargetRoll.AUTOMATIC_FAIL;
+                                break;
+                            case Person.T_GVEE_DRIVER:
+                                bloodnameTarget += person.hasSkill(SkillType.S_PILOT_GVEE)
+                                        ? person.getSkill(SkillType.S_PILOT_GVEE).getFinalSkillValue()
+                                        : TargetRoll.AUTOMATIC_FAIL;
+                                break;
+                        }
                     }
                     break;
+                }
+                case Phenotype.P_PROTOMECH: {
+                    bloodnameTarget += 2 * (person.hasSkill(SkillType.S_GUN_PROTO)
+                            ? person.getSkill(SkillType.S_GUN_PROTO).getFinalSkillValue()
+                            : TargetRoll.AUTOMATIC_FAIL);
+                    break;
+                }
+                case Phenotype.P_NAVAL: {
+                    if (person.getOriginFaction().getShortName().equals("CSR")
+                            || person.getOriginFaction().getShortName().equals("RA")) {
+                        switch (person.getPrimaryRole()) {
+                            case Person.T_SPACE_CREW:
+                                bloodnameTarget += 2 * (person.hasSkill(SkillType.S_TECH_VESSEL)
+                                        ? person.getSkill(SkillType.S_TECH_VESSEL).getFinalSkillValue()
+                                        : TargetRoll.AUTOMATIC_FAIL);
+                            case Person.T_SPACE_GUNNER:
+                                bloodnameTarget += 2 * (person.hasSkill(SkillType.S_GUN_SPACE)
+                                        ? person.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue()
+                                        : TargetRoll.AUTOMATIC_FAIL);
+                            case Person.T_SPACE_PILOT:
+                                bloodnameTarget += 2 * (person.hasSkill(SkillType.S_PILOT_SPACE)
+                                        ? person.getSkill(SkillType.S_PILOT_SPACE).getFinalSkillValue()
+                                        : TargetRoll.AUTOMATIC_FAIL);
+                            case Person.T_NAVIGATOR:
+                            default:
+                                bloodnameTarget += 2 * (person.hasSkill(SkillType.S_NAV)
+                                        ? person.getSkill(SkillType.S_NAV).getFinalSkillValue()
+                                        : TargetRoll.AUTOMATIC_FAIL);
+                        }
+                    }
+                    break;
+                }
             }
             // Higher rated units are more likely to have Bloodnamed
             if (campaignOptions.useDragoonRating()) {
@@ -1512,45 +1491,32 @@ public class Campaign implements Serializable, ITechManager {
             }
             // Reavings diminish the number of available Bloodrights in later eras
             int year = getCalendar().get(Calendar.YEAR);
-            if (year <= 2950)
+            if (year <= 2950) {
                 bloodnameTarget--;
-            if (year > 3055)
+            }
+            if (year > 3055) {
                 bloodnameTarget++;
-            if (year > 3065)
+            }
+            if (year > 3065) {
                 bloodnameTarget++;
-            if (year > 3080)
+            }
+            if (year > 3080) {
                 bloodnameTarget++;
+            }
             // Officers have better chance; no penalty for non-officer
             bloodnameTarget += Math.min(0, ranks.getOfficerCut() - person.getRankNumeric());
 
-            if (Compute.d6(2) >= bloodnameTarget || ignoreDice) {
+            if ((Compute.d6(2) >= bloodnameTarget) || ignoreDice) {
                 /*
                  * The Bloodname generator has slight differences in categories that do not map
                  * easily onto Person constants
                  */
-                int phenotype = Bloodname.P_GENERAL;
-                switch (type) {
-                    case Person.T_MECHWARRIOR:
-                        phenotype = Bloodname.P_MECHWARRIOR;
-                        break;
-                    case Person.T_BA:
-                        phenotype = Bloodname.P_ELEMENTAL;
-                        break;
-                    case Person.T_AERO_PILOT:
-                    case Person.T_CONV_PILOT:
-                        phenotype = Bloodname.P_AEROSPACE;
-                        break;
-                    case Person.T_SPACE_CREW:
-                    case Person.T_NAVIGATOR:
-                    case Person.T_SPACE_GUNNER:
-                    case Person.T_SPACE_PILOT:
-                        phenotype = Bloodname.P_NAVAL;
-                        break;
-                    case Person.T_PROTO_PILOT:
-                        phenotype = Bloodname.P_PROTOMECH;
-                        break;
+                int phenotype = person.getPhenotype();
+                if ((phenotype == Phenotype.P_NONE) || (phenotype > Phenotype.P_GENERAL)) {
+                    phenotype = Phenotype.P_GENERAL;
                 }
-                Bloodname bloodname = Bloodname.randomBloodname(factionCode, phenotype, getGameYear());
+                Bloodname bloodname = Bloodname.randomBloodname(
+                        person.getOriginFaction().getShortName(), phenotype, getGameYear());
                 if (null != bloodname) {
                     person.setBloodname(bloodname.getName());
                 }
@@ -1677,7 +1643,6 @@ public class Campaign implements Serializable, ITechManager {
      */
     public AbstractPersonnelGenerator getPersonnelGenerator(AbstractFactionSelector factionSelector, AbstractPlanetSelector planetSelector) {
         DefaultPersonnelGenerator generator = new DefaultPersonnelGenerator(factionSelector, planetSelector);
-        generator.setNameGenerator(rng);
         generator.setSkillPreferences(getRandomSkillPreferences());
         return generator;
     }
@@ -4585,9 +4550,9 @@ public class Campaign implements Serializable, ITechManager {
         ranks.writeToXml(pw1, 3);
 
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "nameGen",
-                rng.getChosenFaction());
+                RandomNameGenerator.getInstance().getChosenFaction());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "percentFemale",
-                rng.getPercentFemale());
+                RandomGenderGenerator.getPercentFemale());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "overtime", overtime);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "gmMode", gmMode);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "showOverview", app.getCampaigngui()
@@ -4612,10 +4577,10 @@ public class Campaign implements Serializable, ITechManager {
         {
             pw1.println("\t\t<nameGen>");
             pw1.print("\t\t\t<faction>");
-            pw1.print(MekHqXmlUtil.escape(rng.getChosenFaction()));
+            pw1.print(MekHqXmlUtil.escape(RandomNameGenerator.getInstance().getChosenFaction()));
             pw1.println("</faction>");
             pw1.print("\t\t\t<percentFemale>");
-            pw1.print(rng.getPercentFemale());
+            pw1.print(RandomGenderGenerator.getPercentFemale());
             pw1.println("</percentFemale>");
             pw1.println("\t\t</nameGen>");
         }
@@ -6334,8 +6299,106 @@ public class Campaign implements Serializable, ITechManager {
         p.addLogEntry(entry);
     }
 
-    private ArrayList<String> getPossibleRandomPortraits (DirectoryItems portraits, ArrayList<String> existingPortraits, String subDir ) {
-        ArrayList<String> possiblePortraits = new ArrayList<>();
+    public void assignRandomPortraitFor(Person p) {
+        // first create a list of existing portrait strings, so we can check for
+        // duplicates
+        List<String> existingPortraits = new ArrayList<>();
+        for (Person existingPerson : getPersonnel()) {
+            existingPortraits.add(existingPerson.getPortraitCategory() + ":"
+                    + existingPerson.getPortraitFileName());
+        }
+        DirectoryItems portraits;
+        try {
+            portraits = new DirectoryItems(
+                    new MegaMekFile(Configuration.portraitImagesDir().getPath()).getFile(),
+                    "", PortraitFileFactory.getInstance());
+        } catch (Exception e) {
+            MekHQ.getLogger().error(getClass(), "assignRandomPortraitFor", e);
+            return;
+        }
+
+        List<String> possiblePortraits;
+
+        // Will search for portraits in the /gender/primaryrole folder first,
+        // and if none are found then /gender/rolegroup, then /gender/combat or
+        // /gender/support, then in /gender.
+        String searchCat_Gender = "";
+        if (p.getGender() == Crew.G_FEMALE) {
+            searchCat_Gender += "Female/";
+        } else {
+            searchCat_Gender += "Male/";
+        }
+
+        String searchCat_Role = Person.getRoleDesc(p.getPrimaryRole(), false) + "/";
+
+        possiblePortraits = getPossibleRandomPortraits(portraits, existingPortraits,
+                searchCat_Gender + searchCat_Role);
+
+        if (possiblePortraits.isEmpty()) {
+            String searchCat_RoleGroup;
+            switch (p.getPrimaryRole()) {
+                case Person.T_DOCTOR:
+                case Person.T_MEDIC:
+                    searchCat_RoleGroup = "Medical/";
+                    break;
+                case Person.T_MECH_TECH:
+                case Person.T_MECHANIC:
+                case Person.T_AERO_TECH:
+                case Person.T_BA_TECH:
+                    searchCat_RoleGroup = "Tech/";
+                    break;
+                case Person.T_ADMIN_COM:
+                case Person.T_ADMIN_HR:
+                case Person.T_ADMIN_LOG:
+                case Person.T_ADMIN_TRA:
+                    searchCat_RoleGroup = "Admin/";
+                    break;
+                case Person.T_SPACE_PILOT:
+                case Person.T_SPACE_GUNNER:
+                case Person.T_SPACE_CREW:
+                case Person.T_NAVIGATOR:
+                    searchCat_RoleGroup = "Vessel Crew/";
+                    break;
+                default:
+                    searchCat_RoleGroup = "";
+                    break;
+            }
+
+            if (!searchCat_RoleGroup.isEmpty()) {
+                possiblePortraits = getPossibleRandomPortraits(portraits, existingPortraits,
+                        searchCat_Gender + searchCat_RoleGroup);
+            }
+        }
+
+        if (possiblePortraits.isEmpty()) {
+            String searchCat_CombatSupport;
+            if (p.isSupport()) {
+                searchCat_CombatSupport = "Support/";
+            } else {
+                searchCat_CombatSupport = "Combat/";
+            }
+
+            possiblePortraits = getPossibleRandomPortraits(portraits, existingPortraits,
+                    searchCat_Gender + searchCat_CombatSupport);
+        }
+
+        if (possiblePortraits.isEmpty()) {
+            possiblePortraits = getPossibleRandomPortraits(portraits, existingPortraits, searchCat_Gender);
+        }
+
+        if (!possiblePortraits.isEmpty()) {
+            String chosenPortrait = possiblePortraits.get(Compute.randomInt(possiblePortraits.size()));
+            String[] temp = chosenPortrait.split(":");
+            if (temp.length != 2) {
+                return;
+            }
+            p.setPortraitCategory(temp[0]);
+            p.setPortraitFileName(temp[1]);
+        }
+    }
+
+    private List<String> getPossibleRandomPortraits(DirectoryItems portraits, List<String> existingPortraits, String subDir ) {
+        List<String> possiblePortraits = new ArrayList<>();
         Iterator<String> categories = portraits.getCategoryNames();
         while (categories.hasNext()) {
             String category = categories.next();
@@ -6352,90 +6415,6 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
         return possiblePortraits;
-    }
-
-    public void assignRandomPortraitFor(Person p) {
-        // first create a list of existing portrait strings, so we can check for
-        // duplicates
-        ArrayList<String> existingPortraits = new ArrayList<>();
-        for (Person existingPerson : this.getPersonnel()) {
-            existingPortraits.add(existingPerson.getPortraitCategory() + ":"
-                    + existingPerson.getPortraitFileName());
-        }
-        // TODO: it would be nice to pull the portraits directory from MekHQ
-        // TODO: itself
-        DirectoryItems portraits;
-        try {
-            portraits = new DirectoryItems(
-                    new File("data/images/portraits"), "", //$NON-NLS-1$ //$NON-NLS-2$
-                    PortraitFileFactory.getInstance());
-        } catch (Exception e) {
-            MekHQ.getLogger().error(getClass(), "assignRandomPortraitFor", e);
-            return;
-        }
-        ArrayList<String> possiblePortraits;
-
-        // Will search for portraits in the /gender/primaryrole folder first,
-        // and if none are found then /gender/rolegroup, then /gender/combat or
-        // /gender/support, then in /gender.
-        String searchCat_Gender = "";
-        if (p.getGender() == Crew.G_FEMALE) {
-            searchCat_Gender += "Female/";
-        } else {
-            searchCat_Gender += "Male/";
-        }
-        String searchCat_Role = Person.getRoleDesc(p.getPrimaryRole(), false) + "/";
-        String searchCat_RoleGroup = "";
-        String searchCat_CombatSupport = "";
-        if (p.getPrimaryRole() == Person.T_ADMIN_COM
-                || p.getPrimaryRole() == Person.T_ADMIN_HR
-                || p.getPrimaryRole() == Person.T_ADMIN_LOG
-                || p.getPrimaryRole() == Person.T_ADMIN_TRA) {
-            searchCat_RoleGroup = "Admin/";
-        }
-        if (p.getPrimaryRole() == Person.T_MECHANIC
-                || p.getPrimaryRole() == Person.T_AERO_TECH
-                || p.getPrimaryRole() == Person.T_MECH_TECH
-                || p.getPrimaryRole() == Person.T_BA_TECH) {
-            searchCat_RoleGroup = "Tech/";
-        }
-        if (p.getPrimaryRole() == Person.T_MEDIC
-                || p.getPrimaryRole() == Person.T_DOCTOR) {
-            searchCat_RoleGroup = "Medical/";
-        }
-        if (p.getPrimaryRole() == Person.T_SPACE_CREW
-                || p.getPrimaryRole() == Person.T_SPACE_GUNNER
-                || p.getPrimaryRole() == Person.T_SPACE_PILOT
-                || p.getPrimaryRole() == Person.T_NAVIGATOR) {
-            searchCat_RoleGroup = "Vessel Crew/";
-        }
-
-        if (p.isSupport()) {
-            searchCat_CombatSupport = "Support/";
-        } else {
-            searchCat_CombatSupport = "Combat/";
-        }
-
-        possiblePortraits = getPossibleRandomPortraits(portraits, existingPortraits, searchCat_Gender + searchCat_Role);
-
-        if (possiblePortraits.isEmpty() && !searchCat_RoleGroup.isEmpty()) {
-            possiblePortraits = getPossibleRandomPortraits(portraits, existingPortraits, searchCat_Gender + searchCat_RoleGroup);
-        }
-        if (possiblePortraits.isEmpty()) {
-            possiblePortraits = getPossibleRandomPortraits(portraits, existingPortraits, searchCat_Gender + searchCat_CombatSupport);
-        }
-        if (possiblePortraits.isEmpty()) {
-            possiblePortraits = getPossibleRandomPortraits(portraits, existingPortraits, searchCat_Gender);
-        }
-        if (!possiblePortraits.isEmpty()) {
-            String chosenPortrait = possiblePortraits.get(Compute.randomInt(possiblePortraits.size()));
-            String[] temp = chosenPortrait.split(":");
-            if (temp.length != 2) {
-                return;
-            }
-            p.setPortraitCategory(temp[0]);
-            p.setPortraitFileName(temp[1]);
-        }
     }
 
     /**

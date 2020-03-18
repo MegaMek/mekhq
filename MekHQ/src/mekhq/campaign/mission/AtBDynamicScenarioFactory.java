@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.mission;
 
 import java.util.ArrayList;
@@ -30,13 +29,11 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import megamek.client.*;
 import megamek.common.util.StringUtil;
+import mekhq.campaign.personnel.Phenotype;
 import org.joda.time.DateTime;
 
-import megamek.client.Client;
-import megamek.client.RandomNameGenerator;
-import megamek.client.RandomSkillsGenerator;
-import megamek.client.RandomUnitGenerator;
 import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.ratgenerator.MissionRole;
 import megamek.common.Board;
@@ -1237,10 +1234,9 @@ public class AtBDynamicScenarioFactory {
 
         Faction f = Faction.getFaction(faction);
 
-        RandomNameGenerator rng = RandomNameGenerator.getInstance();
-        rng.setChosenFaction(f.getNameGenerator());
-        boolean gender = rng.isFemale();
-        String[] crewNameArray = rng.generateGivenNameSurnameSplit(gender, f.isClan(), faction);
+        int gender = RandomGenderGenerator.generate();
+        String[] crewNameArray = RandomNameGenerator.getInstance()
+                .generateGivenNameSurnameSplit(gender, f.isClan(), f.getNameGenerator());
         String crewName = crewNameArray[0];
         crewName += !StringUtil.isNullOrEmpty(crewNameArray[1]) ?  " " + crewNameArray[1] : "";
 
@@ -1258,26 +1254,41 @@ public class AtBDynamicScenarioFactory {
         }
         int[] skills = rsg.getRandomSkills(en);
 
-        if (f.isClan() && Compute.d6(2) > 8 - skill + skills[0] + skills[1]) {
-            int phenotype;
+        if (f.isClan() && (Compute.d6(2) > (8 - skill + skills[0] + skills[1]))) {
+            int phenotype = Phenotype.P_NONE;
             switch (en.getUnitType()) {
-            case UnitType.MEK:
-                phenotype = Bloodname.P_MECHWARRIOR;
-                break;
-            case UnitType.BATTLE_ARMOR:
-                phenotype = Bloodname.P_ELEMENTAL;
-                break;
-            case UnitType.AERO:
-                phenotype = Bloodname.P_AEROSPACE;
-                break;
-            case UnitType.PROTOMEK:
-                phenotype = Bloodname.P_PROTOMECH;
-                break;
-            default:
-                phenotype = -1;
+                case UnitType.MEK:
+                    phenotype = Phenotype.P_MECHWARRIOR;
+                    break;
+                case UnitType.TANK:
+                case UnitType.VTOL:
+                    if (f.getShortName().equals("CHH")) { // this phenotype is unique to Clan Hell's Horses
+                        phenotype = Phenotype.P_VEHICLE;
+                    }
+                    break;
+                case UnitType.BATTLE_ARMOR:
+                    phenotype = Phenotype.P_ELEMENTAL;
+                    break;
+                case UnitType.AERO:
+                case UnitType.CONV_FIGHTER:
+                    phenotype = Phenotype.P_AEROSPACE;
+                    break;
+                case UnitType.PROTOMEK:
+                    phenotype = Phenotype.P_PROTOMECH;
+                    break;
+                case UnitType.SMALL_CRAFT:
+                case UnitType.DROPSHIP:
+                case UnitType.JUMPSHIP:
+                case UnitType.WARSHIP:
+                    if (f.getShortName().equals("CSR") || f.getShortName().equals("RA")) {
+                        // this phenotype is unique to Clan Snow Raven and the Raven Alliance
+                        phenotype = Phenotype.P_NAVAL;
+                    }
+                    break;
             }
-            if (phenotype >= 0) {
-                String bloodname = Bloodname.randomBloodname(faction, phenotype, campaign.getCalendar().get(Calendar.YEAR)).getName();
+            if (phenotype > 0) {
+                String bloodname = Bloodname.randomBloodname(faction, phenotype,
+                        campaign.getCalendar().get(Calendar.YEAR)).getName();
                 crewName += " " + bloodname;
                 innerMap.put(Crew.MAP_BLOODNAME, bloodname);
                 innerMap.put(Crew.MAP_PHENOTYPE, Integer.toString(phenotype));
@@ -1287,7 +1298,7 @@ public class AtBDynamicScenarioFactory {
         extraData.put(0, innerMap);
 
         en.setCrew(new Crew(en.getCrew().getCrewType(), crewName, Compute.getFullCrewSize(en),
-                skills[0], skills[1], Crew.getGenderAsInt(gender), extraData));
+                skills[0], skills[1], gender, extraData));
 
         UUID id = UUID.randomUUID();
         en.setExternalIdAsString(id.toString());
@@ -1333,18 +1344,19 @@ public class AtBDynamicScenarioFactory {
 
         Faction faction = Faction.getFaction(fName);
 
-        RandomNameGenerator rng = RandomNameGenerator.getInstance();
-        rng.setChosenFaction(faction.getNameGenerator());
-
         RandomSkillsGenerator rsg = new RandomSkillsGenerator();
         rsg.setMethod(RandomSkillsGenerator.M_TAHARQA);
         rsg.setLevel(skill);
 
-        if (faction.isClan()) rsg.setType(RandomSkillsGenerator.T_CLAN);
+        if (faction.isClan()) {
+            rsg.setType(RandomSkillsGenerator.T_CLAN);
+        }
         int[] skills = rsg.getRandomSkills(en);
-        boolean isFemale = rng.isFemale();
-        en.setCrew(new Crew(en.getCrew().getCrewType(), rng.generate(isFemale),
-                Compute.getFullCrewSize(en),skills[0], skills[1], Crew.getGenderAsInt(isFemale), null));
+        int gender = RandomGenderGenerator.generate();
+        en.setCrew(new Crew(en.getCrew().getCrewType(),
+                RandomNameGenerator.getInstance().generate(gender, faction.isClan(),
+                        faction.getNameGenerator()),
+                Compute.getFullCrewSize(en), skills[0], skills[1], gender, null));
 
         UUID id = UUID.randomUUID();
         en.setExternalIdAsString(id.toString());

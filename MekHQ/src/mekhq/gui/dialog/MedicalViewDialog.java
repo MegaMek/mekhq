@@ -58,6 +58,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
 
+import mekhq.campaign.personnel.*;
 import org.joda.time.chrono.GJChronology;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -75,11 +76,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.ExtraData;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.personnel.BodyLocation;
-import mekhq.campaign.personnel.Injury;
-import mekhq.campaign.personnel.InjuryLevel;
-import mekhq.campaign.personnel.InjuryType;
-import mekhq.campaign.personnel.Person;
 
 public class MedicalViewDialog extends JDialog {
     private static final long serialVersionUID = 6178230374580087883L;
@@ -352,7 +348,9 @@ public class MedicalViewDialog extends JDialog {
         int ageInMonths = (now.get(Calendar.YEAR) - birthday.get(Calendar.YEAR)) * 12
             + now.get(Calendar.MONTH) - birthday.get(Calendar.MONTH);
 
-        String phenotype = (p.getPhenotype() != Person.PHENOTYPE_NONE) ? p.getPhenotypeName() : resourceMap.getString("baselinePhenotype.text"); //$NON-NLS-1$
+        String phenotype = (p.getPhenotype() != Phenotype.P_NONE)
+                ? Phenotype.getPhenotypeName(p.getPhenotype())
+                : resourceMap.getString("baselinePhenotype.text");
 
         Force f = c.getForceFor(p);
         String force = (null != f) ? f.getFullName() : "-"; //$NON-NLS-1$

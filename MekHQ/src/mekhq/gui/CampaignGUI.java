@@ -258,11 +258,10 @@ public class CampaignGUI extends JPanel {
 
     public void randomizeAllBloodnames() {
         for (Person p : getCampaign().getPersonnel()) {
-            if (!p.isClanner()) {
-                continue;
+            if (p.isClanner()) {
+                getCampaign().checkBloodnameAdd(p, false);
+                getCampaign().personUpdated(p);
             }
-            getCampaign().checkBloodnameAdd(p, p.getPrimaryRole());
-            getCampaign().personUpdated(p);
         }
     }
 
@@ -270,16 +269,15 @@ public class CampaignGUI extends JPanel {
         BatchXPDialog batchXPDialog = new BatchXPDialog(getFrame(), getCampaign());
         batchXPDialog.setVisible(true);
 
-        if(batchXPDialog.hasDataChanged()) {
+        if (batchXPDialog.hasDataChanged()) {
             refreshReport();
         }
     }
 
     public void showBloodnameDialog() {
-        BloodnameDialog bloodnameDialog = new BloodnameDialog(getFrame());
-        bloodnameDialog.setFaction(getCampaign().getFactionCode());
-        bloodnameDialog.setYear(getCampaign().getCalendar().get(
-                java.util.Calendar.YEAR));
+        int year = getCampaign().getCalendar().get(Calendar.YEAR);
+        BloodnameDialog bloodnameDialog = new BloodnameDialog(getFrame(), year);
+        bloodnameDialog.setFaction(getCampaign().getFaction().getFullName(year));
         bloodnameDialog.setVisible(true);
     }
 

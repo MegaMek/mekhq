@@ -84,9 +84,10 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
 
         generateXp(campaign, person, expLvl);
 
-        generatePhenotype(campaign, person, expLvl);
+        generatePhenotype(campaign, person);
 
-        generateBirthday(campaign, person, expLvl, person.isClanner() && person.getPhenotype() != Person.PHENOTYPE_NONE);
+        generateBirthday(campaign, person, expLvl, person.isClanner()
+                && (person.getPhenotype() != Phenotype.P_NONE));
 
         AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator();
         skillGenerator.setSkillPreferences(getSkillPreferences());
@@ -101,7 +102,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
 
         //check for Bloodname
         if (person.isClanner()) {
-            campaign.checkBloodnameAdd(person, primaryRole, person.getOriginFaction().getShortName());
+            campaign.checkBloodnameAdd(person, false);
         }
 
         person.setDaysToWaitForHealing(campaign.getCampaignOptions().getNaturalHealingWaitingPeriod());
