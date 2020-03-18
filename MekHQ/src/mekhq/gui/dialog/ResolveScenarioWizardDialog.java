@@ -1655,12 +1655,11 @@ public class ResolveScenarioWizardDialog extends JDialog {
         //dialog
         PrisonerStatus pstatus = tracker.getPrisonerStatus().get(id);
 
-        if(null == pstatus || null == pstatus.getPerson() ) {
+        if (null == pstatus || null == pstatus.getPerson() ) {
             return;
         }
 
-        PersonViewPanel pvp = new PersonViewPanel(
-                pstatus.getPerson(),tracker.getCampaign(),tracker.getCampaign().getApp().getCampaigngui());
+        PersonViewPanel pvp = new PersonViewPanel(pstatus.getPerson(), tracker.getCampaign());
 
         final JDialog dialog = new JDialog(frame, "Prisoner View", true); //$NON-NLS-1$
         dialog.getContentPane().setLayout(new GridBagLayout());

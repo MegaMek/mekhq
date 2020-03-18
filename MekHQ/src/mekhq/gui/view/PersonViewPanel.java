@@ -1,9 +1,21 @@
 /*
- * PersonViewPanel
+ * Copyright (c) 2009, 2020 The MegaMek Team
  *
- * Created on July 26, 2009, 11:32 PM
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.view;
 
 import java.awt.*;
@@ -28,6 +40,7 @@ import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.FormerSpouse;
 import org.joda.time.DateTime;
@@ -62,6 +75,7 @@ import mekhq.gui.utilities.WrapLayout;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class PersonViewPanel extends ScrollablePanel {
+    //region Variable Declarations
     private static final long serialVersionUID = 7004741688464105277L;
 
     private static final int MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW = 4;
@@ -75,16 +89,17 @@ public class PersonViewPanel extends ScrollablePanel {
     private final DirectoryItems awardIcons;
     private final IconPackage ip;
 
-    ResourceBundle resourceMap;
+    ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonViewPanel",
+            new EncodeControl());
+    //endregion Variable Declarations
 
-    public PersonViewPanel(Person p, Campaign c, CampaignGUI gui) {
+    public PersonViewPanel(Person p, Campaign c) {
         this.person = p;
         this.campaign = c;
-        this.gui = gui;
-        this.ip = gui.getIconPackage();
-        this.portraits = this.ip.getPortraits();
-        this.awardIcons = this.ip.getAwardIcons();
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonViewPanel", new EncodeControl()); //$NON-NLS-1$
+        gui = c.getApp().getCampaigngui();
+        ip = gui.getIconPackage();
+        portraits = ip.getPortraits();
+        awardIcons = ip.getAwardIcons();
         initComponents();
     }
 
@@ -172,15 +187,11 @@ public class PersonViewPanel extends ScrollablePanel {
 
             if (person.awardController.hasAwardsWithMedals()) {
                 JPanel pnlMedals = drawMedals();
-                pnlMedals.setName("pnlMedals");
-                pnlMedals.setLayout(new WrapLayout(FlowLayout.LEFT));
                 pnlAllAwards.add(pnlMedals);
             }
 
             if (person.awardController.hasAwardsWithMiscs()) {
                 JPanel pnlMiscAwards = drawMiscAwards();
-                pnlMiscAwards.setName("pnlMiscAwards");
-                pnlMiscAwards.setLayout(new WrapLayout(FlowLayout.LEFT));
                 pnlAllAwards.add(pnlMiscAwards);
             }
 
@@ -280,6 +291,7 @@ public class PersonViewPanel extends ScrollablePanel {
         add(javax.swing.Box.createGlue(), gridBagConstraints);
     }
 
+    //region Ribbons and Awards
     /**
      * Draws the ribbons below the person portrait.
      */
@@ -287,42 +299,41 @@ public class PersonViewPanel extends ScrollablePanel {
         Box boxRibbons = Box.createVerticalBox();
         boxRibbons.add(Box.createRigidArea(new Dimension(100, 0)));
 
-        List<Award> awards = person.awardController.getAwards().stream().filter(a -> a.getNumberOfRibbonFiles() > 0)
-                .sorted().collect(Collectors.toList());
+        List<Award> awards = person.awardController.getAwards().stream()
+                .filter(a -> a.getNumberOfRibbonFiles() > 0).sorted().collect(Collectors.toList());
         Collections.reverse(awards);
 
         int i = 0;
         Box rowRibbonsBox = null;
-        ArrayList<Box> rowRibbonsBoxes = new ArrayList<>();
+        List<Box> rowRibbonsBoxes = new ArrayList<>();
 
         for (Award award : awards) {
-            JLabel ribbonLabel = new JLabel();
-            Image ribbon;
-
-            if (i % MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW == 0) {
+            if ((i % MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW) == 0) {
                 rowRibbonsBox = Box.createHorizontalBox();
                 rowRibbonsBox.setBackground(Color.RED);
             }
             try {
                 int numberOfAwards = person.awardController.getNumberOfAwards(award);
                 String ribbonFileName = award.getRibbonFileName(numberOfAwards);
-                ribbon = (Image) awardIcons.getItem(award.getSet() + "/ribbons/", ribbonFileName);
-                if (ribbon == null)
+                Image ribbon = (Image) awardIcons.getItem(award.getSet() + "/ribbons/",
+                        ribbonFileName);
+                if (ribbon == null) {
                     continue;
+                }
                 ribbon = ribbon.getScaledInstance(25, 8, Image.SCALE_DEFAULT);
-                ribbonLabel.setIcon(new ImageIcon(ribbon));
+                JLabel ribbonLabel = new JLabel(new ImageIcon(ribbon));
                 ribbonLabel.setToolTipText(award.getTooltip());
                 rowRibbonsBox.add(ribbonLabel, 0);
+                i++;
             } catch (Exception e) {
                 MekHQ.getLogger().error(getClass(), "drawRibbons", e);
             }
 
-            i++;
-            if (i % MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW == 0) {
+            if ((i % MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW) == 0) {
                 rowRibbonsBoxes.add(rowRibbonsBox);
             }
         }
-        if (i % MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW != 0) {
+        if ((i % MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW) != 0) {
             rowRibbonsBoxes.add(rowRibbonsBox);
         }
 
@@ -338,30 +349,30 @@ public class PersonViewPanel extends ScrollablePanel {
      * Draws the medals above the personal log.
      */
     private JPanel drawMedals() {
-        JPanel pnlMedals = new JPanel();
+        JPanel pnlMedals = new JPanel(new WrapLayout(FlowLayout.LEFT));
+        pnlMedals.setName("pnlMedals");
 
-        List<Award> awards = person.awardController.getAwards().stream().filter(a -> a.getNumberOfMedalFiles() > 0)
-                .sorted().collect(Collectors.toList());
+        List<Award> awards = person.awardController.getAwards().stream()
+                .filter(a -> a.getNumberOfMedalFiles() > 0).sorted().collect(Collectors.toList());
 
         for (Award award : awards) {
-            JLabel medalLabel = new JLabel();
-
-            Image medal;
             try {
                 int numberOfAwards = person.awardController.getNumberOfAwards(award);
                 String medalFileName = award.getMedalFileName(numberOfAwards);
-                medal = (Image) awardIcons.getItem(award.getSet() + "/medals/", medalFileName);
-                if (medal == null)
+                Image medal = (Image) awardIcons.getItem(award.getSet() + "/medals/",
+                        medalFileName);
+                if (medal == null) {
                     continue;
-                medal = ImageHelpers.getScaledForBoundaries(medal, new Dimension(30, 60), Image.SCALE_DEFAULT);
-                medalLabel.setIcon(new ImageIcon(medal));
+                }
+                medal = ImageHelpers.getScaledForBoundaries(medal, new Dimension(30, 60),
+                        Image.SCALE_DEFAULT);
+                JLabel medalLabel = new JLabel(new ImageIcon(medal));
                 medalLabel.setToolTipText(award.getTooltip());
                 pnlMedals.add(medalLabel);
             } catch (Exception e) {
                 MekHQ.getLogger().error(getClass(), "drawMedals", e);
             }
         }
-
         return pnlMedals;
     }
 
@@ -369,23 +380,24 @@ public class PersonViewPanel extends ScrollablePanel {
      * Draws the misc awards below the medals.
      */
     private JPanel drawMiscAwards() {
-        JPanel pnlMiscAwards = new JPanel();
-        ArrayList<Award> awards = person.awardController.getAwards().stream().filter(a -> a.getNumberOfMiscFiles() > 0)
-                .collect(Collectors.toCollection(ArrayList::new));
+        JPanel pnlMiscAwards = new JPanel(new WrapLayout(FlowLayout.LEFT));
+        pnlMiscAwards.setName("pnlMiscAwards");
+
+        List<Award> awards = person.awardController.getAwards().stream()
+                .filter(a -> a.getNumberOfMiscFiles() > 0).collect(Collectors.toCollection(ArrayList::new));
 
         for (Award award : awards) {
-            JLabel miscLabel = new JLabel();
-
-            Image miscAward;
             try {
                 int numberOfAwards = person.awardController.getNumberOfAwards(award);
                 String miscFileName = award.getMiscFileName(numberOfAwards);
-                Image miscAwardBufferedImage = (Image) awardIcons.getItem(award.getSet() + "/misc/", miscFileName);
-                if (miscAwardBufferedImage == null)
+                Image miscAwardBufferedImage = (Image) awardIcons.getItem(
+                        award.getSet() + "/misc/", miscFileName);
+                if (miscAwardBufferedImage == null) {
                     continue;
-                miscAward = ImageHelpers.getScaledForBoundaries(miscAwardBufferedImage, new Dimension(100, 100),
-                        Image.SCALE_DEFAULT);
-                miscLabel.setIcon(new ImageIcon(miscAward));
+                }
+                Image miscAward = ImageHelpers.getScaledForBoundaries(miscAwardBufferedImage,
+                        new Dimension(100, 100), Image.SCALE_DEFAULT);
+                JLabel miscLabel = new JLabel(new ImageIcon(miscAward));
                 miscLabel.setToolTipText(award.getTooltip());
                 pnlMiscAwards.add(miscLabel);
             } catch (Exception e) {
@@ -394,6 +406,7 @@ public class PersonViewPanel extends ScrollablePanel {
         }
         return pnlMiscAwards;
     }
+    //endregion Ribbons and Awards
 
     /**
      * set the portrait for the given person.
@@ -403,41 +416,45 @@ public class PersonViewPanel extends ScrollablePanel {
      *         error loading it.
      */
     public JPanel setPortrait() {
-
-        JPanel pnlPortrait = new JPanel();
+        JPanel pnlPortrait = new JPanel(new GridBagLayout());
 
         // Panel portrait will include the person picture and the ribbons
         pnlPortrait.setName("pnlPortrait");
-        pnlPortrait.setLayout(new GridBagLayout());
 
         JLabel lblPortrait = new JLabel();
-        lblPortrait.setName("lblPortrait"); // NOI18N
+        lblPortrait.setName("lblPortrait");
 
         String category = person.getPortraitCategory();
         String filename = person.getPortraitFileName();
 
         if (Crew.ROOT_PORTRAIT.equals(category)) {
-            category = ""; //$NON-NLS-1$
+            category = "";
         }
 
         // Return a null if the player has selected no portrait file.
         if ((null == category) || (null == filename) || Crew.PORTRAIT_NONE.equals(filename)) {
-            filename = "default.gif"; //$NON-NLS-1$
+            filename = "default.gif";
         }
 
         // Try to get the player's portrait file.
         Image portrait;
         try {
             portrait = (Image) portraits.getItem(category, filename);
-            if (null != portrait) {
+            if (portrait != null) {
                 portrait = portrait.getScaledInstance(100, -1, Image.SCALE_DEFAULT);
             } else {
-                portrait = (Image) portraits.getItem("", "default.gif"); //$NON-NLS-1$ //$NON-NLS-2$
-                if (null != portrait) {
+                portrait = (Image) portraits.getItem("", "default.gif");
+                if (portrait != null) {
                     portrait = portrait.getScaledInstance(100, -1, Image.SCALE_DEFAULT);
                 }
             }
-            lblPortrait.setIcon(new ImageIcon(portrait));
+            if (portrait != null) {
+                lblPortrait.setIcon(new ImageIcon(portrait));
+            } else {
+                MekHQ.getLogger().error(getClass(), "setPortrait",
+                        "Cannot locate the portrait file for " + person.getFullName()
+                                + ", which should be file " + filename + " in category " + category);
+            }
         } catch (Exception e) {
             MekHQ.getLogger().error(getClass(), "setPortrait", e);
         }
@@ -718,35 +735,12 @@ public class PersonViewPanel extends ScrollablePanel {
         JPanel pnlFamily = new JPanel(new GridBagLayout());
         pnlFamily.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlFamily.title")));
 
-        //family panel
-        JLabel lblSpouse1 = new JLabel();
-        JLabel lblSpouse2 = new JLabel();
-        JLabel lblFormerSpouses1 = new JLabel();
-        JLabel lblFormerSpouses2;
-        JLabel lblChildren1 = new JLabel();
-        JLabel lblChildren2;
-        JLabel lblGrandchildren1 = new JLabel();
-        JLabel lblGrandchildren2;
-        JLabel lblFather1 = new JLabel();
-        JLabel lblFather2 = new JLabel();
-        JLabel lblMother1 = new JLabel();
-        JLabel lblMother2 = new JLabel();
-        JLabel lblSiblings1 = new JLabel();
-        JLabel lblSiblings2;
-        JLabel lblGrandparents1 = new JLabel();
-        JLabel lblGrandparents2;
-        JLabel lblAuntsOrUncles1 = new JLabel();
-        JLabel lblAuntsOrUncles2;
-        JLabel lblCousins1 = new JLabel();
-        JLabel lblCousins2;
-
         GridBagConstraints gridBagConstraints;
-
         int firsty = 0;
 
         if (person.hasSpouse()) {
-            lblSpouse1.setName("lblSpouse1"); // NOI18N //$NON-NLS-1$
-            lblSpouse1.setText(resourceMap.getString("lblSpouse1.text")); //$NON-NLS-1$
+            JLabel lblSpouse1 = new JLabel(resourceMap.getString("lblSpouse1.text"));
+            lblSpouse1.setName("lblSpouse1");
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = firsty;
@@ -754,8 +748,9 @@ public class PersonViewPanel extends ScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlFamily.add(lblSpouse1, gridBagConstraints);
 
-            lblSpouse2.setName("lblSpouse2"); // NOI18N //$NON-NLS-1$
-            lblSpouse2.setText(String.format("<html><a href='#'>%s</a></html>", person.getSpouse().getFullName()));
+            JLabel lblSpouse2 = new JLabel(String.format("<html>%s</html>",
+                    person.getSpouse().getHyperlinkedName()));
+            lblSpouse2.setName("lblSpouse2");
             lblSpouse2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             lblSpouse2.addMouseListener(new MouseAdapter() {
                 @Override
@@ -772,8 +767,8 @@ public class PersonViewPanel extends ScrollablePanel {
         }
 
         if (person.hasFormerSpouse()) {
-            lblFormerSpouses1.setName("lblFormerSpouses1"); // NOI18N //$NON-NLS-1$
-            lblFormerSpouses1.setText(resourceMap.getString("lblFormerSpouses1.text")); //$NON-NLS-1$
+            JLabel lblFormerSpouses1 = new JLabel(resourceMap.getString("lblFormerSpouses1.text"));
+            lblFormerSpouses1.setName("lblFormerSpouses1");
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = firsty;
@@ -788,11 +783,11 @@ public class PersonViewPanel extends ScrollablePanel {
             for (FormerSpouse formerSpouse : person.getFormerSpouses()) {
                 Person ex = campaign.getPerson(formerSpouse.getFormerSpouseId());
                 gridBagConstraints.gridy = firsty;
-                lblFormerSpouses2 = new JLabel();
-                lblFormerSpouses2.setName("lblFormerSpouses2"); // NOI18N //$NON-NLS-1$
+                JLabel lblFormerSpouses2 = new JLabel(String.format("<html>%s, %s, %s</html>",
+                        ex.getHyperlinkedName(), formerSpouse.getReasonString(),
+                        formerSpouse.getDateAsString(FormerSpouse.getDisplayDateFormat())));
+                lblFormerSpouses2.setName("lblFormerSpouses2");
                 lblFormerSpouses2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                lblFormerSpouses2.setText(String.format("<html><a href='#'>%s</a>, %s, %s</html>", ex.getFullName(),
-                        formerSpouse.getReasonString(), formerSpouse.getDateAsString(FormerSpouse.getDisplayDateFormat())));
                 lblFormerSpouses2.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
@@ -806,8 +801,8 @@ public class PersonViewPanel extends ScrollablePanel {
 
         if (campaign.getCampaignOptions().useParentage()) {
             if (person.hasChildren() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.PARENTS_CHILDREN_SIBLINGS)) {
-                lblChildren1.setName("lblChildren1"); // NOI18N //$NON-NLS-1$
-                lblChildren1.setText(resourceMap.getString("lblChildren1.text")); //$NON-NLS-1$
+                JLabel lblChildren1 = new JLabel(resourceMap.getString("lblChildren1.text"));
+                lblChildren1.setName("lblChildren1");
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 0;
                 gridBagConstraints.gridy = firsty;
@@ -824,10 +819,10 @@ public class PersonViewPanel extends ScrollablePanel {
 
                 for (Person child : person.getChildren()) {
                     gridBagConstraints.gridy = firsty;
-                    lblChildren2 = new JLabel();
-                    lblChildren2.setName("lblChildren2"); // NOI18N //$NON-NLS-1$
+                    JLabel lblChildren2 = new JLabel(String.format("<html>%s</html>",
+                            child.getHyperlinkedName()));
+                    lblChildren2.setName("lblChildren2");
                     lblChildren2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    lblChildren2.setText(String.format("<html><a href='#'>%s</a></html>", child.getFullName()));
                     lblChildren2.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
@@ -840,8 +835,8 @@ public class PersonViewPanel extends ScrollablePanel {
             }
 
             if (person.hasGrandchildren() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.GRANDPARENTS_GRANDCHILDREN)) {
-                lblGrandchildren1.setName("lblGrandchildren1"); // NOI18N //$NON-NLS-1$
-                lblGrandchildren1.setText(resourceMap.getString("lblGrandchildren1.text")); //$NON-NLS-1$
+                JLabel lblGrandchildren1 = new JLabel(resourceMap.getString("lblGrandchildren1.text"));
+                lblGrandchildren1.setName("lblGrandchildren1");
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 0;
                 gridBagConstraints.gridy = firsty;
@@ -858,10 +853,10 @@ public class PersonViewPanel extends ScrollablePanel {
 
                 for (Person grandchild : person.getGrandchildren()) {
                     gridBagConstraints.gridy = firsty;
-                    lblGrandchildren2 = new JLabel();
+                    JLabel lblGrandchildren2 = new JLabel(String.format("<html>%s</html>",
+                            grandchild.getHyperlinkedName()));
                     lblGrandchildren2.setName("lblGrandchildren2"); // NOI18N //$NON-NLS-1$
                     lblGrandchildren2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    lblGrandchildren2.setText(String.format("<html><a href='#'>%s</a></html>", grandchild.getFullName()));
                     lblGrandchildren2.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
@@ -874,8 +869,8 @@ public class PersonViewPanel extends ScrollablePanel {
             }
 
             if (person.hasFather() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.PARENTS_CHILDREN_SIBLINGS)) {
-                lblFather1.setName("lblFather1"); // NOI18N //$NON-NLS-1$
-                lblFather1.setText(resourceMap.getString("lblFather1.text")); //$NON-NLS-1$
+                JLabel lblFather1 = new JLabel(resourceMap.getString("lblFather1.text"));
+                lblFather1.setName("lblFather1");
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 0;
                 gridBagConstraints.gridy = firsty;
@@ -883,8 +878,9 @@ public class PersonViewPanel extends ScrollablePanel {
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 pnlFamily.add(lblFather1, gridBagConstraints);
 
-                lblFather2.setName("lblFather2"); // NOI18N //$NON-NLS-1$
-                lblFather2.setText(String.format("<html><a href='#'>%s</a></html>", person.getFather().getFullName()));
+                JLabel lblFather2 = new JLabel(String.format("<html>%s</html>",
+                        person.getFather().getHyperlinkedName()));
+                lblFather2.setName("lblFather2");
                 lblFather2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 lblFather2.addMouseListener(new MouseAdapter() {
                     @Override
@@ -904,8 +900,8 @@ public class PersonViewPanel extends ScrollablePanel {
             }
 
             if (person.hasMother() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.PARENTS_CHILDREN_SIBLINGS)) {
-                lblMother1.setName("lblMother1"); // NOI18N //$NON-NLS-1$
-                lblMother1.setText(resourceMap.getString("lblMother1.text")); //$NON-NLS-1$
+                JLabel lblMother1 = new JLabel(resourceMap.getString("lblMother1.text"));
+                lblMother1.setName("lblMother1");
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 0;
                 gridBagConstraints.gridy = firsty;
@@ -913,8 +909,9 @@ public class PersonViewPanel extends ScrollablePanel {
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 pnlFamily.add(lblMother1, gridBagConstraints);
 
-                lblMother2.setName("lblMother2"); // NOI18N //$NON-NLS-1$
-                lblMother2.setText(String.format("<html><a href='#'>%s</a></html>", person.getMother().getFullName()));
+                JLabel lblMother2 = new JLabel(String.format("<html>%s</html>",
+                        person.getMother().getHyperlinkedName()));
+                lblMother2.setName("lblMother2");
                 lblMother2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 lblMother2.addMouseListener(new MouseAdapter() {
                     @Override
@@ -934,8 +931,8 @@ public class PersonViewPanel extends ScrollablePanel {
             }
 
             if (person.hasSiblings() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.PARENTS_CHILDREN_SIBLINGS)) {
-                lblSiblings1.setName("lblSiblings1"); // NOI18N //$NON-NLS-1$
-                lblSiblings1.setText(resourceMap.getString("lblSiblings1.text")); //$NON-NLS-1$
+                JLabel lblSiblings1 = new JLabel(resourceMap.getString("lblSiblings1.text"));
+                lblSiblings1.setName("lblSiblings1");
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 0;
                 gridBagConstraints.gridy = firsty;
@@ -952,10 +949,10 @@ public class PersonViewPanel extends ScrollablePanel {
 
                 for (Person sibling : person.getSiblings()) {
                     gridBagConstraints.gridy = firsty;
-                    lblSiblings2 = new JLabel();
-                    lblSiblings2.setName("lblSiblings2"); // NOI18N //$NON-NLS-1$
+                    JLabel lblSiblings2 = new JLabel(String.format("<html>%s</html>",
+                            sibling.getHyperlinkedName()));
+                    lblSiblings2.setName("lblSiblings2");
                     lblSiblings2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    lblSiblings2.setText(String.format("<html><a href='#'>%s</a></html>", sibling.getFullName()));
                     lblSiblings2.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
@@ -968,8 +965,8 @@ public class PersonViewPanel extends ScrollablePanel {
             }
 
             if (person.hasGrandparent() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.GRANDPARENTS_GRANDCHILDREN)) {
-                lblGrandparents1.setName("lblGrandparents1"); // NOI18N //$NON-NLS-1$
-                lblGrandparents1.setText(resourceMap.getString("lblGrandparents1.text")); //$NON-NLS-1$
+                JLabel lblGrandparents1 = new JLabel(resourceMap.getString("lblGrandparents1.text"));
+                lblGrandparents1.setName("lblGrandparents1");
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 0;
                 gridBagConstraints.gridy = firsty;
@@ -986,10 +983,10 @@ public class PersonViewPanel extends ScrollablePanel {
 
                 for (Person grandparent : person.getGrandparents()) {
                     gridBagConstraints.gridy = firsty;
-                    lblGrandparents2 = new JLabel();
-                    lblGrandparents2.setName("lblGrandparents2"); // NOI18N //$NON-NLS-1$
+                    JLabel lblGrandparents2 = new JLabel(String.format("<html>%s</html>",
+                            grandparent.getHyperlinkedName()));
+                    lblGrandparents2.setName("lblGrandparents2");
                     lblGrandparents2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    lblGrandparents2.setText(String.format("<html><a href='#'>%s</a></html>", grandparent.getFullName()));
                     lblGrandparents2.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
@@ -1002,8 +999,8 @@ public class PersonViewPanel extends ScrollablePanel {
             }
 
             if (person.hasAuntOrUncle() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.AUNTS_UNCLES_COUSINS)) {
-                lblAuntsOrUncles1.setName("lblAuntsOrUncles1"); // NOI18N //$NON-NLS-1$
-                lblAuntsOrUncles1.setText(resourceMap.getString("lblAuntsOrUncles1.text")); //$NON-NLS-1$
+                JLabel lblAuntsOrUncles1 = new JLabel(resourceMap.getString("lblAuntsOrUncles1.text"));
+                lblAuntsOrUncles1.setName("lblAuntsOrUncles1");
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 0;
                 gridBagConstraints.gridy = firsty;
@@ -1020,10 +1017,10 @@ public class PersonViewPanel extends ScrollablePanel {
 
                 for (Person auntOrUncle : person.getsAuntsAndUncles()) {
                     gridBagConstraints.gridy = firsty;
-                    lblAuntsOrUncles2 = new JLabel();
-                    lblAuntsOrUncles2.setName("lblAuntsOrUncles2"); // NOI18N //$NON-NLS-1$
+                    JLabel lblAuntsOrUncles2 = new JLabel(String.format("<html>%s</html>",
+                            auntOrUncle.getHyperlinkedName()));
+                    lblAuntsOrUncles2.setName("lblAuntsOrUncles2");
                     lblAuntsOrUncles2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    lblAuntsOrUncles2.setText(String.format("<html><a href='#'>%s</a></html>", auntOrUncle.getFullName()));
                     lblAuntsOrUncles2.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
@@ -1036,8 +1033,8 @@ public class PersonViewPanel extends ScrollablePanel {
             }
 
             if (person.hasCousins() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.AUNTS_UNCLES_COUSINS)) {
-                lblCousins1.setName("lblCousins1"); // NOI18N //$NON-NLS-1$
-                lblCousins1.setText(resourceMap.getString("lblCousins1.text")); //$NON-NLS-1$
+                JLabel lblCousins1 = new JLabel(resourceMap.getString("lblCousins1.text"));
+                lblCousins1.setName("lblCousins1");
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 0;
                 gridBagConstraints.gridy = firsty;
@@ -1054,10 +1051,10 @@ public class PersonViewPanel extends ScrollablePanel {
 
                 for (Person cousin : person.getCousins()) {
                     gridBagConstraints.gridy = firsty;
-                    lblCousins2 = new JLabel();
-                    lblCousins2.setName("lblCousins2"); // NOI18N //$NON-NLS-1$
+                    JLabel lblCousins2 = new JLabel(String.format("<html>%s</html>",
+                            cousin.getHyperlinkedName()));
+                    lblCousins2.setName("lblCousins2");
                     lblCousins2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    lblCousins2.setText(String.format("<html><a href='#'>%s</a></html>", cousin.getFullName()));
                     lblCousins2.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {

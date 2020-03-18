@@ -62,7 +62,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     }
 
     private void refreshView() {
-        scrollView.setViewportView(new PersonViewPanel(person, hqView.getCampaign(), hqView));
+        scrollView.setViewportView(new PersonViewPanel(person, hqView.getCampaign()));
         // This odd code is to make sure that the scrollbar stays at the top
         // I cant just call it here, because it ends up getting reset somewhere
         // later
