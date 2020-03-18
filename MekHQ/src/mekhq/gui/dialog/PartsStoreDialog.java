@@ -40,6 +40,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import chat.In;
 import megamek.common.AmmoType;
 import megamek.common.MiscType;
 import megamek.common.TargetRoll;
@@ -128,6 +129,7 @@ public class PartsStoreDialog extends JDialog {
     private JTable partsTable;
     private JTextField txtFilter;
     private JComboBox<String> choiceParts;
+    private JCheckBox hideImpossible;
     private JButton btnUseBonusPart;
     //endregion Variable Declarations
 
@@ -225,6 +227,13 @@ public class PartsStoreDialog extends JDialog {
         c.gridy = 1;
         c.weightx = 1.0;
         panFilter.add(txtFilter, c);
+
+        hideImpossible = new JCheckBox(resourceMap.getString("hideImpossible.text"));
+        hideImpossible.setName("hideImpossible");
+        hideImpossible.addActionListener(e -> filterParts());
+        c.gridx = 2;
+        panFilter.add(hideImpossible, c);
+
         getContentPane().add(panFilter, BorderLayout.PAGE_START);
 
         JPanel panButtons = new JPanel();
@@ -408,6 +417,14 @@ public class PartsStoreDialog extends JDialog {
             public boolean include(Entry<? extends PartsTableModel, ? extends Integer> entry) {
                 PartsTableModel partsModel = entry.getModel();
                 Part part = partsModel.getPartAt(entry.getIdentifier());
+
+                if (hideImpossible.isSelected()) {
+                    int target = partsModel.getPartProxyAt(entry.getIdentifier()).getTarget()
+                            .getTargetRoll().getValue();
+                    if (target == TargetRoll.IMPOSSIBLE || target == TargetRoll.AUTOMATIC_FAIL) {
+                        return false;
+                    }
+                } // This MUST NOT be an else if
                 if ((txtFilter.getText().length() > 0)
                         && !part.getName().toLowerCase().contains(txtFilter.getText().toLowerCase())
                         && !part.getDetails().toLowerCase().contains(txtFilter.getText().toLowerCase())) {
@@ -890,8 +907,8 @@ public class PartsStoreDialog extends JDialog {
 
         public PartsTableModel(ArrayList<Part> inventory) {
             data = new ArrayList<>(inventory.size());
-            for (Part p : inventory) {
-                data.add(new PartProxy(p));
+            for (Part part : inventory) {
+                data.add(new PartProxy(part));
             }
         }
 
