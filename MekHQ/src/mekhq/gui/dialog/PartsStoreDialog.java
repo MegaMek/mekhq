@@ -40,7 +40,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
-import chat.In;
 import megamek.common.AmmoType;
 import megamek.common.MiscType;
 import megamek.common.TargetRoll;
@@ -131,6 +130,9 @@ public class PartsStoreDialog extends JDialog {
     private JComboBox<String> choiceParts;
     private JCheckBox hideImpossible;
     private JButton btnUseBonusPart;
+
+    private ResourceBundle resourceMap = ResourceBundle.getBundle(
+            "mekhq.resources.PartsStoreDialog", new EncodeControl());
     //endregion Variable Declarations
 
     /** Creates new form PartsStoreDialog */
@@ -153,7 +155,6 @@ public class PartsStoreDialog extends JDialog {
     }
 
     private void initComponents() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PartsStoreDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("Form.title"));
@@ -319,7 +320,7 @@ public class PartsStoreDialog extends JDialog {
             //endregion Bonus Part
 
             //region Add
-            btnAdd = new JButton(resourceMap.getString("btnAdd.text"));
+            btnAdd = new JButton(resourceMap.getString("btnGMAdd.text"));
             btnAdd.addActionListener(evt -> {
                 if (partsTable.getSelectedRowCount() > 0) {
                     int[] selectedRow = partsTable.getSelectedRows();
@@ -376,14 +377,14 @@ public class PartsStoreDialog extends JDialog {
             //endregion Button Close
         } else {
             //if we aren't adding the unit to the campaign, then different buttons
-            btnAdd = new JButton("Add");
+            btnAdd = new JButton(resourceMap.getString("btnAdd.text"));
             btnAdd.addActionListener(evt -> {
                 setSelectedPart();
                 setVisible(false);
             });
             panButtons.add(btnAdd, new GridBagConstraints());
 
-            btnClose = new JButton("Cancel"); // NOI18N
+            btnClose = new JButton(resourceMap.getString("btnCancel.text"));
             btnClose.addActionListener(evt -> {
                 selectedPart = null;
                 setVisible(false);
