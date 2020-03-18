@@ -426,6 +426,7 @@ public class PartsStoreDialog extends JDialog {
                         return false;
                     }
                 } // This MUST NOT be an else if
+
                 if ((txtFilter.getText().length() > 0)
                         && !part.getName().toLowerCase().contains(txtFilter.getText().toLowerCase())
                         && !part.getDetails().toLowerCase().contains(txtFilter.getText().toLowerCase())) {
