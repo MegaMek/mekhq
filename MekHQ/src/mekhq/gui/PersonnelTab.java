@@ -398,8 +398,9 @@ public final class PersonnelTab extends CampaignGuiTab {
                 PersonnelTableModel personModel = entry.getModel();
                 Person person = personModel.getPerson(entry.getIdentifier());
                 int type = person.getPrimaryRole();
-                if (((nGroup == PG_ACTIVE) || (nGroup == PG_COMBAT && type <= Person.T_SPACE_GUNNER)
-                        || (nGroup == PG_SUPPORT && type > Person.T_SPACE_GUNNER)
+                if (((nGroup == PG_ACTIVE)
+                        || ((nGroup == PG_COMBAT) && ((type <= Person.T_SPACE_GUNNER) && (type > Person.T_NONE)))
+                        || ((nGroup == PG_SUPPORT) && ((type > Person.T_SPACE_GUNNER) || (type == Person.T_NONE)))
                         || (nGroup == PG_MW && type == Person.T_MECHWARRIOR)
                         || (nGroup == PG_CREW && (type == Person.T_GVEE_DRIVER || type == Person.T_NVEE_DRIVER
                                 || type == Person.T_VTOL_PILOT || type == Person.T_VEE_GUNNER || type == Person.T_VEHICLE_CREW))
