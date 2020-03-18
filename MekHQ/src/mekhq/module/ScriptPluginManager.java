@@ -103,11 +103,14 @@ public class ScriptPluginManager {
     private static void listEngines() {
         ScriptEngineManager mgr = new ScriptEngineManager(PluginManager.getInstance().getClassLoader());
         for (ScriptEngineFactory engine : mgr.getEngineFactories()) {
-            System.out.println("Engine: " + engine.getEngineName());
-            System.out.println("\tVersion: " + engine.getEngineVersion());
-            System.out.println("\tAlias: " + engine.getNames());
-            System.out.println("\tLanguage name: " + engine.getLanguageName());
-            System.out.println();
+            MekHQ.getLogger().info(ScriptPluginManager.class, "listEngines",
+                    "Engine: " + engine.getEngineName());
+            MekHQ.getLogger().info(ScriptPluginManager.class, "listEngines",
+                    "\tVersion: " + engine.getEngineVersion());
+            MekHQ.getLogger().info(ScriptPluginManager.class, "listEngines",
+                    "\tAlias: " + engine.getNames());
+            MekHQ.getLogger().info(ScriptPluginManager.class, "listEngines",
+                    "\tLanguage name: " + engine.getLanguageName() + "\n");
         }
     }
 }

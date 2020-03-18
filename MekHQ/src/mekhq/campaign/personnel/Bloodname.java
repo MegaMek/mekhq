@@ -226,8 +226,8 @@ public class Bloodname implements Serializable {
 					retVal.phenotype = P_NAVAL;
 					break;
 				default:
-					System.err.println("Unknown phenotype " +
-							wn.getTextContent() + " in " + retVal.name);
+					MekHQ.getLogger().error(Bloodname.class, "loadFromXml",
+                            "Unknown phenotype " + wn.getTextContent() + " in " + retVal.name);
 				}
 			} else if (wn.getNodeName().equalsIgnoreCase("postReaving")) {
 				String[] clans = wn.getTextContent().trim().split(",");

@@ -1033,13 +1033,12 @@ public class Utilities {
             }
             in.close();
             out.close();
-            System.out.println("File copied."); //$NON-NLS-1$
-        }
-        catch(FileNotFoundException ex){
-            System.out.println(ex.getMessage() + " in the specified directory."); //$NON-NLS-1$
-        }
-        catch(IOException e){
-            System.out.println(e.getMessage());
+            MekHQ.getLogger().info(Utilities.class, "copyFile", "File copied."); //$NON-NLS-1$
+        } catch (FileNotFoundException e) {
+            MekHQ.getLogger().error(Utilities.class, "copyFile",
+                    e.getMessage() + " in the specified directory."); //$NON-NLS-1$
+        } catch (IOException e) {
+            MekHQ.getLogger().error(Utilities.class, "copyFile", e.getMessage());
         }
     }
 

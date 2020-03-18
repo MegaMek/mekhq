@@ -137,13 +137,11 @@ public class ResolveScenarioTracker {
     }
 
     public void processMulFiles() {
-        //File salvageFile = salvageList.getSelectedFile();
-        if(unitList.isPresent()) {
+        if (unitList.isPresent()) {
             try {
                 loadUnitsAndPilots(unitList.get());
             } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                MekHQ.getLogger().error(getClass(), "processMulFiles", e);
             }
         } else {
             initUnitsAndPilotsWithoutBattle();
@@ -860,15 +858,11 @@ public class ResolveScenarioTracker {
             MULParser parser = new MULParser();
 
             // Open up the file.
-            InputStream listStream = new FileInputStream(unitFile);
-            // Read a Vector from the file.
-            try {
+            try (InputStream listStream = new FileInputStream(unitFile)) {
+                // Read a Vector from the file.
                 parser.parse(listStream);
-                listStream.close();
-            } catch (Exception excep) {
-                excep.printStackTrace(System.err);
-                // throw new IOException("Unable to read from: " +
-                // unitFile.getName());
+            } catch (Exception e) {
+                MekHQ.getLogger().error(getClass(), "loadUnitsAndPilots", e);
             }
 
             // Was there any error in parsing?
@@ -1621,7 +1615,7 @@ public class ResolveScenarioTracker {
                             : unit.getEntity();
                     baseEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
                 } catch (EntityLoadingException e) {
-                    e.printStackTrace();
+                    MekHQ.getLogger().error(getClass(), "Unit Status", e);
                 }
             }
         }

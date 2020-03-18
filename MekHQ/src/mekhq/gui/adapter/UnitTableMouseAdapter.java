@@ -289,8 +289,8 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                         }
                         BLKFile.encode(fileNameCampaign, unit.getEntity());
                     }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(getClass(), "actionPerformed", e);
                 }
                 gui.getCampaign().addCustom(
                         unit.getEntity().getChassis() + " "

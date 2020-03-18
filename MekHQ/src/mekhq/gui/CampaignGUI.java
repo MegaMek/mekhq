@@ -1056,8 +1056,8 @@ public class CampaignGUI extends JPanel {
             Method method = clazz.getMethod(methodName, Window.class, boolean.class);
             method.invoke(null, window, true);
         } catch (Throwable t) {
-            System.err.println("Full screen mode is not supported");
-            t.printStackTrace();
+            MekHQ.getLogger().error(CampaignGUI.class, "enableFullScreenMode",
+                    "Full screen mode is not supported", t);
         }
     }
 
@@ -1468,7 +1468,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void menuMekHqOptionsActionPerformed(ActionEvent evt) {
-        MekHqOptionsDialog dialog = new MekHqOptionsDialog(getFrame(), MekHQ.getLogger());
+        MekHqOptionsDialog dialog = new MekHqOptionsDialog(getFrame());
         dialog.setVisible(true);
     }
 
@@ -1918,8 +1918,8 @@ public class CampaignGUI extends JPanel {
             // Open up the file.
             try (InputStream is = new FileInputStream(unitFile)) {
                 parser.parse(is);
-            } catch (Exception excep) {
-                excep.printStackTrace(System.err);
+            } catch (Exception e) {
+                MekHQ.getLogger().error(getClass(), "loadListFile", e);
             }
 
             // Was there any error in parsing?
@@ -2483,8 +2483,8 @@ public class CampaignGUI extends JPanel {
             // other stuff
             try {
                 lab.refreshRefitSummary();
-            } catch (Exception err) {
-                err.printStackTrace();
+            } catch (Exception e) {
+                MekHQ.getLogger().error(getClass(), "refreshLab", e);
             }
         }
     }

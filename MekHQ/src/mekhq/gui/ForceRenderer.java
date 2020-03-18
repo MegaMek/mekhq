@@ -15,6 +15,7 @@ import megamek.common.Crew;
 import megamek.common.Entity;
 import megamek.common.GunEmplacement;
 import mekhq.IconPackage;
+import mekhq.MekHQ;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -112,12 +113,10 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                     // an independent master might also be a slave to a company
                     // master
                     if (entity.getC3Master() != null) {
-                        c3network += "<br>" + Messages.getString("ChatLounge.C3Slave") + " "
-                                + entity.getC3Master().getShortName();
+                        c3network += "<br>" + Messages.getString("ChatLounge.C3Slave") + entity.getC3Master().getShortName(); //$NON-NLS-1$
                     }
                 } else if (entity.getC3Master() != null) {
-                    c3network += Messages.getString("ChatLounge.C3Slave") + " "
-                            + entity.getC3Master().getShortName();
+                    c3network += Messages.getString("ChatLounge.C3Slave") + entity.getC3Master().getShortName(); //$NON-NLS-1$
                 } else {
                     c3network += Messages.getString("ChatLounge.C3None");
                 }
@@ -196,8 +195,8 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 }
             }
             return new ImageIcon(portrait);
-        } catch (Exception err) {
-            err.printStackTrace();
+        } catch (Exception e) {
+            MekHQ.getLogger().error(getClass(), "getIconFrom", e);
             return null;
         }
     }
