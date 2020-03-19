@@ -937,35 +937,43 @@ public class CampaignGUI extends JPanel {
         //endregion Community Menu
 
         //region View Menu
+        // The View menu uses the following Mnemonic keys as of 19-March-2020:
+        // A, B, D, H, O, R
         JMenu menuView = new JMenu(resourceMap.getString("menuView.text")); // NOI18N
         menuView.setMnemonic(KeyEvent.VK_V);
 
         miHistoricalDailyReportDialog = new JMenuItem(resourceMap.getString("miShowHistoricalReportLog.text")); // NOI18N
+        miHistoricalDailyReportDialog.setMnemonic(KeyEvent.VK_H);
         miHistoricalDailyReportDialog.setEnabled(true);
         miHistoricalDailyReportDialog.addActionListener(evt -> showHistoricalDailyReportDialog());
         menuView.add(miHistoricalDailyReportDialog);
 
         miDetachLog = new JMenuItem(resourceMap.getString("miDetachLog.text")); // NOI18N
+        miDetachLog.setMnemonic(KeyEvent.VK_D);
         miDetachLog.addActionListener(evt -> showDailyReportDialog());
         menuView.add(miDetachLog);
 
         miAttachLog = new JMenuItem(resourceMap.getString("miAttachLog.text")); // NOI18N
+        miAttachLog.setMnemonic(KeyEvent.VK_A);
         miAttachLog.setEnabled(false);
         miAttachLog.addActionListener(evt -> hideDailyReportDialog());
         menuView.add(miAttachLog);
 
         JMenuItem miBloodnameDialog = new JMenuItem(resourceMap.getString("miBloodnameDialog.text"));
+        miBloodnameDialog.setMnemonic(KeyEvent.VK_B);
         miBloodnameDialog.setEnabled(true);
         miBloodnameDialog.addActionListener(evt -> showBloodnameDialog());
         menuView.add(miBloodnameDialog);
 
         miRetirementDefectionDialog = new JMenuItem(resourceMap.getString("miRetirementDefectionDialog.text"));
+        miRetirementDefectionDialog.setMnemonic(KeyEvent.VK_R);
         miRetirementDefectionDialog.setEnabled(true);
         miRetirementDefectionDialog.setVisible(getCampaign().getCampaignOptions().getUseAtB());
         miRetirementDefectionDialog.addActionListener(evt -> showRetirementDefectionDialog());
         menuView.add(miRetirementDefectionDialog);
 
         miShowOverview = new JCheckBoxMenuItem(resourceMap.getString("miShowOverview.text"));
+        miShowOverview.setMnemonic(KeyEvent.VK_O);
         miShowOverview.setSelected(hasTab(GuiTabType.OVERVIEW));
         miShowOverview.addActionListener(evt -> toggleOverviewTab());
         menuView.add(miShowOverview);
@@ -999,6 +1007,7 @@ public class CampaignGUI extends JPanel {
         menuManage.add(miBatchXP);
 
         JMenuItem miScenarioEditor = new JMenuItem(resourceMap.getString("miScenarioEditor.text"));
+        miScenarioEditor.setMnemonic(KeyEvent.VK_A);
         miScenarioEditor.setEnabled(true);
         miScenarioEditor.addActionListener(evt -> {
             ScenarioTemplateEditorDialog sted = new ScenarioTemplateEditorDialog(getFrame());
