@@ -895,27 +895,32 @@ public class CampaignGUI extends JPanel {
 
         //region Reports Menu
         // The Reports menu uses the following Mnemonic keys as of 19-March-2020:
-        //
+        // C, H, P, T, U
         JMenu menuReports = new JMenu(resourceMap.getString("menuReports.text")); // NOI18N
         menuReports.setMnemonic(KeyEvent.VK_R);
 
         JMenuItem miDragoonsRating = new JMenuItem(resourceMap.getString("miDragoonsRating.text")); // NOI18N
+        miDragoonsRating.setMnemonic(KeyEvent.VK_U);
         miDragoonsRating.addActionListener(evt -> showReport(new RatingReport(getCampaign())));
         menuReports.add(miDragoonsRating);
 
         JMenuItem miPersonnelReport = new JMenuItem(resourceMap.getString("miPersonnelReport.text")); // NOI18N
+        miPersonnelReport.setMnemonic(KeyEvent.VK_P);
         miPersonnelReport.addActionListener(evt -> showReport(new PersonnelReport(getCampaign())));
         menuReports.add(miPersonnelReport);
 
         JMenuItem miHangarBreakdown = new JMenuItem(resourceMap.getString("miHangarBreakdown.text")); // NOI18N
+        miHangarBreakdown.setMnemonic(KeyEvent.VK_H);
         miHangarBreakdown.addActionListener(evt -> showReport(new HangarReport(getCampaign())));
         menuReports.add(miHangarBreakdown);
 
         JMenuItem miTransportReport = new JMenuItem(resourceMap.getString("miTransportReport.text")); // NOI18N
+        miTransportReport.setMnemonic(KeyEvent.VK_T);
         miTransportReport.addActionListener(evt -> showReport(new TransportReport(getCampaign())));
         menuReports.add(miTransportReport);
 
         JMenuItem miCargoReport = new JMenuItem(resourceMap.getString("miCargoReport.text")); // NOI18N
+        miCargoReport.setMnemonic(KeyEvent.VK_C);
         miCargoReport.addActionListener(evt -> showReport(new CargoReport(getCampaign())));
         menuReports.add(miCargoReport);
 
