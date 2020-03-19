@@ -750,28 +750,29 @@ public class CampaignGUI extends JPanel {
 
         //region Marketplace Menu
         // The Marketplace menu uses the following Mnemonic keys as of 19-March-2020:
-        // P
+        // P, C, U, S
         JMenu menuMarket = new JMenu(resourceMap.getString("menuMarket.text")); // NOI18N
         menuMarket.setMnemonic(KeyEvent.VK_M);
 
-        // Personnel Market
         JMenuItem miPersonnelMarket = new JMenuItem(resourceMap.getString("miPersonnelMarket.text"));
         miPersonnelMarket.setMnemonic(KeyEvent.VK_P);
         miPersonnelMarket.addActionListener(evt -> hirePersonMarket());
         menuMarket.add(miPersonnelMarket);
 
-        // Contract Market
         miContractMarket = new JMenuItem(resourceMap.getString("miContractMarket.text"));
+        menuMarket.setMnemonic(KeyEvent.VK_C);
         miContractMarket.addActionListener(evt -> showContractMarket());
         menuMarket.add(miContractMarket);
         miContractMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
 
         miUnitMarket = new JMenuItem(resourceMap.getString("miUnitMarket.text"));
+        menuMarket.setMnemonic(KeyEvent.VK_U);
         miUnitMarket.addActionListener(evt -> showUnitMarket());
         menuMarket.add(miUnitMarket);
         miUnitMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
 
         miShipSearch = new JMenuItem(resourceMap.getString("miShipSearch.text"));
+        menuMarket.setMnemonic(KeyEvent.VK_S);
         miShipSearch.addActionListener(ev -> showShipSearch());
         menuMarket.add(miShipSearch);
         miShipSearch.setVisible(getCampaign().getCampaignOptions().getUseAtB());
@@ -791,6 +792,7 @@ public class CampaignGUI extends JPanel {
         JMenu menuHire = new JMenu(resourceMap.getString("menuHire.text")); // NOI18N
 
         JMenuItem miHire;
+        menuMarket.setMnemonic(KeyEvent.VK_H);
         for (int i = Person.T_MECHWARRIOR; i < Person.T_NUM; i++) {
             miHire = new JMenuItem(Person.getRoleDesc(i, getCampaign().getFaction().isClan()));
             miHire.setActionCommand(Integer.toString(i));
@@ -799,7 +801,9 @@ public class CampaignGUI extends JPanel {
         }
         menuMarket.add(menuHire);
 
+        //region Astech Pool
         JMenu menuAstechPool = new JMenu(resourceMap.getString("menuAstechPool.text"));
+        menuMarket.setMnemonic(KeyEvent.VK_A);
 
         JMenuItem miHireAstechs = new JMenuItem(resourceMap.getString("miHireAstechs.text"));
         miHireAstechs.addActionListener(evt -> {
@@ -841,7 +845,9 @@ public class CampaignGUI extends JPanel {
         miFireAllAstechs.addActionListener(evt -> getCampaign().decreaseAstechPool(getCampaign().getAstechPool()));
         menuAstechPool.add(miFireAllAstechs);
         menuMarket.add(menuAstechPool);
+        //endregion Astech Pool
 
+        //region Medic Pool
         JMenu menuMedicPool = new JMenu(resourceMap.getString("menuMedicPool.text"));
         JMenuItem miHireMedics = new JMenuItem(resourceMap.getString("miHireMedics.text"));
         miHireMedics.addActionListener(evt -> {
@@ -868,6 +874,7 @@ public class CampaignGUI extends JPanel {
             getCampaign().decreaseMedicPool(pvcd.getValue());
         });
         menuMedicPool.add(miFireMedics);
+
         JMenuItem miFullStrengthMedics = new JMenuItem(resourceMap.getString("miFullStrengthMedics.text"));
         miFullStrengthMedics.addActionListener(evt -> {
             int need = (getCampaign().getDoctors().size() * 4)
@@ -877,15 +884,19 @@ public class CampaignGUI extends JPanel {
             }
         });
         menuMedicPool.add(miFullStrengthMedics);
+
         JMenuItem miFireAllMedics = new JMenuItem(resourceMap.getString("miFireAllMedics.text"));
         miFireAllMedics.addActionListener(evt -> getCampaign().decreaseMedicPool(getCampaign().getMedicPool()));
         menuMedicPool.add(miFireAllMedics);
         menuMarket.add(menuMedicPool);
+        //endregion Medic Pool
 
         menuBar.add(menuMarket);
         //endregion Marketplace Menu
 
         //region Reports Menu
+        // The Reports menu uses the following Mnemonic keys as of 19-March-2020:
+        //
         JMenu menuReports = new JMenu(resourceMap.getString("menuReports.text")); // NOI18N
         menuMarket.setMnemonic(KeyEvent.VK_R);
 
@@ -913,6 +924,8 @@ public class CampaignGUI extends JPanel {
         //endregion Reports Menu
 
         //region Community Menu
+        // The Community menu uses the following Mnemonic keys as of 19-March-2020:
+        // C
         JMenu menuCommunity = new JMenu(resourceMap.getString("menuCommunity.text")); // NOI18N
         menuCommunity.setMnemonic(KeyEvent.VK_C);
 
