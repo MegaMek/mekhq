@@ -4832,7 +4832,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setUseUnofficialProcreation(chkUseUnofficialProcreation.isSelected());
         options.setChanceProcreation((Double) spnChanceProcreation.getModel().getValue() / 100.0);
         options.setUseUnofficialProcreationNoRelationship(chkUseUnofficialProcreationNoRelationship.isSelected());
-        options.setChanceProcreationNoRelationship((Double) spnChanceProcreationNoRelationship.getModel().getValue());
+        options.setChanceProcreationNoRelationship((Double) spnChanceProcreationNoRelationship.getModel().getValue() / 100.0);
         options.setDisplayTrueDueDate(chkDisplayTrueDueDate.isSelected());
         options.setLogConception(chkLogConception.isSelected());
         options.setBabySurnameStyle(comboBabySurnameStyle.getSelectedIndex());
