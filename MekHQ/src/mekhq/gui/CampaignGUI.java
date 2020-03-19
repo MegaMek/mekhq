@@ -760,22 +760,23 @@ public class CampaignGUI extends JPanel {
         menuMarket.add(miPersonnelMarket);
 
         miContractMarket = new JMenuItem(resourceMap.getString("miContractMarket.text"));
-        menuMarket.setMnemonic(KeyEvent.VK_C);
+        miContractMarket.setMnemonic(KeyEvent.VK_C);
         miContractMarket.addActionListener(evt -> showContractMarket());
-        menuMarket.add(miContractMarket);
         miContractMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
+        menuMarket.add(miContractMarket);
 
         miUnitMarket = new JMenuItem(resourceMap.getString("miUnitMarket.text"));
-        menuMarket.setMnemonic(KeyEvent.VK_U);
+        miUnitMarket.setMnemonic(KeyEvent.VK_U);
         miUnitMarket.addActionListener(evt -> showUnitMarket());
-        menuMarket.add(miUnitMarket);
         miUnitMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
+        menuMarket.add(miUnitMarket);
+
 
         miShipSearch = new JMenuItem(resourceMap.getString("miShipSearch.text"));
-        menuMarket.setMnemonic(KeyEvent.VK_S);
+        miShipSearch.setMnemonic(KeyEvent.VK_S);
         miShipSearch.addActionListener(ev -> showShipSearch());
-        menuMarket.add(miShipSearch);
         miShipSearch.setVisible(getCampaign().getCampaignOptions().getUseAtB());
+        menuMarket.add(miShipSearch);
 
         JMenuItem miPurchaseUnit = new JMenuItem(resourceMap.getString("miPurchaseUnit.text")); // NOI18N
         miPurchaseUnit.addActionListener(this::miPurchaseUnitActionPerformed);
@@ -790,11 +791,9 @@ public class CampaignGUI extends JPanel {
         menuMarket.add(miHireBulk);
 
         JMenu menuHire = new JMenu(resourceMap.getString("menuHire.text")); // NOI18N
-
-        JMenuItem miHire;
-        menuMarket.setMnemonic(KeyEvent.VK_H);
+        menuHire.setMnemonic(KeyEvent.VK_H);
         for (int i = Person.T_MECHWARRIOR; i < Person.T_NUM; i++) {
-            miHire = new JMenuItem(Person.getRoleDesc(i, getCampaign().getFaction().isClan()));
+            JMenuItem miHire = new JMenuItem(Person.getRoleDesc(i, getCampaign().getFaction().isClan()));
             miHire.setActionCommand(Integer.toString(i));
             miHire.addActionListener(this::hirePerson);
             menuHire.add(miHire);
@@ -803,7 +802,7 @@ public class CampaignGUI extends JPanel {
 
         //region Astech Pool
         JMenu menuAstechPool = new JMenu(resourceMap.getString("menuAstechPool.text"));
-        menuMarket.setMnemonic(KeyEvent.VK_A);
+        menuAstechPool.setMnemonic(KeyEvent.VK_A);
 
         JMenuItem miHireAstechs = new JMenuItem(resourceMap.getString("miHireAstechs.text"));
         miHireAstechs.addActionListener(evt -> {
@@ -1012,7 +1011,7 @@ public class CampaignGUI extends JPanel {
 
         //region Help Menu
         JMenu menuHelp = new JMenu(resourceMap.getString("menuHelp.text")); // NOI18N
-        menuManage.setMnemonic(KeyEvent.VK_H);
+        menuHelp.setMnemonic(KeyEvent.VK_H);
         menuHelp.setName("helpMenu"); // NOI18N
 
         JMenuItem menuAboutItem = new JMenuItem("aboutMenuItem"); // NOI18N
