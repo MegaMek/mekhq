@@ -327,6 +327,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
     protected int overtimeLeft;
     protected int nTasks;
     protected boolean engineer;
+    public static final int PRIMARY_ROLE_SUPPORT_TIME = 480;
+    public static final int PRIMARY_ROLE_OVERTIME_SUPPORT_TIME = 240;
+    public static final int SECONDARY_ROLE_SUPPORT_TIME = 240;
+    public static final int SECONDARY_ROLE_OVERTIME_SUPPORT_TIME = 120;
 
     //region Advanced Medical
     private List<Injury> injuries;
@@ -3742,13 +3746,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void resetMinutesLeft() {
-        if (isTechPrimary() || getPrimaryRole() == T_DOCTOR) {
-            this.minutesLeft = 480;
-            this.overtimeLeft = 240;
+        if (isTechPrimary() || (getPrimaryRole() == T_DOCTOR)) {
+            this.minutesLeft = PRIMARY_ROLE_SUPPORT_TIME;
+            this.overtimeLeft = PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
         }
-        if (isTechSecondary() || getSecondaryRole() == T_DOCTOR) {
-            this.minutesLeft = 240;
-            this.overtimeLeft = 240;
+        if (isTechSecondary() || (getSecondaryRole() == T_DOCTOR)) {
+            this.minutesLeft = SECONDARY_ROLE_SUPPORT_TIME;
+            this.overtimeLeft = SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
         }
     }
 
@@ -3964,16 +3968,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
         else {
             toReturn.append("><b>");
         }
-        toReturn.append(getFullName());
-        toReturn.append(String.format("</b> (%d XP)<br/>", getXp()));
+        toReturn.append(getFullTitle()).append("</b><br/>");
 
         boolean first = true;
         for (String skillName : DISPLAYED_SKILL_LEVELS) {
             Skill skill = getSkill(skillName);
             if (null == skill) {
                 continue;
-            }
-            else if (!first) {
+            } else if (!first) {
                 toReturn.append("; ");
             }
 
@@ -3982,8 +3984,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
             first = false;
         }
 
-        toReturn.append("<br/>");
-        toReturn.append(String.format("%d minutes left", getMinutesLeft()));
+        toReturn.append(String.format(" (%d XP)<br/>", getXp()))
+                .append(String.format("%d minutes left", getMinutesLeft()));
         if (overtimeAllowed) {
             toReturn.append(String.format(" + (%d overtime)", getOvertimeLeft()));
         }

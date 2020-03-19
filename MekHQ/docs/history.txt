@@ -27,6 +27,10 @@ VERSION HISTORY:
 + Issue #155: Adding Advance Day to Personnel Market
 + PR #1553: AtB: Adding SPA Generation for Generated Veteran and Elite Personnel
 + PR #1555: Fixing spacing for C3 Slaves in the TOE
++ Issue #1564: Hide impossible parts in the Purchase Parts Windows
++ PR #1533: Windchild's Personnel Improvements, covering Issues #765, #876, #1404, #1482, #1486, #1492
++ Issue #1524: Sort P_NONE Personnel as Support Personnel
++ Issues #1542 and #1417: Hangar Tab Popup List: Bulk Selection and Rank Fixes
 
 v0.47.4 (2020-2-09 2200 UTC)
 + PR #1440: Implement "Rugged" quirk (2x or 3x between maintenance rolls)
