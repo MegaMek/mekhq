@@ -586,10 +586,7 @@ public class CampaignGUI extends JPanel {
     private void initMenu() {
         menuBar = new JMenuBar();
         // The Menu Bar uses the following Mnemonic keys as of 19-March-2020:
-        // A, F, H, M, R, V
-
-        // TODO : Remove me once implemented
-        // TODO : F, M, R, V, A, H
+        // A, C, F, H, M, R, V
 
         //region File Menu
         // The File menu uses the following Mnemonic keys as of 19-MAR-2020:
@@ -752,10 +749,14 @@ public class CampaignGUI extends JPanel {
         //endregion File Menu
 
         //region Marketplace Menu
+        // The Marketplace menu uses the following Mnemonic keys as of 19-March-2020:
+        // P
         JMenu menuMarket = new JMenu(resourceMap.getString("menuMarket.text")); // NOI18N
+        menuMarket.setMnemonic(KeyEvent.VK_M);
 
         // Personnel Market
         JMenuItem miPersonnelMarket = new JMenuItem(resourceMap.getString("miPersonnelMarket.text"));
+        miPersonnelMarket.setMnemonic(KeyEvent.VK_P);
         miPersonnelMarket.addActionListener(evt -> hirePersonMarket());
         menuMarket.add(miPersonnelMarket);
 
@@ -886,6 +887,7 @@ public class CampaignGUI extends JPanel {
 
         //region Reports Menu
         JMenu menuReports = new JMenu(resourceMap.getString("menuReports.text")); // NOI18N
+        menuMarket.setMnemonic(KeyEvent.VK_R);
 
         JMenuItem miDragoonsRating = new JMenuItem(resourceMap.getString("miDragoonsRating.text")); // NOI18N
         miDragoonsRating.addActionListener(evt -> showReport(new RatingReport(getCampaign())));
@@ -912,8 +914,10 @@ public class CampaignGUI extends JPanel {
 
         //region Community Menu
         JMenu menuCommunity = new JMenu(resourceMap.getString("menuCommunity.text")); // NOI18N
+        menuCommunity.setMnemonic(KeyEvent.VK_C);
 
         JMenuItem miChat = new JMenuItem(resourceMap.getString("miChat.text")); // NOI18N
+        miChat.setMnemonic(KeyEvent.VK_C);
         miChat.addActionListener(this::miChatActionPerformed);
         menuCommunity.add(miChat);
 
@@ -922,6 +926,7 @@ public class CampaignGUI extends JPanel {
 
         //region View Menu
         JMenu menuView = new JMenu(resourceMap.getString("menuView.text")); // NOI18N
+        menuView.setMnemonic(KeyEvent.VK_V);
 
         miHistoricalDailyReportDialog = new JMenuItem(resourceMap.getString("miShowHistoricalReportLog.text")); // NOI18N
         miHistoricalDailyReportDialog.setEnabled(true);
@@ -958,6 +963,7 @@ public class CampaignGUI extends JPanel {
 
         //region Manage Campaign Menu
         JMenu menuManage = new JMenu(resourceMap.getString("menuManageCampaign.text"));
+        menuManage.setMnemonic(KeyEvent.VK_A);
         menuManage.setName("manageMenu");
 
         JMenuItem miGMToolsDialog = new JMenuItem(resourceMap.getString("miGMToolsDialog.text"));
@@ -993,6 +999,7 @@ public class CampaignGUI extends JPanel {
 
         //region Help Menu
         JMenu menuHelp = new JMenu(resourceMap.getString("menuHelp.text")); // NOI18N
+        menuManage.setMnemonic(KeyEvent.VK_H);
         menuHelp.setName("helpMenu"); // NOI18N
 
         JMenuItem menuAboutItem = new JMenuItem("aboutMenuItem"); // NOI18N
