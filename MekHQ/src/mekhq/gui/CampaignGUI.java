@@ -1010,11 +1010,14 @@ public class CampaignGUI extends JPanel {
         //endregion Manage Campaign Menu
 
         //region Help Menu
+        // The Help menu uses the following Mnemonic keys as of 19-March-2020:
+        // A
         JMenu menuHelp = new JMenu(resourceMap.getString("menuHelp.text")); // NOI18N
         menuHelp.setMnemonic(KeyEvent.VK_H);
         menuHelp.setName("helpMenu"); // NOI18N
 
         JMenuItem menuAboutItem = new JMenuItem("aboutMenuItem"); // NOI18N
+        menuHelp.setMnemonic(KeyEvent.VK_A);
         menuAboutItem.setText(resourceMap.getString("menuAbout.text"));
         menuAboutItem.addActionListener(evt -> showAboutBox());
         menuHelp.add(menuAboutItem);
