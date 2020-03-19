@@ -97,7 +97,7 @@ public final class BatchXPDialog extends JDialog {
 
         this.resourceMap = ResourceBundle.getBundle("mekhq.resources.BatchXPDialog", new EncodeControl()); //$NON-NLS-1$
 
-        setTitle(resourceMap.getString("dialogue.title")); //$NON-NLS-1$
+        setTitle(resourceMap.getString("MassTrainingDialog.title")); //$NON-NLS-1$
         choiceNoSkill = resourceMap.getString("skill.choice.text"); //$NON-NLS-1$
 
         this.campaign = Objects.requireNonNull(campaign);
