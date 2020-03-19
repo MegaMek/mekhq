@@ -588,31 +588,53 @@ public class CampaignGUI extends JPanel {
 
         //region File Menu
         JMenu menuFile = new JMenu(resourceMap.getString("fileMenu.text")); // NOI18N
+        menuFile.setMnemonic(KeyEvent.VK_F);
+
+        // The File menu uses the following Mnemonic keys as of 19-MAR-2020:
+        // C, E, H, I, L, M, N, S, T, U, X
 
         JMenuItem menuLoad = new JMenuItem(resourceMap.getString("menuLoad.text")); // NOI18N
+        menuLoad.setMnemonic(KeyEvent.VK_L);
         menuLoad.addActionListener(this::menuLoadXmlActionPerformed);
         menuFile.add(menuLoad);
 
         JMenuItem menuSave = new JMenuItem(resourceMap.getString("menuSave.text")); // NOI18N
+        menuSave.setMnemonic(KeyEvent.VK_S);
         menuSave.addActionListener(this::menuSaveXmlActionPerformed);
         menuFile.add(menuSave);
 
+        // TODO : Windchild finish implementing and test this new menu option
+        /*
+        JMenuItem menuNew = new JMenuItem(resourceMap.getString("menuNew.text"));
+        menuNew.setMnemonic(KeyEvent.VK_N);
+        menuNew.addActionListener(this::menuNewActionPerformed);
+        menuFile.add(menuNew);
+         */
+
         //region menuImport
         JMenu menuImport = new JMenu(resourceMap.getString("menuImport.text")); // NOI18N
+        menuImport.setMnemonic(KeyEvent.VK_I);
+
+        // The Import menu uses the following Mnemonic keys as of 19-MAR-2020:
+        // A, C, L, P
 
         JMenuItem miImportOptions = new JMenuItem(resourceMap.getString("miImportOptions.text")); // NOI18N
+        miImportOptions.setMnemonic(KeyEvent.VK_C);
         miImportOptions.addActionListener(this::miImportOptionsActionPerformed);
         menuImport.add(miImportOptions);
 
         JMenuItem miImportPerson = new JMenuItem(resourceMap.getString("miImportPerson.text")); // NOI18N
+        miImportPerson.setMnemonic(KeyEvent.VK_P);
         miImportPerson.addActionListener(this::miImportPersonActionPerformed);
         menuImport.add(miImportPerson);
 
         JMenuItem miImportParts = new JMenuItem(resourceMap.getString("miImportParts.text")); // NOI18N
+        miImportParts.setMnemonic(KeyEvent.VK_A);
         miImportParts.addActionListener(this::miImportPartsActionPerformed);
         menuImport.add(miImportParts);
 
         JMenuItem miLoadForces = new JMenuItem(resourceMap.getString("miLoadForces.text")); // NOI18N
+        miLoadForces.setMnemonic(KeyEvent.VK_L);
         miLoadForces.addActionListener(this::miLoadForcesActionPerformed);
         menuImport.add(miLoadForces);
 
@@ -621,34 +643,57 @@ public class CampaignGUI extends JPanel {
 
         //region menuExport
         JMenu menuExport = new JMenu(resourceMap.getString("menuExport.text")); // NOI18N
+        menuExport.setMnemonic(KeyEvent.VK_X);
 
+        // The Export menu uses the following Mnemonic keys as of 19-March-2020:
+        // C, E, X
+
+        //region CSV Export
         JMenu miExportCSVFile = new JMenu(resourceMap.getString("menuExportCSV.text")); // NOI18N
+        miExportCSVFile.setMnemonic(KeyEvent.VK_C);
         menuExport.add(miExportCSVFile);
 
+        // The CSV menu uses the following Mnemonic keys as of 19-March-2020:
+        // F, P, U
+
+        //endregion CSV Export
+
+        //region XML Export
         JMenu miExportXMLFile = new JMenu(resourceMap.getString("menuExportXML.text")); // NOI18N
+        miExportXMLFile.setMnemonic(KeyEvent.VK_X);
         menuExport.add(miExportXMLFile);
 
+        // The XML menu uses the following Mnemonic keys as of 19-March-2020:
+        // C, P
+
         JMenuItem miExportOptions = new JMenuItem(resourceMap.getString("miExportOptions.text")); // NOI18N
+        miExportOptions.setMnemonic(KeyEvent.VK_C);
         miExportOptions.addActionListener(this::miExportOptionsActionPerformed);
         miExportXMLFile.add(miExportOptions);
+        //endregion XML Export
 
         JMenuItem miExportPersonCSV = new JMenuItem(resourceMap.getString("miExportPersonnel.text")); // NOI18N
+        miExportPersonCSV.setMnemonic(KeyEvent.VK_P);
         miExportPersonCSV.addActionListener(this::miExportPersonnelCSVActionPerformed);
         miExportCSVFile.add(miExportPersonCSV);
 
         JMenuItem miExportUnitCSV = new JMenuItem(resourceMap.getString("miExportUnit.text")); // NOI18N
+        miExportUnitCSV.setMnemonic(KeyEvent.VK_U);
         miExportUnitCSV.addActionListener(this::miExportUnitCSVActionPerformed);
         miExportCSVFile.add(miExportUnitCSV);
 
         JMenuItem miExportPlanetsXML = new JMenuItem(resourceMap.getString("miExportPlanets.text"));
+        miExportPlanetsXML.setMnemonic(KeyEvent.VK_P);
         miExportPlanetsXML.addActionListener(this::miExportPlanetsXMLActionPerformed);
         miExportXMLFile.add(miExportPlanetsXML);
 
         JMenuItem miExportFinancesCSV = new JMenuItem(resourceMap.getString("miExportFinances.text")); // NOI18N
+        miExportFinancesCSV.setMnemonic(KeyEvent.VK_F);
         miExportFinancesCSV.addActionListener(this::miExportFinancesCSVActionPerformed);
         miExportCSVFile.add(miExportFinancesCSV);
 
         JMenuItem miExportCampaignSubset = new JMenuItem(resourceMap.getString("miExportCampaignSubset.text"));
+        miExportCampaignSubset.setMnemonic(KeyEvent.VK_E);
         miExportCampaignSubset.addActionListener(evt -> {
             CampaignExportWizard cew = new CampaignExportWizard(getCampaign());
             cew.display(CampaignExportWizard.CampaignExportWizardState.ForceSelection);
@@ -675,28 +720,32 @@ public class CampaignGUI extends JPanel {
         //endregion menuExport
 
         JMenuItem miMercRoster = new JMenuItem(resourceMap.getString("miMercRoster.text")); // NOI18N
+        miMercRoster.setMnemonic(KeyEvent.VK_U);
         miMercRoster.addActionListener(evt -> showMercRosterDialog());
         menuFile.add(miMercRoster);
 
         JMenuItem menuOptions = new JMenuItem(resourceMap.getString("menuOptions.text")); // NOI18N
+        menuOptions.setMnemonic(KeyEvent.VK_C);
         menuOptions.addActionListener(this::menuOptionsActionPerformed);
         menuFile.add(menuOptions);
 
         JMenuItem menuOptionsMM = new JMenuItem(resourceMap.getString("menuOptionsMM.text")); // NOI18N
+        menuOptionsMM.setMnemonic(KeyEvent.VK_M);
         menuOptionsMM.addActionListener(this::menuOptionsMMActionPerformed);
         menuFile.add(menuOptionsMM);
 
         JMenuItem menuMekHqOptions = new JMenuItem(resourceMap.getString("menuMekHqOptions.text"));
-        menuMekHqOptions.setMnemonic(KeyEvent.VK_M);
+        menuMekHqOptions.setMnemonic(KeyEvent.VK_H);
         menuMekHqOptions.addActionListener(this::menuMekHqOptionsActionPerformed);
         menuFile.add(menuMekHqOptions);
 
         menuThemes = new JMenu(resourceMap.getString("menuThemes.text"));
-
+        menuThemes.setMnemonic(KeyEvent.VK_T);
         refreshThemeChoices();
         menuFile.add(menuThemes);
 
         JMenuItem menuExitItem = new JMenuItem(resourceMap.getString("menuExit.text"));
+        menuExitItem.setMnemonic(KeyEvent.VK_E);
         menuExitItem.addActionListener(evt -> getApplication().exit());
         menuFile.add(menuExitItem);
 
