@@ -750,7 +750,7 @@ public class CampaignGUI extends JPanel {
 
         //region Marketplace Menu
         // The Marketplace menu uses the following Mnemonic keys as of 19-March-2020:
-        // P, C, U, S
+        // A, B, C, H, M, N, P, R, S, U
         JMenu menuMarket = new JMenu(resourceMap.getString("menuMarket.text")); // NOI18N
         menuMarket.setMnemonic(KeyEvent.VK_M);
 
@@ -779,14 +779,17 @@ public class CampaignGUI extends JPanel {
         menuMarket.add(miShipSearch);
 
         JMenuItem miPurchaseUnit = new JMenuItem(resourceMap.getString("miPurchaseUnit.text")); // NOI18N
+        miPurchaseUnit.setMnemonic(KeyEvent.VK_N);
         miPurchaseUnit.addActionListener(this::miPurchaseUnitActionPerformed);
         menuMarket.add(miPurchaseUnit);
 
         JMenuItem miBuyParts = new JMenuItem(resourceMap.getString("miBuyParts.text")); // NOI18N
+        miBuyParts.setMnemonic(KeyEvent.VK_R);
         miBuyParts.addActionListener(evt -> buyParts());
         menuMarket.add(miBuyParts);
 
         JMenuItem miHireBulk = new JMenuItem(resourceMap.getString("miHireBulk.text"));
+        miHireBulk.setMnemonic(KeyEvent.VK_B);
         miHireBulk.addActionListener(evt -> hireBulkPersonnel());
         menuMarket.add(miHireBulk);
 
@@ -801,10 +804,13 @@ public class CampaignGUI extends JPanel {
         menuMarket.add(menuHire);
 
         //region Astech Pool
+        // The Astech Pool menu uses the following Mnemonic keys as of 19-March-2020:
+        // B, E, F, H
         JMenu menuAstechPool = new JMenu(resourceMap.getString("menuAstechPool.text"));
         menuAstechPool.setMnemonic(KeyEvent.VK_A);
 
         JMenuItem miHireAstechs = new JMenuItem(resourceMap.getString("miHireAstechs.text"));
+        miHireAstechs.setMnemonic(KeyEvent.VK_H);
         miHireAstechs.addActionListener(evt -> {
             PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
                     getFrame(), true, resourceMap.getString("popupHireAstechsNum.text"),
@@ -818,6 +824,7 @@ public class CampaignGUI extends JPanel {
         menuAstechPool.add(miHireAstechs);
 
         JMenuItem miFireAstechs = new JMenuItem(resourceMap.getString("miFireAstechs.text"));
+        miFireAstechs.setMnemonic(KeyEvent.VK_E);
         miFireAstechs.addActionListener(evt -> {
             PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
                     getFrame(), true, resourceMap.getString("popupFireAstechsNum.text"),
@@ -831,6 +838,7 @@ public class CampaignGUI extends JPanel {
         menuAstechPool.add(miFireAstechs);
 
         JMenuItem miFullStrengthAstechs = new JMenuItem(resourceMap.getString("miFullStrengthAstechs.text"));
+        miFullStrengthAstechs.setMnemonic(KeyEvent.VK_B);
         miFullStrengthAstechs.addActionListener(evt -> {
             int need = (getCampaign().getTechs().size() * 6)
                     - getCampaign().getNumberAstechs();
@@ -841,14 +849,20 @@ public class CampaignGUI extends JPanel {
         menuAstechPool.add(miFullStrengthAstechs);
 
         JMenuItem miFireAllAstechs = new JMenuItem(resourceMap.getString("miFireAllAstechs.text"));
+        miFireAllAstechs.setMnemonic(KeyEvent.VK_F);
         miFireAllAstechs.addActionListener(evt -> getCampaign().decreaseAstechPool(getCampaign().getAstechPool()));
         menuAstechPool.add(miFireAllAstechs);
         menuMarket.add(menuAstechPool);
         //endregion Astech Pool
 
         //region Medic Pool
+        // The Medic Pool menu uses the following Mnemonic keys as of 19-March-2020:
+        // B, E, H, R
         JMenu menuMedicPool = new JMenu(resourceMap.getString("menuMedicPool.text"));
+        menuMedicPool.setMnemonic(KeyEvent.VK_M);
+
         JMenuItem miHireMedics = new JMenuItem(resourceMap.getString("miHireMedics.text"));
+        miHireMedics.setMnemonic(KeyEvent.VK_H);
         miHireMedics.addActionListener(evt -> {
             PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
                     getFrame(), true, resourceMap.getString("popupHireMedicsNum.text"),
@@ -862,6 +876,7 @@ public class CampaignGUI extends JPanel {
         menuMedicPool.add(miHireMedics);
 
         JMenuItem miFireMedics = new JMenuItem(resourceMap.getString("miFireMedics.text"));
+        miFireMedics.setMnemonic(KeyEvent.VK_E);
         miFireMedics.addActionListener(evt -> {
             PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
                     getFrame(), true, resourceMap.getString("popupFireMedicsNum.text"),
@@ -875,6 +890,7 @@ public class CampaignGUI extends JPanel {
         menuMedicPool.add(miFireMedics);
 
         JMenuItem miFullStrengthMedics = new JMenuItem(resourceMap.getString("miFullStrengthMedics.text"));
+        miFullStrengthMedics.setMnemonic(KeyEvent.VK_B);
         miFullStrengthMedics.addActionListener(evt -> {
             int need = (getCampaign().getDoctors().size() * 4)
                     - getCampaign().getNumberMedics();
@@ -885,6 +901,7 @@ public class CampaignGUI extends JPanel {
         menuMedicPool.add(miFullStrengthMedics);
 
         JMenuItem miFireAllMedics = new JMenuItem(resourceMap.getString("miFireAllMedics.text"));
+        miFireAllMedics.setMnemonic(KeyEvent.VK_R);
         miFireAllMedics.addActionListener(evt -> getCampaign().decreaseMedicPool(getCampaign().getMedicPool()));
         menuMedicPool.add(miFireAllMedics);
         menuMarket.add(menuMedicPool);
