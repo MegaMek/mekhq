@@ -898,7 +898,7 @@ public class CampaignGUI extends JPanel {
         // The Reports menu uses the following Mnemonic keys as of 19-March-2020:
         //
         JMenu menuReports = new JMenu(resourceMap.getString("menuReports.text")); // NOI18N
-        menuMarket.setMnemonic(KeyEvent.VK_R);
+        menuReports.setMnemonic(KeyEvent.VK_R);
 
         JMenuItem miDragoonsRating = new JMenuItem(resourceMap.getString("miDragoonsRating.text")); // NOI18N
         miDragoonsRating.addActionListener(evt -> showReport(new RatingReport(getCampaign())));
