@@ -585,13 +585,17 @@ public class CampaignGUI extends JPanel {
 
     private void initMenu() {
         menuBar = new JMenuBar();
+        // The Menu Bar uses the following Mnemonic keys as of 19-March-2020:
+        // A, F, H, M, R, V
+
+        // TODO : Remove me once implemented
+        // TODO : F, M, R, V, A, H
 
         //region File Menu
-        JMenu menuFile = new JMenu(resourceMap.getString("fileMenu.text")); // NOI18N
-        menuFile.setMnemonic(KeyEvent.VK_F);
-
         // The File menu uses the following Mnemonic keys as of 19-MAR-2020:
         // C, E, H, I, L, M, N, S, T, U, X
+        JMenu menuFile = new JMenu(resourceMap.getString("fileMenu.text")); // NOI18N
+        menuFile.setMnemonic(KeyEvent.VK_F);
 
         JMenuItem menuLoad = new JMenuItem(resourceMap.getString("menuLoad.text")); // NOI18N
         menuLoad.setMnemonic(KeyEvent.VK_L);
@@ -612,11 +616,10 @@ public class CampaignGUI extends JPanel {
          */
 
         //region menuImport
-        JMenu menuImport = new JMenu(resourceMap.getString("menuImport.text")); // NOI18N
-        menuImport.setMnemonic(KeyEvent.VK_I);
-
         // The Import menu uses the following Mnemonic keys as of 19-MAR-2020:
         // A, C, L, P
+        JMenu menuImport = new JMenu(resourceMap.getString("menuImport.text")); // NOI18N
+        menuImport.setMnemonic(KeyEvent.VK_I);
 
         JMenuItem miImportOptions = new JMenuItem(resourceMap.getString("miImportOptions.text")); // NOI18N
         miImportOptions.setMnemonic(KeyEvent.VK_C);
@@ -642,29 +645,25 @@ public class CampaignGUI extends JPanel {
         //endregion menuImport
 
         //region menuExport
+        // The Export menu uses the following Mnemonic keys as of 19-March-2020:
+        // C, E, X
         JMenu menuExport = new JMenu(resourceMap.getString("menuExport.text")); // NOI18N
         menuExport.setMnemonic(KeyEvent.VK_X);
 
-        // The Export menu uses the following Mnemonic keys as of 19-March-2020:
-        // C, E, X
-
         //region CSV Export
+        // The CSV menu uses the following Mnemonic keys as of 19-March-2020:
+        // F, P, U
         JMenu miExportCSVFile = new JMenu(resourceMap.getString("menuExportCSV.text")); // NOI18N
         miExportCSVFile.setMnemonic(KeyEvent.VK_C);
         menuExport.add(miExportCSVFile);
-
-        // The CSV menu uses the following Mnemonic keys as of 19-March-2020:
-        // F, P, U
-
         //endregion CSV Export
 
         //region XML Export
+        // The XML menu uses the following Mnemonic keys as of 19-March-2020:
+        // C, P
         JMenu miExportXMLFile = new JMenu(resourceMap.getString("menuExportXML.text")); // NOI18N
         miExportXMLFile.setMnemonic(KeyEvent.VK_X);
         menuExport.add(miExportXMLFile);
-
-        // The XML menu uses the following Mnemonic keys as of 19-March-2020:
-        // C, P
 
         JMenuItem miExportOptions = new JMenuItem(resourceMap.getString("miExportOptions.text")); // NOI18N
         miExportOptions.setMnemonic(KeyEvent.VK_C);
