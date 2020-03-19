@@ -21,11 +21,6 @@ package mekhq.gui.model;
 import java.awt.Component;
 import java.awt.Image;
 import java.awt.Toolkit;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.UUID;
@@ -41,15 +36,11 @@ import megamek.common.Jumpship;
 import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.UnitType;
-import megamek.common.logging.LogLevel;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
 import mekhq.IconPackage;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
@@ -59,15 +50,13 @@ import mekhq.campaign.universe.Planet;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.MekHqColors;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
 
 /**
  * A table Model for displaying information about personnel
  * @author Jay lawson
  */
 public class PersonnelTableModel extends DataTableModel {
-
+    //region Variable Declarations
     private static final long serialVersionUID = -5207167419079014157L;
 
     private Campaign campaign;
@@ -124,6 +113,7 @@ public class PersonnelTableModel extends DataTableModel {
     public static final int N_COL               = 44;
 
     private ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.PersonnelTableModel", new EncodeControl());
+    //endregion Variable Declarations
 
     public PersonnelTableModel(Campaign c) {
         data = new ArrayList<Person>();

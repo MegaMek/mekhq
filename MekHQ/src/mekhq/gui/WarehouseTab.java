@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui;
 
 import java.awt.BorderLayout;
@@ -26,6 +25,7 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.swing.AbstractAction;
@@ -103,9 +103,7 @@ import mekhq.preferences.PreferencesNode;
  * Displays all spare parts in stock, parts on order, and permits repair of damaged
  * parts.
  */
-
 public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel {
-
     private static final long serialVersionUID = 9172184916479921364L;
 
     // parts filter groups
@@ -156,7 +154,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     private int selectedRow = -1;
     private int partId = -1;
     private Person selectedTech;
-    
+
     WarehouseTab(CampaignGUI gui, String name) {
         super(gui, name);
         MekHQ.registerHandler(this);
@@ -671,8 +669,8 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     }
 
     public void refreshTechsList() {
-        ArrayList<Person> techs = getCampaign().getTechs(true, null, false, false);
-        techsModel.setData(techs);
+        // The next gets all techs who have more than 0 minutes free, and sorted by skill descending (elites at bottom)
+        techsModel.setData(getCampaign().getTechs(true, null, true, false));
         String astechString = "<html><b>Astech Pool Minutes:</> " + getCampaign().getAstechPoolMinutes();
         if (getCampaign().isOvertimeAllowed()) {
             astechString += " [" + getCampaign().getAstechPoolOvertime() + " overtime]";
@@ -728,7 +726,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
             }
         }
     }
-    
+
     public void refreshProcurementList() {
         acquirePartsModel.setData(getCampaign().getShoppingList().getPartList());
     }
@@ -736,7 +734,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     private void doTask() {
         selectedTech = getSelectedTech();
         selectedRow = partsTable.getSelectedRow();
-        
+
         Part part = getSelectedTask();
         if (null == part) {
             return;
@@ -776,7 +774,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     public void refreshAstechPool(String astechString) {
         astechPoolLabel.setText(astechString);
     }
-    
+
     private ActionScheduler partsScheduler = new ActionScheduler(this::refreshPartsList);
     private ActionScheduler techsScheduler = new ActionScheduler(this::refreshTechsList);
     private ActionScheduler procurementScheduler = new ActionScheduler(this::refreshProcurementList);
@@ -785,49 +783,49 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     public void handle(UnitRemovedEvent ev) {
         filterParts();
     }
-    
+
     @Subscribe
     public void handle(UnitChangedEvent ev) {
         filterParts();
     }
-    
+
     @Subscribe
     public void handle(UnitRefitEvent ev) {
         partsScheduler.schedule();
         procurementScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(PersonEvent ev) {
         techsScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(PartNewEvent ev) {
         partsScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(PartRemovedEvent ev) {
         partsScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(PartChangedEvent ev) {
         filterParts();
     }
-    
+
     @Subscribe
     public void handle(AcquisitionEvent ev) {
         partsScheduler.schedule();
         procurementScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(ProcurementEvent ev) {
         procurementScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(PartWorkEvent ev) {
         if (ev.getPartWork().getUnit() == null) {
@@ -835,17 +833,17 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         }
         techsScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(OvertimeModeEvent ev) {
         filterTechs();
     }
-    
+
     @Subscribe
     public void handle(AstechPoolChangedEvent ev) {
         filterTechs();
     }
-    
+
     @Subscribe
     public void handle(PartModeChangedEvent ev) {
         updateTechTarget();

@@ -4154,6 +4154,23 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return tech == null && requiresMaintenance() && !isSelfCrewed();
     }
 
+    // TODO : Switch similar tables in person to use this one instead
+    public String determineUnitTechSkillType() {
+        if ((entity instanceof Mech) || (entity instanceof Protomech)) {
+            return SkillType.S_TECH_MECH;
+        } else if (entity instanceof BattleArmor) {
+            return SkillType.S_TECH_BA;
+        } else if (entity instanceof Tank) {
+            return SkillType.S_TECH_MECHANIC;
+        } else if ((entity instanceof Dropship) || (entity instanceof Jumpship)) {
+            return SkillType.S_TECH_VESSEL;
+        } else if ((entity instanceof Aero)) {
+            return SkillType.S_TECH_AERO;
+        } else {
+            return "";
+        }
+    }
+
     public boolean canTakeMoreGunners() {
         int nGunners = gunners.size();
         return nGunners < getTotalGunnerNeeds();
