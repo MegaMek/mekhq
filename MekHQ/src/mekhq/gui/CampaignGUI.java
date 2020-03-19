@@ -987,32 +987,38 @@ public class CampaignGUI extends JPanel {
         //endregion View Menu
 
         //region Manage Campaign Menu
+        // The Manage Campaign menu uses the following Mnemonic keys as of 19-March-2020:
+        // A, B, G, M, S
         JMenu menuManage = new JMenu(resourceMap.getString("menuManageCampaign.text"));
         menuManage.setMnemonic(KeyEvent.VK_A);
         menuManage.setName("manageMenu");
 
         JMenuItem miGMToolsDialog = new JMenuItem(resourceMap.getString("miGMToolsDialog.text"));
+        miGMToolsDialog.setMnemonic(KeyEvent.VK_G);
         miGMToolsDialog.setEnabled(true);
         miGMToolsDialog.addActionListener(evt -> showGMToolsDialog());
         menuManage.add(miGMToolsDialog);
 
         JMenuItem miAdvanceMultipleDays = new JMenuItem(resourceMap.getString("miAdvanceMultipleDays.text"));
+        miAdvanceMultipleDays.setMnemonic(KeyEvent.VK_A);
         miAdvanceMultipleDays.setEnabled(getCampaignController().isHost());
         miAdvanceMultipleDays.addActionListener(evt -> showAdvanceDaysDialog());
         menuManage.add(miAdvanceMultipleDays);
 
         JMenuItem miBloodnames = new JMenuItem(resourceMap.getString("miRandomBloodnames.text"));
+        miBloodnames.setMnemonic(KeyEvent.VK_B);
         miBloodnames.setEnabled(true);
         miBloodnames.addActionListener(evt -> randomizeAllBloodnames());
         menuManage.add(miBloodnames);
 
         JMenuItem miBatchXP = new JMenuItem(resourceMap.getString("miBatchXP.text"));
+        miBatchXP.setMnemonic(KeyEvent.VK_M);
         miBatchXP.setEnabled(true);
         miBatchXP.addActionListener(evt -> spendBatchXP());
         menuManage.add(miBatchXP);
 
         JMenuItem miScenarioEditor = new JMenuItem(resourceMap.getString("miScenarioEditor.text"));
-        miScenarioEditor.setMnemonic(KeyEvent.VK_A);
+        miScenarioEditor.setMnemonic(KeyEvent.VK_S);
         miScenarioEditor.setEnabled(true);
         miScenarioEditor.addActionListener(evt -> {
             ScenarioTemplateEditorDialog sted = new ScenarioTemplateEditorDialog(getFrame());
