@@ -443,7 +443,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         Crew p = u.getEntity().getCrew();
         BigDecimal combatSkillAverage;
 
-        //Infantry and Protos do not have a piloting skill.
+        //Infantry and ProtoMechs do not have a piloting skill.
         if ((u.getEntity() instanceof Infantry) ||
             (u.getEntity() instanceof Protomech)) {
             combatSkillAverage = new BigDecimal(p.getGunnery());

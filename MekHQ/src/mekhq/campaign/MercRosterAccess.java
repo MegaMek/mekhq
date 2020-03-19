@@ -466,8 +466,8 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             try {
                 preparedStatement = connect.prepareStatement("UPDATE " + table + ".crew SET rank=?, lname=?, fname=?, callsign=?, status=?, parent=?, crewnumber=?, joiningdate=?, notes=?, bday=? WHERE uuid=?");
                 preparedStatement.setInt(1, p.getRankNumeric());
-                preparedStatement.setString(2, truncateString(parseLastName(p.getName()),30));
-                preparedStatement.setString(3, truncateString(parseFirstName(p.getName()), 30));
+                preparedStatement.setString(2, truncateString(p.getSurname(),30));
+                preparedStatement.setString(3, truncateString(p.getGivenName(), 30));
                 preparedStatement.setString(4, truncateString(p.getCallsign(), 30));
                 preparedStatement.setString(5, getMercRosterStatusName(p.getStatus()));
                 preparedStatement.setInt(6, forceId);
@@ -482,8 +482,8 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                     //no prior record so insert
                     preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".crew (rank, lname, fname, callsign, status, parent, crewnumber, joiningdate, notes, bday, uuid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                     preparedStatement.setInt(1, p.getRankNumeric());
-                    preparedStatement.setString(2, truncateString(parseLastName(p.getName()),30));
-                    preparedStatement.setString(3, truncateString(parseFirstName(p.getName()), 30));
+                    preparedStatement.setString(2, truncateString(p.getSurname(), 30));
+                    preparedStatement.setString(3, truncateString(p.getGivenName(), 30));
                     preparedStatement.setString(4, truncateString(p.getCallsign(), 30));
                     preparedStatement.setString(5, getMercRosterStatusName(p.getStatus()));
                     preparedStatement.setInt(6, forceId);
@@ -494,6 +494,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                     preparedStatement.setString(11, p.getId().toString());
                     preparedStatement.executeUpdate();
                 }
+
                 //retrieve the MercRoster id of this person
                 preparedStatement = connect.prepareStatement("SELECT id FROM " + table + ".crew WHERE uuid=?");
                 preparedStatement.setString(1, p.getId().toString());
@@ -606,15 +607,6 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 connect.close();
             }
         } catch (Exception ignored) { }
-    }
-
-    private static String parseFirstName(String name) {
-        return name.split(" ")[0];
-    }
-
-    private static String parseLastName(String name) {
-        String[] names = name.split(" ");
-        return names[names.length-1];
     }
 
     private static boolean hasColumn(ResultSet rs, String columnName) throws SQLException {

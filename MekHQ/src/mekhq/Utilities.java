@@ -19,7 +19,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq;
 
 import java.awt.Graphics2D;
@@ -66,6 +65,7 @@ import java.util.stream.Collectors;
 import javax.swing.JTable;
 import javax.swing.table.TableModel;
 
+import megamek.common.util.StringUtil;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.*;
 import org.apache.commons.csv.CSVFormat;
@@ -125,7 +125,7 @@ public class Utilities {
     private static ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Utilities", new EncodeControl()); //$NON-NLS-1$
 
     // A couple of arrays for use in the getLevelName() method
-    private static int[]    arabicNumbers = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+    private static int[] arabicNumbers = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
     private static String[] romanNumerals = "M,CM,D,CD,C,XC,L,XL,X,IX,V,IV,I".split(","); //$NON-NLS-1$ //$NON-NLS-2$
 
     public static int roll3d6() {
@@ -166,12 +166,12 @@ public class Utilities {
      *
      */
     public static <T> T getRandomItem(Collection<? extends T> collection) {
-        if((null == collection) || collection.isEmpty()) {
+        if ((null == collection) || collection.isEmpty()) {
             return null;
         }
         int index = Compute.randomInt(collection.size());
         Iterator<? extends T> iterator = collection.iterator();
-        for(int i = 0; i < index; ++ i) {
+        for (int i = 0; i < index; ++ i) {
             iterator.next();
         }
         return iterator.next();
@@ -191,7 +191,7 @@ public class Utilities {
      *
      */
     public static <T> T getRandomItem(List<? extends T> list) {
-        if((null == list) || list.isEmpty() ) {
+        if ((null == list) || list.isEmpty() ) {
             return null;
         }
         int index = Compute.randomInt(list.size());
@@ -238,15 +238,15 @@ public class Utilities {
      */
     @SafeVarargs
     public static <T> T nonNull(T first, T second, T ... others) {
-        if(null != first) {
+        if (null != first) {
             return first;
         }
-        if(null != second) {
+        if (null != second) {
             return second;
         }
         T result = others[0];
         int index = 1;
-        while((null == result) && (index < others.length)) {
+        while ((null == result) && (index < others.length)) {
             result = others[index];
             ++ index;
         }
@@ -255,7 +255,7 @@ public class Utilities {
 
     public static ArrayList<AmmoType> getMunitionsFor(Entity entity, AmmoType cur_atype, int techLvl) {
         ArrayList<AmmoType> atypes = new ArrayList<>();
-        for(AmmoType atype : AmmoType.getMunitionsFor(cur_atype.getAmmoType())) {
+        for (AmmoType atype : AmmoType.getMunitionsFor(cur_atype.getAmmoType())) {
             //this is an abbreviated version of setupMunitions in the CustomMechDialog
             //TODO: clan/IS limitations?
 
@@ -265,19 +265,18 @@ public class Utilities {
             }
 
             int lvl = atype.getTechLevel(entity.getTechLevelYear());
-            if(lvl < 0) {
+            if (lvl < 0) {
                 lvl = 0;
             }
-            if(techLvl < Utilities.getSimpleTechLevel(lvl)) {
+            if (techLvl < Utilities.getSimpleTechLevel(lvl)) {
                 continue;
             }
-            if(TechConstants.isClan(cur_atype.getTechLevel(entity.getTechLevelYear())) != TechConstants.isClan(lvl)) {
+            if (TechConstants.isClan(cur_atype.getTechLevel(entity.getTechLevelYear())) != TechConstants.isClan(lvl)) {
                 continue;
             }
 
             // Only Protos can use Proto-specific ammo
-            if (atype.hasFlag(AmmoType.F_PROTOMECH)
-                    && !(entity instanceof Protomech)) {
+            if (atype.hasFlag(AmmoType.F_PROTOMECH) && !(entity instanceof Protomech)) {
                 continue;
             }
 
@@ -314,17 +313,15 @@ public class Utilities {
             return false;
         if (!a.getName().equals(b.getName()))
             return false;
-        if (a.getLocation()!=b.getLocation())
-            return false;
-        return true;
+        return a.getLocation() == b.getLocation();
     }
 
     /**
      * Returns the last file modified in a directory and all subdirectories
      * that conforms to a FilenameFilter
-     * @param dir
-     * @param filter
-     * @return
+     * @param dir       direction name
+     * @param filter    filter for the file's name
+     * @return          the last file modified in that dir that fits the filter
      */
     public static File lastFileModified(String dir, FilenameFilter filter) {
         File fl = new File(dir);
@@ -345,15 +342,17 @@ public class Utilities {
         //ok now we need to recursively search any subdirectories,
         //so see if they contain more recent files
         files = fl.listFiles();
-        for(File file : files) {
-            if(!file.isDirectory()) {
-                continue;
-            }
+        if (files != null) {
+            for (File file : files) {
+                if (!file.isDirectory()) {
+                    continue;
+                }
 
-            File subFile =  lastFileModified(file.getPath(), filter);
-            if (null != subFile && subFile.lastModified() > lastMod) {
-                choice = subFile;
-                lastMod = subFile.lastModified();
+                File subFile = lastFileModified(file.getPath(), filter);
+                if (null != subFile && subFile.lastModified() > lastMod) {
+                    choice = subFile;
+                    lastMod = subFile.lastModified();
+                }
             }
         }
 
@@ -362,14 +361,13 @@ public class Utilities {
 
     public static File[] getAllFiles(String dir, FilenameFilter filter) {
         File fl = new File(dir);
-        File[] files = fl.listFiles(filter);
-        return files;
+        return fl.listFiles(filter);
     }
 
     public static ArrayList<String> getAllVariants(Entity en, Campaign campaign) {
         final String METHOD_NAME = "getAllVariants(Entity, Campaign)"; // $NON-NLS-1$
         CampaignOptions options = campaign.getCampaignOptions();
-        ArrayList<String> variants = new ArrayList<String>();
+        ArrayList<String> variants = new ArrayList<>();
         for(MechSummary summary : MechSummaryCache.getInstance().getAllMechs()) {
             // If this isn't the same chassis, is our current unit, or is a different weight we continue
             if(!en.getChassis().equalsIgnoreCase(summary.getChassis())
@@ -402,35 +400,29 @@ public class Utilities {
     public static boolean isOmniVariant(Entity entity1, Entity entity2) {
         if (!entity1.isOmni() || !entity2.isOmni()) {
             return false;
-        }
-        if (entity1.getWeight() != entity2.getWeight()) {
+        } else if (entity1.getWeight() != entity2.getWeight()) {
             return false;
-        }
-        if (entity1.getClass() != entity2.getClass()) {
+        } else if (entity1.getClass() != entity2.getClass()) {
             return false;
-        }
-        if (entity1.getEngine().getRating() != entity2.getEngine().getRating()
+        } else if (entity1.getEngine().getRating() != entity2.getEngine().getRating()
                 || entity1.getEngine().getEngineType() != entity2.getEngine().getEngineType()
                 || entity1.getEngine().getFlags() != entity2.getEngine().getFlags()) {
             return false;
-        }
-        if (entity1.getStructureType() != entity2.getStructureType()) {
+        } else if (entity1.getStructureType() != entity2.getStructureType()) {
             return false;
         }
         if (entity1 instanceof Mech) {
-            if (((Mech)entity1).getCockpitType() != ((Mech)entity2).getCockpitType()) {
+            if (((Mech) entity1).getCockpitType() != ((Mech) entity2).getCockpitType()) {
                 return false;
             }
-            if (((Mech)entity1).getGyroType() != ((Mech)entity2).getGyroType()) {
+            if (entity1.getGyroType() != entity2.getGyroType()) {
                 return false;
             }
-        }
-        if (entity1 instanceof Aero) {
-            if (((Aero)entity1).getCockpitType() != ((Aero)entity2).getCockpitType()) {
+        } else if (entity1 instanceof Aero) {
+            if (((Aero) entity1).getCockpitType() != ((Aero) entity2).getCockpitType()) {
                 return false;
             }
-        }
-        if (entity1 instanceof Tank) {
+        } else if (entity1 instanceof Tank) {
             if (entity1.getMovementMode() != entity2.getMovementMode()) {
                 return false;
             }
@@ -445,7 +437,7 @@ public class Utilities {
             //Go through the base entity and make a list of all fixed equipment in this location.
             for (int slot = 0; slot < entity1.getNumberOfCriticals(loc); slot++) {
                 CriticalSlot crit = entity1.getCritical(loc, slot);
-                if (null != crit && crit.getType() == CriticalSlot.TYPE_EQUIPMENT && null != crit.getMount()) {
+                if ((null != crit) && (crit.getType() == CriticalSlot.TYPE_EQUIPMENT) && (null != crit.getMount())) {
                     if (!crit.getMount().isOmniPodMounted()) {
                         fixedEquipment.add(crit.getMount().getType());
                         if (null != crit.getMount2()) {
@@ -478,19 +470,15 @@ public class Utilities {
 
     public static int generateExpLevel(int bonus) {
         int roll = Compute.d6(2) + bonus;
-        if(roll < 2) {
+        if (roll < 2) {
             return SkillType.EXP_ULTRA_GREEN;
-        }
-        if(roll < 6) {
+        } else if (roll < 6) {
             return SkillType.EXP_GREEN;
-        }
-        else if(roll < 10) {
+        } else if(roll < 10) {
             return SkillType.EXP_REGULAR;
-        }
-        else if(roll < 12) {
+        } else if(roll < 12) {
             return SkillType.EXP_VETERAN;
-        }
-        else {
+        } else {
             return SkillType.EXP_ELITE;
         }
     }
@@ -555,8 +543,8 @@ public class Utilities {
      * If an infantry platoon or vehicle crew took damage, perform the personnel injuries
      */
     public static ArrayList<Person> doCrewInjuries(Entity e, Campaign c, ArrayList<Person> newCrew) {
-        int casualties = 0;
-        if(null != e && e instanceof Infantry) {
+        int casualties;
+        if(e instanceof Infantry) {
             e.applyDamage();
             casualties = newCrew.size() - ((Infantry)e).getShootingStrength();
             for (Person p : newCrew) {
@@ -578,22 +566,15 @@ public class Utilities {
         return newCrew;
     }
 
-    public static boolean isDeadCrew(Entity e) {
-        if (Compute.getFullCrewSize(e) == 0 || e.getCrew().isDead()) {
-            return true;
-        }
-
-        return false;
-    }
-
     public static Map<CrewType, Collection<Person>> genRandomCrewWithCombinedSkill(Campaign c, Unit u, String factionCode) {
         Objects.requireNonNull(c);
         Objects.requireNonNull(u);
         Objects.requireNonNull(u.getEntity(), "Unit needs to have a valid Entity attached");
         Crew oldCrew = u.getEntity().getCrew();
-        String commanderName = oldCrew.getName();
-        int averageGunnery = 0;
-        int averagePiloting = 0;
+
+        int averageGunnery;
+        int averagePiloting;
+        int numberPeopleGenerated = 0;
         List<Person> drivers = new ArrayList<>();
         List<Person> gunners = new ArrayList<>();
         List<Person> vesselCrew = new ArrayList<>();
@@ -602,270 +583,325 @@ public class Utilities {
         int totalGunnery = 0;
         int totalPiloting = 0;
 
-        // If the entire crew is dead, we don't want to generate them.
-        // Actually, we do because they might not be truly dead - this will be the case for BA for example
-        // Also, the user may choose to GM make them un-dead in the resolve scenario dialog. I am disabling
-        // this because it is causing problems for BA.
-        /*if (isDeadCrew(unit.getEntity())) {
-            return new ArrayList<Person>();
-        }*/
+        // If the entire crew is dead, we still want to generate them. This is because they might
+        // not be truly dead - this will be the case for BA for example
+        // Also, the user may choose to GM make them un-dead in the resolve scenario dialog
 
         // Generate solo crews
         if (u.usesSoloPilot()) {
-            Person p = null;
+            //region Solo Pilot
+            Person p;
             if (u.getEntity() instanceof LandAirMech) {
-                p = c.newPerson(Person.T_MECHWARRIOR, factionCode);
-                p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget() - oldCrew.getPiloting(), 0);
-                p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget() - oldCrew.getGunnery(), 0);
-                p.addSkill(SkillType.S_PILOT_AERO, SkillType.getType(SkillType.S_PILOT_AERO).getTarget() - oldCrew.getPiloting(), 0);
-                p.addSkill(SkillType.S_GUN_AERO, SkillType.getType(SkillType.S_GUN_AERO).getTarget() - oldCrew.getGunnery(), 0);
+                p = c.newPerson(Person.T_MECHWARRIOR, Person.T_NONE, factionCode, oldCrew.getGender());
+                p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget()
+                        - oldCrew.getPiloting(), 0);
+                p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget()
+                        - oldCrew.getGunnery(), 0);
+                p.addSkill(SkillType.S_PILOT_AERO, SkillType.getType(SkillType.S_PILOT_AERO).getTarget()
+                        - oldCrew.getPiloting(), 0);
+                p.addSkill(SkillType.S_GUN_AERO, SkillType.getType(SkillType.S_GUN_AERO).getTarget()
+                        - oldCrew.getGunnery(), 0);
                 p.setSecondaryRole(Person.T_AERO_PILOT);
             } else if (u.getEntity() instanceof Mech) {
-                p = c.newPerson(Person.T_MECHWARRIOR, factionCode);
-                p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget() - oldCrew.getPiloting(), 0);
-                p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget() - oldCrew.getGunnery(), 0);
+                p = c.newPerson(Person.T_MECHWARRIOR, Person.T_NONE, factionCode, oldCrew.getGender());
+                p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget()
+                        - oldCrew.getPiloting(), 0);
+                p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget()
+                        - oldCrew.getGunnery(), 0);
             } else if (u.getEntity() instanceof Aero) {
-                p = c.newPerson(Person.T_AERO_PILOT, factionCode);
-                p.addSkill(SkillType.S_PILOT_AERO, SkillType.getType(SkillType.S_PILOT_AERO).getTarget() - oldCrew.getPiloting(), 0);
-                p.addSkill(SkillType.S_GUN_AERO, SkillType.getType(SkillType.S_GUN_AERO).getTarget() - oldCrew.getGunnery(), 0);
+                p = c.newPerson(Person.T_AERO_PILOT, Person.T_NONE, factionCode, oldCrew.getGender());
+                p.addSkill(SkillType.S_PILOT_AERO, SkillType.getType(SkillType.S_PILOT_AERO).getTarget()
+                        - oldCrew.getPiloting(), 0);
+                p.addSkill(SkillType.S_GUN_AERO, SkillType.getType(SkillType.S_GUN_AERO).getTarget()
+                        - oldCrew.getGunnery(), 0);
             } else if (u.getEntity() instanceof ConvFighter) {
-                p = c.newPerson(Person.T_CONV_PILOT, factionCode);
-                p.addSkill(SkillType.S_PILOT_JET, SkillType.getType(SkillType.S_PILOT_JET).getTarget() - oldCrew.getPiloting(), 0);
-                p.addSkill(SkillType.S_GUN_JET, SkillType.getType(SkillType.S_GUN_JET).getTarget() - oldCrew.getPiloting(), 0);
+                p = c.newPerson(Person.T_CONV_PILOT, Person.T_NONE, factionCode, oldCrew.getGender());
+                p.addSkill(SkillType.S_PILOT_JET, SkillType.getType(SkillType.S_PILOT_JET).getTarget()
+                        - oldCrew.getPiloting(), 0);
+                p.addSkill(SkillType.S_GUN_JET, SkillType.getType(SkillType.S_GUN_JET).getTarget()
+                        - oldCrew.getPiloting(), 0);
             } else if (u.getEntity() instanceof Protomech) {
-                p = c.newPerson(Person.T_PROTO_PILOT, factionCode);
-                //p.addSkill(SkillType.S_PILOT_PROTO, SkillType.getType(SkillType.S_PILOT_PROTO).getTarget() - oldCrew.getPiloting(), 0);
-                p.addSkill(SkillType.S_GUN_PROTO, SkillType.getType(SkillType.S_GUN_PROTO).getTarget() - oldCrew.getGunnery(), 0);
+                p = c.newPerson(Person.T_PROTO_PILOT, Person.T_NONE, factionCode, oldCrew.getGender());
+                p.addSkill(SkillType.S_GUN_PROTO, SkillType.getType(SkillType.S_GUN_PROTO).getTarget()
+                        - oldCrew.getGunnery(), 0);
             } else if (u.getEntity() instanceof VTOL) {
-                p = c.newPerson(Person.T_VTOL_PILOT, factionCode);
-                p.addSkill(SkillType.S_PILOT_VTOL, SkillType.getType(SkillType.S_PILOT_VTOL).getTarget() - oldCrew.getPiloting(), 0);
-                p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(), 0);
+                p = c.newPerson(Person.T_VTOL_PILOT, Person.T_NONE, factionCode, oldCrew.getGender());
+                p.addSkill(SkillType.S_PILOT_VTOL, SkillType.getType(SkillType.S_PILOT_VTOL).getTarget()
+                        - oldCrew.getPiloting(), 0);
+                p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget()
+                        - oldCrew.getGunnery(), 0);
             } else {
                 //assume tanker if we got here
-                p = c.newPerson(Person.T_GVEE_DRIVER, factionCode);
-                p.addSkill(SkillType.S_PILOT_GVEE, SkillType.getType(SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(), 0);
-                p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(), 0);
+                p = c.newPerson(Person.T_GVEE_DRIVER, Person.T_NONE, factionCode, oldCrew.getGender());
+                p.addSkill(SkillType.S_PILOT_GVEE, SkillType.getType(SkillType.S_PILOT_GVEE).getTarget()
+                        - oldCrew.getPiloting(), 0);
+                p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget()
+                        - oldCrew.getGunnery(), 0);
             }
 
             populateOptionsFromCrew(p, oldCrew);
 
+            setName(p, oldCrew, 0);
             drivers.add(p);
-        } else if (oldCrew.getSlotCount() > 1) {
-            for (int slot = 0; slot < oldCrew.getSlotCount(); slot++) {
-                Person p = null;
-                if(u.getEntity() instanceof Mech) {
-                    p = c.newPerson(Person.T_MECHWARRIOR, factionCode);
-                    p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget() - oldCrew.getPiloting(slot), 0);
-                    p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget() - oldCrew.getGunnery(slot), 0);
-                } else if(u.getEntity() instanceof Aero) {
-                    p = c.newPerson(Person.T_AERO_PILOT, factionCode);
-                    p.addSkill(SkillType.S_PILOT_AERO, SkillType.getType(SkillType.S_PILOT_AERO).getTarget() - oldCrew.getPiloting(slot), 0);
-                    p.addSkill(SkillType.S_GUN_AERO, SkillType.getType(SkillType.S_GUN_AERO).getTarget() - oldCrew.getGunnery(slot), 0);
-                }
-                if (null != p) {
-                    p.setName(oldCrew.getName(slot));
-                    if (!oldCrew.getExternalIdAsString().equals("-1")) {
-                        p.setId(UUID.fromString(oldCrew.getExternalIdAsString(slot)));
-                    }
-
-                    populateOptionsFromCrew(p, oldCrew);
-                    drivers.add(p);
-                }
-            }
+            //endregion Solo Pilot
         } else {
-            // Generate drivers for multi-crewed vehicles.
-
-            //Uggh, BA are a nightmare. The getTotalDriverNeeds will adjust for missing/destroyed suits
-            //but we can't change that because lots of other stuff needs that to be right, so we will hack
-            //it here to make it the starting squad size
-            int driversNeeded  = u.getTotalDriverNeeds();
-            if(u.getEntity() instanceof BattleArmor) {
-                driversNeeded = ((BattleArmor)u.getEntity()).getSquadSize();
-            }
-            while(drivers.size() < driversNeeded) {
-                Person p = null;
-                if(u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
-                    p = c.newPerson(Person.T_SPACE_PILOT, factionCode);
-                    p.addSkill(SkillType.S_PILOT_SPACE, randomSkillFromTarget(SkillType.getType(SkillType.S_PILOT_SPACE).getTarget() - oldCrew.getPiloting()), 0);
-                    totalPiloting += p.getSkill(SkillType.S_PILOT_SPACE).getFinalSkillValue();
-                }
-                else if(u.getEntity() instanceof BattleArmor) {
-                    p = c.newPerson(Person.T_BA, factionCode);
-                    p.addSkill(SkillType.S_GUN_BA, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_BA).getTarget() - oldCrew.getGunnery()), 0);
-                    totalGunnery += p.getSkill(SkillType.S_GUN_BA).getFinalSkillValue();
-                }
-                else if(u.getEntity() instanceof Infantry) {
-                    p = c.newPerson(Person.T_INFANTRY, factionCode);
-                    p.addSkill(SkillType.S_SMALL_ARMS, randomSkillFromTarget(SkillType.getType(SkillType.S_SMALL_ARMS).getTarget() - oldCrew.getGunnery()), 0);
-                    totalGunnery += p.getSkill(SkillType.S_SMALL_ARMS).getFinalSkillValue();
-                }
-                else if(u.getEntity() instanceof VTOL) {
-                    p = c.newPerson(Person.T_VTOL_PILOT, factionCode);
-                    p.addSkill(SkillType.S_PILOT_VTOL, SkillType.getType(SkillType.S_PILOT_VTOL).getTarget() - oldCrew.getPiloting(), 0);
-                    p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(), 0);
-                } else if (u.getEntity() instanceof Mech) {
-                    p = c.newPerson(Person.T_MECHWARRIOR, factionCode);
-                    p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget() - oldCrew.getPiloting(), 0);
-                    p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget() - oldCrew.getGunnery(), 0);
-                } else {
-                    //assume tanker if we got here
-                    p = c.newPerson(Person.T_GVEE_DRIVER, factionCode);
-                    p.addSkill(SkillType.S_PILOT_GVEE, SkillType.getType(SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(), 0);
-                    p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(), 0);
-                }
-
-                // this will have the side effect of giving every driver on the crew
-                // the SPAs from the entity's crew.
-                // Not really any way around it
-                populateOptionsFromCrew(p, oldCrew);
-                drivers.add(p);
-            }
-
-            // Regenerate as needed to balance
-            if (drivers.size() != 0) {
-                averageGunnery = (int)Math.round(((double)totalGunnery)/drivers.size());
-                averagePiloting = (int)Math.round(((double)totalPiloting)/drivers.size());
-                if (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
-                    while (averagePiloting != oldCrew.getPiloting()) {
-                        totalPiloting = 0;
-                        for (Person p : drivers) {
-                            p.addSkill(SkillType.S_PILOT_SPACE, randomSkillFromTarget(SkillType.getType(SkillType.S_PILOT_SPACE).getTarget() - oldCrew.getPiloting()), 0);
-                            totalPiloting += p.getSkill(SkillType.S_PILOT_SPACE).getFinalSkillValue();
-                        }
-                        averagePiloting = (int)Math.round(((double)totalPiloting)/drivers.size());
-                    }
-                } else if (u.getEntity() instanceof BattleArmor) {
-                    while (averageGunnery != oldCrew.getGunnery()) {
-                        totalGunnery = 0;
-                        for (Person p : drivers) {
-                            p.addSkill(SkillType.S_GUN_BA, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_BA).getTarget() - oldCrew.getGunnery()), 0);
-                            totalGunnery += p.getSkill(SkillType.S_GUN_BA).getFinalSkillValue();
-                        }
-                        averageGunnery = (int)Math.round(((double)totalGunnery)/drivers.size());
-                    }
-                } else if (u.getEntity() instanceof Infantry) {
-                    while (averageGunnery != oldCrew.getGunnery()) {
-                        totalGunnery = 0;
-                        for (Person p : drivers) {
-                            p.addSkill(SkillType.S_SMALL_ARMS, randomSkillFromTarget(SkillType.getType(SkillType.S_SMALL_ARMS).getTarget() - oldCrew.getGunnery()), 0);
-                            totalGunnery += p.getSkill(SkillType.S_SMALL_ARMS).getFinalSkillValue();
-                        }
-                        averageGunnery = (int)Math.round(((double)totalGunnery)/drivers.size());
-                    }
-                }
-            }
-            if(!u.usesSoldiers()) {
-                // Generate gunners for multi-crew vehicles
-                while(gunners.size() < u.getTotalGunnerNeeds()) {
+            if (oldCrew.getSlotCount() > 1) {
+                //region Multi-Slot Crew
+                for (int slot = 0; slot < oldCrew.getSlotCount(); slot++) {
                     Person p = null;
+                    if (u.getEntity() instanceof Mech) {
+                        p = c.newPerson(Person.T_MECHWARRIOR, Person.T_NONE, factionCode, oldCrew.getGender(slot));
+                        p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget()
+                                - oldCrew.getPiloting(slot), 0);
+                        p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget()
+                                - oldCrew.getGunnery(slot), 0);
+                    } else if (u.getEntity() instanceof Aero) {
+                        p = c.newPerson(Person.T_AERO_PILOT, Person.T_NONE, factionCode, oldCrew.getGender(slot));
+                        p.addSkill(SkillType.S_PILOT_AERO, SkillType.getType(SkillType.S_PILOT_AERO).getTarget()
+                                - oldCrew.getPiloting(slot), 0);
+                        p.addSkill(SkillType.S_GUN_AERO, SkillType.getType(SkillType.S_GUN_AERO).getTarget()
+                                - oldCrew.getGunnery(slot), 0);
+                    }
+                    if (null != p) {
+                        setName(p, oldCrew, numberPeopleGenerated);
+
+                        if (!oldCrew.getExternalIdAsString(numberPeopleGenerated).equals("-1")) {
+                            p.setId(UUID.fromString(oldCrew.getExternalIdAsString(numberPeopleGenerated)));
+                        }
+
+                        populateOptionsFromCrew(p, oldCrew);
+                        numberPeopleGenerated++;
+                        drivers.add(p);
+                    }
+                }
+                //endregion Multi-Slot Crew
+            }
+            // This is a nightmare case, not just for BA. We are also currently assuming that MM and
+            // therefore the MUL will contain the correct number of crew if more than 1 is included.
+            // TODO : This should not be an else statement, but rather based on a comparison between
+            // TODO : the numberPeopleGenerated and a fixed u.getFullCrewSize() (because that doesn't
+            // TODO : necessarily provide the correct number when called based on my current read on
+            // TODO : 26-Feb-2020)
+            else {
+                // Generate drivers for multi-crewed vehicles and vessels
+
+                //Uggh, BA are a nightmare. The getTotalDriverNeeds will adjust for missing/destroyed suits
+                //but we can't change that because lots of other stuff needs that to be right, so we will hack
+                //it here to make it the starting squad size
+                int driversNeeded  = u.getTotalDriverNeeds();
+                if (u.getEntity() instanceof BattleArmor) {
+                    driversNeeded = ((BattleArmor) u.getEntity()).getSquadSize();
+                }
+
+                for (int slot = 0; slot < driversNeeded; slot++) {
+                    Person p;
                     if (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
-                        p = c.newPerson(Person.T_SPACE_GUNNER, factionCode);
-                        p.addSkill(SkillType.S_GUN_SPACE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_SPACE).getTarget() - oldCrew.getGunnery()), 0);
-                        totalGunnery += p.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue();
+                        p = c.newPerson(Person.T_SPACE_PILOT, Person.T_NONE, factionCode,
+                                oldCrew.getGender(numberPeopleGenerated));
+                        p.addSkill(SkillType.S_PILOT_SPACE, randomSkillFromTarget(
+                                SkillType.getType(SkillType.S_PILOT_SPACE).getTarget()
+                                        - oldCrew.getPiloting()),
+                                0);
+                        totalPiloting += p.getSkill(SkillType.S_PILOT_SPACE).getFinalSkillValue();
+                    } else if(u.getEntity() instanceof BattleArmor) {
+                        p = c.newPerson(Person.T_BA, Person.T_NONE, factionCode,
+                                oldCrew.getGender(numberPeopleGenerated));
+                        p.addSkill(SkillType.S_GUN_BA, randomSkillFromTarget(
+                                SkillType.getType(SkillType.S_GUN_BA).getTarget()
+                                        - oldCrew.getGunnery()),
+                                0);
+                        totalGunnery += p.getSkill(SkillType.S_GUN_BA).getFinalSkillValue();
+                    } else if(u.getEntity() instanceof Infantry) {
+                        p = c.newPerson(Person.T_INFANTRY, Person.T_NONE, factionCode,
+                                oldCrew.getGender(numberPeopleGenerated));
+                        p.addSkill(SkillType.S_SMALL_ARMS, randomSkillFromTarget(
+                                SkillType.getType(SkillType.S_SMALL_ARMS).getTarget() - oldCrew.getGunnery()),
+                                0);
+                        totalGunnery += p.getSkill(SkillType.S_SMALL_ARMS).getFinalSkillValue();
+                    } else if(u.getEntity() instanceof VTOL) {
+                        p = c.newPerson(Person.T_VTOL_PILOT, Person.T_NONE, factionCode,
+                                oldCrew.getGender(numberPeopleGenerated));
+                        p.addSkill(SkillType.S_PILOT_VTOL, SkillType.getType(
+                                SkillType.S_PILOT_VTOL).getTarget() - oldCrew.getPiloting(),
+                                0);
+                        p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(
+                                SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(),
+                                0);
                     } else if (u.getEntity() instanceof Mech) {
-                        p = c.newPerson(Person.T_MECHWARRIOR, factionCode);
-                        p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget() - oldCrew.getPiloting(), 0);
-                        p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget() - oldCrew.getGunnery(), 0);
-                        totalGunnery += p.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue();
+                        p = c.newPerson(Person.T_MECHWARRIOR, Person.T_NONE, factionCode,
+                                oldCrew.getGender(numberPeopleGenerated));
+                        p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(
+                                SkillType.S_PILOT_MECH).getTarget() - oldCrew.getPiloting(),
+                                0);
+                        p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(
+                                SkillType.S_GUN_MECH).getTarget() - oldCrew.getGunnery(),
+                                0);
                     } else {
                         //assume tanker if we got here
-                        p = c.newPerson(Person.T_VEE_GUNNER, factionCode);
-                        p.addSkill(SkillType.S_GUN_VEE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery()), 0);
-                        totalGunnery += p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue();
+                        p = c.newPerson(Person.T_GVEE_DRIVER, Person.T_NONE, factionCode,
+                                oldCrew.getGender(numberPeopleGenerated));
+                        p.addSkill(SkillType.S_PILOT_GVEE, SkillType.getType(
+                                SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(),
+                                0);
+                        p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(
+                                SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(),
+                                0);
                     }
 
+                    // this will have the side effect of giving every driver on the crew
+                    // the SPAs from the entity's crew.
+                    // Not really any way around it
                     populateOptionsFromCrew(p, oldCrew);
-                    gunners.add(p);
+
+                    setName(p, oldCrew, numberPeopleGenerated);
+                    numberPeopleGenerated++;
+                    drivers.add(p);
                 }
 
-                // Regenerate gunners as needed to balance
-                if (gunners.size() != 0) {
-                    averageGunnery = (int)Math.round(((double)totalGunnery)/gunners.size());
-                    if (u.getEntity() instanceof Tank) {
-                        while (averageGunnery != oldCrew.getGunnery()) {
-                            totalGunnery = 0;
-                            for (Person p : gunners) {
-                                p.addSkill(SkillType.S_GUN_VEE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery()), 0);
-                                totalGunnery += p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue();
+                // Regenerate as needed to balance
+                if (drivers.size() != 0) {
+                    averageGunnery = (int) Math.round(((double) totalGunnery) / drivers.size());
+                    averagePiloting = (int) Math.round(((double) totalPiloting) / drivers.size());
+                    if (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
+                        while (averagePiloting != oldCrew.getPiloting()) {
+                            totalPiloting = 0;
+                            for (Person p : drivers) {
+                                p.addSkill(SkillType.S_PILOT_SPACE, randomSkillFromTarget(
+                                        SkillType.getType(SkillType.S_PILOT_SPACE).getTarget()
+                                                - oldCrew.getPiloting()),
+                                        0);
+                                totalPiloting += p.getSkill(SkillType.S_PILOT_SPACE).getFinalSkillValue();
                             }
-                            averageGunnery = (int)Math.round(((double)totalGunnery)/gunners.size());
+                            averagePiloting = (int) Math.round(((double) totalPiloting) / drivers.size());
                         }
-                    } else if (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
+                    } else if (u.getEntity() instanceof BattleArmor) {
                         while (averageGunnery != oldCrew.getGunnery()) {
                             totalGunnery = 0;
-                            for (Person p : gunners) {
-                                p.addSkill(SkillType.S_GUN_SPACE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_SPACE).getTarget() - oldCrew.getGunnery()), 0);
-                                totalGunnery += p.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue();
+                            for (Person p : drivers) {
+                                p.addSkill(SkillType.S_GUN_BA, randomSkillFromTarget(
+                                        SkillType.getType(SkillType.S_GUN_BA).getTarget()
+                                                - oldCrew.getGunnery()),
+                                        0);
+                                totalGunnery += p.getSkill(SkillType.S_GUN_BA).getFinalSkillValue();
                             }
-                            averageGunnery = (int)Math.round(((double)totalGunnery)/gunners.size());
+                            averageGunnery = (int) Math.round(((double) totalGunnery) / drivers.size());
+                        }
+                    } else if (u.getEntity() instanceof Infantry) {
+                        while (averageGunnery != oldCrew.getGunnery()) {
+                            totalGunnery = 0;
+                            for (Person p : drivers) {
+                                p.addSkill(SkillType.S_SMALL_ARMS, randomSkillFromTarget(
+                                        SkillType.getType(SkillType.S_SMALL_ARMS).getTarget()
+                                                - oldCrew.getGunnery()),
+                                        0);
+                                totalGunnery += p.getSkill(SkillType.S_SMALL_ARMS).getFinalSkillValue();
+                            }
+                            averageGunnery = (int) Math.round(((double) totalGunnery) / drivers.size());
+                        }
+                    }
+                }
+
+                if (!u.usesSoldiers()) {
+                    // Generate gunners for multi-crew vehicles
+                    for (int slot = 0; slot < u.getTotalGunnerNeeds(); slot++) {
+                        Person p;
+                        if (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
+                            p = c.newPerson(Person.T_SPACE_GUNNER, Person.T_NONE, factionCode,
+                                    oldCrew.getGender(numberPeopleGenerated));
+                            p.addSkill(SkillType.S_GUN_SPACE, randomSkillFromTarget(
+                                    SkillType.getType(SkillType.S_GUN_SPACE).getTarget()
+                                            - oldCrew.getGunnery()),
+                                    0);
+                            totalGunnery += p.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue();
+                        } else if (u.getEntity() instanceof Mech) {
+                            p = c.newPerson(Person.T_MECHWARRIOR, Person.T_NONE, factionCode,
+                                    oldCrew.getGender(numberPeopleGenerated));
+                            p.addSkill(SkillType.S_PILOT_MECH,
+                                    SkillType.getType(SkillType.S_PILOT_MECH).getTarget()
+                                            - oldCrew.getPiloting(),
+                                    0);
+                            p.addSkill(SkillType.S_GUN_MECH,
+                                    SkillType.getType(SkillType.S_GUN_MECH).getTarget()
+                                            - oldCrew.getGunnery(),
+                                    0);
+                            totalGunnery += p.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue();
+                        } else {
+                            //assume tanker if we got here
+                            p = c.newPerson(Person.T_VEE_GUNNER, Person.T_NONE, factionCode,
+                                    oldCrew.getGender(numberPeopleGenerated));
+                            p.addSkill(SkillType.S_GUN_VEE, randomSkillFromTarget(
+                                    SkillType.getType(SkillType.S_GUN_VEE).getTarget()
+                                            - oldCrew.getGunnery()), 0);
+                            totalGunnery += p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue();
+                        }
+
+                        populateOptionsFromCrew(p, oldCrew);
+                        setName(p, oldCrew, numberPeopleGenerated);
+                        numberPeopleGenerated++;
+                        gunners.add(p);
+                    }
+
+                    // Regenerate gunners as needed to balance
+                    if (gunners.size() != 0) {
+                        averageGunnery = (int) Math.round(((double) totalGunnery) / gunners.size());
+                        if (u.getEntity() instanceof Tank) {
+                            while (averageGunnery != oldCrew.getGunnery()) {
+                                totalGunnery = 0;
+                                for (Person p : gunners) {
+                                    p.addSkill(SkillType.S_GUN_VEE, randomSkillFromTarget(
+                                            SkillType.getType(SkillType.S_GUN_VEE).getTarget()
+                                                    - oldCrew.getGunnery()), 0);
+                                    totalGunnery += p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue();
+                                }
+                                averageGunnery = (int) Math.round(((double) totalGunnery) / gunners.size());
+                            }
+                        } else if (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
+                            while (averageGunnery != oldCrew.getGunnery()) {
+                                totalGunnery = 0;
+                                for (Person p : gunners) {
+                                    p.addSkill(SkillType.S_GUN_SPACE, randomSkillFromTarget(
+                                            SkillType.getType(SkillType.S_GUN_SPACE).getTarget()
+                                                    - oldCrew.getGunnery()), 0);
+                                    totalGunnery += p.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue();
+                                }
+                                averageGunnery = (int) Math.round(((double) totalGunnery) / gunners.size());
+                            }
                         }
                     }
                 }
             }
-        }
-        //Multi-slot crews already have the names set. Single-slot multi-crew units need to assign the commander's name.
-        boolean nameset = oldCrew.getSlotCount() > 1;
-        while(vesselCrew.size() < u.getTotalCrewNeeds()) {
-            Person p = c.newPerson(u.getEntity().isSupportVehicle() ?
-                    Person.T_VEHICLE_CREW : Person.T_SPACE_CREW, factionCode);
-            if (!nameset) {
-                p.setName(commanderName);
-                nameset = true;
+
+            for (int slot = 0; slot < u.getTotalCrewNeeds(); slot++) {
+                Person p = c.newPerson(u.getEntity().isSupportVehicle()
+                                ? Person.T_VEHICLE_CREW
+                                : Person.T_SPACE_CREW,
+                        Person.T_NONE, factionCode, oldCrew.getGender(numberPeopleGenerated));
+
+                setName(p, oldCrew, numberPeopleGenerated);
+                numberPeopleGenerated++;
+                vesselCrew.add(p);
             }
-            vesselCrew.add(p);
-        }
 
-        if(u.canTakeNavigator()) {
-            Person p = c.newPerson(Person.T_NAVIGATOR, factionCode);
-            navigator = p;
-        }
+            if (u.canTakeNavigator()) {
+                navigator = c.newPerson(Person.T_NAVIGATOR, Person.T_NONE, factionCode,
+                        oldCrew.getGender(numberPeopleGenerated));
+                setName(navigator, oldCrew, numberPeopleGenerated);
+                numberPeopleGenerated++;
+            }
 
-        if (u.canTakeTechOfficer()) {
-            Person p = c.newPerson(Person.T_VEE_GUNNER, factionCode);
-            consoleCmdr = p;
-        }
-
-        for(Person p : drivers) {
-            if (!nameset) {
-                p.setName(commanderName);
-                nameset = true;
+            if (u.canTakeTechOfficer()) {
+                consoleCmdr = c.newPerson(Person.T_VEE_GUNNER, Person.T_NONE, factionCode,
+                        oldCrew.getGender(numberPeopleGenerated));
+                setName(consoleCmdr, oldCrew, numberPeopleGenerated);
             }
         }
 
-        for(Person p : gunners) {
-            if (!nameset) {
-                p.setName(commanderName);
-                nameset = true;
-            }
-        }
-
-        for(Person p : vesselCrew) {
-            if (!nameset) {
-                p.setName(commanderName);
-                nameset = true;
-            }
-        }
-
-        if (null != navigator) {
-            if (!nameset) {
-                navigator.setName(commanderName);
-                nameset = true;
-            }
-        }
-
-        if (null != consoleCmdr) {
-            if (!nameset) {
-                consoleCmdr.setName(commanderName);
-                nameset = true;
-            }
-        }
-
-        // Gather the data
+        //region Data Gathering
         Map<CrewType, Collection<Person>> result = new HashMap<>();
         if (!drivers.isEmpty()) {
-            if(u.usesSoloPilot()) {
+            if (u.usesSoloPilot()) {
                 result.put(CrewType.PILOT, drivers);
-            } else if(u.usesSoldiers()) {
+            } else if (u.usesSoldiers()) {
                 result.put(CrewType.SOLDIER, drivers);
             } else {
                 result.put(CrewType.DRIVER, drivers);
@@ -883,6 +919,7 @@ public class Utilities {
         if (null != consoleCmdr) {
             result.put(CrewType.TECH_OFFICER, Collections.singletonList(consoleCmdr));
         }
+        //endregion Data Gathering
         return result;
     }
 
@@ -893,9 +930,42 @@ public class Utilities {
      */
     private static void populateOptionsFromCrew(Person p, Crew oldCrew) {
         Enumeration<IOption> optionsEnum = oldCrew.getOptions().getOptions();
-        while(optionsEnum.hasMoreElements()) {
-            IOption currentOption = (IOption) optionsEnum.nextElement();
+        while (optionsEnum.hasMoreElements()) {
+            IOption currentOption = optionsEnum.nextElement();
             p.getOptions().getOption(currentOption.getName()).setValue(currentOption.getValue());
+        }
+    }
+
+    /**
+     * Function that determines what name should be used by a person that is created through crew
+     * @param p         the person to be renamed, if applicable
+     * @param oldCrew   the crew object they were a part of
+     * @param crewIndex the index of the person in the crew
+     */
+    private static void setName(Person p, Crew oldCrew, int crewIndex) {
+        // this is a bit of a hack, but instead of tracking it elsewhere we only set gender to
+        // male or female when a name is generated. G_RANDOMIZE will therefore only be returned for
+        // crew that don't have names, so we can just leave them with their randomly generated name
+        if (oldCrew.getGender(crewIndex) != Crew.G_RANDOMIZE) {
+            String givenName = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_GIVEN_NAME);
+
+            if (givenName == null) {
+                String name = oldCrew.getName(crewIndex);
+
+                if (!(name.equalsIgnoreCase(Crew.UNNAMED) || name.equalsIgnoreCase(Crew.UNNAMED_FULL_NAME))) {
+                    p.migrateName(name);
+                }
+            } else {
+                p.setGivenName(givenName);
+                p.setSurname(oldCrew.getExtraDataValue(crewIndex, Crew.MAP_SURNAME));
+
+                String phenotype = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_PHENOTYPE);
+                if (phenotype != null) {
+                    p.setPhenotype(Integer.parseInt(phenotype));
+                }
+
+                p.setBloodname(oldCrew.getExtraDataValue(crewIndex, Crew.MAP_BLOODNAME));
+            }
         }
     }
 
@@ -909,19 +979,18 @@ public class Utilities {
             return 2;
         } else if (roll < 80) { // 20% chance of 1 xp
             return 1;
+        } else {
+            return 0; // 20% chance of no xp
         }
-        return 0; // 20% chance of no xp
     }
 
     public static int rollSpecialAbilities(int bonus) {
         int roll = Compute.d6(2) + bonus;
-        if(roll < 10) {
+        if (roll < 10) {
             return 0;
-        }
-        else if(roll < 12) {
+        } else if (roll < 12) {
             return 1;
-        }
-        else {
+        } else {
             return 2;
         }
     }
@@ -946,14 +1015,14 @@ public class Utilities {
         }
 
         int age = baseage;
-        while(ndice > 0) {
+        while (ndice > 0) {
             int roll = Compute.d6();
             //reroll all sixes once
-            if(roll == 6) {
-                roll += (Compute.d6()-1);
+            if (roll == 6) {
+                roll += (Compute.d6() - 1);
             }
-            if(clan) {
-                roll = (int)Math.ceil(roll/2.0);
+            if (clan) {
+                roll = (int) Math.ceil(roll / 2.0);
             }
             age += roll;
             ndice--;
@@ -991,9 +1060,6 @@ public class Utilities {
 
     public static int getSimpleTechLevel(int level) {
         switch(level) {
-            case TechConstants.T_ALLOWED_ALL:
-            case TechConstants.T_INTRO_BOXSET:
-                return CampaignOptions.TECH_INTRO;
             case TechConstants.T_IS_TW_NON_BOX:
             case TechConstants.T_CLAN_TW:
             case TechConstants.T_IS_TW_ALL:
@@ -1010,6 +1076,8 @@ public class Utilities {
                 return CampaignOptions.TECH_UNOFFICIAL;
             case TechConstants.T_TECH_UNKNOWN:
                 return CampaignOptions.TECH_UNKNOWN;
+            case TechConstants.T_ALLOWED_ALL:
+            case TechConstants.T_INTRO_BOXSET:
             default:
                 return CampaignOptions.TECH_INTRO;
         }
@@ -1017,7 +1085,7 @@ public class Utilities {
 
     //copied from http://www.roseindia.net/java/beginners/copyfile.shtml
     public static void copyfile(File inFile, File outFile){
-        try{
+        try {
             InputStream in = new FileInputStream(inFile);
 
             //For Append the file.
@@ -1050,7 +1118,7 @@ public class Utilities {
             return;
         }
         List<Integer> equipNums = new ArrayList<>();
-        for(Mounted m : unit.getEntity().getEquipment()) {
+        for (Mounted m : unit.getEntity().getEquipment()) {
             equipNums.add(unit.getEntity().getEquipmentNum(m));
         }
         List<Part> remaining = new ArrayList<>();
@@ -1067,7 +1135,7 @@ public class Utilities {
             if (null != etype) {
                 if (equipNums.contains(eqnum)
                         && etype.equals(unit.getEntity().getEquipment(eqnum).getType())) {
-                    equipNums.remove(equipNums.indexOf(eqnum));
+                    equipNums.remove((Integer) eqnum);
                 } else {
                     remaining.add(part);
                 }
@@ -1078,7 +1146,7 @@ public class Utilities {
         // However, if we've just done a refit we may very well have changed ammo types,
         // so we need to set the equipment numbers in this case.
         List<Part> notFound = new ArrayList<>();
-        for(Part part : remaining) {
+        for (Part part : remaining) {
             boolean found = false;
             int i = -1;
 
@@ -1091,10 +1159,9 @@ public class Utilities {
                         //If this is a refit, we want to update our ammo bin parts to match
                         //the munitions specified in the refit, then reassign the equip number
                         if (refit) {
-                            if (m.getType().equals(epart.getType())
-                                    && !m.isDestroyed()) {
+                            if (m.getType().equals(epart.getType()) && !m.isDestroyed()) {
                                 epart.setEquipmentNum(equipNum);
-                                ((AmmoBin) epart).changeMunition(((AmmoType) m.getType()));
+                                ((AmmoBin) epart).changeMunition(m.getType());
                                 found = true;
                                 break;
                             }
@@ -1105,8 +1172,7 @@ public class Utilities {
                                         != ((AmmoType) m.getType()).getMunitionType()) {
                                     continue;
                                 }
-                                if (m.getType().equals(epart.getType())
-                                        && !m.isDestroyed()) {
+                                if (m.getType().equals(epart.getType()) && !m.isDestroyed()) {
                                     epart.setEquipmentNum(equipNum);
                                     found = true;
                                     break;
@@ -1114,8 +1180,7 @@ public class Utilities {
                             }
                         }
                     } else {
-                        if (m.getType().equals(epart.getType())
-                                && !m.isDestroyed()) {
+                        if (m.getType().equals(epart.getType()) && !m.isDestroyed()) {
                             epart.setEquipmentNum(equipNum);
                             found = true;
                             break;
@@ -1124,7 +1189,7 @@ public class Utilities {
                 }
             } else if (part instanceof MissingEquipmentPart) {
                 MissingEquipmentPart epart = (MissingEquipmentPart)part;
-                for(int equipNum : equipNums) {
+                for (int equipNum : equipNums) {
                     i++;
                     Mounted m = unit.getEntity().getEquipment(equipNum);
                     if (part instanceof MissingAmmoBin
@@ -1133,8 +1198,7 @@ public class Utilities {
                             != ((AmmoType) m.getType()).getMunitionType()))) {
                         continue;
                     }
-                    if (m.getType().equals(epart.getType())
-                            && !m.isDestroyed()) {
+                    if (m.getType().equals(epart.getType()) && !m.isDestroyed()) {
                         epart.setEquipmentNum(equipNum);
                         found = true;
                         break;
@@ -1156,12 +1220,12 @@ public class Utilities {
             StringBuilder builder = new StringBuilder();
             builder.append(String.format("Could not unscramble equipment for %s (%s)\r\n\r\n", unit.getName(), unit.getId()));
             for (Part part : remaining) {
-                builder.append(" - " + part.getPartName() + " equipmentNum: ");
+                builder.append(" - ").append(part.getPartName()).append(" equipmentNum: ");
                 if (part instanceof EquipmentPart) {
-                    builder.append(((EquipmentPart)part).getEquipmentNum() + "\r\n");
+                    builder.append(((EquipmentPart) part).getEquipmentNum()).append("\r\n");
                 }
                 else if (part instanceof MissingEquipmentPart) {
-                    builder.append(((MissingEquipmentPart)part).getEquipmentNum() + "\r\n");
+                    builder.append(((MissingEquipmentPart) part).getEquipmentNum()).append("\r\n");
                 }
             }
 
@@ -1171,11 +1235,11 @@ public class Utilities {
                         (!(p instanceof MissingEquipmentPart))) {
                     continue;
                 }
-                int equipNum = -1;
+                int equipNum;
                 if (p instanceof EquipmentPart) {
                     EquipmentPart ePart = (EquipmentPart)p;
                     equipNum = ePart.getEquipmentNum();
-                } else if (p instanceof MissingEquipmentPart) {
+                } else {
                     MissingEquipmentPart mePart = (MissingEquipmentPart)p;
                     equipNum = mePart.getEquipmentNum();
                 }
@@ -1416,17 +1480,17 @@ public class Utilities {
         }
 
         // Roman numeral, prepended with a space for display purposes
-        String roman = " "; //$NON-NLS-1$
+        StringBuilder roman = new StringBuilder(" "); //$NON-NLS-1$
         int num = level+1;
 
         for (int i = 0; i < arabicNumbers.length; i++) {
             while (num > arabicNumbers[i]) {
-                roman += romanNumerals[i];
+                roman.append(romanNumerals[i]);
                 num -= arabicNumbers[i];
             }
         }
 
-        return roman;
+        return roman.toString();
     }
 
     public static Map<String, Integer> sortMapByValue(Map<String, Integer> unsortMap, boolean highFirst) {
@@ -1436,13 +1500,7 @@ public class Utilities {
                 new LinkedList<>(unsortMap.entrySet());
 
         // Sort list with comparator, to compare the Map values
-        Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
-            @Override
-            public int compare(Map.Entry<String, Integer> o1,
-                               Map.Entry<String, Integer> o2) {
-                return (o1.getValue()).compareTo(o2.getValue());
-            }
-        });
+        list.sort(Map.Entry.comparingByValue());
 
         // Convert sorted map back to a Map
         Map<String, Integer> sortedMap = new LinkedHashMap<>();
@@ -1453,8 +1511,7 @@ public class Utilities {
                 sortedMap.put(entry.getKey(), entry.getValue());
             }
         } else {
-            for (Iterator<Map.Entry<String, Integer>> it = list.iterator(); it.hasNext();) {
-                Map.Entry<String, Integer> entry = it.next();
+            for (Map.Entry<String, Integer> entry : list) {
                 sortedMap.put(entry.getKey(), entry.getValue());
             }
         }
@@ -1468,10 +1525,7 @@ public class Utilities {
         if(!en.canEscape()) {
             return true;
         }
-        return en.isDestroyed()
-                || en.isDoomed()
-                || en.isStalled()
-                || en.isStuck();
+        return en.isDestroyed() || en.isDoomed() || en.isStalled() || en.isStuck();
     }
 
     /**
@@ -1487,31 +1541,23 @@ public class Utilities {
     public static void parseXMLFiles(String dirName, Consumer<FileInputStream> parser, boolean recurse) {
         final String METHOD_NAME = "parseXMLFiles(String,FileParser,boolean)"; //$NON-NLS-1$
 
-        if( null == dirName || null == parser ) {
+        if ((null == dirName) || (null == parser)) {
             throw new NullPointerException();
         }
         File dir = new File(dirName);
-        if( dir.isDirectory() ) {
-            File[] files = dir.listFiles(new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    return name.toLowerCase(Locale.ROOT).endsWith(".xml"); //$NON-NLS-1$
-                }
+        if (dir.isDirectory()) {
+            File[] files = dir.listFiles((dir1, name) -> {
+                return name.toLowerCase(Locale.ROOT).endsWith(".xml"); //$NON-NLS-1$
             });
-            if( null != files && files.length > 0 ) {
+            if ((null != files) && (files.length > 0)) {
                 // Case-insensitive sorting. Yes, even on Windows. Deal with it.
-                Arrays.sort(files, new Comparator<File>() {
-                    @Override
-                    public int compare(File f1, File f2) {
-                        return f1.getPath().compareTo(f2.getPath());
-                    }
-                });
+                Arrays.sort(files, Comparator.comparing(File::getPath));
                 // Try parsing and updating the main list, one by one
-                for( File file : files ) {
-                    if( file.isFile() ) {
-                        try(FileInputStream fis = new FileInputStream(file)) {
+                for (File file : files) {
+                    if (file.isFile()) {
+                        try (FileInputStream fis = new FileInputStream(file)) {
                             parser.accept(fis);
-                        } catch(Exception ex) {
+                        } catch (Exception ex) {
                             // Ignore this file then
                             MekHQ.getLogger().log(Utilities.class, METHOD_NAME, LogLevel.ERROR,
                                     "Exception trying to parse " + file.getPath() + " - ignoring."); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1521,27 +1567,21 @@ public class Utilities {
                 }
             }
 
-            if( !recurse ) {
+            if (!recurse) {
                 // We're done
                 return;
             }
 
             // Get subdirectories too
             File[] dirs = dir.listFiles();
-            if( null != dirs && dirs.length > 0 ) {
-                Arrays.sort(dirs, new Comparator<File>() {
-                    @Override
-                    public int compare(File f1, File f2) {
-                        return f1.getPath().compareTo(f2.getPath());
-                    }
-                });
-                for( File subDirectory : dirs ) {
-                    if( subDirectory.isDirectory() ) {
-                        parseXMLFiles(subDirectory.getPath(), parser, recurse);
+            if (null != dirs && dirs.length > 0) {
+                Arrays.sort(dirs, Comparator.comparing(File::getPath));
+                for (File subDirectory : dirs) {
+                    if (subDirectory.isDirectory() ) {
+                        parseXMLFiles(subDirectory.getPath(), parser, true);
                     }
                 }
             }
-
         }
     }
 
@@ -1552,8 +1592,7 @@ public class Utilities {
      * @return The converted BufferedImage
      */
     public static BufferedImage toBufferedImage(Image img) {
-        if (img instanceof BufferedImage)
-        {
+        if (img instanceof BufferedImage) {
             return (BufferedImage) img;
         }
 

@@ -2,6 +2,7 @@
  * PartsStoreDialog.java
  *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2020 - The MegaMek Team
  *
  * This file is part of MekHQ.
  *
@@ -31,15 +32,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.RowFilter;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.AbstractTableModel;
@@ -78,7 +71,6 @@ import mekhq.campaign.parts.MekGyro;
 import mekhq.campaign.parts.MekLifeSupport;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MekSensor;
-import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.OmniPod;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
@@ -102,10 +94,10 @@ import mekhq.gui.sorter.PartsDetailSorter;
 import mekhq.preferences.PreferencesNode;
 
 /**
- *
  * @author  Taharqa
  */
-public class PartsStoreDialog extends javax.swing.JDialog {
+public class PartsStoreDialog extends JDialog {
+    //region Variable Declarations
     private static final long serialVersionUID = -8038099101234445018L;
 
     //parts filter groups
@@ -129,14 +121,19 @@ public class PartsStoreDialog extends javax.swing.JDialog {
     private CampaignGUI campaignGUI;
     private PartsTableModel partsModel;
     private TableRowSorter<PartsTableModel> partsSorter;
-    boolean addToCampaign;
-    Part selectedPart;
+    private boolean addToCampaign;
+    private Part selectedPart;
     private Person logisticsPerson;
 
     private JTable partsTable;
-    private javax.swing.JTextField txtFilter;
+    private JTextField txtFilter;
     private JComboBox<String> choiceParts;
+    private JCheckBox hideImpossible;
     private JButton btnUseBonusPart;
+
+    private ResourceBundle resourceMap = ResourceBundle.getBundle(
+            "mekhq.resources.PartsStoreDialog", new EncodeControl());
+    //endregion Variable Declarations
 
     /** Creates new form PartsStoreDialog */
     public PartsStoreDialog(boolean modal, CampaignGUI gui) {
@@ -158,8 +155,6 @@ public class PartsStoreDialog extends javax.swing.JDialog {
     }
 
     private void initComponents() {
-
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PartsStoreDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("Form.title"));
@@ -233,6 +228,13 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         c.gridy = 1;
         c.weightx = 1.0;
         panFilter.add(txtFilter, c);
+
+        hideImpossible = new JCheckBox(resourceMap.getString("hideImpossible.text"));
+        hideImpossible.setName("hideImpossible");
+        hideImpossible.addActionListener(e -> filterParts());
+        c.gridx = 2;
+        panFilter.add(hideImpossible, c);
+
         getContentPane().add(panFilter, BorderLayout.PAGE_START);
 
         JPanel panButtons = new JPanel();
@@ -318,7 +320,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
             //endregion Bonus Part
 
             //region Add
-            btnAdd = new JButton(resourceMap.getString("btnAdd.text"));
+            btnAdd = new JButton(resourceMap.getString("btnGMAdd.text"));
             btnAdd.addActionListener(evt -> {
                 if (partsTable.getSelectedRowCount() > 0) {
                     int[] selectedRow = partsTable.getSelectedRows();
@@ -375,14 +377,14 @@ public class PartsStoreDialog extends javax.swing.JDialog {
             //endregion Button Close
         } else {
             //if we aren't adding the unit to the campaign, then different buttons
-            btnAdd = new JButton("Add");
+            btnAdd = new JButton(resourceMap.getString("btnAdd.text"));
             btnAdd.addActionListener(evt -> {
                 setSelectedPart();
                 setVisible(false);
             });
             panButtons.add(btnAdd, new GridBagConstraints());
 
-            btnClose = new JButton("Cancel"); // NOI18N
+            btnClose = new JButton(resourceMap.getString("btnCancel.text"));
             btnClose.addActionListener(evt -> {
                 selectedPart = null;
                 setVisible(false);
@@ -411,74 +413,89 @@ public class PartsStoreDialog extends javax.swing.JDialog {
     public void filterParts() {
         RowFilter<PartsTableModel, Integer> partsTypeFilter;
         final int nGroup = choiceParts.getSelectedIndex();
-        partsTypeFilter = new RowFilter<PartsTableModel,Integer>() {
+        partsTypeFilter = new RowFilter<PartsTableModel, Integer>() {
             @Override
             public boolean include(Entry<? extends PartsTableModel, ? extends Integer> entry) {
                 PartsTableModel partsModel = entry.getModel();
                 Part part = partsModel.getPartAt(entry.getIdentifier());
+
+                if (hideImpossible.isSelected()) {
+                    int target = partsModel.getPartProxyAt(entry.getIdentifier()).getTarget()
+                            .getTargetRoll().getValue();
+                    if (target == TargetRoll.IMPOSSIBLE || target == TargetRoll.AUTOMATIC_FAIL) {
+                        return false;
+                    }
+                } // This MUST NOT be an else if
+
                 if ((txtFilter.getText().length() > 0)
                         && !part.getName().toLowerCase().contains(txtFilter.getText().toLowerCase())
                         && !part.getDetails().toLowerCase().contains(txtFilter.getText().toLowerCase())) {
                     return false;
-                }
-                if(part.getTechBase() == Part.T_CLAN && !campaign.getCampaignOptions().allowClanPurchases()) {
+                } else if ((part.getTechBase() == Part.T_CLAN)
+                        && !campaign.getCampaignOptions().allowClanPurchases()) {
                     return false;
-                }
-                if((part.getTechBase() == Part.T_IS)
+                } else if ((part.getTechBase() == Part.T_IS)
                         && !campaign.getCampaignOptions().allowISPurchases()
                         // Hack to allow Clan access to SL tech but not post-Exodus tech
                         // until 3050.
                         && !(campaign.useClanTechBase() && (part.getIntroductionDate() > 2787)
                                 && (part.getIntroductionDate() < 3050))) {
                     return false;
-                }
-                if (!campaign.isLegal(part)) {
+                } else if (!campaign.isLegal(part)) {
                     return false;
                 }
-                if(nGroup == SG_ALL) {
+
+                if (nGroup == SG_ALL) {
                     return true;
-                } else if(nGroup == SG_ARMOR) {
+                } else if (nGroup == SG_ARMOR) {
                     return part instanceof Armor; // ProtomekAmor and BaArmor are derived from Armor
-                } else if(nGroup == SG_SYSTEM) {
-                    return part instanceof MekLifeSupport
-                        || part instanceof MekSensor
-                        || part instanceof LandingGear
-                        || part instanceof Avionics
-                        || part instanceof FireControlSystem
-                        || part instanceof AeroSensor
-                        || part instanceof KfBoom
-                        || part instanceof DropshipDockingCollar
-                        || part instanceof JumpshipDockingCollar
-                        || part instanceof BayDoor
-                        || part instanceof Cubicle
-                        || part instanceof GravDeck
-                        || part instanceof VeeSensor
-                        || part instanceof VeeStabiliser
-                        || part instanceof ProtomekSensor;
-                } else if(nGroup == SG_EQUIP) {
-                    return part instanceof EquipmentPart || part instanceof ProtomekJumpJet;
-                } else if(nGroup == SG_LOC) {
-                    return part instanceof MekLocation || part instanceof TankLocation || part instanceof ProtomekLocation;
-                } else if(nGroup == SG_WEAP) {
-                    return part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof WeaponType;
-                } else if(nGroup == SG_AMMO) {
-                    return part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof AmmoType;
-                } else if(nGroup == SG_MISC) {
-                    return (part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof MiscType) || part instanceof ProtomekJumpJet;
-                } else if(nGroup == SG_ENGINE) {
+                } else if (nGroup == SG_SYSTEM) {
+                    return (part instanceof MekLifeSupport)
+                        || (part instanceof MekSensor)
+                        || (part instanceof LandingGear)
+                        || (part instanceof Avionics)
+                        || (part instanceof FireControlSystem)
+                        || (part instanceof AeroSensor)
+                        || (part instanceof KfBoom)
+                        || (part instanceof DropshipDockingCollar)
+                        || (part instanceof JumpshipDockingCollar)
+                        || (part instanceof BayDoor)
+                        || (part instanceof Cubicle)
+                        || (part instanceof GravDeck)
+                        || (part instanceof VeeSensor)
+                        || (part instanceof VeeStabiliser)
+                        || (part instanceof ProtomekSensor);
+                } else if (nGroup == SG_EQUIP) {
+                    return (part instanceof EquipmentPart) || (part instanceof ProtomekJumpJet);
+                } else if (nGroup == SG_LOC) {
+                    return (part instanceof MekLocation) || (part instanceof TankLocation)
+                            || (part instanceof ProtomekLocation);
+                } else if (nGroup == SG_WEAP) {
+                    return (part instanceof EquipmentPart)
+                            && (((EquipmentPart) part).getType() instanceof WeaponType);
+                } else if (nGroup == SG_AMMO) {
+                    return ((part instanceof EquipmentPart)
+                            && (((EquipmentPart) part).getType() instanceof AmmoType));
+                } else if (nGroup == SG_MISC) {
+                    return ((part instanceof EquipmentPart)
+                            && (((EquipmentPart) part).getType() instanceof MiscType)
+                            || (part instanceof ProtomekJumpJet));
+                } else if (nGroup == SG_ENGINE) {
                     return part instanceof EnginePart;
-                } else if(nGroup == SG_GYRO) {
+                } else if (nGroup == SG_GYRO) {
                     return part instanceof MekGyro;
-                } else if(nGroup == SG_ACT) {
-                    return part instanceof MekActuator || part instanceof ProtomekArmActuator || part instanceof ProtomekLegActuator;
-                } else if(nGroup == SG_COCKPIT) {
+                } else if (nGroup == SG_ACT) {
+                    return ((part instanceof MekActuator) || (part instanceof ProtomekArmActuator)
+                            || (part instanceof ProtomekLegActuator));
+                } else if (nGroup == SG_COCKPIT) {
                     return part instanceof MekCockpit;
-                } else if(nGroup == SG_BA_SUIT) {
+                } else if (nGroup == SG_BA_SUIT) {
                     return part instanceof BattleArmorSuit;
-                } else if(nGroup == SG_OMNI_POD) {
+                } else if (nGroup == SG_OMNI_POD) {
                     return part instanceof OmniPod;
+                } else {
+                    return false;
                 }
-                return false;
             }
         };
         partsSorter.setRowFilter(partsTypeFilter);
@@ -491,14 +508,14 @@ public class PartsStoreDialog extends javax.swing.JDialog {
     private void addPart(boolean purchase, boolean bonus, Part part, int quantity) {
         final String METHOD_NAME = "addPart(boolean,boolean,Part,int)"; //$NON-NLS-1$
 
-        if(bonus) {
+        if (bonus) {
             String report = part.getAcquisitionWork().find(0);
             if (report.endsWith("0 days.")) {
                 AtBContract contract = null;
                 for (Mission m : campaign.getMissions()) {
-                    if (m.isActive() && m instanceof AtBContract &&
-                            ((AtBContract)m).getNumBonusParts() > 0) {
-                        contract = (AtBContract)m;
+                    if (m.isActive() && (m instanceof AtBContract)
+                            && (((AtBContract) m).getNumBonusParts() > 0)) {
+                        contract = (AtBContract) m;
                         break;
                     }
                 }
@@ -509,10 +526,10 @@ public class PartsStoreDialog extends javax.swing.JDialog {
                     contract.useBonusPart();
                 }
             }
-        } else if(purchase) {
+        } else if (purchase) {
             campaign.getShoppingList().addShoppingItem(part.getAcquisitionWork(), quantity, campaign);
         } else {
-            while(quantity > 0) {
+            while (quantity > 0) {
                 campaign.addPart(part.clone(), 0);
                 quantity--;
             }
@@ -533,36 +550,36 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 
     public static String getPartsGroupName(int group) {
         switch(group) {
-        case SG_ALL:
-            return "All Parts";
-        case SG_ARMOR:
-            return "Armor";
-        case SG_SYSTEM:
-            return "System Components";
-        case SG_EQUIP:
-            return "Equipment";
-        case SG_LOC:
-            return "Locations";
-        case SG_WEAP:
-            return "Weapons";
-        case SG_AMMO:
-            return "Ammunition";
-        case SG_MISC:
-            return "Miscellaneous Equipment";
-        case SG_ENGINE:
-            return "Engines";
-        case SG_GYRO:
-            return "Gyros";
-        case SG_ACT:
-            return "Actuators";
-        case SG_COCKPIT:
-            return "Cockpits";
-        case SG_BA_SUIT:
-            return "Battle Armor Suits";
-        case SG_OMNI_POD:
-            return "Empty OmniPods";
-        default:
-            return "?";
+            case SG_ALL:
+                return "All Parts";
+            case SG_ARMOR:
+                return "Armor";
+            case SG_SYSTEM:
+                return "System Components";
+            case SG_EQUIP:
+                return "Equipment";
+            case SG_LOC:
+                return "Locations";
+            case SG_WEAP:
+                return "Weapons";
+            case SG_AMMO:
+                return "Ammunition";
+            case SG_MISC:
+                return "Miscellaneous Equipment";
+            case SG_ENGINE:
+                return "Engines";
+            case SG_GYRO:
+                return "Gyros";
+            case SG_ACT:
+                return "Actuators";
+            case SG_COCKPIT:
+                return "Cockpits";
+            case SG_BA_SUIT:
+                return "Battle Armor Suits";
+            case SG_OMNI_POD:
+                return "Empty OmniPods";
+            default:
+                return "?";
         }
     }
 
@@ -892,8 +909,8 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 
         public PartsTableModel(ArrayList<Part> inventory) {
             data = new ArrayList<>(inventory.size());
-            for (Part p : inventory) {
-                data.add(new PartProxy(p));
+            for (Part part : inventory) {
+                data.add(new PartProxy(part));
             }
         }
 

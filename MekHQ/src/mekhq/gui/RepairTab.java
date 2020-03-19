@@ -26,6 +26,7 @@ import java.awt.Insets;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
@@ -856,7 +857,8 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 
     public void refreshTechsList() {
         int selected = techTable.getSelectedRow();
-        ArrayList<Person> techs = getCampaign().getTechs(true, null, false, false);
+        // The next gets all techs who have more than 0 minutes free, and sorted by skill descending (elites at bottom)
+        List<Person> techs = getCampaign().getTechs(true, null, true, false);
         techsModel.setData(techs);
         if ((selected > -1) && (selected < techs.size())) {
             techTable.setRowSelectionInterval(selected, selected);
@@ -874,8 +876,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         } else if (selectedTech != null) {
             // Or get the selected tech back
             for (int i = 0; i < techTable.getRowCount(); i++) {
-                Person p = techsModel
-                        .getTechAt(techTable.convertRowIndexToModel(i));
+                Person p = techsModel.getTechAt(techTable.convertRowIndexToModel(i));
                 if (p != null && selectedTech.getId().equals(p.getId())) {
                     techTable.setRowSelectionInterval(i, i);
                     break;

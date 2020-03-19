@@ -18,12 +18,12 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import mekhq.campaign.finances.Money;
@@ -50,51 +50,48 @@ import mekhq.campaign.rating.UnitRatingMethod;
 public class CampaignOptions implements Serializable {
     private static final long serialVersionUID = 5698008431749303602L;
 
-    public final static int TECH_INTRO = 0;
-    public final static int TECH_STANDARD = 1;
-    public final static int TECH_ADVANCED = 2;
-    public final static int TECH_EXPERIMENTAL = 3;
-    public final static int TECH_UNOFFICIAL = 4;
+    public static final int TECH_INTRO = 0;
+    public static final int TECH_STANDARD = 1;
+    public static final int TECH_ADVANCED = 2;
+    public static final int TECH_EXPERIMENTAL = 3;
+    public static final int TECH_UNOFFICIAL = 4;
     // This must always be the highest tech level in order to hide parts
     // that haven't been invented yet, or that are completely extinct
-    public final static int TECH_UNKNOWN = 5;
+    public static final int TECH_UNKNOWN = 5;
 
-    public final static int TRANSIT_UNIT_DAY = 0;
-    public final static int TRANSIT_UNIT_WEEK = 1;
-    public final static int TRANSIT_UNIT_MONTH = 2;
-    public final static int TRANSIT_UNIT_NUM = 3;
+    public static final int TRANSIT_UNIT_DAY = 0;
+    public static final int TRANSIT_UNIT_WEEK = 1;
+    public static final int TRANSIT_UNIT_MONTH = 2;
+    public static final int TRANSIT_UNIT_NUM = 3;
 
 
-    public final static String S_TECH = "Tech";
-    public final static String S_AUTO = "Automatic Success";
+    public static final String S_TECH = "Tech";
+    public static final String S_AUTO = "Automatic Success";
 
-    public final static int PRISONER_RANK = 0;
-    public final static int BONDSMAN_RANK = 1;
+    public static final int REPAIR_SYSTEM_STRATOPS = 0;
+    public static final int REPAIR_SYSTEM_WARCHEST_CUSTOM = 1;
+    public static final int REPAIR_SYSTEM_GENERIC_PARTS = 2;
 
-    public final static int REPAIR_SYSTEM_STRATOPS = 0;
-    public final static int REPAIR_SYSTEM_WARCHEST_CUSTOM = 1;
-    public final static int REPAIR_SYSTEM_GENERIC_PARTS = 2;
-
-    public final static int MAXIMUM_D6_VALUE = 6;
+    public static final int MAXIMUM_D6_VALUE = 6;
 
     //FIXME: This needs to be localized
-    public final static String[] REPAIR_SYSTEM_NAMES = {"Strat Ops", "Warchest Custom", "Generic Spare Parts"};
+    public static final String[] REPAIR_SYSTEM_NAMES = {"Strat Ops", "Warchest Custom", "Generic Spare Parts"};
 
-    public final static double MAXIMUM_COMBAT_EQUIPMENT_PERCENT = 5.0;
-    public final static double MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT = 1.0;
-    public final static double MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT = 1.0;
-    public final static double MAXIMUM_WARSHIP_EQUIPMENT_PERCENT = 1.0;
+    public static final double MAXIMUM_COMBAT_EQUIPMENT_PERCENT = 5.0;
+    public static final double MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT = 1.0;
+    public static final double MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT = 1.0;
+    public static final double MAXIMUM_WARSHIP_EQUIPMENT_PERCENT = 1.0;
 
-    public final static int PLANET_ACQUISITION_ALL = 0;
-    public final static int PLANET_ACQUISITION_NEUTRAL = 1;
-    public final static int PLANET_ACQUISITION_ALLY = 2;
-    public final static int PLANET_ACQUISITION_SELF = 3;
+    public static final int PLANET_ACQUISITION_ALL = 0;
+    public static final int PLANET_ACQUISITION_NEUTRAL = 1;
+    public static final int PLANET_ACQUISITION_ALLY = 2;
+    public static final int PLANET_ACQUISITION_SELF = 3;
 
 
     private boolean useFactionForNames;
     private boolean useUnitRating;
 
-    //personnel related
+    //region Personnel Tab
     private boolean useTactics;
     private boolean useInitBonus;
     private boolean useToughness;
@@ -103,28 +100,58 @@ public class CampaignOptions implements Serializable {
     private boolean useEdge;
     private boolean useSupportEdge;
     private boolean useImplants;
-	private boolean altQualityAveraging;
-    private int healWaitingPeriod;
-    private int naturalHealingWaitingPeriod;
-    private boolean useAdvancedMedical; // Unofficial
-    private boolean useDylansRandomXp; // Unofficial
-    private boolean useRandomHitsForVees;
-    private int minimumHitsForVees;
-    private boolean tougherHealing;
-    private int maxAcquisitions;
-    private boolean useUnofficialProcreation;
-    private boolean useUnofficialProcreationNoRelationship;
-    private boolean useParentage;
-    private boolean logConception;
-    private boolean useTransfers;
-    private boolean useTimeInService;
     private boolean capturePrisoners;
     private int defaultPrisonerStatus;
+    public static final int PRISONER_RANK = 0;
+    public static final int BONDSMAN_RANK = 1;
+	private boolean altQualityAveraging;
+    private boolean useAdvancedMedical; // Unofficial
+    private boolean useDylansRandomXp; // Unofficial
+    private int healWaitingPeriod;
+    private int naturalHealingWaitingPeriod;
+    private int minimumHitsForVees;
+    private boolean useRandomHitsForVees;
+    private boolean tougherHealing;
+    private boolean useTransfers;
+    private boolean useTimeInService;
     private boolean showOriginFaction;
     private boolean randomizeOrigin;
+    private boolean randomizeDependentOrigin;
     private int originSearchRadius;
     private boolean isOriginExtraRandom;
     private double originDistanceScale;
+    //family
+    private int minimumMarriageAge;
+    private int checkMutualAncestorsDepth;
+    private boolean useRandomMarriages;
+    private double chanceRandomMarriages;
+    private int marriageAgeRange;
+    private int[] randomMarriageSurnameWeights;
+    private boolean useRandomSameSexMarriages;
+    private double chanceRandomSameSexMarriages;
+    private boolean useUnofficialProcreation;
+    private double chanceProcreation;
+    private boolean useUnofficialProcreationNoRelationship;
+    private double chanceProcreationNoRelationship;
+    private boolean displayTrueDueDate;
+    private boolean logConception;
+    private int babySurnameStyle;
+    public static final int BABY_SURNAME_MINE = 0; //baby uses mother's surname
+    public static final int BABY_SURNAME_SPOUSE = 1; //baby uses father's surname
+    private boolean useParentage;
+    private int displayFamilyLevel;
+    public static final int PARENTS_CHILDREN_SIBLINGS = 0;
+    public static final int GRANDPARENTS_GRANDCHILDREN = 1;
+    public static final int AUNTS_UNCLES_COUSINS = 2;
+    private boolean useRandomDeaths;
+    private boolean keepMarriedNameUponSpouseDeath;
+    //salary
+    private double salaryCommissionMultiplier;
+    private double salaryEnlistedMultiplier;
+    private double salaryAntiMekMultiplier;
+    private double[] salaryXpMultiplier;
+    private Money[] salaryTypeBase;
+    //endregion Personnel Tab
 
     //personnel market related
     private boolean personnelMarketReportRefresh;
@@ -172,6 +199,7 @@ public class CampaignOptions implements Serializable {
     private boolean usePercentageMaint; // Unofficial
     private boolean infantryDontCount; // Unofficial
     private double clanPriceModifier;
+    private int maxAcquisitions;
 
     //contract related
     private boolean equipmentContractBase;
@@ -240,15 +268,8 @@ public class CampaignOptions implements Serializable {
 	private boolean useUnofficialMaintenance;
 	private boolean reverseQualityNames;
 
-    //Dragoon's Rating
+    //Unit Rating
     private UnitRatingMethod unitRatingMethod;
-
-    //salary related
-    private Money[] salaryTypeBase;
-    private double[] salaryXpMultiplier;
-    private double salaryCommissionMultiplier;
-    private double salaryEnlistedMultiplier;
-    private double salaryAntiMekMultiplier;
 
     //phenotype related
     private int probPhenoMW;
@@ -332,23 +353,7 @@ public class CampaignOptions implements Serializable {
         assignedTechFirst = false;
 		resetToFirstTech = false;
         useUnitRating = true;
-        useTactics = false;
-        useInitBonus = false;
-        useToughness = false;
-        useArtillery = false;
-        useAbilities = false;
-        useEdge = false;
-        useSupportEdge = false;
-        useImplants = false;
-		altQualityAveraging = false;
-        useAdvancedMedical = false;
-        useDylansRandomXp = false;
         useQuirks = false;
-        showOriginFaction = true;
-        randomizeOrigin = false;
-        originSearchRadius = 45;
-        isOriginExtraRandom = false;
-        originDistanceScale = 0.6;
         payForParts = false;
         payForRepairs = false;
         payForUnits = false;
@@ -452,8 +457,6 @@ public class CampaignOptions implements Serializable {
         planetAcquisitionVerbose = false;
         noClanPartsFromIS = true;
         penaltyClanPartsFromIS = 4;
-        healWaitingPeriod = 1;
-        naturalHealingWaitingPeriod = 15;
         destroyByMargin = false;
         destroyMargin = 4;
         destroyPartTarget = 10;
@@ -464,25 +467,74 @@ public class CampaignOptions implements Serializable {
         useUnofficialMaintenance = false;
         reverseQualityNames = false;
         checkMaintenance = true;
-        useRandomHitsForVees = false;
-        minimumHitsForVees = 1;
         maxAcquisitions = 0;
-        useUnofficialProcreation = false;
-        useUnofficialProcreationNoRelationship = false;
-        useParentage = false;
-        logConception = false;
-        useTransfers = true;
-        useTimeInService = false;
+
+        //region Personnel Tab
+        useTactics = false;
+        useInitBonus = false;
+        useToughness = false;
+        useArtillery = false;
+        useAbilities = false;
+        useEdge = false;
+        useSupportEdge = false;
+        useImplants = false;
         capturePrisoners = true;
         defaultPrisonerStatus = PRISONER_RANK;
-        personnelMarketReportRefresh = true;
-        personnelMarketName = PersonnelMarket.getTypeName(PersonnelMarket.TYPE_STRAT_OPS);
-        personnelMarketRandomEliteRemoval = 10;
-        personnelMarketRandomVeteranRemoval = 8;
-        personnelMarketRandomRegularRemoval = 6;
-        personnelMarketRandomGreenRemoval = 4;
-        personnelMarketRandomUltraGreenRemoval = 4;
-        personnelMarketDylansWeight = 0.3;
+        altQualityAveraging = false;
+        useAdvancedMedical = false;
+        useDylansRandomXp = false;
+        healWaitingPeriod = 1;
+        naturalHealingWaitingPeriod = 15;
+        minimumHitsForVees = 1;
+        useRandomHitsForVees = false;
+        tougherHealing = false;
+        useTransfers = true;
+        useTimeInService = false;
+        showOriginFaction = true;
+        randomizeOrigin = false;
+        randomizeDependentOrigin = false;
+        originSearchRadius = 45;
+        isOriginExtraRandom = false;
+        originDistanceScale = 0.6;
+        //Family
+        minimumMarriageAge = 16;
+        checkMutualAncestorsDepth = 4;
+        useRandomMarriages = false;
+        chanceRandomMarriages = 0.00025;
+        marriageAgeRange = 10;
+        randomMarriageSurnameWeights = new int[Person.NUM_SURNAME];
+        randomMarriageSurnameWeights[Person.SURNAME_NO_CHANGE] = 100;
+        randomMarriageSurnameWeights[Person.SURNAME_YOURS] = 60;
+        randomMarriageSurnameWeights[Person.SURNAME_SPOUSE] = 60;
+        randomMarriageSurnameWeights[Person.SURNAME_HYP_YOURS] = 35;
+        randomMarriageSurnameWeights[Person.SURNAME_BOTH_HYP_YOURS] = 25;
+        randomMarriageSurnameWeights[Person.SURNAME_HYP_SPOUSE] = 35;
+        randomMarriageSurnameWeights[Person.SURNAME_BOTH_HYP_SPOUSE] = 25;
+        randomMarriageSurnameWeights[Person.SURNAME_MALE] = 500;
+        randomMarriageSurnameWeights[Person.SURNAME_FEMALE] = 160;
+        useRandomSameSexMarriages = false;
+        chanceRandomSameSexMarriages = 0.00002;
+        useUnofficialProcreation = false;
+        chanceProcreation = 0.0005;
+        useUnofficialProcreationNoRelationship = false;
+        chanceProcreationNoRelationship = 0.00005;
+        displayTrueDueDate = false;
+        logConception = false;
+        babySurnameStyle = BABY_SURNAME_MINE;
+        useParentage = false;
+        displayFamilyLevel = PARENTS_CHILDREN_SIBLINGS;
+        useRandomDeaths = true;
+        keepMarriedNameUponSpouseDeath = true;
+        //Salary
+        salaryAntiMekMultiplier = 1.5;
+        salaryEnlistedMultiplier = 1.0;
+        salaryCommissionMultiplier = 1.2;
+        salaryXpMultiplier = new double[5];
+        salaryXpMultiplier[SkillType.EXP_ULTRA_GREEN] = 0.6;
+        salaryXpMultiplier[SkillType.EXP_GREEN] = 0.6;
+        salaryXpMultiplier[SkillType.EXP_REGULAR] = 1.0;
+        salaryXpMultiplier[SkillType.EXP_VETERAN] = 1.6;
+        salaryXpMultiplier[SkillType.EXP_ELITE] = 3.2;
         salaryTypeBase = new Money[Person.T_NUM];
         salaryTypeBase[Person.T_NONE] = Money.of(0);
         salaryTypeBase[Person.T_MECHWARRIOR] = Money.of(1500);
@@ -512,20 +564,23 @@ public class CampaignOptions implements Serializable {
         salaryTypeBase[Person.T_PROTO_PILOT] = Money.of(960);
         salaryTypeBase[Person.T_LAM_PILOT] = Money.of(1500);
         salaryTypeBase[Person.T_VEHICLE_CREW] = Money.of(900);
-        salaryXpMultiplier = new double[5];
-        salaryXpMultiplier[SkillType.EXP_ULTRA_GREEN] = 0.6;
-        salaryXpMultiplier[SkillType.EXP_GREEN] = 0.6;
-        salaryXpMultiplier[SkillType.EXP_REGULAR] = 1.0;
-        salaryXpMultiplier[SkillType.EXP_VETERAN] = 1.6;
-        salaryXpMultiplier[SkillType.EXP_ELITE] = 3.2;
-        salaryAntiMekMultiplier = 1.5;
-        salaryCommissionMultiplier = 1.2;
-        salaryEnlistedMultiplier = 1.0;
+        //endregion Personnel Tab
+
+        //region Personnel Market Tab
+        personnelMarketName = PersonnelMarket.getTypeName(PersonnelMarket.TYPE_STRAT_OPS);
+        personnelMarketReportRefresh = true;
+        personnelMarketRandomEliteRemoval = 10;
+        personnelMarketRandomVeteranRemoval = 8;
+        personnelMarketRandomRegularRemoval = 6;
+        personnelMarketRandomGreenRemoval = 4;
+        personnelMarketRandomUltraGreenRemoval = 4;
+        personnelMarketDylansWeight = 0.3;
+        //endregion Personnel Market Tab
+
         probPhenoMW = 95;
         probPhenoAero = 95;
         probPhenoBA = 100;
         probPhenoVee = 0;
-        tougherHealing = false;
 
         useAtB = false;
     	useAero = false;
@@ -589,12 +644,626 @@ public class CampaignOptions implements Serializable {
         }
 
         historicalDailyLog = false;
-   }
+    }
 
+    //region Personnel Tab
+    public boolean useTactics() {
+        return useTactics;
+    }
+
+    public void setUseTactics(boolean b) {
+        this.useTactics = b;
+    }
+
+    public boolean useInitBonus() {
+        return useInitBonus;
+    }
+
+    public void setInitBonus(boolean b) {
+        this.useInitBonus = b;
+    }
+
+    public boolean useToughness() {
+        return useToughness;
+    }
+
+    public void setToughness(boolean b) {
+        this.useToughness = b;
+    }
+
+    public boolean useArtillery() {
+        return useArtillery;
+    }
+
+    public void setArtillery(boolean b) {
+        this.useArtillery = b;
+    }
+
+    public boolean useAbilities() {
+        return useAbilities;
+    }
+
+    public void setAbilities(boolean b) {
+        this.useAbilities = b;
+    }
+
+    public boolean useEdge() {
+        return useEdge;
+    }
+
+    public void setEdge(boolean b) {
+        this.useEdge = b;
+    }
+
+    public boolean useSupportEdge() {
+        return useSupportEdge;
+    }
+
+    public void setSupportEdge(boolean b) {
+        useSupportEdge = b;
+    }
+
+    public boolean useImplants() {
+        return useImplants;
+    }
+
+    public void setImplants(boolean b) {
+        this.useImplants = b;
+    }
+
+    public boolean capturePrisoners() {
+        return capturePrisoners;
+    }
+
+    public void setCapturePrisoners(boolean b) {
+        capturePrisoners = b;
+    }
+
+    public int getDefaultPrisonerStatus() {
+        return defaultPrisonerStatus;
+    }
+
+    public void setDefaultPrisonerStatus(int d) {
+        defaultPrisonerStatus = d;
+    }
+
+    public boolean useAltQualityAveraging() {
+        return altQualityAveraging;
+    }
+
+    public void setAltQualityAveraging(boolean altQualityAveraging) {
+        this.altQualityAveraging = altQualityAveraging;
+    }
+
+    public boolean useAdvancedMedical() {
+        return useAdvancedMedical;
+    }
+
+    public void setAdvancedMedical(boolean b) {
+        this.useAdvancedMedical = b;
+    }
+
+    public boolean useDylansRandomXp() {
+        return useDylansRandomXp;
+    }
+
+    public void setDylansRandomXp(boolean b) {
+        this.useDylansRandomXp = b;
+    }
+
+    public int getHealingWaitingPeriod() {
+        return healWaitingPeriod;
+    }
+
+    public void setHealingWaitingPeriod(int d) {
+        healWaitingPeriod = d;
+    }
+
+    public int getNaturalHealingWaitingPeriod() {
+        return naturalHealingWaitingPeriod;
+    }
+
+    public void setNaturalHealingWaitingPeriod(int d) {
+        naturalHealingWaitingPeriod = d;
+    }
+
+    public int getMinimumHitsForVees() {
+        return minimumHitsForVees;
+    }
+
+    public void setMinimumHitsForVees(int d) {
+        minimumHitsForVees = d;
+    }
+
+    public boolean useRandomHitsForVees() {
+        return useRandomHitsForVees;
+    }
+
+    public void setUseRandomHitsForVees(boolean b) {
+        useRandomHitsForVees = b;
+    }
+
+    public boolean useTougherHealing() {
+        return tougherHealing;
+    }
+
+    public void setTougherHealing(boolean b) {
+        tougherHealing = b;
+    }
+
+    public boolean useTransfers() {
+        return useTransfers;
+    }
+
+    public void setUseTransfers(boolean b) {
+        useTransfers = b;
+    }
+
+    public boolean getUseTimeInService() {
+        return useTimeInService;
+    }
+
+    public void setUseTimeInService(boolean b) {
+        useTimeInService = b;
+    }
+
+    /**
+     * Gets a value indicating whether or not to show a person's
+     * origin faction when displaying their details.
+     */
+    public boolean showOriginFaction() {
+        return showOriginFaction;
+    }
+
+    /**
+     * Sets a value indicating whether or not to show a person's
+     * origin faction when displaying their details.
+     */
+    public void setShowOriginFaction(boolean b) {
+        showOriginFaction = b;
+    }
+
+    /**
+     * Gets a value indicating whether or not to randomize the
+     * origin of personnel.
+     */
+    public boolean randomizeOrigin() {
+        return randomizeOrigin;
+    }
+
+    /**
+     * Sets a value indicating whether or not to randomize
+     * the origin of personnel.
+     * @param b true for randomize, otherwise false
+     */
+    public void setRandomizeOrigin(boolean b) {
+        randomizeOrigin = b;
+    }
+
+    /**
+     * Gets a value indicating whether or not to randomize the origin of dependents
+     */
+    public boolean getRandomizeDependentOrigin() {
+        return randomizeDependentOrigin;
+    }
+
+    /**
+     * Sets a value indicating whether or not to randomize the origin of dependents
+     * @param b true for randomize, otherwise false
+     */
+    public void setRandomizeDependentOrigin(boolean b) {
+        randomizeDependentOrigin = b;
+    }
+
+    /**
+     * Gets the search radius to use for randomizing
+     * personnel origins.
+     */
+    public int getOriginSearchRadius() {
+        return originSearchRadius;
+    }
+
+    /**
+     * Sets the search radius to use for randomizing
+     * personnel origins.
+     * @param r The search radius.
+     */
+    public void setOriginSearchRadius(int r) {
+        originSearchRadius = r;
+    }
+
+    /**
+     * Gets a value indicating whether or not to randomize
+     * origin to the planetary level, rather than just the
+     * system level.
+     */
+    public boolean isOriginExtraRandom() {
+        return isOriginExtraRandom;
+    }
+
+    /**
+     * Sets a value indicating whether or not to randomize
+     * origin to the planetary level, rather than just the
+     * system level.
+     */
+    public void setOriginExtraRandom(boolean b) {
+        isOriginExtraRandom = b;
+    }
+
+    /**
+     * Gets the distance scale factor to apply when weighting
+     * random origin planets.
+     */
+    public double getOriginDistanceScale() {
+        return originDistanceScale;
+    }
+
+    /**
+     * Sets the distance scale factor to apply when weighting
+     * random origin planets (should be between 0.1 and 2).
+     */
+    public void setOriginDistanceScale(double v) {
+        originDistanceScale = v;
+    }
+
+    //region family
+    /**
+     * @return the minimum age a person can get married at
+     */
+    public int getMinimumMarriageAge() {
+        return minimumMarriageAge;
+    }
+
+    /**
+     * @param b the minimum age a person can get married at
+     */
+    public void setMinimumMarriageAge(int b) {
+        minimumMarriageAge = b;
+    }
+
+    /**
+     * This gets the number of recursions to use when checking mutual ancestors between two personnel
+     * @return the number of recursions to use
+     */
+    public int checkMutualAncestorsDepth() {
+        return checkMutualAncestorsDepth;
+    }
+
+    /**
+     * This sets the number of recursions to use when checking mutual ancestors between two personnel
+     * @param b the number of recursions
+     */
+    public void setCheckMutualAncestorsDepth(int b) {
+        checkMutualAncestorsDepth = b;
+    }
+
+    /**
+     * @return whether or not to use random marriages
+     */
+    public boolean useRandomMarriages() {
+        return useRandomMarriages;
+    }
+
+    /**
+     * @param b whether or not to use random marriages
+     */
+    public void setUseRandomMarriages(boolean b) {
+        useRandomMarriages = b;
+    }
+
+    /**
+     * This gets the decimal chance (between 0 and 1) of a random marriage occurring
+     * @return the chance, with a value between 0 and 1
+     */
+    public double getChanceRandomMarriages() {
+        return chanceRandomMarriages;
+    }
+
+    /**
+     * This sets the decimal chance (between 0 and 1) of a random marriage occurring
+     * @param b the chance, with a value between 0 and 1
+     */
+    public void setChanceRandomMarriages(double b) {
+        chanceRandomMarriages = b;
+    }
+
+    /**
+     * A random marriage can only happen between two people whose ages differ (+/-) by the returned value
+     * @return the age range ages can differ (+/-)
+     */
+    public int getMarriageAgeRange() {
+        return marriageAgeRange;
+    }
+
+    /**
+     * A random marriage can only happen between two people whose ages differ (+/-) by this value
+     * @param b the maximum age range
+     */
+    public void setMarriageAgeRange(int b) {
+        marriageAgeRange = b;
+    }
+
+    /**
+     * @return the array of weights of potential surname changes for weighted marriage surname generation
+     */
+    public int[] getRandomMarriageSurnameWeights() {
+        return randomMarriageSurnameWeights;
+    }
+
+    /**
+     * This gets one of the values in the array of weights of potential surname changes for weighted marriage surname generation
+     * @param pos the position in the array to set
+     * @return the weight at index pos
+     */
+    public int getRandomMarriageSurnameWeights(int pos) {
+        return randomMarriageSurnameWeights[pos];
+    }
+
+    /**
+     * This sets one of the values in the array of weights of potential surname changes for weighted marriage surname generation
+     * @param pos the position in the array to set
+     * @param b the weight to use
+     */
+    public void setRandomMarriageSurnameWeight(int pos, int b) {
+        randomMarriageSurnameWeights[pos] = b;
+    }
+
+    /**
+     * @return whether or not to use random same sex marriages
+     */
+    public boolean useRandomSameSexMarriages() {
+        return useRandomSameSexMarriages;
+    }
+
+    /**
+     * @param b whether or not to use random same sex marriages
+     */
+    public void setUseRandomSameSexMarriages(boolean b) {
+        useRandomSameSexMarriages = b;
+    }
+
+    /**
+     * This gets the decimal chance (between 0 and 1) of a random same sex marriage occurring
+     * @return the chance, with a value between 0 and 1
+     */
+    public double getChanceRandomSameSexMarriages() {
+        return chanceRandomSameSexMarriages;
+    }
+
+    /**
+     * This sets the decimal chance (between 0 and 1) of a random same sex marriage occurring
+     * @param b the chance, with a value between 0 and 1
+     */
+    public void setChanceRandomSameSexMarriages(double b) {
+        chanceRandomSameSexMarriages = b;
+    }
+
+    /**
+     * @return whether or not to use unofficial procreation
+     */
+    public boolean useUnofficialProcreation() {
+        return useUnofficialProcreation;
+    }
+
+    /**
+     * @param b  whether or not to use unofficial procreation
+     */
+    public void setUseUnofficialProcreation(boolean b) {
+        useUnofficialProcreation = b;
+    }
+
+    /**
+     * This gets the decimal chance (between 0 and 1) of random procreation occurring
+     * @return the chance, with a value between 0 and 1
+     */
+    public double getChanceProcreation() {
+        return chanceProcreation;
+    }
+
+    /**
+     * This sets the decimal chance (between 0 and 1) of random procreation occurring
+     * @param b the chance, with a value between 0 and 1
+     */
+    public void setChanceProcreation(double b) {
+        chanceProcreation = b;
+    }
+
+    /**
+     * @return whether or not to use unofficial procreation without a relationship
+     */
+    public boolean useUnofficialProcreationNoRelationship() {
+        return useUnofficialProcreationNoRelationship;
+    }
+
+    /**
+     * @param b whether or not to use unofficial procreation without a relationship
+     */
+    public void setUseUnofficialProcreationNoRelationship(boolean b) {
+        useUnofficialProcreationNoRelationship = b;
+    }
+
+    /**
+     * This gets the decimal chance (between 0 and 1) of random procreation occurring without a relationship
+     * @return the chance, with a value between 0 and 1
+     */
+    public double getChanceProcreationNoRelationship() {
+        return chanceProcreationNoRelationship;
+    }
+
+    /**
+     * This sets the decimal chance (between 0 and 1) of random procreation occurring without a relationship
+     * @param b the chance, with a value between 0 and 1
+     */
+    public void setChanceProcreationNoRelationship(double b) {
+        chanceProcreationNoRelationship = b;
+    }
+
+    /**
+     * @return whether to show the expected or actual due date for personnel
+     */
+    public boolean getDisplayTrueDueDate() {
+        return displayTrueDueDate;
+    }
+
+    /**
+     * @param b whether to show the expected or actual due date for personnel
+     */
+    public void setDisplayTrueDueDate(boolean b) {
+        displayTrueDueDate = b;
+    }
+
+    /**
+     * @return whether to log conception
+     */
+    public boolean logConception() {
+        return logConception;
+    }
+
+    /**
+     * @param b whether to log conception
+     */
+    public void setLogConception(boolean b) {
+        logConception = b;
+    }
+
+    /**
+     * @return what style of surname to use for a baby
+     */
+    public int getBabySurnameStyle() {
+        return babySurnameStyle;
+    }
+
+    /**
+     * @param b the style of surname to use for a baby
+     */
+    public void setBabySurnameStyle(int b) {
+        babySurnameStyle = b;
+    }
+
+    /**
+     * @return whether or not to display parentage for personnel
+     */
+    public boolean useParentage() {
+        return useParentage;
+    }
+
+    /**
+     * @param b whether or not to display parentage for personnel
+     */
+    public void setUseParentage(boolean b) {
+        useParentage = b;
+    }
+
+    /**
+     * @return the level of familial relation to display
+     */
+    public int displayFamilyLevel() {
+        return displayFamilyLevel;
+    }
+
+    /**
+     * @param b the level of familial relation to display
+     */
+    public void setDisplayFamilyLevel(int b) {
+        displayFamilyLevel = b;
+    }
+
+    /**
+     * TODO : Finish implementing me
+     * @return whether or not to use random deaths
+     */
+    public boolean useRandomDeaths() {
+        return useRandomDeaths;
+    }
+
+    /**
+     * TODO : Finish implementing me
+     * @param b whether or not to use random deaths
+     */
+    public void setUseRandomDeaths(boolean b) {
+        useRandomDeaths = b;
+    }
+
+    /**
+     * @return whether to keep ones married name upon spouse death or not
+     */
+    public boolean getKeepMarriedNameUponSpouseDeath() {
+        return keepMarriedNameUponSpouseDeath;
+    }
+
+    /**
+     * @param b whether to keep ones married name upon spouse death or not
+     */
+    public void setKeepMarriedNameUponSpouseDeath(boolean b) {
+        keepMarriedNameUponSpouseDeath = b;
+    }
+    //endregion family
+
+    //region salary
+    public double getSalaryCommissionMultiplier() {
+        return salaryCommissionMultiplier;
+    }
+
+    public void setSalaryCommissionMultiplier(double d) {
+        salaryCommissionMultiplier = d;
+    }
+
+    public double getSalaryEnlistedMultiplier() {
+        return salaryEnlistedMultiplier;
+    }
+
+    public void setSalaryEnlistedMultiplier(double d) {
+        salaryEnlistedMultiplier = d;
+    }
+
+    public double getSalaryAntiMekMultiplier() {
+        return salaryAntiMekMultiplier;
+    }
+
+    public void setSalaryAntiMekMultiplier(double d) {
+        salaryAntiMekMultiplier = d;
+    }
+
+    public double getSalaryXpMultiplier(int xp) {
+        if (xp < 0 || xp >= salaryXpMultiplier.length) {
+            return 1.0;
+        }
+        return salaryXpMultiplier[xp];
+    }
+
+    public void setSalaryXpMultiplier(double d, int xp) {
+        if (xp < 0 || xp >= salaryXpMultiplier.length) {
+            return;
+        }
+        this.salaryXpMultiplier[xp] = d;
+    }
+
+    public Money getBaseSalary(int type) {
+        if (type < 0 || type >= salaryTypeBase.length) {
+            return Money.zero();
+        }
+        return salaryTypeBase[type];
+    }
+
+    public void setBaseSalary(int type, Money base) {
+        if (type < 0 || type >= salaryTypeBase.length) {
+            return;
+        }
+        this.salaryTypeBase[type] = base;
+    }
+    //endregion salary
+    //endregion Personnel Tab
+
+    /**
+     * @return the method of unit rating to use
+     */
     public UnitRatingMethod getUnitRatingMethod() {
         return unitRatingMethod;
     }
 
+    /**
+     * @param method the method of unit rating to use
+     */
     public void setUnitRatingMethod(UnitRatingMethod method) {
         this.unitRatingMethod = method;
     }
@@ -726,94 +1395,6 @@ public class CampaignOptions implements Serializable {
 
     public void setFactionForNames(boolean b) {
         this.useFactionForNames = b;
-    }
-
-    public boolean useTactics() {
-        return useTactics;
-    }
-
-    public void setUseTactics(boolean b) {
-        this.useTactics = b;
-    }
-
-    public boolean useInitBonus() {
-        return useInitBonus;
-    }
-
-    public void setInitBonus(boolean b) {
-        this.useInitBonus = b;
-    }
-
-    public boolean useToughness() {
-        return useToughness;
-    }
-
-    public void setToughness(boolean b) {
-        this.useToughness = b;
-    }
-
-    public boolean useArtillery() {
-        return useArtillery;
-    }
-
-    public void setArtillery(boolean b) {
-        this.useArtillery = b;
-    }
-
-    public boolean useAbilities() {
-        return useAbilities;
-    }
-
-    public void setAbilities(boolean b) {
-        this.useAbilities = b;
-    }
-
-    public boolean useEdge() {
-        return useEdge;
-    }
-
-    public void setEdge(boolean b) {
-        this.useEdge = b;
-    }
-
-    public boolean useSupportEdge() {
-        return useSupportEdge;
-    }
-
-    public void setSupportEdge(boolean b) {
-        useSupportEdge = b;
-    }
-
-    public boolean useImplants() {
-        return useImplants;
-    }
-
-    public void setImplants(boolean b) {
-        this.useImplants = b;
-    }
-
-	public boolean useAltQualityAveraging() {
-		return altQualityAveraging;
-	}
-
-	public void setAltQualityAveraging(boolean altQualityAveraging) {
-		this.altQualityAveraging = altQualityAveraging;
-	}
-
-    public boolean useAdvancedMedical() {
-        return useAdvancedMedical;
-    }
-
-    public void setAdvancedMedical(boolean b) {
-        this.useAdvancedMedical = b;
-    }
-
-    public boolean useDylansRandomXp() {
-        return useDylansRandomXp;
-    }
-
-    public void setDylansRandomXp(boolean b) {
-        this.useDylansRandomXp = b;
     }
 
     // Personnel Market
@@ -1001,89 +1582,6 @@ public class CampaignOptions implements Serializable {
         this.useQuirks = b;
     }
 
-    /**
-     * Gets a value indicating whether or not to show a person's
-     * origin faction when displaying their details.
-     */
-    public boolean showOriginFaction() {
-        return showOriginFaction;
-    }
-
-    /**
-     * Sets a value indicating whether or not to show a person's
-     * origin faction when displaying their details.
-     */
-    public void setShowOriginFaction(boolean b) {
-        showOriginFaction = b;
-    }
-
-    /**
-     * Gets a value indicating whether or not to randomize the
-     * origin of personnel.
-     */
-    public boolean randomizeOrigin() {
-        return randomizeOrigin;
-    }
-
-    /**
-     * Sets a value indicating whether or not to randomize
-     * the origin of personnel.
-     */
-    public void setRandomizeOrigin(boolean b) {
-        randomizeOrigin = b;
-    }
-
-    /**
-     * Gets the search radius to use for randomizing
-     * personnel origins.
-     */
-    public int getOriginSearchRadius() {
-        return originSearchRadius;
-    }
-
-    /**
-     * Sets the search radius to use for randomizing
-     * personnel origins.
-     * @param r The search radius.
-     */
-    public void setOriginSearchRadius(int r) {
-        originSearchRadius = r;
-    }
-
-    /**
-     * Gets a value indicating whether or not to randomize
-     * origin to the planetary level, rather than just the
-     * system level.
-     */
-    public boolean isOriginExtraRandom() {
-        return isOriginExtraRandom;
-    }
-
-    /**
-     * Sets a value indicating whether or not to randomize
-     * origin to the planetary level, rather than just the
-     * system level.
-     */
-    public void setOriginExtraRandom(boolean b) {
-        isOriginExtraRandom = b;
-    }
-
-    /**
-     * Gets the distance scale factor to apply when weighting
-     * random origin planets.
-     */
-    public double getOriginDistanceScale() {
-        return originDistanceScale;
-    }
-
-    /**
-     * Sets the distance scale factor to apply when weighting
-     * random origin planets (should be between 0.1 and 2).
-     */
-    public void setOriginDistanceScale(double v) {
-        originDistanceScale = v;
-    }
-
     public int getScenarioXP() {
         return scenarioXP;
     }
@@ -1197,7 +1695,7 @@ public class CampaignOptions implements Serializable {
         variableTechLevel = b;
     }
 
-    public void setfactionIntroDate(boolean b) {
+    public void setFactionIntroDate(boolean b) {
         factionIntroDate = b;
     }
 
@@ -1268,7 +1766,6 @@ public class CampaignOptions implements Serializable {
     public void setProbPhenoVee(int p) {
         probPhenoVee = p;
     }
-
 
     public boolean usePortraitForType(int type) {
         if (type < 0 || type >= usePortraitForType.length) {
@@ -1606,22 +2103,6 @@ public class CampaignOptions implements Serializable {
         this.planetOutputAcquisitionBonus[type] = base;
     }
 
-    public int getHealingWaitingPeriod() {
-        return healWaitingPeriod;
-    }
-
-    public void setHealingWaitingPeriod(int d) {
-        healWaitingPeriod = d;
-    }
-
-    public int getNaturalHealingWaitingPeriod() {
-        return naturalHealingWaitingPeriod;
-    }
-
-    public void setNaturalHealingWaitingPeriod(int d) {
-        naturalHealingWaitingPeriod = d;
-    }
-
     public int getMaintenanceCycleDays() {
         return maintenanceCycleDays;
     }
@@ -1702,152 +2183,12 @@ public class CampaignOptions implements Serializable {
         useAeroSystemHits = b;
     }
 
-    public boolean useRandomHitsForVees() {
-        return useRandomHitsForVees;
-    }
-
-    public void setUseRandomHitsForVees(boolean b) {
-        useRandomHitsForVees = b;
-    }
-
     public int getMaxAcquisitions() {
         return maxAcquisitions;
     }
 
     public void setMaxAcquisitions(int d) {
         maxAcquisitions = d;
-    }
-
-    public boolean useUnofficialProcreation() {
-        return useUnofficialProcreation;
-    }
-
-    public void setUseUnofficialProcreation(boolean b) {
-    	useUnofficialProcreation = b;
-    }
-
-    public boolean useUnofficialProcreationNoRelationship() {
-        return useUnofficialProcreationNoRelationship;
-    }
-
-    public void setUseUnofficialProcreationNoRelationship(boolean b) {
-    	useUnofficialProcreationNoRelationship = b;
-    }
-
-    public boolean useParentage() {
-        return useParentage;
-    }
-
-    public void setUseParentage(boolean b) {
-        useParentage = b;
-    }
-
-    public boolean logConception() {
-        return logConception;
-    }
-
-    public void setLogConception(boolean b) {
-        logConception = b;
-    }
-
-    public boolean useTransfers() {
-    	return useTransfers;
-    }
-
-    public void setUseTransfers(boolean b) {
-    	useTransfers = b;
-    }
-
-    public boolean getUseTimeInService() {
-        return useTimeInService;
-    }
-
-    public void setUseTimeInService(boolean b) {
-        useTimeInService = b;
-    }
-
-    public boolean capturePrisoners() {
-    	return capturePrisoners;
-    }
-
-    public void setCapturePrisoners(boolean b) {
-    	capturePrisoners = b;
-    }
-
-    public int getDefaultPrisonerStatus() {
-        return defaultPrisonerStatus;
-    }
-
-    public void setDefaultPrisonerStatus(int d) {
-    	defaultPrisonerStatus = d;
-    }
-
-    public int getMinimumHitsForVees() {
-        return minimumHitsForVees;
-    }
-
-    public void setMinimumHitsForVees(int d) {
-        minimumHitsForVees = d;
-    }
-
-    public Money getBaseSalary(int type) {
-        if (type < 0 || type >= salaryTypeBase.length) {
-            return Money.zero();
-        }
-        return salaryTypeBase[type];
-    }
-
-    public void setBaseSalary(Money base, int type) {
-        if (type < 0 || type >= salaryTypeBase.length) {
-            return;
-        }
-        this.salaryTypeBase[type] = base;
-    }
-
-    public double getSalaryXpMultiplier(int xp) {
-        if (xp < 0 || xp >= salaryXpMultiplier.length) {
-            return 1.0;
-        }
-        return salaryXpMultiplier[xp];
-    }
-
-    public void setSalaryXpMultiplier(double d, int xp) {
-        if (xp < 0 || xp >= salaryXpMultiplier.length) {
-            return;
-        }
-        this.salaryXpMultiplier[xp] = d;
-    }
-
-    public double getSalaryEnlistedMultiplier() {
-        return salaryEnlistedMultiplier;
-    }
-
-    public void setSalaryEnlistedMultiplier(double d) {
-        salaryEnlistedMultiplier = d;
-    }
-
-    public double getSalaryCommissionMultiplier() {
-        return salaryCommissionMultiplier;
-    }
-
-    public void setSalaryCommissionMultiplier(double d) {
-        salaryCommissionMultiplier = d;
-    }
-
-    public double getSalaryAntiMekMultiplier() {
-        return salaryAntiMekMultiplier;
-    }
-
-    public void setSalaryAntiMekMultiplier(double d) {
-        salaryAntiMekMultiplier = d;
-    }
-
-    public boolean useTougherHealing() {
-        return tougherHealing;
-    }
-
-    public void setTougherHealing(boolean b) {
-        tougherHealing = b;
     }
 
 	public boolean getUseAtB() {
@@ -2294,7 +2635,7 @@ public class CampaignOptions implements Serializable {
 			massRepairOptions.remove(foundIdx + 1);
 		}
 
-		massRepairOptions.sort((o1, o2) -> o1.getType() < o2.getType() ? -1 : 1);
+		massRepairOptions.sort(Comparator.comparingInt(MassRepairOption::getType));
 	}
 
 	public void setAllowOpforAeros(boolean allowOpforAeros) {
@@ -2355,6 +2696,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useQuirks", useQuirks);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "showOriginFaction", showOriginFaction);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "randomizeOrigin", randomizeOrigin);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "randomizeDependentOrigin", randomizeDependentOrigin);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "originSearchRadius", originSearchRadius);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "isOriginExtraRandom", isOriginExtraRandom);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForParts", payForParts);
@@ -2445,10 +2787,30 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomHitsForVees", useRandomHitsForVees);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "minimumHitsForVees", minimumHitsForVees);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maxAcquisitions", maxAcquisitions);
+        //region family
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "minimumMarriageAge", minimumMarriageAge);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "checkMutualAncestorsDepth", checkMutualAncestorsDepth);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomMarriages", useRandomMarriages);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "chanceRandomMarriages", chanceRandomMarriages);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "marriageAgeRange", marriageAgeRange);
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                + "<randomMarriageSurnameWeights>"
+                + StringUtils.join(randomMarriageSurnameWeights, ',')
+                + "</randomMarriageSurnameWeights>");
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomSameSexMarriages", useRandomSameSexMarriages);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "chanceRandomSameSexMarriages", chanceRandomSameSexMarriages);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnofficialProcreation", useUnofficialProcreation);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "chanceProcreation", chanceProcreation);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnofficialProcreationNoRelationship", useUnofficialProcreationNoRelationship);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useParentage", useParentage);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "chanceProcreationNoRelationship", chanceProcreationNoRelationship);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "displayTrueDueDate", displayTrueDueDate);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "logConception", logConception);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "babySurnameStyle", babySurnameStyle);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useParentage", useParentage);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "displayFamilyLevel", displayFamilyLevel);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomDeaths", useRandomDeaths);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "keepMarriedNameUponSpouseDeath", keepMarriedNameUponSpouseDeath);
+        //endregion family
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTransfers", useTransfers);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTimeInService", useTimeInService);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "capturePrisoners", capturePrisoners);
@@ -2664,6 +3026,8 @@ public class CampaignOptions implements Serializable {
                 retVal.showOriginFaction = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("randomizeOrigin")) {
                 retVal.randomizeOrigin = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("randomizeDependentOrigin")) {
+                retVal.randomizeDependentOrigin = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("originSearchRadius")) {
                 retVal.originSearchRadius = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("isOriginExtraRandom")) {
@@ -2877,14 +3241,49 @@ public class CampaignOptions implements Serializable {
                 retVal.minimumHitsForVees = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("maxAcquisitions")) {
                 retVal.maxAcquisitions = Integer.parseInt(wn2.getTextContent().trim());
+            //region Family
+            } else if (wn2.getNodeName().equalsIgnoreCase("minimumMarriageAge")) {
+                retVal.minimumMarriageAge = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("checkMutualAncestorsDepth")) {
+                retVal.checkMutualAncestorsDepth = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useRandomMarriages")) {
+                retVal.useRandomMarriages = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomMarriages")) {
+                retVal.chanceRandomMarriages = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("marriageAgeRange")) {
+                retVal.marriageAgeRange = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageSurnameWeights")) {
+                String[] values = wn2.getTextContent().split(",");
+                for (int i = 0; i < values.length; i++) {
+                    retVal.randomMarriageSurnameWeights[i] = Integer.parseInt(values[i]);
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("useRandomSameSexMarriages")) {
+                retVal.useRandomSameSexMarriages = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomSameSexMarriages")) {
+                retVal.chanceRandomSameSexMarriages = Double.parseDouble(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreation")) {
             	retVal.useUnofficialProcreation = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("chanceProcreation")) {
+            	retVal.chanceProcreation = Double.parseDouble(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreationNoRelationship")) {
             	retVal.useUnofficialProcreationNoRelationship = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useParentage")) {
-                retVal.useParentage = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("chanceProcreationNoRelationship")) {
+                retVal.chanceProcreationNoRelationship = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("displayTrueDueDate")) {
+                retVal.displayTrueDueDate = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("logConception")) {
                 retVal.logConception = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("babySurnameStyle")) {
+                retVal.babySurnameStyle = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useParentage")) {
+                retVal.useParentage = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("displayFamilyLevel")) {
+                retVal.displayFamilyLevel = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useRandomDeaths")) {
+                retVal.useRandomDeaths = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("keepMarriedNameUponSpouseDeath")) {
+                retVal.keepMarriedNameUponSpouseDeath = Boolean.parseBoolean(wn2.getTextContent().trim());
+            //endregion Family
             } else if (wn2.getNodeName().equalsIgnoreCase("useTransfers")) {
             	retVal.useTransfers = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useTimeInService")) {
