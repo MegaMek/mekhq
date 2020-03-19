@@ -326,10 +326,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                             "Do you really want to disband this unit "
                                     + unit.getName() + "?",
                             "Disband Unit?", JOptionPane.YES_NO_OPTION)) {
-                        Vector<Part> parts = new Vector<>();
-                        for (Part p : unit.getParts()) {
-                            parts.add(p);
-                        }
+                        Vector<Part> parts = new Vector<>(unit.getParts());
                         for (Part p : parts) {
                             p.remove(true);
                         }
@@ -582,7 +579,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 Person tech = gui.getCampaign().getPerson(id);
                 if (tech.getTechUnitIDs().size() > 0) {
                     if (JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(gui.getFrame(),
-                            tech.getName() + " will not be able to perform maintenance on "
+                            tech.getFullName() + " will not be able to perform maintenance on "
                                     + tech.getTechUnitIDs().size() + " assigned units. Proceed?",
                                     "Unmaintained unit warning",
                                     JOptionPane.YES_NO_OPTION)) {

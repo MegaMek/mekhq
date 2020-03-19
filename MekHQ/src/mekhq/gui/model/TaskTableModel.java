@@ -86,6 +86,7 @@ public class TaskTableModel extends DataTableModel {
             int actualRow = table.convertRowIndexToModel(row);
 
             setText("<html>" + getValueAt(actualRow, actualCol).toString() + "</html>");
+
             if (isSelected) {
                 highlightBorder();
             } else {
@@ -157,8 +158,7 @@ public class TaskTableModel extends DataTableModel {
 
 	        				if (null == tech) {
 			        			//Create a dummy elite tech with the proper skill and 1 minute and put it in our cache for later use
-
-			        			tech = new Person(String.format("Temp Tech (%s)", skillName), gui.getCampaign());
+			        			tech = new Person("Temp", String.format("Tech (%s)", skillName), gui.getCampaign());
 			        			tech.addSkill(skillName, partSkill.getType().getEliteLevel(), 1);
 			        			tech.setMinutesLeft(1);
 

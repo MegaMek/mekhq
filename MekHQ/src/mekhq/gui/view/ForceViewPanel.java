@@ -235,7 +235,7 @@ public class ForceViewPanel extends ScrollablePanel {
 
     	if (null != force.getTechID()) {
     		Person p = campaign.getPerson(force.getTechID());
-    		LanceTech = p.getName();
+    		LanceTech = p.getFullName();
     	}
 
     	if(null != force.getParentForce()) {

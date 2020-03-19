@@ -286,7 +286,7 @@ public final class InjuryTypes {
 
         @Override
         public String getFluffText(BodyLocation loc, int severity, int gender) {
-            return "Lost " + Person.getGenderPronoun(gender, Person.PRONOUN_HISHER) + " "
+            return "Lost " + Person.getGenderString(gender, Person.GENDER_DESCRIPTOR.HIS_HER) + " "
                 + loc.readableName;
         }
 
@@ -616,7 +616,7 @@ public final class InjuryTypes {
 
         @Override
         public String getFluffText(BodyLocation loc, int severity, int gender) {
-            return "A laceration on " + Person.getGenderPronoun(gender, Person.PRONOUN_HISHER) + " head";
+            return "A laceration on " + Person.getGenderString(gender, Person.GENDER_DESCRIPTOR.HIS_HER) + " head";
         }
 
         @Override
@@ -644,8 +644,8 @@ public final class InjuryTypes {
 
         @Override
         public String getFluffText(BodyLocation loc, int severity, int gender) {
-            return "A bruise on " + Person.getGenderPronoun(gender, Person.PRONOUN_HISHER) + " "
-                + loc.readableName;
+            return "A bruise on " + Person.getGenderString(gender, Person.GENDER_DESCRIPTOR.HIS_HER)
+                    + " " + loc.readableName;
         }
 
         @Override
@@ -673,8 +673,8 @@ public final class InjuryTypes {
 
         @Override
         public String getFluffText(BodyLocation loc, int severity, int gender) {
-            return "Some cuts on " + Person.getGenderPronoun(gender, Person.PRONOUN_HISHER) + " "
-                + loc.readableName;
+            return "Some cuts on " + Person.getGenderString(gender, Person.GENDER_DESCRIPTOR.HIS_HER)
+                    + " " + loc.readableName;
         }
 
         @Override

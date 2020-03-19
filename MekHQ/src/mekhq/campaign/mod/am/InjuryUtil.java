@@ -47,7 +47,6 @@ public final class InjuryUtil {
     // Fumble and critical success limits for doctor skills levels 0-10, on a d100
     private static final int[] FUMBLE_LIMITS = {50, 40, 30, 20, 12, 6, 5, 4, 3, 2, 1};
     private static final int[] CRIT_LIMITS = {98, 97, 94, 89, 84, 79, 74, 69, 64, 59, 49};
-
     /*
     private static AMEventHandler eventHandler = null;
 
@@ -285,7 +284,7 @@ public final class InjuryUtil {
                     result.add(new GameEffect(
                         String.format("%s made a mistake in the treatment of %s and caused %s %s to worsen.",
                             doc.getHyperlinkedFullTitle(), p.getHyperlinkedName(),
-                            p.getGenderPronoun(Person.PRONOUN_HISHER), i.getName()),
+                            p.getGenderString(Person.GENDER_DESCRIPTOR.HIS_HER), i.getName()),
                         rnd -> {
                             int time = i.getTime();
                             i.setTime((int) Math.max(Math.ceil(time * 1.2), time + 5));
@@ -339,7 +338,7 @@ public final class InjuryUtil {
             } else {
                 result.add(new GameEffect(
                     String.format("%s spent time resting to heal %s %s.",
-                        p.getHyperlinkedName(), p.getGenderPronoun(Person.PRONOUN_HISHER), i.getName()),
+                        p.getHyperlinkedName(), p.getGenderString(Person.GENDER_DESCRIPTOR.HIS_HER), i.getName()),
                     rnd -> {
 
                     }));

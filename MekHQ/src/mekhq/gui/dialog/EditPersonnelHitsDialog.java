@@ -1,20 +1,20 @@
 /*
  * EditPersonnelHitsDialog.java
- * 
+ *
  * Copyright (C) 2018 MegaMek team
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -52,7 +52,7 @@ public class EditPersonnelHitsDialog extends JDialog {
     private JButton btnOK;
     private JSpinner spinnerHits;
     private SpinnerNumberModel spinnerModel;
-    
+
     /** Creates new form EditPersonnelHitsDialog */
     public EditPersonnelHitsDialog(Frame parent, boolean modal, Person p) {
         super(parent, modal);
@@ -72,7 +72,7 @@ public class EditPersonnelHitsDialog extends JDialog {
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditPersonnelHitsDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
-        setTitle(resourceMap.getString("Form.title") + " " + person.getName());
+        setTitle(resourceMap.getString("Form.title") + " " + person.getFullName());
         getContentPane().setLayout(new BorderLayout());
         setMinimumSize(new Dimension(240, 40));
 
@@ -105,7 +105,7 @@ public class EditPersonnelHitsDialog extends JDialog {
 
     private void btnOKActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
         person.setHits((Integer)spinnerHits.getModel().getValue());
-        
+
         this.setVisible(false);
     }
 }

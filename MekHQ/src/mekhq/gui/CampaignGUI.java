@@ -1836,14 +1836,13 @@ public class CampaignGUI extends JPanel {
                             report = "Unsupported FileType in Export Units";
                         }
                         JOptionPane.showMessageDialog(mainPanel, report);
-
                     });
         } else {
             JOptionPane.showMessageDialog(mainPanel, resourceMap.getString("dlgNoUnits"));
         }
     }
 
-    /**
+     /**
      * Exports Finances to a file (CSV, XML, etc.)
      * @param format        file format to export to
      * @param dialogTitle   title of the dialog frame
@@ -2004,7 +2003,7 @@ public class CampaignGUI extends JPanel {
                 }
 
                 if (p != null) {
-                    getCampaign().addPersonWithoutId(p, true);
+                    getCampaign().recruitPerson(p, p.isPrisoner(), p.isDependent(), true, true);
 
                     // Clear some values we no longer should have set in case this
                     // has transferred campaigns or things in the campaign have
