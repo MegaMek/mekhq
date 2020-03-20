@@ -841,13 +841,13 @@ public class CampaignXmlParser {
                     unitDesc = u.getName();
                     tech.removeTechUnitId(id);
                 } else if (!tech.getId().equals(u.getTechId())) {
-                    reason = String.format("referenced tech %s's maintained unit", u.getTech().getName());
+                    reason = String.format("referenced tech %s's maintained unit", u.getTech().getFullName());
                     unitDesc = u.getName();
                     tech.removeTechUnitId(id);
                 }
                 if (null != reason) {
                     MekHQ.getLogger().log(CampaignXmlParser.class, METHOD_NAME, LogLevel.WARNING,
-                            String.format("Tech %s %s %s (fixed)", tech.getName(), reason, unitDesc));
+                            String.format("Tech %s %s %s (fixed)", tech.getFullName(), reason, unitDesc));
                 }
             }
         }

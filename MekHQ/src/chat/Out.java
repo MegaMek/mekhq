@@ -1,5 +1,7 @@
 package chat;
 
+import mekhq.MekHQ;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -19,14 +21,20 @@ public class Out {
 
     // for Socket output
     public Out(Socket socket) {
-        try                     { out = new PrintWriter(socket.getOutputStream(), true); }
-        catch (IOException ioe) { ioe.printStackTrace();                                 }
+        try {
+            out = new PrintWriter(socket.getOutputStream(), true);
+        } catch (IOException e) {
+            MekHQ.getLogger().error(getClass(), "Out", e);
+        }
     }
 
     // for file output
     public Out(String s) {
-        try                     { out = new PrintWriter(new FileOutputStream(s), true);  }
-        catch(IOException ioe)  { ioe.printStackTrace();                                 }
+        try {
+            out = new PrintWriter(new FileOutputStream(s), true);
+        } catch (IOException e) {
+            MekHQ.getLogger().error(getClass(), "Out", e);
+        }
     }
 
     public void close() { out.close(); }

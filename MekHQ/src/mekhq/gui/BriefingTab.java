@@ -795,15 +795,14 @@ public final class BriefingTab extends CampaignGuiTab {
             // Save the player's entities to the file.
             // FIXME: this is not working
             EntityListFile.saveTo(unitFile, chosen);
-
-        } catch (IOException ex) {
-            ex.printStackTrace(System.err);
+        } catch (IOException e) {
+            MekHQ.getLogger().error(getClass(), "deployListFile", e);
         }
 
         if (undeployed.length() > 0) {
             JOptionPane.showMessageDialog(getFrame(),
-                    "The following units could not be deployed:" + undeployed.toString(), "Could not deploy some units",
-                    JOptionPane.WARNING_MESSAGE);
+                    "The following units could not be deployed:" + undeployed.toString(),
+                    "Could not deploy some units", JOptionPane.WARNING_MESSAGE);
         }
     }
 

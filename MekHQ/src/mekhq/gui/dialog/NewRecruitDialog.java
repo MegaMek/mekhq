@@ -190,14 +190,16 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     }
 
     private void hire() {
-        hqView.getCampaign().recruitPerson(person, false);
-        createNewRecruit();
+        if (hqView.getCampaign().recruitPerson(person, false)) {
+            createNewRecruit();
+        }
         refreshView();
     }
 
     private void addGM() {
-        hqView.getCampaign().recruitPerson(person, true);
-        createNewRecruit();
+        if (hqView.getCampaign().recruitPerson(person, true)) {
+            createNewRecruit();
+        }
         refreshView();
     }
 
@@ -209,7 +211,10 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     }
 
     private void randomName() {
-        person.setName(hqView.getCampaign().getRNG().generate(person.getGender() == Person.G_FEMALE));
+        String[] name = hqView.getCampaign().getRNG().generateGivenNameSurnameSplit(person.isFemale(),
+                person.isClanner(), person.getOriginFaction().getShortName());
+        person.setGivenName(name[0]);
+        person.setSurname(name[1]);
         refreshView();
     }
 

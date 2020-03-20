@@ -3497,6 +3497,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
             entity.getCrew().setName(commander.getFullTitle(), 0);
             entity.getCrew().setNickname(commander.getCallsign(), 0);
+            entity.getCrew().setGender(commander.getGender(), 0);
             entity.getCrew().setPortraitCategory(commander.getPortraitCategory(), 0);
             entity.getCrew().setPortraitFileName(commander.getPortraitFileName(), 0);
             entity.getCrew().setExternalIdAsString(commander.getId().toString(), 0);
@@ -3917,6 +3918,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     private void assignToCrewSlot(Person p, int slot, String gunType, String driveType) {
         entity.getCrew().setName(p.getFullTitle(), slot);
         entity.getCrew().setNickname(p.getCallsign(), slot);
+        entity.getCrew().setGender(p.getGender(), slot);
         entity.getCrew().setPortraitCategory(p.getPortraitCategory(), slot);
         entity.getCrew().setPortraitFileName(p.getPortraitFileName(), slot);
         entity.getCrew().setHits(p.getHits(), slot);
@@ -3978,7 +3980,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         if(getEntity() instanceof Infantry) {
             if(!isUnmanned()) {
-                engineer = new Person(getCommander().getName(), getCampaign());
+                engineer = new Person(getCommander().getGivenName(), getCommander().getSurname(), getCampaign());
                 engineer.setEngineer(true);
                 engineer.setMinutesLeft(minutesLeft);
                 engineer.setOvertimeLeft(overtimeLeft);
@@ -3997,15 +3999,16 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 int sumBonus = 0;
                 int sumEdge = 0;
                 int sumEdgeUsed = 0;
-                String engineerName = "Nobody";
+                String engineerGivenName = "Nobody";
+                String engineerSurname = "Nobody";
                 int bestRank = Integer.MIN_VALUE;
                 for(UUID pid : vesselCrew) {
                     Person p = getCampaign().getPerson(pid);
                     if(null == p) {
                         continue;
                     }
-                    //If the engineer used edge points, remove some from vessel crewmembers until all is paid for
                     if (engineer != null) {
+                        //If the engineer used edge points, remove some from vessel crewmembers until all is paid for
                         if (engineer.getEdgeUsed() > 0) {
                             //Don't subtract an Edge if the individual has none left
                             if (p.getCurrentEdge() > 0) {
@@ -4026,7 +4029,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     }
                     sumEdge += p.getEdge();
 
-                    if(p.hasSkill(SkillType.S_TECH_VESSEL)) {
+                    if (p.hasSkill(SkillType.S_TECH_VESSEL)) {
                         sumSkill += p.getSkill(SkillType.S_TECH_VESSEL).getLevel();
                         sumBonus += p.getSkill(SkillType.S_TECH_VESSEL).getBonus();
                         nCrew++;
@@ -4037,13 +4040,14 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     if (!(p.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT))) {
                         failrefitreroll = false;
                     }
-                    if(p.getRankNumeric() > bestRank) {
-                        engineerName = p.getFullName();
+                    if (p.getRankNumeric() > bestRank) {
+                        engineerGivenName = p.getGivenName();
+                        engineerSurname = p.getSurname();
                         bestRank = p.getRankNumeric();
                     }
                 }
-                if(nCrew > 0) {
-                    engineer = new Person(engineerName, getCampaign());
+                if (nCrew > 0) {
+                    engineer = new Person(engineerGivenName, engineerSurname, getCampaign());
                     engineer.setEngineer(true);
                     engineer.setEngineerXp(0);
                     engineer.setEdgeTrigger(PersonnelOptions.EDGE_REPAIR_BREAK_PART, breakpartreroll);
@@ -4148,6 +4152,23 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
     public boolean canTakeTech() {
         return tech == null && requiresMaintenance() && !isSelfCrewed();
+    }
+
+    // TODO : Switch similar tables in person to use this one instead
+    public String determineUnitTechSkillType() {
+        if ((entity instanceof Mech) || (entity instanceof Protomech)) {
+            return SkillType.S_TECH_MECH;
+        } else if (entity instanceof BattleArmor) {
+            return SkillType.S_TECH_BA;
+        } else if (entity instanceof Tank) {
+            return SkillType.S_TECH_MECHANIC;
+        } else if ((entity instanceof Dropship) || (entity instanceof Jumpship)) {
+            return SkillType.S_TECH_VESSEL;
+        } else if ((entity instanceof Aero)) {
+            return SkillType.S_TECH_AERO;
+        } else {
+            return "";
+        }
     }
 
     public boolean canTakeMoreGunners() {
@@ -4265,7 +4286,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     public void setTech(Person p) {
         if (null != tech) {
             MekHQ.getLogger().log(Unit.class, "setTech(Person)", LogLevel.WARNING,
-                String.format("New tech assigned %s without removing previous tech %s", p.getName(), tech));
+                String.format("New tech assigned %s without removing previous tech %s", p.getFullName(), tech));
         }
         ensurePersonIsRegistered(p);
         tech = p.getId();
@@ -4288,9 +4309,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     private void ensurePersonIsRegistered(Person p) {
         Objects.requireNonNull(p);
         if (null == getCampaign().getPerson(p.getId())) {
-            getCampaign().addPersonWithoutId(p, false);
+            getCampaign().recruitPerson(p, p.isPrisoner(), p.isDependent(), true,  false);
             MekHQ.getLogger().log(Unit.class, "ensurePersonIsRegistered(Person)", LogLevel.WARNING,
-                String.format("The person %s added this unit %s, was not in the campaign.", p.getName(), getName()));
+                String.format("The person %s added this unit %s, was not in the campaign.", p.getFullName(), getName()));
         }
     }
 

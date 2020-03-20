@@ -41,6 +41,7 @@ import megamek.common.UnitType;
 import megamek.common.VTOL;
 import megamek.common.Warship;
 import megamek.common.logging.LogLevel;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
@@ -85,7 +86,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             return;
         }
 
-        getLogger().methodBegin(getClass(), METHOD_NAME);
+        MekHQ.getLogger().methodBegin(getClass(), METHOD_NAME);
 
         super.initValues();
         setHighTechPercent(BigDecimal.ZERO);
@@ -98,10 +99,10 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             if (null == u) {
                 continue;
             }
-            getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                             "Processing unit " + u.getName());
             if (u.isMothballed()) {
-                getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                                 "Unit " + u.getName() +
                                 " is mothballed.  Skipping.");
                 continue;
@@ -109,16 +110,16 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
             updateUnitCounts(u);
             BigDecimal value = getUnitValue(u);
-            getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                             "Unit " + u.getName() + " -- Value = " +
                             value.toPlainString());
             setNumberUnits(getNumberUnits().add(value));
 
             Person p = u.getCommander();
             if (null != p) {
-                getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                                 "Unit " + u.getName() +
-                                " -- Adding commander (" + p.getName() + "" +
+                                " -- Adding commander (" + p.getFullTitle() + "" +
                                 ") to commander list.");
                 getCommanderList().add(p);
             }
@@ -138,13 +139,13 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         calcMedicalSupportHoursNeeded();
         calcAdminSupportHoursNeeded();
 
-        getLogger().methodEnd(getClass(), METHOD_NAME);
+        MekHQ.getLogger().methodEnd(getClass(), METHOD_NAME);
     }
 
     void updateAvailableSupport() {
         final String METHOD_NAME = "updateAvailableSupport()";
 
-        getLogger().methodCalled(getClass(), METHOD_NAME);
+        MekHQ.getLogger().methodCalled(getClass(), METHOD_NAME);
         for (Person p : getCampaign().getActivePersonnel()) {
             if (p.isTech()) {
                 updateTechSupportHours(p);
@@ -180,18 +181,19 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             return;
         }
 
-        getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG, "Unit " + u.getName() + " updating tech support needs.");
+        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
+                "Unit " + u.getName() + " updating tech support needs.");
 
         double timeMult = 1.0;
         int needed = 0;
         if (getCampaign().getCampaignOptions().useQuirks()) {
             if (en.hasQuirk("easy_maintain")) {
-                getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                                 "Unit " + u.getName() +
                                 " is easy to maintain.");
                 timeMult = 0.8;
             } else if (en.hasQuirk("difficult_maintain")) {
-                getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                                 "Unit " + u.getName() +
                                 " is difficult to maintain.");
                 timeMult = 1.2;
@@ -200,7 +202,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
         if (en instanceof Mech) {
             needed += (int) Math.ceil((Math.floor(en.getWeight() / 5) + 40) * timeMult);
-            getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                             "Unit " + u.getName() + " needs " +
                             needed + " mech tech hours.");
             mechSupportNeeded += needed;
@@ -216,37 +218,37 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             } else {
                 needed += (int) Math.ceil((Math.floor(en.getWeight() / 10) + 80) * timeMult);
             }
-            getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                             "Unit " + u.getName() + " needs " +
                             needed + " small craft tech hours.");
             smallCraftSupportNeeded += needed;
         } else if (en instanceof ConvFighter) {
             needed += (int) Math.ceil((Math.floor(en.getWeight() / 2.5) + 20) * timeMult);
-            getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                             "Unit " + u.getName() + " needs " +
                             needed + " conv. fighter tech hours.");
             convFighterSupportNeeded += needed;
         } else if (en instanceof Aero) {
             needed += (int) Math.ceil((Math.floor(en.getWeight() / 2.5) + 40) * timeMult);
-            getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                             "Unit " + u.getName() + " needs " +
                             needed + " aero tech hours.");
             aeroFighterSupportNeeded += needed;
         } else if (en instanceof VTOL) {
             needed += (int) Math.ceil((Math.floor(en.getWeight() / 5) + 30) * timeMult);
-            getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                             "Unit " + u.getName() + " needs " +
                             needed + " VTOL tech hours.");
             vtolSupportNeeded += needed;
         } else if (en instanceof Tank) {
             needed += (int) Math.ceil((Math.floor(en.getWeight() / 5) + 20) * timeMult);
-            getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                             "Unit " + u.getName() + " needs " +
                             needed + " tank tech hours.");
             tankSupportNeeded += needed;
         } else if (en instanceof BattleArmor) {
             needed += (int) Math.ceil(((en.getTotalArmor() * 2) + 5) * timeMult);
-            getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                             "Unit " + u.getName() + " needs " +
                             needed + " BA tech hours.");
             baSupportNeeded += needed;
@@ -286,7 +288,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                 hours *= 1.2;
             }
         }
-        getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
+        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                         "Unit " + en.getId() + " needs " + hours +
                         " ship tech hours.");
 
@@ -382,8 +384,9 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         if (p.isTechSecondary()) {
             hours = (int) Math.floor(hours / 2.0);
         }
-        getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
-                        "Person, " + p.getName() + ", provides " +
+
+        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
+                        "Person, " + p.getFullTitle() + ", provides " +
                         hours + " tech support hours.");
         techSupportHours += hours;
     }
@@ -399,8 +402,9 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         if (p.getSecondaryRole() == Person.T_DOCTOR) {
             hours = (int) Math.floor(hours / 2.0);
         }
-        getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
-                        "Person, " + p.getName() + " provides " +
+
+        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
+                        "Person, " + p.getFullTitle() + " provides " +
                         hours + " medical support hours.");
         medSupportHours += hours;
     }
@@ -416,8 +420,9 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         if (p.isAdminSecondary()) {
             hours = (int) Math.floor(hours / 2.0);
         }
-        getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
-                        "Person, " + p.getName() + ", provides " +
+
+        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
+                        "Person, " + p.getFullTitle() + ", provides " +
                         hours + " admin support hours.");
         adminSupportHours += hours;
     }
@@ -430,7 +435,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             return;
         }
 
-        getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
+        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                         "Unit " + u.getName() +
                         " updating unit skill rating.");
 
@@ -438,7 +443,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         Crew p = u.getEntity().getCrew();
         BigDecimal combatSkillAverage;
 
-        //Infantry and Protos do not have a piloting skill.
+        //Infantry and ProtoMechs do not have a piloting skill.
         if ((u.getEntity() instanceof Infantry) ||
             (u.getEntity() instanceof Protomech)) {
             combatSkillAverage = new BigDecimal(p.getGunnery());
@@ -453,7 +458,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         }
 
         String experience = getExperienceLevelName(combatSkillAverage);
-        getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
+        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                         "Unit " + u.getName() +
                         " combat skill average = " +
                         combatSkillAverage.toPlainString() +
@@ -738,7 +743,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         StringBuilder out = new StringBuilder();
         Person commander = getCommander();
         String commanderName = (null == commander) ? "" :
-                               " (" + commander.getName() + ")";
+                               " (" + commander.getFullTitle() + ")";
         out.append(String.format("%-" + HEADER_LENGTH + "s %3d %s",
                                  "Command:", getCommanderValue(),
                                  commanderName)).append("\n");
@@ -781,22 +786,22 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         int excessHeavyVeeBays = Math.max(getHeavyVeeBayCount() - getHeavyVeeCount(), 0);
         int excessSmallCraftBays = Math.max(getSmallCraftBayCount() - getSmallCraftCount(), 0);
 
-        out.append(String.format(TEMPLATE, "Dropship Capacity:", getTransportPercent().toPlainString() + "%"))
-        .append("\n").append(String.format(TEMPLATE_TWO, "Mech Bays:", getMechCount(), getMechBayCount()))
+        out.append(String.format(TEMPLATE, "DropShip Capacity:", getTransportPercent().toPlainString() + "%"))
+        .append("\n").append(String.format(TEMPLATE_TWO, "BattleMech Bays:", getMechCount(), getMechBayCount()))
         .append("\n").append(String.format(TEMPLATE_TWO, "Fighter Bays:", getFighterCount(), getFighterBayCount()))
-        .append(" (plus ").append(excessSmallCraftBays).append(" excess small craft)")
+        .append(" (plus ").append(excessSmallCraftBays).append(" excess Small Craft)")
         .append("\n").append(String.format(TEMPLATE_TWO, "Small Craft Bays:", getSmallCraftCount(), getSmallCraftBayCount()))
-        .append("\n").append(String.format(TEMPLATE_TWO, "Protomech Bays:", getProtoCount(), getProtoBayCount()))
+        .append("\n").append(String.format(TEMPLATE_TWO, "ProtoMech Bays:", getProtoCount(), getProtoBayCount()))
         .append("\n").append(String.format(TEMPLATE_TWO, "Super Heavy Vehicle Bays:", getSuperHeavyVeeCount(), getSuperHeavyVeeBayCount()))
         .append("\n").append(String.format(TEMPLATE_TWO, "Heavy Vehicle Bays:", getHeavyVeeCount(), getHeavyVeeBayCount()))
-        .append(" (plus ").append(excessSuperHeavyVeeBays).append(" excess super heavy)")
+        .append(" (plus ").append(excessSuperHeavyVeeBays).append(" excess Super Heavy)")
         .append("\n").append(String.format(TEMPLATE_TWO, "Light Vehicle Bays:", getLightVeeCount(), getLightVeeBayCount()))
-        .append(" (plus ").append(excessHeavyVeeBays).append(" excess heavy and ").append(excessSuperHeavyVeeBays).append(" excess super heavy)")
-        .append("\n").append(String.format(TEMPLATE_TWO, "BA Bays:", getNumberBaSquads(), getBaBayCount()))
+        .append(" (plus ").append(excessHeavyVeeBays).append(" excess Heavy and ").append(excessSuperHeavyVeeBays).append(" excess Super Heavy)")
+        .append("\n").append(String.format(TEMPLATE_TWO, "Battle Armor Bays:", getNumberBaSquads(), getBaBayCount()))
         .append("\n").append(String.format(TEMPLATE_TWO, "Infantry Bays:", calcInfantryPlatoons(), getInfantryBayCount()))
-        .append("\n").append(String.format(TEMPLATE, "Jumpship?", (isJumpshipOwner() ? "Yes" : "No")))
-        .append("\n").append(String.format(TEMPLATE, "Warship w/out Collar?", (isWarshipOwner() ? "Yes" : "No")))
-        .append("\n").append(String.format(TEMPLATE, "Warship w/ Collar?", (isWarshipWithDocsOwner() ? "Yes" : "No")));
+        .append("\n").append(String.format(TEMPLATE, "JumpShip?", (isJumpshipOwner() ? "Yes" : "No")))
+        .append("\n").append(String.format(TEMPLATE, "WarShip w/out Collar?", (isWarshipOwner() ? "Yes" : "No")))
+        .append("\n").append(String.format(TEMPLATE, "WarShip w/ Collar?", (isWarshipWithDocsOwner() ? "Yes" : "No")));
 
         return out.toString();
     }
@@ -831,17 +836,17 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                "%" +
                "\n" + String.format(TEMPLATE_CAT, "Total Hours Needed:",
                                     getTechSupportNeeded()) +
-               "\n" + String.format(TEMPLATE_SUBCAT, "Mech:",
+               "\n" + String.format(TEMPLATE_SUBCAT, "BattleMechs:",
                                     mechSupportNeeded) +
-               "\n" + String.format(TEMPLATE_SUBCAT, "Tank:",
+               "\n" + String.format(TEMPLATE_SUBCAT, "Vehicles:",
                                     tankSupportNeeded) +
                "\n" + String.format(TEMPLATE_SUBCAT, "VTOL:",
                                     vtolSupportNeeded) +
-               "\n" + String.format(TEMPLATE_SUBCAT, "BA:",
+               "\n" + String.format(TEMPLATE_SUBCAT, "Battle Armor:",
                                     baSupportNeeded) +
-               "\n" + String.format(TEMPLATE_SUBCAT, "Conv. Fighter:",
+               "\n" + String.format(TEMPLATE_SUBCAT, "Conventional Fighters:",
                                     convFighterSupportNeeded) +
-               "\n" + String.format(TEMPLATE_SUBCAT, "Aero. Fighter:",
+               "\n" + String.format(TEMPLATE_SUBCAT, "Aerospace Fighters:",
                                     aeroFighterSupportNeeded) +
                "\n" + String.format(TEMPLATE_SUBCAT, "Small Craft:",
                                     smallCraftSupportNeeded) +
@@ -914,7 +919,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                "    Auxiliary vessels are not accounted for.\n" +
                "+ Support: Artillery weapons & Naval vessels are not accounted " +
                "for.\n" +
-               "Note: The Dragoons Rating, RAW, does not account for Protomechs " +
+               "Note: The Dragoons Rating, RAW, does not account for ProtoMechs " +
                "at all and Infantry only require admin & medical support, not " +
                "tech support.";
     }
@@ -1063,7 +1068,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         if (u.isMothballed()) {
             return;
         }
-        getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
+        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                         "Unit " + u.getName() +
                         " updating advanced tech count.");
 
@@ -1081,7 +1086,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             case UnitType.WARSHIP:
             case UnitType.JUMPSHIP:
                 int techLevel = u.getEntity().getTechLevel();
-                getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                                 "Unit " + u.getName() + " TL = " +
                                 TechConstants.getLevelDisplayableName(techLevel));
                 if (techLevel > TechConstants.T_INTRO_BOXSET) {
@@ -1100,7 +1105,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                 break;
             default:
                 // not counted for tech level purposes.
-                getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                                 "Unit " + u.getName() +
                                 " not counted for tech level.");
         }

@@ -239,14 +239,17 @@ public class PersonnelMarketDialog extends JDialog {
         tablePersonnel.getSelectionModel().addListSelectionListener(this::personChanged);
         TableColumn column = null;
         for (int i = 0; i < PersonnelTableModel.N_COL; i++) {
-            column = ((XTableColumnModel)tablePersonnel.getColumnModel()).getColumnByModelIndex(i);
+            column = ((XTableColumnModel) tablePersonnel.getColumnModel()).getColumnByModelIndex(i);
             column.setPreferredWidth(personnelModel.getColumnWidth(i));
             column.setCellRenderer(personnelModel.getRenderer(false, null));
-            if(i != PersonnelTableModel.COL_NAME && i != PersonnelTableModel.COL_TYPE
-                    && i != PersonnelTableModel.COL_SKILL && i != PersonnelTableModel.COL_AGE
-                    && i != PersonnelTableModel.COL_GENDER
+
+            if (i != PersonnelTableModel.COL_GIVEN_NAME
+                    && ((!campaign.getFaction().isClan() && i != PersonnelTableModel.COL_SURNAME)
+                        || (campaign.getFaction().isClan() && i != PersonnelTableModel.COL_BLOODNAME))
+                    && i != PersonnelTableModel.COL_TYPE && i != PersonnelTableModel.COL_SKILL
+                    && i != PersonnelTableModel.COL_AGE && i != PersonnelTableModel.COL_GENDER
                     && i != PersonnelTableModel.COL_ASSIGN) {
-                ((XTableColumnModel)tablePersonnel.getColumnModel()).setColumnVisible(column, false);
+                ((XTableColumnModel) tablePersonnel.getColumnModel()).setColumnVisible(column, false);
             }
         }
 
@@ -330,22 +333,18 @@ public class PersonnelMarketDialog extends JDialog {
 	}
 
 	private void hirePerson(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
-	    if(null != selectedPerson) {
+	    if (null != selectedPerson) {
 	    	if (campaign.getFunds().isLessThan(
                     (campaign.getCampaignOptions().payForRecruitment() ? selectedPerson.getSalary().multipliedBy(2) : Money.zero())
-                            .plus(unitCost))){
+                            .plus(unitCost))) {
 				 campaign.addReport("<font color='red'><b>Insufficient funds. Transaction cancelled</b>.</font>");
 	    	} else {
 	    		/* Adding person to campaign changes pid; grab the old one to
 	    		 * use as a key to any attached entity
 	    		 */
 	    		UUID pid = selectedPerson.getId();
-	    		if(campaign.recruitPerson(selectedPerson)) {
+	    		if (campaign.recruitPerson(selectedPerson)) {
 	    			Entity en = personnelMarket.getAttachedEntity(pid);
-	    			if (campaign.getCampaignOptions().getUseTimeInService()) {
-                        GregorianCalendar rawrecruit = (GregorianCalendar) campaign.getCalendar().clone();
-                        selectedPerson.setRecruitment(rawrecruit);
-                    }
 	    			if (null != en) {
 	    				addUnit(en, true);
 	    				personnelMarket.removeAttachedEntity(pid);
@@ -362,15 +361,13 @@ public class PersonnelMarketDialog extends JDialog {
 		if (selectedPerson != null) {
 			Entity en = personnelMarket.getAttachedEntity(selectedPerson);
 			UUID pid = selectedPerson.getId();
-            campaign.addPersonWithoutId(selectedPerson, true);
-            addUnit(en, false);
-            if (campaign.getCampaignOptions().getUseTimeInService()) {
-                GregorianCalendar rawrecruit = (GregorianCalendar) campaign.getCalendar().clone();
-                selectedPerson.setRecruitment(rawrecruit);
+
+            if (campaign.recruitPerson(selectedPerson, false, false, true, true)) {
+                addUnit(en, false);
+                personnelMarket.removePerson(selectedPerson);
+                personnelModel.setData(personnelMarket.getPersonnel());
+                personnelMarket.removeAttachedEntity(pid);
             }
-            personnelMarket.removePerson(selectedPerson);
-            personnelModel.setData(personnelMarket.getPersonnel());
-            personnelMarket.removeAttachedEntity(pid);
             refreshPersonView();
 		}
 	}

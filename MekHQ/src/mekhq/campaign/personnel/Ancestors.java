@@ -34,11 +34,8 @@ public class Ancestors implements Serializable, MekHqXmlSerializable {
 		motherId = mother;
 		campaign = c;
 
-		// Generate ID
+		// Generate Id
 		id = UUID.randomUUID();
-		while (c.getAncestors(id) != null) {
-			id = UUID.randomUUID();
-		}
 
 		// Find the parents and if they exist set the ancestors
 		Person f = c.getPerson(father);
@@ -99,9 +96,8 @@ public class Ancestors implements Serializable, MekHqXmlSerializable {
 	}
 
 	public boolean checkMutualAncestors(Ancestors anc, int depth) {
-		// We only go 4 generations back looking for a connection
-		// TODO: Make this a setting
-		if (depth > 4) {
+		// We go back the number of generations specified in the settings looking for a connection
+		if (depth > campaign.getCampaignOptions().checkMutualAncestorsDepth()) {
 			return false;
 		}
 

@@ -1497,24 +1497,19 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 }
                 BLKFile.encode(fileNameCampaign, newEntity);
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (Exception e) {
+            MekHQ.getLogger().error(getClass(), "saveCustomization", e);
         }
         oldUnit.getCampaign().addCustom(newEntity.getChassis() + " " + newEntity.getModel());
         MechSummaryCache.getInstance().loadMechData();
         //I need to change the new entity to the one from the mtf file now, so that equip
         //numbers will match
         MechSummary summary = MechSummaryCache.getInstance().getMech(newEntity.getChassis() + " " + newEntity.getModel());
-        if(null == summary) {
+        if (null == summary) {
             throw(new EntityLoadingException());
         }
-        //try {
-            newEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
-        /*} catch (EntityLoadingException ex) {
-            Logger.getLogger(CampaignGUI.class.getName())
-                    .log(Level.SEVERE, null, ex);
-        }*/
 
+        newEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
     }
 
     private int getTimeMultiplier() {

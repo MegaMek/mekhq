@@ -199,7 +199,6 @@ public class InjuryType {
         final String fluff = getFluffText(loc, severity, p.getGender());
         Injury result = new Injury(recoveryTime, fluff, loc, this, severity, new DateTime(c.getCalendar()), false);
         result.setVersion(Injury.VERSION);
-        result.setStart(new DateTime(c.getCalendar()));
         return result;
     }
 

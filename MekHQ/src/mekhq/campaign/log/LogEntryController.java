@@ -101,6 +101,9 @@ public class LogEntryController {
                 foundExpressionWithOneVariable("divorcedFrom.text", description) ||
                 foundExpressionWithOneVariable("marries.text", description) ||
                 foundExpressionWithOneVariable("gained.text", description) ||
+                foundSingleExpression("spouseConceived.text", description) ||
+                foundExpressionWithOneVariable("spouseConceived.text", description) ||
+                foundSingleExpression("ourChildBorn.text.text", description) ||
                 foundSingleExpression("gainedEdge.text", description)) {
             return LogEntryType.PERSONAL;
         }

@@ -33,46 +33,17 @@ import java.util.stream.Stream;
 
 import javax.swing.JOptionPane;
 
+import megamek.common.*;
 import mekhq.*;
 import mekhq.campaign.finances.*;
 import mekhq.campaign.log.*;
+import mekhq.campaign.personnel.FormerSpouse;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 import org.joda.time.DateTime;
 
 import megamek.client.RandomNameGenerator;
 import megamek.client.RandomUnitGenerator;
-import megamek.common.Aero;
-import megamek.common.BattleArmor;
-import megamek.common.BombType;
-import megamek.common.Compute;
-import megamek.common.ConvFighter;
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.EntityMovementMode;
-import megamek.common.EquipmentType;
-import megamek.common.FighterSquadron;
-import megamek.common.Game;
-import megamek.common.GunEmplacement;
-import megamek.common.IBomber;
-import megamek.common.ITechManager;
-import megamek.common.ITechnology;
-import megamek.common.Infantry;
-import megamek.common.Jumpship;
-import megamek.common.LandAirMech;
-import megamek.common.Mech;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
-import megamek.common.MechSummaryCache;
-import megamek.common.MiscType;
-import megamek.common.Mounted;
-import megamek.common.Player;
-import megamek.common.Protomech;
-import megamek.common.SimpleTechLevel;
-import megamek.common.SmallCraft;
-import megamek.common.Tank;
-import megamek.common.TargetRoll;
-import megamek.common.Warship;
 import megamek.common.annotations.Nullable;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
@@ -311,8 +282,7 @@ public class Campaign implements Serializable, ITechManager {
         calendar = new GregorianCalendar(3067, Calendar.JANUARY, 1);
         currentDateTime = new DateTime(calendar);
         CurrencyManager.getInstance().setCampaign(this);
-        location = new CurrentLocation(Systems.getInstance().getSystems()
-                .get("Outreach"), 0);
+        location = new CurrentLocation(Systems.getInstance().getSystems().get("Outreach"), 0);
         campaignOptions = new CampaignOptions();
         currentReport = new ArrayList<>();
         currentReportHTML = "";
@@ -350,7 +320,7 @@ public class Campaign implements Serializable, ITechManager {
         retirementDefectionTracker = new RetirementDefectionTracker();
         fatigueLevel = 0;
         atbConfig = null;
-        autosaveService = new AutosaveService(MekHQ.getLogger());
+        autosaveService = new AutosaveService();
     }
 
     /**
@@ -573,7 +543,7 @@ public class Campaign implements Serializable, ITechManager {
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    MekHQ.getLogger().error(getClass(), "initUnitGenerator", e);
                 }
             }
             rm.setSelectedRATs(campaignOptions.getRATs());
@@ -786,8 +756,8 @@ public class Campaign implements Serializable, ITechManager {
                     }
                     int dependents = getRetirementDefectionTracker().getPayout(pid).getDependents();
                     while (dependents > 0) {
-                        Person p = newDependent(Person.T_ASTECH);
-                        if (recruitPerson(p)) {
+                        Person person = newDependent(Person.T_ASTECH, false);
+                        if (recruitPerson(person)) {
                             dependents--;
                         } else {
                             dependents = 0;
@@ -899,7 +869,7 @@ public class Campaign implements Serializable, ITechManager {
 
                     u.setTech(forceTech);
                 } else {
-                    String cantTech = forceTech.getName() + " cannot maintain " + u.getName() + "\n"
+                    String cantTech = forceTech.getFullName() + " cannot maintain " + u.getName() + "\n"
                             + "You will need to assign a tech manually.";
                     JOptionPane.showMessageDialog(null, cantTech, "Warning", JOptionPane.WARNING_MESSAGE);
                 }
@@ -1102,10 +1072,7 @@ public class Campaign implements Serializable, ITechManager {
         unit.getEntity().setGame(game);
 
         UUID id = UUID.randomUUID();
-        // check for the very rare chance of getting same id
-        while (null != units.get(id)) {
-            id = UUID.randomUUID();
-        }
+
         unit.getEntity().setExternalIdAsString(id.toString());
         unit.setId(id);
         units.put(id, unit);
@@ -1144,10 +1111,6 @@ public class Campaign implements Serializable, ITechManager {
         en.setGame(game);
 
         UUID id = UUID.randomUUID();
-        // check for the very rare chance of getting same id
-        while (null != units.get(id)) {
-            id = UUID.randomUUID();
-        }
         en.setExternalIdAsString(id.toString());
         Unit unit = new Unit(en, this);
         unit.setId(id);
@@ -1227,6 +1190,107 @@ public class Campaign implements Serializable, ITechManager {
         return units.get(id);
     }
 
+    //region Personnel
+    //region Person Creation
+    /**
+     * Creates a new {@link Person}, who is a dependent, of a given primary role.
+     * @param type The primary role of the {@link Person}, e.g. {@link Person#T_MECHWARRIOR}.
+     * @return A new {@link Person} of the given primary role, who is a dependent.
+     */
+    public Person newDependent(int type, boolean baby) {
+        Person person;
+
+        if (!baby && campaignOptions.getRandomizeDependentOrigin()) {
+            person = newPerson(type);
+        } else {
+            person = newPerson(type, Person.T_NONE, new DefaultFactionSelector(),
+                    new DefaultPlanetSelector(), Crew.G_RANDOMIZE);
+        }
+
+        person.setDependent(true);
+        return person;
+    }
+
+    /**
+     * Generate a new pilotPerson of the given type using whatever randomization options have been given in the
+     * CampaignOptions
+     *
+     * @param type The primary role
+     * @return A new {@link Person}.
+     */
+    public Person newPerson(int type) {
+        return newPerson(type, Person.T_NONE);
+    }
+
+    /**
+     * Generate a new pilotPerson of the given type using whatever randomization options have been given in the
+     * CampaignOptions
+     *
+     * @param type The primary role
+     * @param secondary A secondary role; used for LAM pilots to generate MW + Aero pilot
+     * @return A new {@link Person}.
+     */
+    public Person newPerson(int type, int secondary) {
+        return newPerson(type, secondary, getFactionSelector(), getPlanetSelector(), Crew.G_RANDOMIZE);
+    }
+
+    /**
+     * Generate a new pilotPerson of the given type using whatever randomization options have been given in the
+     * CampaignOptions
+     *
+     * @param type The primary role
+     * @param secondary A secondary role; used for LAM pilots to generate MW + Aero pilot
+     * @param factionCode The code for the faction this person is to be generated from
+     * @param gender The gender of the person to be generated, or a randomize it value
+     * @return A new {@link Person}.
+     */
+    public Person newPerson(int type, int secondary, String factionCode, int gender) {
+        return newPerson(type, secondary, new DefaultFactionSelector(factionCode), getPlanetSelector(), gender);
+    }
+
+    /**
+     * Generate a new pilotPerson of the given type using whatever randomization options have been given in the
+     * CampaignOptions
+     *
+     * @param type The primary role
+     * @param secondary A secondary role; used for LAM pilots to generate MW + Aero pilot
+     * @param factionSelector The faction selector to use for the person.
+     * @param planetSelector The planet selector for the person.
+     * @param gender The gender of the person to be generated, or a randomize it value
+     * @return A new {@link Person}.
+     */
+    public Person newPerson(int type, int secondary, AbstractFactionSelector factionSelector,
+                            AbstractPlanetSelector planetSelector, int gender) {
+        AbstractPersonnelGenerator personnelGenerator = getPersonnelGenerator(factionSelector, planetSelector);
+        return newPerson(type, secondary, personnelGenerator, gender);
+    }
+
+    /**
+     * Generate a new {@link Person} of the given type, using the supplied {@link AbstractPersonnelGenerator}
+     * @param type The primary role of the {@link Person}.
+     * @param secondary The secondary role, or {@link Person#T_NONE}, of the {@link Person}.
+     * @param personnelGenerator The {@link AbstractPersonnelGenerator} to use when creating the {@link Person}.
+     * @param gender The gender of the person to be generated, or a randomize it value
+     * @return A new {@link Person} configured using {@code personnelGenerator}.
+     */
+    public Person newPerson(int type, int secondary, AbstractPersonnelGenerator personnelGenerator, int gender) {
+        if (type == Person.T_LAM_PILOT) {
+            type = Person.T_MECHWARRIOR;
+            secondary = Person.T_AERO_PILOT;
+        }
+
+        Person person = personnelGenerator.generate(this, type, secondary, gender);
+
+        // Assign a random portrait after we generate a new person
+        if (getCampaignOptions().usePortraitForType(type)) {
+            assignRandomPortraitFor(person);
+        }
+
+        return person;
+    }
+    //endregion Person Creation
+
+    //region Personnel Recruitment
     /**
      *
      * @param p         the person being added
@@ -1261,7 +1325,6 @@ public class Campaign implements Serializable, ITechManager {
         if (p == null) {
             return false;
         }
-
         // Only pay if option set, they weren't GM added, and they aren't a dependent, prisoner or bondsman
         if (getCampaignOptions().payForRecruitment() && !dependent && !gmAdd && !prisoner) {
             if (!getFinances().debit(p.getSalary().multipliedBy(2), Transaction.C_SALARY,
@@ -1290,6 +1353,7 @@ public class Campaign implements Serializable, ITechManager {
             astechPoolOvertime += 120;
         }
         String rankEntry = LogEntryController.generateRankEntryString(p);
+
         if (prisoner) {
             if (getCampaignOptions().getDefaultPrisonerStatus() == CampaignOptions.BONDSMAN_RANK) {
                 p.setBondsman();
@@ -1318,53 +1382,185 @@ public class Campaign implements Serializable, ITechManager {
         MekHQ.triggerEvent(new PersonNewEvent(p));
         return true;
     }
+    //endregion Personnel Recruitment
 
-    /** Adds a person to the campaign unconditionally, without paying for the person. */
-    @Deprecated // as part of the personnel changes, 23-Feb-2020
-    public void addPerson(Person p) {
-        if (p == null) {
-            return;
-        }
-
-        UUID id = UUID.randomUUID();
-        while (null != personnel.get(id)) {
-            id = UUID.randomUUID();
-        }
-        p.setId(id);
-        personnel.put(id, p);
-
-        //TODO: implement a boolean check based on campaign options
-        addReport(p.getHyperlinkedName() + " has been added to the personnel roster.");
-        if (p.getPrimaryRole() == Person.T_ASTECH) {
-            astechPoolMinutes += 480;
-            astechPoolOvertime += 240;
-        }
-        if (p.getSecondaryRole() == Person.T_ASTECH) {
-            astechPoolMinutes += 240;
-            astechPoolOvertime += 120;
-        }
-        String rankEntry = LogEntryController.generateRankEntryString(p);
-
-        p.setFreeMan();
-        ServiceLogger.joined(p, getDate(), getName(), rankEntry);
-        MekHQ.triggerEvent(new PersonNewEvent(p));
+    //region Bloodnames
+    /**
+     * If the person does not already have a bloodname, assigns a chance of having one based on
+     * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
+     * appropriate to the person's phenotype and the player's faction.
+     *
+     * @param person       The Bloodname candidate
+     * @param type         The phenotype index
+     */
+    public void checkBloodnameAdd(Person person, int type) {
+        checkBloodnameAdd(person, type, false, this.factionCode);
     }
 
     /**
-     * Imports a {@link Person} into a campaign.
-     * @param p A {@link Person} to import into the campaign.
+     * If the person does not already have a bloodname, assigns a chance of having one based on
+     * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
+     * appropriate to Clan and phenotype.
+     *
+     * @param person       The Bloodname candidate
+     * @param type         The phenotype index
+     * @param factionCode  The shortName of the faction the person belongs to. Note that there
+     *                     is a chance of having a Bloodname that is unique to a different Clan
+     *                     as this person could have been captured.
      */
-    @Deprecated // as part of the personnel changes, 23-Feb-2020
-    public void importPerson(Person p) {
-        addPersonWithoutId(p);
+    public void checkBloodnameAdd(Person person, int type, String factionCode) {
+        checkBloodnameAdd(person, type, false, factionCode);
     }
 
-    @Deprecated // as part of the personnel changes, 23-Feb-2020
-    private void addPersonWithoutId(Person p) {
-        personnel.put(p.getId(), p);
-        MekHQ.triggerEvent(new PersonNewEvent(p));
+    /**
+     * If the person does not already have a bloodname, assigns a chance of having one based on
+     * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
+     * appropriate to the person's phenotype and the player's faction.
+     *
+     * @param person       The Bloodname candidate
+     * @param type         The phenotype index
+     * @param ignoreDice   If true, skips the random roll and assigns a Bloodname automatically
+     */
+    public void checkBloodnameAdd(Person person, int type, boolean ignoreDice) {
+        checkBloodnameAdd(person, type, ignoreDice, this.factionCode);
     }
 
+    /**
+     * If the person does not already have a bloodname, assigns a chance of having one based on
+     * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
+     * appropriate to Clan and phenotype.
+     *
+     * @param person       The Bloodname candidate
+     * @param type         The phenotype index
+     * @param ignoreDice   If true, skips the random roll and assigns a Bloodname automatically
+     * @param factionCode  The shortName of the faction the person belongs to. Note that there
+     *                     is a chance of having a Bloodname that is unique to a different Clan
+     *                     as this person could have been captured.
+     */
+    public void checkBloodnameAdd(Person person, int type, boolean ignoreDice, String factionCode) {
+        // Person already has a bloodname?
+        if (person.getBloodname().length() > 0) {
+            int result = JOptionPane.showConfirmDialog(null,
+                    person.getFullName() + " already has the bloodname " + person.getBloodname()
+                            + "\nDo you wish to remove that bloodname and generate a new one?",
+                    "Already Has Bloodname", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            if (result == JOptionPane.NO_OPTION) {
+                return;
+            }
+        }
+
+        // Go ahead and generate a new bloodname
+        if (person.isClanner() && person.getPhenotype() != Person.PHENOTYPE_NONE) {
+            int bloodnameTarget = 6;
+            switch (person.getPhenotype()) {
+                case Person.PHENOTYPE_MW:
+                    bloodnameTarget += person.hasSkill(SkillType.S_GUN_MECH)
+                            ? person.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue()
+                            : TargetRoll.AUTOMATIC_FAIL;
+                    bloodnameTarget += person.hasSkill(SkillType.S_PILOT_MECH)
+                            ? person.getSkill(SkillType.S_PILOT_MECH).getFinalSkillValue()
+                            : TargetRoll.AUTOMATIC_FAIL;
+                    break;
+                case Person.PHENOTYPE_AERO:
+                    if (type == Person.T_PROTO_PILOT) {
+                        bloodnameTarget += 2 * (person.hasSkill(SkillType.S_GUN_PROTO)
+                                ? person.getSkill(SkillType.S_GUN_PROTO).getFinalSkillValue()
+                                : TargetRoll.AUTOMATIC_FAIL);
+
+                    } else {
+                        bloodnameTarget += person.hasSkill(SkillType.S_GUN_AERO)
+                                ? person.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue()
+                                : TargetRoll.AUTOMATIC_FAIL;
+                        bloodnameTarget += person.hasSkill(SkillType.S_PILOT_AERO)
+                                ? person.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue()
+                                : TargetRoll.AUTOMATIC_FAIL;
+                    }
+                    break;
+                case Person.PHENOTYPE_BA:
+                    bloodnameTarget += person.hasSkill(SkillType.S_GUN_BA)
+                            ? person.getSkill(SkillType.S_GUN_BA).getFinalSkillValue()
+                            : TargetRoll.AUTOMATIC_FAIL;
+                    bloodnameTarget += person.hasSkill(SkillType.S_ANTI_MECH)
+                            ? person.getSkill(SkillType.S_ANTI_MECH).getFinalSkillValue()
+                            : TargetRoll.AUTOMATIC_FAIL;
+                    break;
+                case Person.PHENOTYPE_VEE:
+                    bloodnameTarget += person.hasSkill(SkillType.S_GUN_VEE)
+                            ? person.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue()
+                            : TargetRoll.AUTOMATIC_FAIL;
+                    if (type == Person.T_VTOL_PILOT) {
+                        bloodnameTarget += person.hasSkill(SkillType.S_PILOT_VTOL)
+                                ? person.getSkill(SkillType.S_PILOT_VTOL).getFinalSkillValue()
+                                : TargetRoll.AUTOMATIC_FAIL;
+                    } else if (type == Person.T_NVEE_DRIVER) {
+                        bloodnameTarget += person.hasSkill(SkillType.S_PILOT_NVEE)
+                                ? person.getSkill(SkillType.S_PILOT_NVEE).getFinalSkillValue()
+                                : TargetRoll.AUTOMATIC_FAIL;
+                    } else {
+                        bloodnameTarget += person.hasSkill(SkillType.S_PILOT_GVEE)
+                                ? person.getSkill(SkillType.S_PILOT_GVEE).getFinalSkillValue()
+                                : TargetRoll.AUTOMATIC_FAIL;
+                    }
+                    break;
+            }
+            // Higher rated units are more likely to have Bloodnamed
+            if (campaignOptions.useDragoonRating()) {
+                IUnitRating rating = getUnitRating();
+                bloodnameTarget += IUnitRating.DRAGOON_C - (campaignOptions.getUnitRatingMethod().equals(
+                        mekhq.campaign.rating.UnitRatingMethod.FLD_MAN_MERCS_REV) ? rating.getUnitRatingAsInteger()
+                        : rating.getModifier());
+            }
+            // Reavings diminish the number of available Bloodrights in later eras
+            int year = getCalendar().get(Calendar.YEAR);
+            if (year <= 2950)
+                bloodnameTarget--;
+            if (year > 3055)
+                bloodnameTarget++;
+            if (year > 3065)
+                bloodnameTarget++;
+            if (year > 3080)
+                bloodnameTarget++;
+            // Officers have better chance; no penalty for non-officer
+            bloodnameTarget += Math.min(0, ranks.getOfficerCut() - person.getRankNumeric());
+
+            if (Compute.d6(2) >= bloodnameTarget || ignoreDice) {
+                /*
+                 * The Bloodname generator has slight differences in categories that do not map
+                 * easily onto Person constants
+                 */
+                int phenotype = Bloodname.P_GENERAL;
+                switch (type) {
+                    case Person.T_MECHWARRIOR:
+                        phenotype = Bloodname.P_MECHWARRIOR;
+                        break;
+                    case Person.T_BA:
+                        phenotype = Bloodname.P_ELEMENTAL;
+                        break;
+                    case Person.T_AERO_PILOT:
+                    case Person.T_CONV_PILOT:
+                        phenotype = Bloodname.P_AEROSPACE;
+                        break;
+                    case Person.T_SPACE_CREW:
+                    case Person.T_NAVIGATOR:
+                    case Person.T_SPACE_GUNNER:
+                    case Person.T_SPACE_PILOT:
+                        phenotype = Bloodname.P_NAVAL;
+                        break;
+                    case Person.T_PROTO_PILOT:
+                        phenotype = Bloodname.P_PROTOMECH;
+                        break;
+                }
+                Bloodname bloodname = Bloodname.randomBloodname(factionCode, phenotype, getGameYear());
+                if (null != bloodname) {
+                    person.setBloodname(bloodname.getName());
+                }
+            }
+        }
+        MekHQ.triggerEvent(new PersonChangedEvent(person));
+    }
+    //endregion Bloodnames
+
+    //region Ancestors
     /**
      * Imports an {@link Ancestors} into a campaign.
      * @param a An {@link Ancestors} to import into the campaign.
@@ -1375,51 +1571,6 @@ public class Campaign implements Serializable, ITechManager {
 
     private void addAncestorsWithoutId(Ancestors a) {
         ancestors.put(a.getId(), a);
-    }
-
-    public void addPersonWithoutId(Person p, boolean log) {
-        while((null == p.getId()) || (null != personnel.get(p.getId()))) {
-            p.setId(UUID.randomUUID());
-        }
-        addPersonWithoutId(p);
-        if (log) {
-            addReport(p.getHyperlinkedName() + " has been added to the personnel roster.");
-        }
-        if (p.getPrimaryRole() == Person.T_ASTECH) {
-            astechPoolMinutes += 480;
-            astechPoolOvertime += 240;
-        }
-        if (p.getSecondaryRole() == Person.T_ASTECH) {
-            astechPoolMinutes += 240;
-            astechPoolOvertime += 120;
-        }
-        String rankEntry = LogEntryController.generateRankEntryString(p);
-        ServiceLogger.joined(p, getDate(), getName(), rankEntry);
-    }
-
-    @Deprecated
-    public Date getDate() {
-        return calendar.getTime();
-    }
-
-    public DateTime getDateTime() {
-        return currentDateTime;
-    }
-
-    public Collection<Person> getPersonnel() {
-        return personnel.values();
-    }
-
-    /**
-     * Provides a filtered list of personnel including only active Persons.
-     * @return ArrayList<Person>
-     */
-    public ArrayList<Person> getActivePersonnel() {
-        ArrayList<Person> activePersonnel = new ArrayList<>();
-        for (Person p : getPersonnel()) {
-            if (p.isActive()) {activePersonnel.add(p);}
-        }
-        return activePersonnel;
     }
 
     public Iterable<Ancestors> getAncestors() {
@@ -1437,8 +1588,113 @@ public class Campaign implements Serializable, ITechManager {
         return null;
     }
 
-    public ArrayList<Person> getPatients() {
-        ArrayList<Person> patients = new ArrayList<>();
+    public Ancestors getAncestors(UUID id) {
+        if (id == null) {
+            return null;
+        }
+        return ancestors.get(id);
+    }
+
+    public Ancestors createAncestors(UUID father, UUID mother) {
+        Ancestors na = new Ancestors(father, mother, this);
+        ancestors.put(na.getId(), na);
+        return na;
+    }
+    //endregion Ancestors
+
+    //region Other Personnel Methods
+    /**
+     * Imports a {@link Person} into a campaign.
+     * @param p A {@link Person} to import into the campaign.
+     */
+    public void importPerson(Person p) {
+        personnel.put(p.getId(), p);
+        MekHQ.triggerEvent(new PersonNewEvent(p));
+    }
+
+    public Person getPerson(UUID id) {
+        if (id == null) {
+            return null;
+        }
+        return personnel.get(id);
+    }
+
+    public Collection<Person> getPersonnel() {
+        return personnel.values();
+    }
+
+    /**
+     * Provides a filtered list of personnel including only active Persons.
+     * @return List<Person>
+     */
+    public List<Person> getActivePersonnel() {
+        List<Person> activePersonnel = new ArrayList<>();
+        for (Person p : getPersonnel()) {
+            if (p.isActive()) {
+                activePersonnel.add(p);
+            }
+        }
+        return activePersonnel;
+    }
+    //endregion Other Personnel Methods
+
+    //region Personnel Selectors and Generators
+    /**
+     * Gets the {@link AbstractFactionSelector} to use with this campaign.
+     * @return An {@link AbstractFactionSelector} to use when selecting a {@link Faction}.
+     */
+    public AbstractFactionSelector getFactionSelector() {
+        if (getCampaignOptions().randomizeOrigin()) {
+            RangedFactionSelector selector = new RangedFactionSelector(getCampaignOptions().getOriginSearchRadius());
+            selector.setDistanceScale(getCampaignOptions().getOriginDistanceScale());
+            return selector;
+        } else {
+            return new DefaultFactionSelector();
+        }
+    }
+
+    /**
+     * Gets the {@link AbstractPlanetSelector} to use with this campaign.
+     * @return An {@link AbstractPlanetSelector} to use when selecting a {@link Planet}.
+     */
+    public AbstractPlanetSelector getPlanetSelector() {
+        if (getCampaignOptions().randomizeOrigin()) {
+            RangedPlanetSelector selector =
+                    new RangedPlanetSelector(getCampaignOptions().getOriginSearchRadius(),
+                            getCampaignOptions().isOriginExtraRandom());
+            selector.setDistanceScale(getCampaignOptions().getOriginDistanceScale());
+            return selector;
+        } else {
+            return new DefaultPlanetSelector();
+        }
+    }
+
+    /**
+     * Gets the {@link AbstractPersonnelGenerator} to use with this campaign.
+     * @param factionSelector The {@link AbstractFactionSelector} to use when choosing a {@link Faction}.
+     * @param planetSelector The {@link AbstractPlanetSelector} to use when choosing a {@link Planet}.
+     * @return An {@link AbstractPersonnelGenerator} to use when creating new personnel.
+     */
+    public AbstractPersonnelGenerator getPersonnelGenerator(AbstractFactionSelector factionSelector, AbstractPlanetSelector planetSelector) {
+        DefaultPersonnelGenerator generator = new DefaultPersonnelGenerator(factionSelector, planetSelector);
+        generator.setNameGenerator(rng);
+        generator.setSkillPreferences(getRandomSkillPreferences());
+        return generator;
+    }
+    //endregion Personnel Selectors and Generators
+    //endregion Personnel
+
+    @Deprecated
+    public Date getDate() {
+        return calendar.getTime();
+    }
+
+    public DateTime getDateTime() {
+        return currentDateTime;
+    }
+
+    public List<Person> getPatients() {
+        List<Person> patients = new ArrayList<>();
         for (Person p : getPersonnel()) {
             if (p.needsFixing()
                     || (getCampaignOptions().useAdvancedMedical() && p.hasInjuries(true) && p.isActive())) {
@@ -1459,26 +1715,6 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
         return service;
-    }
-
-    public Person getPerson(UUID id) {
-        if (id == null) {
-            return null;
-        }
-        return personnel.get(id);
-    }
-
-    public Ancestors getAncestors(UUID id) {
-        if (id == null) {
-            return null;
-        }
-        return ancestors.get(id);
-    }
-
-    public Ancestors createAncestors(UUID father, UUID mother) {
-        Ancestors na = new Ancestors(father, mother, this);
-        ancestors.put(na.getId(), na);
-        return na;
     }
 
     public void addPart(Part p, int transitDays) {
@@ -1854,6 +2090,17 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     /**
+     * @return The list of all active {@link Person}s who qualify as technicians ({@link Person#isTech()}));
+     */
+    public List<Person> getTechs() {
+        return getTechs(false, null, true, false);
+    }
+
+    public List<Person> getTechs(boolean noZeroMinute) {
+        return getTechs(noZeroMinute, null, true, false);
+    }
+
+    /**
      * Returns a list of active technicians.
      *
      * @param noZeroMinute
@@ -1870,8 +2117,8 @@ public class Campaign implements Serializable, ITechManager {
      * @return The list of active {@link Person}s who qualify as technicians
      *         ({@link Person#isTech()}).
      */
-    public ArrayList<Person> getTechs(boolean noZeroMinute, UUID firstTechId, boolean sorted, boolean eliteFirst) {
-        ArrayList<Person> techs = new ArrayList<>();
+    public List<Person> getTechs(boolean noZeroMinute, UUID firstTechId, boolean sorted, boolean eliteFirst) {
+        List<Person> techs = new ArrayList<>();
 
         // Get the first tech.
         Person firstTech = getPerson(firstTechId);
@@ -1887,7 +2134,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         // also need to loop through and collect engineers on self-crewed vessels
         for (Unit u : getUnits()) {
-            if (u.isSelfCrewed() && !(u.getEntity() instanceof Infantry) && null != u.getEngineer()) {
+            if (u.isSelfCrewed() && !(u.getEntity() instanceof Infantry) && (null != u.getEngineer())) {
                 techs.add(u.getEngineer());
             }
         }
@@ -1895,6 +2142,20 @@ public class Campaign implements Serializable, ITechManager {
         // Return the tech collection sorted worst to best
         // Reverse the sort if we've been asked for best to worst
         if (sorted) {
+            // First order by the amount of time the person has remaining, based on the sorting order
+            // comparison changes because locations that use elite first will want the person with
+            // the most remaining time at the top of the list while locations that don't will want it
+            // at the bottom of the list
+            if (eliteFirst) {
+                // We want the highest amount of remaining time at the top of the list, as that
+                // makes it easy to compare between the two
+                techs.sort(Comparator.comparingInt(Person::getMinutesLeft));
+            } else {
+                // Otherwise, we want the highest amount of time being at the bottom of the list
+                techs.sort(Comparator.comparingInt(Person::getMinutesLeft).reversed());
+            }
+            // Then sort by the skill level, which puts Elite personnel first or last dependant on
+            // the eliteFirst value
             techs.sort((person1, person2) -> {
                 // default to 0, which means they're equal
                 int retVal = 0;
@@ -1904,14 +2165,12 @@ public class Campaign implements Serializable, ITechManager {
                 boolean p1Secondary = !person1.isTechPrimary() && person1.isTechSecondary();
                 boolean p2Secondary = !person2.isTechPrimary() && person2.isTechSecondary();
 
-                if (person1.getExperienceLevel(p1Secondary)
-                        > person2.getExperienceLevel(p2Secondary)) {
+                if (person1.getExperienceLevel(p1Secondary) > person2.getExperienceLevel(p2Secondary)) {
                     // Person 1 is better than Person 2.
-                    retVal = -1;
-                } else if (person1.getExperienceLevel(p1Secondary)
-                        < person2.getExperienceLevel(p2Secondary)) {
-                    // Person 2 is better than Person 1
                     retVal = 1;
+                } else if (person1.getExperienceLevel(p1Secondary) < person2.getExperienceLevel(p2Secondary)) {
+                    // Person 2 is better than Person 1
+                    retVal = -1;
                 }
 
                 // Return, swapping the value if we're looking to have Elites ordered first
@@ -1920,17 +2179,6 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         return techs;
-    }
-
-    public ArrayList<Person> getTechs(boolean noZeroMinute) {
-        return getTechs(noZeroMinute, null, true, false);
-    }
-
-    /**
-     * @return The list of all active {@link Person}s who qualify as technicians ({@link Person#isTech()}));
-     */
-    public ArrayList<Person> getTechs() {
-        return getTechs(false, null, true, false);
     }
 
     /**
@@ -3214,9 +3462,8 @@ public class Campaign implements Serializable, ITechManager {
                 change++;
             }
             for (int i = 0; i < change; i++) {
-                Person p = newDependent(Person.T_ASTECH);
-                p.setId(UUID.randomUUID());
-                addPersonWithoutId(p, true);
+                Person p = newDependent(Person.T_ASTECH, false);
+                recruitPerson(p, false, true, false, true);
             }
         }
 
@@ -3252,6 +3499,11 @@ public class Campaign implements Serializable, ITechManager {
                 continue;
             }
 
+            // Random Marriages
+            if (campaignOptions.useRandomMarriages()) {
+                p.randomMarriage();
+            }
+
             // Procreation
             if (p.isFemale()) {
                 if (p.isPregnant()) {
@@ -3260,7 +3512,7 @@ public class Campaign implements Serializable, ITechManager {
                             babies.addAll(p.birth());
                         }
                     } else {
-                        p.setDueDate(null);
+                        p.removePregnancy();
                     }
                 } else if (getCampaignOptions().useUnofficialProcreation()) {
                     p.procreate();
@@ -3318,7 +3570,7 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         for (Person baby : babies) {
-            addPersonWithoutId(baby, false);
+            recruitPerson(baby, false, true, false, false);
         }
     }
 
@@ -3943,25 +4195,25 @@ public class Campaign implements Serializable, ITechManager {
      */
     public void cleanUp(){
         // Cleans non-existing spouses
-        for(Person p : personnel.values()){
-            if(p.hasSpouse()){
-                if(!personnel.containsKey(p.getSpouseID())){
-                    p.setSpouseID(null);
+        for (Person p : personnel.values()) {
+            if (p.hasSpouse()) {
+                if (!personnel.containsKey(p.getSpouseId())) {
+                    p.setSpouseId(null);
                 }
             }
         }
 
         // clean up non-existent unit references in force unit lists
-        for(Force force : forceIds.values()) {
+        for (Force force : forceIds.values()) {
             List<UUID> orphanForceUnitIDs = new ArrayList<>();
 
-            for(UUID unitID : force.getUnits()) {
-                if(getUnit(unitID) == null) {
+            for (UUID unitID : force.getUnits()) {
+                if (getUnit(unitID) == null) {
                     orphanForceUnitIDs.add(unitID);
                 }
             }
 
-            for(UUID unitID : orphanForceUnitIDs) {
+            for (UUID unitID : orphanForceUnitIDs) {
                 force.removeUnit(unitID);
             }
         }
@@ -4215,7 +4467,7 @@ public class Campaign implements Serializable, ITechManager {
         points = Math.min(points, armor.getAmount());
         boolean sellingAllArmor = points == armor.getAmount();
         double proportion = ((double) points / armor.getAmount());
-        if(sellingAllArmor) {
+        if (sellingAllArmor) {
             // to avoid rounding error
             proportion = 1.0;
         }
@@ -4283,8 +4535,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public static Entity getBrandNewUndamagedEntity(String entityShortName) {
-        MechSummary mechSummary = MechSummaryCache.getInstance().getMech(
-                entityShortName);
+        MechSummary mechSummary = MechSummaryCache.getInstance().getMech(entityShortName);
         if (mechSummary == null) {
             return null;
         }
@@ -4315,8 +4566,7 @@ public class Campaign implements Serializable, ITechManager {
         // File header
         pw1.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
-        ResourceBundle resourceMap = ResourceBundle
-                .getBundle("mekhq.resources.MekHQ");
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQ");
         // Start the XML root.
         pw1.println("<campaign version=\""
                 + resourceMap.getString("Application.version") + "\">");
@@ -4480,23 +4730,23 @@ public class Campaign implements Serializable, ITechManager {
                 startedSystem = true;
             }
             //now check for planetary events
-            for(Planet p : psystem.getPlanets()) {
+            for (Planet p : psystem.getPlanets()) {
                 List<Planet.PlanetaryEvent> customEvents = p.getCustomEvents();
-	            if(!customEvents.isEmpty()) {
-	            	if(!startedSystem) {
-	            		//only write this if we haven't already started the system
-	            		pw1.println("\t\t<system><id>" + psystem.getId() + "</id>");
-	            	}
-	                pw1.println("\t\t\t<planet><sysPos>" + p.getSystemPosition() + "</sysPos>");
-	                for(Planet.PlanetaryEvent event : customEvents) {
-	                    Systems.getInstance().writePlanetaryEvent(pw1, event);
-	                    pw1.println();
-	                }
-	                pw1.println("\t\t\t</planet>");
-	                startedSystem = true;
-	            }
+                if (!customEvents.isEmpty()) {
+                    if (!startedSystem) {
+                        //only write this if we haven't already started the system
+                        pw1.println("\t\t<system><id>" + psystem.getId() + "</id>");
+                    }
+                    pw1.println("\t\t\t<planet><sysPos>" + p.getSystemPosition() + "</sysPos>");
+                    for (Planet.PlanetaryEvent event : customEvents) {
+                        Systems.getInstance().writePlanetaryEvent(pw1, event);
+                        pw1.println();
+                    }
+                    pw1.println("\t\t\t</planet>");
+                    startedSystem = true;
+                }
             }
-            if(startedSystem) {
+            if (startedSystem) {
                 //close the system
                 pw1.println("\t\t</system>");
             }
@@ -4659,305 +4909,6 @@ public class Campaign implements Serializable, ITechManager {
 
     public PlanetarySystem getSystemByName(String name) {
         return Systems.getInstance().getSystemByName(name, getDateTime());
-    }
-
-    /**
-     * Creates a new {@link Person}, who is a dependent, of a given primary role.
-     * @param type The primary role of the {@link Person}, e.g. {@link Person#T_MECHWARRIOR}.
-     * @return A new {@link Person} of the given primary role, who is a dependent.
-     */
-    public Person newDependent(int type) {
-        Person person = newPerson(type, new DefaultFactionSelector(), new DefaultPlanetSelector());
-        person.setDependent(true);
-        return person;
-    }
-
-    /**
-     * Gets the {@link AbstractFactionSelector} to use with this campaign.
-     * @return An {@link AbstractFactionSelector} to use when selecting a {@link Faction}.
-     */
-    public AbstractFactionSelector getFactionSelector() {
-        if (getCampaignOptions().randomizeOrigin()) {
-            RangedFactionSelector selector = new RangedFactionSelector(getCampaignOptions().getOriginSearchRadius());
-            selector.setDistanceScale(getCampaignOptions().getOriginDistanceScale());
-            return selector;
-        } else {
-            return new DefaultFactionSelector();
-        }
-    }
-
-    /**
-     * Gets the {@link AbstractPlanetSelector} to use with this campaign.
-     * @return An {@link AbstractPlanetSelector} to use when selecting a {@link Planet}.
-     */
-    public AbstractPlanetSelector getPlanetSelector() {
-        if (getCampaignOptions().randomizeOrigin()) {
-            RangedPlanetSelector selector =
-                new RangedPlanetSelector(getCampaignOptions().getOriginSearchRadius(),
-                        getCampaignOptions().isOriginExtraRandom());
-            selector.setDistanceScale(getCampaignOptions().getOriginDistanceScale());
-            return selector;
-        } else {
-            return new DefaultPlanetSelector();
-        }
-    }
-
-    /**
-     * Gets the {@link AbstractPersonnelGenerator} to use with this campaign.
-     * @param factionSelector The {@link AbstractFactionSelector} to use when choosing a {@link Faction}.
-     * @param planetSelector The {@link AbstractPlanetSelector} to use when choosing a {@link Planet}.
-     * @return An {@link AbstractPersonnelGenerator} to use when creating new personnel.
-     */
-    public AbstractPersonnelGenerator getPersonnelGenerator(AbstractFactionSelector factionSelector, AbstractPlanetSelector planetSelector) {
-        DefaultPersonnelGenerator generator = new DefaultPersonnelGenerator(factionSelector, planetSelector);
-        generator.setNameGenerator(rng);
-        generator.setSkillPreferences(getRandomSkillPreferences());
-        return generator;
-    }
-
-    public Person newPerson(int type) {
-        return newPerson(type, Person.T_NONE);
-    }
-
-    public Person newPerson(int type, int secondary) {
-        return newPerson(type, secondary, getFactionSelector());
-    }
-
-    public Person newPerson(int type, String factionCode) {
-        return newPerson(type, new DefaultFactionSelector(factionCode));
-    }
-
-    public Person newPerson(int type, AbstractFactionSelector factionSelector) {
-        return newPerson(type, Person.T_NONE, factionSelector);
-    }
-
-    public Person newPerson(int type, AbstractFactionSelector factionSelector, AbstractPlanetSelector planetSelector) {
-        return newPerson(type, Person.T_NONE, factionSelector, planetSelector);
-    }
-
-    /**
-     * Generate a new pilotPerson of the given type using whatever randomization options have been given in the
-     * CampaignOptions
-     *
-     * @param type The primary role
-     * @param secondary A secondary role; used for LAM pilots to generate MW + Aero pilot
-     * @param factionSelector The faction selector to use for the person.
-     * @return A new {@link Person}.
-     */
-    public Person newPerson(int type, int secondary, AbstractFactionSelector factionSelector) {
-        return newPerson(type, secondary, factionSelector, getPlanetSelector());
-    }
-
-    /**
-     * Generate a new pilotPerson of the given type using whatever randomization options have been given in the
-     * CampaignOptions
-     *
-     * @param type The primary role
-     * @param secondary A secondary role; used for LAM pilots to generate MW + Aero pilot
-     * @param factionSelector The faction selector to use for the person.
-     * @param planetSelector The planet selector for the person.
-     * @return A new {@link Person}.
-     */
-    public Person newPerson(int type, int secondary, AbstractFactionSelector factionSelector, AbstractPlanetSelector planetSelector) {
-        AbstractPersonnelGenerator personnelGenerator = getPersonnelGenerator(factionSelector, planetSelector);
-        return newPerson(type, secondary, personnelGenerator);
-    }
-
-    /**
-     * Generate a new {@link Person} of the given type, using the supplied {@link AbstractPersonnelGenerator}
-     * @param type The primary role of the {@link Person}.
-     * @param secondary The secondary role, or {@link Person#T_NONE}, of the {@link Person}.
-     * @param personnelGenerator The {@link AbstractPersonnelGenerator} to use when creating the {@link Person}.
-     * @return A new {@link Person} configured using {@code personnelGenerator}.
-     */
-    public Person newPerson(int type, int secondary, AbstractPersonnelGenerator personnelGenerator) {
-        if (type == Person.T_LAM_PILOT) {
-            type = Person.T_MECHWARRIOR;
-            secondary = Person.T_AERO_PILOT;
-        }
-
-        Person person = personnelGenerator.generate(this, type, secondary);
-
-        // Assign a random portrait after we generate a new person
-        if (getCampaignOptions().usePortraitForType(type)) {
-            assignRandomPortraitFor(person);
-        }
-
-        return person;
-    }
-
-    /**
-     * If the person does not already have a bloodname, assigns a chance of having one based on
-     * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
-     * appropriate to the person's phenotype and the player's faction.
-     *
-     * @param person       The Bloodname candidate
-     * @param type         The phenotype index
-     */
-    public void checkBloodnameAdd(Person person, int type) {
-        checkBloodnameAdd(person, type, false, this.factionCode);
-    }
-
-    /**
-     * If the person does not already have a bloodname, assigns a chance of having one based on
-     * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
-     * appropriate to Clan and phenotype.
-     *
-     * @param person       The Bloodname candidate
-     * @param type         The phenotype index
-     * @param factionCode  The shortName of the faction the person belongs to. Note that there
-     *                     is a chance of having a Bloodname that is unique to a different Clan
-     *                     as this person could have been captured.
-     */
-    public void checkBloodnameAdd(Person person, int type, String factionCode) {
-        checkBloodnameAdd(person, type, false, factionCode);
-    }
-
-    /**
-     * If the person does not already have a bloodname, assigns a chance of having one based on
-     * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
-     * appropriate to the person's phenotype and the player's faction.
-     *
-     * @param person       The Bloodname candidate
-     * @param type         The phenotype index
-     * @param ignoreDice   If true, skips the random roll and assigns a Bloodname automatically
-     */
-    public void checkBloodnameAdd(Person person, int type, boolean ignoreDice) {
-        checkBloodnameAdd(person, type, ignoreDice, this.factionCode);
-    }
-
-    /**
-     * If the person does not already have a bloodname, assigns a chance of having one based on
-     * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
-     * appropriate to Clan and phenotype.
-     *
-     * @param person       The Bloodname candidate
-     * @param type         The phenotype index
-     * @param ignoreDice   If true, skips the random roll and assigns a Bloodname automatically
-     * @param factionCode  The shortName of the faction the person belongs to. Note that there
-     *                     is a chance of having a Bloodname that is unique to a different Clan
-     *                     as this person could have been captured.
-     */
-    public void checkBloodnameAdd(Person person, int type, boolean ignoreDice, String factionCode) {
-        // Person already has a bloodname?
-        if (person.getBloodname().length() > 0) {
-            int result = JOptionPane.showConfirmDialog(null,
-                    person.getName() + " already has the bloodname " + person.getBloodname()
-                            + "\nDo you wish to remove that bloodname and generate a new one?",
-                    "Already Has Bloodname", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-            if (result == JOptionPane.NO_OPTION) {
-                return;
-            }
-        }
-
-        // Go ahead and generate a new bloodname
-        if (person.isClanner() && person.getPhenotype() != Person.PHENOTYPE_NONE) {
-            int bloodnameTarget = 6;
-            switch (person.getPhenotype()) {
-                case Person.PHENOTYPE_MW:
-                    bloodnameTarget += person.hasSkill(SkillType.S_GUN_MECH)
-                            ? person.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue()
-                            : 13;
-                    bloodnameTarget += person.hasSkill(SkillType.S_PILOT_MECH)
-                            ? person.getSkill(SkillType.S_PILOT_MECH).getFinalSkillValue()
-                            : 13;
-                    break;
-                case Person.PHENOTYPE_AERO:
-                    if (type == Person.T_PROTO_PILOT) {
-                        bloodnameTarget += 2 * (person.hasSkill(SkillType.S_GUN_PROTO)
-                                ? person.getSkill(SkillType.S_GUN_PROTO).getFinalSkillValue()
-                                : 13);
-
-                    } else {
-                        bloodnameTarget += person.hasSkill(SkillType.S_GUN_AERO)
-                                ? person.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue()
-                                : 13;
-                        bloodnameTarget += person.hasSkill(SkillType.S_PILOT_AERO)
-                                ? person.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue()
-                                : 13;
-                    }
-                    break;
-                case Person.PHENOTYPE_BA:
-                    bloodnameTarget += person.hasSkill(SkillType.S_GUN_BA)
-                            ? person.getSkill(SkillType.S_GUN_BA).getFinalSkillValue()
-                            : 13;
-                    bloodnameTarget += person.hasSkill(SkillType.S_ANTI_MECH)
-                            ? person.getSkill(SkillType.S_ANTI_MECH).getFinalSkillValue()
-                            : 13;
-                    break;
-                case Person.PHENOTYPE_VEE:
-                    bloodnameTarget += person.hasSkill(SkillType.S_GUN_VEE)
-                            ? person.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue()
-                            : 13;
-                    if (type == Person.T_VTOL_PILOT) {
-                        bloodnameTarget += person.hasSkill(SkillType.S_PILOT_VTOL)
-                                ? person.getSkill(SkillType.S_PILOT_VTOL).getFinalSkillValue()
-                                : 13;
-                    } else if (type == Person.T_NVEE_DRIVER) {
-                        bloodnameTarget += person.hasSkill(SkillType.S_PILOT_NVEE)
-                                ? person.getSkill(SkillType.S_PILOT_NVEE).getFinalSkillValue()
-                                : 13;
-                    } else {
-                        bloodnameTarget += person.hasSkill(SkillType.S_PILOT_GVEE)
-                                ? person.getSkill(SkillType.S_PILOT_GVEE).getFinalSkillValue()
-                                : 13;
-                    }
-                    break;
-            }
-            // Higher rated units are more likely to have Bloodnamed
-            if (campaignOptions.useDragoonRating()) {
-                IUnitRating rating = getUnitRating();
-                bloodnameTarget += IUnitRating.DRAGOON_C - (campaignOptions.getUnitRatingMethod().equals(
-                        mekhq.campaign.rating.UnitRatingMethod.FLD_MAN_MERCS_REV) ? rating.getUnitRatingAsInteger()
-                                : rating.getModifier());
-            }
-            // Reavings diminish the number of available Bloodrights in later eras
-            int year = getCalendar().get(Calendar.YEAR);
-            if (year <= 2950)
-                bloodnameTarget--;
-            if (year > 3055)
-                bloodnameTarget++;
-            if (year > 3065)
-                bloodnameTarget++;
-            if (year > 3080)
-                bloodnameTarget++;
-            // Officers have better chance; no penalty for non-officer
-            bloodnameTarget += Math.min(0, ranks.getOfficerCut() - person.getRankNumeric());
-
-            if (Compute.d6(2) >= bloodnameTarget || ignoreDice) {
-                /*
-                 * The Bloodname generator has slight differences in categories that do not map
-                 * easily onto Person constants
-                 */
-                int phenotype = Bloodname.P_GENERAL;
-                switch (type) {
-                    case Person.T_MECHWARRIOR:
-                        phenotype = Bloodname.P_MECHWARRIOR;
-                        break;
-                    case Person.T_BA:
-                        phenotype = Bloodname.P_ELEMENTAL;
-                        break;
-                    case Person.T_AERO_PILOT:
-                    case Person.T_CONV_PILOT:
-                        phenotype = Bloodname.P_AEROSPACE;
-                        break;
-                    case Person.T_SPACE_CREW:
-                    case Person.T_NAVIGATOR:
-                    case Person.T_SPACE_GUNNER:
-                    case Person.T_SPACE_PILOT:
-                        phenotype = Bloodname.P_NAVAL;
-                        break;
-                    case Person.T_PROTO_PILOT:
-                        phenotype = Bloodname.P_PROTOMECH;
-                        break;
-                }
-                Bloodname bloodname = Bloodname.randomBloodname(factionCode, phenotype, getGameYear());
-                if (null != bloodname) {
-                    person.setBloodname(bloodname.getName());
-                }
-            }
-        }
-        MekHQ.triggerEvent(new PersonChangedEvent(person));
     }
 
     public void setRanks(Ranks r) {
@@ -5966,8 +5917,7 @@ public class Campaign implements Serializable, ITechManager {
     public int getNumberMedics() {
         int medics = medicPool;
         for (Person p : getPersonnel()) {
-            if ((p.getPrimaryRole() == Person.T_MEDIC || p.getSecondaryRole() == Person.T_MEDIC)
-                    && p.isActive() && !p.isDeployed()) {
+            if (p.isMedic() && p.isActive() && !p.isDeployed()) {
                 medics++;
             }
         }
@@ -6003,9 +5953,7 @@ public class Campaign implements Serializable, ITechManager {
                 }
                 p.setPrisoner();
                 ServiceLogger.madePrisoner(p, getDate());
-                if (getCampaignOptions().getUseTimeInService()) {
-                    p.setRecruitment(null);
-                }
+                p.setRecruitment(null); //more efficient to just set it to null instead of checking if the setting is enabled
                 break;
             case Person.PRISONER_BONDSMAN:
                 if (p.getRankNumeric() > 0) {
@@ -6014,9 +5962,7 @@ public class Campaign implements Serializable, ITechManager {
                 }
                 p.setBondsman();
                 ServiceLogger.madeBondsman(p, getDate());
-                if (getCampaignOptions().getUseTimeInService()) {
-                    p.setRecruitment(null);
-                }
+                p.setRecruitment(null); //more efficient to just set it to null instead of checking if the setting is enabled
                 break;
             default:
                 break;
@@ -6034,14 +5980,13 @@ public class Campaign implements Serializable, ITechManager {
         Unit u = getUnit(person.getUnitId());
         if (status == Person.S_KIA) {
             ServiceLogger.kia(person, getDate());
-            // Don't forget to tell the spouse
-            if (person.hasSpouse()) {
-                Person spouse = person.getSpouse();
-                PersonalLogger.spouseKia(spouse, person, getDate());
-                spouse.setSpouseID(null);
-            }
             // set the date of death
             person.setDateOfDeath((GregorianCalendar) calendar.clone());
+            // Don't forget to tell the spouse
+            if (person.hasSpouse()) {
+                person.divorce(getCampaignOptions().getKeepMarriedNameUponSpouseDeath()
+                        ? Person.OPT_KEEP_SURNAME : Person.OPT_SPOUSE_CHANGE_SURNAME);
+            }
         } else if (person.getStatus() == Person.S_KIA) {
             // remove date of death for resurrection
             person.setDateOfDeath(null);
@@ -6057,18 +6002,16 @@ public class Campaign implements Serializable, ITechManager {
         }
         person.setStatus(status);
         if (status != Person.S_ACTIVE) {
-            person.setDoctorId(null, getCampaignOptions()
-                    .getNaturalHealingWaitingPeriod());
+            person.setDoctorId(null, getCampaignOptions().getNaturalHealingWaitingPeriod());
             // If we're assigned to a unit, remove us from it
             if (null != u) {
                 u.remove(person, true);
             }
             // If we're assigned as a tech for any unit, remove us from it/them
             if (!person.getTechUnitIDs().isEmpty()) {
-                @SuppressWarnings("unchecked") // Broken assed Java returning Object from clone
-                ArrayList<UUID> techIDs = (ArrayList<UUID>) person.getTechUnitIDs().clone();
-                for (UUID tuuid : techIDs) {
-                    Unit t = getUnit(tuuid);
+                List<UUID> techIds = person.getTechUnitIDs();
+                for (UUID tUUID : techIds) {
+                    Unit t = getUnit(tUUID);
                     t.remove(person, true);
                 }
             }
@@ -6108,11 +6051,9 @@ public class Campaign implements Serializable, ITechManager {
 
     public Vector<IBasicOption> getGameOptionsVector() {
         Vector<IBasicOption> options = new Vector<>();
-        for (Enumeration<IOptionGroup> i = gameOptions.getGroups(); i
-                .hasMoreElements(); ) {
+        for (Enumeration<IOptionGroup> i = gameOptions.getGroups(); i.hasMoreElements(); ) {
             IOptionGroup group = i.nextElement();
-            for (Enumeration<IOption> j = group.getOptions(); j
-                    .hasMoreElements(); ) {
+            for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements(); ) {
                 IOption option = j.nextElement();
                 options.add(option);
             }
@@ -6288,13 +6229,11 @@ public class Campaign implements Serializable, ITechManager {
             if (null == p) {
                 break;
             }
-            if (!isGM) {
-                if (!recruitPerson(p)) {
-                    return;
-                }
-            } else {
-                addPerson(p);
+
+            if (!recruitPerson(p, isGM)) {
+                return;
             }
+
             if (unit.usesSoloPilot() || unit.usesSoldiers()) {
                 unit.addPilotOrSoldier(p);
             } else {
@@ -6312,34 +6251,22 @@ public class Campaign implements Serializable, ITechManager {
             } else if (unit.getEntity() instanceof Mech) {
                 p = newPerson(Person.T_MECHWARRIOR);
             }
-            if (!isGM) {
-                if (!recruitPerson(p)) {
-                    return;
-                }
-            } else {
-                addPerson(p);
+            if (!recruitPerson(p, isGM)) {
+                return;
             }
             unit.addGunner(p);
         }
         while (unit.canTakeMoreVesselCrew()) {
             Person p = newPerson(unit.getEntity().isSupportVehicle() ? Person.T_VEHICLE_CREW : Person.T_SPACE_CREW);
-            if (!isGM) {
-                if (!recruitPerson(p)) {
-                    return;
-                }
-            } else {
-                addPerson(p);
+            if (!recruitPerson(p, isGM)) {
+                return;
             }
             unit.addVesselCrew(p);
         }
         if (unit.canTakeNavigator()) {
             Person p = newPerson(Person.T_NAVIGATOR);
-            if (!isGM) {
-                if (!recruitPerson(p)) {
-                    return;
-                }
-            } else {
-                addPerson(p);
+            if (!recruitPerson(p, isGM)) {
+                return;
             }
             unit.setNavigator(p);
         }
@@ -6351,12 +6278,8 @@ public class Campaign implements Serializable, ITechManager {
             } else {
                 p = newPerson(Person.T_MECHWARRIOR);
             }
-            if (!isGM) {
-                if (!recruitPerson(p)) {
-                    return;
-                }
-            } else {
-                addPerson(p);
+            if (!recruitPerson(p, isGM)) {
+                return;
             }
             unit.setTechOfficer(p);
         }
@@ -6458,7 +6381,7 @@ public class Campaign implements Serializable, ITechManager {
         // and if none are found then /gender/rolegroup, then /gender/combat or
         // /gender/support, then in /gender.
         String searchCat_Gender = "";
-        if (p.getGender() == Person.G_FEMALE) {
+        if (p.getGender() == Crew.G_FEMALE) {
             searchCat_Gender += "Female/";
         } else {
             searchCat_Gender += "Male/";
@@ -7878,21 +7801,17 @@ public class Campaign implements Serializable, ITechManager {
                     && !p.isBondsman() && p.isActive()) {
                 countPersonByType[p.getPrimaryRole()]++;
                 countTotal++;
-                if (getCampaignOptions().useAdvancedMedical()
-                        && p.getInjuries().size() > 0) {
+                if (getCampaignOptions().useAdvancedMedical() && p.getInjuries().size() > 0) {
                     countInjured++;
                 } else if (p.getHits() > 0) {
                     countInjured++;
                 }
                 salary = salary.plus(p.getSalary());
-            } else if (Person.isCombatRole(p.getPrimaryRole())
-                    && p.getStatus() == Person.S_RETIRED) {
+            } else if (Person.isCombatRole(p.getPrimaryRole()) && p.getStatus() == Person.S_RETIRED) {
                 countRetired++;
-            } else if (Person.isCombatRole(p.getPrimaryRole())
-                    && p.getStatus() == Person.S_MIA) {
+            } else if (Person.isCombatRole(p.getPrimaryRole()) && p.getStatus() == Person.S_MIA) {
                 countMIA++;
-            } else if (Person.isCombatRole(p.getPrimaryRole())
-                    && p.getStatus() == Person.S_KIA) {
+            } else if (Person.isCombatRole(p.getPrimaryRole()) && p.getStatus() == Person.S_KIA) {
                 countKIA++;
             }
         }
@@ -8010,15 +7929,15 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void doMaintenance(Unit u) {
-        if (!u.requiresMaintenance()) {
+        if (!u.requiresMaintenance() || !campaignOptions.checkMaintenance()) {
             return;
         }
         // lets start by checking times
         Person tech = u.getTech();
         int minutesUsed = u.getMaintenanceTime();
         int astechsUsed = getAvailableAstechs(minutesUsed, false);
-        boolean maintained = null != tech
-                && tech.getMinutesLeft() >= minutesUsed && !tech.isMothballing();
+        boolean maintained = ((tech != null) && (tech.getMinutesLeft() >= minutesUsed)
+                && !tech.isMothballing());
         boolean paidMaintenance = true;
         if (maintained) {
             // use the time
@@ -8028,211 +7947,212 @@ public class Campaign implements Serializable, ITechManager {
         u.incrementDaysSinceMaintenance(maintained, astechsUsed);
 
         int ruggedMultiplier = 1;
-        if(u.getEntity().hasQuirk(OptionsConstants.QUIRK_POS_RUGGED_1)) {
+        if (u.getEntity().hasQuirk(OptionsConstants.QUIRK_POS_RUGGED_1)) {
             ruggedMultiplier = 2;
         }
 
-        if(u.getEntity().hasQuirk(OptionsConstants.QUIRK_POS_RUGGED_2)) {
+        if (u.getEntity().hasQuirk(OptionsConstants.QUIRK_POS_RUGGED_2)) {
             ruggedMultiplier = 3;
         }
 
-        if (u.getDaysSinceMaintenance() >= getCampaignOptions().getMaintenanceCycleDays() * ruggedMultiplier) {
+        if (u.getDaysSinceMaintenance() >= (getCampaignOptions().getMaintenanceCycleDays() * ruggedMultiplier)) {
             // maybe use the money
             if (campaignOptions.payForMaintain()) {
-                if (finances.debit(u.getMaintenanceCost(), Transaction.C_MAINTAIN, "Maintenance for " + u.getName(),
-                        calendar.getTime())) {
-                } else {
+                if (!(finances.debit(u.getMaintenanceCost(), Transaction.C_MAINTAIN, "Maintenance for "
+                                + u.getName(), calendar.getTime()))) {
                     addReport("<font color='red'><b>You cannot afford to pay maintenance costs for "
                             + u.getHyperlinkedName() + "!</b></font>");
                     paidMaintenance = false;
                 }
             }
-            if (getCampaignOptions().checkMaintenance()) {
-                // its time for a maintenance check
-                int qualityOrig = u.getQuality();
-                String techName = "Nobody";
-                String techNameLinked = techName;
-                if (null != tech) {
-                    techName = tech.getFullTitle();
-                    techNameLinked = tech.getHyperlinkedFullTitle();
+            // it is time for a maintenance check
+            int qualityOrig = u.getQuality();
+            String techName = "Nobody";
+            String techNameLinked = techName;
+            if (null != tech) {
+                techName = tech.getFullTitle();
+                techNameLinked = tech.getHyperlinkedFullTitle();
+            }
+            // don't do actual damage until we clear the for loop to avoid
+            // concurrent mod problems
+            // put it into a hash - 4 points of damage will mean destruction
+            HashMap<Integer, Integer> partsToDamage = new HashMap<>();
+            StringBuilder maintenanceReport = new StringBuilder("<emph>" + techName + " performing maintenance</emph><br><br>");
+            for (Part p : u.getParts()) {
+                String partReport = "<b>" + p.getName() + "</b> (Quality " + p.getQualityName() + ")";
+                if (!p.needsMaintenance()) {
+                    continue;
                 }
-                // dont do actual damage until we clear the for loop to avoid
-                // concurrent mod problems
-                // put it into a hash - 4 points of damage will mean destruction
-                HashMap<Integer, Integer> partsToDamage = new HashMap<>();
-                String maintenanceReport = "<emph>" + techName + " performing maintenance</emph><br><br>";
-                for (Part p : u.getParts()) {
-                    String partReport = "<b>" + p.getName() + "</b> (Quality " + p.getQualityName() + ")";
-                    if (!p.needsMaintenance()) {
-                        continue;
-                    }
-                    int oldQuality = p.getQuality();
-                    TargetRoll target = getTargetForMaintenance(p, tech);
-                    if (!paidMaintenance) {
-                        // I should probably make this modifier user inputtable
-                        target.addModifier(1, "did not pay maintenance");
-                    }
-                    partReport += ", TN " + target.getValue() + "[" + target.getDesc() + "]";
-                    int roll = Compute.d6(2);
-                    int margin = roll - target.getValue();
-                    partReport += " rolled a " + roll + ", margin of " + margin;
-                    switch (p.getQuality()) {
-                        case Part.QUALITY_F:
-                            if (margin < -2) {
-                                p.decreaseQuality();
-                                if (margin < -6 && !campaignOptions.useUnofficialMaintenance()) {
-                                    partsToDamage.put(p.getId(), 1);
-                                }
-                            }
-                            if (margin >= 6) {
-                                // TODO: award XP point (make this optional)
-                            }
-                            break;
-                        case Part.QUALITY_E:
-                            if (margin < -2) {
-                                p.decreaseQuality();
-                                if (margin < -5 && !campaignOptions.useUnofficialMaintenance()) {
-                                    partsToDamage.put(p.getId(), 1);
-                                }
-                            }
-                            if (margin >= 6) {
-                                p.improveQuality();
-                            }
-                            break;
-                        case Part.QUALITY_D:
-                            if (margin < -3) {
-                                p.decreaseQuality();
-                                if (margin < -4 && !campaignOptions.useUnofficialMaintenance()) {
-                                    partsToDamage.put(p.getId(), 1);
-                                }
-                            }
-                            if (margin >= 5) {
-                                p.improveQuality();
-                            }
-                            break;
-                        case Part.QUALITY_C:
-                            if (margin < -4) {
-                                p.decreaseQuality();
-                            }
-                            if (!campaignOptions.useUnofficialMaintenance()) {
-                                if (margin < -6) {
-                                    partsToDamage.put(p.getId(), 2);
-                                } else if (margin < -3) {
-                                    partsToDamage.put(p.getId(), 1);
-                                }
-                            }
-                            if (margin >= 5) {
-                                p.improveQuality();
-                            }
-                            break;
-                        case Part.QUALITY_B:
-                            if (margin < -5) {
-                                p.decreaseQuality();
-                            }
-                            if (!campaignOptions.useUnofficialMaintenance()) {
-                                if (margin < -6) {
-                                    partsToDamage.put(p.getId(), 2);
-                                } else if (margin < -2) {
-                                    partsToDamage.put(p.getId(), 1);
-                                }
-                            }
-                            if (margin >= 4) {
-                                p.improveQuality();
-                            }
-                            break;
-                        case Part.QUALITY_A:
-                            if (!campaignOptions.useUnofficialMaintenance()) {
-                                if (margin < -6) {
-                                    partsToDamage.put(p.getId(), 4);
-                                } else if (margin < -4) {
-                                    partsToDamage.put(p.getId(), 3);
-                                } else if (margin == -4) {
-                                    partsToDamage.put(p.getId(), 2);
-                                } else if (margin < -1) {
-                                    partsToDamage.put(p.getId(), 1);
-                                }
-                            } else if (margin < -6) {
+                int oldQuality = p.getQuality();
+                TargetRoll target = getTargetForMaintenance(p, tech);
+                if (!paidMaintenance) {
+                    // TODO : Make this modifier user inputtable
+                    target.addModifier(1, "did not pay for maintenance");
+                }
+
+                partReport += ", TN " + target.getValue() + "[" + target.getDesc() + "]";
+                int roll = Compute.d6(2);
+                int margin = roll - target.getValue();
+                partReport += " rolled a " + roll + ", margin of " + margin;
+
+                switch (p.getQuality()) {
+                    case Part.QUALITY_A: {
+                        if (margin >= 4) {
+                            p.improveQuality();
+                        }
+                        if (!campaignOptions.useUnofficialMaintenance()) {
+                            if (margin < -6) {
+                                partsToDamage.put(p.getId(), 4);
+                            } else if (margin < -4) {
+                                partsToDamage.put(p.getId(), 3);
+                            } else if (margin == -4) {
+                                partsToDamage.put(p.getId(), 2);
+                            } else if (margin < -1) {
                                 partsToDamage.put(p.getId(), 1);
                             }
-                            if (margin >= 4) {
-                                p.improveQuality();
+                        } else if (margin < -6) {
+                            partsToDamage.put(p.getId(), 1);
+                        }
+                        break;
+                    }
+                    case Part.QUALITY_B: {
+                        if (margin >= 4) {
+                            p.improveQuality();
+                        } else if (margin < -5) {
+                            p.decreaseQuality();
+                        }
+                        if (!campaignOptions.useUnofficialMaintenance()) {
+                            if (margin < -6) {
+                                partsToDamage.put(p.getId(), 2);
+                            } else if (margin < -2) {
+                                partsToDamage.put(p.getId(), 1);
                             }
-                            break;
-                    }
-                    if (p.getQuality() > oldQuality) {
-                        partReport += ": <font color='green'>new quality is " + p.getQualityName() + "</font>";
-                    } else if (p.getQuality() < oldQuality) {
-                        partReport += ": <font color='red'>new quality is " + p.getQualityName() + "</font>";
-                    } else {
-                        partReport += ": quality remains " + p.getQualityName();
-                    }
-                    if (null != partsToDamage.get(p.getId())) {
-                        if (partsToDamage.get(p.getId()) > 3) {
-                            partReport += ", <font color='red'><b>part destroyed</b></font>";
-                        } else {
-                            partReport += ", <font color='red'><b>part damaged</b></font>";
                         }
+                        break;
                     }
-                    maintenanceReport += partReport + "<br>";
-                }
-                int nDamage = 0;
-                int nDestroy = 0;
-                for (int key : partsToDamage.keySet()) {
-                    Part p = getPart(key);
-                    if (null != p) {
-                        int damage = partsToDamage.get(key);
-                        if (damage > 3) {
-                            nDestroy++;
-                            p.remove(false);
-                        } else {
-                            p.doMaintenanceDamage(damage);
-                            nDamage++;
+                    case Part.QUALITY_C: {
+                        if (margin < -4) {
+                            p.decreaseQuality();
+                        } else if (margin >= 5) {
+                            p.improveQuality();
                         }
+                        if (!campaignOptions.useUnofficialMaintenance()) {
+                            if (margin < -6) {
+                                partsToDamage.put(p.getId(), 2);
+                            } else if (margin < -3) {
+                                partsToDamage.put(p.getId(), 1);
+                            }
+                        }
+                        break;
                     }
+                    case Part.QUALITY_D: {
+                        if (margin < -3) {
+                            p.decreaseQuality();
+                            if ((margin < -4) && !campaignOptions.useUnofficialMaintenance()) {
+                                partsToDamage.put(p.getId(), 1);
+                            }
+                        } else if (margin >= 5) {
+                            p.improveQuality();
+                        }
+                        break;
+                    }
+                    case Part.QUALITY_E:
+                        if (margin < -2) {
+                            p.decreaseQuality();
+                            if ((margin < -5) && !campaignOptions.useUnofficialMaintenance()) {
+                                partsToDamage.put(p.getId(), 1);
+                            }
+                        } else if (margin >= 6) {
+                            p.improveQuality();
+                        }
+                        break;
+                    case Part.QUALITY_F:
+                    default:
+                        if (margin < -2) {
+                            p.decreaseQuality();
+                            if (margin < -6 && !campaignOptions.useUnofficialMaintenance()) {
+                                partsToDamage.put(p.getId(), 1);
+                            }
+                        }
+                        // TODO: award XP point if margin >= 6 (make this optional)
+                        //if (margin >= 6) {
+                        //
+                        //}
+                        break;
                 }
-                u.setLastMaintenanceReport(maintenanceReport);
-                int quality = u.getQuality();
-                String qualityString;
-                boolean reverse = getCampaignOptions().reverseQualityNames();
-                if (quality > qualityOrig) {
-                    qualityString = "<font color='green'>Overall quality improves from "
-                            + Part.getQualityName(qualityOrig, reverse) + " to " + Part.getQualityName(quality, reverse)
-                            + "</font>";
-                } else if (quality < qualityOrig) {
-                    qualityString = "<font color='red'>Overall quality declines from "
-                            + Part.getQualityName(qualityOrig, reverse) + " to " + Part.getQualityName(quality, reverse)
-                            + "</font>";
+                if (p.getQuality() > oldQuality) {
+                    partReport += ": <font color='green'>new quality is " + p.getQualityName() + "</font>";
+                } else if (p.getQuality() < oldQuality) {
+                    partReport += ": <font color='red'>new quality is " + p.getQualityName() + "</font>";
                 } else {
-                    qualityString = "Overall quality remains " + Part.getQualityName(quality, reverse);
+                    partReport += ": quality remains " + p.getQualityName();
                 }
-                String damageString = "";
-                if (nDamage > 0) {
-                    damageString += nDamage + " parts were damaged. ";
+                if (null != partsToDamage.get(p.getId())) {
+                    if (partsToDamage.get(p.getId()) > 3) {
+                        partReport += ", <font color='red'><b>part destroyed</b></font>";
+                    } else {
+                        partReport += ", <font color='red'><b>part damaged</b></font>";
+                    }
                 }
-                if (nDestroy > 0) {
-                    damageString += nDestroy + " parts were destroyed.";
-                }
-                if (!damageString.isEmpty()) {
-                    damageString = "<b><font color='red'>" + damageString + "</b></font> [<a href='REPAIR|" + u.getId()
-                            + "'>Repair bay</a>]";
-                }
-                String paidString = "";
-                if (!paidMaintenance) {
-                    paidString = "<font color='red'>Could not afford maintenance costs, so check is at a penalty.</font>";
-                }
-                addReport(techNameLinked + " performs maintenance on " + u.getHyperlinkedName() + ". " + paidString
-                        + qualityString + ". " + damageString + " [<a href='MAINTENANCE|" + u.getId()
-                        + "'>Get details</a>]");
+                maintenanceReport.append(partReport).append("<br>");
             }
-            u.resetDaysSinceMaintenance();
+            int nDamage = 0;
+            int nDestroy = 0;
+            for (int key : partsToDamage.keySet()) {
+                Part p = getPart(key);
+                if (null != p) {
+                    int damage = partsToDamage.get(key);
+                    if (damage > 3) {
+                        nDestroy++;
+                        p.remove(false);
+                    } else {
+                        p.doMaintenanceDamage(damage);
+                        nDamage++;
+                    }
+                }
+            }
+            u.setLastMaintenanceReport(maintenanceReport.toString());
+            int quality = u.getQuality();
+            String qualityString;
+            boolean reverse = getCampaignOptions().reverseQualityNames();
+            if (quality > qualityOrig) {
+                qualityString = "<font color='green'>Overall quality improves from "
+                        + Part.getQualityName(qualityOrig, reverse) + " to " + Part.getQualityName(quality, reverse)
+                        + "</font>";
+            } else if (quality < qualityOrig) {
+                qualityString = "<font color='red'>Overall quality declines from "
+                        + Part.getQualityName(qualityOrig, reverse) + " to " + Part.getQualityName(quality, reverse)
+                        + "</font>";
+            } else {
+                qualityString = "Overall quality remains " + Part.getQualityName(quality, reverse);
+            }
+            String damageString = "";
+            if (nDamage > 0) {
+                damageString += nDamage + " parts were damaged. ";
+            }
+            if (nDestroy > 0) {
+                damageString += nDestroy + " parts were destroyed.";
+            }
+            if (!damageString.isEmpty()) {
+                damageString = "<b><font color='red'>" + damageString + "</b></font> [<a href='REPAIR|" + u.getId()
+                        + "'>Repair bay</a>]";
+            }
+            String paidString = "";
+            if (!paidMaintenance) {
+                paidString = "<font color='red'>Could not afford maintenance costs, so check is at a penalty.</font>";
+            }
+            addReport(techNameLinked + " performs maintenance on " + u.getHyperlinkedName() + ". " + paidString
+                    + qualityString + ". " + damageString + " [<a href='MAINTENANCE|" + u.getId()
+                    + "'>Get details</a>]");
         }
+        u.resetDaysSinceMaintenance();
     }
 
     public void initTimeInService() {
         for (Person p : getPersonnel()) {
             Date join = null;
             for (LogEntry e : p.getPersonnelLog()) {
-                if (join == null){
+                if (join == null) {
                     // If by some nightmare there is no Joined date just use the first entry.
                     join = e.getDate();
                 }
@@ -8243,15 +8163,14 @@ public class Campaign implements Serializable, ITechManager {
             }
             if (!p.isDependent() && !p.isPrisoner() && !p.isBondsman()) {
                 GregorianCalendar cal = (GregorianCalendar) GregorianCalendar.getInstance();
-                // For that one in a billion chance the log is empty. Clone todays date and subtract a year
+                // For that one in a billion chance the log is empty. Clone today's date and subtract a year
                 if (join == null) {
                     cal = (GregorianCalendar)calendar.clone();
                     cal.add(Calendar.YEAR, -1);
-                    p.setRecruitment(cal);
                 } else {
                     cal.setTime(join);
-                    p.setRecruitment(cal);
                 }
+                p.setRecruitment(cal);
             }
         }
     }
@@ -8310,13 +8229,10 @@ public class Campaign implements Serializable, ITechManager {
                                     || ms.getWeightClass() < megamek.common.EntityWeightClass.WEIGHT_ASSAULT)) {
                                 p.setOriginalUnitWeight(ms.getWeightClass());
                                 if (ms.isClan()) {
-                                    p.setOriginalUnitTech(2);
+                                    p.setOriginalUnitTech(Person.TECH_CLAN);
                                 } else if (ms.getYear() > 3050) {
-                                    /*
-                                    * We're only guessing anyway, so we use this hack to avoid actually loading the
-                                    * entity to check for IS2
-                                    */
-                                    p.setOriginalUnitTech(1);
+                                    // TODO : Fix this so we aren't using a hack that just assumes IS2
+                                    p.setOriginalUnitTech(Person.TECH_IS2);
                                 }
                                 if (null != p.getUnitId() && null != units.get(p.getUnitId())
                                         && ms.getName().equals(units.get(p.getUnitId()).getEntity().getShortNameRaw())) {

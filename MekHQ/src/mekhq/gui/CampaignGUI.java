@@ -1054,8 +1054,8 @@ public class CampaignGUI extends JPanel {
             Method method = clazz.getMethod(methodName, Window.class, boolean.class);
             method.invoke(null, window, true);
         } catch (Throwable t) {
-            System.err.println("Full screen mode is not supported");
-            t.printStackTrace();
+            MekHQ.getLogger().error(CampaignGUI.class, "enableFullScreenMode",
+                    "Full screen mode is not supported", t);
         }
     }
 
@@ -1466,7 +1466,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void menuMekHqOptionsActionPerformed(ActionEvent evt) {
-        MekHqOptionsDialog dialog = new MekHqOptionsDialog(getFrame(), MekHQ.getLogger());
+        MekHqOptionsDialog dialog = new MekHqOptionsDialog(getFrame());
         dialog.setVisible(true);
     }
 
@@ -1690,17 +1690,6 @@ public class CampaignGUI extends JPanel {
     /**
      * Shows a dialog that lets the user select a tech for a task on a particular unit
      *
-     * @param u    The unit to be serviced, used to filter techs for skill on the unit.
-     * @param desc The description of the task
-     * @return     The ID of the selected tech, or null if none is selected.
-     */
-    public @Nullable UUID selectTech(Unit u, String desc) {
-        return selectTech(u, desc, false);
-    }
-
-    /**
-     * Shows a dialog that lets the user select a tech for a task on a particular unit
-     *
      * @param u                 The unit to be serviced, used to filter techs for skill on the unit.
      * @param desc              The description of the task
      * @param ignoreMaintenance If true, ignores the time required for maintenance tasks when displaying
@@ -1709,17 +1698,15 @@ public class CampaignGUI extends JPanel {
      */
     public @Nullable UUID selectTech(Unit u, String desc, boolean ignoreMaintenance) {
         String name;
-        HashMap<String, Person> techHash = new HashMap<>();
+        Map<String, Person> techHash = new LinkedHashMap<>();
         for (Person tech : getCampaign().getTechs()) {
-            if (tech.canTech(u.getEntity()) && !tech.isMothballing()) {
+            if (!tech.isMothballing() && tech.canTech(u.getEntity())) {
                 int time = tech.getMinutesLeft();
                 if (!ignoreMaintenance) {
                     time -= Math.max(0, tech.getMaintenanceTimeUsing());
                 }
-                name = tech.getFullName()
-                        + ", "
-                        + SkillType.getExperienceLevelName(tech
-                        .getSkillForWorkingOn(u).getExperienceLevel())
+                name = tech.getFullTitle() + ", "
+                        + SkillType.getExperienceLevelName(tech.getSkillForWorkingOn(u).getExperienceLevel())
                         + " (" + time + "min)";
                 techHash.put(name, tech);
             }
@@ -1730,23 +1717,16 @@ public class CampaignGUI extends JPanel {
                     JOptionPane.WARNING_MESSAGE);
             return null;
         }
-        String[] techNames = new String[techHash.keySet().size()];
-        int i = 0;
-        for (String n : techHash.keySet()) {
-            techNames[i] = n;
-            i++;
-        }
+
+        Object[] nameArray = techHash.keySet().toArray();
+
         String s = (String) JOptionPane.showInputDialog(frame,
                 "Which tech should work on " + desc + "?", "Select Tech",
-                JOptionPane.PLAIN_MESSAGE, null, techNames, techNames[0]);
+                JOptionPane.PLAIN_MESSAGE, null, nameArray, nameArray[0]);
         if (null == s) {
             return null;
         }
         return techHash.get(s).getId();
-    }
-
-    public Part getPartByNameAndDetails(String pnd) {
-        return getCampaign().getPartsStore().getByNameAndDetails(pnd);
     }
 
     /**
@@ -1839,14 +1819,13 @@ public class CampaignGUI extends JPanel {
                             report = "Unsupported FileType in Export Units";
                         }
                         JOptionPane.showMessageDialog(mainPanel, report);
-
                     });
         } else {
             JOptionPane.showMessageDialog(mainPanel, resourceMap.getString("dlgNoUnits"));
         }
     }
 
-    /**
+     /**
      * Exports Finances to a file (CSV, XML, etc.)
      * @param format        file format to export to
      * @param dialogTitle   title of the dialog frame
@@ -1921,8 +1900,8 @@ public class CampaignGUI extends JPanel {
             // Open up the file.
             try (InputStream is = new FileInputStream(unitFile)) {
                 parser.parse(is);
-            } catch (Exception excep) {
-                excep.printStackTrace(System.err);
+            } catch (Exception e) {
+                MekHQ.getLogger().error(getClass(), "loadListFile", e);
             }
 
             // Was there any error in parsing?
@@ -2007,7 +1986,7 @@ public class CampaignGUI extends JPanel {
                 }
 
                 if (p != null) {
-                    getCampaign().addPersonWithoutId(p, true);
+                    getCampaign().recruitPerson(p, p.isPrisoner(), p.isDependent(), true, true);
 
                     // Clear some values we no longer should have set in case this
                     // has transferred campaigns or things in the campaign have
@@ -2486,8 +2465,8 @@ public class CampaignGUI extends JPanel {
             // other stuff
             try {
                 lab.refreshRefitSummary();
-            } catch (Exception err) {
-                err.printStackTrace();
+            } catch (Exception e) {
+                MekHQ.getLogger().error(getClass(), "refreshLab", e);
             }
         }
     }
