@@ -330,3 +330,119 @@ message ForceUnit {
     // The name of the Unit's commander.
     string commander = 3;
 }
+
+// Represents a Scenario within a Campaign.
+message ScenarioIdentifier {
+    // The unique identifier of the Campaign
+    // who owns the scenario
+    string source_id = 1;
+
+    // The unique identifier of the Contract
+    // for the source campaign
+    int32 contract_id = 2;
+
+    // The unique identifier of the Scenario
+    // within the Contract
+    int32 scenario_id = 3;
+}
+
+// Represents a Force assigned to a Scenario
+message ScenarioForce {
+    // The unique identifier of the Campaign
+    // which owns this force, or null if
+    // the owner is a bot.
+    string owner_id = 1;
+
+    // The name of the force's owner.
+    string owner_name = 2;
+
+    // The team number of the force's owner.
+    int32 team = 3;
+
+    // An optional Force assigned to the Scenario.
+    Force force = 4;
+
+    // Zero-or-more units assigned to the Scenario.
+    repeated ForceUnit units = 5;
+}
+
+// Represents the details of a Scenario.
+message ScenarioDetails {
+    // The unique identifier the Scenario.
+    ScenarioIdentifier scenario = 1;
+
+    // The date of the scenario (ISO 8601).
+    string date = 2;
+
+    // The name of the Scenario.
+    string name = 3;
+
+    // A description of the Scenario.
+    string description = 4;
+
+    // Zero or more objectives for the Scenario.
+    repeated ScenarioObjective objectives = 5;
+
+    // The forces assigned to the Scenario
+    repeated ScenarioForce forces = 6;
+}
+
+// Represents an invitation to join a Scenario.
+message ScenarioInvitation {
+    // The details of the Scenario.
+    ScenarioDetails scenario = 1;
+
+    // The unique identifier of the Campaign
+    // who is receiving the invitation
+    string target_id = 2;
+}
+
+// Represents a message sent when the source or
+// target campaign would no longer like to participate
+// in a scenario together.
+message ScenarioInvitationCancelled {
+    // The unique identifier the Scenario
+    ScenarioIdentifier scenario_id = 1;
+
+    // The unique identifier of the Campaign
+    // who recieved the invitation
+    string target_id = 2;
+}
+
+// Represents a message sent when the target
+// campaign accepts a request to participate
+// in a scenario.
+message ScenarioInvitationAcceptance {
+    // The unique identifier the Scenario
+    ScenarioIdentifier scenario_id = 1;
+
+    // The unique identifier of the Campaign
+    // who recieved the invitation
+    string target_id = 2;
+}
+
+// Represents a message sent when the details
+// of a scenario are updated.
+message ScenarioDetailsUpdated {
+    // The details of the Scenario.
+    ScenarioDetails scenario = 1;
+
+    // The unique identifier of the Campaign
+    // who should receive the update.
+    string target_id = 2;
+}
+
+// Represents a message sent when the target
+// campaign updates their units deployed to
+// the scenario.
+message ScenarioUnitsUpdated {
+    // The unique identifier the Scenario
+    ScenarioIdentifier scenario_id = 1;
+
+    // The unique identifier of the Campaign
+    // who recieved the invitation
+    string target_id = 2;
+
+    // Zero or more forces attached to the Scenario.
+    repeated ScenarioForce attached_forces = 3;
+}
