@@ -475,129 +475,129 @@ public class ResolveScenarioTracker {
             if (null == en) {
                 continue;
             }
-            // check for an ejected entity and if we find one then assign it instead to switch vees
-            // over to infantry checks for casualties
-            Entity ejected = ejections.get(UUID.fromString(en.getCrew().getExternalIdAsString()));
-            // determine total casualties for infantry and large craft
-            int casualties = 0;
-            int casualtiesAssigned = 0;
-            Infantry infantry = null;
-            if (en instanceof Infantry) {
-                infantry = (Infantry) en;
-            } else if (ejected != null) {
-                infantry = (Infantry) ejected;
-            }
-            if (infantry != null) {
-                infantry.applyDamage();
-                // If reading from a MUL, the shooting strength is set to Integer.MAX_VALUE if there is no damage.
-                int strength = Math.min(infantry.getShootingStrength(), crew.size());
-                casualties = crew.size() - strength;
-                if (unitStatus.isTotalLoss()) {
-                    casualties = crew.size();
-                }
-                // If a tank has already taken hits to the commander or driver, do not assign them again.
-                if (en instanceof Tank) {
-                    if (((Tank) en).isDriverHit()) {
-                        casualtiesAssigned++;
-                    }
-                    if (((Tank) en).isCommanderHit()) {
-                        casualtiesAssigned++;
-                    }
-                }
-            }
+            //Handle ejected spacecraft a bit differently
             if ((en instanceof SmallCraft) || (en instanceof Jumpship)) {
-                //need to check for existing hits because you can fly aeros with less than full
-                //crew
-                int existingHits = 0;
-                int currentHits = 0;
-                if (null != u.getEntity().getCrew()) {
-                    existingHits = u.getEntity().getCrew().getHits();
+                processEjectedLargeCraft(u, en, crew, unitStatus);
+            } else {
+                // check for an ejected entity and if we find one then assign it instead to switch vees
+                // over to infantry checks for casualties
+                Entity ejected = ejections.get(UUID.fromString(en.getCrew().getExternalIdAsString()));
+                // determine total casualties for infantry and large craft
+                int casualties = 0;
+                int casualtiesAssigned = 0;
+                Infantry infantry = null;
+                if (en instanceof Infantry) {
+                    infantry = (Infantry) en;
+                } else if (ejected != null) {
+                    infantry = (Infantry) ejected;
                 }
-                if (null != en.getCrew()) {
-                    currentHits = en.getCrew().getHits();
-                }
-                int newHits = Math.max(0, currentHits - existingHits);
-                casualties = (int) Math.ceil(Compute.getFullCrewSize(en) * (newHits / 6.0));
-            }
-            //try to find the crew in our pilot and mia vectors
-            Crew pilot = pilots.get(u.getCommander().getId());
-            boolean missingCrew = false;
-            //For multi-crew cockpits, the crew id is the first slot, which is not necessarily the commander
-            if (null == pilot) {
-                for (Person p : u.getCrew()) {
-                    if (pilots.containsKey(p.getId())) {
-                        pilot = pilots.get(p.getId());
-                        break;
+                if (infantry != null) {
+                    infantry.applyDamage();
+                    // If reading from a MUL, the shooting strength is set to Integer.MAX_VALUE if there is no damage.
+                    int strength = Math.min(infantry.getShootingStrength(), crew.size());
+                    casualties = crew.size() - strength;
+                    if (unitStatus.isTotalLoss()) {
+                        casualties = crew.size();
+                    }
+                    // If a tank has already taken hits to the commander or driver, do not assign them again.
+                    if (en instanceof Tank) {
+                        if (((Tank) en).isDriverHit()) {
+                            casualtiesAssigned++;
+                        }
+                        if (((Tank) en).isCommanderHit()) {
+                            casualtiesAssigned++;
+                        }
                     }
                 }
-            }
-            if (null == pilot) {
-                pilot = mia.get(UUID.fromString(en.getCrew().getExternalIdAsString()));
-                missingCrew = true;
-            }
-            for(Person p : crew) {
-                PersonStatus status = new PersonStatus(p.getFullName(), u.getEntity().getDisplayName(),
-                        p.getHits(), p.getId());
-                status.setMissing(missingCrew);
-                // if the pilot was not found in either the pilot or mia vector
-                // then the unit was devastated and no one ejected, so they should be dead, really dead
+                //try to find the crew in our pilot and mia vectors
+                Crew pilot = pilots.get(u.getCommander().getId());
+                boolean missingCrew = false;
+                //For multi-crew cockpits, the crew id is the first slot, which is not necessarily the commander
                 if (null == pilot) {
-                    status.setHits(6);
-                    status.setDead(true);
-                }
-                // multi-crewed cockpit; set each crew member separately
-                else if (pilot.getSlotCount() > 1) {
-                    for (int slot = 0; slot < pilot.getSlotCount(); slot++) {
-                        if (p.getId().toString().equals(pilot.getExternalIdAsString(slot))) {
-                            status.setHits(pilot.getHits(slot));
+                    for (Person p : u.getCrew()) {
+                        if (pilots.containsKey(p.getId())) {
+                            pilot = pilots.get(p.getId());
                             break;
                         }
                     }
-                // else if: can't do the following by u.usesSoloPilot because entity may be different if ejected
-                } else if (en instanceof Mech || en instanceof Protomech || en.isFighter()) {
-                    status.setHits(pilot.getHits());
-                } else {
-                    // we have a multi-crewed Vehicle/Aero/Infantry
-                    boolean wounded = false;
-                    // tanks need to be handled specially because of the special crits and because
-                    // tank destruction should "kill" the crew
-                    if (en instanceof Tank) {
-                        boolean destroyed = false;
-                        for (int loc = 0; loc < en.locations(); loc++) {
-                            if (loc == Tank.LOC_TURRET || loc == Tank.LOC_TURRET_2 || loc == Tank.LOC_BODY) {
-                                continue;
-                            }
-                            if (en.getInternal(loc) <= 0) {
-                                destroyed = true;
+                }
+                if (null == pilot) {
+                    pilot = mia.get(UUID.fromString(en.getCrew().getExternalIdAsString()));
+                    missingCrew = true;
+                }
+                for(Person p : crew) {
+                    PersonStatus status = new PersonStatus(p.getFullName(), u.getEntity().getDisplayName(),
+                            p.getHits(), p.getId());
+                    status.setMissing(missingCrew);
+                    // if the pilot was not found in either the pilot or mia vector
+                    // then the unit was devastated and no one ejected, so they should be dead, really dead
+                    if (null == pilot) {
+                        status.setHits(6);
+                        status.setDead(true);
+                    }
+                    // multi-crewed cockpit; set each crew member separately
+                    else if (pilot.getSlotCount() > 1) {
+                        for (int slot = 0; slot < pilot.getSlotCount(); slot++) {
+                            if (p.getId().toString().equals(pilot.getExternalIdAsString(slot))) {
+                                status.setHits(pilot.getHits(slot));
                                 break;
                             }
                         }
-                        if (destroyed || null == en.getCrew() || en.getCrew().isDead()) {
-                            if (Compute.d6(2) >= 7) {
-                                wounded = true;
-                            } else {
-                                status.setHits(6);
-                                status.setDead(true);
+                    // else if: can't do the following by u.usesSoloPilot because entity may be different if ejected
+                    } else if (en instanceof Mech || en instanceof Protomech || en.isFighter()) {
+                        status.setHits(pilot.getHits());
+                    } else {
+                        // we have a multi-crewed Vehicle/Aero/Infantry
+                        boolean wounded = false;
+                        // tanks need to be handled specially because of the special crits and because
+                        // tank destruction should "kill" the crew
+                        if (en instanceof Tank) {
+                            boolean destroyed = false;
+                            for (int loc = 0; loc < en.locations(); loc++) {
+                                if (loc == Tank.LOC_TURRET || loc == Tank.LOC_TURRET_2 || loc == Tank.LOC_BODY) {
+                                    continue;
+                                }
+                                if (en.getInternal(loc) <= 0) {
+                                    destroyed = true;
+                                    break;
+                                }
                             }
-                        } else if (((Tank)en).isDriverHit() && u.isDriver(p)) {
-                            if(Compute.d6(2) >= 7) {
-                                wounded = true;
-                            } else {
-                                status.setHits(6);
-                                status.setDead(true);
+                            if (destroyed || null == en.getCrew() || en.getCrew().isDead()) {
+                                if (Compute.d6(2) >= 7) {
+                                    wounded = true;
+                                } else {
+                                    status.setHits(6);
+                                    status.setDead(true);
+                                }
+                            } else if (((Tank)en).isDriverHit() && u.isDriver(p)) {
+                                if(Compute.d6(2) >= 7) {
+                                    wounded = true;
+                                } else {
+                                    status.setHits(6);
+                                    status.setDead(true);
+                                }
+                            } else if (((Tank)en).isCommanderHit() && (u.isCommander(p)
+                                    || u.isTechOfficer(p))) {
+                                //If there is a command console, the commander hit flag is set on the second such critical,
+                                //which means both commanders have been hit.
+                                if(Compute.d6(2) >= 7) {
+                                    wounded = true;
+                                } else {
+                                    status.setHits(6);
+                                    status.setDead(true);
+                                }
+                            } else if (((Tank)en).isUsingConsoleCommander() && u.isCommander(p)) {
+                                //This flag is set after the first commander hit critical.
+                                if(Compute.d6(2) >= 7) {
+                                    wounded = true;
+                                } else {
+                                    status.setHits(6);
+                                    status.setDead(true);
+                                }
                             }
-                        } else if (((Tank)en).isCommanderHit() && (u.isCommander(p)
-                                || u.isTechOfficer(p))) {
-                            //If there is a command console, the commander hit flag is set on the second such critical,
-                            //which means both commanders have been hit.
-                            if(Compute.d6(2) >= 7) {
-                                wounded = true;
-                            } else {
-                                status.setHits(6);
-                                status.setDead(true);
-                            }
-                        } else if (((Tank)en).isUsingConsoleCommander() && u.isCommander(p)) {
-                            //This flag is set after the first commander hit critical.
+                        }
+                        if(casualtiesAssigned < casualties) {
+                            casualtiesAssigned++;
                             if(Compute.d6(2) >= 7) {
                                 wounded = true;
                             } else {
@@ -605,28 +605,19 @@ public class ResolveScenarioTracker {
                                 status.setDead(true);
                             }
                         }
-                    }
-                    if(casualtiesAssigned < casualties) {
-                        casualtiesAssigned++;
-                        if(Compute.d6(2) >= 7) {
-                            wounded = true;
-                        } else {
-                            status.setHits(6);
-                            status.setDead(true);
+                        if(wounded) {
+                            int hits = campaign.getCampaignOptions().getMinimumHitsForVees();
+                            if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVees()) {
+                                int range = 6 - hits;
+                                hits = hits + Compute.randomInt(range);
+                            }
+                            status.setHits(hits);
                         }
                     }
-                    if(wounded) {
-                        int hits = campaign.getCampaignOptions().getMinimumHitsForVees();
-                        if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVees()) {
-                            int range = 6 - hits;
-                            hits = hits + Compute.randomInt(range);
-                        }
-                        status.setHits(hits);
-                    }
+                    status.setXP(campaign.getCampaignOptions().getScenarioXP());
+                    status.setDeployed(!en.wasNeverDeployed());
+                    peopleStatus.put(p.getId(), status);
                 }
-                status.setXP(campaign.getCampaignOptions().getScenarioXP());
-                status.setDeployed(!en.wasNeverDeployed());
-                peopleStatus.put(p.getId(), status);
             }
         }
 
@@ -635,6 +626,30 @@ public class ResolveScenarioTracker {
             processPrisonerCapture(potentialSalvage);
             processPrisonerCapture(devastatedEnemyUnits);
         }
+    }
+    
+    /**
+     * Helper function that handles crew and passengers ejected from a large spacecraft,
+     * which may be scattered about on numerous other entities
+     * @param ship The large craft unit we're currently processing
+     * @param en The entity associated with the unit Ship
+     * @param crew The list of persons assigned to the ship as crew and marines
+     * @param unitStatus The post-battle status of en
+     */
+    private void processEjectedLargeCraft(Unit ship, Entity en, List<Person> crew, UnitStatus unitStatus) {
+        //Check crewed aeros for existing hits since they could be flying without full crews
+        int casualties = 0;
+        int casualtiesAssigned = 0;
+        int existingHits = 0;
+        int currentHits = 0;
+        if (null != ship.getEntity().getCrew()) {
+            existingHits = ship.getEntity().getCrew().getHits();
+        }
+        if (null != en.getCrew()) {
+            currentHits = en.getCrew().getHits();
+        }
+        int newHits = Math.max(0, currentHits - existingHits);
+        casualties = (int) Math.ceil(Compute.getFullCrewSize(en) * (newHits / 6.0));
     }
 
     /**
