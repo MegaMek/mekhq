@@ -31,6 +31,7 @@ VERSION HISTORY:
 + PR #1533: Windchild's Personnel Improvements, covering Issues #765, #876, #1404, #1482, #1486, #1492
 + Issue #1524: Sort P_NONE Personnel as Support Personnel
 + Issues #1542 and #1417: Hangar Tab Popup List: Bulk Selection and Rank Fixes
++ PR #1556: Updating Unit Rating wording
 
 v0.47.4 (2020-2-09 2200 UTC)
 + PR #1440: Implement "Rugged" quirk (2x or 3x between maintenance rolls)
