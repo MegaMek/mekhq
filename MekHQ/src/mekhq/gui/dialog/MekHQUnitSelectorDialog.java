@@ -57,12 +57,19 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         super(frame, unitLoadingDialog);
         this.campaign = campaign;
         this.addToCampaign = addToCampaign;
+
+        updateOptionValues();
+
+        initialize();
+    }
+
+    @Override
+    public void updateOptionValues() {
+        gameOptions = campaign.getGameOptions();
         enableYearLimits = campaign.getCampaignOptions().limitByYear();
         allowedYear = campaign.getCalendar().get(GregorianCalendar.YEAR);
         canonOnly = campaign.getCampaignOptions().allowCanonOnly();
         gameTechLevel = campaign.getCampaignOptions().getTechLevel();
-
-        initialize();
     }
 
     @Override
