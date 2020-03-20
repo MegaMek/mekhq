@@ -614,7 +614,7 @@ public class CampaignGUI extends JPanel {
 
         //region menuImport
         // The Import menu uses the following Mnemonic keys as of 19-MAR-2020:
-        // A, C, L, P
+        // A, C, F, P
         JMenu menuImport = new JMenu(resourceMap.getString("menuImport.text")); // NOI18N
         menuImport.setMnemonic(KeyEvent.VK_I);
 
@@ -634,7 +634,7 @@ public class CampaignGUI extends JPanel {
         menuImport.add(miImportParts);
 
         JMenuItem miLoadForces = new JMenuItem(resourceMap.getString("miLoadForces.text")); // NOI18N
-        miLoadForces.setMnemonic(KeyEvent.VK_L);
+        miLoadForces.setMnemonic(KeyEvent.VK_F);
         miLoadForces.addActionListener(this::miLoadForcesActionPerformed);
         menuImport.add(miLoadForces);
 
@@ -643,7 +643,7 @@ public class CampaignGUI extends JPanel {
 
         //region menuExport
         // The Export menu uses the following Mnemonic keys as of 19-March-2020:
-        // C, E, X
+        // C, X, S
         JMenu menuExport = new JMenu(resourceMap.getString("menuExport.text")); // NOI18N
         menuExport.setMnemonic(KeyEvent.VK_X);
 
@@ -689,7 +689,7 @@ public class CampaignGUI extends JPanel {
         miExportCSVFile.add(miExportFinancesCSV);
 
         JMenuItem miExportCampaignSubset = new JMenuItem(resourceMap.getString("miExportCampaignSubset.text"));
-        miExportCampaignSubset.setMnemonic(KeyEvent.VK_E);
+        miExportCampaignSubset.setMnemonic(KeyEvent.VK_S);
         miExportCampaignSubset.addActionListener(evt -> {
             CampaignExportWizard cew = new CampaignExportWizard(getCampaign());
             cew.display(CampaignExportWizard.CampaignExportWizardState.ForceSelection);
