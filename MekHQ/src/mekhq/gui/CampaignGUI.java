@@ -784,6 +784,10 @@ public class CampaignGUI extends JPanel {
         menuHire.setMnemonic(KeyEvent.VK_H);
         for (int i = Person.T_MECHWARRIOR; i < Person.T_NUM; i++) {
             JMenuItem miHire = new JMenuItem(Person.getRoleDesc(i, getCampaign().getFaction().isClan()));
+            int miHireMnemonic = Person.getRoleMnemonic(i);
+            if (miHireMnemonic != KeyEvent.VK_UNDEFINED) {
+                miHire.setMnemonic(miHireMnemonic);
+            }
             miHire.setActionCommand(Integer.toString(i));
             miHire.addActionListener(this::hirePerson);
             menuHire.add(miHire);
