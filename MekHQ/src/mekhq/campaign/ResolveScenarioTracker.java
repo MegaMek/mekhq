@@ -475,9 +475,9 @@ public class ResolveScenarioTracker {
             if (null == en) {
                 continue;
             }
-            //Handle ejected spacecraft a bit differently
+            //Handle spacecraft a bit differently
             if ((en instanceof SmallCraft) || (en instanceof Jumpship)) {
-                processEjectedLargeCraft(u, en, crew, unitStatus);
+                processLargeCraft(u, en, crew, unitStatus);
             } else {
                 // check for an ejected entity and if we find one then assign it instead to switch vees
                 // over to infantry checks for casualties
@@ -636,7 +636,38 @@ public class ResolveScenarioTracker {
      * @param crew The list of persons assigned to the ship as crew and marines
      * @param unitStatus The post-battle status of en
      */
-    private void processEjectedLargeCraft(Unit ship, Entity en, List<Person> crew, UnitStatus unitStatus) {
+    private void processLargeCraft(Unit ship, Entity en, List<Person> personnel, UnitStatus unitStatus) {
+        final String METHOD_NAME = "processLargeCraft(Unit,Entity,List<Person>,UnitStatus)"; //$NON-NLS-1$
+        //The entity must be an Aero for us to get here
+        Aero aero = (Aero) en;
+        //Find out if this large craft ejected or was in the process of ejecting, 
+        // and if so what entities are carrying the personnel
+        int rescuedCrew = 0;
+        if (en.getCrew().isEjected() || aero.isEjecting()) {
+            for (String id : aero.getEscapeCraft()) {
+                Entity e = entities.get(UUID.fromString(id));
+                // Invalid entity?
+                if (e == null) {
+                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                            "Null entity reference in:" + aero.getDisplayName() + "getEscapeCraft()");
+                }
+                //If the escape craft was destroyed in combat, skip it
+                if (e.isDestroyed() || e.isDoomed()) {
+                    continue;
+                }
+                if (e instanceof SmallCraft) {
+                    SmallCraft craft = (SmallCraft) e;
+                    if (craft.getNOtherCrew().get(e.getExternalIdAsString()) != null) {
+                        rescuedCrew += craft.getNOtherCrew().get(id);
+                    }
+                } else if (e instanceof EjectedCrew) {
+                    EjectedCrew crew = (EjectedCrew) e;
+                    if (crew.getNOtherCrew().get(e.getExternalIdAsString()) != null) {
+                        rescuedCrew += crew.getNOtherCrew().get(id);
+                    }
+                }
+            }
+        }
         //Check crewed aeros for existing hits since they could be flying without full crews
         int casualties = 0;
         int casualtiesAssigned = 0;
@@ -650,6 +681,7 @@ public class ResolveScenarioTracker {
         }
         int newHits = Math.max(0, currentHits - existingHits);
         casualties = (int) Math.ceil(Compute.getFullCrewSize(en) * (newHits / 6.0));
+        casualties -= Math.max(0, casualties - rescuedCrew);
     }
 
     /**
