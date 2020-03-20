@@ -981,7 +981,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             case (T_NONE):
                 return "None";
             case (T_MECHWARRIOR):
-                return "Mechwarrior";
+                return "MechWarrior";
             case (T_GVEE_DRIVER):
                 return "Vehicle Driver";
             case (T_NVEE_DRIVER):
@@ -993,9 +993,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
             case (T_CONV_PILOT):
                 return "Conventional Aircraft Pilot";
             case (T_AERO_PILOT):
-                return "Aero Pilot";
+                return "Aerospace Pilot";
             case (T_PROTO_PILOT):
-                return "Proto Pilot";
+                return "ProtoMech Pilot";
             case (T_BA):
                 if (clan) {
                     return "Elemental";
