@@ -606,13 +606,10 @@ public class CampaignGUI extends JPanel {
         menuSave.addActionListener(this::menuSaveXmlActionPerformed);
         menuFile.add(menuSave);
 
-        // TODO : Windchild finish implementing and test this new menu option
-        /*
         JMenuItem menuNew = new JMenuItem(resourceMap.getString("menuNew.text"));
         menuNew.setMnemonic(KeyEvent.VK_N);
-        menuNew.addActionListener(this::menuNewActionPerformed);
+        menuNew.addActionListener(this::menuNewCampaignActionPerformed);
         menuFile.add(menuNew);
-         */
 
         //region menuImport
         // The Import menu uses the following Mnemonic keys as of 19-MAR-2020:
@@ -1487,6 +1484,11 @@ public class CampaignGUI extends JPanel {
 
     private File selectLoadCampaignFile() {
         return FileDialogs.openCampaign(frame).orElse(null);
+    }
+
+    private void menuNewCampaignActionPerformed(ActionEvent e) {
+        DataLoadingDialog dataLoadingDialog = new DataLoadingDialog(app, frame, null);
+        dataLoadingDialog.setVisible(true);
     }
 
     private void btnOvertimeActionPerformed(java.awt.event.ActionEvent evt) {
