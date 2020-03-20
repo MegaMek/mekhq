@@ -234,8 +234,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                     return false;
                 }
             };
-        } catch (PatternSyntaxException e) {
-            MekHQ.getLogger().error(getClass(), "filterUnits", "I've been ignored, HELP");
+        } catch (PatternSyntaxException ignored) {
             return;
         }
         sorter.setRowFilter(unitTypeFilter);
