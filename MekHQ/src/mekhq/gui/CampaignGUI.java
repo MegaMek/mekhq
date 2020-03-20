@@ -1033,9 +1033,9 @@ public class CampaignGUI extends JPanel {
         menuHelp.setMnemonic(KeyEvent.VK_H);
         menuHelp.setName("helpMenu"); // NOI18N
 
-        JMenuItem menuAboutItem = new JMenuItem("aboutMenuItem"); // NOI18N
+        JMenuItem menuAboutItem = new JMenuItem(resourceMap.getString("menuAbout.text"));
         menuAboutItem.setMnemonic(KeyEvent.VK_A);
-        menuAboutItem.setText(resourceMap.getString("menuAbout.text"));
+        menuAboutItem.setName("aboutMenuItem");
         menuAboutItem.addActionListener(evt -> showAboutBox());
         menuHelp.add(menuAboutItem);
 
