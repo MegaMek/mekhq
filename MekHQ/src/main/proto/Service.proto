@@ -346,6 +346,18 @@ message ScenarioIdentifier {
     int32 scenario_id = 3;
 }
 
+// Represents the deployment details of a Force
+// within a Scenario.
+message ForceDeployment {
+    // The number of rounds the force will be delayed
+    // upon deployment.
+    int32 deployment_delay = 1;
+
+    // The edge of the board the force will be deployed
+    // to.
+    int32 board_start = 2;
+}
+
 // Represents a Force assigned to a Scenario
 message ScenarioForce {
     // The unique identifier of the Campaign
@@ -364,6 +376,24 @@ message ScenarioForce {
 
     // Zero-or-more units assigned to the Scenario.
     repeated ForceUnit units = 5;
+
+    // Details of how the force will be deployed
+    // in the Scenario.
+    //
+    // This is sent by the Host Campaign only.
+    ForceDeployment deployment = 6;
+}
+
+// Represents an objective within a Scenario.
+message ScenarioObjective {
+    // A description of the objective.
+    string description = 1;
+
+    // Zero or more forces affected by the objective.
+    repeated string affected_forces = 2;
+
+    // Zero or more units affected by the objective.
+    repeated string affected_units = 3;
 }
 
 // Represents the details of a Scenario.
