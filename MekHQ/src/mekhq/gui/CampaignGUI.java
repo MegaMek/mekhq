@@ -190,10 +190,10 @@ public class CampaignGUI extends JPanel {
 
     private void showDailyReportDialog() {
         mainPanel.remove(panLog);
-        miDetachLog.setEnabled(false);
-        miAttachLog.setEnabled(true);
         mainPanel.setOneTouchExpandable(false);
         logDialog.setVisible(true);
+        miAttachLog.setVisible(logDialog.isVisible());
+        miDetachLog.setVisible(!logDialog.isVisible());
         refreshReport();
         this.revalidate();
         this.repaint();
@@ -203,8 +203,8 @@ public class CampaignGUI extends JPanel {
         logDialog.setVisible(false);
         mainPanel.setRightComponent(panLog);
         mainPanel.setOneTouchExpandable(true);
-        miDetachLog.setEnabled(true);
-        miAttachLog.setEnabled(false);
+        miAttachLog.setVisible(logDialog.isVisible());
+        miDetachLog.setVisible(!logDialog.isVisible());
         this.revalidate();
         this.repaint();
     }
@@ -584,6 +584,8 @@ public class CampaignGUI extends JPanel {
     }
 
     private void initMenu() {
+        // TODO: Implement "Export All" versions for Personnel and Parts
+
         menuBar = new JMenuBar();
         // The Menu Bar uses the following Mnemonic keys as of 19-March-2020:
         // A, C, F, H, M, R, V
@@ -652,21 +654,6 @@ public class CampaignGUI extends JPanel {
         // F, P, U
         JMenu miExportCSVFile = new JMenu(resourceMap.getString("menuExportCSV.text")); // NOI18N
         miExportCSVFile.setMnemonic(KeyEvent.VK_C);
-        menuExport.add(miExportCSVFile);
-        //endregion CSV Export
-
-        //region XML Export
-        // The XML menu uses the following Mnemonic keys as of 19-March-2020:
-        // C, P
-        JMenu miExportXMLFile = new JMenu(resourceMap.getString("menuExportXML.text")); // NOI18N
-        miExportXMLFile.setMnemonic(KeyEvent.VK_X);
-        menuExport.add(miExportXMLFile);
-
-        JMenuItem miExportOptions = new JMenuItem(resourceMap.getString("miExportOptions.text")); // NOI18N
-        miExportOptions.setMnemonic(KeyEvent.VK_C);
-        miExportOptions.addActionListener(this::miExportOptionsActionPerformed);
-        miExportXMLFile.add(miExportOptions);
-        //endregion XML Export
 
         JMenuItem miExportPersonCSV = new JMenuItem(resourceMap.getString("miExportPersonnel.text")); // NOI18N
         miExportPersonCSV.setMnemonic(KeyEvent.VK_P);
@@ -678,15 +665,32 @@ public class CampaignGUI extends JPanel {
         miExportUnitCSV.addActionListener(this::miExportUnitCSVActionPerformed);
         miExportCSVFile.add(miExportUnitCSV);
 
+        JMenuItem miExportFinancesCSV = new JMenuItem(resourceMap.getString("miExportFinances.text")); // NOI18N
+        miExportFinancesCSV.setMnemonic(KeyEvent.VK_F);
+        miExportFinancesCSV.addActionListener(this::miExportFinancesCSVActionPerformed);
+        miExportCSVFile.add(miExportFinancesCSV);
+
+        menuExport.add(miExportCSVFile);
+        //endregion CSV Export
+
+        //region XML Export
+        // The XML menu uses the following Mnemonic keys as of 19-March-2020:
+        // C, P
+        JMenu miExportXMLFile = new JMenu(resourceMap.getString("menuExportXML.text")); // NOI18N
+        miExportXMLFile.setMnemonic(KeyEvent.VK_X);
+
+        JMenuItem miExportOptions = new JMenuItem(resourceMap.getString("miExportOptions.text")); // NOI18N
+        miExportOptions.setMnemonic(KeyEvent.VK_C);
+        miExportOptions.addActionListener(this::miExportOptionsActionPerformed);
+        miExportXMLFile.add(miExportOptions);
+
         JMenuItem miExportPlanetsXML = new JMenuItem(resourceMap.getString("miExportPlanets.text"));
         miExportPlanetsXML.setMnemonic(KeyEvent.VK_P);
         miExportPlanetsXML.addActionListener(this::miExportPlanetsXMLActionPerformed);
         miExportXMLFile.add(miExportPlanetsXML);
 
-        JMenuItem miExportFinancesCSV = new JMenuItem(resourceMap.getString("miExportFinances.text")); // NOI18N
-        miExportFinancesCSV.setMnemonic(KeyEvent.VK_F);
-        miExportFinancesCSV.addActionListener(this::miExportFinancesCSVActionPerformed);
-        miExportCSVFile.add(miExportFinancesCSV);
+        menuExport.add(miExportXMLFile);
+        //endregion XML Export
 
         JMenuItem miExportCampaignSubset = new JMenuItem(resourceMap.getString("miExportCampaignSubset.text"));
         miExportCampaignSubset.setMnemonic(KeyEvent.VK_S);
@@ -695,22 +699,6 @@ public class CampaignGUI extends JPanel {
             cew.display(CampaignExportWizard.CampaignExportWizardState.ForceSelection);
         });
         menuExport.add(miExportCampaignSubset);
-
-        /*
-         * TODO: Implement these as "Export All" versions
-         *
-         * miExportPerson.setText(resourceMap.getString("miExportPerson.text"));
-         * // NOI18N miExportPerson.addActionListener(new ActionListener() {
-         * public void actionPerformed(java.awt.event.ActionEvent evt) {
-         * miExportPersonActionPerformed(evt); } });
-         * menuExport.add(miExportPerson);
-         *
-         * miExportParts.setText(resourceMap.getString("miExportParts.text"));
-         * // NOI18N miExportParts.addActionListener(new ActionListener() {
-         * public void actionPerformed(java.awt.event.ActionEvent evt) {
-         * miExportPartsActionPerformed(evt); } });
-         * menuExport.add(miExportParts);
-         */
 
         menuFile.add(menuExport);
         //endregion menuExport
@@ -771,7 +759,6 @@ public class CampaignGUI extends JPanel {
         miUnitMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
         menuMarket.add(miUnitMarket);
 
-
         miShipSearch = new JMenuItem(resourceMap.getString("miShipSearch.text"));
         miShipSearch.setMnemonic(KeyEvent.VK_S);
         miShipSearch.addActionListener(ev -> showShipSearch());
@@ -816,10 +803,9 @@ public class CampaignGUI extends JPanel {
                     getFrame(), true, resourceMap.getString("popupHireAstechsNum.text"),
                     1, 0, CampaignGUI.MAX_QUANTITY_SPINNER);
             pvcd.setVisible(true);
-            if (pvcd.getValue() < 0) {
-                return;
+            if (pvcd.getValue() >= 0) {
+                getCampaign().increaseAstechPool(pvcd.getValue());
             }
-            getCampaign().increaseAstechPool(pvcd.getValue());
         });
         menuAstechPool.add(miHireAstechs);
 
@@ -830,18 +816,16 @@ public class CampaignGUI extends JPanel {
                     getFrame(), true, resourceMap.getString("popupFireAstechsNum.text"),
                     1, 0, getCampaign().getAstechPool());
             pvcd.setVisible(true);
-            if (pvcd.getValue() < 0) {
-                return;
+            if (pvcd.getValue() >= 0) {
+                getCampaign().decreaseAstechPool(pvcd.getValue());
             }
-            getCampaign().decreaseAstechPool(pvcd.getValue());
         });
         menuAstechPool.add(miFireAstechs);
 
         JMenuItem miFullStrengthAstechs = new JMenuItem(resourceMap.getString("miFullStrengthAstechs.text"));
         miFullStrengthAstechs.setMnemonic(KeyEvent.VK_B);
         miFullStrengthAstechs.addActionListener(evt -> {
-            int need = (getCampaign().getTechs().size() * 6)
-                    - getCampaign().getNumberAstechs();
+            int need = (getCampaign().getTechs().size() * 6) - getCampaign().getNumberAstechs();
             if (need > 0) {
                 getCampaign().increaseAstechPool(need);
             }
@@ -868,10 +852,9 @@ public class CampaignGUI extends JPanel {
                     getFrame(), true, resourceMap.getString("popupHireMedicsNum.text"),
                     1, 0, CampaignGUI.MAX_QUANTITY_SPINNER);
             pvcd.setVisible(true);
-            if (pvcd.getValue() < 0) {
-                return;
+            if (pvcd.getValue() >= 0) {
+                getCampaign().increaseMedicPool(pvcd.getValue());
             }
-            getCampaign().increaseMedicPool(pvcd.getValue());
         });
         menuMedicPool.add(miHireMedics);
 
@@ -882,18 +865,16 @@ public class CampaignGUI extends JPanel {
                     getFrame(), true, resourceMap.getString("popupFireMedicsNum.text"),
                     1, 0, getCampaign().getMedicPool());
             pvcd.setVisible(true);
-            if (pvcd.getValue() < 0) {
-                return;
+            if (pvcd.getValue() >= 0) {
+                getCampaign().decreaseMedicPool(pvcd.getValue());
             }
-            getCampaign().decreaseMedicPool(pvcd.getValue());
         });
         menuMedicPool.add(miFireMedics);
 
         JMenuItem miFullStrengthMedics = new JMenuItem(resourceMap.getString("miFullStrengthMedics.text"));
         miFullStrengthMedics.setMnemonic(KeyEvent.VK_B);
         miFullStrengthMedics.addActionListener(evt -> {
-            int need = (getCampaign().getDoctors().size() * 4)
-                    - getCampaign().getNumberMedics();
+            int need = (getCampaign().getDoctors().size() * 4) - getCampaign().getNumberMedics();
             if (need > 0) {
                 getCampaign().increaseMedicPool(need);
             }
@@ -966,30 +947,28 @@ public class CampaignGUI extends JPanel {
 
         miHistoricalDailyReportDialog = new JMenuItem(resourceMap.getString("miShowHistoricalReportLog.text")); // NOI18N
         miHistoricalDailyReportDialog.setMnemonic(KeyEvent.VK_H);
-        miHistoricalDailyReportDialog.setEnabled(true);
         miHistoricalDailyReportDialog.addActionListener(evt -> showHistoricalDailyReportDialog());
         menuView.add(miHistoricalDailyReportDialog);
+
+        miAttachLog = new JMenuItem(resourceMap.getString("miAttachLog.text")); // NOI18N
+        miAttachLog.setMnemonic(KeyEvent.VK_A);
+        miAttachLog.addActionListener(evt -> hideDailyReportDialog());
+        miAttachLog.setVisible(logDialog.isVisible());
+        menuView.add(miAttachLog);
 
         miDetachLog = new JMenuItem(resourceMap.getString("miDetachLog.text")); // NOI18N
         miDetachLog.setMnemonic(KeyEvent.VK_D);
         miDetachLog.addActionListener(evt -> showDailyReportDialog());
+        miDetachLog.setVisible(!logDialog.isVisible());
         menuView.add(miDetachLog);
-
-        miAttachLog = new JMenuItem(resourceMap.getString("miAttachLog.text")); // NOI18N
-        miAttachLog.setMnemonic(KeyEvent.VK_A);
-        miAttachLog.setEnabled(false);
-        miAttachLog.addActionListener(evt -> hideDailyReportDialog());
-        menuView.add(miAttachLog);
 
         JMenuItem miBloodnameDialog = new JMenuItem(resourceMap.getString("miBloodnameDialog.text"));
         miBloodnameDialog.setMnemonic(KeyEvent.VK_B);
-        miBloodnameDialog.setEnabled(true);
         miBloodnameDialog.addActionListener(evt -> showBloodnameDialog());
         menuView.add(miBloodnameDialog);
 
         miRetirementDefectionDialog = new JMenuItem(resourceMap.getString("miRetirementDefectionDialog.text"));
         miRetirementDefectionDialog.setMnemonic(KeyEvent.VK_R);
-        miRetirementDefectionDialog.setEnabled(true);
         miRetirementDefectionDialog.setVisible(getCampaign().getCampaignOptions().getUseAtB());
         miRetirementDefectionDialog.addActionListener(evt -> showRetirementDefectionDialog());
         menuView.add(miRetirementDefectionDialog);
@@ -1012,31 +991,28 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miGMToolsDialog = new JMenuItem(resourceMap.getString("miGMToolsDialog.text"));
         miGMToolsDialog.setMnemonic(KeyEvent.VK_G);
-        miGMToolsDialog.setEnabled(true);
         miGMToolsDialog.addActionListener(evt -> showGMToolsDialog());
         menuManage.add(miGMToolsDialog);
 
-        JMenuItem miAdvanceMultipleDays = new JMenuItem(resourceMap.getString("miAdvanceMultipleDays.text"));
-        miAdvanceMultipleDays.setMnemonic(KeyEvent.VK_A);
-        miAdvanceMultipleDays.setEnabled(getCampaignController().isHost());
-        miAdvanceMultipleDays.addActionListener(evt -> showAdvanceDaysDialog());
-        menuManage.add(miAdvanceMultipleDays);
+        if (getCampaignController().isHost()) {
+            JMenuItem miAdvanceMultipleDays = new JMenuItem(resourceMap.getString("miAdvanceMultipleDays.text"));
+            miAdvanceMultipleDays.setMnemonic(KeyEvent.VK_A);
+            miAdvanceMultipleDays.addActionListener(evt -> showAdvanceDaysDialog());
+            menuManage.add(miAdvanceMultipleDays);
+        }
 
         JMenuItem miBloodnames = new JMenuItem(resourceMap.getString("miRandomBloodnames.text"));
         miBloodnames.setMnemonic(KeyEvent.VK_B);
-        miBloodnames.setEnabled(true);
         miBloodnames.addActionListener(evt -> randomizeAllBloodnames());
         menuManage.add(miBloodnames);
 
         JMenuItem miBatchXP = new JMenuItem(resourceMap.getString("miBatchXP.text"));
         miBatchXP.setMnemonic(KeyEvent.VK_M);
-        miBatchXP.setEnabled(true);
         miBatchXP.addActionListener(evt -> spendBatchXP());
         menuManage.add(miBatchXP);
 
         JMenuItem miScenarioEditor = new JMenuItem(resourceMap.getString("miScenarioEditor.text"));
         miScenarioEditor.setMnemonic(KeyEvent.VK_S);
-        miScenarioEditor.setEnabled(true);
         miScenarioEditor.addActionListener(evt -> {
             ScenarioTemplateEditorDialog sted = new ScenarioTemplateEditorDialog(getFrame());
             sted.setVisible(true);
