@@ -412,7 +412,7 @@ public class CampaignOpsReputationTest {
         spyReputation.initValues();
         assertEquals(20, spyReputation.getTransportValue());
 
-        // Test not having any dropships (though we still have a jumpship).
+        // Test not having any DropShips (though we still have a JumpShip).
         doReturn(0).when(spyReputation).getDropshipCount();
         doReturn(0).when(spyReputation).getMechBayCount();
         doReturn(0).when(spyReputation).getInfantryBayCount();
@@ -509,27 +509,27 @@ public class CampaignOpsReputationTest {
                 "    Contract Breaches:        0\n" +
                 "\n" +
                 "Transportation:      20\n" +
-                "    Mech Bays:                   4 needed /   4 available\n" +
-                "    Fighter Bays:                2 needed /   2 available (plus 0 excess small craft)\n" +
+                "    BattleMech Bays:             4 needed /   4 available\n" +
+                "    Fighter Bays:                2 needed /   2 available (plus 0 excess Small Craft)\n" +
                 "    Small Craft Bays:            0 needed /   0 available\n" +
-                "    Protomech Bays:              0 needed /   0 available\n" +
+                "    ProtoMech Bays:              0 needed /   0 available\n" +
                 "    Super Heavy Vehicle Bays:    0 needed /   0 available\n" +
-                "    Heavy Vehicle Bays:          0 needed /   0 available (plus 0 excess super heavy)\n" +
-                "    Light Vehicle Bays:          8 needed /  22 available (plus 0 excess heavy and 0 excess super heavy)\n" +
-                "    BA Bays:                     0 needed /   0 available\n" +
+                "    Heavy Vehicle Bays:          0 needed /   0 available (plus 0 excess Super Heavy)\n" +
+                "    Light Vehicle Bays:          8 needed /  22 available (plus 0 excess Heavy and 0 excess Super Heavy)\n" +
+                "    Battle Armor Bays:           0 needed /   0 available\n" +
                 "    Infantry Bays:               1 needed /   4 available\n" +
                 "    Docking Collars:             1 needed /   4 available\n" +
-                "    Has Jumpships?             Yes\n" +
-                "    Has Warships?               No\n" +
+                "    Has JumpShips?             Yes\n" +
+                "    Has WarShips?               No\n" +
                 "\n" +
                 "Support:             -5\n" +
                 "    Tech Support:\n" +
                 "        Mech Techs:                   4 needed /    0 available\n" +
-                "            NOTE: Protomechs and mechs use same techs.\n" +
+                "            NOTE: ProtoMechs and BattleMechs use same techs.\n" +
                 "        Aero Techs:                   2 needed /    0 available\n" +
                 "        Mechanics:                    8 needed /    0 available\n" +
                 "            NOTE: Vehicles and Infantry use the same mechanics.\n" +
-                "        BA Techs:                     0 needed /    0 available\n" +
+                "        Battle Armor Techs:           0 needed /    0 available\n" +
                 "        Astechs:                     84 needed /   84 available\n" +
                 "    Admin Support:                   10 needed /   10 available\n" +
                 "    Large Craft Crew:\n" +
@@ -565,27 +565,27 @@ public class CampaignOpsReputationTest {
                 "    Contract Breaches:        0\n" +
                 "\n" +
                 "Transportation:       0\n" +
-                "    Mech Bays:                   0 needed /   0 available\n" +
-                "    Fighter Bays:                0 needed /   0 available (plus 0 excess small craft)\n" +
+                "    BattleMech Bays:             0 needed /   0 available\n" +
+                "    Fighter Bays:                0 needed /   0 available (plus 0 excess Small Craft)\n" +
                 "    Small Craft Bays:            0 needed /   0 available\n" +
-                "    Protomech Bays:              0 needed /   0 available\n" +
+                "    ProtoMech Bays:              0 needed /   0 available\n" +
                 "    Super Heavy Vehicle Bays:    0 needed /   0 available\n" +
-                "    Heavy Vehicle Bays:          0 needed /   0 available (plus 0 excess super heavy)\n" +
-                "    Light Vehicle Bays:          0 needed /   0 available (plus 0 excess heavy and 0 excess super heavy)\n" +
-                "    BA Bays:                     0 needed /   0 available\n" +
+                "    Heavy Vehicle Bays:          0 needed /   0 available (plus 0 excess Super Heavy)\n" +
+                "    Light Vehicle Bays:          0 needed /   0 available (plus 0 excess Heavy and 0 excess Super Heavy)\n" +
+                "    Battle Armor Bays:           0 needed /   0 available\n" +
                 "    Infantry Bays:               0 needed /   0 available\n" +
                 "    Docking Collars:             0 needed /   0 available\n" +
-                "    Has Jumpships?              No\n" +
-                "    Has Warships?               No\n" +
+                "    Has JumpShips?              No\n" +
+                "    Has WarShips?               No\n" +
                 "\n" +
                 "Support:              0\n" +
                 "    Tech Support:\n" +
                 "        Mech Techs:                   0 needed /    0 available\n" +
-                "            NOTE: Protomechs and mechs use same techs.\n" +
+                "            NOTE: ProtoMechs and BattleMechs use same techs.\n" +
                 "        Aero Techs:                   0 needed /    0 available\n" +
                 "        Mechanics:                    0 needed /    0 available\n" +
                 "            NOTE: Vehicles and Infantry use the same mechanics.\n" +
-                "        BA Techs:                     0 needed /    0 available\n" +
+                "        Battle Armor Techs:           0 needed /    0 available\n" +
                 "        Astechs:                      0 needed /    0 available\n" +
                 "    Admin Support:                    0 needed /    0 available\n" +
                 "    Large Craft Crew:\n" +
@@ -646,52 +646,52 @@ public class CampaignOpsReputationTest {
     @Test
     public void testGetTransportationDetails() {
         String expected = "Transportation:      20\n" +
-                          "    Mech Bays:                   4 needed /   4 available\n" +
-                          "    Fighter Bays:                2 needed /   2 available (plus 0 excess small craft)\n" +
+                          "    BattleMech Bays:             4 needed /   4 available\n" +
+                          "    Fighter Bays:                2 needed /   2 available (plus 0 excess Small Craft)\n" +
                           "    Small Craft Bays:            0 needed /   0 available\n" +
-                          "    Protomech Bays:              0 needed /   0 available\n" +
+                          "    ProtoMech Bays:              0 needed /   0 available\n" +
                           "    Super Heavy Vehicle Bays:    0 needed /   0 available\n" +
-                          "    Heavy Vehicle Bays:          0 needed /   0 available (plus 0 excess super heavy)\n" +
-                          "    Light Vehicle Bays:          8 needed /  22 available (plus 0 excess heavy and 0 excess super heavy)\n" +
-                          "    BA Bays:                     0 needed /   0 available\n" +
+                          "    Heavy Vehicle Bays:          0 needed /   0 available (plus 0 excess Super Heavy)\n" +
+                          "    Light Vehicle Bays:          8 needed /  22 available (plus 0 excess Heavy and 0 excess Super Heavy)\n" +
+                          "    Battle Armor Bays:           0 needed /   0 available\n" +
                           "    Infantry Bays:               1 needed /   4 available\n" +
                           "    Docking Collars:             1 needed /   4 available\n" +
-                          "    Has Jumpships?             Yes\n" +
-                          "    Has Warships?               No";
+                          "    Has JumpShips?             Yes\n" +
+                          "    Has WarShips?               No";
         spyReputation.initValues();
         assertEquals(expected, spyReputation.getTransportationDetails());
 
         // Add some heavy vehicles.
         expected = "Transportation:      10\n" +
-                   "    Mech Bays:                   4 needed /   4 available\n" +
-                   "    Fighter Bays:                2 needed /   2 available (plus 0 excess small craft)\n" +
+                   "    BattleMech Bays:             4 needed /   4 available\n" +
+                   "    Fighter Bays:                2 needed /   2 available (plus 0 excess Small Craft)\n" +
                    "    Small Craft Bays:            0 needed /   0 available\n" +
-                   "    Protomech Bays:              0 needed /   0 available\n" +
+                   "    ProtoMech Bays:              0 needed /   0 available\n" +
                    "    Super Heavy Vehicle Bays:    0 needed /   0 available\n" +
-                   "    Heavy Vehicle Bays:          4 needed /   0 available (plus 0 excess super heavy)\n" +
-                   "    Light Vehicle Bays:          8 needed /  22 available (plus 0 excess heavy and 0 excess super heavy)\n" +
-                   "    BA Bays:                     0 needed /   0 available\n" +
+                   "    Heavy Vehicle Bays:          4 needed /   0 available (plus 0 excess Super Heavy)\n" +
+                   "    Light Vehicle Bays:          8 needed /  22 available (plus 0 excess Heavy and 0 excess Super Heavy)\n" +
+                   "    Battle Armor Bays:           0 needed /   0 available\n" +
                    "    Infantry Bays:               1 needed /   4 available\n" +
                    "    Docking Collars:             1 needed /   4 available\n" +
-                   "    Has Jumpships?             Yes\n" +
-                   "    Has Warships?               No";
+                   "    Has JumpShips?             Yes\n" +
+                   "    Has WarShips?               No";
         doReturn(4).when(spyReputation).getHeavyVeeCount();
         assertEquals(expected, spyReputation.getTransportationDetails());
 
         // Add excess heavy vehicle bays.
         expected = "Transportation:      20\n" +
-                   "    Mech Bays:                   4 needed /   4 available\n" +
-                   "    Fighter Bays:                2 needed /   2 available (plus 0 excess small craft)\n" +
+                   "    BattleMech Bays:             4 needed /   4 available\n" +
+                   "    Fighter Bays:                2 needed /   2 available (plus 0 excess Small Craft)\n" +
                    "    Small Craft Bays:            0 needed /   0 available\n" +
-                   "    Protomech Bays:              0 needed /   0 available\n" +
+                   "    ProtoMech Bays:              0 needed /   0 available\n" +
                    "    Super Heavy Vehicle Bays:    0 needed /   0 available\n" +
-                   "    Heavy Vehicle Bays:          4 needed /   8 available (plus 0 excess super heavy)\n" +
-                   "    Light Vehicle Bays:          8 needed /  22 available (plus 4 excess heavy and 0 excess super heavy)\n" +
-                   "    BA Bays:                     0 needed /   0 available\n" +
+                   "    Heavy Vehicle Bays:          4 needed /   8 available (plus 0 excess Super Heavy)\n" +
+                   "    Light Vehicle Bays:          8 needed /  22 available (plus 4 excess Heavy and 0 excess Super Heavy)\n" +
+                   "    Battle Armor Bays:           0 needed /   0 available\n" +
                    "    Infantry Bays:               1 needed /   4 available\n" +
                    "    Docking Collars:             1 needed /   4 available\n" +
-                   "    Has Jumpships?             Yes\n" +
-                   "    Has Warships?               No";
+                   "    Has JumpShips?             Yes\n" +
+                   "    Has WarShips?               No";
         doReturn(8).when(spyReputation).getHeavyVeeBayCount();
         assertEquals(expected, spyReputation.getTransportationDetails());
     }
