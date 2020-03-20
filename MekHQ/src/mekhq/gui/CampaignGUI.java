@@ -849,7 +849,7 @@ public class CampaignGUI extends JPanel {
         menuAstechPool.add(miFullStrengthAstechs);
 
         JMenuItem miFireAllAstechs = new JMenuItem(resourceMap.getString("miFireAllAstechs.text"));
-        miFireAllAstechs.setMnemonic(KeyEvent.VK_F);
+        miFireAllAstechs.setMnemonic(KeyEvent.VK_R);
         miFireAllAstechs.addActionListener(evt -> getCampaign().decreaseAstechPool(getCampaign().getAstechPool()));
         menuAstechPool.add(miFireAllAstechs);
         menuMarket.add(menuAstechPool);
