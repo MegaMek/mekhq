@@ -72,13 +72,13 @@ import mekhq.preferences.PreferencesNode;
  * (code borrowed heavily from MegaMekLab UnitSelectorDialog
  */
 public class PersonnelMarketDialog extends JDialog {
-	private static final long serialVersionUID = 707579637170575313L;
+    //region Variable Declarations
+    private static final long serialVersionUID = 707579637170575313L;
 
 	private PersonnelTableModel personnelModel;
 	private Campaign campaign;
 	private CampaignGUI hqView;
     private PersonnelMarket personnelMarket;
-    boolean addToCampaign;
     Person selectedPerson = null;
     @SuppressWarnings("unused")
     private DirectoryItems portraits;
@@ -99,6 +99,10 @@ public class PersonnelMarketDialog extends JDialog {
     private TableRowSorter<PersonnelTableModel> sorter;
     ArrayList <RowSorter.SortKey> sortKeys;
     private javax.swing.JSplitPane splitMain;
+
+    ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelMarketDialog",
+            new EncodeControl());
+    //endregion Variable Declarations
 
     /** Creates new form PersonnelMarketDialog */
     public PersonnelMarketDialog(Frame frame, CampaignGUI view, Campaign c, DirectoryItems portraits) {
@@ -134,7 +138,6 @@ public class PersonnelMarketDialog extends JDialog {
         //choicePersonView = new javax.swing.JComboBox();
         //lblPersonView = new javax.swing.JLabel();
 
-		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitSelectorDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Personnel Market"); // NOI18N
         setName("Form"); // NOI18N
