@@ -643,6 +643,7 @@ public class ResolveScenarioTracker {
         //Find out if this large craft ejected or was in the process of ejecting, 
         // and if so what entities are carrying the personnel
         int rescuedCrew = 0;
+        int rescuedPassengers = 0;
         if (en.getCrew().isEjected() || aero.isEjecting()) {
             for (String id : aero.getEscapeCraft()) {
                 Entity e = entities.get(UUID.fromString(id));
@@ -655,15 +656,22 @@ public class ResolveScenarioTracker {
                 if (e.isDestroyed() || e.isDoomed()) {
                     continue;
                 }
+                //Now let's see how many passengers and crew we picked up
                 if (e instanceof SmallCraft) {
                     SmallCraft craft = (SmallCraft) e;
-                    if (craft.getNOtherCrew().get(e.getExternalIdAsString()) != null) {
-                        rescuedCrew += craft.getNOtherCrew().get(id);
+                    if (craft.getPassengers().get(en.getExternalIdAsString()) != null) {
+                        rescuedPassengers += craft.getPassengers().get(en.getExternalIdAsString());
+                    }
+                    if (craft.getNOtherCrew().get(en.getExternalIdAsString()) != null) {
+                        rescuedCrew += craft.getNOtherCrew().get(en.getExternalIdAsString());
                     }
                 } else if (e instanceof EjectedCrew) {
                     EjectedCrew crew = (EjectedCrew) e;
-                    if (crew.getNOtherCrew().get(e.getExternalIdAsString()) != null) {
-                        rescuedCrew += crew.getNOtherCrew().get(id);
+                    if (crew.getPassengers().get(en.getExternalIdAsString()) != null) {
+                        rescuedPassengers += crew.getPassengers().get(en.getExternalIdAsString());
+                    }
+                    if (crew.getNOtherCrew().get(en.getExternalIdAsString()) != null) {
+                        rescuedCrew += crew.getNOtherCrew().get(en.getExternalIdAsString());
                     }
                 }
             }
