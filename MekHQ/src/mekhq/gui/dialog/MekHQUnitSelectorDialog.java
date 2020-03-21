@@ -59,8 +59,9 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         this.addToCampaign = addToCampaign;
 
         updateOptionValues();
-
         initialize();
+        run();
+        setVisible(true);
     }
 
     @Override
@@ -73,9 +74,16 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
     }
 
     @Override
-    protected void initialize() {
-        super.initialize();
-        setUserPreferences();
+    protected void setUserPreferences() {
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(MekHQUnitSelectorDialog.class);
+
+        preferences.manage(new JComboBoxPreference(comboUnitType));
+
+        preferences.manage(new JComboBoxPreference(comboWeight));
+
+        preferences.manage(new JTablePreference(tableUnits));
+
+        preferences.manage(new JWindowPreference(this));
     }
 
     //region Button Methods
@@ -238,17 +246,5 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             return;
         }
         sorter.setRowFilter(unitTypeFilter);
-    }
-
-    private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(MekHQUnitSelectorDialog.class);
-
-        preferences.manage(new JComboBoxPreference(comboUnitType));
-
-        preferences.manage(new JComboBoxPreference(comboWeight));
-
-        preferences.manage(new JTablePreference(tableUnits));
-
-        preferences.manage(new JWindowPreference(this));
     }
 }
