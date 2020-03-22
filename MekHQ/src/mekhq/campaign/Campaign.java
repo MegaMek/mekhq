@@ -5914,8 +5914,11 @@ public class Campaign implements Serializable, ITechManager {
         return Math.min(nmedics / ndocs, 4);
     }
 
+    /**
+     * @return the number of medics in the campaign including any in the temporary medic pool
+     */
     public int getNumberMedics() {
-        int medics = medicPool;
+        int medics = getMedicPool(); // this uses a getter for unit testing
         for (Person p : getPersonnel()) {
             if (p.isMedic() && p.isActive() && !p.isDeployed()) {
                 medics++;
