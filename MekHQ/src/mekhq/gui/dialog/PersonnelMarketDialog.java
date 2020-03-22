@@ -276,7 +276,10 @@ public class PersonnelMarketDialog extends JDialog {
 
         JButton btnAdvDay = new JButton("Advance Day");
         btnAdvDay.setName("buttonAdvanceDay");
-        btnAdvDay.addActionListener(evt -> hqView.getCampaignController().advanceDay());
+        btnAdvDay.addActionListener(evt -> {
+            hqView.getCampaignController().advanceDay();
+            personnelModel.setData(personnelMarket.getPersonnel());
+        });
         btnAdvDay.setEnabled(hqView.getCampaignController().isHost());
         panelOKBtns.add(btnAdvDay, new GridBagConstraints());
 
