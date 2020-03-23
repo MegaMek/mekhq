@@ -328,9 +328,9 @@ public class AtBGameThread extends GameThread {
                 // All player and bot units have been added to the lobby
                 // Prompt the player to auto-load units into transports
                 if (!scenario.getPlayerTransportLinkages().isEmpty()) {
-                    boolean loadFighters = false;
-                    boolean loadGround = false;
                     for (UUID id : scenario.getPlayerTransportLinkages().keySet()) {
+                        boolean loadFighters = false;
+                        boolean loadGround = false;
                         Unit transport = campaign.getUnit(id);
                         Set<Integer> toLoad = new HashSet<>();
                         // Let the player choose to load fighters and/or ground units on each transport
