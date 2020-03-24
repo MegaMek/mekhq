@@ -62,6 +62,8 @@ import mekhq.gui.FileDialogs;
  */
 public class ResolveScenarioTracker {
     Map<UUID, Entity> entities;
+    Map<UUID, List<Entity>> bayLoadedEntities;
+    Map<Integer, UUID> idMap;
     Hashtable<UUID, UnitStatus> unitsStatus;
     Hashtable<UUID, UnitStatus> salvageStatus;
     Hashtable<UUID, Crew> pilots;
@@ -113,6 +115,8 @@ public class ResolveScenarioTracker {
         ejections = new Hashtable<>();
         enemyEjections = new Hashtable<>();
         entities = new HashMap<>();
+        bayLoadedEntities = new HashMap<>();
+        idMap = new HashMap<>();
         for(UUID uid : scenario.getForces(campaign).getAllUnits()) {
             Unit u = campaign.getUnit(uid);
             if(null != u && null == u.checkDeployment()) {
@@ -185,6 +189,8 @@ public class ResolveScenarioTracker {
             }
 
             entities.put(UUID.fromString(e.getExternalIdAsString()), e);
+            //Convenience data 
+            idMap.put(e.getId(), UUID.fromString(e.getExternalIdAsString()));
 
             checkForLostLimbs(e, control);
             if(e.getOwnerId() == pid || e.getOwner().getTeam() == team) {
@@ -239,6 +245,21 @@ public class ResolveScenarioTracker {
                     salvageStatus.put(nu.getId(), us);
                     potentialSalvage.add(nu);
                 }
+            }
+        }
+        
+        //If any units ended the game with others loaded in its bays, map those out
+        for (Enumeration<Entity> iter = victoryEvent.getEntities(); iter.hasMoreElements();) {
+            Entity e = iter.nextElement();
+            if (!e.getBayLoadedUnitIds().isEmpty()) {
+                List<Entity> cargo = new ArrayList<>();
+                for (int id : e.getBayLoadedUnitIds()) {
+                    UUID extId = idMap.get(id);
+                    if (extId != null) {
+                        cargo.add(entities.get(extId));
+                    }
+                }
+                bayLoadedEntities.put(UUID.fromString(e.getExternalIdAsString()), cargo);
             }
         }
 
@@ -377,7 +398,7 @@ public class ResolveScenarioTracker {
         UnitStatus us = new UnitStatus(nu);
         unitsStatus.put(nu.getId(), us);
         alliedUnits.add(nu);
-
+        
         return us;
     }
 
@@ -1005,6 +1026,25 @@ public class ResolveScenarioTracker {
             }
 
             killCredits = parser.getKills();
+            
+            //Map everyone's ID to External Id
+            for (Entity e : parser.getEntities()) {
+                idMap.put(e.getId(), UUID.fromString(e.getExternalIdAsString()));
+            }
+            
+            //If any units ended the game with others loaded in its bays, map those out
+            for (Entity e : parser.getEntities()) {
+                if (!e.getBayLoadedUnitIds().isEmpty()) {
+                    List<Entity> cargo = new ArrayList<>();
+                    for (int id : e.getBayLoadedUnitIds()) {
+                        UUID extId = idMap.get(id);
+                        if (extId != null) {
+                            cargo.add(entities.get(extId));
+                        }
+                    }
+                    bayLoadedEntities.put(UUID.fromString(e.getExternalIdAsString()), cargo);
+                }
+            }
 
             for (Entity e : parser.getSurvivors()) {
                 entities.put(UUID.fromString(e.getExternalIdAsString()), e);
