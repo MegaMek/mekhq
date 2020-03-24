@@ -37,6 +37,7 @@ import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Modifier;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
+import mekhq.campaign.personnel.enums.ModifierValue;
 
 /** Advanced Medical sub-system injury types */
 public final class InjuryTypes {
@@ -122,7 +123,7 @@ public final class InjuryTypes {
 
         @Override
         public Collection<Modifier> getModifiers(Injury inj) {
-            return Arrays.asList(new Modifier(Modifier.Value.PILOTING, Integer.MAX_VALUE,
+            return Arrays.asList(new Modifier(ModifierValue.PILOTING, Integer.MAX_VALUE,
                 null, InjuryType.MODTAG_INJURY));
         }
     }
@@ -156,8 +157,8 @@ public final class InjuryTypes {
         @Override
         public Collection<Modifier> getModifiers(Injury inj) {
             return Arrays.asList(
-                new Modifier(Modifier.Value.GUNNERY, 3, null, InjuryType.MODTAG_INJURY),
-                new Modifier(Modifier.Value.PILOTING, 3, null, InjuryType.MODTAG_INJURY));
+                new Modifier(ModifierValue.GUNNERY, 3, null, InjuryType.MODTAG_INJURY),
+                new Modifier(ModifierValue.PILOTING, 3, null, InjuryType.MODTAG_INJURY));
         }
     }
 
@@ -203,7 +204,7 @@ public final class InjuryTypes {
 
         @Override
         public Collection<Modifier> getModifiers(Injury inj) {
-            return Arrays.asList(new Modifier(Modifier.Value.PILOTING, Integer.MAX_VALUE, null, InjuryType.MODTAG_INJURY));
+            return Arrays.asList(new Modifier(ModifierValue.PILOTING, Integer.MAX_VALUE, null, InjuryType.MODTAG_INJURY));
         }
     }
 
@@ -258,7 +259,7 @@ public final class InjuryTypes {
 
         @Override
         public Collection<Modifier> getModifiers(Injury inj) {
-            return Arrays.asList(new Modifier(Modifier.Value.PILOTING, 2, null, InjuryType.MODTAG_INJURY));
+            return Arrays.asList(new Modifier(ModifierValue.PILOTING, 2, null, InjuryType.MODTAG_INJURY));
         }
     }
 
@@ -296,9 +297,9 @@ public final class InjuryTypes {
             BodyLocation loc = inj.getLocation();
             switch(loc) {
                 case LEFT_ARM: case LEFT_HAND: case RIGHT_ARM: case RIGHT_HAND:
-                    return Arrays.asList(new Modifier(Modifier.Value.GUNNERY, 3, null, InjuryType.MODTAG_INJURY));
+                    return Arrays.asList(new Modifier(ModifierValue.GUNNERY, 3, null, InjuryType.MODTAG_INJURY));
                 case LEFT_LEG: case LEFT_FOOT: case RIGHT_LEG: case RIGHT_FOOT:
-                    return Arrays.asList(new Modifier(Modifier.Value.PILOTING, 3, null, InjuryType.MODTAG_INJURY));
+                    return Arrays.asList(new Modifier(ModifierValue.PILOTING, 3, null, InjuryType.MODTAG_INJURY));
                 default:
                     return Arrays.asList();
             }
@@ -438,10 +439,10 @@ public final class InjuryTypes {
             BodyLocation loc = inj.getLocation();
             switch(loc) {
                 case LEFT_ARM: case LEFT_HAND: case RIGHT_ARM: case RIGHT_HAND:
-                    return Arrays.asList(new Modifier(Modifier.Value.GUNNERY, inj.isPermanent() ? 1 : 2,
+                    return Arrays.asList(new Modifier(ModifierValue.GUNNERY, inj.isPermanent() ? 1 : 2,
                         null, InjuryType.MODTAG_INJURY));
                 case LEFT_LEG: case LEFT_FOOT: case RIGHT_LEG: case RIGHT_FOOT:
-                    return Arrays.asList(new Modifier(Modifier.Value.PILOTING, inj.isPermanent() ? 1 : 2,
+                    return Arrays.asList(new Modifier(ModifierValue.PILOTING, inj.isPermanent() ? 1 : 2,
                         null, InjuryType.MODTAG_INJURY));
                 default:
                     return Arrays.asList();
@@ -563,7 +564,7 @@ public final class InjuryTypes {
 
         @Override
         public Collection<Modifier> getModifiers(Injury inj) {
-            return Arrays.asList(new Modifier(Modifier.Value.PILOTING, 1, null, InjuryType.MODTAG_INJURY));
+            return Arrays.asList(new Modifier(ModifierValue.PILOTING, 1, null, InjuryType.MODTAG_INJURY));
         }
     }
 
@@ -594,9 +595,9 @@ public final class InjuryTypes {
             BodyLocation loc = inj.getLocation();
             switch(loc) {
                 case LEFT_ARM: case LEFT_HAND: case RIGHT_ARM: case RIGHT_HAND:
-                    return Arrays.asList(new Modifier(Modifier.Value.GUNNERY, 1, null, InjuryType.MODTAG_INJURY));
+                    return Arrays.asList(new Modifier(ModifierValue.GUNNERY, 1, null, InjuryType.MODTAG_INJURY));
                 case LEFT_LEG: case LEFT_FOOT: case RIGHT_LEG: case RIGHT_FOOT:
-                    return Arrays.asList(new Modifier(Modifier.Value.PILOTING, 1, null, InjuryType.MODTAG_INJURY));
+                    return Arrays.asList(new Modifier(ModifierValue.PILOTING, 1, null, InjuryType.MODTAG_INJURY));
                 default:
                     return Arrays.asList();
             }
