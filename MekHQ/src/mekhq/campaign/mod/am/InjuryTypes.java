@@ -30,7 +30,7 @@ import mekhq.Utilities;
 import mekhq.campaign.*;
 import mekhq.campaign.log.MedicalLogEntry;
 import mekhq.campaign.log.MedicalLogger;
-import mekhq.campaign.personnel.BodyLocation;
+import mekhq.campaign.personnel.enums.BodyLocation;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryLevel;
 import mekhq.campaign.personnel.InjuryType;

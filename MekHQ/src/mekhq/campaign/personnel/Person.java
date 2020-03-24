@@ -35,6 +35,7 @@ import megamek.common.util.WeightedMap;
 import mekhq.campaign.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.*;
+import mekhq.campaign.personnel.enums.BodyLocation;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
 import org.joda.time.DateTime;
 import org.w3c.dom.Node;
