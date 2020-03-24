@@ -16,11 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.personnel;
+package mekhq.campaign.personnel.generator;
 
 import java.util.Objects;
 
 import mekhq.campaign.RandomSkillPreferences;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.SkillType;
 
 /**
  * Represents a class which can generate new Special Abilities
