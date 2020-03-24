@@ -745,39 +745,41 @@ public class ResolveScenarioTracker {
         //Now, did the passengers take any hits? 
         //We'll assume that if units in transport bays were hit, their crews and techs might also have been
         Set<Person> allPassengers = new HashSet<>(); //Use this to keep track of ejected passengers for the next step
-        for (Entity e : en.getLoadedUnits()) {
-            //Match the still-loaded cargo entity with its unit so we can get the crew
-            Unit u = campaign.getUnit(UUID.fromString(e.getExternalIdAsString()));
-            Bay b = en.getBay(e);
-            if (u != null) {
-                List<Person> cargoCrew = u.getActiveCrew();
-                cargoCrew.add(u.getTech());
-                cargoCrew = shuffleCrew(cargoCrew);
-                for (Person p : cargoCrew) {
-                    //Go ahead and add everyone to this master list, even if they're killed/wounded below.
-                    //It's normal to have some casualties in the lifeboats...
-                    allPassengers.add(p);
-                    boolean wounded = false;
-                    //The lore says bay crews have pressurized sleeping alcoves in the corners of each bay
-                    //Let's assume people are injured on an 8+, same as a critical hit chance
-                    if (b != null && b.getBayDamage() > 0 && Compute.d6(2) >= 8) {
-                        PersonStatus status = new PersonStatus(p.getFullName(), u.getEntity().getDisplayName(),
-                                p.getHits(), p.getId());
-                        //As with crewmembers, on a 7+ they're only wounded
-                        if(Compute.d6(2) >= 7) {
-                            wounded = true;
-                        } else {
-                            status.setHits(6);
-                            status.setDead(true);
-                        }
-                        if(wounded) {
-                            int hits = campaign.getCampaignOptions().getMinimumHitsForVees();
-                            if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVees()) {
-                                int range = 6 - hits;
-                                hits = hits + Compute.randomInt(range);
+        List<Entity> cargo = bayLoadedEntities.get(UUID.fromString(en.getExternalIdAsString()));
+        if (cargo != null) {
+            for (Entity e : cargo) {
+                //Match the still-loaded cargo entity with its unit so we can get the crew
+                Unit u = campaign.getUnit(UUID.fromString(e.getExternalIdAsString()));
+                if (u != null) {
+                    List<Person> cargoCrew = u.getActiveCrew();
+                    cargoCrew.add(u.getTech());
+                    cargoCrew = shuffleCrew(cargoCrew);
+                    for (Person p : cargoCrew) {
+                        //Go ahead and add everyone to this master list, even if they're killed/wounded below.
+                        //It's normal to have some casualties in the lifeboats...
+                        allPassengers.add(p);
+                        boolean wounded = false;
+                        //The lore says bay crews have pressurized sleeping alcoves in the corners of each bay
+                        //Let's assume people are injured on an 8+ if the unit is destroyed, same as a critical hit chance
+                        if (e.isDestroyed() && Compute.d6(2) >= 8) {
+                            PersonStatus status = new PersonStatus(p.getFullName(), u.getEntity().getDisplayName(),
+                                    p.getHits(), p.getId());
+                            //As with crewmembers, on a 7+ they're only wounded
+                            if(Compute.d6(2) >= 7) {
+                                wounded = true;
+                            } else {
+                                status.setHits(6);
+                                status.setDead(true);
                             }
-                            status.setHits(hits);
-                            peopleStatus.put(p.getId(), status);
+                            if(wounded) {
+                                int hits = campaign.getCampaignOptions().getMinimumHitsForVees();
+                                if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVees()) {
+                                    int range = 6 - hits;
+                                    hits = hits + Compute.randomInt(range);
+                                }
+                                status.setHits(hits);
+                                peopleStatus.put(p.getId(), status);
+                            }
                         }
                     }
                 }
