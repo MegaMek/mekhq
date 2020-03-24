@@ -35,6 +35,7 @@ import megamek.common.util.WeightedMap;
 import mekhq.campaign.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.*;
+import mekhq.campaign.personnel.enums.GenderDescriptors;
 import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -105,15 +106,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public static final int S_KIA = 2;
     public static final int S_MIA = 3;
     public static final int S_NUM = 4;
-
-    public enum GENDER_DESCRIPTOR {
-        MALE_FEMALE,
-        HE_SHE,
-        HIM_HER,
-        HIS_HER,
-        HIS_HERS,
-        BOY_GIRL
-    }
 
     // Prisoners, Bondsmen, and Normal Personnel
     public static final int PRISONER_NOT = 0;
@@ -590,11 +582,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     //region Text Getters
     //TODO : Rename and Localize region
-    public String getGenderString(GENDER_DESCRIPTOR variant) {
+    public String getGenderString(GenderDescriptors variant) {
         return getGenderString(gender, variant);
     }
 
-    public static String getGenderString(int gender, GENDER_DESCRIPTOR variant) {
+    public static String getGenderString(int gender, GenderDescriptors variant) {
         switch (variant) {
             case MALE_FEMALE: {
                 switch (gender) {
@@ -1325,7 +1317,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             baby.setAncestorsId(ancId);
 
             campaign.addReport(String.format("%s has given birth to %s, a baby %s!", getHyperlinkedName(),
-                    baby.getHyperlinkedName(), baby.getGenderString(GENDER_DESCRIPTOR.BOY_GIRL)));
+                    baby.getHyperlinkedName(), baby.getGenderString(GenderDescriptors.BOY_GIRL)));
             if (campaign.getCampaignOptions().logConception()) {
                 MedicalLogger.deliveredBaby(this, baby, campaign.getDate());
                 if (fatherId != null) {

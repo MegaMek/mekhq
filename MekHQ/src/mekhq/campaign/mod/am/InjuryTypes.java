@@ -36,6 +36,7 @@ import mekhq.campaign.personnel.InjuryLevel;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Modifier;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.GenderDescriptors;
 
 /** Advanced Medical sub-system injury types */
 public final class InjuryTypes {
@@ -286,7 +287,7 @@ public final class InjuryTypes {
 
         @Override
         public String getFluffText(BodyLocation loc, int severity, int gender) {
-            return "Lost " + Person.getGenderString(gender, Person.GENDER_DESCRIPTOR.HIS_HER) + " "
+            return "Lost " + Person.getGenderString(gender, GenderDescriptors.HIS_HER) + " "
                 + loc.readableName;
         }
 
@@ -616,7 +617,7 @@ public final class InjuryTypes {
 
         @Override
         public String getFluffText(BodyLocation loc, int severity, int gender) {
-            return "A laceration on " + Person.getGenderString(gender, Person.GENDER_DESCRIPTOR.HIS_HER) + " head";
+            return "A laceration on " + Person.getGenderString(gender, GenderDescriptors.HIS_HER) + " head";
         }
 
         @Override
@@ -644,7 +645,7 @@ public final class InjuryTypes {
 
         @Override
         public String getFluffText(BodyLocation loc, int severity, int gender) {
-            return "A bruise on " + Person.getGenderString(gender, Person.GENDER_DESCRIPTOR.HIS_HER)
+            return "A bruise on " + Person.getGenderString(gender, GenderDescriptors.HIS_HER)
                     + " " + loc.readableName;
         }
 
@@ -673,7 +674,7 @@ public final class InjuryTypes {
 
         @Override
         public String getFluffText(BodyLocation loc, int severity, int gender) {
-            return "Some cuts on " + Person.getGenderString(gender, Person.GENDER_DESCRIPTOR.HIS_HER)
+            return "Some cuts on " + Person.getGenderString(gender, GenderDescriptors.HIS_HER)
                     + " " + loc.readableName;
         }
 
