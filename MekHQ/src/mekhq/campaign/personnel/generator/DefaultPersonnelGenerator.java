@@ -22,7 +22,6 @@ import java.util.Objects;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.*;
-import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.universe.AbstractFactionSelector;
 import mekhq.campaign.universe.AbstractPlanetSelector;
 import mekhq.campaign.universe.DefaultFactionSelector;
