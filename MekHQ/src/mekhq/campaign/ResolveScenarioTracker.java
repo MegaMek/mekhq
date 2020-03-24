@@ -755,6 +755,10 @@ public class ResolveScenarioTracker {
                     cargoCrew.add(u.getTech());
                     cargoCrew = shuffleCrew(cargoCrew);
                     for (Person p : cargoCrew) {
+                        if (peopleStatus.get(p.getId()) != null) {
+                            //Then we've already accounted for this person - most likely a tech
+                            continue;
+                        }
                         //Go ahead and add everyone to this master list, even if they're killed/wounded below.
                         //It's normal to have some casualties in the lifeboats...
                         allPassengers.add(p);
