@@ -57,11 +57,15 @@ public class CampaignController {
     /**
      * Sets the unique identifier of the campaign hosting
      * this session.
-     * @param id The unique identifier of the host compaign.
+     * @param id The unique identifier of the host campaign.
      */
     public void setHost(UUID id) {
         host = id;
         isHost = getLocalCampaign().getId().equals(id);
+
+        // We need to change these based on which campaign is currently the host
+        // TODO: Add the following:
+        // something that returns CampaignGUI.showAdvanceMultipleDays(isHost);
     }
 
     /**
