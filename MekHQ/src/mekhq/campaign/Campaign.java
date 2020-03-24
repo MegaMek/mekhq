@@ -3458,7 +3458,7 @@ public class Campaign implements Serializable, ITechManager {
                 roll = 12;
             int change = numPersonnel * (roll - 5) / 100;
             if ((change < 0) && !getCampaignOptions().getDependentsNeverLeave()) {
-                while (change < 0 && dependents.size() > 0) {
+                while ((change < 0) && (dependents.size() > 0)) {
                     removePerson(Utilities.getRandomItem(dependents).getId());
                     change++;
                 }
