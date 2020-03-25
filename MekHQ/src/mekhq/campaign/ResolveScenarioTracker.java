@@ -744,7 +744,7 @@ public class ResolveScenarioTracker {
         
         //Now, did the passengers take any hits? 
         //We'll assume that if units in transport bays were hit, their crews and techs might also have been
-        Set<Person> allPassengers = new HashSet<>(); //Use this to keep track of ejected passengers for the next step
+        Map<UUID,PersonStatus> allPassengersStatus = new HashMap<>(); //Use this to keep track of ejected passengers for the next step
         List<Entity> cargo = bayLoadedEntities.get(UUID.fromString(en.getExternalIdAsString()));
         if (cargo != null) {
             for (Entity e : cargo) {
@@ -755,19 +755,16 @@ public class ResolveScenarioTracker {
                     cargoCrew.add(u.getTech());
                     cargoCrew = shuffleCrew(cargoCrew);
                     for (Person p : cargoCrew) {
-                        if (peopleStatus.get(p.getId()) != null) {
-                            //Then we've already accounted for this person - most likely a tech
+                        PersonStatus status = new PersonStatus(p.getFullName(), u.getEntity().getDisplayName(),
+                                p.getHits(), p.getId());
+                        if (allPassengersStatus.get(p.getId()) != null) {
+                            //Then we've already accounted for this person - most likely a tech assigned to multiple units
                             continue;
                         }
-                        //Go ahead and add everyone to this master list, even if they're killed/wounded below.
-                        //It's normal to have some casualties in the lifeboats...
-                        allPassengers.add(p);
                         boolean wounded = false;
                         //The lore says bay crews have pressurized sleeping alcoves in the corners of each bay
                         //Let's assume people are injured on an 8+ if the unit is destroyed, same as a critical hit chance
                         if (e.isDestroyed() && Compute.d6(2) >= 8) {
-                            PersonStatus status = new PersonStatus(p.getFullName(), u.getEntity().getDisplayName(),
-                                    p.getHits(), p.getId());
                             //As with crewmembers, on a 7+ they're only wounded
                             if(Compute.d6(2) >= 7) {
                                 wounded = true;
@@ -782,12 +779,31 @@ public class ResolveScenarioTracker {
                                     hits = hits + Compute.randomInt(range);
                                 }
                                 status.setHits(hits);
-                                peopleStatus.put(p.getId(), status);
                             }
                         }
+                        //Go ahead and add everyone to this master list, even if they're killed/wounded above.
+                        //It's normal to have some casualties in the lifeboats...
+                        allPassengersStatus.put(p.getId(),status);
                     }
                 }
             }
+        }
+        //Now let's account for any passengers aboard escape craft
+        //If the host ship ended the game mid-ejection but remains undestroyed, add its remaining passengers
+        if (aero.isEjecting() && !aero.isDestroyed()) {
+            rescuedPassengers += aero.getNPassenger();
+        }
+        //Let's go through and handle the list
+        while (rescuedPassengers > 0) {
+            if (allPassengersStatus.isEmpty()) {
+                //Could happen on ships with passenger quarters where numbers exceed those associated
+                //with transported units, or ships that are just empty
+                break;
+            }
+            PersonStatus s = allPassengersStatus.remove(Compute.randomInt(allPassengersStatus.size()));
+            UUID pid = s.getId();
+            peopleStatus.put(pid, s);
+            rescuedPassengers --;
         }
     }
 
