@@ -20,6 +20,7 @@
  */
 package mekhq.campaign.personnel;
 
+import java.awt.event.KeyEvent;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -969,13 +970,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
         this.daysToWaitForHealing = d;
     }
 
-
     public static String getRoleDesc(int type, boolean clan) {
         switch (type) {
             case (T_NONE):
                 return "None";
             case (T_MECHWARRIOR):
-                return "Mechwarrior";
+                return "MechWarrior";
             case (T_GVEE_DRIVER):
                 return "Vehicle Driver";
             case (T_NVEE_DRIVER):
@@ -987,9 +987,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
             case (T_CONV_PILOT):
                 return "Conventional Aircraft Pilot";
             case (T_AERO_PILOT):
-                return "Aero Pilot";
+                return "Aerospace Pilot";
             case (T_PROTO_PILOT):
-                return "Proto Pilot";
+                return "ProtoMech Pilot";
             case (T_BA):
                 if (clan) {
                     return "Elemental";
@@ -1055,6 +1055,64 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public String getSecondaryRoleDesc() {
         return getRoleDesc(secondaryRole, campaign.getFaction().isClan());
+    }
+
+    public static int getRoleMnemonic(int type) {
+        // The following characters are unused:
+        // J, K, Q, X, Z
+        switch (type) {
+            case T_MECHWARRIOR:
+                return KeyEvent.VK_M;
+            case T_GVEE_DRIVER:
+                return KeyEvent.VK_V;
+            case T_NVEE_DRIVER:
+                return KeyEvent.VK_N;
+            case T_VEE_GUNNER:
+                return KeyEvent.VK_G;
+            case T_AERO_PILOT:
+                return KeyEvent.VK_A;
+            case T_PROTO_PILOT:
+                return KeyEvent.VK_P;
+            case T_CONV_PILOT:
+                return KeyEvent.VK_F;
+            case T_BA:
+                return KeyEvent.VK_B;
+            case T_INFANTRY:
+                return KeyEvent.VK_S;
+            case T_SPACE_PILOT:
+                return KeyEvent.VK_I;
+            case T_SPACE_CREW:
+                return KeyEvent.VK_W;
+            case T_SPACE_GUNNER:
+                return KeyEvent.VK_U;
+            case T_NAVIGATOR:
+                return KeyEvent.VK_Y;
+            case T_MECH_TECH:
+                return KeyEvent.VK_T;
+            case T_MECHANIC:
+                return KeyEvent.VK_E;
+            case T_AERO_TECH:
+                return KeyEvent.VK_O;
+            case T_DOCTOR:
+                return KeyEvent.VK_D;
+            case T_ADMIN_COM:
+                return KeyEvent.VK_C;
+            case T_ADMIN_LOG:
+                return KeyEvent.VK_L;
+            case T_ADMIN_TRA:
+                return KeyEvent.VK_R;
+            case T_ADMIN_HR:
+                return KeyEvent.VK_H;
+            case T_VTOL_PILOT:
+            case T_BA_TECH:
+            case T_ASTECH:
+            case T_MEDIC:
+            case T_LAM_PILOT:
+            case T_VEHICLE_CREW:
+            case T_NONE:
+            default:
+                return KeyEvent.VK_UNDEFINED;
+        }
     }
 
     public boolean canPerformRole(int role) {
