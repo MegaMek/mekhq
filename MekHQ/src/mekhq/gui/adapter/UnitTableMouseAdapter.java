@@ -59,7 +59,6 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.StripUnitAction;
@@ -77,6 +76,7 @@ import mekhq.gui.dialog.LargeCraftAmmoSwapDialog;
 import mekhq.gui.dialog.MarkdownEditorDialog;
 import mekhq.gui.dialog.QuirksDialog;
 import mekhq.gui.model.UnitTableModel;
+import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
 
 public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionListener {
@@ -872,11 +872,11 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                         }
                     }
                     if (techsFound > 0) {
-                        addMenuIfNonEmpty(menu, menuElite, 20);
-                        addMenuIfNonEmpty(menu, menuVeteran, 20);
-                        addMenuIfNonEmpty(menu, menuRegular, 20);
-                        addMenuIfNonEmpty(menu, menuGreen, 20);
-                        addMenuIfNonEmpty(menu, menuUltraGreen, 20);
+                        JMenuHelpers.addMenuIfNonEmpty(menu, menuElite, 20);
+                        JMenuHelpers.addMenuIfNonEmpty(menu, menuVeteran, 20);
+                        JMenuHelpers.addMenuIfNonEmpty(menu, menuRegular, 20);
+                        JMenuHelpers.addMenuIfNonEmpty(menu, menuGreen, 20);
+                        JMenuHelpers.addMenuIfNonEmpty(menu, menuUltraGreen, 20);
 
                         popup.add(menu);
                     }
@@ -1148,14 +1148,5 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements ActionLi
                     + unit.getEntity().getModel());
         }
         MechSummaryCache.getInstance().loadMechData();
-    }
-
-    private static void addMenuIfNonEmpty(JMenu menu, JMenu child, int scrollerThreshold) {
-        if (child.getItemCount() > 0) {
-            menu.add(child);
-            if (child.getItemCount() > scrollerThreshold) {
-                MenuScroller.setScrollerFor(child, scrollerThreshold);
-            }
-        }
     }
 }
