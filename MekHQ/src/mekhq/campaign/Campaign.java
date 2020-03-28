@@ -1156,26 +1156,36 @@ public class Campaign implements Serializable, ITechManager {
         return units.values();
     }
 
-    public List<Unit> getUnits(boolean alphaSorted, boolean weightSorted) {
-        return getUnits(alphaSorted, weightSorted, false, false);
+    public List<Unit> getUnits(boolean weightSorted) {
+        return getUnits(false, weightSorted, false);
     }
-    public List<Unit> getUnits(boolean alphaSorted, boolean weightSorted, boolean weightClassSorted,
+
+    /**
+     * This returns a list of the current units, sorted alphabetically and potentially by other methods
+     * @param weightSorted      True if the unit list is sorted by weight descending, otherwise false
+     * @param weightClassSorted True if the unit list is sorted by weight class in format heaviest to lightest, otherwise false
+     * @param unitTypeSorted    True if the unit list is sorted by the unit type
+     * @return a copy of the units in the campaign with the applicable sort format
+     */
+    public List<Unit> getUnits(boolean weightClassSorted, boolean weightSorted,
                                boolean unitTypeSorted) {
         List<Unit> units = getCopyOfUnits();
-        if (alphaSorted || weightSorted) {
-            if (alphaSorted) {
-                Comparator<String> naturalOrderComparator = new NaturalOrderComparator();
-                units.sort((o1, o2) -> naturalOrderComparator.compare(o1.getName(), o2.getName()));
-            }
 
+        // Natural order sorting the units alphabetically is the default for getSortedUnits
+        Comparator<String> naturalOrderComparator = new NaturalOrderComparator();
+        units.sort((o1, o2) -> naturalOrderComparator.compare(o1.getName(), o2.getName()));
+
+        if (weightClassSorted || weightSorted || unitTypeSorted) {
+            // We need to determine these by both the weight sorted and weight class sorted values,
+            // as to properly sort by weight class and weight we should do both at the same time
             if (weightSorted && weightClassSorted) {
                 units.sort((lhs, rhs) -> {
                     int weightClass1 = lhs.getEntity().getWeightClass();
                     int weightClass2 = rhs.getEntity().getWeightClass();
                     if (weightClass1 == weightClass2) {
-                        return (int) (lhs.getEntity().getWeight() - rhs.getEntity().getWeight());
+                        return (int) (rhs.getEntity().getWeight() - lhs.getEntity().getWeight());
                     } else {
-                        return weightClass1 - weightClass2;
+                        return weightClass2 - weightClass1;
                     }
                 });
             } else if (weightClassSorted) {
