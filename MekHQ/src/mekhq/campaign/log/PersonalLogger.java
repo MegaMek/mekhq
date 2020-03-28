@@ -21,6 +21,7 @@ package mekhq.campaign.log;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.GenderDescriptors;
 
 import java.text.MessageFormat;
 import java.util.Date;
@@ -71,6 +72,6 @@ public class PersonalLogger {
     public static void ourChildBorn(Person person, Person baby, String spouseName, Date date) {
         person.addLogEntry(new PersonalLogEntry(date,
                 MessageFormat.format(logEntriesResourceMap.getString("ourChildBorn.text"),
-                        spouseName, baby.getGenderString(Person.GENDER_DESCRIPTOR.BOY_GIRL))));
+                        spouseName, baby.getGenderString(GenderDescriptors.BOY_GIRL))));
     }
 }

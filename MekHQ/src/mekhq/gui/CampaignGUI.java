@@ -133,7 +133,6 @@ public class CampaignGUI extends JPanel {
     /* For the menu bar */
     private JMenuBar menuBar;
     private JMenu menuThemes;
-    private JMenuItem miHistoricalDailyReportDialog;
     private JMenuItem miDetachLog;
     private JMenuItem miAttachLog;
     private JMenuItem miContractMarket;
@@ -141,6 +140,7 @@ public class CampaignGUI extends JPanel {
     private JMenuItem miShipSearch;
     private JMenuItem miRetirementDefectionDialog;
     private JCheckBoxMenuItem miShowOverview;
+    private JMenuItem miAdvanceMultipleDays;
 
     private EnumMap<GuiTabType, CampaignGuiTab> standardTabs;
 
@@ -237,6 +237,10 @@ public class CampaignGUI extends JPanel {
         } else {
             removeStandardTab(GuiTabType.OVERVIEW);
         }
+    }
+
+    public void showAdvanceMultipleDays(boolean isHost) {
+        miAdvanceMultipleDays.setVisible(isHost);
     }
 
     public void showGMToolsDialog() {
@@ -946,7 +950,7 @@ public class CampaignGUI extends JPanel {
         JMenu menuView = new JMenu(resourceMap.getString("menuView.text")); // NOI18N
         menuView.setMnemonic(KeyEvent.VK_V);
 
-        miHistoricalDailyReportDialog = new JMenuItem(resourceMap.getString("miShowHistoricalReportLog.text")); // NOI18N
+        JMenuItem miHistoricalDailyReportDialog = new JMenuItem(resourceMap.getString("miShowHistoricalReportLog.text")); // NOI18N
         miHistoricalDailyReportDialog.setMnemonic(KeyEvent.VK_H);
         miHistoricalDailyReportDialog.addActionListener(evt -> showHistoricalDailyReportDialog());
         menuView.add(miHistoricalDailyReportDialog);
@@ -995,12 +999,11 @@ public class CampaignGUI extends JPanel {
         miGMToolsDialog.addActionListener(evt -> showGMToolsDialog());
         menuManage.add(miGMToolsDialog);
 
-        if (getCampaignController().isHost()) {
-            JMenuItem miAdvanceMultipleDays = new JMenuItem(resourceMap.getString("miAdvanceMultipleDays.text"));
-            miAdvanceMultipleDays.setMnemonic(KeyEvent.VK_A);
-            miAdvanceMultipleDays.addActionListener(evt -> showAdvanceDaysDialog());
-            menuManage.add(miAdvanceMultipleDays);
-        }
+        miAdvanceMultipleDays = new JMenuItem(resourceMap.getString("miAdvanceMultipleDays.text"));
+        miAdvanceMultipleDays.setMnemonic(KeyEvent.VK_A);
+        miAdvanceMultipleDays.addActionListener(evt -> showAdvanceDaysDialog());
+        miAdvanceMultipleDays.setVisible(getCampaignController().isHost());
+        menuManage.add(miAdvanceMultipleDays);
 
         JMenuItem miBloodnames = new JMenuItem(resourceMap.getString("miRandomBloodnames.text"));
         miBloodnames.setMnemonic(KeyEvent.VK_B);

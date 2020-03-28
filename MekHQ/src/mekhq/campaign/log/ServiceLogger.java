@@ -21,6 +21,7 @@ package mekhq.campaign.log;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.GenderDescriptors;
 
 import java.text.MessageFormat;
 import java.util.Date;
@@ -37,7 +38,7 @@ public class ServiceLogger {
     public static void retireDueToWounds(Person person, Date date){
         String message = logEntriesResourceMap.getString("retiredDueToWounds.text");
         person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message,
-                person.getGenderString(Person.GENDER_DESCRIPTOR.HIS_HER))));
+                person.getGenderString(GenderDescriptors.HIS_HER))));
     }
 
     public static void madeBondsman(Person person, Date date, String name, String rankEntry){
