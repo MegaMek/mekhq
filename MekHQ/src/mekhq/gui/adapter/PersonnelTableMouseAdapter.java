@@ -1386,42 +1386,54 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 // Assign pilot to unit/none
                 menu = new JMenu(resourceMap.getString("assignToUnit.text")); //$NON-NLS-1$
                 JMenu pilotMenu = new JMenu(resourceMap.getString("assignAsPilot.text")); //$NON-NLS-1$
+                JMenu pilotUnitTypeMenu = new JMenu();
                 JMenu pilotEntityWeightMenu = new JMenu();
                 JMenu driverMenu = new JMenu(resourceMap.getString("assignAsDriver.text")); //$NON-NLS-1$
+                JMenu driverUnitTypeMenu = new JMenu();
                 JMenu driverEntityWeightMenu = new JMenu();
                 JMenu crewMenu = new JMenu(resourceMap.getString("assignAsCrewmember.text")); //$NON-NLS-1$
+                JMenu crewUnitTypeMenu = new JMenu();
                 JMenu crewEntityWeightMenu = new JMenu();
                 JMenu gunnerMenu = new JMenu(resourceMap.getString("assignAsGunner.text")); //$NON-NLS-1$
+                JMenu gunnerUnitTypeMenu = new JMenu();
                 JMenu gunnerEntityWeightMenu = new JMenu();
                 JMenu navMenu = new JMenu(resourceMap.getString("assignAsNavigator.text")); //$NON-NLS-1$
+                JMenu navUnitTypeMenu = new JMenu();
                 JMenu navEntityWeightMenu = new JMenu();
                 JMenu soldierMenu = new JMenu(resourceMap.getString("assignAsSoldier.text")); //$NON-NLS-1$
+                JMenu soldierUnitTypeMenu = new JMenu();
                 JMenu soldierEntityWeightMenu = new JMenu();
                 JMenu techOfficerMenu = new JMenu(resourceMap.getString("assignAsTechOfficer.text")); //$NON-NLS-1$
+                JMenu techOfficerUnitTypeMenu = new JMenu();
                 JMenu techOfficerEntityWeightMenu = new JMenu();
                 JMenu consoleCmdrMenu = new JMenu(resourceMap.getString("assignAsConsoleCmdr.text")); //$NON-NLS-1$
+                JMenu consoleCmdrUnitTypeMenu = new JMenu();
                 JMenu consoleCmdrEntityWeightMenu = new JMenu();
                 JMenu techMenu = new JMenu(resourceMap.getString("assignAsTech.text")); //$NON-NLS-1$
+                JMenu techUnitTypeMenu = new JMenu();
                 JMenu techEntityWeightMenu = new JMenu();
 
+                String unitTypeName = "";
                 String weightClassName = "";
 
                 if (oneSelected && person.isActive() && person.isFree()) {
                     for (Unit unit : gui.getCampaign().getUnits(true, true)) {
                         if (!unit.isAvailable()) {
                             continue;
-                        } else if (!unit.getEntity().getWeightClassName().equals(weightClassName)) {
+                        }
+
+                        if (!unit.getEntity().getWeightClassName().equals(weightClassName)) {
                             weightClassName = unit.getEntity().getWeightClassName();
 
-                            JMenuHelpers.addMenuIfNonEmpty(pilotMenu, pilotEntityWeightMenu, MAX_POPUP_ITEMS);
-                            JMenuHelpers.addMenuIfNonEmpty(driverMenu, driverEntityWeightMenu, MAX_POPUP_ITEMS);
-                            JMenuHelpers.addMenuIfNonEmpty(crewMenu, crewEntityWeightMenu, MAX_POPUP_ITEMS);
-                            JMenuHelpers.addMenuIfNonEmpty(gunnerMenu, gunnerEntityWeightMenu, MAX_POPUP_ITEMS);
-                            JMenuHelpers.addMenuIfNonEmpty(navMenu, navEntityWeightMenu, MAX_POPUP_ITEMS);
-                            JMenuHelpers.addMenuIfNonEmpty(soldierMenu, soldierEntityWeightMenu, MAX_POPUP_ITEMS);
-                            JMenuHelpers.addMenuIfNonEmpty(techOfficerMenu, techOfficerEntityWeightMenu, MAX_POPUP_ITEMS);
-                            JMenuHelpers.addMenuIfNonEmpty(consoleCmdrMenu, consoleCmdrEntityWeightMenu, MAX_POPUP_ITEMS);
-                            JMenuHelpers.addMenuIfNonEmpty(techMenu, techEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(pilotUnitTypeMenu, pilotEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(driverUnitTypeMenu, driverEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(crewUnitTypeMenu, crewEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(gunnerUnitTypeMenu, gunnerEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(navUnitTypeMenu, navEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(soldierUnitTypeMenu, soldierEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(techOfficerUnitTypeMenu, techOfficerEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(consoleCmdrUnitTypeMenu, consoleCmdrEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(techUnitTypeMenu, techEntityWeightMenu, MAX_POPUP_ITEMS);
 
                             pilotEntityWeightMenu = new JMenu(weightClassName);
                             driverEntityWeightMenu = new JMenu(weightClassName);
@@ -1518,15 +1530,16 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     for (Unit unit : gui.getCampaign().getUnits()) {
                         if (!unit.isAvailable()) {
                             continue;
-                        } else if (!unit.getEntity().getWeightClassName().equals(weightClassName)) {
+                        }
+                        if (!unit.getEntity().getWeightClassName().equals(weightClassName)) {
                             weightClassName = unit.getEntity().getWeightClassName();
 
-                            JMenuHelpers.addMenuIfNonEmpty(pilotMenu, pilotEntityWeightMenu, MAX_POPUP_ITEMS);
-                            JMenuHelpers.addMenuIfNonEmpty(driverMenu, driverEntityWeightMenu, MAX_POPUP_ITEMS);
-                            JMenuHelpers.addMenuIfNonEmpty(crewMenu, crewEntityWeightMenu, MAX_POPUP_ITEMS);
-                            JMenuHelpers.addMenuIfNonEmpty(gunnerMenu, gunnerEntityWeightMenu, MAX_POPUP_ITEMS);
-                            JMenuHelpers.addMenuIfNonEmpty(navMenu, navEntityWeightMenu, MAX_POPUP_ITEMS);
-                            JMenuHelpers.addMenuIfNonEmpty(soldierMenu, soldierEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(pilotUnitTypeMenu, pilotEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(driverUnitTypeMenu, driverEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(crewUnitTypeMenu, crewEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(gunnerUnitTypeMenu, gunnerEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(navUnitTypeMenu, navEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(soldierUnitTypeMenu, soldierEntityWeightMenu, MAX_POPUP_ITEMS);
 
                             pilotEntityWeightMenu = new JMenu(weightClassName);
                             driverEntityWeightMenu = new JMenu(weightClassName);
@@ -1619,18 +1632,29 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     }
                 }
 
-                // Add weight menus to the menus
-                JMenuHelpers.addMenuIfNonEmpty(pilotMenu, pilotEntityWeightMenu, MAX_POPUP_ITEMS);
-                JMenuHelpers.addMenuIfNonEmpty(driverMenu, driverEntityWeightMenu, MAX_POPUP_ITEMS);
-                JMenuHelpers.addMenuIfNonEmpty(crewMenu, crewEntityWeightMenu, MAX_POPUP_ITEMS);
-                JMenuHelpers.addMenuIfNonEmpty(gunnerMenu, gunnerEntityWeightMenu, MAX_POPUP_ITEMS);
-                JMenuHelpers.addMenuIfNonEmpty(navMenu, navEntityWeightMenu, MAX_POPUP_ITEMS);
-                JMenuHelpers.addMenuIfNonEmpty(soldierMenu, soldierEntityWeightMenu, MAX_POPUP_ITEMS);
-                JMenuHelpers.addMenuIfNonEmpty(techOfficerMenu, techOfficerEntityWeightMenu, MAX_POPUP_ITEMS);
-                JMenuHelpers.addMenuIfNonEmpty(consoleCmdrMenu, consoleCmdrEntityWeightMenu, MAX_POPUP_ITEMS);
-                JMenuHelpers.addMenuIfNonEmpty(techMenu, techEntityWeightMenu, MAX_POPUP_ITEMS);
+                // Add the last grouping of entity weight menus to the last grouping of entity menus
+                JMenuHelpers.addMenuIfNonEmpty(pilotUnitTypeMenu, pilotEntityWeightMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(driverUnitTypeMenu, driverEntityWeightMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(crewUnitTypeMenu, crewEntityWeightMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(gunnerUnitTypeMenu, gunnerEntityWeightMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(navUnitTypeMenu, navEntityWeightMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(soldierUnitTypeMenu, soldierEntityWeightMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(techOfficerUnitTypeMenu, techOfficerEntityWeightMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(consoleCmdrUnitTypeMenu, consoleCmdrEntityWeightMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(techUnitTypeMenu, techEntityWeightMenu, MAX_POPUP_ITEMS);
 
-                // then add the menus to the primary menu
+                // then add the last grouping of entity menus to the primary menus
+                JMenuHelpers.addMenuIfNonEmpty(pilotMenu, pilotUnitTypeMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(driverMenu, driverUnitTypeMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(crewMenu, crewUnitTypeMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(gunnerMenu, gunnerUnitTypeMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(navMenu, navUnitTypeMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(soldierMenu, soldierUnitTypeMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(techOfficerMenu, techOfficerUnitTypeMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(consoleCmdrMenu, consoleCmdrUnitTypeMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(techMenu, techUnitTypeMenu, MAX_POPUP_ITEMS);
+
+                // and finally add any non-empty menus to the primary menu
                 JMenuHelpers.addMenuIfNonEmpty(menu, pilotMenu, MAX_POPUP_ITEMS);
                 JMenuHelpers.addMenuIfNonEmpty(menu, driverMenu, MAX_POPUP_ITEMS);
                 JMenuHelpers.addMenuIfNonEmpty(menu, crewMenu, MAX_POPUP_ITEMS);
@@ -1641,7 +1665,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 JMenuHelpers.addMenuIfNonEmpty(menu, consoleCmdrMenu, MAX_POPUP_ITEMS);
                 JMenuHelpers.addMenuIfNonEmpty(menu, techMenu, MAX_POPUP_ITEMS);
 
-                // Always include the None checkbox
+                // and we always include the None checkbox
                 cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("none.text")); //$NON-NLS-1$
                 cbMenuItem.setActionCommand(makeCommand(CMD_REMOVE_UNIT, "-1")); //$NON-NLS-1$
                 cbMenuItem.addActionListener(this);
