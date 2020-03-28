@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import javax.swing.*;
 
+import mekhq.campaign.personnel.enums.GenderDescriptors;
 import org.joda.time.DateTime;
 
 import megamek.client.ui.swing.DialogOptionComponent;
@@ -282,8 +283,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         panDemog.add(lblGender, gridBagConstraints);
 
         DefaultComboBoxModel<String> genderModel = new DefaultComboBoxModel<>();
-        genderModel.addElement(Person.getGenderString(Crew.G_MALE, Person.GENDER_DESCRIPTOR.MALE_FEMALE));
-        genderModel.addElement(Person.getGenderString(Crew.G_FEMALE, Person.GENDER_DESCRIPTOR.MALE_FEMALE));
+        genderModel.addElement(Person.getGenderString(Crew.G_MALE, GenderDescriptors.MALE_FEMALE));
+        genderModel.addElement(Person.getGenderString(Crew.G_FEMALE, GenderDescriptors.MALE_FEMALE));
         choiceGender.setModel(genderModel);
         choiceGender.setName("choiceGender"); // NOI18N
         choiceGender.setSelectedIndex(person.getGender());

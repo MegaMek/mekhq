@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.personnel;
+package mekhq.campaign.personnel.generator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +25,9 @@ import megamek.common.Compute;
 import mekhq.Utilities;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.RandomSkillPreferences;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
 
 public class DefaultSkillGenerator extends AbstractSkillGenerator {
 

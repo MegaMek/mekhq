@@ -37,7 +37,6 @@ import megamek.common.*;
 import mekhq.*;
 import mekhq.campaign.finances.*;
 import mekhq.campaign.log.*;
-import mekhq.campaign.personnel.FormerSpouse;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 import org.joda.time.DateTime;
@@ -113,10 +112,10 @@ import mekhq.campaign.parts.StructuralIntegrity;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
-import mekhq.campaign.personnel.AbstractPersonnelGenerator;
+import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.Ancestors;
 import mekhq.campaign.personnel.Bloodname;
-import mekhq.campaign.personnel.DefaultPersonnelGenerator;
+import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.Rank;
@@ -3457,9 +3456,11 @@ public class Campaign implements Serializable, ITechManager {
             if (roll > 12)
                 roll = 12;
             int change = numPersonnel * (roll - 5) / 100;
-            while (change < 0 && dependents.size() > 0) {
-                removePerson(Utilities.getRandomItem(dependents).getId());
-                change++;
+            if ((change < 0) && !getCampaignOptions().getDependentsNeverLeave()) {
+                while ((change < 0) && (dependents.size() > 0)) {
+                    removePerson(Utilities.getRandomItem(dependents).getId());
+                    change++;
+                }
             }
             for (int i = 0; i < change; i++) {
                 Person p = newDependent(Person.T_ASTECH, false);
@@ -4923,11 +4924,9 @@ public class Campaign implements Serializable, ITechManager {
         getRanks().setRankSystem(system);
     }
 
-    public List<String> getAllRankNamesFor(int profession) {
-
+    public List<String> getAllRankNamesFor(int p) {
         List<String> retVal = new ArrayList<>();
         for(Rank rank : getRanks().getAllRanks()) {
-            int p = profession;
             // Grab rank from correct profession as needed
             while (rank.getName(p).startsWith("--") && p != Ranks.RPROF_MW) {
                 if (rank.getName(p).equals("--")) {
@@ -5914,8 +5913,11 @@ public class Campaign implements Serializable, ITechManager {
         return Math.min(nmedics / ndocs, 4);
     }
 
+    /**
+     * @return the number of medics in the campaign including any in the temporary medic pool
+     */
     public int getNumberMedics() {
-        int medics = medicPool;
+        int medics = getMedicPool(); // this uses a getter for unit testing
         for (Person p : getPersonnel()) {
             if (p.isMedic() && p.isActive() && !p.isDeployed()) {
                 medics++;

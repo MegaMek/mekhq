@@ -45,6 +45,7 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.gui.BasicInfo;
@@ -404,7 +405,7 @@ public class PersonnelTableModel extends DataTableModel {
                     return "";
                 }
             case COL_GENDER:
-                return p.getGenderString(Person.GENDER_DESCRIPTOR.MALE_FEMALE);
+                return p.getGenderString(GenderDescriptors.MALE_FEMALE);
             case COL_AGE:
                 return Integer.toString(p.getAge(getCampaign().getCalendar()));
             case COL_TYPE:

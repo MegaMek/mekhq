@@ -31,13 +31,14 @@ import megamek.common.Mech;
 import mekhq.campaign.*;
 import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.log.ServiceLogger;
-import mekhq.campaign.personnel.BodyLocation;
+import mekhq.campaign.personnel.enums.BodyLocation;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -284,7 +285,7 @@ public final class InjuryUtil {
                     result.add(new GameEffect(
                         String.format("%s made a mistake in the treatment of %s and caused %s %s to worsen.",
                             doc.getHyperlinkedFullTitle(), p.getHyperlinkedName(),
-                            p.getGenderString(Person.GENDER_DESCRIPTOR.HIS_HER), i.getName()),
+                            p.getGenderString(GenderDescriptors.HIS_HER), i.getName()),
                         rnd -> {
                             int time = i.getTime();
                             i.setTime((int) Math.max(Math.ceil(time * 1.2), time + 5));
@@ -338,7 +339,7 @@ public final class InjuryUtil {
             } else {
                 result.add(new GameEffect(
                     String.format("%s spent time resting to heal %s %s.",
-                        p.getHyperlinkedName(), p.getGenderString(Person.GENDER_DESCRIPTOR.HIS_HER), i.getName()),
+                        p.getHyperlinkedName(), p.getGenderString(GenderDescriptors.HIS_HER), i.getName()),
                     rnd -> {
 
                     }));

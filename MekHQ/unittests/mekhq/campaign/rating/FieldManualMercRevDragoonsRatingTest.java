@@ -42,9 +42,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
@@ -316,7 +314,6 @@ public class FieldManualMercRevDragoonsRatingTest {
 
     @Test
     public void testGetMedSupportAvailable() {
-
         // Test having 1 regular doctor with 4 temp medics.
         // Expected available support should be:
         // Regular Doctor = 40 hours.
@@ -350,6 +347,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         Person mockMedic = mock(Person.class);
         when(mockMedic.getPrimaryRole()).thenReturn(Person.T_MEDIC);
         when(mockMedic.isDoctor()).thenReturn(false);
+        when(mockMedic.isMedic()).thenReturn(true);
         when(mockMedic.isActive()).thenReturn(true);
         when(mockMedic.isDeployed()).thenReturn(false);
         when(mockMedic.getSkill(eq(SkillType.S_MEDTECH))).thenReturn(mockMedicSkill);
