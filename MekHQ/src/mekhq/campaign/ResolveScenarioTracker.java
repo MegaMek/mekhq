@@ -788,7 +788,7 @@ public class ResolveScenarioTracker {
         //If the host ship ended the game mid-ejection but remains undestroyed, add its remaining passengers
         if (aero.isEjecting() || aero.getCrew().isEjected()) {
             if (aero.isEjecting() && !aero.isDestroyed()) {
-                rescuedPassengers += aero.getNPassenger();
+                rescuedPassengers = allPassengersStatus.size();
             }
             //Convert the set to a list so we can pick a random value by index...
             List<PersonStatus> allPassengersStatusList = new ArrayList<>();
