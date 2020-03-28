@@ -1,0 +1,478 @@
+/*
+ * Copyright (c) 2020 The MegaMek Team.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "mekhq.online";
+option java_outer_classname = "DistributedMekHQ";
+
+import "google/protobuf/any.proto";
+import "google/protobuf/timestamp.proto";
+
+package mekhqonline;
+
+// The MekHQHost Service handles distributed MekHQ play
+// between a Host Campaign and one or more Client Campaigns.
+service MekHQHost {
+    //
+    // Initiates a connection to the Host Campaign.
+    //
+    rpc Connect(ConnectionRequest) returns (ConnectionResponse) {}
+
+    //
+    // Advises the Host Campaign that a Client Campaign
+    // is no longer participating in the session.
+    //
+    rpc Disconnect(DisconnectionRequest) returns (DisconnectionResponse) {}
+
+    //
+    // Initiates a Message Bus between the Client Campaign
+    // and Host Campaign.
+    //
+    rpc MessageBus(stream ClientMessage) returns (stream ServerMessage) {}
+}
+
+// Represents a request to initiate a connection to a host
+// campaign.
+message ConnectionRequest {
+    // The version of MekHQ on the Client machine.
+    string version = 1;
+
+    // A CampaignDetails message with details of the Client Campaign.
+    CampaignDetails client = 2;
+
+    // An optional password to use during connection attempts.
+    oneof password_option {
+        // The password required to initiate the connection.
+        string password = 3;
+    }
+}
+
+// Represents a response to a successful connection attempt
+// containing details of the Host Campaign.
+message ConnectionResponse {
+    // The version of MekHQ on the Host machine.
+    string version = 1;
+
+    // A CampaignDetails message with details of the Host Campaign.
+    CampaignDetails host = 2;
+
+    // Zero or more CampaignDetails messages representing the
+    // Client Campaigns involved in the session.
+    //
+    // These campaigns may or may not be active.
+    repeated CampaignDetails campaigns = 3;
+}
+
+// Represents a request to disconnect from the Host Campaign.
+message DisconnectionRequest {
+    // The unique identifier of the Client Campaign.
+    string id = 1;
+}
+
+// Represents a response to a successful disconnection attempt.
+message DisconnectionResponse {
+    // The unique identifier of the Host Campaign.
+    string id = 1;
+}
+
+// Represents the details of a specific Campaign involved
+// in the session.
+message CampaignDetails {
+    // The unique identifier of the Campaign.
+    string id = 1;
+
+    // The name of the Campaign.
+    string name = 2;
+
+    // The date of the Campaign (ISO8601)
+    string date = 3;
+
+    // The team number of the Campaign.
+    // NOTE: The Host Campaign is always team 1.
+    int32 team = 4;
+
+    // The location of the Campaign.
+    string location = 5;
+
+    // A value indicating whether or not the Campaign
+    // is operating under GM Mode.
+    bool isGMMode = 6;
+
+    // A value indicating whether or not the Campaign
+    // is actively playing in this session.
+    //
+    // Client Campaigns should not set this value
+    // when sending a CampaignDetails message.
+    //
+    // Host Campaigns should not read this value in
+    // messages from Client Campaigns.
+    bool is_active = 7;
+}
+
+// Represents a message from a Client Campaign
+// to the Host Campaign over the message bus.
+message ClientMessage {
+    // The time when the message was generated.
+    google.protobuf.Timestamp timestamp = 1;
+
+    // The unique identifier of the Client Campaign.
+    string id = 2;
+
+    // An optional map of metadata associated
+    // with this message.
+    map<string, string> metadata = 3;
+
+    // The eveloped message being sent to the Host Campaign.
+    google.protobuf.Any message = 4;
+}
+
+// Represents a message from the Host Campaign
+// to a Client Campaign over the message bus.
+message ServerMessage {
+    // The time when the message was generated.
+    google.protobuf.Timestamp timestamp = 1;
+
+    // The unique identifier of the Host Campaign.
+    string id = 2;
+
+    // An optional map of metadata associated
+    // with this message.
+    map<string, string> metadata = 3;
+
+    // The enveloped message being sent to a Client Campaign.
+    google.protobuf.Any message = 4;
+}
+
+// Represents a PING being sent to keep-alive
+// the connection between a Host and Client Campaign.
+//
+// This message can be sent by either the Host or
+// a Client Campaign.
+//
+// Any Campaign which receives a Ping message should
+// respond as soon as possible with a Pong message.
+message Ping {
+    // A CampaignDetails message which contains details
+    // from the sending campaign.
+    CampaignDetails campaign = 1;
+}
+
+// Represents a PONG being sent in response to
+// a PING message.
+//
+// This message can be sent by either the Host or
+// a Client Campaign, but only in response to a
+// previous PING message.
+//
+// Only the Host Campaign sends along data about
+// the other campaigns in the session, and should
+// ignore any data in the `campaigns` field.
+message Pong {
+    // A CampaignDetails message which contains details
+    // from the sending campaign.
+    CampaignDetails campaign = 1;
+
+    // Zero or more CampaignDetails messages representing the
+    // Client Campaigns involved in the session.
+    //
+    // These campaigns may or may not be active.
+    repeated CampaignDetails campaigns = 2;
+}
+
+// Represents a message sent when a Campaign changes
+// dates.
+//
+// This message may be sent by any Campaign, and will
+// be forwarded by the Host Campaign to everyone in
+// the current session.
+message CampaignDateChanged {
+    // The unique identifier of the Campaign.
+    string id = 1;
+
+    // The new date of the Campaign (ISO8601).
+    string date = 2;
+}
+
+// Represents a message sent when a Campaign changes
+// its GM Mode.
+//
+// This message may be sent by any Campaign, and will
+// be forwarded by the Host Campaign to everyone in
+// the current session.
+message GMModeChanged {
+    // The unique identifier of the Campaign.
+    string id = 1;
+
+    // A value indicating whether or not the Campaign
+    // is operating under GM Mode.
+    bool value = 2;
+}
+
+// Represents a message sent when Team Assignments change.
+//
+// This message is only sent by the Host Campaign to the
+// connected Client Campaigns.
+message TeamAssignmentChanged {
+    // Zero or more TeamAssignment messages detailing
+    // which team each Campaign is assigned to.
+    //
+    // If no TeamAssignment messages are sent, then every
+    // Campaign is on its own team.
+    repeated TeamAssignment teams = 1;
+}
+
+// Represents a message detailing a specific Team Assignment.
+message TeamAssignment {
+    // The unique identifier of the Campaign.
+    string id = 1;
+
+    // The team number of the Campaign.
+    //
+    // NOTE: The Host Campaign is always on team 1.
+    int32 team = 2;
+}
+
+// Represents a message sent when a Campaign changes locations,
+// either due to a KF Jump or due to GM movement.
+message LocationChanged {
+    // The unique identifier of the Campaign.
+    string id = 1;
+
+    // The new location of the Campaign.
+    string location = 2;
+
+    // A value indicating whether or not the movement
+    // was due to a GM action.
+    bool is_gm_movement = 3;
+}
+
+// Represents a message sent when a Campaign updates its daily
+// log. Zero or more of these messages may be sent for the same
+// date.
+message LogUpdated {
+    // The unique identifier of the Campaign.
+    string id = 1;
+
+    // The date that this log entry corresponds to.
+    string date = 2;
+
+    // Zero or more LogEntry messages containing the
+    // log entries for that date.
+    repeated LogEntry entries = 3;
+}
+
+// Represents an entry in the daily log.
+message LogEntry {
+    // The daily log entry.
+    string entry = 1;
+}
+
+// Represents a message sent when the TOE for a Campaign
+// is updated.
+//
+// This message may be sent by any Campaign, and will
+// be forwarded by the Host Campaign to everyone in
+// the current session.
+//
+// This message may be restricted to campaigns on the
+// same team.
+message TOEUpdated {
+    // The unique identifier of the Campaign.
+    string id = 1;
+
+    // The top level Force in the Campaign.
+    Force force = 2;
+}
+
+// Represents a Force within a Campaign's TOE.
+message Force {
+    // The unique identifier of the Force.
+    int32 id = 1;
+
+    // The name of the force.
+    string name = 2;
+
+    // Zero or more sub-forces assigned
+    // to this Force.
+    repeated Force sub_forces = 3;
+
+    // Zero or more units attached directly
+    // to this Force.
+    repeated ForceUnit units = 4;
+}
+
+// Represents a unit within a Force in a Campaign's
+// TOE.
+message ForceUnit {
+    // The unique identifier of the Unit.
+    string id = 1;
+
+    // The name of the Unit.
+    string name = 2;
+
+    // The name of the Unit's commander.
+    string commander = 3;
+}
+
+// Represents a Scenario within a Campaign.
+message ScenarioIdentifier {
+    // The unique identifier of the Campaign
+    // who owns the scenario
+    string source_id = 1;
+
+    // The unique identifier of the Contract
+    // for the source campaign
+    int32 contract_id = 2;
+
+    // The unique identifier of the Scenario
+    // within the Contract
+    int32 scenario_id = 3;
+}
+
+// Represents the deployment details of a Force
+// within a Scenario.
+message ForceDeployment {
+    // The number of rounds the force will be delayed
+    // upon deployment.
+    int32 deployment_delay = 1;
+
+    // The edge of the board the force will be deployed
+    // to.
+    int32 board_start = 2;
+}
+
+// Represents a Force assigned to a Scenario
+message ScenarioForce {
+    // The unique identifier of the Campaign
+    // which owns this force, or null if
+    // the owner is a bot.
+    string owner_id = 1;
+
+    // The name of the force's owner.
+    string owner_name = 2;
+
+    // The team number of the force's owner.
+    int32 team = 3;
+
+    // An optional Force assigned to the Scenario.
+    Force force = 4;
+
+    // Zero-or-more units assigned to the Scenario.
+    repeated ForceUnit units = 5;
+
+    // Details of how the force will be deployed
+    // in the Scenario.
+    //
+    // This is sent by the Host Campaign only.
+    ForceDeployment deployment = 6;
+}
+
+// Represents an objective within a Scenario.
+message ScenarioObjective {
+    // A description of the objective.
+    string description = 1;
+
+    // Zero or more forces affected by the objective.
+    repeated string affected_forces = 2;
+
+    // Zero or more units affected by the objective.
+    repeated string affected_units = 3;
+}
+
+// Represents the details of a Scenario.
+message ScenarioDetails {
+    // The unique identifier the Scenario.
+    ScenarioIdentifier scenario = 1;
+
+    // The date of the scenario (ISO 8601).
+    string date = 2;
+
+    // The name of the Scenario.
+    string name = 3;
+
+    // A description of the Scenario.
+    string description = 4;
+
+    // Zero or more objectives for the Scenario.
+    repeated ScenarioObjective objectives = 5;
+
+    // The forces assigned to the Scenario
+    repeated ScenarioForce forces = 6;
+}
+
+// Represents an invitation to join a Scenario.
+message ScenarioInvitation {
+    // The details of the Scenario.
+    ScenarioDetails scenario = 1;
+
+    // The unique identifier of the Campaign
+    // who is receiving the invitation
+    string target_id = 2;
+}
+
+// Represents a message sent when the source or
+// target campaign would no longer like to participate
+// in a scenario together.
+message ScenarioInvitationCancelled {
+    // The unique identifier the Scenario
+    ScenarioIdentifier scenario_id = 1;
+
+    // The unique identifier of the Campaign
+    // who recieved the invitation
+    string target_id = 2;
+}
+
+// Represents a message sent when the target
+// campaign accepts a request to participate
+// in a scenario.
+message ScenarioInvitationAcceptance {
+    // The unique identifier the Scenario
+    ScenarioIdentifier scenario_id = 1;
+
+    // The unique identifier of the Campaign
+    // who recieved the invitation
+    string target_id = 2;
+}
+
+// Represents a message sent when the details
+// of a scenario are updated.
+message ScenarioDetailsUpdated {
+    // The details of the Scenario.
+    ScenarioDetails scenario = 1;
+
+    // The unique identifier of the Campaign
+    // who should receive the update.
+    string target_id = 2;
+}
+
+// Represents a message sent when the target
+// campaign updates their units deployed to
+// the scenario.
+message ScenarioUnitsUpdated {
+    // The unique identifier the Scenario
+    ScenarioIdentifier scenario_id = 1;
+
+    // The unique identifier of the Campaign
+    // who recieved the invitation
+    string target_id = 2;
+
+    // Zero or more forces attached to the Scenario.
+    repeated ScenarioForce attached_forces = 3;
+}

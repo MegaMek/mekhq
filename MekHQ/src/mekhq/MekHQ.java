@@ -34,8 +34,12 @@ import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.text.DefaultEditorKit;
 
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
+
 import megamek.MegaMek;
 import megamek.client.Client;
+import megamek.common.annotations.Nullable;
 import megamek.common.event.EventBus;
 import megamek.common.event.GameBoardChangeEvent;
 import megamek.common.event.GameBoardNewEvent;
@@ -80,6 +84,8 @@ import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.preferences.StringPreference;
 import mekhq.gui.utilities.ObservableString;
+import mekhq.online.MekHQClient;
+import mekhq.online.MekHQServer;
 import mekhq.preferences.MekHqPreferences;
 import mekhq.preferences.PreferencesNode;
 import mekhq.service.AutosaveService;
@@ -129,6 +135,19 @@ public class MekHQ implements GameListener {
     private IconPackage iconPackage = new IconPackage();
 
     private final IAutosaveService autosaveService;
+
+    private final ResourceBundle resourceBundle = ResourceBundle.getBundle("mekhq.resources.MekHQ");
+
+    /** A value indicating whether or not MekHQ is hosting an online session. */
+    private boolean isHost;
+    /** The port to use when hosting the online session. */
+    private int hostPort = 3000;
+    /** The address of the MekHQ instance to connect to (i.e. hostname:port) */
+    private String remoteHost;
+
+    private MekHQServer onlineServer;
+    private MekHQClient onlineClient;
+    private ManagedChannel channel;
 
 	/**
 	 * Converts the MekHQ {@link #VERBOSITY_LEVEL} to {@link LogLevel}.
@@ -285,11 +304,30 @@ public class MekHQ implements GameListener {
     /**
      * At startup create and show the main frame of the application.
      */
-    protected void startup() {
+    protected void startup(String[] args) {
         UIManager.installLookAndFeel("Flat Light", "com.formdev.flatlaf.FlatLightLaf");
         UIManager.installLookAndFeel("Flat IntelliJ", "com.formdev.flatlaf.FlatIntelliJLaf");
         UIManager.installLookAndFeel("Flat Dark", "com.formdev.flatlaf.FlatDarkLaf");
         UIManager.installLookAndFeel("Flat Darcula", "com.formdev.flatlaf.FlatDarculaLaf");
+
+        for (String arg : args) {
+            if (arg.startsWith("--host")) {
+                setIsHosting(true);
+                int equals = arg.indexOf('=');
+                if (equals > 0) {
+                    setHostPort(Integer.parseInt(arg.substring(equals + 1)));
+                }
+            } else if (arg.startsWith("--connect")) {
+                int equals = arg.indexOf('=');
+                if (equals < 0) {
+                    // for testing we're defaulting to localhost:3000
+                    // this will go away outside of prototyping
+                    setHostLocation("localhost:3000");
+                } else {
+                    setHostLocation(arg.substring(equals + 1));
+                }
+            }
+        }
 
         showInfo();
 
@@ -303,7 +341,35 @@ public class MekHQ implements GameListener {
         sud.setVisible(true);
     }
 
-    private void setUserPreferences() {
+    public String getVersion() {
+        return resourceBundle.getString("Application.version");
+    }
+
+    private void setHostLocation(@Nullable String host) {
+        remoteHost = host;
+    }
+
+    public boolean isRemote() {
+        return remoteHost != null;
+    }
+
+    private void setIsHosting(boolean b) {
+        isHost = b;
+    }
+
+    public boolean isHosting() {
+        return isHost;
+    }
+
+    public void setHostPort(int port) {
+        hostPort = port;
+    }
+
+    public int getHostPort() {
+        return hostPort;
+    }
+
+	private void setUserPreferences() {
         PreferencesNode preferences = getPreferences().forClass(MekHQ.class);
 
         selectedTheme = new ObservableString("selectedTheme", UIManager.getLookAndFeel().getClass().getName());
@@ -354,8 +420,53 @@ public class MekHQ implements GameListener {
     }
 
     public void showNewView() {
+
+        // Start up the host server or connect to a remote host
+        // if indicated.
+        connectDistributedFeatures();
+
     	campaigngui = new CampaignGUI(this);
     	campaigngui.showOverviewTab(getCampaign().isOverviewLoadingValue());
+    }
+
+    private void connectDistributedFeatures() {
+
+        // Close any existing connections.
+        disconnectDistributedFeatures();
+
+        try {
+            if (isHosting()) {
+                onlineServer = new MekHQServer(hostPort, campaignController);
+
+                onlineServer.start();
+            } else if (isRemote()) {
+                channel = ManagedChannelBuilder.forTarget(remoteHost).usePlaintext().build();
+                onlineClient = new MekHQClient(channel, campaignController);
+
+                onlineClient.connect();
+            }
+        } catch (IOException ex) {
+            MekHQ.getLogger().error(MekHQ.class, "showNewView()", "Could not connect to server.", ex);
+
+            disconnectDistributedFeatures();
+        }
+    }
+
+    private void disconnectDistributedFeatures() {
+        try {
+            if (onlineServer != null) {
+                onlineServer.stop();
+            } else if (channel != null) {
+                try {
+                    onlineClient.disconnect();
+                } catch (Exception ex) {
+                    MekHQ.getLogger().error(MekHQ.class, "disconnectDistributedFeatures()", "Could not disconnect from server.", ex);
+                }
+                channel.shutdownNow();
+            }
+        } catch (Exception ex) {
+            MekHQ.getLogger().error(MekHQ.class, "disconnectDistributedFeatures()", "Could not shut down existing online features.", ex);
+        }
     }
 
     /**
@@ -371,7 +482,7 @@ public class MekHQ implements GameListener {
         // redirect output to log file
         redirectOutput(logFileName); // Deprecated call required for MegaMek usage
 
-        SwingUtilities.invokeLater(() -> MekHQ.getInstance().startup());
+        SwingUtilities.invokeLater(() -> MekHQ.getInstance().startup(args));
     }
 
     private void showInfo() {
