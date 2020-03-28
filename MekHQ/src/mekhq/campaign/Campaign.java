@@ -37,6 +37,7 @@ import megamek.common.*;
 import mekhq.*;
 import mekhq.campaign.finances.*;
 import mekhq.campaign.log.*;
+import mekhq.gui.sorter.NaturalOrderComparator;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 import org.joda.time.DateTime;
@@ -1155,14 +1156,31 @@ public class Campaign implements Serializable, ITechManager {
         return units.values();
     }
 
-    public List<Unit> getUnits(boolean weightSorted, boolean alphaSorted, boolean unitTypeSorted) {
+    public List<Unit> getUnits(boolean alphaSorted, boolean weightSorted) {
+        return getUnits(alphaSorted, weightSorted, false, false);
+    }
+    public List<Unit> getUnits(boolean alphaSorted, boolean weightSorted, boolean weightClassSorted,
+                               boolean unitTypeSorted) {
         List<Unit> units = getCopyOfUnits();
         if (alphaSorted || weightSorted) {
             if (alphaSorted) {
-                units.sort(Comparator.comparing(Unit::getName));
+                Comparator<String> naturalOrderComparator = new NaturalOrderComparator();
+                units.sort((o1, o2) -> naturalOrderComparator.compare(o1.getName(), o2.getName()));
             }
 
-            if (weightSorted) {
+            if (weightSorted && weightClassSorted) {
+                units.sort((lhs, rhs) -> {
+                    int weightClass1 = lhs.getEntity().getWeightClass();
+                    int weightClass2 = rhs.getEntity().getWeightClass();
+                    if (weightClass1 == weightClass2) {
+                        return (int) (lhs.getEntity().getWeight() - rhs.getEntity().getWeight());
+                    } else {
+                        return weightClass1 - weightClass2;
+                    }
+                });
+            } else if (weightClassSorted) {
+                units.sort(Comparator.comparingInt(o -> o.getEntity().getWeightClass()));
+            } else if (weightSorted) {
                 // Sorted in descending order of weights
                 units.sort((lhs, rhs) -> Double.compare(rhs.getEntity().getWeight(), lhs.getEntity().getWeight()));
             }
