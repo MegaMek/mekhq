@@ -1240,18 +1240,27 @@ public class CampaignOptions implements Serializable {
         this.salaryXpMultiplier[xp] = d;
     }
 
-    public Money getBaseSalary(int type) {
+    public double getBaseSalary(int type) {
+        if ((type < 0) || (type >= salaryTypeBase.length)) {
+            return 0.0;
+        }
+
+        return salaryTypeBase[type].getAmount().doubleValue();
+    }
+
+    public Money getBaseSalaryMoney(int type) {
         if (type < 0 || type >= salaryTypeBase.length) {
             return Money.zero();
         }
         return salaryTypeBase[type];
     }
 
-    public void setBaseSalary(int type, Money base) {
-        if (type < 0 || type >= salaryTypeBase.length) {
+    public void setBaseSalary(int type, double base) {
+        if ((type < 0) || (type >= salaryTypeBase.length)) {
             return;
         }
-        this.salaryTypeBase[type] = base;
+
+        this.salaryTypeBase[type] = Money.of(base);
     }
     //endregion salary
     //endregion Personnel Tab
