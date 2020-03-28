@@ -744,7 +744,7 @@ public class ResolveScenarioTracker {
         
         //Now, did the passengers take any hits? 
         //We'll assume that if units in transport bays were hit, their crews and techs might also have been
-        Map<UUID,PersonStatus> allPassengersStatus = new HashMap<>(); //Use this to keep track of ejected passengers for the next step
+        Set<PersonStatus> allPassengersStatus = new HashSet<>(); //Use this to keep track of ejected passengers for the next step
         List<Entity> cargo = bayLoadedEntities.get(UUID.fromString(en.getExternalIdAsString()));
         if (cargo != null) {
             for (Entity e : cargo) {
@@ -757,10 +757,6 @@ public class ResolveScenarioTracker {
                     for (Person p : cargoCrew) {
                         PersonStatus status = new PersonStatus(p.getFullName(), u.getEntity().getDisplayName(),
                                 p.getHits(), p.getId());
-                        if (allPassengersStatus.get(p.getId()) != null) {
-                            //Then we've already accounted for this person - most likely a tech assigned to multiple units
-                            continue;
-                        }
                         boolean wounded = false;
                         //The lore says bay crews have pressurized sleeping alcoves in the corners of each bay
                         //Let's assume people are injured on an 8+ if the unit is destroyed, same as a critical hit chance
@@ -783,27 +779,46 @@ public class ResolveScenarioTracker {
                         }
                         //Go ahead and add everyone to this master list, even if they're killed/wounded above.
                         //It's normal to have some casualties in the lifeboats...
-                        allPassengersStatus.put(p.getId(),status);
+                        allPassengersStatus.add(status);
                     }
                 }
             }
         }
         //Now let's account for any passengers aboard escape craft
         //If the host ship ended the game mid-ejection but remains undestroyed, add its remaining passengers
-        if (aero.isEjecting() && !aero.isDestroyed()) {
-            rescuedPassengers += aero.getNPassenger();
-        }
-        //Let's go through and handle the list
-        while (rescuedPassengers > 0) {
-            if (allPassengersStatus.isEmpty()) {
-                //Could happen on ships with passenger quarters where numbers exceed those associated
-                //with transported units, or ships that are just empty
-                break;
+        if (aero.isEjecting() || aero.getCrew().isEjected()) {
+            if (aero.isEjecting() && !aero.isDestroyed()) {
+                rescuedPassengers += aero.getNPassenger();
             }
-            PersonStatus s = allPassengersStatus.remove(Compute.randomInt(allPassengersStatus.size()));
-            UUID pid = s.getId();
-            peopleStatus.put(pid, s);
-            rescuedPassengers --;
+            //Convert the set to a list so we can pick a random value by index...
+            List<PersonStatus> allPassengersStatusList = new ArrayList<>();
+            for (PersonStatus s : allPassengersStatus) {
+                allPassengersStatusList.add(s);
+            }
+            
+            //Let's go through and handle the list
+            while (rescuedPassengers > 0) {
+                if (allPassengersStatus.isEmpty()) {
+                    //Could happen on ships with passenger quarters where numbers exceed those associated
+                    //with transported units, or ships that are just empty
+                    break;
+                }
+                PersonStatus s = allPassengersStatusList.remove(Compute.randomInt(allPassengersStatusList.size()));
+                UUID pid = s.getId();
+                peopleStatus.put(pid, s);
+                rescuedPassengers --;
+            }
+            //Everyone who didn't make it to an escape craft dies
+            for (PersonStatus s : allPassengersStatusList) {
+                s.setHits(6);
+                s.setDead(true);
+                peopleStatus.put(s.getId(), s);
+            }
+        } else {
+            //No ejection is involved, just add everyone to our master peopleStatus table
+            for (PersonStatus s : allPassengersStatus) {
+                peopleStatus.put(s.getId(), s);
+            }
         }
     }
 
