@@ -30,13 +30,7 @@ import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
 
 import megamek.client.ui.swing.util.MenuScroller;
-import megamek.common.Aero;
-import megamek.common.BattleArmor;
-import megamek.common.Crew;
-import megamek.common.Infantry;
-import megamek.common.Mech;
-import megamek.common.Mounted;
-import megamek.common.Tank;
+import megamek.common.*;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
@@ -1413,17 +1407,63 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 JMenu techUnitTypeMenu = new JMenu();
                 JMenu techEntityWeightMenu = new JMenu();
 
-                String unitTypeName = "";
-                String weightClassName = "";
+                int unitType = -1;
+                int weightClass = -1;
 
                 if (oneSelected && person.isActive() && person.isFree()) {
-                    for (Unit unit : gui.getCampaign().getUnits(true, true)) {
+                    for (Unit unit : gui.getCampaign().getUnits(true, true, true)) {
                         if (!unit.isAvailable()) {
                             continue;
-                        }
+                        } else if (unit.getEntity().getUnitType() != unitType) {
+                            unitType = unit.getEntity().getUnitType();
+                            String unitTypeName = UnitType.getTypeName(unitType);
+                            weightClass = unit.getEntity().getWeightClass();
+                            String weightClassName = unit.getEntity().getWeightClassName();
 
-                        if (!unit.getEntity().getWeightClassName().equals(weightClassName)) {
-                            weightClassName = unit.getEntity().getWeightClassName();
+                            // Add Weight Menus to Unit Type Menus
+                            JMenuHelpers.addMenuIfNonEmpty(pilotUnitTypeMenu, pilotEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(driverUnitTypeMenu, driverEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(crewUnitTypeMenu, crewEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(gunnerUnitTypeMenu, gunnerEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(navUnitTypeMenu, navEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(soldierUnitTypeMenu, soldierEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(techOfficerUnitTypeMenu, techOfficerEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(consoleCmdrUnitTypeMenu, consoleCmdrEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(techUnitTypeMenu, techEntityWeightMenu, MAX_POPUP_ITEMS);
+
+                            // Then add the Unit Type Menus to the Role Menus
+                            JMenuHelpers.addMenuIfNonEmpty(pilotMenu, pilotUnitTypeMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(driverMenu, driverUnitTypeMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(crewMenu, crewUnitTypeMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(gunnerMenu, gunnerUnitTypeMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(navMenu, navUnitTypeMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(soldierMenu, soldierUnitTypeMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(techOfficerMenu, techOfficerUnitTypeMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(consoleCmdrMenu, consoleCmdrUnitTypeMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(techMenu, techUnitTypeMenu, MAX_POPUP_ITEMS);
+
+                            // Create new UnitType and EntityWeight Menus
+                            pilotUnitTypeMenu = new JMenu(unitTypeName);
+                            pilotEntityWeightMenu = new JMenu(weightClassName);
+                            driverUnitTypeMenu = new JMenu(unitTypeName);
+                            driverEntityWeightMenu = new JMenu(weightClassName);
+                            crewUnitTypeMenu = new JMenu(unitTypeName);
+                            crewEntityWeightMenu = new JMenu(weightClassName);
+                            gunnerUnitTypeMenu = new JMenu(unitTypeName);
+                            gunnerEntityWeightMenu = new JMenu(weightClassName);
+                            navUnitTypeMenu = new JMenu(unitTypeName);
+                            navEntityWeightMenu = new JMenu(weightClassName);
+                            soldierUnitTypeMenu = new JMenu(unitTypeName);
+                            soldierEntityWeightMenu = new JMenu(weightClassName);
+                            techOfficerUnitTypeMenu = new JMenu(unitTypeName);
+                            techOfficerEntityWeightMenu = new JMenu(weightClassName);
+                            consoleCmdrUnitTypeMenu = new JMenu(unitTypeName);
+                            consoleCmdrEntityWeightMenu = new JMenu(weightClassName);
+                            techUnitTypeMenu = new JMenu(unitTypeName);
+                            techEntityWeightMenu = new JMenu(weightClassName);
+                        } else if (unit.getEntity().getWeightClass() != weightClass) {
+                            weightClass = unit.getEntity().getWeightClass();
+                            String weightClassName = unit.getEntity().getWeightClassName();
 
                             JMenuHelpers.addMenuIfNonEmpty(pilotUnitTypeMenu, pilotEntityWeightMenu, MAX_POPUP_ITEMS);
                             JMenuHelpers.addMenuIfNonEmpty(driverUnitTypeMenu, driverEntityWeightMenu, MAX_POPUP_ITEMS);
@@ -1527,12 +1567,47 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         }
                     }
                 } else if (StaticChecks.areAllActive(selected) && StaticChecks.areAllEligible(selected)) {
-                    for (Unit unit : gui.getCampaign().getUnits()) {
+                    for (Unit unit : gui.getCampaign().getUnits( true, true, true)) {
                         if (!unit.isAvailable()) {
                             continue;
-                        }
-                        if (!unit.getEntity().getWeightClassName().equals(weightClassName)) {
-                            weightClassName = unit.getEntity().getWeightClassName();
+                        } else if (unit.getEntity().getUnitType() != unitType) {
+                            unitType = unit.getEntity().getUnitType();
+                            String unitTypeName = UnitType.getTypeName(unitType);
+                            weightClass = unit.getEntity().getWeightClass();
+                            String weightClassName = unit.getEntity().getWeightClassName();
+
+                            // Add Weight Menus to Unit Type Menus
+                            JMenuHelpers.addMenuIfNonEmpty(pilotUnitTypeMenu, pilotEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(driverUnitTypeMenu, driverEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(crewUnitTypeMenu, crewEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(gunnerUnitTypeMenu, gunnerEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(navUnitTypeMenu, navEntityWeightMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(soldierUnitTypeMenu, soldierEntityWeightMenu, MAX_POPUP_ITEMS);
+
+                            // Then add the Unit Type Menus to the Role Menus
+                            JMenuHelpers.addMenuIfNonEmpty(pilotMenu, pilotUnitTypeMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(driverMenu, driverUnitTypeMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(crewMenu, crewUnitTypeMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(gunnerMenu, gunnerUnitTypeMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(navMenu, navUnitTypeMenu, MAX_POPUP_ITEMS);
+                            JMenuHelpers.addMenuIfNonEmpty(soldierMenu, soldierUnitTypeMenu, MAX_POPUP_ITEMS);
+
+                            // Create new UnitType and EntityWeight Menus
+                            pilotUnitTypeMenu = new JMenu(unitTypeName);
+                            pilotEntityWeightMenu = new JMenu(weightClassName);
+                            driverUnitTypeMenu = new JMenu(unitTypeName);
+                            driverEntityWeightMenu = new JMenu(weightClassName);
+                            crewUnitTypeMenu = new JMenu(unitTypeName);
+                            crewEntityWeightMenu = new JMenu(weightClassName);
+                            gunnerUnitTypeMenu = new JMenu(unitTypeName);
+                            gunnerEntityWeightMenu = new JMenu(weightClassName);
+                            navUnitTypeMenu = new JMenu(unitTypeName);
+                            navEntityWeightMenu = new JMenu(weightClassName);
+                            soldierUnitTypeMenu = new JMenu(unitTypeName);
+                            soldierEntityWeightMenu = new JMenu(weightClassName);
+                        } else if (unit.getEntity().getWeightClass() != weightClass) {
+                            weightClass = unit.getEntity().getWeightClass();
+                            String weightClassName = unit.getEntity().getWeightClassName();
 
                             JMenuHelpers.addMenuIfNonEmpty(pilotUnitTypeMenu, pilotEntityWeightMenu, MAX_POPUP_ITEMS);
                             JMenuHelpers.addMenuIfNonEmpty(driverUnitTypeMenu, driverEntityWeightMenu, MAX_POPUP_ITEMS);
