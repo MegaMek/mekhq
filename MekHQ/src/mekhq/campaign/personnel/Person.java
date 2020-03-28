@@ -2436,7 +2436,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
             if (version.isLowerThan("0.47.5") && (retVal.getExpectedDueDate() == null)
                     && (retVal.getDueDate() != null)) {
-                retVal.setExpectedDueDate(retVal.getDueDate().clone());
+                retVal.setExpectedDueDate((GregorianCalendar) retVal.getDueDate().clone());
             }
 
             if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 13) {
