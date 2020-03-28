@@ -1155,18 +1155,23 @@ public class Campaign implements Serializable, ITechManager {
         return units.values();
     }
 
-    public ArrayList<Unit> getUnits(boolean weightSorted, boolean alphaSorted) {
-        ArrayList<Unit> sortedUnits = getCopyOfUnits();
+    public List<Unit> getUnits(boolean weightSorted, boolean alphaSorted, boolean unitTypeSorted) {
+        List<Unit> units = getCopyOfUnits();
         if (alphaSorted || weightSorted) {
             if (alphaSorted) {
-                sortedUnits.sort(Comparator.comparing(Unit::getName));
+                units.sort(Comparator.comparing(Unit::getName));
             }
+
             if (weightSorted) {
                 // Sorted in descending order of weights
-                sortedUnits.sort((lhs, rhs) -> Double.compare(rhs.getEntity().getWeight(), lhs.getEntity().getWeight()));
+                units.sort((lhs, rhs) -> Double.compare(rhs.getEntity().getWeight(), lhs.getEntity().getWeight()));
+            }
+
+            if (unitTypeSorted) {
+                units.sort(Comparator.comparingInt(e -> e.getEntity().getUnitType()));
             }
         }
-        return sortedUnits;
+        return units;
     }
 
     // Since getUnits doesn't return a defensive copy and I don't know what I might break if I made it do so...

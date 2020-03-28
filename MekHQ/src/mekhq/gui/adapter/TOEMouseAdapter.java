@@ -1020,7 +1020,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     // Or Gun Emplacements!
                     // TODO: Or Robotic Systems!
                     JMenu unsorted = new JMenu("Unsorted");
-                    for (Unit u : gui.getCampaign().getUnits(true, true)) {
+                    for (Unit u : gui.getCampaign().getUnits(true, true, false)) {
                         String type = UnitType.getTypeName(u.getEntity().getUnitType());
                         String className = u.getEntity().getWeightClassName();
                         if (null != u.getCommander()) {
@@ -1189,7 +1189,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                 JMenu a_trn = new JMenu(TOEMouseAdapter.ASF_CARRIERS);
                 JMenu sc_trn = new JMenu(TOEMouseAdapter.SC_CARRIERS);
                 JMenu singleUnitMenu = new JMenu();
-                
+
                 if (unitsInForces.size() > 0) {
                     Unit unit = unitsInForces.get(0);
                     String unitIds = "" + unit.getId().toString();
@@ -1222,7 +1222,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                             if (ship == null || ship.isSalvage() || ship.getCommander() == null) {
                                 continue;
                             }
-                            
+
                             if (allUnitsSameType) {
                                 double capacity = ship.getCorrectBayCapacity(singleUnitType, unitWeight);
                                 if (capacity > 0) {
@@ -1537,7 +1537,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     boolean allUnitsSameType = false;
                     double unitWeight = 0;
                     int singleUnitType = -1;
-                    
+
                     // Add submenus for different types of transports
                     JMenu m_trn = new JMenu(TOEMouseAdapter.MECH_CARRIERS);
                     JMenu pm_trn = new JMenu(TOEMouseAdapter.PROTOMECH_CARRIERS);
@@ -1549,14 +1549,14 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     JMenu a_trn = new JMenu(TOEMouseAdapter.ASF_CARRIERS);
                     JMenu sc_trn = new JMenu(TOEMouseAdapter.SC_CARRIERS);
                     JMenu singleUnitMenu = new JMenu();
-                    
+
                     for (Unit u : units) {
                         if (u.getEntity() != null && u.getEntity().isLargeCraft()) {
                             shipInSelection = true;
                             break;
                         }
                     }
-                    
+
                     //Check to see if all selected units are of the same type
                     for (int i = 0; i < UnitType.SIZE; i++) {
                         if (StaticChecks.areAllUnitsSameType(units, i)) {
@@ -1775,8 +1775,8 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
      * Worker function that creates a new instance of a JMenuItem for a set of transport ship characteristics
      * Used to have a single ship appear on multiple menu entries defined by type of unit transported
      * Displays the remaining capacity in bays of the specified type
-     * 
-     * @param shipName String name of this ship. 
+     *
+     * @param shipName String name of this ship.
      * @param shipId Unique id of this ship. Used to fill out actionPerformed(ActionEvent)
      * @param unitIds  String of units delimited by | used to fill out actionPerformed(ActionEvent)
      * @param capacity Double representing the capacity of the designated bay type
@@ -1787,7 +1787,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
         menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ASSIGN_TO_SHIP + shipId + "|" + unitIds);
         menuItem.addActionListener(this);
         menuItem.setEnabled(true);
-        
+
         return menuItem;
     }
 }
