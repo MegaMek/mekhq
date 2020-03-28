@@ -762,14 +762,13 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                         if ((menu.getMenuComponentCount() > 0) || (menu.getItemCount() > 0)) {
                             popup.add(menu);
                         }
-                    }
-                    if (force.getTechID() != null) {
+                    } else {
                         menuItem = new JMenuItem("Remove Tech from Force");
                         menuItem.setActionCommand(TOEMouseAdapter.COMMAND_REMOVE_LANCE_TECH + force.getTechID() + "|" + forceIds);
                         menuItem.addActionListener(this);
-                        menuItem.setEnabled(true);
                         popup.add(menuItem);
                     }
+                    
                     menu = new JMenu("Add Unit");
                     menu.setEnabled(false);
                     HashMap<String, JMenu> unitTypeMenus = new HashMap<>();
