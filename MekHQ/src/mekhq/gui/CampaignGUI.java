@@ -610,14 +610,6 @@ public class CampaignGUI extends JPanel {
         menuSave.addActionListener(this::menuSaveXmlActionPerformed);
         menuFile.add(menuSave);
 
-        // TODO : Windchild finish implementing and test this new menu option
-        /*
-        JMenuItem menuNew = new JMenuItem(resourceMap.getString("menuNew.text"));
-        menuNew.setMnemonic(KeyEvent.VK_N);
-        menuNew.addActionListener(this::menuNewActionPerformed);
-        menuFile.add(menuNew);
-         */
-
         //region menuImport
         // The Import menu uses the following Mnemonic keys as of 19-MAR-2020:
         // A, C, F, P
