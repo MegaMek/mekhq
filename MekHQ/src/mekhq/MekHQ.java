@@ -96,7 +96,7 @@ public class MekHQ implements GameListener {
 	public static String CAMPAIGN_DIRECTORY = "./campaigns/";
 	public static String PREFERENCES_FILE = "mmconf/mekhq.preferences";
 	public static String PRESET_DIR = "./mmconf/mhqPresets/";
-	private static String DEFAULT_LOG_FILE_NAME = "mekhqlog.txt";
+	public static String DEFAULT_LOG_FILE_NAME = "mekhqlog.txt";
 
 	private static final EventBus EVENT_BUS = new EventBus();
 
