@@ -2587,13 +2587,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
 
         //if salary is negative, then use the standard amounts
-        Money primaryBase = campaign.getCampaignOptions().getBaseSalary(getPrimaryRole());
+        Money primaryBase = campaign.getCampaignOptions().getBaseSalaryMoney(getPrimaryRole());
         primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXpMultiplier(getExperienceLevel(false)));
         if (hasSkill(SkillType.S_ANTI_MECH) && (getPrimaryRole() == T_INFANTRY || getPrimaryRole() == T_BA)) {
             primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
         }
 
-        Money secondaryBase = campaign.getCampaignOptions().getBaseSalary(getSecondaryRole()).dividedBy(2);
+        Money secondaryBase = campaign.getCampaignOptions().getBaseSalaryMoney(getSecondaryRole()).dividedBy(2);
         secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXpMultiplier(getExperienceLevel(true)));
         if (hasSkill(SkillType.S_ANTI_MECH) && (getSecondaryRole() == T_INFANTRY || getSecondaryRole() == T_BA)) {
             secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
