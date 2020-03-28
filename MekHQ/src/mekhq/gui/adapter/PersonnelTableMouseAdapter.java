@@ -56,6 +56,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.*;
 import mekhq.gui.model.PersonnelTableModel;
+import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.MultiLineTooltip;
 import mekhq.gui.utilities.StaticChecks;
 
@@ -1385,14 +1386,14 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 // Assign pilot to unit/none
                 menu = new JMenu(resourceMap.getString("assignToUnit.text")); //$NON-NLS-1$
                 JMenu pilotMenu = new JMenu(resourceMap.getString("assignAsPilot.text")); //$NON-NLS-1$
-                JMenu crewMenu = new JMenu(resourceMap.getString("assignAsCrewmember.text")); //$NON-NLS-1$
                 JMenu driverMenu = new JMenu(resourceMap.getString("assignAsDriver.text")); //$NON-NLS-1$
+                JMenu crewMenu = new JMenu(resourceMap.getString("assignAsCrewmember.text")); //$NON-NLS-1$
                 JMenu gunnerMenu = new JMenu(resourceMap.getString("assignAsGunner.text")); //$NON-NLS-1$
-                JMenu soldierMenu = new JMenu(resourceMap.getString("assignAsSoldier.text")); //$NON-NLS-1$
-                JMenu techMenu = new JMenu(resourceMap.getString("assignAsTech.text")); //$NON-NLS-1$
                 JMenu navMenu = new JMenu(resourceMap.getString("assignAsNavigator.text")); //$NON-NLS-1$
+                JMenu soldierMenu = new JMenu(resourceMap.getString("assignAsSoldier.text")); //$NON-NLS-1$
                 JMenu techOfficerMenu = new JMenu(resourceMap.getString("assignAsTechOfficer.text")); //$NON-NLS-1$
                 JMenu consoleCmdrMenu = new JMenu(resourceMap.getString("assignAsConsoleCmdr.text")); //$NON-NLS-1$
+                JMenu techMenu = new JMenu(resourceMap.getString("assignAsTech.text")); //$NON-NLS-1$
 
                 if (oneSelected && person.isActive() && person.isFree()) {
                     for (Unit unit : gui.getCampaign().getUnits()) {
@@ -1477,60 +1478,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             cbMenuItem.setActionCommand(makeCommand(CMD_ADD_TECH, unit.getId().toString()));
                             cbMenuItem.addActionListener(this);
                             techMenu.add(cbMenuItem);
-                        }
-                    }
-                    if (pilotMenu.getItemCount() > 0) {
-                        menu.add(pilotMenu);
-                        if (pilotMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                            MenuScroller.setScrollerFor(pilotMenu, MAX_POPUP_ITEMS);
-                        }
-                    }
-                    if (driverMenu.getItemCount() > 0) {
-                        menu.add(driverMenu);
-                        if (driverMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                            MenuScroller.setScrollerFor(driverMenu, MAX_POPUP_ITEMS);
-                        }
-                    }
-                    if (crewMenu.getItemCount() > 0) {
-                        menu.add(crewMenu);
-                        if (crewMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                            MenuScroller.setScrollerFor(crewMenu, MAX_POPUP_ITEMS);
-                        }
-                    }
-                    if (navMenu.getItemCount() > 0) {
-                        menu.add(navMenu);
-                        if (navMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                            MenuScroller.setScrollerFor(navMenu, MAX_POPUP_ITEMS);
-                        }
-                    }
-                    if (gunnerMenu.getItemCount() > 0) {
-                        menu.add(gunnerMenu);
-                        if (gunnerMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                            MenuScroller.setScrollerFor(gunnerMenu, MAX_POPUP_ITEMS);
-                        }
-                    }
-                    if (soldierMenu.getItemCount() > 0) {
-                        menu.add(soldierMenu);
-                        if (soldierMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                            MenuScroller.setScrollerFor(soldierMenu, MAX_POPUP_ITEMS);
-                        }
-                    }
-                    if (techOfficerMenu.getItemCount() > 0) {
-                        menu.add(techOfficerMenu);
-                        if (techOfficerMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                            MenuScroller.setScrollerFor(techOfficerMenu, MAX_POPUP_ITEMS);
-                        }
-                    }
-                    if (consoleCmdrMenu.getItemCount() > 0) {
-                        menu.add(consoleCmdrMenu);
-                        if (consoleCmdrMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                            MenuScroller.setScrollerFor(consoleCmdrMenu, MAX_POPUP_ITEMS);
-                        }
-                    }
-                    if (techMenu.getItemCount() > 0) {
-                        menu.add(techMenu);
-                        if (techMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                            MenuScroller.setScrollerFor(techMenu, MAX_POPUP_ITEMS);
                         }
                     }
                 } else if (StaticChecks.areAllActive(selected) && StaticChecks.areAllEligible(selected)) {
@@ -1619,49 +1566,18 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             }
                         }
                     }
-                    if (soldierMenu.getItemCount() > 0) {
-                        menu.add(soldierMenu);
-                        if (soldierMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                            MenuScroller.setScrollerFor(soldierMenu, MAX_POPUP_ITEMS);
-                        }
-                    }
-                    if (pilotMenu.getItemCount() > 0) {
-                        menu.add(pilotMenu);
-                        if (pilotMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                            MenuScroller.setScrollerFor(pilotMenu, MAX_POPUP_ITEMS);
-                        }
-                    }
-                    if (driverMenu.getItemCount() > 0) {
-                        menu.add(driverMenu);
-                        if (driverMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                            MenuScroller.setScrollerFor(driverMenu, MAX_POPUP_ITEMS);
-                        }
-                    }
-                    if (crewMenu.getItemCount() > 0) {
-                        menu.add(crewMenu);
-                        if (crewMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                            MenuScroller.setScrollerFor(crewMenu, MAX_POPUP_ITEMS);
-                        }
-                    }
-                    if (navMenu.getItemCount() > 0) {
-                        menu.add(navMenu);
-                        if (navMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                            MenuScroller.setScrollerFor(navMenu, MAX_POPUP_ITEMS);
-                        }
-                    }
-                    if (gunnerMenu.getItemCount() > 0) {
-                        menu.add(gunnerMenu);
-                        if (gunnerMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                            MenuScroller.setScrollerFor(gunnerMenu, MAX_POPUP_ITEMS);
-                        }
-                    }
-                    if (soldierMenu.getItemCount() > 0) {
-                        menu.add(soldierMenu);
-                        if (soldierMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                            MenuScroller.setScrollerFor(soldierMenu, MAX_POPUP_ITEMS);
-                        }
-                    }
                 }
+
+                JMenuHelpers.addMenuIfNonEmpty(menu, pilotMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(menu, driverMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(menu, crewMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(menu, gunnerMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(menu, navMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(menu, soldierMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(menu, techOfficerMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(menu, consoleCmdrMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(menu, techMenu, MAX_POPUP_ITEMS);
+
                 cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("none.text")); //$NON-NLS-1$
                 cbMenuItem.setActionCommand(makeCommand(CMD_REMOVE_UNIT, "-1")); //$NON-NLS-1$
                 cbMenuItem.addActionListener(this);
