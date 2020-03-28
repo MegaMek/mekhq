@@ -62,10 +62,6 @@ public class CampaignController {
     public void setHost(UUID id) {
         host = id;
         isHost = getLocalCampaign().getId().equals(id);
-
-        // We need to change these based on which campaign is currently the host
-        // TODO: Add the following:
-        // something that returns CampaignGUI.showAdvanceMultipleDays(isHost);
     }
 
     /**
