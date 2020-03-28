@@ -34,6 +34,7 @@ VERSION HISTORY:
 + PR #1556: Updating Unit Rating wording
 + PR #1584: Stop double-counting medics for FMM:R unit rating
 + Issue #691: Fixed multiple issues importing units from MUL files, including portraits, gender, SPAs
++ PR #1583: Adding Menu Bar Mnemonics (Shortcut Keys)
 
 v0.47.4 (2020-2-09 2200 UTC)
 + PR #1440: Implement "Rugged" quirk (2x or 3x between maintenance rolls)
