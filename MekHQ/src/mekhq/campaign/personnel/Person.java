@@ -2493,6 +2493,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
             retVal.setFullName(); // this sets the name based on the loaded values
 
+            if (version.isLowerThan("0.47.5") && (retVal.getExpectedDueDate() == null)
+                    && (retVal.getDueDate() != null)) {
+                retVal.setExpectedDueDate((GregorianCalendar) retVal.getDueDate().clone());
+            }
+
             if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 13) {
                 if (retVal.primaryRole > T_INFANTRY) {
                     retVal.primaryRole += 4;
