@@ -37,6 +37,7 @@ VERSION HISTORY:
 + PR #1583: Adding Menu Bar Mnemonics (Shortcut Keys)
 + Issue #1540: Switching over to using JSpinner for base salaries
 + Issue #1578: Adding New Campaign to the main menu
++ PR #1597: MegaMek Log File is Reset on MekHQ load
 
 v0.47.4 (2020-2-09 2200 UTC)
 + PR #1440: Implement "Rugged" quirk (2x or 3x between maintenance rolls)
