@@ -473,7 +473,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         originalUnitTech = TECH_IS1;
         originalUnitId = null;
         acquisitions = 0;
-        extraData = null;
+        extraData = new ExtraData();
 
         // Initialize Data based on these settings
         setFullName();
@@ -1325,9 +1325,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         setDueDate(tCal);
 
         int size = PREGNANCY_SIZE.getAsInt();
-        if (extraData == null) {
-            extraData = new ExtraData();
-        }
         extraData.set(PREGNANCY_CHILDREN_DATA, size);
         extraData.set(PREGNANCY_FATHER_DATA, (hasSpouse()) ? getSpouseId().toString() : null);
 
@@ -2156,7 +2153,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     + acquisitions
                     + "</acquisitions>");
         }
-        if (extraData != null) {
+        if (!extraData.isEmpty()) {
             extraData.writeToXml(pw1);
         }
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</person>");
