@@ -610,6 +610,11 @@ public class CampaignGUI extends JPanel {
         menuSave.addActionListener(this::menuSaveXmlActionPerformed);
         menuFile.add(menuSave);
 
+        JMenuItem menuNew = new JMenuItem(resourceMap.getString("menuNew.text"));
+        menuNew.setMnemonic(KeyEvent.VK_N);
+        menuNew.addActionListener(this::menuNewCampaignActionPerformed);
+        menuFile.add(menuNew);
+
         //region menuImport
         // The Import menu uses the following Mnemonic keys as of 19-MAR-2020:
         // A, C, F, P
@@ -1482,6 +1487,11 @@ public class CampaignGUI extends JPanel {
 
     private File selectLoadCampaignFile() {
         return FileDialogs.openCampaign(frame).orElse(null);
+    }
+
+    private void menuNewCampaignActionPerformed(ActionEvent e) {
+        DataLoadingDialog dataLoadingDialog = new DataLoadingDialog(app, frame, null);
+        dataLoadingDialog.setVisible(true);
     }
 
     private void btnOvertimeActionPerformed(java.awt.event.ActionEvent evt) {
