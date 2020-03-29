@@ -499,8 +499,9 @@ public class ResolveScenarioTracker {
             //Handle spacecraft a bit differently
             if ((en instanceof SmallCraft) || (en instanceof Jumpship)) {
                 processLargeCraft(u, en, crew, unitStatus);
-            } else if (en.getTransportId() != Entity.NONE) {
-                // Check to see if the unit is in a large craft bay, if so, it's crew will be processed with the ship
+            } else if (bayLoadedEntities.containsKey(u.getId())) {
+                // Check to see if the unit is in a large craft bay, if so, its crew will be processed with the ship,
+                // so ignore it here.
             } else {
                 // check for an ejected entity and if we find one then assign it instead to switch vees
                 // over to infantry checks for casualties
