@@ -2266,6 +2266,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                     retVal.dueDate = (GregorianCalendar) GregorianCalendar.getInstance();
                     retVal.dueDate.setTime(df.parse(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("expectedDueDate")) {
+                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                    retVal.expectedDueDate = (GregorianCalendar) GregorianCalendar.getInstance();
+                    retVal.expectedDueDate.setTime(df.parse(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("teamId")) {
                     retVal.teamId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) {
