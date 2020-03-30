@@ -1088,6 +1088,12 @@ public class ResolveScenarioTracker {
             for (Entity e : parser.getEntities()) {
                 idMap.put(e.getId(), UUID.fromString(e.getExternalIdAsString()));
             }
+            for (Entity e : parser.getSalvage()) {
+                idMap.put(e.getId(), UUID.fromString(e.getExternalIdAsString()));
+            }
+            for (Entity e : parser.getRetreated()) {
+                idMap.put(e.getId(), UUID.fromString(e.getExternalIdAsString()));
+            }
             
             //If any units ended the game with others loaded in its bays, map those out
             for (Entity e : parser.getEntities()) {
@@ -1184,6 +1190,18 @@ public class ResolveScenarioTracker {
                     // Check to see if this is a friendly deployed unit with a unit ID in the campaign
                     status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
                 }
+                //If a unit in a bay was destroyed, add it. We still need to deal with the crew
+                if (e.getTransportId() != Entity.NONE) {
+                    UUID trnId = idMap.get(e.getTransportId());
+                    List<Entity> cargo;
+                    if (bayLoadedEntities.containsKey(trnId)) {
+                        cargo = bayLoadedEntities.get(trnId);
+                    } else {
+                        cargo = new ArrayList<>();
+                    }
+                    cargo.add(e);
+                    bayLoadedEntities.put(trnId, cargo);
+                }
                 if(null != status) {
                     status.assignFoundEntity(e, !control);
                     if(null != e.getCrew()) {
@@ -1225,6 +1243,16 @@ public class ResolveScenarioTracker {
 
                     if(null != status) {
                         status.assignFoundEntity(e, false);
+                    }
+                    if (!e.getBayLoadedUnitIds().isEmpty()) {
+                        List<Entity> cargo = new ArrayList<>();
+                        for (int id : e.getBayLoadedUnitIds()) {
+                            UUID extId = idMap.get(id);
+                            if (extId != null) {
+                                cargo.add(entities.get(extId));
+                            }
+                        }
+                        bayLoadedEntities.put(UUID.fromString(e.getExternalIdAsString()), cargo);
                     }
                 }
                 if(null != e.getCrew()) {
