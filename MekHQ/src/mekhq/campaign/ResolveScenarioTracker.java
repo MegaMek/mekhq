@@ -338,6 +338,7 @@ public class ResolveScenarioTracker {
             }
 
             entities.put(UUID.fromString(e.getExternalIdAsString()), e);
+            idMap.put(e.getId(), UUID.fromString(e.getExternalIdAsString()));
 
             checkForLostLimbs(e, control);
             if(e.getOwnerId() == pid || e.getOwner().getTeam() == team) {
@@ -388,6 +389,21 @@ public class ResolveScenarioTracker {
                     salvageStatus.put(nu.getId(), us);
                     potentialSalvage.add(nu);
                 }
+            }
+        }
+        //If a unit in a bay was destroyed, add it. We still need to deal with the crew
+        for (Enumeration<Entity> iter = victoryEvent.getGraveyardEntities(); iter.hasMoreElements();) {
+            Entity e = iter.nextElement();
+            if (e.getTransportId() != Entity.NONE) {
+                UUID trnId = idMap.get(e.getTransportId());
+                List<Entity> cargo;
+                if (bayLoadedEntities.containsKey(trnId)) {
+                    cargo = bayLoadedEntities.get(trnId);
+                } else {
+                    cargo = new ArrayList<>();
+                }
+                cargo.add(e);
+                bayLoadedEntities.put(trnId, cargo);
             }
         }
         checkStatusOfPersonnel();
@@ -710,6 +726,9 @@ public class ResolveScenarioTracker {
         }
         if (null != en.getCrew()) {
             currentHits = en.getCrew().getHits();
+        }
+        if (en.isDestroyed()) {
+            currentHits = 6;
         }
         int newHits = Math.max(0, currentHits - existingHits);
         casualties = (int) Math.ceil(Compute.getFullCrewSize(en) * (newHits / 6.0));
