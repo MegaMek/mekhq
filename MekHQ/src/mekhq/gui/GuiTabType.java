@@ -78,30 +78,30 @@ public enum GuiTabType {
 
     public CampaignGuiTab createTab(CampaignGUI gui) {
         switch (this) {
-        case TOE:
-            return new TOETab(gui, name);
-        case BRIEFING:
-            return new BriefingTab(gui, name);
-        case MAP:
-            return new MapTab(gui, name);
-        case PERSONNEL:
-            return new PersonnelTab(gui, name);
-        case HANGAR:
-            return new HangarTab(gui, name);
-        case WAREHOUSE:
-            return new WarehouseTab(gui, name);
-        case REPAIR:
-            return new RepairTab(gui, name);
-        case INFIRMARY:
-            return new InfirmaryTab(gui, name);
-        case MEKLAB:
-            return new MekLabTab(gui, name);
-        case FINANCES:
-            return new FinancesTab(gui, name);
-        case OVERVIEW:
-            return new OverviewTab(gui, name);
-        default:
-            return null;
+            case TOE:
+                return new TOETab(gui, name);
+            case BRIEFING:
+                return new BriefingTab(gui, name);
+            case MAP:
+                return new MapTab(gui, name);
+            case PERSONNEL:
+                return new PersonnelTab(gui, name);
+            case HANGAR:
+                return new HangarTab(gui, name);
+            case WAREHOUSE:
+                return new WarehouseTab(gui, name);
+            case REPAIR:
+                return new RepairTab(gui, name);
+            case INFIRMARY:
+                return new InfirmaryTab(gui, name);
+            case MEKLAB:
+                return new MekLabTab(gui, name);
+            case FINANCES:
+                return new FinancesTab(gui, name);
+            case OVERVIEW:
+                return new OverviewTab(gui, name);
+            default:
+                return null;
         }
     }
 }
