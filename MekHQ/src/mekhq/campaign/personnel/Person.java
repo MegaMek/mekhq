@@ -2180,12 +2180,16 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         switch (Integer.parseInt(wn2.getTextContent())) {
                             case 1:
                                 retVal.status = PersonnelStatus.RETIRED;
+                                break;
                             case 2:
                                 retVal.status = PersonnelStatus.KIA;
+                                break;
                             case 3:
                                 retVal.status = PersonnelStatus.MIA;
+                                break;
                             default:
                                 retVal.status = PersonnelStatus.ACTIVE;
+                                break;
                         }
                     } else {
                         retVal.status = PersonnelStatus.valueOf(wn2.getTextContent());
