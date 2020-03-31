@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.log;
 
 import megamek.common.util.EncodeControl;
@@ -38,7 +37,7 @@ public class ServiceLogger {
     public static void retireDueToWounds(Person person, Date date){
         String message = logEntriesResourceMap.getString("retiredDueToWounds.text");
         person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message,
-                person.getGenderString(GenderDescriptors.HIS_HER))));
+                GenderDescriptors.HIS_HER.getDescriptor(person.getGender()))));
     }
 
     public static void madeBondsman(Person person, Date date, String name, String rankEntry){

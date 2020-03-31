@@ -585,92 +585,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     //region Text Getters
     //TODO : Rename and Localize region
-    public String getGenderString(GenderDescriptors variant) {
-        return getGenderString(gender, variant);
-    }
-
-    public static String getGenderString(int gender, GenderDescriptors variant) {
-        switch (variant) {
-            case MALE_FEMALE: {
-                switch (gender) {
-                    case Crew.G_MALE:
-                        return "Male";
-                    case Crew.G_FEMALE:
-                        return "Female";
-                    default:
-                        MekHQ.getLogger().error(Person.class, "getGenderString",
-                                "Gender described by int " + gender + " is unknown!");
-                        return Crew.GENDER_ERROR;
-                }
-            }
-            case HE_SHE: {
-                switch (gender) {
-                    case Crew.G_MALE:
-                        return "he";
-                    case Crew.G_FEMALE:
-                        return "she";
-                    default:
-                        MekHQ.getLogger().error(Person.class, "getGenderString",
-                                "Gender described by int " + gender + " is unknown!");
-                        return Crew.GENDER_ERROR;
-                }
-            }
-            case HIM_HER: {
-                switch (gender) {
-                    case Crew.G_MALE:
-                        return "him";
-                    case Crew.G_FEMALE:
-                        return "her";
-                    default:
-                        MekHQ.getLogger().error(Person.class, "getGenderString",
-                                "Gender described by int " + gender + " is unknown!");
-                        return Crew.GENDER_ERROR;
-                }
-            }
-            case HIS_HER: {
-                switch (gender) {
-                    case Crew.G_MALE:
-                        return "his";
-                    case Crew.G_FEMALE:
-                        return "her";
-                    default:
-                        MekHQ.getLogger().error(Person.class, "getGenderString",
-                                "Gender described by int " + gender + " is unknown!");
-                        return Crew.GENDER_ERROR;
-                }
-            }
-            case HIS_HERS: {
-                switch (gender) {
-                    case Crew.G_MALE:
-                        return "his";
-                    case Crew.G_FEMALE:
-                        return "hers";
-                    default:
-                        MekHQ.getLogger().error(Person.class, "getGenderString",
-                                "Gender described by int " + gender + " is unknown!");
-                        return Crew.GENDER_ERROR;
-                }
-            }
-            case BOY_GIRL: {
-                switch (gender) {
-                    case Crew.G_MALE:
-                        return "boy";
-                    case Crew.G_FEMALE:
-                        return "girl";
-                    default:
-                        MekHQ.getLogger().error(Person.class, "getGenderString",
-                                "Gender described by int " + gender + " is unknown!");
-                        return Crew.GENDER_ERROR;
-                }
-            }
-            default: {
-                MekHQ.getLogger().error(Person.class, "getGenderString",
-                        "Gender described by int " + gender + " is unknown!");
-                return Crew.GENDER_ERROR;
-            }
-        }
-    }
-
     public String getStatusName() {
         return getStatusName(status);
     }
@@ -1374,7 +1288,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             baby.setAncestorsId(ancId);
 
             campaign.addReport(String.format("%s has given birth to %s, a baby %s!", getHyperlinkedName(),
-                    baby.getHyperlinkedName(), baby.getGenderString(GenderDescriptors.BOY_GIRL)));
+                    baby.getHyperlinkedName(), GenderDescriptors.BOY_GIRL.getDescriptor(baby.getGender())));
             if (campaign.getCampaignOptions().logConception()) {
                 MedicalLogger.deliveredBaby(this, baby, campaign.getDate());
                 if (fatherId != null) {
