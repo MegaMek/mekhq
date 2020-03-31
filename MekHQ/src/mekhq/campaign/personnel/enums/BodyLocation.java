@@ -18,11 +18,9 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Set;
+import megamek.common.util.EncodeControl;
+
+import java.util.*;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -30,33 +28,35 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlJavaTypeAdapter(BodyLocation.XMLAdapter.class)
 public enum BodyLocation {
     //region Enum Declarations
-    HEAD(0, "head"),
-    LEFT_LEG(1, "left leg", true),
-    LEFT_ARM(2, "left arm", true),
-    CHEST(3, "chest"),
-    ABDOMEN(4, "abdomen"),
-    RIGHT_ARM(5, "right arm", true),
-    RIGHT_LEG(6, "right leg", true),
-    INTERNAL(7, "innards"),
-    LEFT_HAND(8, "left hand", true, LEFT_ARM),
-    RIGHT_HAND(9, "right hand", true, RIGHT_ARM),
-    LEFT_FOOT(10, "left foot", true, LEFT_LEG),
-    RIGHT_FOOT(11, "right foot", true, RIGHT_LEG),
-    GENERIC(-1, "");
+    HEAD(0, "BodyLocation.HEAD.text"),
+    CHEST(3, "BodyLocation.CHEST.text"),
+    ABDOMEN(4, "BodyLocation.ABDOMEN.text"),
+    RIGHT_ARM(5, "BodyLocation.RIGHT_ARM.text", true),
+    LEFT_ARM(2, "BodyLocation.LEFT_ARM.text", true),
+    RIGHT_LEG(6, "BodyLocation.RIGHT_LEG.text", true),
+    LEFT_LEG(1, "BodyLocation.Left_LEG.text", true),
+    RIGHT_HAND(9, "BodyLocation.RIGHT_HAND.text", true, RIGHT_ARM),
+    LEFT_HAND(8, "BodyLocation.LEFT_HAND.text", true, LEFT_ARM),
+    RIGHT_FOOT(11, "BodyLocation.RIGHT_FOOT.text", true, RIGHT_LEG),
+    LEFT_FOOT(10, "BodyLocation.LEFT_FOOT.text", true, LEFT_LEG),
+    INTERNAL(7, "BodyLocation.INTERNAL.text"),
+    GENERIC(-1, "BodyLocation.GENERIC.text");
     //endregion Enum Declarations
 
     //region Variable Declarations
-    public final int id;
-    // Includes everything attached to a limb
-    public final boolean isLimb;
-    public final String readableName;
-    public final BodyLocation parent;
+    private final int id;
+    private final boolean limb; // Includes everything attached to a limb
+    private final String locationName;
+    private final BodyLocation parent;
 
     /**
      * We can't use an EnumSet here because it requires the whole enum to be initialised. We
      * fix it later, in the static code block.
      */
     private Set<BodyLocation> children = new HashSet<>();
+
+    private final ResourceBundle resources = ResourceBundle.getBundle("Personnel",
+            new EncodeControl());
     //endregion Variable Declarations
 
     //region Static Initialization
@@ -85,24 +85,38 @@ public enum BodyLocation {
     //endregion Static Initialization
 
     //region Constructors
-    BodyLocation(int id, String readableName) {
-        this(id, readableName, false, null);
+    BodyLocation(int id, String localizationString) {
+        this(id, localizationString, false, null);
     }
 
-    BodyLocation(int id, String readableName, boolean isLimb) {
-        this(id, readableName, isLimb, null);
+    BodyLocation(int id, String localizationString, boolean limb) {
+        this(id, localizationString, limb, null);
     }
 
-    BodyLocation(int id, String readableName, boolean isLimb, BodyLocation parent) {
+    BodyLocation(int id, String localizationString, boolean limb, BodyLocation parent) {
         this.id = id;
-        this.readableName = readableName;
-        this.isLimb = isLimb;
+        this.locationName = resources.getString(localizationString);
+        this.limb = limb;
         this.parent = parent;
-        if (null != parent) {
+        if (parent != null) {
             parent.addChildLocation(this);
         }
     }
     //endregion Constructors
+
+    //region Getters
+    public boolean isLimb() {
+        return limb;
+    }
+
+    public String locationName() {
+        return locationName;
+    }
+
+    public BodyLocation Parent() {
+        return parent;
+    }
+    //endregion Getters
 
     /**
      * @return the body location corresponding to the (old) ID
