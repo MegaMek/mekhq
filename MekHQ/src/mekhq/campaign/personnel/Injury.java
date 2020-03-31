@@ -276,7 +276,7 @@ public class Injury {
 
     // Return the location name for the injury by passing location to the static overload
     public String getLocationName() {
-        return Utilities.capitalize(location.readableName);
+        return Utilities.capitalize(location.locationName());
     }
 
     public String getTypeKey() {

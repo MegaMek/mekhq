@@ -145,11 +145,11 @@ public class MedicalViewDialog extends JDialog {
 
         dollActionListener = ae -> {
             final BodyLocation loc = BodyLocation.of(ae.getActionCommand());
-            final boolean locationPicked = !loc.readableName.isEmpty();
+            final boolean locationPicked = !loc.locationName().isEmpty();
             Point mousePos = doll.getMousePosition();
             JPopupMenu popup = new JPopupMenu();
             if (locationPicked) {
-                JLabel header = new JLabel(Utilities.capitalize(loc.readableName));
+                JLabel header = new JLabel(Utilities.capitalize(loc.locationName()));
                 header.setFont(UIManager.getDefaults().getFont("Menu.font").deriveFont(Font.BOLD)); //$NON-NLS-1$
                 popup.add(header);
                 popup.addSeparator();
@@ -177,7 +177,7 @@ public class MedicalViewDialog extends JDialog {
                     UIManager.getIcon("FileView.fileIcon")); //$NON-NLS-1$
                 popup.add(edit);
             }
-            JMenuItem remove = new JMenuItem(loc.readableName.isEmpty() ? resourceMap.getString("menuHealAll.text") : resourceMap.getString("menuHeal.text"), healImageIcon); //$NON-NLS-1$ //$NON-NLS-2$
+            JMenuItem remove = new JMenuItem(loc.locationName().isEmpty() ? resourceMap.getString("menuHealAll.text") : resourceMap.getString("menuHeal.text"), healImageIcon); //$NON-NLS-1$ //$NON-NLS-2$
             if (locationPicked && p.getInjuriesByLocation(loc).isEmpty()) {
                 remove.setEnabled(false);
             } else {
@@ -291,7 +291,7 @@ public class MedicalViewDialog extends JDialog {
         Arrays.stream(BodyLocation.values())
             .filter(p::hasInjury)
             .forEach(bl -> {
-                if (person.isLocationMissing(bl) && !person.isLocationMissing(bl.parent)) {
+                if (person.isLocationMissing(bl) && !person.isLocationMissing(bl.Parent())) {
                     doll.setLocTag(bl, "lost"); //$NON-NLS-1$
                 } else if (!person.isLocationMissing(bl)) {
                     InjuryLevel level = getMaxInjuryLevel(person, bl);
@@ -466,7 +466,7 @@ public class MedicalViewDialog extends JDialog {
             blWrapper.setOpaque(false);
             blWrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
             blWrapper.add(Box.createHorizontalStrut(30));
-            blWrapper.add(genWrittenText(Utilities.capitalize(bl.readableName)));
+            blWrapper.add(genWrittenText(Utilities.capitalize(bl.locationName())));
             panel.add(blWrapper);
 
             p.getInjuriesByLocation(bl).stream()

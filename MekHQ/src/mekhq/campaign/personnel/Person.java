@@ -3380,7 +3380,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
         }
         // Check parent locations as well (a hand can be missing if the corresponding arm is)
-        return isLocationMissing(loc.parent);
+        return isLocationMissing(loc.Parent());
     }
 
     public void heal() {

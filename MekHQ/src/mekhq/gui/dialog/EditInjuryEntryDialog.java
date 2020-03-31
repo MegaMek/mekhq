@@ -382,7 +382,7 @@ public class EditInjuryEntryDialog extends JDialog {
 
         @Override
         public String toString() {
-            return loc.readableName;
+            return loc.locationName();
         }
     }
 
