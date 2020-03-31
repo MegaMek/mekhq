@@ -788,24 +788,23 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void setFullName() {
-        if (!StringUtil.isNullOrEmpty(givenName)) {
-            if (isClanner()) {
-                if (!StringUtil.isNullOrEmpty(bloodname)) {
-                    fullName = givenName + " " + bloodname;
-                } else {
-                    fullName = givenName;
-                }
+        if (isClanner()) {
+            if (!StringUtil.isNullOrEmpty(bloodname)) {
+                fullName = givenName + " " + bloodname;
             } else {
-                if (!StringUtil.isNullOrEmpty(surname)) {
-                    fullName = givenName + " " + surname;
-                } else {
-                    fullName = givenName;
-                }
+                fullName = givenName;
             }
+        } else {
+            if (!StringUtil.isNullOrEmpty(surname)) {
+                fullName = givenName + " " + surname;
+            } else {
+                MekHQ.getLogger().warning(getClass(), "setFullName", "Person ");
+                fullName = givenName;
+            }
+        }
 
-            if (!StringUtil.isNullOrEmpty(honorific)) {
-                fullName += " " + honorific;
-            }
+        if (!StringUtil.isNullOrEmpty(honorific)) {
+            fullName += " " + honorific;
         }
     }
 
@@ -828,7 +827,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         // Array of length 3: the name is assumed to be a given name and two surnames
         // Array of length 4+: the name is assumed to be as many given names as possible and two surnames
         //
-        // Then, the full name is set
+        // Then, the full name is su
         final String space = " ";
         String[] name = n.split(space);
 
@@ -844,12 +843,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
             if (!(!StringUtil.isNullOrEmpty(getBloodname()) && getBloodname().equals(name[i]))) {
                 givenName += space + name[i];
             }
-
-            surname = null;
         } else {
             if (name.length == 1) {
                 givenName = name[0];
-                surname = null;
             } else if (name.length == 2) {
                 givenName = name[0];
                 surname = name[1];
@@ -875,6 +871,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     surname = name[i] + space + name[i + 1];
                 }
             }
+        }
+
+        if ((surname == null) || (surname.equals(Crew.UNNAMED_SURNAME))) {
+            surname = "";
         }
 
         setFullName();
@@ -1472,15 +1472,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         String surname = getSurname();
         String spouseSurname = spouse.getSurname();
 
-        // these are used in the divorce code, as a null name will be ignored while a
-        // "" name is used to set an empty last name
-        if (surname == null) {
-            surname = "";
-        }
-        if (spouseSurname == null) {
-            spouseSurname = "";
-        }
-
         if (surnameOption == SURNAME_WEIGHTED) {
             WeightedMap<Integer> map = createWeightedSurnameMap();
             surnameOption = map.randomItem();
@@ -1490,17 +1481,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
             case SURNAME_NO_CHANGE:
                 break;
             case SURNAME_SPOUSE:
-                if (!StringUtil.isNullOrEmpty(spouseSurname)) {
-                    setSurname(spouseSurname);
-                }
-
+                setSurname(spouseSurname);
                 setMaidenName(surname); //"" is handled in the divorce code
                 break;
             case SURNAME_YOURS:
-                if (!StringUtil.isNullOrEmpty(surname)) {
-                    spouse.setSurname(surname);
-                }
-
+                spouse.setSurname(surname);
                 spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
                 break;
             case SURNAME_HYP_YOURS:
@@ -1509,7 +1494,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else {
                     setSurname(spouseSurname);
                 }
-                //both null or "" is ignored as a case, as it would lead to no changes
 
                 setMaidenName(surname); //"" is handled in the divorce code
                 break;
@@ -1533,7 +1517,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else {
                     spouse.setSurname(surname);
                 }
-                //both null or "" is ignored as a case, as it would lead to no changes
 
                 spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
                 break;
@@ -1553,31 +1536,19 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 break;
             case SURNAME_MALE:
                 if (isMale()) {
-                    if (!StringUtil.isNullOrEmpty(surname)) {
-                        spouse.setSurname(surname);
-                    }
-
+                    spouse.setSurname(surname);
                     spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
                 } else {
-                    if (!StringUtil.isNullOrEmpty(spouseSurname)) {
-                        setSurname(spouseSurname);
-                    }
-
+                    setSurname(spouseSurname);
                     setMaidenName(surname); //"" is handled in the divorce code
                 }
                 break;
             case SURNAME_FEMALE:
                 if (isMale()) {
-                    if (!StringUtil.isNullOrEmpty(spouseSurname)) {
-                        setSurname(spouseSurname);
-                    }
-
+                    setSurname(spouseSurname);
                     setMaidenName(surname); //"" is handled in the divorce code
                 } else {
-                    if (!StringUtil.isNullOrEmpty(surname)) {
-                        spouse.setSurname(surname);
-                    }
-
+                    spouse.setSurname(surname);
                     spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
                 }
                 break;
@@ -1785,12 +1756,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 + "<givenName>"
                 + MekHqXmlUtil.escape(givenName)
                 + "</givenName>");
-        if (!StringUtil.isNullOrEmpty(surname)) {
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "<surname>"
-                    + MekHqXmlUtil.escape(surname)
-                    + "</surname>");
-        }
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                + "<surname>"
+                + MekHqXmlUtil.escape(surname)
+                + "</surname>");
         if (!StringUtil.isNullOrEmpty(honorific)) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<honorific>"
