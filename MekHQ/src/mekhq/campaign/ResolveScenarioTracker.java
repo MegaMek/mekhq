@@ -1207,6 +1207,7 @@ public class ResolveScenarioTracker {
                     } else {
                         cargo = new ArrayList<>();
                     }
+                    e.setDestroyed(true);
                     cargo.add(e);
                     bayLoadedEntities.put(trnId, cargo);
                 }
