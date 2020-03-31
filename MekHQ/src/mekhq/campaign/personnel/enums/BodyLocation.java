@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 MegaMek team
+ * Copyright (C) 2016, 2020 - The MegaMek team
  *
  * This file is part of MekHQ.
  *
@@ -29,77 +29,96 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 @XmlJavaTypeAdapter(BodyLocation.XMLAdapter.class)
 public enum BodyLocation {
-    HEAD(0, "head"), LEFT_LEG(1, "left leg", true), LEFT_ARM(2, "left arm", true),
-    CHEST(3, "chest"), ABDOMEN(4, "abdomen"), RIGHT_ARM(5, "right arm", true), RIGHT_LEG(6, "right leg", true),
+    //region Enum Declarations
+    HEAD(0, "head"),
+    LEFT_LEG(1, "left leg", true),
+    LEFT_ARM(2, "left arm", true),
+    CHEST(3, "chest"),
+    ABDOMEN(4, "abdomen"),
+    RIGHT_ARM(5, "right arm", true),
+    RIGHT_LEG(6, "right leg", true),
     INTERNAL(7, "innards"),
     LEFT_HAND(8, "left hand", true, LEFT_ARM),
     RIGHT_HAND(9, "right hand", true, RIGHT_ARM),
     LEFT_FOOT(10, "left foot", true, LEFT_LEG),
-    RIGHT_FOOT(11, "right foot", true, RIGHT_LEG), GENERIC(-1, "");
+    RIGHT_FOOT(11, "right foot", true, RIGHT_LEG),
+    GENERIC(-1, "");
+    //endregion Enum Declarations
 
+    //region Variable Declarations
+    public final int id;
+    // Includes everything attached to a limb
+    public final boolean isLimb;
+    public final String readableName;
+    public final BodyLocation parent;
+
+    /**
+     * We can't use an EnumSet here because it requires the whole enum to be initialised. We
+     * fix it later, in the static code block.
+     */
+    private Set<BodyLocation> children = new HashSet<>();
+    //endregion Variable Declarations
+
+    //region Static Initialization
     // Initialize by-id array lookup table
     private static BodyLocation[] idMap;
     static {
         int maxId = 0;
-        for(BodyLocation workTime : values()) {
+        for (BodyLocation workTime : values()) {
             maxId = Math.max(maxId, workTime.id);
         }
         idMap = new BodyLocation[maxId + 1];
         Arrays.fill(idMap, GENERIC);
-        for(BodyLocation workTime : values()) {
-            if(workTime.id > 0) {
+        for (BodyLocation workTime : values()) {
+            if (workTime.id > 0) {
                 idMap[workTime.id] = workTime;
             }
             // Optimise the children sets (we can't do that in the constructor, since
             // the EnumSet static methods require this enum to be fully initialized first).
-            if(workTime.children.isEmpty()) {
+            if (workTime.children.isEmpty()) {
                 workTime.children = EnumSet.noneOf(BodyLocation.class);
             } else {
                 workTime.children = EnumSet.copyOf(workTime.children);
             }
         }
     }
+    //endregion Static Initialization
 
-    /** @return the body location corresponding to the (old) ID */
-    public static BodyLocation of(int id) {
-        return ((id > 0) && (id < idMap.length)) ? idMap[id] : GENERIC;
-    }
-
-    /** @return the body location corresponding to the given string */
-    public static BodyLocation of(String str) {
-        try {
-            return of(Integer.parseInt(str));
-        } catch(NumberFormatException nfex) {
-            // Try something else
-        }
-        return valueOf(str.toUpperCase(Locale.ROOT));
-    }
-
-    public final int id;
-    // Includes everything attached to a limb
-    public final boolean isLimb;
-    public final String readableName;
-    public final BodyLocation parent;
-    // We can't use an EnumSet here because it requires the whole enum to be initialised. We
-    // fix it later, in the static code block.
-    private Set<BodyLocation> children = new HashSet<>();
-
-    private BodyLocation(int id, String readableName) {
+    //region Constructors
+    BodyLocation(int id, String readableName) {
         this(id, readableName, false, null);
     }
 
-    private BodyLocation(int id, String readableName, boolean isLimb) {
+    BodyLocation(int id, String readableName, boolean isLimb) {
         this(id, readableName, isLimb, null);
     }
 
-    private BodyLocation(int id, String readableName, boolean isLimb, BodyLocation parent) {
+    BodyLocation(int id, String readableName, boolean isLimb, BodyLocation parent) {
         this.id = id;
         this.readableName = readableName;
         this.isLimb = isLimb;
         this.parent = parent;
-        if(null != parent)
-        {
+        if (null != parent) {
             parent.addChildLocation(this);
+        }
+    }
+    //endregion Constructors
+
+    /**
+     * @return the body location corresponding to the (old) ID
+     */
+    public static BodyLocation of(int id) {
+        return ((id > 0) && (id < idMap.length)) ? idMap[id] : GENERIC;
+    }
+
+    /**
+     * @return the body location corresponding to the given string
+     */
+    public static BodyLocation of(String str) {
+        try {
+            return of(Integer.parseInt(str));
+        } catch(NumberFormatException ignored) {
+            return valueOf(str.toUpperCase(Locale.ROOT));
         }
     }
 
@@ -108,11 +127,11 @@ public enum BodyLocation {
     }
 
     public boolean isParentOf(BodyLocation child) {
-        if(children.contains(child)) {
+        if (children.contains(child)) {
             return true;
         }
-        for(BodyLocation myChild : children) {
-            if(myChild.isParentOf(child)) {
+        for (BodyLocation myChild : children) {
+            if (myChild.isParentOf(child)) {
                 return true;
             }
         }
@@ -120,17 +139,17 @@ public enum BodyLocation {
     }
 
     public boolean isChildOf(BodyLocation parent) {
-        return (null != this.parent) ? (this.parent == parent) || this.parent.isChildOf(parent) : false;
+        return ((null != this.parent) && ((this.parent == parent) || this.parent.isChildOf(parent)));
     }
 
     public static final class XMLAdapter extends XmlAdapter<String, BodyLocation> {
         @Override
-        public BodyLocation unmarshal(String v) throws Exception {
+        public BodyLocation unmarshal(String v) {
             return (null == v) ? null : BodyLocation.of(v);
         }
 
         @Override
-        public String marshal(BodyLocation v) throws Exception {
+        public String marshal(BodyLocation v) {
             return (null == v) ? null : v.toString();
         }
     }
