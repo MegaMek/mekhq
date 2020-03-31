@@ -827,7 +827,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         // Array of length 3: the name is assumed to be a given name and two surnames
         // Array of length 4+: the name is assumed to be as many given names as possible and two surnames
         //
-        // Then, the full name is su
+        // Then, the full name is set
         final String space = " ";
         String[] name = n.split(space);
 
