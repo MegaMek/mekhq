@@ -798,7 +798,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
             if (!StringUtil.isNullOrEmpty(surname)) {
                 fullName = givenName + " " + surname;
             } else {
-                MekHQ.getLogger().warning(getClass(), "setFullName", "Person ");
                 fullName = givenName;
             }
         }
