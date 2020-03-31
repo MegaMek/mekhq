@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.personnel;
+package mekhq.campaign.personnel.generator;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -24,9 +24,12 @@ import java.util.Objects;
 
 import megamek.client.RandomNameGenerator;
 import megamek.common.Compute;
+import megamek.common.Crew;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomSkillPreferences;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.SkillType;
 
 /**
  * Represents a class which can generate new {@link Person} objects
@@ -35,7 +38,7 @@ import mekhq.campaign.RandomSkillPreferences;
 public abstract class AbstractPersonnelGenerator {
     private RandomNameGenerator randomNameGenerator = RandomNameGenerator.getInstance();
 
-    private RandomSkillPreferences rskillPrefs = new RandomSkillPreferences();
+    private RandomSkillPreferences rSkillPrefs = new RandomSkillPreferences();
 
     /**
      * Gets the {@link RandomNameGenerator}.
@@ -58,7 +61,7 @@ public abstract class AbstractPersonnelGenerator {
      * @return The {@link RandomSkillPreferences} to use.
      */
     public RandomSkillPreferences getSkillPreferences() {
-        return rskillPrefs;
+        return rSkillPrefs;
     }
 
     /**
@@ -66,25 +69,18 @@ public abstract class AbstractPersonnelGenerator {
      * @param skillPreferences A {@link RandomSkillPreferences} to use.
      */
     public void setSkillPreferences(RandomSkillPreferences skillPreferences) {
-        rskillPrefs = Objects.requireNonNull(skillPreferences);
+        rSkillPrefs = Objects.requireNonNull(skillPreferences);
     }
 
     /**
      * Generates a new {@link Person}.
      * @param campaign The {@link Campaign} which tracks the person.
      * @param primaryRole The primary role of the person.
-     * @return A new {@link Person}.
-     */
-    public abstract Person generate(Campaign campaign, int primaryRole);
-
-    /**
-     * Generates a new {@link Person}.
-     * @param campaign The {@link Campaign} which tracks the person.
-     * @param primaryRole The primary role of the person.
      * @param secondaryRole The secondary role of the person.
+     * @param gender The person's gender, or a randomize value
      * @return A new {@link Person}.
      */
-    public abstract Person generate(Campaign campaign, int primaryRole, int secondaryRole);
+    public abstract Person generate(Campaign campaign, int primaryRole, int secondaryRole, int gender);
 
     /**
      * Creates a {@link Person} object for the given {@link Campaign}.
@@ -115,15 +111,22 @@ public abstract class AbstractPersonnelGenerator {
 
     /**
      * Generates a name for a {@link Person}.
-     * @param campaign The {@link Campaign} which tracks the person.
      * @param person The {@link Person} being generated.
+     * @param gender The person's gender, or a randomize value
      */
-    protected void generateName(Campaign campaign, Person person) {
-        boolean isFemale = getNameGenerator().isFemale();
+    protected void generateName(Person person, int gender) {
+        boolean isFemale = gender == Crew.G_RANDOMIZE
+                ? getNameGenerator().isFemale()
+                : gender == Crew.G_FEMALE;
+
         if (isFemale) {
-            person.setGender(Person.G_FEMALE);
+            person.setGender(Crew.G_FEMALE);
         }
-        person.setName(getNameGenerator().generate(isFemale));
+
+        String[] name = getNameGenerator().generateGivenNameSurnameSplit(isFemale, person.isClanner(),
+                person.getOriginFaction().getShortName());
+        person.setGivenName(name[0]);
+        person.setSurname(name[1]);
     }
 
     /**

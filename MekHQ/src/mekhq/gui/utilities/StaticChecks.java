@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2014 - The MegaMek Team.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui.utilities;
 
 import java.util.StringJoiner;
@@ -186,6 +204,7 @@ public class StaticChecks {
         return null;
     }
 
+    //region C3
     public static boolean doAllUnitsHaveC3i(Vector<Unit> units) {
         for (Unit unit : units) {
             Entity e = unit.getEntity();
@@ -405,9 +424,10 @@ public class StaticChecks {
         return true;
 
     }
-    
+    //endregion C3
+
     /**
-     * Used to test a selection of Units provided by the player and determine whether they all share a designated unitType. 
+     * Used to test a selection of Units provided by the player and determine whether they all share a designated unitType.
      * @param units Vector of units that the player has selected
      * @return false if any unit in the passed-in Vector does not have the specified unit type
      */
@@ -436,7 +456,7 @@ public class StaticChecks {
                 if (superheavy && (unit.getEntity().getWeight() <= 100 || unit.getEntity().getWeight() > 200)) {
                     return false;
                 }
-                
+
             }
             if (unit.getEntity().getUnitType() != unitType) {
                 return false;

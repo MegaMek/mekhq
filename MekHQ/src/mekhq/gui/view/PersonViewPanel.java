@@ -28,6 +28,9 @@ import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.personnel.FormerSpouse;
+import mekhq.campaign.personnel.enums.GenderDescriptors;
 import org.joda.time.DateTime;
 
 import megamek.common.Crew;
@@ -137,7 +140,7 @@ public class PersonViewPanel extends ScrollablePanel {
             gridy++;
         }
 
-        if (person.hasAnyFamily()) {
+        if (person.hasAnyFamily() || person.hasFormerSpouse()) {
             JPanel pnlFamily = fillFamily();
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -311,8 +314,8 @@ public class PersonViewPanel extends ScrollablePanel {
                 ribbonLabel.setIcon(new ImageIcon(ribbon));
                 ribbonLabel.setToolTipText(award.getTooltip());
                 rowRibbonsBox.add(ribbonLabel, 0);
-            } catch (Exception err) {
-                err.printStackTrace();
+            } catch (Exception e) {
+                MekHQ.getLogger().error(getClass(), "drawRibbons", e);
             }
 
             i++;
@@ -355,8 +358,8 @@ public class PersonViewPanel extends ScrollablePanel {
                 medalLabel.setIcon(new ImageIcon(medal));
                 medalLabel.setToolTipText(award.getTooltip());
                 pnlMedals.add(medalLabel);
-            } catch (Exception err) {
-                err.printStackTrace();
+            } catch (Exception e) {
+                MekHQ.getLogger().error(getClass(), "drawMedals", e);
             }
         }
 
@@ -386,8 +389,8 @@ public class PersonViewPanel extends ScrollablePanel {
                 miscLabel.setIcon(new ImageIcon(miscAward));
                 miscLabel.setToolTipText(award.getTooltip());
                 pnlMiscAwards.add(miscLabel);
-            } catch (Exception err) {
-                err.printStackTrace();
+            } catch (Exception e) {
+                MekHQ.getLogger().error(getClass(), "drawMiscAwards", e);
             }
         }
         return pnlMiscAwards;
@@ -436,8 +439,8 @@ public class PersonViewPanel extends ScrollablePanel {
                 }
             }
             lblPortrait.setIcon(new ImageIcon(portrait));
-        } catch (Exception err) {
-            err.printStackTrace();
+        } catch (Exception e) {
+            MekHQ.getLogger().error(getClass(), "setPortrait", e);
         }
 
         GridBagConstraints gbc_lblPortrait = new GridBagConstraints();
@@ -612,7 +615,7 @@ public class PersonViewPanel extends ScrollablePanel {
         pnlInfo.add(lblGender1, gridBagConstraints);
 
         lblGender2.setName("lblGender2"); // NOI18N
-        lblGender2.setText(person.getGenderName());
+        lblGender2.setText(person.getGenderString(GenderDescriptors.MALE_FEMALE));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = firsty;
@@ -629,7 +632,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 //need to subtract 1 from firsty to properly line the recruited date up with age on the display
                 firsty--;
 
-                lblRecruited1.setName("lblRecruited1"); // NOI18N
+                lblRecruited1.setName("lblRecruited1");
                 lblRecruited1.setText(resourceMap.getString("lblRecruited1.text"));
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 2;
@@ -638,7 +641,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 pnlInfo.add(lblRecruited1, gridBagConstraints);
 
-                lblRecruited2.setName("lblRecruited2"); // NOI18N
+                lblRecruited2.setName("lblRecruited2");
                 lblRecruited2.setText(person.getRecruitmentAsString());
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 3;
@@ -650,7 +653,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 pnlInfo.add(lblRecruited2, gridBagConstraints);
 
                 firsty++;
-                lblTimeServed1.setName("lblTimeServed1"); // NOI18N
+                lblTimeServed1.setName("lblTimeServed1");
                 lblTimeServed1.setText(resourceMap.getString("lblTimeServed1.text"));
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 2;
@@ -659,7 +662,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 pnlInfo.add(lblTimeServed1, gridBagConstraints);
 
-                lblTimeServed2.setName("lblTimeServed2"); // NOI18N
+                lblTimeServed2.setName("lblTimeServed2");
                 lblTimeServed2.setText(person.getTimeInService(campaign.getCalendar()) + " years");
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 3;
@@ -680,10 +683,10 @@ public class PersonViewPanel extends ScrollablePanel {
 
         if (person.isPregnant()) {
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-            String DueDate = df.format(person.getDueDate().getTime());
+            String dueDate;
 
             lblDueDate1.setName("lblDueDate1");
-            lblDueDate1.setText(resourceMap.getString("lblDueDate1.text")); //$NON-NLS-1$
+            lblDueDate1.setText(resourceMap.getString("lblDueDate1.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = firsty;
@@ -691,8 +694,14 @@ public class PersonViewPanel extends ScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblDueDate1, gridBagConstraints);
 
-            lblDueDate2.setName("lblDueDate2"); // NOI18N
-            lblDueDate2.setText(DueDate);
+            if (campaign.getCampaignOptions().getDisplayTrueDueDate()) {
+                dueDate = df.format(person.getDueDate().getTime());
+            } else {
+                dueDate = df.format(person.getExpectedDueDate().getTime());
+            }
+
+            lblDueDate2.setName("lblDueDate2");
+            lblDueDate2.setText(dueDate);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = firsty;
@@ -713,12 +722,24 @@ public class PersonViewPanel extends ScrollablePanel {
         //family panel
         JLabel lblSpouse1 = new JLabel();
         JLabel lblSpouse2 = new JLabel();
+        JLabel lblFormerSpouses1 = new JLabel();
+        JLabel lblFormerSpouses2;
         JLabel lblChildren1 = new JLabel();
         JLabel lblChildren2;
+        JLabel lblGrandchildren1 = new JLabel();
+        JLabel lblGrandchildren2;
         JLabel lblFather1 = new JLabel();
         JLabel lblFather2 = new JLabel();
         JLabel lblMother1 = new JLabel();
         JLabel lblMother2 = new JLabel();
+        JLabel lblSiblings1 = new JLabel();
+        JLabel lblSiblings2;
+        JLabel lblGrandparents1 = new JLabel();
+        JLabel lblGrandparents2;
+        JLabel lblAuntsOrUncles1 = new JLabel();
+        JLabel lblAuntsOrUncles2;
+        JLabel lblCousins1 = new JLabel();
+        JLabel lblCousins2;
 
         GridBagConstraints gridBagConstraints;
 
@@ -740,22 +761,52 @@ public class PersonViewPanel extends ScrollablePanel {
             lblSpouse2.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    gui.getPersonnelTab().focusOnPerson(person.getSpouseID());
+                    gui.getPersonnelTab().focusOnPerson(person.getSpouseId());
                 }
             });
-            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = firsty;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlFamily.add(lblSpouse2, gridBagConstraints);
             firsty++;
         }
 
+        if (person.hasFormerSpouse()) {
+            lblFormerSpouses1.setName("lblFormerSpouses1"); // NOI18N //$NON-NLS-1$
+            lblFormerSpouses1.setText(resourceMap.getString("lblFormerSpouses1.text")); //$NON-NLS-1$
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlFamily.add(lblFormerSpouses1, gridBagConstraints);
+
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+
+            for (FormerSpouse formerSpouse : person.getFormerSpouses()) {
+                Person ex = campaign.getPerson(formerSpouse.getFormerSpouseId());
+                gridBagConstraints.gridy = firsty;
+                lblFormerSpouses2 = new JLabel();
+                lblFormerSpouses2.setName("lblFormerSpouses2"); // NOI18N //$NON-NLS-1$
+                lblFormerSpouses2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                lblFormerSpouses2.setText(String.format("<html><a href='#'>%s</a>, %s, %s</html>", ex.getFullName(),
+                        formerSpouse.getReasonString(), formerSpouse.getDateAsString(FormerSpouse.getDisplayDateFormat())));
+                lblFormerSpouses2.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        gui.getPersonnelTab().focusOnPerson(ex.getId());
+                    }
+                });
+                pnlFamily.add(lblFormerSpouses2, gridBagConstraints);
+                firsty++;
+            }
+        }
+
         if (campaign.getCampaignOptions().useParentage()) {
-            if (person.hasChildren()) {
+            if (person.hasChildren() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.PARENTS_CHILDREN_SIBLINGS)) {
                 lblChildren1.setName("lblChildren1"); // NOI18N //$NON-NLS-1$
                 lblChildren1.setText(resourceMap.getString("lblChildren1.text")); //$NON-NLS-1$
                 gridBagConstraints = new GridBagConstraints();
@@ -772,7 +823,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 gridBagConstraints.fill = GridBagConstraints.NONE;
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 
-                for (Person child : person.getChildList()) {
+                for (Person child : person.getChildren()) {
                     gridBagConstraints.gridy = firsty;
                     lblChildren2 = new JLabel();
                     lblChildren2.setName("lblChildren2"); // NOI18N //$NON-NLS-1$
@@ -789,7 +840,41 @@ public class PersonViewPanel extends ScrollablePanel {
                 }
             }
 
-            if (person.hasFather()) {
+            if (person.hasGrandchildren() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.GRANDPARENTS_GRANDCHILDREN)) {
+                lblGrandchildren1.setName("lblGrandchildren1"); // NOI18N //$NON-NLS-1$
+                lblGrandchildren1.setText(resourceMap.getString("lblGrandchildren1.text")); //$NON-NLS-1$
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 0;
+                gridBagConstraints.gridy = firsty;
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlFamily.add(lblGrandchildren1, gridBagConstraints);
+
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 1;
+                gridBagConstraints.weightx = 1.0;
+                gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+
+                for (Person grandchild : person.getGrandchildren()) {
+                    gridBagConstraints.gridy = firsty;
+                    lblGrandchildren2 = new JLabel();
+                    lblGrandchildren2.setName("lblGrandchildren2"); // NOI18N //$NON-NLS-1$
+                    lblGrandchildren2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    lblGrandchildren2.setText(String.format("<html><a href='#'>%s</a></html>", grandchild.getFullName()));
+                    lblGrandchildren2.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            gui.getPersonnelTab().focusOnPerson(grandchild.getId());
+                        }
+                    });
+                    pnlFamily.add(lblGrandchildren2, gridBagConstraints);
+                    firsty++;
+                }
+            }
+
+            if (person.hasFather() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.PARENTS_CHILDREN_SIBLINGS)) {
                 lblFather1.setName("lblFather1"); // NOI18N //$NON-NLS-1$
                 lblFather1.setText(resourceMap.getString("lblFather1.text")); //$NON-NLS-1$
                 gridBagConstraints = new GridBagConstraints();
@@ -819,7 +904,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 firsty++;
             }
 
-            if (person.hasMother()) {
+            if (person.hasMother() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.PARENTS_CHILDREN_SIBLINGS)) {
                 lblMother1.setName("lblMother1"); // NOI18N //$NON-NLS-1$
                 lblMother1.setText(resourceMap.getString("lblMother1.text")); //$NON-NLS-1$
                 gridBagConstraints = new GridBagConstraints();
@@ -846,6 +931,143 @@ public class PersonViewPanel extends ScrollablePanel {
                 gridBagConstraints.fill = GridBagConstraints.NONE;
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 pnlFamily.add(lblMother2, gridBagConstraints);
+                firsty++;
+            }
+
+            if (person.hasSiblings() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.PARENTS_CHILDREN_SIBLINGS)) {
+                lblSiblings1.setName("lblSiblings1"); // NOI18N //$NON-NLS-1$
+                lblSiblings1.setText(resourceMap.getString("lblSiblings1.text")); //$NON-NLS-1$
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 0;
+                gridBagConstraints.gridy = firsty;
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlFamily.add(lblSiblings1, gridBagConstraints);
+
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 1;
+                gridBagConstraints.weightx = 1.0;
+                gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+
+                for (Person sibling : person.getSiblings()) {
+                    gridBagConstraints.gridy = firsty;
+                    lblSiblings2 = new JLabel();
+                    lblSiblings2.setName("lblSiblings2"); // NOI18N //$NON-NLS-1$
+                    lblSiblings2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    lblSiblings2.setText(String.format("<html><a href='#'>%s</a></html>", sibling.getFullName()));
+                    lblSiblings2.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            gui.getPersonnelTab().focusOnPerson(sibling.getId());
+                        }
+                    });
+                    pnlFamily.add(lblSiblings2, gridBagConstraints);
+                    firsty++;
+                }
+            }
+
+            if (person.hasGrandparent() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.GRANDPARENTS_GRANDCHILDREN)) {
+                lblGrandparents1.setName("lblGrandparents1"); // NOI18N //$NON-NLS-1$
+                lblGrandparents1.setText(resourceMap.getString("lblGrandparents1.text")); //$NON-NLS-1$
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 0;
+                gridBagConstraints.gridy = firsty;
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlFamily.add(lblGrandparents1, gridBagConstraints);
+
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 1;
+                gridBagConstraints.weightx = 1.0;
+                gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+
+                for (Person grandparent : person.getGrandparents()) {
+                    gridBagConstraints.gridy = firsty;
+                    lblGrandparents2 = new JLabel();
+                    lblGrandparents2.setName("lblGrandparents2"); // NOI18N //$NON-NLS-1$
+                    lblGrandparents2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    lblGrandparents2.setText(String.format("<html><a href='#'>%s</a></html>", grandparent.getFullName()));
+                    lblGrandparents2.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            gui.getPersonnelTab().focusOnPerson(grandparent.getId());
+                        }
+                    });
+                    pnlFamily.add(lblGrandparents2, gridBagConstraints);
+                    firsty++;
+                }
+            }
+
+            if (person.hasAuntOrUncle() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.AUNTS_UNCLES_COUSINS)) {
+                lblAuntsOrUncles1.setName("lblAuntsOrUncles1"); // NOI18N //$NON-NLS-1$
+                lblAuntsOrUncles1.setText(resourceMap.getString("lblAuntsOrUncles1.text")); //$NON-NLS-1$
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 0;
+                gridBagConstraints.gridy = firsty;
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlFamily.add(lblAuntsOrUncles1, gridBagConstraints);
+
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 1;
+                gridBagConstraints.weightx = 1.0;
+                gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+
+                for (Person auntOrUncle : person.getsAuntsAndUncles()) {
+                    gridBagConstraints.gridy = firsty;
+                    lblAuntsOrUncles2 = new JLabel();
+                    lblAuntsOrUncles2.setName("lblAuntsOrUncles2"); // NOI18N //$NON-NLS-1$
+                    lblAuntsOrUncles2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    lblAuntsOrUncles2.setText(String.format("<html><a href='#'>%s</a></html>", auntOrUncle.getFullName()));
+                    lblAuntsOrUncles2.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            gui.getPersonnelTab().focusOnPerson(auntOrUncle.getId());
+                        }
+                    });
+                    pnlFamily.add(lblAuntsOrUncles2, gridBagConstraints);
+                    firsty++;
+                }
+            }
+
+            if (person.hasCousins() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.AUNTS_UNCLES_COUSINS)) {
+                lblCousins1.setName("lblCousins1"); // NOI18N //$NON-NLS-1$
+                lblCousins1.setText(resourceMap.getString("lblCousins1.text")); //$NON-NLS-1$
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 0;
+                gridBagConstraints.gridy = firsty;
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlFamily.add(lblCousins1, gridBagConstraints);
+
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 1;
+                gridBagConstraints.weightx = 1.0;
+                gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+
+                for (Person cousin : person.getCousins()) {
+                    gridBagConstraints.gridy = firsty;
+                    lblCousins2 = new JLabel();
+                    lblCousins2.setName("lblCousins2"); // NOI18N //$NON-NLS-1$
+                    lblCousins2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    lblCousins2.setText(String.format("<html><a href='#'>%s</a></html>", cousin.getFullName()));
+                    lblCousins2.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            gui.getPersonnelTab().focusOnPerson(cousin.getId());
+                        }
+                    });
+                    pnlFamily.add(lblCousins2, gridBagConstraints);
+                    firsty++;
+                }
             }
         }
 
@@ -1037,7 +1259,7 @@ public class PersonViewPanel extends ScrollablePanel {
     }
 
     private JPanel fillLog() {
-        ArrayList<LogEntry> logs = person.getPersonnelLog();
+        List<LogEntry> logs = person.getPersonnelLog();
 
         JPanel pnlLog = new JPanel(new GridBagLayout());
 
@@ -1179,7 +1401,7 @@ public class PersonViewPanel extends ScrollablePanel {
         JLabel lblInjury;
         JLabel txtInjury;
         int row = 1;
-        ArrayList<Injury> injuries = person.getInjuries();
+        List<Injury> injuries = person.getInjuries();
         for(Injury injury : injuries) {
             lblInjury = new JLabel(injury.getFluff());
             gridBagConstraints = new GridBagConstraints();

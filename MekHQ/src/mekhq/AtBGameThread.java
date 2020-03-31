@@ -109,11 +109,11 @@ public class AtBGameThread extends GameThread {
             // phase
             for (int i = 0; (i < 1000) && (client.getGame().getPhase() == IGame.Phase.PHASE_UNKNOWN); i++) {
                 Thread.sleep(50);
-                System.out.println("Thread in unknown stage" );
+                MekHQ.getLogger().error(getClass(), "run", "Thread in unknown stage" );
             }
 
             if (((client.getGame() != null) && (client.getGame().getPhase() == IGame.Phase.PHASE_LOUNGE))) {
-                System.out.println("Thread in lounge" );
+                MekHQ.getLogger().info(getClass(), "run", "Thread in lounge" );
 
                 client.getLocalPlayer().setCamoCategory(app.getCampaign().getCamoCategory());
                 client.getLocalPlayer().setCamoFileName(app.getCampaign().getCamoFileName());

@@ -28,6 +28,7 @@ import megamek.common.Entity;
 import megamek.common.UnitType;
 import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
@@ -170,8 +171,8 @@ public class ForceViewPanel extends ScrollablePanel {
         	portrait = portrait.getScaledInstance(scale, -1, Image.SCALE_SMOOTH);
             ImageIcon icon = new ImageIcon(portrait);
         	lbl.setIcon(icon);
-        } catch (Exception err) {
-            err.printStackTrace();
+        } catch (Exception e) {
+            MekHQ.getLogger().error(getClass(), "setIcon", e);
         }
 	}
 
@@ -234,7 +235,7 @@ public class ForceViewPanel extends ScrollablePanel {
 
     	if (null != force.getTechID()) {
     		Person p = campaign.getPerson(force.getTechID());
-    		LanceTech = p.getName();
+    		LanceTech = p.getFullName();
     	}
 
     	if(null != force.getParentForce()) {
@@ -520,8 +521,8 @@ public class ForceViewPanel extends ScrollablePanel {
             	}
             }
             lbl.setIcon(new ImageIcon(portrait));
-        } catch (Exception err) {
-            err.printStackTrace();
+        } catch (Exception e) {
+            MekHQ.getLogger().error(getClass(), "setPortrait", e);
         }
     }
 
@@ -541,8 +542,8 @@ public class ForceViewPanel extends ScrollablePanel {
         Image camo = null;
         try {
             camo = (Image) icons.getCamos().getItem(unit.getCamoCategory(), unit.getCamoFileName());
-        } catch (Exception err) {
-            err.printStackTrace();
+        } catch (Exception e) {
+            MekHQ.getLogger().error(getClass(), "getCamo", e);
         }
         return camo;
     }

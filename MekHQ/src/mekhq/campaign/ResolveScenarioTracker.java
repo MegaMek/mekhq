@@ -141,13 +141,11 @@ public class ResolveScenarioTracker {
     }
 
     public void processMulFiles() {
-        //File salvageFile = salvageList.getSelectedFile();
-        if(unitList.isPresent()) {
+        if (unitList.isPresent()) {
             try {
                 loadUnitsAndPilots(unitList.get());
             } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                MekHQ.getLogger().error(getClass(), "processMulFiles", e);
             }
         } else {
             initUnitsAndPilotsWithoutBattle();
@@ -974,7 +972,6 @@ public class ResolveScenarioTracker {
                         continue;
                     }
                     int slot = 0;
-
                     //For multi-person cockpits the person id has been set to match the crew slot
                     for (int pos = 0; pos < pilot.getSlotCount(); pos++) {
                         if (p.getId().toString().equals(pilot.getExternalIdAsString(pos))) {
@@ -1073,15 +1070,11 @@ public class ResolveScenarioTracker {
             MULParser parser = new MULParser();
 
             // Open up the file.
-            InputStream listStream = new FileInputStream(unitFile);
-            // Read a Vector from the file.
-            try {
+            try (InputStream listStream = new FileInputStream(unitFile)) {
+                // Read a Vector from the file.
                 parser.parse(listStream);
-                listStream.close();
-            } catch (Exception excep) {
-                excep.printStackTrace(System.err);
-                // throw new IOException("Unable to read from: " +
-                // unitFile.getName());
+            } catch (Exception e) {
+                MekHQ.getLogger().error(getClass(), "loadUnitsAndPilots", e);
             }
 
             // Was there any error in parsing?
@@ -1363,7 +1356,6 @@ public class ResolveScenarioTracker {
     }
 
     public void resolveScenario(int resolution, String report) {
-
         //lets start by generating a stub file for our records
         scenario.generateStub(campaign);
 
@@ -1403,7 +1395,8 @@ public class ResolveScenarioTracker {
                     campaign.getRetirementDefectionTracker().removeFromCampaign(person,
                             true, campaign.getCampaignOptions().getUseShareSystem()
                                     ? person.getNumShares(campaign.getCampaignOptions().getSharesForAll())
-                                    : 0, campaign, (AtBContract) m);
+                                    : 0,
+                            campaign, (AtBContract) m);
                 }
             }
             if (campaign.getCampaignOptions().useAdvancedMedical()) {
@@ -1428,8 +1421,7 @@ public class ResolveScenarioTracker {
                 getCampaign().recruitPerson(person, true, false, false, true);
                 if (getCampaign().getCampaignOptions().getUseAtB() &&
                         getCampaign().getCampaignOptions().getUseAtBCapture() &&
-                        m instanceof AtBContract &&
-                        status.isCaptured()) {
+                        m instanceof AtBContract && status.isCaptured()) {
                     if (Compute.d6(2) >= 10 + ((AtBContract)m).getEnemySkill() - getCampaign().getUnitRatingMod()) {
                         getCampaign().addReport(String.format(
                             "You have convinced %s to defect.", person.getHyperlinkedName())); //$NON-NLS-1$
@@ -1449,16 +1441,17 @@ public class ResolveScenarioTracker {
             for (Kill k : status.getKills()) {
                 campaign.addKill(k);
             }
+
             if (status.isMissing()) {
                 campaign.changeStatus(person, Person.S_MIA);
-            }
-            if (status.isDead()) {
+            } else if (status.isDead()) {
                 campaign.changeStatus(person, Person.S_KIA);
-                if (campaign.getCampaignOptions().getUseAtB() &&
-                        m instanceof AtBContract) {
+                if (campaign.getCampaignOptions().getUseAtB() && (m instanceof AtBContract)) {
                     campaign.getRetirementDefectionTracker().removeFromCampaign(person,
-                            true, campaign.getCampaignOptions().getUseShareSystem()?person.getNumShares(campaign.getCampaignOptions().getSharesForAll()):0,
-                                    campaign, (AtBContract)m);
+                            true, campaign.getCampaignOptions().getUseShareSystem()
+                                    ? person.getNumShares(campaign.getCampaignOptions().getSharesForAll())
+                                    : 0,
+                            campaign, (AtBContract)m);
                 }
             }
             if (campaign.getCampaignOptions().useAdvancedMedical()) {
@@ -1882,7 +1875,7 @@ public class ResolveScenarioTracker {
                             : unit.getEntity();
                     baseEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
                 } catch (EntityLoadingException e) {
-                    e.printStackTrace();
+                    MekHQ.getLogger().error(getClass(), "Unit Status", e);
                 }
             }
         }

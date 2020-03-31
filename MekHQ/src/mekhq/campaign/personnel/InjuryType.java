@@ -23,6 +23,8 @@ import java.util.*;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import mekhq.campaign.personnel.enums.BodyLocation;
+import mekhq.campaign.personnel.enums.InjuryLevel;
 import org.joda.time.DateTime;
 
 import mekhq.Utilities;
@@ -199,7 +201,6 @@ public class InjuryType {
         final String fluff = getFluffText(loc, severity, p.getGender());
         Injury result = new Injury(recoveryTime, fluff, loc, this, severity, new DateTime(c.getCalendar()), false);
         result.setVersion(Injury.VERSION);
-        result.setStart(new DateTime(c.getCalendar()));
         return result;
     }
 

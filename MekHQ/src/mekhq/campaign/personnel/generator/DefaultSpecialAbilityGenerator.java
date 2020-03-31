@@ -16,22 +16,40 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.personnel;
+package mekhq.campaign.personnel.generator;
 
 import mekhq.Utilities;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.SkillType;
 
 public class DefaultSpecialAbilityGenerator extends AbstractSpecialAbilityGenerator {
 
     @Override
     public boolean generateSpecialAbilities(Person person, int expLvl) {
         if (getCampaignOptions(person).useAbilities()) {
-            SingleSpecialAbilityGenerator generator = new SingleSpecialAbilityGenerator();
-            generator.setSkillPreferences(getSkillPreferences());
+            SingleSpecialAbilityGenerator singleSpecialAbilityGenerator = new SingleSpecialAbilityGenerator();
+            singleSpecialAbilityGenerator.setSkillPreferences(getSkillPreferences());
 
-            int nabil = Utilities.rollSpecialAbilities(getSkillPreferences().getSpecialAbilBonus(expLvl));
-            while (nabil > 0 && generator.generateSpecialAbilities(person, expLvl)) {
-                nabil--;
+            // base number of special abilities is based on a random roll
+            int numAbilities = Utilities.rollSpecialAbilities(getSkillPreferences().getSpecialAbilBonus(expLvl));
+
+            // Based on the AtB rules, recruits of veteran gain one and elites gain two
+            // additional special abilities
+            if (getCampaignOptions(person).getUseAtB()) {
+                switch (expLvl) {
+                    case SkillType.EXP_VETERAN:
+                        numAbilities += 1;
+                        break;
+                    case SkillType.EXP_ELITE:
+                        numAbilities += 2;
+                        break;
+                }
+            }
+
+            while ((numAbilities > 0)
+                    && singleSpecialAbilityGenerator.generateSpecialAbilities(person, expLvl)) {
+                numAbilities--;
             }
 
             return true;

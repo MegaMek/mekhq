@@ -154,9 +154,6 @@ public class PersonnelMarket {
 
     public void addPerson(Person p) {
 		UUID id = UUID.randomUUID();
-		while (null != personnelIds.get(id)) {
-			id = UUID.randomUUID();
-		}
 		p.setId(id);
         personnel.add(p);
     }

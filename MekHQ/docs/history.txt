@@ -22,6 +22,22 @@ VERSION HISTORY:
 + Issue #1482: Hire Full Complement Now Records Time in Service
 + Issue #1486: Fixing Unit and Personnel Export to CSV and Localizing Top Menu Bar
 + Issue #1530: Fixes issue in infirmary where buttons unreadable in dark mode
++ Issue #1250: Added FormattedNumberSorter to Warehouse total cost column
++ Issue #1375: Creating Localized Natural Order Sorter
++ Issue #155: Adding Advance Day to Personnel Market
++ PR #1553: AtB: Adding SPA Generation for Generated Veteran and Elite Personnel
++ PR #1555: Fixing spacing for C3 Slaves in the TOE
++ Issue #1564: Hide impossible parts in the Purchase Parts Windows
++ PR #1533: Windchild's Personnel Improvements, covering Issues #765, #876, #1404, #1482, #1486, #1492
++ Issue #1524: Sort P_NONE Personnel as Support Personnel
++ Issues #1542 and #1417: Hangar Tab Popup List: Bulk Selection and Rank Fixes
++ PR #1556: Updating Unit Rating wording
++ PR #1584: Stop double-counting medics for FMM:R unit rating
++ Issue #691: Fixed multiple issues importing units from MUL files, including portraits, gender, SPAs
++ PR #1583: Adding Menu Bar Mnemonics (Shortcut Keys)
++ Issue #1540: Switching over to using JSpinner for base salaries
++ Issue #1578: Adding New Campaign to the main menu
++ PR #1597: MegaMek Log File is Reset on MekHQ load
 
 v0.47.4 (2020-2-09 2200 UTC)
 + PR #1440: Implement "Rugged" quirk (2x or 3x between maintenance rolls)
