@@ -27,14 +27,11 @@ import mekhq.Utilities;
 import mekhq.campaign.*;
 import mekhq.campaign.log.MedicalLogEntry;
 import mekhq.campaign.log.MedicalLogger;
-import mekhq.campaign.personnel.enums.BodyLocation;
+import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.Injury;
-import mekhq.campaign.personnel.enums.InjuryLevel;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Modifier;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.GenderDescriptors;
-import mekhq.campaign.personnel.enums.ModifierValue;
 
 /** Advanced Medical sub-system injury types */
 public final class InjuryTypes {
@@ -179,7 +176,7 @@ public final class InjuryTypes {
                         new GameEffect(
                                 "certain death",
                                 rnd -> {
-                                    p.setStatus(Person.S_KIA);
+                                    p.setStatus(PersonnelStatus.KIA);
                                     MedicalLogEntry entry = MedicalLogger.diedDueToBrainTrauma(p, c.getDate());
                                     MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, entry.toString());
                                 }));
@@ -191,7 +188,7 @@ public final class InjuryTypes {
                         deathchance + "% chance of death",
                         rnd -> {
                             if(rnd.applyAsInt(6) + hits >= 5) {
-                                p.setStatus(Person.S_KIA);
+                                p.setStatus(PersonnelStatus.KIA);
                                 MedicalLogEntry entry = MedicalLogger.diedDueToBrainTrauma(p, c.getDate());
                                 MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, entry.toString());
                         }
@@ -360,7 +357,7 @@ public final class InjuryTypes {
                         new GameEffect(
                                 "certain death",
                                 rnd -> {
-                                    p.setStatus(Person.S_KIA);
+                                    p.setStatus(PersonnelStatus.KIA);
                                     MedicalLogEntry entry = MedicalLogger.diedOfInternalBleeding(p, c.getDate());
                                     MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, entry.toString());
                                 })
@@ -378,7 +375,7 @@ public final class InjuryTypes {
                                     MedicalLogEntry entry = MedicalLogger.internalBleedingWorsened(p, c.getDate());
                                     MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, entry.toString());
                                 } else {
-                                    p.setStatus(Person.S_KIA);
+                                    p.setStatus(PersonnelStatus.KIA);
                                     MedicalLogEntry entry = MedicalLogger.diedOfInternalBleeding(p, c.getDate());
                                     MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, entry.toString());
                                 }
@@ -491,7 +488,7 @@ public final class InjuryTypes {
                     rnd -> {
                         int rib = rnd.applyAsInt(100);
                         if (rib < 1) {
-                            p.changeStatus(Person.S_KIA);
+                            p.changeStatus(PersonnelStatus.KIA);
                             MedicalLogEntry entry = MedicalLogger.brokenRibPunctureDead(p, c.getDate());
                             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, entry.toString());
                         } else if (rib < 10) {

@@ -503,7 +503,7 @@ public class PersonViewPanel extends ScrollablePanel {
         pnlInfo.add(lblStatus1, gridBagConstraints);
 
         lblStatus2.setName("lblStatus2"); // NOI18N
-        lblStatus2.setText(person.getStatusName() + person.pregnancyStatus());
+        lblStatus2.setText(person.getStatus().getStatusName() + person.pregnancyStatus());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = firsty;

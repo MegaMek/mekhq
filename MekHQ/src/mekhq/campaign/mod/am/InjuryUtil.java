@@ -39,6 +39,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -428,22 +429,22 @@ public final class InjuryUtil {
             result.add(new GameEffect("Infirmary health check-up",
                 rnd -> {
                     boolean dismissed = false;
-                    if(p.getStatus() == Person.S_KIA) {
+                    if (p.getStatus() == PersonnelStatus.KIA) {
                         dismissed = true;
                         MedicalLogger.diedInInfirmary(p, c.getDate());
-                    } else if(p.getStatus() == Person.S_MIA) {
+                    } else if (p.getStatus() == PersonnelStatus.MIA) {
                         // What? How?
                         dismissed = true;
                         MedicalLogger.abductedFromInfirmary(p, c.getDate());
-                    } else if(p.getStatus() == Person.S_RETIRED) {
+                    } else if (p.getStatus() == PersonnelStatus.RETIRED) {
                         dismissed = true;
                         MedicalLogger.retiredAndTransferredFromInfirmary(p, c.getDate());
-                    } else if(!p.needsFixing()) {
+                    } else if (!p.needsFixing()) {
                         dismissed = true;
                         MedicalLogger.dismissedFromInfirmary(p, c.getDate());
                     }
 
-                    if(dismissed) {
+                    if (dismissed) {
                         p.setDoctorId(null, c.getCampaignOptions().getHealingWaitingPeriod());
                     }
                 }));

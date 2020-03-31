@@ -37,6 +37,7 @@ import megamek.common.*;
 import mekhq.*;
 import mekhq.campaign.finances.*;
 import mekhq.campaign.log.*;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 import org.joda.time.DateTime;
@@ -735,7 +736,7 @@ public class Campaign implements Serializable, ITechManager {
             if (getFinances().debit(totalPayout, Transaction.C_SALARY, "Final Payout", getDate())) {
                 for (UUID pid : getRetirementDefectionTracker().getRetirees()) {
                     if (getPerson(pid).isActive()) {
-                        changeStatus(getPerson(pid), Person.S_RETIRED);
+                        changeStatus(getPerson(pid), PersonnelStatus.RETIRED);
                         addReport(getPerson(pid).getFullName() + " has retired.");
                     }
                     if (Person.T_NONE != getRetirementDefectionTracker().getPayout(pid).getRecruitType()) {
@@ -5978,9 +5979,9 @@ public class Campaign implements Serializable, ITechManager {
         MekHQ.triggerEvent(new PersonChangedEvent(p));
     }
 
-    public void changeStatus(Person person, int status) {
+    public void changeStatus(Person person, PersonnelStatus status) {
         Unit u = getUnit(person.getUnitId());
-        if (status == Person.S_KIA) {
+        if (status == PersonnelStatus.KIA) {
             ServiceLogger.kia(person, getDate());
             // set the date of death
             person.setDateOfDeath((GregorianCalendar) calendar.clone());
@@ -5989,21 +5990,21 @@ public class Campaign implements Serializable, ITechManager {
                 person.divorce(getCampaignOptions().getKeepMarriedNameUponSpouseDeath()
                         ? Person.OPT_KEEP_SURNAME : Person.OPT_SPOUSE_CHANGE_SURNAME);
             }
-        } else if (person.getStatus() == Person.S_KIA) {
+        } else if (person.getStatus() == PersonnelStatus.KIA) {
             // remove date of death for resurrection
             person.setDateOfDeath(null);
         }
-        if (status == Person.S_MIA) {
+        if (status == PersonnelStatus.MIA) {
             ServiceLogger.mia(person, getDate());
         }
-        if (status == Person.S_RETIRED) {
+        if (status == PersonnelStatus.RETIRED) {
             ServiceLogger.retired(person, getDate());
         }
-        if (status == Person.S_ACTIVE && person.getStatus() == Person.S_MIA) {
+        if ((status == PersonnelStatus.ACTIVE) && (person.getStatus() == PersonnelStatus.MIA)) {
             ServiceLogger.recoveredMia(person, getDate());
         }
         person.setStatus(status);
-        if (status != Person.S_ACTIVE) {
+        if (status != PersonnelStatus.ACTIVE) {
             person.setDoctorId(null, getCampaignOptions().getNaturalHealingWaitingPeriod());
             // If we're assigned to a unit, remove us from it
             if (null != u) {
@@ -7809,11 +7810,11 @@ public class Campaign implements Serializable, ITechManager {
                     countInjured++;
                 }
                 salary = salary.plus(p.getSalary());
-            } else if (Person.isCombatRole(p.getPrimaryRole()) && p.getStatus() == Person.S_RETIRED) {
+            } else if (Person.isCombatRole(p.getPrimaryRole()) && (p.getStatus() == PersonnelStatus.RETIRED)) {
                 countRetired++;
-            } else if (Person.isCombatRole(p.getPrimaryRole()) && p.getStatus() == Person.S_MIA) {
+            } else if (Person.isCombatRole(p.getPrimaryRole()) && (p.getStatus() == PersonnelStatus.MIA)) {
                 countMIA++;
-            } else if (Person.isCombatRole(p.getPrimaryRole()) && p.getStatus() == Person.S_KIA) {
+            } else if (Person.isCombatRole(p.getPrimaryRole()) && (p.getStatus() == PersonnelStatus.KIA)) {
                 countKIA++;
             }
         }
@@ -7882,13 +7883,13 @@ public class Campaign implements Serializable, ITechManager {
                     countInjured++;
                 }
             } else if (Person.isSupportRole(p.getPrimaryRole())
-                    && p.getStatus() == Person.S_RETIRED) {
+                    && p.getStatus() == PersonnelStatus.RETIRED) {
                 countRetired++;
             } else if (Person.isSupportRole(p.getPrimaryRole())
-                    && p.getStatus() == Person.S_MIA) {
+                    && p.getStatus() == PersonnelStatus.MIA) {
                 countMIA++;
             } else if (Person.isSupportRole(p.getPrimaryRole())
-                    && p.getStatus() == Person.S_KIA) {
+                    && p.getStatus() == PersonnelStatus.KIA) {
                 countKIA++;
             }
         }

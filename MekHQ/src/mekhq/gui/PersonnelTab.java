@@ -55,6 +55,7 @@ import mekhq.campaign.event.PersonRemovedEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.event.UnitRemovedEvent;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.gui.adapter.PersonnelTableMouseAdapter;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.model.XTableColumnModel;
@@ -423,11 +424,11 @@ public final class PersonnelTab extends CampaignGuiTab {
                 } else if (nGroup == PG_DEPENDENT) {
                     return person.isDependent();
                 } else if (nGroup == PG_RETIRE) {
-                    return person.getStatus() == Person.S_RETIRED;
+                    return person.getStatus() == PersonnelStatus.RETIRED;
                 } else if (nGroup == PG_MIA) {
-                    return person.getStatus() == Person.S_MIA;
+                    return person.getStatus() == PersonnelStatus.MIA;
                 } else if (nGroup == PG_KIA) {
-                    return person.getStatus() == Person.S_KIA;
+                    return person.getStatus() == PersonnelStatus.KIA;
                 } else if (nGroup == PG_PRISONER) {
                     return person.isPrisoner();
                 } else {
