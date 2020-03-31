@@ -55,7 +55,7 @@ public enum BodyLocation {
      */
     private Set<BodyLocation> children = new HashSet<>();
 
-    private final ResourceBundle resources = ResourceBundle.getBundle("Personnel",
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             new EncodeControl());
     //endregion Variable Declarations
 

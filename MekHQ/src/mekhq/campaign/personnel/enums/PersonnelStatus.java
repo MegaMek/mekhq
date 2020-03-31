@@ -32,7 +32,7 @@ public enum PersonnelStatus {
 
     //region Variable Declarations
     private final String statusName;
-    private final ResourceBundle resources = ResourceBundle.getBundle("Personnel",
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             new EncodeControl());
     //endregion Variable Declarations
 

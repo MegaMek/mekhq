@@ -58,7 +58,7 @@ public enum GenderDescriptors {
     private final String masculine;
     private final String feminine;
     private final String other;
-    private final ResourceBundle resources = ResourceBundle.getBundle("Personnel",
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             new EncodeControl());
     //endregion Variable Declarations
 
