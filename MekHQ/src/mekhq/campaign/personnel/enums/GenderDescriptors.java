@@ -29,23 +29,23 @@ import java.util.ResourceBundle;
 public enum GenderDescriptors {
     //region Enum Declarations
     /**
-     * Descriptor: Male, Female, or They
+     * Descriptor: Male, Female, or Other
      */
     MALE_FEMALE("GenderDescriptors.MALE.text", "GenderDescriptors.FEMALE.text", "GenderDescriptors.OTHER.text"),
     /**
-     * Descriptor: He, She, or It
+     * Descriptor: He, She, or They
      */
     HE_SHE("GenderDescriptors.HE.text", "GenderDescriptors.SHE.text", "GenderDescriptors.THEY.text"),
     /**
-     * Descriptor: Him or Her
+     * Descriptor: Him, Her, or Them
      */
     HIM_HER("GenderDescriptors.HIM.text", "GenderDescriptors.HER.text", "GenderDescriptors.THEM.text"),
     /**
-     * Descriptor: His or Her
+     * Descriptor: His, Her, or Their
      */
     HIS_HER("GenderDescriptors.HIS.text", "GenderDescriptors.HER.text", "GenderDescriptors.THEIR.text"),
     /**
-     * Descriptor: His or Hers
+     * Descriptor: His, Hers, or Theirs
      */
     HIS_HERS("GenderDescriptors.HIS.text", "GenderDescriptors.HERS.text", "GenderDescriptors.THEIRS.text"),
     /**
