@@ -607,7 +607,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 break;
             }
             case CMD_CHANGE_STATUS: {
-                //data[1]
                 PersonnelStatus status = PersonnelStatus.valueOf(data[1]);
                 for (Person person : people) {
                     if ((status == PersonnelStatus.ACTIVE) || (0 == JOptionPane.showConfirmDialog(null,

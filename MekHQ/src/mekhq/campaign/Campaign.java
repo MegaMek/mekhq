@@ -7874,13 +7874,13 @@ public class Campaign implements Serializable, ITechManager {
                     countInjured++;
                 }
             } else if (Person.isSupportRole(p.getPrimaryRole())
-                    && p.getStatus() == PersonnelStatus.RETIRED) {
+                    && (p.getStatus() == PersonnelStatus.RETIRED)) {
                 countRetired++;
             } else if (Person.isSupportRole(p.getPrimaryRole())
-                    && p.getStatus() == PersonnelStatus.MIA) {
+                    && (p.getStatus() == PersonnelStatus.MIA)) {
                 countMIA++;
             } else if (Person.isSupportRole(p.getPrimaryRole())
-                    && p.getStatus() == PersonnelStatus.KIA) {
+                    && (p.getStatus() == PersonnelStatus.KIA)) {
                 countKIA++;
             }
         }
