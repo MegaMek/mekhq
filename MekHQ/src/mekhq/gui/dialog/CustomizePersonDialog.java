@@ -12,6 +12,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.text.SimpleDateFormat;
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -65,7 +66,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private PilotOptions options;
     private LocalDate birthdate;
     private LocalDate recruitment;
-    private SimpleDateFormat dateFormat;
+    private String dateFormat = "MMMM d yyyy";
     private Frame frame;
 
     private javax.swing.JButton btnDate;
@@ -102,7 +103,6 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         super(parent, modal);
         this.campaign = campaign;
         this.frame = parent;
-        this.dateFormat = new SimpleDateFormat("MMMM d yyyy");
         this.person = person;
         initializePilotAndOptions();
         setLocationRelativeTo(parent);
@@ -1159,11 +1159,11 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     }
 
     private String getDateAsString() {
-        return dateFormat.format(birthdate);
+        return birthdate.format(DateTimeFormatter.ofPattern(dateFormat));
     }
 
     private String getDateAsString2() {
-        return dateFormat.format(recruitment);
+        return recruitment.format(DateTimeFormatter.ofPattern(dateFormat));
     }
 
     private void changeSkillValue(String type) {
@@ -1191,7 +1191,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private void btnDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDateActionPerformed
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizePersonDialog", new EncodeControl()); //$NON-NLS-1$
         // show the date chooser
-        GregorianCalendar birthdate = GregorianCalendar.from(ZonedDateTime.from(this.birthdate));
+        GregorianCalendar birthdate = GregorianCalendar.from(this.birthdate.atStartOfDay(
+                ZoneId.systemDefault()));
         DateChooser dc = new DateChooser(frame, birthdate);
         // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
@@ -1203,7 +1204,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
 
     private void btnServiceDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnServiceDateActionPerformed
         // show the date chooser
-        GregorianCalendar recruitment = GregorianCalendar.from(ZonedDateTime.from(this.recruitment));
+        GregorianCalendar recruitment = GregorianCalendar.from(this.recruitment.atStartOfDay(
+                ZoneId.systemDefault()));
         DateChooser dc = new DateChooser(frame, recruitment);
         // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
@@ -1214,7 +1216,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
 
     public int getAge() {
     	// Get age based on year
-        return Period.between(campaign.getLocalDate(), birthdate).getYears();
+        return Period.between(birthdate, campaign.getLocalDate()).getYears();
     }
 
     private void backgroundChanged() {

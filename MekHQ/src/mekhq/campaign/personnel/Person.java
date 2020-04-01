@@ -1224,7 +1224,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             today = getDateOfDeath();
         }
 
-        return Period.between(today, getBirthday()).getYears();
+        return Period.between(getBirthday(), today).getYears();
     }
 
     public int getTimeInService(LocalDate today) {
@@ -1723,8 +1723,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); // TODO : Remove inline date format
-
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<person id=\""
                 + id.toString()
                 + "\" type=\""
@@ -1859,13 +1857,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (dueDate != null) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<dueDate>"
-                    + df.format(dueDate.format(DateTimeFormatter.ofPattern(dateSaveFormat)))
+                    + dueDate.format(DateTimeFormatter.ofPattern(dateSaveFormat))
                     + "</dueDate>");
         }
         if (expectedDueDate != null) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<expectedDueDate>"
-                    + df.format(expectedDueDate.format(DateTimeFormatter.ofPattern(dateSaveFormat)))
+                    + expectedDueDate.format(DateTimeFormatter.ofPattern(dateSaveFormat))
                     + "</expectedDueDate>");
         }
         if (!portraitCategory.equals(Crew.ROOT_PORTRAIT)) {
@@ -1993,19 +1991,19 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (birthday != null) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<birthday>"
-                    + df.format(birthday.format(DateTimeFormatter.ofPattern(dateSaveFormat)))
+                    + birthday.format(DateTimeFormatter.ofPattern(dateSaveFormat))
                     + "</birthday>");
         }
         if (null != dateOfDeath) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<deathday>"
-                    + df.format(dateOfDeath.format(DateTimeFormatter.ofPattern(dateSaveFormat)))
+                    + dateOfDeath.format(DateTimeFormatter.ofPattern(dateSaveFormat))
                     + "</deathday>");
         }
         if (null != recruitment) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<recruitment>"
-                    + df.format(recruitment.format(DateTimeFormatter.ofPattern(dateSaveFormat)))
+                    + recruitment.format(DateTimeFormatter.ofPattern(dateSaveFormat))
                     + "</recruitment>");
         }
         for (Skill skill : skills.getSkills()) {
@@ -2212,16 +2210,22 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("dueDate")) {
                     if (version.isLowerThan("0.47.6")) {
-                        retVal.dueDate = LocalDate.parse(wn2.getTextContent().trim(),
-                                DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+                        try {
+                            retVal.dueDate = LocalDate.parse(wn2.getTextContent().trim(),
+                                    DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+                        } catch (Exception ignored) {
+                        }
                     } else {
                         retVal.dueDate = LocalDate.parse(wn2.getTextContent().trim(),
                                 DateTimeFormatter.ofPattern(dateSaveFormat));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("expectedDueDate")) {
                     if (version.isLowerThan("0.47.6")) {
-                        retVal.expectedDueDate = LocalDate.parse(wn2.getTextContent().trim(),
-                                DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+                        try {
+                            retVal.expectedDueDate = LocalDate.parse(wn2.getTextContent().trim(),
+                                    DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+                        } catch (Exception ignored) {
+                        }
                     } else {
                         retVal.expectedDueDate = LocalDate.parse(wn2.getTextContent().trim(),
                                 DateTimeFormatter.ofPattern(dateSaveFormat));
@@ -2290,24 +2294,33 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     retVal.overtimeLeft = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("birthday")) {
                     if (version.isLowerThan("0.47.6")) {
-                        retVal.birthday = LocalDate.parse(wn2.getTextContent().trim(),
-                                DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+                        try {
+                            retVal.birthday = LocalDate.parse(wn2.getTextContent().trim(),
+                                    DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+                        } catch (Exception ignored) {
+                        }
                     } else {
                         retVal.birthday = LocalDate.parse(wn2.getTextContent().trim(),
                                 DateTimeFormatter.ofPattern(dateSaveFormat));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("deathday")) {
                     if (version.isLowerThan("0.47.6")) {
-                        retVal.dateOfDeath = LocalDate.parse(wn2.getTextContent().trim(),
-                                DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+                        try {
+                            retVal.dateOfDeath = LocalDate.parse(wn2.getTextContent().trim(),
+                                    DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+                        } catch (Exception ignored) {
+                        }
                     } else {
                         retVal.dateOfDeath = LocalDate.parse(wn2.getTextContent().trim(),
                                 DateTimeFormatter.ofPattern(dateSaveFormat));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("recruitment")) {
                     if (version.isLowerThan("0.47.6")) {
-                        retVal.recruitment = LocalDate.parse(wn2.getTextContent().trim(),
-                                DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+                        try {
+                            retVal.recruitment = LocalDate.parse(wn2.getTextContent().trim(),
+                                    DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+                        } catch (Exception ignored) {
+                        }
                     } else {
                         retVal.recruitment = LocalDate.parse(wn2.getTextContent().trim(),
                                 DateTimeFormatter.ofPattern(dateSaveFormat));
