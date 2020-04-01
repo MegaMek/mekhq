@@ -1240,7 +1240,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             today = getDateOfDeath();
         }
 
-        return Period.between(today, getRecruitment()).getYears();
+        return Period.between(getRecruitment(), today).getYears();
     }
 
     public void setId(UUID id) {
