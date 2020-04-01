@@ -1,6 +1,6 @@
 VERSION HISTORY:
 ----------------
-0.47.5-SNAPSHOT
+0.47.5 (2020-4-01 2000 UTC)
 + Issue #1470: Thumper artillery vehicle causes array index out of bounds exception error
 + Issue #1261: RFE: In Contract Market, hyperlink the system/location to the Interstellar Map
 + Issue #1090: Feature Request: Add Origin Faction to Fluff Information display of Personnel
