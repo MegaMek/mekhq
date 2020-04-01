@@ -3486,14 +3486,16 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void processNewDayPersonnel() {
-        ArrayList<Person> babies = new ArrayList<>();
+        List<Person> babies = new ArrayList<>();
         for (Person p : getPersonnel()) {
             if (!p.isActive()) {
                 continue;
             }
 
+            // Random Death
+
             // Random Marriages
-            if (campaignOptions.useRandomMarriages()) {
+            if (getCampaignOptions().useRandomMarriages()) {
                 p.randomMarriage();
             }
 
@@ -3518,14 +3520,14 @@ public class Campaign implements Serializable, ITechManager {
             if (p.needsFixing() && !getCampaignOptions().useAdvancedMedical()) {
                 p.decrementDaysToWaitForHealing();
                 Person doctor = getPerson(p.getDoctorId());
-                if (null != doctor && doctor.isDoctor()) {
+                if ((doctor != null) && doctor.isDoctor()) {
                     if (p.getDaysToWaitForHealing() <= 0) {
                         addReport(healPerson(p, doctor));
                     }
                 } else if (p.checkNaturalHealing(15)) {
                     addReport(p.getHyperlinkedFullTitle() + " heals naturally!");
                     Unit u = getUnit(p.getUnitId());
-                    if (null != u) {
+                    if (u != null) {
                         u.resetPilotAndEntity();
                     }
                 }
@@ -3534,7 +3536,7 @@ public class Campaign implements Serializable, ITechManager {
             if (getCampaignOptions().useAdvancedMedical()) {
                 InjuryUtil.resolveDailyHealing(this, p);
                 Unit u = getUnit(p.getUnitId());
-                if (null != u) {
+                if (u != null) {
                     u.resetPilotAndEntity();
                 }
             }
@@ -3542,20 +3544,18 @@ public class Campaign implements Serializable, ITechManager {
             // Reset edge points to the purchased value each week. This should only
             // apply for support personnel - combat troops reset with each new mm game
             if ((p.isAdmin() || p.isDoctor() || p.isEngineer() || p.isTech())
-                    && calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
+                    && (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY)) {
                 p.resetCurrentEdge();
             }
 
-            if (getCampaignOptions().getIdleXP() > 0 && calendar.get(Calendar.DAY_OF_MONTH) == 1 && p.isActive()
-                    && !p.isPrisoner()) { // Prisoners no
-                                          // XP, Bondsmen
-                                          // yes xp
+            if ((getCampaignOptions().getIdleXP() > 0) && (calendar.get(Calendar.DAY_OF_MONTH) == 1)
+                    && p.isActive() && !p.isPrisoner()) { // Prisoners can't gain XP, while Bondsmen can gain xp
                 p.setIdleMonths(p.getIdleMonths() + 1);
                 if (p.getIdleMonths() >= getCampaignOptions().getMonthsIdleXP()) {
                     if (Compute.d6(2) >= getCampaignOptions().getTargetIdleXP()) {
                         p.setXp(p.getXp() + getCampaignOptions().getIdleXP());
-                        addReport(p.getHyperlinkedFullTitle() + " has gained " + getCampaignOptions().getIdleXP()
-                                + " XP");
+                        addReport(p.getHyperlinkedFullTitle() + " has gained "
+                                + getCampaignOptions().getIdleXP() + " XP");
                     }
                     p.setIdleMonths(0);
                 }
