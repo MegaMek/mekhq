@@ -2,7 +2,7 @@
  * Person.java
  *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- *
+ * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
