@@ -11,13 +11,14 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.text.SimpleDateFormat;
+import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.swing.*;
 
 import mekhq.campaign.personnel.enums.GenderDescriptors;
-import org.joda.time.DateTime;
 
 import megamek.client.ui.swing.DialogOptionComponent;
 import megamek.client.ui.swing.DialogOptionListener;
@@ -47,6 +48,7 @@ import mekhq.gui.control.EditPersonnelLogControl;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.preferences.PreferencesNode;
+import org.joda.time.DateTime;
 
 /**
  * This dialog is used to both hire new pilots and to edit existing ones
@@ -62,8 +64,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private Hashtable<String, JLabel> skillValues = new Hashtable<>();
     private Hashtable<String, JCheckBox> skillChks = new Hashtable<>();
     private PilotOptions options;
-    private GregorianCalendar birthdate;
-    private GregorianCalendar recruitment;
+    private LocalDate birthdate;
+    private LocalDate recruitment;
     private SimpleDateFormat dateFormat;
     private Frame frame;
 
@@ -109,9 +111,9 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     }
 
     private void initializePilotAndOptions () {
-        this.birthdate = (GregorianCalendar) person.getBirthday().clone();
+        this.birthdate = person.getBirthday();
     	if (campaign.getCampaignOptions().getUseTimeInService() && (person.getRecruitment() != null)) {
-            this.recruitment = (GregorianCalendar) person.getRecruitment().clone();
+            this.recruitment = person.getRecruitment();
         }
     	this.options = person.getOptions();
     	initComponents();
@@ -375,7 +377,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
                                                    cellHasFocus);
                 if (value instanceof PlanetarySystem) {
                     PlanetarySystem system = (PlanetarySystem)value;
-                    setText(system.getName(new DateTime(campaign.getCalendar())));
+                    setText(system.getName(campaign.getDateTime()));
                 }
 
                 return this;
@@ -435,7 +437,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
                                                    cellHasFocus);
                 if (value instanceof Planet) {
                     Planet planet = (Planet)value;
-                    setText(planet.getName(new DateTime(campaign.getCalendar())));
+                    setText(planet.getName(campaign.getDateTime()));
                 }
 
                 return this;
@@ -512,7 +514,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panDemog.add(btnDate, gridBagConstraints);
 
-        lblAge.setText(person.getAge(campaign.getCalendar()) + " " + resourceMap.getString("age")); // NOI18N
+        lblAge.setText(person.getAge(campaign.getLocalDate()) + " " + resourceMap.getString("age")); // NOI18N
         lblAge.setName("lblAge"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -786,9 +788,9 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
                 // and when they were recruited, or now if we're
                 // not tracking recruitment.
                 int endYear = person.getRecruitment() != null
-                    ? Math.min(person.getRecruitment().get(Calendar.YEAR), year)
+                    ? Math.min(person.getRecruitment().getYear(), year)
                     : year;
-                if (faction.validBetween(person.getBirthday().get(Calendar.YEAR), endYear)) {
+                if (faction.validBetween(person.getBirthday().getYear(), endYear)) {
                     factionsModel.addElement(faction);
                 }
             }
@@ -813,7 +815,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private DefaultComboBoxModel<PlanetarySystem> getPlanetarySystemsComboBoxModel(Faction faction) {
         DefaultComboBoxModel<PlanetarySystem> model = new DefaultComboBoxModel<>();
 
-        DateTime birthYear = new DateTime(person.getBirthday());
+        DateTime birthYear = new DateTime(Instant.from(person.getBirthday().atStartOfDay(ZoneId.systemDefault())));
         List<PlanetarySystem> orderedSystems = campaign.getSystems().stream()
             .filter(a -> a.getFactionSet(birthYear).contains(faction))
             .sorted(Comparator.comparing(a -> a.getName(birthYear)))
@@ -1158,11 +1160,11 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     }
 
     private String getDateAsString() {
-        return dateFormat.format(birthdate.getTime());
+        return dateFormat.format(birthdate);
     }
 
     private String getDateAsString2() {
-        return dateFormat.format(recruitment.getTime());
+        return dateFormat.format(recruitment);
     }
 
     private void changeSkillValue(String type) {
@@ -1190,10 +1192,11 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private void btnDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDateActionPerformed
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizePersonDialog", new EncodeControl()); //$NON-NLS-1$
         // show the date chooser
+        GregorianCalendar birthdate = GregorianCalendar.from(ZonedDateTime.from(this.birthdate));
         DateChooser dc = new DateChooser(frame, birthdate);
-        // user can eiter choose a date or cancel by closing
+        // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-            birthdate = dc.getDate();
+            this.birthdate = dc.getDate().toZonedDateTime().toLocalDate();
             btnDate.setText(getDateAsString());
             lblAge.setText(getAge() + " " + resourceMap.getString("age")); // NOI18N
         }
@@ -1201,27 +1204,18 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
 
     private void btnServiceDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnServiceDateActionPerformed
         // show the date chooser
+        GregorianCalendar recruitment = GregorianCalendar.from(ZonedDateTime.from(this.recruitment));
         DateChooser dc = new DateChooser(frame, recruitment);
         // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-            recruitment = dc.getDate();
+            this.recruitment = dc.getDate().toZonedDateTime().toLocalDate();
             btnServiceDate.setText(getDateAsString2());
         }
     }
 
     public int getAge() {
     	// Get age based on year
-    	int age = campaign.getCalendar().get(Calendar.YEAR) - birthdate.get(Calendar.YEAR);
-
-    	// Add the tentative age to the date of birth to get this year's birthday
-    	GregorianCalendar tmpDate = (GregorianCalendar) birthdate.clone();
-    	tmpDate.add(Calendar.YEAR, age);
-
-    	// If this year's birthday has not happened yet, subtract one from age
-    	if (campaign.getCalendar().before(tmpDate)) {
-    	    age--;
-    	}
-    	return age;
+        return Period.between(campaign.getLocalDate(), birthdate).getYears();
     }
 
     private void backgroundChanged() {
