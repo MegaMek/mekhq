@@ -47,17 +47,15 @@ public class FormerSpouse implements Serializable, MekHqXmlSerializable {
     //endregion Variables
 
     //region Constructors
+    public FormerSpouse(UUID formerSpouseId, LocalDate date) {
+        this(formerSpouseId, date, REASON_WIDOWED);
+    }
+
     public FormerSpouse(UUID formerSpouseId, LocalDate date, int reason) {
         this.formerSpouseId = formerSpouseId;
         this.date = date;
         this.reason = reason;
     }
-    public FormerSpouse(UUID formerSpouseId, LocalDate date) {
-        this.formerSpouseId = formerSpouseId;
-        this.date = date;
-        reason = REASON_WIDOWED;
-    }
-
     public FormerSpouse() { }
     //endregion Constructors
 
@@ -113,20 +111,13 @@ public class FormerSpouse implements Serializable, MekHqXmlSerializable {
             this.reason = REASON_DIVORCE;
         } else if (reason.equalsIgnoreCase("Widowed")) {
             this.reason = REASON_WIDOWED;
+        } else {
+            this.reason = REASON_UNKNOWN;
         }
-        this.reason = REASON_UNKNOWN;
      }
     //endregion getters/setters
 
     //region Deprecated
-    // The following method has been deprecated as it is used specifically to convert between the old DateTime and
-    // the modern LocalDate methods, and should be removed as soon as LocalDate is implemented
-    // TODO : Remove me following the conversion of MekHQ to LocalDate
-    @Deprecated
-    public static LocalDate convertDateTimeToLocalDate(DateTime inputDate) {
-        return LocalDate.of(inputDate.getYear(), inputDate.getMonthOfYear(), inputDate.getDayOfMonth());
-    }
-
     // The following method has been deprecated as it is used to provide a DateFormat to external class which should
     // get that method from another location, not this internal saving Format
     // TODO : Remove me following the conversion of MekHQ to LocalDate with a standardized DateFormat output
@@ -168,8 +159,7 @@ public class FormerSpouse implements Serializable, MekHqXmlSerializable {
                 }
             }
         } catch (Exception e) {
-            // Errrr, apparently either the class name was invalid... Or the listed name doesn't exist.
-            MekHQ.getLogger().error(FormerSpouse.class, "generateInstanceFromXML(Node,Campaign,Version)", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(FormerSpouse.class, "generateInstanceFromXML(Node,Campaign,Version)", e);
         }
 
         return retVal;

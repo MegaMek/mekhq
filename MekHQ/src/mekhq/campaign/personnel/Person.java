@@ -1640,10 +1640,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
 
         // Add to former spouse list
-        spouse.addFormerSpouse(new FormerSpouse(getId(),
-                FormerSpouse.convertDateTimeToLocalDate(getCampaign().getDateTime()), reason));
-        addFormerSpouse(new FormerSpouse(spouse.getId(),
-                FormerSpouse.convertDateTimeToLocalDate(getCampaign().getDateTime()), reason));
+        spouse.addFormerSpouse(new FormerSpouse(getId(), getCampaign().getLocalDate(), reason));
+        addFormerSpouse(new FormerSpouse(spouse.getId(), getCampaign().getLocalDate(), reason));
 
         MekHQ.triggerEvent(new PersonChangedEvent(spouse));
         MekHQ.triggerEvent(new PersonChangedEvent(this));
