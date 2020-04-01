@@ -21,7 +21,6 @@ package mekhq.campaign.personnel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
-import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
