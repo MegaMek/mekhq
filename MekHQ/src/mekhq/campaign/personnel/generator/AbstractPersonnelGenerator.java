@@ -19,8 +19,6 @@
 package mekhq.campaign.personnel.generator;
 
 import java.time.LocalDate;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.Objects;
 
 import megamek.client.RandomNameGenerator;

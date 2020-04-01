@@ -23,7 +23,6 @@ package mekhq.campaign.personnel;
 import java.awt.event.KeyEvent;
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
