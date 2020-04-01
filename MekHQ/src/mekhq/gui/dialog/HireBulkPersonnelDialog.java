@@ -3,7 +3,6 @@
  *
  * Created on Jan 6, 2010, 10:46:02 PM
  */
-
 package mekhq.gui.dialog;
 
 import java.awt.Frame;
@@ -39,15 +38,12 @@ import mekhq.preferences.PreferencesNode;
 
 import megamek.common.Compute;
 import megamek.common.util.EncodeControl;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Ranks;
 import mekhq.gui.CampaignGUI;
 
-
 /**
- *
  * @author Jay Lawson
  */
 public class HireBulkPersonnelDialog extends JDialog {
