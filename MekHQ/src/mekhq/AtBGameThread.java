@@ -51,7 +51,7 @@ import mekhq.campaign.unit.Unit;
 
 /**
  * @author Neoancient
- * 
+ *
  * Enhanced version of GameThread which imports settings and non-player
  * units into the MM game
  *
@@ -128,7 +128,7 @@ public class AtBGameThread extends GameThread {
                 MapSettings mapSettings = MapSettings.getInstance();
 
                 // if the scenario is taking place in space, do space settings instead
-                if((scenario instanceof AtBScenario) &&
+                if ((scenario instanceof AtBScenario) &&
                         scenario.getTerrainType() == AtBScenario.TER_SPACE) {
                     mapSettings.setMedium(MapSettings.MEDIUM_SPACE);
                 } else {
@@ -153,7 +153,7 @@ public class AtBGameThread extends GameThread {
                 client.sendMapSettings(mapSettings);
                 Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
 
-                PlanetaryConditions planetaryConditions = new PlanetaryConditions(); 
+                PlanetaryConditions planetaryConditions = new PlanetaryConditions();
                 planetaryConditions.setLight(scenario.getLight());
                 planetaryConditions.setWeather(scenario.getWeather());
                 planetaryConditions.setWindStrength(scenario.getWind());
@@ -200,7 +200,7 @@ public class AtBGameThread extends GameThread {
                         scenario.getPlayerTransportLinkages().put(unit.getId(), new ArrayList<>());
                     }
                     // If this unit is a spacecraft, set the crew size and marine size values
-                    if (entity.isLargeCraft() || entity.getUnitType() == UnitType.SMALL_CRAFT) {
+                    if (entity.isLargeCraft() || (entity.getUnitType() == UnitType.SMALL_CRAFT)) {
                         entity.setNCrew(unit.getActiveCrew().size());
                         //TODO: Change this when marines are fully implemented
                         entity.setNMarines(unit.getMarineCount());
@@ -229,7 +229,7 @@ public class AtBGameThread extends GameThread {
                     entity.setDeployRound(deploymentRound);
                     // Add Mek to game
                     client.sendAddEntity(entity);
-                    // Wait a few secs to not overuse bandwith
+                    // Wait a few secs to not overuse bandwidth
                     Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
                 }
                 // Run through the units again. This time add transported units to the correct linkage,
@@ -381,7 +381,7 @@ public class AtBGameThread extends GameThread {
     /**
      * wait for the server to add the bot client, then send starting position,
      * camo, and entities
-     * 
+     *
      * @param botClient
      * @param botForce
      */
@@ -409,7 +409,7 @@ public class AtBGameThread extends GameThread {
                 botClient.getLocalPlayer().setTeam(botForce.getTeam());
                 botClient.getLocalPlayer().setStartingPos(botForce.getStart());
 
-                if (botForce.getCamoCategory() == Player.NO_CAMO) {
+                if (botForce.getCamoCategory().equals(Player.NO_CAMO)) {
                     if (botForce.getColorIndex() >= 0) {
                         botClient.getLocalPlayer().setColorIndex(botForce.getColorIndex());
                     }
@@ -422,6 +422,6 @@ public class AtBGameThread extends GameThread {
             }
         } catch (Exception e) {
             MekHQ.getLogger().error(getClass(), "configureBot", e); //$NON-NLS-1$
-        }    	
+        }
     }
 }
