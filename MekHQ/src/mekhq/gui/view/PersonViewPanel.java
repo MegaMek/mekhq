@@ -12,6 +12,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.Image;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -682,7 +683,7 @@ public class PersonViewPanel extends ScrollablePanel {
         firsty++;
 
         if (person.isPregnant()) {
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd"); // TODO : remove inline date format
+            String displayFormat = "yyyy-MM-dd"; // TODO : remove inline date format
             String dueDate;
 
             lblDueDate1.setName("lblDueDate1");
@@ -695,9 +696,9 @@ public class PersonViewPanel extends ScrollablePanel {
             pnlInfo.add(lblDueDate1, gridBagConstraints);
 
             if (campaign.getCampaignOptions().getDisplayTrueDueDate()) {
-                dueDate = df.format(person.getDueDate());
+                dueDate = person.getDueDate().format(DateTimeFormatter.ofPattern(displayFormat));
             } else {
-                dueDate = df.format(person.getExpectedDueDate());
+                dueDate = person.getExpectedDueDate().format(DateTimeFormatter.ofPattern(displayFormat));
             }
 
             lblDueDate2.setName("lblDueDate2");
