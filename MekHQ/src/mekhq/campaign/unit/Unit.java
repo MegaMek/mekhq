@@ -117,7 +117,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     // Convenience data used by GameThread
     private boolean carryingAero = false;
     private boolean carryingGround = false;
-    
+
     //assignments
     private int forceId;
     protected int scenarioId;
