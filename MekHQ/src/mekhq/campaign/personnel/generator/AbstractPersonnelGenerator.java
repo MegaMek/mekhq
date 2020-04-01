@@ -195,10 +195,7 @@ public abstract class AbstractPersonnelGenerator {
         birthday = birthday.minusYears(Utilities.getAgeByExpLevel(expLvl, isClanner));
 
         // choose a random day and month
-        int nDays = 365;
-        if (birthday.isLeapYear()) {
-            nDays = 366;
-        }
+        int nDays = birthday.isLeapYear() ? 366 : 365;
 
         int randomDay = Compute.randomInt(nDays) + 1;
         person.setBirthday(birthday.withDayOfYear(randomDay));
