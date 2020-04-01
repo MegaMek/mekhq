@@ -412,7 +412,7 @@ public class ResolveScenarioTracker {
         UnitStatus us = new UnitStatus(nu);
         unitsStatus.put(nu.getId(), us);
         alliedUnits.add(nu);
-        
+
         return us;
     }
 
@@ -520,7 +520,7 @@ public class ResolveScenarioTracker {
                     UUID trnId = idMap.get(en.getTransportId());
                     if (trnId != null) {
                         Entity transport = unitsStatus.get(trnId).getEntity();
-                        if (transport != null && transport.isLargeCraft()) {
+                        if ((transport != null) && transport.isLargeCraft()) {
                             continue;
                         }
                     }
@@ -571,7 +571,7 @@ public class ResolveScenarioTracker {
                     pilot = mia.get(UUID.fromString(en.getCrew().getExternalIdAsString()));
                     missingCrew = true;
                 }
-                for(Person p : crew) {
+                for (Person p : crew) {
                     PersonStatus status = new PersonStatus(p.getFullName(), u.getEntity().getDisplayName(),
                             p.getHits(), p.getId());
                     status.setMissing(missingCrew);
@@ -616,7 +616,7 @@ public class ResolveScenarioTracker {
                                     status.setDead(true);
                                 }
                             } else if (((Tank)en).isDriverHit() && u.isDriver(p)) {
-                                if(Compute.d6(2) >= 7) {
+                                if (Compute.d6(2) >= 7) {
                                     wounded = true;
                                 } else {
                                     status.setHits(6);
@@ -626,7 +626,7 @@ public class ResolveScenarioTracker {
                                     || u.isTechOfficer(p))) {
                                 //If there is a command console, the commander hit flag is set on the second such critical,
                                 //which means both commanders have been hit.
-                                if(Compute.d6(2) >= 7) {
+                                if (Compute.d6(2) >= 7) {
                                     wounded = true;
                                 } else {
                                     status.setHits(6);
@@ -634,7 +634,7 @@ public class ResolveScenarioTracker {
                                 }
                             } else if (((Tank)en).isUsingConsoleCommander() && u.isCommander(p)) {
                                 //This flag is set after the first commander hit critical.
-                                if(Compute.d6(2) >= 7) {
+                                if (Compute.d6(2) >= 7) {
                                     wounded = true;
                                 } else {
                                     status.setHits(6);
@@ -642,7 +642,7 @@ public class ResolveScenarioTracker {
                                 }
                             }
                         }
-                        if(casualtiesAssigned < casualties) {
+                        if (casualtiesAssigned < casualties) {
                             casualtiesAssigned++;
                             if(Compute.d6(2) >= 7) {
                                 wounded = true;
@@ -651,7 +651,7 @@ public class ResolveScenarioTracker {
                                 status.setDead(true);
                             }
                         }
-                        if(wounded) {
+                        if (wounded) {
                             int hits = campaign.getCampaignOptions().getMinimumHitsForVees();
                             if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVees()) {
                                 int range = 6 - hits;
@@ -742,20 +742,20 @@ public class ResolveScenarioTracker {
         casualties = Math.max(0, casualties - rescuedCrew);
         
         //And assign the casualties and experience amongst the crew and marines
-        for(Person p : personnel) {
+        for (Person p : personnel) {
             PersonStatus status = new PersonStatus(p.getFullName(), ship.getEntity().getDisplayName(),
                     p.getHits(), p.getId());
             boolean wounded = false;
-            if(casualtiesAssigned < casualties) {
+            if (casualtiesAssigned < casualties) {
                 casualtiesAssigned++;
-                if(Compute.d6(2) >= 7) {
+                if (Compute.d6(2) >= 7) {
                     wounded = true;
                 } else {
                     status.setHits(6);
                     status.setDead(true);
                 }
             }
-            if(wounded) {
+            if (wounded) {
                 int hits = campaign.getCampaignOptions().getMinimumHitsForVees();
                 if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVees()) {
                     int range = 6 - hits;
@@ -763,9 +763,9 @@ public class ResolveScenarioTracker {
                 }
                 status.setHits(hits);
             }
-        status.setXP(campaign.getCampaignOptions().getScenarioXP());
-        status.setDeployed(!en.wasNeverDeployed());
-        peopleStatus.put(p.getId(), status);
+            status.setXP(campaign.getCampaignOptions().getScenarioXP());
+            status.setDeployed(!en.wasNeverDeployed());
+            peopleStatus.put(p.getId(), status);
         }
         
         //Now, did the passengers take any hits? 
@@ -788,13 +788,13 @@ public class ResolveScenarioTracker {
                         //Let's assume people are injured on an 8+ if the unit is destroyed, same as a critical hit chance
                         if (e.isDestroyed() && Compute.d6(2) >= 8) {
                             //As with crewmembers, on a 7+ they're only wounded
-                            if(Compute.d6(2) >= 7) {
+                            if (Compute.d6(2) >= 7) {
                                 wounded = true;
                             } else {
                                 status.setHits(6);
                                 status.setDead(true);
                             }
-                            if(wounded) {
+                            if (wounded) {
                                 int hits = campaign.getCampaignOptions().getMinimumHitsForVees();
                                 if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVees()) {
                                     int range = 6 - hits;
