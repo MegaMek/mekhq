@@ -18,6 +18,7 @@
  */
 package mekhq.campaign.personnel.generator;
 
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Objects;
@@ -190,18 +191,16 @@ public abstract class AbstractPersonnelGenerator {
      * @param isClanner A value indicating if {@code person} is a clanner.
      */
     protected void generateBirthday(Campaign campaign, Person person, int expLvl, boolean isClanner) {
-        GregorianCalendar birthdate = (GregorianCalendar) campaign.getCalendar().clone();
-        birthdate.set(Calendar.YEAR, birthdate.get(Calendar.YEAR) - Utilities.getAgeByExpLevel(expLvl, isClanner));
+        LocalDate birthday = campaign.getLocalDate();
+        birthday = birthday.minusYears(Utilities.getAgeByExpLevel(expLvl, isClanner));
 
         // choose a random day and month
         int nDays = 365;
-        if (birthdate.isLeapYear(birthdate.get(Calendar.YEAR))) {
+        if (birthday.isLeapYear()) {
             nDays = 366;
         }
 
         int randomDay = Compute.randomInt(nDays) + 1;
-        birthdate.set(Calendar.DAY_OF_YEAR, randomDay);
-
-        person.setBirthday(birthdate);
+        person.setBirthday(birthday.withDayOfYear(randomDay));
     }
 }

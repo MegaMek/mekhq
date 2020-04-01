@@ -24,6 +24,10 @@ import java.awt.event.KeyEvent;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.IntSupplier;
 import java.util.stream.Collectors;
@@ -152,8 +156,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     protected List<FormerSpouse> formerSpouses;
 
     //region Procreation
-    protected GregorianCalendar dueDate;
-    protected GregorianCalendar expectedDueDate;
+    protected LocalDate dueDate;
+    protected LocalDate expectedDueDate;
 
     private static final int PREGNANCY_STANDARD_DURATION = 268; //standard duration of a pregnancy in days
 
@@ -240,9 +244,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private int secondaryDesignator;
 
     protected String biography;
-    protected GregorianCalendar birthday;
-    protected GregorianCalendar dateOfDeath;
-    protected GregorianCalendar recruitment;
+    protected LocalDate birthday;
+    protected LocalDate dateOfDeath;
+    protected LocalDate recruitment;
     protected List<LogEntry> personnelLog;
     protected List<LogEntry> missionLog;
 
@@ -371,8 +375,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
         OTHER_RANSOM_VALUES.put(SkillType.EXP_ELITE, Money.of(50000));
     }
 
+    private final static String dateDisplayFormat = "yyyy-MM-dd";
+    private final static String dateSaveFormat = "yyyy-MM-dd";  //DO NOT USE FOR DISPLAY FORMATS
+
     //region Reverse Compatibility
-    // TODO : Move these so their migration is handled locally, to free the memory space (as minimal it might be)
     private int oldUnitId = -1;
     private int oldDoctorId = -1;
     //v0.1.8 and earlier
@@ -539,7 +545,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (dependent) {
             recruitment = null;
         } else {
-            recruitment = (GregorianCalendar) campaign.getCalendar().clone();
+            recruitment = getCampaign().getLocalDate();
         }
     }
 
@@ -1179,81 +1185,62 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return gender;
     }
 
-    public void setBirthday(GregorianCalendar date) {
+    public void setBirthday(LocalDate date) {
         this.birthday = date;
     }
 
-    public GregorianCalendar getBirthday() {
+    public LocalDate getBirthday() {
         return birthday;
     }
 
-    public GregorianCalendar getDateOfDeath() {
+    public LocalDate getDateOfDeath() {
         return dateOfDeath;
     }
 
-    public void setDateOfDeath(GregorianCalendar date) {
+    public void setDateOfDeath(LocalDate date) {
         this.dateOfDeath = date;
     }
 
-    public void setRecruitment(GregorianCalendar date) {
+    public void setRecruitment(LocalDate date) {
         this.recruitment = date;
     }
 
-    public GregorianCalendar getRecruitment() {
+    public LocalDate getRecruitment() {
         return recruitment;
     }
 
     public String getRecruitmentAsString() {
-        if (recruitment == null) {
+        if (getRecruitment() == null) {
             return null;
+        } else {
+            return getRecruitment().format(DateTimeFormatter.ofPattern(dateDisplayFormat));
         }
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-        return df.format(recruitment.getTime());
     }
 
-    public int getAge(GregorianCalendar today) {
+    public int getAge(LocalDate today) {
         // Get age based on year
-        if (null != dateOfDeath) {
+        if (getDateOfDeath() != null) {
             //use date of death instead of birthday
-            today = dateOfDeath;
+            today = getDateOfDeath();
         }
 
-        int age = today.get(Calendar.YEAR) - birthday.get(Calendar.YEAR);
-
-        // Add the tentative age to the date of birth to get this year's birthday
-        GregorianCalendar tmpDate = (GregorianCalendar) birthday.clone();
-        tmpDate.add(Calendar.YEAR, age);
-
-        // If this year's birthday has not happened yet, subtract one from age
-        if (today.before(tmpDate)) {
-            age--;
-        }
-        return age;
+        return Period.between(today, getBirthday()).getYears();
     }
 
-    public int getTimeInService(GregorianCalendar today) {
+    public int getTimeInService(LocalDate today) {
         // Get time in service based on year
-        if (null == recruitment) {
-            //use zero if hasn't been recruited yet
+        if (getRecruitment() == null) {
+            //use -1 they haven't been recruited or are dependents
             return -1;
         }
 
         // If the person is dead, we only care about how long they spent in service to the company
-        if (dateOfDeath != null) {
+        if (getDateOfDeath() != null) {
             //use date of death instead of the current day
-            today = dateOfDeath;
+            today = getDateOfDeath();
         }
 
-        int timeInService = today.get(Calendar.YEAR) - recruitment.get(Calendar.YEAR);
-
-        // Add the tentative time in service to the date of recruitment to get this year's service history
-        GregorianCalendar tmpDate = (GregorianCalendar) recruitment.clone();
-        tmpDate.add(Calendar.YEAR, timeInService);
-
-        if (today.before(tmpDate)) {
-            timeInService--;
-        }
-        return timeInService;
+        return Period.between(today, getRecruitment()).getYears();
     }
 
     public void setId(UUID id) {
@@ -1265,23 +1252,23 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public boolean isChild() {
-        return (getAge(campaign.getCalendar()) <= 13);
+        return (getAge(getCampaign().getLocalDate()) <= 13);
     }
 
     //region Pregnancy
-    public GregorianCalendar getDueDate() {
+    public LocalDate getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(GregorianCalendar dueDate) {
+    public void setDueDate(LocalDate dueDate) {
         this.dueDate = dueDate;
     }
 
-    public GregorianCalendar getExpectedDueDate() {
+    public LocalDate getExpectedDueDate() {
         return expectedDueDate;
     }
 
-    public void setExpectedDueDate(GregorianCalendar expectedDueDate) {
+    public void setExpectedDueDate(LocalDate expectedDueDate) {
         this.expectedDueDate = expectedDueDate;
     }
 
@@ -1295,7 +1282,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
 
         // Age limitations...
-        if (!isChild() && getAge(campaign.getCalendar()) < 51) {
+        if (!isChild() && getAge(getCampaign().getLocalDate()) < 51) {
             boolean conceived = false;
             if (hasSpouse()) {
                 if (!getSpouse().isDeployed() && !getSpouse().isDeadOrMIA() && !getSpouse().isChild()
@@ -1315,13 +1302,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void addPregnancy() {
-        GregorianCalendar tCal = (GregorianCalendar) campaign.getCalendar().clone();
-
-        tCal.add(GregorianCalendar.DAY_OF_YEAR, PREGNANCY_STANDARD_DURATION);
-        setExpectedDueDate(tCal);
-        tCal = (GregorianCalendar) tCal.clone();
-        tCal.add(GregorianCalendar.DAY_OF_YEAR, PREGNANCY_MODIFY_DURATION.getAsInt());
-        setDueDate(tCal);
+        LocalDate dueDate = getCampaign().getLocalDate();
+        dueDate.plus(PREGNANCY_STANDARD_DURATION, ChronoUnit.DAYS);
+        setExpectedDueDate(dueDate);
+        dueDate.plus(PREGNANCY_MODIFY_DURATION.getAsInt(), ChronoUnit.DAYS);
+        setDueDate(dueDate);
 
         int size = PREGNANCY_SIZE.getAsInt();
         extraData.set(PREGNANCY_CHILDREN_DATA, size);
@@ -1366,7 +1351,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return IntStream.range(0, size).mapToObj(i -> {
             Person baby = campaign.newDependent(T_NONE, true);
             baby.setSurname(surname);
-            baby.setBirthday((GregorianCalendar) campaign.getCalendar().clone());
+            baby.setBirthday(getCampaign().getLocalDate());
             UUID babyId = UUID.randomUUID();
 
             baby.setId(babyId);
@@ -1420,7 +1405,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public boolean oldEnoughToMarry() {
-        return (getAge(campaign.getCalendar()) >= campaign.getCampaignOptions().getMinimumMarriageAge());
+        return (getAge(getCampaign().getLocalDate()) >= campaign.getCampaignOptions().getMinimumMarriageAge());
     }
 
     public void randomMarriage() {
@@ -1462,9 +1447,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
             return false;
         }
 
-        int ageDifference = Math.abs(p.getAge(campaign.getCalendar()) - getAge(campaign.getCalendar()));
+        int ageDifference = Math.abs(p.getAge(getCampaign().getLocalDate())) - getAge(getCampaign().getLocalDate());
 
-        return (ageDifference <= campaign.getCampaignOptions().getMarriageAgeRange());
+        return (ageDifference <= getCampaign().getCampaignOptions().getMarriageAgeRange());
     }
 
     public void marry(Person spouse, int surnameOption) {
@@ -1874,13 +1859,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (dueDate != null) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<dueDate>"
-                    + df.format(dueDate.getTime())
+                    + df.format(dueDate.format(DateTimeFormatter.ofPattern(dateSaveFormat)))
                     + "</dueDate>");
         }
         if (expectedDueDate != null) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<expectedDueDate>"
-                    + df.format(expectedDueDate.getTime())
+                    + df.format(expectedDueDate.format(DateTimeFormatter.ofPattern(dateSaveFormat)))
                     + "</expectedDueDate>");
         }
         if (!portraitCategory.equals(Crew.ROOT_PORTRAIT)) {
@@ -2008,19 +1993,19 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (birthday != null) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<birthday>"
-                    + df.format(birthday.getTime())
+                    + df.format(birthday.format(DateTimeFormatter.ofPattern(dateSaveFormat)))
                     + "</birthday>");
         }
         if (null != dateOfDeath) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<deathday>"
-                    + df.format(dateOfDeath.getTime())
+                    + df.format(dateOfDeath.format(DateTimeFormatter.ofPattern(dateSaveFormat)))
                     + "</deathday>");
         }
         if (null != recruitment) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<recruitment>"
-                    + df.format(recruitment.getTime())
+                    + df.format(recruitment.format(DateTimeFormatter.ofPattern(dateSaveFormat)))
                     + "</recruitment>");
         }
         for (Skill skill : skills.getSkills()) {
@@ -2226,13 +2211,21 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         retVal.formerSpouses.add(FormerSpouse.generateInstanceFromXML(wn3));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("dueDate")) {
-                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                    retVal.dueDate = (GregorianCalendar) GregorianCalendar.getInstance();
-                    retVal.dueDate.setTime(df.parse(wn2.getTextContent().trim()));
+                    if (version.isLowerThan("0.47.6")) {
+                        retVal.dueDate = LocalDate.parse(wn2.getTextContent().trim(),
+                                DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+                    } else {
+                        retVal.dueDate = LocalDate.parse(wn2.getTextContent().trim(),
+                                DateTimeFormatter.ofPattern(dateSaveFormat));
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("expectedDueDate")) {
-                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                    retVal.expectedDueDate = (GregorianCalendar) GregorianCalendar.getInstance();
-                    retVal.expectedDueDate.setTime(df.parse(wn2.getTextContent().trim()));
+                    if (version.isLowerThan("0.47.6")) {
+                        retVal.expectedDueDate = LocalDate.parse(wn2.getTextContent().trim(),
+                                DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+                    } else {
+                        retVal.expectedDueDate = LocalDate.parse(wn2.getTextContent().trim(),
+                                DateTimeFormatter.ofPattern(dateSaveFormat));
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("teamId")) {
                     retVal.teamId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) {
@@ -2296,17 +2289,29 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("overtimeLeft")) {
                     retVal.overtimeLeft = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("birthday")) {
-                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                    retVal.birthday = (GregorianCalendar) GregorianCalendar.getInstance();
-                    retVal.birthday.setTime(df.parse(wn2.getTextContent().trim()));
+                    if (version.isLowerThan("0.47.6")) {
+                        retVal.birthday = LocalDate.parse(wn2.getTextContent().trim(),
+                                DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+                    } else {
+                        retVal.birthday = LocalDate.parse(wn2.getTextContent().trim(),
+                                DateTimeFormatter.ofPattern(dateSaveFormat));
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("deathday")) {
-                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                    retVal.dateOfDeath = (GregorianCalendar) GregorianCalendar.getInstance();
-                    retVal.dateOfDeath.setTime(df.parse(wn2.getTextContent().trim()));
+                    if (version.isLowerThan("0.47.6")) {
+                        retVal.dateOfDeath = LocalDate.parse(wn2.getTextContent().trim(),
+                                DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+                    } else {
+                        retVal.dateOfDeath = LocalDate.parse(wn2.getTextContent().trim(),
+                                DateTimeFormatter.ofPattern(dateSaveFormat));
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("recruitment")) {
-                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                    retVal.recruitment = (GregorianCalendar) GregorianCalendar.getInstance();
-                    retVal.recruitment.setTime(df.parse(wn2.getTextContent().trim()));
+                    if (version.isLowerThan("0.47.6")) {
+                        retVal.recruitment = LocalDate.parse(wn2.getTextContent().trim(),
+                                DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+                    } else {
+                        retVal.recruitment = LocalDate.parse(wn2.getTextContent().trim(),
+                                DateTimeFormatter.ofPattern(dateSaveFormat));
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("advantages")) {
                     advantages = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("edge")) {
@@ -2461,7 +2466,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
             if (version.isLowerThan("0.47.5") && (retVal.getExpectedDueDate() == null)
                     && (retVal.getDueDate() != null)) {
-                retVal.setExpectedDueDate((GregorianCalendar) retVal.getDueDate().clone());
+                retVal.setExpectedDueDate(retVal.getDueDate());
             }
 
             if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 13) {
@@ -4114,7 +4119,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (status == Person.S_KIA) {
             MedicalLogger.diedFromWounds(this, campaign.getDate());
             //set the date of death
-            setDateOfDeath((GregorianCalendar) campaign.getCalendar().clone());
+            setDateOfDeath(getCampaign().getLocalDate());
         }
         if (status == Person.S_RETIRED) {
             ServiceLogger.retireDueToWounds(this, campaign.getDate());

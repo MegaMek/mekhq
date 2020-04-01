@@ -38,6 +38,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -84,6 +86,7 @@ import mekhq.campaign.personnel.Person;
 public class MedicalViewDialog extends JDialog {
     private static final long serialVersionUID = 6178230374580087883L;
     private static final String MENU_CMD_SEPARATOR = ","; //$NON-NLS-1$
+    private static final String DISPLAY_FORMAT = "yyyy-MM-dd";
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd"); //$NON-NLS-1$
     private final static DateTimeFormatter DATE_FORMATTER =
         DateTimeFormat.forPattern("yyyy-MM-dd").withChronology(GJChronology.getInstanceUTC()); //$NON-NLS-1$
@@ -341,16 +344,11 @@ public class MedicalViewDialog extends JDialog {
             surname = p.getBloodname();
         }
 
-        if (surname == null) {
-            surname = "-";
-        }
+        LocalDate birthday = p.getBirthday();
+        String birthdayString = birthday.format(java.time.format.DateTimeFormatter.ofPattern(DISPLAY_FORMAT));
 
-        GregorianCalendar birthday = (GregorianCalendar) p.getBirthday().clone();
-        DATE_FORMAT.setCalendar(birthday);
-        String birthdayString = DATE_FORMAT.format(birthday.getTime());
-        GregorianCalendar now = (GregorianCalendar) c.getCalendar().clone();
-        int ageInMonths = (now.get(Calendar.YEAR) - birthday.get(Calendar.YEAR)) * 12
-            + now.get(Calendar.MONTH) - birthday.get(Calendar.MONTH);
+        Period period = Period.between(birthday, campaign.getLocalDate());
+        int ageInMonths = (period.getYears() * 12) + period.getMonths();
 
         String phenotype = (p.getPhenotype() != Person.PHENOTYPE_NONE) ? p.getPhenotypeName() : resourceMap.getString("baselinePhenotype.text"); //$NON-NLS-1$
 

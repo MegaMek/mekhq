@@ -23,6 +23,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -1687,8 +1688,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
             }
             if (oneSelected && person.isActive()) {
-                GregorianCalendar calendar = gui.getCampaign().getCalendar();
-
                 if (person.oldEnoughToMarry() && (!person.hasSpouse())) {
                     menu = new JMenu(resourceMap.getString("chooseSpouse.text")); //$NON-NLS-1$
                     JMenu maleMenu = new JMenu(resourceMap.getString("spouseMenuMale.text"));
@@ -1697,21 +1696,23 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     JMenuItem surnameMenu;
                     String type;
 
+                    LocalDate today = gui.getCampaign().getLocalDate();
+
                     List<Person> personnel = new ArrayList<>(gui.getCampaign().getPersonnel());
-                    personnel.sort(Comparator.comparing((Person p) -> p.getAge(calendar)).thenComparing(Person::getSurname));
+                    personnel.sort(Comparator.comparing((Person p) -> p.getAge(today)).thenComparing(Person::getSurname));
 
                     for (Person ps : personnel) {
                         if (person.safeSpouse(ps)) {
                             String pStatus;
                             if (ps.isBondsman()) {
                                 pStatus = String.format(resourceMap.getString("marriageBondsmanDesc.format"), //$NON-NLS-1$
-                                    ps.getFullName(), ps.getAge(calendar), ps.getRoleDesc());
+                                    ps.getFullName(), ps.getAge(today), ps.getRoleDesc());
                             } else if (ps.isPrisoner()) {
                                 pStatus = String.format(resourceMap.getString("marriagePrisonerDesc.format"), //$NON-NLS-1$
-                                    ps.getFullName(), ps.getAge(calendar), ps.getRoleDesc());
+                                    ps.getFullName(), ps.getAge(today), ps.getRoleDesc());
                             } else {
                                 pStatus = String.format(resourceMap.getString("marriagePartnerDesc.format"), //$NON-NLS-1$
-                                    ps.getFullName(), ps.getAge(calendar), ps.getRoleDesc());
+                                    ps.getFullName(), ps.getAge(today), ps.getRoleDesc());
                             }
                             spouseMenu = new JMenu(pStatus);
                             type = resourceMap.getString("marriageNoNameChange.text"); //$NON-NLS-1$

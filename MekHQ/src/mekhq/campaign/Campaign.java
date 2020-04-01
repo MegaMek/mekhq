@@ -25,6 +25,9 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
@@ -1374,8 +1377,7 @@ public class Campaign implements Serializable, ITechManager {
 
         // Add their recruitment date if using track time in service
         if (getCampaignOptions().getUseTimeInService() && !prisoner && !dependent) {
-            GregorianCalendar recruitmentDate = (GregorianCalendar) getCalendar().clone();
-            p.setRecruitment(recruitmentDate);
+            p.setRecruitment(getLocalDate());
         }
 
         MekHQ.triggerEvent(new PersonNewEvent(p));
@@ -1690,6 +1692,13 @@ public class Campaign implements Serializable, ITechManager {
 
     public DateTime getDateTime() {
         return currentDateTime;
+    }
+
+    /**
+     * For now, this is just going to parse through the current date time
+     */
+    public LocalDate getLocalDate() {
+        return LocalDate.of(getDateTime().getYear(), getDateTime().getMonthOfYear(), getDateTime().getDayOfMonth());
     }
 
     public List<Person> getPatients() {
@@ -3511,7 +3520,7 @@ public class Campaign implements Serializable, ITechManager {
             if (p.isFemale()) {
                 if (p.isPregnant()) {
                     if (getCampaignOptions().useUnofficialProcreation()) {
-                        if (getCalendar().compareTo((p.getDueDate())) == 0) {
+                        if (getLocalDate().compareTo((p.getDueDate())) == 0) {
                             babies.addAll(p.birth());
                         }
                     } else {
@@ -5945,7 +5954,7 @@ public class Campaign implements Serializable, ITechManager {
                 }
                 ServiceLogger.freed(p, getDate());
                 if (getCampaignOptions().getUseTimeInService()) {
-                    p.setRecruitment((GregorianCalendar) getCalendar().clone());
+                    p.setRecruitment(getLocalDate());
                 }
                 break;
             case Person.PRISONER_YES:
@@ -5983,7 +5992,7 @@ public class Campaign implements Serializable, ITechManager {
         if (status == Person.S_KIA) {
             ServiceLogger.kia(person, getDate());
             // set the date of death
-            person.setDateOfDeath((GregorianCalendar) calendar.clone());
+            person.setDateOfDeath(getLocalDate());
             // Don't forget to tell the spouse
             if (person.hasSpouse()) {
                 person.divorce(getCampaignOptions().getKeepMarriedNameUponSpouseDeath()
@@ -8164,15 +8173,14 @@ public class Campaign implements Serializable, ITechManager {
                 }
             }
             if (!p.isDependent() && !p.isPrisoner() && !p.isBondsman()) {
-                GregorianCalendar cal = (GregorianCalendar) GregorianCalendar.getInstance();
+                LocalDate date;
                 // For that one in a billion chance the log is empty. Clone today's date and subtract a year
                 if (join == null) {
-                    cal = (GregorianCalendar)calendar.clone();
-                    cal.add(Calendar.YEAR, -1);
+                    date = getLocalDate().minus(1, ChronoUnit.YEARS);
                 } else {
-                    cal.setTime(join);
+                    date = join.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                 }
-                p.setRecruitment(cal);
+                p.setRecruitment(date);
             }
         }
     }
