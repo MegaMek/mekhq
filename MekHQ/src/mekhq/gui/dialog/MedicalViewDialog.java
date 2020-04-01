@@ -40,6 +40,7 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -347,8 +348,8 @@ public class MedicalViewDialog extends JDialog {
         LocalDate birthday = p.getBirthday();
         String birthdayString = birthday.format(java.time.format.DateTimeFormatter.ofPattern(DISPLAY_FORMAT));
 
-        Period period = Period.between(birthday, campaign.getLocalDate());
-        int ageInMonths = (period.getYears() * 12) + period.getMonths();
+        int ageInMonths = Math.toIntExact(ChronoUnit.MONTHS.between(birthday, campaign.getLocalDate()
+                .plus(1, ChronoUnit.DAYS)));
 
         String phenotype = (p.getPhenotype() != Person.PHENOTYPE_NONE) ? p.getPhenotypeName() : resourceMap.getString("baselinePhenotype.text"); //$NON-NLS-1$
 
