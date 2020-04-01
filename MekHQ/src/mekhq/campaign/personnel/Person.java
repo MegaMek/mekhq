@@ -1303,9 +1303,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void addPregnancy() {
         LocalDate dueDate = getCampaign().getLocalDate();
-        dueDate.plus(PREGNANCY_STANDARD_DURATION, ChronoUnit.DAYS);
+        dueDate = dueDate.plus(PREGNANCY_STANDARD_DURATION, ChronoUnit.DAYS);
         setExpectedDueDate(dueDate);
-        dueDate.plus(PREGNANCY_MODIFY_DURATION.getAsInt(), ChronoUnit.DAYS);
+        dueDate = dueDate.plus(PREGNANCY_MODIFY_DURATION.getAsInt(), ChronoUnit.DAYS);
         setDueDate(dueDate);
 
         int size = PREGNANCY_SIZE.getAsInt();
@@ -1447,7 +1447,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             return false;
         }
 
-        int ageDifference = Math.abs(p.getAge(getCampaign().getLocalDate())) - getAge(getCampaign().getLocalDate());
+        int ageDifference = Math.abs(p.getAge(getCampaign().getLocalDate()) - getAge(getCampaign().getLocalDate()));
 
         return (ageDifference <= getCampaign().getCampaignOptions().getMarriageAgeRange());
     }
