@@ -1,5 +1,7 @@
 VERSION HISTORY:
 ----------------
+0.47.6-SNAPSHOT
+
 0.47.5 (2020-4-01 2000 UTC)
 + Issue #1470: Thumper artillery vehicle causes array index out of bounds exception error
 + Issue #1261: RFE: In Contract Market, hyperlink the system/location to the Interstellar Map
@@ -51,7 +53,7 @@ v0.47.4 (2020-2-09 2200 UTC)
 + PR #1467: Made the Standard Value for Double Enemy Vehicles False
 + Issue #280: Adding Portrait folder documentation
 
-v0.47.3 (2020-2-01 2200 UTC) 
+v0.47.3 (2020-2-01 2200 UTC)
 + Issue #1344: Ensure techs show the right skill for Protomechs
 + PR #1348: Enable scenario modifiers to add objectives to scenarios generated from templates
 + Issue #1349: Problem with replacing Protomech limbs lost in combat
@@ -92,7 +94,7 @@ v0.47.3 (2020-2-01 2200 UTC)
 + Issue #1433: Enabling RandomizePortraits for personnel with pre-existing portraits
 + PR #1438: Adding Scrollbar to Personnel Settings under Campaign Options for small screens
 
-v0.47.2 (2019-11-15 2000 UTC) 
+v0.47.2 (2019-11-15 2000 UTC)
 + PR #1325: Customize protomechs and advanced aero in MekLab
 + PR #1326: Fix another potential error preventing day advancement when giving training XP
 + Issue #1327, 1329: Fixed multiple issues relating to scenario resolution introduced in 47.1
