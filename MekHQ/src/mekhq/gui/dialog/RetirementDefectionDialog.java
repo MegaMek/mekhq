@@ -57,6 +57,7 @@ import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.RetirementDefectionTracker;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.PersonnelTab;
@@ -671,19 +672,16 @@ public class RetirementDefectionDialog extends JDialog {
                         ) {
                     return person.isActive() || results;
                 }
-                if ((nGroup == PersonnelTab.PG_MIA && person.getStatus() == Person.S_MIA) ||
-                        (nGroup == PersonnelTab.PG_KIA && person.getStatus() == Person.S_KIA) ||
-                        (nGroup == PersonnelTab.PG_RETIRE && person.getStatus() == Person.S_RETIRED)) {
-                    return true;
-                }
-                return false;
+                return ((nGroup == PersonnelTab.PG_MIA) && (person.getStatus() == PersonnelStatus.MIA))
+                        || ((nGroup == PersonnelTab.PG_KIA) && (person.getStatus() == PersonnelStatus.KIA))
+                        || ((nGroup == PersonnelTab.PG_RETIRE) && (person.getStatus() == PersonnelStatus.RETIRED));
             }
         };
         sorter.setRowFilter(personTypeFilter);
     }
 
     public void filterUnits() {
-        RowFilter<UnitAssignmentTableModel, Integer> unitTypeFilter = null;
+        RowFilter<UnitAssignmentTableModel, Integer> unitTypeFilter;
         final int nGroup = cbUnitCategory.getSelectedIndex() - 1;
         unitTypeFilter = new RowFilter<UnitAssignmentTableModel, Integer>() {
             @Override

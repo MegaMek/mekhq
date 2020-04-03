@@ -23,6 +23,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -52,6 +53,7 @@ import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.PersonLogEvent;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.personnel.*;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
@@ -606,12 +608,12 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 break;
             }
             case CMD_CHANGE_STATUS: {
-                int selected = Integer.parseInt(data[1]);
+                PersonnelStatus status = PersonnelStatus.valueOf(data[1]);
                 for (Person person : people) {
-                    if ((selected == Person.S_ACTIVE) || (0 == JOptionPane.showConfirmDialog(null,
+                    if ((status == PersonnelStatus.ACTIVE) || (0 == JOptionPane.showConfirmDialog(null,
                             String.format(resourceMap.getString("confirmRetireQ.format"), person.getFullTitle()), //$NON-NLS-1$
                             resourceMap.getString("kiaQ.text"), JOptionPane.YES_NO_OPTION))) { //$NON-NLS-1$
-                        gui.getCampaign().changeStatus(person, selected);
+                        gui.getCampaign().changeStatus(person, status);
                     }
                 }
                 break;
@@ -1288,15 +1290,14 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
                 popup.add(menu);
             }
-            menu = new JMenu(resourceMap.getString("changeStatus.text")); //$NON-NLS-1$
-            for (int s = 0; s < Person.S_NUM; s++) {
-                cbMenuItem = new JCheckBoxMenuItem(Person.getStatusName(s));
-                if (person.getStatus() == s) {
+            menu = new JMenu(resourceMap.getString("changeStatus.text"));
+            for (PersonnelStatus status : PersonnelStatus.values()) {
+                cbMenuItem = new JCheckBoxMenuItem(status.getStatusName());
+                if (person.getStatus() == status) {
                     cbMenuItem.setSelected(true);
                 }
-                cbMenuItem.setActionCommand(makeCommand(CMD_CHANGE_STATUS, String.valueOf(s)));
+                cbMenuItem.setActionCommand(makeCommand(CMD_CHANGE_STATUS, status.name()));
                 cbMenuItem.addActionListener(this);
-                cbMenuItem.setEnabled(true);
                 menu.add(cbMenuItem);
             }
             popup.add(menu);
@@ -1687,8 +1688,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
             }
             if (oneSelected && person.isActive()) {
-                GregorianCalendar calendar = gui.getCampaign().getCalendar();
-
                 if (person.oldEnoughToMarry() && (!person.hasSpouse())) {
                     menu = new JMenu(resourceMap.getString("chooseSpouse.text")); //$NON-NLS-1$
                     JMenu maleMenu = new JMenu(resourceMap.getString("spouseMenuMale.text"));
@@ -1697,21 +1696,23 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     JMenuItem surnameMenu;
                     String type;
 
+                    LocalDate today = gui.getCampaign().getLocalDate();
+
                     List<Person> personnel = new ArrayList<>(gui.getCampaign().getPersonnel());
-                    personnel.sort(Comparator.comparing((Person p) -> p.getAge(calendar)).thenComparing(Person::getSurname));
+                    personnel.sort(Comparator.comparing((Person p) -> p.getAge(today)).thenComparing(Person::getSurname));
 
                     for (Person ps : personnel) {
                         if (person.safeSpouse(ps)) {
                             String pStatus;
                             if (ps.isBondsman()) {
                                 pStatus = String.format(resourceMap.getString("marriageBondsmanDesc.format"), //$NON-NLS-1$
-                                    ps.getFullName(), ps.getAge(calendar), ps.getRoleDesc());
+                                    ps.getFullName(), ps.getAge(today), ps.getRoleDesc());
                             } else if (ps.isPrisoner()) {
                                 pStatus = String.format(resourceMap.getString("marriagePrisonerDesc.format"), //$NON-NLS-1$
-                                    ps.getFullName(), ps.getAge(calendar), ps.getRoleDesc());
+                                    ps.getFullName(), ps.getAge(today), ps.getRoleDesc());
                             } else {
                                 pStatus = String.format(resourceMap.getString("marriagePartnerDesc.format"), //$NON-NLS-1$
-                                    ps.getFullName(), ps.getAge(calendar), ps.getRoleDesc());
+                                    ps.getFullName(), ps.getAge(today), ps.getRoleDesc());
                             }
                             spouseMenu = new JMenu(pStatus);
                             type = resourceMap.getString("marriageNoNameChange.text"); //$NON-NLS-1$

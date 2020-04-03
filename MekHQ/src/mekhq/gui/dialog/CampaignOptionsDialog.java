@@ -252,7 +252,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JSpinner spnSalaryEnlisted;
     private JSpinner spnSalaryAntiMek;
     private JSpinner[] spnSalaryXp;
-    private JMoneyTextField[] txtSalaryBase;
+    private JSpinner[] spnSalaryBase;
     //endregion Personnel Tab
 
     //region Finances Tab
@@ -1945,34 +1945,31 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panSalary.add(panXpMultiplier, gridBagConstraints);
 
         JPanel panAllTypes = new JPanel(new GridLayout(Person.T_NUM / 2, 2));
-        JMoneyTextField txtType;
         JPanel panType;
-        // TODO: use JFormattedTextField with Numeric formatter
-        txtSalaryBase = new JMoneyTextField[Person.T_NUM];
+        spnSalaryBase = new JSpinner[Person.T_NUM];
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         for (int i = 1; i < Person.T_NUM; i++) {
-            txtType = new JMoneyTextField();
-            txtType.setMoney(options.getBaseSalary(i));
-            txtType.setPreferredSize(new Dimension(75, 20));
             panType = new JPanel(new GridBagLayout());
-            gridBagConstraints = new java.awt.GridBagConstraints();
+
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = 0;
             gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.weighty = 0.0;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
             panType.add(new JLabel(Person.getRoleDesc(i, false)), gridBagConstraints);
-            gridBagConstraints = new java.awt.GridBagConstraints();
+
+            JSpinner spnType = new JSpinner(new SpinnerNumberModel(options.getBaseSalary(i), 0d, null, 10d));
+            spnType.setPreferredSize(new Dimension(75, 20));
+            spnSalaryBase[i] = spnType;
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = 0;
             gridBagConstraints.weightx = 0.0;
-            gridBagConstraints.weighty = 0.0;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-            panType.add(txtType, gridBagConstraints);
-            txtSalaryBase[i] = txtType;
+            panType.add(spnType, gridBagConstraints);
             panAllTypes.add(panType);
         }
+
         JScrollPane scrSalaryBase = new JScrollPane(panAllTypes);
         scrSalaryBase.setBorder(BorderFactory.createTitledBorder("Base Salaries"));
         scrSalaryBase.setOpaque(false);
@@ -4857,7 +4854,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         }
         for (int i = 1; i < Person.T_NUM; i++) {
             try {
-                options.setBaseSalary(i, txtSalaryBase[i].getMoney());
+                options.setBaseSalary(i, (double) spnSalaryBase[i].getValue());
             } catch (Exception ignored) { }
         }
         //endregion Personnel Tab

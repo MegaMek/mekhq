@@ -50,6 +50,7 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.FileDialogs;
@@ -1127,9 +1128,9 @@ public class ResolveScenarioTracker {
                 campaign.addKill(k);
             }
             if (status.isMissing()) {
-                campaign.changeStatus(person, Person.S_MIA);
+                campaign.changeStatus(person, PersonnelStatus.MIA);
             } else if (status.isDead()) {
-                campaign.changeStatus(person, Person.S_KIA);
+                campaign.changeStatus(person, PersonnelStatus.KIA);
                 if (campaign.getCampaignOptions().getUseAtB() && m instanceof AtBContract) {
                     campaign.getRetirementDefectionTracker().removeFromCampaign(person,
                             true, campaign.getCampaignOptions().getUseShareSystem()
@@ -1182,9 +1183,9 @@ public class ResolveScenarioTracker {
             }
 
             if (status.isMissing()) {
-                campaign.changeStatus(person, Person.S_MIA);
+                campaign.changeStatus(person, PersonnelStatus.MIA);
             } else if (status.isDead()) {
-                campaign.changeStatus(person, Person.S_KIA);
+                campaign.changeStatus(person, PersonnelStatus.KIA);
                 if (campaign.getCampaignOptions().getUseAtB() && (m instanceof AtBContract)) {
                     campaign.getRetirementDefectionTracker().removeFromCampaign(person,
                             true, campaign.getCampaignOptions().getUseShareSystem()

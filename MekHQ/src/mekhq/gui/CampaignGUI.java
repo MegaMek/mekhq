@@ -133,7 +133,6 @@ public class CampaignGUI extends JPanel {
     /* For the menu bar */
     private JMenuBar menuBar;
     private JMenu menuThemes;
-    private JMenuItem miHistoricalDailyReportDialog;
     private JMenuItem miDetachLog;
     private JMenuItem miAttachLog;
     private JMenuItem miContractMarket;
@@ -141,6 +140,7 @@ public class CampaignGUI extends JPanel {
     private JMenuItem miShipSearch;
     private JMenuItem miRetirementDefectionDialog;
     private JCheckBoxMenuItem miShowOverview;
+    private JMenuItem miAdvanceMultipleDays;
 
     private EnumMap<GuiTabType, CampaignGuiTab> standardTabs;
 
@@ -190,10 +190,10 @@ public class CampaignGUI extends JPanel {
 
     private void showDailyReportDialog() {
         mainPanel.remove(panLog);
-        miDetachLog.setEnabled(false);
-        miAttachLog.setEnabled(true);
         mainPanel.setOneTouchExpandable(false);
         logDialog.setVisible(true);
+        miAttachLog.setVisible(logDialog.isVisible());
+        miDetachLog.setVisible(!logDialog.isVisible());
         refreshReport();
         this.revalidate();
         this.repaint();
@@ -203,8 +203,8 @@ public class CampaignGUI extends JPanel {
         logDialog.setVisible(false);
         mainPanel.setRightComponent(panLog);
         mainPanel.setOneTouchExpandable(true);
-        miDetachLog.setEnabled(true);
-        miAttachLog.setEnabled(false);
+        miAttachLog.setVisible(logDialog.isVisible());
+        miDetachLog.setVisible(!logDialog.isVisible());
         this.revalidate();
         this.repaint();
     }
@@ -237,6 +237,10 @@ public class CampaignGUI extends JPanel {
         } else {
             removeStandardTab(GuiTabType.OVERVIEW);
         }
+    }
+
+    public void showAdvanceMultipleDays(boolean isHost) {
+        miAdvanceMultipleDays.setVisible(isHost);
     }
 
     public void showGMToolsDialog() {
@@ -584,35 +588,56 @@ public class CampaignGUI extends JPanel {
     }
 
     private void initMenu() {
+        // TODO: Implement "Export All" versions for Personnel and Parts
+
         menuBar = new JMenuBar();
+        // The Menu Bar uses the following Mnemonic keys as of 19-March-2020:
+        // A, C, F, H, M, R, V
 
         //region File Menu
+        // The File menu uses the following Mnemonic keys as of 19-MAR-2020:
+        // C, E, H, I, L, M, N, S, T, U, X
         JMenu menuFile = new JMenu(resourceMap.getString("fileMenu.text")); // NOI18N
+        menuFile.setMnemonic(KeyEvent.VK_F);
 
         JMenuItem menuLoad = new JMenuItem(resourceMap.getString("menuLoad.text")); // NOI18N
+        menuLoad.setMnemonic(KeyEvent.VK_L);
         menuLoad.addActionListener(this::menuLoadXmlActionPerformed);
         menuFile.add(menuLoad);
 
         JMenuItem menuSave = new JMenuItem(resourceMap.getString("menuSave.text")); // NOI18N
+        menuSave.setMnemonic(KeyEvent.VK_S);
         menuSave.addActionListener(this::menuSaveXmlActionPerformed);
         menuFile.add(menuSave);
 
+        JMenuItem menuNew = new JMenuItem(resourceMap.getString("menuNew.text"));
+        menuNew.setMnemonic(KeyEvent.VK_N);
+        menuNew.addActionListener(this::menuNewCampaignActionPerformed);
+        menuFile.add(menuNew);
+
         //region menuImport
+        // The Import menu uses the following Mnemonic keys as of 19-MAR-2020:
+        // A, C, F, P
         JMenu menuImport = new JMenu(resourceMap.getString("menuImport.text")); // NOI18N
+        menuImport.setMnemonic(KeyEvent.VK_I);
 
         JMenuItem miImportOptions = new JMenuItem(resourceMap.getString("miImportOptions.text")); // NOI18N
+        miImportOptions.setMnemonic(KeyEvent.VK_C);
         miImportOptions.addActionListener(this::miImportOptionsActionPerformed);
         menuImport.add(miImportOptions);
 
         JMenuItem miImportPerson = new JMenuItem(resourceMap.getString("miImportPerson.text")); // NOI18N
+        miImportPerson.setMnemonic(KeyEvent.VK_P);
         miImportPerson.addActionListener(this::miImportPersonActionPerformed);
         menuImport.add(miImportPerson);
 
         JMenuItem miImportParts = new JMenuItem(resourceMap.getString("miImportParts.text")); // NOI18N
+        miImportParts.setMnemonic(KeyEvent.VK_A);
         miImportParts.addActionListener(this::miImportPartsActionPerformed);
         menuImport.add(miImportParts);
 
         JMenuItem miLoadForces = new JMenuItem(resourceMap.getString("miLoadForces.text")); // NOI18N
+        miLoadForces.setMnemonic(KeyEvent.VK_F);
         miLoadForces.addActionListener(this::miLoadForcesActionPerformed);
         menuImport.add(miLoadForces);
 
@@ -620,83 +645,92 @@ public class CampaignGUI extends JPanel {
         //endregion menuImport
 
         //region menuExport
+        // The Export menu uses the following Mnemonic keys as of 19-March-2020:
+        // C, X, S
         JMenu menuExport = new JMenu(resourceMap.getString("menuExport.text")); // NOI18N
+        menuExport.setMnemonic(KeyEvent.VK_X);
 
+        //region CSV Export
+        // The CSV menu uses the following Mnemonic keys as of 19-March-2020:
+        // F, P, U
         JMenu miExportCSVFile = new JMenu(resourceMap.getString("menuExportCSV.text")); // NOI18N
-        menuExport.add(miExportCSVFile);
-
-        JMenu miExportXMLFile = new JMenu(resourceMap.getString("menuExportXML.text")); // NOI18N
-        menuExport.add(miExportXMLFile);
-
-        JMenuItem miExportOptions = new JMenuItem(resourceMap.getString("miExportOptions.text")); // NOI18N
-        miExportOptions.addActionListener(this::miExportOptionsActionPerformed);
-        miExportXMLFile.add(miExportOptions);
+        miExportCSVFile.setMnemonic(KeyEvent.VK_C);
 
         JMenuItem miExportPersonCSV = new JMenuItem(resourceMap.getString("miExportPersonnel.text")); // NOI18N
+        miExportPersonCSV.setMnemonic(KeyEvent.VK_P);
         miExportPersonCSV.addActionListener(this::miExportPersonnelCSVActionPerformed);
         miExportCSVFile.add(miExportPersonCSV);
 
         JMenuItem miExportUnitCSV = new JMenuItem(resourceMap.getString("miExportUnit.text")); // NOI18N
+        miExportUnitCSV.setMnemonic(KeyEvent.VK_U);
         miExportUnitCSV.addActionListener(this::miExportUnitCSVActionPerformed);
         miExportCSVFile.add(miExportUnitCSV);
 
-        JMenuItem miExportPlanetsXML = new JMenuItem(resourceMap.getString("miExportPlanets.text"));
-        miExportPlanetsXML.addActionListener(this::miExportPlanetsXMLActionPerformed);
-        miExportXMLFile.add(miExportPlanetsXML);
-
         JMenuItem miExportFinancesCSV = new JMenuItem(resourceMap.getString("miExportFinances.text")); // NOI18N
+        miExportFinancesCSV.setMnemonic(KeyEvent.VK_F);
         miExportFinancesCSV.addActionListener(this::miExportFinancesCSVActionPerformed);
         miExportCSVFile.add(miExportFinancesCSV);
 
+        menuExport.add(miExportCSVFile);
+        //endregion CSV Export
+
+        //region XML Export
+        // The XML menu uses the following Mnemonic keys as of 19-March-2020:
+        // C, P
+        JMenu miExportXMLFile = new JMenu(resourceMap.getString("menuExportXML.text")); // NOI18N
+        miExportXMLFile.setMnemonic(KeyEvent.VK_X);
+
+        JMenuItem miExportOptions = new JMenuItem(resourceMap.getString("miExportOptions.text")); // NOI18N
+        miExportOptions.setMnemonic(KeyEvent.VK_C);
+        miExportOptions.addActionListener(this::miExportOptionsActionPerformed);
+        miExportXMLFile.add(miExportOptions);
+
+        JMenuItem miExportPlanetsXML = new JMenuItem(resourceMap.getString("miExportPlanets.text"));
+        miExportPlanetsXML.setMnemonic(KeyEvent.VK_P);
+        miExportPlanetsXML.addActionListener(this::miExportPlanetsXMLActionPerformed);
+        miExportXMLFile.add(miExportPlanetsXML);
+
+        menuExport.add(miExportXMLFile);
+        //endregion XML Export
+
         JMenuItem miExportCampaignSubset = new JMenuItem(resourceMap.getString("miExportCampaignSubset.text"));
+        miExportCampaignSubset.setMnemonic(KeyEvent.VK_S);
         miExportCampaignSubset.addActionListener(evt -> {
             CampaignExportWizard cew = new CampaignExportWizard(getCampaign());
             cew.display(CampaignExportWizard.CampaignExportWizardState.ForceSelection);
         });
         menuExport.add(miExportCampaignSubset);
 
-        /*
-         * TODO: Implement these as "Export All" versions
-         *
-         * miExportPerson.setText(resourceMap.getString("miExportPerson.text"));
-         * // NOI18N miExportPerson.addActionListener(new ActionListener() {
-         * public void actionPerformed(java.awt.event.ActionEvent evt) {
-         * miExportPersonActionPerformed(evt); } });
-         * menuExport.add(miExportPerson);
-         *
-         * miExportParts.setText(resourceMap.getString("miExportParts.text"));
-         * // NOI18N miExportParts.addActionListener(new ActionListener() {
-         * public void actionPerformed(java.awt.event.ActionEvent evt) {
-         * miExportPartsActionPerformed(evt); } });
-         * menuExport.add(miExportParts);
-         */
-
         menuFile.add(menuExport);
         //endregion menuExport
 
         JMenuItem miMercRoster = new JMenuItem(resourceMap.getString("miMercRoster.text")); // NOI18N
+        miMercRoster.setMnemonic(KeyEvent.VK_U);
         miMercRoster.addActionListener(evt -> showMercRosterDialog());
         menuFile.add(miMercRoster);
 
         JMenuItem menuOptions = new JMenuItem(resourceMap.getString("menuOptions.text")); // NOI18N
+        menuOptions.setMnemonic(KeyEvent.VK_C);
         menuOptions.addActionListener(this::menuOptionsActionPerformed);
         menuFile.add(menuOptions);
 
         JMenuItem menuOptionsMM = new JMenuItem(resourceMap.getString("menuOptionsMM.text")); // NOI18N
+        menuOptionsMM.setMnemonic(KeyEvent.VK_M);
         menuOptionsMM.addActionListener(this::menuOptionsMMActionPerformed);
         menuFile.add(menuOptionsMM);
 
         JMenuItem menuMekHqOptions = new JMenuItem(resourceMap.getString("menuMekHqOptions.text"));
-        menuMekHqOptions.setMnemonic(KeyEvent.VK_M);
+        menuMekHqOptions.setMnemonic(KeyEvent.VK_H);
         menuMekHqOptions.addActionListener(this::menuMekHqOptionsActionPerformed);
         menuFile.add(menuMekHqOptions);
 
         menuThemes = new JMenu(resourceMap.getString("menuThemes.text"));
-
+        menuThemes.setMnemonic(KeyEvent.VK_T);
         refreshThemeChoices();
         menuFile.add(menuThemes);
 
         JMenuItem menuExitItem = new JMenuItem(resourceMap.getString("menuExit.text"));
+        menuExitItem.setMnemonic(KeyEvent.VK_E);
         menuExitItem.addActionListener(evt -> getApplication().exit());
         menuFile.add(menuExitItem);
 
@@ -704,84 +738,99 @@ public class CampaignGUI extends JPanel {
         //endregion File Menu
 
         //region Marketplace Menu
+        // The Marketplace menu uses the following Mnemonic keys as of 19-March-2020:
+        // A, B, C, H, M, N, P, R, S, U
         JMenu menuMarket = new JMenu(resourceMap.getString("menuMarket.text")); // NOI18N
+        menuMarket.setMnemonic(KeyEvent.VK_M);
 
-        // Personnel Market
         JMenuItem miPersonnelMarket = new JMenuItem(resourceMap.getString("miPersonnelMarket.text"));
+        miPersonnelMarket.setMnemonic(KeyEvent.VK_P);
         miPersonnelMarket.addActionListener(evt -> hirePersonMarket());
         menuMarket.add(miPersonnelMarket);
 
-        // Contract Market
         miContractMarket = new JMenuItem(resourceMap.getString("miContractMarket.text"));
+        miContractMarket.setMnemonic(KeyEvent.VK_C);
         miContractMarket.addActionListener(evt -> showContractMarket());
-        menuMarket.add(miContractMarket);
         miContractMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
+        menuMarket.add(miContractMarket);
 
         miUnitMarket = new JMenuItem(resourceMap.getString("miUnitMarket.text"));
+        miUnitMarket.setMnemonic(KeyEvent.VK_U);
         miUnitMarket.addActionListener(evt -> showUnitMarket());
-        menuMarket.add(miUnitMarket);
         miUnitMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
+        menuMarket.add(miUnitMarket);
 
         miShipSearch = new JMenuItem(resourceMap.getString("miShipSearch.text"));
+        miShipSearch.setMnemonic(KeyEvent.VK_S);
         miShipSearch.addActionListener(ev -> showShipSearch());
-        menuMarket.add(miShipSearch);
         miShipSearch.setVisible(getCampaign().getCampaignOptions().getUseAtB());
+        menuMarket.add(miShipSearch);
 
         JMenuItem miPurchaseUnit = new JMenuItem(resourceMap.getString("miPurchaseUnit.text")); // NOI18N
+        miPurchaseUnit.setMnemonic(KeyEvent.VK_N);
         miPurchaseUnit.addActionListener(this::miPurchaseUnitActionPerformed);
         menuMarket.add(miPurchaseUnit);
 
         JMenuItem miBuyParts = new JMenuItem(resourceMap.getString("miBuyParts.text")); // NOI18N
+        miBuyParts.setMnemonic(KeyEvent.VK_R);
         miBuyParts.addActionListener(evt -> buyParts());
         menuMarket.add(miBuyParts);
 
         JMenuItem miHireBulk = new JMenuItem(resourceMap.getString("miHireBulk.text"));
+        miHireBulk.setMnemonic(KeyEvent.VK_B);
         miHireBulk.addActionListener(evt -> hireBulkPersonnel());
         menuMarket.add(miHireBulk);
 
         JMenu menuHire = new JMenu(resourceMap.getString("menuHire.text")); // NOI18N
-
-        JMenuItem miHire;
+        menuHire.setMnemonic(KeyEvent.VK_H);
         for (int i = Person.T_MECHWARRIOR; i < Person.T_NUM; i++) {
-            miHire = new JMenuItem(Person.getRoleDesc(i, getCampaign().getFaction().isClan()));
+            JMenuItem miHire = new JMenuItem(Person.getRoleDesc(i, getCampaign().getFaction().isClan()));
+            int miHireMnemonic = Person.getRoleMnemonic(i);
+            if (miHireMnemonic != KeyEvent.VK_UNDEFINED) {
+                miHire.setMnemonic(miHireMnemonic);
+            }
             miHire.setActionCommand(Integer.toString(i));
             miHire.addActionListener(this::hirePerson);
             menuHire.add(miHire);
         }
         menuMarket.add(menuHire);
 
+        //region Astech Pool
+        // The Astech Pool menu uses the following Mnemonic keys as of 19-March-2020:
+        // B, E, F, H
         JMenu menuAstechPool = new JMenu(resourceMap.getString("menuAstechPool.text"));
+        menuAstechPool.setMnemonic(KeyEvent.VK_A);
 
         JMenuItem miHireAstechs = new JMenuItem(resourceMap.getString("miHireAstechs.text"));
+        miHireAstechs.setMnemonic(KeyEvent.VK_H);
         miHireAstechs.addActionListener(evt -> {
             PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
                     getFrame(), true, resourceMap.getString("popupHireAstechsNum.text"),
                     1, 0, CampaignGUI.MAX_QUANTITY_SPINNER);
             pvcd.setVisible(true);
-            if (pvcd.getValue() < 0) {
-                return;
+            if (pvcd.getValue() >= 0) {
+                getCampaign().increaseAstechPool(pvcd.getValue());
             }
-            getCampaign().increaseAstechPool(pvcd.getValue());
         });
         menuAstechPool.add(miHireAstechs);
 
         JMenuItem miFireAstechs = new JMenuItem(resourceMap.getString("miFireAstechs.text"));
+        miFireAstechs.setMnemonic(KeyEvent.VK_E);
         miFireAstechs.addActionListener(evt -> {
             PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
                     getFrame(), true, resourceMap.getString("popupFireAstechsNum.text"),
                     1, 0, getCampaign().getAstechPool());
             pvcd.setVisible(true);
-            if (pvcd.getValue() < 0) {
-                return;
+            if (pvcd.getValue() >= 0) {
+                getCampaign().decreaseAstechPool(pvcd.getValue());
             }
-            getCampaign().decreaseAstechPool(pvcd.getValue());
         });
         menuAstechPool.add(miFireAstechs);
 
         JMenuItem miFullStrengthAstechs = new JMenuItem(resourceMap.getString("miFullStrengthAstechs.text"));
+        miFullStrengthAstechs.setMnemonic(KeyEvent.VK_B);
         miFullStrengthAstechs.addActionListener(evt -> {
-            int need = (getCampaign().getTechs().size() * 6)
-                    - getCampaign().getNumberAstechs();
+            int need = (getCampaign().getTechs().size() * 6) - getCampaign().getNumberAstechs();
             if (need > 0) {
                 getCampaign().increaseAstechPool(need);
             }
@@ -789,73 +838,92 @@ public class CampaignGUI extends JPanel {
         menuAstechPool.add(miFullStrengthAstechs);
 
         JMenuItem miFireAllAstechs = new JMenuItem(resourceMap.getString("miFireAllAstechs.text"));
+        miFireAllAstechs.setMnemonic(KeyEvent.VK_R);
         miFireAllAstechs.addActionListener(evt -> getCampaign().decreaseAstechPool(getCampaign().getAstechPool()));
         menuAstechPool.add(miFireAllAstechs);
         menuMarket.add(menuAstechPool);
+        //endregion Astech Pool
 
+        //region Medic Pool
+        // The Medic Pool menu uses the following Mnemonic keys as of 19-March-2020:
+        // B, E, H, R
         JMenu menuMedicPool = new JMenu(resourceMap.getString("menuMedicPool.text"));
+        menuMedicPool.setMnemonic(KeyEvent.VK_M);
+
         JMenuItem miHireMedics = new JMenuItem(resourceMap.getString("miHireMedics.text"));
+        miHireMedics.setMnemonic(KeyEvent.VK_H);
         miHireMedics.addActionListener(evt -> {
             PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
                     getFrame(), true, resourceMap.getString("popupHireMedicsNum.text"),
                     1, 0, CampaignGUI.MAX_QUANTITY_SPINNER);
             pvcd.setVisible(true);
-            if (pvcd.getValue() < 0) {
-                return;
+            if (pvcd.getValue() >= 0) {
+                getCampaign().increaseMedicPool(pvcd.getValue());
             }
-            getCampaign().increaseMedicPool(pvcd.getValue());
         });
         menuMedicPool.add(miHireMedics);
 
         JMenuItem miFireMedics = new JMenuItem(resourceMap.getString("miFireMedics.text"));
+        miFireMedics.setMnemonic(KeyEvent.VK_E);
         miFireMedics.addActionListener(evt -> {
             PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
                     getFrame(), true, resourceMap.getString("popupFireMedicsNum.text"),
                     1, 0, getCampaign().getMedicPool());
             pvcd.setVisible(true);
-            if (pvcd.getValue() < 0) {
-                return;
+            if (pvcd.getValue() >= 0) {
+                getCampaign().decreaseMedicPool(pvcd.getValue());
             }
-            getCampaign().decreaseMedicPool(pvcd.getValue());
         });
         menuMedicPool.add(miFireMedics);
+
         JMenuItem miFullStrengthMedics = new JMenuItem(resourceMap.getString("miFullStrengthMedics.text"));
+        miFullStrengthMedics.setMnemonic(KeyEvent.VK_B);
         miFullStrengthMedics.addActionListener(evt -> {
-            int need = (getCampaign().getDoctors().size() * 4)
-                    - getCampaign().getNumberMedics();
+            int need = (getCampaign().getDoctors().size() * 4) - getCampaign().getNumberMedics();
             if (need > 0) {
                 getCampaign().increaseMedicPool(need);
             }
         });
         menuMedicPool.add(miFullStrengthMedics);
+
         JMenuItem miFireAllMedics = new JMenuItem(resourceMap.getString("miFireAllMedics.text"));
+        miFireAllMedics.setMnemonic(KeyEvent.VK_R);
         miFireAllMedics.addActionListener(evt -> getCampaign().decreaseMedicPool(getCampaign().getMedicPool()));
         menuMedicPool.add(miFireAllMedics);
         menuMarket.add(menuMedicPool);
+        //endregion Medic Pool
 
         menuBar.add(menuMarket);
         //endregion Marketplace Menu
 
         //region Reports Menu
+        // The Reports menu uses the following Mnemonic keys as of 19-March-2020:
+        // C, H, P, T, U
         JMenu menuReports = new JMenu(resourceMap.getString("menuReports.text")); // NOI18N
+        menuReports.setMnemonic(KeyEvent.VK_R);
 
         JMenuItem miDragoonsRating = new JMenuItem(resourceMap.getString("miDragoonsRating.text")); // NOI18N
+        miDragoonsRating.setMnemonic(KeyEvent.VK_U);
         miDragoonsRating.addActionListener(evt -> showReport(new RatingReport(getCampaign())));
         menuReports.add(miDragoonsRating);
 
         JMenuItem miPersonnelReport = new JMenuItem(resourceMap.getString("miPersonnelReport.text")); // NOI18N
+        miPersonnelReport.setMnemonic(KeyEvent.VK_P);
         miPersonnelReport.addActionListener(evt -> showReport(new PersonnelReport(getCampaign())));
         menuReports.add(miPersonnelReport);
 
         JMenuItem miHangarBreakdown = new JMenuItem(resourceMap.getString("miHangarBreakdown.text")); // NOI18N
+        miHangarBreakdown.setMnemonic(KeyEvent.VK_H);
         miHangarBreakdown.addActionListener(evt -> showReport(new HangarReport(getCampaign())));
         menuReports.add(miHangarBreakdown);
 
         JMenuItem miTransportReport = new JMenuItem(resourceMap.getString("miTransportReport.text")); // NOI18N
+        miTransportReport.setMnemonic(KeyEvent.VK_T);
         miTransportReport.addActionListener(evt -> showReport(new TransportReport(getCampaign())));
         menuReports.add(miTransportReport);
 
         JMenuItem miCargoReport = new JMenuItem(resourceMap.getString("miCargoReport.text")); // NOI18N
+        miCargoReport.setMnemonic(KeyEvent.VK_C);
         miCargoReport.addActionListener(evt -> showReport(new CargoReport(getCampaign())));
         menuReports.add(miCargoReport);
 
@@ -863,9 +931,13 @@ public class CampaignGUI extends JPanel {
         //endregion Reports Menu
 
         //region Community Menu
+        // The Community menu uses the following Mnemonic keys as of 19-March-2020:
+        // C
         JMenu menuCommunity = new JMenu(resourceMap.getString("menuCommunity.text")); // NOI18N
+        menuCommunity.setMnemonic(KeyEvent.VK_C);
 
         JMenuItem miChat = new JMenuItem(resourceMap.getString("miChat.text")); // NOI18N
+        miChat.setMnemonic(KeyEvent.VK_C);
         miChat.addActionListener(this::miChatActionPerformed);
         menuCommunity.add(miChat);
 
@@ -873,34 +945,41 @@ public class CampaignGUI extends JPanel {
         //endregion Community Menu
 
         //region View Menu
+        // The View menu uses the following Mnemonic keys as of 19-March-2020:
+        // A, B, D, H, O, R
         JMenu menuView = new JMenu(resourceMap.getString("menuView.text")); // NOI18N
+        menuView.setMnemonic(KeyEvent.VK_V);
 
-        miHistoricalDailyReportDialog = new JMenuItem(resourceMap.getString("miShowHistoricalReportLog.text")); // NOI18N
-        miHistoricalDailyReportDialog.setEnabled(true);
+        JMenuItem miHistoricalDailyReportDialog = new JMenuItem(resourceMap.getString("miShowHistoricalReportLog.text")); // NOI18N
+        miHistoricalDailyReportDialog.setMnemonic(KeyEvent.VK_H);
         miHistoricalDailyReportDialog.addActionListener(evt -> showHistoricalDailyReportDialog());
         menuView.add(miHistoricalDailyReportDialog);
 
-        miDetachLog = new JMenuItem(resourceMap.getString("miDetachLog.text")); // NOI18N
-        miDetachLog.addActionListener(evt -> showDailyReportDialog());
-        menuView.add(miDetachLog);
-
         miAttachLog = new JMenuItem(resourceMap.getString("miAttachLog.text")); // NOI18N
-        miAttachLog.setEnabled(false);
+        miAttachLog.setMnemonic(KeyEvent.VK_A);
         miAttachLog.addActionListener(evt -> hideDailyReportDialog());
+        miAttachLog.setVisible(logDialog.isVisible());
         menuView.add(miAttachLog);
 
+        miDetachLog = new JMenuItem(resourceMap.getString("miDetachLog.text")); // NOI18N
+        miDetachLog.setMnemonic(KeyEvent.VK_D);
+        miDetachLog.addActionListener(evt -> showDailyReportDialog());
+        miDetachLog.setVisible(!logDialog.isVisible());
+        menuView.add(miDetachLog);
+
         JMenuItem miBloodnameDialog = new JMenuItem(resourceMap.getString("miBloodnameDialog.text"));
-        miBloodnameDialog.setEnabled(true);
+        miBloodnameDialog.setMnemonic(KeyEvent.VK_B);
         miBloodnameDialog.addActionListener(evt -> showBloodnameDialog());
         menuView.add(miBloodnameDialog);
 
         miRetirementDefectionDialog = new JMenuItem(resourceMap.getString("miRetirementDefectionDialog.text"));
-        miRetirementDefectionDialog.setEnabled(true);
+        miRetirementDefectionDialog.setMnemonic(KeyEvent.VK_R);
         miRetirementDefectionDialog.setVisible(getCampaign().getCampaignOptions().getUseAtB());
         miRetirementDefectionDialog.addActionListener(evt -> showRetirementDefectionDialog());
         menuView.add(miRetirementDefectionDialog);
 
         miShowOverview = new JCheckBoxMenuItem(resourceMap.getString("miShowOverview.text"));
+        miShowOverview.setMnemonic(KeyEvent.VK_O);
         miShowOverview.setSelected(hasTab(GuiTabType.OVERVIEW));
         miShowOverview.addActionListener(evt -> toggleOverviewTab());
         menuView.add(miShowOverview);
@@ -909,31 +988,35 @@ public class CampaignGUI extends JPanel {
         //endregion View Menu
 
         //region Manage Campaign Menu
+        // The Manage Campaign menu uses the following Mnemonic keys as of 19-March-2020:
+        // A, B, G, M, S
         JMenu menuManage = new JMenu(resourceMap.getString("menuManageCampaign.text"));
+        menuManage.setMnemonic(KeyEvent.VK_A);
         menuManage.setName("manageMenu");
 
         JMenuItem miGMToolsDialog = new JMenuItem(resourceMap.getString("miGMToolsDialog.text"));
-        miGMToolsDialog.setEnabled(true);
+        miGMToolsDialog.setMnemonic(KeyEvent.VK_G);
         miGMToolsDialog.addActionListener(evt -> showGMToolsDialog());
         menuManage.add(miGMToolsDialog);
 
-        JMenuItem miAdvanceMultipleDays = new JMenuItem(resourceMap.getString("miAdvanceMultipleDays.text"));
-        miAdvanceMultipleDays.setEnabled(getCampaignController().isHost());
+        miAdvanceMultipleDays = new JMenuItem(resourceMap.getString("miAdvanceMultipleDays.text"));
+        miAdvanceMultipleDays.setMnemonic(KeyEvent.VK_A);
         miAdvanceMultipleDays.addActionListener(evt -> showAdvanceDaysDialog());
+        miAdvanceMultipleDays.setVisible(getCampaignController().isHost());
         menuManage.add(miAdvanceMultipleDays);
 
         JMenuItem miBloodnames = new JMenuItem(resourceMap.getString("miRandomBloodnames.text"));
-        miBloodnames.setEnabled(true);
+        miBloodnames.setMnemonic(KeyEvent.VK_B);
         miBloodnames.addActionListener(evt -> randomizeAllBloodnames());
         menuManage.add(miBloodnames);
 
         JMenuItem miBatchXP = new JMenuItem(resourceMap.getString("miBatchXP.text"));
-        miBatchXP.setEnabled(true);
+        miBatchXP.setMnemonic(KeyEvent.VK_M);
         miBatchXP.addActionListener(evt -> spendBatchXP());
         menuManage.add(miBatchXP);
 
         JMenuItem miScenarioEditor = new JMenuItem(resourceMap.getString("miScenarioEditor.text"));
-        miScenarioEditor.setEnabled(true);
+        miScenarioEditor.setMnemonic(KeyEvent.VK_S);
         miScenarioEditor.addActionListener(evt -> {
             ScenarioTemplateEditorDialog sted = new ScenarioTemplateEditorDialog(getFrame());
             sted.setVisible(true);
@@ -944,11 +1027,15 @@ public class CampaignGUI extends JPanel {
         //endregion Manage Campaign Menu
 
         //region Help Menu
+        // The Help menu uses the following Mnemonic keys as of 19-March-2020:
+        // A
         JMenu menuHelp = new JMenu(resourceMap.getString("menuHelp.text")); // NOI18N
+        menuHelp.setMnemonic(KeyEvent.VK_H);
         menuHelp.setName("helpMenu"); // NOI18N
 
-        JMenuItem menuAboutItem = new JMenuItem("aboutMenuItem"); // NOI18N
-        menuAboutItem.setText(resourceMap.getString("menuAbout.text"));
+        JMenuItem menuAboutItem = new JMenuItem(resourceMap.getString("menuAbout.text"));
+        menuAboutItem.setMnemonic(KeyEvent.VK_A);
+        menuAboutItem.setName("aboutMenuItem");
         menuAboutItem.addActionListener(evt -> showAboutBox());
         menuHelp.add(menuAboutItem);
 
@@ -1400,6 +1487,11 @@ public class CampaignGUI extends JPanel {
 
     private File selectLoadCampaignFile() {
         return FileDialogs.openCampaign(frame).orElse(null);
+    }
+
+    private void menuNewCampaignActionPerformed(ActionEvent e) {
+        DataLoadingDialog dataLoadingDialog = new DataLoadingDialog(app, frame, null);
+        dataLoadingDialog.setVisible(true);
     }
 
     private void btnOvertimeActionPerformed(java.awt.event.ActionEvent evt) {

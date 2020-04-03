@@ -72,6 +72,6 @@ public class PersonalLogger {
     public static void ourChildBorn(Person person, Person baby, String spouseName, Date date) {
         person.addLogEntry(new PersonalLogEntry(date,
                 MessageFormat.format(logEntriesResourceMap.getString("ourChildBorn.text"),
-                        spouseName, baby.getGenderString(GenderDescriptors.BOY_GIRL))));
+                        spouseName, GenderDescriptors.BOY_GIRL.getDescriptor(baby.getGender()))));
     }
 }
