@@ -2510,6 +2510,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 popup.add(menuItem);
             }
 
+            //region GM Menu
             if (gui.getCampaign().isGM()) {
                 popup.addSeparator();
 
@@ -2607,17 +2608,18 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         menuItem = new JMenuItem(resourceMap.getString("addPregnancy.text"));
                         menuItem.setActionCommand(CMD_ADD_PREGNANCY);
                         menuItem.addActionListener(this);
-                        popup.add(menuItem);
+                        menu.add(menuItem);
                     } else if (person.isPregnant()) {
                         menuItem = new JMenuItem(resourceMap.getString("removePregnancy.text"));
                         menuItem.setActionCommand(CMD_REMOVE_PREGNANCY);
                         menuItem.addActionListener(this);
-                        popup.add(menuItem);
+                        menu.add(menuItem);
                     }
                 }
                 popup.add(menu);
-
             }
+            //endregion GM Menu
+
             popup.show(e.getComponent(), e.getX(), e.getY());
         }
     }
