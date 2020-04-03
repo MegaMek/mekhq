@@ -1,6 +1,6 @@
-/* Finances.java
- *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+/*
+ * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2020 - The MegaMek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.finances;
 
 import java.io.BufferedWriter;
@@ -56,7 +55,6 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Finances implements Serializable {
