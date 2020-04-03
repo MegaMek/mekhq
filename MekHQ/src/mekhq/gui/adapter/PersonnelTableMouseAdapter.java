@@ -59,6 +59,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.*;
 import mekhq.gui.model.PersonnelTableModel;
+import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.MultiLineTooltip;
 import mekhq.gui.utilities.StaticChecks;
 
@@ -1785,25 +1786,16 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     }
 
                     if (person.isMale()) {
-                        if (femaleMenu.getItemCount() > 0) {
-                            menu.add(femaleMenu);
-                        }
-                        if (maleMenu.getItemCount() > 0) {
-                            menu.add(maleMenu);
-                        }
+                        JMenuHelpers.addMenuIfNonEmpty(menu, femaleMenu, MAX_POPUP_ITEMS);
+                        JMenuHelpers.addMenuIfNonEmpty(menu, maleMenu, MAX_POPUP_ITEMS);
                     } else {
-                        if (maleMenu.getItemCount() > 0) {
-                            menu.add(maleMenu);
-                        }
-                        if (femaleMenu.getItemCount() > 0) {
-                            menu.add(femaleMenu);
-                        }
+                        JMenuHelpers.addMenuIfNonEmpty(menu, maleMenu, MAX_POPUP_ITEMS);
+                        JMenuHelpers.addMenuIfNonEmpty(menu, femaleMenu, MAX_POPUP_ITEMS);
                     }
 
-                    if (menu.getItemCount() > MAX_POPUP_ITEMS) {
-                        MenuScroller.setScrollerFor(menu, MAX_POPUP_ITEMS);
+                    if (menu.getItemCount() > 0) {
+                        popup.add(menu);
                     }
-                    popup.add(menu);
                 }
                 if (person.hasSpouse()) {
                     menu = new JMenu(resourceMap.getString("removeSpouse.text"));
