@@ -3441,8 +3441,9 @@ public class Campaign implements Serializable, ITechManager {
             processShipSearch();
         }
 
-        // Add or remove dependents
-        if (calendar.get(Calendar.DAY_OF_YEAR) == 1) {
+        // Add or remove dependents - only if one of the two options makes this possible is enabled
+        if ((getLocalDate().getDayOfYear() == 1)
+                && (!getCampaignOptions().getDependentsNeverLeave() || getCampaignOptions().getAddDependents())) {
             int numPersonnel = 0;
             List<Person> dependents = new ArrayList<>();
             for (Person p : getPersonnel()) {
