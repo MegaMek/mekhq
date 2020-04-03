@@ -3,7 +3,6 @@
  *
  * Created on Jan 6, 2010, 10:46:02 PM
  */
-
 package mekhq.gui.dialog;
 
 import java.awt.Frame;
@@ -14,9 +13,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.GregorianCalendar;
-import java.util.Objects;
-import java.util.ResourceBundle;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -36,21 +35,15 @@ import javax.swing.event.ChangeListener;
 import mekhq.MekHQ;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
-import org.joda.time.DateTime;
-import org.joda.time.Days;
-import org.joda.time.Years;
 
 import megamek.common.Compute;
 import megamek.common.util.EncodeControl;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Ranks;
 import mekhq.gui.CampaignGUI;
 
-
 /**
- *
  * @author Jay Lawson
  */
 public class HireBulkPersonnelDialog extends JDialog {
@@ -296,39 +289,44 @@ public class HireBulkPersonnelDialog extends JDialog {
     }
 
     private void hire() {
-        int number = (Integer)spnNumber.getModel().getValue();
-        GregorianCalendar today = campaign.getCalendar();
-        DateTime earliestBirthDate = null;
-        DateTime latestBirthDate = null;
-        if(useAge) {
-            // One day before birthday
-            earliestBirthDate = Utilities.getDateTimeDay(today).minus(Years.years(maxAgeVal + 1)).plus(Days.ONE);
-            // Just the birthday
-            latestBirthDate = Utilities.getDateTimeDay(today).minus(Years.years(minAgeVal));
+        int number = (Integer) spnNumber.getModel().getValue();
+        PersonTypeItem selectedItem = (PersonTypeItem) choiceType.getSelectedItem();
+        if (selectedItem == null) {
+            MekHQ.getLogger().error(getClass(), "hire",
+                    "Attempted to bulk hire for null PersonnelType!");
+            return;
         }
-        while(number > 0) {
-            Person p = campaign.newPerson(((PersonTypeItem)choiceType.getSelectedItem()).id);
-            p.setRankNumeric(campaign.getRanks().getRankNumericFromNameAndProfession(p.getProfession(), (String)choiceRanks.getSelectedItem()));
+
+
+        LocalDate today = campaign.getLocalDate();
+        LocalDate earliestBirthDate = today.minus(maxAgeVal + 1, ChronoUnit.YEARS)
+                .plus(1, ChronoUnit.DAYS);
+        final int days = Math.toIntExact(ChronoUnit.DAYS.between(earliestBirthDate,
+                today.minus(minAgeVal, ChronoUnit.YEARS)));
+
+        while (number > 0) {
+            Person p = campaign.newPerson(((PersonTypeItem) choiceType.getSelectedItem()).id);
+            p.setRankNumeric(campaign.getRanks().getRankNumericFromNameAndProfession(p.getProfession(),
+                    (String) choiceRanks.getSelectedItem()));
             int age = p.getAge(today);
-            if(useAge) {
-                if((age > maxAgeVal) || (age < minAgeVal)) {
-                    int days = Days.daysBetween(earliestBirthDate, latestBirthDate).getDays();
-                    DateTime birthDay = earliestBirthDate.plus(Days.days(Compute.randomInt(days)));
-                    p.setBirthday(birthDay.toGregorianCalendar());
+            if (useAge) {
+                if ((age > maxAgeVal) || (age < minAgeVal)) {
+                    LocalDate birthDay = earliestBirthDate.plus(Compute.randomInt(days), ChronoUnit.DAYS);
+                    p.setBirthday(birthDay);
                     age = p.getAge(today);
                 }
             }
 
             // Limit skills by age for children and adolescents
-            if(age < 12) {
+            if (age < 12) {
                 p.removeAllSkills();
-            } else if(age < 14) {
+            } else if (age < 14) {
                 p.limitSkills(0);
-            } else if(age < 18) {
+            } else if (age < 18) {
                 p.limitSkills(age - 13);
             }
 
-            if(!campaign.recruitPerson(p)) {
+            if (!campaign.recruitPerson(p)) {
                 number = 0;
             } else {
                 number--;

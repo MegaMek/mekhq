@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.personnel;
+package mekhq.campaign.personnel.generator;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -30,7 +30,9 @@ import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import mekhq.Utilities;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.generator.AbstractSpecialAbilityGenerator;
 
 /**
  * Generates a single special ability for a {@link Person}.

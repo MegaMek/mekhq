@@ -1,6 +1,9 @@
 VERSION HISTORY:
 ----------------
-0.47.5-SNAPSHOT
+0.47.6-SNAPSHOT
++ PR #1610: Raised cost of edge points from 1 to 10 for the AtB configuration preset.
+
+0.47.5 (2020-4-01 2000 UTC)
 + Issue #1470: Thumper artillery vehicle causes array index out of bounds exception error
 + Issue #1261: RFE: In Contract Market, hyperlink the system/location to the Interstellar Map
 + Issue #1090: Feature Request: Add Origin Faction to Fluff Information display of Personnel
@@ -31,6 +34,13 @@ VERSION HISTORY:
 + PR #1533: Windchild's Personnel Improvements, covering Issues #765, #876, #1404, #1482, #1486, #1492
 + Issue #1524: Sort P_NONE Personnel as Support Personnel
 + Issues #1542 and #1417: Hangar Tab Popup List: Bulk Selection and Rank Fixes
++ PR #1556: Updating Unit Rating wording
++ PR #1584: Stop double-counting medics for FMM:R unit rating
++ Issue #691: Fixed multiple issues importing units from MUL files, including portraits, gender, SPAs
++ PR #1583: Adding Menu Bar Mnemonics (Shortcut Keys)
++ Issue #1540: Switching over to using JSpinner for base salaries
++ Issue #1578: Adding New Campaign to the main menu
++ PR #1597: MegaMek Log File is Reset on MekHQ load
 
 v0.47.4 (2020-2-09 2200 UTC)
 + PR #1440: Implement "Rugged" quirk (2x or 3x between maintenance rolls)
@@ -44,7 +54,7 @@ v0.47.4 (2020-2-09 2200 UTC)
 + PR #1467: Made the Standard Value for Double Enemy Vehicles False
 + Issue #280: Adding Portrait folder documentation
 
-v0.47.3 (2020-2-01 2200 UTC) 
+v0.47.3 (2020-2-01 2200 UTC)
 + Issue #1344: Ensure techs show the right skill for Protomechs
 + PR #1348: Enable scenario modifiers to add objectives to scenarios generated from templates
 + Issue #1349: Problem with replacing Protomech limbs lost in combat
@@ -85,7 +95,7 @@ v0.47.3 (2020-2-01 2200 UTC)
 + Issue #1433: Enabling RandomizePortraits for personnel with pre-existing portraits
 + PR #1438: Adding Scrollbar to Personnel Settings under Campaign Options for small screens
 
-v0.47.2 (2019-11-15 2000 UTC) 
+v0.47.2 (2019-11-15 2000 UTC)
 + PR #1325: Customize protomechs and advanced aero in MekLab
 + PR #1326: Fix another potential error preventing day advancement when giving training XP
 + Issue #1327, 1329: Fixed multiple issues relating to scenario resolution introduced in 47.1

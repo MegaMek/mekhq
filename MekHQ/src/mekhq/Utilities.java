@@ -639,9 +639,7 @@ public class Utilities {
                         - oldCrew.getGunnery(), 0);
             }
 
-            populateOptionsFromCrew(p, oldCrew);
-
-            setName(p, oldCrew, 0);
+            migrateCrewData(p, oldCrew, 0, true);
             drivers.add(p);
             //endregion Solo Pilot
         } else {
@@ -663,14 +661,11 @@ public class Utilities {
                                 - oldCrew.getGunnery(slot), 0);
                     }
                     if (null != p) {
-                        setName(p, oldCrew, numberPeopleGenerated);
-
                         if (!oldCrew.getExternalIdAsString(numberPeopleGenerated).equals("-1")) {
                             p.setId(UUID.fromString(oldCrew.getExternalIdAsString(numberPeopleGenerated)));
                         }
 
-                        populateOptionsFromCrew(p, oldCrew);
-                        numberPeopleGenerated++;
+                        migrateCrewData(p, oldCrew, numberPeopleGenerated++, true);
                         drivers.add(p);
                     }
                 }
@@ -748,13 +743,7 @@ public class Utilities {
                                 0);
                     }
 
-                    // this will have the side effect of giving every driver on the crew
-                    // the SPAs from the entity's crew.
-                    // Not really any way around it
-                    populateOptionsFromCrew(p, oldCrew);
-
-                    setName(p, oldCrew, numberPeopleGenerated);
-                    numberPeopleGenerated++;
+                    migrateCrewData(p, oldCrew, numberPeopleGenerated++, true);
                     drivers.add(p);
                 }
 
@@ -835,9 +824,7 @@ public class Utilities {
                             totalGunnery += p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue();
                         }
 
-                        populateOptionsFromCrew(p, oldCrew);
-                        setName(p, oldCrew, numberPeopleGenerated);
-                        numberPeopleGenerated++;
+                        migrateCrewData(p, oldCrew, numberPeopleGenerated++, true);
                         gunners.add(p);
                     }
 
@@ -877,22 +864,20 @@ public class Utilities {
                                 : Person.T_SPACE_CREW,
                         Person.T_NONE, factionCode, oldCrew.getGender(numberPeopleGenerated));
 
-                setName(p, oldCrew, numberPeopleGenerated);
-                numberPeopleGenerated++;
+                migrateCrewData(p, oldCrew, numberPeopleGenerated++, false);
                 vesselCrew.add(p);
             }
 
             if (u.canTakeNavigator()) {
                 navigator = c.newPerson(Person.T_NAVIGATOR, Person.T_NONE, factionCode,
                         oldCrew.getGender(numberPeopleGenerated));
-                setName(navigator, oldCrew, numberPeopleGenerated);
-                numberPeopleGenerated++;
+                migrateCrewData(navigator, oldCrew, numberPeopleGenerated++, false);
             }
 
             if (u.canTakeTechOfficer()) {
                 consoleCmdr = c.newPerson(Person.T_VEE_GUNNER, Person.T_NONE, factionCode,
                         oldCrew.getGender(numberPeopleGenerated));
-                setName(consoleCmdr, oldCrew, numberPeopleGenerated);
+                migrateCrewData(consoleCmdr, oldCrew, numberPeopleGenerated, false);
             }
         }
 
@@ -924,32 +909,26 @@ public class Utilities {
     }
 
     /**
-     * Worker function that takes the PilotOptions (SPAs, in other words) from the given "old crew" and sets them for a person.
-     * @param p The person whose SPAs to populate
-     * @param oldCrew The entity the SPAs of whose crew we're importing
-     */
-    private static void populateOptionsFromCrew(Person p, Crew oldCrew) {
-        Enumeration<IOption> optionsEnum = oldCrew.getOptions().getOptions();
-        while (optionsEnum.hasMoreElements()) {
-            IOption currentOption = optionsEnum.nextElement();
-            p.getOptions().getOption(currentOption.getName()).setValue(currentOption.getValue());
-        }
-    }
-
-    /**
      * Function that determines what name should be used by a person that is created through crew
-     * @param p         the person to be renamed, if applicable
-     * @param oldCrew   the crew object they were a part of
-     * @param crewIndex the index of the person in the crew
+     * And then assigns them a pre-selected portrait, provided one is to their index
+     * Additionally, any extraData parameters should be migrated here
+     * @param p           the person to be renamed, if applicable
+     * @param oldCrew     the crew object they were a part of
+     * @param crewIndex   the index of the person in the crew
+     * @param crewOptions whether or not to run the populateOptionsFromCrew for this person
      */
-    private static void setName(Person p, Crew oldCrew, int crewIndex) {
+    private static void migrateCrewData(Person p, Crew oldCrew, int crewIndex, boolean crewOptions) {
+        if (crewOptions) {
+            populateOptionsFromCrew(p, oldCrew);
+        }
+
         // this is a bit of a hack, but instead of tracking it elsewhere we only set gender to
         // male or female when a name is generated. G_RANDOMIZE will therefore only be returned for
         // crew that don't have names, so we can just leave them with their randomly generated name
         if (oldCrew.getGender(crewIndex) != Crew.G_RANDOMIZE) {
             String givenName = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_GIVEN_NAME);
 
-            if (givenName == null) {
+            if (StringUtil.isNullOrEmpty(givenName)) {
                 String name = oldCrew.getName(crewIndex);
 
                 if (!(name.equalsIgnoreCase(Crew.UNNAMED) || name.equalsIgnoreCase(Crew.UNNAMED_FULL_NAME))) {
@@ -966,6 +945,25 @@ public class Utilities {
 
                 p.setBloodname(oldCrew.getExtraDataValue(crewIndex, Crew.MAP_BLOODNAME));
             }
+
+            // Only created crew can be assigned a portrait, so this is safe to put in here
+            if (!Crew.PORTRAIT_NONE.equals(oldCrew.getPortraitFileName(crewIndex))) {
+                p.setPortraitCategory(oldCrew.getPortraitCategory(crewIndex));
+                p.setPortraitFileName(oldCrew.getPortraitFileName(crewIndex));
+            }
+        }
+    }
+
+    /**
+     * Worker function that takes the PilotOptions (SPAs, in other words) from the given "old crew" and sets them for a person.
+     * @param p The person whose SPAs to populate
+     * @param oldCrew The entity the SPAs of whose crew we're importing
+     */
+    private static void populateOptionsFromCrew(Person p, Crew oldCrew) {
+        Enumeration<IOption> optionsEnum = oldCrew.getOptions().getOptions();
+        while (optionsEnum.hasMoreElements()) {
+            IOption currentOption = optionsEnum.nextElement();
+            p.getOptions().getOption(currentOption.getName()).setValue(currentOption.getValue());
         }
     }
 

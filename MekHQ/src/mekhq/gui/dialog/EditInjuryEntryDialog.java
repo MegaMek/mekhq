@@ -1,21 +1,21 @@
 /*
  * EditInjuryEntryDialog.java
- * 
+ *
  * Copyright (C) 2018 MegaMek team
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -45,7 +45,7 @@ import javax.swing.WindowConstants;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.campaign.personnel.BodyLocation;
+import mekhq.campaign.personnel.enums.BodyLocation;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.gui.model.FilterableComboBoxModel;
@@ -61,7 +61,7 @@ public class EditInjuryEntryDialog extends JDialog {
     @SuppressWarnings("unused")
     private Frame frame; // FIXME: Unusued => Unneeded?
     private Injury injury;
-    
+
     private JButton btnClose;
     private JButton btnOK;
     private JTextArea txtDays;
@@ -74,11 +74,11 @@ public class EditInjuryEntryDialog extends JDialog {
     private JComboBox<String> ddExtended;
     private JPanel panBtn;
     private JPanel panMain;
-    
+
     private BodyLocationChoice[] locations;
     private InjuryTypeChoice[] types;
     private FilterableComboBoxModel<InjuryTypeChoice> ddTypeModel;
-    
+
     /** Creates new form EditInjuryEntryDialog */
     public EditInjuryEntryDialog(Frame parent, boolean modal, Injury e) {
         super(parent, modal);
@@ -125,7 +125,7 @@ public class EditInjuryEntryDialog extends JDialog {
                 break;
             }
         }
-        
+
         txtDays = new JTextArea();
         txtFluff = new JTextArea();
         txtHits = new JTextArea();
@@ -137,7 +137,7 @@ public class EditInjuryEntryDialog extends JDialog {
         btnClose = new JButton();
         panBtn = new JPanel();
         panMain = new JPanel();
-        
+
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditInjuryEntryDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
@@ -145,7 +145,7 @@ public class EditInjuryEntryDialog extends JDialog {
         getContentPane().setLayout(new BorderLayout());
         panBtn.setLayout(new GridLayout(0,2));
         panMain.setLayout(new GridBagLayout());
-        
+
         txtDays.setText(Integer.toString(injury.getTime()));
         txtDays.setName("txtDays");
         txtDays.setEditable(true);
@@ -165,7 +165,7 @@ public class EditInjuryEntryDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panMain.add(txtDays, gridBagConstraints);
-        
+
         ddLocation.setName("ddLocation");
         ddLocation.setEditable(false);
         ddLocation.setBorder(BorderFactory.createCompoundBorder(
@@ -212,7 +212,7 @@ public class EditInjuryEntryDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panMain.add(ddType, gridBagConstraints);
-        
+
         txtFluff.setText(injury.getFluff());
         txtFluff.setName("txtFluff");
         txtFluff.setEditable(true);
@@ -232,7 +232,7 @@ public class EditInjuryEntryDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panMain.add(txtFluff, gridBagConstraints);
-        
+
         txtHits.setText(Integer.toString(injury.getHits()));
         txtHits.setName("txtHits");
         txtHits.setEditable(true);
@@ -252,7 +252,7 @@ public class EditInjuryEntryDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panMain.add(txtHits, gridBagConstraints);
-        
+
         ddPermanent.setSelectedIndex(injury.isPermanent() ? 0 : 1);
         ddPermanent.setName("ddPermanent");
         ddPermanent.setEditable(false);
@@ -270,7 +270,7 @@ public class EditInjuryEntryDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panMain.add(ddPermanent, gridBagConstraints);
-        
+
         ddWorkedOn.setSelectedIndex(injury.isWorkedOn() ? 0 : 1);
         ddWorkedOn.setName("ddWorkedOn");
         ddWorkedOn.setEditable(false);
@@ -288,7 +288,7 @@ public class EditInjuryEntryDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panMain.add(ddWorkedOn, gridBagConstraints);
-        
+
         ddExtended.setSelectedIndex(injury.getExtended() ? 0 : 1);
         ddExtended.setName("ddExtended");
         ddExtended.setEditable(true);
@@ -306,7 +306,7 @@ public class EditInjuryEntryDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panMain.add(ddExtended, gridBagConstraints);
-        
+
         btnOK.setText(resourceMap.getString("btnOkay.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
         btnOK.addActionListener(new ActionListener() {
@@ -368,31 +368,31 @@ public class EditInjuryEntryDialog extends JDialog {
         injury = null;
         this.setVisible(false);
     }
-    
+
     public Injury getEntry() {
         return injury;
     }
-    
+
     private static class BodyLocationChoice {
         public final BodyLocation loc;
-        
+
         public BodyLocationChoice(BodyLocation loc) {
             this.loc = loc;
         }
-        
+
         @Override
         public String toString() {
-            return loc.readableName;
+            return loc.locationName();
         }
     }
-    
+
     private static class InjuryTypeChoice {
         public final InjuryType type;
-        
+
         public InjuryTypeChoice(InjuryType type) {
             this.type = type;
         }
-        
+
         @Override
         public String toString() {
             return type.getName(BodyLocation.GENERIC, 1);

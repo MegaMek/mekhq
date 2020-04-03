@@ -751,7 +751,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
     private String getCommanderDetails() {
         StringBuilder out = new StringBuilder();
         String commanderName = null == getCommander() ? "" :
-                               "(" + getCommander().getFullName() + ")";
+                "(" + getCommander().getFullTitle() + ")";
         out.append(String.format("%-" + HEADER_LENGTH + "s %3d %s",
                                  "Commander:", getCommanderValue(),
                                  commanderName));
@@ -795,23 +795,23 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         int excessSmallCraftBays = Math.max(smallCraftBayCount - getSmallCraftCount(), 0);
 
         String out = String.format("%-" + HEADER_LENGTH + "s %3d", "Transportation:", getTransportValue()) +
-                     "\n" + String.format(TEMPLATE, "Mech Bays:", getMechCount(), getMechBayCount()) +
+                     "\n" + String.format(TEMPLATE, "BattleMech Bays:", getMechCount(), getMechBayCount()) +
                      "\n" + String.format(TEMPLATE, "Fighter Bays:", getFighterCount(), getFighterBayCount()) +
-                     " (plus " + excessSmallCraftBays + " excess small craft)" +
+                     " (plus " + excessSmallCraftBays + " excess Small Craft)" +
                      "\n" + String.format(TEMPLATE, "Small Craft Bays:", getSmallCraftCount(), smallCraftBayCount) +
-                     "\n" + String.format(TEMPLATE, "Protomech Bays:", getProtoCount(), getProtoBayCount()) +
+                     "\n" + String.format(TEMPLATE, "ProtoMech Bays:", getProtoCount(), getProtoBayCount()) +
                      "\n" + String.format(TEMPLATE, "Super Heavy Vehicle Bays:", getSuperHeavyVeeCount(), superHeavyVeeBayCount) +
                      "\n" + String.format(TEMPLATE, "Heavy Vehicle Bays:", getHeavyVeeCount(), heavyVeeBayCount) +
-                     " (plus " + excessSuperHeavyVeeBays + " excess super heavy)" +
+                     " (plus " + excessSuperHeavyVeeBays + " excess Super Heavy)" +
                      "\n" + String.format(TEMPLATE, "Light Vehicle Bays:", getLightVeeCount(), getLightVeeBayCount()) +
-                     " (plus " + excessHeavyVeeBays + " excess heavy and " + excessSuperHeavyVeeBays + " excess super heavy)" +
-                     "\n" + String.format(TEMPLATE, "BA Bays:", getBattleArmorCount() / 5, getBaBayCount()) +
+                     " (plus " + excessHeavyVeeBays + " excess Heavy and " + excessSuperHeavyVeeBays + " excess Super Heavy)" +
+                     "\n" + String.format(TEMPLATE, "Battle Armor Bays:", getBattleArmorCount() / 5, getBaBayCount()) +
                      "\n" + String.format(TEMPLATE, "Infantry Bays:", calcInfantryPlatoons(), getInfantryBayCount()) +
                      "\n" + String.format(TEMPLATE, "Docking Collars:", getDropshipCount(), getDockingCollarCount());
 
         final String TEMPLATE_2 = "    %-" + CATEGORY_LENGTH + "s %3s";
-        out += "\n" + String.format(TEMPLATE_2, "Has Jumpships?", getJumpshipCount() > 0 ? "Yes" : "No");
-        out += "\n" + String.format(TEMPLATE_2, "Has Warships?", getWarshipCount() > 0 ? "Yes" : "No");
+        out += "\n" + String.format(TEMPLATE_2, "Has JumpShips?", getJumpshipCount() > 0 ? "Yes" : "No");
+        out += "\n" + String.format(TEMPLATE_2, "Has WarShips?", getWarshipCount() > 0 ? "Yes" : "No");
 
         return out;
     }
@@ -827,7 +827,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         out.append("\n").append(String.format(TEMPLATE_CAT, "Mech Techs:",
                                               getMechTechTeamsNeeded(),
                                               getMechTechTeams()));
-        out.append("\n            NOTE: Protomechs and mechs use same techs.");
+        out.append("\n            NOTE: ProtoMechs and BattleMechs use same techs.");
         out.append("\n").append(String.format(TEMPLATE_CAT,
                                               "Aero Techs:",
                                               getAeroTechTeamsNeeded(),
@@ -837,7 +837,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
                                               getMechanicTeams()));
         out.append("\n            NOTE: Vehicles and Infantry use the same" +
                    " mechanics.");
-        out.append("\n").append(String.format(TEMPLATE_CAT, "BA Techs:",
+        out.append("\n").append(String.format(TEMPLATE_CAT, "Battle Armor Techs:",
                                               getBattleArmorTechTeamsNeeded(),
                                               getBaTechTeams()));
         out.append("\n").append(String.format(TEMPLATE_CAT, "Astechs:",
