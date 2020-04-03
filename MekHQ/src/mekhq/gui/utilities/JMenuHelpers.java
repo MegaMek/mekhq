@@ -23,7 +23,30 @@ import megamek.client.ui.swing.util.MenuScroller;
 import javax.swing.*;
 
 public class JMenuHelpers {
+    /**
+     * This is used to add a JMenu to another JMenu, provided it isn't empty, and then add a scroller
+     * to it if it is above the minimum threshold
+     * @param menu the JMenu to add the child to
+     * @param child the JMenu to add
+     * @param scrollerThreshold the threshold for adding a scroller
+     */
     public static void addMenuIfNonEmpty(JMenu menu, JMenu child, int scrollerThreshold) {
+        if (child.getItemCount() > 0) {
+            menu.add(child);
+            if (child.getItemCount() > scrollerThreshold) {
+                MenuScroller.setScrollerFor(child, scrollerThreshold);
+            }
+        }
+    }
+
+    /**
+     * This is used to add a JMenu to a JPopupMenu, provided it isn't empty, and then add a scroller
+     * to it if it is above the minimum threshold
+     * @param menu the JPopupMenu to add the child to
+     * @param child the JMenu to add
+     * @param scrollerThreshold the threshold for adding a scroller
+     */
+    public static void addMenuIfNonEmpty(JPopupMenu menu, JMenu child, int scrollerThreshold) {
         if (child.getItemCount() > 0) {
             menu.add(child);
             if (child.getItemCount() > scrollerThreshold) {
