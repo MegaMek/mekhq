@@ -207,6 +207,20 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
     }
 
     /**
+     * Checks if an award can be awarded to a given group of people
+     * @param people to be given the award
+     * @return true if this award can be awarded to the selected people
+     */
+    public boolean canBeAwarded(Person[] people) {
+        for (Person person : people) {
+            if (!canBeAwarded(person)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Checks if two awards are equal
      * @param set is the name of the set of this award
      * @param name is the name of the award
