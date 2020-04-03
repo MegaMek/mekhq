@@ -19,6 +19,7 @@
 
 package mekhq.campaign.personnel;
 
+import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.log.AwardLogger;
@@ -138,27 +139,48 @@ public class PersonAwardController {
         MekHQ.triggerEvent(new PersonChangedEvent(person));
     }
 
+    public void removeAward(String setName, String awardName, String stringDate) {
+        if (StringUtil.isNullOrEmpty(stringDate)) {
+            MekHQ.getLogger().error(getClass(), "removeAward",
+                    "Attempted to remove award with a null date. Returning without removing the award");
+        } else {
+            removeAward(setName, awardName, stringDate, null);
+        }
+    }
     /**
      * Removes an award given to this person based on:
      * @param setName is the name of the set of the award
      * @param awardName is the name of the award
-     * @param stringDate is the date it was awarded
+     * @param stringDate is the date it was awarded, or null if it is to be bulk removed
+     * @param currentDate is the current date
      */
-    public void removeAward(String setName, String awardName, String stringDate){
+    public void removeAward(String setName, String awardName, String stringDate, Date currentDate) {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd"); // TODO : remove inline date format
 
-        Date date = null;
-        try {
-            date = df.parse(stringDate);
-        } catch (ParseException e) {
-            MekHQ.getLogger().error(getClass(), "removeAward", e);
+        Date date;
+        if (!StringUtil.isNullOrEmpty(stringDate)) {
+            try {
+                date = df.parse(stringDate);
+            } catch (ParseException e) {
+                MekHQ.getLogger().error(getClass(), "removeAward", e);
+                date = null;
+            }
+        } else {
+            date = null;
         }
 
-        for(Award award : awards){
-            if(award.equals(setName, awardName)){
-                award.removeDate(date);
-                if(!award.hasDates()) awards.remove(award);
-                AwardLogger.removedAward(person, date, award);
+        if (currentDate == null) {
+            currentDate = date;
+        }
+
+        for (Award award : awards) {
+            if (award.equals(setName, awardName)) {
+                if ((date != null) && award.hasDates()) {
+                    award.removeDate(date);
+                } else {
+                    awards.remove(award);
+                }
+                AwardLogger.removedAward(person, currentDate, award);
                 MekHQ.triggerEvent(new PersonChangedEvent(person));
                 return;
             }
