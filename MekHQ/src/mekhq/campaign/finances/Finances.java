@@ -19,10 +19,7 @@
  */
 package mekhq.campaign.finances;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Serializable;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.ParseException;
@@ -34,6 +31,7 @@ import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
+import mekhq.io.FileType;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -237,6 +235,12 @@ public class Finances implements Serializable {
 
         // check for a new year
         if (calendar.get(Calendar.MONTH) == Calendar.JANUARY && calendar.get(Calendar.DAY_OF_MONTH) == 1) {
+            if (campaignOptions.getYearlyFinancesToCSVExport()) {
+                String exportFileName =  campaign.getName() + " Finances for " + campaign.getLocalDate().getYear()
+                        + "." + FileType.CSV.getRecommendedExtension();
+                exportFinancesToCSV(new File(MekHQ.getCampaignsDirectory().getValue(), exportFileName).getPath(),
+                        FileType.CSV.getRecommendedExtension());
+            }
             // clear the ledger
             newFiscalYear(calendar.getTime());
         }
