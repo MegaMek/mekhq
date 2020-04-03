@@ -510,7 +510,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             case CMD_RMV_AWARD: {
                 for (Person person : people) {
                     if (person.awardController.hasAward(data[1], data[2])) {
-                        person.awardController.removeAward(data[1], data[2], data[3]);
+                        person.awardController.removeAward(data[1], data[2],
+                                (data.length > 3) ? data[3] : null, gui.getCampaign().getDate());
                     }
                 }
                 break;
@@ -1857,8 +1858,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 Collections.sort(awardsOfSet);
 
                 for (Award award : awardsOfSet) {
-                    if (!award.canBeAwarded(person)
-                            || !(award.canBeAwarded(person) || gui.getCampaign().isGM())) {
+                    if (!award.canBeAwarded(selected)) {
                         continue;
                     }
 
@@ -1892,22 +1892,41 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 JMenuHelpers.addMenuIfNonEmpty(awardMenu, setAwardMenu, MAX_POPUP_ITEMS);
             }
 
-            if (person.awardController.hasAwards()) {
+            if (StaticChecks.doAnyHaveAnAward(selected)) {
                 if (awardMenu.getItemCount() > 0) {
                     awardMenu.addSeparator();
                 }
 
                 JMenu removeAwardMenu = new JMenu(resourceMap.getString("removeAward.text"));
 
-                for (Award award : person.awardController.getAwards()) {
-                    JMenu singleAwardMenu = new JMenu(award.getName());
-                    for (String date : award.getFormatedDates()) {
-                        JMenuItem specificAwardMenu = new JMenuItem(date);
-                        specificAwardMenu.setActionCommand(makeCommand(CMD_RMV_AWARD, award.getSet(), award.getName(), date));
-                        specificAwardMenu.addActionListener(this);
-                        singleAwardMenu.add(specificAwardMenu);
+                if (oneSelected) {
+                    for (Award award : person.awardController.getAwards()) {
+                        JMenu singleAwardMenu = new JMenu(award.getName());
+                        for (String date : award.getFormatedDates()) {
+                            JMenuItem specificAwardMenu = new JMenuItem(date);
+                            specificAwardMenu.setActionCommand(makeCommand(CMD_RMV_AWARD, award.getSet(), award.getName(), date));
+                            specificAwardMenu.addActionListener(this);
+                            singleAwardMenu.add(specificAwardMenu);
+                        }
+                        JMenuHelpers.addMenuIfNonEmpty(removeAwardMenu, singleAwardMenu, MAX_POPUP_ITEMS);
                     }
-                    JMenuHelpers.addMenuIfNonEmpty(removeAwardMenu, singleAwardMenu, MAX_POPUP_ITEMS);
+                } else {
+                    Set<Award> awards = new TreeSet<>((a1, a2) -> {
+                        if (a1.getSet().equals(a2.getSet()) && a1.getName().equals(a2.getName())) {
+                            return 0;
+                        } else {
+                            return 1; // This is purposeful, we want to keep the original copy
+                        }
+                    });
+                    for (Person p : selected) {
+                        awards.addAll(p.awardController.getAwards());
+                    }
+                    for (Award award : awards) {
+                        JMenuItem singleAwardMenu = new JMenuItem(award.getName());
+                        singleAwardMenu.setActionCommand(makeCommand(CMD_RMV_AWARD, award.getSet(), award.getName()));
+                        singleAwardMenu.addActionListener(this);
+                        removeAwardMenu.add(singleAwardMenu);
+                    }
                 }
                 JMenuHelpers.addMenuIfNonEmpty(awardMenu, removeAwardMenu, MAX_POPUP_ITEMS);
             }
