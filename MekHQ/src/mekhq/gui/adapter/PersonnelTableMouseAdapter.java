@@ -1845,29 +1845,32 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 JMenu awardMenu = new JMenu(resourceMap.getString("award.text"));
                 List<String> setNames = AwardsFactory.getInstance().getAllSetNames();
                 Collections.sort(setNames);
-                for(String setName : setNames){
+                for (String setName : setNames) {
                     JMenu setAwardMenu = new JMenu(setName);
 
                     List<Award> awardsOfSet = AwardsFactory.getInstance().getAllAwardsForSet(setName);
                     Collections.sort(awardsOfSet);
 
                     for (Award award : awardsOfSet) {
-
-                        if(!award.canBeAwarded(person)) continue;
+                        if (!award.canBeAwarded(person)
+                                || !(award.canBeAwarded(person) || gui.getCampaign().isGM())) {
+                            continue;
+                        }
 
                         StringBuilder awardMenuItem = new StringBuilder();
                         awardMenuItem.append(String.format("%s", award.getName()));
 
-                        if(award.getXPReward() != 0 || award.getEdgeReward() != 0){
+                        if ((award.getXPReward() != 0) || (award.getEdgeReward() != 0)) {
                             awardMenuItem.append(" (");
 
-                            if(award.getXPReward() != 0){
+                            if (award.getXPReward() != 0) {
                                 awardMenuItem.append(award.getXPReward()).append(" XP");
-                                if(award.getEdgeReward() != 0)
+                                if (award.getEdgeReward() != 0) {
                                     awardMenuItem.append(" & ");
+                                }
                             }
 
-                            if(award.getEdgeReward() != 0){
+                            if (award.getEdgeReward() != 0) {
                                 awardMenuItem.append(award.getEdgeReward()).append(" Edge");
                             }
 
@@ -1876,18 +1879,12 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 
                         menuItem = new JMenuItem(awardMenuItem.toString());
                         menuItem.setToolTipText(MultiLineTooltip.splitToolTip(award.getDescription()));
-
-                        if(!award.canBeAwarded(person) && !gui.getCampaign().isGM())
-                            menuItem.setEnabled(false);
-
                         menuItem.setActionCommand(makeCommand(CMD_ADD_AWARD, award.getSet(), award.getName()));
                         menuItem.addActionListener(this);
-
                         setAwardMenu.add(menuItem);
                     }
 
                     JMenuHelpers.addMenuIfNonEmpty(awardMenu, setAwardMenu, MAX_POPUP_ITEMS);
-
                 }
 
                 if (person.awardController.hasAwards()) {
