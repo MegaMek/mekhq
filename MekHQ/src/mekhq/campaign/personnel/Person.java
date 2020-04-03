@@ -33,7 +33,6 @@ import java.util.function.IntSupplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import jdk.vm.ci.meta.Local;
 import megamek.common.*;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
@@ -1153,9 +1152,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return Period.between(getRecruitment(), today).getYears();
     }
 
-    public Period getTimeInRank(LocalDate today) {
+    public int getTimeInRank(LocalDate today) {
         if (getLastRankChangeDate() == null) {
-            return null;
+            return -1;
         }
 
         // If the person is dead, we only care about how long it was from their last promotion till they died
@@ -1164,7 +1163,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
             today = getDateOfDeath();
         }
 
-        return Period.between(getLastRankChangeDate(), today);
+        return Math.toIntExact(ChronoUnit.MONTHS.between(getLastRankChangeDate(),
+                today.plus(1, ChronoUnit.DAYS)));
     }
 
     public void setId(UUID id) {

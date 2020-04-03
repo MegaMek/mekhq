@@ -1239,7 +1239,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
             lastRankChangeDate = dc.getDate().toZonedDateTime().toLocalDate();
-            btnServiceDate.setText(lastRankChangeDate.format(DateTimeFormatter.ofPattern(dateFormat)));
+            btnRankDate.setText(lastRankChangeDate.format(DateTimeFormatter.ofPattern(dateFormat)));
         }
     }
 
