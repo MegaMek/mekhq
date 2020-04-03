@@ -3719,7 +3719,7 @@ public class Campaign implements Serializable, ITechManager {
         shoppingList = goShopping(shoppingList);
 
         // check for anything in finances
-        finances.newDay(this);
+        getFinances().newDay(this);
 
         MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
@@ -8147,7 +8147,7 @@ public class Campaign implements Serializable, ITechManager {
             addReport(techNameLinked + " performs maintenance on " + u.getHyperlinkedName() + ". " + paidString
                     + qualityString + ". " + damageString + " [<a href='MAINTENANCE|" + u.getId()
                     + "'>Get details</a>]");
-            
+
             u.resetDaysSinceMaintenance();
         }
     }
