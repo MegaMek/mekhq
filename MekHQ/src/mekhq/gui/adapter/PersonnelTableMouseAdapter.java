@@ -52,6 +52,7 @@ import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.PersonLogEvent;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.personnel.*;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
@@ -606,12 +607,12 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 break;
             }
             case CMD_CHANGE_STATUS: {
-                int selected = Integer.parseInt(data[1]);
+                PersonnelStatus status = PersonnelStatus.valueOf(data[1]);
                 for (Person person : people) {
-                    if ((selected == Person.S_ACTIVE) || (0 == JOptionPane.showConfirmDialog(null,
+                    if ((status == PersonnelStatus.ACTIVE) || (0 == JOptionPane.showConfirmDialog(null,
                             String.format(resourceMap.getString("confirmRetireQ.format"), person.getFullTitle()), //$NON-NLS-1$
                             resourceMap.getString("kiaQ.text"), JOptionPane.YES_NO_OPTION))) { //$NON-NLS-1$
-                        gui.getCampaign().changeStatus(person, selected);
+                        gui.getCampaign().changeStatus(person, status);
                     }
                 }
                 break;
@@ -1288,15 +1289,14 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
                 popup.add(menu);
             }
-            menu = new JMenu(resourceMap.getString("changeStatus.text")); //$NON-NLS-1$
-            for (int s = 0; s < Person.S_NUM; s++) {
-                cbMenuItem = new JCheckBoxMenuItem(Person.getStatusName(s));
-                if (person.getStatus() == s) {
+            menu = new JMenu(resourceMap.getString("changeStatus.text"));
+            for (PersonnelStatus status : PersonnelStatus.values()) {
+                cbMenuItem = new JCheckBoxMenuItem(status.getStatusName());
+                if (person.getStatus() == status) {
                     cbMenuItem.setSelected(true);
                 }
-                cbMenuItem.setActionCommand(makeCommand(CMD_CHANGE_STATUS, String.valueOf(s)));
+                cbMenuItem.setActionCommand(makeCommand(CMD_CHANGE_STATUS, status.name()));
                 cbMenuItem.addActionListener(this);
-                cbMenuItem.setEnabled(true);
                 menu.add(cbMenuItem);
             }
             popup.add(menu);

@@ -39,6 +39,7 @@ import mekhq.campaign.personnel.Rank;
 import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
 
 public class MercRosterAccess extends SwingWorker<Void, Void> {
@@ -627,18 +628,18 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
         return name;
     }
 
-    private static String getMercRosterStatusName(int status) {
+    private static String getMercRosterStatusName(PersonnelStatus status) {
         switch(status) {
-        case Person.S_ACTIVE:
-            return "Active";
-        case Person.S_KIA:
-            return "Deceased";
-        case Person.S_RETIRED:
-            return "Retired";
-        case Person.S_MIA:
-            return "Missing in Action";
-        default:
-            return "?";
+            case ACTIVE:
+                return "Active";
+            case KIA:
+                return "Deceased";
+            case RETIRED:
+                return "Retired";
+            case MIA:
+                return "Missing in Action";
+            default:
+                return "?";
         }
     }
 

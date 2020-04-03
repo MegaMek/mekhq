@@ -18,32 +18,91 @@
  */
 package mekhq.campaign.personnel.enums;
 
+import megamek.common.Crew;
+import megamek.common.util.EncodeControl;
+
+import java.util.ResourceBundle;
+
 /**
  * This is used to determine which gender descriptor to use based on the following specified format
  */
 public enum GenderDescriptors {
+    //region Enum Declarations
     /**
-     * Descriptor: Male or Female
+     * Descriptor: Male, Female, or Other
      */
-    MALE_FEMALE,
+    MALE_FEMALE("GenderDescriptors.MALE.text", "GenderDescriptors.FEMALE.text", "GenderDescriptors.OTHER.text"),
     /**
-     * Descriptor: He or She
+     * Descriptor: He, She, or They
      */
-    HE_SHE,
+    HE_SHE("GenderDescriptors.HE.text", "GenderDescriptors.SHE.text", "GenderDescriptors.THEY.text"),
     /**
-     * Descriptor: Him or Her
+     * Descriptor: Him, Her, or Them
      */
-    HIM_HER,
+    HIM_HER("GenderDescriptors.HIM.text", "GenderDescriptors.HER.text", "GenderDescriptors.THEM.text"),
     /**
-     * Descriptor: His or Her
+     * Descriptor: His, Her, or Their
      */
-    HIS_HER,
+    HIS_HER("GenderDescriptors.HIS.text", "GenderDescriptors.HER.text", "GenderDescriptors.THEIR.text"),
     /**
-     * Descriptor: His or Hers
+     * Descriptor: His, Hers, or Theirs
      */
-    HIS_HERS,
+    HIS_HERS("GenderDescriptors.HIS.text", "GenderDescriptors.HERS.text", "GenderDescriptors.THEIRS.text"),
     /**
      * Descriptor: Boy or Girl
      */
-    BOY_GIRL
+    BOY_GIRL("GenderDescriptors.BOY.text", "GenderDescriptors.GIRL.text");
+    //endregion Enum Declarations
+
+    //region Variable Declarations
+    private final String masculine;
+    private final String feminine;
+    private final String other;
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+            new EncodeControl());
+    //endregion Variable Declarations
+
+    //region Constructors
+    GenderDescriptors(String masculine, String feminine) {
+        this(masculine, feminine, null);
+    }
+
+    GenderDescriptors(String masculine, String feminine, String other) {
+        this.masculine = resources.getString(masculine);
+        this.feminine = resources.getString(feminine);
+        this.other = other;
+    }
+    //endregion Constructors
+
+    /**
+     * @param gender the gender to return the descriptor for
+     * @return the descriptor
+     */
+    public String getDescriptor(int gender) {
+        switch (gender) {
+            case Crew.G_MALE:
+                return this.masculine;
+            case Crew.G_FEMALE:
+                return this.feminine;
+            default:
+                return (this.other != null) ? this.other : "";
+        }
+    }
+
+    /**
+     * This returns a descriptor with the first letter capitalized
+     * @param gender the gender to return the descriptor for
+     * @return the string with its first letter capitalized
+     */
+    public String getDescriptorCapitalized(int gender) {
+        String descriptor = getDescriptor(gender).trim();
+        switch (descriptor.length()) {
+            case 0:
+                return descriptor;
+            case 1:
+                return descriptor.toUpperCase();
+            default:
+                return descriptor.substring(0, 1).toUpperCase() + descriptor.substring(1);
+        }
+    }
 }

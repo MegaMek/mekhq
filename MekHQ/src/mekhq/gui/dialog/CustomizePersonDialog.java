@@ -283,8 +283,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         panDemog.add(lblGender, gridBagConstraints);
 
         DefaultComboBoxModel<String> genderModel = new DefaultComboBoxModel<>();
-        genderModel.addElement(Person.getGenderString(Crew.G_MALE, GenderDescriptors.MALE_FEMALE));
-        genderModel.addElement(Person.getGenderString(Crew.G_FEMALE, GenderDescriptors.MALE_FEMALE));
+        genderModel.addElement(GenderDescriptors.MALE_FEMALE.getDescriptorCapitalized(Crew.G_MALE));
+        genderModel.addElement(GenderDescriptors.MALE_FEMALE.getDescriptorCapitalized(Crew.G_FEMALE));
         choiceGender.setModel(genderModel);
         choiceGender.setName("choiceGender"); // NOI18N
         choiceGender.setSelectedIndex(person.getGender());

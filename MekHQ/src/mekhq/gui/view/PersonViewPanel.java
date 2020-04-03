@@ -503,7 +503,7 @@ public class PersonViewPanel extends ScrollablePanel {
         pnlInfo.add(lblStatus1, gridBagConstraints);
 
         lblStatus2.setName("lblStatus2"); // NOI18N
-        lblStatus2.setText(person.getStatusName() + person.pregnancyStatus());
+        lblStatus2.setText(person.getStatus().getStatusName() + person.pregnancyStatus());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = firsty;
@@ -615,7 +615,7 @@ public class PersonViewPanel extends ScrollablePanel {
         pnlInfo.add(lblGender1, gridBagConstraints);
 
         lblGender2.setName("lblGender2"); // NOI18N
-        lblGender2.setText(person.getGenderString(GenderDescriptors.MALE_FEMALE));
+        lblGender2.setText(GenderDescriptors.MALE_FEMALE.getDescriptorCapitalized(person.getGender()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = firsty;
