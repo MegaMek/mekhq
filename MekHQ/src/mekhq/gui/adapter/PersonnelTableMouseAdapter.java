@@ -1692,6 +1692,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     popup.add(menuItem);
                 }
             }
+
             if (oneSelected && person.isActive()) {
                 if (person.oldEnoughToMarry() && (!person.hasSpouse())) {
                     menu = new JMenu(resourceMap.getString("chooseSpouse.text")); //$NON-NLS-1$
@@ -1711,37 +1712,37 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             String pStatus;
                             if (ps.isBondsman()) {
                                 pStatus = String.format(resourceMap.getString("marriageBondsmanDesc.format"), //$NON-NLS-1$
-                                    ps.getFullName(), ps.getAge(today), ps.getRoleDesc());
+                                        ps.getFullName(), ps.getAge(today), ps.getRoleDesc());
                             } else if (ps.isPrisoner()) {
                                 pStatus = String.format(resourceMap.getString("marriagePrisonerDesc.format"), //$NON-NLS-1$
-                                    ps.getFullName(), ps.getAge(today), ps.getRoleDesc());
+                                        ps.getFullName(), ps.getAge(today), ps.getRoleDesc());
                             } else {
                                 pStatus = String.format(resourceMap.getString("marriagePartnerDesc.format"), //$NON-NLS-1$
-                                    ps.getFullName(), ps.getAge(today), ps.getRoleDesc());
+                                        ps.getFullName(), ps.getAge(today), ps.getRoleDesc());
                             }
                             spouseMenu = new JMenu(pStatus);
                             type = resourceMap.getString("marriageNoNameChange.text"); //$NON-NLS-1$
                             surnameMenu = new JMenuItem(type);
                             surnameMenu.setActionCommand(
-                                makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_NO_CHANGE)));
+                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_NO_CHANGE)));
                             surnameMenu.addActionListener(this);
                             spouseMenu.add(surnameMenu);
                             type = resourceMap.getString("marriageRenameSpouse.text"); //$NON-NLS-1$
                             surnameMenu = new JMenuItem(type);
                             surnameMenu.setActionCommand(
-                                   makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_YOURS)));
+                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_YOURS)));
                             surnameMenu.addActionListener(this);
                             spouseMenu.add(surnameMenu);
                             type = resourceMap.getString("marriageRenameYourself.text"); //$NON-NLS-1$
                             surnameMenu = new JMenuItem(type);
                             surnameMenu.setActionCommand(
-                                  makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_SPOUSE)));
+                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_SPOUSE)));
                             surnameMenu.addActionListener(this);
                             spouseMenu.add(surnameMenu);
                             type = resourceMap.getString("marriageHyphenateYourself.text"); //$NON-NLS-1$
                             surnameMenu = new JMenuItem(type);
                             surnameMenu.setActionCommand(
-                                makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_HYP_YOURS)));
+                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_HYP_YOURS)));
                             surnameMenu.addActionListener(this);
                             spouseMenu.add(surnameMenu);
                             type = resourceMap.getString("marriageBothHyphenateYourself.text"); //$NON-NLS-1$
@@ -1753,31 +1754,31 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             type = resourceMap.getString("marriageHyphenateSpouse.text"); //$NON-NLS-1$
                             surnameMenu = new JMenuItem(type);
                             surnameMenu.setActionCommand(
-                                makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_HYP_SPOUSE)));
+                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_HYP_SPOUSE)));
                             surnameMenu.addActionListener(this);
                             spouseMenu.add(surnameMenu);
                             type = resourceMap.getString("marriageBothHyphenateSpouse.text"); //$NON-NLS-1$
                             surnameMenu = new JMenuItem(type);
                             surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(),Integer.toString(Person.SURNAME_BOTH_HYP_SPOUSE)));
+                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_BOTH_HYP_SPOUSE)));
                             surnameMenu.addActionListener(this);
                             spouseMenu.add(surnameMenu);
                             type = resourceMap.getString("marriageMale.text"); //$NON-NLS-1$
                             surnameMenu = new JMenuItem(type);
                             surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(),Integer.toString(Person.SURNAME_MALE)));
+                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_MALE)));
                             surnameMenu.addActionListener(this);
                             spouseMenu.add(surnameMenu);
                             type = resourceMap.getString("marriageFemale.text"); //$NON-NLS-1$
                             surnameMenu = new JMenuItem(type);
                             surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(),Integer.toString(Person.SURNAME_FEMALE)));
+                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_FEMALE)));
                             surnameMenu.addActionListener(this);
                             spouseMenu.add(surnameMenu);
                             type = resourceMap.getString("marriageRandomWeighted.text"); //$NON-NLS-1$
                             surnameMenu = new JMenuItem(type);
                             surnameMenu.setActionCommand(
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(),Integer.toString(Person.SURNAME_WEIGHTED)));
+                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), Integer.toString(Person.SURNAME_WEIGHTED)));
                             surnameMenu.addActionListener(this);
                             spouseMenu.add(surnameMenu);
 
@@ -1841,73 +1842,75 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 
                     popup.add(menu);
                 }
+            }
 
-                JMenu awardMenu = new JMenu(resourceMap.getString("award.text"));
-                List<String> setNames = AwardsFactory.getInstance().getAllSetNames();
-                Collections.sort(setNames);
-                for (String setName : setNames) {
-                    JMenu setAwardMenu = new JMenu(setName);
+            JMenu awardMenu = new JMenu(resourceMap.getString("award.text"));
+            List<String> setNames = AwardsFactory.getInstance().getAllSetNames();
+            Collections.sort(setNames);
+            for (String setName : setNames) {
+                JMenu setAwardMenu = new JMenu(setName);
 
-                    List<Award> awardsOfSet = AwardsFactory.getInstance().getAllAwardsForSet(setName);
-                    Collections.sort(awardsOfSet);
+                List<Award> awardsOfSet = AwardsFactory.getInstance().getAllAwardsForSet(setName);
+                Collections.sort(awardsOfSet);
 
-                    for (Award award : awardsOfSet) {
-                        if (!award.canBeAwarded(person)
-                                || !(award.canBeAwarded(person) || gui.getCampaign().isGM())) {
-                            continue;
-                        }
+                for (Award award : awardsOfSet) {
+                    if (!award.canBeAwarded(person)
+                            || !(award.canBeAwarded(person) || gui.getCampaign().isGM())) {
+                        continue;
+                    }
 
-                        StringBuilder awardMenuItem = new StringBuilder();
-                        awardMenuItem.append(String.format("%s", award.getName()));
+                    StringBuilder awardMenuItem = new StringBuilder();
+                    awardMenuItem.append(String.format("%s", award.getName()));
 
-                        if ((award.getXPReward() != 0) || (award.getEdgeReward() != 0)) {
-                            awardMenuItem.append(" (");
+                    if ((award.getXPReward() != 0) || (award.getEdgeReward() != 0)) {
+                        awardMenuItem.append(" (");
 
-                            if (award.getXPReward() != 0) {
-                                awardMenuItem.append(award.getXPReward()).append(" XP");
-                                if (award.getEdgeReward() != 0) {
-                                    awardMenuItem.append(" & ");
-                                }
-                            }
-
+                        if (award.getXPReward() != 0) {
+                            awardMenuItem.append(award.getXPReward()).append(" XP");
                             if (award.getEdgeReward() != 0) {
-                                awardMenuItem.append(award.getEdgeReward()).append(" Edge");
+                                awardMenuItem.append(" & ");
                             }
-
-                            awardMenuItem.append(")");
                         }
 
-                        menuItem = new JMenuItem(awardMenuItem.toString());
-                        menuItem.setToolTipText(MultiLineTooltip.splitToolTip(award.getDescription()));
-                        menuItem.setActionCommand(makeCommand(CMD_ADD_AWARD, award.getSet(), award.getName()));
-                        menuItem.addActionListener(this);
-                        setAwardMenu.add(menuItem);
-                    }
-
-                    JMenuHelpers.addMenuIfNonEmpty(awardMenu, setAwardMenu, MAX_POPUP_ITEMS);
-                }
-
-                if (person.awardController.hasAwards()) {
-                    if (awardMenu.getItemCount() > 0) {
-                        awardMenu.addSeparator();
-                    }
-
-                    JMenu removeAwardMenu = new JMenu(resourceMap.getString("removeAward.text"));
-
-                    for (Award award : person.awardController.getAwards()) {
-                        JMenu singleAwardMenu = new JMenu(award.getName());
-                        for (String date : award.getFormatedDates()) {
-                            JMenuItem specificAwardMenu = new JMenuItem(date);
-                            specificAwardMenu.setActionCommand(makeCommand(CMD_RMV_AWARD, award.getSet(), award.getName(), date));
-                            specificAwardMenu.addActionListener(this);
-                            singleAwardMenu.add(specificAwardMenu);
+                        if (award.getEdgeReward() != 0) {
+                            awardMenuItem.append(award.getEdgeReward()).append(" Edge");
                         }
-                        JMenuHelpers.addMenuIfNonEmpty(removeAwardMenu, singleAwardMenu, MAX_POPUP_ITEMS);
-                    }
-                    JMenuHelpers.addMenuIfNonEmpty(awardMenu, removeAwardMenu, MAX_POPUP_ITEMS);
-                }
-                popup.add(awardMenu);
 
+                        awardMenuItem.append(")");
+                    }
+
+                    menuItem = new JMenuItem(awardMenuItem.toString());
+                    menuItem.setToolTipText(MultiLineTooltip.splitToolTip(award.getDescription()));
+                    menuItem.setActionCommand(makeCommand(CMD_ADD_AWARD, award.getSet(), award.getName()));
+                    menuItem.addActionListener(this);
+                    setAwardMenu.add(menuItem);
+                }
+
+                JMenuHelpers.addMenuIfNonEmpty(awardMenu, setAwardMenu, MAX_POPUP_ITEMS);
+            }
+
+            if (person.awardController.hasAwards()) {
+                if (awardMenu.getItemCount() > 0) {
+                    awardMenu.addSeparator();
+                }
+
+                JMenu removeAwardMenu = new JMenu(resourceMap.getString("removeAward.text"));
+
+                for (Award award : person.awardController.getAwards()) {
+                    JMenu singleAwardMenu = new JMenu(award.getName());
+                    for (String date : award.getFormatedDates()) {
+                        JMenuItem specificAwardMenu = new JMenuItem(date);
+                        specificAwardMenu.setActionCommand(makeCommand(CMD_RMV_AWARD, award.getSet(), award.getName(), date));
+                        specificAwardMenu.addActionListener(this);
+                        singleAwardMenu.add(specificAwardMenu);
+                    }
+                    JMenuHelpers.addMenuIfNonEmpty(removeAwardMenu, singleAwardMenu, MAX_POPUP_ITEMS);
+                }
+                JMenuHelpers.addMenuIfNonEmpty(awardMenu, removeAwardMenu, MAX_POPUP_ITEMS);
+            }
+            popup.add(awardMenu);
+
+            if (oneSelected && person.isActive()) {
                 menu = new JMenu(resourceMap.getString("spendXP.text")); //$NON-NLS-1$
                 if (gui.getCampaign().getCampaignOptions().useAbilities()) {
                     JMenu abMenu = new JMenu(resourceMap.getString("spendOnSpecialAbilities.text")); //$NON-NLS-1$
@@ -1925,7 +1928,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         }
                         cost = spa.getCost();
                         String costDesc;
-                        if(cost < 0) {
+                        if (cost < 0) {
                             costDesc = resourceMap.getString("costNotPossible.text"); //$NON-NLS-1$
                         } else {
                             costDesc = String.format(resourceMap.getString("costValue.format"), cost); //$NON-NLS-1$
@@ -2070,7 +2073,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             if (specialistMenu.getMenuComponentCount() > 0) {
                                 abMenu.add(specialistMenu);
                             }
-                        } else if (!person.getOptions().booleanOption(spa.getName())){
+                        } else if (!person.getOptions().booleanOption(spa.getName())) {
                             menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), spa.getDisplayName(), costDesc)); //$NON-NLS-1$
                             menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ABILITY, spa.getName(), String.valueOf(cost)));
                             menuItem.addActionListener(this);
@@ -2101,7 +2104,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
                 JMenuHelpers.addMenuIfNonEmpty(menu, currentMenu, MAX_POPUP_ITEMS);
                 JMenuHelpers.addMenuIfNonEmpty(menu, newMenu, MAX_POPUP_ITEMS);
+            }
 
+            if (oneSelected && person.isActive()) {
                 // Edge
                 if (gui.getCampaign().getCampaignOptions().useEdge()) {
                     JMenu edgeMenu = new JMenu(resourceMap.getString("edge.text")); //$NON-NLS-1$
@@ -2266,6 +2271,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 
                     popup.add(menu);
                 }
+
                 menu = new JMenu(resourceMap.getString("specialFlags.text")); //$NON-NLS-1$
                 cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("dependent.text")); //$NON-NLS-1$
                 cbMenuItem.setSelected(person.isDependent());
@@ -2411,6 +2417,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     menu.add(submenu);
                     popup.add(menu);
                 }
+
                 menu = new JMenu(resourceMap.getString("specialFlags.text")); //$NON-NLS-1$
                 submenu = new JMenu(resourceMap.getString("dependent.text")); //$NON-NLS-1$
                 menuItem = new JMenuItem(resourceMap.getString("yes.text")); //$NON-NLS-1$
