@@ -501,11 +501,15 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 break;
             }
             case CMD_ADD_AWARD: {
-                selectedPerson.awardController.addAndLogAward(data[1], data[2], gui.getCampaign().getDate());
+                for (Person person : people) {
+                    person.awardController.addAndLogAward(data[1], data[2], gui.getCampaign().getDate());
+                }
                 break;
             }
             case CMD_RMV_AWARD: {
-                selectedPerson.awardController.removeAward(data[1], data[2], data[3]);
+                for (Person person : people) {
+                    person.awardController.removeAward(data[1], data[2], data[3]);
+                }
                 break;
             }
             case CMD_IMPROVE: {
@@ -2114,8 +2118,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     menu.add(edgeMenu);
                 }
                 popup.add(menu);
-            }
-            if (oneSelected && person.isActive()) {
+
                 if (gui.getCampaign().getCampaignOptions().useEdge()) {
                     menu = new JMenu(resourceMap.getString("setEdgeTriggers.text")); //$NON-NLS-1$
                     //Start of Edge reroll options
