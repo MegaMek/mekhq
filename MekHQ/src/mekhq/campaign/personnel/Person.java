@@ -33,6 +33,7 @@ import java.util.function.IntSupplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import jdk.vm.ci.meta.Local;
 import megamek.common.*;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
@@ -242,6 +243,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     protected LocalDate birthday;
     protected LocalDate dateOfDeath;
     protected LocalDate recruitment;
+    protected LocalDate lastRankChangeDate;
     protected List<LogEntry> personnelLog;
     protected List<LogEntry> missionLog;
 
@@ -461,6 +463,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         birthday = null;
         dateOfDeath = null;
         recruitment = null;
+        lastRankChangeDate = null;
         skills = new Skills();
         options = new PersonnelOptions();
         currentEdge = 0;
@@ -538,9 +541,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public void setDependent(boolean tf) {
         dependent = tf;
         if (dependent) {
-            recruitment = null;
+            setRecruitment(null);
+            setLastRankChangeDate(null);
         } else {
-            recruitment = getCampaign().getLocalDate();
+            setRecruitment(getCampaign().getLocalDate());
+            setLastRankChangeDate(getCampaign().getLocalDate());
         }
     }
 
@@ -1106,6 +1111,22 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
 
+    public void setLastRankChangeDate(LocalDate date) {
+        this.lastRankChangeDate = date;
+    }
+
+    public LocalDate getLastRankChangeDate() {
+        return lastRankChangeDate;
+    }
+
+    public String getLastRankChangeDateAsString() {
+        if (getLastRankChangeDate() == null) {
+            return null;
+        } else {
+            return getLastRankChangeDate().format(DateTimeFormatter.ofPattern(DATE_DISPLAY_FORMAT));
+        }
+    }
+
     public int getAge(LocalDate today) {
         // Get age based on year
         if (getDateOfDeath() != null) {
@@ -1130,6 +1151,20 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
 
         return Period.between(getRecruitment(), today).getYears();
+    }
+
+    public Period getTimeInRank(LocalDate today) {
+        if (getLastRankChangeDate() == null) {
+            return null;
+        }
+
+        // If the person is dead, we only care about how long it was from their last promotion till they died
+        if (getDateOfDeath() != null) {
+            //use date of death instead of the current day
+            today = getDateOfDeath();
+        }
+
+        return Period.between(getLastRankChangeDate(), today);
     }
 
     public void setId(UUID id) {
@@ -1889,11 +1924,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     + dateOfDeath.format(DateTimeFormatter.ofPattern(DATE_SAVE_FORMAT))
                     + "</deathday>");
         }
-        if (null != recruitment) {
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "<recruitment>"
-                    + recruitment.format(DateTimeFormatter.ofPattern(DATE_SAVE_FORMAT))
-                    + "</recruitment>");
+        if (recruitment != null) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "recruitment",
+                    recruitment.format(DateTimeFormatter.ofPattern(DATE_SAVE_FORMAT)));
+        }
+        if (lastRankChangeDate != null) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastRankChangeDate",
+                    lastRankChangeDate.format(DateTimeFormatter.ofPattern(DATE_SAVE_FORMAT)));
         }
         for (Skill skill : skills.getSkills()) {
             skill.writeToXml(pw1, indent + 1);
@@ -2232,6 +2269,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         retVal.recruitment = LocalDate.parse(wn2.getTextContent().trim(),
                                 DateTimeFormatter.ofPattern(DATE_SAVE_FORMAT));
                     }
+                } else if (wn2.getNodeName().equalsIgnoreCase("lastRankChangeDate")) {
+                    retVal.lastRankChangeDate = LocalDate.parse(wn2.getTextContent().trim(),
+                            DateTimeFormatter.ofPattern(DATE_SAVE_FORMAT));
                 } else if (wn2.getNodeName().equalsIgnoreCase("advantages")) {
                     advantages = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("edge")) {

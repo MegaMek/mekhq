@@ -11,6 +11,7 @@ import java.awt.Dialog.ModalityType;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.Image;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
@@ -710,6 +711,55 @@ public class PersonViewPanel extends ScrollablePanel {
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblDueDate2, gridBagConstraints);
+        }
+
+        if (campaign.getCampaignOptions().getUseTimeInRank()) {
+            if (person.getLastRankChangeDate() != null) {
+                JLabel lblLastRankChangeDate1 = new JLabel(resourceMap.getString("lblLastRankChangeDate1.text"));
+                lblLastRankChangeDate1.setName("lblLastRankChangeDate1");
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 2;
+                gridBagConstraints.gridy = firsty;
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlInfo.add(lblLastRankChangeDate1, gridBagConstraints);
+
+                JLabel lblLastRankChangeDate2 = new JLabel(person.getLastRankChangeDateAsString());
+                lblLastRankChangeDate2.setName("lblLastRankChangeDate2");
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 3;
+                gridBagConstraints.gridy = firsty;
+                gridBagConstraints.weightx = 1.0;
+                gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlInfo.add(lblLastRankChangeDate2, gridBagConstraints);
+
+                firsty++;
+                Period timeInRank = person.getTimeInRank(campaign.getLocalDate());
+                if (timeInRank != null) {
+                    JLabel lblTimeInRank1 = new JLabel(resourceMap.getString("lblTimeInRank1.text"));
+                    lblTimeInRank1.setName("lblTimeInRank1");
+                    gridBagConstraints = new GridBagConstraints();
+                    gridBagConstraints.gridx = 2;
+                    gridBagConstraints.gridy = firsty;
+                    gridBagConstraints.fill = GridBagConstraints.NONE;
+                    gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                    pnlInfo.add(lblTimeInRank1, gridBagConstraints);
+
+                    JLabel lblTimeInRank2 = new JLabel(timeInRank.getMonths() + " "
+                            + resourceMap.getString("Time.MonthMonths"));
+                    lblTimeInRank2.setName("lblTimeInRank2");
+                    gridBagConstraints = new GridBagConstraints();
+                    gridBagConstraints.gridx = 3;
+                    gridBagConstraints.gridy = firsty;
+                    gridBagConstraints.weightx = 1.0;
+                    gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+                    gridBagConstraints.fill = GridBagConstraints.NONE;
+                    gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                    pnlInfo.add(lblTimeInRank2, gridBagConstraints);
+                }
+            }
         }
 
         return pnlInfo;
