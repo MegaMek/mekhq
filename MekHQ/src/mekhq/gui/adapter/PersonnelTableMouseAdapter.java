@@ -1912,7 +1912,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     }
                 } else {
                     Set<Award> awards = new TreeSet<>((a1, a2) -> {
-                        if (a1.getSet().equals(a2.getSet()) && a1.getName().equals(a2.getName())) {
+                        if (a1.getSet().equalsIgnoreCase(a2.getSet()) && a1.getName().equalsIgnoreCase(a2.getName())) {
                             return 0;
                         } else {
                             return 1; // This is purposeful, we want to keep the original copy
@@ -1921,6 +1921,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     for (Person p : selected) {
                         awards.addAll(p.awardController.getAwards());
                     }
+
                     for (Award award : awards) {
                         JMenuItem singleAwardMenu = new JMenuItem(award.getName());
                         singleAwardMenu.setActionCommand(makeCommand(CMD_RMV_AWARD, award.getSet(), award.getName()));
