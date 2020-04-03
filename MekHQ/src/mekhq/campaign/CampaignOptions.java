@@ -409,7 +409,7 @@ public class CampaignOptions implements Serializable {
         contractNegotiationXP = 0;
         adminXP = 0;
         adminXPPeriod = 1;
-        edgeCost = 1;
+        edgeCost = 10;
         unitRatingMethod = UnitRatingMethod.CAMPAIGN_OPS;
         waitingPeriod = 7;
         acquisitionSkill = S_TECH;
