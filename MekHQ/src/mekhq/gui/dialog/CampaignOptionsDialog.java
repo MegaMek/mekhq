@@ -285,6 +285,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox usePeacetimeCostBox;
     private JCheckBox useExtendedPartsModifierBox;
     private JCheckBox showPeacetimeCostBox;
+    private JCheckBox yearlyFinancesToCSVExportBox;
     private JSpinner spnClanPriceModifier;
     private JSpinner[] spnUsedPartsValue;
     private JSpinner spnDamagedPartsValue;
@@ -2170,7 +2171,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panFinances.add(usePeacetimeCostBox, gridBagConstraints);
 
         useExtendedPartsModifierBox.setText(resourceMap.getString("useExtendedPartsModifierBox.text")); // NOI18N
-        //useExtendedPartsModifierBox.setToolTipText(resourceMap.getString("useExtendedPartsModifierBox.toolTipText")); // NOI18N
         useExtendedPartsModifierBox.setName("useExtendedPartsModifierBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -2191,6 +2191,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panFinances.add(showPeacetimeCostBox, gridBagConstraints);
 
+        yearlyFinancesToCSVExportBox = new JCheckBox(resourceMap.getString("yearlyFinancesToCSVExportBox.text"));
+        yearlyFinancesToCSVExportBox.setToolTipText(resourceMap.getString("yearlyFinancesToCSVExportBox.toolTipText"));
+        yearlyFinancesToCSVExportBox.setName("yearlyFinancesToCSVExportBox");
+        yearlyFinancesToCSVExportBox.setSelected(options.getYearlyFinancesToCSVExport());
+        gridBagConstraints.gridy = gridy++;
+        panFinances.add(yearlyFinancesToCSVExportBox, gridBagConstraints);
 
         clanPriceModifierLabel.setText(resourceMap.getString("clanPriceModifierLabel.text")); // NOI18N
         clanPriceModifierLabel.setName("clanPriceModifierLabel"); // NOI18N
@@ -2210,8 +2216,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panFinances.add(spnClanPriceModifier, gridBagConstraints);
-
-        //JPanel panUsedParts = new JPanel(new GridBagLayout());
 
         usedPartsValueLabel.setText(resourceMap.getString("usedPartsValueLabel.text")); // NOI18N
         usedPartsValueLabel.setName("usedPartsValueLabel"); // NOI18N
@@ -4706,6 +4710,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setUsePeacetimeCost(usePeacetimeCostBox.isSelected());
         options.setUseExtendedPartsModifier(useExtendedPartsModifierBox.isSelected());
         options.setShowPeacetimeCost(showPeacetimeCostBox.isSelected());
+        options.setYearlyFinancesToCSVExport(yearlyFinancesToCSVExportBox.isSelected());
         options.setAssignPortraitOnRoleChange(chkAssignPortraitOnRoleChange.isSelected());
 
         options.setEquipmentContractBase(btnContractEquipment.isSelected());
