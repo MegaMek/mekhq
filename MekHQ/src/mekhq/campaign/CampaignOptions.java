@@ -177,7 +177,7 @@ public class CampaignOptions implements Serializable {
     private boolean factionIntroDate;
     private boolean useAmmoByType; // Unofficial
 
-    //finance related
+    //region Finance tab
     private boolean payForParts;
     private boolean payForRepairs;
     private boolean payForUnits;
@@ -192,13 +192,14 @@ public class CampaignOptions implements Serializable {
     private boolean usePeacetimeCost;
     private boolean useExtendedPartsModifier;
     private boolean showPeacetimeCost;
+    private boolean yearlyFinancesToCSVExport;
     private double[] usedPartsValue;
     private double damagedPartsValue;
     private double canceledOrderReimbursement;
     private boolean usePercentageMaint; // Unofficial
     private boolean infantryDontCount; // Unofficial
     private double clanPriceModifier;
-    private int maxAcquisitions;
+    //endregion Finance Tab
 
     //contract related
     private boolean equipmentContractBase;
@@ -232,6 +233,7 @@ public class CampaignOptions implements Serializable {
     private int penaltyClanPartsFromIS;
     private boolean noClanPartsFromIS;
     private boolean planetAcquisitionVerbose;
+    private int maxAcquisitions;
 
     //xp related
     private int scenarioXP;
@@ -366,6 +368,7 @@ public class CampaignOptions implements Serializable {
         usePeacetimeCost = false;
         useExtendedPartsModifier = false;
         showPeacetimeCost = false;
+        yearlyFinancesToCSVExport = false;
         sellUnits = false;
         sellParts = false;
         limitByYear = true;
@@ -1560,6 +1563,14 @@ public class CampaignOptions implements Serializable {
         this.showPeacetimeCost = b;
     }
 
+    public boolean getYearlyFinancesToCSVExport() {
+        return yearlyFinancesToCSVExport;
+    }
+
+    public void setYearlyFinancesToCSVExport(boolean b) {
+        yearlyFinancesToCSVExport = b;
+    }
+
     public boolean canSellUnits() {
         return sellUnits;
     }
@@ -2727,6 +2738,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePeacetimeCost", usePeacetimeCost);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useExtendedPartsModifier", useExtendedPartsModifier);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "showPeacetimeCost", showPeacetimeCost);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "yearlyFinancesToCSVExport", yearlyFinancesToCSVExport);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueA", usedPartsValue[0]);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueB", usedPartsValue[1]);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueC", usedPartsValue[2]);
@@ -3073,6 +3085,8 @@ public class CampaignOptions implements Serializable {
                 retVal.useExtendedPartsModifier = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("showPeacetimeCost")) {
                 retVal.showPeacetimeCost = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("yearlyFinancesToCSVExport")) {
+                retVal.yearlyFinancesToCSVExport = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("payForRecruitment")) {
                 retVal.payForRecruitment = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useLoanLimits")) {
