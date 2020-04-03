@@ -509,7 +509,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             case CMD_RMV_AWARD: {
                 for (Person person : people) {
-                    person.awardController.removeAward(data[1], data[2], data[3]);
+                    if (person.awardController.hasAward(data[1], data[2])) {
+                        person.awardController.removeAward(data[1], data[2], data[3]);
+                    }
                 }
                 break;
             }
@@ -1844,6 +1846,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
             }
 
+            //region Awards Menu
             JMenu awardMenu = new JMenu(resourceMap.getString("award.text"));
             List<String> setNames = AwardsFactory.getInstance().getAllSetNames();
             Collections.sort(setNames);
@@ -1909,6 +1912,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 JMenuHelpers.addMenuIfNonEmpty(awardMenu, removeAwardMenu, MAX_POPUP_ITEMS);
             }
             popup.add(awardMenu);
+            //endregion Awards Menu
 
             if (oneSelected && person.isActive()) {
                 menu = new JMenu(resourceMap.getString("spendXP.text")); //$NON-NLS-1$
