@@ -66,7 +66,7 @@ public class PersonAwardController {
      * @param name String with the name of the award
      * @return true if person has an award of that name and set
      */
-    private boolean hasAward(String set, String name){
+    public boolean hasAward(String set, String name){
         return getAward(set, name) != null;
     }
 
