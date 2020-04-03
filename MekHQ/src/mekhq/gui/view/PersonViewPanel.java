@@ -11,7 +11,7 @@ import java.awt.Dialog.ModalityType;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.Image;
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -594,7 +594,7 @@ public class PersonViewPanel extends ScrollablePanel {
         pnlInfo.add(lblAge1, gridBagConstraints);
 
         lblAge2.setName("lblAge2"); // NOI18N
-        lblAge2.setText(Integer.toString(person.getAge(campaign.getCalendar())));
+        lblAge2.setText(Integer.toString(person.getAge(campaign.getLocalDate())));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = firsty;
@@ -663,7 +663,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 pnlInfo.add(lblTimeServed1, gridBagConstraints);
 
                 lblTimeServed2.setName("lblTimeServed2");
-                lblTimeServed2.setText(person.getTimeInService(campaign.getCalendar()) + " years");
+                lblTimeServed2.setText(person.getTimeInService(campaign.getLocalDate()) + " years");
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 3;
                 gridBagConstraints.gridy = firsty;
@@ -682,7 +682,7 @@ public class PersonViewPanel extends ScrollablePanel {
         firsty++;
 
         if (person.isPregnant()) {
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+            String displayFormat = "yyyy-MM-dd"; // TODO : remove inline date format
             String dueDate;
 
             lblDueDate1.setName("lblDueDate1");
@@ -695,9 +695,9 @@ public class PersonViewPanel extends ScrollablePanel {
             pnlInfo.add(lblDueDate1, gridBagConstraints);
 
             if (campaign.getCampaignOptions().getDisplayTrueDueDate()) {
-                dueDate = df.format(person.getDueDate().getTime());
+                dueDate = person.getDueDate().format(DateTimeFormatter.ofPattern(displayFormat));
             } else {
-                dueDate = df.format(person.getExpectedDueDate().getTime());
+                dueDate = person.getExpectedDueDate().format(DateTimeFormatter.ofPattern(displayFormat));
             }
 
             lblDueDate2.setName("lblDueDate2");

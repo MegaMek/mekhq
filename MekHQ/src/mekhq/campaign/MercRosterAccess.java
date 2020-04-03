@@ -474,10 +474,10 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 preparedStatement.setInt(6, forceId);
                 preparedStatement.setInt(7, 1);
                 //TODO: get joining date right
-                preparedStatement.setDate(8, new java.sql.Date(p.getBirthday().getTimeInMillis()));
+                preparedStatement.setDate(8, java.sql.Date.valueOf(p.getBirthday()));
                 //TODO: combine personnel log with biography
                 preparedStatement.setString(9, p.getBiography());
-                preparedStatement.setDate(10, new java.sql.Date(p.getBirthday().getTimeInMillis()));
+                preparedStatement.setDate(10, java.sql.Date.valueOf(p.getBirthday()));
                 preparedStatement.setString(11, p.getId().toString());
                 if(preparedStatement.executeUpdate() < 1) {
                     //no prior record so insert
@@ -489,9 +489,9 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                     preparedStatement.setString(5, getMercRosterStatusName(p.getStatus()));
                     preparedStatement.setInt(6, forceId);
                     preparedStatement.setInt(7, 1);
-                    preparedStatement.setDate(8, new java.sql.Date(p.getBirthday().getTimeInMillis()));
+                    preparedStatement.setDate(8, java.sql.Date.valueOf(p.getBirthday()));
                     preparedStatement.setString(9, p.getBiography());
-                    preparedStatement.setDate(10, new java.sql.Date(p.getBirthday().getTimeInMillis()));
+                    preparedStatement.setDate(10, java.sql.Date.valueOf(p.getBirthday()));
                     preparedStatement.setString(11, p.getId().toString());
                     preparedStatement.executeUpdate();
                 }
