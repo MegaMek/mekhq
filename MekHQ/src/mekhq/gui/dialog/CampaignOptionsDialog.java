@@ -396,6 +396,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox chkRetirementRolls;
     private JCheckBox chkCustomRetirementMods;
     private JCheckBox chkFoundersNeverRetire;
+    private JCheckBox chkAddDependents;
     private JCheckBox chkDependentsNeverLeave;
     private JCheckBox chkTrackUnitFatigue;
     private JCheckBox chkUseLeadership;
@@ -3772,6 +3773,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy++;
         panSubAtBAdmin.add(chkFoundersNeverRetire, gridBagConstraints);
 
+        chkAddDependents = new JCheckBox(resourceMap.getString("chkAddDependents.text"));
+        chkAddDependents.setToolTipText(resourceMap.getString("chkAddDependents.toolTipText"));
+        chkAddDependents.setSelected(options.getAddDependents());
+        gridBagConstraints.gridy++;
+        panSubAtBAdmin.add(chkAddDependents, gridBagConstraints);
+
         chkDependentsNeverLeave = new JCheckBox(resourceMap.getString("chkDependentsNeverLeave.text"));
         chkDependentsNeverLeave.setToolTipText(resourceMap.getString("chkDependentsNeverLeave.toolTipText"));
         chkDependentsNeverLeave.setSelected(options.getDependentsNeverLeave());
@@ -4869,6 +4876,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setRetirementRolls(chkRetirementRolls.isSelected());
         options.setCustomRetirementMods(chkCustomRetirementMods.isSelected());
         options.setFoundersNeverRetire(chkFoundersNeverRetire.isSelected());
+        options.setAddDependents(chkAddDependents.isSelected());
         options.setDependentsNeverLeave(chkDependentsNeverLeave.isSelected());
         options.setTrackUnitFatigue(chkTrackUnitFatigue.isSelected());
         options.setLimitLanceWeight(chkLimitLanceWeight.isSelected());
