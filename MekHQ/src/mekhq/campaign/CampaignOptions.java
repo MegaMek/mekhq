@@ -303,7 +303,7 @@ public class CampaignOptions implements Serializable {
     private boolean trackUnitFatigue;
     private boolean customRetirementMods;
     private boolean foundersNeverRetire;
-    private boolean addDependents;
+    private boolean atbAddDependents;
     private boolean dependentsNeverLeave;
     private boolean trackOriginalUnit;
     private boolean mercSizeLimited;
@@ -603,7 +603,7 @@ public class CampaignOptions implements Serializable {
         retirementRolls = true;
         customRetirementMods = false;
         foundersNeverRetire = false;
-        addDependents = true;
+        atbAddDependents = true;
         dependentsNeverLeave = false;
         trackUnitFatigue = false;
         trackOriginalUnit = false;
@@ -2352,12 +2352,12 @@ public class CampaignOptions implements Serializable {
         foundersNeverRetire = mods;
 	}
 
-	public boolean getAddDependents() {
-        return addDependents;
+	public boolean canAtBAddDependents() {
+        return atbAddDependents;
     }
 
-    public void setAddDependents(boolean b) {
-        addDependents = b;
+    public void setAtBAddDependents(boolean b) {
+        atbAddDependents = b;
     }
 
     public boolean getDependentsNeverLeave() {
@@ -2884,7 +2884,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "retirementRolls", retirementRolls);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "customRetirementMods", customRetirementMods);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "foundersNeverRetire", foundersNeverRetire);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "addDependents", addDependents);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "atbAddDependents", atbAddDependents);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "dependentsNeverLeave", dependentsNeverLeave);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "trackUnitFatigue", trackUnitFatigue);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "mercSizeLimited", mercSizeLimited);
@@ -3405,8 +3405,8 @@ public class CampaignOptions implements Serializable {
                 retVal.customRetirementMods = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("foundersNeverRetire")) {
                 retVal.foundersNeverRetire = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("addDependents")) {
-                retVal.addDependents = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("atbAddDependents")) {
+                retVal.atbAddDependents = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("dependentsNeverLeave")) {
                 retVal.dependentsNeverLeave = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("trackUnitFatigue")) {

@@ -672,9 +672,9 @@ public class AtBContract extends Contract implements Serializable {
         int roll = Compute.d6();
         switch (roll) {
         case 1: /* 1d6 dependents */
-            number = Compute.d6();
-            c.addReport("Bonus: " + number + " dependent" + ((number > 1) ? "s" : ""));
-            if (c.getCampaignOptions().getAddDependents()) {
+            if (c.getCampaignOptions().canAtBAddDependents()) {
+                number = Compute.d6();
+                c.addReport("Bonus: " + number + " dependent" + ((number > 1) ? "s" : ""));
                 for (int i = 0; i < number; i++) {
                     Person p = c.newDependent(Person.T_ASTECH, false);
                     c.recruitPerson(p, false, true, false, true);

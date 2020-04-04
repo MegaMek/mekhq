@@ -3775,7 +3775,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         chkAddDependents = new JCheckBox(resourceMap.getString("chkAddDependents.text"));
         chkAddDependents.setToolTipText(resourceMap.getString("chkAddDependents.toolTipText"));
-        chkAddDependents.setSelected(options.getAddDependents());
+        chkAddDependents.setSelected(options.canAtBAddDependents());
         gridBagConstraints.gridy++;
         panSubAtBAdmin.add(chkAddDependents, gridBagConstraints);
 
@@ -4876,7 +4876,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setRetirementRolls(chkRetirementRolls.isSelected());
         options.setCustomRetirementMods(chkCustomRetirementMods.isSelected());
         options.setFoundersNeverRetire(chkFoundersNeverRetire.isSelected());
-        options.setAddDependents(chkAddDependents.isSelected());
+        options.setAtBAddDependents(chkAddDependents.isSelected());
         options.setDependentsNeverLeave(chkDependentsNeverLeave.isSelected());
         options.setTrackUnitFatigue(chkTrackUnitFatigue.isSelected());
         options.setLimitLanceWeight(chkLimitLanceWeight.isSelected());

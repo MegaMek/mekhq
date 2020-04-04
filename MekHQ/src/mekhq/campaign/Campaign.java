@@ -748,7 +748,7 @@ public class Campaign implements Serializable, ITechManager {
                             getPersonnelMarket().addPerson(p);
                         }
                     }
-                    if (getCampaignOptions().getAddDependents()) {
+                    if (getCampaignOptions().canAtBAddDependents()) {
                         int dependents = getRetirementDefectionTracker().getPayout(pid).getDependents();
                         while (dependents > 0) {
                             Person person = newDependent(Person.T_ASTECH, false);
@@ -3443,7 +3443,7 @@ public class Campaign implements Serializable, ITechManager {
 
         // Add or remove dependents - only if one of the two options makes this possible is enabled
         if ((getLocalDate().getDayOfYear() == 1)
-                && (!getCampaignOptions().getDependentsNeverLeave() || getCampaignOptions().getAddDependents())) {
+                && (!getCampaignOptions().getDependentsNeverLeave() || getCampaignOptions().canAtBAddDependents())) {
             int numPersonnel = 0;
             List<Person> dependents = new ArrayList<>();
             for (Person p : getPersonnel()) {
@@ -3469,7 +3469,7 @@ public class Campaign implements Serializable, ITechManager {
                     }
                 }
             } else {
-                if (getCampaignOptions().getAddDependents()) {
+                if (getCampaignOptions().canAtBAddDependents()) {
                     for (int i = 0; i < change; i++) {
                         Person p = newDependent(Person.T_ASTECH, false);
                         recruitPerson(p, false, true, false, true);
