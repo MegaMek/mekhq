@@ -147,6 +147,7 @@ public class PersonAwardController {
             removeAward(setName, awardName, stringDate, null);
         }
     }
+
     /**
      * Removes an award given to this person based on:
      * @param setName is the name of the set of the award
