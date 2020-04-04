@@ -1165,13 +1165,17 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return dueDate != null;
     }
 
-    public void procreate() {
-        if (!isFemale() || isPregnant() || isDeployed()) {
-            return;
-        }
+    /**
+     * This is used to determine if a person can procreate
+     * @return true if they can, otherwise false
+     */
+    public boolean canProcreate() {
+        return isFemale() && !isPregnant() && !isDeployed()
+                && !isChild() && (getAge(getCampaign().getLocalDate()) < 51);
+    }
 
-        // Age limitations...
-        if (!isChild() && getAge(getCampaign().getLocalDate()) < 51) {
+    public void procreate() {
+        if (canProcreate()) {
             boolean conceived = false;
             if (hasSpouse()) {
                 if (!getSpouse().isDeployed() && !getSpouse().isDeadOrMIA() && !getSpouse().isChild()

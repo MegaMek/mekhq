@@ -1317,7 +1317,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 
             if (gui.getCampaign().getCampaignOptions().getUseAtB()
                     && (gui.getCampaign().getCampaignOptions().getUseAtBCapture()
-                        || gui.getCampaign().getCampaignOptions().capturePrisoners())
+                    || gui.getCampaign().getCampaignOptions().capturePrisoners())
                     && StaticChecks.areAllPrisoners(selected)) {
                 popup.add(newMenuItem(resourceMap.getString("ransom.text"), CMD_RANSOM));
             }
@@ -1445,7 +1445,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         }
                         if (unit.canTakeMoreVesselCrew()
                                 && ((unit.getEntity().isAero() && person.hasSkill(SkillType.S_TECH_VESSEL))
-                                    || ((unit.getEntity().isSupportVehicle() && person.hasSkill(SkillType.S_TECH_MECHANIC))))){
+                                || ((unit.getEntity().isSupportVehicle() && person.hasSkill(SkillType.S_TECH_MECHANIC))))) {
                             cbMenuItem = new JCheckBoxMenuItem(unit.getName());
                             cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
                             cbMenuItem.setActionCommand(makeCommand(CMD_ADD_CREW, unit.getId().toString()));
@@ -1481,7 +1481,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     if (unit.canTakeTech() && person.canTech(unit.getEntity())
                             && (person.getMaintenanceTimeUsing() + unit.getMaintenanceTime() <= 480)) {
                         cbMenuItem = new JCheckBoxMenuItem(String.format(resourceMap.getString("maintenanceTimeDesc.format"), //$NON-NLS-1$
-                            unit.getName(), unit.getMaintenanceTime()));
+                                unit.getName(), unit.getMaintenanceTime()));
                         cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
                         cbMenuItem.setActionCommand(makeCommand(CMD_ADD_TECH, unit.getId().toString()));
                         cbMenuItem.addActionListener(this);
@@ -1599,7 +1599,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         }
                         if (unit.canTakeMoreVesselCrew()
                                 && ((unit.getEntity().isAero() && person.hasSkill(SkillType.S_TECH_VESSEL))
-                                || ((unit.getEntity().isSupportVehicle() && person.hasSkill(SkillType.S_TECH_MECHANIC))))){
+                                || ((unit.getEntity().isSupportVehicle() && person.hasSkill(SkillType.S_TECH_MECHANIC))))) {
                             cbMenuItem = new JCheckBoxMenuItem(unit.getName());
                             cbMenuItem.setSelected(unit.getId().equals(person.getUnitId()));
                             cbMenuItem.setActionCommand(makeCommand(CMD_ADD_CREW, unit.getId().toString()));
@@ -1679,22 +1679,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             cbMenuItem.setActionCommand(makeCommand(CMD_REMOVE_UNIT, "-1")); //$NON-NLS-1$
             cbMenuItem.addActionListener(this);
             menu.add(cbMenuItem);
-            if (oneSelected) {
-                if (!person.isChild() && (person.isFemale()) && !person.isPregnant()) {
-                    menuItem = new JMenuItem(resourceMap.getString("addPregnancy.text")); //$NON-NLS-1$
-                    menuItem.setActionCommand(CMD_ADD_PREGNANCY);
-                    menuItem.addActionListener(this);
-                    menuItem.setEnabled(gui.getCampaign().isGM());
-                    popup.add(menuItem);
-                }
-                if (person.isPregnant()) {
-                    menuItem = new JMenuItem(resourceMap.getString("removePregnancy.text")); //$NON-NLS-1$
-                    menuItem.setActionCommand(CMD_REMOVE_PREGNANCY);
-                    menuItem.addActionListener(this);
-                    menuItem.setEnabled(gui.getCampaign().isGM());
-                    popup.add(menuItem);
-                }
-            }
 
             if (oneSelected && person.isActive()) {
                 if (person.oldEnoughToMarry() && (!person.hasSpouse())) {
@@ -2153,7 +2137,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     cbMenuItem.setSelected(person.getOptions()
                             .booleanOption(OPT_EDGE_HEADHIT));
                     cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_HEADHIT));
-                    if (person.getPrimaryRole() != Person.T_MECHWARRIOR) { cbMenuItem.setForeground(new Color(150, 150, 150)); }
+                    if (person.getPrimaryRole() != Person.T_MECHWARRIOR) {
+                        cbMenuItem.setForeground(new Color(150, 150, 150));
+                    }
                     cbMenuItem.addActionListener(this);
                     menu.add(cbMenuItem);
                     cbMenuItem = new JCheckBoxMenuItem(
@@ -2161,28 +2147,36 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     cbMenuItem.setSelected(person.getOptions()
                             .booleanOption(OPT_EDGE_TAC));
                     cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_TAC));
-                    if (person.getPrimaryRole() != Person.T_MECHWARRIOR) { cbMenuItem.setForeground(new Color(150, 150, 150)); }
+                    if (person.getPrimaryRole() != Person.T_MECHWARRIOR) {
+                        cbMenuItem.setForeground(new Color(150, 150, 150));
+                    }
                     cbMenuItem.addActionListener(this);
                     menu.add(cbMenuItem);
                     cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerKO.text")); //$NON-NLS-1$
                     cbMenuItem.setSelected(person.getOptions()
                             .booleanOption(OPT_EDGE_KO));
                     cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_KO));
-                    if (person.getPrimaryRole() != Person.T_MECHWARRIOR) { cbMenuItem.setForeground(new Color(150, 150, 150)); }
+                    if (person.getPrimaryRole() != Person.T_MECHWARRIOR) {
+                        cbMenuItem.setForeground(new Color(150, 150, 150));
+                    }
                     cbMenuItem.addActionListener(this);
                     menu.add(cbMenuItem);
                     cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerExplosion.text")); //$NON-NLS-1$
                     cbMenuItem.setSelected(person.getOptions()
                             .booleanOption(OPT_EDGE_EXPLOSION));
                     cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_EXPLOSION));
-                    if (person.getPrimaryRole() != Person.T_MECHWARRIOR) { cbMenuItem.setForeground(new Color(150, 150, 150)); }
+                    if (person.getPrimaryRole() != Person.T_MECHWARRIOR) {
+                        cbMenuItem.setForeground(new Color(150, 150, 150));
+                    }
                     cbMenuItem.addActionListener(this);
                     menu.add(cbMenuItem);
                     cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerMASCFailure.text")); //$NON-NLS-1$
                     cbMenuItem.setSelected(person.getOptions()
                             .booleanOption(OPT_EDGE_MASC_FAILURE));
                     cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_MASC_FAILURE));
-                    if (person.getPrimaryRole() != Person.T_MECHWARRIOR) { cbMenuItem.setForeground(new Color(150, 150, 150)); }
+                    if (person.getPrimaryRole() != Person.T_MECHWARRIOR) {
+                        cbMenuItem.setForeground(new Color(150, 150, 150));
+                    }
                     cbMenuItem.addActionListener(this);
                     menu.add(cbMenuItem);
                     //Aero pilots and gunners
@@ -2192,7 +2186,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_WHEN_AERO_ALT_LOSS));
                     if (person.getPrimaryRole() != Person.T_SPACE_PILOT
                             && person.getPrimaryRole() != Person.T_SPACE_GUNNER
-                            && person.getPrimaryRole() != Person.T_AERO_PILOT) { cbMenuItem.setForeground(new Color(150, 150, 150)); }
+                            && person.getPrimaryRole() != Person.T_AERO_PILOT) {
+                        cbMenuItem.setForeground(new Color(150, 150, 150));
+                    }
                     cbMenuItem.addActionListener(this);
                     menu.add(cbMenuItem);
                     cbMenuItem = new JCheckBoxMenuItem(
@@ -2202,14 +2198,18 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_WHEN_AERO_EXPLOSION));
                     if (person.getPrimaryRole() != Person.T_SPACE_PILOT
                             && person.getPrimaryRole() != Person.T_SPACE_GUNNER
-                            && person.getPrimaryRole() != Person.T_AERO_PILOT) { cbMenuItem.setForeground(new Color(150, 150, 150)); }
+                            && person.getPrimaryRole() != Person.T_AERO_PILOT) {
+                        cbMenuItem.setForeground(new Color(150, 150, 150));
+                    }
                     cbMenuItem.addActionListener(this);
                     menu.add(cbMenuItem);
                     cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerAeroKO.text")); //$NON-NLS-1$
                     cbMenuItem.setSelected(person.getOptions()
                             .booleanOption(OPT_EDGE_WHEN_AERO_KO));
                     cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_WHEN_AERO_KO));
-                    if (person.getPrimaryRole() != Person.T_AERO_PILOT) { cbMenuItem.setForeground(new Color(150, 150, 150)); }
+                    if (person.getPrimaryRole() != Person.T_AERO_PILOT) {
+                        cbMenuItem.setForeground(new Color(150, 150, 150));
+                    }
                     cbMenuItem.addActionListener(this);
                     menu.add(cbMenuItem);
                     cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerAeroLuckyCrit.text")); //$NON-NLS-1$
@@ -2218,7 +2218,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_WHEN_AERO_LUCKY_CRIT));
                     if (person.getPrimaryRole() != Person.T_SPACE_PILOT
                             && person.getPrimaryRole() != Person.T_SPACE_GUNNER
-                            && person.getPrimaryRole() != Person.T_AERO_PILOT) { cbMenuItem.setForeground(new Color(150, 150, 150)); }
+                            && person.getPrimaryRole() != Person.T_AERO_PILOT) {
+                        cbMenuItem.setForeground(new Color(150, 150, 150));
+                    }
                     cbMenuItem.addActionListener(this);
                     menu.add(cbMenuItem);
                     cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerAeroNukeCrit.text")); //$NON-NLS-1$
@@ -2226,7 +2228,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             .booleanOption(OPT_EDGE_WHEN_AERO_NUKE_CRIT));
                     cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_WHEN_AERO_NUKE_CRIT));
                     if (person.getPrimaryRole() != Person.T_SPACE_PILOT
-                            && person.getPrimaryRole() != Person.T_SPACE_GUNNER) { cbMenuItem.setForeground(new Color(150, 150, 150)); }
+                            && person.getPrimaryRole() != Person.T_SPACE_GUNNER) {
+                        cbMenuItem.setForeground(new Color(150, 150, 150));
+                    }
                     cbMenuItem.addActionListener(this);
                     menu.add(cbMenuItem);
                     cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerAeroTrnBayCrit.text")); //$NON-NLS-1$
@@ -2234,7 +2238,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             .booleanOption(OPT_EDGE_WHEN_AERO_UNIT_CARGO_LOST));
                     cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_WHEN_AERO_UNIT_CARGO_LOST));
                     if (person.getPrimaryRole() != Person.T_SPACE_PILOT
-                            && person.getPrimaryRole() != Person.T_SPACE_GUNNER) { cbMenuItem.setForeground(new Color(150, 150, 150)); }
+                            && person.getPrimaryRole() != Person.T_SPACE_GUNNER) {
+                        cbMenuItem.setForeground(new Color(150, 150, 150));
+                    }
                     cbMenuItem.addActionListener(this);
                     menu.add(cbMenuItem);
                     // Support Edge
@@ -2245,7 +2251,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         cbMenuItem.setSelected(person.getOptions()
                                 .booleanOption(PersonnelOptions.EDGE_MEDICAL));
                         cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_MEDICAL));
-                        if (person.getPrimaryRole() != Person.T_DOCTOR) { cbMenuItem.setForeground(new Color(150, 150, 150)); }
+                        if (person.getPrimaryRole() != Person.T_DOCTOR) {
+                            cbMenuItem.setForeground(new Color(150, 150, 150));
+                        }
                         cbMenuItem.addActionListener(this);
                         menu.add(cbMenuItem);
                         //Techs
@@ -2277,7 +2285,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         }
                         cbMenuItem.addActionListener(this);
                         menu.add(cbMenuItem);
-                    //Admins
+                        //Admins
                         cbMenuItem = new JCheckBoxMenuItem(
                                 resourceMap.getString("edgeTriggerAcquireCheck.text")); //$NON-NLS-1$
                         cbMenuItem.setSelected(person.getOptions()
@@ -2523,6 +2531,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             menuItem.addActionListener(ev -> gui.miExportPersonActionPerformed(ev));
             menuItem.setEnabled(true);
             popup.add(menuItem);
+
             if (gui.getCampaign().getCampaignOptions().getUseAtB()
                     && StaticChecks.areAllActive(selected)) {
                 menuItem = new JMenuItem(resourceMap.getString("sack.text")); //$NON-NLS-1$
@@ -2530,101 +2539,117 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
             }
-            menu = new JMenu(resourceMap.getString("gmMode.text")); //$NON-NLS-1$
 
-            menuItem = new JMenu(resourceMap.getString("changePrisonerStatus.text")); //$NON-NLS-1$
-            menuItem.add(newCheckboxMenu(
-                    Person.getPrisonerStatusName(Person.PRISONER_NOT),
-                    makeCommand(CMD_CHANGE_PRISONER_STATUS, OPT_PRISONER_FREE),
-                    person.getPrisonerStatus() == Person.PRISONER_NOT));
-            menuItem.add(newCheckboxMenu(
-                    Person.getPrisonerStatusName(Person.PRISONER_YES),
-                    makeCommand(CMD_CHANGE_PRISONER_STATUS, OPT_PRISONER_IMPRISONED),
-                    (person.getPrisonerStatus() == Person.PRISONER_YES) && !person.isWillingToDefect()));
-            menuItem.add(newCheckboxMenu(
-                    resourceMap.getString("prisonerWillingToDefect.text"), //$NON-NLS-1$
-                    makeCommand(CMD_CHANGE_PRISONER_STATUS, OPT_PRISONER_IMPRISONED_DEFECTING),
-                    (person.getPrisonerStatus() == Person.PRISONER_YES) && person.isWillingToDefect()));
-            menuItem.add(newCheckboxMenu(
-                    Person.getPrisonerStatusName(Person.PRISONER_BONDSMAN),
-                    makeCommand(CMD_CHANGE_PRISONER_STATUS, OPT_PRISONER_BONDSMAN),
-                    person.getPrisonerStatus() == Person.PRISONER_BONDSMAN));
-            menuItem.setEnabled(gui.getCampaign().isGM());
-            menu.add(menuItem);
+            //region GM Menu
+            if (gui.getCampaign().isGM()) {
+                popup.addSeparator();
 
-            menuItem = new JMenuItem(resourceMap.getString("removePerson.text")); //$NON-NLS-1$
-            menuItem.setActionCommand(CMD_REMOVE);
-            menuItem.addActionListener(this);
-            menuItem.setEnabled(gui.getCampaign().isGM());
-            menu.add(menuItem);
-            if (!gui.getCampaign().getCampaignOptions().useAdvancedMedical()) {
-                menuItem = new JMenuItem(resourceMap.getString("editHits.text")); //$NON-NLS-1$
-                menuItem.setActionCommand(CMD_EDIT_HITS);
-                menuItem.addActionListener(this);
-                menuItem.setEnabled(gui.getCampaign().isGM());
-                menu.add(menuItem);
-            }
-            menuItem = new JMenuItem(resourceMap.getString("add1XP.text")); //$NON-NLS-1$
-            menuItem.setActionCommand(CMD_ADD_1_XP);
-            menuItem.addActionListener(this);
-            menuItem.setEnabled(gui.getCampaign().isGM());
-            menu.add(menuItem);
-            menuItem = new JMenuItem(resourceMap.getString("addXP.text")); //$NON-NLS-1$
-            menuItem.setActionCommand(CMD_ADD_XP);
-            menuItem.addActionListener(this);
-            menuItem.setEnabled(gui.getCampaign().isGM());
-            menu.add(menuItem);
-            menuItem = new JMenuItem(resourceMap.getString("setXP.text")); //$NON-NLS-1$
-            menuItem.setActionCommand(CMD_SET_XP);
-            menuItem.addActionListener(this);
-            menuItem.setEnabled(gui.getCampaign().isGM());
-            menu.add(menuItem);
-            if (gui.getCampaign().getCampaignOptions().useEdge()) {
-                menuItem = new JMenuItem(resourceMap.getString("setEdge.text")); //$NON-NLS-1$
-                menuItem.setActionCommand(CMD_SET_EDGE);
-                menuItem.addActionListener(this);
-                menuItem.setEnabled(gui.getCampaign().isGM());
-                menu.add(menuItem);
-            }
-            if (oneSelected) {
-                menuItem = new JMenuItem(resourceMap.getString("edit.text")); //$NON-NLS-1$
-                menuItem.setActionCommand(CMD_EDIT);
-                menuItem.addActionListener(this);
-                menuItem.setEnabled(gui.getCampaign().isGM());
+                menu = new JMenu(resourceMap.getString("gmMode.text")); //$NON-NLS-1$
+
+                menuItem = new JMenu(resourceMap.getString("changePrisonerStatus.text")); //$NON-NLS-1$
+                menuItem.add(newCheckboxMenu(
+                        Person.getPrisonerStatusName(Person.PRISONER_NOT),
+                        makeCommand(CMD_CHANGE_PRISONER_STATUS, OPT_PRISONER_FREE),
+                        person.getPrisonerStatus() == Person.PRISONER_NOT));
+                menuItem.add(newCheckboxMenu(
+                        Person.getPrisonerStatusName(Person.PRISONER_YES),
+                        makeCommand(CMD_CHANGE_PRISONER_STATUS, OPT_PRISONER_IMPRISONED),
+                        (person.getPrisonerStatus() == Person.PRISONER_YES) && !person.isWillingToDefect()));
+                menuItem.add(newCheckboxMenu(
+                        resourceMap.getString("prisonerWillingToDefect.text"), //$NON-NLS-1$
+                        makeCommand(CMD_CHANGE_PRISONER_STATUS, OPT_PRISONER_IMPRISONED_DEFECTING),
+                        (person.getPrisonerStatus() == Person.PRISONER_YES) && person.isWillingToDefect()));
+                menuItem.add(newCheckboxMenu(
+                        Person.getPrisonerStatusName(Person.PRISONER_BONDSMAN),
+                        makeCommand(CMD_CHANGE_PRISONER_STATUS, OPT_PRISONER_BONDSMAN),
+                        person.getPrisonerStatus() == Person.PRISONER_BONDSMAN));
                 menu.add(menuItem);
 
-                if (null == person.getUnitId()) {
-                    menuItem = new JMenuItem(resourceMap.getString("rollForUnit.text")); //$NON-NLS-1$
-                    menuItem.setActionCommand(CMD_ROLL_MECH);
+                menuItem = new JMenuItem(resourceMap.getString("removePerson.text")); //$NON-NLS-1$
+                menuItem.setActionCommand(CMD_REMOVE);
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
+
+                if (!gui.getCampaign().getCampaignOptions().useAdvancedMedical()) {
+                    menuItem = new JMenuItem(resourceMap.getString("editHits.text")); //$NON-NLS-1$
+                    menuItem.setActionCommand(CMD_EDIT_HITS);
                     menuItem.addActionListener(this);
-                    menuItem.setEnabled(gui.getCampaign().isGM());
                     menu.add(menuItem);
                 }
-            }
-            if (gui.getCampaign().getCampaignOptions().useAdvancedMedical()) {
-                menuItem = new JMenuItem(resourceMap.getString("removeAllInjuries.text")); //$NON-NLS-1$
-                menuItem.setActionCommand(CMD_CLEAR_INJURIES);
+
+                menuItem = new JMenuItem(resourceMap.getString("add1XP.text")); //$NON-NLS-1$
+                menuItem.setActionCommand(CMD_ADD_1_XP);
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(gui.getCampaign().isGM());
                 menu.add(menuItem);
+
+                menuItem = new JMenuItem(resourceMap.getString("addXP.text")); //$NON-NLS-1$
+                menuItem.setActionCommand(CMD_ADD_XP);
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
+
+                menuItem = new JMenuItem(resourceMap.getString("setXP.text")); //$NON-NLS-1$
+                menuItem.setActionCommand(CMD_SET_XP);
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
+
+                if (gui.getCampaign().getCampaignOptions().useEdge()) {
+                    menuItem = new JMenuItem(resourceMap.getString("setEdge.text")); //$NON-NLS-1$
+                    menuItem.setActionCommand(CMD_SET_EDGE);
+                    menuItem.addActionListener(this);
+                    menu.add(menuItem);
+                }
+
                 if (oneSelected) {
-                    for (Injury i : person.getInjuries()) {
-                        menuItem = new JMenuItem(String.format(resourceMap.getString("removeInjury.format"), i.getName())); //$NON-NLS-1$
-                        menuItem.setActionCommand(makeCommand(CMD_REMOVE_INJURY, i.getUUID().toString()));
+                    menuItem = new JMenuItem(resourceMap.getString("edit.text")); //$NON-NLS-1$
+                    menuItem.setActionCommand(CMD_EDIT);
+                    menuItem.addActionListener(this);
+                    menu.add(menuItem);
+
+                    if (person.getUnitId() == null) {
+                        menuItem = new JMenuItem(resourceMap.getString("rollForUnit.text")); //$NON-NLS-1$
+                        menuItem.setActionCommand(CMD_ROLL_MECH);
                         menuItem.addActionListener(this);
-                        menuItem.setEnabled(gui.getCampaign().isGM());
                         menu.add(menuItem);
                     }
-
-                    menuItem = new JMenuItem(resourceMap.getString("editInjuries.text")); //$NON-NLS-1$
-                    menuItem.setActionCommand(CMD_EDIT_INJURIES);
-                    menuItem.addActionListener(this);
-                    menuItem.setEnabled(gui.getCampaign().isGM());
-                    menu.add(menuItem);
                 }
+                if (gui.getCampaign().getCampaignOptions().useAdvancedMedical()) {
+                    menuItem = new JMenuItem(resourceMap.getString("removeAllInjuries.text")); //$NON-NLS-1$
+                    menuItem.setActionCommand(CMD_CLEAR_INJURIES);
+                    menuItem.addActionListener(this);
+                    menu.add(menuItem);
+
+                    if (oneSelected) {
+                        for (Injury i : person.getInjuries()) {
+                            menuItem = new JMenuItem(String.format(resourceMap.getString("removeInjury.format"), i.getName())); //$NON-NLS-1$
+                            menuItem.setActionCommand(makeCommand(CMD_REMOVE_INJURY, i.getUUID().toString()));
+                            menuItem.addActionListener(this);
+                            menu.add(menuItem);
+                        }
+
+                        menuItem = new JMenuItem(resourceMap.getString("editInjuries.text")); //$NON-NLS-1$
+                        menuItem.setActionCommand(CMD_EDIT_INJURIES);
+                        menuItem.addActionListener(this);
+                        menu.add(menuItem);
+                    }
+                }
+
+                if (oneSelected) {
+                    if (person.canProcreate()) {
+                        menuItem = new JMenuItem(resourceMap.getString("addPregnancy.text"));
+                        menuItem.setActionCommand(CMD_ADD_PREGNANCY);
+                        menuItem.addActionListener(this);
+                        menu.add(menuItem);
+                    } else if (person.isPregnant()) {
+                        menuItem = new JMenuItem(resourceMap.getString("removePregnancy.text"));
+                        menuItem.setActionCommand(CMD_REMOVE_PREGNANCY);
+                        menuItem.addActionListener(this);
+                        menu.add(menuItem);
+                    }
+                }
+                popup.add(menu);
             }
-            popup.addSeparator();
-            popup.add(menu);
+            //endregion GM Menu
+
             popup.show(e.getComponent(), e.getX(), e.getY());
         }
     }
