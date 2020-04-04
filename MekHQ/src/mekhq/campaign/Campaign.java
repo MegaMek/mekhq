@@ -1167,8 +1167,7 @@ public class Campaign implements Serializable, ITechManager {
         List<Unit> units = getCopyOfUnits();
 
         // Natural order sorting the units alphabetically is the default for getSortedUnits
-        Comparator<String> naturalOrderComparator = new NaturalOrderComparator();
-        units.sort((o1, o2) -> naturalOrderComparator.compare(o1.getName(), o2.getName()));
+        units.sort(Comparator.comparing(o -> o.getName(), new NaturalOrderComparator()));
 
         if (weightClassSorted || weightSorted || unitTypeSorted) {
             // We need to determine these by both the weight sorted and weight class sorted values,
