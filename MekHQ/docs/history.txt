@@ -2,6 +2,8 @@ VERSION HISTORY:
 ----------------
 0.47.6-SNAPSHOT
 + PR #1610: Raised cost of edge points from 1 to 10 for the AtB configuration preset.
++ PR #1627: Moved pregnancy GM items to Personnel GM menu (and hide GM menu if not a GM)
++ Issue #1612: Adding Scrolling to Marriage Candidates
 
 0.47.5 (2020-4-01 2000 UTC)
 + Issue #1470: Thumper artillery vehicle causes array index out of bounds exception error
