@@ -1186,7 +1186,7 @@ public class Campaign implements Serializable, ITechManager {
                 units.sort(Comparator.comparingInt(o -> o.getEntity().getWeightClass()));
             } else if (weightSorted) {
                 // Sorted in descending order of weights
-                units.sort((lhs, rhs) -> Double.compare(rhs.getEntity().getWeight(), lhs.getEntity().getWeight()));
+                units.sort(Comparator.comparingDouble(o -> o.getEntity().getWeight()));
             }
 
             if (unitTypeSorted) {
