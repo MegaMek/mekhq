@@ -545,6 +545,7 @@ task assembleDist(overwrite: true) {
     group = 'distribution'
     dependsOn stageMM
     dependsOn stageMML
+    dependsOn test
     dependsOn unixDistTar
     dependsOn windowsDistZip
 //    dependsOn macDistTar
