@@ -1912,10 +1912,10 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     }
                 } else {
                     Set<Award> awards = new TreeSet<>((a1, a2) -> {
-                        if (a1.getSet().equalsIgnoreCase(a2.getSet()) && a1.getName().equalsIgnoreCase(a2.getName())) {
-                            return 0;
+                        if (a1.getSet().equalsIgnoreCase(a2.getSet())) {
+                            return a1.getName().compareToIgnoreCase(a2.getName());
                         } else {
-                            return 1; // This is purposeful, we want to keep the original copy
+                            return a1.getSet().compareToIgnoreCase(a2.getSet());
                         }
                     });
                     for (Person p : selected) {
