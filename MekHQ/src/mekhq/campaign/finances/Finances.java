@@ -161,12 +161,12 @@ public class Finances implements Serializable {
      */
     public void newFiscalYear(Date date, Campaign campaign) {
         if (campaign.getCampaignOptions().getYearlyFinancesToCSVExport()) {
-            String exportFileName =  campaign.getName() + " Finances for " + campaign.getLocalDate().getYear()
+            String exportFileName = campaign.getName() + " Finances for " + campaign.getLocalDate().getYear()
                     + "." + FileType.CSV.getRecommendedExtension();
             exportFinancesToCSV(new File(MekHQ.getCampaignsDirectory().getValue(), exportFileName).getPath(),
                     FileType.CSV.getRecommendedExtension());
         }
-        
+
         Money carryover = getBalance();
         transactions = new ArrayList<>();
         credit(carryover, Transaction.C_START, resourceMap.getString("Carryover.text"), date);
