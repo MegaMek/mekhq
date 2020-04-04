@@ -159,7 +159,14 @@ public class Finances implements Serializable {
      * clear transactions By default, this will be called up on Jan 1 of every year
      * in order to keep the transaction record from becoming too large
      */
-    public void newFiscalYear(Date date) {
+    public void newFiscalYear(Date date, Campaign campaign) {
+        if (campaign.getCampaignOptions().getYearlyFinancesToCSVExport()) {
+            String exportFileName =  campaign.getName() + " Finances for " + campaign.getLocalDate().getYear()
+                    + "." + FileType.CSV.getRecommendedExtension();
+            exportFinancesToCSV(new File(MekHQ.getCampaignsDirectory().getValue(), exportFileName).getPath(),
+                    FileType.CSV.getRecommendedExtension());
+        }
+        
         Money carryover = getBalance();
         transactions = new ArrayList<>();
         credit(carryover, Transaction.C_START, resourceMap.getString("Carryover.text"), date);
@@ -234,15 +241,9 @@ public class Finances implements Serializable {
         GregorianCalendar calendar = campaign.getCalendar();
 
         // check for a new year
-        if (calendar.get(Calendar.MONTH) == Calendar.JANUARY && calendar.get(Calendar.DAY_OF_MONTH) == 1) {
-            if (campaignOptions.getYearlyFinancesToCSVExport()) {
-                String exportFileName =  campaign.getName() + " Finances for " + campaign.getLocalDate().getYear()
-                        + "." + FileType.CSV.getRecommendedExtension();
-                exportFinancesToCSV(new File(MekHQ.getCampaignsDirectory().getValue(), exportFileName).getPath(),
-                        FileType.CSV.getRecommendedExtension());
-            }
+        if (campaign.getLocalDate().getDayOfYear() == 1) {
             // clear the ledger
-            newFiscalYear(calendar.getTime());
+            newFiscalYear(calendar.getTime(), campaign);
         }
 
         // Handle contract payments
