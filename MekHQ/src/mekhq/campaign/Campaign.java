@@ -1178,7 +1178,7 @@ public class Campaign implements Serializable, ITechManager {
                     int weightClass1 = lhs.getEntity().getWeightClass();
                     int weightClass2 = rhs.getEntity().getWeightClass();
                     if (weightClass1 == weightClass2) {
-                        return (int) (rhs.getEntity().getWeight() - lhs.getEntity().getWeight());
+                        return Double.compare(rhs.getEntity().getWeight(), lhs.getEntity().getWeight());
                     } else {
                         return weightClass2 - weightClass1;
                     }
