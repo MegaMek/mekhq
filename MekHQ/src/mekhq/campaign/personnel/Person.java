@@ -1320,7 +1320,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void addRandomSpouse(boolean sameSex) {
         List<Person> potentials = new ArrayList<>();
-        int gender = sameSex ? getGender() : (isMale() ? Crew.G_MALE : Crew.G_FEMALE);
+        int gender = sameSex ? getGender() : (isMale() ? Crew.G_FEMALE : Crew.G_MALE);
         for (Person p : campaign.getPersonnel()) {
             if (isPotentialRandomSpouse(p, gender)) {
                 potentials.add(p);
