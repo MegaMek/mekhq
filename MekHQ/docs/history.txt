@@ -7,6 +7,7 @@ VERSION HISTORY:
 + PR #1606: Abandon ship (MekHQ version)! Crews of large craft and units transported aboard large craft are handled during scenario resolution.
 + PR #1618: De-clutter assign lance tech menu in TO&E
 + Issue #1632: All random marriages default to same sex
++ Issue #1626: Adding Time in Rank to MekHQ
 
 0.47.5 (2020-4-01 2000 UTC)
 + Issue #1470: Thumper artillery vehicle causes array index out of bounds exception error
