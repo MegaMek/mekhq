@@ -43,6 +43,7 @@ jobs:
         path: ./mekhq/MekHQ/build/reports/
     - name: Comment on PR with Build Scan URI
       uses: thollander/actions-comment-pull-request@master
+      if: always() && steps.gradle_build.outputs.buildScanUri != ''
       with:
         message: Build scan available at ${{ steps.gradle_build.outputs.buildScanUri }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
