@@ -125,6 +125,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     private ArrayList<UUID> drivers;
     private ArrayList<UUID> gunners;
     private ArrayList<UUID> vesselCrew;
+    // Contains unique Id of each Infantry/BA Entity assigned to this unit as marines
+    // Used to calculate marine points (which are based on equipment) as well as Personnel IDs
+    private Set<UUID> marines;
     //this is the id of the tech officer in a superheavy tripod
     private UUID techOfficer;
     private UUID navigator;
@@ -185,6 +188,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         this.drivers = new ArrayList<>();
         this.gunners = new ArrayList<>();
         this.vesselCrew = new ArrayList<>();
+        this.marines =  new HashSet<>();
         this.navigator = null;
         this.tech = null;
         this.mothballTime = 0;
@@ -3835,25 +3839,25 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 entity.getCrew().setMissing(true, 0);
                 return;
             }
-        } else if(entity instanceof SmallCraft || entity instanceof Jumpship) {
-            //assign crew hits based on what percent of the crew is present
-            int currentSize = nDrivers + nGunners + nCrew;
-            double percent = Math.max(0.0, 1.0 - (1.0 * currentSize)/getFullCrewSize());
-            int hits = (int)Math.floor(percent * 6);
-            if(percent > 0.0 && hits==0) {
-                //at least one hit if less than full staffed
-                hits = 1;
-            }
-            entity.getCrew().setHits(hits, 0);
         }
-
         //TODO: For the moment we need to max these out at 8 so people don't get errors
         //when they customize in MM but we should put an option in MM to ignore those limits
         //and set it to true when we start up through MHQ
         entity.getCrew().setPiloting(Math.min(Math.max(piloting, 0), 8), 0);
         entity.getCrew().setGunnery(Math.min(Math.max(gunnery, 0), 7), 0);
         entity.getCrew().setArtillery(Math.min(Math.max(artillery, 0), 8), 0);
-        entity.getCrew().setSize(nCrew);
+        if (entity instanceof SmallCraft || entity instanceof Jumpship) {
+            //Use tacops crew hits calculations and current size versus maximum size
+            entity.getCrew().setCurrentSize(nCrew + nGunners + nDrivers);
+            entity.getCrew().setSize(Compute.getFullCrewSize(entity));
+            entity.getCrew().setHits(entity.getCrew().calculateHits(),0);
+        } else if (entity instanceof Infantry || usesSoloPilot()) {
+            //Set the crew size based on gunners, since all personnel are both gunners and drivers
+            entity.getCrew().setSize(nGunners);
+        } else {
+            //Crew size should be the total of the 3 types of crewmembers
+            entity.getCrew().setSize(nCrew + nGunners + nDrivers);
+        }
         entity.getCrew().setMissing(false, 0);
     }
 
@@ -4673,6 +4677,21 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
         }
         return crew;
+    }
+    
+    /**
+     * Returns a personnel count for each marine platoon/squad assigned to this unit
+     * @return The number of marines aboard
+     */
+    public int getMarineCount() {
+        int count = 0;
+        for (UUID id : marines) {
+            Unit marine = campaign.getUnit(id);
+            if (marine != null) {
+                count += marine.getGunnerIDs().size();
+            }
+        }
+        return count;
     }
 
     public boolean isDriver(Person person) {
