@@ -34,7 +34,7 @@ jobs:
     - name: Build with Gradle
       id: gradle_build
       working-directory: mekhq
-      run: ./gradlew -I .github/build-scan-init.gradle build --info --stacktrace --scan "-Dscan.link.VCS=${{ github.event.pull_request.html_url }}"
+      run: ./gradlew -I .github/build-scan-init.gradle build --stacktrace --scan "-Dscan.link.VCS=${{ github.event.pull_request.html_url }}"
     - name: Upload Test Logs on Failure
       uses: actions/upload-artifact@v2-preview
       if: failure()
