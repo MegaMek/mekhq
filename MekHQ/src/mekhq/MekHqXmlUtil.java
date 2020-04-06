@@ -59,10 +59,10 @@ public class MekHqXmlUtil {
             XPathFactory xpf = XPathFactory.newInstance();
             XPATH_INSTANCE = xpf.newXPath();
         }
-        
+
         return XPATH_INSTANCE;
     }
-    
+
     /**
      * Creates a DocumentBuilder safe from XML external entities
      * attacks, and XML entity expansion attacks.
@@ -237,6 +237,22 @@ public class MekHqXmlUtil {
         pw1.println("</"+name+">");
     }
 
+    public static void writeSimpleXMLOpenIndentedLine(PrintWriter pw1, int indent, String name) {
+        writeIndents(pw1, indent);
+        pw1.println("<" + name + ">");
+    }
+
+    public static void writeSimpleXMLCloseIndentedLine(PrintWriter pw1, int indent, String name) {
+        writeIndents(pw1, indent);
+        pw1.println("</" + name + ">");
+    }
+
+    private static void writeIndents(PrintWriter pw1, int indent) {
+        for (int x = 0; x < indent; x++) {
+            pw1.print("\t");
+        }
+    }
+
     private static final String[] INDENTS = new String[] {
         "",
         "\t",
@@ -322,11 +338,11 @@ public class MekHqXmlUtil {
              retVal += "\" camoFileName=\"";
              retVal += String.valueOf(escape(tgtEnt.getCamoFileName()));
          }
-         
+
          if(tgtEnt.getDeployRound() > 0) {
              retVal += String.format("\" %s=\"%d", MULParser.DEPLOYMENT, tgtEnt.getDeployRound());
          }
-         
+
          if(tgtEnt instanceof Infantry) {
              retVal += String.format("\" %s=\"%d", MULParser.INF_SQUAD_NUM, ((Infantry) tgtEnt).getSquadN());
          }
@@ -395,7 +411,7 @@ public class MekHqXmlUtil {
         if (null != loc) {
             retVal += loc;
         }
-        
+
         // Write the Naval C3 Data if needed
         if (tgtEnt.hasNavalC3()) {
             retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "<nc3set>";
@@ -658,10 +674,10 @@ public class MekHqXmlUtil {
      * {@code null} if the input can't be parsed; if it can be parsed and
      * contains more than one entity, an {@linkplain IllegalArgumentException}
      * is thrown.
-     * 
+     *
      * @param element
      *        the xml tag to parse
-     * 
+     *
      * @return the first entity parsed from the given element, or {@code null}
      *         if anything is wrong with the input
      *
