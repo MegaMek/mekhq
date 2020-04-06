@@ -255,6 +255,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     protected int engXp;
     protected int acquisitions;
     protected Money salary;
+    private Money totalEarnings;
     private int hits;
     private int prisonerStatus;
     // Is this person willing to defect? Only for prisoners ...
@@ -453,6 +454,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         doctorId = null;
         unitId = null;
         salary = Money.of(-1);
+        totalEarnings = Money.of(0);
         status = PersonnelStatus.ACTIVE;
         prisonerStatus = PRISONER_NOT;
         willingToDefect = false;
@@ -1874,6 +1876,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     + "<salary>"
                     + salary.toXmlString()
                     + "</salary>");
+        }
+        if (totalEarnings != Money.of(0)) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "totalEarnings", totalEarnings.toXmlString());
         }
         // Always save a person's status, to make it easy to parse the personnel saved data
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
