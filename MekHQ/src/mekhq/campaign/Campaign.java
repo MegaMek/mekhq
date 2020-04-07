@@ -403,19 +403,23 @@ public class Campaign implements Serializable, ITechManager {
                 + getDateAsString() + " (" + getEraName() + ")";
     }
 
+    @Deprecated
     public void setCalendar(GregorianCalendar c) {
         calendar = c;
         currentDateTime = new DateTime(c);
     }
 
+    @Deprecated
     public GregorianCalendar getCalendar() {
         return calendar;
     }
 
+    @Deprecated
     public DateFormat getDateFormatter() {
         return new SimpleDateFormat(dateFormat);
     }
 
+    @Deprecated
     public DateFormat getShortDateFormatter() {
         return new SimpleDateFormat(shortDateFormat);
     }
@@ -1682,6 +1686,7 @@ public class Campaign implements Serializable, ITechManager {
         return calendar.getTime();
     }
 
+    @Deprecated
     public DateTime getDateTime() {
         return currentDateTime;
     }
