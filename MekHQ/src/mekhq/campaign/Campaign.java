@@ -1696,7 +1696,7 @@ public class Campaign implements Serializable, ITechManager {
      * For now, this is just going to parse through the current date time
      */
     public LocalDate getLocalDate() {
-        return LocalDate.of(getDateTime().getYear(), getDateTime().getMonthOfYear(), getDateTime().getDayOfMonth());
+        return LocalDate.of(currentDateTime.getYear(), currentDateTime.getMonthOfYear(), currentDateTime.getDayOfMonth());
     }
 
     public List<Person> getPatients() {
@@ -3696,7 +3696,7 @@ public class Campaign implements Serializable, ITechManager {
         newReports.clear();
         beginReport("<b>" + getDateAsString() + "</b>");
 
-        if (calendar.get(Calendar.DAY_OF_YEAR) == 1) {
+        if (getLocalDate().getDayOfYear() == 1) {
             reloadNews();
         }
 
