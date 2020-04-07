@@ -31,6 +31,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
+import java.time.DayOfWeek;
 import java.util.*;
 import java.util.zip.GZIPOutputStream;
 
@@ -1294,7 +1295,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public boolean nagShortDeployments() {
-        if (getCampaign().getCalendar().get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
+        if (getCampaign().getLocalDate().getDayOfWeek() != DayOfWeek.SUNDAY) {
             return false;
         }
         for (Mission m : getCampaign().getMissions()) {
