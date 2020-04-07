@@ -91,6 +91,10 @@ public class CampaignOptions implements Serializable {
     private boolean useFactionForNames;
     private boolean useUnitRating;
 
+    //region General Tab
+    private String displayDateFormat;
+    //endregion General Tab
+
     //region Personnel Tab
     private boolean useTactics;
     private boolean useInitBonus;
@@ -348,6 +352,9 @@ public class CampaignOptions implements Serializable {
     private boolean historicalDailyLog;
 
     public CampaignOptions() {
+        //region General Tab
+        displayDateFormat = "yyyy-MM-dd";
+        //endregion General Tab
         clanPriceModifier = 1.0;
         useFactionForNames = true;
         repairSystem = REPAIR_SYSTEM_STRATOPS;
@@ -649,6 +656,16 @@ public class CampaignOptions implements Serializable {
 
         historicalDailyLog = false;
     }
+
+    //region General Tab
+    public String getDisplayDateFormat() {
+        return displayDateFormat;
+    }
+
+    public void setDisplayDateFormat(String s) {
+        displayDateFormat = s;
+    }
+    //endregion General Tab
 
     //region Personnel Tab
     public boolean useTactics() {
@@ -2701,6 +2718,9 @@ public class CampaignOptions implements Serializable {
 
 	public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
+        //region General Tab
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "displayDateFormat", displayDateFormat);
+        //endregion General Tab
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clanPriceModifier", clanPriceModifier); //private double
         // clanPriceModifier;
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useFactionForNames", useFactionForNames); //private boolean
@@ -3016,8 +3036,11 @@ public class CampaignOptions implements Serializable {
             MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
                     String.format("%s\n\t%s", //$NON-NLS-1$
                             wn2.getNodeName(), wn2.getTextContent()));
-
-            if (wn2.getNodeName().equalsIgnoreCase("clanPriceModifier")) {
+            //region General Tab
+            if (wn2.getNodeName().equalsIgnoreCase("displayDateFormat")) {
+                retVal.displayDateFormat = wn2.getTextContent().trim();
+            //endregion General Tab
+            } else if (wn2.getNodeName().equalsIgnoreCase("clanPriceModifier")) {
                 retVal.clanPriceModifier = Double.parseDouble(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useFactionForNames")) {
                 retVal.useFactionForNames = wn2.getTextContent().equalsIgnoreCase("true");
