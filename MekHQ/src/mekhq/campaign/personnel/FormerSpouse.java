@@ -41,15 +41,9 @@ public class FormerSpouse implements Serializable, MekHqXmlSerializable {
     public final static int REASON_WIDOWED = 0;
     public final static int REASON_DIVORCE = 1;
     public final static int REASON_UNKNOWN = 2;
-    private final static String dateSaveFormat = "yyyy-MM-dd";  //DO NOT USE FOR DISPLAY FORMATS
-                                                                //this is used solely in this class to save dates to file
     //endregion Variables
 
     //region Constructors
-    public FormerSpouse(UUID formerSpouseId, LocalDate date) {
-        this(formerSpouseId, date, REASON_WIDOWED);
-    }
-
     public FormerSpouse(UUID formerSpouseId, LocalDate date, int reason) {
         this.formerSpouseId = formerSpouseId;
         this.date = date;
@@ -77,10 +71,6 @@ public class FormerSpouse implements Serializable, MekHqXmlSerializable {
 
     public void setDate(LocalDate date) {
         this.date = date;
-    }
-
-    public void setDateFromString(String dateString, String dateFormat) {
-        this.date = LocalDate.parse(dateString, DateTimeFormatter.ofPattern(dateFormat));
     }
 
     public int getReason() {
@@ -116,24 +106,12 @@ public class FormerSpouse implements Serializable, MekHqXmlSerializable {
      }
     //endregion getters/setters
 
-    //region Deprecated
-    // The following method has been deprecated as it is used to provide a DateFormat to external class which should
-    // get that method from another location, not this internal saving Format
-    // TODO : Remove me following the conversion of MekHQ to LocalDate with a standardized DateFormat output
-    @Deprecated
-    public static String getDisplayDateFormat() {
-        return dateSaveFormat;
-    }
-    //endregion Deprecated
-
     //region read from/write to XML
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(String.format("%s<formerSpouse id=\"%s\">", MekHqXmlUtil.indentStr(indent), getFormerSpouseId().toString()));
-        indent++;
-        pw1.println(String.format("%s<id>%s</id>", MekHqXmlUtil.indentStr(indent), getFormerSpouseId().toString()));
-        pw1.println(String.format("%s<date>%s</date>", MekHqXmlUtil.indentStr(indent), getDateAsString(dateSaveFormat)));
-        pw1.println(String.format("%s<reason>%s</reason>", MekHqXmlUtil.indentStr(indent), reason));
-        indent--;
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "id", formerSpouseId.toString());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "date", MekHqXmlUtil.saveFormattedDate(date));
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "reason", reason);
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</formerSpouse>");
     }
 
@@ -143,7 +121,6 @@ public class FormerSpouse implements Serializable, MekHqXmlSerializable {
         try {
             retVal = new FormerSpouse();
 
-            // Okay, now load FormerSpouse-specific fields!
             NodeList nl = wn.getChildNodes();
 
             for (int x = 0; x < nl.getLength(); x++) {
@@ -152,7 +129,7 @@ public class FormerSpouse implements Serializable, MekHqXmlSerializable {
                 if (wn2.getNodeName().equalsIgnoreCase("id")) {
                     retVal.setFormerSpouseId(UUID.fromString(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("date")) {
-                    retVal.setDateFromString(wn2.getTextContent(), dateSaveFormat);
+                    retVal.setDate(MekHqXmlUtil.parseDate(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("reason")) {
                     retVal.setReason(Integer.parseInt((wn2.getTextContent())));
                 }
