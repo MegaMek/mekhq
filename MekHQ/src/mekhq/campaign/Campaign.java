@@ -3764,13 +3764,9 @@ public class Campaign implements Serializable, ITechManager {
 
     private Money getTheoreticalPayroll(boolean noInfantry) {
         Money salaries = Money.zero();
-        for (Person p : getPersonnel()) {
+        for (Person p : getActivePersonnel()) {
             // Optionized infantry (Unofficial)
-            if (noInfantry && (p.getPrimaryRole() == Person.T_INFANTRY)) {
-                continue;
-            }
-
-            if (p.isActive() && !p.isDependent() && p.isFree()) {
+            if (!(noInfantry && (p.getPrimaryRole() == Person.T_INFANTRY))) {
                 salaries = salaries.plus(p.getSalary());
             }
         }
