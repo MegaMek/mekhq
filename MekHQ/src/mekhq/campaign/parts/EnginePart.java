@@ -153,7 +153,7 @@ public class EnginePart extends Part {
 
     @Override
     public boolean isSamePartType(Part part) {
-        int year = campaign.getLocalDate().getYear();
+        int year = campaign.getGameYear();
         return part instanceof EnginePart && getName().equals(part.getName())
                 && getEngine().getEngineType() == ((EnginePart) part).getEngine().getEngineType()
                 && getEngine().getRating() == ((EnginePart) part).getEngine().getRating()
