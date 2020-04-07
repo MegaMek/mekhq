@@ -244,7 +244,7 @@ public class Finances implements Serializable {
         }
 
         // Handle contract payments
-        if (calendar.get(Calendar.DAY_OF_MONTH) == 1) {
+        if (campaign.getLocalDate().getDayOfMonth() == 1) {
             for (Contract contract : campaign.getActiveContracts()) {
                 credit(contract.getMonthlyPayOut(), Transaction.C_CONTRACT,
                         String.format(resourceMap.getString("MonthlyContractPayment.text"), contract.getName()),
