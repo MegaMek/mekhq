@@ -40,10 +40,7 @@ import megamek.common.util.WeightedMap;
 import mekhq.campaign.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.*;
-import mekhq.campaign.personnel.enums.BodyLocation;
-import mekhq.campaign.personnel.enums.GenderDescriptors;
-import mekhq.campaign.personnel.enums.ModifierValue;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.enums.*;
 import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -108,11 +105,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     // This value should always be +1 of the last defined role
     public static final int T_NUM = 28;
-
-    // Prisoners, Bondsmen, and Normal Personnel
-    public static final int PRISONER_NOT = 0;
-    public static final int PRISONER_YES = 1;
-    public static final int PRISONER_BONDSMAN = 2;
 
     // Phenotypes
     public static final int PHENOTYPE_NONE = 0;
@@ -256,7 +248,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     protected int acquisitions;
     protected Money salary;
     private int hits;
-    private int prisonerStatus;
+    private PrisonerStatus prisonerStatus;
     // Is this person willing to defect? Only for prisoners ...
     private boolean willingToDefect;
 
@@ -454,7 +446,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         unitId = null;
         salary = Money.of(-1);
         status = PersonnelStatus.ACTIVE;
-        prisonerStatus = PRISONER_NOT;
+        prisonerStatus = PrisonerStatus.FREE;
         willingToDefect = false;
         hits = 0;
         toughness = 0;
@@ -549,20 +541,20 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public boolean isPrisoner() {
-        return prisonerStatus == PRISONER_YES;
+        return prisonerStatus == PrisonerStatus.PRISONER;
     }
 
     public void setPrisoner() {
-        prisonerStatus = PRISONER_YES;
+        prisonerStatus = PrisonerStatus.PRISONER;
         setRankNumeric(Ranks.RANK_PRISONER);
     }
 
     public boolean isBondsman() {
-        return prisonerStatus == PRISONER_BONDSMAN;
+        return prisonerStatus == PrisonerStatus.BONDSMAN;
     }
 
     public void setBondsman() {
-        prisonerStatus = PRISONER_BONDSMAN;
+        prisonerStatus = PrisonerStatus.BONDSMAN;
         willingToDefect = false;
         setRankNumeric(Ranks.RANK_BONDSMAN);
     }
@@ -572,11 +564,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void setFreeMan() {
-        prisonerStatus = PRISONER_NOT;
+        prisonerStatus = PrisonerStatus.FREE;
         willingToDefect = false;
     }
 
-    public int getPrisonerStatus() {
+    public PrisonerStatus getPrisonerStatus() {
         return prisonerStatus;
     }
 
@@ -585,7 +577,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void setWillingToDefect(boolean willingToDefect) {
-        this.willingToDefect = willingToDefect && (prisonerStatus == PRISONER_YES);
+        this.willingToDefect = willingToDefect && (prisonerStatus == PrisonerStatus.PRISONER);
     }
 
     //region Text Getters
@@ -627,19 +619,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
             case PHENOTYPE_VEE:
             case PHENOTYPE_BA:
                 return "Trueborn";
-            default:
-                return "?";
-        }
-    }
-
-    public static String getPrisonerStatusName(int status) {
-        switch (status) {
-            case PRISONER_NOT:
-                return "Free";
-            case PRISONER_YES:
-                return "Prisoner";
-            case PRISONER_BONDSMAN:
-                return "Bondsman";
             default:
                 return "?";
         }
@@ -1880,11 +1859,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     + "<status>"
                     + status.name()
                     + "</status>");
-        if (prisonerStatus != PRISONER_NOT) {
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "<prisonerStatus>"
-                    + prisonerStatus
-                    + "</prisonerStatus>");
+        if (prisonerStatus != PrisonerStatus.FREE) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "prisonerStatus", prisonerStatus.name());
         }
         if (willingToDefect) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
@@ -2231,7 +2207,22 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         retVal.status = PersonnelStatus.valueOf(wn2.getTextContent());
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("prisonerStatus")) {
-                    retVal.prisonerStatus = Integer.parseInt(wn2.getTextContent());
+                    // TODO : remove inline migration
+                    if (version.isLowerThan("0.47.6")) {
+                        switch (Integer.parseInt(wn2.getTextContent().trim())) {
+                            case 1:
+                                retVal.prisonerStatus = PrisonerStatus.PRISONER;
+                                break;
+                            case 2:
+                                retVal.prisonerStatus = PrisonerStatus.BONDSMAN;
+                            case 0:
+                            default:
+                                retVal.prisonerStatus = PrisonerStatus.FREE;
+                                break;
+                        }
+                    } else {
+                        retVal.prisonerStatus = PrisonerStatus.valueOf(wn2.getTextContent().trim());
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("willingToDefect")) {
                     retVal.willingToDefect = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("salary")) {
@@ -2555,8 +2546,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
 
             // Prisoner and Bondsman updating
-            if (retVal.prisonerStatus != PRISONER_NOT && retVal.rank == 0) {
-                if (retVal.prisonerStatus == PRISONER_BONDSMAN) {
+            if ((retVal.prisonerStatus != PrisonerStatus.FREE) && (retVal.rank == 0)) {
+                if (retVal.prisonerStatus == PrisonerStatus.BONDSMAN) {
                     retVal.setRankNumeric(Ranks.RANK_BONDSMAN);
                 } else {
                     retVal.setRankNumeric(Ranks.RANK_PRISONER);

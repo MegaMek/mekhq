@@ -78,6 +78,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.RATManager;
@@ -1610,10 +1611,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panPersonnel.add(chkCapturePrisoners, gridBagConstraints);
 
         DefaultComboBoxModel<String> prisonerStatusModel = new DefaultComboBoxModel<>();
-        prisonerStatusModel.addElement(resourceMap.getString("prisonerStatus.Prisoner"));
-        prisonerStatusModel.addElement(resourceMap.getString("prisonerStatus.Bondsman"));
+        PrisonerStatus[] prisonerStatuses = PrisonerStatus.values();
+        for (int i = 1; i < prisonerStatuses.length; i++) {
+            prisonerStatusModel.addElement(prisonerStatuses[i].getTypeName());
+        }
         comboPrisonerStatus = new JComboBox<>(prisonerStatusModel);
-        comboPrisonerStatus.setSelectedIndex(options.getDefaultPrisonerStatus());
+        comboPrisonerStatus.setSelectedIndex(options.getDefaultPrisonerStatus().ordinal() - 1);
         JPanel pnlPrisonerStatus = new JPanel();
         pnlPrisonerStatus.add(new JLabel(resourceMap.getString("prisonerStatus.text")));
         pnlPrisonerStatus.add(comboPrisonerStatus);
@@ -4811,7 +4814,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setImplants(useImplantsBox.isSelected());
         campaign.getGameOptions().getOption("manei_domini").setValue(useImplantsBox.isSelected());
         options.setCapturePrisoners(chkCapturePrisoners.isSelected());
-        options.setDefaultPrisonerStatus(comboPrisonerStatus.getSelectedIndex());
+        options.setDefaultPrisonerStatus(PrisonerStatus.getStatusFromTypeName((String) comboPrisonerStatus.getSelectedItem()));
         options.setAltQualityAveraging(altQualityAveragingCheckBox.isSelected());
         options.setAdvancedMedical(useAdvancedMedicalBox.isSelected());
         options.setDylansRandomXp(useDylansRandomXpBox.isSelected());

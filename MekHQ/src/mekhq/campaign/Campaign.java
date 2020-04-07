@@ -42,6 +42,7 @@ import mekhq.campaign.finances.*;
 import mekhq.campaign.log.*;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.service.AutosaveService;
@@ -1333,7 +1334,7 @@ public class Campaign implements Serializable, ITechManager {
         p.setId(id);
         personnel.put(id, p);
 
-        boolean bondsman = campaignOptions.getDefaultPrisonerStatus() == CampaignOptions.BONDSMAN_RANK;
+        boolean bondsman = getCampaignOptions().getDefaultPrisonerStatus() == PrisonerStatus.BONDSMAN;
         String add = prisoner ? (bondsman ? " as a bondsman" : " as a prisoner") : "";
         if (log) {
             addReport(String.format("%s has been added to the personnel roster%s.", p.getHyperlinkedName(), add));
@@ -1349,7 +1350,7 @@ public class Campaign implements Serializable, ITechManager {
         String rankEntry = LogEntryController.generateRankEntryString(p);
 
         if (prisoner) {
-            if (getCampaignOptions().getDefaultPrisonerStatus() == CampaignOptions.BONDSMAN_RANK) {
+            if (getCampaignOptions().getDefaultPrisonerStatus() == PrisonerStatus.BONDSMAN) {
                 p.setBondsman();
                 if (log) {
                     ServiceLogger.madeBondsman(p, getDate(), getName(), rankEntry);
@@ -5937,9 +5938,9 @@ public class Campaign implements Serializable, ITechManager {
         MekHQ.triggerEvent(new MedicPoolChangedEvent(this, -i));
     }
 
-    public void changePrisonerStatus(Person p, int status) {
+    public void changePrisonerStatus(Person p, PrisonerStatus status) {
         switch (status) {
-            case Person.PRISONER_NOT:
+            case FREE:
                 p.setFreeMan();
                 if (p.getRankNumeric() < 0) {
                     changeRank(p, 0, false);
@@ -5949,7 +5950,7 @@ public class Campaign implements Serializable, ITechManager {
                     p.setRecruitment(getLocalDate());
                 }
                 break;
-            case Person.PRISONER_YES:
+            case PRISONER:
                 if (p.getRankNumeric() != Ranks.RANK_PRISONER) {
                     changeRank(p, Ranks.RANK_PRISONER, true); // They don't get to have a rank. Their
                     // rank is Prisoner or Bondsman.
@@ -5958,7 +5959,7 @@ public class Campaign implements Serializable, ITechManager {
                 ServiceLogger.madePrisoner(p, getDate());
                 p.setRecruitment(null); //more efficient to just set it to null instead of checking if the setting is enabled
                 break;
-            case Person.PRISONER_BONDSMAN:
+            case BONDSMAN:
                 if (p.getRankNumeric() != Ranks.RANK_BONDSMAN) {
                     changeRank(p, Ranks.RANK_BONDSMAN, true); // They don't get to have a rank. Their
                     // rank is Prisoner or Bondsman.
