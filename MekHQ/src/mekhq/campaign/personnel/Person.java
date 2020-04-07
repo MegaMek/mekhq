@@ -2241,6 +2241,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     retVal.willingToDefect = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("salary")) {
                     retVal.salary = Money.fromXmlString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("totalEarnings")) {
+                    retVal.totalEarnings = Money.fromXmlString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("minutesLeft")) {
                     retVal.minutesLeft = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("overtimeLeft")) {
@@ -2616,6 +2618,21 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return totalBase;
         //TODO: distinguish DropShip, JumpShip, and WarShip crew
         //TODO: Add era mod to salary calc..
+    }
+
+    /**
+     * @return the person's total earnings
+     */
+    public Money getTotalEarnings() {
+        return totalEarnings;
+    }
+
+    /**
+     * This is used to pay a person
+     * @param money the amount of money to add to their total earnings
+     */
+    public void payPerson(Money money) {
+        totalEarnings = getTotalEarnings().plus(money);
     }
 
     public int getRankNumeric() {
