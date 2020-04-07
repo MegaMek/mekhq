@@ -2645,6 +2645,18 @@ public class Person implements Serializable, MekHqXmlSerializable {
         totalEarnings = getTotalEarnings().plus(money);
     }
 
+    /**
+     * This is used to pay a person their share value based on the value of a single share
+     * @param money the value of a single share
+     * @param sharesForAll whether or not all personnel have shares
+     */
+    public void payPersonShares(Money money, boolean sharesForAll) {
+        int shares = getNumShares(sharesForAll);
+        if (shares > 0) {
+            payPerson(money.multipliedBy(shares));
+        }
+    }
+
     public int getRankNumeric() {
         return rank;
     }

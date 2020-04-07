@@ -35,6 +35,7 @@ import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
+import mekhq.campaign.personnel.Person;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -254,26 +255,7 @@ public class Finances implements Serializable {
                         contract.getMonthlyPayOut().toAmountAndSymbolString(),
                         contract.getName()));
 
-                if (campaignOptions.getUseAtB() && campaignOptions.getUseShareSystem()
-                        && contract instanceof AtBContract) {
-                    Money shares = contract.getMonthlyPayOut()
-                            .multipliedBy(((AtBContract) contract).getSharesPct())
-                            .dividedBy(100);
-                    if (debit(shares, Transaction.C_SALARY,
-                            String.format(resourceMap.getString("ContractSharePayment.text"), contract.getName()),
-                            calendar.getTime())) {
-                        campaign.addReport(String.format(
-                                resourceMap.getString("DistributedShares.text"),
-                                shares.toAmountAndSymbolString()));
-                    } else {
-                        /*
-                         * This should not happen, as the shares payment is less than the contract
-                         * payment that has just been made.
-                         */
-                        campaign.addReport(
-                                String.format(resourceMap.getString("NotImplemented.text"), "shares"));
-                    }
-                }
+                payoutShares(campaign, contract, calendar);
             }
         }
 
@@ -405,6 +387,36 @@ public class Finances implements Serializable {
             wentIntoDebt = null;
         }
         loans = newLoans;
+    }
+
+
+    private void payoutShares(Campaign campaign, Contract contract, GregorianCalendar calendar) {
+        if (campaign.getCampaignOptions().getUseAtB() && campaign.getCampaignOptions().getUseShareSystem()
+                && (contract instanceof AtBContract)) {
+            Money shares = contract.getMonthlyPayOut().multipliedBy(((AtBContract) contract).getSharesPct())
+                    .dividedBy(100);
+            if (debit(shares, Transaction.C_SALARY,
+                    String.format(resourceMap.getString("ContractSharePayment.text"), contract.getName()),
+                    calendar.getTime())) {
+                campaign.addReport(String.format(resourceMap.getString("DistributedShares.text"),
+                        shares.toAmountAndSymbolString()));
+
+                if (campaign.getCampaignOptions().trackTotalEarnings()) {
+                    for (Person person : campaign.getPersonnel()) {
+                        person.payPersonShares(shares, campaign.getCampaignOptions().getSharesForAll());
+                    }
+                }
+            } else {
+                /*
+                 * This should not happen, as the shares payment should be less than the contract
+                 * payment that has just been made.
+                 */
+                campaign.addReport(
+                        String.format(resourceMap.getString("NotImplemented.text"), "shares"));
+                MekHQ.getLogger().error(getClass(), "payoutShares",
+                        "Attempted to payout share amount larger than the payment of the contract");
+            }
+        }
     }
 
     public Money checkOverdueLoanPayments(Campaign campaign) {
