@@ -846,6 +846,16 @@ public class Person implements Serializable, MekHqXmlSerializable {
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
+    /**
+     * This is used to determine if a person has a specific role as either their primary OR their
+     * secondary role
+     * @param role the role to determine
+     * @return true if the person has the specific role either as their primary or secondary role
+     */
+    public boolean hasRole(int role) {
+        return (getPrimaryRole() == role) || (getSecondaryRole() == role);
+    }
+
     public PersonnelStatus getStatus() {
         return status;
     }
@@ -4331,15 +4341,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public int getNumShares(boolean sharesForAll) {
-        if (isPrisoner() || isBondsman() || !isActive()) {
-            return 0;
-        }
-        if (!sharesForAll && primaryRole != T_MECHWARRIOR &&
-                secondaryRole != T_MECHWARRIOR) {
+        if (!isActive() || !isFree() || (!sharesForAll && !hasRole(T_MECHWARRIOR))) {
             return 0;
         }
         int shares = 1;
-        if (founder) {
+        if (isFounder()) {
             shares++;
         }
         shares += Math.max(-1, getExperienceLevel(false) - 2);
@@ -4347,7 +4353,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (getRank().isOfficer()) {
             Ranks ranks = getRanks();
             int rankOrder = ranks.getOfficerCut();
-            while (rankOrder <= rank && rankOrder < Ranks.RC_NUM) {
+            while ((rankOrder <= getRankNumeric()) && (rankOrder < Ranks.RC_NUM)) {
                 Rank rank = ranks.getAllRanks().get(rankOrder);
                 if (!rank.getName(getProfession()).equals("-")) {
                     shares++;
@@ -4355,13 +4361,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 rankOrder++;
             }
         }
-        if (originalUnitWeight >= 1) {
+        if (getOriginalUnitWeight() >= 1) {
             shares++;
         }
-        if (originalUnitWeight >= 3) {
+        if (getOriginalUnitWeight()  >= 3) {
             shares++;
         }
-        shares += originalUnitTech;
+        shares += getOriginalUnitTech();
 
         return shares;
     }
