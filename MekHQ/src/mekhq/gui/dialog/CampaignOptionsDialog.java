@@ -1612,11 +1612,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         DefaultComboBoxModel<String> prisonerStatusModel = new DefaultComboBoxModel<>();
         PrisonerStatus[] prisonerStatuses = PrisonerStatus.values();
-        for (int i = 1; i < prisonerStatuses.length; i++) {
+        for (int i = 1; i < prisonerStatuses.length; i++) { // ignoring the PrisonerStatus.Free enum case
             prisonerStatusModel.addElement(prisonerStatuses[i].getTypeName());
         }
         comboPrisonerStatus = new JComboBox<>(prisonerStatusModel);
-        comboPrisonerStatus.setSelectedIndex(options.getDefaultPrisonerStatus().ordinal() - 1);
+        comboPrisonerStatus.setSelectedIndex(options.getDefaultPrisonerStatus().ordinal() - 1); // ignores the PrisonerStatus.Free enum case
         JPanel pnlPrisonerStatus = new JPanel();
         pnlPrisonerStatus.add(new JLabel(resourceMap.getString("prisonerStatus.text")));
         pnlPrisonerStatus.add(comboPrisonerStatus);
