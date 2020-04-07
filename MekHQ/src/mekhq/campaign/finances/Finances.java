@@ -283,7 +283,7 @@ public class Finances implements Serializable {
             if (campaignOptions.usePeacetimeCost()) {
                 if (!campaignOptions.showPeacetimeCost()) {
                     // Do not include salaries as that will be tracked below
-                    Money peacetimeCost = campaign.getPeacetimeCost(/*includeSalaries:*/false);
+                    Money peacetimeCost = campaign.getPeacetimeCost(false);
 
                     if (debit(peacetimeCost, Transaction.C_MAINTAIN,
                             resourceMap.getString("PeacetimeCosts.title"), calendar.getTime())) {
@@ -329,13 +329,19 @@ public class Finances implements Serializable {
             }
 
             if (campaignOptions.payForSalaries()) {
-                Money payrollCost = campaign.getPayRoll();
+                Money payRollCost = campaign.getPayRoll();
 
-                if (debit(payrollCost, Transaction.C_SALARY, resourceMap.getString("Salaries.title"),
+                if (debit(payRollCost, Transaction.C_SALARY, resourceMap.getString("Salaries.title"),
                         calendar.getTime())) {
                     campaign.addReport(
                             String.format(resourceMap.getString("Salaries.text"),
-                                    payrollCost.toAmountAndSymbolString()));
+                                    payRollCost.toAmountAndSymbolString()));
+
+                    if (campaign.getCampaignOptions().trackTotalEarnings()) {
+                        for (Person person : campaign.getPersonnel()) {
+                            person.payPersonSalary();
+                        }
+                    }
                 } else {
                     campaign.addReport(
                             String.format(resourceMap.getString("NotImplemented.text"), "payroll costs"));

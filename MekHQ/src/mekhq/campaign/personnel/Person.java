@@ -2594,7 +2594,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public Money getSalary() {
-        if (isPrisoner() || isBondsman()) {
+        if (!isActive() || isDependent() || isPrisoner() || isBondsman()) {
             return Money.zero();
         }
 
@@ -2643,6 +2643,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
      */
     public void payPerson(Money money) {
         totalEarnings = getTotalEarnings().plus(money);
+    }
+
+    /**
+     * This is used to pay a person their salary
+     */
+    public void payPersonSalary() {
+        payPerson(getSalary());
     }
 
     /**
