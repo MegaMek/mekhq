@@ -179,11 +179,9 @@ public class ExtraData {
      * @return true if the extraData fields are empty, otherwise false
      */
     public boolean isEmpty() {
-        if (!values.isEmpty()) {
-            for (Map<String, Object> map : values.values()) {
-                if (!map.isEmpty()) {
-                    return false;
-                }
+        for (Map<String, Object> map : values.values()) {
+            if ((map != null) && (!map.isEmpty())) {
+                return false;
             }
         }
         return true;
