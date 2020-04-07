@@ -616,8 +616,6 @@ public final class BriefingTab extends CampaignGuiTab {
                     // Add and run
                     chosen.add(u);
 
-                    // So MegaMek has correct crew sizes
-                    u.getEntity().getCrew().setSize(u.getActiveCrew().size());
                 } else {
                     undeployed.append("\n").append(u.getName()).append(" (").append(u.checkDeployment()).append(")");
                 }
@@ -705,8 +703,6 @@ public final class BriefingTab extends CampaignGuiTab {
                     // Add and run
                     chosen.add(u);
 
-                    // So MegaMek has correct crew sizes
-                    u.getEntity().getCrew().setSize(u.getActiveCrew().size());
                 } else {
                     undeployed.append("\n").append(u.getName()).append(" (").append(u.checkDeployment()).append(")");
                 }
@@ -751,9 +747,6 @@ public final class BriefingTab extends CampaignGuiTab {
                     // Make sure the unit's entity and pilot are fully up to
                     // date!
                     u.resetPilotAndEntity();
-
-                    // So MegaMek has correct crew sizes
-                    u.getEntity().getCrew().setSize(u.getActiveCrew().size());
 
                     // Add the entity
                     chosen.add(u.getEntity());

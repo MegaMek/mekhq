@@ -10,6 +10,7 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -65,11 +66,13 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private PilotOptions options;
     private LocalDate birthdate;
     private LocalDate recruitment;
+    private LocalDate lastRankChangeDate;
     private String dateFormat = "MMMM d yyyy";
     private Frame frame;
 
-    private javax.swing.JButton btnDate;
-    private javax.swing.JButton btnServiceDate;
+    private JButton btnDate;
+    private JButton btnServiceDate;
+    private JButton btnRankDate;
     private javax.swing.JComboBox<String> choiceGender;
     private javax.swing.JLabel lblAge;
     private javax.swing.JPanel panSkills;
@@ -113,6 +116,9 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         if (campaign.getCampaignOptions().getUseTimeInService() && (person.getRecruitment() != null)) {
             this.recruitment = person.getRecruitment();
         }
+        if (campaign.getCampaignOptions().getUseTimeInRank() && (person.getLastRankChangeDate() != null)) {
+            this.lastRankChangeDate = person.getLastRankChangeDate();
+        }
         this.options = person.getOptions();
         initComponents();
     }
@@ -149,8 +155,6 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         JButton btnClose = new JButton();
         JButton btnRandomName = new JButton();
         JButton btnRandomBloodname = new JButton();
-        btnDate = new javax.swing.JButton();
-        btnServiceDate = new javax.swing.JButton();
 
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizePersonDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -503,7 +507,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         panDemog.add(lblBday, gridBagConstraints);
 
-        btnDate.setText(getDateAsString());
+        btnDate = new JButton(this.birthdate.format(DateTimeFormatter.ofPattern(dateFormat)));
         btnDate.setName("btnDate"); // NOI18N
         btnDate.addActionListener(this::btnDateActionPerformed);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -533,7 +537,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
             gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
             panDemog.add(lblRecruitment, gridBagConstraints);
 
-            btnServiceDate.setText(getDateAsString2());
+            btnServiceDate = new JButton(recruitment.format(DateTimeFormatter.ofPattern(dateFormat)));
             btnServiceDate.setName("btnServiceDate"); // NOI18N
             btnServiceDate.addActionListener(this::btnServiceDateActionPerformed);
             gridBagConstraints = new java.awt.GridBagConstraints();
@@ -542,9 +546,30 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
             gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
             panDemog.add(btnServiceDate, gridBagConstraints);
 
+            y++;
         }
 
-        y++;
+        if (campaign.getCampaignOptions().getUseTimeInRank() && (lastRankChangeDate != null)) {
+            JLabel lblLastRankChangeDate = new JLabel(resourceMap.getString("lblLastRankChangeDate.text"));
+            lblLastRankChangeDate.setName("lblLastRankChangeDate");
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+            panDemog.add(lblLastRankChangeDate, gridBagConstraints);
+
+            btnRankDate = new JButton(lastRankChangeDate.format(DateTimeFormatter.ofPattern(dateFormat)));
+            btnRankDate.setName("btnRankDate");
+            btnRankDate.addActionListener(e -> btnRankDateActionPerformed());
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            panDemog.add(btnRankDate, gridBagConstraints);
+
+            y++;
+        }
 
         lblToughness.setText(resourceMap.getString("lblToughness.text")); // NOI18N
         lblToughness.setName("lblToughness"); // NOI18N
@@ -874,6 +899,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         person.setGender(choiceGender.getSelectedIndex());
         person.setBirthday(birthdate);
         person.setRecruitment(recruitment);
+        person.setLastRankChangeDate(lastRankChangeDate);
         person.setOriginFaction((Faction) choiceFaction.getSelectedItem());
         if (choiceSystem.getSelectedItem() != null && choicePlanet.getSelectedItem() != null) {
             person.setOriginPlanet((Planet)choicePlanet.getSelectedItem());
@@ -1157,14 +1183,6 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         }
     }
 
-    private String getDateAsString() {
-        return birthdate.format(DateTimeFormatter.ofPattern(dateFormat));
-    }
-
-    private String getDateAsString2() {
-        return recruitment.format(DateTimeFormatter.ofPattern(dateFormat));
-    }
-
     private void changeSkillValue(String type) {
         if (!skillChks.get(type).isSelected()) {
             skillValues.get(type).setText("-");
@@ -1196,7 +1214,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
             this.birthdate = dc.getDate().toZonedDateTime().toLocalDate();
-            btnDate.setText(getDateAsString());
+            btnDate.setText(this.birthdate.format(DateTimeFormatter.ofPattern(dateFormat)));
             lblAge.setText(getAge() + " " + resourceMap.getString("age")); // NOI18N
         }
     }
@@ -1209,7 +1227,19 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
             this.recruitment = dc.getDate().toZonedDateTime().toLocalDate();
-            btnServiceDate.setText(getDateAsString2());
+            btnServiceDate.setText(this.recruitment.format(DateTimeFormatter.ofPattern(dateFormat)));
+        }
+    }
+
+    private void btnRankDateActionPerformed() {
+        // show the date chooser
+        GregorianCalendar rank = GregorianCalendar.from(lastRankChangeDate.atStartOfDay(
+                ZoneId.systemDefault()));
+        DateChooser dc = new DateChooser(frame, rank);
+        // user can either choose a date or cancel by closing
+        if (dc.showDateChooser() == DateChooser.OK_OPTION) {
+            lastRankChangeDate = dc.getDate().toZonedDateTime().toLocalDate();
+            btnRankDate.setText(lastRankChangeDate.format(DateTimeFormatter.ofPattern(dateFormat)));
         }
     }
 

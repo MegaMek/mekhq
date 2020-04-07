@@ -5950,7 +5950,7 @@ public class Campaign implements Serializable, ITechManager {
                 }
                 break;
             case Person.PRISONER_YES:
-                if (p.getRankNumeric() > 0) {
+                if (p.getRankNumeric() != Ranks.RANK_PRISONER) {
                     changeRank(p, Ranks.RANK_PRISONER, true); // They don't get to have a rank. Their
                     // rank is Prisoner or Bondsman.
                 }
@@ -5959,7 +5959,7 @@ public class Campaign implements Serializable, ITechManager {
                 p.setRecruitment(null); //more efficient to just set it to null instead of checking if the setting is enabled
                 break;
             case Person.PRISONER_BONDSMAN:
-                if (p.getRankNumeric() > 0) {
+                if (p.getRankNumeric() != Ranks.RANK_BONDSMAN) {
                     changeRank(p, Ranks.RANK_BONDSMAN, true); // They don't get to have a rank. Their
                     // rank is Prisoner or Bondsman.
                 }
@@ -6037,6 +6037,15 @@ public class Campaign implements Serializable, ITechManager {
         int oldRankLevel = person.getRankLevel();
         person.setRankNumeric(rank);
         person.setRankLevel(rankLevel);
+
+        if (getCampaignOptions().getUseTimeInRank()) {
+            if (person.isFree() && !person.isDependent()) {
+                person.setLastRankChangeDate(getLocalDate());
+            } else {
+                person.setLastRankChangeDate(null);
+            }
+        }
+
         personUpdated(person);
         MekHQ.triggerEvent(new PersonChangedEvent(person));
         if (report) {
@@ -8147,7 +8156,7 @@ public class Campaign implements Serializable, ITechManager {
             addReport(techNameLinked + " performs maintenance on " + u.getHyperlinkedName() + ". " + paidString
                     + qualityString + ". " + damageString + " [<a href='MAINTENANCE|" + u.getId()
                     + "'>Get details</a>]");
-            
+
             u.resetDaysSinceMaintenance();
         }
     }
@@ -8165,7 +8174,7 @@ public class Campaign implements Serializable, ITechManager {
                     break;
                 }
             }
-            if (!p.isDependent() && !p.isPrisoner() && !p.isBondsman()) {
+            if (!p.isDependent() && p.isFree()) {
                 LocalDate date;
                 // For that one in a billion chance the log is empty. Clone today's date and subtract a year
                 if (join == null) {
@@ -8174,6 +8183,32 @@ public class Campaign implements Serializable, ITechManager {
                     date = join.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                 }
                 p.setRecruitment(date);
+            }
+        }
+    }
+
+    public void initTimeInRank() {
+        for (Person p : getPersonnel()) {
+            Date join = null;
+            for (LogEntry e : p.getPersonnelLog()) {
+                if (join == null) {
+                    // If by some nightmare there is no date from the below, just use the first entry.
+                    join = e.getDate();
+                }
+                if (e.getDesc().startsWith("Joined ") || e.getDesc().startsWith("Freed ")
+                        || e.getDesc().startsWith("Promoted ") || e.getDesc().startsWith("Demoted ")) {
+                    join = e.getDate();
+                }
+            }
+            if (!p.isDependent() && p.isFree()) {
+                LocalDate date;
+                // For that one in a billion chance the log is empty. Clone today's date and subtract a year
+                if (join == null) {
+                    date = getLocalDate().minus(1, ChronoUnit.YEARS);
+                } else {
+                    date = join.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                }
+                p.setLastRankChangeDate(date);
             }
         }
     }

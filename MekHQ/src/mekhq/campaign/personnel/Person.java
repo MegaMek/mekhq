@@ -242,6 +242,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     protected LocalDate birthday;
     protected LocalDate dateOfDeath;
     protected LocalDate recruitment;
+    protected LocalDate lastRankChangeDate;
     protected List<LogEntry> personnelLog;
     protected List<LogEntry> missionLog;
 
@@ -461,6 +462,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         birthday = null;
         dateOfDeath = null;
         recruitment = null;
+        lastRankChangeDate = null;
         skills = new Skills();
         options = new PersonnelOptions();
         currentEdge = 0;
@@ -538,9 +540,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public void setDependent(boolean tf) {
         dependent = tf;
         if (dependent) {
-            recruitment = null;
+            setRecruitment(null);
+            setLastRankChangeDate(null);
         } else {
-            recruitment = getCampaign().getLocalDate();
+            setRecruitment(getCampaign().getLocalDate());
+            setLastRankChangeDate(getCampaign().getLocalDate());
         }
     }
 
@@ -1106,6 +1110,22 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
 
+    public void setLastRankChangeDate(LocalDate date) {
+        this.lastRankChangeDate = date;
+    }
+
+    public LocalDate getLastRankChangeDate() {
+        return lastRankChangeDate;
+    }
+
+    public String getLastRankChangeDateAsString() {
+        if (getLastRankChangeDate() == null) {
+            return null;
+        } else {
+            return getLastRankChangeDate().format(DateTimeFormatter.ofPattern(DATE_DISPLAY_FORMAT));
+        }
+    }
+
     public int getAge(LocalDate today) {
         // Get age based on year
         if (getDateOfDeath() != null) {
@@ -1130,6 +1150,21 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
 
         return Period.between(getRecruitment(), today).getYears();
+    }
+
+    public int getTimeInRank(LocalDate today) {
+        if (getLastRankChangeDate() == null) {
+            return -1;
+        }
+
+        // If the person is dead, we only care about how long it was from their last promotion till they died
+        if (getDateOfDeath() != null) {
+            //use date of death instead of the current day
+            today = getDateOfDeath();
+        }
+
+        return Math.toIntExact(ChronoUnit.MONTHS.between(getLastRankChangeDate(),
+                today.plus(1, ChronoUnit.DAYS)));
     }
 
     public void setId(UUID id) {
@@ -1165,13 +1200,17 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return dueDate != null;
     }
 
-    public void procreate() {
-        if (!isFemale() || isPregnant() || isDeployed()) {
-            return;
-        }
+    /**
+     * This is used to determine if a person can procreate
+     * @return true if they can, otherwise false
+     */
+    public boolean canProcreate() {
+        return isFemale() && !isPregnant() && !isDeployed()
+                && !isChild() && (getAge(getCampaign().getLocalDate()) < 51);
+    }
 
-        // Age limitations...
-        if (!isChild() && getAge(getCampaign().getLocalDate()) < 51) {
+    public void procreate() {
+        if (canProcreate()) {
             boolean conceived = false;
             if (hasSpouse()) {
                 if (!getSpouse().isDeployed() && !getSpouse().isDeadOrMIA() && !getSpouse().isChild()
@@ -1285,7 +1324,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 !this.equals(p)
                 && !p.hasSpouse()
                 && p.oldEnoughToMarry()
-                && (!p.isPrisoner() || (p.isPrisoner() && isPrisoner()))
+                && (!p.isPrisoner() || isPrisoner())
                 && !p.isDeadOrMIA()
                 && p.isActive()
                 && ((getAncestorsId() == null)
@@ -1316,7 +1355,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void addRandomSpouse(boolean sameSex) {
         List<Person> potentials = new ArrayList<>();
-        int gender = sameSex ? getGender() : (isMale() ? Crew.G_MALE : Crew.G_FEMALE);
+        int gender = sameSex ? getGender() : (isMale() ? Crew.G_FEMALE : Crew.G_MALE);
         for (Person p : campaign.getPersonnel()) {
             if (isPotentialRandomSpouse(p, gender)) {
                 potentials.add(p);
@@ -1890,11 +1929,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         + dateOfDeath.format(DateTimeFormatter.ofPattern(DATE_SAVE_FORMAT))
                         + "</deathday>");
             }
-            if (null != recruitment) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<recruitment>"
-                        + recruitment.format(DateTimeFormatter.ofPattern(DATE_SAVE_FORMAT))
-                        + "</recruitment>");
+            if (recruitment != null) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "recruitment",
+                        recruitment.format(DateTimeFormatter.ofPattern(DATE_SAVE_FORMAT)));
+            }
+            if (lastRankChangeDate != null) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastRankChangeDate",
+                        lastRankChangeDate.format(DateTimeFormatter.ofPattern(DATE_SAVE_FORMAT)));
             }
             for (Skill skill : skills.getSkills()) {
                 skill.writeToXml(pw1, indent + 1);
@@ -2238,6 +2279,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         retVal.recruitment = LocalDate.parse(wn2.getTextContent().trim(),
                                 DateTimeFormatter.ofPattern(DATE_SAVE_FORMAT));
                     }
+                } else if (wn2.getNodeName().equalsIgnoreCase("lastRankChangeDate")) {
+                    retVal.lastRankChangeDate = LocalDate.parse(wn2.getTextContent().trim(),
+                            DateTimeFormatter.ofPattern(DATE_SAVE_FORMAT));
                 } else if (wn2.getNodeName().equalsIgnoreCase("advantages")) {
                     advantages = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("edge")) {
