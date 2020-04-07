@@ -28,11 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import mekhq.campaign.personnel.Person;
@@ -338,7 +334,7 @@ public class Finances implements Serializable {
                                     payRollCost.toAmountAndSymbolString()));
 
                     if (campaign.getCampaignOptions().trackTotalEarnings()) {
-                        for (Person person : campaign.getPersonnel()) {
+                        for (Person person : campaign.getActivePersonnel()) {
                             person.payPersonSalary();
                         }
                     }
@@ -408,8 +404,15 @@ public class Finances implements Serializable {
                         shares.toAmountAndSymbolString()));
 
                 if (campaign.getCampaignOptions().trackTotalEarnings()) {
-                    for (Person person : campaign.getPersonnel()) {
-                        person.payPersonShares(shares, campaign.getCampaignOptions().getSharesForAll());
+                    int numberOfShares = 0;
+                    boolean sharesForAll = campaign.getCampaignOptions().getSharesForAll();
+                    for (Person person : campaign.getActivePersonnel()) {
+                        numberOfShares += person.getNumShares(sharesForAll);
+                    }
+
+                    Money singleShare = shares.dividedBy(numberOfShares);
+                    for (Person person : campaign.getActivePersonnel()) {
+                        person.payPersonShares(singleShare, sharesForAll);
                     }
                 }
             } else {
