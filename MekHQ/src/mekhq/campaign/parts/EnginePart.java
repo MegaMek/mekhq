@@ -18,11 +18,9 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
-import java.util.GregorianCalendar;
 
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
