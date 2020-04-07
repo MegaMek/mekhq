@@ -2519,10 +2519,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 }
             }
         } catch (Exception ex) {
-            // Errrr, apparently either the class name was invalid...
-            // Or the listed name doesn't exist.
-            // Doh!
             MekHQ.getLogger().error(Person.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(Person.class, METHOD_NAME, "Failed to save for person "
+                    + retVal.getFullName());
         }
 
         return retVal;
