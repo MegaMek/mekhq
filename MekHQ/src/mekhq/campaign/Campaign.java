@@ -655,7 +655,7 @@ public class Campaign implements Serializable, ITechManager {
             if (roll >= target.getValue()) {
                 report.append("<br/>Search successful. ");
                 MechSummary ms = unitGenerator.generate(factionCode, shipSearchType, -1,
-                        getCalendar().get(Calendar.YEAR), getUnitRatingMod());
+                        getGameYear(), getUnitRatingMod());
                 if (ms == null) {
                     ms = getAtBConfig().findShip(shipSearchType);
                 }
@@ -1504,7 +1504,7 @@ public class Campaign implements Serializable, ITechManager {
                         : rating.getModifier());
             }
             // Reavings diminish the number of available Bloodrights in later eras
-            int year = getCalendar().get(Calendar.YEAR);
+            int year = getGameYear();
             if (year <= 2950)
                 bloodnameTarget--;
             if (year > 3055)
@@ -5693,8 +5693,7 @@ public class Campaign implements Serializable, ITechManager {
 
             }
 
-            if ((getCalendar().get(Calendar.YEAR) < 2950
-                    || getCalendar().get(Calendar.YEAR) > 3040)
+            if (((getGameYear() < 2950) || (getGameYear() > 3040))
                     && (acquisition instanceof Armor || acquisition instanceof MissingMekActuator
                             || acquisition instanceof mekhq.campaign.parts.MissingMekCockpit
                             || acquisition instanceof mekhq.campaign.parts.MissingMekLifeSupport

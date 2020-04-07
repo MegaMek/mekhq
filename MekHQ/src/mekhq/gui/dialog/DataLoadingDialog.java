@@ -28,7 +28,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.ResourceBundle;
 
 import javax.swing.ImageIcon;
@@ -252,7 +251,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                     campaign.setCalendar(dc.getDate());
                     // Ensure that the MegaMek year GameOption matches the campaign year
                     GameOptions gameOpts = campaign.getGameOptions();
-                    int campaignYear = campaign.getCalendar().get(Calendar.YEAR);
+                    int campaignYear = campaign.getGameYear();
                     if (gameOpts.intOption("year") != campaignYear) {
                         gameOpts.getOption("year").setValue(campaignYear);
                     }
