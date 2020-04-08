@@ -4367,7 +4367,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     /**
      * This is used to get the number of shares the person has
-     * @param sharesForAll w
+     * @param sharesForAll true if all combat and support personnel have shares, otherwise false if
+     *                     just MechWarriors have shares
      * @return the number of shares the person has
      */
     public int getNumShares(boolean sharesForAll) {
