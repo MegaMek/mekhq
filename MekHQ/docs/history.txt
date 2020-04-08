@@ -4,6 +4,12 @@ VERSION HISTORY:
 + PR #1610: Raised cost of edge points from 1 to 10 for the AtB configuration preset.
 + PR #1627: Moved pregnancy GM items to Personnel GM menu (and hide GM menu if not a GM)
 + Issue #1612: Adding Scrolling to Marriage Candidates
++ PR #1606: Abandon ship (MekHQ version)! Crews of large craft and units transported aboard large craft are handled during scenario resolution.
++ PR #1618: De-clutter assign lance tech menu in TO&E
++ Issue #1632: All random marriages default to same sex
++ Issue #1626: Adding Time in Rank to MekHQ
++ PR #1634Z Fixing Activate/Mothball Display Text
++ Issue #1636: ExtraData Export Fails because of Null Mapping
 
 0.47.5 (2020-4-01 2000 UTC)
 + Issue #1470: Thumper artillery vehicle causes array index out of bounds exception error
