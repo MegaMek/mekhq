@@ -1368,8 +1368,13 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         // Add their recruitment date if using track time in service
-        if (getCampaignOptions().getUseTimeInService() && !prisoner && !dependent) {
-            p.setRecruitment(getLocalDate());
+        if (!prisoner && !dependent) {
+            if (getCampaignOptions().getUseTimeInService()) {
+                p.setRecruitment(getLocalDate());
+            }
+            if (getCampaignOptions().getUseTimeInRank()) {
+                p.setLastRankChangeDate(getLocalDate());
+            }
         }
 
         MekHQ.triggerEvent(new PersonNewEvent(p));

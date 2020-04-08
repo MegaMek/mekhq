@@ -3,6 +3,8 @@ package mekhq;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -59,10 +61,10 @@ public class MekHqXmlUtil {
             XPathFactory xpf = XPathFactory.newInstance();
             XPATH_INSTANCE = xpf.newXPath();
         }
-        
+
         return XPATH_INSTANCE;
     }
-    
+
     /**
      * Creates a DocumentBuilder safe from XML external entities
      * attacks, and XML entity expansion attacks.
@@ -322,11 +324,11 @@ public class MekHqXmlUtil {
              retVal += "\" camoFileName=\"";
              retVal += String.valueOf(escape(tgtEnt.getCamoFileName()));
          }
-         
+
          if(tgtEnt.getDeployRound() > 0) {
              retVal += String.format("\" %s=\"%d", MULParser.DEPLOYMENT, tgtEnt.getDeployRound());
          }
-         
+
          if(tgtEnt instanceof Infantry) {
              retVal += String.format("\" %s=\"%d", MULParser.INF_SQUAD_NUM, ((Infantry) tgtEnt).getSquadN());
          }
@@ -395,7 +397,7 @@ public class MekHqXmlUtil {
         if (null != loc) {
             retVal += loc;
         }
-        
+
         // Write the Naval C3 Data if needed
         if (tgtEnt.hasNavalC3()) {
             retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "<nc3set>";
@@ -658,10 +660,10 @@ public class MekHqXmlUtil {
      * {@code null} if the input can't be parsed; if it can be parsed and
      * contains more than one entity, an {@linkplain IllegalArgumentException}
      * is thrown.
-     * 
+     *
      * @param element
      *        the xml tag to parse
-     * 
+     *
      * @return the first entity parsed from the given element, or {@code null}
      *         if anything is wrong with the input
      *
@@ -685,6 +687,31 @@ public class MekHqXmlUtil {
             default:
                 throw new IllegalArgumentException("More than one entity contained in XML string!  Expecting a single entity.");
         }
+    }
+
+    /**
+     * Parse a date from an XML node's content.
+     * @param value The date from an XML node's content.
+     * @return The Date retrieved from the XML node content.
+     */
+    public static LocalDate parseDate(String value) throws DateTimeParseException {
+        // Accept (truncates): uuuu-MM-dd HH:mm:ss
+        // Accept: uuuu-MM-dd
+        int firstSpace = value.indexOf(' ');
+        if (firstSpace < 0) {
+            return LocalDate.parse(value);
+        } else {
+            return LocalDate.parse(value.substring(0, firstSpace));
+        }
+    }
+
+    /**
+     * Formats a Date suitable for writing to an XML node.
+     * @param date The date to format for XML.
+     * @return A String suitable for writing a date to an XML node.
+     */
+    public static String saveFormattedDate(LocalDate date) {
+        return date.toString(); // ISO-8601
     }
 
     /** Escapes a string to store in an XML element.
