@@ -2106,8 +2106,8 @@ public class CampaignGUI extends JPanel {
             return;
         }
         String path = file.getPath();
-        if (!path.endsWith(".prsx")) {
-            path += ".prsx";
+        if (!path.endsWith(FileType.PRSX.getRecommendedExtension())) {
+            path += FileType.PRSX.getRecommendedExtension();
             file = new File(path);
         }
 

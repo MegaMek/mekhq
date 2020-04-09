@@ -61,11 +61,10 @@ public class FileDialogs {
      * @return the file selected, if any
      */
     public static Optional<File> savePersonnel(JFrame frame, Campaign campaign) {
-
         String fileName = String.format(
-                "%s%s_ExportedPersonnel.prsx", //$NON-NLS-1$
+                "%s%s_ExportedPersonnel" + FileType.PRSX.getRecommendedExtension(),
                 campaign.getName(),
-                campaign.getShortDateAsString() );
+                campaign.getShortDateAsString());
 
         Optional<File> value = GUI.fileDialogSave(
                 frame,
