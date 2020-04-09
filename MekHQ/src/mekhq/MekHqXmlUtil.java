@@ -3,6 +3,8 @@ package mekhq;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -701,6 +703,31 @@ public class MekHqXmlUtil {
             default:
                 throw new IllegalArgumentException("More than one entity contained in XML string!  Expecting a single entity.");
         }
+    }
+
+    /**
+     * Parse a date from an XML node's content.
+     * @param value The date from an XML node's content.
+     * @return The Date retrieved from the XML node content.
+     */
+    public static LocalDate parseDate(String value) throws DateTimeParseException {
+        // Accept (truncates): uuuu-MM-dd HH:mm:ss
+        // Accept: uuuu-MM-dd
+        int firstSpace = value.indexOf(' ');
+        if (firstSpace < 0) {
+            return LocalDate.parse(value);
+        } else {
+            return LocalDate.parse(value.substring(0, firstSpace));
+        }
+    }
+
+    /**
+     * Formats a Date suitable for writing to an XML node.
+     * @param date The date to format for XML.
+     * @return A String suitable for writing a date to an XML node.
+     */
+    public static String saveFormattedDate(LocalDate date) {
+        return date.toString(); // ISO-8601
     }
 
     /** Escapes a string to store in an XML element.
