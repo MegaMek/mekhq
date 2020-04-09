@@ -598,6 +598,8 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         rft.setForceName(REINFORCEMENT_TEMPLATE_ID);
         rft.setGenerationMethod(ForceGenerationMethod.PlayerSupplied.ordinal());
         rft.setGenerationOrder(1);
+        rft.setActualDeploymentZone(Board.START_NONE);
+        rft.setSyncDeploymentType(SynchronizedDeploymentType.None);
 
         return rft;
     }
