@@ -2029,7 +2029,7 @@ public class CampaignGUI extends JPanel {
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                     "Starting load of personnel file from XML..."); //$NON-NLS-1$
             // Initialize variables.
-            Document xmlDoc = null;
+            Document xmlDoc;
 
             // Open the file
             try (InputStream is = new FileInputStream(personnelFile)) {
@@ -2039,7 +2039,8 @@ public class CampaignGUI extends JPanel {
                 // Parse using builder to get DOM representation of the XML file
                 xmlDoc = db.parse(is);
             } catch (Exception ex) {
-                MekHQ.getLogger().error(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
+                MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
+                return; // if we can't parse the file, we will NPE out in the next line
             }
 
             Element personnelEle = xmlDoc.getDocumentElement();
