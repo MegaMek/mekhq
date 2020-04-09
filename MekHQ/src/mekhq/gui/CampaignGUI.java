@@ -2092,6 +2092,20 @@ public class CampaignGUI extends JPanel {
                 }
             }
 
+            // Fix Spouse Id Information - This is required to fix spouse NPEs where one doesn't export
+            // both members of the couple
+            // TODO : make it so that exports will automatically include both spouses
+            for (Person p : getCampaign().getActivePersonnel()) {
+                if (p.hasSpouse()) {
+                    if (!getCampaign().getPersonnel().contains(p.getSpouse())) {
+                        // If this happens, we need to clear the spouse
+                        p.setSurname(p.getMaidenName());
+
+                        p.setSpouseId(null);
+                    }
+                }
+            }
+
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                     "Finished load of personnel file"); //$NON-NLS-1$
         }
