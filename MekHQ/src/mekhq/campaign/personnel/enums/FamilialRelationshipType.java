@@ -54,9 +54,7 @@ public enum FamilialRelationshipType {
             "FamilialRelationshipType.AUNT_UNCLE.FEMALE.text"),
     AUNT_UNCLE("FamilialRelationshipType.AUNT_UNCLE.MALE.text",
             "FamilialRelationshipType.AUNT_UNCLE.FEMALE.text"),
-    COUSIN("FamilialRelationshipType.COUSIN.text",
-            "FamilialRelationshipType.COUSIN.text",
-            "FamilialRelationshipType.COUSIN.text"),
+    COUSIN("FamilialRelationshipType.COUSIN.text"),
     NIBLING("FamilialRelationshipType.NIBLING.MALE.text",
             "FamilialRelationshipType.NIBLING.FEMALE.text",
             "FamilialRelationshipType.NIBLING.OTHER.text"),
@@ -65,6 +63,7 @@ public enum FamilialRelationshipType {
     SPOUSE("FamilialRelationshipType.SPOUSE.MALE.text",
             "FamilialRelationshipType.SPOUSE.FEMALE.text",
             "FamilialRelationshipType.SPOUSE.OTHER.text"),
+    PARTNER("FamilialRelationshipType.PARTNER.text"),
     PARENT_IN_LAW("FamilialRelationshipType.PARENT_IN_LAW.MALE.text",
             "FamilialRelationshipType.PARENT_IN_LAW.FEMALE.text",
             "FamilialRelationshipType.PARENT_IN_LAW.OTHER.text"),
@@ -97,6 +96,10 @@ public enum FamilialRelationshipType {
     //endregion Variable Declarations
 
     //region Constructors
+    FamilialRelationshipType(String neutral) {
+        this(neutral, neutral, neutral);
+    }
+
     FamilialRelationshipType(String masculine, String feminine) {
         this(masculine, feminine, null);
     }
