@@ -1389,16 +1389,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
             surnameOption = map.randomItem();
         }
 
-        switch(surnameOption) {
+        switch (surnameOption) {
             case SURNAME_NO_CHANGE:
                 break;
             case SURNAME_SPOUSE:
                 setSurname(spouseSurname);
-                setMaidenName(surname); //"" is handled in the divorce code
                 break;
             case SURNAME_YOURS:
                 spouse.setSurname(surname);
-                spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
                 break;
             case SURNAME_HYP_YOURS:
                 if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
@@ -1406,8 +1404,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else {
                     setSurname(spouseSurname);
                 }
-
-                setMaidenName(surname); //"" is handled in the divorce code
                 break;
             case SURNAME_BOTH_HYP_YOURS:
                 if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
@@ -1418,10 +1414,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (!StringUtil.isNullOrEmpty(surname)) {
                     spouse.setSurname(surname);
                 }
-                //both null or "" is ignored as a case, as it would lead to no changes
-
-                setMaidenName(surname); //"" is handled in the divorce code
-                spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
                 break;
             case SURNAME_HYP_SPOUSE:
                 if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
@@ -1429,8 +1421,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else {
                     spouse.setSurname(surname);
                 }
-
-                spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
                 break;
             case SURNAME_BOTH_HYP_SPOUSE:
                 if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
@@ -1441,27 +1431,19 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (!StringUtil.isNullOrEmpty(surname)) {
                     spouse.setSurname(surname);
                 }
-                //both null or "" is ignored as a case, as it would lead to no changes
-
-                setMaidenName(surname); //"" is handled in the divorce code
-                spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
                 break;
             case SURNAME_MALE:
                 if (isMale()) {
                     spouse.setSurname(surname);
-                    spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
                 } else {
                     setSurname(spouseSurname);
-                    setMaidenName(surname); //"" is handled in the divorce code
                 }
                 break;
             case SURNAME_FEMALE:
                 if (isMale()) {
                     setSurname(spouseSurname);
-                    setMaidenName(surname); //"" is handled in the divorce code
                 } else {
                     spouse.setSurname(surname);
-                    spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
                 }
                 break;
             default:
@@ -1470,6 +1452,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         getFullName(), spouse.getFullName()));
                 break;
         }
+
+        // This is required for personnel import/export
+        setMaidenName(surname);
+        spouse.setMaidenName(spouseSurname);
 
         spouse.setSpouseId(getId());
         PersonalLogger.marriage(spouse, this, getCampaign().getDate());
@@ -1503,22 +1489,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
         switch (divorceOption) {
             case OPT_SELECTED_CHANGE_SURNAME:
-                if (getMaidenName() != null) {
-                    setSurname(getMaidenName());
-                }
+                setSurname(getMaidenName());
                 break;
             case OPT_SPOUSE_CHANGE_SURNAME:
-                if (spouse.getMaidenName() != null) {
-                    spouse.setSurname(spouse.getMaidenName());
-                }
+                spouse.setSurname(spouse.getMaidenName());
                 break;
             case OPT_BOTH_CHANGE_SURNAME:
-                if (getMaidenName() != null) {
-                    setSurname(getMaidenName());
-                }
-                if (spouse.getMaidenName() != null) {
-                    spouse.setSurname(spouse.getMaidenName());
-                }
+                setSurname(getMaidenName());
+                spouse.setSurname(spouse.getMaidenName());
                 break;
             case OPT_KEEP_SURNAME:
             default:
@@ -1533,19 +1511,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
             campaign.addReport(String.format("%s has divorced %s!", getHyperlinkedName(),
                     spouse.getHyperlinkedName()));
-
-            spouse.setMaidenName(null);
-            setMaidenName(null);
-
-            spouse.setSpouseId(null);
-            setSpouseId(null);
-        } else if (spouse.isDeadOrMIA()) {
-            setMaidenName(null);
-            setSpouseId(null);
-        } else if (isDeadOrMIA()) {
-            spouse.setMaidenName(null);
-            spouse.setSpouseId(null);
         }
+
+        setMaidenName(null);
+        setSpouseId(null);
+        spouse.setMaidenName(null);
+        spouse.setSpouseId(null);
 
         // Output a message for Spouses who are KIA
         if (reason == FormerSpouse.REASON_WIDOWED) {
