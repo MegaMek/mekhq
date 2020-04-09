@@ -4603,7 +4603,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
      */
     @Nullable
     public Person getSpouse() {
-        return campaign.getPerson(spouse);
+        return getCampaign().getPerson(spouse);
     }
 
     /**

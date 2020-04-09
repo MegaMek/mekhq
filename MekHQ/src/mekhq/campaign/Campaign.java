@@ -1559,35 +1559,43 @@ public class Campaign implements Serializable, ITechManager {
      * @param a An {@link Ancestors} to import into the campaign.
      */
     public void importAncestors(Ancestors a) {
-        addAncestorsWithoutId(a);
-    }
-
-    private void addAncestorsWithoutId(Ancestors a) {
         ancestors.put(a.getId(), a);
     }
 
+    /**
+     * @return an Iterable of all Ancestors objects for the campaign
+     */
     public Iterable<Ancestors> getAncestors() {
         return ancestors.values();
     }
 
-    /** @return a matching ancestors entry for the arguments, or null if there isn't any */
+    /**
+     * @return a matching ancestors entry for the arguments, or null if there isn't any
+     */
     public Ancestors getAncestors(UUID fatherId, UUID motherId) {
-        for(Map.Entry<UUID, Ancestors> m : ancestors.entrySet()) {
+        for (Map.Entry<UUID, Ancestors> m : ancestors.entrySet()) {
             Ancestors a = m.getValue();
-            if(Objects.equals(fatherId, a.getFatherId()) && Objects.equals(motherId, a.getMotherId())) {
+            if (Objects.equals(fatherId, a.getFatherId()) && Objects.equals(motherId, a.getMotherId())) {
                 return a;
             }
         }
         return null;
     }
 
+    /**
+     * @param id the Ancestor Id to get the Ancestors object for
+     * @return the Ancestors object relating to the input id, or null
+     */
     public Ancestors getAncestors(UUID id) {
-        if (id == null) {
-            return null;
-        }
         return ancestors.get(id);
     }
 
+    /**
+     * This adds an ancestor field to the ancestors map
+     * @param father the father's UUID, or null if there is no specified father
+     * @param mother the mother's UUID, or null if there is no specified mother
+     * @return the newly created Ancestors object
+     */
     public Ancestors createAncestors(UUID father, UUID mother) {
         Ancestors na = new Ancestors(father, mother, this);
         ancestors.put(na.getId(), na);
@@ -1605,13 +1613,17 @@ public class Campaign implements Serializable, ITechManager {
         MekHQ.triggerEvent(new PersonNewEvent(p));
     }
 
+    /**
+     * @param id the Id of the person to get
+     * @return the person whose Id equals the input id, or null (this map permits null, as UUID is an object)
+     */
     public Person getPerson(UUID id) {
-        if (id == null) {
-            return null;
-        }
         return personnel.get(id);
     }
 
+    /**
+     * @return a collection of all the personnel related to the current campaign
+     */
     public Collection<Person> getPersonnel() {
         return personnel.values();
     }
