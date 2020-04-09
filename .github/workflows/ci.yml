@@ -1,5 +1,15 @@
-# This workflow will build a Java project with Gradle
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
+#
+# Builds MekHQ for CI (and CD via artifacts)
+#
+# Jobs:
+#
+#    - ci_cd: Build MekHQ for CI/CD on Ubuntu with Java 1.8
+#        - This job will use MM and MML source directly
+#          for the build.
+#
+#    - other_os_ci: Build MekHQ on Windows and MacOS.
+#        - This job runs after `ci_cd` completes successfully.
+#
 
 name: MekHQ CI with Gradle
 
@@ -32,18 +42,72 @@ jobs:
         path: mekhq
 
     #
+    # Find the repo and branch to use for MM
+    #
+    # Output variables:
+    #
+    #    - mmRepo: The MM repository to use.
+    #    - mmBranch: The MM branch to use.
+    #
+    - name: Find the Right MegaMek Branch
+      id: find_mm
+      # Override bash so that it doesn't fail fast (the default)
+      # if we can't find the branch
+      shell: bash {0}
+      # This shell script searches the PR submitter's MM repo for
+      # a branch that has the same name as the current PR branch.
+      # If found it sets the `mmRepo` and `mmBranch` step output variables
+      # to that branch.
+      run: |
+        git ls-remote --exit-code --heads ${{ github.event.pull_request.head.repo.owner.html_url }}/megamek.git ${{ github.event.pull_request.head.ref }}
+        if [ "$?" == "0" ]
+        then
+          echo "${{ github.event.pull_request.head.repo.owner.html_url }}" | awk -F/ '{print "::set-output name=mmRepo::" $4 "/megamek"}'
+          echo "::set-output name=mmBranch::${{ github.event.pull_request.head.ref }}"
+        else
+          echo "::set-output name=mmRepo::MegaMek/megamek"
+          echo "::set-output name=mmBranch::master"
+        fi
+        exit 0
+
+    #
     # Checkout the latest Megamek source
     # and put it in: ./megamek
-    #
-    # TODO: figure out if we can link up
-    #       this with a "sister" branch
-    #       in MegaMek.
     #
     - name: Checkout MegaMek
       uses: actions/checkout@v2
       with:
-        repository: MegaMek/megamek
-        path: megamek
+        repository: ${{ steps.find_mm.outputs.mmRepo }}
+        path: ${{ steps.find_mm.outputs.mmBranch }}
+
+    #
+    # Find the repo and branch to use for MML
+    #
+    # Output variables:
+    #
+    #    - mmlRepo: The MML repository to use.
+    #    - mmlBranch: The MML branch to use.
+    #
+    - name: Find the Right MegaMekLab Branch
+      id: find_mml
+      # Override bash so that it doesn't fail fast (the default)
+      # if we can't find the branch
+      shell: bash {0}
+      # This shell script searches the PR submitter's MML repo for
+      # a branch that has the same name as the current PR branch.
+      # If found it sets the mmlRepo and mmlBranch step output variables
+      # to that branch.
+      run: |
+        git ls-remote --exit-code --heads ${{ github.event.pull_request.head.repo.owner.html_url }}/megameklab.git ${{ github.event.pull_request.head.ref }}
+        if [ "$?" == "0" ]
+        then
+          echo "${{ github.event.pull_request.head.repo.owner.html_url }}" | awk -F/ '{print "::set-output name=mmlRepo::" $4 "/megameklab"}'
+          echo "::set-output name=mmlBranch::${{ github.event.pull_request.head.ref }}"
+        else
+          echo "::set-output name=mmlRepo::MegaMek/megameklab"
+          echo "::set-output name=mmlBranch::master"
+        fi
+        exit 0
 
     #
     # Checkout the latest MegaMekLab source
@@ -52,8 +116,8 @@ jobs:
     - name: Checkout MegaMekLab
       uses: actions/checkout@v2
       with:
-        repository: MegaMek/megameklab
-        path: megameklab
+        repository: ${{ steps.find_mml.outputs.mmlRepo }}
+        path: ${{ steps.find_mml.outputs.mmlBranch }}
 
     - name: Set up JDK 1.8
       uses: actions/setup-java@v1
@@ -103,12 +167,12 @@ jobs:
     # NB: This only works if you're on the main MegaMek\mekhq repo
     #     for now due to a GitHub Actions limitation.
     #
-    - name: Comment on PR with Build Scan URI
-      uses: thollander/actions-comment-pull-request@master
-      if: always() && steps.gradle_build.outputs.buildScanUri != ''
-      with:
-        message: Build scan available at ${{ steps.gradle_build.outputs.buildScanUri }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #- name: Comment on PR with Build Scan URI
+    #  uses: thollander/actions-comment-pull-request@master
+    #  if: always() && steps.gradle_build.outputs.buildScanUri != ''
+    #  with:
+    #    message: Build scan available at ${{ steps.gradle_build.outputs.buildScanUri }}
+    #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     #
     # Put the releases up in a single zip file called:
@@ -126,7 +190,7 @@ jobs:
         
   #
   # Confirm on Windows and MacOS that we can still
-  # build and test MekHQ. This does use MegaMek or
+  # build and test MekHQ. This doesn't use MegaMek or
   # MegaMekLab's source and exercises the Maven Repo.
   #
   other_os_ci:
