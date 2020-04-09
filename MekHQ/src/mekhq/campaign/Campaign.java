@@ -1286,7 +1286,6 @@ public class Campaign implements Serializable, ITechManager {
 
     //region Personnel Recruitment
     /**
-     *
      * @param p         the person being added
      * @return          true if the person is hired successfully, otherwise false
      */
@@ -1295,7 +1294,6 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     /**
-     *
      * @param p         the person being added
      * @param gmAdd     false means that they need to pay to hire this person, provided that
      *                  the campaign option to pay for new hires is set, while
@@ -1307,7 +1305,6 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     /**
-     *
      * @param p         the person being added
      * @param prisoner  if the person is a prisoner or not. True means they are a prisoner
      * @param dependent if the person is a dependent or not. True means they are a dependent
@@ -1329,8 +1326,10 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
 
-        UUID id = UUID.randomUUID();
-        p.setId(id);
+        if (p.getId() != null) {
+            UUID id = UUID.randomUUID();
+            p.setId(id);
+        }
         personnel.put(id, p);
 
         boolean bondsman = campaignOptions.getDefaultPrisonerStatus() == CampaignOptions.BONDSMAN_RANK;
