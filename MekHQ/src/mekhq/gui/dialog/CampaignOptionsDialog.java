@@ -224,6 +224,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox chkUseTransfers;
     private JCheckBox chkUseTimeInService;
     private JCheckBox chkUseTimeInRank;
+    private JCheckBox chkTrackTotalEarnings;
     private JCheckBox chkShowOriginFaction;
     private JCheckBox chkRandomizeOrigin;
     private JCheckBox chkRandomizeDependentsOrigin;
@@ -1690,6 +1691,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         chkUseTimeInRank.setSelected(options.getUseTimeInRank());
         gridBagConstraints.gridy = ++gridy;
         panPersonnel.add(chkUseTimeInRank, gridBagConstraints);
+
+        chkTrackTotalEarnings = new JCheckBox(resourceMap.getString("trackTotalEarnings.text"));
+        chkTrackTotalEarnings.setToolTipText("trackTotalEarnings.toolTipText");
+        chkTrackTotalEarnings.setSelected(options.trackTotalEarnings());
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(chkTrackTotalEarnings, gridBagConstraints);
 
         chkShowOriginFaction = new JCheckBox(resourceMap.getString("showOriginFaction.text"));
         chkShowOriginFaction.setSelected(options.showOriginFaction());
@@ -4825,6 +4832,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setUseTransfers(chkUseTransfers.isSelected());
         options.setUseTimeInService(chkUseTimeInService.isSelected());
         options.setUseTimeInRank(chkUseTimeInRank.isSelected());
+        options.setTrackTotalEarnings(chkTrackTotalEarnings.isSelected());
         options.setShowOriginFaction(chkShowOriginFaction.isSelected());
         options.setRandomizeOrigin(chkRandomizeOrigin.isSelected());
         options.setRandomizeDependentOrigin(chkRandomizeDependentsOrigin.isSelected());
