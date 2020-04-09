@@ -2039,7 +2039,7 @@ public class CampaignGUI extends JPanel {
                 // Parse using builder to get DOM representation of the XML file
                 xmlDoc = db.parse(is);
             } catch (Exception ex) {
-                MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
+                MekHQ.getLogger().error(getClass(), METHOD_NAME, "Cannot load person XML", ex);
                 return; // if we can't parse the file, we will NPE out in the next line
             }
 
