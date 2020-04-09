@@ -115,6 +115,7 @@ public class CampaignOptions implements Serializable {
     private boolean useTransfers;
     private boolean useTimeInService;
     private boolean useTimeInRank;
+    private boolean trackTotalEarnings;
     private boolean showOriginFaction;
     private boolean randomizeOrigin;
     private boolean randomizeDependentOrigin;
@@ -493,6 +494,7 @@ public class CampaignOptions implements Serializable {
         useTransfers = true;
         useTimeInService = false;
         useTimeInRank = false;
+        trackTotalEarnings = false;
         showOriginFaction = true;
         randomizeOrigin = false;
         randomizeDependentOrigin = false;
@@ -819,6 +821,13 @@ public class CampaignOptions implements Serializable {
         useTimeInRank = b;
     }
 
+    public boolean trackTotalEarnings() {
+        return trackTotalEarnings;
+    }
+
+    public void setTrackTotalEarnings(boolean b) {
+        trackTotalEarnings = b;
+    }
     /**
      * Gets a value indicating whether or not to show a person's
      * origin faction when displaying their details.
@@ -2843,6 +2852,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTransfers", useTransfers);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTimeInService", useTimeInService);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTimeInRank", useTimeInRank);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "trackTotalEarnings", trackTotalEarnings);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "capturePrisoners", capturePrisoners);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "defaultPrisonerStatus", defaultPrisonerStatus);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketName", personnelMarketName);
@@ -3321,6 +3331,8 @@ public class CampaignOptions implements Serializable {
                 retVal.useTimeInService = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useTimeInRank")) {
                 retVal.useTimeInRank = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("trackTotalEarnings")) {
+                retVal.trackTotalEarnings = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("capturePrisoners")) {
             	retVal.capturePrisoners = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("defaultPrisonerStatus")) {

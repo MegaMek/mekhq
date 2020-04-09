@@ -255,6 +255,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     protected int engXp;
     protected int acquisitions;
     protected Money salary;
+    private Money totalEarnings;
     private int hits;
     private int prisonerStatus;
     // Is this person willing to defect? Only for prisoners ...
@@ -453,6 +454,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         doctorId = null;
         unitId = null;
         salary = Money.of(-1);
+        totalEarnings = Money.of(0);
         status = PersonnelStatus.ACTIVE;
         prisonerStatus = PRISONER_NOT;
         willingToDefect = false;
@@ -842,6 +844,16 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public void setSecondaryRole(int t) {
         this.secondaryRole = t;
         MekHQ.triggerEvent(new PersonChangedEvent(this));
+    }
+
+    /**
+     * This is used to determine if a person has a specific role as either their primary OR their
+     * secondary role
+     * @param role the role to determine
+     * @return true if the person has the specific role either as their primary or secondary role
+     */
+    public boolean hasRole(int role) {
+        return (getPrimaryRole() == role) || (getSecondaryRole() == role);
     }
 
     public PersonnelStatus getStatus() {
@@ -1876,6 +1888,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         + salary.toXmlString()
                         + "</salary>");
             }
+            if (totalEarnings != Money.of(0)) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "totalEarnings", totalEarnings.toXmlString());
+            }
             // Always save a person's status, to make it easy to parse the personnel saved data
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<status>"
@@ -2242,6 +2257,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     retVal.willingToDefect = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("salary")) {
                     retVal.salary = Money.fromXmlString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("totalEarnings")) {
+                    retVal.totalEarnings = Money.fromXmlString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("minutesLeft")) {
                     retVal.minutesLeft = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("overtimeLeft")) {
@@ -2581,7 +2598,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public Money getSalary() {
-        if (isPrisoner() || isBondsman()) {
+        if (!isFree() || isDependent()) {
             return Money.zero();
         }
 
@@ -2615,6 +2632,42 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return totalBase;
         //TODO: distinguish DropShip, JumpShip, and WarShip crew
         //TODO: Add era mod to salary calc..
+    }
+
+    /**
+     * @return the person's total earnings
+     */
+    public Money getTotalEarnings() {
+        return totalEarnings;
+    }
+
+    /**
+     * This is used to pay a person
+     * @param money the amount of money to add to their total earnings
+     */
+    public void payPerson(Money money) {
+        totalEarnings = getTotalEarnings().plus(money);
+    }
+
+    /**
+     * This is used to pay a person their salary
+     */
+    public void payPersonSalary() {
+        if (isActive()) {
+            payPerson(getSalary());
+        }
+    }
+
+    /**
+     * This is used to pay a person their share value based on the value of a single share
+     * @param money the value of a single share
+     * @param sharesForAll whether or not all personnel have shares
+     */
+    public void payPersonShares(Money money, boolean sharesForAll) {
+        int shares = getNumShares(sharesForAll);
+        if (shares > 0) {
+            payPerson(money.multipliedBy(shares));
+        }
     }
 
     public int getRankNumeric() {
@@ -4312,16 +4365,18 @@ public class Person implements Serializable, MekHqXmlSerializable {
         originalUnitWeight = unit.getEntity().getWeightClass();
     }
 
+    /**
+     * This is used to get the number of shares the person has
+     * @param sharesForAll true if all combat and support personnel have shares, otherwise false if
+     *                     just MechWarriors have shares
+     * @return the number of shares the person has
+     */
     public int getNumShares(boolean sharesForAll) {
-        if (isPrisoner() || isBondsman() || !isActive()) {
-            return 0;
-        }
-        if (!sharesForAll && primaryRole != T_MECHWARRIOR &&
-                secondaryRole != T_MECHWARRIOR) {
+        if (!isActive() || !isFree() || (!sharesForAll && !hasRole(T_MECHWARRIOR))) {
             return 0;
         }
         int shares = 1;
-        if (founder) {
+        if (isFounder()) {
             shares++;
         }
         shares += Math.max(-1, getExperienceLevel(false) - 2);
@@ -4329,7 +4384,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (getRank().isOfficer()) {
             Ranks ranks = getRanks();
             int rankOrder = ranks.getOfficerCut();
-            while (rankOrder <= rank && rankOrder < Ranks.RC_NUM) {
+            while ((rankOrder <= getRankNumeric()) && (rankOrder < Ranks.RC_NUM)) {
                 Rank rank = ranks.getAllRanks().get(rankOrder);
                 if (!rank.getName(getProfession()).equals("-")) {
                     shares++;
@@ -4337,13 +4392,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 rankOrder++;
             }
         }
-        if (originalUnitWeight >= 1) {
+        if (getOriginalUnitWeight() >= 1) {
             shares++;
         }
-        if (originalUnitWeight >= 3) {
+        if (getOriginalUnitWeight()  >= 3) {
             shares++;
         }
-        shares += originalUnitTech;
+        shares += getOriginalUnitTech();
 
         return shares;
     }

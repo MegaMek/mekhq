@@ -28,13 +28,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import mekhq.campaign.personnel.Person;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -244,7 +241,7 @@ public class Finances implements Serializable {
         }
 
         // Handle contract payments
-        if (calendar.get(Calendar.DAY_OF_MONTH) == 1) {
+        if (campaign.getLocalDate().getDayOfMonth() == 1) {
             for (Contract contract : campaign.getActiveContracts()) {
                 credit(contract.getMonthlyPayOut(), Transaction.C_CONTRACT,
                         String.format(resourceMap.getString("MonthlyContractPayment.text"), contract.getName()),
@@ -254,26 +251,7 @@ public class Finances implements Serializable {
                         contract.getMonthlyPayOut().toAmountAndSymbolString(),
                         contract.getName()));
 
-                if (campaignOptions.getUseAtB() && campaignOptions.getUseShareSystem()
-                        && contract instanceof AtBContract) {
-                    Money shares = contract.getMonthlyPayOut()
-                            .multipliedBy(((AtBContract) contract).getSharesPct())
-                            .dividedBy(100);
-                    if (debit(shares, Transaction.C_SALARY,
-                            String.format(resourceMap.getString("ContractSharePayment.text"), contract.getName()),
-                            calendar.getTime())) {
-                        campaign.addReport(String.format(
-                                resourceMap.getString("DistributedShares.text"),
-                                shares.toAmountAndSymbolString()));
-                    } else {
-                        /*
-                         * This should not happen, as the shares payment is less than the contract
-                         * payment that has just been made.
-                         */
-                        campaign.addReport(
-                                String.format(resourceMap.getString("NotImplemented.text"), "shares"));
-                    }
-                }
+                payoutShares(campaign, contract, calendar);
             }
         }
 
@@ -301,7 +279,7 @@ public class Finances implements Serializable {
             if (campaignOptions.usePeacetimeCost()) {
                 if (!campaignOptions.showPeacetimeCost()) {
                     // Do not include salaries as that will be tracked below
-                    Money peacetimeCost = campaign.getPeacetimeCost(/*includeSalaries:*/false);
+                    Money peacetimeCost = campaign.getPeacetimeCost(false);
 
                     if (debit(peacetimeCost, Transaction.C_MAINTAIN,
                             resourceMap.getString("PeacetimeCosts.title"), calendar.getTime())) {
@@ -347,13 +325,19 @@ public class Finances implements Serializable {
             }
 
             if (campaignOptions.payForSalaries()) {
-                Money payrollCost = campaign.getPayRoll();
+                Money payRollCost = campaign.getPayRoll();
 
-                if (debit(payrollCost, Transaction.C_SALARY, resourceMap.getString("Salaries.title"),
+                if (debit(payRollCost, Transaction.C_SALARY, resourceMap.getString("Salaries.title"),
                         calendar.getTime())) {
                     campaign.addReport(
                             String.format(resourceMap.getString("Salaries.text"),
-                                    payrollCost.toAmountAndSymbolString()));
+                                    payRollCost.toAmountAndSymbolString()));
+
+                    if (campaign.getCampaignOptions().trackTotalEarnings()) {
+                        for (Person person : campaign.getActivePersonnel()) {
+                            person.payPersonSalary();
+                        }
+                    }
                 } else {
                     campaign.addReport(
                             String.format(resourceMap.getString("NotImplemented.text"), "payroll costs"));
@@ -405,6 +389,43 @@ public class Finances implements Serializable {
             wentIntoDebt = null;
         }
         loans = newLoans;
+    }
+
+
+    private void payoutShares(Campaign campaign, Contract contract, GregorianCalendar calendar) {
+        if (campaign.getCampaignOptions().getUseAtB() && campaign.getCampaignOptions().getUseShareSystem()
+                && (contract instanceof AtBContract)) {
+            Money shares = contract.getMonthlyPayOut().multipliedBy(((AtBContract) contract).getSharesPct())
+                    .dividedBy(100);
+            if (debit(shares, Transaction.C_SALARY,
+                    String.format(resourceMap.getString("ContractSharePayment.text"), contract.getName()),
+                    calendar.getTime())) {
+                campaign.addReport(String.format(resourceMap.getString("DistributedShares.text"),
+                        shares.toAmountAndSymbolString()));
+
+                if (campaign.getCampaignOptions().trackTotalEarnings()) {
+                    int numberOfShares = 0;
+                    boolean sharesForAll = campaign.getCampaignOptions().getSharesForAll();
+                    for (Person person : campaign.getActivePersonnel()) {
+                        numberOfShares += person.getNumShares(sharesForAll);
+                    }
+
+                    Money singleShare = shares.dividedBy(numberOfShares);
+                    for (Person person : campaign.getActivePersonnel()) {
+                        person.payPersonShares(singleShare, sharesForAll);
+                    }
+                }
+            } else {
+                /*
+                 * This should not happen, as the shares payment should be less than the contract
+                 * payment that has just been made.
+                 */
+                campaign.addReport(
+                        String.format(resourceMap.getString("NotImplemented.text"), "shares"));
+                MekHQ.getLogger().error(getClass(), "payoutShares",
+                        "Attempted to payout share amount larger than the payment of the contract");
+            }
+        }
     }
 
     public Money checkOverdueLoanPayments(Campaign campaign) {
