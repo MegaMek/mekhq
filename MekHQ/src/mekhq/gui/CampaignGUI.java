@@ -2092,15 +2092,6 @@ public class CampaignGUI extends JPanel {
                 }
             }
 
-            // Fix Spouse Id Information - This is required to fix spouse NPEs
-            for (Person p : getCampaign().getActivePersonnel()) {
-                if (p.hasSpouse()) {
-                    if (!getCampaign().getPersonnel().contains(p.getSpouse())) {
-                        p.divorce(Person.OPT_SPOUSE_CHANGE_SURNAME);
-                    }
-                }
-            }
-
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                     "Finished load of personnel file"); //$NON-NLS-1$
         }
