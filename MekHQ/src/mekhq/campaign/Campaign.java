@@ -3760,24 +3760,18 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Money getPayRoll(boolean noInfantry) {
-        if(!campaignOptions.payForSalaries()) {
+        if (getCampaignOptions().payForSalaries()) {
+            return getTheoreticalPayroll(noInfantry);
+        } else {
             return Money.zero();
         }
-
-        return getTheoreticalPayroll(noInfantry);
     }
 
-    private Money getTheoreticalPayroll(boolean noInfantry){
+    private Money getTheoreticalPayroll(boolean noInfantry) {
         Money salaries = Money.zero();
-        for (Person p : getPersonnel()) {
+        for (Person p : getActivePersonnel()) {
             // Optionized infantry (Unofficial)
-            if (noInfantry && p.getPrimaryRole() == Person.T_INFANTRY) {
-                continue;
-            }
-
-            if (p.isActive() &&
-                    !p.isDependent() &&
-                    !(p.isPrisoner() || p.isBondsman())) {
+            if (!(noInfantry && (p.getPrimaryRole() == Person.T_INFANTRY))) {
                 salaries = salaries.plus(p.getSalary());
             }
         }
@@ -3811,11 +3805,11 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Money getOverheadExpenses() {
-        if(!campaignOptions.payForOverhead()) {
+        if (getCampaignOptions().payForOverhead()) {
+            return getTheoreticalPayroll(false).multipliedBy(0.05);
+        } else {
             return Money.zero();
         }
-
-        return getTheoreticalPayroll(false).multipliedBy(0.05);
     }
 
     public void removeUnit(UUID id) {

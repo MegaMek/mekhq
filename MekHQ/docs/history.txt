@@ -8,8 +8,10 @@ VERSION HISTORY:
 + PR #1618: De-clutter assign lance tech menu in TO&E
 + Issue #1632: All random marriages default to same sex
 + Issue #1626: Adding Time in Rank to MekHQ
-+ PR #1634Z Fixing Activate/Mothball Display Text
++ PR #1634: Fixing Activate/Mothball Display Text
 + Issue #1636: ExtraData Export Fails because of Null Mapping
++ PR #1642: Fixing Popup Display Text Spacing Issues in DataLoadingDialog
++ Issue #1218: Personnel Total Earnings Tracking
 
 0.47.5 (2020-4-01 2000 UTC)
 + Issue #1470: Thumper artillery vehicle causes array index out of bounds exception error
