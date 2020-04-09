@@ -34,7 +34,7 @@ public enum BodyLocation {
     RIGHT_ARM(5, "BodyLocation.RIGHT_ARM.text", true),
     LEFT_ARM(2, "BodyLocation.LEFT_ARM.text", true),
     RIGHT_LEG(6, "BodyLocation.RIGHT_LEG.text", true),
-    LEFT_LEG(1, "BodyLocation.Left_LEG.text", true),
+    LEFT_LEG(1, "BodyLocation.LEFT_LEG.text", true),
     RIGHT_HAND(9, "BodyLocation.RIGHT_HAND.text", true, RIGHT_ARM),
     LEFT_HAND(8, "BodyLocation.LEFT_HAND.text", true, LEFT_ARM),
     RIGHT_FOOT(11, "BodyLocation.RIGHT_FOOT.text", true, RIGHT_LEG),
