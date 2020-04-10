@@ -3871,31 +3871,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return null;
     }
 
-    public String getDocDesc() {
-        StringBuilder toReturn = new StringBuilder(128);
-        toReturn.append("<html><font size='2'><b>").append(getFullTitle()).append("</b><br/>");
-
-        Skill skill = getSkill(SkillType.S_DOCTOR);
-        if (null != skill) {
-            toReturn.append(SkillType.getExperienceLevelName(skill.getExperienceLevel()))
-                    .append(" " + SkillType.S_DOCTOR);
-        }
-
-        toReturn.append(String.format(" (%d XP)", getXp()));
-
-        if (campaign.getMedicsPerDoctor() < 4) {
-            toReturn.append("</font><font size='2' color='red'>, ")
-                    .append(campaign.getMedicsPerDoctor())
-                    .append(" medics</font><font size='2'><br/>");
-        } else {
-            toReturn.append(String.format(", %d medics<br />", campaign.getMedicsPerDoctor()));
-        }
-
-        toReturn.append(String.format("%d patient(s)</font></html>", campaign.getPatientsFor(this)));
-
-        return toReturn.toString();
-    }
-
     public int getBestTechLevel() {
         int lvl = -1;
         Skill mechSkill = getSkill(SkillType.S_TECH_MECH);
