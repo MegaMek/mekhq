@@ -59,6 +59,7 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
@@ -2215,6 +2216,25 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         DefaultComboBoxModel<FinancesResetDuration> financesResetDurationModel = new DefaultComboBoxModel<>(FinancesResetDuration.values());
         comboFinancesResetDuration = new JComboBox<>(financesResetDurationModel);
+        comboFinancesResetDuration.setRenderer(new BasicComboBoxRenderer() {
+                public Component getListCellRendererComponent(JList<FinancesResetDuration extends Object> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                    if (isSelected) {
+                        setBackground(list.getSelectionBackground());
+                        setForeground(list.getSelectionForeground());
+                        if (index > -1) {
+                            list.setToolTipText(list.getSelectedValue().getToolTipText());
+                        }
+                    }
+                    else {
+                        setBackground(list.getBackground());
+                        setForeground(list.getForeground());
+                    }
+                    setFont(list.getFont());
+                    setText((value == null) ? "" : value.toString());
+
+                    return this;
+                }
+            });
         comboFinancesResetDuration.setSelectedItem(options.getFinancesResetDuration());
         JPanel pnlFinancesResetDuration = new JPanel();
         pnlFinancesResetDuration.add(new JLabel(resourceMap.getString("financesResetDuration.text")));
