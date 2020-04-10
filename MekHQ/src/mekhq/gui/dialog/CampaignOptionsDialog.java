@@ -2217,20 +2217,13 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         DefaultComboBoxModel<FinancesResetDuration> financesResetDurationModel = new DefaultComboBoxModel<>(FinancesResetDuration.values());
         comboFinancesResetDuration = new JComboBox<>(financesResetDurationModel);
         comboFinancesResetDuration.setRenderer(new BasicComboBoxRenderer() {
-                public Component getListCellRendererComponent(JList<FinancesResetDuration extends Object> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                    if (isSelected) {
-                        setBackground(list.getSelectionBackground());
-                        setForeground(list.getSelectionForeground());
-                        if (index > -1) {
-                            list.setToolTipText(list.getSelectedValue().getToolTipText());
-                        }
+                @Override
+                public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                    super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                    if (isSelected && (index > -1)) {
+                        list.setToolTipText((list.getSelectedValue() instanceof FinancesResetDuration)
+                                ? ((FinancesResetDuration) list.getSelectedValue()).getToolTipText() : "");
                     }
-                    else {
-                        setBackground(list.getBackground());
-                        setForeground(list.getForeground());
-                    }
-                    setFont(list.getFont());
-                    setText((value == null) ? "" : value.toString());
 
                     return this;
                 }
@@ -2240,8 +2233,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         pnlFinancesResetDuration.add(new JLabel(resourceMap.getString("financesResetDuration.text")));
         pnlFinancesResetDuration.setToolTipText(resourceMap.getString("financesResetDuration.toolTipText"));
         pnlFinancesResetDuration.add(comboFinancesResetDuration);
-        gridBagConstraints.gridy = ++gridy;
-        panFamily.add(pnlFinancesResetDuration, gridBagConstraints);
+        gridBagConstraints.gridy = gridy++;
+        panFinances.add(pnlFinancesResetDuration, gridBagConstraints);
 
         clanPriceModifierLabel.setText(resourceMap.getString("clanPriceModifierLabel.text")); // NOI18N
         clanPriceModifierLabel.setName("clanPriceModifierLabel"); // NOI18N
