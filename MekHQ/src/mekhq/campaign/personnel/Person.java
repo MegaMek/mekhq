@@ -4085,29 +4085,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return Modifier.calcTotalModifier(injuries.stream().flatMap(i -> i.getModifiers().stream()), ModifierValue.GUNNERY);
     }
 
-    /**
-     * @return an HTML encoded string of effects
-     */
-    public String getEffectString() {
-        StringBuilder sb = new StringBuilder("<html>");
-        final int pilotingMod = getPilotingInjuryMod();
-        final int gunneryMod = getGunneryInjuryMod();
-        if((pilotingMod != 0) && (pilotingMod < Integer.MAX_VALUE)) {
-            sb.append(String.format("  Piloting %+d <br>", pilotingMod));
-        } else if(pilotingMod == Integer.MAX_VALUE) {
-            sb.append("  Piloting: <i>Impossible</i>  <br>");
-        }
-        if((gunneryMod != 0) && (gunneryMod < Integer.MAX_VALUE)) {
-            sb.append(String.format("  Gunnery: %+d <br>", gunneryMod));
-        } else if(gunneryMod == Integer.MAX_VALUE) {
-            sb.append("  Gunnery: <i>Impossible</i>  <br>");
-        }
-        if(gunneryMod == 0 && pilotingMod == 0) {
-            sb.append("None");
-        }
-        return sb.append("</html>").toString();
-    }
-
     public boolean hasInjuries(boolean permCheck) {
         boolean tf = false;
         if (injuries.size() > 0) {
