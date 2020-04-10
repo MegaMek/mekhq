@@ -191,12 +191,12 @@ jobs:
     # NB: This only works if you're on the main MegaMek\mekhq repo
     #     for now due to a GitHub Actions limitation.
     #
-    #- name: Comment on PR with Build Scan URI
-    #  uses: thollander/actions-comment-pull-request@master
-    #  if: always() && steps.gradle_build.outputs.buildScanUri != ''
-    #  with:
-    #    message: Build scan available at ${{ steps.gradle_build.outputs.buildScanUri }}
-    #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Comment on PR with Build Scan URI
+      uses: thollander/actions-comment-pull-request@master
+      if: always() && steps.gradle_build.outputs.buildScanUri != ''
+      with:
+        message: Build scan available at ${{ steps.gradle_build.outputs.buildScanUri }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     #
     # Put the releases up in a single zip file called:
