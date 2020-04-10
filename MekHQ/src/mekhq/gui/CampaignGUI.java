@@ -2097,14 +2097,21 @@ public class CampaignGUI extends JPanel {
             // both members of the couple
             // TODO : make it so that exports will automatically include both spouses
             for (Person p : getCampaign().getActivePersonnel()) {
-                if (p.hasSpouse()) {
-                    if (!getCampaign().getPersonnel().contains(p.getSpouse())) {
-                        // If this happens, we need to clear the spouse
-                        if (p.getMaidenName() != null) {
-                            p.setSurname(p.getMaidenName());
-                        }
+                if (p.hasSpouse() && !getCampaign().getPersonnel().contains(p.getSpouse())) {
+                    // If this happens, we need to clear the spouse
+                    if (p.getMaidenName() != null) {
+                        p.setSurname(p.getMaidenName());
+                    }
 
-                        p.setSpouseId(null);
+                    p.setSpouseId(null);
+                }
+
+                if (p.isPregnant()) {
+                    String fatherIdString = p.getExtraData().get(Person.PREGNANCY_FATHER_DATA);
+                    UUID fatherId = (fatherIdString != null) ? UUID.fromString(fatherIdString) : null;
+                    if ((fatherId != null)
+                            && !getCampaign().getPersonnel().contains(getCampaign().getPerson(fatherId))) {
+                        p.getExtraData().set(Person.PREGNANCY_FATHER_DATA, null);
                     }
                 }
             }
