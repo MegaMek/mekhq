@@ -16,7 +16,7 @@ VERSION HISTORY:
 + Issue #1134: Option to Disable Dependent Automatic Addition in AtB
 + PR #1645: Deploying units as reinforcements to AtB and template scenarios no longer defaults them to the "any" deployment zone
 + Issue #1649, #1651: Fixing ExtraData Unmarshaller
-+ PR #1654: Fixing load from psrx data for spouses and babies
++ PR #1654: Fixing Spouse and Baby Load from Personnel export
 
 0.47.5 (2020-4-01 2000 UTC)
 + Issue #1470: Thumper artillery vehicle causes array index out of bounds exception error
