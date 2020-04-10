@@ -1336,7 +1336,7 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
 
-        UUID id = UUID.randomUUID();
+        UUID id = (p.getId() == null) ? UUID.randomUUID() : p.getId();
         p.setId(id);
         personnel.put(id, p);
 

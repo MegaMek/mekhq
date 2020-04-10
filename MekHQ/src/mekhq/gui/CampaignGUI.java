@@ -2030,7 +2030,7 @@ public class CampaignGUI extends JPanel {
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                     "Starting load of personnel file from XML..."); //$NON-NLS-1$
             // Initialize variables.
-            Document xmlDoc = null;
+            Document xmlDoc;
 
             // Open the file
             try (InputStream is = new FileInputStream(personnelFile)) {
@@ -2040,7 +2040,8 @@ public class CampaignGUI extends JPanel {
                 // Parse using builder to get DOM representation of the XML file
                 xmlDoc = db.parse(is);
             } catch (Exception ex) {
-                MekHQ.getLogger().error(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
+                MekHQ.getLogger().error(getClass(), METHOD_NAME, "Cannot load person XML", ex);
+                return; // otherwise we NPE out in the next line
             }
 
             Element personnelEle = xmlDoc.getDocumentElement();
@@ -2091,6 +2092,30 @@ public class CampaignGUI extends JPanel {
                     p.clearTechUnitIDs();
                 }
             }
+
+            // Fix Spouse Id Information - This is required to fix spouse NPEs where one doesn't export
+            // both members of the couple
+            // TODO : make it so that exports will automatically include both spouses
+            for (Person p : getCampaign().getActivePersonnel()) {
+                if (p.hasSpouse() && !getCampaign().getPersonnel().contains(p.getSpouse())) {
+                    // If this happens, we need to clear the spouse
+                    if (p.getMaidenName() != null) {
+                        p.setSurname(p.getMaidenName());
+                    }
+
+                    p.setSpouseId(null);
+                }
+
+                if (p.isPregnant()) {
+                    String fatherIdString = p.getExtraData().get(Person.PREGNANCY_FATHER_DATA);
+                    UUID fatherId = (fatherIdString != null) ? UUID.fromString(fatherIdString) : null;
+                    if ((fatherId != null)
+                            && !getCampaign().getPersonnel().contains(getCampaign().getPerson(fatherId))) {
+                        p.getExtraData().set(Person.PREGNANCY_FATHER_DATA, null);
+                    }
+                }
+            }
+
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                     "Finished load of personnel file"); //$NON-NLS-1$
         }
