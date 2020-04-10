@@ -1,29 +1,26 @@
 /*
  * MissingMekEngine.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
-import java.util.GregorianCalendar;
-
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -41,7 +38,6 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 
 /**
- * 
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingEnginePart extends MissingPart {
@@ -62,12 +58,12 @@ public class MissingEnginePart extends MissingPart {
 		}
 		this.engine = e;
 	}
-	
-	@Override 
+
+	@Override
 	public int getBaseTime() {
 		return 360;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		return -1;
@@ -76,7 +72,7 @@ public class MissingEnginePart extends MissingPart {
 	public Engine getEngine() {
 		return engine;
 	}
-	
+
 	@Override
 	public double getTonnage() {
 	    double weight = Engine.ENGINE_RATINGS[(int) Math.ceil(engine.getRating() / 5.0)];
@@ -146,26 +142,26 @@ public class MissingEnginePart extends MissingPart {
 		int engineType = -1;
 		int engineRating = -1;
 		int engineFlags = 0;
-		
+
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
-			
+
 			if (wn2.getNodeName().equalsIgnoreCase("engineType")) {
 				engineType = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("engineRating")) {
 				engineRating = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("engineFlags")) {
 				engineFlags = Integer.parseInt(wn2.getTextContent());
-			} 
+			}
 		}
-		
+
 		engine = new Engine(engineRating, engineType, engineFlags);
 		this.name = engine.getEngineName() + " Engine";
 	}
 
 	@Override
 	public boolean isAcceptableReplacement(Part part, boolean refit) {
-	    int year = campaign.getCalendar().get(GregorianCalendar.YEAR);
+	    int year = campaign.getGameYear();
 		if(part instanceof EnginePart) {
 			Engine eng = ((EnginePart)part).getEngine();
 			if (null != eng) {
@@ -173,12 +169,12 @@ public class MissingEnginePart extends MissingPart {
 						&& getEngine().getRating() == eng.getRating()
 						&& getEngine().getTechType(year) == eng.getTechType(year)
 						&& getUnitTonnage() == ((EnginePart)part).getUnitTonnage()
-						&& getTonnage() == ((EnginePart)part).getTonnage();				
+						&& getTonnage() == ((EnginePart)part).getTonnage();
 			}
 		}
 		return false;
 	}
-	
+
 	public void fixTankFlag(boolean hover) {
 		int flags = engine.getFlags();
 		if(!engine.hasFlag(Engine.TANK_ENGINE)) {
@@ -188,7 +184,7 @@ public class MissingEnginePart extends MissingPart {
 		this.name = engine.getEngineName() + " Engine";
 		this.forHover = hover;
 	}
-	
+
 	public void fixClanFlag() {
 		int flags = engine.getFlags();
 		if(!engine.hasFlag(Engine.CLAN_ENGINE)) {
@@ -197,7 +193,7 @@ public class MissingEnginePart extends MissingPart {
 		engine = new Engine(engine.getRating(), engine.getEngineType(), flags);
 		this.name = engine.getEngineName() + " Engine";
 	}
-	
+
 	 @Override
 	 public String checkFixable() {
 		 if(null == unit) {
@@ -242,7 +238,7 @@ public class MissingEnginePart extends MissingPart {
             }
 		}
 	}
-	
+
 	@Override
 	public String getAcquisitionName() {
 		return getPartName() + ",  " + getTonnage() + " tons";
@@ -258,7 +254,7 @@ public class MissingEnginePart extends MissingPart {
 	public int getLocation() {
 		return Entity.LOC_NONE;
 	}
-	
+
 	@Override
 	public TechAdvancement getTechAdvancement() {
 	    return engine.getTechAdvancement();
@@ -280,13 +276,13 @@ public class MissingEnginePart extends MissingPart {
                  break;
          }
          if (needsSideTorso
-                 && (unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_LT 
+                 && (unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_LT
                          || unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_RT)) {
              return true;
          }
-         return false;	
+         return false;
     }
-	
+
 	@Override
 	public int getMassRepairOptionType() {
     	return Part.REPAIR_PART_TYPE.ENGINE;

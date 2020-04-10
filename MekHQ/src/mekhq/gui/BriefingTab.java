@@ -27,7 +27,6 @@ import java.awt.GridLayout;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -668,7 +667,7 @@ public final class BriefingTab extends CampaignGuiTab {
         if (chosen.size() > 0) {
             // Ensure that the MegaMek year GameOption matches the campaign year
             GameOptions gameOpts = getCampaign().getGameOptions();
-            int campaignYear = getCampaign().getCalendar().get(Calendar.YEAR);
+            int campaignYear = getCampaign().getGameYear();
             if (gameOpts.intOption("year") != campaignYear) {
                 gameOpts.getOption("year").setValue(campaignYear);
             }

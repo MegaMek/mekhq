@@ -11,6 +11,11 @@ VERSION HISTORY:
 + PR #1634: Fixing Activate/Mothball Display Text
 + Issue #1636: ExtraData Export Fails because of Null Mapping
 + PR #1642: Fixing Popup Display Text Spacing Issues in DataLoadingDialog
++ Issue #1218: Personnel Total Earnings Tracking
++ Issue #1613: Automatically Output Finances Table to File on New Year
++ Issue #1134: Option to Disable Dependent Automatic Addition in AtB
++ PR #1645: Deploying units as reinforcements to AtB and template scenarios no longer defaults them to the "any" deployment zone
++ Issue #1649, #1651: Fixing ExtraData Unmarshaller
 
 0.47.5 (2020-4-01 2000 UTC)
 + Issue #1470: Thumper artillery vehicle causes array index out of bounds exception error
