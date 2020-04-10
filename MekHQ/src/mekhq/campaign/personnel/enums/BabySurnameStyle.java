@@ -25,26 +25,32 @@ import java.util.ResourceBundle;
 
 public enum BabySurnameStyle {
     //region Enum Declaration
-    MOTHERS("BabySurnameStyle.MOTHERS"),
-    FATHERS("BabySurnameStyle.FATHERS"),
-    WELSH_PATRONYMICS("BabySurnameStyle.WELSH_PATRONYMICS"),
-    WELSH_MATRONYMICS("BabySurnameStyle.WELSH_MATRONYMICS");
+    FATHERS("BabySurnameStyle.FATHERS.text", "BabySurnameStyle.FATHERS.toolTipText"),
+    MOTHERS("BabySurnameStyle.MOTHERS.text", "BabySurnameStyle.MOTHERS.toolTipText"),
+    WELSH_PATRONYMICS("BabySurnameStyle.WELSH_PATRONYMICS.text", "BabySurnameStyle.WELSH_PATRONYMICS.toolTipText"),
+    WELSH_MATRONYMICS("BabySurnameStyle.WELSH_MATRONYMICS.text", "BabySurnameStyle.WELSH_MATRONYMICS.toolTipText");
     //endregion Enum Declaration
 
     //region Variable Declarations
     private String styleName;
+    private String styleToolTip;
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
-    BabySurnameStyle(String styleName) {
+    BabySurnameStyle(String styleName, String styleToolTip) {
         this.styleName = resources.getString(styleName);
+        this.styleToolTip = resources.getString(styleToolTip);
     }
     //endregion Constructors
 
     public String getStyleName() {
         return styleName;
+    }
+
+    public String getStyleToolTip() {
+        return styleToolTip;
     }
 
     public String generateBabySurname(Person mother, Person father) {
@@ -78,5 +84,10 @@ public enum BabySurnameStyle {
             default:
                 return "ap " + fatherName;
         }
+    }
+
+    @Override
+    public String toString() {
+        return getStyleName();
     }
 }

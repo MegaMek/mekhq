@@ -59,6 +59,7 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
@@ -90,6 +91,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.RATManager;
@@ -256,7 +258,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JSpinner spnChanceProcreationNoRelationship;
     private JCheckBox chkDisplayTrueDueDate;
     private JCheckBox chkLogConception;
-    private JComboBox<String> comboBabySurnameStyle;
+    private JComboBox<BabySurnameStyle> comboBabySurnameStyle;
     private JCheckBox chkUseParentage;
     private JComboBox<String> comboDisplayFamilyLevel;
     private JCheckBox chkUseRandomDeaths;
@@ -1868,11 +1870,21 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(chkLogConception, gridBagConstraints);
 
-        DefaultComboBoxModel<String> babySurnameStyleModel = new DefaultComboBoxModel<>();
-        babySurnameStyleModel.addElement(resourceMap.getString("babySurnameStyle.Mother"));
-        babySurnameStyleModel.addElement(resourceMap.getString("babySurnameStyle.Father"));
+        DefaultComboBoxModel<BabySurnameStyle> babySurnameStyleModel = new DefaultComboBoxModel<>(BabySurnameStyle.values());
         comboBabySurnameStyle = new JComboBox<>(babySurnameStyleModel);
-        comboBabySurnameStyle.setSelectedIndex(options.getBabySurnameStyle());
+        comboBabySurnameStyle.setRenderer(new BasicComboBoxRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (isSelected && (index > -1)) {
+                    list.setToolTipText((list.getSelectedValue() instanceof BabySurnameStyle)
+                            ? ((BabySurnameStyle) list.getSelectedValue()).getStyleToolTip() : "");
+                }
+
+                return this;
+            }
+        });
+        comboBabySurnameStyle.setSelectedItem(options.getBabySurnameStyle());
         JPanel pnlBabySurnameStyle = new JPanel();
         pnlBabySurnameStyle.add(new JLabel(resourceMap.getString("babySurnameStyle.text")));
         pnlBabySurnameStyle.setToolTipText(resourceMap.getString("babySurnameStyle.toolTipText"));
@@ -4863,7 +4875,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setChanceProcreationNoRelationship((Double) spnChanceProcreationNoRelationship.getModel().getValue() / 100.0);
         options.setDisplayTrueDueDate(chkDisplayTrueDueDate.isSelected());
         options.setLogConception(chkLogConception.isSelected());
-        options.setBabySurnameStyle(comboBabySurnameStyle.getSelectedIndex());
+        options.setBabySurnameStyle((BabySurnameStyle) comboBabySurnameStyle.getSelectedItem());
         options.setUseParentage(chkUseParentage.isSelected());
         options.setDisplayFamilyLevel(comboDisplayFamilyLevel.getSelectedIndex());
         options.setUseRandomDeaths(chkUseRandomDeaths.isSelected());
