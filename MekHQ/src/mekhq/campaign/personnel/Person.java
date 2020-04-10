@@ -3011,13 +3011,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
 
-    public String getPatientDesc() {
-        String toReturn = "<html><font size='2'><b>" + getFullTitle() + "</b><br/>";
-        toReturn += getHits() + " hit(s)<br>[next check in " + getDaysToWaitForHealing() + " days]";
-        toReturn += "</font></html>";
-        return toReturn;
-    }
-
     /**
      * returns a full description in HTML format that will be used for the graphical display in the
      * personnel table among other places
@@ -3987,22 +3980,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public void removeInjury(Injury i) {
         injuries.remove(i);
         MekHQ.triggerEvent(new PersonChangedEvent(this));
-    }
-
-    public String getInjuriesDesc() {
-        StringBuilder toReturn = new StringBuilder("<html><font size='2'><b>").append(getFullTitle())
-                .append("</b><br/>").append("&nbsp;&nbsp;&nbsp;Injuries:");
-        String sep = "<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-        for (Injury injury : injuries) {
-            toReturn.append(sep).append(injury.getFluff());
-            if (sep.contains("<br/>")) {
-                sep = ", ";
-            } else {
-                sep = ",<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-            }
-        }
-        toReturn.append("</font></html>");
-        return toReturn.toString();
     }
 
     public void diagnose(int hits) {
