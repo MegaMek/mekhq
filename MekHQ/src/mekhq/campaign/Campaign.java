@@ -1593,6 +1593,22 @@ public class Campaign implements Serializable, ITechManager {
         return ancestors.get(id);
     }
 
+    /**
+     * This is used to get any ancestors where the person is the parent for
+     * @param personId the person's UUID
+     * @return the list of Ancestors objects where the person is the parent
+     */
+    public List<Ancestors> getChildAncestors(UUID personId) {
+        List<Ancestors> children = new ArrayList<>();
+
+        for (Ancestors a : getAncestors()) {
+            if (personId.equals(a.getMotherId()) || personId.equals(a.getFatherId())) {
+                children.add(a);
+            }
+        }
+        return children;
+    }
+
     public Ancestors createAncestors(UUID father, UUID mother) {
         Ancestors na = new Ancestors(father, mother, this);
         ancestors.put(na.getId(), na);
