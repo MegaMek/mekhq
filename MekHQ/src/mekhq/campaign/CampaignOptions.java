@@ -28,6 +28,7 @@ import java.util.List;
 
 import mekhq.campaign.finances.Money;
 
+import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -136,9 +137,7 @@ public class CampaignOptions implements Serializable {
     private double chanceProcreationNoRelationship;
     private boolean displayTrueDueDate;
     private boolean logConception;
-    private int babySurnameStyle;
-    public static final int BABY_SURNAME_MINE = 0; //baby uses mother's surname
-    public static final int BABY_SURNAME_SPOUSE = 1; //baby uses father's surname
+    private BabySurnameStyle babySurnameStyle;
     private boolean useParentage;
     private int displayFamilyLevel;
     public static final int PARENTS_CHILDREN_SIBLINGS = 0;
@@ -523,7 +522,7 @@ public class CampaignOptions implements Serializable {
         chanceProcreationNoRelationship = 0.00005;
         displayTrueDueDate = false;
         logConception = false;
-        babySurnameStyle = BABY_SURNAME_MINE;
+        babySurnameStyle = BabySurnameStyle.MOTHERS;
         useParentage = false;
         displayFamilyLevel = PARENTS_CHILDREN_SIBLINGS;
         useRandomDeaths = true;
@@ -1141,14 +1140,14 @@ public class CampaignOptions implements Serializable {
     /**
      * @return what style of surname to use for a baby
      */
-    public int getBabySurnameStyle() {
+    public BabySurnameStyle getBabySurnameStyle() {
         return babySurnameStyle;
     }
 
     /**
      * @param b the style of surname to use for a baby
      */
-    public void setBabySurnameStyle(int b) {
+    public void setBabySurnameStyle(BabySurnameStyle b) {
         babySurnameStyle = b;
     }
 

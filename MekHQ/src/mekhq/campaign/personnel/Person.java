@@ -1266,12 +1266,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
         String fatherIdString = extraData.get(PREGNANCY_FATHER_DATA);
         UUID fatherId = (fatherIdString != null) ? UUID.fromString(fatherIdString) : null;
         Ancestors anc = campaign.getAncestors(fatherId, id);
-        if (null == anc) {
+        if (anc == null) {
             anc = campaign.createAncestors(fatherId, id);
         }
         final UUID ancId = anc.getId();
 
-        final String surname = generateBabySurname(fatherId);
+        final String surname = getCampaign().getCampaignOptions().getBabySurnameStyle()
+                .generateBabySurname(this, campaign.getPerson(fatherId));
 
         // Cleanup
         removePregnancy();
@@ -1295,15 +1296,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
             return baby;
         }).collect(Collectors.toList());
-    }
-
-    private String generateBabySurname(UUID fatherId) {
-        if (campaign.getCampaignOptions().getBabySurnameStyle() == CampaignOptions.BABY_SURNAME_SPOUSE) {
-            if (fatherId != null) {
-                return campaign.getPerson(fatherId).getSurname();
-            }
-        }
-        return surname = getSurname();
     }
     //endregion Pregnancy
 
