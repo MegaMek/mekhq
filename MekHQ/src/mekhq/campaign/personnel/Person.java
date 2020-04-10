@@ -3637,7 +3637,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
         for (UUID unitId : techUnitIds) {
             Unit u = campaign.getUnit(unitId);
-            if (u != null && u.isMothballing()) {
+            if ((u != null) && u.isMothballing()) {
                 return true;
             }
         }
