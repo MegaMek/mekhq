@@ -20,6 +20,7 @@ package mekhq.campaign.personnel.enums;
 
 import megamek.common.Crew;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 
 import java.util.ResourceBundle;
@@ -63,6 +64,8 @@ public enum FamilialRelationshipType {
     SPOUSE("FamilialRelationshipType.SPOUSE.MALE.text",
             "FamilialRelationshipType.SPOUSE.FEMALE.text",
             "FamilialRelationshipType.SPOUSE.OTHER.text"),
+    DIVORCE("FamilialRelationshipType.DIVORCE.text"),
+    WIDOW("FamilialRelationshipType.WIDOW.text"),
     PARTNER("FamilialRelationshipType.PARTNER.text"),
     PARENT_IN_LAW("FamilialRelationshipType.PARENT_IN_LAW.MALE.text",
             "FamilialRelationshipType.PARENT_IN_LAW.FEMALE.text",
@@ -141,5 +144,16 @@ public enum FamilialRelationshipType {
         }
 
         return name.toString();
+    }
+
+    public String getLateSpouseTypeName(int gender) {
+        if (this != WIDOW) {
+            MekHQ.getLogger().error(getClass(), "getLateSpouseTypeName",
+                    "Called late spouse type name for an invalid relationship type.");
+        }
+
+        String name = resources.getString("FamilialRelationshipType.late");
+        name += " " + SPOUSE.getTypeName(gender);
+        return name;
     }
 }
