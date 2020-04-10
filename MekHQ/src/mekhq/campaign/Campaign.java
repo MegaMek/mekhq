@@ -1336,8 +1336,11 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
 
-        UUID id = UUID.randomUUID();
-        p.setId(id);
+        // This is required for any imported personnel
+        if (p.getId() == null) {
+            UUID id = UUID.randomUUID();
+            p.setId(id);
+        }
         personnel.put(id, p);
 
         boolean bondsman = campaignOptions.getDefaultPrisonerStatus() == CampaignOptions.BONDSMAN_RANK;
