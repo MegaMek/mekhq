@@ -42,6 +42,16 @@ jobs:
         path: mekhq
 
     #
+    # Setup composite build for MekHQ
+    #
+    # see: https://github.com/MegaMek/megamek/wiki/Working-With-Gradle
+    #
+    - name: Setup Composite Build for MekHQ
+      run: |
+        echo "includeBuild '../megamek'" >./mekhq/settings_local.gradle
+        echo "includeBuild '../megameklab'" >>./mekhq/settings_local.gradle
+
+    #
     # Find the repo and branch to use for MM
     #
     # Output variables:
@@ -78,7 +88,8 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: ${{ steps.find_mm.outputs.mmRepo }}
-        path: ${{ steps.find_mm.outputs.mmBranch }}
+        ref:  ${{ steps.find_mm.outputs.mmBranch }}
+        path: megamek
 
     #
     # Find the repo and branch to use for MML
@@ -117,8 +128,21 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: ${{ steps.find_mml.outputs.mmlRepo }}
-        path: ${{ steps.find_mml.outputs.mmlBranch }}
+        ref: ${{ steps.find_mml.outputs.mmlBranch }}
+        path: megameklab
 
+    #
+    # Setup composite build for MegaMekLab
+    #
+    # see: https://github.com/MegaMek/megamek/wiki/Working-With-Gradle
+    #
+    - name: Setup Composite Build for MegaMekLab
+      run: |
+        echo "if (gradle.parent == null) includeBuild '../megamek'" >./megameklab/settings_local.gradle
+
+    #
+    # Use Java 1.8
+    #
     - name: Set up JDK 1.8
       uses: actions/setup-java@v1
       with:
