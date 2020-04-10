@@ -26,7 +26,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.io.File;
-import java.util.Calendar;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -199,7 +198,7 @@ public class MekLabTab extends CampaignGuiTab {
         } catch (EntityLoadingException ex) {
             MekHQ.getLogger().error(getClass(), "loadUnit(Unit)", ex); //$NON-NLS-1$
         }
-        entity.setYear(unit.getCampaign().getCalendar().get(Calendar.YEAR));
+        entity.setYear(unit.getCampaign().getGameYear());
         UnitUtil.updateLoadedUnit(entity);
         entity.setModel(entity.getModel() + " Mk II");
         removeAll();
@@ -233,7 +232,7 @@ public class MekLabTab extends CampaignGuiTab {
         } catch (EntityLoadingException ex) {
             MekHQ.getLogger().error(getClass(), "resetUnit()", ex); //$NON-NLS-1$
         }
-        entity.setYear(unit.getCampaign().getCalendar().get(Calendar.YEAR));
+        entity.setYear(unit.getCampaign().getGameYear());
         UnitUtil.updateLoadedUnit(entity);
         removeAll();
         labPanel = getCorrectLab(entity);
