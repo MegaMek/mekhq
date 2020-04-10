@@ -90,6 +90,10 @@ public class CampaignOptions implements Serializable {
     private boolean useFactionForNames;
     private boolean useUnitRating;
 
+    //region General Tab
+    private String displayDateFormat;
+    //endregion General Tab
+
     //region Personnel Tab
     private boolean useTactics;
     private boolean useInitBonus;
@@ -351,6 +355,10 @@ public class CampaignOptions implements Serializable {
     private boolean historicalDailyLog;
 
     public CampaignOptions() {
+        //region General Tab
+        displayDateFormat = "yyyy-MM-dd";
+        //endregion General Tab
+
         useFactionForNames = true;
         repairSystem = REPAIR_SYSTEM_STRATOPS;
         useEraMods = false;
@@ -658,6 +666,16 @@ public class CampaignOptions implements Serializable {
 
         historicalDailyLog = false;
     }
+
+    //region General Tab
+    public String getDisplayDateFormat() {
+        return displayDateFormat;
+    }
+
+    public void setDisplayDateFormat(String s) {
+        displayDateFormat = s;
+    }
+    //endregion General Tab
 
     //region Personnel Tab
     public boolean useTactics() {
@@ -2735,6 +2753,10 @@ public class CampaignOptions implements Serializable {
 
 	public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
+        //region General Tab
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "displayDateFormat", displayDateFormat);
+        //endregion General Tab
+
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useFactionForNames", useFactionForNames);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "repairSystem", repairSystem);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnitRating", useUnitRating);
@@ -3058,8 +3080,11 @@ public class CampaignOptions implements Serializable {
 
             MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
                     String.format("%s\n\t%s", wn2.getNodeName(), wn2.getTextContent()));
-
-            if (wn2.getNodeName().equalsIgnoreCase("useFactionForNames")) {
+            //region General Tab
+            if (wn2.getNodeName().equalsIgnoreCase("displayDateFormat")) {
+                retVal.displayDateFormat = wn2.getTextContent().trim();
+            //endregion General Tab
+            } else if (wn2.getNodeName().equalsIgnoreCase("useFactionForNames")) {
                 retVal.useFactionForNames = wn2.getTextContent().equalsIgnoreCase("true");
             } else if (wn2.getNodeName().equalsIgnoreCase("repairSystem")) {
                 retVal.repairSystem = Integer.parseInt(wn2.getTextContent());
