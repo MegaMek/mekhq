@@ -25,7 +25,6 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -152,8 +151,8 @@ public class ContractMarket implements Serializable {
 	}
 
 	public void generateContractOffers(Campaign campaign, boolean newCampaign) {
-		if ((method == TYPE_ATBMONTHLY && campaign.getCalendar().get(Calendar.DAY_OF_MONTH) == 1) ||
-				newCampaign) {
+		if (((method == TYPE_ATBMONTHLY) && (campaign.getLocalDate().getDayOfMonth() == 1))
+                || newCampaign) {
 			Contract[] list = contracts.toArray(new Contract[contracts.size()]);
 			for (Contract c : list) {
 				removeContract(c);
@@ -211,7 +210,7 @@ public class ContractMarket implements Serializable {
                     }
                 }
             }
-            
+
             if (inBackwater) {
 				numContracts--;
 			}
@@ -322,7 +321,7 @@ public class ContractMarket implements Serializable {
 	private AtBContract generateAtBContract(Campaign campaign,
 			String employer, int unitRatingMod, int retries) {
 	    final String METHOD_NAME = "generateAtBContract(Campaign,String,int,int)"; //$NON-NLS-1$
-	    
+
 		AtBContract contract = new AtBContract(employer
 				+"-"
 				+Contract.generateRandomContractName()
@@ -394,17 +393,17 @@ public class ContractMarket implements Serializable {
 		} catch (NullPointerException ex) {
 			// could not calculate jump path; leave jp null
 		}
-		
+
 		if (jp == null) {
 			if (retries > 0) {
 				return generateAtBContract(campaign, employer, unitRatingMod, retries - 1);
 			} else {
 				return null;
-			}			
+			}
 		}
 
-		setAllyRating(contract, isAttacker, campaign.getCalendar().get(Calendar.YEAR));
-		setEnemyRating(contract, isAttacker, campaign.getCalendar().get(Calendar.YEAR));
+		setAllyRating(contract, isAttacker, campaign.getGameYear());
+		setEnemyRating(contract, isAttacker, campaign.getGameYear());
 
 		if (contract.getMissionType() == AtBContract.MT_CADREDUTY) {
 			contract.setAllySkill(RandomSkillsGenerator.L_GREEN);
@@ -422,11 +421,11 @@ public class ContractMarket implements Serializable {
         contract.calculateContract(campaign);
 
         //Ralgith had a version of this then the PR got added. Commenting this Out.
-/*        contract.setName(Faction.getFaction(employer).getShortName() + "-" + String.format("%1$tY%1$tm", contract.getStartDate()) 
-        				 + "-" + AtBContract.missionTypeNames[contract.getMissionType()] 
+/*        contract.setName(Faction.getFaction(employer).getShortName() + "-" + String.format("%1$tY%1$tm", contract.getStartDate())
+        				 + "-" + AtBContract.missionTypeNames[contract.getMissionType()]
         				 + "-" + Faction.getFaction(contract.getEnemyCode()).getShortName()
         				 + "-" + contract.getLength());*/
-        
+
 		return contract;
 	}
 
@@ -485,8 +484,8 @@ public class ContractMarket implements Serializable {
 				(contract.getMissionType() == AtBContract.MT_RELIEFDUTY && Compute.d6() < 4) ||
 				contract.getEnemyCode().equals("REB"));
         contract.setSystemId(parent.getSystemId());
-		setAllyRating(contract, isAttacker, campaign.getCalendar().get(Calendar.YEAR));
-		setEnemyRating(contract, isAttacker, campaign.getCalendar().get(Calendar.YEAR));
+		setAllyRating(contract, isAttacker, campaign.getGameYear());
+		setEnemyRating(contract, isAttacker, campaign.getGameYear());
 
 		if (contract.getMissionType() == AtBContract.MT_CADREDUTY) {
 			contract.setAllySkill(RandomSkillsGenerator.L_GREEN);
@@ -656,7 +655,7 @@ public class ContractMarket implements Serializable {
 		if (roll == 11) return IUnitRating.DRAGOON_B;
 		return IUnitRating.DRAGOON_A;
 	}
-	
+
 	protected void setAtBContractClauses(AtBContract contract, int unitRatingMod, Campaign campaign) {
 		ClauseMods mods = new ClauseMods();
 		clauseMods.put(contract.getId(), mods);

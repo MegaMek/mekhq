@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -403,19 +404,23 @@ public class Campaign implements Serializable, ITechManager {
                 + getDateAsString() + " (" + getEraName() + ")";
     }
 
+    @Deprecated
     public void setCalendar(GregorianCalendar c) {
         calendar = c;
         currentDateTime = new DateTime(c);
     }
 
+    @Deprecated
     public GregorianCalendar getCalendar() {
         return calendar;
     }
 
+    @Deprecated
     public DateFormat getDateFormatter() {
         return new SimpleDateFormat(dateFormat);
     }
 
+    @Deprecated
     public DateFormat getShortDateFormatter() {
         return new SimpleDateFormat(shortDateFormat);
     }
@@ -655,7 +660,7 @@ public class Campaign implements Serializable, ITechManager {
             if (roll >= target.getValue()) {
                 report.append("<br/>Search successful. ");
                 MechSummary ms = unitGenerator.generate(factionCode, shipSearchType, -1,
-                        getCalendar().get(Calendar.YEAR), getUnitRatingMod());
+                        getGameYear(), getUnitRatingMod());
                 if (ms == null) {
                     ms = getAtBConfig().findShip(shipSearchType);
                 }
@@ -1509,7 +1514,7 @@ public class Campaign implements Serializable, ITechManager {
                         : rating.getModifier());
             }
             // Reavings diminish the number of available Bloodrights in later eras
-            int year = getCalendar().get(Calendar.YEAR);
+            int year = getGameYear();
             if (year <= 2950)
                 bloodnameTarget--;
             if (year > 3055)
@@ -1687,6 +1692,7 @@ public class Campaign implements Serializable, ITechManager {
         return calendar.getTime();
     }
 
+    @Deprecated
     public DateTime getDateTime() {
         return currentDateTime;
     }
@@ -1695,7 +1701,7 @@ public class Campaign implements Serializable, ITechManager {
      * For now, this is just going to parse through the current date time
      */
     public LocalDate getLocalDate() {
-        return LocalDate.of(getDateTime().getYear(), getDateTime().getMonthOfYear(), getDateTime().getDayOfMonth());
+        return LocalDate.of(currentDateTime.getYear(), currentDateTime.getMonthOfYear(), currentDateTime.getDayOfMonth());
     }
 
     public List<Person> getPatients() {
@@ -3323,7 +3329,7 @@ public class Campaign implements Serializable, ITechManager {
                         "The start and end dates of " + m.getName() + " have been shifted to reflect the current ETA.");
                 continue;
             }
-            if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
+            if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
                 int deficit = getDeploymentDeficit((AtBContract) m);
                 if (deficit > 0) {
                     ((AtBContract) m).addPlayerMinorBreaches(deficit);
@@ -3348,7 +3354,7 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
 
-        if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
+        if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
             AtBScenarioFactory.createScenariosForNewWeek(this);
         }
 
@@ -3440,12 +3446,12 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
 
-        if (getCalendar().get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
+        if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
             processShipSearch();
         }
 
         // Add or remove dependents
-        if (calendar.get(Calendar.DAY_OF_YEAR) == 1) {
+        if (getLocalDate().getDayOfYear() == 1) {
             int numPersonnel = 0;
             ArrayList<Person> dependents = new ArrayList<>();
             for (Person p : getPersonnel()) {
@@ -3474,7 +3480,7 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
 
-        if (calendar.get(Calendar.DAY_OF_MONTH) == 1) {
+        if (getLocalDate().getDayOfMonth() == 1) {
             /*
              * First of the month; roll morale, track unit fatigue.
              */
@@ -3558,7 +3564,7 @@ public class Campaign implements Serializable, ITechManager {
             // Reset edge points to the purchased value each week. This should only
             // apply for support personnel - combat troops reset with each new mm game
             if ((p.isAdmin() || p.isDoctor() || p.isEngineer() || p.isTech())
-                    && (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY)) {
+                    && (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY)) {
                 p.resetCurrentEdge();
             }
 
@@ -3685,7 +3691,7 @@ public class Campaign implements Serializable, ITechManager {
             return false;
         }
 
-        this.autosaveService.requestDayAdvanceAutosave(this, this.calendar);
+        this.autosaveService.requestDayAdvanceAutosave(this);
 
         calendar.add(Calendar.DAY_OF_MONTH, 1);
         currentDateTime = new DateTime(calendar);
@@ -3695,7 +3701,7 @@ public class Campaign implements Serializable, ITechManager {
         newReports.clear();
         beginReport("<b>" + getDateAsString() + "</b>");
 
-        if (calendar.get(Calendar.DAY_OF_YEAR) == 1) {
+        if (getLocalDate().getDayOfYear() == 1) {
             reloadNews();
         }
 
@@ -5692,8 +5698,7 @@ public class Campaign implements Serializable, ITechManager {
 
             }
 
-            if ((getCalendar().get(Calendar.YEAR) < 2950
-                    || getCalendar().get(Calendar.YEAR) > 3040)
+            if (((getGameYear() < 2950) || (getGameYear() > 3040))
                     && (acquisition instanceof Armor || acquisition instanceof MissingMekActuator
                             || acquisition instanceof mekhq.campaign.parts.MissingMekCockpit
                             || acquisition instanceof mekhq.campaign.parts.MissingMekLifeSupport
