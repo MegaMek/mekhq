@@ -25,7 +25,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
 import java.util.Collections;
@@ -126,12 +125,15 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent event) {
         if (event.getSource().equals(btnStart) || event.getSource().equals(btnNextMonth)) {
-            int days = (int)spnDays.getValue();
+            int days = (int) spnDays.getValue();
             boolean firstDay = true;
             MekHQ.registerHandler(this);
             if (event.getSource().equals(btnNextMonth)) {
                 LocalDate today = gui.getCampaign().getLocalDate();
-                days = today.lengthOfMonth() - today.getDayOfMonth();
+                // The number of days till the next month is the length of the month plus one minus
+                // the current day, with the one added because otherwise we get the last day of the same
+                // month
+                days = today.lengthOfMonth() + 1 - today.getDayOfMonth();
             }
 
             int numDays;
@@ -147,12 +149,12 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
                     gui.showRetirementDefectionDialog();
                     break;
                 }
-                if(!gui.getCampaign().newDay()) {
+                if (!gui.getCampaign().newDay()) {
                     break;
                 }
                 //String newLogString = logPanel.getLogText();
                 //newLogString = newLogString.concat(gui.getCampaign().getCurrentReportHTML());
-                if(firstDay) {
+                if (firstDay) {
                     logPanel.refreshLog(gui.getCampaign().getCurrentReportHTML());
                     firstDay = false;
                 } else {
