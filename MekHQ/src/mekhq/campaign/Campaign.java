@@ -3730,7 +3730,7 @@ public class Campaign implements Serializable, ITechManager {
         shoppingList = goShopping(shoppingList);
 
         // check for anything in finances
-        finances.newDay(this);
+        getFinances().newDay(this);
 
         MekHQ.triggerEvent(new NewDayEvent(this));
         return true;

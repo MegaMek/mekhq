@@ -1,9 +1,21 @@
 /*
- * CampaignOptionsDialog.java
+ * Copyright (C) 2009, 2020 - The MegaMek Team. All rights reserved
  *
- * Created on August 19, 2009, 11:22 AM
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
@@ -275,6 +287,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox usePeacetimeCostBox;
     private JCheckBox useExtendedPartsModifierBox;
     private JCheckBox showPeacetimeCostBox;
+    private JCheckBox yearlyFinancesToCSVExportBox;
     private JSpinner spnClanPriceModifier;
     private JSpinner[] spnUsedPartsValue;
     private JSpinner spnDamagedPartsValue;
@@ -2171,7 +2184,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panFinances.add(usePeacetimeCostBox, gridBagConstraints);
 
         useExtendedPartsModifierBox.setText(resourceMap.getString("useExtendedPartsModifierBox.text")); // NOI18N
-        //useExtendedPartsModifierBox.setToolTipText(resourceMap.getString("useExtendedPartsModifierBox.toolTipText")); // NOI18N
         useExtendedPartsModifierBox.setName("useExtendedPartsModifierBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -2192,6 +2204,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panFinances.add(showPeacetimeCostBox, gridBagConstraints);
 
+        yearlyFinancesToCSVExportBox = new JCheckBox(resourceMap.getString("yearlyFinancesToCSVExportBox.text"));
+        yearlyFinancesToCSVExportBox.setToolTipText(resourceMap.getString("yearlyFinancesToCSVExportBox.toolTipText"));
+        yearlyFinancesToCSVExportBox.setName("yearlyFinancesToCSVExportBox");
+        yearlyFinancesToCSVExportBox.setSelected(options.getYearlyFinancesToCSVExport());
+        gridBagConstraints.gridy = gridy++;
+        panFinances.add(yearlyFinancesToCSVExportBox, gridBagConstraints);
 
         clanPriceModifierLabel.setText(resourceMap.getString("clanPriceModifierLabel.text")); // NOI18N
         clanPriceModifierLabel.setName("clanPriceModifierLabel"); // NOI18N
@@ -2211,8 +2229,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panFinances.add(spnClanPriceModifier, gridBagConstraints);
-
-        //JPanel panUsedParts = new JPanel(new GridBagLayout());
 
         usedPartsValueLabel.setText(resourceMap.getString("usedPartsValueLabel.text")); // NOI18N
         usedPartsValueLabel.setName("usedPartsValueLabel"); // NOI18N
@@ -4707,6 +4723,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setUsePeacetimeCost(usePeacetimeCostBox.isSelected());
         options.setUseExtendedPartsModifier(useExtendedPartsModifierBox.isSelected());
         options.setShowPeacetimeCost(showPeacetimeCostBox.isSelected());
+        options.setYearlyFinancesToCSVExport(yearlyFinancesToCSVExportBox.isSelected());
         options.setAssignPortraitOnRoleChange(chkAssignPortraitOnRoleChange.isSelected());
 
         options.setEquipmentContractBase(btnContractEquipment.isSelected());
