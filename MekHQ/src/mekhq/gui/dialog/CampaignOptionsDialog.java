@@ -82,7 +82,8 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.GamePreset;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.event.OptionsChangedEvent;
-import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.Finances;
+import mekhq.campaign.finances.enums.FinancesResetDuration;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.Part;
@@ -98,7 +99,6 @@ import mekhq.gui.SpecialAbilityPanel;
 import mekhq.gui.model.RankTableModel;
 import mekhq.gui.model.SortedComboBoxModel;
 import mekhq.gui.preferences.JWindowPreference;
-import mekhq.gui.utilities.JMoneyTextField;
 import mekhq.gui.utilities.TableCellListener;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
@@ -288,6 +288,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox useExtendedPartsModifierBox;
     private JCheckBox showPeacetimeCostBox;
     private JCheckBox yearlyFinancesToCSVExportBox;
+    private JComboBox<FinancesResetDuration> comboFinancesResetDuration;
     private JSpinner spnClanPriceModifier;
     private JSpinner[] spnUsedPartsValue;
     private JSpinner spnDamagedPartsValue;
@@ -2211,6 +2212,16 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         yearlyFinancesToCSVExportBox.setSelected(options.getYearlyFinancesToCSVExport());
         gridBagConstraints.gridy = gridy++;
         panFinances.add(yearlyFinancesToCSVExportBox, gridBagConstraints);
+
+        DefaultComboBoxModel<FinancesResetDuration> financesResetDurationModel = new DefaultComboBoxModel<>(FinancesResetDuration.values());
+        comboFinancesResetDuration = new JComboBox<>(financesResetDurationModel);
+        comboFinancesResetDuration.setSelectedItem(options.getFinancesResetDuration());
+        JPanel pnlFinancesResetDuration = new JPanel();
+        pnlFinancesResetDuration.add(new JLabel(resourceMap.getString("financesResetDuration.text")));
+        pnlFinancesResetDuration.setToolTipText(resourceMap.getString("financesResetDuration.toolTipText"));
+        pnlFinancesResetDuration.add(comboFinancesResetDuration);
+        gridBagConstraints.gridy = ++gridy;
+        panFamily.add(pnlFinancesResetDuration, gridBagConstraints);
 
         clanPriceModifierLabel.setText(resourceMap.getString("clanPriceModifierLabel.text")); // NOI18N
         clanPriceModifierLabel.setName("clanPriceModifierLabel"); // NOI18N
@@ -4715,6 +4726,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setUseExtendedPartsModifier(useExtendedPartsModifierBox.isSelected());
         options.setShowPeacetimeCost(showPeacetimeCostBox.isSelected());
         options.setYearlyFinancesToCSVExport(yearlyFinancesToCSVExportBox.isSelected());
+        options.setFinancesResetDuration((FinancesResetDuration) comboFinancesResetDuration.getSelectedItem());
         options.setAssignPortraitOnRoleChange(chkAssignPortraitOnRoleChange.isSelected());
 
         options.setEquipmentContractBase(btnContractEquipment.isSelected());
