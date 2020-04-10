@@ -18,11 +18,9 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
-import java.util.GregorianCalendar;
 
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
@@ -153,15 +151,15 @@ public class EnginePart extends Part {
 
     @Override
     public boolean isSamePartType(Part part) {
-        int year = campaign.getCalendar().get(GregorianCalendar.YEAR);
+        int year = campaign.getGameYear();
         return part instanceof EnginePart && getName().equals(part.getName())
                 && getEngine().getEngineType() == ((EnginePart) part).getEngine().getEngineType()
                 && getEngine().getRating() == ((EnginePart) part).getEngine().getRating()
                 && getEngine().getTechType(year) == ((EnginePart) part).getEngine().getTechType(year)
                 && getEngine().hasFlag(Engine.TANK_ENGINE) == ((EnginePart) part).getEngine()
                         .hasFlag(Engine.TANK_ENGINE)
-                && getUnitTonnage() == ((EnginePart) part).getUnitTonnage()
-                && getTonnage() == ((EnginePart) part).getTonnage();
+                && getUnitTonnage() == part.getUnitTonnage()
+                && getTonnage() == part.getTonnage();
     }
 
     @Override

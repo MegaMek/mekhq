@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -746,11 +747,11 @@ public class AtBContract extends Contract implements Serializable {
     }
 
     public void checkEvents(Campaign c) {
-        if (c.getCalendar().get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
+        if (c.getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
             nextWeekBattleTypeMod = 0;
         }
 
-        if (c.getCalendar().get(Calendar.DAY_OF_MONTH) == 1) {
+        if (c.getLocalDate().getDayOfMonth() == 1) {
             if (priorLogisticsFailure) {
                 partsAvailabilityLevel++;
                 priorLogisticsFailure = false;

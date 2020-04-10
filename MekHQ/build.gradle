@@ -40,26 +40,14 @@ dependencies {
         exclude group: 'org.mozilla', module: 'rhino'
     }
 
-    // We have been using a modified version of svgSalamander in MML, which we'll keep around until
-    // the conversion to batik is complete.
-    implementation files('lib/svgSalamander.jar')
-
     implementation 'org.jfree:jfreechart:1.5.0'
     implementation 'joda-time:joda-time:2.10'
     implementation 'org.joda:joda-money:1.0.1'
     implementation 'org.apache.commons:commons-text:1.4'
     implementation 'org.apache.commons:commons-csv:1.4'
     implementation 'javax.vecmath:vecmath:1.5.2'
-    implementation 'com.formdev:flatlaf:0.26'
-
     implementation 'com.atlassian.commonmark:commonmark:0.13.0'
-
-    implementation 'log4j:log4j:1.2.17'
-    implementation 'javax.xml.bind:jaxb-api:2.3.0'
     implementation 'com.fasterxml.jackson.core:jackson-core:2.9.8'
-    runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:2.3.0'
-    runtimeOnly 'org.glassfish.jaxb:jaxb-core:2.3.0'
-    runtimeOnly 'com.sun.activation:javax.activation:1.2.0'
 
     jarbundler 'com.ultramixer.jarbundler:jarbundler-core:3.3.0'
 
@@ -545,6 +533,7 @@ task assembleDist(overwrite: true) {
     group = 'distribution'
     dependsOn stageMM
     dependsOn stageMML
+    dependsOn test
     dependsOn unixDistTar
     dependsOn windowsDistZip
 //    dependsOn macDistTar

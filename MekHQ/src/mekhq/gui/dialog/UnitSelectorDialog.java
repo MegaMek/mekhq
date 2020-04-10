@@ -3,7 +3,6 @@
  *
  * Created on August 21, 2009, 4:26 PM
  */
-
 package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
@@ -17,7 +16,6 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Comparator;
-import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 
 import javax.swing.DefaultComboBoxModel;
@@ -124,7 +122,7 @@ public class UnitSelectorDialog extends JDialog {
         //methods like buyUnit, addUnit, etc. that we could register with this dialog
         //and then update when needed
         this.campaign = c;
-        asd = new AdvancedSearchDialog(frame, campaign.getCalendar().get(GregorianCalendar.YEAR));
+        asd = new AdvancedSearchDialog(frame, campaign.getGameYear());
         initComponents();
 
         MechSummary[] allMechs = MechSummaryCache.getInstance().getAllMechs();
@@ -454,10 +452,10 @@ public class UnitSelectorDialog extends JDialog {
     }//GEN-LAST:event_btnCloseActionPerformed
 
     private void filterUnits() {
-        RowFilter<MechTableModel, Integer> unitTypeFilter = null;
+        RowFilter<MechTableModel, Integer> unitTypeFilter;
         final int nClass = comboWeight.getSelectedIndex();
         final int nUnit = comboUnitType.getSelectedIndex();
-        final int year = campaign.getCalendar().get(GregorianCalendar.YEAR);
+        final int year = campaign.getGameYear();
         //If current expression doesn't parse, don't update.
         try {
             unitTypeFilter = new RowFilter<MechTableModel,Integer>() {

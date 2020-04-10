@@ -24,7 +24,6 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Map;
 import java.util.StringJoiner;
 import java.util.UUID;
@@ -508,7 +507,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
     public SimpleTechLevel getSimpleTechLevel() {
         if (campaign.useVariableTechLevel()) {
-            return getSimpleLevel(campaign.getCalendar().get(Calendar.YEAR));
+            return getSimpleLevel(campaign.getGameYear());
         } else {
             return getStaticTechLevel();
         }
@@ -1717,10 +1716,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
     @Override
     public int calcYearAvailability(int year, boolean clan) {
-        int av = getTechAdvancement().calcYearAvailability(campaign.getCalendar().get(Calendar.YEAR),
+        int av = getTechAdvancement().calcYearAvailability(campaign.getGameYear(),
                 campaign.getFaction().isClan());
         if (omniPodded) {
-            av = Math.max(av, TA_POD.calcYearAvailability(campaign.getCalendar().get(Calendar.YEAR),
+            av = Math.max(av, TA_POD.calcYearAvailability(campaign.getGameYear(),
                 campaign.getFaction().isClan()));
         }
         return av;

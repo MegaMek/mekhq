@@ -20,7 +20,6 @@ package mekhq.campaign.personnel.generator;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import megamek.common.Compute;
@@ -109,7 +108,7 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
             person.getOptions()
                 .acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
                     SpecialAbility.chooseWeaponSpecialization(person.getPrimaryRole(), person.getOriginFaction().isClan(),
-                            getCampaignOptions(person).getTechLevel(), person.getCampaign().getCalendar().get(GregorianCalendar.YEAR)));
+                            getCampaignOptions(person).getTechLevel(), person.getCampaign().getGameYear()));
         } else {
             person.getOptions()
                 .acquireAbility(PilotOptions.LVL3_ADVANTAGES, name, true);

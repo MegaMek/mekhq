@@ -18,11 +18,9 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
-import java.util.GregorianCalendar;
 
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
@@ -74,7 +72,7 @@ public class MASC extends EquipmentPart {
     		return 0;
     	}
     	//supercharger tonnage will need to be set by hand in parts store
-        if (TechConstants.isClan(type.getTechLevel(campaign.getCalendar().get(GregorianCalendar.YEAR)))) {
+        if (TechConstants.isClan(type.getTechLevel(campaign.getGameYear()))) {
             return Math.round(getUnitTonnage() / 25.0f);
         }
         return Math.round(getUnitTonnage() / 20.0f);

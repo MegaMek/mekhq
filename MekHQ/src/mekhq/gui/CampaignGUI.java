@@ -31,6 +31,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
+import java.time.DayOfWeek;
 import java.util.*;
 import java.util.zip.GZIPOutputStream;
 
@@ -1294,7 +1295,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public boolean nagShortDeployments() {
-        if (getCampaign().getCalendar().get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
+        if (getCampaign().getLocalDate().getDayOfWeek() != DayOfWeek.SUNDAY) {
             return false;
         }
         for (Mission m : getCampaign().getMissions()) {
@@ -1500,15 +1501,21 @@ public class CampaignGUI extends JPanel {
 
     private void menuOptionsActionPerformed(java.awt.event.ActionEvent evt) {
         boolean atb = getCampaign().getCampaignOptions().getUseAtB();
-        boolean timein = getCampaign().getCampaignOptions().getUseTimeInService();
+        boolean timeIn = getCampaign().getCampaignOptions().getUseTimeInService();
+        boolean rankIn = getCampaign().getCampaignOptions().getUseTimeInRank();
         boolean staticRATs = getCampaign().getCampaignOptions().useStaticRATs();
         boolean factionIntroDate = getCampaign().getCampaignOptions().useFactionIntroDate();
         CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), true,
                 getCampaign(), getIconPackage().getCamos());
         cod.setVisible(true);
-        if (timein != getCampaign().getCampaignOptions().getUseTimeInService()) {
+        if (timeIn != getCampaign().getCampaignOptions().getUseTimeInService()) {
             if (getCampaign().getCampaignOptions().getUseTimeInService()) {
                 getCampaign().initTimeInService();
+            }
+        }
+        if (rankIn != getCampaign().getCampaignOptions().getUseTimeInRank()) {
+            if (getCampaign().getCampaignOptions().getUseTimeInRank()) {
+                getCampaign().initTimeInRank();
             }
         }
         if (atb != getCampaign().getCampaignOptions().getUseAtB()) {
