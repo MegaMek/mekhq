@@ -212,15 +212,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //endregion Divorce Variables
     //endregion Family Variables
 
-    /** Contains the skill levels to be displayed in a tech's description */
-    private static final String[] DISPLAYED_SKILL_LEVELS = new String[] {
-        SkillType.S_TECH_MECH,
-        SkillType.S_TECH_MECHANIC,
-        SkillType.S_TECH_BA,
-        SkillType.S_TECH_AERO,
-        SkillType.S_TECH_VESSEL,
-    };
-
     protected UUID id;
     protected int oldId;
 
@@ -2865,13 +2856,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
 
-    public String getPatientDesc() {
-        String toReturn = "<html><font size='2'><b>" + getFullTitle() + "</b><br/>";
-        toReturn += getHits() + " hit(s)<br>[next check in " + getDaysToWaitForHealing() + " days]";
-        toReturn += "</font></html>";
-        return toReturn;
-    }
-
     /**
      * returns a full description in HTML format that will be used for the graphical display in the
      * personnel table among other places
@@ -3717,31 +3701,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return null;
     }
 
-    public String getDocDesc() {
-        StringBuilder toReturn = new StringBuilder(128);
-        toReturn.append("<html><font size='2'><b>").append(getFullTitle()).append("</b><br/>");
-
-        Skill skill = getSkill(SkillType.S_DOCTOR);
-        if (null != skill) {
-            toReturn.append(SkillType.getExperienceLevelName(skill.getExperienceLevel()))
-                    .append(" " + SkillType.S_DOCTOR);
-        }
-
-        toReturn.append(String.format(" (%d XP)", getXp()));
-
-        if (campaign.getMedicsPerDoctor() < 4) {
-            toReturn.append("</font><font size='2' color='red'>, ")
-                    .append(campaign.getMedicsPerDoctor())
-                    .append(" medics</font><font size='2'><br/>");
-        } else {
-            toReturn.append(String.format(", %d medics<br />", campaign.getMedicsPerDoctor()));
-        }
-
-        toReturn.append(String.format("%d patient(s)</font></html>", campaign.getPatientsFor(this)));
-
-        return toReturn.toString();
-    }
-
     public int getBestTechLevel() {
         int lvl = -1;
         Skill mechSkill = getSkill(SkillType.S_TECH_MECH);
@@ -3761,40 +3720,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
             lvl = aeroSkill.getLevel();
         }
         return lvl;
-    }
-
-    public String getTechDesc(boolean overtimeAllowed, IPartWork part) {
-        StringBuilder toReturn = new StringBuilder(128);
-        toReturn.append("<html><font size='2'");
-        if (null != part && null != part.getUnit() && getTechUnitIDs().contains(part.getUnit().getId())) {
-            toReturn.append(" color='green'><b>@");
-        }
-        else {
-            toReturn.append("><b>");
-        }
-        toReturn.append(getFullTitle()).append("</b><br/>");
-
-        boolean first = true;
-        for (String skillName : DISPLAYED_SKILL_LEVELS) {
-            Skill skill = getSkill(skillName);
-            if (null == skill) {
-                continue;
-            } else if (!first) {
-                toReturn.append("; ");
-            }
-
-            toReturn.append(SkillType.getExperienceLevelName(skill.getExperienceLevel()));
-            toReturn.append(" ").append(skillName);
-            first = false;
-        }
-
-        toReturn.append(String.format(" (%d XP)<br/>", getXp()))
-                .append(String.format("%d minutes left", getMinutesLeft()));
-        if (overtimeAllowed) {
-            toReturn.append(String.format(" + (%d overtime)", getOvertimeLeft()));
-        }
-        toReturn.append("</font></html>");
-        return toReturn.toString();
     }
 
     public boolean isRightTechTypeFor(IPartWork part) {
@@ -3903,22 +3828,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
-    public String getInjuriesDesc() {
-        StringBuilder toReturn = new StringBuilder("<html><font size='2'><b>").append(getFullTitle())
-                .append("</b><br/>").append("&nbsp;&nbsp;&nbsp;Injuries:");
-        String sep = "<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-        for (Injury injury : injuries) {
-            toReturn.append(sep).append(injury.getFluff());
-            if (sep.contains("<br/>")) {
-                sep = ", ";
-            } else {
-                sep = ",<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-            }
-        }
-        toReturn.append("</font></html>");
-        return toReturn.toString();
-    }
-
     public void diagnose(int hits) {
         InjuryUtil.resolveAfterCombat(campaign, this, hits);
         InjuryUtil.resolveCombatDamage(campaign, this, hits);
@@ -3997,29 +3906,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public int getGunneryInjuryMod() {
         return Modifier.calcTotalModifier(injuries.stream().flatMap(i -> i.getModifiers().stream()), ModifierValue.GUNNERY);
-    }
-
-    /**
-     * @return an HTML encoded string of effects
-     */
-    public String getEffectString() {
-        StringBuilder sb = new StringBuilder("<html>");
-        final int pilotingMod = getPilotingInjuryMod();
-        final int gunneryMod = getGunneryInjuryMod();
-        if((pilotingMod != 0) && (pilotingMod < Integer.MAX_VALUE)) {
-            sb.append(String.format("  Piloting %+d <br>", pilotingMod));
-        } else if(pilotingMod == Integer.MAX_VALUE) {
-            sb.append("  Piloting: <i>Impossible</i>  <br>");
-        }
-        if((gunneryMod != 0) && (gunneryMod < Integer.MAX_VALUE)) {
-            sb.append(String.format("  Gunnery: %+d <br>", gunneryMod));
-        } else if(gunneryMod == Integer.MAX_VALUE) {
-            sb.append("  Gunnery: <i>Impossible</i>  <br>");
-        }
-        if(gunneryMod == 0 && pilotingMod == 0) {
-            sb.append("None");
-        }
-        return sb.append("</html>").toString();
     }
 
     public boolean hasInjuries(boolean permCheck) {
