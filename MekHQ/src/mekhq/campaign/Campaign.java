@@ -753,13 +753,15 @@ public class Campaign implements Serializable, ITechManager {
                             getPersonnelMarket().addPerson(p);
                         }
                     }
-                    int dependents = getRetirementDefectionTracker().getPayout(pid).getDependents();
-                    while (dependents > 0) {
-                        Person person = newDependent(Person.T_ASTECH, false);
-                        if (recruitPerson(person)) {
-                            dependents--;
-                        } else {
-                            dependents = 0;
+                    if (getCampaignOptions().canAtBAddDependents()) {
+                        int dependents = getRetirementDefectionTracker().getPayout(pid).getDependents();
+                        while (dependents > 0) {
+                            Person person = newDependent(Person.T_ASTECH, false);
+                            if (recruitPerson(person)) {
+                                dependents--;
+                            } else {
+                                dependents = 0;
+                            }
                         }
                     }
                     if (unitAssignments.containsKey(pid)) {
@@ -3450,10 +3452,11 @@ public class Campaign implements Serializable, ITechManager {
             processShipSearch();
         }
 
-        // Add or remove dependents
-        if (getLocalDate().getDayOfYear() == 1) {
+        // Add or remove dependents - only if one of the two options makes this possible is enabled
+        if ((getLocalDate().getDayOfYear() == 1)
+                && (!getCampaignOptions().getDependentsNeverLeave() || getCampaignOptions().canAtBAddDependents())) {
             int numPersonnel = 0;
-            ArrayList<Person> dependents = new ArrayList<>();
+            List<Person> dependents = new ArrayList<>();
             for (Person p : getPersonnel()) {
                 if (p.isActive()) {
                     numPersonnel++;
@@ -3463,20 +3466,26 @@ public class Campaign implements Serializable, ITechManager {
                 }
             }
             int roll = Compute.d6(2) + getUnitRatingMod() - 2;
-            if (roll < 2)
+            if (roll < 2) {
                 roll = 2;
-            if (roll > 12)
+            } else if (roll > 12) {
                 roll = 12;
-            int change = numPersonnel * (roll - 5) / 100;
-            if ((change < 0) && !getCampaignOptions().getDependentsNeverLeave()) {
-                while ((change < 0) && (dependents.size() > 0)) {
-                    removePerson(Utilities.getRandomItem(dependents).getId());
-                    change++;
-                }
             }
-            for (int i = 0; i < change; i++) {
-                Person p = newDependent(Person.T_ASTECH, false);
-                recruitPerson(p, false, true, false, true);
+            int change = numPersonnel * (roll - 5) / 100;
+            if (change < 0) {
+                if (!getCampaignOptions().getDependentsNeverLeave()) {
+                    while ((change < 0) && (dependents.size() > 0)) {
+                        removePerson(Utilities.getRandomItem(dependents).getId());
+                        change++;
+                    }
+                }
+            } else {
+                if (getCampaignOptions().canAtBAddDependents()) {
+                    for (int i = 0; i < change; i++) {
+                        Person p = newDependent(Person.T_ASTECH, false);
+                        recruitPerson(p, false, true, false, true);
+                    }
+                }
             }
         }
 
