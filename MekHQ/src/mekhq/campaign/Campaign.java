@@ -1294,16 +1294,14 @@ public class Campaign implements Serializable, ITechManager {
 
     //region Personnel Recruitment
     /**
-     *
      * @param p         the person being added
      * @return          true if the person is hired successfully, otherwise false
      */
     public boolean recruitPerson(Person p) {
-        return recruitPerson(p, false, false, false, true);
+        return recruitPerson(p, p.getPrisonerStatus(), p.isDependent(), false, true);
     }
 
     /**
-     *
      * @param p         the person being added
      * @param gmAdd     false means that they need to pay to hire this person, provided that
      *                  the campaign option to pay for new hires is set, while
@@ -1311,24 +1309,34 @@ public class Campaign implements Serializable, ITechManager {
      * @return          true if the person is hired successfully, otherwise false
      */
     public boolean recruitPerson(Person p, boolean gmAdd) {
-        return recruitPerson(p, false,  false, gmAdd, true);
+        return recruitPerson(p, p.getPrisonerStatus(), p.isDependent(), gmAdd, true);
     }
 
     /**
      *
-     * @param p         the person being added
-     * @param prisoner  if the person is a prisoner or not. True means they are a prisoner
-     * @param dependent if the person is a dependent or not. True means they are a dependent
-     * @param gmAdd     false means that they need to pay to hire this person, true means it is added without paying
-     * @param log       whether or not to write to logs
-     * @return          true if the person is hired successfully, otherwise false
+     * @param p              the person being added
+     * @param prisonerStatus the person's prisoner status upon recruitment
+     * @return               true if the person is hired successfully, otherwise false
      */
-    public boolean recruitPerson(Person p, boolean prisoner, boolean dependent, boolean gmAdd, boolean log) {
+    public boolean recruitPerson(Person p, PrisonerStatus prisonerStatus) {
+        return recruitPerson(p, prisonerStatus, p.isDependent(), false, true);
+    }
+
+    /**
+     * @param p              the person being added
+     * @param prisonerStatus the person's prisoner status upon recruitment
+     * @param dependent      if the person is a dependent or not. True means they are a dependent
+     * @param gmAdd          false means that they need to pay to hire this person, true means it is added without paying
+     * @param log            whether or not to write to logs
+     * @return               true if the person is hired successfully, otherwise false
+     */
+    public boolean recruitPerson(Person p, PrisonerStatus prisonerStatus, boolean dependent,
+                                 boolean gmAdd, boolean log) {
         if (p == null) {
             return false;
         }
         // Only pay if option set, they weren't GM added, and they aren't a dependent, prisoner or bondsman
-        if (getCampaignOptions().payForRecruitment() && !dependent && !gmAdd && !prisoner) {
+        if (getCampaignOptions().payForRecruitment() && !dependent && !gmAdd && prisonerStatus.isFree()) {
             if (!getFinances().debit(p.getSalary().multipliedBy(2), Transaction.C_SALARY,
                     "recruitment of " + p.getFullName(), getCalendar().getTime())) {
                 addReport("<font color='red'><b>Insufficient funds to recruit "
@@ -1341,11 +1349,11 @@ public class Campaign implements Serializable, ITechManager {
         p.setId(id);
         personnel.put(id, p);
 
-        boolean bondsman = getCampaignOptions().getDefaultPrisonerStatus().isBondsman();
-        String add = prisoner ? (bondsman ? " as a bondsman" : " as a prisoner") : "";
         if (log) {
+            String add = !prisonerStatus.isFree() ? (prisonerStatus.isBondsman() ? " as a bondsman" : " as a prisoner") : "";
             addReport(String.format("%s has been added to the personnel roster%s.", p.getHyperlinkedName(), add));
         }
+
         if (p.getPrimaryRole() == Person.T_ASTECH) {
             astechPoolMinutes += 480;
             astechPoolOvertime += 240;
@@ -1353,37 +1361,8 @@ public class Campaign implements Serializable, ITechManager {
             astechPoolMinutes += 240;
             astechPoolOvertime += 120;
         }
-        String rankEntry = LogEntryController.generateRankEntryString(p);
 
-        // TODO : Windchild Fix Me
-        if (prisoner) {
-            if (getCampaignOptions().getDefaultPrisonerStatus().isBondsman()) {
-                p.setPrisonerStatus(PrisonerStatus.BONDSMAN);
-                if (log) {
-                    ServiceLogger.madeBondsman(p, getDate(), getName(), rankEntry);
-                }
-            } else {
-                p.setPrisonerStatus(PrisonerStatus.PRISONER);
-                if (log) {
-                    ServiceLogger.madePrisoner(p, getDate(), getName(), rankEntry);
-                }
-            }
-        } else {
-            p.setPrisonerStatus(PrisonerStatus.FREE);
-            if (log) {
-                ServiceLogger.joined(p, getDate(), getName(), rankEntry);
-            }
-        }
-
-        // Add their recruitment date if using track time in service
-        if (!prisoner && !dependent) {
-            if (getCampaignOptions().getUseTimeInService()) {
-                p.setRecruitment(getLocalDate());
-            }
-            if (getCampaignOptions().getUseTimeInRank()) {
-                p.setLastRankChangeDate(getLocalDate());
-            }
-        }
+        p.setPrisonerStatus(prisonerStatus, log);
 
         MekHQ.triggerEvent(new PersonNewEvent(p));
         return true;
@@ -3484,7 +3463,7 @@ public class Campaign implements Serializable, ITechManager {
                 if (getCampaignOptions().canAtBAddDependents()) {
                     for (int i = 0; i < change; i++) {
                         Person p = newDependent(Person.T_ASTECH, false);
-                        recruitPerson(p, false, true, false, true);
+                        recruitPerson(p);
                     }
                 }
             }
@@ -3593,7 +3572,7 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         for (Person baby : babies) {
-            recruitPerson(baby, false, true, false, false);
+            recruitPerson(baby, baby.getPrisonerStatus(), baby.isDependent(), true, false);
         }
     }
 

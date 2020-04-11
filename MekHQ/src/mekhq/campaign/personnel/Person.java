@@ -534,7 +534,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void setPrisonerStatus(PrisonerStatus prisonerStatus) {
+        setPrisonerStatus(prisonerStatus, true);
+    }
+
+    public void setPrisonerStatus(PrisonerStatus prisonerStatus, boolean log) {
+        boolean freed = !this.prisonerStatus.isFree();
         this.prisonerStatus = prisonerStatus;
+
+        // Now, we need to fix values and ranks based on the Person's status
         switch (prisonerStatus) {
             case PRISONER:
             case PRISONER_DEFECTOR:
@@ -542,30 +549,46 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 getCampaign().changeRank(this, Ranks.RANK_BONDSMAN, true);
                 setRecruitment(null);
                 setLastRankChangeDate(null);
-                ServiceLogger.madePrisoner(this, getCampaign().getDate());
+                if (log) {
+                    ServiceLogger.madePrisoner(this, getCampaign().getDate(),
+                            getCampaign().getName(), "");
+                }
                 break;
             case BONDSMAN:
                 // They don't get to have a rank. Their rank is Bondsman.
                 getCampaign().changeRank(this, Ranks.RANK_BONDSMAN, true);
                 setRecruitment(null);
                 setLastRankChangeDate(null);
-                ServiceLogger.madeBondsman(this, getCampaign().getDate());
+                if (log) {
+                    ServiceLogger.madeBondsman(this, getCampaign().getDate(),
+                            getCampaign().getName(), "");
+                }
                 break;
             case FREE:
-                if (getCampaign().getCampaignOptions().getUseTimeInService()) {
-                    setRecruitment(getCampaign().getLocalDate());
-                }
-                if (getCampaign().getCampaignOptions().getUseTimeInRank()) {
-                    setLastRankChangeDate(getCampaign().getLocalDate());
+                if (!isDependent()) {
+                    if (getCampaign().getCampaignOptions().getUseTimeInService()) {
+                        setRecruitment(getCampaign().getLocalDate());
+                    }
+                    if (getCampaign().getCampaignOptions().getUseTimeInRank()) {
+                        setLastRankChangeDate(getCampaign().getLocalDate());
+                    }
                 }
                 if (getRankNumeric() < 0) {
                     getCampaign().changeRank(this, 0, false);
                 }
-                ServiceLogger.freed(this, getCampaign().getDate());
+                if (log) {
+                    if (freed) {
+                        ServiceLogger.freed(this, getCampaign().getDate(),
+                                getCampaign().getName(), "");
+                    } else {
+                        ServiceLogger.joined(this, getCampaign().getDate(),
+                                getCampaign().getName(), "");
+                    }
+                }
                 break;
         }
 
-        if (!prisonerStatus.isFree() && (getUnitId() != null)) {
+        if (!prisonerStatus.isFree()) {
             Unit u = getCampaign().getUnit(getUnitId());
             if (u != null) {
                 u.remove(this, true);

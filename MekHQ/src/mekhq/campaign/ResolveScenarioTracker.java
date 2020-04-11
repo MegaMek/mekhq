@@ -954,11 +954,10 @@ public class ResolveScenarioTracker {
                     currentHits = en.getCrew().getHits();
                 }
                 int newHits = Math.max(0, currentHits - existingHits);
-                casualties = (int) Math.ceil(Compute.getFullCrewSize(en) * (newHits/6.0));
+                casualties = (int) Math.ceil(Compute.getFullCrewSize(en) * (newHits / 6.0));
             }
             for (Person p : crew) {
-                // Give them a UUID. We won't actually use this for the campaign, but to
-                // identify them in the oppositionPersonnel hash
+                // We need to assign them a UUID now to place them into the hash
                 UUID id = (p.getId() == null) ? UUID.randomUUID() : p.getId();
                 p.setId(id);
 
@@ -1418,16 +1417,21 @@ public class ResolveScenarioTracker {
                 continue;
             }
             if (status.isCaptured()) {
-                getCampaign().recruitPerson(person, true, false, false, true);
-                if (getCampaign().getCampaignOptions().getUseAtB()
-                        && getCampaign().getCampaignOptions().getUseAtBCapture()
-                        && (m instanceof AtBContract) && status.isCaptured()
-                        && (person.getPrisonerStatus() == PrisonerStatus.PRISONER)) {
+                PrisonerStatus prisonerStatus = getCampaign().getCampaignOptions().getDefaultPrisonerStatus();
+
+                // Then, we need to determine if they are a defector
+                if (prisonerStatus.isPrisoner() && getCampaign().getCampaignOptions().getUseAtB()
+                        && getCampaign().getCampaignOptions().getUseAtBCapture() && (m instanceof AtBContract)) {
+                    // We need to find out if they are a defector
                     if (Compute.d6(2) >= (10 + ((AtBContract) m).getEnemySkill() - getCampaign().getUnitRatingMod())) {
-                        getCampaign().addReport(String.format(
-                            "You have convinced %s to defect.", person.getHyperlinkedName())); //$NON-NLS-1$
-                        person.setPrisonerStatus(PrisonerStatus.PRISONER_DEFECTOR);
+                        prisonerStatus = PrisonerStatus.PRISONER_DEFECTOR;
                     }
+                }
+
+                getCampaign().recruitPerson(person, prisonerStatus);
+                if (prisonerStatus.isWillingToDefect()) {
+                    getCampaign().addReport(String.format("You have convinced %s to defect.",
+                            person.getHyperlinkedName()));
                 }
             } else {
                 continue;
