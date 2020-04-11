@@ -533,26 +533,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return prisonerStatus == PrisonerStatus.PRISONER;
     }
 
-    public void setPrisoner() {
-        prisonerStatus = PrisonerStatus.PRISONER;
-        setRankNumeric(Ranks.RANK_PRISONER);
-    }
-
     public boolean isBondsman() {
         return prisonerStatus == PrisonerStatus.BONDSMAN;
-    }
-
-    public void setBondsman() {
-        prisonerStatus = PrisonerStatus.BONDSMAN;
-        setRankNumeric(Ranks.RANK_BONDSMAN);
-    }
-
-    public boolean isFree() {
-        return (!isPrisoner() && !isBondsman());
-    }
-
-    public void setFreeMan() {
-        prisonerStatus = PrisonerStatus.FREE;
     }
 
     public PrisonerStatus getPrisonerStatus() {
@@ -564,14 +546,43 @@ public class Person implements Serializable, MekHqXmlSerializable {
         switch (prisonerStatus) {
             case PRISONER:
             case PRISONER_DEFECTOR:
-                setRankNumeric(Ranks.RANK_PRISONER);
+                // They don't get to have a rank. Their rank is Bondsman.
+                getCampaign().changeRank(this, Ranks.RANK_BONDSMAN, true);
+                setRecruitment(null);
+                setLastRankChangeDate(null);
+                ServiceLogger.madePrisoner(this, getCampaign().getDate());
                 break;
             case BONDSMAN:
-                setRankNumeric(Ranks.RANK_BONDSMAN);
+                // They don't get to have a rank. Their rank is Bondsman.
+                getCampaign().changeRank(this, Ranks.RANK_BONDSMAN, true);
+                setRecruitment(null);
+                setLastRankChangeDate(null);
+                ServiceLogger.madeBondsman(this, getCampaign().getDate());
                 break;
-            default:
+            case FREE:
+                if (getCampaign().getCampaignOptions().getUseTimeInService()) {
+                    setRecruitment(getCampaign().getLocalDate());
+                }
+                if (getCampaign().getCampaignOptions().getUseTimeInRank()) {
+                    setLastRankChangeDate(getCampaign().getLocalDate());
+                }
+                if (getRankNumeric() < 0) {
+                    getCampaign().changeRank(this, 0, false);
+                }
+                ServiceLogger.freed(this, getCampaign().getDate());
                 break;
         }
+
+        if (!prisonerStatus.isFree() && (getUnitId() != null)) {
+            Unit u = getCampaign().getUnit(getUnitId());
+            if (u != null) {
+                u.remove(this, true);
+            } else {
+                setUnitId(null);
+            }
+        }
+
+        MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
     //region Text Getters
@@ -2376,7 +2387,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public Money getSalary() {
-        if (!isFree() || isDependent()) {
+        if (!getPrisonerStatus().isFree() || isDependent()) {
             return Money.zero();
         }
 
@@ -2870,10 +2881,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
         // Do prisoner checks
         if (rank.equalsIgnoreCase("None")) {
-            if (isPrisoner()) {
+            if (getPrisonerStatus().isPrisoner()) {
                 return "Prisoner " + getFullName();
             }
-            if (isBondsman()) {
+            if (getPrisonerStatus().isBondsman()) {
                 return "Bondsman " + getFullName();
             }
             return getFullName();
@@ -2896,7 +2907,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public String makeHTMLRankDiv() {
         return String.format("<div id=\"%s\">%s%s</div>", getId().toString(), getRankName(),
-                (getPrisonerStatus() == PrisonerStatus.PRISONER_DEFECTOR) ? "*" : "");
+                getPrisonerStatus().isWillingToDefect() ? "*" : "");
     }
 
     public String getHyperlinkedFullTitle() {
@@ -4047,7 +4058,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * @return the number of shares the person has
      */
     public int getNumShares(boolean sharesForAll) {
-        if (!isActive() || !isFree() || (!sharesForAll && !hasRole(T_MECHWARRIOR))) {
+        if (!isActive() || !getPrisonerStatus().isFree() || (!sharesForAll && !hasRole(T_MECHWARRIOR))) {
             return 0;
         }
         int shares = 1;

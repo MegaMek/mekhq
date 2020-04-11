@@ -45,8 +45,8 @@ import mekhq.campaign.personnel.enums.PrisonerStatus;
 	        	if (p0.getRankNumeric() == p1.getRankNumeric()) {
 	        	    // For prisoners: Sort those willing to defect "above" those who don't
 	        	    if (p0.getRankNumeric() == Ranks.RANK_PRISONER) {
-	        	        return Boolean.compare(p0.getPrisonerStatus() == PrisonerStatus.PRISONER_DEFECTOR,
-                                p1.getPrisonerStatus() == PrisonerStatus.PRISONER_DEFECTOR);
+	        	        return Boolean.compare(p0.getPrisonerStatus().isWillingToDefect(),
+                                p1.getPrisonerStatus().isWillingToDefect());
 	        	    }
 	        		// the levels match too, try comparing MD rank
 	        		if (p0.getRankLevel() == p1.getRankLevel()) {

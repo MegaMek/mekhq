@@ -58,6 +58,23 @@ public enum PrisonerStatus {
         return typeName;
     }
 
+    //region Boolean Comparisons
+    public boolean isFree() {
+        return this == FREE;
+    }
+
+    public boolean isPrisoner() {
+        return (this == PRISONER) || (this == PRISONER_DEFECTOR);
+    }
+
+    public boolean isWillingToDefect() {
+        return this == PRISONER_DEFECTOR;
+    }
+
+    public boolean isBondsman() {
+        return this == BONDSMAN;
+    }
+
     @Override
     public String toString() {
         return getTypeName();

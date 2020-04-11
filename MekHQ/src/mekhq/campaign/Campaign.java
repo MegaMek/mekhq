@@ -1341,7 +1341,7 @@ public class Campaign implements Serializable, ITechManager {
         p.setId(id);
         personnel.put(id, p);
 
-        boolean bondsman = getCampaignOptions().getDefaultPrisonerStatus() == PrisonerStatus.BONDSMAN;
+        boolean bondsman = getCampaignOptions().getDefaultPrisonerStatus().isBondsman();
         String add = prisoner ? (bondsman ? " as a bondsman" : " as a prisoner") : "";
         if (log) {
             addReport(String.format("%s has been added to the personnel roster%s.", p.getHyperlinkedName(), add));
@@ -1349,27 +1349,27 @@ public class Campaign implements Serializable, ITechManager {
         if (p.getPrimaryRole() == Person.T_ASTECH) {
             astechPoolMinutes += 480;
             astechPoolOvertime += 240;
-        }
-        if (p.getSecondaryRole() == Person.T_ASTECH) {
+        } else if (p.getSecondaryRole() == Person.T_ASTECH) {
             astechPoolMinutes += 240;
             astechPoolOvertime += 120;
         }
         String rankEntry = LogEntryController.generateRankEntryString(p);
 
+        // TODO : Windchild Fix Me
         if (prisoner) {
-            if (getCampaignOptions().getDefaultPrisonerStatus() == PrisonerStatus.BONDSMAN) {
-                p.setBondsman();
+            if (getCampaignOptions().getDefaultPrisonerStatus().isBondsman()) {
+                p.setPrisonerStatus(PrisonerStatus.BONDSMAN);
                 if (log) {
                     ServiceLogger.madeBondsman(p, getDate(), getName(), rankEntry);
                 }
             } else {
-                p.setPrisoner();
+                p.setPrisonerStatus(PrisonerStatus.PRISONER);
                 if (log) {
                     ServiceLogger.madePrisoner(p, getDate(), getName(), rankEntry);
                 }
             }
         } else {
-            p.setFreeMan();
+            p.setPrisonerStatus(PrisonerStatus.FREE);
             if (log) {
                 ServiceLogger.joined(p, getDate(), getName(), rankEntry);
             }
@@ -3579,7 +3579,7 @@ public class Campaign implements Serializable, ITechManager {
             }
 
             if ((getCampaignOptions().getIdleXP() > 0) && (calendar.get(Calendar.DAY_OF_MONTH) == 1)
-                    && p.isActive() && !p.isPrisoner()) { // Prisoners can't gain XP, while Bondsmen can gain xp
+                    && p.isActive() && !p.getPrisonerStatus().isPrisoner()) { // Prisoners can't gain XP, while Bondsmen can gain xp
                 p.setIdleMonths(p.getIdleMonths() + 1);
                 if (p.getIdleMonths() >= getCampaignOptions().getMonthsIdleXP()) {
                     if (Compute.d6(2) >= getCampaignOptions().getTargetIdleXP()) {
@@ -5951,54 +5951,6 @@ public class Campaign implements Serializable, ITechManager {
         MekHQ.triggerEvent(new MedicPoolChangedEvent(this, -i));
     }
 
-    public void bulkChangePrisonerStatus(Person[] people, PrisonerStatus status) {
-        for (Person person : people) {
-            changePrisonerStatus(person, status);
-        }
-    }
-
-    public void changePrisonerStatus(Person p, PrisonerStatus status) {
-        switch (status) {
-            case FREE:
-                p.setFreeMan();
-                if (p.getRankNumeric() < 0) {
-                    changeRank(p, 0, false);
-                }
-                ServiceLogger.freed(p, getDate());
-                if (getCampaignOptions().getUseTimeInService()) {
-                    p.setRecruitment(getLocalDate());
-                }
-                break;
-            case PRISONER:
-                if (p.getRankNumeric() != Ranks.RANK_PRISONER) {
-                    changeRank(p, Ranks.RANK_PRISONER, true); // They don't get to have a rank. Their
-                    // rank is Prisoner or Bondsman.
-                }
-                p.setPrisoner();
-                ServiceLogger.madePrisoner(p, getDate());
-                p.setRecruitment(null); //more efficient to just set it to null instead of checking if the setting is enabled
-                break;
-            case BONDSMAN:
-                if (p.getRankNumeric() != Ranks.RANK_BONDSMAN) {
-                    changeRank(p, Ranks.RANK_BONDSMAN, true); // They don't get to have a rank. Their
-                    // rank is Prisoner or Bondsman.
-                }
-                p.setBondsman();
-                ServiceLogger.madeBondsman(p, getDate());
-                p.setRecruitment(null); //more efficient to just set it to null instead of checking if the setting is enabled
-                break;
-            default:
-                break;
-        }
-        if (p.isBondsman() || p.isPrisoner()) {
-            Unit u = getUnit(p.getUnitId());
-            if (u != null) {
-                u.remove(p, true);
-            }
-        }
-        MekHQ.triggerEvent(new PersonChangedEvent(p));
-    }
-
     public void changeStatus(Person person, PersonnelStatus status) {
         Unit u = getUnit(person.getUnitId());
         if (status == PersonnelStatus.KIA) {
@@ -6059,7 +6011,7 @@ public class Campaign implements Serializable, ITechManager {
         person.setRankLevel(rankLevel);
 
         if (getCampaignOptions().getUseTimeInRank()) {
-            if (person.isFree() && !person.isDependent()) {
+            if (person.getPrisonerStatus().isFree() && !person.isDependent()) {
                 person.setLastRankChangeDate(getLocalDate());
             } else {
                 person.setLastRankChangeDate(null);
@@ -7829,8 +7781,7 @@ public class Campaign implements Serializable, ITechManager {
 
         for (Person p : getPersonnel()) {
             // Add them to the total count
-            if (Person.isCombatRole(p.getPrimaryRole()) && !p.isPrisoner()
-                    && !p.isBondsman() && p.isActive()) {
+            if (Person.isCombatRole(p.getPrimaryRole()) && p.getPrisonerStatus().isFree() && p.isActive()) {
                 countPersonByType[p.getPrimaryRole()]++;
                 countTotal++;
                 if (getCampaignOptions().useAdvancedMedical() && p.getInjuries().size() > 0) {
@@ -7893,20 +7844,19 @@ public class Campaign implements Serializable, ITechManager {
 
         for (Person p : getPersonnel()) {
             // Add them to the total count
-            if (Person.isSupportRole(p.getPrimaryRole()) && !p.isPrisoner()
-                    && !p.isBondsman() && p.isActive()) {
+            if (Person.isSupportRole(p.getPrimaryRole()) && p.getPrisonerStatus().isFree() && p.isActive()) {
                 countPersonByType[p.getPrimaryRole()]++;
                 countTotal++;
                 if (p.getInjuries().size() > 0 || p.getHits() > 0) {
                     countInjured++;
                 }
                 salary = salary.plus(p.getSalary());
-            } else if (p.isPrisoner() && p.isActive()) {
+            } else if (p.getPrisonerStatus().isPrisoner() && p.isActive()) {
                 prisoners++;
                 if (p.getInjuries().size() > 0 || p.getHits() > 0) {
                     countInjured++;
                 }
-            } else if (p.isBondsman() && p.isActive()) {
+            } else if (p.getPrisonerStatus().isBondsman() && p.isActive()) {
                 bondsmen++;
                 if (p.getInjuries().size() > 0 || p.getHits() > 0) {
                     countInjured++;
@@ -8194,7 +8144,7 @@ public class Campaign implements Serializable, ITechManager {
                     break;
                 }
             }
-            if (!p.isDependent() && p.isFree()) {
+            if (!p.isDependent() && p.getPrisonerStatus().isFree()) {
                 LocalDate date;
                 // For that one in a billion chance the log is empty. Clone today's date and subtract a year
                 if (join == null) {
@@ -8220,7 +8170,7 @@ public class Campaign implements Serializable, ITechManager {
                     join = e.getDate();
                 }
             }
-            if (!p.isDependent() && p.isFree()) {
+            if (!p.isDependent() && p.getPrisonerStatus().isFree()) {
                 LocalDate date;
                 // For that one in a billion chance the log is empty. Clone today's date and subtract a year
                 if (join == null) {

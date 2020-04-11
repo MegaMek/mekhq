@@ -551,8 +551,7 @@ public class StaticChecks {
     public static boolean areAllEligible(Person[] people) {
         int profession = people[0].getProfession();
         for (Person person : people) {
-            if (person.isPrisoner() || person.isBondsman()
-                    || person.getProfession() != profession) {
+            if (!person.getPrisonerStatus().isFree() || person.getProfession() != profession) {
                 return false;
             }
         }
@@ -566,8 +565,8 @@ public class StaticChecks {
     }
 
     public static boolean areAllPrisoners(Person[] people) {
-        for(Person person : people) {
-            if(!person.isPrisoner()) {
+        for (Person person : people) {
+            if (!person.getPrisonerStatus().isPrisoner()) {
                 return false;
             }
         }
@@ -577,7 +576,7 @@ public class StaticChecks {
 
     public static boolean areAnyWillingToDefect(Person[] people) {
         for (Person person : people) {
-            if (person.getPrisonerStatus() == PrisonerStatus.PRISONER_DEFECTOR) {
+            if (person.getPrisonerStatus().isWillingToDefect()) {
                 return true;
             }
         }
