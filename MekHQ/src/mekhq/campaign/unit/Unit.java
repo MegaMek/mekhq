@@ -4678,7 +4678,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         return crew;
     }
-    
+
     /**
      * Returns a personnel count for each marine platoon/squad assigned to this unit
      * @return The number of marines aboard
@@ -4836,7 +4836,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             //it would be better to just use the unit extinction date itself, but given
             //that there are no canon extinction/reintro dates for units, we will use this
             //instead
-            if(p.isExtinct(getCampaign().getCalendar().get(Calendar.YEAR), getCampaign().getFaction().isClan())) {
+            if (p.isExtinct(getCampaign().getGameYear(), getCampaign().getFaction().isClan())) {
                 newAvailability = EquipmentType.RATING_X;
             }
             if(newAvailability > availability) {
@@ -5159,7 +5159,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         // Now for extended parts cost modifiers
         if (getCampaign().getCampaignOptions().useExtendedPartsModifier()) {
             Engine en = entity.getEngine();
-            int currentYear = getCampaign().getCalendar().get(Calendar.YEAR);
+            int currentYear = getCampaign().getGameYear();
             int rating = getTechRating();
             if (((currentYear > 2859) && (currentYear < 3040))
                     && (!getCampaign().getFaction().isClan() && !getCampaign().getFaction().isComstar())) {
@@ -5427,7 +5427,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
     public SimpleTechLevel getSimpleTechLevel() {
         if (getCampaign().useVariableTechLevel()) {
-            return getSimpleLevel(getCampaign().getCalendar().get(Calendar.YEAR));
+            return getSimpleLevel(getCampaign().getGameYear());
         } else {
             return getStaticTechLevel();
         }

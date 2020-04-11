@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -672,11 +673,13 @@ public class AtBContract extends Contract implements Serializable {
         int roll = Compute.d6();
         switch (roll) {
         case 1: /* 1d6 dependents */
-            number = Compute.d6();
-            c.addReport("Bonus: " + number + " dependent" + ((number>1)?"s":""));
-            for (int i = 0; i < number; i++) {
-                Person p = c.newDependent(Person.T_ASTECH, false);
-                c.recruitPerson(p, false, true, false, true);
+            if (c.getCampaignOptions().canAtBAddDependents()) {
+                number = Compute.d6();
+                c.addReport("Bonus: " + number + " dependent" + ((number > 1) ? "s" : ""));
+                for (int i = 0; i < number; i++) {
+                    Person p = c.newDependent(Person.T_ASTECH, false);
+                    c.recruitPerson(p, false, true, false, true);
+                }
             }
             break;
         case 2: /* Recruit (choose) */
@@ -744,11 +747,11 @@ public class AtBContract extends Contract implements Serializable {
     }
 
     public void checkEvents(Campaign c) {
-        if (c.getCalendar().get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
+        if (c.getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
             nextWeekBattleTypeMod = 0;
         }
 
-        if (c.getCalendar().get(Calendar.DAY_OF_MONTH) == 1) {
+        if (c.getLocalDate().getDayOfMonth() == 1) {
             if (priorLogisticsFailure) {
                 partsAvailabilityLevel++;
                 priorLogisticsFailure = false;
