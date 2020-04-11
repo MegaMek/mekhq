@@ -74,6 +74,7 @@ public enum PrisonerStatus {
     public boolean isBondsman() {
         return this == BONDSMAN;
     }
+    //endregion Boolean Comparisons
 
     @Override
     public String toString() {

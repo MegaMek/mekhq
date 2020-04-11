@@ -73,7 +73,8 @@ public class ServiceLogger {
     public static void freed(Person person, Date date, String name, String rankEntry) {
         String message = logEntriesResourceMap.getString("freedBy.text");
         person.addLogEntry(new ServiceLogEntry(date,
-                MessageFormat.format(message, name) + rankEntry));    }
+                MessageFormat.format(message, name) + rankEntry));
+    }
 
     public static void kia(Person person, Date date) {
         person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("kia.text")));
