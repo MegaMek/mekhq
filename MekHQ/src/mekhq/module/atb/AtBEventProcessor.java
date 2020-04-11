@@ -18,8 +18,8 @@
  */
 package mekhq.module.atb;
 
+import java.time.DayOfWeek;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.UUID;
 
 import megamek.client.ratgenerator.MissionRole;
@@ -72,7 +72,7 @@ public class AtBEventProcessor {
     public void handleNewDay(NewDayEvent ev) {
         // TODO: move code from Campaign here
         if (campaign.getPersonnelMarket().getPaidRecruitment()
-                && campaign.getCalendar().get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
+                && (campaign.getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY)) {
             if (campaign.getFinances().debit(Money.of(100000), Transaction.C_MISC,
                     "Paid recruitment roll", campaign.getDate())) {
                 doPaidRecruitment();
@@ -207,7 +207,7 @@ public class AtBEventProcessor {
         params.setFaction(faction);
         params.setUnitType(unitType);
         params.setWeightClass(weight);
-        params.setYear(campaign.getCalendar().get(Calendar.YEAR));
+        params.setYear(campaign.getGameYear());
         params.setQuality(IUnitRating.DRAGOON_F);
 
         MechSummary ms = campaign.getUnitGenerator().generate(params);
@@ -291,7 +291,7 @@ public class AtBEventProcessor {
 
     public static String getRecruitFaction(Campaign c) {
         if (c.getFactionCode().equals("MERC")) {
-            if (c.getCalendar().get(Calendar.YEAR) > 3055 && Compute.randomInt(20) == 0) {
+            if ((c.getGameYear() > 3055) && (Compute.randomInt(20) == 0)) {
                 ArrayList<String> clans = new ArrayList<>();
                 for (String f : RandomFactionGenerator.getInstance().getCurrentFactions()) {
                     if (Faction.getFaction(f).isClan()) {

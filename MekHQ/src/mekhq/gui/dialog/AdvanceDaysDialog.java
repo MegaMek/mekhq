@@ -1,6 +1,20 @@
-/**
- * @author Dylan Myers <ralgith@gmail.com>
+/*
+ * Copyright (c) 2014 - The MegaMek Team. All rights reserved.
  *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
@@ -11,10 +25,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.time.Duration;
-import java.util.GregorianCalendar;
+import java.time.LocalDate;
 import java.util.ResourceBundle;
-import java.util.Calendar;
 import java.util.Collections;
 
 import javax.swing.JButton;
@@ -35,11 +47,14 @@ import mekhq.gui.preferences.JIntNumberSpinnerPreference;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
 
+/**
+ * @author Dylan Myers <ralgith@gmail.com>
+ */
 public class AdvanceDaysDialog extends JDialog implements ActionListener {
     private static final long serialVersionUID = 1L;
-    
+
     private ResourceBundle resourceMap;
-    
+
     private JSpinner spnDays;
     private JButton btnStart;
     private JButton btnNextMonth;
@@ -63,7 +78,7 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
 
     public void initComponents() {
         setLayout(new BorderLayout());
-        
+
         resourceMap = ResourceBundle.getBundle("mekhq.resources.AdvanceDaysDialog", new EncodeControl()); //$NON-NLS-1$
 
         this.setTitle(resourceMap.getString("dlgTitle.text"));
@@ -110,16 +125,15 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent event) {
         if (event.getSource().equals(btnStart) || event.getSource().equals(btnNextMonth)) {
-            int days = (int)spnDays.getValue();
+            int days = (int) spnDays.getValue();
             boolean firstDay = true;
             MekHQ.registerHandler(this);
             if (event.getSource().equals(btnNextMonth)) {
-                //Use java.time to get the number of days to next month.
-                //We already need Java 8 anyway, and this is much easier and more accurate.
-                GregorianCalendar cal = gui.getCampaign().getCalendar();
-                Duration duration = Duration.between(cal.getTime().toInstant(),
-                        new java.util.GregorianCalendar(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH)+1, 1).getTime().toInstant());
-                days = Math.abs((int)duration.toDays());
+                LocalDate today = gui.getCampaign().getLocalDate();
+                // The number of days till the next month is the length of the month plus one minus
+                // the current day, with the one added because otherwise we get the last day of the same
+                // month
+                days = today.lengthOfMonth() + 1 - today.getDayOfMonth();
             }
 
             int numDays;
@@ -135,12 +149,12 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
                     gui.showRetirementDefectionDialog();
                     break;
                 }
-                if(!gui.getCampaign().newDay()) {
+                if (!gui.getCampaign().newDay()) {
                     break;
                 }
                 //String newLogString = logPanel.getLogText();
                 //newLogString = newLogString.concat(gui.getCampaign().getCurrentReportHTML());
-                if(firstDay) {
+                if (firstDay) {
                     logPanel.refreshLog(gui.getCampaign().getCurrentReportHTML());
                     firstDay = false;
                 } else {
@@ -162,7 +176,7 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
             gui.refreshAllTabs();
         }
     }
-    
+
     @Subscribe(priority = 1)
     public void reportOverride(ReportEvent ev) {
         ev.cancel();

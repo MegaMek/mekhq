@@ -857,7 +857,8 @@ public class PersonViewPanel extends ScrollablePanel {
                 lblFormerSpouses2.setName("lblFormerSpouses2"); // NOI18N //$NON-NLS-1$
                 lblFormerSpouses2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 lblFormerSpouses2.setText(String.format("<html><a href='#'>%s</a>, %s, %s</html>", ex.getFullName(),
-                        formerSpouse.getReasonString(), formerSpouse.getDateAsString(FormerSpouse.getDisplayDateFormat())));
+                        formerSpouse.getReasonString(), formerSpouse.getDateAsString(
+                                campaign.getCampaignOptions().getDisplayDateFormat())));
                 lblFormerSpouses2.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
@@ -1451,7 +1452,7 @@ public class PersonViewPanel extends ScrollablePanel {
         }
 
         lblAdvancedMedical2.setName("lblAdvancedMedical2"); // NOI18N
-        lblAdvancedMedical2.setText(person.getEffectString());
+        lblAdvancedMedical2.setText(getAdvancedMedalEffectString(person));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -1498,6 +1499,30 @@ public class PersonViewPanel extends ScrollablePanel {
         pnlInjuries.add(pnlInjuryDetails, BorderLayout.CENTER);
 
         return pnlInjuries;
+    }
+
+    /**
+     * Gets the advanced medical effects active for the person.
+     * @return an HTML encoded string of effects
+     */
+    private String getAdvancedMedalEffectString(Person p) {
+        StringBuilder sb = new StringBuilder("<html>");
+        final int pilotingMod = p.getPilotingInjuryMod();
+        final int gunneryMod = p.getGunneryInjuryMod();
+        if((pilotingMod != 0) && (pilotingMod < Integer.MAX_VALUE)) {
+            sb.append(String.format("  Piloting %+d <br>", pilotingMod));
+        } else if(pilotingMod == Integer.MAX_VALUE) {
+            sb.append("  Piloting: <i>Impossible</i>  <br>");
+        }
+        if((gunneryMod != 0) && (gunneryMod < Integer.MAX_VALUE)) {
+            sb.append(String.format("  Gunnery: %+d <br>", gunneryMod));
+        } else if(gunneryMod == Integer.MAX_VALUE) {
+            sb.append("  Gunnery: <i>Impossible</i>  <br>");
+        }
+        if(gunneryMod == 0 && pilotingMod == 0) {
+            sb.append("None");
+        }
+        return sb.append("</html>").toString();
     }
 
     private JPanel fillKillRecord() {

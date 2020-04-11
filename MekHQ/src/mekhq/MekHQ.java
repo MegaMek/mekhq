@@ -27,8 +27,9 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.text.NumberFormat;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.ResourceBundle;
 
 import javax.swing.*;
@@ -393,9 +394,9 @@ public class MekHQ implements GameListener {
         msg.append("\t").append(resourceMap.getString("Application.name")) //$NON-NLS-1$ //$NON-NLS-2$
                 .append(" ").append(resourceMap.getString("Application.version")); //$NON-NLS-1$ //$NON-NLS-2$
         if (TIMESTAMP > 0) {
-            msg.append("\n\tCompiled on ").append(new Date(TIMESTAMP)); //$NON-NLS-1$
+            msg.append("\n\tCompiled on ").append(Instant.ofEpochMilli(TIMESTAMP)); //$NON-NLS-1$
         }
-        msg.append("\n\tToday is ").append(new Date()); //$NON-NLS-1$
+        msg.append("\n\tToday is ").append(LocalDate.now()); //$NON-NLS-1$
         msg.append("\n\tJava vendor ").append(System.getProperty("java.vendor")); //$NON-NLS-1$ //$NON-NLS-2$
         msg.append("\n\tJava version ").append(System.getProperty("java.version")); //$NON-NLS-1$ //$NON-NLS-2$
         msg.append("\n\tPlatform ") //$NON-NLS-1$

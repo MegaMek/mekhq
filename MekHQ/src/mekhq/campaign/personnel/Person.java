@@ -212,15 +212,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //endregion Divorce Variables
     //endregion Family Variables
 
-    /** Contains the skill levels to be displayed in a tech's description */
-    private static final String[] DISPLAYED_SKILL_LEVELS = new String[] {
-        SkillType.S_TECH_MECH,
-        SkillType.S_TECH_MECHANIC,
-        SkillType.S_TECH_BA,
-        SkillType.S_TECH_AERO,
-        SkillType.S_TECH_VESSEL,
-    };
-
     protected UUID id;
     protected int oldId;
 
@@ -373,7 +364,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     private final static String DATE_DISPLAY_FORMAT = "yyyy-MM-dd";
-    private final static String DATE_SAVE_FORMAT = "yyyy-MM-dd";  //DO NOT USE FOR DISPLAY FORMATS
 
     //region Reverse Compatibility
     private int oldUnitId = -1;
@@ -1663,82 +1653,40 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<person id=\""
-                + id.toString()
-                + "\" type=\""
-                + this.getClass().getName()
-                + "\">");
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "<person id=\"" + id.toString()
+                + "\" type=\"" + this.getClass().getName() + "\">");
         try {
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "<id>"
-                    + this.id.toString()
-                    + "</id>");
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "<givenName>"
-                    + MekHqXmlUtil.escape(givenName)
-                    + "</givenName>");
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "<surname>"
-                    + MekHqXmlUtil.escape(surname)
-                    + "</surname>");
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "id", id.toString());
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "givenName", givenName);
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "surname", surname);
             if (!StringUtil.isNullOrEmpty(honorific)) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<honorific>"
-                        + MekHqXmlUtil.escape(honorific)
-                        + "</honorific>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "honorific", honorific);
             }
             if (maidenName != null) { // this is only a != null comparison because empty is a use case for divorce
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<maidenName>"
-                        + MekHqXmlUtil.escape(maidenName)
-                        + "</maidenName>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maidenName", maidenName);
             }
             if (!StringUtil.isNullOrEmpty(callsign)) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<callsign>"
-                        + MekHqXmlUtil.escape(callsign)
-                        + "</callsign>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "callsign", callsign);
             }
             // Always save the primary role
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "<primaryRole>"
-                    + primaryRole
-                    + "</primaryRole>");
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "primaryRole", primaryRole);
             if (secondaryRole != T_NONE) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<secondaryRole>"
-                        + secondaryRole
-                        + "</secondaryRole>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "secondaryRole", secondaryRole);
             }
             if (primaryDesignator != DESIG_NONE) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<primaryDesignator>"
-                        + primaryDesignator
-                        + "</primaryDesignator>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "primaryDesignator", primaryDesignator);
             }
             if (secondaryDesignator != DESIG_NONE) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<secondaryDesignator>"
-                        + secondaryDesignator
-                        + "</secondaryDesignator>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "secondaryDesignator", secondaryDesignator);
             }
             if (commander) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<commander>"
-                        + MekHqXmlUtil.escape(Boolean.toString(commander))
-                        + "</commander>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "commander", true);
             }
             if (dependent) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<dependent>"
-                        + MekHqXmlUtil.escape(Boolean.toString(dependent))
-                        + "</dependent>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "dependent", true);
             }
             // Always save the person's origin faction
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "<faction>"
-                    + originFaction.getShortName()
-                    + "</faction>");
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "faction", originFaction.getShortName());
             if (originPlanet != null) {
                 pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                         + "<planetId systemId=\""
@@ -1748,305 +1696,186 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         + "</planetId>");
             }
             // Always save whether or not someone is a clanner
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "<clan>"
-                    + clan
-                    + "</clan>");
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clan", clan);
             if (phenotype != PHENOTYPE_NONE) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<phenotype>"
-                        + phenotype
-                        + "</phenotype>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "phenotype", phenotype);
             }
             if (!StringUtil.isNullOrEmpty(bloodname)) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<bloodname>"
-                        + bloodname
-                        + "</bloodname>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "bloodname", bloodname);
             }
             if (!StringUtil.isNullOrEmpty(biography)) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<biography>"
-                        + MekHqXmlUtil.escape(biography)
-                        + "</biography>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "biography", biography);
             }
             if (idleMonths > 0) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<idleMonths>"
-                        + idleMonths
-                        + "</idleMonths>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "idleMonths", idleMonths);
             }
             if (ancestorsId != null) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<ancestors>"
-                        + this.ancestorsId.toString()
-                        + "</ancestors>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "ancestors", ancestorsId.toString());
             }
             if (spouse != null) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<spouse>"
-                        + this.spouse.toString()
-                        + "</spouse>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "spouse", spouse.toString());
             }
             if (!formerSpouses.isEmpty()) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<formerSpouses>");
+                MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "formerSpouses");
                 for (FormerSpouse ex : formerSpouses) {
                     ex.writeToXml(pw1, indent + 2);
                 }
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "</formerSpouses>");
+                MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "formerSpouses");
             }
             if (dueDate != null) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<dueDate>"
-                        + dueDate.format(DateTimeFormatter.ofPattern(DATE_SAVE_FORMAT))
-                        + "</dueDate>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "dueDate",
+                        MekHqXmlUtil.saveFormattedDate(dueDate));
             }
             if (expectedDueDate != null) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<expectedDueDate>"
-                        + expectedDueDate.format(DateTimeFormatter.ofPattern(DATE_SAVE_FORMAT))
-                        + "</expectedDueDate>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "expectedDueDate",
+                        MekHqXmlUtil.saveFormattedDate(expectedDueDate));
             }
             if (!portraitCategory.equals(Crew.ROOT_PORTRAIT)) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<portraitCategory>"
-                        + MekHqXmlUtil.escape(portraitCategory)
-                        + "</portraitCategory>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "portraitCategory", portraitCategory);
             }
             if (!portraitFile.equals(Crew.PORTRAIT_NONE)) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<portraitFile>"
-                        + MekHqXmlUtil.escape(portraitFile)
-                        + "</portraitFile>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "portraitFile", portraitFile);
             }
             // Always save the current XP
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "<xp>"
-                    + xp
-                    + "</xp>");
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "xp", xp);
             if (daysToWaitForHealing != 0) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<daysToWaitForHealing>"
-                        + daysToWaitForHealing
-                        + "</daysToWaitForHealing>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "daysToWaitForHealing", daysToWaitForHealing);
             }
             // Always save the person's gender, as it would otherwise get confusing fast
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "<gender>"
-                    + gender
-                    + "</gender>");
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "gender", gender);
             // Always save a person's rank
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "<rank>"
-                    + rank
-                    + "</rank>");
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "rank", rank);
             if (rankLevel != 0) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<rankLevel>"
-                        + rankLevel
-                        + "</rankLevel>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "rankLevel", rankLevel);
             }
             if (rankSystem != -1) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<rankSystem>"
-                        + rankSystem
-                        + "</rankSystem>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "rankSystem", rankSystem);
             }
             if (maneiDominiRank != Rank.MD_RANK_NONE) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<maneiDominiRank>"
-                        + maneiDominiRank
-                        + "</maneiDominiRank>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maneiDominiRank", maneiDominiRank);
             }
             if (maneiDominiClass != MD_NONE) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<maneiDominiClass>"
-                        + maneiDominiClass
-                        + "</maneiDominiClass>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maneiDominiClass", maneiDominiClass);
             }
             if (nTasks > 0) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<nTasks>"
-                        + nTasks
-                        + "</nTasks>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "nTasks", nTasks);
             }
             if (doctorId != null) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<doctorId>"
-                        + doctorId.toString()
-                        + "</doctorId>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "doctorId", doctorId.toString());
             }
             if (unitId != null) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<unitId>"
-                        + unitId.toString()
-                        + "</unitId>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitId", unitId.toString());
             }
             if (salary != Money.of(-1)) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<salary>"
-                        + salary.toXmlString()
-                        + "</salary>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "salary", salary.toXmlString());
             }
             if (totalEarnings != Money.of(0)) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "totalEarnings", totalEarnings.toXmlString());
             }
             // Always save a person's status, to make it easy to parse the personnel saved data
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "<status>"
-                    + status.name()
-                    + "</status>");
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "status", status.name());
             if (prisonerStatus != PRISONER_NOT) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<prisonerStatus>"
-                        + prisonerStatus
-                        + "</prisonerStatus>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "prisonerStatus", prisonerStatus);
             }
             if (willingToDefect) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<willingToDefect>"
-                        + willingToDefect
-                        + "</willingToDefect>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "willingToDefect", true);
             }
             if (hits > 0) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<hits>"
-                        + hits
-                        + "</hits>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "hits", hits);
             }
             if (toughness != 0) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<toughness>"
-                        + toughness
-                        + "</toughness>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "toughness", toughness);
             }
             if (minutesLeft > 0) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<minutesLeft>"
-                        + minutesLeft
-                        + "</minutesLeft>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "minutesLeft", minutesLeft);
             }
             if (overtimeLeft > 0) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<overtimeLeft>"
-                        + overtimeLeft
-                        + "</overtimeLeft>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "overtimeLeft", overtimeLeft);
             }
             if (birthday != null) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<birthday>"
-                        + birthday.format(DateTimeFormatter.ofPattern(DATE_SAVE_FORMAT))
-                        + "</birthday>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "birthday",
+                        MekHqXmlUtil.saveFormattedDate(birthday));
             }
-            if (null != dateOfDeath) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<deathday>"
-                        + dateOfDeath.format(DateTimeFormatter.ofPattern(DATE_SAVE_FORMAT))
-                        + "</deathday>");
+            if (dateOfDeath != null) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "deathday",
+                        MekHqXmlUtil.saveFormattedDate(dateOfDeath));
             }
             if (recruitment != null) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "recruitment",
-                        recruitment.format(DateTimeFormatter.ofPattern(DATE_SAVE_FORMAT)));
+                        MekHqXmlUtil.saveFormattedDate(recruitment));
             }
             if (lastRankChangeDate != null) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastRankChangeDate",
-                        lastRankChangeDate.format(DateTimeFormatter.ofPattern(DATE_SAVE_FORMAT)));
+                        MekHqXmlUtil.saveFormattedDate(lastRankChangeDate));
             }
             for (Skill skill : skills.getSkills()) {
                 skill.writeToXml(pw1, indent + 1);
             }
             if (countOptions(PilotOptions.LVL3_ADVANTAGES) > 0) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<advantages>"
-                        + getOptionList("::", PilotOptions.LVL3_ADVANTAGES)
-                        + "</advantages>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "advantages",
+                        getOptionList("::", PilotOptions.LVL3_ADVANTAGES));
             }
             if (countOptions(PilotOptions.EDGE_ADVANTAGES) > 0) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<edge>"
-                        + getOptionList("::", PilotOptions.EDGE_ADVANTAGES)
-                        + "</edge>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "edge",
+                        getOptionList("::", PilotOptions.EDGE_ADVANTAGES));
                 // For support personnel, write an available edge value
                 if (isSupport() || isEngineer()) {
-                    pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                            + "<edgeAvailable>"
-                            + getCurrentEdge()
-                            + "</edgeAvailable>");
+                    MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "edgeAvailable", getCurrentEdge());
                 }
             }
             if (countOptions(PilotOptions.MD_ADVANTAGES) > 0) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<implants>"
-                        + getOptionList("::", PilotOptions.MD_ADVANTAGES)
-                        + "</implants>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "implants",
+                        getOptionList("::", PilotOptions.MD_ADVANTAGES));
             }
             if (!techUnitIds.isEmpty()) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<techUnitIds>");
+                MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "techUnitIds");
                 for (UUID id : techUnitIds) {
-                    pw1.println(MekHqXmlUtil.indentStr(indent + 2)
-                            + "<id>"
-                            + id.toString()
-                            + "</id>");
+                    MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 2, "id", id.toString());
                 }
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "</techUnitIds>");
+                MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "techUnitIds");
             }
             if (!personnelLog.isEmpty()) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<personnelLog>");
+                MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "personnelLog");
                 for (LogEntry entry : personnelLog) {
                     entry.writeToXml(pw1, indent + 2);
                 }
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "</personnelLog>");
+                MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "personnelLog");
             }
             if (!missionLog.isEmpty()) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<missionLog>");
+                MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "missionLog");
                 for (LogEntry entry : missionLog) {
                     entry.writeToXml(pw1, indent + 2);
                 }
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "</missionLog>");
+                MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "missionLog");
             }
             if (!awardController.getAwards().isEmpty()) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<awards>");
+                MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "awards");
                 for (Award award : awardController.getAwards()) {
                     award.writeToXml(pw1, indent + 2);
                 }
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "</awards>");
+                MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "awards");
             }
             if (injuries.size() > 0) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<injuries>");
+                MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "injuries");
                 for (Injury injury : injuries) {
                     injury.writeToXml(pw1, indent + 2);
                 }
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "</injuries>");
+                MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "injuries");
             }
             if (founder) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<founder>"
-                        + founder
-                        + "</founder>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "founder", true);
             }
             if (originalUnitWeight != EntityWeightClass.WEIGHT_ULTRA_LIGHT) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<originalUnitWeight>"
-                        + originalUnitWeight
-                        + "</originalUnitWeight>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "originalUnitWeight", originalUnitWeight);
             }
             if (originalUnitTech != TECH_IS1) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<originalUnitTech>"
-                        + originalUnitTech
-                        + "</originalUnitTech>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "originalUnitTech", originalUnitTech);
             }
             if (originalUnitId != null) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<originalUnitId>"
-                        + originalUnitId.toString()
-                        + "</originalUnitId>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "originalUnitId", originalUnitId.toString());
             }
             if (acquisitions != 0) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<acquisitions>"
-                        + acquisitions
-                        + "</acquisitions>");
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquisitions", acquisitions);
             }
             if (!extraData.isEmpty()) {
                 extraData.writeToXml(pw1);
@@ -2160,27 +1989,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         retVal.formerSpouses.add(FormerSpouse.generateInstanceFromXML(wn3));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("dueDate")) {
-                    if (version.isLowerThan("0.47.6")) {
-                        try {
-                            retVal.dueDate = LocalDate.parse(wn2.getTextContent().trim(),
-                                    DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
-                        } catch (Exception ignored) {
-                        }
-                    } else {
-                        retVal.dueDate = LocalDate.parse(wn2.getTextContent().trim(),
-                                DateTimeFormatter.ofPattern(DATE_SAVE_FORMAT));
-                    }
+                    retVal.dueDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("expectedDueDate")) {
-                    if (version.isLowerThan("0.47.6")) {
-                        try {
-                            retVal.expectedDueDate = LocalDate.parse(wn2.getTextContent().trim(),
-                                    DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
-                        } catch (Exception ignored) {
-                        }
-                    } else {
-                        retVal.expectedDueDate = LocalDate.parse(wn2.getTextContent().trim(),
-                                DateTimeFormatter.ofPattern(DATE_SAVE_FORMAT));
-                    }
+                    retVal.expectedDueDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("teamId")) {
                     retVal.teamId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) {
@@ -2264,41 +2075,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("overtimeLeft")) {
                     retVal.overtimeLeft = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("birthday")) {
-                    if (version.isLowerThan("0.47.6")) {
-                        try {
-                            retVal.birthday = LocalDate.parse(wn2.getTextContent().trim(),
-                                    DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
-                        } catch (Exception ignored) {
-                        }
-                    } else {
-                        retVal.birthday = LocalDate.parse(wn2.getTextContent().trim(),
-                                DateTimeFormatter.ofPattern(DATE_SAVE_FORMAT));
-                    }
+                    retVal.birthday = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("deathday")) {
-                    if (version.isLowerThan("0.47.6")) {
-                        try {
-                            retVal.dateOfDeath = LocalDate.parse(wn2.getTextContent().trim(),
-                                    DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
-                        } catch (Exception ignored) {
-                        }
-                    } else {
-                        retVal.dateOfDeath = LocalDate.parse(wn2.getTextContent().trim(),
-                                DateTimeFormatter.ofPattern(DATE_SAVE_FORMAT));
-                    }
+                    retVal.dateOfDeath = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("recruitment")) {
-                    if (version.isLowerThan("0.47.6")) {
-                        try {
-                            retVal.recruitment = LocalDate.parse(wn2.getTextContent().trim(),
-                                    DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
-                        } catch (Exception ignored) {
-                        }
-                    } else {
-                        retVal.recruitment = LocalDate.parse(wn2.getTextContent().trim(),
-                                DateTimeFormatter.ofPattern(DATE_SAVE_FORMAT));
-                    }
+                    retVal.recruitment = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("lastRankChangeDate")) {
-                    retVal.lastRankChangeDate = LocalDate.parse(wn2.getTextContent().trim(),
-                            DateTimeFormatter.ofPattern(DATE_SAVE_FORMAT));
+                    retVal.lastRankChangeDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("advantages")) {
                     advantages = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("edge")) {
@@ -3073,13 +2856,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
 
-    public String getPatientDesc() {
-        String toReturn = "<html><font size='2'><b>" + getFullTitle() + "</b><br/>";
-        toReturn += getHits() + " hit(s)<br>[next check in " + getDaysToWaitForHealing() + " days]";
-        toReturn += "</font></html>";
-        return toReturn;
-    }
-
     /**
      * returns a full description in HTML format that will be used for the graphical display in the
      * personnel table among other places
@@ -3688,8 +3464,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (!isTech()) {
             return false;
         }
-        for (Unit u : campaign.getUnits()) {
-            if (u.isMothballing() && u.getTech().getId().equals(id)) {
+        for (UUID unitId : techUnitIds) {
+            Unit u = campaign.getUnit(unitId);
+            if ((u != null) && u.isMothballing()) {
                 return true;
             }
         }
@@ -3924,31 +3701,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return null;
     }
 
-    public String getDocDesc() {
-        StringBuilder toReturn = new StringBuilder(128);
-        toReturn.append("<html><font size='2'><b>").append(getFullTitle()).append("</b><br/>");
-
-        Skill skill = getSkill(SkillType.S_DOCTOR);
-        if (null != skill) {
-            toReturn.append(SkillType.getExperienceLevelName(skill.getExperienceLevel()))
-                    .append(" " + SkillType.S_DOCTOR);
-        }
-
-        toReturn.append(String.format(" (%d XP)", getXp()));
-
-        if (campaign.getMedicsPerDoctor() < 4) {
-            toReturn.append("</font><font size='2' color='red'>, ")
-                    .append(campaign.getMedicsPerDoctor())
-                    .append(" medics</font><font size='2'><br/>");
-        } else {
-            toReturn.append(String.format(", %d medics<br />", campaign.getMedicsPerDoctor()));
-        }
-
-        toReturn.append(String.format("%d patient(s)</font></html>", campaign.getPatientsFor(this)));
-
-        return toReturn.toString();
-    }
-
     public int getBestTechLevel() {
         int lvl = -1;
         Skill mechSkill = getSkill(SkillType.S_TECH_MECH);
@@ -3968,40 +3720,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
             lvl = aeroSkill.getLevel();
         }
         return lvl;
-    }
-
-    public String getTechDesc(boolean overtimeAllowed, IPartWork part) {
-        StringBuilder toReturn = new StringBuilder(128);
-        toReturn.append("<html><font size='2'");
-        if (null != part && null != part.getUnit() && getTechUnitIDs().contains(part.getUnit().getId())) {
-            toReturn.append(" color='green'><b>@");
-        }
-        else {
-            toReturn.append("><b>");
-        }
-        toReturn.append(getFullTitle()).append("</b><br/>");
-
-        boolean first = true;
-        for (String skillName : DISPLAYED_SKILL_LEVELS) {
-            Skill skill = getSkill(skillName);
-            if (null == skill) {
-                continue;
-            } else if (!first) {
-                toReturn.append("; ");
-            }
-
-            toReturn.append(SkillType.getExperienceLevelName(skill.getExperienceLevel()));
-            toReturn.append(" ").append(skillName);
-            first = false;
-        }
-
-        toReturn.append(String.format(" (%d XP)<br/>", getXp()))
-                .append(String.format("%d minutes left", getMinutesLeft()));
-        if (overtimeAllowed) {
-            toReturn.append(String.format(" + (%d overtime)", getOvertimeLeft()));
-        }
-        toReturn.append("</font></html>");
-        return toReturn.toString();
     }
 
     public boolean isRightTechTypeFor(IPartWork part) {
@@ -4110,22 +3828,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
-    public String getInjuriesDesc() {
-        StringBuilder toReturn = new StringBuilder("<html><font size='2'><b>").append(getFullTitle())
-                .append("</b><br/>").append("&nbsp;&nbsp;&nbsp;Injuries:");
-        String sep = "<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-        for (Injury injury : injuries) {
-            toReturn.append(sep).append(injury.getFluff());
-            if (sep.contains("<br/>")) {
-                sep = ", ";
-            } else {
-                sep = ",<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-            }
-        }
-        toReturn.append("</font></html>");
-        return toReturn.toString();
-    }
-
     public void diagnose(int hits) {
         InjuryUtil.resolveAfterCombat(campaign, this, hits);
         InjuryUtil.resolveCombatDamage(campaign, this, hits);
@@ -4204,29 +3906,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public int getGunneryInjuryMod() {
         return Modifier.calcTotalModifier(injuries.stream().flatMap(i -> i.getModifiers().stream()), ModifierValue.GUNNERY);
-    }
-
-    /**
-     * @return an HTML encoded string of effects
-     */
-    public String getEffectString() {
-        StringBuilder sb = new StringBuilder("<html>");
-        final int pilotingMod = getPilotingInjuryMod();
-        final int gunneryMod = getGunneryInjuryMod();
-        if((pilotingMod != 0) && (pilotingMod < Integer.MAX_VALUE)) {
-            sb.append(String.format("  Piloting %+d <br>", pilotingMod));
-        } else if(pilotingMod == Integer.MAX_VALUE) {
-            sb.append("  Piloting: <i>Impossible</i>  <br>");
-        }
-        if((gunneryMod != 0) && (gunneryMod < Integer.MAX_VALUE)) {
-            sb.append(String.format("  Gunnery: %+d <br>", gunneryMod));
-        } else if(gunneryMod == Integer.MAX_VALUE) {
-            sb.append("  Gunnery: <i>Impossible</i>  <br>");
-        }
-        if(gunneryMod == 0 && pilotingMod == 0) {
-            sb.append("None");
-        }
-        return sb.append("</html>").toString();
     }
 
     public boolean hasInjuries(boolean permCheck) {
