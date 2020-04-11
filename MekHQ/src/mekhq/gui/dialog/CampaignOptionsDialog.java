@@ -1625,11 +1625,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = ++gridy;
         panPersonnel.add(chkCapturePrisoners, gridBagConstraints);
 
-        DefaultComboBoxModel<PrisonerStatus> prisonerStatusModel = new DefaultComboBoxModel<>();
-        PrisonerStatus[] prisonerStatuses = PrisonerStatus.values();
-        for (int i = 1; i < prisonerStatuses.length; i++) { // ignoring the PrisonerStatus.Free enum case
-            prisonerStatusModel.addElement(prisonerStatuses[i]);
-        }
+        DefaultComboBoxModel<PrisonerStatus> prisonerStatusModel = new DefaultComboBoxModel<>(PrisonerStatus.values());
+        prisonerStatusModel.removeElement(PrisonerStatus.FREE); // we don't want this as a standard use case for prisoners
         comboPrisonerStatus = new JComboBox<>(prisonerStatusModel);
         comboPrisonerStatus.setSelectedItem(options.getDefaultPrisonerStatus());
         JPanel pnlPrisonerStatus = new JPanel();
