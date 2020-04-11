@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
 import java.awt.*;
@@ -46,7 +45,7 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
-import mekhq.campaign.ResolveScenarioTracker.PrisonerStatus;
+import mekhq.campaign.ResolveScenarioTracker.OppositionPersonnelStatus;
 import mekhq.campaign.ResolveScenarioTracker.UnitStatus;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.Contract;
@@ -62,7 +61,6 @@ import mekhq.gui.view.PersonViewPanel;
 import mekhq.preferences.PreferencesNode;
 
 /**
- *
  * @author  Taharqa
  */
 public class ResolveScenarioWizardDialog extends JDialog {
@@ -133,7 +131,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
      */
     private ArrayList<JCheckBox> prisonerBtns = new ArrayList<>();
     private ArrayList<JSlider> pr_hitSliders = new ArrayList<>();
-    private ArrayList<PrisonerStatus> prstatuses = new ArrayList<>();
+    private ArrayList<OppositionPersonnelStatus> prstatuses = new ArrayList<>();
     private ArrayList<JButton> btnsViewPrisoner;
 
     /*
@@ -435,7 +433,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         j = 0;
         btnsViewPrisoner = new ArrayList<>();
         JButton btnViewPrisoner;
-        for(PrisonerStatus status : tracker.getSortedPrisoners()) {
+        for (OppositionPersonnelStatus status : tracker.getSortedPrisoners()) {
             j++;
             prstatuses.add(status);
             nameLbl = new JLabel("<html>" + status.getName() + "<br><i> " + status.getUnitName() + "</i></html>");
@@ -459,7 +457,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
             gridBagConstraints.insets = new Insets(5, 5, 0, 0);
             gridBagConstraints.weightx = 0.0;
-            if(j == tracker.getPrisonerStatus().keySet().size()) {
+            if (j == tracker.getOppositionPersonnel().keySet().size()) {
                 gridBagConstraints.weighty = 1.0;
             }
             pnlPrisonerStatus.add(nameLbl, gridBagConstraints);
@@ -1303,8 +1301,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
 
         //now prisoners
-        for(int i = 0; i < prstatuses.size(); i++) {
-            PrisonerStatus status = prstatuses.get(i);
+        for (int i = 0; i < prstatuses.size(); i++) {
+            OppositionPersonnelStatus status = prstatuses.get(i);
 
             if (pr_hitSliders.get(i).isEnabled()) {
                 status.setHits(pr_hitSliders.get(i).getValue());
@@ -1314,9 +1312,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
 
         //now salvage
-        for(int i = 0; i < salvageBoxes.size(); i++) {
+        for (int i = 0; i < salvageBoxes.size(); i++) {
             JCheckBox box = salvageBoxes.get(i);
-            if(box.isSelected()) {
+            if (box.isSelected()) {
                 tracker.salvageUnit(i);
             } else if (!escapeBoxes.get(i).isSelected()) { // Only salvage if they don't escape
                 tracker.dontSalvageUnit(i);
@@ -1324,12 +1322,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
 
         //now assign kills
-        for(String killName : tracker.getKillCredits().keySet()) {
-            if(killChoices.get(killName).getSelectedIndex() == 0) {
+        for (String killName : tracker.getKillCredits().keySet()) {
+            if (killChoices.get(killName).getSelectedIndex() == 0) {
                 tracker.getKillCredits().put(killName, "None");
             } else {
                 Unit u = tracker.getUnits().get(killChoices.get(killName).getSelectedIndex()-1);
-                if(null != u) {
+                if (null != u) {
                     tracker.getKillCredits().put(killName, u.getId().toString());
                 }
             }
@@ -1337,9 +1335,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
         tracker.assignKills();
 
         //now get loot
-        for(int i = 0; i < lootBoxes.size(); i++) {
+        for (int i = 0; i < lootBoxes.size(); i++) {
             JCheckBox box = lootBoxes.get(i);
-            if(box.isSelected()) {
+            if (box.isSelected()) {
                 tracker.addLoot(loots.get(i));
             }
         }
@@ -1385,24 +1383,21 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
         else if(panelName.equals(PILOTPANEL)) {
             return tracker.getPeopleStatus().keySet().size() > 0;
-        }
-        else if(panelName.equals(PRISONERPANEL)) {
-            return tracker.getPrisonerStatus().keySet().size() > 0;
-        }
-        else if(panelName.equals(SALVAGEPANEL)) {
+        } else if (panelName.equals(PRISONERPANEL)) {
+            return tracker.getOppositionPersonnel().keySet().size() > 0;
+        } else if (panelName.equals(SALVAGEPANEL)) {
             return tracker.getPotentialSalvage().size() > 0
-                    && (!(tracker.getMission() instanceof Contract) || ((Contract)tracker.getMission()).canSalvage());
-        }
-        else if(panelName.equals(KILLPANEL)) {
+                    && (!(tracker.getMission() instanceof Contract) || ((Contract) tracker.getMission()).canSalvage());
+        } else if (panelName.equals(KILLPANEL)) {
             return !tracker.getKillCredits().isEmpty();
         }
-        if(panelName.equals(REWARDPANEL)) {
+        if (panelName.equals(REWARDPANEL)) {
             return loots.size() > 0;
-        }
-        else if(panelName.equals(PREVIEWPANEL)) {
+        } else if (panelName.equals(PREVIEWPANEL)) {
             return true;
+        } else {
+            return false;
         }
-        return false;
     }
 
     /**
@@ -1653,9 +1648,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
     private void showPrisoner(UUID id) {
         //dialog
-        PrisonerStatus pstatus = tracker.getPrisonerStatus().get(id);
+        OppositionPersonnelStatus pstatus = tracker.getOppositionPersonnel().get(id);
 
-        if(null == pstatus || null == pstatus.getPerson() ) {
+        if (null == pstatus || null == pstatus.getPerson()) {
             return;
         }
 

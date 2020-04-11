@@ -51,6 +51,7 @@ import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.FileDialogs;
@@ -78,7 +79,7 @@ public class ResolveScenarioTracker {
     ArrayList<Loot> potentialLoot;
     ArrayList<Loot> actualLoot;
     Hashtable<UUID, PersonStatus> peopleStatus;
-    Hashtable<UUID, PrisonerStatus> prisonerStatus;
+    Hashtable<UUID, OppositionPersonnelStatus> oppositionPersonnel;
     Hashtable<String, String> killCredits;
     Hashtable<UUID, EjectedCrew> ejections;
     Hashtable<UUID, EjectedCrew> enemyEjections;
@@ -111,7 +112,7 @@ public class ResolveScenarioTracker {
         potentialLoot = scenario.getLoot();
         actualLoot = new ArrayList<>();
         peopleStatus = new Hashtable<>();
-        prisonerStatus = new Hashtable<>();
+        oppositionPersonnel = new Hashtable<>();
         killCredits = new Hashtable<>();
         ejections = new Hashtable<>();
         enemyEjections = new Hashtable<>();
@@ -680,7 +681,7 @@ public class ResolveScenarioTracker {
      * which may be scattered about on numerous other entities
      * @param ship The large craft unit we're currently processing
      * @param en The entity associated with the unit Ship
-     * @param crew The list of persons assigned to the ship as crew and marines
+     * @param personnel The list of persons assigned to the ship as crew and marines
      * @param unitStatus The post-battle status of en
      */
     private void processLargeCraft(Unit ship, Entity en, List<Person> personnel, UnitStatus unitStatus) {
@@ -724,7 +725,7 @@ public class ResolveScenarioTracker {
             }
         }
         //Check crewed aeros for existing hits since they could be flying without full crews
-        int casualties = 0;
+        int casualties;
         int casualtiesAssigned = 0;
         int existingHits = 0;
         int currentHits = 0;
@@ -957,13 +958,11 @@ public class ResolveScenarioTracker {
             }
             for (Person p : crew) {
                 // Give them a UUID. We won't actually use this for the campaign, but to
-                //identify them in the prisonerStatus hash
-                UUID id = p.getId();
-                if (null == id) {
-                    id = UUID.randomUUID();
-                    p.setId(id);
-                }
-                PrisonerStatus status = new PrisonerStatus(p.getFullName(), u.getEntity().getDisplayName(), p);
+                // identify them in the oppositionPersonnel hash
+                UUID id = (p.getId() == null) ? UUID.randomUUID() : p.getId();
+                p.setId(id);
+
+                OppositionPersonnelStatus status = new OppositionPersonnelStatus(p.getFullName(), u.getEntity().getDisplayName(), p);
                 if (en instanceof Mech
                         || en instanceof Protomech
                         || en.isFighter()
@@ -1056,7 +1055,7 @@ public class ResolveScenarioTracker {
                 }
                 status.setCaptured(Utilities.isLikelyCapture(en) || pickedUp);
                 status.setXP(campaign.getCampaignOptions().getScenarioXP());
-                prisonerStatus.put(id, status);
+                oppositionPersonnel.put(id, status);
             }
         }
     }
@@ -1408,8 +1407,8 @@ public class ResolveScenarioTracker {
             }
         }
         // update prisoners
-        for (UUID pid : prisonerStatus.keySet()) {
-            PrisonerStatus status = prisonerStatus.get(pid);
+        for (UUID pid : oppositionPersonnel.keySet()) {
+            OppositionPersonnelStatus status = oppositionPersonnel.get(pid);
             Person person = status.getPerson();
             if (null == person) {
                 continue;
@@ -1422,11 +1421,12 @@ public class ResolveScenarioTracker {
                 getCampaign().recruitPerson(person, true, false, false, true);
                 if (getCampaign().getCampaignOptions().getUseAtB()
                         && getCampaign().getCampaignOptions().getUseAtBCapture()
-                        && (m instanceof AtBContract) && status.isCaptured()) {
+                        && (m instanceof AtBContract) && status.isCaptured()
+                        && (person.getPrisonerStatus() == PrisonerStatus.PRISONER)) {
                     if (Compute.d6(2) >= (10 + ((AtBContract) m).getEnemySkill() - getCampaign().getUnitRatingMod())) {
                         getCampaign().addReport(String.format(
                             "You have convinced %s to defect.", person.getHyperlinkedName())); //$NON-NLS-1$
-                        person.setWillingToDefect(true);
+                        person.setPrisonerStatus(PrisonerStatus.PRISONER_DEFECTOR);
                     }
                 }
             } else {
@@ -1626,8 +1626,8 @@ public class ResolveScenarioTracker {
         return peopleStatus;
     }
 
-    public Hashtable<UUID, PrisonerStatus> getPrisonerStatus() {
-        return prisonerStatus;
+    public Hashtable<UUID, OppositionPersonnelStatus> getOppositionPersonnel() {
+        return oppositionPersonnel;
     }
 
     public Hashtable<UUID, UnitStatus> getUnitsStatus() {
@@ -1664,11 +1664,11 @@ public class ResolveScenarioTracker {
         return toReturn;
     }
 
-    public ArrayList<PrisonerStatus> getSortedPrisoners() {
+    public ArrayList<OppositionPersonnelStatus> getSortedPrisoners() {
         //put all the PersonStatuses in an ArrayList and sort by the unit name
-        ArrayList<PrisonerStatus> toReturn = new ArrayList<>();
-        for (UUID id : getPrisonerStatus().keySet()) {
-            PrisonerStatus status = prisonerStatus.get(id);
+        ArrayList<OppositionPersonnelStatus> toReturn = new ArrayList<>();
+        for (UUID id : getOppositionPersonnel().keySet()) {
+            OppositionPersonnelStatus status = oppositionPersonnel.get(id);
             if (null != status) {
                 toReturn.add(status);
             }
@@ -1816,17 +1816,17 @@ public class ResolveScenarioTracker {
     }
 
     /**
-     * This object is used to track the status of a prisoners. We need to actually put the whole
+     * This object is used to track the status of a opposition personnel. We need to actually put the whole
      * person object here because we are not already tracking it on the campaign
      * @author Jay Lawson
      *
      */
-    public static class PrisonerStatus extends PersonStatus {
+    public static class OppositionPersonnelStatus extends PersonStatus {
         //for prisoners we have to track a whole person
         Person person;
         private boolean captured;
 
-        public PrisonerStatus(String n, String u, Person p) {
+        public OppositionPersonnelStatus(String n, String u, Person p) {
             super(n, u, 0, p.getId());
             person = p;
         }
