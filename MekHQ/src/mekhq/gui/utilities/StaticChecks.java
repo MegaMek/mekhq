@@ -27,6 +27,7 @@ import megamek.common.UnitType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Ranks;
+import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 
 public class StaticChecks {
@@ -574,17 +575,9 @@ public class StaticChecks {
         return true;
     }
 
-    public static boolean isWillingToDefect(Person person) {
-        if (!(person.isBondsman() || person.isWillingToDefect())) {
-            return false;
-        }
-
-        return true;
-    }
-
     public static boolean areAnyWillingToDefect(Person[] people) {
         for (Person person : people) {
-            if (isWillingToDefect((person))) {
+            if (person.getPrisonerStatus() == PrisonerStatus.PRISONER_DEFECTOR) {
                 return true;
             }
         }

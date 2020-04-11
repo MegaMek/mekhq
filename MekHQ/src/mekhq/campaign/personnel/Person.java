@@ -241,8 +241,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private Money totalEarnings;
     private int hits;
     private PrisonerStatus prisonerStatus;
-    // Is this person willing to defect? Only for prisoners ...
-    private boolean willingToDefect;
 
     boolean dependent;
     boolean commander;
@@ -439,7 +437,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         totalEarnings = Money.of(0);
         status = PersonnelStatus.ACTIVE;
         prisonerStatus = PrisonerStatus.FREE;
-        willingToDefect = false;
         hits = 0;
         toughness = 0;
         resetMinutesLeft(); // this assigns minutesLeft and overtimeLeft
@@ -547,7 +544,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void setBondsman() {
         prisonerStatus = PrisonerStatus.BONDSMAN;
-        willingToDefect = false;
         setRankNumeric(Ranks.RANK_BONDSMAN);
     }
 
@@ -557,7 +553,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void setFreeMan() {
         prisonerStatus = PrisonerStatus.FREE;
-        willingToDefect = false;
     }
 
     public PrisonerStatus getPrisonerStatus() {
@@ -577,14 +572,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
             default:
                 break;
         }
-    }
-
-    public boolean isWillingToDefect() {
-        return willingToDefect;
-    }
-
-    public void setWillingToDefect(boolean willingToDefect) {
-        this.willingToDefect = willingToDefect && (prisonerStatus == PrisonerStatus.PRISONER);
     }
 
     //region Text Getters
@@ -1771,9 +1758,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
             if (prisonerStatus != PrisonerStatus.FREE) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "prisonerStatus", prisonerStatus.name());
             }
-            if (willingToDefect) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "willingToDefect", true);
-            }
             if (hits > 0) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "hits", hits);
             }
@@ -2073,8 +2057,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     } else {
                         retVal.prisonerStatus = PrisonerStatus.valueOf(wn2.getTextContent().trim());
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("willingToDefect")) {
-                    retVal.willingToDefect = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("willingToDefect")) { // Legacy
+                    if (Boolean.parseBoolean(wn2.getTextContent().trim())) {
+                        retVal.prisonerStatus = PrisonerStatus.PRISONER_DEFECTOR;
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("salary")) {
                     retVal.salary = Money.fromXmlString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("totalEarnings")) {
@@ -2909,7 +2895,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public String makeHTMLRankDiv() {
-        return String.format("<div id=\"%s\">%s%s</div>", getId().toString(), getRankName(), (isPrisoner() && isWillingToDefect() ? "*" : ""));
+        return String.format("<div id=\"%s\">%s%s</div>", getId().toString(), getRankName(),
+                (getPrisonerStatus() == PrisonerStatus.PRISONER_DEFECTOR) ? "*" : "");
     }
 
     public String getHyperlinkedFullTitle() {
@@ -3817,7 +3804,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     //region injuries
     /**
-     * All methods below are for the Advanced Medical option **
+     * All methods below are for the Advanced Medical option
      */
 
     public List<Injury> getInjuries() {
