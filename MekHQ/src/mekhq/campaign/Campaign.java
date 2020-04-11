@@ -3531,6 +3531,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void processNewDayPersonnel() {
+        // TODO : Windchild this is going to break as soon as I add the first baby
         for (Person p : getPersonnel()) {
             if (!p.isActive()) {
                 continue;
