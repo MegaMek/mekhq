@@ -741,7 +741,7 @@ public class CampaignOptions implements Serializable {
         useUnofficialMaintenance = b;
     }
 
-    public boolean useLogMaintenance() {
+    public boolean logMaintenance() {
         return logMaintenance;
     }
 
