@@ -5951,6 +5951,12 @@ public class Campaign implements Serializable, ITechManager {
         MekHQ.triggerEvent(new MedicPoolChangedEvent(this, -i));
     }
 
+    public void bulkChangePrisonerStatus(Person[] people, PrisonerStatus status) {
+        for (Person person : people) {
+            changePrisonerStatus(person, status);
+        }
+    }
+
     public void changePrisonerStatus(Person p, PrisonerStatus status) {
         switch (status) {
             case FREE:
