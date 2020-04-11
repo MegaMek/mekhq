@@ -54,12 +54,8 @@ public enum PrisonerStatus {
         return typeName;
     }
 
-    public static PrisonerStatus getStatusFromTypeName(String typeName) {
-        for (PrisonerStatus status : PrisonerStatus.values()) {
-            if (status.getTypeName().equals(typeName)) {
-                return status;
-            }
-        }
-        return PrisonerStatus.FREE;
+    @Override
+    public String toString() {
+        return getTypeName();
     }
 }

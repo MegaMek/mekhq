@@ -2511,11 +2511,11 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 
                 menuItem = new JMenu(resourceMap.getString("changePrisonerStatus.text")); //$NON-NLS-1$
                 menuItem.add(newCheckboxMenu(
-                        PrisonerStatus.FREE.getTypeName(),
+                        PrisonerStatus.FREE.toString(),
                         makeCommand(CMD_CHANGE_PRISONER_STATUS, OPT_PRISONER_FREE),
                         person.getPrisonerStatus() == PrisonerStatus.FREE));
                 menuItem.add(newCheckboxMenu(
-                        PrisonerStatus.PRISONER.getTypeName(),
+                        PrisonerStatus.PRISONER.toString(),
                         makeCommand(CMD_CHANGE_PRISONER_STATUS, OPT_PRISONER_IMPRISONED),
                         (person.getPrisonerStatus() == PrisonerStatus.PRISONER) && !person.isWillingToDefect()));
                 menuItem.add(newCheckboxMenu(
@@ -2523,7 +2523,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         makeCommand(CMD_CHANGE_PRISONER_STATUS, OPT_PRISONER_IMPRISONED_DEFECTING),
                         (person.getPrisonerStatus() == PrisonerStatus.PRISONER) && person.isWillingToDefect()));
                 menuItem.add(newCheckboxMenu(
-                        PrisonerStatus.BONDSMAN.getTypeName(),
+                        PrisonerStatus.BONDSMAN.toString(),
                         makeCommand(CMD_CHANGE_PRISONER_STATUS, OPT_PRISONER_BONDSMAN),
                         person.getPrisonerStatus() == PrisonerStatus.BONDSMAN));
                 menu.add(menuItem);

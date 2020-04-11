@@ -225,7 +225,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox useSupportEdgeBox;
     private JCheckBox useImplantsBox;
     private JCheckBox chkCapturePrisoners;
-    private JComboBox<String> comboPrisonerStatus;
+    private JComboBox<PrisonerStatus> comboPrisonerStatus;
     private JCheckBox altQualityAveragingCheckBox;
     private JCheckBox useAdvancedMedicalBox;
     private JCheckBox useDylansRandomXpBox;
@@ -1625,13 +1625,13 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = ++gridy;
         panPersonnel.add(chkCapturePrisoners, gridBagConstraints);
 
-        DefaultComboBoxModel<String> prisonerStatusModel = new DefaultComboBoxModel<>();
+        DefaultComboBoxModel<PrisonerStatus> prisonerStatusModel = new DefaultComboBoxModel<>();
         PrisonerStatus[] prisonerStatuses = PrisonerStatus.values();
         for (int i = 1; i < prisonerStatuses.length; i++) { // ignoring the PrisonerStatus.Free enum case
-            prisonerStatusModel.addElement(prisonerStatuses[i].getTypeName());
+            prisonerStatusModel.addElement(prisonerStatuses[i]);
         }
         comboPrisonerStatus = new JComboBox<>(prisonerStatusModel);
-        comboPrisonerStatus.setSelectedIndex(options.getDefaultPrisonerStatus().ordinal() - 1); // ignores the PrisonerStatus.Free enum case
+        comboPrisonerStatus.setSelectedItem(options.getDefaultPrisonerStatus());
         JPanel pnlPrisonerStatus = new JPanel();
         pnlPrisonerStatus.add(new JLabel(resourceMap.getString("prisonerStatus.text")));
         pnlPrisonerStatus.add(comboPrisonerStatus);
@@ -4829,7 +4829,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setImplants(useImplantsBox.isSelected());
         campaign.getGameOptions().getOption("manei_domini").setValue(useImplantsBox.isSelected());
         options.setCapturePrisoners(chkCapturePrisoners.isSelected());
-        options.setDefaultPrisonerStatus(PrisonerStatus.getStatusFromTypeName((String) comboPrisonerStatus.getSelectedItem()));
+        options.setDefaultPrisonerStatus((PrisonerStatus) comboPrisonerStatus.getSelectedItem());
         options.setAltQualityAveraging(altQualityAveragingCheckBox.isSelected());
         options.setAdvancedMedical(useAdvancedMedicalBox.isSelected());
         options.setDylansRandomXp(useDylansRandomXpBox.isSelected());
