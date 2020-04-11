@@ -51,6 +51,8 @@ public enum FamilialRelationshipType {
             "FamilialRelationshipType.GRANDCHILD.OTHER.text"),
 
     // Relatives
+    GREAT_GRANDAUNT_GREAT_GRANDUNCLE("FamilialRelationshipType.GRANDAUNT_GRANDUNCLE.MALE.text",
+            "FamilialRelationshipType.GRANDAUNT_GRANDUNCLE.FEMALE.text"),
     GREAT_AUNT_GREAT_UNCLE("FamilialRelationshipType.AUNT_UNCLE.MALE.text",
             "FamilialRelationshipType.AUNT_UNCLE.FEMALE.text"),
     AUNT_UNCLE("FamilialRelationshipType.AUNT_UNCLE.MALE.text",
