@@ -564,6 +564,21 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return prisonerStatus;
     }
 
+    public void setPrisonerStatus(PrisonerStatus prisonerStatus) {
+        this.prisonerStatus = prisonerStatus;
+        switch (prisonerStatus) {
+            case PRISONER:
+            case PRISONER_DEFECTOR:
+                setRankNumeric(Ranks.RANK_PRISONER);
+                break;
+            case BONDSMAN:
+                setRankNumeric(Ranks.RANK_BONDSMAN);
+                break;
+            default:
+                break;
+        }
+    }
+
     public boolean isWillingToDefect() {
         return willingToDefect;
     }
