@@ -2083,7 +2083,7 @@ public class CampaignGUI extends JPanel {
                 }
 
                 if (p != null) {
-                    getCampaign().recruitPerson(p, p.isPrisoner(), p.isDependent(), true, true);
+                    getCampaign().recruitPerson(p, p.getPrisonerStatus().isPrisoner(), p.isDependent(), true, true);
 
                     // Clear some values we no longer should have set in case this
                     // has transferred campaigns or things in the campaign have

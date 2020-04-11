@@ -1390,7 +1390,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             /*
              * if(!person.isAssigned()) { cbMenuItem.setSelected(true); }
              */
-            if (oneSelected && person.isActive() && !(person.isPrisoner() || person.isBondsman())) {
+            if (oneSelected && person.isActive() && person.getPrisonerStatus().isFree()) {
                 for (Unit unit : gui.getCampaign().getUnits()) {
                     if (!unit.isAvailable()) {
                         continue;
@@ -1684,10 +1684,10 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     for (Person ps : personnel) {
                         if (person.safeSpouse(ps)) {
                             String pStatus;
-                            if (ps.isBondsman()) {
+                            if (ps.getPrisonerStatus().isBondsman()) {
                                 pStatus = String.format(resourceMap.getString("marriageBondsmanDesc.format"), //$NON-NLS-1$
                                         ps.getFullName(), ps.getAge(today), ps.getRoleDesc());
-                            } else if (ps.isPrisoner()) {
+                            } else if (ps.getPrisonerStatus().isPrisoner()) {
                                 pStatus = String.format(resourceMap.getString("marriagePrisonerDesc.format"), //$NON-NLS-1$
                                         ps.getFullName(), ps.getAge(today), ps.getRoleDesc());
                             } else {

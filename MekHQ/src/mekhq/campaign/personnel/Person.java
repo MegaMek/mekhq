@@ -529,14 +529,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
 
-    public boolean isPrisoner() {
-        return prisonerStatus == PrisonerStatus.PRISONER;
-    }
-
-    public boolean isBondsman() {
-        return prisonerStatus == PrisonerStatus.BONDSMAN;
-    }
-
     public PrisonerStatus getPrisonerStatus() {
         return prisonerStatus;
     }
@@ -1318,7 +1310,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 !this.equals(p)
                 && !p.hasSpouse()
                 && p.oldEnoughToMarry()
-                && (!p.isPrisoner() || isPrisoner())
+                && (!p.getPrisonerStatus().isPrisoner() || getPrisonerStatus().isPrisoner())
                 && !p.isDeadOrMIA()
                 && p.isActive()
                 && ((getAncestorsId() == null)
@@ -1333,7 +1325,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public void randomMarriage() {
         // Don't attempt to generate is someone has a spouse, isn't old enough to marry,
         // is actively deployed, or is currently a prisoner
-        if (hasSpouse() || !oldEnoughToMarry() || isDeployed() || isPrisoner()) {
+        if (hasSpouse() || !oldEnoughToMarry() || isDeployed() || !getPrisonerStatus().isFree()) {
             return;
         }
 
@@ -1363,9 +1355,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public boolean isPotentialRandomSpouse(Person p, int gender) {
-        if (p.getGender() != gender) {
-            return false;
-        } else if (!safeSpouse(p)) {
+        if ((p.getGender() != gender) || !safeSpouse(p) || !p.getPrisonerStatus().isFree()) {
             return false;
         }
 

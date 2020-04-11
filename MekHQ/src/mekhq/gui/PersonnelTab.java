@@ -419,7 +419,7 @@ public final class PersonnelTab extends CampaignGuiTab {
                         || ((nGroup == PG_TECH) && (type >= Person.T_MECH_TECH) && (type < Person.T_DOCTOR))
                         || ((nGroup == PG_DOC) && ((type == Person.T_DOCTOR) || (type == Person.T_MEDIC)))
                         || ((nGroup == PG_ADMIN) && (type > Person.T_MEDIC)))
-                        && !person.isPrisoner()) {
+                        && !person.getPrisonerStatus().isPrisoner()) {
                     return person.isActive();
                 } else if (nGroup == PG_DEPENDENT) {
                     return person.isDependent();
@@ -430,7 +430,7 @@ public final class PersonnelTab extends CampaignGuiTab {
                 } else if (nGroup == PG_KIA) {
                     return person.getStatus() == PersonnelStatus.KIA;
                 } else if (nGroup == PG_PRISONER) {
-                    return person.isPrisoner();
+                    return person.getPrisonerStatus().isPrisoner();
                 } else {
                     return false;
                 }
