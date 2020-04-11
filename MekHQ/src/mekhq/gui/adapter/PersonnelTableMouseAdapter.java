@@ -1298,7 +1298,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 
             if (StaticChecks.areAnyFree(selected)) {
                 popup.add(newMenuItem(resourceMap.getString("imprison.text"), CMD_IMPRISON));
-            } 
+            }
 
             if (oneSelected && !person.getPrisonerStatus().isFree()) {
                 popup.add(newMenuItem(resourceMap.getString("free.text"), CMD_FREE));
