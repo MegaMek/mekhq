@@ -564,6 +564,16 @@ public class StaticChecks {
         return true;
     }
 
+    public static boolean areAnyFree(Person[] people) {
+        for (Person person : people) {
+            if (person.getPrisonerStatus().isFree()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static boolean areAllPrisoners(Person[] people) {
         for (Person person : people) {
             if (!person.getPrisonerStatus().isPrisoner()) {

@@ -634,7 +634,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             case CMD_IMPRISON: {
                 for (Person person : people) {
-                    person.setPrisonerStatus(PrisonerStatus.PRISONER);
+                    if (!person.getPrisonerStatus().isPrisoner()) {
+                        person.setPrisonerStatus(PrisonerStatus.PRISONER);
+                    }
                 }
                 break;
             }
@@ -1294,12 +1296,12 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             popup.add(menu);
 
-            if (oneSelected) {
-                if (person.getPrisonerStatus().isFree()) {
-                    popup.add(newMenuItem(resourceMap.getString("imprison.text"), CMD_IMPRISON));
-                } else {
-                    popup.add(newMenuItem(resourceMap.getString("free.text"), CMD_FREE));
-                }
+            if (StaticChecks.areAnyFree(selected)) {
+                popup.add(newMenuItem(resourceMap.getString("imprison.text"), CMD_IMPRISON));
+            } 
+
+            if (oneSelected && !person.getPrisonerStatus().isFree()) {
+                popup.add(newMenuItem(resourceMap.getString("free.text"), CMD_FREE));
             }
 
             if (gui.getCampaign().getCampaignOptions().getUseAtB()
