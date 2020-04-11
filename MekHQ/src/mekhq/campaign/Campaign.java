@@ -3531,7 +3531,6 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void processNewDayPersonnel() {
-        List<Person> babies = new ArrayList<>();
         for (Person p : getPersonnel()) {
             if (!p.isActive()) {
                 continue;
@@ -3549,7 +3548,7 @@ public class Campaign implements Serializable, ITechManager {
                 if (p.isPregnant()) {
                     if (getCampaignOptions().useUnofficialProcreation()) {
                         if (getLocalDate().compareTo((p.getDueDate())) == 0) {
-                            babies.addAll(p.birth());
+                            p.birth(this);
                         }
                     } else {
                         p.removePregnancy();
@@ -3605,10 +3604,6 @@ public class Campaign implements Serializable, ITechManager {
                     p.setIdleMonths(0);
                 }
             }
-        }
-
-        for (Person baby : babies) {
-            recruitPerson(baby, false, true, false, false);
         }
     }
 
