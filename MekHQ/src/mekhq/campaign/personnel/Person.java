@@ -1283,14 +1283,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
         final UUID ancId = anc.getId();
 
-        final String surname = getCampaign().getCampaignOptions().getBabySurnameStyle()
-                .generateBabySurname(this, campaign.getPerson(fatherId));
-
         // Cleanup
         removePregnancy();
 
         return IntStream.range(0, size).mapToObj(i -> {
             Person baby = campaign.newDependent(T_NONE, true);
+            String surname = getCampaign().getCampaignOptions().getBabySurnameStyle()
+                    .generateBabySurname(this, campaign.getPerson(fatherId), baby.getGender());
             baby.setSurname(surname);
             baby.setBirthday(getCampaign().getLocalDate());
             UUID babyId = UUID.randomUUID();
