@@ -1048,6 +1048,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         logMaintenance = new JCheckBox(resourceMap.getString("logMaintenance.text")); // NOI18N
         logMaintenance.setToolTipText(resourceMap.getString("logMaintenance.toolTipText")); // NOI18N
         logMaintenance.setName("logMaintenance");
+        logMaintenance.setSelected(options.useLogMaintenance());
         gridBagConstraints.gridy = 6;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
