@@ -29,9 +29,13 @@ public enum PrisonerStatus {
      */
     FREE("PrisonerStatus.FREE.text"),
     /**
-     * This is used to track standard personnel
+     * This is used to track standard personnel who are prisoners and not willing to defect
      */
     PRISONER("PrisonerStatus.PRISONER.text"),
+    /**
+     * This is used to track standard personnel who are prisoners and are willing to defect
+     */
+    PRISONER_DEFECTOR("PrisonerStatus.PRISONER_DEFECTOR.text"),
     /**
      * This is used to track clan personnel who become Bondsmen when captured
      */
