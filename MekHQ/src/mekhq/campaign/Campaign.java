@@ -8136,7 +8136,13 @@ public class Campaign implements Serializable, ITechManager {
                     }
                 }
             }
+
             u.setLastMaintenanceReport(maintenanceReport.toString());
+
+            if (getCampaignOptions().logMaintenance()) {
+                MekHQ.getLogger().info(getClass(), "doMaintenance", maintenanceReport.toString());
+            }
+
             int quality = u.getQuality();
             String qualityString;
             boolean reverse = getCampaignOptions().reverseQualityNames();
