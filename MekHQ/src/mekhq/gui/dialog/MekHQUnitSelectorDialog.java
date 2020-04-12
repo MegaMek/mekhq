@@ -22,15 +22,10 @@ import megamek.client.ui.Messages;
 import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.common.*;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.unit.UnitTechProgression;
-import mekhq.gui.preferences.JComboBoxPreference;
-import mekhq.gui.preferences.JTablePreference;
-import mekhq.gui.preferences.JWindowPreference;
-import mekhq.preferences.PreferencesNode;
 
 import javax.swing.*;
 import java.awt.*;
@@ -67,19 +62,6 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         allowedYear = campaign.getCalendar().get(GregorianCalendar.YEAR);
         canonOnly = campaign.getCampaignOptions().allowCanonOnly();
         gameTechLevel = campaign.getCampaignOptions().getTechLevel();
-    }
-
-    @Override
-    protected void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(MekHQUnitSelectorDialog.class);
-
-        preferences.manage(new JComboBoxPreference(comboUnitType));
-
-        preferences.manage(new JComboBoxPreference(comboWeight));
-
-        preferences.manage(new JTablePreference(tableUnits));
-
-        preferences.manage(new JWindowPreference(this));
     }
 
     //region Button Methods
