@@ -40,8 +40,7 @@ import megamek.common.util.WeightedMap;
 import mekhq.campaign.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.*;
-import mekhq.campaign.personnel.enums.BodyLocation;
-import mekhq.campaign.personnel.enums.GenderDescriptors;
+import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.ModifierValue;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import org.joda.time.DateTime;
@@ -146,13 +145,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     //region Family Variables
     // Lineage
-    protected UUID ancestorsId;
-    protected UUID spouse;
-    protected List<FormerSpouse> formerSpouses;
+    private List<UUID> parents;
+    private UUID spouse;
+    private List<FormerSpouse> formerSpouses;
+    private List<UUID> children;
 
     //region Procreation
-    protected LocalDate dueDate;
-    protected LocalDate expectedDueDate;
+    private LocalDate dueDate;
+    private LocalDate expectedDueDate;
 
     private static final int PREGNANCY_STANDARD_DURATION = 268; //standard duration of a pregnancy in days
 
@@ -212,8 +212,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //endregion Divorce Variables
     //endregion Family Variables
 
-    protected UUID id;
-    protected int oldId;
+    private UUID id;
 
     private String fullName;
     private String givenName;
@@ -229,31 +228,31 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private int primaryDesignator;
     private int secondaryDesignator;
 
-    protected String biography;
-    protected LocalDate birthday;
-    protected LocalDate dateOfDeath;
-    protected LocalDate recruitment;
-    protected LocalDate lastRankChangeDate;
-    protected List<LogEntry> personnelLog;
-    protected List<LogEntry> missionLog;
+    private String biography;
+    private LocalDate birthday;
+    private LocalDate dateOfDeath;
+    private LocalDate recruitment;
+    private LocalDate lastRankChangeDate;
+    private List<LogEntry> personnelLog;
+    private List<LogEntry> missionLog;
 
     private Skills skills;
     private PersonnelOptions options;
     private int toughness;
 
     private PersonnelStatus status;
-    protected int xp;
-    protected int engXp;
-    protected int acquisitions;
-    protected Money salary;
+    private int xp;
+    private int engXp;
+    private int acquisitions;
+    private Money salary;
     private Money totalEarnings;
     private int hits;
     private int prisonerStatus;
     // Is this person willing to defect? Only for prisoners ...
     private boolean willingToDefect;
 
-    boolean dependent;
-    boolean commander;
+    private boolean dependent;
+    private boolean commander;
 
     // Supports edge usage by a ship's engineer composite crewman
     int edgeUsedThisRound;
@@ -269,19 +268,19 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     //assignments
     private UUID unitId;
-    protected UUID doctorId;
+    private UUID doctorId;
     private List<UUID> techUnitIds;
 
     //days of rest
-    protected int idleMonths;
-    protected int daysToWaitForHealing;
+    private int idleMonths;
+    private int daysToWaitForHealing;
 
     //region portrait
-    protected String portraitCategory;
-    protected String portraitFile;
+    private String portraitCategory;
+    private String portraitFile;
     // runtime override (not saved)
-    protected transient String portraitCategoryOverride = null;
-    protected transient String portraitFileOverride = null;
+    private transient String portraitCategoryOverride = null;
+    private transient String portraitFileOverride = null;
     //endregion portrait
 
     // Our rank
@@ -305,10 +304,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private int maneiDominiRank;
 
     //stuff to track for support teams
-    protected int minutesLeft;
-    protected int overtimeLeft;
-    protected int nTasks;
-    protected boolean engineer;
+    private int minutesLeft;
+    private int overtimeLeft;
+    private int nTasks;
+    private boolean engineer;
     public static final int PRIMARY_ROLE_SUPPORT_TIME = 480;
     public static final int PRIMARY_ROLE_OVERTIME_SUPPORT_TIME = 240;
     public static final int SECONDARY_ROLE_SUPPORT_TIME = 240;
@@ -366,10 +365,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private final static String DATE_DISPLAY_FORMAT = "yyyy-MM-dd";
 
     //region Reverse Compatibility
+    private int oldId;
     private int oldUnitId = -1;
     private int oldDoctorId = -1;
     //v0.1.8 and earlier
-    protected int teamId = -1;
+    private int teamId = -1;
     //endregion Reverse Compatibility
     //endregion Variable Declarations
 
@@ -425,9 +425,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
         bloodname = "";
         biography = "";
         idleMonths = -1;
-        ancestorsId = null;
+        parents = new ArrayList<>();
         spouse = null;
         formerSpouses = new ArrayList<>();
+        children = new ArrayList<>();
         dueDate = null;
         expectedDueDate = null;
         portraitCategory = Crew.ROOT_PORTRAIT;
@@ -1263,40 +1264,43 @@ public class Person implements Serializable, MekHqXmlSerializable {
         extraData.set(PREGNANCY_FATHER_DATA, null);
     }
 
-    public Collection<Person> birth() {
-        int size = extraData.get(PREGNANCY_CHILDREN_DATA, 1);
-        String fatherIdString = extraData.get(PREGNANCY_FATHER_DATA);
+    public void birth(Campaign campaign) {
+        String fatherIdString = getExtraData().get(PREGNANCY_FATHER_DATA);
         UUID fatherId = (fatherIdString != null) ? UUID.fromString(fatherIdString) : null;
-        Ancestors anc = campaign.getAncestors(fatherId, id);
-        if (null == anc) {
-            anc = campaign.createAncestors(fatherId, id);
-        }
-        final UUID ancId = anc.getId();
-
-        final String surname = generateBabySurname(fatherId);
+        final String babySurname = generateBabySurname(fatherId);
 
         // Cleanup
         removePregnancy();
 
-        return IntStream.range(0, size).mapToObj(i -> {
-            Person baby = campaign.newDependent(T_NONE, true);
-            baby.setSurname(surname);
+        for (int i = 0; i < getExtraData().get(PREGNANCY_CHILDREN_DATA, 1); i++) {
+            // Create the baby
+            Person baby = getCampaign().newDependent(T_NONE, true);
+            baby.setSurname(babySurname);
             baby.setBirthday(getCampaign().getLocalDate());
-            UUID babyId = UUID.randomUUID();
+            baby.setId(UUID.randomUUID());
 
-            baby.setId(babyId);
-            baby.setAncestorsId(ancId);
+            // Add the baby to the campaign
+            campaign.recruitPerson(baby, false, true, false, false);
 
-            campaign.addReport(String.format("%s has given birth to %s, a baby %s!", getHyperlinkedName(),
+            // Create genealogy information
+            baby.setParents(getId(), fatherId);
+            baby.setMotherId(getId());
+            addChild(baby);
+            if (fatherId != null) {
+                getCampaign().getPerson(fatherId).addChild(baby);
+            }
+
+            // Log the birth
+            getCampaign().addReport(String.format("%s has given birth to %s, a baby %s!", getHyperlinkedName(),
                     baby.getHyperlinkedName(), GenderDescriptors.BOY_GIRL.getDescriptor(baby.getGender())));
-            if (campaign.getCampaignOptions().logConception()) {
-                MedicalLogger.deliveredBaby(this, baby, campaign.getDate());
+            if (getCampaign().getCampaignOptions().logConception()) {
+                MedicalLogger.deliveredBaby(this, baby, getCampaign().getDate());
                 if (fatherId != null) {
-                    PersonalLogger.ourChildBorn(campaign.getPerson(fatherId), baby, getFullName(), campaign.getDate());
+                    PersonalLogger.ourChildBorn(getCampaign().getPerson(fatherId), baby, getFullName(),
+                            getCampaign().getDate());
                 }
             }
-            return baby;
-        }).collect(Collectors.toList());
+        }
     }
 
     private String generateBabySurname(UUID fatherId) {
@@ -1709,8 +1713,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
             if (idleMonths > 0) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "idleMonths", idleMonths);
             }
-            if (ancestorsId != null) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "ancestors", ancestorsId.toString());
+            if (!parents.isEmpty()) {
+                //TODO : windchild fix me
             }
             if (spouse != null) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "spouse", spouse.toString());
@@ -1721,6 +1725,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     ex.writeToXml(pw1, indent + 2);
                 }
                 MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "formerSpouses");
+            }
+            if (!children.isEmpty()) {
+                //TODO : windchild fix me
             }
             if (dueDate != null) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "dueDate",
@@ -1966,7 +1973,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         retVal.id = UUID.fromString(wn2.getTextContent());
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("ancestors")) {
-                    retVal.ancestorsId = UUID.fromString(wn2.getTextContent());
+                    // retVal.ancestorsId = UUID.fromString(wn2.getTextContent());
+                    // TODO : Windchild fix me and implement loading from XML
                 } else if (wn2.getNodeName().equalsIgnoreCase("spouse")) {
                     retVal.spouse = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("formerSpouses")) {
@@ -4109,13 +4117,21 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     //region Family
-    //region setFamily
-    /**
-     *
-     * @param id is the new ancestor id for the current person
-     */
-    public void setAncestorsId(UUID id) {
-        ancestorsId = id;
+    //region Family
+    public List<UUID> getParents() {
+        return parents;
+    }
+
+    public void addParentId(UUID id) {
+        getParents().add(id);
+    }
+
+    public List<UUID> getChildren() {
+        return children;
+    }
+
+    public void addChildId(UUID id) {
+        getChildren().add(id);
     }
 
     /**
@@ -4365,7 +4381,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * getChildren creates a list of all children from the current person
      * @return a list of Person objects for all children of the current person
      */
-    public List<Person> getChildren() {
+/*    public List<Person> getChildren() {
         List<UUID> ancestors = new ArrayList<>();
         for (Ancestors a : campaign.getAncestors()) {
             if ((a != null) && (getId().equals(a.getMotherId()) || getId().equals(a.getFatherId()))) {
@@ -4382,7 +4398,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
         return children;
     }
-
+*/
     public List<Person> getGrandchildren() {
         List<Person> grandchildren = new ArrayList<>();
         List<Person> tempChildList;

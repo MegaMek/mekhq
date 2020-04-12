@@ -14,9 +14,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class Ancestors implements Serializable, MekHqXmlSerializable {
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = -6350146649504329173L;
 	private UUID id;
 	private UUID fatherId;
@@ -62,32 +59,16 @@ public class Ancestors implements Serializable, MekHqXmlSerializable {
 		return motherId;
 	}
 
-	public void setMotherId(UUID motherId) {
-		this.motherId = motherId;
-	}
-
 	public UUID getId() {
 		return id;
-	}
-
-	public void setId(UUID id) {
-		this.id = id;
 	}
 
 	public Ancestors getFathersAncestors() {
 		return campaign.getAncestors(fathersAncestors);
 	}
 
-	public void setFathersAncestors(UUID fathersAncestors) {
-		this.fathersAncestors = fathersAncestors;
-	}
-
 	public Ancestors getMothersAncestors() {
 		return campaign.getAncestors(mothersAncestors);
-	}
-
-	public void setMothersAncestors(UUID mothersAncestors) {
-		this.mothersAncestors = mothersAncestors;
 	}
 
 	// Designed for recursive searching
@@ -178,7 +159,6 @@ public class Ancestors implements Serializable, MekHqXmlSerializable {
 		try {
 			retVal = new Ancestors(c);
 
-            // Okay, now load Ancestor-specific fields!
             NodeList nl = wn.getChildNodes();
 
             for (int x = 0; x < nl.getLength(); x++) {
@@ -197,9 +177,6 @@ public class Ancestors implements Serializable, MekHqXmlSerializable {
 	            }
             }
 		} catch (Exception e) {
-			// Errrr, apparently either the class name was invalid...
-            // Or the listed name doesn't exist.
-            // Doh!
 		    MekHQ.getLogger().error(Ancestors.class, "generateInstanceFromXML(Node,Campaign,Version)", e); //$NON-NLS-1$
 		}
 
