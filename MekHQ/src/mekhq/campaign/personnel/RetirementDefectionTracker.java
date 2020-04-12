@@ -219,7 +219,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
                     }
                 }
             }
-            if (p.getAge(campaign.getCalendar()) >= 50) {
+            if (p.getAge(campaign.getLocalDate()) >= 50) {
                 target.addModifier(1, "Over 50");
             }
             if (campaign.getCampaignOptions().getUseShareSystem()) {

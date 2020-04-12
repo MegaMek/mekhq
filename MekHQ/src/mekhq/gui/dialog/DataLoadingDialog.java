@@ -1,5 +1,5 @@
 /*
- * MegaMek - Copyright (C) 2000-2002 Ben Mazur (bmazur@sev.org)
+ *  MegaMek - Copyright (C) 2000-2002 Ben Mazur (bmazur@sev.org)
  *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the Free
@@ -11,12 +11,6 @@
  *  or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  *  for more details.
  */
-
-/*
- * My own version of a UnitLoadingDialog using a progress bar
- *  based on the one in MegaMek
- */
-
 package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
@@ -28,7 +22,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.ResourceBundle;
 
 import javax.swing.ImageIcon;
@@ -61,10 +54,6 @@ import mekhq.preferences.PreferencesNode;
 import mekhq.campaign.universe.Systems;
 
 public class DataLoadingDialog extends JDialog implements PropertyChangeListener {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = -3454307876761238915L;
     private JProgressBar progressBar;
     Task task;
@@ -212,13 +201,13 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                     fis.close();
                 } catch (NullEntityException e) {
                     JOptionPane.showMessageDialog(null,
-                            "The following units could not be loaded by the campaign:\n"
-                                    + e.getError() + "\n\nPlease be sure to copy over any custom units"
-                                    + "before starting a new version of MekHQ.\nIf you believe the units"
-                                    + "listed are not customs, then try deleting the file data/mechfiles/units.cache"
-                                    + "and restarting MekHQ.\nIt is also possible that unit chassi"
-                                    + "and model names have changed across versions of MegaMek."
-                                    + "You can check this by\nopening up MegaMek and searching for the units."
+                            "The following units could not be loaded by the campaign:\n "
+                                    + e.getError() + "\n\nPlease be sure to copy over any custom units "
+                                    + "before starting a new version of MekHQ.\nIf you believe the units "
+                                    + "listed are not customs, then try deleting the file data/mechfiles/units.cache "
+                                    + "and restarting MekHQ.\nIt is also possible that unit chassi "
+                                    + "and model names have changed across versions of MegaMek. "
+                                    + "You can check this by\nopening up MegaMek and searching for the units. "
                                     + "Chassis and models can be edited in your MekHQ save file with a text editor.",
                             "Unit Loading Error",
                             JOptionPane.ERROR_MESSAGE);
@@ -227,15 +216,15 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 } catch (Exception e) {
                     MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
                     JOptionPane.showMessageDialog(null,
-                            "The campaign file could not be loaded.\nPlease check the log file for details.",
+                            "The campaign file could not be loaded. \nPlease check the log file for details.",
                             "Campaign Loading Error",
                             JOptionPane.ERROR_MESSAGE);
                     cancelled = true;
                     cancel(true);
                 } catch (OutOfMemoryError e) {
                     JOptionPane.showMessageDialog(null,
-                            "MekHQ ran out of memory attempting to load the campaign file."
-                                    + "\nTry increasing the memory allocated to MekHQ and reloading."
+                            "MekHQ ran out of memory attempting to load the campaign file. "
+                                    + "\nTry increasing the memory allocated to MekHQ and reloading. "
                                     + "\nSee the FAQ at http://megamek.org for details.",
                             "Not Enough Memory",
                             JOptionPane.ERROR_MESSAGE);
@@ -252,7 +241,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                     campaign.setCalendar(dc.getDate());
                     // Ensure that the MegaMek year GameOption matches the campaign year
                     GameOptions gameOpts = campaign.getGameOptions();
-                    int campaignYear = campaign.getCalendar().get(Calendar.YEAR);
+                    int campaignYear = campaign.getGameYear();
                     if (gameOpts.intOption("year") != campaignYear) {
                         gameOpts.getOption("year").setValue(campaignYear);
                     }
@@ -308,7 +297,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         @Override
         public void done() {
             setVisible(false);
-            if(!cancelled) {
+            if (!cancelled) {
                 app.setCampaign(campaign);
                 app.getCampaignController().setHost(campaign.getId());
                 frame.setVisible(false);

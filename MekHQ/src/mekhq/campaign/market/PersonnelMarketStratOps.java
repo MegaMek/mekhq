@@ -16,12 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.market;
 
 import java.io.PrintWriter;
+import java.time.LocalDate;
 import java.util.Collections;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,10 +34,8 @@ import mekhq.module.api.PersonnelMarketMethod;
 
 /**
  * Method for personnel market generation given in the repair and maintenance section of Strategic Operations
- *
  */
 public class PersonnelMarketStratOps implements PersonnelMarketMethod {
-    
     private int daysSinceRolled = 0;
 
     @Override
@@ -54,7 +51,8 @@ public class PersonnelMarketStratOps implements PersonnelMarketMethod {
             if (roll == 2) { // Medical
                 p = c.newPerson(Person.T_DOCTOR);
             } else if (roll == 3) { // ASF or Proto Pilot
-                if (c.getFaction().isClan() && c.getCalendar().after(new GregorianCalendar(3059, 1, 1)) && Compute.d6(2) < 6) {
+                if (c.getFaction().isClan() && c.getLocalDate().isAfter(LocalDate.of(3059, 1, 1))
+                        && Compute.d6(2) < 6) {
                     p = c.newPerson(Person.T_PROTO_PILOT);
                 } else {
                     p = c.newPerson(Person.T_AERO_PILOT);
@@ -105,17 +103,16 @@ public class PersonnelMarketStratOps implements PersonnelMarketMethod {
         }
         return null;
     }
-    
+
     @Override
     public void loadFieldsFromXml(Node node) {
         if (node.getNodeName().equals("daysSinceRolled")) {
             daysSinceRolled = Integer.parseInt(node.getTextContent());
         }
     }
-    
+
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "daysSinceRolled", daysSinceRolled);
     }
-
 }

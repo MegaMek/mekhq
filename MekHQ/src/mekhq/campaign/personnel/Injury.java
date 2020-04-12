@@ -1,6 +1,4 @@
 /*
- * java
- *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  *
  * This file is part of MekHQ.
@@ -38,6 +36,9 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import mekhq.campaign.personnel.enums.BodyLocation;
+import mekhq.campaign.personnel.enums.InjuryHiding;
+import mekhq.campaign.personnel.enums.InjuryLevel;
 import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 
@@ -97,7 +98,7 @@ public class Injury {
     /** Flag to indicate someone capable successfully treated this injury. */
     private boolean workedOn;
     private boolean extended;
-    private Hiding hidingState = Hiding.DEFAULT;
+    private InjuryHiding hidingState = InjuryHiding.DEFAULT;
     @XmlElement(name="InjuryUUID")
     private UUID id;
     /** Generic extra data, for use with plugins and mods */
@@ -259,10 +260,10 @@ public class Injury {
     }
 
     public boolean isHidden() {
-        return (hidingState != Hiding.NO) && ((hidingState == Hiding.YES) || type.isHidden(this));
+        return (hidingState != InjuryHiding.NO) && ((hidingState == InjuryHiding.YES) || type.isHidden(this));
     }
 
-    public void setHidingState(Hiding hidingState) {
+    public void setHidingState(InjuryHiding hidingState) {
         this.hidingState = Objects.requireNonNull(hidingState);
     }
 
@@ -275,7 +276,7 @@ public class Injury {
 
     // Return the location name for the injury by passing location to the static overload
     public String getLocationName() {
-        return Utilities.capitalize(location.readableName);
+        return Utilities.capitalize(location.locationName());
     }
 
     public String getTypeKey() {
@@ -333,10 +334,8 @@ public class Injury {
             extraData = new ExtraData();
         }
 
-        hidingState = Utilities.nonNull(hidingState, Hiding.DEFAULT);
+        hidingState = Utilities.nonNull(hidingState, InjuryHiding.DEFAULT);
 
         version = Injury.VERSION;
     }
-
-    public static enum Hiding { YES, NO, DEFAULT }
 }

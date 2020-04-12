@@ -27,7 +27,6 @@ import java.awt.GridLayout;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -616,8 +615,6 @@ public final class BriefingTab extends CampaignGuiTab {
                     // Add and run
                     chosen.add(u);
 
-                    // So MegaMek has correct crew sizes
-                    u.getEntity().getCrew().setSize(u.getActiveCrew().size());
                 } else {
                     undeployed.append("\n").append(u.getName()).append(" (").append(u.checkDeployment()).append(")");
                 }
@@ -670,7 +667,7 @@ public final class BriefingTab extends CampaignGuiTab {
         if (chosen.size() > 0) {
             // Ensure that the MegaMek year GameOption matches the campaign year
             GameOptions gameOpts = getCampaign().getGameOptions();
-            int campaignYear = getCampaign().getCalendar().get(Calendar.YEAR);
+            int campaignYear = getCampaign().getGameYear();
             if (gameOpts.intOption("year") != campaignYear) {
                 gameOpts.getOption("year").setValue(campaignYear);
             }
@@ -705,8 +702,6 @@ public final class BriefingTab extends CampaignGuiTab {
                     // Add and run
                     chosen.add(u);
 
-                    // So MegaMek has correct crew sizes
-                    u.getEntity().getCrew().setSize(u.getActiveCrew().size());
                 } else {
                     undeployed.append("\n").append(u.getName()).append(" (").append(u.checkDeployment()).append(")");
                 }
@@ -751,9 +746,6 @@ public final class BriefingTab extends CampaignGuiTab {
                     // Make sure the unit's entity and pilot are fully up to
                     // date!
                     u.resetPilotAndEntity();
-
-                    // So MegaMek has correct crew sizes
-                    u.getEntity().getCrew().setSize(u.getActiveCrew().size());
 
                     // Add the entity
                     chosen.add(u.getEntity());

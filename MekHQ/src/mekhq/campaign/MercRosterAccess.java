@@ -39,6 +39,7 @@ import mekhq.campaign.personnel.Rank;
 import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
 
 public class MercRosterAccess extends SwingWorker<Void, Void> {
@@ -473,10 +474,10 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 preparedStatement.setInt(6, forceId);
                 preparedStatement.setInt(7, 1);
                 //TODO: get joining date right
-                preparedStatement.setDate(8, new java.sql.Date(p.getBirthday().getTimeInMillis()));
+                preparedStatement.setDate(8, java.sql.Date.valueOf(p.getBirthday()));
                 //TODO: combine personnel log with biography
                 preparedStatement.setString(9, p.getBiography());
-                preparedStatement.setDate(10, new java.sql.Date(p.getBirthday().getTimeInMillis()));
+                preparedStatement.setDate(10, java.sql.Date.valueOf(p.getBirthday()));
                 preparedStatement.setString(11, p.getId().toString());
                 if(preparedStatement.executeUpdate() < 1) {
                     //no prior record so insert
@@ -488,9 +489,9 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                     preparedStatement.setString(5, getMercRosterStatusName(p.getStatus()));
                     preparedStatement.setInt(6, forceId);
                     preparedStatement.setInt(7, 1);
-                    preparedStatement.setDate(8, new java.sql.Date(p.getBirthday().getTimeInMillis()));
+                    preparedStatement.setDate(8, java.sql.Date.valueOf(p.getBirthday()));
                     preparedStatement.setString(9, p.getBiography());
-                    preparedStatement.setDate(10, new java.sql.Date(p.getBirthday().getTimeInMillis()));
+                    preparedStatement.setDate(10, java.sql.Date.valueOf(p.getBirthday()));
                     preparedStatement.setString(11, p.getId().toString());
                     preparedStatement.executeUpdate();
                 }
@@ -627,18 +628,18 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
         return name;
     }
 
-    private static String getMercRosterStatusName(int status) {
+    private static String getMercRosterStatusName(PersonnelStatus status) {
         switch(status) {
-        case Person.S_ACTIVE:
-            return "Active";
-        case Person.S_KIA:
-            return "Deceased";
-        case Person.S_RETIRED:
-            return "Retired";
-        case Person.S_MIA:
-            return "Missing in Action";
-        default:
-            return "?";
+            case ACTIVE:
+                return "Active";
+            case KIA:
+                return "Deceased";
+            case RETIRED:
+                return "Retired";
+            case MIA:
+                return "Missing in Action";
+            default:
+                return "?";
         }
     }
 

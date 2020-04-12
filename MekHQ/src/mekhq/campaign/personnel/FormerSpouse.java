@@ -21,7 +21,6 @@ package mekhq.campaign.personnel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
-import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -42,8 +41,6 @@ public class FormerSpouse implements Serializable, MekHqXmlSerializable {
     public final static int REASON_WIDOWED = 0;
     public final static int REASON_DIVORCE = 1;
     public final static int REASON_UNKNOWN = 2;
-    private final static String dateSaveFormat = "yyyy-MM-dd";  //DO NOT USE FOR DISPLAY FORMATS
-                                                                //this is used solely in this class to save dates to file
     //endregion Variables
 
     //region Constructors
@@ -52,12 +49,6 @@ public class FormerSpouse implements Serializable, MekHqXmlSerializable {
         this.date = date;
         this.reason = reason;
     }
-    public FormerSpouse(UUID formerSpouseId, LocalDate date) {
-        this.formerSpouseId = formerSpouseId;
-        this.date = date;
-        reason = REASON_WIDOWED;
-    }
-
     public FormerSpouse() { }
     //endregion Constructors
 
@@ -80,10 +71,6 @@ public class FormerSpouse implements Serializable, MekHqXmlSerializable {
 
     public void setDate(LocalDate date) {
         this.date = date;
-    }
-
-    public void setDateFromString(String dateString, String dateFormat) {
-        this.date = LocalDate.parse(dateString, DateTimeFormatter.ofPattern(dateFormat));
     }
 
     public int getReason() {
@@ -113,37 +100,18 @@ public class FormerSpouse implements Serializable, MekHqXmlSerializable {
             this.reason = REASON_DIVORCE;
         } else if (reason.equalsIgnoreCase("Widowed")) {
             this.reason = REASON_WIDOWED;
+        } else {
+            this.reason = REASON_UNKNOWN;
         }
-        this.reason = REASON_UNKNOWN;
      }
     //endregion getters/setters
-
-    //region Deprecated
-    // The following method has been deprecated as it is used specifically to convert between the old DateTime and
-    // the modern LocalDate methods, and should be removed as soon as LocalDate is implemented
-    // TODO : Remove me following the conversion of MekHQ to LocalDate
-    @Deprecated
-    public static LocalDate convertDateTimeToLocalDate(DateTime inputDate) {
-        return LocalDate.of(inputDate.getYear(), inputDate.getMonthOfYear(), inputDate.getDayOfMonth());
-    }
-
-    // The following method has been deprecated as it is used to provide a DateFormat to external class which should
-    // get that method from another location, not this internal saving Format
-    // TODO : Remove me following the conversion of MekHQ to LocalDate with a standardized DateFormat output
-    @Deprecated
-    public static String getDisplayDateFormat() {
-        return dateSaveFormat;
-    }
-    //endregion Deprecated
 
     //region read from/write to XML
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(String.format("%s<formerSpouse id=\"%s\">", MekHqXmlUtil.indentStr(indent), getFormerSpouseId().toString()));
-        indent++;
-        pw1.println(String.format("%s<id>%s</id>", MekHqXmlUtil.indentStr(indent), getFormerSpouseId().toString()));
-        pw1.println(String.format("%s<date>%s</date>", MekHqXmlUtil.indentStr(indent), getDateAsString(dateSaveFormat)));
-        pw1.println(String.format("%s<reason>%s</reason>", MekHqXmlUtil.indentStr(indent), reason));
-        indent--;
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "id", formerSpouseId.toString());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "date", MekHqXmlUtil.saveFormattedDate(date));
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "reason", reason);
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</formerSpouse>");
     }
 
@@ -153,7 +121,6 @@ public class FormerSpouse implements Serializable, MekHqXmlSerializable {
         try {
             retVal = new FormerSpouse();
 
-            // Okay, now load FormerSpouse-specific fields!
             NodeList nl = wn.getChildNodes();
 
             for (int x = 0; x < nl.getLength(); x++) {
@@ -162,14 +129,13 @@ public class FormerSpouse implements Serializable, MekHqXmlSerializable {
                 if (wn2.getNodeName().equalsIgnoreCase("id")) {
                     retVal.setFormerSpouseId(UUID.fromString(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("date")) {
-                    retVal.setDateFromString(wn2.getTextContent(), dateSaveFormat);
+                    retVal.setDate(MekHqXmlUtil.parseDate(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("reason")) {
                     retVal.setReason(Integer.parseInt((wn2.getTextContent())));
                 }
             }
         } catch (Exception e) {
-            // Errrr, apparently either the class name was invalid... Or the listed name doesn't exist.
-            MekHQ.getLogger().error(FormerSpouse.class, "generateInstanceFromXML(Node,Campaign,Version)", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(FormerSpouse.class, "generateInstanceFromXML(Node,Campaign,Version)", e);
         }
 
         return retVal;

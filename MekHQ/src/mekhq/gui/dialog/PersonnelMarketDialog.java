@@ -52,6 +52,7 @@ import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.PersonnelTab;
@@ -279,7 +280,10 @@ public class PersonnelMarketDialog extends JDialog {
 
         JButton btnAdvDay = new JButton("Advance Day");
         btnAdvDay.setName("buttonAdvanceDay");
-        btnAdvDay.addActionListener(evt -> hqView.getCampaignController().advanceDay());
+        btnAdvDay.addActionListener(evt -> {
+            hqView.getCampaignController().advanceDay();
+            personnelModel.setData(personnelMarket.getPersonnel());
+        });
         btnAdvDay.setEnabled(hqView.getCampaignController().isHost());
         panelOKBtns.add(btnAdvDay, new GridBagConstraints());
 
@@ -449,11 +453,11 @@ public class PersonnelMarketDialog extends JDialog {
                             ) {
                         return person.isActive();
                     } else if(nGroup == PersonnelTab.PG_RETIRE) {
-                        return person.getStatus() == Person.S_RETIRED;
+                        return person.getStatus() == PersonnelStatus.RETIRED;
                     } else if(nGroup == PersonnelTab.PG_MIA) {
-                        return person.getStatus() == Person.S_MIA;
+                        return person.getStatus() == PersonnelStatus.MIA;
                     } else if(nGroup == PersonnelTab.PG_KIA) {
-                        return person.getStatus() == Person.S_KIA;
+                        return person.getStatus() == PersonnelStatus.KIA;
                     }
                     return false;
                 }

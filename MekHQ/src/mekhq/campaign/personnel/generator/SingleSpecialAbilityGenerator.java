@@ -16,11 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.personnel;
+package mekhq.campaign.personnel.generator;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import megamek.common.Compute;
@@ -30,7 +29,9 @@ import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import mekhq.Utilities;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.generator.AbstractSpecialAbilityGenerator;
 
 /**
  * Generates a single special ability for a {@link Person}.
@@ -107,7 +108,7 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
             person.getOptions()
                 .acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
                     SpecialAbility.chooseWeaponSpecialization(person.getPrimaryRole(), person.getOriginFaction().isClan(),
-                            getCampaignOptions(person).getTechLevel(), person.getCampaign().getCalendar().get(GregorianCalendar.YEAR)));
+                            getCampaignOptions(person).getTechLevel(), person.getCampaign().getGameYear()));
         } else {
             person.getOptions()
                 .acquireAbility(PilotOptions.LVL3_ADVANTAGES, name, true);

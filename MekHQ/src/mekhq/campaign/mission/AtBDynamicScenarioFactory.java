@@ -21,7 +21,6 @@ package mekhq.campaign.mission;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -476,7 +475,7 @@ public class AtBDynamicScenarioFactory {
      * @param campaign  The campaign for which the turrets are being generated.
      */
     public static List<Entity> generateTurrets(int num, int skill, int quality, Campaign campaign) {
-        int currentYear = campaign.getCalendar().get(Calendar.YEAR);
+        int currentYear = campaign.getGameYear();
         List<MechSummary> msl = campaign.getUnitGenerator().generateTurrets(num, skill, quality, currentYear);
         return msl.stream().map(ms -> createEntityWithCrew("IND", skill, campaign, ms)).collect(Collectors.toCollection(ArrayList::new));
     }
@@ -887,7 +886,7 @@ public class AtBDynamicScenarioFactory {
         params.setQuality(quality);
         params.setUnitType(unitType);
         params.setWeightClass(weightClass);
-        params.setYear(campaign.getCalendar().get(Calendar.YEAR));
+        params.setYear(campaign.getGameYear());
 
         if (unitType == UnitType.TANK) {
             return getTankEntity(params, skill, artillery, campaign);
@@ -1277,7 +1276,7 @@ public class AtBDynamicScenarioFactory {
                 phenotype = -1;
             }
             if (phenotype >= 0) {
-                String bloodname = Bloodname.randomBloodname(faction, phenotype, campaign.getCalendar().get(Calendar.YEAR)).getName();
+                String bloodname = Bloodname.randomBloodname(faction, phenotype, campaign.getGameYear()).getName();
                 crewName += " " + bloodname;
                 innerMap.put(Crew.MAP_BLOODNAME, bloodname);
                 innerMap.put(Crew.MAP_PHENOTYPE, Integer.toString(phenotype));

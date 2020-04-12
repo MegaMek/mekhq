@@ -539,8 +539,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     private int getMedicPoolHours() {
-        return (getCampaign().getMedicPool() +
-                getCampaign().getNumberMedics()) * 20;
+        return getCampaign().getNumberMedics() * 20;
     }
 
     int getMedicalSupportAvailable() {
