@@ -937,6 +937,9 @@ public class Utilities {
             } else {
                 p.setGivenName(givenName);
                 p.setSurname(oldCrew.getExtraDataValue(crewIndex, Crew.MAP_SURNAME));
+                if (p.getSurname() == null) {
+                    p.setSurname("");
+                }
 
                 String phenotype = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_PHENOTYPE);
                 if (phenotype != null) {
