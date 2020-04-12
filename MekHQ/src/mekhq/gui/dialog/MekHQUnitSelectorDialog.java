@@ -143,7 +143,6 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
      */
     @Override
     public Entity getSelectedEntity() {
-        MekHQ.getLogger().warning(getClass(), "getSelectedEntity", "selecting entity");
         Entity entity = super.getSelectedEntity();
         if (entity == null) {
             selectedUnit = null;
@@ -152,8 +151,6 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                     new Object[]{TARGET_UNKNOWN}));
             buttonSelect.setToolTipText(null);
         } else {
-            MekHQ.getLogger().warning(getClass(), "getSelectedEntity", "selecting entity not null");
-
             selectedUnit = new UnitOrder(entity, campaign);
             buttonSelect.setEnabled(true);
             Person logisticsPerson = campaign.getLogisticsPerson();
