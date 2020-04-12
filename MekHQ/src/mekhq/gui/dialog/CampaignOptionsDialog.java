@@ -667,7 +667,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useQualityMaintenance = new JCheckBox();
         useUnofficialMaintenance = new JCheckBox();
         checkMaintenance = new JCheckBox();
-        logMaintenance = new JCheckBox();
         reverseQualityNames = new JCheckBox();
 
         chkSupportStaffOnly = new JCheckBox();
@@ -963,12 +962,14 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
                 spnMaintenanceDays.setEnabled(true);
                 useQualityMaintenance.setEnabled(true);
                 useUnofficialMaintenance.setEnabled(true);
+                reverseQualityNames.setEnabled(true);
                 spnMaintenanceBonus.setEnabled(true);
                 logMaintenance.setEnabled(true);
             } else {
                 spnMaintenanceDays.setEnabled(false);
                 useQualityMaintenance.setEnabled(false);
                 useUnofficialMaintenance.setEnabled(false);
+                reverseQualityNames.setEnabled(false);
                 spnMaintenanceBonus.setEnabled(false);
                 logMaintenance.setEnabled(false);
             }
@@ -1044,15 +1045,13 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSubMaintenance.add(useUnofficialMaintenance, gridBagConstraints);
 
-        logMaintenance.setText(resourceMap.getString("logMaintenance.text")); // NOI18N
+        logMaintenance = new JCheckBox(resourceMap.getString("logMaintenance.text")); // NOI18N
         logMaintenance.setToolTipText(resourceMap.getString("logMaintenance.toolTipText")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
+        logMaintenance.setName("logMaintenance");
+        logMaintenance.setSelected(options.logMaintenance());
         gridBagConstraints.gridy = 6;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSubMaintenance.add(logMaintenance, gridBagConstraints);
 
         tabOptions.addTab(resourceMap.getString("panRepair.TabConstraints.tabTitle"), panRepair); // NOI18N
@@ -4678,6 +4677,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setUseQualityMaintenance(useQualityMaintenance.isSelected());
         options.setReverseQualityNames(reverseQualityNames.isSelected());
         options.setUseUnofficialMaintenance(useUnofficialMaintenance.isSelected());
+        options.setLogMaintenance(logMaintenance.isSelected());
         options.setMaintenanceBonus((Integer) spnMaintenanceBonus.getModel().getValue());
         options.setMaintenanceCycleDays((Integer) spnMaintenanceDays.getModel().getValue());
         options.setPayForParts(payForPartsBox.isSelected());
