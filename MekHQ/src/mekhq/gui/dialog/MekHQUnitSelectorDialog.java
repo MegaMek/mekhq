@@ -22,9 +22,6 @@ import megamek.client.ui.Messages;
 import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.common.*;
-import megamek.common.logging.LogLevel;
-import megamek.common.options.OptionsConstants;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -40,7 +37,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.regex.PatternSyntaxException;
 
 public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
