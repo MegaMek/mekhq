@@ -387,7 +387,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         this.unit = u;
         if(null != unit) {
             unitId = unit.getId();
-            unitTonnage = (int) u.getEntity().getWeight();
+            unitTonnage = (int) unit.getEntity().getWeight();
         } else {
             unitId = null;
         }
@@ -980,21 +980,22 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         TargetRoll mods = new TargetRoll(campaign.getCampaignOptions().getMaintenanceBonus(), "maintenance");
         mods.addModifier(Availability.getTechModifier(getTechRating()), "tech rating " + ITechnology.getRatingName(getTechRating()));
 
-        if(null != unit) {
-            mods.append(unit.getSiteMod());
-            if(unit.getEntity().hasQuirk("easy_maintain")) {
+        if(null != getUnit()) {
+            mods.append(getUnit().getSiteMod());
+            if(getUnit().getEntity().hasQuirk("easy_maintain")) {
                 mods.addModifier(-1, "easy to maintain");
             }
-            else if(unit.getEntity().hasQuirk("difficult_maintain")) {
+            else if(getUnit().getEntity().hasQuirk("difficult_maintain")) {
                 mods.addModifier(1, "difficult to maintain");
             }
-        }
-        if(isClanTechBase() || (this instanceof MekLocation && this.getUnit() != null && this.getUnit().getEntity().isClan())) {
-            if (unit.getTech() == null) {
-                mods.addModifier(2, "Clan tech");
-            } else if (!unit.getTech().isClanner()
-                    && !unit.getTech().getOptions().booleanOption(PersonnelOptions.TECH_CLAN_TECH_KNOWLEDGE)) {
-                mods.addModifier(2, "Clan tech");
+
+            if(isClanTechBase() || (this instanceof MekLocation && getUnit().getEntity().isClan())) {
+                if (getUnit().getTech() == null) {
+                    mods.addModifier(2, "Clan tech");
+                } else if (!getUnit().getTech().isClanner()
+                        && !getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_CLAN_TECH_KNOWLEDGE)) {
+                    mods.addModifier(2, "Clan tech");
+                }
             }
         }
 
