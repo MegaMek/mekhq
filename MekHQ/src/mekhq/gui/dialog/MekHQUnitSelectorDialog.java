@@ -22,6 +22,7 @@ import megamek.client.ui.Messages;
 import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.common.*;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.UnitOrder;
@@ -61,6 +62,14 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         allowedYear = campaign.getGameYear();
         canonOnly = campaign.getCampaignOptions().allowCanonOnly();
         gameTechLevel = campaign.getCampaignOptions().getTechLevel();
+
+        if (campaign.getCampaignOptions().allowISPurchases() && campaign.getCampaignOptions().allowISPurchases()) {
+            techLevelDisplayType = TECH_LEVEL_DISPLAY_IS_CLAN;
+        } else if (campaign.getCampaignOptions().allowClanPurchases()) {
+            techLevelDisplayType = TECH_LEVEL_DISPLAY_CLAN;
+        } else {
+            techLevelDisplayType = TECH_LEVEL_DISPLAY_IS;
+        }
     }
 
     //region Button Methods
@@ -116,7 +125,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
 
     @Override
     protected void select(boolean isGM) {
-        if (selectedUnit != null) {
+        if (getSelectedEntity() != null) {
             if (isGM) {
                 campaign.addUnit(selectedUnit.getEntity(), false, 0);
             } else {
@@ -134,17 +143,20 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
      */
     @Override
     public Entity getSelectedEntity() {
+        MekHQ.getLogger().warning(getClass(), "getSelectedEntity", "selecting entity");
         Entity entity = super.getSelectedEntity();
         if (entity == null) {
             selectedUnit = null;
             buttonSelect.setEnabled(false);
-            buttonSelect = new JButton(Messages.getString("MechSelectorDialog.Buy",
+            buttonSelect.setText(Messages.getString("MechSelectorDialog.Buy",
                     new Object[]{TARGET_UNKNOWN}));
             buttonSelect.setToolTipText(null);
         } else {
+            MekHQ.getLogger().warning(getClass(), "getSelectedEntity", "selecting entity not null");
+
             selectedUnit = new UnitOrder(entity, campaign);
-            Person logisticsPerson = campaign.getLogisticsPerson();
             buttonSelect.setEnabled(true);
+            Person logisticsPerson = campaign.getLogisticsPerson();
             buttonSelect.setText(Messages.getString("MechSelectorDialog.Buy",
                     new Object[]{campaign.getTargetForAcquisition(selectedUnit, logisticsPerson,
                             false).getValueAsString()}));
