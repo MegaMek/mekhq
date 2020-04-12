@@ -109,3 +109,18 @@ jobs:
       with:
         name: ${{ matrix.os }}-jdk${{ matrix.java }}-ci-failure-logs
         path: mekhq/MekHQ/build/reports/
+        
+    #
+    # Put the releases up in a single zip file called:
+    #
+    #     releases-{{ matrix.os }}.zip
+    #
+    # NB: Due to a GitHub Actions limitation we won't know
+    #     what the filename is in order to display it somewhere.
+    #
+    - name: Upload Releases
+      uses: actions/upload-artifact@v2-preview
+      if: matrix.os == 'ubuntu-latest'
+      with:
+        name: releases-java${{ matrix.java }}
+        path: mekhq/MekHQ/build/distributions/
