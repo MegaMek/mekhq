@@ -59,7 +59,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
     public void updateOptionValues() {
         gameOptions = campaign.getGameOptions();
         enableYearLimits = campaign.getCampaignOptions().limitByYear();
-        allowedYear = campaign.getCalendar().get(GregorianCalendar.YEAR);
+        allowedYear = campaign.getGameYear();
         canonOnly = campaign.getCampaignOptions().allowCanonOnly();
         gameTechLevel = campaign.getCampaignOptions().getTechLevel();
     }
