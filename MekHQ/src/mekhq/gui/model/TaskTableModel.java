@@ -158,7 +158,7 @@ public class TaskTableModel extends DataTableModel {
 	        			for (int i = techs.size() - 1; i >= 0; i--) {
 	        				Person techTemp = techs.get(i);
 
-	        				if ((null == techTemp) || (null == part) || (null == part.getUnit())) {
+	        				if ((null == techTemp) || (null == part.getUnit())) {
 	        					continue;
 	        				}
 
