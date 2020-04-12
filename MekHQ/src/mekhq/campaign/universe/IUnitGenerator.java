@@ -32,7 +32,7 @@ import megamek.common.UnitType;
 
 /**
  * Common interface to interact with various methods for generating units.
- * 
+ *
  * @author Neoancient
  *
  */
@@ -51,11 +51,25 @@ public interface IUnitGenerator {
     final static EnumSet<EntityMovementMode> ALL_INFANTRY_MODES = EnumSet.of(EntityMovementMode.INF_JUMP,
             EntityMovementMode.INF_LEG, EntityMovementMode.INF_MOTORIZED, EntityMovementMode.INF_UMU,
             EntityMovementMode.TRACKED, EntityMovementMode.WHEELED, EntityMovementMode.HOVER);
+    
+    final static EnumSet<EntityMovementMode> ALL_BATTLE_ARMOR_MODES = EnumSet.of(EntityMovementMode.INF_JUMP,
+            EntityMovementMode.INF_LEG, EntityMovementMode.INF_UMU, EntityMovementMode.VTOL);
 
     /**
-     * For convenience in generating infantry units, the maximum tonnage of a foot infantry platoon.
+     * For convenience in generating infantry units, the minimum tonnage of a foot infantry platoon.
      */
     final static double FOOT_PLATOON_INFANTRY_WEIGHT = 3.0;
+    
+    /**
+     * For convenience in generating battle armor, minimum tonnage of a battle armor squad.
+     */
+    final static double BATTLE_ARMOR_MIN_WEIGHT = 4.0;
+    
+    /**
+     * For convenience in generating battle armor/infantry, when the tonnage does not matter 
+     * (a dedicated dropship bay, battle armor riding on a mech, etc)
+     */
+    final static double NO_WEIGHT_LIMIT = -1.0;
 
     /**
      * Convenience function to let us know whether a unit type supports weight class selection.
@@ -67,7 +81,7 @@ public interface IUnitGenerator {
     }
 
     /**
-     * 
+     *
      * @param unitType UnitType constant
      * @return true if the generator supports the unit type
      */
@@ -75,7 +89,7 @@ public interface IUnitGenerator {
 
     /**
      * Generate a single unit.
-     * 
+     *
      * @param faction Faction shortname
      * @param unitType UnitType constant
      * @param weightClass EntityWeightClass constant, or -1 for unspecified
@@ -87,7 +101,7 @@ public interface IUnitGenerator {
 
     /**
      * Generate a single unit.
-     * 
+     *
      * @param faction Faction shortname
      * @param unitType UnitType constant
      * @param weightClass EntityWeightClass constant, or -1 for unspecified
@@ -100,9 +114,9 @@ public interface IUnitGenerator {
             Predicate<MechSummary> filter);
 
     /**
-     * 
+     *
      * Generates a list of units.
-     * 
+     *
      * @param count The number of units to generate
      * @param faction Faction shortname
      * @param unitType UnitType constant
@@ -115,9 +129,9 @@ public interface IUnitGenerator {
             int year, int quality);
 
     /**
-     * 
+     *
      * Generates a list of units with an additional test function.
-     * 
+     *
      * @param count The number of units to generate
      * @param faction Faction shortname
      * @param unitType UnitType constant
@@ -133,13 +147,13 @@ public interface IUnitGenerator {
 
     /**
      * Generate a unit using additional parameters specific to the generation method.
-     * 
+     *
      * @param faction Faction shortname
      * @param unitType UnitType constant
      * @param weightClass EntityWeightClass constant, or -1 for unspecified
      * @param year The year of the campaign date
      * @param quality Index of equipment rating, with zero being the lowest quality.
-     * @param options A map of additional parameters keyed to the parameter name.
+     * @param movementModes A collection of various movement modes
      * @return A unit that matches the criteria
      */
     MechSummary generate(String faction, int unitType, int weightClass,
@@ -147,16 +161,16 @@ public interface IUnitGenerator {
             Predicate<MechSummary> filter);
 
     /**
-     * 
+     *
      * Generates a list of units using additional parameters specific to the generation method.
-     * 
+     *
      * @param count The number of units to generate
      * @param faction Faction shortname
      * @param unitType UnitType constant
      * @param weightClass EntityWeightClass constant, or -1 for unspecified
      * @param year The year of the campaign date
      * @param quality Index of equipment rating, with zero being the lowest quality.
-     * @param options A map of additional parameters keyed to the parameter name.
+     * @param movementModes A collection of various movement modes
      * @param filter All generated units return true when the filter function is applied.
      * @return A list of units matching the criteria.
      */

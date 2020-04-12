@@ -6,7 +6,6 @@
 
 package mekhq.gui.view;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Image;
 import java.text.DecimalFormat;
@@ -29,34 +28,36 @@ import megamek.common.Entity;
 import megamek.common.UnitType;
 import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.EntityImage;
+import mekhq.gui.utilities.MarkdownRenderer;
 
 /**
  * A custom panel that gets filled in with goodies from a Force record
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class ForceViewPanel extends javax.swing.JPanel {
-	
+public class ForceViewPanel extends ScrollablePanel {
+
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 7004741688464105277L;
 
 	private Force force;
 	private Campaign campaign;
-	
+
 	private IconPackage icons;
 
 	private javax.swing.JLabel lblIcon;
 	private javax.swing.JPanel pnlStats;
 	private javax.swing.JPanel pnlSubUnits;
-	private javax.swing.JTextArea txtDesc;
-	
+	private javax.swing.JTextPane txtDesc;
+
 	private javax.swing.JLabel lblType;
 	private javax.swing.JLabel lblAssign1;
 	private javax.swing.JLabel lblAssign2;
@@ -70,29 +71,26 @@ public class ForceViewPanel extends javax.swing.JPanel {
 	private javax.swing.JLabel lblCost2;
 	private javax.swing.JLabel lblTech1;
 	private javax.swing.JLabel lblTech2;
-	
-	
+
 	public ForceViewPanel(Force f, Campaign c, IconPackage icons) {
 		this.force = f;
 		this.campaign = c;
 		this.icons = icons;
 		initComponents();
 	}
-	
+
 	private void initComponents() {
 		java.awt.GridBagConstraints gridBagConstraints;
 
 		lblIcon = new javax.swing.JLabel();
 		pnlStats = new javax.swing.JPanel();
 		pnlSubUnits = new javax.swing.JPanel();
-		txtDesc = new javax.swing.JTextArea();
-		       
+		txtDesc = new javax.swing.JTextPane();
+
 		setLayout(new java.awt.GridBagLayout());
 
-		setBackground(Color.WHITE);
-		
-		lblIcon.setName("lblPortait"); // NOI18N
-		lblIcon.setBackground(Color.WHITE);
+
+		lblIcon.setName("lblPortrait"); // NOI18N
 		setIcon(force, lblIcon, 150);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
@@ -101,53 +99,52 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		gridBagConstraints.insets = new java.awt.Insets(10,10,0,0);
 		add(lblIcon, gridBagConstraints);
-		
+
 		pnlStats.setName("pnlStats");
 		pnlStats.setBorder(BorderFactory.createTitledBorder(force.getName()));
-		pnlStats.setBackground(Color.WHITE);
 		fillStats();
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.gridheight = 1;
 		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
+		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;	
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		add(pnlStats, gridBagConstraints);
-		
+
 		pnlSubUnits.setName("pnlSubUnits");
-		pnlSubUnits.setBackground(Color.WHITE);
 		fillSubUnits();
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 1;
 		gridBagConstraints.gridwidth = 2;
 		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;	
-		add(pnlSubUnits, gridBagConstraints);
-		
-		txtDesc.setName("txtDesc");
-		txtDesc.setText(force.getDescription());
-		txtDesc.setEditable(false);
-		txtDesc.setLineWrap(true);
-		txtDesc.setWrapStyleWord(true);
-		txtDesc.setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createTitledBorder("Description"),
-                BorderFactory.createEmptyBorder(5,5,5,5)));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 2;
-		gridBagConstraints.gridwidth = 2;
-		gridBagConstraints.weighty = 1.0;
-		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
+		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		add(txtDesc, gridBagConstraints);
+		add(pnlSubUnits, gridBagConstraints);
+
+        if(null != force.getDescription() && !force.getDescription().isEmpty()) {
+            txtDesc.setName("txtDesc");
+            txtDesc.setEditable(false);
+            txtDesc.setContentType("text/html");
+            txtDesc.setText(MarkdownRenderer.getRenderedHtml(force.getDescription()));
+            txtDesc.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createTitledBorder("Description"),
+                    BorderFactory.createEmptyBorder(0,2,2,2)));
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 2;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.weighty = 1.0;
+            gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            add(txtDesc, gridBagConstraints);
+        }
 	}
-	
+
 	private void setIcon(Force force, JLabel lbl, int scale) {
         String category = force.getIconCategory();
         String filename = force.getIconFileName();
@@ -163,25 +160,25 @@ public class ForceViewPanel extends javax.swing.JPanel {
         }
 
         // Try to get the player's portrait file.
-        Image portrait = null;        
+        Image portrait = null;
         try {
             portrait = IconPackage.buildForceIcon(category, filename, icons.getForceIcons(), iconMap);
             if(null != portrait) {
-        		portrait = portrait.getScaledInstance(scale, -1, Image.SCALE_SMOOTH);  
+        		portrait = portrait.getScaledInstance(scale, -1, Image.SCALE_SMOOTH);
             } else {
             	portrait = (Image) icons.getForceIcons().getItem("", "empty.png");
             }
-        	portrait = portrait.getScaledInstance(scale, -1, Image.SCALE_SMOOTH);  
+        	portrait = portrait.getScaledInstance(scale, -1, Image.SCALE_SMOOTH);
             ImageIcon icon = new ImageIcon(portrait);
         	lbl.setIcon(icon);
-        } catch (Exception err) {
-            err.printStackTrace();
+        } catch (Exception e) {
+            MekHQ.getLogger().error(getClass(), "setIcon", e);
         }
 	}
 
-	
+
 	private void fillStats() {
-		
+
     	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ForceViewPanel", new EncodeControl()); //$NON-NLS-1$
 
     	lblType = new javax.swing.JLabel();
@@ -199,7 +196,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		lblTech2 = new javax.swing.JLabel();
 		java.awt.GridBagConstraints gridBagConstraints;
 		pnlStats.setLayout(new java.awt.GridBagLayout());
-		
+
 	 	long bv = 0;
     	Money cost = Money.zero();
     	double ton = 0;
@@ -235,18 +232,18 @@ public class ForceViewPanel extends javax.swing.JPanel {
     	if(people.size() > 0) {
     		commander = people.get(0).getFullTitle();
     	}
-    	
+
     	if (null != force.getTechID()) {
     		Person p = campaign.getPerson(force.getTechID());
-    		LanceTech = p.getName();
+    		LanceTech = p.getFullName();
     	}
-    	
+
     	if(null != force.getParentForce()) {
     		assigned = force.getParentForce().getName();
     	}
-    	
+
     	int nexty = 0;
-    	
+
     	if(null != type) {
     		lblType.setName("lblCommander2"); // NOI18N
 			lblType.setText("<html><i>" + type + " " + resourceMap.getString("unit")+ "</i></html>");
@@ -260,7 +257,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 			pnlStats.add(lblType, gridBagConstraints);
 			nexty++;
     	}
-    	
+
     	if(!commander.equals("")) {
 	    	lblCommander1.setName("lblCommander1"); // NOI18N
 	    	lblCommander1.setText(resourceMap.getString("lblCommander1.text"));
@@ -270,7 +267,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 			pnlStats.add(lblCommander1, gridBagConstraints);
-			
+
 			lblCommander2.setName("lblCommander2"); // NOI18N
 			lblCommander2.setText(commander);
 			gridBagConstraints = new java.awt.GridBagConstraints();
@@ -293,7 +290,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
     			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
     			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     			pnlStats.add(lblTech1, gridBagConstraints);
-    			
+
     			lblTech2.setName("lblTech2"); // NOI18N
     			lblTech2.setText(LanceTech);
     			gridBagConstraints = new java.awt.GridBagConstraints();
@@ -307,7 +304,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
     			nexty++;
     			}
     	}
-    	
+
     	if(!assigned.equals("")) {
 	    	lblAssign1.setName("lblAssign1"); // NOI18N
 	    	lblAssign1.setText(resourceMap.getString("lblAssign1.text"));
@@ -317,7 +314,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 			pnlStats.add(lblAssign1, gridBagConstraints);
-			
+
 			lblAssign2.setName("lblAssign2"); // NOI18N
 			lblAssign2.setText(assigned);
 			gridBagConstraints = new java.awt.GridBagConstraints();
@@ -330,7 +327,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 			pnlStats.add(lblAssign2, gridBagConstraints);
 			nexty++;
     	}
-    	
+
     	lblBV1.setName("lblBV1"); // NOI18N
     	lblBV1.setText(resourceMap.getString("lblBV1.text"));
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -339,7 +336,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblBV1, gridBagConstraints);
-		
+
 		lblBV2.setName("lblBV2"); // NOI18N
 		lblBV2.setText(DecimalFormat.getInstance().format(bv));
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -351,7 +348,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblBV2, gridBagConstraints);
 		nexty++;
-		
+
 		lblTonnage1.setName("lblTonnage1"); // NOI18N
 		lblTonnage1.setText(resourceMap.getString("lblTonnage1.text"));
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -360,7 +357,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblTonnage1, gridBagConstraints);
-		
+
 		lblTonnage2.setName("lblTonnage2"); // NOI18N
 		lblTonnage2.setText(DecimalFormat.getInstance().format(ton));
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -372,7 +369,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblTonnage2, gridBagConstraints);
 		nexty++;
-		
+
 		// if AtB is enabled, set tooltip to show lance weight breakdowns
 		if (campaign.getCampaignOptions().getUseAtB()) {
 			// see Lance.java for lance weight breakdowns
@@ -388,7 +385,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblCost1, gridBagConstraints);
-		
+
 		lblCost2.setName("lblCost2"); // NOI18N
 		lblCost2.setText(cost.toAmountAndSymbolString());
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -400,20 +397,20 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblCost2, gridBagConstraints);
 		nexty++;
-    	
+
 		//BV
 		//Tonnage?
 		//Cost?
 		//Number of units?
 		//Assigned to
 	}
-	
+
 	private void fillSubUnits() {
-		
+
 		java.awt.GridBagConstraints gridBagConstraints;
 
 		pnlSubUnits.setLayout(new java.awt.GridBagLayout());
-		
+
 		JLabel lblForce;
 
 		int nexty = 0;
@@ -434,7 +431,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 			pnlSubUnits.add(lblForce, gridBagConstraints);
 		}
 		JLabel lblPerson;
-		JLabel lblUnit;		
+		JLabel lblUnit;
 		ArrayList<Unit> units = new ArrayList<Unit>();
 		ArrayList<Unit> unmannedUnits = new ArrayList<Unit>();
  		for(UUID uid : force.getUnits()) {
@@ -449,7 +446,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 			}
  		}
  		//sort person vector by rank
- 		Collections.sort(units, new Comparator<Unit>(){		 
+ 		Collections.sort(units, new Comparator<Unit>(){
             public int compare(final Unit u1, final Unit u2) {
                return ((Comparable<Integer>)u2.getCommander().getRankNumeric()).compareTo(u1.getCommander().getRankNumeric());
             }
@@ -476,7 +473,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 			pnlSubUnits.add(lblPerson, gridBagConstraints);
 			if(null != unit) {
 				lblUnit.setText(getSummaryFor(unit));
-				lblUnit.setIcon(new ImageIcon(getImageFor(unit, lblUnit)));			
+				lblUnit.setIcon(new ImageIcon(getImageFor(unit, lblUnit)));
 			}
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 1;
@@ -489,7 +486,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 			pnlSubUnits.add(lblUnit, gridBagConstraints);
 		}
 	}
-	
+
 	/**
      * set the portrait for the given person.
      *
@@ -516,22 +513,22 @@ public class ForceViewPanel extends javax.swing.JPanel {
         try {
             portrait = (Image) icons.getPortraits().getItem(category, filename);
             if(null != portrait) {
-                portrait = portrait.getScaledInstance(72, -1, Image.SCALE_DEFAULT);               
+                portrait = portrait.getScaledInstance(72, -1, Image.SCALE_DEFAULT);
             } else {
             	portrait = (Image) icons.getPortraits().getItem("", "default.gif");
             	if(null != portrait) {
-                    portrait = portrait.getScaledInstance(72, -1, Image.SCALE_DEFAULT);               
+                    portrait = portrait.getScaledInstance(72, -1, Image.SCALE_DEFAULT);
             	}
             }
             lbl.setIcon(new ImageIcon(portrait));
-        } catch (Exception err) {
-            err.printStackTrace();
+        } catch (Exception e) {
+            MekHQ.getLogger().error(getClass(), "setPortrait", e);
         }
     }
-    
+
     private Image getImageFor(Unit u, Component c) {
-        
-		if(null == icons.getMechTiles()) { 
+
+		if(null == icons.getMechTiles()) {
 			return null;
 		}
         Image base = icons.getMechTiles().imageFor(u.getEntity(), c, -1);
@@ -539,18 +536,18 @@ public class ForceViewPanel extends javax.swing.JPanel {
         EntityImage entityImage = new EntityImage(base, tint, getCamo(u), c);
         return entityImage.loadPreviewImage();
     }
-    
+
     private Image getCamo(Unit unit) {
         // Try to get the player's camo file.
         Image camo = null;
         try {
             camo = (Image) icons.getCamos().getItem(unit.getCamoCategory(), unit.getCamoFileName());
-        } catch (Exception err) {
-            err.printStackTrace();
+        } catch (Exception e) {
+            MekHQ.getLogger().error(getClass(), "getCamo", e);
         }
         return camo;
     }
-    
+
     public String getSummaryFor(Person person, Unit unit) {
         String toReturn = "<html><font size='2'><b>" + person.getFullTitle() + "</b><br/>";
         toReturn += person.getSkillSummary() + " " + person.getRoleDesc();
@@ -561,13 +558,27 @@ public class ForceViewPanel extends javax.swing.JPanel {
         toReturn += "</font></html>";
         return toReturn;
     }
-    
+
     public String getSummaryFor(Unit unit) {
-        String toReturn = "<html><font size='2'><b>" + unit.getName() + "</b><br/>";
-        toReturn += "<b>BV:</b> " + unit.getEntity().calculateBattleValue(true, null == unit.getEntity().getCrew()) + "<br/>";
+        String toReturn = "<html><font size='3'><b>" + unit.getName() + "</b></font><br/>";
+        toReturn += "<font size='2'><b>BV:</b> " + unit.getEntity().calculateBattleValue(true, null == unit.getEntity().getCrew()) + "<br/>";
         toReturn += unit.getStatus();
         Entity entity = unit.getEntity();
-    	if (entity.hasC3i()) {
+        if (entity.hasNavalC3()) {
+            toReturn += "<br><i>";
+            if (entity.calculateFreeC3Nodes() >= 5) {
+                toReturn += Messages.getString("ChatLounge.NC3None");
+            } else {
+                toReturn += Messages
+                        .getString("ChatLounge.NC3Network")
+                        + entity.getC3NetId();
+                if (entity.calculateFreeC3Nodes() > 0) {
+                    toReturn += Messages.getString("ChatLounge.NC3Nodes",
+                            new Object[] { entity.calculateFreeC3Nodes() });
+                }
+            }
+            toReturn += "</i>";
+        } else if (entity.hasC3i()) {
     		toReturn += "<br><i>";
             if (entity.calculateFreeC3Nodes() >= 5) {
             	toReturn += Messages.getString("ChatLounge.C3iNone");
@@ -582,10 +593,43 @@ public class ForceViewPanel extends javax.swing.JPanel {
             }
     		toReturn += "</i>";
         }
+        if (unit.hasTransportShipId()) {
+            for (UUID id : unit.getTransportShipId().keySet()) {
+                Unit transport = campaign.getUnit(id);
+                if (transport != null) {
+                    toReturn += "<br><i>" + "Transported by: ";
+                    toReturn += transport.getName();
+                    toReturn += "</i>";
+                }
+            }
+        }
+        // If this is a transport ship, tell us what bay capacity is at
+        if (!unit.getEntity().getTransportBays().isEmpty()) {
+            int veeTotal = (int) (unit.getCurrentLightVehicleCapacity() + unit.getCurrentHeavyVehicleCapacity() + unit.getCurrentSuperHeavyVehicleCapacity());
+            int aeroTotal = (int) (unit.getCurrentASFCapacity() + unit.getCurrentSmallCraftCapacity());
+            if (unit.getCurrentMechCapacity() > 0) {
+                toReturn += "<br><i>" + "Mech Bays: " + (int)unit.getCurrentMechCapacity() + " free.</i>";
+            }
+            if (veeTotal > 0) {
+                toReturn += "<br><i>" + "Vehicle Bays: " + veeTotal + " free.</i>";
+            }
+            if (aeroTotal > 0) {
+                toReturn += "<br><i>" + "ASF/SC Bays: " + aeroTotal + " free.</i>";
+            }
+            if (unit.getCurrentProtomechCapacity() > 0) {
+                toReturn += "<br><i>" + "ProtoMech Bays: " + (int)unit.getCurrentProtomechCapacity() + " free.</i>";
+            }
+            if (unit.getCurrentBattleArmorCapacity() > 0) {
+                toReturn += "<br><i>" + "Battle Armor Bays: " + (int)unit.getCurrentBattleArmorCapacity() + " free.</i>";
+            }
+            if (unit.getCurrentInfantryCapacity() > 0) {
+                toReturn += "<br><i>" + "Infantry Bays: " + (int)unit.getCurrentInfantryCapacity() + " tons free.</i>";
+            }
+        }
         toReturn += "</font></html>";
         return toReturn;
     }
-    
+
     public String getSummaryFor(Force f) {
     	//we are not going to use the campaign methods here because we can be more efficient
     	//by only traversing once
@@ -613,7 +657,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
     		}
     	}
  		//sort person vector by rank
- 		Collections.sort(people, new Comparator<Person>(){		 
+ 		Collections.sort(people, new Comparator<Person>(){
             public int compare(final Person p1, final Person p2) {
                return ((Comparable<Integer>)p2.getRankNumeric()).compareTo(p1.getRankNumeric());
             }

@@ -18,8 +18,8 @@
  */
 package mekhq.module.atb;
 
+import java.time.DayOfWeek;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,7 +31,7 @@ import mekhq.module.api.PersonnelMarketMethod;
 
 /**
  * Method for generating market personnel according to AtB rules.
- * 
+ *
  * @author Neoancient
  *
  */
@@ -44,10 +44,10 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
 
     @Override
     public List<Person> generatePersonnelForDay(Campaign c) {
-        if (c.getCalendar().get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
+        if (c.getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
             List<Person> retVal = new ArrayList<>();
             Person p = null;
-            
+
             int roll = Compute.d6(2);
             if (roll == 2) {
                 switch (Compute.randomInt(4)) {
@@ -66,8 +66,7 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                 }
             } else if (roll == 3 || roll == 11) {
                 int r = Compute.d6();
-                if (r == 1 && c.getCalendar().get(Calendar.YEAR) >
-                (c.getFaction().isClan()?2870:3050)) {
+                if ((r == 1) && (c.getGameYear() > (c.getFaction().isClan() ? 2870 : 3050))) {
                     p = c.newPerson(Person.T_BA_TECH);
                 } else if (r < 4) {
                     p = c.newPerson(Person.T_MECHANIC);
@@ -82,7 +81,7 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                 p = c.newPerson(Person.T_AERO_PILOT);
             } else if (roll == 5 && c.getFaction().isClan()) {
                 p = c.newPerson(Person.T_MECHWARRIOR);
-            } else if (roll == 5 || roll == 10) {
+            } else if (roll == 5) {
                 int r = Compute.d6(2);
                 if (r == 2) {
                     p = c.newPerson(Person.T_VTOL_PILOT);
@@ -93,13 +92,9 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                     p = c.newPerson(Person.T_VEE_GUNNER);
                 }
             } else if (roll == 6 || roll == 8) {
-                if (c.getFaction().isClan() &&
-                        c.getCalendar().get(Calendar.YEAR) > 2870 &&
-                        Compute.d6(2) > 3) {
+                if (c.getFaction().isClan() && (c.getGameYear() > 2870) && (Compute.d6(2) > 3)) {
                     p = c.newPerson(Person.T_BA);
-                } else if (!c.getFaction().isClan() &&
-                        c.getCalendar().get(Calendar.YEAR) > 3050 &&
-                        Compute.d6(2) > 11) {
+                } else if (!c.getFaction().isClan() && (c.getGameYear() > 3050) && (Compute.d6(2) > 11)) {
                     p = c.newPerson(Person.T_BA);
                 } else {
                     p = c.newPerson(Person.T_INFANTRY);
@@ -118,18 +113,7 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                      * chances of being drivers or gunners */
                     retVal.remove(p);
                     for (int i = 0; i < Compute.d6(); i++) {
-                        if (Compute.d6() < 4) {
-                            p = c.newPerson(Person.T_GVEE_DRIVER);
-                        } else {
-                            p = c.newPerson(Person.T_VEE_GUNNER);
-                        }
-                        p = c.newPerson((Compute.d6() < 4)?Person.T_GVEE_DRIVER:Person.T_VEE_GUNNER);
-                        if (c.getCampaignOptions().useAbilities()) {
-                            int nabil = Math.max(0, p.getExperienceLevel(false) - SkillType.EXP_REGULAR);
-                            while (nabil > 0 && null != c.rollSPA(p.getPrimaryRole(), p)) {
-                                nabil--;
-                            }
-                        }
+                        p = c.newPerson((Compute.d6() < 4) ? Person.T_GVEE_DRIVER : Person.T_VEE_GUNNER);
                         id = UUID.randomUUID();
                         p.setId(id);
                         retVal.add(p);
@@ -197,10 +181,6 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                     adjustSkill(p, SkillType.S_GUN_PROTO, gunneryMod);
                     break;
                 }
-                int nabil = Math.max(0, p.getExperienceLevel(false) - SkillType.EXP_REGULAR);
-                while (nabil > 0 && null != c.rollSPA(p.getPrimaryRole(), p)) {
-                    nabil--;
-                }
             }
             return retVal;
         }
@@ -209,7 +189,7 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
 
     @Override
     public List<Person> removePersonnelForDay(Campaign c, List<Person> current) {
-        if (c.getCalendar().get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
+        if (c.getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
             return current;
         }
         return null;

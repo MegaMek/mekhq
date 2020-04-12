@@ -24,6 +24,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
+import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -409,7 +410,7 @@ public class BattleArmorSuit extends Part {
             }
         }
     }
-    
+
     @Override
     public void fix() {
         super.fix();
@@ -485,8 +486,9 @@ public class BattleArmorSuit extends Part {
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
         if(null != unit) {
-            if(trooper < 0) {
-                System.err.println("Trooper location -1 found on BattleArmorSuit attached to unit");
+            if (trooper < 0) {
+                MekHQ.getLogger().error(getClass(), "updateConditionFromEntity",
+                        "Trooper location -1 found on BattleArmorSuit attached to unit");
                 return;
             }
             if(unit.getEntity().getInternal(trooper) == IArmorState.ARMOR_DESTROYED) {
@@ -504,8 +506,8 @@ public class BattleArmorSuit extends Part {
             }
         }
     }
-    
-    @Override 
+
+    @Override
     public int getBaseTime() {
         return 0;
     }
@@ -517,6 +519,11 @@ public class BattleArmorSuit extends Part {
 
     @Override
     public String getDetails() {
+        return getDetails(true);
+    }
+
+    @Override
+    public String getDetails(boolean includeRepairDetails) {
         if(null != unit) {
             return "Trooper " + trooper;
         } else {
@@ -536,7 +543,7 @@ public class BattleArmorSuit extends Part {
                 return nEquip + " pieces of equipment; " + armor + " armor points";
             }
         }
-        return super.getDetails();
+        return super.getDetails(includeRepairDetails);
     }
 
     @Override
@@ -610,7 +617,7 @@ public class BattleArmorSuit extends Part {
         try {
             newEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
         } catch (EntityLoadingException e) {
-            e.printStackTrace();
+            MekHQ.getLogger().error(getClass(), "addSubParts", e);
         }
         Unit newUnit = null;
         if (null != newEntity) {

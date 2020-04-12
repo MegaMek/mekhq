@@ -1,18 +1,18 @@
 /*
  * Copyright (c) 2018 - The MegaMek Team
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -32,8 +32,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -110,7 +112,9 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.Planets;
+import mekhq.campaign.universe.Planet.PlanetaryEvent;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.Systems;
 import mekhq.module.atb.AtBEventProcessor;
 
 public class CampaignXmlParser {
@@ -501,8 +505,7 @@ public class CampaignXmlParser {
             }
             if (prt instanceof MissingEnginePart && null != u
                     && u.getEntity() instanceof Tank) {
-                boolean isHover = null != u
-                        && u.getEntity().getMovementMode() == EntityMovementMode.HOVER && u.getEntity() instanceof Tank;
+                boolean isHover = u.getEntity().getMovementMode() == EntityMovementMode.HOVER;
                 ((MissingEnginePart) prt).fixTankFlag(isHover);
             }
             if (prt instanceof MissingEnginePart
@@ -557,15 +560,19 @@ public class CampaignXmlParser {
                     case Person.T_AERO_PILOT:
                     case Person.T_CONV_PILOT:
                         psn.setPhenotype(Person.PHENOTYPE_AERO);
+                        break;
                     case Person.T_BA:
                         psn.setPhenotype(Person.PHENOTYPE_BA);
+                        break;
                     case Person.T_VEE_GUNNER:
                     case Person.T_GVEE_DRIVER:
                     case Person.T_NVEE_DRIVER:
                     case Person.T_VTOL_PILOT:
                         psn.setPhenotype(Person.PHENOTYPE_VEE);
+                        break;
                     default:
                         psn.setPhenotype(Person.PHENOTYPE_NONE);
+                        break;
                 }
             }
         }
@@ -587,11 +594,17 @@ public class CampaignXmlParser {
                 unit.getRefit().reCalc();
                 if (null == unit.getRefit().getNewArmorSupplies()
                         && unit.getRefit().getNewArmorSuppliesId() > 0) {
-                    Armor armorSupplies = (Armor) retVal.getPart(
-                            unit.getRefit().getNewArmorSuppliesId());
-                    unit.getRefit().setNewArmorSupplies(armorSupplies);
-                    if (null == armorSupplies.getUnit()) {
-                        armorSupplies.setUnit(unit);
+                    Part armorPart = retVal.getPart(unit.getRefit().getNewArmorSuppliesId());
+                    if (armorPart instanceof Armor) {
+                        Armor armorSupplies = (Armor) armorPart;
+                        unit.getRefit().setNewArmorSupplies(armorSupplies);
+                        if (null == armorSupplies.getUnit()) {
+                            armorSupplies.setUnit(unit);
+                        }
+                    } else {
+                        MekHQ.getLogger().error(CampaignXmlParser.class, METHOD_NAME,
+                            String.format("[Campain Load] Refit for unit %s (%s) references armor supplies that are incorrect; ignoring.",
+                                unit.getName(), unit.getId().toString()));
                     }
                 }
                 if (!unit.getRefit().isCustomJob()
@@ -613,7 +626,8 @@ public class CampaignXmlParser {
             // possible that these might have changed if changes were made to
             // the
             // ordering of equipment in the underlying data file for the unit
-            Utilities.unscrambleEquipmentNumbers(unit);
+            // We're not checking for refit here.
+            Utilities.unscrambleEquipmentNumbers(unit, false);
 
             // some units might need to be assigned to scenarios
             Scenario s = retVal.getScenario(unit.getScenarioId());
@@ -649,7 +663,7 @@ public class CampaignXmlParser {
 
         for(Unit unit : retVal.getUnits()) {
             // Some units have been incorrectly assigned a null C3UUID as a string. This should correct that by setting a new C3UUID
-            if ((unit.getEntity().hasC3() || unit.getEntity().hasC3i())
+            if ((unit.getEntity().hasC3() || unit.getEntity().hasC3i() || unit.getEntity().hasNavalC3())
                     && (unit.getEntity().getC3UUIDAsString() == null || unit.getEntity().getC3UUIDAsString().equals("null"))) {
                 unit.getEntity().setC3UUID();
                 unit.getEntity().setC3NetIdSelf();
@@ -667,7 +681,7 @@ public class CampaignXmlParser {
         List<Unit> removeUnits = new ArrayList<>();
         for (Unit unit : retVal.getUnits()) {
             // just in case parts are missing (i.e. because they weren't tracked
-            // in previous versions)            
+            // in previous versions)
             unit.initializeParts(true);
             unit.runDiagnostic(false);
             if (!unit.isRepairable()) {
@@ -827,13 +841,13 @@ public class CampaignXmlParser {
                     unitDesc = u.getName();
                     tech.removeTechUnitId(id);
                 } else if (!tech.getId().equals(u.getTechId())) {
-                    reason = String.format("referenced tech %s's maintained unit", u.getTech().getName());
+                    reason = String.format("referenced tech %s's maintained unit", u.getTech().getFullName());
                     unitDesc = u.getName();
                     tech.removeTechUnitId(id);
                 }
                 if (null != reason) {
                     MekHQ.getLogger().log(CampaignXmlParser.class, METHOD_NAME, LogLevel.WARNING,
-                            String.format("Tech %s %s %s (fixed)", tech.getName(), reason, unitDesc));
+                            String.format("Tech %s %s %s (fixed)", tech.getFullName(), reason, unitDesc));
                 }
             }
         }
@@ -893,8 +907,7 @@ public class CampaignXmlParser {
                         retVal.setCamoFileName(val);
                     }
                 } else if (xn.equalsIgnoreCase("colorIndex")) {
-                    retVal.setColorIndex(Integer.parseInt(wn.getTextContent()
-                            .trim()));
+                    retVal.setColorIndex(Integer.parseInt(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("nameGen")) {
                     // First, get all the child nodes;
                     NodeList nl2 = wn.getChildNodes();
@@ -905,9 +918,8 @@ public class CampaignXmlParser {
                         }
                         if (wn2.getNodeName().equalsIgnoreCase("faction")) {
                             retVal.getRNG().setChosenFaction(wn2.getTextContent().trim());
-                        } else if (wn2.getNodeName().equalsIgnoreCase(
-                                "percentFemale")) {
-                            retVal.getRNG().setPerentFemale(Integer.parseInt(wn2.getTextContent().trim()));
+                        } else if (wn2.getNodeName().equalsIgnoreCase("percentFemale")) {
+                            retVal.getRNG().setPercentFemale(Integer.parseInt(wn2.getTextContent().trim()));
                         }
                     }
                 } else if (xn.equalsIgnoreCase("currentReport")) {
@@ -1105,7 +1117,7 @@ public class CampaignXmlParser {
             en.setExternalIdAsString(u.getId().toString());
 
             // If they have C3 or C3i we need to set their ID
-            if (en.hasC3() || en.hasC3i()) {
+            if (en.hasC3() || en.hasC3i() || en.hasNavalC3()) {
                 en.setC3UUID();
                 en.setC3NetIdSelf();
             }
@@ -1767,7 +1779,7 @@ public class CampaignXmlParser {
         MekHQ.getLogger().log(CampaignXmlParser.class, METHOD_NAME, LogLevel.INFO,
                 "Load Part Nodes Complete!"); //$NON-NLS-1$
     }
-    
+
     /**
      * Determines if the supplied part is a MASC from an older save. This means that it needs to be converted
      * to an actual MASC part.
@@ -1775,12 +1787,12 @@ public class CampaignXmlParser {
      * @return Whether it's an old MASC.
      */
     private static boolean isLegacyMASC(Part p) {
-        return (p instanceof EquipmentPart) && 
+        return (p instanceof EquipmentPart) &&
                 !(p instanceof MASC) &&
-                ((EquipmentPart) p).getType().hasFlag(MiscType.F_MASC) && 
+                ((EquipmentPart) p).getType().hasFlag(MiscType.F_MASC) &&
                 (((EquipmentPart) p).getType() instanceof MiscType);
     }
-    
+
     /**
      * Determines if the supplied part is a "missing" MASC from an older save. This means that it needs to be converted
      * to an actual "missing" MASC part.
@@ -1788,15 +1800,18 @@ public class CampaignXmlParser {
      * @return Whether it's an old "missing" MASC.
      */
     private static boolean isLegacyMissingMASC(Part p) {
-        return (p instanceof MissingEquipmentPart) && 
+        return (p instanceof MissingEquipmentPart) &&
                 !(p instanceof MissingMASC) &&
-                ((MissingEquipmentPart) p).getType().hasFlag(MiscType.F_MASC) && 
+                ((MissingEquipmentPart) p).getType().hasFlag(MiscType.F_MASC) &&
                 (((MissingEquipmentPart) p).getType() instanceof MiscType);
     }
-    
+
     private static void updatePlanetaryEventsFromXML(Node wn) {
-        // TODO: make Planets a member of Campaign
-        Planets.reload(true);
+
+        Systems.reload(true);
+
+        List<Planet.PlanetaryEvent> events;
+        Map<Integer, List<Planet.PlanetaryEvent>> eventsMap = new HashMap<>();;
 
         NodeList wList = wn.getChildNodes();
         for (int x = 0; x < wList.getLength(); x++) {
@@ -1807,10 +1822,67 @@ public class CampaignXmlParser {
                 continue;
             }
 
+            if (wn2.getNodeName().equalsIgnoreCase("system")) {
+                NodeList systemNodes = wn2.getChildNodes();
+                String systemId = null;
+                List<PlanetarySystem.PlanetarySystemEvent> sysEvents = new ArrayList<>();
+                eventsMap.clear();
+                for(int n = 0; n < systemNodes.getLength(); ++n) {
+                    Node systemNode = systemNodes.item(n);
+                    if(systemNode.getNodeType() != Node.ELEMENT_NODE) {
+                        continue;
+                    }
+                    if(systemNode.getNodeName().equalsIgnoreCase("id")) {
+                        systemId = systemNode.getTextContent();
+                    } else if(systemNode.getNodeName().equalsIgnoreCase("event")) {
+                        PlanetarySystem.PlanetarySystemEvent event = Systems.getInstance().readPlanetarySystemEvent(systemNode);
+                        if(null != event) {
+                        	event.custom = true;
+                        	sysEvents.add(event);
+                        }
+                    } else if(systemNode.getNodeName().equalsIgnoreCase("planet")) {
+                    	NodeList planetNodes = systemNode.getChildNodes();
+                        int sysPos = 0;
+                        events = new ArrayList<>();
+                        for(int j = 0; j < planetNodes.getLength(); ++j) {
+                        	Node planetNode = planetNodes.item(j);
+                            if(planetNode.getNodeType() != Node.ELEMENT_NODE) {
+                                continue;
+                            }
+                            if(planetNode.getNodeName().equalsIgnoreCase("sysPos")) {
+                                sysPos = Integer.parseInt(planetNode.getTextContent());
+                            } else if(planetNode.getNodeName().equalsIgnoreCase("event")) {
+                                Planet.PlanetaryEvent event = Systems.getInstance().readPlanetaryEvent(planetNode);
+                                if(null != event) {
+                                    event.custom = true;
+                                    events.add(event);
+                                }
+                            }
+                        }
+                        if(sysPos > 0 && !events.isEmpty()) {
+                        	eventsMap.put(sysPos, events);
+                        }
+                    }
+                }
+                if(null != systemId) {
+                	//iterate through events hash and assign events to planets
+                	Iterator<Map.Entry<Integer, List<PlanetaryEvent>>> it = eventsMap.entrySet().iterator();
+                    while (it.hasNext()) {
+                        Map.Entry<Integer, List<PlanetaryEvent>> pair = it.next();
+                        Systems.getInstance().updatePlanetaryEvents(systemId, pair.getValue(), true, pair.getKey());
+                    }
+                    //check for system-wide events
+                    if(!sysEvents.isEmpty()) {
+                    	Systems.getInstance().updatePlanetarySystemEvents(systemId, sysEvents, true);
+                    }
+                }
+            }
+
+            //legacy code for before switch to planetary systems if planet is at top level
             if (wn2.getNodeName().equalsIgnoreCase("planet")) {
                 NodeList planetNodes = wn2.getChildNodes();
                 String planetId = null;
-                List<Planet.PlanetaryEvent> events = new ArrayList<>();
+                events = new ArrayList<>();
                 for(int n = 0; n < planetNodes.getLength(); ++n) {
                     Node planetNode = planetNodes.item(n);
                     if(planetNode.getNodeType() != Node.ELEMENT_NODE) {
@@ -1819,7 +1891,7 @@ public class CampaignXmlParser {
                     if(planetNode.getNodeName().equalsIgnoreCase("id")) {
                         planetId = planetNode.getTextContent();
                     } else if(planetNode.getNodeName().equalsIgnoreCase("event")) {
-                        Planet.PlanetaryEvent event = Planets.getInstance().readPlanetaryEvent(planetNode);
+                        Planet.PlanetaryEvent event = Systems.getInstance().readPlanetaryEvent(planetNode);
                         if(null != event) {
                             event.custom = true;
                             events.add(event);
@@ -1827,7 +1899,7 @@ public class CampaignXmlParser {
                     }
                 }
                 if(null != planetId) {
-                    Planets.getInstance().updatePlanetaryEvents(planetId, events, true);
+                    Systems.getInstance().updatePlanetaryEvents(planetId, events, true);
                 }
             }
         }

@@ -38,17 +38,17 @@ import mekhq.campaign.Campaign;
  */
 public class MissingDropshipDockingCollar extends MissingPart {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -717866644605314883L;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -717866644605314883L;
 
-	private int collarType;
-	
-	public MissingDropshipDockingCollar() {
-    	this(0, null, Dropship.COLLAR_STANDARD);
+    private int collarType;
+
+    public MissingDropshipDockingCollar() {
+        this(0, null, Dropship.COLLAR_STANDARD);
     }
-    
+
     public MissingDropshipDockingCollar(int tonnage, Campaign c, int collarType) {
         super(tonnage, c);
         this.collarType = collarType;
@@ -59,51 +59,50 @@ public class MissingDropshipDockingCollar extends MissingPart {
             name += " (Prototype)";
         }
     }
-    
-    @Override 
-	public int getBaseTime() {
-		return 2880;
-	}
-	
-	@Override
-	public int getDifficulty() {
-		return -2;
-	}
 
-	@Override
-	public void updateConditionFromPart() {
-		if(null != unit && unit.getEntity() instanceof Dropship) {
+    @Override 
+    public int getBaseTime() {
+        return 2880;
+    }
+
+    @Override
+    public int getDifficulty() {
+        return -2;
+    }
+
+    @Override
+    public void updateConditionFromPart() {
+        if(null != unit && unit.getEntity() instanceof Dropship) {
             ((Dropship)unit.getEntity()).setDamageDockCollar(true);
             ((Dropship)unit.getEntity()).setDamageKFBoom(true);
-		}	
-		
-	}
+        }    
+        
+    }
 
-	@Override
-	public Part getNewPart() {
-		return new DropshipDockingCollar(getUnitTonnage(), campaign, collarType);
-	}
+    @Override
+    public Part getNewPart() {
+        return new DropshipDockingCollar(getUnitTonnage(), campaign, collarType);
+    }
 
-	@Override
-	public String checkFixable() {
-		return null;
-	}
+    @Override
+    public String checkFixable() {
+        return null;
+    }
 
-	
-	@Override
-	public double getTonnage() {
-		return 0;
-	}
+    @Override
+    public double getTonnage() {
+        return 0;
+    }
 
-	@Override
-	public void writeToXml(PrintWriter pw1, int indent) {
-		writeToXmlBegin(pw1, indent);
+    @Override
+    public void writeToXml(PrintWriter pw1, int indent) {
+        writeToXmlBegin(pw1, indent);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "collarType", collarType);
-		writeToXmlEnd(pw1, indent);
-	}
+        writeToXmlEnd(pw1, indent);
+    }
 
-	@Override
-	protected void loadFieldsFromXmlNode(Node wn) {
+    @Override
+    protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
         for (int x=0; x<nl.getLength(); x++) {
@@ -112,32 +111,31 @@ public class MissingDropshipDockingCollar extends MissingPart {
                 collarType = Integer.parseInt(wn2.getTextContent());
             }
         }
-	}
+    }
 
-	@Override
-	public boolean isAcceptableReplacement(Part part, boolean refit) {
-		return (part instanceof DropshipDockingCollar)
-		        && (refit || (((DropshipDockingCollar) part).getCollarType() == collarType));
-	}
+    @Override
+    public boolean isAcceptableReplacement(Part part, boolean refit) {
+        return (part instanceof DropshipDockingCollar)
+                && (refit || (((DropshipDockingCollar) part).getCollarType() == collarType));
+    }
 
-	@Override
-	public String getLocationName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public String getLocationName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public int getLocation() {
-		return Entity.LOC_NONE;
-	}
-	
-	@Override
-	public TechAdvancement getTechAdvancement() {
+    @Override
+    public int getLocation() {
+        return Entity.LOC_NONE;
+    }
+
+    @Override
+    public TechAdvancement getTechAdvancement() {
         if (collarType != Dropship.COLLAR_NO_BOOM) {
             return DropshipDockingCollar.TA_BOOM;
         } else {
             return DropshipDockingCollar.TA_NO_BOOM;
         }
-	}
-	
+    }
 }

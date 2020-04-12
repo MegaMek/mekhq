@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.Hashtable;
 
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -130,6 +131,10 @@ public class SkillType implements Serializable {
                 lookupHash.put(name, skills.get(name));
             }
         }
+    }
+    
+    public static Hashtable<String, SkillType> getSkillHash() {
+        return lookupHash;
     }
     
     public static String[] getSkillList() {
@@ -304,26 +309,6 @@ public class SkillType implements Serializable {
         lookupHash.put(S_LEADER, createLeadership());
         lookupHash.put(S_NEG, createNegotiation());
         lookupHash.put(S_SCROUNGE, createScrounge());
-
-        /*
-        abilityCosts = new HashMap<String, Integer>();
-        abilityCosts.put("hot_dog", 4);
-        abilityCosts.put("jumping_jack", 12);
-        abilityCosts.put("melee_master", 12);
-        abilityCosts.put("multi_tasker", 4);
-        abilityCosts.put("oblique_attacker", 4);
-        abilityCosts.put("pain_resistance", 4);
-        abilityCosts.put("sniper", 12);
-        abilityCosts.put("weapon_specialist", 1);
-        abilityCosts.put("specialist", 4);
-        abilityCosts.put("tactical_genius", 12);
-        abilityCosts.put("aptitude_gunnery", 40);
-        abilityCosts.put("gunnery_laser", 4);
-        abilityCosts.put("gunnery_ballistic", 4);
-        abilityCosts.put("gunnery_missile", 4);
-        abilityCosts.put("ei_implant", 0);
-        abilityCosts.put("clan_pilot_training", 0);
-        */
     }
     
     public static SkillType getType(String t) {
@@ -461,7 +446,7 @@ public class SkillType implements Serializable {
                 +"</eliteLvl>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<costs>"
-                +printCosts()
+                + StringUtils.join(costs, ',')
                 +"</costs>");
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</skillType>");    
     }
@@ -562,17 +547,6 @@ public class SkillType implements Serializable {
             MekHQ.getLogger().error(SkillType.class, METHOD_NAME, ex);
         }
         hash.put(retVal.name, retVal);
-    }
-    
-    private String printCosts() {
-        String values = "";
-        for(int i = 0; i < costs.length; i++) {
-            values += Integer.toString(costs[i]);
-            if(i < 10) {
-                values += ",";
-            }
-        }
-        return values;
     }
     
     public static SkillType createPilotingMech() {

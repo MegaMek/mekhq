@@ -46,17 +46,17 @@ public class RegionPerimeter {
     /**
      * Calculates the border polygon for the list of Planets provided.
      * 
-     * @param planets A list of planets that define the region.
+     * @param systems A list of <code>PlanetarySystem</code>'s that define the region.
      */
-    public RegionPerimeter(Collection<Planet> planets) {
-        if (!planets.isEmpty()) {
+    public RegionPerimeter(Collection<PlanetarySystem> systems) {
+        if (!systems.isEmpty()) {
             List<Point> points = new ArrayList<>();
             boundsX1 = Double.MAX_VALUE;
             boundsY1 = Double.MAX_VALUE;
             boundsX2 = Double.MIN_VALUE;
             boundsY2 = Double.MIN_VALUE;
-            for (Planet planet : planets) {
-                Point p = new Point(planet.getX(), planet.getY());
+            for (PlanetarySystem system : systems) {
+                Point p = new Point(system.getX(), system.getY());
                 boundsX1 = Math.min(boundsX1, p.getX());
                 boundsX2 = Math.max(boundsX2, p.getX());
                 boundsY1 = Math.min(boundsY1, p.getY());
@@ -363,13 +363,7 @@ public class RegionPerimeter {
         @Override
         public int compare(Point p1, Point p2) {
             double cp = vectorCrossProduct(origin, p1, p2);
-            if (cp > 0) {
-                return -1;
-            } else if (cp < 0) {
-                return 1;
-            } else {
-                return 0;
-            }
+            return Double.compare(0, cp);
         }
     }
     

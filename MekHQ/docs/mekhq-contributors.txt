@@ -19,11 +19,12 @@
   	 Deric Page
   	 Robin Toll <fastsammy@users.sourceforge.net>
 
-  Patch Submitters:
+  More Code:
      Daniel Vystrcil
      Longinus00
      Josh Street
      Neyah Peterson
+ 	 Justin "Windchild" Bowen
 
   Data
       Unit Updates:
@@ -57,6 +58,16 @@
 		CampaignAnon 
 		
 	
+    Icons for MarkdownEditorPanel
+     Bold, italic, ordered list, unordered list, horizontal rule, and question mark icons provided
+     by Google in Google Material Design Icons and distributed under the Creative Commons ShareAlike 4.0 
+      International License (https://creativecommons.org/licenses/by-sa/4.0/).
+    
+     Header icons provided by Font Awesome by Dave Gandy - http://fontawesome.io
+    
+    Star Images
+        Bloodwolf
+  
 
   And Of Course...
      FASA, WizKids, FanPro and Catalyst Game Labs for creating and publishing the original game of

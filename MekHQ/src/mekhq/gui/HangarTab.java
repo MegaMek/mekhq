@@ -26,9 +26,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.ResourceBundle;
-import java.util.UUID;
+import java.util.*;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -75,12 +73,7 @@ import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.model.XTableColumnModel;
 import mekhq.gui.preferences.JComboBoxPreference;
 import mekhq.gui.preferences.JTablePreference;
-import mekhq.gui.preferences.JToggleButtonPreference;
-import mekhq.gui.sorter.FormattedNumberSorter;
-import mekhq.gui.sorter.TargetSorter;
-import mekhq.gui.sorter.UnitStatusSorter;
-import mekhq.gui.sorter.UnitTypeSorter;
-import mekhq.gui.sorter.WeightClassSorter;
+import mekhq.gui.sorter.*;
 import mekhq.gui.view.UnitViewPanel;
 import mekhq.preferences.PreferencesNode;
 
@@ -92,7 +85,7 @@ public final class HangarTab extends CampaignGuiTab {
 
     private static final long serialVersionUID = -5636638711420905602L;
 
-    public static final int UNIT_VIEW_WIDTH = 450;
+    public static final int UNIT_VIEW_WIDTH = 600;
 
     // unit views
     private static final int UV_GRAPHIC = 0;
@@ -125,7 +118,7 @@ public final class HangarTab extends CampaignGuiTab {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see mekhq.gui.CampaignGuiTab#initTab()
      */
     @Override
@@ -145,12 +138,12 @@ public final class HangarTab extends CampaignGuiTab {
         add(new JLabel(resourceMap.getString("lblUnitChoice.text")), //$NON-NLS-1$ ;
                 gridBagConstraints);
 
-        DefaultComboBoxModel<String> unitGroupModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> unitGroupModel = new DefaultComboBoxModel<>();
         unitGroupModel.addElement("All Units");
         for (int i = 0; i < UnitType.SIZE; i++) {
             unitGroupModel.addElement(UnitType.getTypeDisplayableName(i));
         }
-        choiceUnit = new JComboBox<String>(unitGroupModel);
+        choiceUnit = new JComboBox<>(unitGroupModel);
         choiceUnit.setSelectedIndex(0);
         choiceUnit.addActionListener(ev -> filterUnits());
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -167,14 +160,14 @@ public final class HangarTab extends CampaignGuiTab {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        add(new JLabel(resourceMap.getString("lblUnitView.text")), //$NON-NLS-1$ ;
+        add(new JLabel(resourceMap.getString("lblUnitView.text")), //$NON-NLS-1$
                 gridBagConstraints);
 
-        DefaultComboBoxModel<String> unitViewModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> unitViewModel = new DefaultComboBoxModel<>();
         for (int i = 0; i < UV_NUM; i++) {
             unitViewModel.addElement(getUnitViewName(i));
         }
-        choiceUnitView = new JComboBox<String>(unitViewModel);
+        choiceUnitView = new JComboBox<>(unitViewModel);
         choiceUnitView.setSelectedIndex(UV_GENERAL);
         choiceUnitView.addActionListener(ev -> changeUnitView());
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -193,12 +186,13 @@ public final class HangarTab extends CampaignGuiTab {
         unitTable.setColumnModel(unitColumnModel);
         unitTable.createDefaultColumnsFromModel();
         unitSorter = new TableRowSorter<>(unitModel);
+        unitSorter.setComparator(UnitTableModel.COL_NAME, new NaturalOrderComparator());
         unitSorter.setComparator(UnitTableModel.COL_STATUS, new UnitStatusSorter());
         unitSorter.setComparator(UnitTableModel.COL_TYPE, new UnitTypeSorter());
         unitSorter.setComparator(UnitTableModel.COL_WCLASS, new WeightClassSorter());
         unitSorter.setComparator(UnitTableModel.COL_COST, new FormattedNumberSorter());
         unitTable.setRowSorter(unitSorter);
-        ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+        List<RowSorter.SortKey> sortKeys = new ArrayList<>();
         sortKeys.add(new RowSorter.SortKey(UnitTableModel.COL_TYPE, SortOrder.DESCENDING));
         sortKeys.add(new RowSorter.SortKey(UnitTableModel.COL_WCLASS, SortOrder.DESCENDING));
         unitSorter.setSortKeys(sortKeys);
@@ -216,10 +210,10 @@ public final class HangarTab extends CampaignGuiTab {
                         splitUnit.setDividerLocation(1.0);
                     }
                 }
-            }            
+            }
         });
         unitTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        TableColumn column = null;
+        TableColumn column;
         for (int i = 0; i < UnitTableModel.N_COL; i++) {
             column = unitTable.getColumnModel().getColumn(i);
             column.setPreferredWidth(unitModel.getColumnWidth(i));
@@ -233,12 +227,11 @@ public final class HangarTab extends CampaignGuiTab {
 
         acquireUnitsModel = new ProcurementTableModel(getCampaign());
         acquireUnitsTable = new JTable(acquireUnitsModel);
-        TableRowSorter<ProcurementTableModel> acquireUnitsSorter = new TableRowSorter<ProcurementTableModel>(
+        TableRowSorter<ProcurementTableModel> acquireUnitsSorter = new TableRowSorter<>(
                 acquireUnitsModel);
         acquireUnitsSorter.setComparator(ProcurementTableModel.COL_COST, new FormattedNumberSorter());
         acquireUnitsSorter.setComparator(ProcurementTableModel.COL_TARGET, new TargetSorter());
         acquireUnitsTable.setRowSorter(acquireUnitsSorter);
-        column = null;
         for (int i = 0; i < ProcurementTableModel.N_COL; i++) {
             column = acquireUnitsTable.getColumnModel().getColumn(i);
             column.setPreferredWidth(acquireUnitsModel.getColumnWidth(i));
@@ -300,7 +293,8 @@ public final class HangarTab extends CampaignGuiTab {
         panAcquireUnit.setMinimumSize(new Dimension(200, 200));
         panAcquireUnit.setPreferredSize(new Dimension(200, 200));
 
-        JSplitPane splitLeftUnit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(unitTable),
+        JScrollPane scrollUnitTable = new JScrollPane(unitTable);
+        JSplitPane splitLeftUnit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scrollUnitTable,
                 panAcquireUnit);
         splitLeftUnit.setOneTouchExpandable(true);
         splitLeftUnit.setResizeWeight(1.0);
@@ -344,7 +338,7 @@ public final class HangarTab extends CampaignGuiTab {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see mekhq.gui.CampaignGuiTab#refreshAll()
      */
     @Override
@@ -353,7 +347,7 @@ public final class HangarTab extends CampaignGuiTab {
     }
 
     public void filterUnits() {
-        RowFilter<UnitTableModel, Integer> unitTypeFilter = null;
+        RowFilter<UnitTableModel, Integer> unitTypeFilter;
         final int nGroup = choiceUnit.getSelectedIndex() - 1;
         unitTypeFilter = new RowFilter<UnitTableModel, Integer>() {
             @Override
@@ -397,7 +391,7 @@ public final class HangarTab extends CampaignGuiTab {
         unitTable.setRowHeight(15);
 
         // set the renderer
-        TableColumn column = null;
+        TableColumn column;
         for (int i = 0; i < UnitTableModel.N_COL; i++) {
             column = columnModel.getColumnByModelIndex(i);
             column.setCellRenderer(
@@ -556,7 +550,7 @@ public final class HangarTab extends CampaignGuiTab {
         }
         getCampaignGui().refreshLab();
     }
-    
+
     private void refreshAcquisitionList() {
         acquireUnitsModel.setData(getCampaign().getShoppingList().getUnitList());
     }
@@ -567,14 +561,14 @@ public final class HangarTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(DeploymentChangedEvent ev) {
-        filterUnitScheduler.schedule();;
+        filterUnitScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(PersonChangedEvent ev) {
-        filterUnitScheduler.schedule();;
+        filterUnitScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(ScenarioResolvedEvent ev) {
         unitListScheduler.schedule();
@@ -582,19 +576,19 @@ public final class HangarTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(UnitChangedEvent ev) {
-        filterUnitScheduler.schedule();;
+        filterUnitScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(UnitNewEvent ev) {
         unitListScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(UnitRemovedEvent ev) {
         unitListScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(RepairStatusChangedEvent ev) {
         filterUnitScheduler.schedule();
@@ -607,28 +601,28 @@ public final class HangarTab extends CampaignGuiTab {
             acquisitionListScheduler.schedule();
         }
     }
-    
+
     @Subscribe
     public void handle(ProcurementEvent ev) {
         if (ev.getAcquisition() instanceof UnitOrder) {
             acquisitionListScheduler.schedule();
         }
     }
-    
+
     @Subscribe
     public void handle(PartEvent ev) {
         if (ev.getPart().getUnit() != null) {
             filterUnitScheduler.schedule();
         }
     }
-    
+
     @Subscribe
     public void handle(PartWorkEvent ev) {
         if (ev.getPartWork().getUnit() != null) {
             filterUnitScheduler.schedule();
         }
     }
-    
+
     @Subscribe
     public void handle(OvertimeModeEvent ev) {
         filterUnitScheduler.schedule();

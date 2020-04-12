@@ -21,7 +21,7 @@ altNamesByYear - Identifies alternate names for a given year.
 					Format: <altNamesByYear year='XXXX'>Faction name</altNamesByYear>
 altNames - A list of alternate names for a faction, 'also known as' type of names,
 					not official designations
-startingPlanet - Identifies the starting planet if you begin a new campaign with this faction. 
+startingPlanet - Identifies the starting planet if you begin a new campaign with this faction.
 				 The name of the planet must be the name as it is recognized in MekHQ.
 				 If left out, then this defaults to Terra.
 changePlanet - Identifies the starting planet after the given year
@@ -37,7 +37,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	"pirate", "merc", "trader", "minor", "rebel", "inactive", "hidden", "abandoned", "chaos"
  -->
 <factions>
-	<choosableFactionCodes>MERC,CC,DC,FS,FWL,LA,FC,ROS,CS,WOB,FRR,SIC,MOC,MH,OA,TC,CDS,CGB,CHH,CJF,CNC,CSJ,CSV,CSR,CW,CBS,CCC,CCO,CFM,CGS,CIH,CSA,TH,RWR,CIR,JF,PIR,NIOPS,CDP,HL,NC,RD</choosableFactionCodes>
+	<choosableFactionCodes>MERC,CC,DC,FS,FWL,LA,FC,ROS,CS,WOB,FRR,SIC,MOC,MH,OA,TC,SL,CDS,CGB,CHH,CJF,CNC,CSJ,CSV,CSR,CW,CBS,CCC,CCO,CFM,CGS,CIH,CSA,TH,RWR,CIR,JF,PIR,NIOPS,CDP,HL,NC,RD,ARC</choosableFactionCodes>
 	<!-- Early spaceflight factions -->
 	<faction>
 		<shortname>WA</shortname>
@@ -953,7 +953,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	</faction>
 	<faction>
 		<shortname>CEI</shortname>
-		<fullname>Escorpion Imperio</fullname>
+		<fullname>Escorpión Imperio</fullname>
 		<startingPlanet>Granda</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
@@ -1760,62 +1760,85 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<start>3144</start>
 	</faction>
 	<faction>
-      <shortname>GL</shortname>
-      <fullname>Galatean League</fullname>
-      <startingPlanet>Galatea</startingPlanet>
-      <nameGenerator>General</nameGenerator>
-      <colorRGB>102,255,255</colorRGB>
+		<shortname>GL</shortname>
+		<fullname>Galatean League</fullname>
+		<startingPlanet>Galatea</startingPlanet>
+		<nameGenerator>General</nameGenerator>
+		<colorRGB>102,255,255</colorRGB>
 		<tags>is,minor</tags>
-   	<start>3144</start>
+		<start>3144</start>
 	</faction>
-   <faction>
-      <shortname>IE</shortname>
-      <fullname>Interstellar Expeditions</fullname>
-      <nameGenerator>General</nameGenerator>
-      <colorRGB>255,255,102</colorRGB>
+	<faction>
+		<shortname>IE</shortname>
+		<fullname>Interstellar Expeditions</fullname>
+		<nameGenerator>General</nameGenerator>
+		<colorRGB>255,255,102</colorRGB>
 		<tags>periphery,chaos</tags>
-   </faction>
-   <faction>
-      <shortname>NDC</shortname>
-      <fullname>New Delphi Compact</fullname>
-      <startingPlanet>New Delphi</startingPlanet>
-      <nameGenerator>General</nameGenerator>
-      <colorRGB>127,151,139</colorRGB>
+	</faction>
+	<faction>
+		<shortname>NDC</shortname>
+		<fullname>New Delphi Compact</fullname>
+		<startingPlanet>New Delphi</startingPlanet>
+		<nameGenerator>General</nameGenerator>
+		<colorRGB>127,151,139</colorRGB>
 		<tags>periphery</tags>
-   	<start>2602</start>
+		<start>2602</start>
 	</faction>
-	 <faction>
-      <shortname>FCo</shortname>
-      <fullname>Ferris Collective</fullname>
-      <nameGenerator>General</nameGenerator>
-      <colorRGB>191,171,120</colorRGB>
+	<faction>
+		<shortname>FCo</shortname>
+		<fullname>Ferris Collective</fullname>
+		<nameGenerator>General</nameGenerator>
+		<colorRGB>191,171,120</colorRGB>
 		<tags>minor</tags>
-   	<start>3087</start>
+		<start>3087</start>
 	</faction>
-	 <faction>
-      <shortname>FFR</shortname>
-      <fullname>Finmark Free Republic</fullname>
-      <nameGenerator>General</nameGenerator>
-      <colorRGB>191,171,120</colorRGB>
+	<faction>
+		<shortname>FFR</shortname>
+		<fullname>Finmark Free Republic</fullname>
+		<nameGenerator>General</nameGenerator>
+		<colorRGB>191,171,120</colorRGB>
 		<tags>periphery,minor</tags>
-		 <start>2779</start>
-		 <!-- May be sooner than that, but no later -->
-		 <end>2822</end>
-   </faction>
-	 <faction>
-      <shortname>RU</shortname>
-      <fullname>Ragnarok Union</fullname>
-      <nameGenerator>General</nameGenerator>
-      <colorRGB>211,189,72</colorRGB>
-		<tags>periphery,minor</tags>
-   	<start>3084</start>
+		<start>2779</start>
+		<!-- May be sooner than that, but no later -->
+		<end>2822</end>
 	</faction>
-	 <faction>
-      <shortname>THa</shortname>
-      <fullname>The Havens</fullname>
-      <nameGenerator>General</nameGenerator>
-      <colorRGB>147,173,172</colorRGB>
+	<faction>
+		<shortname>RU</shortname>
+		<fullname>Ragnarok Union</fullname>
+		<nameGenerator>General</nameGenerator>
+		<colorRGB>211,189,72</colorRGB>
 		<tags>periphery,minor</tags>
-   	<start>3089</start>
+		<start>3084</start>
+	</faction>
+	<faction>
+		<shortname>THa</shortname>
+		<fullname>The Havens</fullname>
+		<nameGenerator>General</nameGenerator>
+		<colorRGB>147,173,172</colorRGB>
+		<tags>periphery,minor</tags>
+		<start>3084</start>
+	</faction>
+	<faction>
+		<shortname>ARC</shortname>
+		<fullname>Aurigan Coalition</fullname>
+		<startingPlanet>Coromodir</startingPlanet>
+		<changePlanet year="3022">New Abilene</changePlanet>
+		<changePlanet year="3026">Coromodir</changePlanet>
+		<altNamesByYear year='3022'>Arano Restoration</altNamesByYear>
+		<altNamesByYear year='3026'>Aurigan Coalition</altNamesByYear>
+		<nameGenerator>General</nameGenerator>
+		<colorRGB>255,36,0</colorRGB>
+		<tags>periphery,minor</tags>
+		<start>2910</start>
+	</faction>
+	<faction>
+		<shortname>ARD</shortname>
+		<fullname>Aurigan Directorate</fullname>
+		<startingPlanet>Coromodir</startingPlanet>
+		<nameGenerator>General</nameGenerator>
+		<colorRGB>103,140,73</colorRGB>
+		<tags>periphery,minor</tags>
+		<start>3022</start>
+		<end>3025</end>
 	</faction>
 </factions>

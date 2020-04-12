@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gamePreset>
 	<title>Campaign Operations</title>
-	<description>Options to run a unit using the Campaign Operations rules. This preset uses the basic rules and rating system. Optional rules are off by default as well as SPAs, Implants, and Quirks. For games using the older Field Manual Mercenaries system use the Total Warefare (TW) preset instead.</description>
+	<description>Options to run a unit using the Campaign Operations rules. This preset uses the basic rules and rating system. Optional rules are off by default as well as SPAs, Implants, and Quirks. For games using the older Field Manual Mercenaries system use the Total Warfare (TW) preset instead.</description>
 	<campaignOptions>
 		<clanPriceModifier>1.0</clanPriceModifier>
 		<useFactionForNames>true</useFactionForNames>
@@ -130,7 +130,7 @@
 		<useAero>false</useAero>
 		<useVehicles>true</useVehicles>
 		<clanVehicles>true</clanVehicles>
-		<doubleVehicles>true</doubleVehicles>
+		<doubleVehicles>false</doubleVehicles>
 		<adjustPlayerVehicles>false</adjustPlayerVehicles>
 		<opforLanceTypeMechs>1</opforLanceTypeMechs>
 		<opforLanceTypeMixed>2</opforLanceTypeMixed>

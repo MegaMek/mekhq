@@ -22,11 +22,14 @@
 package mekhq.campaign.personnel;
 
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -37,6 +40,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
 import megamek.common.WeaponType;
@@ -63,7 +67,7 @@ import mekhq.Version;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class SpecialAbility implements MekHqXmlSerializable {
-    
+
     // Keys for miscellaneous prerequisites (i.e. not skill or ability)
     private static final String PREREQ_MISC_CLANNER = "clanner";
 
@@ -92,10 +96,10 @@ public class SpecialAbility implements MekHqXmlSerializable {
     //these are abilities that should be removed if the person gets this ability
     //(typically this is a lower value ability on the same chain (e.g. Cluster Hitter removed when you get Cluster Master)
     private Vector<String> removeAbilities;
-    
+
     // For custom SPAs of type CHOICE the legal values need to be provided.
     private Vector<String> choiceValues;
-    
+
     public SpecialAbility() {
         this("unknown");
     }
@@ -108,11 +112,11 @@ public class SpecialAbility implements MekHqXmlSerializable {
         lookupName = name;
         displayName = display;
         desc = description;
-        prereqAbilities = new Vector<String>();
-        invalidAbilities = new Vector<String>();
-        removeAbilities = new Vector<String>();
+        prereqAbilities = new Vector<>();
+        invalidAbilities = new Vector<>();
+        removeAbilities = new Vector<>();
         choiceValues = new Vector<>();
-        prereqSkills = new Vector<SkillPrereq>();
+        prereqSkills = new Vector<>();
         prereqMisc = new HashMap<>();
         xpCost = 1;
         weight = 1;
@@ -152,10 +156,39 @@ public class SpecialAbility implements MekHqXmlSerializable {
                 return false;
             }
         }
-        if (prereqMisc.containsKey(PREREQ_MISC_CLANNER)
-                && (p.isClanner() != Boolean.parseBoolean(prereqMisc.get(PREREQ_MISC_CLANNER)))) {
-            return false;
+        return !prereqMisc.containsKey(PREREQ_MISC_CLANNER)
+                || (p.isClanner() == Boolean.parseBoolean(prereqMisc.get(PREREQ_MISC_CLANNER)));
+    }
+
+    public boolean isEligible(boolean isClanner, Skills skills, PersonnelOptions options) {
+        for(SkillPrereq sp : prereqSkills) {
+            if(!sp.qualifies(skills)) {
+                return false;
+            }
         }
+        for(String ability : prereqAbilities) {
+            //TODO: will this work for choice options like weapon specialist?
+            if(!options.booleanOption(ability)) {
+                return false;
+            }
+        }
+        for(String ability : invalidAbilities) {
+            //TODO: will this work for choice options like weapon specialist?
+            if(options.booleanOption(ability)) {
+                return false;
+            }
+        }
+        return !prereqMisc.containsKey(PREREQ_MISC_CLANNER)
+                || (isClanner == Boolean.parseBoolean(prereqMisc.get(PREREQ_MISC_CLANNER)));
+    }
+
+    public boolean isEligible(int unitType) {
+        for(SkillPrereq sp : prereqSkills) {
+            if(!sp.qualifies(unitType)) {
+                return false;
+            }
+        }
+
         return true;
     }
 
@@ -202,11 +235,11 @@ public class SpecialAbility implements MekHqXmlSerializable {
     public void setPrereqAbilities(Vector<String> prereq) {
     	prereqAbilities = prereq;
     }
-    
+
     public Map<String,String> getPrereqMisc() {
         return prereqMisc;
     }
-    
+
     public void setPrereqMisc(Map<String,String> prereq) {
         prereqMisc = new HashMap<>(prereq);
     }
@@ -226,19 +259,19 @@ public class SpecialAbility implements MekHqXmlSerializable {
     public void setRemovedAbilities(Vector<String> remove) {
     	removeAbilities = remove;
     }
-    
+
     public Vector<String> getChoiceValues() {
         return choiceValues;
     }
-    
+
     public void setChoiceValues(Vector<String> values) {
         choiceValues = values;
     }
 
     public void clearPrereqSkills() {
-        prereqSkills = new Vector<SkillPrereq>();
+        prereqSkills = new Vector<>();
     }
-    
+
     public void clearPrereqMisc() {
         prereqMisc = new HashMap<>();
     }
@@ -363,7 +396,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
                 }
             }
         }
-        
+
         if (wn.getNodeName().equalsIgnoreCase("edgetrigger")) {
             edgeTriggers.put(retVal.lookupName, retVal);
         } else if (wn.getNodeName().equalsIgnoreCase("implant")) {
@@ -445,13 +478,12 @@ public class SpecialAbility implements MekHqXmlSerializable {
 
         Document xmlDoc = null;
 
-        try {
-            FileInputStream fis = new FileInputStream("data/universe/defaultspa.xml");
+        try (InputStream is = new FileInputStream("data/universe/defaultspa.xml")) {
             // Using factory get an instance of document builder
             DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
             // Parse using builder to get DOM representation of the XML file
-            xmlDoc = db.parse(fis);
+            xmlDoc = db.parse(is);
         } catch (Exception ex) {
             MekHQ.getLogger().error(SpecialAbility.class, METHOD_NAME, ex);
         }
@@ -509,7 +541,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
     public static Hashtable<String, SpecialAbility> getAllDefaultSpecialAbilities() {
         return defaultSpecialAbilities;
     }
-    
+
     public static SpecialAbility getEdgeTrigger(String name) {
         return edgeTriggers.get(name);
     }
@@ -517,11 +549,11 @@ public class SpecialAbility implements MekHqXmlSerializable {
     public static Hashtable<String, SpecialAbility> getAllEdgeTriggers() {
         return edgeTriggers;
     }
-    
+
     public static SpecialAbility getImplant(String name) {
         return implants.get(name);
     }
-    
+
     public static Hashtable<String, SpecialAbility> getAllImplants() {
         return implants;
     }
@@ -529,7 +561,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
     public static void replaceSpecialAbilities(Hashtable<String, SpecialAbility> spas) {
     	specialAbilities = spas;
     }
-    
+
     public static SpecialAbility getOption(String name) {
         SpecialAbility retVal = specialAbilities.get(name);
         if (null != retVal) {
@@ -549,7 +581,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
     }
 
     public static String chooseWeaponSpecialization(int type, boolean isClan, int techLvl, int year) {
-        ArrayList<String> candidates = new ArrayList<String>();
+        ArrayList<String> candidates = new ArrayList<>();
         for (Enumeration<EquipmentType> e = EquipmentType.getAllTypes(); e.hasMoreElements();) {
             EquipmentType et = e.nextElement();
             if(!(et instanceof WeaponType)) {
@@ -685,6 +717,24 @@ public class SpecialAbility implements MekHqXmlSerializable {
 
     public static void setSpecialAbilities(Hashtable<String, SpecialAbility> spHash) {
     	specialAbilities = spHash;
+    }
+
+    public static List<SpecialAbility> getWeightedSpecialAbilities() {
+        return getWeightedSpecialAbilities(getAllSpecialAbilities().values());
+    }
+
+    public static List<SpecialAbility> getWeightedSpecialAbilities(Collection<SpecialAbility> source) {
+        List<SpecialAbility> retVal = new ArrayList<>();
+
+        for (SpecialAbility spa : source) {
+            int weight = spa.getWeight();
+            while (weight > 0) {
+                retVal.add(spa);
+                weight--;
+            }
+        }
+
+        return retVal;
     }
 
     //TODO: also put some static methods here that return the available options for a given SPA, so

@@ -1,5 +1,5 @@
 /*
- * Person.java
+ * MassMothballDialog.java
  *
  * Copyright (c) 2018 Megamek Team. All rights reserved.
  *
@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
 import java.awt.Color;
@@ -35,6 +34,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
@@ -64,36 +64,35 @@ import mekhq.preferences.PreferencesNode;
  *
  */
 public class MassMothballDialog extends JDialog implements ActionListener, ListSelectionListener {
-    /**
-     * 
-     */
+    //region Variable Declarations
     private static final long serialVersionUID = -7435381378836891774L;
-    
-    Map<Integer, List<Unit>> unitsByType = new HashMap<>();
-    Map<Integer, JList<Person>> techListsByUnitType = new HashMap<>(); 
-    Map<Integer, JLabel> timeLabelsByUnitType = new HashMap<>();
-    Campaign campaign;
-    boolean activating;
-    
-    JScrollPane scrollPane = new JScrollPane();
-    JPanel contentPanel = new JPanel();
-    
+
+    private Map<Integer, List<Unit>> unitsByType = new HashMap<>();
+    private Map<Integer, JList<Person>> techListsByUnitType = new HashMap<>();
+    private Map<Integer, JLabel> timeLabelsByUnitType = new HashMap<>();
+    private Campaign campaign;
+    private boolean activating;
+
+    private JPanel contentPanel = new JPanel();
+    //endregion Variable Declarations
+
     /**
      * Constructor
      * @param parent MekHQ frame
      * @param units An array of unit IDs to mothball/activate
      * @param campaign Campaign with which we're working
-     * @param activate Whether to activate or mothball
+     * @param activate true to activate, otherwise false for mothball
      */
     public MassMothballDialog(Frame parent, Unit[] units, Campaign campaign, boolean activate) {
         super(parent, "Mass Mothball/Activate");
         setLocationRelativeTo(parent);
-        
+
         sortUnitsByType(units);
         this.campaign = campaign;
+        this.activating = activate;
 
         contentPanel.setLayout(new GridBagLayout());
-        
+
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridwidth = 3;
         gbc.gridx = 0;
@@ -101,31 +100,34 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         gbc.ipadx = 4;
         gbc.ipady = 4;
         gbc.insets = new Insets(2, 2, 2, 2);
-        
+
         gbc.weightx = 3;
         JLabel instructionLabel = new JLabel();
         instructionLabel.setBorder(new LineBorder(Color.BLUE));
-        instructionLabel.setText("<html>Choose the techs to carry out mothball/reactivation operations on the displayed units. <br/>A * indicates that the tech is currently maintaining units.</html>");
+        instructionLabel.setText("<html>Choose the techs to carry out " +
+                (activating ? "activation" : "mothballing") + " operations on the displayed units. <br/>"
+                + "A * indicates that the tech is currently maintaining units.</html>");
         contentPanel.add(instructionLabel, gbc);
-        
+
         gbc.weightx = 1;
         gbc.gridy++;
         addTableHeaders(gbc);
-        
-        for(int unitType : unitsByType.keySet()) {
+
+        for (int unitType : unitsByType.keySet()) {
             gbc.gridy++;
             addUnitTypePanel(unitType, gbc);
         }
-        
+
         gbc.gridy++;
-        addExecuteButton(activate, gbc);
-        
+        addExecuteButton(activating, gbc);
+
+        JScrollPane scrollPane = new JScrollPane();
         scrollPane.setViewportView(contentPanel);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setMaximumSize(new Dimension(600, 600));
         scrollPane.setPreferredSize(new Dimension(600, 600));
         getContentPane().add(scrollPane);
-        
+
         this.setResizable(true);
         this.pack();
         this.validate();
@@ -134,80 +136,80 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
 
     /**
      * Adds the table headers to the content pane
-     * @param gbc
+     * @param gbc the input gridBagConstraints to use
      */
     private void addTableHeaders(GridBagConstraints gbc) {
         gbc.gridwidth = 1;
-        gbc.weightx = .3;
+        gbc.weightx = 0.3;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.BOTH;
-        
+
         gbc.gridx = 0;
         JLabel labelUnitNames = new JLabel();
         labelUnitNames.setText("Units to Process");
         contentPanel.add(labelUnitNames, gbc);
-        
+
         gbc.gridx = 1;
         JLabel labelTechs = new JLabel();
         labelTechs.setText("Available Techs");
         contentPanel.add(labelTechs, gbc);
-        
+
         gbc.gridx = 2;
         JLabel labelPlaceHolder = new JLabel();
         labelPlaceHolder.setText(" ");
         contentPanel.add(labelPlaceHolder, gbc);
     }
-    
+
     /**
      * Adds a row of units, techs and time summary to the content pane
-     * @param unitType
-     * @param gbc
+     * @param unitType the unit's type, as an int
+     * @param gbc the input gridBagConstraints to use
      */
     private void addUnitTypePanel(int unitType, GridBagConstraints gbc) {
         gbc.gridwidth = 1;
-        gbc.weightx = .3;
+        gbc.weightx = 0.3;
         gbc.gridx = 0;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.anchor = GridBagConstraints.NORTHWEST;
-        
+
         JPanel unitPanel = new JPanel();
         unitPanel.setLayout(new GridLayout(unitsByType.get(unitType).size(), 1, 1, 0));
-        
-        for(Unit unit : unitsByType.get(unitType)) {
+
+        for (Unit unit : unitsByType.get(unitType)) {
             JLabel unitLabel = new JLabel();
             unitLabel.setText(unit.getName());
             unitPanel.add(unitLabel);
         }
-        
-        unitPanel.setBorder(new LineBorder(Color.GRAY, 1));   
-        contentPanel.add(unitPanel, gbc);
-        
-        gbc.gridx = 1;
 
-        JList<Person> techList = new JList<Person>();
-        DefaultListModel<Person> listModel = new DefaultListModel<Person>();
-        
-        for(Person tech : campaign.getTechs()) {
-            if(tech.canTech(unitsByType.get(unitType).get(0).getEntity())) {
+        unitPanel.setBorder(new LineBorder(Color.GRAY, 1));
+        contentPanel.add(unitPanel, gbc);
+
+        gbc.gridx = 1;
+        gbc.weightx = 2.0;
+        JList<Person> techList = new JList<>();
+        DefaultListModel<Person> listModel = new DefaultListModel<>();
+
+        for (Person tech : campaign.getTechs()) {
+            if (tech.canTech(unitsByType.get(unitType).get(0).getEntity())) {
                 listModel.addElement(tech);
             }
         }
-        
+
         techList.setModel(listModel);
         techList.addListSelectionListener(this);
         techList.setBorder(new LineBorder(Color.GRAY, 1));
         techList.setCellRenderer(new TechListCellRenderer());
-        
+
         JScrollPane techListPane = new JScrollPane();
         techListPane.setViewportView(techList);
         techListPane.setMaximumSize(new Dimension(200, 100));
         techListPane.setPreferredSize(new Dimension(200, 50));
-        
+
         contentPanel.add(techListPane, gbc);
         techListsByUnitType.put(unitType, techList);
-        
+
         gbc.gridx = 2;
-        gbc.weightx = 1;
+        gbc.weightx = 0.5;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         JLabel labelTotalTime = new JLabel();
         labelTotalTime.setBorder(new LineBorder(Color.BLUE));
@@ -215,20 +217,22 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         timeLabelsByUnitType.put(unitType, labelTotalTime);
         contentPanel.add(labelTotalTime, gbc);
     }
-    
+
     /**
-     * Renders the mothball/activate button on the content pane 
-     * @param activate Whether the button is "mothball" or "activate"
-     * @param gbc
+     * Renders the mothball/activate button on the content pane
+     * @param activate true to activate, otherwise false for mothball
+     * @param gbc the input gridBagConstraints to use
      */
     private void addExecuteButton(boolean activate, GridBagConstraints gbc) {
-        gbc.gridx = 1; 
-        gbc.weightx = .8;
-        gbc.weighty = .8;
+        gbc.gridx = 1;
+        gbc.weightx = 0.8;
+        gbc.weighty = 0.8;
         gbc.anchor = GridBagConstraints.CENTER;
         JButton buttonExecute = new JButton();
-        buttonExecute.setText(activate ? "Activate" : "Mothball");
-        buttonExecute.setActionCommand(activate ? UnitTableMouseAdapter.COMMAND_ACTIVATE : UnitTableMouseAdapter.COMMAND_MOTHBALL);
+        activating = activate;
+        buttonExecute.setText(activating ? "Activate" : "Mothball");
+        buttonExecute.setActionCommand(activating ? UnitTableMouseAdapter.COMMAND_ACTIVATE
+                : UnitTableMouseAdapter.COMMAND_MOTHBALL);
         buttonExecute.addActionListener(this);
         contentPanel.add(buttonExecute, gbc);
     }
@@ -245,14 +249,14 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
      * @param units Units to sort
      */
     private void sortUnitsByType(Unit[] units) {
-        for(int x = 0; x < units.length; x++) {
-            int unitType = units[x].getEntity().getUnitType();
-            
-            if(!unitsByType.containsKey(unitType)) {
+        for (Unit unit : units) {
+            int unitType = unit.getEntity().getUnitType();
+
+            if (!unitsByType.containsKey(unitType)) {
                 unitsByType.put(unitType, new ArrayList<>());
             }
-            
-            unitsByType.get(unitType).add(units[x]);
+
+            unitsByType.get(unitType).add(unit);
         }
     }
 
@@ -261,30 +265,35 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        
-        if(e.getActionCommand() != UnitTableMouseAdapter.COMMAND_MOTHBALL &&
-                e.getActionCommand() != UnitTableMouseAdapter.COMMAND_ACTIVATE) {
+        if (!e.getActionCommand().equals(UnitTableMouseAdapter.COMMAND_MOTHBALL) &&
+                !e.getActionCommand().equals(UnitTableMouseAdapter.COMMAND_ACTIVATE)) {
             return;
         }
-        
-        for(int unitType : unitsByType.keySet()) {
+
+        boolean isMothballing = e.getActionCommand().equals(UnitTableMouseAdapter.COMMAND_MOTHBALL);
+
+        for (int unitType : unitsByType.keySet()) {
             List<Person> selectedTechs = techListsByUnitType.get(unitType).getSelectedValuesList();
             int techIndex = 0;
-            
+
             // this is a "naive" approach, where we assign each of the selected techs
             // to approximately # units / # techs in mothball/reactivation tasks
-            for(Unit unit : unitsByType.get(unitType)) {                
-                unit.startMothballing(selectedTechs.get(techIndex).getId());
+            for (Unit unit : unitsByType.get(unitType)) {
+                UUID id = selectedTechs.get(techIndex).getId();
+                if (isMothballing) {
+                    unit.startMothballing(id);
+                } else {
+                    unit.startActivating(id);
+                }
                 MekHQ.triggerEvent(new UnitChangedEvent(unit));
-                
-                if(techIndex == selectedTechs.size() - 1) {
+
+                if (techIndex == (selectedTechs.size() - 1)) {
                     techIndex = 0;
                 } else {
                     techIndex++;
                 }
             }
         }
-        
         this.setVisible(false);
     }
 
@@ -295,34 +304,34 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
     public void valueChanged(ListSelectionEvent e) {
         @SuppressWarnings("unchecked")
         JList<Person> techList = (JList<Person>) e.getSource();
-        
+
         int unitType = -1;
         // this is mildly kludgy:
         // we scan the 'tech lists by unit type' dictionary to determine the unit type
         // since the number of tech lists is limited by the number of unit types, it shouldn't be too problematic for performance
-        for(int key : techListsByUnitType.keySet()) {
-            if(techListsByUnitType.get(key).equals(techList)) {
+        for (int key : techListsByUnitType.keySet()) {
+            if (techListsByUnitType.get(key).equals(techList)) {
                 unitType = key;
                 break;
             }
         }
-        
+
         // time to do the work is # units * 2 if mothballing * work day in minutes;
         int workTime = unitsByType.get(unitType).size() * (activating ? 1 : 2) * Unit.TECH_WORK_DAY;
         // a unit can only be mothballed by one tech, so it's pointless to assign more techs to the task
         int numTechs = Math.min(techList.getSelectedValuesList().size(), unitsByType.get(unitType).size());
-        
+
         timeLabelsByUnitType.get(unitType).setText(getCompletionTimeText(workTime / numTechs));
         pack();
     }
-    
+
     /**
      * Worker function that determines the "completion time" text based on the passed-in number.
      * @param completionTime How many minutes to complete the work.
      * @return Displayable text.
      */
     private String getCompletionTimeText(int completionTime) {
-        if(completionTime > 0) {
+        if (completionTime > 0) {
             return String.format("Completion Time: %d minutes", completionTime);
         } else {
             return "<html>Completion Time: <span color='red'>Never</span></html>";
@@ -334,25 +343,21 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
      * @author NickAragua
      *
      */
-    class TechListCellRenderer extends DefaultListCellRenderer {
-
-        /**
-         * 
-         */
+    private static class TechListCellRenderer extends DefaultListCellRenderer {
         private static final long serialVersionUID = -1552997620131149101L;
 
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index,
                 boolean isSelected, boolean cellHasFocus) {
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-            
+
             Person person = (Person) value;
-            
+
             boolean maintainsUnits = person.getTechUnitIDs().size() > 0;
-            setText(person.getFullName() + (maintainsUnits ? " (*)" : ""));
-            
+            setText((maintainsUnits ? "(*) " : "") + person.getFullTitle() + " ("
+                    + person.getMinutesLeft() + " min)");
+
             return this;
         }
-        
     }
 }

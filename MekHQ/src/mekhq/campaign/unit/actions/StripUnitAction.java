@@ -22,6 +22,7 @@
 package mekhq.campaign.unit.actions;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.SpacecraftCoolingSystem;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
 
@@ -38,7 +39,16 @@ public class StripUnitAction implements IUnitAction {
     public void Execute(Campaign campaign, Unit unit) {
         unit.setSalvage(true);
         for (IPartWork partWork : unit.getSalvageableParts()) {
-            partWork.succeed();
+            if (partWork instanceof SpacecraftCoolingSystem) {
+                //Pull all available sinks out of the system
+                int removableHeatSinks = ((SpacecraftCoolingSystem)partWork).getRemoveableSinks();
+                while (removableHeatSinks > 0) {
+                    partWork.succeed();
+                    removableHeatSinks--;
+                }
+            } else {
+                partWork.succeed();
+            }
         }
     }
 }

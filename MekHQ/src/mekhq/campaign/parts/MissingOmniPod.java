@@ -130,7 +130,7 @@ public class MissingOmniPod extends MissingPart {
                         if (null != wn2.getAttributes().getNamedItem("hsType")) {
                             hsType = Integer.parseInt(wn2.getAttributes().getNamedItem("hsType").getTextContent());
                         }
-                        if (hsType != Aero.HEAT_SINGLE && hsType != Aero.HEAT_DOUBLE) {
+                        if (hsType != Aero.HEAT_SINGLE && hsType != Aero.HEAT_DOUBLE && hsType != AeroHeatSink.CLAN_HEAT_DOUBLE) {
                             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                                     "Aero heatsink OmniPod does not have a legal value for heat sink type; using SINGLE"); //$NON-NLS-1$
                             hsType = Aero.HEAT_SINGLE;

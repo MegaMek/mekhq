@@ -29,9 +29,11 @@ import org.w3c.dom.Node;
 import megamek.common.Aero;
 import megamek.common.Compute;
 import megamek.common.CriticalSlot;
+import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.IAero;
+import megamek.common.Jumpship;
 import megamek.common.LandAirMech;
 import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
@@ -85,14 +87,13 @@ public class Avionics extends Part {
 	    int time = 0;
 		if (campaign.getCampaignOptions().useAeroSystemHits()) {
 		    //Test of proposed errata for repair times
-		    Entity e = unit.getEntity();
-		    if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+		    if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
                 time = 240;
             } else {
                 time = 120;
             }
 		    if (isSalvaging()) {
-		        if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+		        if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
 	                time *= 10;
 	            } else {
 	                time *= 5;
@@ -239,7 +240,7 @@ public class Avionics extends Part {
 	    if (unit != null && unit.getEntity() instanceof LandAirMech) {
 	        return skillType.equals(SkillType.S_TECH_MECH);
 	    }
-		return skillType.equals(SkillType.S_TECH_AERO);
+		return (skillType.equals(SkillType.S_TECH_AERO) || skillType.equals(SkillType.S_TECH_VESSEL));
 	}
 
     @Override

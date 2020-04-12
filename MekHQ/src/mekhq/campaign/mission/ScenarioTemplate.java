@@ -47,18 +47,9 @@ public class ScenarioTemplate implements Cloneable {
     @XmlElement(name="scenarioForce")
     public Map<String, ScenarioForceTemplate> scenarioForces = new HashMap<>();
     
-    public Object clone() {
-        ScenarioTemplate clone = new ScenarioTemplate();
-        
-        clone.name = name;
-        clone.shortBriefing = shortBriefing;
-        clone.detailedBriefing = detailedBriefing;
-        clone.mapParameters = (ScenarioMapParameters) mapParameters.clone();
-        clone.scenarioForces = new HashMap<>(scenarioForces);
-        clone.scenarioModifiers = new ArrayList<>(scenarioModifiers);
-        
-        return clone;
-    }
+    @XmlElementWrapper(name="scenarioObjectives")
+    @XmlElement(name="scenarioObjective")
+    public List<ScenarioObjective> scenarioObjectives = new ArrayList<>();
     
     /**
      * Returns the "primary" player force. This is always the force with the name "Player".
@@ -128,6 +119,7 @@ public class ScenarioTemplate implements Cloneable {
             JAXBContext context = JAXBContext.newInstance(ScenarioTemplate.class);
             JAXBElement<ScenarioTemplate> templateElement = new JAXBElement<>(new QName(ROOT_XML_ELEMENT_NAME), ScenarioTemplate.class, this);
             Marshaller m = context.createMarshaller();
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(templateElement, outputFile);
         } catch(Exception e) {
             MekHQ.getLogger().error(ScenarioTemplate.class, "Serialize", e.getMessage());
@@ -144,7 +136,8 @@ public class ScenarioTemplate implements Cloneable {
             JAXBContext context = JAXBContext.newInstance(ScenarioTemplate.class);
             JAXBElement<ScenarioTemplate> templateElement = new JAXBElement<>(new QName(ROOT_XML_ELEMENT_NAME), ScenarioTemplate.class, this);
             Marshaller m = context.createMarshaller();
-            m.setProperty("jaxb.fragment", true);
+            m.setProperty(Marshaller.JAXB_FRAGMENT, true);
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(templateElement, pw);
         } catch(Exception e) {
             MekHQ.getLogger().error(ScenarioTemplate.class, "Serialize", e.getMessage());

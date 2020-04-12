@@ -16,11 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.log;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.GenderDescriptors;
 
 import java.text.MessageFormat;
 import java.util.Date;
@@ -36,7 +36,8 @@ public class ServiceLogger {
 
     public static void retireDueToWounds(Person person, Date date){
         String message = logEntriesResourceMap.getString("retiredDueToWounds.text");
-        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message, person.getGenderPronoun(person.PRONOUN_HISHER))));
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message,
+                GenderDescriptors.HIS_HER.getDescriptor(person.getGender()))));
     }
 
     public static void madeBondsman(Person person, Date date, String name, String rankEntry){
@@ -114,7 +115,7 @@ public class ServiceLogger {
 
     public static void successfullyTreated(Person doctor, Person patient, Date date, int injuries){
         String message = logEntriesResourceMap.getString("successfullyTreatedForXInjuries.text");
-        doctor.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message, patient.getName(), injuries)));
+        doctor.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message, patient.getFullName(), injuries)));
     }
 
     public static void assignedTo(Person person, Date date, String unitName){

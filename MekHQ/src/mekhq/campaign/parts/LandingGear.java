@@ -29,6 +29,7 @@ import org.w3c.dom.Node;
 import megamek.common.Aero;
 import megamek.common.Compute;
 import megamek.common.CriticalSlot;
+import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.LandAirMech;
@@ -42,54 +43,53 @@ import mekhq.campaign.personnel.SkillType;
  */
 public class LandingGear extends Part {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -717866644605314883L;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -717866644605314883L;
 
-	public LandingGear() {
-    	this(0, null);
+    public LandingGear() {
+        this(0, null);
     }
-    
+
     public LandingGear(int tonnage, Campaign c) {
         super(tonnage, c);
         this.name = "Landing Gear";
     }
-        
+
     public LandingGear clone() {
-    	LandingGear clone = new LandingGear(0, campaign);
+        LandingGear clone = new LandingGear(0, campaign);
         clone.copyBaseData(this);
-    	return clone;
+        return clone;
     }
-    
-	@Override
-	public void updateConditionFromEntity(boolean checkForDestruction) {
-		int priorHits = hits;
-		if(null != unit) {
-		    if (unit.getEntity() instanceof Aero) {
-    			if(((Aero)unit.getEntity()).isGearHit()) {
-    				hits = 1;
-    			} else {
-    				hits = 0;
-    			}
-		    } else if (unit.getEntity() instanceof LandAirMech) {
-		        hits = unit.getHitCriticals(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_LANDING_GEAR);
-		    }
-			if(checkForDestruction 
-					&& hits > priorHits 
-					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
-				remove(false);
-			}
-		}
-	}
-	
-	@Override 
-	public int getBaseTime() {
-	    int time;
-	    if (campaign.getCampaignOptions().useAeroSystemHits()) {
+
+    @Override
+    public void updateConditionFromEntity(boolean checkForDestruction) {
+        int priorHits = hits;
+        if(null != unit) {
+            if (unit.getEntity() instanceof Aero) {
+                if(((Aero)unit.getEntity()).isGearHit()) {
+                    hits = 1;
+                } else {
+                    hits = 0;
+                }
+            } else if (unit.getEntity() instanceof LandAirMech) {
+                hits = unit.getHitCriticals(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_LANDING_GEAR);
+            }
+            if(checkForDestruction 
+                    && hits > priorHits 
+                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                remove(false);
+            }
+        }
+    }
+
+    @Override 
+    public int getBaseTime() {
+        int time;
+        if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair times
-            Entity e = unit.getEntity();
-            if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+            if (unit != null && unit.getEntity() instanceof Dropship) {
                 time = 120;
             } else {
                 time = 60;
@@ -99,123 +99,123 @@ public class LandingGear extends Part {
             }
             return time;
         }
-		if(isSalvaging()) {
-			time = 1200;
-		} else {
-		    time = 120;
-		}
-		return time;
-	}
-	
-	@Override
-	public int getDifficulty() {
-		if(isSalvaging()) {
-			return 3;
-		}
-		return 2;
-	}
+        if(isSalvaging()) {
+            time = 1200;
+        } else {
+            time = 120;
+        }
+        return time;
+    }
 
-	@Override
-	public void updateConditionFromPart() {
-		if(null != unit && unit.getEntity() instanceof Aero) {
-		        ((Aero)unit.getEntity()).setGearHit(needsFixing());
-		} else if (null != unit && unit.getEntity() instanceof LandAirMech) {
-		    if (hits == 0) {
-		        unit.repairSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_LANDING_GEAR);
-		    } else {
-		        unit.damageSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_LANDING_GEAR, hits);
-		    }
-		}
-	}
+    @Override
+    public int getDifficulty() {
+        if(isSalvaging()) {
+            return 3;
+        }
+        return 2;
+    }
 
-	@Override
-	public void fix() {
-		super.fix();
-		if (null != unit && unit.getEntity() instanceof Aero) {
-			((Aero)unit.getEntity()).setGearHit(false);
-		} else if (null != unit && unit.getEntity() instanceof LandAirMech) {
+    @Override
+    public void updateConditionFromPart() {
+        if(null != unit && unit.getEntity() instanceof Aero) {
+                ((Aero)unit.getEntity()).setGearHit(needsFixing());
+        } else if (null != unit && unit.getEntity() instanceof LandAirMech) {
+            if (hits == 0) {
+                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_LANDING_GEAR);
+            } else {
+                unit.damageSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_LANDING_GEAR, hits);
+            }
+        }
+    }
+
+    @Override
+    public void fix() {
+        super.fix();
+        if (null != unit && unit.getEntity() instanceof Aero) {
+            ((Aero)unit.getEntity()).setGearHit(false);
+        } else if (null != unit && unit.getEntity() instanceof LandAirMech) {
             unit.repairSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_LANDING_GEAR);
-		}
-	}
+        }
+    }
 
-	@Override
-	public void remove(boolean salvage) {
-		if(null != unit) {
-		    if (unit.getEntity() instanceof Aero) {
-		        ((Aero)unit.getEntity()).setGearHit(true);
-		    } else if (unit.getEntity() instanceof LandAirMech) {
-		        unit.damageSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_LANDING_GEAR, 3);
-		    }
-			Part spare = campaign.checkForExistingSparePart(this);
-			if(!salvage) {
-				campaign.removePart(this);
-			} else if(null != spare) {
-				spare.incrementQuantity();
-				campaign.removePart(this);
-			}
-			unit.removePart(this);
-			Part missing = getMissingPart();
-			unit.addPart(missing);
-			campaign.addPart(missing, 0);
-		}
-		setUnit(null);
-		updateConditionFromEntity(false);
-	}
+    @Override
+    public void remove(boolean salvage) {
+        if(null != unit) {
+            if (unit.getEntity() instanceof Aero) {
+                ((Aero)unit.getEntity()).setGearHit(true);
+            } else if (unit.getEntity() instanceof LandAirMech) {
+                unit.damageSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_LANDING_GEAR, 3);
+            }
+            Part spare = campaign.checkForExistingSparePart(this);
+            if(!salvage) {
+                campaign.removePart(this);
+            } else if(null != spare) {
+                spare.incrementQuantity();
+                campaign.removePart(this);
+            }
+            unit.removePart(this);
+            Part missing = getMissingPart();
+            unit.addPart(missing);
+            campaign.addPart(missing, 0);
+        }
+        setUnit(null);
+        updateConditionFromEntity(false);
+    }
 
-	@Override
-	public MissingPart getMissingPart() {
-		return new MissingLandingGear(getUnitTonnage(), campaign);
-	}
+    @Override
+    public MissingPart getMissingPart() {
+        return new MissingLandingGear(getUnitTonnage(), campaign);
+    }
 
-	@Override
-	public String checkFixable() {
-		return null;
-	}
+    @Override
+    public String checkFixable() {
+        return null;
+    }
 
-	@Override
-	public boolean needsFixing() {
-		return hits > 0;
-	}
+    @Override
+    public boolean needsFixing() {
+        return hits > 0;
+    }
 
-	@Override
-	public Money getStickerPrice() {
-		return Money.of(10.0 * getUnitTonnage());
-	}
+    @Override
+    public Money getStickerPrice() {
+        return Money.of(10.0 * getUnitTonnage());
+    }
 
-	@Override
-	public double getTonnage() {
-		return 0;
-	}
+    @Override
+    public double getTonnage() {
+        return 0;
+    }
 
-	@Override
-	public int getTechRating() {
-		//go with conventional fighter avionics
-		return EquipmentType.RATING_B;
-	}
+    @Override
+    public int getTechRating() {
+        //go with conventional fighter avionics
+        return EquipmentType.RATING_B;
+    }
 
-	@Override
-	public boolean isSamePartType(Part part) {
-		return part instanceof LandingGear;
-	}
+    @Override
+    public boolean isSamePartType(Part part) {
+        return part instanceof LandingGear;
+    }
 
-	@Override
-	public void writeToXml(PrintWriter pw1, int indent) {
-		writeToXmlBegin(pw1, indent);
-		writeToXmlEnd(pw1, indent);
-	}
+    @Override
+    public void writeToXml(PrintWriter pw1, int indent) {
+        writeToXmlBegin(pw1, indent);
+        writeToXmlEnd(pw1, indent);
+    }
 
-	@Override
-	protected void loadFieldsFromXmlNode(Node wn) {
-		//nothing to load
-	}
-	
-	@Override
-	public boolean isRightTechType(String skillType) {
+    @Override
+    protected void loadFieldsFromXmlNode(Node wn) {
+        //nothing to load
+    }
+
+    @Override
+    public boolean isRightTechType(String skillType) {
         if (unit != null && unit.getEntity() instanceof LandAirMech) {
             return skillType.equals(SkillType.S_TECH_MECH);
         }
-		return skillType.equals(SkillType.S_TECH_AERO);
-	}
+        return (skillType.equals(SkillType.S_TECH_AERO) || skillType.equals(SkillType.S_TECH_VESSEL));
+    }
 
     @Override
     public String getLocationName() {
@@ -232,10 +232,9 @@ public class LandingGear extends Part {
         }
         return Entity.LOC_NONE;
     }
-    
-	@Override
-	public TechAdvancement getTechAdvancement() {
-	    return TA_GENERIC;
-	}
-	
+
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return TA_GENERIC;
+    }
 }

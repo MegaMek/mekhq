@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui;
 
 import java.awt.Dimension;
@@ -25,6 +24,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.ResourceBundle;
 
 import javax.swing.AbstractAction;
@@ -77,27 +77,22 @@ public final class OverviewTab extends CampaignGuiTab {
     private static final long serialVersionUID = -564451623308341081L;
 
     private JTabbedPane tabOverview;
-    // Overview Parts In Use
-    private JScrollPane scrollOverviewParts;
-    private JPanel overviewPartsPanel;
-    private JTable overviewPartsInUseTable;
     // Overview Transport
     private JScrollPane scrollOverviewTransport;
+    // Overview Cargo
+    private JScrollPane scrollOverviewCargo;
     // Overview Personnel
     private JScrollPane scrollOverviewCombatPersonnel;
     private JScrollPane scrollOverviewSupportPersonnel;
-    private JSplitPane splitOverviewPersonnel;
+    private PartsInUseTableModel overviewPartsModel;
     // Overview Hangar
     private JScrollPane scrollOverviewHangar;
     private JTextArea overviewHangarArea;
-    private JSplitPane splitOverviewHangar;
+    // Overview Parts In Use
+    private JPanel overviewPartsPanel;
+    private JTable overviewPartsInUseTable;
     // Overview Rating
     private JScrollPane scrollOverviewUnitRating;
-    // Overview Cargo
-    private JScrollPane scrollOverviewCargo;
-
-    private PartsInUseTableModel overviewPartsModel;
-    private TableRowSorter<PartsInUseTableModel> partsInUseSorter;
 
     ResourceBundle resourceMap;
 
@@ -119,14 +114,14 @@ public final class OverviewTab extends CampaignGuiTab {
         GridBagConstraints gridBagConstraints;
 
         setTabOverview(new JTabbedPane());
-        scrollOverviewParts = new JScrollPane();
+        JScrollPane scrollOverviewParts = new JScrollPane();
         initOverviewPartsInUse();
         scrollOverviewTransport = new JScrollPane();
         scrollOverviewCombatPersonnel = new JScrollPane();
         scrollOverviewSupportPersonnel = new JScrollPane();
         scrollOverviewHangar = new JScrollPane();
         overviewHangarArea = new JTextArea();
-        splitOverviewHangar = new JSplitPane();
+        JSplitPane splitOverviewHangar;
         scrollOverviewUnitRating = new JScrollPane();
         scrollOverviewCargo = new JScrollPane();
 
@@ -161,7 +156,7 @@ public final class OverviewTab extends CampaignGuiTab {
         scrollOverviewSupportPersonnel.setPreferredSize(new java.awt.Dimension(350, 400));
         scrollOverviewSupportPersonnel.setViewportView(new PersonnelReport(getCampaign()).getSupportPersonnelReport());
 
-        splitOverviewPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollOverviewCombatPersonnel,
+        JSplitPane splitOverviewPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollOverviewCombatPersonnel,
                 scrollOverviewSupportPersonnel);
         splitOverviewPersonnel.setName("splitOverviewPersonnel");
         splitOverviewPersonnel.setOneTouchExpandable(true);
@@ -264,7 +259,7 @@ public final class OverviewTab extends CampaignGuiTab {
         overviewPartsInUseTable = new JTable(overviewPartsModel);
         overviewPartsInUseTable.setRowSelectionAllowed(false);
         overviewPartsInUseTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        TableColumn column = null;
+        TableColumn column;
         for (int i = 0; i < overviewPartsModel.getColumnCount(); ++i) {
             column = overviewPartsInUseTable.getColumnModel().getColumn(i);
             column.setCellRenderer(overviewPartsModel.getRenderer());
@@ -277,7 +272,7 @@ public final class OverviewTab extends CampaignGuiTab {
         }
         overviewPartsInUseTable.setIntercellSpacing(new Dimension(0, 0));
         overviewPartsInUseTable.setShowGrid(false);
-        partsInUseSorter = new TableRowSorter<PartsInUseTableModel>(overviewPartsModel);
+        TableRowSorter<PartsInUseTableModel> partsInUseSorter = new TableRowSorter<>(overviewPartsModel);
         partsInUseSorter.setSortsOnUpdates(true);
         // Don't sort the buttons
         partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_BUY, false);
@@ -291,7 +286,7 @@ public final class OverviewTab extends CampaignGuiTab {
         partsInUseSorter.setComparator(PartsInUseTableModel.COL_IN_TRANSFER, new TwoNumbersSorter());
         partsInUseSorter.setComparator(PartsInUseTableModel.COL_COST, new FormattedNumberSorter());
         // Default starting sort
-        partsInUseSorter.setSortKeys(Arrays.asList(new RowSorter.SortKey(0, SortOrder.ASCENDING)));
+        partsInUseSorter.setSortKeys(Collections.singletonList(new RowSorter.SortKey(0, SortOrder.ASCENDING)));
         overviewPartsInUseTable.setRowSorter(partsInUseSorter);
 
         // Add buttons and actions. TODO: Only refresh the row we are working
@@ -300,7 +295,7 @@ public final class OverviewTab extends CampaignGuiTab {
         Action buy = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int row = Integer.valueOf(e.getActionCommand());
+                int row = Integer.parseInt(e.getActionCommand());
                 PartInUse piu = overviewPartsModel.getPartInUse(row);
                 IAcquisitionWork partToBuy = piu.getPartToBuy();
                 getCampaign().getShoppingList().addShoppingItem(partToBuy, 1, getCampaign());
@@ -311,7 +306,7 @@ public final class OverviewTab extends CampaignGuiTab {
         Action buyInBulk = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int row = Integer.valueOf(e.getActionCommand());
+                int row = Integer.parseInt(e.getActionCommand());
                 PartInUse piu = overviewPartsModel.getPartInUse(row);
                 int quantity = 1;
                 PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(getFrame(), true,
@@ -327,7 +322,7 @@ public final class OverviewTab extends CampaignGuiTab {
         Action add = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int row = Integer.valueOf(e.getActionCommand());
+                int row = Integer.parseInt(e.getActionCommand());
                 PartInUse piu = overviewPartsModel.getPartInUse(row);
                 IAcquisitionWork partToBuy = piu.getPartToBuy();
                 getCampaign().addPart((Part) partToBuy.getNewEquipment(), 0);
@@ -338,7 +333,7 @@ public final class OverviewTab extends CampaignGuiTab {
         Action addInBulk = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int row = Integer.valueOf(e.getActionCommand());
+                int row = Integer.parseInt(e.getActionCommand());
                 PartInUse piu = overviewPartsModel.getPartInUse(row);
                 int quantity = 1;
                 PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(getFrame(), true,
@@ -384,15 +379,15 @@ public final class OverviewTab extends CampaignGuiTab {
                             scrollOverviewUnitRating);
                 }
             }
-    
+
             scrollOverviewUnitRating.setViewportView(new RatingReport(getCampaign()).getReport());
             scrollOverviewCombatPersonnel.setViewportView(new PersonnelReport(getCampaign()).getCombatPersonnelReport());
             scrollOverviewSupportPersonnel.setViewportView(new PersonnelReport(getCampaign()).getSupportPersonnelReport());
             scrollOverviewTransport.setViewportView(new TransportReport(getCampaign()).getReport());
             scrollOverviewCargo.setViewportView(new CargoReport(getCampaign()).getReport());
             HangarReport hr = new HangarReport(getCampaign());
-            overviewHangarArea.setText(hr.getHangarTotals());
             scrollOverviewHangar.setViewportView(hr.getHangarTree());
+            overviewHangarArea.setText(hr.getHangarTotals());
             refreshOverviewPartsInUse();
         });
     }
@@ -419,17 +414,17 @@ public final class OverviewTab extends CampaignGuiTab {
     }
 
     private ActionScheduler overviewScheduler = new ActionScheduler(this::refreshOverview);
-    
+
     @Subscribe
     public void handle(OptionsChangedEvent ev) {
         overviewScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(DeploymentChangedEvent ev) {
         overviewScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(ScenarioResolvedEvent ev) {
         overviewScheduler.schedule();
@@ -439,22 +434,22 @@ public final class OverviewTab extends CampaignGuiTab {
     public void handle(UnitEvent ev) {
         overviewScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(PersonEvent ev) {
         overviewScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(PartEvent ev) {
         overviewScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(PartWorkEvent ev) {
         overviewScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(LoanEvent ev) {
     	overviewScheduler.schedule();

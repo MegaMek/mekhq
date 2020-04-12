@@ -271,17 +271,10 @@ public class GamePreset implements MekHqXmlSerializable {
     				presets.add(preset);
     			}
     			fis.close();
-    		} catch (Exception ex) {
-    			ex.printStackTrace();
-    			/*	JOptionPane.showMessageDialog(null,
-					"The campaign file could not be loaded.\nPlease check the log file for details.",
-					"Campaign Loading Error",
-				    JOptionPane.ERROR_MESSAGE);*/
+    		} catch (Exception e) {
+                MekHQ.getLogger().error(GamePreset.class, "getGamePresetsIn", e);
     		}
     	}
     	return presets;
 	}
-
-
-
 }

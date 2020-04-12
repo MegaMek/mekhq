@@ -9,6 +9,7 @@ import javax.swing.ListCellRenderer;
 
 import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.BasicInfo;
 
@@ -18,9 +19,9 @@ import mekhq.gui.BasicInfo;
 public class PatientTableModel extends AbstractListModel<Person> {
     private static final long serialVersionUID = -1615929049408417297L;
 
-    ArrayList<Person> patients;
-    Campaign campaign;
-    
+    private ArrayList<Person> patients;
+    private final Campaign campaign;
+
     public PatientTableModel(Campaign c) {
         patients = new ArrayList<Person>();
         campaign = c;
@@ -45,11 +46,11 @@ public class PatientTableModel extends AbstractListModel<Person> {
     public int getSize() {
         return patients.size();
     }
-    
+
     private Campaign getCampaign() {
         return campaign;
     }
-    
+
     public PatientTableModel.Renderer getRenderer(IconPackage icons) {
         return new PatientTableModel.Renderer(icons);
     }
@@ -67,21 +68,44 @@ public class PatientTableModel extends AbstractListModel<Person> {
                 int index,
                 boolean isSelected,
                 boolean cellHasFocus) {
-            Component c = this;
-            setOpaque(true);
             Person p = (Person)getElementAt(index);
+            setPortrait(p);
             if (getCampaign().getCampaignOptions().useAdvancedMedical()) {
-                setText(p.getInjuriesDesc(), "black");
+                setHtmlText(getInjuriesDesc(p));
             } else {
-                setText(p.getPatientDesc(), "black");
+                setHtmlText(getPatientDesc(p));
             }
             if (isSelected) {
                 highlightBorder();
             } else {
                 unhighlightBorder();
             }
-            setPortrait(p);
-            return c;
+            setBackground(list.getBackground());
+            setForeground(list.getForeground());
+            return this;
         }
+    }
+
+    private String getInjuriesDesc(Person p) {
+        StringBuilder toReturn = new StringBuilder("<html><font size='2'><b>").append(p.getFullTitle())
+                .append("</b><br/>").append("&nbsp;&nbsp;&nbsp;Injuries:");
+        String sep = "<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+        for (Injury injury : p.getInjuries()) {
+            toReturn.append(sep).append(injury.getFluff());
+            if (sep.contains("<br/>")) {
+                sep = ", ";
+            } else {
+                sep = ",<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            }
+        }
+        toReturn.append("</font></html>");
+        return toReturn.toString();
+    }
+
+    private String getPatientDesc(Person p) {
+        String toReturn = "<html><font size='2'><b>" + p.getFullTitle() + "</b><br/>";
+        toReturn += p.getHits() + " hit(s)<br>[next check in " + p.getDaysToWaitForHealing() + " days]";
+        toReturn += "</font></html>";
+        return toReturn;
     }
 }

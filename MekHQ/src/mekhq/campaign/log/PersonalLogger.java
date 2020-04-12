@@ -21,6 +21,7 @@ package mekhq.campaign.log;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.GenderDescriptors;
 
 import java.text.MessageFormat;
 import java.util.Date;
@@ -31,29 +32,46 @@ import java.util.ResourceBundle;
  * @author Miguel Azevedo
  */
 public class PersonalLogger {
-    private static ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries", new EncodeControl());;
+    private static ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries", new EncodeControl());
 
-    public static void spouseKia(Person spouse, Person person, Date date){
+    public static void spouseKia(Person spouse, Person person, Date date) {
         String message = logEntriesResourceMap.getString("spouseKia.text");
-        spouse.addLogEntry(new PersonalLogEntry(date, MessageFormat.format(message, person.getName())));
+        spouse.addLogEntry(new PersonalLogEntry(date, MessageFormat.format(message, person.getFullName())));
     }
 
-    public static void divorcedFrom(Person person, Person spouse, Date date){
+    public static void divorcedFrom(Person person, Person spouse, Date date) {
         String message = logEntriesResourceMap.getString("divorcedFrom.text");
         person.addLogEntry(new PersonalLogEntry(date, MessageFormat.format(message, spouse.getFullName())));
     }
 
-    public static void marriage(Person person, Person spouse, Date date){
+    public static void marriage(Person person, Person spouse, Date date) {
         String message = logEntriesResourceMap.getString("marries.text");
         person.addLogEntry(new PersonalLogEntry(date, MessageFormat.format(message, spouse.getFullName())));
     }
 
-    public static void gainedEdge(Person person, Date date){
+    public static void gainedEdge(Person person, Date date) {
         person.addLogEntry(new PersonalLogEntry(date, logEntriesResourceMap.getString("gainedEdge.text")));
     }
 
-    public static void gained(Person person, Date date, String spa){
+    public static void gained(Person person, Date date, String spa) {
         String message = logEntriesResourceMap.getString("gained.text");
         person.addLogEntry(new PersonalLogEntry(date, MessageFormat.format(message, spa)));
+    }
+
+    public static void spouseConceived(Person person, String spouseName, Date date, String sizeString) {
+        String message = MessageFormat.format(logEntriesResourceMap.getString("spouseConceived.text"), spouseName);
+
+        if(sizeString != null) {
+            message += " " + sizeString;
+        }
+
+        person.addLogEntry(new PersonalLogEntry(date, message));
+    }
+
+    //this is called to log the child being born on the father's personal log
+    public static void ourChildBorn(Person person, Person baby, String spouseName, Date date) {
+        person.addLogEntry(new PersonalLogEntry(date,
+                MessageFormat.format(logEntriesResourceMap.getString("ourChildBorn.text"),
+                        spouseName, GenderDescriptors.BOY_GIRL.getDescriptor(baby.getGender()))));
     }
 }

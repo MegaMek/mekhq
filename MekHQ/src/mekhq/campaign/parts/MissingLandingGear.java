@@ -23,8 +23,10 @@ package mekhq.campaign.parts;
 
 import megamek.common.Aero;
 import megamek.common.CriticalSlot;
+import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.Jumpship;
 import megamek.common.LandAirMech;
 import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
@@ -37,27 +39,26 @@ import org.w3c.dom.Node;
  */
 public class MissingLandingGear extends MissingPart {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 2806921577150714477L;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 2806921577150714477L;
 
-	public MissingLandingGear() {
-    	this(0, null);
+    public MissingLandingGear() {
+        this(0, null);
     }
-    
+
     public MissingLandingGear(int tonnage, Campaign c) {
-    	super(0, c);
-    	this.name = "Landing Gear";
+        super(0, c);
+        this.name = "Landing Gear";
     }
-    
+
     @Override 
-	public int getBaseTime() {
+    public int getBaseTime() {
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
             int time = 0;
             //Test of proposed errata for repair times
-            Entity e = unit.getEntity();
-            if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+            if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
                 time = 1200;
             } else {
                 time = 600;
@@ -66,51 +67,51 @@ public class MissingLandingGear extends MissingPart {
         }
         return 1200;
     }
-	
-	@Override
-	public int getDifficulty() {
-		return 2;
-	}
-    
-	@Override
-	public String checkFixable() {
-		return null;
-	}
 
-	@Override
-	public Part getNewPart() {
-		return new LandingGear(getUnitTonnage(), campaign);
-	}
+    @Override
+    public int getDifficulty() {
+        return 2;
+    }
 
-	@Override
-	public boolean isAcceptableReplacement(Part part, boolean refit) {
-		return part instanceof LandingGear;
-	}
+    @Override
+    public String checkFixable() {
+        return null;
+    }
 
-	@Override
-	public double getTonnage() {
-		return 0;
-	}
+    @Override
+    public Part getNewPart() {
+        return new LandingGear(getUnitTonnage(), campaign);
+    }
 
-	@Override
-	public int getTechRating() {
-		//go with conventional fighter avionics
-		return EquipmentType.RATING_B;
-	}
+    @Override
+    public boolean isAcceptableReplacement(Part part, boolean refit) {
+        return part instanceof LandingGear;
+    }
 
-	@Override
-	public void updateConditionFromPart() {
-		if(null != unit && unit.getEntity() instanceof Aero) {
-			((Aero)unit.getEntity()).setGearHit(true);
+    @Override
+    public double getTonnage() {
+        return 0;
+    }
+
+    @Override
+    public int getTechRating() {
+        //go with conventional fighter avionics
+        return EquipmentType.RATING_B;
+    }
+
+    @Override
+    public void updateConditionFromPart() {
+        if(null != unit && unit.getEntity() instanceof Aero) {
+            ((Aero)unit.getEntity()).setGearHit(true);
         } else if (null != unit && unit.getEntity() instanceof LandAirMech) {
             unit.damageSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_LANDING_GEAR, 3);
         }
-	}
-	
-	@Override
-	protected void loadFieldsFromXmlNode(Node wn) {
-		//nothing to load
-	}
+    }
+
+    @Override
+    protected void loadFieldsFromXmlNode(Node wn) {
+        //nothing to load
+    }
 
     @Override
     public String getLocationName() {
@@ -127,10 +128,9 @@ public class MissingLandingGear extends MissingPart {
         }
         return Entity.LOC_NONE;
     }
-    
+
     @Override
     public TechAdvancement getTechAdvancement() {
         return TA_GENERIC;
     }
-	
 }

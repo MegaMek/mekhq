@@ -31,9 +31,13 @@ public class UnitCostReportDialog extends javax.swing.JDialog {
         super(parent, false);
         setTitle("Monthly Cost Report for " + unit.getName());
         initComponents();     
+        
         txtReport.setText(unit.displayMonthlyCost());
         txtReport.setCaretPosition(0);
+        
         setPreferredSize(new Dimension(700, 500));
+        pack();
+
         setLocationRelativeTo(parent);
         setUserPreferences();
     }

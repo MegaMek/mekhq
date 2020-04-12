@@ -1,0 +1,34 @@
+<AtBScenarioModifier>
+	<benefitsPlayer>false</benefitsPlayer>
+	<eventTiming>PreForceGeneration</eventTiming>
+	<objectives>
+        <objective>
+            <associatedForceNames>
+                <associatedForceName>Base Turrets</associatedForceName>
+            </associatedForceNames>
+            <associatedUnitIDs/>
+            <successEffects>
+                <successEffect>
+                    <effectType>ScenarioVictory</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </successEffect>
+            </successEffects>
+            <failureEffects>
+                <failureEffect>
+                    <effectType>ScenarioDefeat</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </failureEffect>
+            </failureEffects>
+            <additionalDetails/>
+            <description>Engage any hostile units with weapons fire or physical attacks for the specified number of turns.</description>
+            <destinationEdge>NONE</destinationEdge>
+            <objectiveCriterion>Custom</objectiveCriterion>
+            <percentage>1</percentage>
+            <timeLimitAtMost>false</timeLimitAtMost>
+            <timeLimitScaleFactor>1</timeLimitScaleFactor>
+            <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
+	</objective>
+	</objectives>
+</AtBScenarioModifier>

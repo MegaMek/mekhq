@@ -1,12 +1,13 @@
 package mekhq.gui;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Image;
+import java.util.UUID;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JTree;
+import javax.swing.UIManager;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import megamek.client.ui.Messages;
@@ -14,6 +15,7 @@ import megamek.common.Crew;
 import megamek.common.Entity;
 import megamek.common.GunEmplacement;
 import mekhq.IconPackage;
+import mekhq.MekHQ;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -22,7 +24,8 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
 
     private static final long serialVersionUID = -553191867660269247L;
 
-    private IconPackage icons;
+    private final IconPackage icons;
+    private final MekHqColors colors = new MekHqColors();
 
     public ForceRenderer(IconPackage i) {
         icons = i;
@@ -41,12 +44,11 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 tree, value, sel,
                 expanded, leaf, row,
                 hasFocus);
-        setOpaque(true);
-        setBackground(Color.WHITE);
-        setForeground(Color.BLACK);
+        setBackground(UIManager.getColor("Tree.background"));
+        setForeground(UIManager.getColor("Tree.textForeground"));
         if(sel) {
-            setBackground(Color.DARK_GRAY);
-            setForeground(Color.WHITE);
+            setBackground(UIManager.getColor("Tree.selectionBackground"));
+            setForeground(UIManager.getColor("Tree.selectionForeground"));
         }
 
         if(value instanceof Unit) {
@@ -56,6 +58,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             }
             String uname = "";
             String c3network = "";
+            String transport = "";
             Unit u = (Unit)value;
             Person pp = u.getCommander();
             if(null != pp) {
@@ -70,7 +73,19 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 uname = "<font color='red'>" + uname + "</font>";
             }
             Entity entity = u.getEntity();
-            if (entity.hasC3i()) {
+            if (entity.hasNavalC3()) {
+                if (entity.calculateFreeC3Nodes() >= 5) {
+                    c3network += Messages.getString("ChatLounge.NC3None");
+                } else {
+                    c3network += Messages
+                            .getString("ChatLounge.NC3Network")
+                            + entity.getC3NetId();
+                    if (entity.calculateFreeC3Nodes() > 0) {
+                        c3network += Messages.getString("ChatLounge.NC3Nodes",
+                                new Object[] { entity.calculateFreeC3Nodes() });
+                    }
+                }
+            } else if (entity.hasC3i()) {
                 if (entity.calculateFreeC3Nodes() >= 5) {
                     c3network += Messages.getString("ChatLounge.C3iNone");
                 } else {
@@ -109,14 +124,24 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             if(!c3network.isEmpty()) {
                 c3network = "<br><i>" + c3network + "</i>";
             }
-            setText("<html>" + name + ", " + uname + c3network + "</html>");
+            if(u.hasTransportShipId()) {
+                for (UUID id : u.getTransportShipId().keySet()) {
+                    Unit ship = u.getCampaign().getUnit(id);
+                    if (ship != null) {
+                        transport += "<br>" + "Transported by: " + ship.getName();
+                    }
+                }
+            }
+            setText("<html>" + name + ", " + uname + c3network + transport + "</html>");
             if(u.isDeployed() && !sel) {
-                setBackground(Color.LIGHT_GRAY);
+                colors.getDeployed().getColor().ifPresent(c -> setBackground(c));
+                colors.getDeployed().getAlternateColor().ifPresent(c -> setForeground(c));
             }
         }
         if(value instanceof Force) {
             if(!hasFocus && ((Force)value).isDeployed()) {
-                setBackground(Color.LIGHT_GRAY);
+                colors.getDeployed().getColor().ifPresent(c -> setBackground(c));
+                colors.getDeployed().getAlternateColor().ifPresent(c -> setForeground(c));
             }
         }
         setIcon(getIcon(value));
@@ -170,8 +195,8 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 }
             }
             return new ImageIcon(portrait);
-        } catch (Exception err) {
-            err.printStackTrace();
+        } catch (Exception e) {
+            MekHQ.getLogger().error(getClass(), "getIconFrom", e);
             return null;
         }
     }

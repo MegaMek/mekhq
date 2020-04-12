@@ -27,7 +27,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.Aero;
+import megamek.common.Dropship;
 import megamek.common.Entity;
+import megamek.common.Jumpship;
 import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -38,92 +40,90 @@ import mekhq.campaign.Campaign;
  */
 public class MissingAeroSensor extends MissingPart {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 2806921577150714477L;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 2806921577150714477L;
 
-	private boolean dropship;
-	
-	public MissingAeroSensor() {
-    	this(0, false, null);
+    private boolean dropship;
+
+    public MissingAeroSensor() {
+        this(0, false, null);
     }
-    
+
     public MissingAeroSensor(int tonnage, boolean drop, Campaign c) {
-    	super(tonnage, c);
-    	this.name = "Aero Sensors";
-    	this.dropship = drop;
+        super(tonnage, c);
+        this.name = "Aero Sensors";
+        this.dropship = drop;
     }
-    
+
     @Override 
-	public int getBaseTime() {
+    public int getBaseTime() {
         //Published errata for replacement times of small aero vs large craft
-        Entity e = unit.getEntity();
-        if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+        if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
             return 1200;
         }
         return 260;            
-	}
-	
-	@Override
-	public int getDifficulty() {
-		return -2;
-	}
-    
-	@Override
-	public String checkFixable() {
-		return null;
-	}
+    }
 
-	@Override
-	public Part getNewPart() {
-		return new AeroSensor(getUnitTonnage(), dropship, campaign);
-	}
+    @Override
+    public int getDifficulty() {
+        return -2;
+    }
 
-	@Override
-	public boolean isAcceptableReplacement(Part part, boolean refit) {
-		return part instanceof AeroSensor && dropship == ((AeroSensor)part).isForDropShip()
-				&& (dropship || getUnitTonnage() == part.getUnitTonnage());
-	}
+    @Override
+    public String checkFixable() {
+        return null;
+    }
 
-	@Override
-	public double getTonnage() {
-		return 0;
-	}
+    @Override
+    public Part getNewPart() {
+        return new AeroSensor(getUnitTonnage(), dropship, campaign);
+    }
 
-	@Override
-	public void writeToXml(PrintWriter pw1, int indent) {
-		writeToXmlBegin(pw1, indent);
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<dropship>"
-				+dropship
-				+"</dropship>");
-		writeToXmlEnd(pw1, indent);
-	}
+    @Override
+    public boolean isAcceptableReplacement(Part part, boolean refit) {
+        return part instanceof AeroSensor && dropship == ((AeroSensor)part).isForSpaceCraft()
+                && (dropship || getUnitTonnage() == part.getUnitTonnage());
+    }
 
-	@Override
-	protected void loadFieldsFromXmlNode(Node wn) {
-		NodeList nl = wn.getChildNodes();
-		
-		for (int x=0; x<nl.getLength(); x++) {
-			Node wn2 = nl.item(x);		
-			if (wn2.getNodeName().equalsIgnoreCase("dropship")) {
-				if(wn2.getTextContent().trim().equalsIgnoreCase("true")) {
-					dropship = true;
-				} else {
-					dropship = false;
-				}
-			}
-		}
-	}
+    @Override
+    public double getTonnage() {
+        return 0;
+    }
 
-	@Override
-	public void updateConditionFromPart() {
-		if(null != unit && unit.getEntity() instanceof Aero) {
-			((Aero)unit.getEntity()).setSensorHits(3);
-		}
-		
-	}
+    @Override
+    public void writeToXml(PrintWriter pw1, int indent) {
+        writeToXmlBegin(pw1, indent);
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<dropship>"
+                +dropship
+                +"</dropship>");
+        writeToXmlEnd(pw1, indent);
+    }
+
+    @Override
+    protected void loadFieldsFromXmlNode(Node wn) {
+        NodeList nl = wn.getChildNodes();
+
+        for (int x=0; x<nl.getLength(); x++) {
+            Node wn2 = nl.item(x);        
+            if (wn2.getNodeName().equalsIgnoreCase("dropship")) {
+                if(wn2.getTextContent().trim().equalsIgnoreCase("true")) {
+                    dropship = true;
+                } else {
+                    dropship = false;
+                }
+            }
+        }
+    }
+
+    @Override
+    public void updateConditionFromPart() {
+        if(null != unit && unit.getEntity() instanceof Aero) {
+            ((Aero)unit.getEntity()).setSensorHits(3);
+        }
+    }
 
     @Override
     public String getLocationName() {
@@ -140,14 +140,14 @@ public class MissingAeroSensor extends MissingPart {
         }
         return Entity.LOC_NONE;
     }
-    
-	@Override
-	public TechAdvancement getTechAdvancement() {
-	    return AeroSensor.TECH_ADVANCEMENT;
-	}
-	
-	@Override
-	public int getMassRepairOptionType() {
-    	return Part.REPAIR_PART_TYPE.ELECTRONICS;
+
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return AeroSensor.TECH_ADVANCEMENT;
+    }
+
+    @Override
+    public int getMassRepairOptionType() {
+        return Part.REPAIR_PART_TYPE.ELECTRONICS;
     }
 }

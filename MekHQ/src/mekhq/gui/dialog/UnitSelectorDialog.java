@@ -3,7 +3,6 @@
  *
  * Created on August 21, 2009, 4:26 PM
  */
-
 package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
@@ -17,7 +16,6 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Comparator;
-import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 
 import javax.swing.DefaultComboBoxModel;
@@ -124,7 +122,7 @@ public class UnitSelectorDialog extends JDialog {
         //methods like buyUnit, addUnit, etc. that we could register with this dialog
         //and then update when needed
         this.campaign = c;
-        asd = new AdvancedSearchDialog(frame, campaign.getCalendar().get(GregorianCalendar.YEAR));
+        asd = new AdvancedSearchDialog(frame, campaign.getGameYear());
         initComponents();
 
         MechSummary[] allMechs = MechSummaryCache.getInstance().getAllMechs();
@@ -454,10 +452,10 @@ public class UnitSelectorDialog extends JDialog {
     }//GEN-LAST:event_btnCloseActionPerformed
 
     private void filterUnits() {
-        RowFilter<MechTableModel, Integer> unitTypeFilter = null;
+        RowFilter<MechTableModel, Integer> unitTypeFilter;
         final int nClass = comboWeight.getSelectedIndex();
         final int nUnit = comboUnitType.getSelectedIndex();
-        final int year = campaign.getCalendar().get(GregorianCalendar.YEAR);
+        final int year = campaign.getGameYear();
         //If current expression doesn't parse, don't update.
         try {
             unitTypeFilter = new RowFilter<MechTableModel,Integer>() {
@@ -546,7 +544,7 @@ public class UnitSelectorDialog extends JDialog {
         try {
             mechView = new MechView(selectedUnit.getEntity(), false, true);
         } catch (Exception e) {
-            e.printStackTrace();
+            MekHQ.getLogger().error(getClass(), "refreshUnitView", e);
             // error unit didn't load right. this is bad news.
             populateTextFields = false;
         }
@@ -582,7 +580,7 @@ public class UnitSelectorDialog extends JDialog {
 
         // break out if there are no units to filter
         if (mechs == null) {
-            System.err.println("No units to filter!");
+            MekHQ.getLogger().error(getClass(), "setMechs", "No units to filter!");
         } else {
             unitModel.setData(mechs);
         }
@@ -751,7 +749,7 @@ public class UnitSelectorDialog extends JDialog {
      * @author Jay Lawson
      *
      */
-    public class FormattedNumberSorter implements Comparator<String> {
+    public static class FormattedNumberSorter implements Comparator<String> {
         @Override
         public int compare(String s0, String s1) {
             DecimalFormat format = new DecimalFormat();
@@ -759,13 +757,13 @@ public class UnitSelectorDialog extends JDialog {
             try {
                 l0 = format.parse(s0).doubleValue();
             } catch (java.text.ParseException e) {
-                e.printStackTrace();
+                MekHQ.getLogger().error(getClass(), "FormattedNumberSorter", e);
             }
             double l1 = 0;
             try {
                 l1 = format.parse(s1).doubleValue();
             } catch (java.text.ParseException e) {
-                e.printStackTrace();
+                MekHQ.getLogger().error(getClass(), "FormattedNumberSorter", e);
             }
             return ((Comparable<Double>)l0).compareTo(l1);
         }

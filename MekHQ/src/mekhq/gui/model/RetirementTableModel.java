@@ -1,6 +1,5 @@
 package mekhq.gui.model;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Image;
 import java.util.ArrayList;
@@ -10,7 +9,6 @@ import java.util.UUID;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
 import megamek.common.EntityWeightClass;
@@ -28,7 +26,9 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.RetirementDefectionTracker;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
+import mekhq.gui.MekHqColors;
 import mekhq.gui.dialog.RetirementDefectionDialog;
+import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 public class RetirementTableModel extends AbstractTableModel {
     /**
@@ -55,7 +55,8 @@ public class RetirementTableModel extends AbstractTableModel {
         "Payout", "Recruit", "Unit"
     };
 
-    private Campaign campaign;
+    private final Campaign campaign;
+    private final MekHqColors colors = new MekHqColors();
     private ArrayList<UUID> data;
     private HashMap<UUID, TargetRoll> targets;
     private HashMap<UUID, Boolean> payBonus;
@@ -383,7 +384,7 @@ public class RetirementTableModel extends AbstractTableModel {
         } else return new TextRenderer();
     }
 
-    public class TextRenderer extends DefaultTableCellRenderer {
+    public class TextRenderer extends MekHqTableCellRenderer {
         /**
          *
          */
@@ -398,18 +399,11 @@ public class RetirementTableModel extends AbstractTableModel {
             int actualCol = table.convertColumnIndexToModel(column);
             Person p = getPerson(actualRow);
             setHorizontalAlignment(getAlignment(actualCol));
-            setForeground(isSelected?Color.WHITE:Color.BLACK);
-            if (isSelected) {
-                setBackground(Color.DARK_GRAY);
-            } else if (null != campaign.getRetirementDefectionTracker().getPayout(p.getId()) &&
+            if (!isSelected) {
+                if (null != campaign.getRetirementDefectionTracker().getPayout(p.getId()) &&
                     campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() > 0) {
-                setBackground(Color.LIGHT_GRAY);
-            } else {
-                // tiger stripes
-                if ((row % 2) == 0) {
-                    setBackground(new Color(220, 220, 220));
-                } else {
-                    setBackground(Color.WHITE);
+                    colors.getPaidRetirement().getColor().ifPresent(c -> setBackground(c));
+                    colors.getPaidRetirement().getAlternateColor().ifPresent(c -> setForeground(c));
                 }
             }
             return this;
@@ -430,18 +424,13 @@ public class RetirementTableModel extends AbstractTableModel {
         public Component getTableCellRendererComponent(JTable table,
                 Object value, boolean isSelected, boolean hasFocus,
                 int row, int column) {
-            Component c = this;
             int actualCol = table.convertColumnIndexToModel(column);
             int actualRow = table.convertRowIndexToModel(row);
             Person p = getPerson(actualRow);
-            String color = "black";
-            if(isSelected) {
-                color = "white";
-            }
-            setText(getValueAt(actualRow, actualCol).toString(), color);
+            setText(getValueAt(actualRow, actualCol).toString());
             if (actualCol == COL_PERSON) {
                 setPortrait(p);
-                setText(p.getFullDesc(false), color);
+                setText(p.getFullDesc(false));
             }
             if(actualCol == COL_ASSIGN) {
                 Unit u = campaign.getUnit(p.getUnitId());
@@ -455,7 +444,7 @@ public class RetirementTableModel extends AbstractTableModel {
                         desc += " " + UnitType.getTypeDisplayableName(u.getEntity().getUnitType());
                     }
                     desc += "<br>" + u.getStatus() + "";
-                    setText(desc, color);
+                    setText(desc);
                     Image mekImage = getImageFor(u);
                     if(null != mekImage) {
                         setImage(mekImage);
@@ -479,7 +468,7 @@ public class RetirementTableModel extends AbstractTableModel {
                         parent = parent.getParentForce();
                     }
                     desc += "</html>";
-                    setText(desc, color);
+                    setHtmlText(desc);
                     Image forceImage = getImageFor(force);
                     if(null != forceImage) {
                         setImage(forceImage);
@@ -491,20 +480,16 @@ public class RetirementTableModel extends AbstractTableModel {
                 }
             }
 
-            if (isSelected) {
-                c.setBackground(Color.DARK_GRAY);
-            } else if (null != campaign.getRetirementDefectionTracker().getPayout(p.getId()) &&
+            MekHqTableCellRenderer.setupTableColors(this, table, isSelected, hasFocus, row);
+            if (!isSelected) {
+                if (null != campaign.getRetirementDefectionTracker().getPayout(p.getId()) &&
                         campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() > 0) {
-                c.setBackground(Color.LIGHT_GRAY);
-            } else {
-                // tiger stripes
-                if ((row % 2) == 0) {
-                    c.setBackground(new Color(220, 220, 220));
-                } else {
-                    c.setBackground(Color.WHITE);
+                    colors.getPaidRetirement().getColor().ifPresent(c -> setBackground(c));
+                    colors.getPaidRetirement().getAlternateColor().ifPresent(c -> setForeground(c));
                 }
             }
-            return c;
+
+            return this;
         }
     }
 }

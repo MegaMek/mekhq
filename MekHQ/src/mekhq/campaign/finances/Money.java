@@ -26,7 +26,6 @@ import org.joda.money.BigMoney;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * This class represents an quantity of money and its associated

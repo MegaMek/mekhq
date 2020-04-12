@@ -42,9 +42,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
@@ -316,7 +314,6 @@ public class FieldManualMercRevDragoonsRatingTest {
 
     @Test
     public void testGetMedSupportAvailable() {
-
         // Test having 1 regular doctor with 4 temp medics.
         // Expected available support should be:
         // Regular Doctor = 40 hours.
@@ -350,6 +347,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         Person mockMedic = mock(Person.class);
         when(mockMedic.getPrimaryRole()).thenReturn(Person.T_MEDIC);
         when(mockMedic.isDoctor()).thenReturn(false);
+        when(mockMedic.isMedic()).thenReturn(true);
         when(mockMedic.isActive()).thenReturn(true);
         when(mockMedic.isDeployed()).thenReturn(false);
         when(mockMedic.getSkill(eq(SkillType.S_MEDTECH))).thenReturn(mockMedicSkill);
@@ -463,36 +461,53 @@ public class FieldManualMercRevDragoonsRatingTest {
         doReturn(4).when(testRating).getHeavyVeeCount();
         doReturn(4).when(testRating).getLightVeeCount();
         String expected = "Transportation      -10\n" +
-                          "    Dropship Capacity:       0%\n" +
-                          "        #Mech Bays:                   0 needed /   0 available\n" +
-                          "        #Fighter Bays:                0 needed /   0 available\n" +
+                          "    DropShip Capacity:       0%\n" +
+                          "        #BattleMech Bays:             0 needed /   0 available\n" +
+                          "        #Fighter Bays:                0 needed /   0 available (plus 0 excess Small Craft)\n" +
                           "        #Small Craft Bays:            0 needed /   0 available\n" +
-                          "        #Protomech Bays:              0 needed /   0 available\n" +
-                          "        #Heavy Vehicle Bays:          4 needed /   0 available\n" +
-                          "        #Light Vehicle Bays:          4 needed /   0 available (plus 0 excess heavy)\n" +
-                          "        #BA Bays:                     0 needed /   0 available\n" +
+                          "        #ProtoMech Bays:              0 needed /   0 available\n" +
+                          "        #Super Heavy Vehicle Bays:    0 needed /   0 available\n" +
+                          "        #Heavy Vehicle Bays:          4 needed /   0 available (plus 0 excess Super Heavy)\n" +
+                          "        #Light Vehicle Bays:          4 needed /   0 available (plus 0 excess Heavy and 0 excess Super Heavy)\n" +
+                          "        #Battle Armor Bays:           0 needed /   0 available\n" +
                           "        #Infantry Bays:               0 needed /   0 available\n" +
-                          "    Jumpship?                No\n" +
-                          "    Warship w/out Collar?    No\n" +
-                          "    Warship w/ Collar?       No";
+                          "    JumpShip?                No\n" +
+                          "    WarShip w/out Collar?    No\n" +
+                          "    WarShip w/ Collar?       No";
         assertEquals(expected, testRating.getTransportationDetails());
         // Add some heavy vee bays.
         doReturn(0).when(testRating).getTransportValue();
         doReturn(BigDecimal.valueOf(100)).when(testRating).getTransportPercent();
         doReturn(8).when(testRating).getHeavyVeeBayCount();
         expected = "Transportation        0\n" +
-                   "    Dropship Capacity:      100%\n" +
-                   "        #Mech Bays:                   0 needed /   0 available\n" +
-                   "        #Fighter Bays:                0 needed /   0 available\n" +
+                   "    DropShip Capacity:      100%\n" +
+                   "        #BattleMech Bays:             0 needed /   0 available\n" +
+                   "        #Fighter Bays:                0 needed /   0 available (plus 0 excess Small Craft)\n" +
                    "        #Small Craft Bays:            0 needed /   0 available\n" +
-                   "        #Protomech Bays:              0 needed /   0 available\n" +
-                   "        #Heavy Vehicle Bays:          4 needed /   8 available\n" +
-                   "        #Light Vehicle Bays:          4 needed /   0 available (plus 4 excess heavy)\n" +
-                   "        #BA Bays:                     0 needed /   0 available\n" +
+                   "        #ProtoMech Bays:              0 needed /   0 available\n" +
+                   "        #Super Heavy Vehicle Bays:    0 needed /   0 available\n" +
+                   "        #Heavy Vehicle Bays:          4 needed /   8 available (plus 0 excess Super Heavy)\n" +
+                   "        #Light Vehicle Bays:          4 needed /   0 available (plus 4 excess Heavy and 0 excess Super Heavy)\n" +
+                   "        #Battle Armor Bays:           0 needed /   0 available\n" +
                    "        #Infantry Bays:               0 needed /   0 available\n" +
-                   "    Jumpship?                No\n" +
-                   "    Warship w/out Collar?    No\n" +
-                   "    Warship w/ Collar?       No";
+                   "    JumpShip?                No\n" +
+                   "    WarShip w/out Collar?    No\n" +
+                   "    WarShip w/ Collar?       No";
         assertEquals(expected, testRating.getTransportationDetails());
+    }
+
+    @Test
+    public void testSHVeeBayOverflow() {
+        FieldManualMercRevDragoonsRating testRating = spy(new FieldManualMercRevDragoonsRating(mockCampaign));
+        testRating.initValues();
+        doReturn(2).when(testRating).getSuperHeavyVeeBayCount();
+        doReturn(2).when(testRating).getHeavyVeeBayCount();
+        doReturn(2).when(testRating).getLightVeeBayCount();
+        doReturn(1).when(testRating).getSuperHeavyVeeCount();
+        doReturn(0).when(testRating).getHeavyVeeCount();
+        doReturn(5).when(testRating).getLightVeeCount();
+
+        assertEquals(BigDecimal.valueOf(100.0)
+                .setScale(0, BigDecimal.ROUND_HALF_EVEN), testRating.getTransportPercent());
     }
 }

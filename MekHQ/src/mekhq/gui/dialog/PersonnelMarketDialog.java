@@ -1,14 +1,24 @@
 /*
- * UnitSelectorDialog.java
+ * Copyright (c) 2009, 2013, 2020  - The MegaMek Team
  *
- * Created on August 21, 2009, 4:26 PM
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Frame;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
@@ -42,6 +52,7 @@ import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.PersonnelTab;
@@ -74,9 +85,6 @@ public class PersonnelMarketDialog extends JDialog {
     private DirectoryItems portraits;
     private Money unitCost = Money.zero();
 
-    private JButton btnAdd;
-    private javax.swing.JButton btnHire;
-    private javax.swing.JButton btnClose;
     private javax.swing.JComboBox<String> comboPersonType;
     private javax.swing.JLabel lblPersonChoice;
     private javax.swing.JRadioButton radioNormalRoll;
@@ -123,8 +131,6 @@ public class PersonnelMarketDialog extends JDialog {
         comboRecruitType = new javax.swing.JComboBox<>();
         lblUnitCost = new javax.swing.JLabel();
         panelOKBtns = new javax.swing.JPanel();
-        btnHire = new javax.swing.JButton();
-        btnClose = new javax.swing.JButton();
         lblPersonChoice = new javax.swing.JLabel();
         //choicePersonView = new javax.swing.JComboBox();
         //lblPersonView = new javax.swing.JLabel();
@@ -231,17 +237,20 @@ public class PersonnelMarketDialog extends JDialog {
         sortKeys.add(new RowSorter.SortKey(PersonnelTableModel.COL_SKILL, SortOrder.DESCENDING));
         sorter.setSortKeys(sortKeys);
         tablePersonnel.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        tablePersonnel.getSelectionModel().addListSelectionListener(evt -> personChanged(evt));
+        tablePersonnel.getSelectionModel().addListSelectionListener(this::personChanged);
         TableColumn column = null;
         for (int i = 0; i < PersonnelTableModel.N_COL; i++) {
-            column = ((XTableColumnModel)tablePersonnel.getColumnModel()).getColumnByModelIndex(i);
+            column = ((XTableColumnModel) tablePersonnel.getColumnModel()).getColumnByModelIndex(i);
             column.setPreferredWidth(personnelModel.getColumnWidth(i));
             column.setCellRenderer(personnelModel.getRenderer(false, null));
-            if(i != PersonnelTableModel.COL_NAME && i != PersonnelTableModel.COL_TYPE
-                    && i != PersonnelTableModel.COL_SKILL && i != PersonnelTableModel.COL_AGE
-                    && i != PersonnelTableModel.COL_GENDER
+
+            if (i != PersonnelTableModel.COL_GIVEN_NAME
+                    && ((!campaign.getFaction().isClan() && i != PersonnelTableModel.COL_SURNAME)
+                        || (campaign.getFaction().isClan() && i != PersonnelTableModel.COL_BLOODNAME))
+                    && i != PersonnelTableModel.COL_TYPE && i != PersonnelTableModel.COL_SKILL
+                    && i != PersonnelTableModel.COL_AGE && i != PersonnelTableModel.COL_GENDER
                     && i != PersonnelTableModel.COL_ASSIGN) {
-                ((XTableColumnModel)tablePersonnel.getColumnModel()).setColumnVisible(column, false);
+                ((XTableColumnModel) tablePersonnel.getColumnModel()).setColumnVisible(column, false);
             }
         }
 
@@ -266,20 +275,28 @@ public class PersonnelMarketDialog extends JDialog {
 
         panelOKBtns.setLayout(new java.awt.GridBagLayout());
 
-        btnHire.setText("Hire");
+        JButton btnAdvDay = new JButton("Advance Day");
+        btnAdvDay.setName("buttonAdvanceDay");
+        btnAdvDay.addActionListener(evt -> {
+            hqView.getCampaignController().advanceDay();
+            personnelModel.setData(personnelMarket.getPersonnel());
+        });
+        btnAdvDay.setEnabled(hqView.getCampaignController().isHost());
+        panelOKBtns.add(btnAdvDay, new GridBagConstraints());
+
+        JButton btnHire = new JButton("Hire");
         btnHire.setName("btnHire"); // NOI18N
-        btnHire.addActionListener(evt -> hirePerson(evt));
+        btnHire.addActionListener(this::hirePerson);
         panelOKBtns.add(btnHire, new java.awt.GridBagConstraints());
 
-        btnAdd = new JButton("Add (GM)");
+        JButton btnAdd = new JButton("Add (GM)");
         btnAdd.addActionListener(evt -> addPerson());
         btnAdd.setEnabled(campaign.isGM());
         panelOKBtns.add(btnAdd, new java.awt.GridBagConstraints());
 
-
-        btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
+        JButton btnClose = new JButton(resourceMap.getString("btnClose.text")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
-        btnClose.addActionListener(evt -> btnCloseActionPerformed(evt));
+        btnClose.addActionListener(this::btnCloseActionPerformed);
         panelOKBtns.add(btnClose, new java.awt.GridBagConstraints());
 
         javax.swing.JPanel panel = new javax.swing.JPanel();
@@ -320,22 +337,18 @@ public class PersonnelMarketDialog extends JDialog {
 	}
 
 	private void hirePerson(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
-	    if(null != selectedPerson) {
+	    if (null != selectedPerson) {
 	    	if (campaign.getFunds().isLessThan(
                     (campaign.getCampaignOptions().payForRecruitment() ? selectedPerson.getSalary().multipliedBy(2) : Money.zero())
-                            .plus(unitCost))){
+                            .plus(unitCost))) {
 				 campaign.addReport("<font color='red'><b>Insufficient funds. Transaction cancelled</b>.</font>");
 	    	} else {
 	    		/* Adding person to campaign changes pid; grab the old one to
 	    		 * use as a key to any attached entity
 	    		 */
 	    		UUID pid = selectedPerson.getId();
-	    		if(campaign.recruitPerson(selectedPerson)) {
+	    		if (campaign.recruitPerson(selectedPerson)) {
 	    			Entity en = personnelMarket.getAttachedEntity(pid);
-	    			if (campaign.getCampaignOptions().getUseTimeInService()) {
-                        GregorianCalendar rawrecruit = (GregorianCalendar) campaign.getCalendar().clone();
-                        selectedPerson.setRecruitment(rawrecruit);
-                    }
 	    			if (null != en) {
 	    				addUnit(en, true);
 	    				personnelMarket.removeAttachedEntity(pid);
@@ -352,18 +365,14 @@ public class PersonnelMarketDialog extends JDialog {
 		if (selectedPerson != null) {
 			Entity en = personnelMarket.getAttachedEntity(selectedPerson);
 			UUID pid = selectedPerson.getId();
-		    if(null != selectedPerson) {
-		    	campaign.addPersonWithoutId(selectedPerson, true);
-				addUnit(en, false);
-                if (campaign.getCampaignOptions().getUseTimeInService()) {
-                    GregorianCalendar rawrecruit = (GregorianCalendar) campaign.getCalendar().clone();
-                    selectedPerson.setRecruitment(rawrecruit);
-                }
-		    	personnelMarket.removePerson(selectedPerson);
-	    		personnelModel.setData(personnelMarket.getPersonnel());
-				personnelMarket.removeAttachedEntity(pid);
-		    	refreshPersonView();
-		    }
+
+            if (campaign.recruitPerson(selectedPerson, false, false, true, true)) {
+                addUnit(en, false);
+                personnelMarket.removePerson(selectedPerson);
+                personnelModel.setData(personnelMarket.getPersonnel());
+                personnelMarket.removeAttachedEntity(pid);
+            }
+            refreshPersonView();
 		}
 	}
 
@@ -412,7 +421,7 @@ public class PersonnelMarketDialog extends JDialog {
 	}//GEN-LAST:event_btnCloseActionPerformed
 
     private void filterPersonnel() {
-        RowFilter<PersonnelTableModel, Integer> personTypeFilter = null;
+        RowFilter<PersonnelTableModel, Integer> personTypeFilter;
         final int nGroup = comboPersonType.getSelectedIndex();
         //If current expression doesn't parse, don't update.
         try {
@@ -426,7 +435,9 @@ public class PersonnelMarketDialog extends JDialog {
                             (nGroup == PersonnelTab.PG_COMBAT && type <= Person.T_SPACE_GUNNER) ||
                             (nGroup == PersonnelTab.PG_SUPPORT && type > Person.T_SPACE_GUNNER) ||
                             (nGroup == PersonnelTab.PG_MW && type == Person.T_MECHWARRIOR) ||
-                            (nGroup == PersonnelTab.PG_CREW && (type == Person.T_GVEE_DRIVER || type == Person.T_NVEE_DRIVER || type == Person.T_VTOL_PILOT || type == Person.T_VEE_GUNNER)) ||
+                            (nGroup == PersonnelTab.PG_CREW && (type == Person.T_GVEE_DRIVER
+                                    || type == Person.T_NVEE_DRIVER || type == Person.T_VTOL_PILOT
+                                    || type == Person.T_VEE_GUNNER || type == Person.T_VEHICLE_CREW)) ||
                             (nGroup == PersonnelTab.PG_PILOT && type == Person.T_AERO_PILOT) ||
                             (nGroup == PersonnelTab.PG_CPILOT && type == Person.T_CONV_PILOT) ||
                             (nGroup == PersonnelTab.PG_PROTO && type == Person.T_PROTO_PILOT) ||
@@ -439,11 +450,11 @@ public class PersonnelMarketDialog extends JDialog {
                             ) {
                         return person.isActive();
                     } else if(nGroup == PersonnelTab.PG_RETIRE) {
-                        return person.getStatus() == Person.S_RETIRED;
+                        return person.getStatus() == PersonnelStatus.RETIRED;
                     } else if(nGroup == PersonnelTab.PG_MIA) {
-                        return person.getStatus() == Person.S_MIA;
+                        return person.getStatus() == PersonnelStatus.MIA;
                     } else if(nGroup == PersonnelTab.PG_KIA) {
-                        return person.getStatus() == Person.S_KIA;
+                        return person.getStatus() == PersonnelStatus.KIA;
                     }
                     return false;
                 }
@@ -513,13 +524,13 @@ public class PersonnelMarketDialog extends JDialog {
              if (Compute.getFullCrewSize(en) == 1) {
             	 name = "Pilot";
              }
-             tabUnit.add(name, new PersonViewPanel(selectedPerson, campaign, hqView.getIconPackage()));
+             tabUnit.add(name, new PersonViewPanel(selectedPerson, campaign, hqView));
              MechViewPanel mvp = new MechViewPanel();
              mvp.setMech(en, true);
              tabUnit.add("Unit", mvp);
              scrollPersonnelView.setViewportView(tabUnit);
          } else {
-        	 scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, campaign, hqView.getIconPackage()));
+        	 scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, campaign, hqView));
          }
  		//This odd code is to make sure that the scrollbar stays at the top
  		//I cant just call it here, because it ends up getting reset somewhere later

@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.service;
 
 import mekhq.campaign.Campaign;
@@ -32,9 +31,8 @@ public interface IAutosaveService {
      * Handles auto-saving when the day of the campaign advances.
      *
      * @param campaign Campaign to save
-     * @param dayOfTheWeek Day of the week when the auto-save is requested
      */
-    void requestDayAdvanceAutosave(Campaign campaign, int dayOfTheWeek);
+    void requestDayAdvanceAutosave(Campaign campaign);
 
     /**
      * Handles auto-saving before a mission starts.

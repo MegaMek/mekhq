@@ -65,7 +65,26 @@ public interface IPartWork extends IWork {
     MissingPart getMissingPart();
     
     String getDesc();
+
+    /**
+     * Gets a string containing details regarding the part,
+     * e.g. OmniPod or how many hits it has taken and its
+     * repair cost.
+     * @return A string containing details regarding the part.
+     */
     String getDetails();
+    
+    /**
+     * Gets a string containing details regarding the part,
+     * and optionally include information on its repair
+     * status.
+     * @param includeRepairDetails {@code true} if the details
+     *        should include information such as the number of
+     *        hits or how much it would cost to repair the
+     *        part.
+     * @return A string containing details regarding the part.
+     */
+    String getDetails(boolean includeRepairDetails);
     int getLocation();
     
     Unit getUnit();

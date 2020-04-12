@@ -27,7 +27,6 @@ import java.awt.GridLayout;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -148,13 +147,12 @@ public final class BriefingTab extends CampaignGuiTab {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see mekhq.gui.CampaignGuiTab#initTab()
      */
     @Override
     public void initTab() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", //$NON-NLS-1$ ;
-                new EncodeControl());
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl());
         GridBagConstraints gridBagConstraints;
 
         panBriefing = new JPanel(new GridBagLayout());
@@ -166,8 +164,7 @@ public final class BriefingTab extends CampaignGuiTab {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
-        panBriefing.add(new JLabel(resourceMap.getString("lblMission.text")), //$NON-NLS-1$ ;
-                gridBagConstraints);
+        panBriefing.add(new JLabel(resourceMap.getString("lblMission.text")), gridBagConstraints);
 
         choiceMission = new JComboBox<>();
         choiceMission.addActionListener(ev -> changeMission());
@@ -238,8 +235,7 @@ public final class BriefingTab extends CampaignGuiTab {
         scenarioTable = new JTable(scenarioModel);
         scenarioTable.setShowGrid(false);
         scenarioTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        scenarioTable.addMouseListener(new ScenarioTableMouseAdapter(getCampaignGui(),
-                scenarioTable, scenarioModel));
+        scenarioTable.addMouseListener(new ScenarioTableMouseAdapter(getCampaignGui(), scenarioTable, scenarioModel));
         scenarioTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         scenarioTable.setIntercellSpacing(new Dimension(0, 0));
         scenarioTable.getSelectionModel().addListSelectionListener(ev -> refreshScenarioView());
@@ -308,12 +304,11 @@ public final class BriefingTab extends CampaignGuiTab {
 
         scrollScenarioView = new JScrollPane();
         scrollScenarioView.setViewportView(null);
-        scrollScenarioView.setMinimumSize(new java.awt.Dimension(450, 600));
-        scrollScenarioView.setPreferredSize(new java.awt.Dimension(450, 600));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         panScenario.add(scrollScenarioView, gridBagConstraints);
@@ -433,13 +428,13 @@ public final class BriefingTab extends CampaignGuiTab {
                             }
                         }
                     }
-                    
+
                     if(mission.getStatus() != Mission.S_ACTIVE) {
                         MekHQ.triggerEvent(new MissionCompletedEvent(mission));
                     }
                 }
-                
-                
+
+
                 if (!mission.isActive()) {
                     if (getCampaign().getCampaignOptions().getUseAtB() && mission instanceof AtBContract) {
                         ((AtBContract) mission).checkForFollowup(getCampaign());
@@ -479,14 +474,14 @@ public final class BriefingTab extends CampaignGuiTab {
 			return;
     	}
 
-        if (0 != JOptionPane.showConfirmDialog(null, "Are you sure you want to generate a new set of missions?", "Generate missions?",
+        if (0 != JOptionPane.showConfirmDialog(null, "Are you sure you want to generate a new set of scenarios?", "Generate scenarios?",
                 JOptionPane.YES_NO_OPTION)) {
             return;
         }
-        
-        AtBScenarioFactory.createScenariosForNewWeek(getCampaign(), false);
+
+        AtBScenarioFactory.createScenariosForNewWeek(getCampaign());
     }
-    
+
     private void addScenario() {
         Mission m = getCampaign().getMission(selectedMission);
         if (null != m) {
@@ -620,17 +615,16 @@ public final class BriefingTab extends CampaignGuiTab {
                     // Add and run
                     chosen.add(u);
 
-                    // So MegaMek has correct crew sizes
-                    u.getEntity().getCrew().setSize(u.getActiveCrew().size());
                 } else {
                     undeployed.append("\n").append(u.getName()).append(" (").append(u.checkDeployment()).append(")");
                 }
             }
         }
-        
+
         if(scenario instanceof AtBDynamicScenario) {
             AtBDynamicScenarioFactory.setPlayerDeploymentTurns((AtBDynamicScenario) scenario, getCampaign());
             AtBDynamicScenarioFactory.finalizeStaggeredDeploymentTurns((AtBDynamicScenario) scenario, getCampaign());
+            AtBDynamicScenarioFactory.setPlayerDeploymentZones((AtBDynamicScenario) scenario, getCampaign());
         }
 
         if (undeployed.length() > 0) {
@@ -647,7 +641,7 @@ public final class BriefingTab extends CampaignGuiTab {
         // code to support deployment of reinforcements for legacy ATB scenarios.
         if((scenario instanceof AtBScenario) && !(scenario instanceof AtBDynamicScenario)) {
             Lance assignedLance = ((AtBScenario) scenario).getLance(getCampaign());
-            if(assignedLance != null) {            
+            if(assignedLance != null) {
                 int assignedForceId = assignedLance.getForceId();
                 int cmdrStrategy = 0;
                 Person commander = getCampaign().getPerson(Lance.findCommander(assignedForceId, getCampaign()));
@@ -655,17 +649,17 @@ public final class BriefingTab extends CampaignGuiTab {
                     cmdrStrategy = commander.getSkill(SkillType.S_STRATEGY).getLevel();
                 }
                 List<Entity> reinforcementEntities = new ArrayList<>();
-                
+
                 for(Unit unit : chosen) {
                     if(unit.getForceId() != assignedForceId) {
                         reinforcementEntities.add(unit.getEntity());
                     }
                 }
-                
+
                 AtBDynamicScenarioFactory.setDeploymentTurnsForReinforcements(reinforcementEntities, cmdrStrategy);
             }
         }
-        
+
         if (getCampaign().getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario) {
             ((AtBScenario) scenario).refresh(getCampaign());
         }
@@ -673,7 +667,7 @@ public final class BriefingTab extends CampaignGuiTab {
         if (chosen.size() > 0) {
             // Ensure that the MegaMek year GameOption matches the campaign year
             GameOptions gameOpts = getCampaign().getGameOptions();
-            int campaignYear = getCampaign().getCalendar().get(Calendar.YEAR);
+            int campaignYear = getCampaign().getGameYear();
             if (gameOpts.intOption("year") != campaignYear) {
                 gameOpts.getOption("year").setValue(campaignYear);
             }
@@ -708,8 +702,6 @@ public final class BriefingTab extends CampaignGuiTab {
                     // Add and run
                     chosen.add(u);
 
-                    // So MegaMek has correct crew sizes
-                    u.getEntity().getCrew().setSize(u.getActiveCrew().size());
                 } else {
                     undeployed.append("\n").append(u.getName()).append(" (").append(u.checkDeployment()).append(")");
                 }
@@ -755,9 +747,6 @@ public final class BriefingTab extends CampaignGuiTab {
                     // date!
                     u.resetPilotAndEntity();
 
-                    // So MegaMek has correct crew sizes
-                    u.getEntity().getCrew().setSize(u.getActiveCrew().size());
-
                     // Add the entity
                     chosen.add(u.getEntity());
                 } else {
@@ -784,31 +773,28 @@ public final class BriefingTab extends CampaignGuiTab {
 
         File unitFile = maybeUnitFile.get();
 
-        if (unitFile != null) {
-            if (!(unitFile.getName().toLowerCase().endsWith(".mul") //$NON-NLS-1$
-                    || unitFile.getName().toLowerCase().endsWith(".xml"))) { //$NON-NLS-1$
-                try {
-                    unitFile = new File(unitFile.getCanonicalPath() + ".mul"); //$NON-NLS-1$
-                } catch (IOException ie) {
-                    // nothing needs to be done here
-                    return;
-                }
-            }
-
+        if (!(unitFile.getName().toLowerCase().endsWith(".mul") //$NON-NLS-1$
+                || unitFile.getName().toLowerCase().endsWith(".xml"))) { //$NON-NLS-1$
             try {
-                // Save the player's entities to the file.
-                // FIXME: this is not working
-                EntityListFile.saveTo(unitFile, chosen);
-
-            } catch (IOException excep) {
-                excep.printStackTrace(System.err);
+                unitFile = new File(unitFile.getCanonicalPath() + ".mul"); //$NON-NLS-1$
+            } catch (IOException ie) {
+                // nothing needs to be done here
+                return;
             }
+        }
+
+        try {
+            // Save the player's entities to the file.
+            // FIXME: this is not working
+            EntityListFile.saveTo(unitFile, chosen);
+        } catch (IOException e) {
+            MekHQ.getLogger().error(getClass(), "deployListFile", e);
         }
 
         if (undeployed.length() > 0) {
             JOptionPane.showMessageDialog(getFrame(),
-                    "The following units could not be deployed:" + undeployed.toString(), "Could not deploy some units",
-                    JOptionPane.WARNING_MESSAGE);
+                    "The following units could not be deployed:" + undeployed.toString(),
+                    "Could not deploy some units", JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -881,7 +867,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see mekhq.gui.CampaignGuiTab#refreshAll()
      */
     @Override
@@ -902,11 +888,11 @@ public final class BriefingTab extends CampaignGuiTab {
             if (null != m) {
                 selectedMission = m.getId();
                 if (getCampaign().getCampaignOptions().getUseAtB() && m instanceof AtBContract) {
-                    scrollMissionView.setViewportView(new AtBContractViewPanel((AtBContract) m, getCampaign()));
+                    scrollMissionView.setViewportView(new AtBContractViewPanel((AtBContract) m, getCampaign(), getCampaignGui()));
                 } else if (m instanceof Contract) {
-                    scrollMissionView.setViewportView(new ContractViewPanel((Contract) m));
+                    scrollMissionView.setViewportView(new ContractViewPanel((Contract) m, getCampaignGui()));
                 } else {
-                    scrollMissionView.setViewportView(new MissionViewPanel(m));
+                    scrollMissionView.setViewportView(new MissionViewPanel(m, getCampaignGui()));
                 }
                 // This odd code is to make sure that the scrollbar stays at the
                 // top
@@ -947,7 +933,7 @@ public final class BriefingTab extends CampaignGuiTab {
         splitScenario.getBottomComponent().setVisible(getCampaignOptions().getUseAtB());
         splitScenario.resetToPreferredSizes();
     }
-    
+
     @Subscribe
     public void handle(ScenarioChangedEvent ev) {
         if (ev.getScenario() != null && ev.getScenario().getMissionId() == selectedMission) {
@@ -957,12 +943,12 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
     }
-    
+
     @Subscribe
     public void handle(ScenarioResolvedEvent ev) {
         missionsScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(OrganizationChangedEvent ev) {
         scenarioDataScheduler.schedule();
@@ -970,32 +956,32 @@ public final class BriefingTab extends CampaignGuiTab {
             lanceAssignmentScheduler.schedule();
         }
     }
-    
+
     @Subscribe
     public void handle(ScenarioNewEvent ev) {
         scenarioDataScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(ScenarioRemovedEvent ev) {
         scenarioDataScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(MissionNewEvent ev) {
         missionsScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(MissionRemovedEvent ev) {
         missionsScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(MissionCompletedEvent ev) {
         missionsScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(MissionChangedEvent ev) {
         if (ev.getMission().getId() == selectedMission) {

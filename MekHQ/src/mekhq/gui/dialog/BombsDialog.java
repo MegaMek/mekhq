@@ -96,7 +96,7 @@ public class BombsDialog extends JDialog implements ActionListener {
         }
         
         bombPanel = new BombChoicePanel(bomber, campaign.getGameOptions().booleanOption("at2_nukes"),
-                campaign.getGameOptions().booleanOption("allow_advanced_ammo"), typeMax);
+                true, typeMax);
 
         //Set up the display of this dialog.
         JScrollPane scroller = new JScrollPane(bombPanel);

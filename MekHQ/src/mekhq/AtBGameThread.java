@@ -18,13 +18,18 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
+import javax.swing.JOptionPane;
 
 import megamek.client.Client;
 import megamek.client.bot.BotClient;
@@ -46,7 +51,7 @@ import mekhq.campaign.unit.Unit;
 
 /**
  * @author Neoancient
- * 
+ *
  * Enhanced version of GameThread which imports settings and non-player
  * units into the MM game
  *
@@ -63,6 +68,13 @@ public class AtBGameThread extends GameThread {
         super(name, c, app, units, started);
         this.scenario = scenario;
     }
+
+    // String tokens for dialog boxes used for transport loading
+    private static final String LOAD_FTR_DIALOG_TEXT = "Would you like the fighters assigned to %s to deploy loaded into its bays?";
+    private static final String LOAD_FTR_DIALOG_TITLE = "Load Fighters on Transport?";
+    private static final String LOAD_GND_DIALOG_TEXT = "Would you like the ground units assigned to %s to deploy loaded into its bays?";
+    private static final String LOAD_GND_DIALOG_TITLE = "Load Ground Units on Transport?";
+
 
     @Override
     public void run() {
@@ -97,11 +109,11 @@ public class AtBGameThread extends GameThread {
             // phase
             for (int i = 0; (i < 1000) && (client.getGame().getPhase() == IGame.Phase.PHASE_UNKNOWN); i++) {
                 Thread.sleep(50);
-                System.out.println("Thread in unknown stage" );
+                MekHQ.getLogger().error(getClass(), "run", "Thread in unknown stage" );
             }
 
             if (((client.getGame() != null) && (client.getGame().getPhase() == IGame.Phase.PHASE_LOUNGE))) {
-                System.out.println("Thread in lounge" );
+                MekHQ.getLogger().info(getClass(), "run", "Thread in lounge" );
 
                 client.getLocalPlayer().setCamoCategory(app.getCampaign().getCamoCategory());
                 client.getLocalPlayer().setCamoFileName(app.getCampaign().getCamoFileName());
@@ -116,13 +128,13 @@ public class AtBGameThread extends GameThread {
                 MapSettings mapSettings = MapSettings.getInstance();
 
                 // if the scenario is taking place in space, do space settings instead
-                if((scenario instanceof AtBScenario) &&
+                if ((scenario instanceof AtBScenario) &&
                         scenario.getTerrainType() == AtBScenario.TER_SPACE) {
                     mapSettings.setMedium(MapSettings.MEDIUM_SPACE);
                 } else {
                     File mapgenFile = new File("data/mapgen/" + scenario.getMap() + ".xml");
-                    try {
-                        mapSettings = MapSettings.getInstance(new FileInputStream(mapgenFile));
+                    try (InputStream is = new FileInputStream(mapgenFile)) {
+                        mapSettings = MapSettings.getInstance(is);
                     } catch (FileNotFoundException ex) {
                         MekHQ.getLogger().log(getClass(), "run", LogLevel.ERROR, //$NON-NLS-1$
                                 "Could not load map file data/mapgen/" + scenario.getMap() + ".xml"); //$NON-NLS-1$
@@ -141,7 +153,7 @@ public class AtBGameThread extends GameThread {
                 client.sendMapSettings(mapSettings);
                 Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
 
-                PlanetaryConditions planetaryConditions = new PlanetaryConditions(); 
+                PlanetaryConditions planetaryConditions = new PlanetaryConditions();
                 planetaryConditions.setLight(scenario.getLight());
                 planetaryConditions.setWeather(scenario.getWeather());
                 planetaryConditions.setWindStrength(scenario.getWind());
@@ -179,10 +191,20 @@ public class AtBGameThread extends GameThread {
                 for (Unit unit : units) {
                     // Get the Entity
                     Entity entity = unit.getEntity();
-                    // Set the TempID for autoreporting
+                    // Set the TempID for auto reporting
                     entity.setExternalIdAsString(unit.getId().toString());
                     // Set the owner
-                    entity.setOwner(client.getLocalPlayer()); 
+                    entity.setOwner(client.getLocalPlayer());
+                    if (!unit.getTransportedUnits().isEmpty()) {
+                        //Store this unit as a potential transport to load
+                        scenario.getPlayerTransportLinkages().put(unit.getId(), new ArrayList<>());
+                    }
+                    // If this unit is a spacecraft, set the crew size and marine size values
+                    if (entity.isLargeCraft() || (entity.getUnitType() == UnitType.SMALL_CRAFT)) {
+                        entity.setNCrew(unit.getActiveCrew().size());
+                        //TODO: Change this when marines are fully implemented
+                        entity.setNMarines(unit.getMarineCount());
+                    }
                     // Calculate deployment round
                     int deploymentRound = entity.getDeployRound();
                     if(!(scenario instanceof AtBDynamicScenario)) {
@@ -207,8 +229,37 @@ public class AtBGameThread extends GameThread {
                     entity.setDeployRound(deploymentRound);
                     // Add Mek to game
                     client.sendAddEntity(entity);
-                    // Wait a few secs to not overuse bandwith
+                    // Wait a few secs to not overuse bandwidth
                     Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
+                }
+                // Run through the units again. This time add transported units to the correct linkage,
+                // but only if the transport itself is in the game too.
+                for (Unit unit : units) {
+                    if (unit.hasTransportShipId()) {
+                        for (UUID trnId : unit.getTransportShipId().keySet()) {
+                            if (!scenario.getPlayerTransportLinkages().containsKey(trnId)) {
+                                continue;
+                            }
+
+                            scenario.addPlayerTransportRelationship(trnId, unit.getId());
+                            // Set these flags so we know what prompts to display later
+                            if (unit.getEntity().isAero()) {
+                                campaign.getUnit(trnId).setCarryingAero(true);
+                            } else {
+                                campaign.getUnit(trnId).setCarryingGround(true);
+                            }
+                        }
+                    }
+                }
+                // Now, clean the list of any transports that don't have deployed units in the game
+                Set<UUID> emptyTransports = new HashSet<>();
+                for (UUID id : scenario.getPlayerTransportLinkages().keySet()) {
+                    if (scenario.getPlayerTransportLinkages().get(id).isEmpty()) {
+                        emptyTransports.add(id);
+                    }
+                }
+                for (UUID id : emptyTransports) {
+                    scenario.getPlayerTransportLinkages().remove(id);
                 }
 
                 /* Add player-controlled ally units */
@@ -266,10 +317,48 @@ public class AtBGameThread extends GameThread {
                     swingGui.getBots().put(name, botClient);
 
                     configureBot(botClient, bf);
-                    
+
                     // we need to wait until the game has actually started to do transport loading
+                    // This will load the bot's infantry into APCs
                     if(scenario instanceof AtBScenario) {
                         AtBDynamicScenarioFactory.loadTransports((AtBScenario) scenario, botClient);
+                    }
+                }
+                
+                // All player and bot units have been added to the lobby
+                // Prompt the player to auto-load units into transports
+                if (!scenario.getPlayerTransportLinkages().isEmpty()) {
+                    for (UUID id : scenario.getPlayerTransportLinkages().keySet()) {
+                        boolean loadFighters = false;
+                        boolean loadGround = false;
+                        Unit transport = campaign.getUnit(id);
+                        Set<Integer> toLoad = new HashSet<>();
+                        // Let the player choose to load fighters and/or ground units on each transport
+                        if (transport.isCarryingAero()) {
+                            loadFighters = (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
+                                                String.format(AtBGameThread.LOAD_FTR_DIALOG_TEXT, transport.getName()),
+                                                AtBGameThread.LOAD_FTR_DIALOG_TITLE, JOptionPane.YES_NO_OPTION));
+                        }
+                        if (transport.isCarryingGround()) {
+                            loadGround = (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
+                                    String.format(AtBGameThread.LOAD_GND_DIALOG_TEXT, transport.getName()),
+                                    AtBGameThread.LOAD_GND_DIALOG_TITLE, JOptionPane.YES_NO_OPTION));
+                        }
+                        // Now, send the load commands
+                        if (loadFighters || loadGround) {
+                            // List of technicians assigned to transported units. Several units can share a tech.
+                            Set<UUID> cargoTechs = new HashSet<>();
+                            for (UUID cargoId : scenario.getPlayerTransportLinkages().get(id)) {
+                                //Convert the list of Unit UUIDs to MM EntityIds
+                                toLoad.add(campaign.getUnit(cargoId).getEntity().getId());
+                                cargoTechs.add(campaign.getUnit(cargoId).getTech().getId());
+                            }
+                            //Update the transport's passenger count with assigned techs
+                            transport.getEntity().setNPassenger(transport.getEntity().getNPassenger() + (cargoTechs.size()));
+                            client.sendUpdateEntity(transport.getEntity());
+                            //And now load the units. Unit crews load as passengers here.
+                            Utilities.loadPlayerTransports(transport.getEntity().getId(), toLoad, client, loadFighters, loadGround);
+                        }
                     }
                 }
             }
@@ -292,7 +381,7 @@ public class AtBGameThread extends GameThread {
     /**
      * wait for the server to add the bot client, then send starting position,
      * camo, and entities
-     * 
+     *
      * @param botClient
      * @param botForce
      */
@@ -320,7 +409,7 @@ public class AtBGameThread extends GameThread {
                 botClient.getLocalPlayer().setTeam(botForce.getTeam());
                 botClient.getLocalPlayer().setStartingPos(botForce.getStart());
 
-                if (botForce.getCamoCategory() == Player.NO_CAMO) {
+                if (botForce.getCamoCategory().equals(Player.NO_CAMO)) {
                     if (botForce.getColorIndex() >= 0) {
                         botClient.getLocalPlayer().setColorIndex(botForce.getColorIndex());
                     }
@@ -333,6 +422,6 @@ public class AtBGameThread extends GameThread {
             }
         } catch (Exception e) {
             MekHQ.getLogger().error(getClass(), "configureBot", e); //$NON-NLS-1$
-        }    	
+        }
     }
 }

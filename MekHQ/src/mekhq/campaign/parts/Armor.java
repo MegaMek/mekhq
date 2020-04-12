@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
+import java.util.Objects;
 
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
@@ -146,6 +147,11 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public String getDetails() {
+        return getDetails(true);
+    }
+
+    @Override
+    public String getDetails(boolean includeRepairDetails) {
         if(null != unit) {
             String rearMount = "";
             if(rear) {
@@ -189,12 +195,14 @@ public class Armor extends Part implements IAcquisitionWork {
         return amount + amountNeeded;
     }
 
+    @Override
     public int getLocation() {
         return location;
     }
 
+    @Override
     public String getLocationName() {
-        return unit.getEntity().getLocationName(location);
+        return unit != null ? unit.getEntity().getLocationName(location) : null;
     }
 
     public boolean isRearMounted() {
@@ -221,8 +229,8 @@ public class Armor extends Part implements IAcquisitionWork {
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof Armor
-                && isSameType((Armor)part)
-                && getRefitId() == part.getRefitId();
+                && Objects.equals(getRefitId(), part.getRefitId())
+                && isSameType((Armor)part);
     }
 
     @Override
@@ -234,7 +242,7 @@ public class Armor extends Part implements IAcquisitionWork {
     public TechAdvancement getTechAdvancement() {
         return EquipmentType.getArmorTechAdvancement(type, clan);
     }
-    
+
     public double getArmorWeight(int points) {
         // from megamek.common.Entity.getArmorWeight()
 
@@ -254,31 +262,51 @@ public class Armor extends Part implements IAcquisitionWork {
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<amount>"
-                +amount
-                +"</amount>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<type>"
-                +type
-                +"</type>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<location>"
-                +location
-                +"</location>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<rear>"
-                +rear
-                +"</rear>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<amountNeeded>"
-                +amountNeeded
-                +"</amountNeeded>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<clan>"
-                +clan
-                +"</clan>");
+        String level1 = MekHqXmlUtil.indentStr(indent+1);
+        StringBuilder builder = new StringBuilder(128);
+        builder.append(level1)
+            .append("<amount>")
+                .append(amount)
+                .append("</amount>")
+                .append(NL);
+        builder.append(level1)
+                .append("<type>")
+                .append(type)
+                .append("</type>")
+                .append(NL);
+        builder.append(level1)
+                .append("<location>")
+                .append(location)
+                .append("</location>")
+                .append(NL);
+        builder.append(level1)
+                .append("<rear>")
+                .append(rear)
+                .append("</rear>")
+                .append(NL);
+        builder.append(level1)
+                .append("<amountNeeded>")
+                .append(amountNeeded)
+                .append("</amountNeeded>")
+                .append(NL);
+        builder.append(level1)
+                .append("<clan>")
+                .append(clan)
+                .append("</clan>")
+                .append(NL);
+        pw1.print(builder.toString());
+        writeAdditionalFields(pw1, indent + 1);
         writeToXmlEnd(pw1, indent);
+    }
+
+    /**
+     * This should be overridden by subclasses that need to write additional fields
+     *
+     * @param pw      The writer instance
+     * @param indent  The amount to indent the xml output
+     */
+    protected void writeAdditionalFields(PrintWriter pw, int indent) {
+        // do nothing
     }
 
     @Override
@@ -306,8 +334,13 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public void fix() {
+        if (unit.getEntity().isCapitalScale()) {
+            amountNeeded *= 10;
+        }
         int amountFound = Math.min(getAmountAvailable(), amountNeeded);
-        int fixAmount = Math.min(amount + amountFound, unit.getEntity().getOArmor(location, rear));
+        int fixAmount = Math.min(amount +
+                // Make sure that we handle the capital scale conversion when setting the fix amount
+                (unit.getEntity().isCapitalScale() ? (amountFound / 10) : amountFound), unit.getEntity().getOArmor(location, rear));
         unit.getEntity().setArmor(fixAmount, location, rear);
         changeAmountAvailable(-1 * amountFound);
         updateConditionFromEntity(false);
@@ -353,6 +386,10 @@ public class Armor extends Part implements IAcquisitionWork {
     public void remove(boolean salvage) {
         unit.getEntity().setArmor(IArmorState.ARMOR_DESTROYED, location, rear);
         if(salvage) {
+            // Account for capital-scale units when warehouse armor is stored at standard scale.
+            if (unit.getEntity().isCapitalScale()) {
+                amount *= 10;
+            }
             changeAmountAvailable(amount);
         }
         updateConditionFromEntity(false);
@@ -463,7 +500,7 @@ public class Armor extends Part implements IAcquisitionWork {
     @Override
     public String getAcquisitionDisplayName() {
         return getName();
-    }    
+    }
 
     @Override
     public String getAcquisitionExtraDesc() {
@@ -529,31 +566,30 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     public int getAmountAvailable() {
-        for(Part part : campaign.getSpareParts()) {
-            if(part instanceof Armor) {
-                Armor a = (Armor)part;
-                if(isSameType(a) && !a.isReservedForRefit() && a.isPresent()) {
-                    return a.getAmount();
-                }
-            }
-        }
-        return 0;
+        Armor a = (Armor)campaign.findSparePart(part -> {
+            return part instanceof Armor
+                && part.isPresent()
+                && !part.isReservedForRefit()
+                && isSameType((Armor)part);
+        });
+
+        return a != null ? a.getAmount() : 0;
     }
 
     public void changeAmountAvailable(int amount) {
-        Armor a = null;
-        for(Part part : campaign.getSpareParts()) {
-            if(part instanceof Armor && isSameType((Armor)part)
-                    && getRefitId() == part.getRefitId()
-                    && part.isPresent()) {
-                a = (Armor)part;
-                a.setAmount(a.getAmount() + amount);
-                break;
+        Armor a = (Armor)campaign.findSparePart(part -> {
+            return part instanceof Armor
+                && part.isPresent()
+                && Objects.equals(getRefitId(), part.getRefitId())
+                && isSameType((Armor)part);
+        });
+
+        if (null != a) {
+            a.setAmount(a.getAmount() + amount);
+            if (a.getAmount() <= 0) {
+                campaign.removePart(a);
             }
-        }
-        if(null != a && a.getAmount() <= 0) {
-            campaign.removePart(a);
-        } else if(null == a && amount > 0) {
+        } else if (amount > 0) {
             campaign.addPart(new Armor(getUnitTonnage(), type, amount, -1, false, isClanTechBase(), campaign), 0);
         }
     }
@@ -572,7 +608,7 @@ public class Armor extends Part implements IAcquisitionWork {
                 remove(false);
             } else {
                 skillMin = SkillType.EXP_GREEN;
-                changeAmountAvailable(-1 * Math.min(amountNeeded, getAmountAvailable()));
+                changeAmountAvailable(-1 * Math.min((unit.getEntity().isCapitalScale() ? (amountNeeded * 10) : amountNeeded), getAmountAvailable()));
             }
         }
         return " <font color='red'><b> failed." + scrap + "</b></font>";

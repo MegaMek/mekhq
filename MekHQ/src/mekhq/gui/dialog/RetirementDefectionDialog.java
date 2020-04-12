@@ -57,6 +57,7 @@ import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.RetirementDefectionTracker;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.PersonnelTab;
@@ -281,7 +282,7 @@ public class RetirementDefectionDialog extends JDialog {
                     }
                 }
             });
- 
+
             JScrollPane scroll = new JScrollPane();
             scroll.setViewportView(personnelTable);
             scroll.setPreferredSize(new Dimension(500, 500));
@@ -656,7 +657,9 @@ public class RetirementDefectionDialog extends JDialog {
                     (nGroup == PersonnelTab.PG_COMBAT && type <= Person.T_SPACE_GUNNER) ||
                     (nGroup == PersonnelTab.PG_SUPPORT && type > Person.T_SPACE_GUNNER) ||
                     (nGroup == PersonnelTab.PG_MW && type == Person.T_MECHWARRIOR) ||
-                    (nGroup == PersonnelTab.PG_CREW && (type == Person.T_GVEE_DRIVER || type == Person.T_NVEE_DRIVER || type == Person.T_VTOL_PILOT || type == Person.T_VEE_GUNNER)) ||
+                    (nGroup == PersonnelTab.PG_CREW && (type == Person.T_GVEE_DRIVER
+                            || type == Person.T_NVEE_DRIVER || type == Person.T_VTOL_PILOT
+                            || type == Person.T_VEE_GUNNER || type == Person.T_VEHICLE_CREW)) ||
                     (nGroup == PersonnelTab.PG_PILOT && type == Person.T_AERO_PILOT) ||
                     (nGroup == PersonnelTab.PG_CPILOT && type == Person.T_CONV_PILOT) ||
                     (nGroup == PersonnelTab.PG_PROTO && type == Person.T_PROTO_PILOT) ||
@@ -669,19 +672,16 @@ public class RetirementDefectionDialog extends JDialog {
                         ) {
                     return person.isActive() || results;
                 }
-                if ((nGroup == PersonnelTab.PG_MIA && person.getStatus() == Person.S_MIA) ||
-                        (nGroup == PersonnelTab.PG_KIA && person.getStatus() == Person.S_KIA) ||
-                        (nGroup == PersonnelTab.PG_RETIRE && person.getStatus() == Person.S_RETIRED)) {
-                    return true;
-                }
-                return false;
+                return ((nGroup == PersonnelTab.PG_MIA) && (person.getStatus() == PersonnelStatus.MIA))
+                        || ((nGroup == PersonnelTab.PG_KIA) && (person.getStatus() == PersonnelStatus.KIA))
+                        || ((nGroup == PersonnelTab.PG_RETIRE) && (person.getStatus() == PersonnelStatus.RETIRED));
             }
         };
         sorter.setRowFilter(personTypeFilter);
     }
 
     public void filterUnits() {
-        RowFilter<UnitAssignmentTableModel, Integer> unitTypeFilter = null;
+        RowFilter<UnitAssignmentTableModel, Integer> unitTypeFilter;
         final int nGroup = cbUnitCategory.getSelectedIndex() - 1;
         unitTypeFilter = new RowFilter<UnitAssignmentTableModel, Integer>() {
             @Override

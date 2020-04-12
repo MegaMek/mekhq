@@ -7,12 +7,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -49,9 +49,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -75,19 +77,18 @@ import javax.swing.JViewport;
 import javax.swing.Timer;
 import javax.vecmath.Vector2d;
 
+import mekhq.MekHQ;
 import org.joda.time.DateTime;
 
-import megamek.common.Compute;
 import megamek.common.EquipmentType;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
-import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.Planet.SocioIndustrialData;
-import mekhq.campaign.universe.Planets;
-import mekhq.gui.dialog.NewPlanetaryEventDialog;
+import mekhq.campaign.universe.SocioIndustrialData;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.Systems;
 
 /**
  * This is not functional yet. Just testing things out.
@@ -96,7 +97,7 @@ import mekhq.gui.dialog.NewPlanetaryEventDialog;
  */
 public class InterstellarMapPanel extends JPanel {
     private static final long serialVersionUID = -1110105822399704646L;
-    
+
     private static final Vector2d[] BASE_HEXCOORDS = {
         new Vector2d(1.0, 0.0),
         new Vector2d(Math.cos(Math.PI / 3.0), Math.sin(Math.PI / 3.0)),
@@ -111,7 +112,7 @@ public class InterstellarMapPanel extends JPanel {
     private JViewport optionView;
     private JPanel optionPanel;
     private JButton optionButton;
-    
+
     // Map view options
     private JRadioButton optFactions;
     private JRadioButton optTech;
@@ -119,6 +120,9 @@ public class InterstellarMapPanel extends JPanel {
     private JRadioButton optRawMaterials;
     private JRadioButton optOutput;
     private JRadioButton optAgriculture;
+    private JRadioButton optPopulation;
+    private JRadioButton optHPG;
+    private JRadioButton optRecharge;
 
     private JCheckBox optEmptySystems;
     private JCheckBox optHPGNetwork;
@@ -126,13 +130,14 @@ public class InterstellarMapPanel extends JPanel {
 
     private Timer optionPanelTimer;
     private boolean optionPanelHidden;
-    
-    private ArrayList<Planet> planets;
+
+    private ArrayList<PlanetarySystem> systems;
+
     private JumpPath jumpPath;
     private Campaign campaign;
     private InnerStellarMapConfig conf = new InnerStellarMapConfig();
     private CampaignGUI hqview;
-    private Planet selectedPlanet = null;
+    private PlanetarySystem selectedSystem = null;
     private Point lastMousePos = null;
     private int mouseMod = 0;
 
@@ -144,13 +149,13 @@ public class InterstellarMapPanel extends JPanel {
 
     public InterstellarMapPanel(Campaign c, CampaignGUI view) {
         campaign = c;
-        planets = campaign.getPlanets();
+        systems = campaign.getSystems();
         hqview = view;
         jumpPath = new JumpPath();
         optionPanelHidden = true;
         optionPanelTimer = new Timer(50, new ActionListener() {
             Point viewPoint = new Point();
-            
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 int width = optionView.getWidth();
@@ -253,24 +258,24 @@ public class InterstellarMapPanel extends JPanel {
                     popup.add(item);
                     JMenu centerM = new JMenu("Center Map");
                     item = new JMenuItem("On Selected Planet");
-                    item.setEnabled(selectedPlanet != null);
-                    if (selectedPlanet != null) {// only add if there is a planet to center on
+                    item.setEnabled(selectedSystem != null);
+                    if (selectedSystem != null) {// only add if there is a planet to center on
                         item.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent ae) {
-                                center(selectedPlanet);
+                                center(selectedSystem);
                             }
                         });
                     }
                     centerM.add(item);
                     item = new JMenuItem("On Current Location");
-                    item.setEnabled(campaign.getCurrentPlanet() != null);
-                    if (campaign.getCurrentPlanet() != null) {// only add if there is a planet to center on
+                    item.setEnabled(campaign.getCurrentSystem() != null);
+                    if (campaign.getCurrentSystem() != null) {// only add if there is a planet to center on
                         item.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent ae) {
-                                selectedPlanet = campaign.getCurrentPlanet();
-                                center(campaign.getCurrentPlanet());
+                                selectedSystem = campaign.getCurrentSystem();
+                                center(campaign.getCurrentSystem());
                             }
                         });
                     }
@@ -318,7 +323,7 @@ public class InterstellarMapPanel extends JPanel {
                                     ImageIO.write(img, "png", file.get());
                                 }
                             } catch (IOException e) {
-                                e.printStackTrace();
+                                MekHQ.getLogger().error(getClass(), "maybeShowPopup", e);
                             }
                             conf.centerX = originalX;
                             conf.centerY = originalY;
@@ -329,33 +334,46 @@ public class InterstellarMapPanel extends JPanel {
                     popup.add(item);
                     JMenu menuGM = new JMenu("GM Mode");
                     item = new JMenuItem("Move to selected planet");
-                    item.setEnabled(selectedPlanet != null && campaign.isGM());
-                    if (selectedPlanet != null) {// only add if there is a planet to center on
+                    item.setEnabled(selectedSystem != null  && campaign.isGM());
+                    if (selectedSystem != null) {// only add if there is a planet to center on
                         item.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent ae) {
-                                campaign.getLocation().setCurrentPlanet(selectedPlanet);
-                                campaign.getLocation().setTransitTime(0.0);
-                                campaign.getLocation().setJumpPath(null);
+                                campaign.moveToPlanetarySystem(selectedSystem);
                                 jumpPath = new JumpPath();
-                                center(selectedPlanet);
-                                hqview.refreshLocation();
+                                center(selectedSystem);
                             }
                         });
                     }
                     menuGM.add(item);
+                    /*
+                     * TODO: re-enable this later
                     item = new JMenuItem("Edit planetary events");
-                    item.setEnabled(selectedPlanet != null && campaign.isGM());
-                    if (selectedPlanet != null) {
-                        item.setText("Edit planetary events for " + selectedPlanet.getPrintableName(Utilities.getDateTimeDay(campaign.getCalendar())));
+                    item.setEnabled(selectedSystem != null && campaign.isGM());
+                    if (selectedSystem != null) {
+                        item.setText("Edit planetary events for " + selectedSystem.getPrintableName(Utilities.getDateTimeDay(campaign.getCalendar())));
                         item.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent ae) {
-                                openPlanetEventEditor(selectedPlanet);
+                                openPlanetEventEditor(selectedSystem);
                             }
                         });
                     }
                     menuGM.add(item);
+                    */
+
+                    item = new JMenuItem("Recharge Jumpdrive");
+                    item.setEnabled(campaign.getLocation().isRecharging(campaign) && campaign.isGM());
+                    item.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent ae) {
+                            campaign.getLocation().setRecharged(campaign);
+                            campaign.addReport("GM: Jumpship drives fully charged");
+                            hqview.refreshLocation();
+                        }
+                    });
+                    menuGM.add(item);
+
                     popup.add(menuGM);
                     popup.show(e.getComponent(), e.getX() + 10, e.getY() + 10);
                 }
@@ -365,21 +383,23 @@ public class InterstellarMapPanel extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON1) {
                     if (e.getClickCount() >= 2) {
-                        //center and zoom
-                        changeSelectedPlanet(nearestNeighbour(scr2mapX(e.getX()), scr2mapY(e.getY())));
+                      //center and zoom
+                        changeSelectedSystem(nearestNeighbour(scr2mapX(e.getX()), scr2mapY(e.getY())));
                         if(conf.scale < 4.0) {
                             conf.scale = 4.0;
                         }
-                        center(selectedPlanet);
+                        center(selectedSystem);
+                        //bring up planetary system map
+                        hqview.getMapTab().switchPlanetaryMap(selectedSystem);
                     } else {
-                        Planet target = nearestNeighbour(scr2mapX(e.getX()), scr2mapY(e.getY()));
+                        PlanetarySystem target = nearestNeighbour(scr2mapX(e.getX()), scr2mapY(e.getY()));
                         if(null == target) {
                             return;
                         }
                         if(e.isAltDown()) {
                             //calculate a new jump path from the current location
-                            jumpPath = campaign.calculateJumpPath(campaign.getCurrentPlanet(), target);
-                            selectedPlanet = target;
+                            jumpPath = campaign.calculateJumpPath(campaign.getCurrentSystem(), target);
+                            selectedSystem = target;
                             repaint();
                             notifyListeners();
                             return;
@@ -387,21 +407,21 @@ public class InterstellarMapPanel extends JPanel {
                         }
                         else if(e.isShiftDown()) {
                             //add to the existing jump path
-                            Planet lastPlanet = jumpPath.getLastPlanet();
-                            if(null == lastPlanet) {
-                                lastPlanet = campaign.getCurrentPlanet();
+                            PlanetarySystem lastSystem = jumpPath.getLastSystem();
+                            if(null == lastSystem) {
+                                lastSystem = campaign.getCurrentSystem();
                             }
-                            JumpPath addPath = campaign.calculateJumpPath(lastPlanet, target);
+                            JumpPath addPath = campaign.calculateJumpPath(lastSystem, target);
                               if(!jumpPath.isEmpty()) {
-                                  addPath.removeFirstPlanet();
+                                  addPath.removeFirstSystem();
                               }
-                            jumpPath.addPlanets(addPath.getPlanets());
-                              selectedPlanet = target;
+                            jumpPath.addSystems(addPath.getSystems());
+                            selectedSystem = target;
                               repaint();
                               notifyListeners();
                               return;
                         }
-                        changeSelectedPlanet(target);
+                        changeSelectedSystem(target);
                         repaint();
                     }
                 }
@@ -440,7 +460,7 @@ public class InterstellarMapPanel extends JPanel {
                  zoom(Math.pow(1.5,-1 * e.getWheelRotation()), e.getPoint());
              }
         });
-        
+
         pane = new JLayeredPane();
         mapPanel = new JPanel() {
             private static final long serialVersionUID = -6666762147393179909L;
@@ -453,7 +473,7 @@ public class InterstellarMapPanel extends JPanel {
                 g2.fillRect(0, 0, getWidth(), getHeight());
                 double size = 1 + 5 * Math.log(conf.scale);
                 size = Math.max(Math.min(size, conf.maxdotSize), conf.minDotSize);
-                
+
                 final Stroke thick = new BasicStroke(2.0f);
                 final Stroke thin = new BasicStroke(1.2f);
                 final Stroke dashed = new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{3}, 0);
@@ -465,19 +485,19 @@ public class InterstellarMapPanel extends JPanel {
                 maxX = scr2mapX(getWidth() + size * 2.0);
                 maxY = scr2mapY(- size * 2.0);
                 now = Utilities.getDateTimeDay(campaign.getCalendar());
-                
+
                 Arc2D.Double arc = new Arc2D.Double();
                 //first get the jump diameter for selected planet
-                if(null != selectedPlanet && conf.scale > conf.showPlanetNamesThreshold) {
-                    double x = map2scrX(selectedPlanet.getX());
-                    double y = map2scrY(selectedPlanet.getY());
-                    double z = map2scrX(selectedPlanet.getX() + 30);
+                if(null != selectedSystem && conf.scale > conf.showPlanetNamesThreshold) {
+                    double x = map2scrX(selectedSystem.getX());
+                    double y = map2scrY(selectedSystem.getY());
+                    double z = map2scrX(selectedSystem.getX() + 30);
                     double jumpRadius = (z - x);
                     g2.setPaint(Color.DARK_GRAY);
                     arc.setArcByCenter(x, y, jumpRadius, 0, 360, Arc2D.OPEN);
                     g2.fill(arc);
                     if(optHPGNetwork.isSelected()) {
-                        z = map2scrX(selectedPlanet.getX() + 50);
+                        z = map2scrX(selectedSystem.getX() + 50);
                         jumpRadius = (z - x);
                         g2.setPaint(darkCyan);
                         g2.setStroke(dotted);
@@ -485,7 +505,7 @@ public class InterstellarMapPanel extends JPanel {
                         g2.draw(arc);
                     }
                 }
-                
+
                 if((conf.scale > 1.0) && optISWAreas.isSelected()) {
                     // IDEA: Allow for different hex sizes later on.
                     final double HEX_SIZE = 30.0;
@@ -505,12 +525,12 @@ public class InterstellarMapPanel extends JPanel {
                             Paint factionPaint = new Color(0.0f, 0.0f, 0.0f, 0.25f);
                             Paint linePaint = new Color(1.0f, 1.0f, 1.0f, 0.25f);
                             Set<Faction> hexFactions = new HashSet<>();
-                            for(Planet planet : Planets.getInstance().getNearbyPlanets(coordX, coordY, (int) Math.round(HEX_SIZE * 1.3))) {
-                                if(!isPlanetEmpty(planet) && path.contains(planet.getX(), planet.getY())) {
-                                    hexFactions.addAll(planet.getFactionSet(now));
+                            for(PlanetarySystem system : Systems.getInstance().getNearbySystems(coordX, coordY, (int) Math.round(HEX_SIZE * 1.3))) {
+                                if(!isSystemEmpty(system) && path.contains(system.getX(), system.getY())) {
+                                    hexFactions.addAll(system.getFactionSet(now));
                                 }
                             }
-                            
+
                             path.transform(transform);
 
                             if(hexFactions.size() == 1) {
@@ -539,7 +559,7 @@ public class InterstellarMapPanel extends JPanel {
                                     paintColors[i * 2 + 1] = factionColor;
                                 }
                                 paintFractions[0] = 0.0f;
-                                
+
                                 // Determine where to anchor the stripes
                                 Point2D firstPoint = new Point2D.Double(map2scrX(coordX), map2scrY(coordY));
                                 Point2D secondPoint = new Point2D.Double(
@@ -561,13 +581,13 @@ public class InterstellarMapPanel extends JPanel {
                         }
                     }
                 }
-                
+
                 //draw a jump path
                 g2.setStroke(new BasicStroke(1.0f));
                 for(int i = 0; i < jumpPath.size(); i++) {
-                    Planet planetB = jumpPath.get(i);
-                    double x = map2scrX(planetB.getX());
-                    double y = map2scrY(planetB.getY());
+                    PlanetarySystem systemB = jumpPath.get(i);
+                    double x = map2scrX(systemB.getX());
+                    double y = map2scrY(systemB.getY());
                     //lest try rings
                     g2.setPaint(Color.WHITE);
                     arc.setArcByCenter(x, y, size * 1.8, 0, 360, Arc2D.OPEN);
@@ -582,22 +602,22 @@ public class InterstellarMapPanel extends JPanel {
                     arc.setArcByCenter(x, y, size * 1.2, 0, 360, Arc2D.OPEN);
                     g2.fill(arc);
                     if(i > 0) {
-                        Planet planetA = jumpPath.get(i-1);
+                        PlanetarySystem systemA = jumpPath.get(i-1);
                         g2.setPaint(Color.WHITE);
-                        g2.draw(new Line2D.Double(map2scrX(planetA.getX()), map2scrY(planetA.getY()), map2scrX(planetB.getX()), map2scrY(planetB.getY())));
+                        g2.draw(new Line2D.Double(map2scrX(systemA.getX()), map2scrY(systemA.getY()), map2scrX(systemB.getX()), map2scrY(systemB.getY())));
                     }
                 }
 
                 // Brute-force HPG network drawing. Will be optimised
                 if(optHPGNetwork.isSelected()) {
                     // Grab the network from the planet manager
-                    Collection<Planets.HPGLink> hpgNetwork = Planets.getInstance().getHPGNetwork(now);
-                    
-                    for(Planet planet : planets) {
-                        if(isPlanetVisible(planet, true)) {
-                            double x = map2scrX(planet.getX());
-                            double y = map2scrY(planet.getY());
-                            int hpgRating = Utilities.nonNull(planet.getHPG(now), EquipmentType.RATING_X);
+                    Collection<Systems.HPGLink> hpgNetwork = Systems.getInstance().getHPGNetwork(now);
+
+                    for(PlanetarySystem system : systems) {
+                        if(isSystemVisible(system, true)) {
+                            double x = map2scrX(system.getX());
+                            double y = map2scrY(system.getY());
+                            int hpgRating = Utilities.nonNull(system.getHPG(now), EquipmentType.RATING_X);
                             if(hpgRating == EquipmentType.RATING_A) {
                                 g2.setPaint(Color.CYAN);
                                 arc.setArcByCenter(x, y, size * 1.6, 0, 360, Arc2D.OPEN);
@@ -628,10 +648,10 @@ public class InterstellarMapPanel extends JPanel {
                             }
                         }
                     }
-                    for(Planets.HPGLink link : hpgNetwork) {
-                        Planet p1 = link.primary;
-                        Planet p2 = link.secondary;
-                        if(isPlanetVisible(p1, false) || isPlanetVisible(p2, false)) {
+                    for(Systems.HPGLink link : hpgNetwork) {
+                        PlanetarySystem p1 = link.primary;
+                        PlanetarySystem p2 = link.secondary;
+                        if(isSystemVisible(p1, false) || isSystemVisible(p2, false)) {
                             if(link.rating == EquipmentType.RATING_A) {
                                 g2.setPaint(Color.CYAN);
                                 g2.setStroke(thick);
@@ -646,14 +666,14 @@ public class InterstellarMapPanel extends JPanel {
                     }
                     g2.setStroke(new BasicStroke(1.0f));
                 }
-                
+
                 //check to see if the unit is traveling on a jump path currently and if so
                 //draw this one too, in a different color
                 if(null != campaign.getLocation().getJumpPath()) {
                     for(int i = 0; i < campaign.getLocation().getJumpPath().size(); i++) {
-                        Planet planetB = campaign.getLocation().getJumpPath().get(i);
-                        double x = map2scrX(planetB.getX());
-                        double y = map2scrY(planetB.getY());
+                        PlanetarySystem systemB = campaign.getLocation().getJumpPath().get(i);
+                        double x = map2scrX(systemB.getX());
+                        double y = map2scrY(systemB.getY());
                         //lest try rings
                         g2.setPaint(Color.YELLOW);
                         arc.setArcByCenter(x, y, size * 1.8, 0, 360, Arc2D.OPEN);
@@ -668,18 +688,24 @@ public class InterstellarMapPanel extends JPanel {
                         arc.setArcByCenter(x, y, size * 1.2, 0, 360, Arc2D.OPEN);
                         g2.fill(arc);
                         if(i > 0) {
-                            Planet planetA = campaign.getLocation().getJumpPath().get(i-1);
+                            PlanetarySystem systemA = campaign.getLocation().getJumpPath().get(i-1);
                             g2.setPaint(Color.YELLOW);
-                            g2.draw(new Line2D.Double(map2scrX(planetA.getX()), map2scrY(planetA.getY()), map2scrX(planetB.getX()), map2scrY(planetB.getY())));
+                            g2.draw(new Line2D.Double(map2scrX(systemA.getX()), map2scrY(systemA.getY()),
+                                    map2scrX(systemB.getX()), map2scrY(systemB.getY())));
                         }
                     }
                 }
 
-                for(Planet planet : planets) {
-                    if(isPlanetVisible(planet, false)) {
-                        double x = map2scrX(planet.getX());
-                        double y = map2scrY(planet.getY());
-                        if(planet.equals(campaign.getCurrentPlanet())) {
+                Map<Faction, String> capitals = new HashMap<>();
+                for (Faction faction : Faction.getFactions()) {
+                	capitals.put(faction,faction.getStartingPlanet(campaign.getGameYear()));
+                }
+
+                for(PlanetarySystem system : systems) {
+                    if(isSystemVisible(system, false)) {
+                        double x = map2scrX(system.getX());
+                        double y = map2scrY(system.getY());
+                        if(system.equals(campaign.getCurrentSystem())) {
                             //lest try rings
                             g2.setPaint(Color.ORANGE);
                             arc.setArcByCenter(x, y, size * 1.8, 0, 360, Arc2D.OPEN);
@@ -694,7 +720,7 @@ public class InterstellarMapPanel extends JPanel {
                             arc.setArcByCenter(x, y, size * 1.2, 0, 360, Arc2D.OPEN);
                             g2.fill(arc);
                         }
-                        if(null != selectedPlanet && selectedPlanet.equals(planet)) {
+                        if(null != selectedSystem && selectedSystem.equals(system)) {
                             //lest try rings
                             g2.setPaint(Color.WHITE);
                             arc.setArcByCenter(x, y, size * 1.8, 0, 360, Arc2D.OPEN);
@@ -709,14 +735,24 @@ public class InterstellarMapPanel extends JPanel {
                             arc.setArcByCenter(x, y, size * 1.2, 0, 360, Arc2D.OPEN);
                             g2.fill(arc);
                         }
-                        
+
                         //if factions are selected then we need to do it differently, because
                         //of multiple factions per planet
                         if(isFactionsSelected()) {
-	                        Set<Faction> factions = planet.getFactionSet(now);
-	                        if(null != factions && !isPlanetEmpty(planet)) {
+	                        Set<Faction> factions = system.getFactionSet(now);
+	                        if(null != factions && !isSystemEmpty(system)) {
 	                            int i = 0;
 	                            for(Faction faction : factions) {
+	                            	if (capitals.get(faction).equals(system.getId())) {
+	                            		g2.setPaint(new Color(212,175,55));
+		                                arc.setArcByCenter(x, y, size+3, 0, 360.0 * (1-((double)i)/factions.size()), Arc2D.PIE);
+		                                g2.fill(arc);
+	                            	}
+	                            	if (campaign.getCampaignOptions().getUseAtB()  && campaign.getAtBConfig().isHiringHall(system.getId(), campaign.getDate())) {
+	                            		g2.setPaint(new Color(192,192,192));
+		                                arc.setArcByCenter(x, y, size+2, 0, 360.0 * (1-((double)i)/factions.size()), Arc2D.PIE);
+		                                g2.fill(arc);
+		                            }
 	                                g2.setPaint(faction.getColor());
 	                                arc.setArcByCenter(x, y, size, 0, 360.0 * (1-((double)i)/factions.size()), Arc2D.PIE);
 	                                g2.fill(arc);
@@ -729,7 +765,7 @@ public class InterstellarMapPanel extends JPanel {
 	                            g2.fill(arc);
 	                        }
                         } else {
-	                        g2.setPaint(getPlanetColor(planet));
+	                        g2.setPaint(getSystemColor(system));
 	                        arc.setArcByCenter(x, y, size, 0, 360.0, Arc2D.PIE);
 	                        g2.fill(arc);
                         }
@@ -737,14 +773,14 @@ public class InterstellarMapPanel extends JPanel {
                 }
 
                 //cycle through planets again and assign names - to make sure names go on outside
-                for(Planet planet : planets) {
-                    if(isPlanetVisible(planet, !optEmptySystems.isSelected())) {
-                        double x = map2scrX(planet.getX());
-                        double y = map2scrY(planet.getY());
+                for(PlanetarySystem system : systems) {
+                    if(isSystemVisible(system, !optEmptySystems.isSelected())) {
+                        double x = map2scrX(system.getX());
+                        double y = map2scrY(system.getY());
                         if (conf.showPlanetNamesThreshold == 0 || conf.scale > conf.showPlanetNamesThreshold
-                                || jumpPath.contains(planet)
-                                || (null != campaign.getLocation().getJumpPath() && campaign.getLocation().getJumpPath().contains(planet))) {
-                            final String planetName = planet.getPrintableName(Utilities.getDateTimeDay(campaign.getCalendar()));
+                                || jumpPath.contains(system)
+                                || (null != campaign.getLocation().getJumpPath() && campaign.getLocation().getJumpPath().contains(system))) {
+                            final String planetName = system.getPrintableName(Utilities.getDateTimeDay(campaign.getCalendar()));
                             final float xPos = (float) (x + size * 1.8);
                             final float yPos = (float) y;
                             g2.setPaint(Color.BLACK);
@@ -760,15 +796,15 @@ public class InterstellarMapPanel extends JPanel {
             }
         };
         pane.add(mapPanel, Integer.valueOf(1));
-        
+
         optionPanel = new JPanel();
         optionPanel.setLayout(new BoxLayout(optionPanel, BoxLayout.Y_AXIS));
         optionPanel.setBackground(new Color(0, 100, 230, 200));
         optionPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
-        
+
         Icon checkboxIcon = new ImageIcon("data/images/misc/checkbox_unselected.png");
         Icon checkboxSelectedIcon = new ImageIcon("data/images/misc/checkbox_selected.png");
-        
+
         optionPanel.add(createLabel("Color:"));
 
         optFactions = createOptionRadioButton("Faction", checkboxIcon, checkboxSelectedIcon);
@@ -783,6 +819,12 @@ public class InterstellarMapPanel extends JPanel {
         optionPanel.add(optOutput);
         optAgriculture = createOptionRadioButton("Agriculture", checkboxIcon, checkboxSelectedIcon);
         optionPanel.add(optAgriculture);
+        optPopulation = createOptionRadioButton("Population", checkboxIcon, checkboxSelectedIcon);
+        optionPanel.add(optPopulation);
+        optHPG = createOptionRadioButton("HPG", checkboxIcon, checkboxSelectedIcon);
+        optionPanel.add(optHPG);
+        optRecharge = createOptionRadioButton("Recharge Stations", checkboxIcon, checkboxSelectedIcon);
+        optionPanel.add(optRecharge);
 
         ButtonGroup colorChoice = new ButtonGroup();
         colorChoice.add(optFactions);
@@ -791,10 +833,12 @@ public class InterstellarMapPanel extends JPanel {
         colorChoice.add(optRawMaterials);
         colorChoice.add(optOutput);
         colorChoice.add(optAgriculture);
-        
+        colorChoice.add(optPopulation);
+        colorChoice.add(optHPG);
+        colorChoice.add(optRecharge);
         //factions by default
         optFactions.setSelected(true);
-        
+
         optionPanel.add(Box.createRigidArea(new Dimension(0,10)));
         optionPanel.add(createLabel("Options:"));
         optEmptySystems = createOptionCheckBox("Empty systems", checkboxIcon, checkboxSelectedIcon);
@@ -823,17 +867,17 @@ public class InterstellarMapPanel extends JPanel {
 
         optionView = new JViewport();
         optionView.add(optionPanel);
-        
+
         pane.add(optionView, Integer.valueOf(10));
-        
+
         add(pane);
-        
+
         optionPanelTimer.start();
     }
 
     public void setCampaign(Campaign c) {
         this.campaign = c;
-        this.planets = campaign.getPlanets();
+        this.systems = campaign.getSystems();
         repaint();
     }
 
@@ -852,7 +896,7 @@ public class InterstellarMapPanel extends JPanel {
 
         super.paintComponent(g);
     }
-    
+
     private JLabel createLabel(String text) {
     	JLabel label = new JLabel(text);
     	label.setOpaque(false);
@@ -860,7 +904,7 @@ public class InterstellarMapPanel extends JPanel {
     	label.setFont(label.getFont().deriveFont(Font.BOLD));
     	return(label);
     }
-    
+
     private JCheckBox createOptionCheckBox(String text, Icon checkboxIcon, Icon checkboxSelectedIcon) {
         JCheckBox checkBox = new JCheckBox(text);
         checkBox.setOpaque(false);
@@ -879,7 +923,7 @@ public class InterstellarMapPanel extends JPanel {
         });
         return checkBox;
     }
-    
+
     private JRadioButton createOptionRadioButton(String text, Icon checkboxIcon, Icon checkboxSelectedIcon) {
         JRadioButton radioButton = new JRadioButton(text);
         radioButton.setOpaque(false);
@@ -898,7 +942,7 @@ public class InterstellarMapPanel extends JPanel {
         });
         return radioButton;
     }
-    
+
     private void setupHexPath(GeneralPath path, double centerX, double centerY, double radius) {
         if(null == path) {
             return;
@@ -911,7 +955,7 @@ public class InterstellarMapPanel extends JPanel {
         }
         path.closePath();
     }
-    
+
     /**
      * Computes the map-coordinate from the screen coordinate system
      */
@@ -938,24 +982,23 @@ public class InterstellarMapPanel extends JPanel {
         transform.translate(conf.centerX, - conf.centerY);
         return transform;
     }
-    
-    public void setSelectedPlanet(Planet p) {
-        selectedPlanet = p;
+    public void setSelectedSystem(PlanetarySystem p) {
+        selectedSystem = p;
         if(conf.scale < 4.0) {
             conf.scale = 4.0;
         }
-        center(selectedPlanet);
+        center(selectedSystem);
         repaint();
     }
 
      /**
      * Calculate the nearest neighbour for the given point If anyone has a better algorithm than this stupid kind of shit, please, feel free to exchange my brute force thing... An good idea would be an voronoi diagram and the sweep algorithm from Steven Fortune.
      */
-    private Planet nearestNeighbour(double x, double y) {
+    private PlanetarySystem nearestNeighbour(double x, double y) {
         double minDiff = Double.MAX_VALUE;
         double diff = 0.0;
-        Planet minPlanet = null;
-        for(Planet p : planets) {
+        PlanetarySystem minPlanet = null;
+        for(PlanetarySystem p : systems) {
             diff = Math.sqrt(Math.pow(x - p.getX(), 2) + Math.pow(y - p.getY(), 2));
             if (diff < minDiff) {
                 minDiff = diff;
@@ -965,8 +1008,8 @@ public class InterstellarMapPanel extends JPanel {
         return minPlanet;
     }
 
-    private boolean isPlanetEmpty(Planet planet) {
-        Set<Faction> factions = planet.getFactionSet(now);
+    private boolean isSystemEmpty(PlanetarySystem system) {
+        Set<Faction> factions = system.getFactionSet(now);
         if((null == factions) || factions.isEmpty()) {
             return true;
         }
@@ -976,35 +1019,35 @@ public class InterstellarMapPanel extends JPanel {
                 return false;
             }
         }
-        
+
         return true;
     }
-    
-    private boolean isPlanetVisible(Planet planet, boolean hideEmpty) {
-        if(null == planet) {
+
+    private boolean isSystemVisible(PlanetarySystem system, boolean hideEmpty) {
+        if(null == system) {
             return false;
         }
         // The current planet and the selected one are always visible
-        if(planet.equals(campaign.getCurrentPlanet()) || planet.equals(selectedPlanet)) {
+        if(system.equals(campaign.getCurrentSystem()) || system.equals(selectedSystem)) {
             return true;
         }
         // viewport check
-        double x = planet.getX().doubleValue();
-        double y = planet.getY().doubleValue();
+        double x = system.getX().doubleValue();
+        double y = system.getY().doubleValue();
         if((x < minX) || (x > maxX) || (y < minY) || (y > maxY)) {
             return false;
         }
         if(hideEmpty) {
             // Filter out "empty" systems
-            return !isPlanetEmpty(planet);
+            return !isSystemEmpty(system);
         }
         return true;
     }
-    
+
     /**
      * Activate and Center
      */
-    private void center(Planet p) {
+    private void center(PlanetarySystem p) {
 
         if (p == null) {
             return;
@@ -1022,137 +1065,194 @@ public class InterstellarMapPanel extends JPanel {
         repaint();
     }
 
-    public Planet getSelectedPlanet() {
-        return selectedPlanet;
+    public PlanetarySystem getSelectedSystem() {
+        return selectedSystem;
     }
 
     public JumpPath getJumpPath() {
         return jumpPath;
     }
 
-    private void changeSelectedPlanet(Planet p) {
-        selectedPlanet = p;
+    public void changeSelectedSystem(PlanetarySystem p) {
+        selectedSystem = p;
         jumpPath = new JumpPath();
         notifyListeners();
     }
-    
+
     /**
      * Return a planet color based on what the user has selected from the radio button options
-     * @param a Planet object
+     * @param p PlanetarySystem object
      * @return a Color
      */
-    public Color getPlanetColor(Planet p) {
-    	
-    	//color shading is from https://colorbrewer2.org and should be color-blind safe
-    	
+    public Color getSystemColor(PlanetarySystem p) {
+
+    	//color shading is from the Viridis color palettes
+
+		long pop = p.getPopulation(Utilities.getDateTimeDay(campaign.getCalendar()));
+
+		//if no population, then just return black no matter what we asked for
+		if(pop==0l) {
+			return Color.BLACK;
+		}
+
     	SocioIndustrialData socio = p.getSocioIndustrial(Utilities.getDateTimeDay(campaign.getCalendar()));
 
-    	//just for testing lets randomly fill in missing values
-    	/*if(null == socio) {
-    		socio = new SocioIndustrialData();
-    		socio.tech = Compute.d6(1)-1;
-    		socio.industry = Compute.d6(1)-1;
-    		socio.rawMaterials = Compute.d6(1)-1;
-    		socio.output = Compute.d6(1)-1;
-    		socio.agriculture = Compute.d6(1)-1;
-    	}*/
-    	
     	if(null != socio && optTech.isSelected()) {
 	    	switch(socio.tech) {
 	    		case EquipmentType.RATING_F:
-	    			return new Color(239,243,255);
 	    		case EquipmentType.RATING_E:
-	    			return new Color(198,219,239);
+	    			return new Color(68,1,84);
 	    		case EquipmentType.RATING_D:
-	    			return new Color(158,202,225);
+	    			return new Color(59,82,139);
 	    		case EquipmentType.RATING_C:
-	    			return new Color(107,174,214);
+	    			return new Color(33,144,140);
 	    		case EquipmentType.RATING_B:
-	    			return new Color(49,130,189);
+	    			return new Color(93,200,99);
 	    		case EquipmentType.RATING_A:
-	    			return new Color(8,81,156);
-	    		default: 
-	    			return Color.WHITE;
+	    			return new Color(253,231,37);
+	    		default:
+	    			return Color.BLACK;
 	    	}
     	}
     	if(null != socio && optIndustry.isSelected()) {
 	    	switch(socio.industry) {
 	    		case EquipmentType.RATING_F:
-	    			return new Color(242,240,247);
 	    		case EquipmentType.RATING_E:
-	    			return new Color(218,218,235);
+	    			return new Color(0,0,4);
 	    		case EquipmentType.RATING_D:
-	    			return new Color(188,189,220);
+	    			return new Color(81,18,124);
 	    		case EquipmentType.RATING_C:
-	    			return new Color(158,154,200);
+	    			return new Color(182,54,121);
 	    		case EquipmentType.RATING_B:
-	    			return new Color(117,107,177);
+	    			return new Color(251,136,97);
 	    		case EquipmentType.RATING_A:
-	    			return new Color(84,39,143);
-	    		default: 
-	    			return Color.WHITE;
+	    			return new Color(252,253,191);
+	    		default:
+	    			return Color.BLACK;
 	    	}
     	}
     	if(null != socio && optRawMaterials.isSelected()) {
 	    	switch(socio.rawMaterials) {
 	    		case EquipmentType.RATING_F:
-	    			return new Color(254,237,222);
 	    		case EquipmentType.RATING_E:
-	    			return new Color(253,208,162);
+	    			return new Color(13,8,135);
 	    		case EquipmentType.RATING_D:
-	    			return new Color(253,174,107);
+	    			return new Color(126,3,168);
 	    		case EquipmentType.RATING_C:
-	    			return new Color(253,141,60);
+	    			return new Color(204,70,120);
 	    		case EquipmentType.RATING_B:
-	    			return new Color(230,85,13);
+	    			return new Color(248,148,65);
 	    		case EquipmentType.RATING_A:
-	    			return new Color(166,54,3);
-	    		default: 
-	    			return Color.WHITE;
+	    			return new Color(240,249,33);
+	    		default:
+	    			return Color.BLACK;
 	    	}
     	}
     	if(null != socio && optOutput.isSelected()) {
 	    	switch(socio.output) {
 	    		case EquipmentType.RATING_F:
-	    			return new Color(254,229,217);
 	    		case EquipmentType.RATING_E:
-	    			return new Color(252,187,161);
+	    			return new Color(0,0,4);
 	    		case EquipmentType.RATING_D:
-	    			return new Color(252,146,114);
+	    			return new Color(86,15,110);
 	    		case EquipmentType.RATING_C:
-	    			return new Color(251,106,74);
+	    			return new Color(187,55,84);
 	    		case EquipmentType.RATING_B:
-	    			return new Color(222,45,38);
+	    			return new Color(249,140,10);
 	    		case EquipmentType.RATING_A:
-	    			return new Color(165,15,21);
-	    		default: 
-	    			return Color.WHITE;
+	    			return new Color(252,255,164);
+	    		default:
+	    			return Color.BLACK;
 	    	}
     	}
     	if(null != socio && optAgriculture.isSelected()) {
 	    	switch(socio.agriculture) {
 	    		case EquipmentType.RATING_F:
-	    			return new Color(237,248,233);
 	    		case EquipmentType.RATING_E:
-	    			return new Color(199,233,192);
+	    			return new Color(0,32,77);
 	    		case EquipmentType.RATING_D:
-	    			return new Color(161,217,155);
+	    			return new Color(66,77,107);
 	    		case EquipmentType.RATING_C:
-	    			return new Color(116,196,118);
+	    			return new Color(124,123,120);
 	    		case EquipmentType.RATING_B:
-	    			return new Color(49,163,84);
+	    			return new Color(188,175,111);
 	    		case EquipmentType.RATING_A:
-	    			return new Color(0,109,44);
-	    		default: 
-	    			return Color.WHITE;
+	    			return new Color(255,234,70);
+	    		default:
+	    			return Color.BLACK;
 	    	}
     	}
-    	
+
+    	if(optPopulation.isSelected()) {
+    		//numbers based roughly on deciles of population distribution
+    		//in 2750
+    		if(pop>=3000000000l) {
+    			return new Color(253,231, 37);
+    		} else if(pop>=1500000000l) {
+    			return new Color(180,222,44);
+    		} else if(pop>=1000000000l) {
+    			return new Color(109,205,89);
+    		} else if(pop>=500000000l) {
+    			return new Color(53,183,121);
+    		} else if(pop>=300000000l) {
+    			return new Color(31,158,137);
+    		} else if(pop>=200000000l) {
+    			return new Color(38,130,142);
+    		} else if(pop>=100000000l) {
+    			return new Color(49,104,142);
+    		} else if(pop>=25000000l) {
+    			return new Color(62,74,137);
+    		} else if(pop>=1000000l) {
+    			return new Color(72,40,120);
+    		} else if(pop>0l) {
+    			return new Color(68,1,84);
+    		} else {
+    			return Color.GRAY;
+    		}
+    	}
+
+    	if(optHPG.isSelected()) {
+    		Integer hpg = p.getHPG(Utilities.getDateTimeDay(campaign.getCalendar()));
+    		if(null == hpg) {
+    			return Color.BLACK;
+    		}
+    		//use two shades of grey for C and D as this is pony express
+    		switch(hpg) {
+    		case EquipmentType.RATING_D:
+    			return new Color(84,84,84);
+    		case EquipmentType.RATING_C:
+    			return new Color(168,168,168);
+    		case EquipmentType.RATING_B:
+    			return new Color(222,73,104);
+    		case EquipmentType.RATING_A:
+    			return new Color(252,253,191);
+    		default:
+    			return Color.BLACK;
+    		}
+    	}
+
+    	if(optRecharge.isSelected()) {
+
+    		//use two shades of grey for C and D as this is pony express
+    		switch(p.getNumberRechargeStations(Utilities.getDateTimeDay(campaign.getCalendar()))) {
+    		case 2:
+    			return new Color(240,249,33);
+    		case 1:
+    			return new Color(225,100,98);
+    		case 0:
+    			return new Color(128,128,128);
+    		default:
+    			return Color.BLACK;
+    		}
+    	}
+
 		return Color.GRAY;
     }
 
+    /*
+     * TODO: re-enable later
     private void openPlanetEventEditor(Planet p) {
-        NewPlanetaryEventDialog editor = new NewPlanetaryEventDialog(null, campaign, selectedPlanet);
+        NewPlanetaryEventDialog editor = new NewPlanetaryEventDialog(null, campaign, selectedSystem);
         editor.setVisible(true);
         List<Planet.PlanetaryEvent> result = editor.getChangedEvents();
         if((null != result) && !result.isEmpty()) {
@@ -1162,7 +1262,8 @@ public class InterstellarMapPanel extends JPanel {
             notifyListeners();
         }
     }
-    
+    */
+
     /**
      * All configuration behaviour of InterStellarMap are saved here.
      *
@@ -1200,25 +1301,24 @@ public class InterstellarMapPanel extends JPanel {
          */
         int planetID;
     }
-    
-    
+
     private transient List<ActionListener> listeners = new ArrayList<>();
-    
+
     public void addActionListener(ActionListener l) {
         if (!listeners.contains(l)) {
             listeners.add(l);
         }
     }
-    
+
     public void removeActionListener(ActionListener l) {
         listeners.remove(l);
     }
-    
+
     private void notifyListeners() {
         ActionEvent ev = new ActionEvent(this, ActionEvent.ACTION_FIRST, "refresh");
         listeners.forEach(l -> l.actionPerformed(ev));
     }
-    
+
     public boolean isFactionsSelected() {
     	return optFactions.isSelected();
     }

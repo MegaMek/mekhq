@@ -1,18 +1,18 @@
 /*
  * Copyright (c) 2018 - The MegaMek Team
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -44,7 +44,7 @@ public class CampaignFactory {
 
     /**
      * Obtain a new instance of a CampaignFactory.
-     * 
+     *
      * @return New instance of a CampaignFactory.
      */
     public static CampaignFactory newInstance(MekHQ app) {
@@ -56,7 +56,7 @@ public class CampaignFactory {
     /**
      * Creates a new instance of a {@link Campaign} from the input stream using
      * the currently configured parameters.
-     * 
+     *
      * @param is The {@link InputStream} to create the {@link Campaign} from.
      * @return A new instance of a {@link Campaign}.
      * @throws CampaignXmlParseException if the XML for the campaign cannot be
@@ -65,7 +65,7 @@ public class CampaignFactory {
      *                                   the input stream.
      * @throws NullEntityException       if the campaign contains a null entity
      */
-    public Campaign createCampaign(InputStream is) 
+    public Campaign createCampaign(InputStream is)
         throws CampaignXmlParseException, IOException, NullEntityException {
         if (!is.markSupported()) {
             is = new BufferedInputStream(is);
@@ -73,7 +73,7 @@ public class CampaignFactory {
 
         byte[] header = readHeader(is);
 
-        Boolean isGzipped = false;
+        boolean isGzipped = false;
         // Check if the first two bytes are the GZIP magic bytes...
         if (header.length >= 2 && header[0] == (byte) 0x1f
             && header[1] == (byte) 0x8b) {

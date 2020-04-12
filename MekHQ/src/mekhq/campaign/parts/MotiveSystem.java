@@ -1,20 +1,20 @@
 /*
  * MotiveSystem.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -40,40 +40,40 @@ import mekhq.campaign.Campaign;
 public class MotiveSystem extends Part {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -5637743997294510810L;
 
 	int damage;
 	int penalty;
-	
+
 	public MotiveSystem() {
 		this(0, null);
 	}
-	
+
 	public MotiveSystem(int ton, Campaign c) {
 		super(ton, c);
 		this.name = "Motive System";
 		this.damage = 0;
 		this.penalty = 0;
 	}
-	
-	@Override 
+
+	@Override
 	public int getBaseTime() {
 		return 60;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		return -1;
 	}
-	
+
 	public MotiveSystem clone() {
 		MotiveSystem clone = new MotiveSystem(getUnitTonnage(), campaign);
         clone.copyBaseData(this);
         return clone;
 	}
-	
+
 	@Override
 	public int getBaseAvailability(int era) {
 		return RATING_B;
@@ -84,7 +84,7 @@ public class MotiveSystem extends Part {
 		// TODO Auto-generated method stub
 		return Money.zero();
 	}
-	
+
 	@Override
 	public double getTonnage() {
 		// TODO Auto-generated method stub
@@ -99,17 +99,17 @@ public class MotiveSystem extends Part {
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {
 		NodeList nl = wn.getChildNodes();
-		
+
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
-			
+
 			if (wn2.getNodeName().equalsIgnoreCase("damage")) {
 				damage = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("penalty")) {
 				penalty = Integer.parseInt(wn2.getTextContent());
-			} 
+			}
 		}
-		
+
 	}
 
 	@Override
@@ -124,7 +124,7 @@ public class MotiveSystem extends Part {
 				+penalty
 				+"</penalty>");
 		writeToXmlEnd(pw1, indent);
-		
+
 	}
 
 	@Override
@@ -152,12 +152,12 @@ public class MotiveSystem extends Part {
 	@Override
 	public void remove(boolean salvage) {
 		// you can't do this so nothing here
-		
+
 	}
 
 	@Override
 	public void updateConditionFromEntity(boolean checkForDestruction) {
-		//motive systems don't have to check for destruction since they 
+		//motive systems don't have to check for destruction since they
 		//cannot be removed
 		if(null != unit && unit.getEntity() instanceof Tank) {
 			Tank t = (Tank)unit.getEntity();
@@ -176,17 +176,26 @@ public class MotiveSystem extends Part {
 	public boolean needsFixing() {
 		return damage > 0 || penalty > 0;
 	}
-	
+
 	@Override
     public String getDetails() {
-        return "-" + damage + " MP/-" + penalty + " Piloting";
+        return getDetails(true);
     }
-	
+
+    @Override
+    public String getDetails(boolean includeRepairDetails) {
+        if (includeRepairDetails) {
+            return "-" + damage + " MP/-" + penalty + " Piloting";
+        } else {
+            return super.getDetails(includeRepairDetails);
+        }
+    }
+
 	@Override
 	public String checkScrappable() {
 		return "Motive type cannot be scrapped";
 	}
-	
+
 	@Override
 	public boolean canNeverScrap() {
 		return true;
@@ -207,7 +216,7 @@ public class MotiveSystem extends Part {
 	public int getLocation() {
 		return Entity.LOC_NONE;
 	}
-	
+
 	@Override
 	public TechAdvancement getTechAdvancement() {
 	    return TankLocation.TECH_ADVANCEMENT;

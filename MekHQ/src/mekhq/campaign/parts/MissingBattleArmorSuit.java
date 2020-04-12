@@ -260,7 +260,7 @@ public class MissingBattleArmorSuit extends MissingPart {
         			origArmor.updateConditionFromEntity(false);
         		} else if(childPart instanceof BattleArmorEquipmentPart) {
         			for(MissingBattleArmorEquipmentPart p : missingStuff) {
-	            		if(null != childPart && null != p.getUnit() && p.isAcceptableReplacement(childPart, false)) {
+	            		if(null != p.getUnit() && p.isAcceptableReplacement(childPart, false)) {
 	            			//then add child part and remove current part from unit and campaign
 	            			Part newPart = childPart.clone();
 	            			unit.addPart(newPart);
@@ -294,12 +294,17 @@ public class MissingBattleArmorSuit extends MissingPart {
 
 	@Override
     public String getDetails() {
+        return getDetails(true);
+    }
+
+    @Override
+    public String getDetails(boolean includeRepairDetails) {
     	if(null == unit) {
-    		return super.getDetails();
+    		return super.getDetails(includeRepairDetails);
 
         }
     	String toReturn = unit.getEntity().getLocationName(trooper) + "<br>";
-		return toReturn + super.getDetails();
+		return toReturn + super.getDetails(includeRepairDetails);
     }
 
 	@Override

@@ -1,31 +1,32 @@
 /*
  * Ranks.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.personnel;
 
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
+import java.util.StringJoiner;
 import java.util.Vector;
 
 import javax.swing.JOptionPane;
@@ -50,7 +51,7 @@ import mekhq.gui.model.RankTableModel;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Ranks {
- 	
+
 	// Rank Faction Codes
 	// TODO: Major periphery realms?
 	public static final int RS_SL		= 0;
@@ -71,10 +72,11 @@ public class Ranks {
 	public static final int RS_MH		= 15;
 	public static final int RS_OA		= 16;
 	public static final int RS_FRR		= 17;
-	public static final int RS_NUM		= 18;
-	
+    public static final int RS_ARC      = 18;
+	public static final int RS_NUM		= 19;
+
 	public static final int[] translateFactions = { /* 0 */ 0, /* 1 */ 1, /* 2 */ 4, /* 3 */ 5, /* 4 */ 6, /* 5 */ 8, /* 6 */ 9, /* 7 */ 12 };
-	
+
 	// Rank Size Codes
 	// Enlisted
 	public static final int RE_MIN	= 0; // Rank "None"
@@ -90,7 +92,7 @@ public class Ranks {
 	public static final int RO_NUM	= 51; // Number that comes after RO_MAX
 	// Total
 	public static final int RC_NUM	= 51; // Same as RO_MAX+1
-	
+
 	// Rank Profession Codes
 	public static final int RPROF_MW	= 0;
 	public static final int RPROF_ASF	= 1;
@@ -99,97 +101,95 @@ public class Ranks {
 	public static final int RPROF_INF	= 4;
 	public static final int RPROF_TECH	= 5;
 	public static final int RPROF_NUM	= 6;
-	
+
 	private static Hashtable<Integer, Ranks> rankSystems;
 	@SuppressWarnings("unused") // FIXME
 	private static final int[] officerCut = {/*SLDF*/7,/*AFFS*/6,/*AFFC*/8,/*LCAF*/14,/*LAAF*/11,/*FWLM*/9,/*CCAF*/5,/*CCWH*/2,/*DCMD*/9,/*Clan*/3,/*COM*/2,/*WOB*/2};
 	public static final int RANK_BONDSMAN = -1;
 	public static final int RANK_PRISONER = -2;
-	
+
 	private int rankSystem;
 	private int oldRankSystem = -1;
 	private ArrayList<Rank> ranks;
-	
+
 	public Ranks() {
 		this(RS_SL);
 	}
-	
+
 	public Ranks(int system) {
 		rankSystem = system;
 		useRankSystem(rankSystem);
 	}
-    
+
     public static void initializeRankSystems() {
         final String METHOD_NAME = "initializeRankSystems()"; //$NON-NLS-1$
 
-        rankSystems = new Hashtable<Integer, Ranks>();
+        rankSystems = new Hashtable<>();
         MekHQ.getLogger().log(Ranks.class, METHOD_NAME, LogLevel.INFO,
                 "Starting load of Rank Systems from XML..."); //$NON-NLS-1$
         // Initialize variables.
         Document xmlDoc = null;
-    
-        
-        try {
-            FileInputStream fis = new FileInputStream("data/universe/ranks.xml");
+
+        try (InputStream is = new FileInputStream("data/universe/ranks.xml")) {
             // Using factory get an instance of document builder
             DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
-    
+
             // Parse using builder to get DOM representation of the XML file
-            xmlDoc = db.parse(fis);
+            xmlDoc = db.parse(is);
         } catch (Exception ex) {
             MekHQ.getLogger().error(Ranks.class, METHOD_NAME, ex);
         }
-    
+
         Element ranksEle = xmlDoc.getDocumentElement();
         NodeList nl = ranksEle.getChildNodes();
-    
+
         // Get rid of empty text nodes and adjacent text nodes...
         // Stupid weird parsing of XML.  At least this cleans it up.
-        ranksEle.normalize(); 
-    
+        ranksEle.normalize();
+
         // Okay, lets iterate through the children, eh?
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn = nl.item(x);
             Ranks value;
-            
+
             if (wn.getParentNode() != ranksEle)
                 continue;
-    
+
             int xc = wn.getNodeType();
-    
+
             if (xc == Node.ELEMENT_NODE) {
                 // This is what we really care about.
                 // All the meat of our document is in this node type, at this
                 // level.
                 // Okay, so what element is it?
                 String xn = wn.getNodeName();
-    
+
                 if (xn.equalsIgnoreCase("rankSystem")) {
                     value = generateInstanceFromXML(wn, null);
                     rankSystems.put(value.getRankSystem(), value);
                 }
             }
-        }   
+        }
         MekHQ.getLogger().log(Ranks.class, METHOD_NAME, LogLevel.INFO,
                 "Done loading Rank Systems"); //$NON-NLS-1$
     }
-	
+
 	public static Ranks getRanksFromSystem(int system) {
 		return rankSystems.get(system);
 	}
-	
+
 	public int getRankSystem() {
 		return rankSystem;
 	}
-	
+
 	public int getOldRankSystem() {
 		return oldRankSystem;
 	}
-	
+
 	public void setOldRankSystem(int old) {
 		oldRankSystem = old;
 	}
-	
+
 	public static String getRankSystemName(int system) {
 		switch(system) {
 		case RS_CUSTOM:
@@ -228,20 +228,22 @@ public class Ranks {
 			return "Outworld's Alliance";
 		case RS_FRR:
 			return "Free Rasalhague Republic";
+        case RS_ARC:
+            return "Aurigan Coalition";
 		default:
 			return "?";
 		}
 	}
-	
+
 	public int getRankNumericFromNameAndProfession(int profession, String name) {
 		while (profession != RPROF_MW && isEmptyProfession(profession)) {
 			profession = getAlternateProfession(profession);
 		}
-		
+
 		for(int i = 0; i < RC_NUM; i++) {
 			Rank rank = getAllRanks().get(i);
         	int p = profession;
-        	
+
         	// Grab rank from correct profession as needed
         	while (rank.getName(p).startsWith("--") && p != Ranks.RPROF_MW) {
             	if (rank.getName(p).equals("--")) {
@@ -250,52 +252,47 @@ public class Ranks {
             		p = getAlternateProfession(rank.getName(p));
             	}
         	}
-        	
+
         	// Check it...
         	if (rank.getName(p).equals(name)) {
         		return i;
         	}
         }
-		
+
 		return 0;
 	}
-    
+
     public boolean isEmptyProfession(int profession) {
     	// MechWarrior profession cannot be empty
     	if (profession == RPROF_MW)
     		return false;
-    	
+
     	// Check the profession
     	for (int i = 0; i < RC_NUM; i++) {
     		// If our first Rank is an indicator of an alternate system, skip it.
     		if (i == 0 && ranks.get(0).getName(profession).startsWith("--")) {
     			continue;
     		}
-    		
+
     		if (!ranks.get(i).getName(profession).equals("-")) {
     			return false;
     		}
     	}
-    	
+
     	// It's empty...
     	return true;
     }
-    
+
     public boolean useAlternateProfession(int profession) {
-    	if (ranks.get(0).getName(profession).startsWith("--")) {
-    		return true;
-    	}
-    	return false;
+        return ranks.get(0).getName(profession).startsWith("--");
     }
-    
+
     public int getAlternateProfession(int profession) {
     	return getAlternateProfession(ranks.get(0).getName(profession));
     }
-    
+
     public int getAlternateProfession(String name) {
     	switch (name.replaceAll("--", "")) {
-    		case "MW":
-    			return RPROF_MW;
     		case "ASF":
     			return RPROF_ASF;
     		case "VEE":
@@ -306,20 +303,21 @@ public class Ranks {
     			return RPROF_INF;
     		case "TECH":
     			return RPROF_TECH;
+            case "MW":
     		default:
     			return RPROF_MW;
     	}
     }
-	
+
 	public ArrayList<Rank> getAllRanks() {
 		return ranks;
 	}
-	
+
 	private void useRankSystem(int system) {
 		// If we've got an invalid rank system, default to Star League
 		if(system >= rankSystems.size()) {
 			if (rankSystems.isEmpty()) {
-				ranks = new ArrayList<Rank>();
+				ranks = new ArrayList<>();
 			} else {
 				ranks = rankSystems.get(RS_SL).getAllRanks();
 			}
@@ -329,15 +327,15 @@ public class Ranks {
 		ranks = rankSystems.get(system).getAllRanks();
 		rankSystem = system;
 	}
-	
+
 	public void setCustomRanks(ArrayList<ArrayList<String>> customRanks, int offCut) {
-	    ranks = new ArrayList<Rank>();
+	    ranks = new ArrayList<>();
         for (int i = 0; i < customRanks.size(); i++) {
             ranks.add(new Rank(customRanks.get(i), offCut <= i,  1.0));
         }
 		rankSystem = RS_CUSTOM;
 	}
-	
+
 	public Rank getRank(int r) {
 		if(r >= ranks.size()) {
 		    //assign the highest rank
@@ -353,7 +351,7 @@ public class Ranks {
 		}
 		return ranks.get(r);
 	}
-	
+
 	public int getOfficerCut() {
 	    for(int i = 0; i < ranks.size(); i++) {
             if(ranks.get(i).isOfficer()) {
@@ -362,7 +360,7 @@ public class Ranks {
         }
         return ranks.size() - 1;
 	}
-	
+
 	public int getRankOrder(String rank, int profession) {
 		if (rank.equals("Prisoner")) {
 			return RANK_PRISONER;
@@ -377,33 +375,28 @@ public class Ranks {
 		}
 		return 0;
 	}
-	
+
 	public void setRankSystem(int system) {
 		if(system < RS_NUM) {
 			rankSystem = system;
 			useRankSystem(rankSystem);
-		}	
-	}
-	
-	public String getRankNameList(int profession) {
-		String rankNames = "";
-		int i = 0;
-		for(Rank rank : getAllRanks()) {
-			rankNames += rank.getName(profession);
-			i++;
-			if(i < getAllRanks().size()) {
-				rankNames += ",";
-			}
 		}
-		return rankNames;
 	}
-	
-	//Keep this for reverse compatability in loading campaigns
+
+	public String getRankNameList(int profession) {
+		StringJoiner joiner = new StringJoiner(",");
+		for (Rank rank : getAllRanks()) {
+			joiner.add(rank.getName(profession));
+		}
+		return joiner.toString();
+	}
+
+	//Keep this for reverse compatibility in loading campaigns
 	public void setRanksFromList(String names, int officerCut) {
-		ArrayList<ArrayList<String>> rankNames = new ArrayList<ArrayList<String>>();
+		ArrayList<ArrayList<String>> rankNames = new ArrayList<>();
 		String[] rnames = names.split(",");
 		for(String rname : rnames) {
-			ArrayList<String> temp = new ArrayList<String>();
+			ArrayList<String> temp = new ArrayList<>(RPROF_NUM);
 			for (int i = 0; i < RPROF_NUM; i++) {
 				temp.add(rname);
 			}
@@ -411,7 +404,7 @@ public class Ranks {
 		}
 		setCustomRanks(rankNames, officerCut);
 	}
-	
+
 	private String getRankPostTag(int rankNum) {
 		if (rankNum == 0)
 			return " <!-- E0 \"None\" -->";
@@ -421,15 +414,15 @@ public class Ranks {
 			return " <!-- WO"+(rankNum-RE_MAX)+" -->";
 		if (rankNum < RO_NUM)
 			return " <!-- O"+(rankNum-RWO_MAX)+" -->";
-		
+
 		// Yuck, we've got nada!
 		return "";
 	}
-	
+
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXml(pw1, indent, false);
 	}
-	
+
 	public void writeToXml(PrintWriter pw1, int indent, boolean saveAll) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<rankSystem>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)+"<!-- "+getRankSystemName(rankSystem)+" -->");
@@ -447,25 +440,25 @@ public class Ranks {
         }
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</rankSystem>");
     }
-	
+
 	public static Ranks generateInstanceFromXML(Node wn, Version version) {
         final String METHOD_NAME = "generateInstanceFromXML(Node,Version)"; //$NON-NLS-1$
 
         Ranks retVal = new Ranks();
 		boolean showMessage = false;
-        
+
         // Dump the ranks ArrayList so we can re-use it.
-        retVal.ranks = new ArrayList<Rank>();
+        retVal.ranks = new ArrayList<>();
 
         try {
             NodeList nl = wn.getChildNodes();
-            
+
             for (int x=0; x<nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
-                
+
                 if (wn2.getNodeName().equalsIgnoreCase("system") || wn2.getNodeName().equalsIgnoreCase("rankSystem")) {
                 	retVal.rankSystem = Integer.parseInt(wn2.getTextContent());
-                	
+
                 	// If this is an older version from before the full blown rank system with
                 	// professions, we need to translate it to match the new constants
                 	if (version != null && version.isLowerThan("0.3.4-r1782")) {
@@ -501,7 +494,7 @@ public class Ranks {
                 		retVal.oldRankSystem = temp;
                 		return retVal;
                 	}
-                } 
+                }
             }
             if (showMessage) {
             	JOptionPane.showConfirmDialog(
@@ -517,10 +510,10 @@ public class Ranks {
             // Doh!
             MekHQ.getLogger().error(Ranks.class, METHOD_NAME, ex);
         }
-        
+
         return retVal;
     }
-	
+
 	public Object[][] getRanksForModel() {
         Object[][] array = new Object[ranks.size()][RankTableModel.COL_NUM];
         int i = 0;
@@ -544,9 +537,9 @@ public class Ranks {
         }
         return array;
     }
-	
+
 	public void setRanksFromModel(RankTableModel model) {
-        ranks = new ArrayList<Rank>();
+        ranks = new ArrayList<>();
 	    @SuppressWarnings("rawtypes") // Broken java doesn't have typed vectors in the DefaultTableModel
 		Vector<Vector> vectors = model.getDataVector();
 	    for(@SuppressWarnings("rawtypes") Vector row : vectors) {

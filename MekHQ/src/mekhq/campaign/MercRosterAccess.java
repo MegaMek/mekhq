@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2013, 2020 MegaMek team
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.campaign;
 
 import java.sql.Connection;
@@ -14,16 +32,18 @@ import java.util.UUID;
 import javax.swing.SwingWorker;
 
 import megamek.common.UnitType;
+import mekhq.MekHQ;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Rank;
 import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
 
 public class MercRosterAccess extends SwingWorker<Void, Void> {
-   
+
     Campaign campaign;
     String username;
     String hostname;
@@ -43,7 +63,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
     //to track progress
     private String progressNote;
     private int progressTicker;
-    
+
     public MercRosterAccess(String h, int port, String t, String u, String p, Campaign c) {
       username = u;
       hostname = h;
@@ -51,13 +71,13 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
       this.port = port;
       passwd = p;
       campaign = c;
-      skillHash = new HashMap<String, Integer>();
-      personHash = new HashMap<UUID, Integer>();
-      forceHash = new HashMap<UUID, Integer>();
+      skillHash = new HashMap<>();
+      personHash = new HashMap<>();
+      forceHash = new HashMap<>();
       progressNote = "";
       progressTicker = 0;
     }
-  
+
     public void connect() throws SQLException {
     	conProperties = new Properties();
     	conProperties.put("user", username);
@@ -68,41 +88,38 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
         } catch (SQLException e) {
             throw e;
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            MekHQ.getLogger().error(getClass(), "connect", e);
         }
     }
 
     public void writeCampaignData() {
-        
         //TODO throw all SQLExceptions - but then where do they go from doInBackground?
         try {
             statement = connect.createStatement();
-        } catch (SQLException e2) {
-            e2.printStackTrace();
+        } catch (SQLException e) {
+            MekHQ.getLogger().error(getClass(), "writeCampaignData", e);
         };
-        
+
         writeBasicData();
         writeForceData();
         writePersonnelData();
         writeEquipmentData();
         //TODO: writeContractData
         //TODO: write logs?
-        
+
         // Needed because otherwise progress isn't reaching 100 and the progress meter stays open
         setProgress(100);
-
     }
-    
+
     private void writeBasicData() {
-        
         try {
             preparedStatement = connect.prepareStatement("UPDATE " + table + ".command SET name=? where id=1");
             preparedStatement.setString(1, truncateString(campaign.getName(), 100));
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
-        } 
-        
+            MekHQ.getLogger().error(getClass(), "writeBasicData", e);
+        }
+
         progressNote = "Uploading dates";
         determineProgress();
         //write dates
@@ -111,7 +128,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             preparedStatement.setDate(1, new java.sql.Date(campaign.getCalendar().getTimeInMillis()));
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            MekHQ.getLogger().error(getClass(), "writeBasicData", e);
         }
         progressTicker++;
         progressNote = "Uploading ranks";
@@ -131,7 +148,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 determineProgress();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            MekHQ.getLogger().error(getClass(), "writeBasicData", e);
         }
         //write skill types
         progressNote = "Uploading skill types";
@@ -148,7 +165,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 determineProgress();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            MekHQ.getLogger().error(getClass(), "writeBasicData", e);
         }
         //write crewtypes
         progressNote = "Uploading personnel types";
@@ -303,6 +320,13 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                     preparedStatement.setInt(2, i);
                     preparedStatement.executeUpdate();
                     break;
+                case Person.T_VEHICLE_CREW:
+                    preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
+                    preparedStatement.setInt(1, skillHash.get(SkillType.S_TECH_MECHANIC));
+                    preparedStatement.setInt(2, i);
+                    preparedStatement.executeUpdate();
+                    equipment = 1;
+                    break;
                 }
                 preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".crewtypes (type, squad, vehicletype, prefpos, equipment) VALUES (?, ?, ?, ?, ?)");
                 preparedStatement.setString(1, truncateString(Person.getRoleDesc(i, campaign.getFaction().isClan()), 45));
@@ -315,9 +339,9 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 determineProgress();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            MekHQ.getLogger().error(getClass(), "writeBasicData", e);
         }
-        
+
         //write equipment types
         progressNote = "Uploading equipment types";
         determineProgress();
@@ -345,15 +369,15 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 determineProgress();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            MekHQ.getLogger().error(getClass(), "writeBasicData", e);
         }
     }
-    
+
     private void writeForceData() {
-        
+
         //clear the table and re-enter a top level command
         try {
-            statement.execute("TRUNCATE TABLE " + table + ".unit");  
+            statement.execute("TRUNCATE TABLE " + table + ".unit");
             preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".unit (type, name, parent, prefpos, text) VALUES (?, ?, ?, ?, ?)");
             preparedStatement.setString(1, "1");
             preparedStatement.setString(2, "Command");
@@ -361,8 +385,8 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             preparedStatement.setInt(4, 0);
             preparedStatement.setString(5, campaign.getForces().getDescription());
             preparedStatement.executeUpdate();
-        } catch (SQLException e1) {
-            e1.printStackTrace();
+        } catch (SQLException e) {
+            MekHQ.getLogger().error(getClass(), "writeForceData", e);
         }
 
         progressNote = "Uploading force data";
@@ -379,10 +403,9 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             }
         }
     }
-    
+
     private void writeForce(Force force, int parent) {
-        
-        try {           
+        try {
             preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".unit (type, name, parent, prefpos, text) VALUES (?, ?, ?, ?, ?)");
             preparedStatement.setString(1, "1");
             preparedStatement.setString(2, force.getName());
@@ -391,99 +414,95 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             preparedStatement.setString(5, force.getDescription());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
-        } 
-        //retrieve the mercroster id of this force
-        ResultSet rs;
+            MekHQ.getLogger().error(getClass(), "writeForce", e);
+        }
+        //retrieve the MercRoster id of this force
         int id = parent;
-        try {
-            rs = statement.executeQuery("SELECT id FROM " + table + ".unit ORDER BY id DESC LIMIT 1");
+        try (ResultSet rs = statement.executeQuery("SELECT id FROM " + table + ".unit ORDER BY id DESC LIMIT 1")) {
             rs.next();
             id = rs.getInt("id");
         } catch (SQLException e) {
-            e.printStackTrace();
+            MekHQ.getLogger().error(getClass(), "writeForce", e);
         }
-        
+
         progressTicker += 2;
         determineProgress();
         //loop through subforces and call again
         for(Force sub : force.getSubForces()) {
             writeForce(sub, id);
         }
-        //assign personnel uuids to hash
 
+        //assign personnel uuids to hash
         for(UUID uid : force.getUnits()) {
             Unit u = campaign.getUnit(uid);
             if(u != null && u.getCommander() != null) {
                 forceHash.put(u.getCommander().getId(), id);
             }
         }
-
     }
 
     private void writePersonnelData() {
-       
-        
         //check for a uuid column
-        try {
+        try (ResultSet rs = statement.executeQuery("SELECT * FROM " + table + ".crew")) {
             //add in a UUID column if not already present
-            if(!hasColumn(statement.executeQuery("SELECT * FROM " + table + ".crew"), "uuid")) {
+            if (!hasColumn(rs, "uuid")) {
                 statement.execute("TRUNCATE TABLE " + table + ".crew");
                 statement.execute("ALTER TABLE " + table + ".crew ADD uuid VARCHAR(40)");
-            }             
+            }
             statement.execute("TRUNCATE TABLE " + table + ".personnelpositions");
             statement.execute("TRUNCATE TABLE " + table + ".skills");
             statement.execute("TRUNCATE TABLE " + table + ".kills");
-
-        } catch (SQLException e1) {
-            e1.printStackTrace();
+        } catch (SQLException e) {
+            MekHQ.getLogger().error(getClass(), "writePersonnelData", e);
         }
 
         progressNote = "Uploading personnel data";
         determineProgress();
-        for(Person p: campaign.getPersonnel()) {
+        for (Person p: campaign.getPersonnel()) {
             int forceId = 0;
             //assign parent id from force hash
-            if(null != forceHash.get(p.getId())) {
+            if (null != forceHash.get(p.getId())) {
                 forceId = forceHash.get(p.getId());
             }
             try {
-                preparedStatement = connect.prepareStatement("UPDATE " + table + ".crew SET rank=?, lname=?, fname=?, callsign=?, status=?, parent=?, crewnumber=?, joiningdate=?, notes=?, bday=? WHERE uuid=?"); 
+                preparedStatement = connect.prepareStatement("UPDATE " + table + ".crew SET rank=?, lname=?, fname=?, callsign=?, status=?, parent=?, crewnumber=?, joiningdate=?, notes=?, bday=? WHERE uuid=?");
                 preparedStatement.setInt(1, p.getRankNumeric());
-                preparedStatement.setString(2, truncateString(parseLastName(p.getName()),30));
-                preparedStatement.setString(3, truncateString(parseFirstName(p.getName()), 30));
+                preparedStatement.setString(2, truncateString(p.getSurname(),30));
+                preparedStatement.setString(3, truncateString(p.getGivenName(), 30));
                 preparedStatement.setString(4, truncateString(p.getCallsign(), 30));
                 preparedStatement.setString(5, getMercRosterStatusName(p.getStatus()));
                 preparedStatement.setInt(6, forceId);
                 preparedStatement.setInt(7, 1);
                 //TODO: get joining date right
-                preparedStatement.setDate(8, new java.sql.Date(p.getBirthday().getTimeInMillis()));
+                preparedStatement.setDate(8, java.sql.Date.valueOf(p.getBirthday()));
                 //TODO: combine personnel log with biography
                 preparedStatement.setString(9, p.getBiography());
-                preparedStatement.setDate(10, new java.sql.Date(p.getBirthday().getTimeInMillis()));
+                preparedStatement.setDate(10, java.sql.Date.valueOf(p.getBirthday()));
                 preparedStatement.setString(11, p.getId().toString());
                 if(preparedStatement.executeUpdate() < 1) {
                     //no prior record so insert
                     preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".crew (rank, lname, fname, callsign, status, parent, crewnumber, joiningdate, notes, bday, uuid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                     preparedStatement.setInt(1, p.getRankNumeric());
-                    preparedStatement.setString(2, truncateString(parseLastName(p.getName()),30));
-                    preparedStatement.setString(3, truncateString(parseFirstName(p.getName()), 30));
+                    preparedStatement.setString(2, truncateString(p.getSurname(), 30));
+                    preparedStatement.setString(3, truncateString(p.getGivenName(), 30));
                     preparedStatement.setString(4, truncateString(p.getCallsign(), 30));
                     preparedStatement.setString(5, getMercRosterStatusName(p.getStatus()));
                     preparedStatement.setInt(6, forceId);
                     preparedStatement.setInt(7, 1);
-                    preparedStatement.setDate(8, new java.sql.Date(p.getBirthday().getTimeInMillis()));
+                    preparedStatement.setDate(8, java.sql.Date.valueOf(p.getBirthday()));
                     preparedStatement.setString(9, p.getBiography());
-                    preparedStatement.setDate(10, new java.sql.Date(p.getBirthday().getTimeInMillis()));
+                    preparedStatement.setDate(10, java.sql.Date.valueOf(p.getBirthday()));
                     preparedStatement.setString(11, p.getId().toString());
                     preparedStatement.executeUpdate();
                 }
-                //retrieve the mercroster id of this person
+
+                //retrieve the MercRoster id of this person
                 preparedStatement = connect.prepareStatement("SELECT id FROM " + table + ".crew WHERE uuid=?");
                 preparedStatement.setString(1, p.getId().toString());
                 ResultSet rs = preparedStatement.executeQuery();
                 rs.next();
                 int id = rs.getInt("id");
+                rs.close();
                 //put id in a hash for equipment assignment
                 personHash.put(p.getId(), id);
                 //assign the personnel position
@@ -516,29 +535,31 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 progressTicker += 4;
                 determineProgress();
             } catch (SQLException e) {
-                e.printStackTrace();
-            }          
+                MekHQ.getLogger().error(getClass(), "writePersonnelData", e);
+            }
         }
     }
-    
+
     private void writeEquipmentData() {
         //TODO: we need to clear the equipment table because equipment will come and go
-        
+
         //check for a uuid column
         try {
             //add in a UUID column if not already present
-            if(!hasColumn(statement.executeQuery("SELECT * FROM " + table + ".equipment"), "uuid")) {
+            ResultSet rs = statement.executeQuery("SELECT * FROM " + table + ".equipment");
+            if(!hasColumn(rs, "uuid")) {
                 statement.execute("ALTER TABLE " + table + ".equipment ADD uuid VARCHAR(40)");
-            }             
-        } catch (SQLException e1) {
-            e1.printStackTrace();
+            }
+            rs.close();
+        } catch (SQLException e) {
+            MekHQ.getLogger().error(getClass(), "writeEquipmentData", e);
         }
 
         progressNote = "Uploading equipment data";
         determineProgress();
         for(Unit u : campaign.getUnits()) {
             try {
-                preparedStatement = connect.prepareStatement("UPDATE " + table + ".equipment SET type=?, name=?, subtype=?, crew=?, weight=?, regnumber=?, notes=? WHERE uuid=?"); 
+                preparedStatement = connect.prepareStatement("UPDATE " + table + ".equipment SET type=?, name=?, subtype=?, crew=?, weight=?, regnumber=?, notes=? WHERE uuid=?");
                 preparedStatement.setInt(1, u.getEntity().getUnitType() + 1);
                 preparedStatement.setString(2, truncateString(u.getEntity().getChassis(), 45));
                 preparedStatement.setString(3, truncateString(u.getEntity().getModel(), 45));
@@ -572,11 +593,11 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 progressTicker += 1;
                 determineProgress();
             } catch (SQLException e) {
-                e.printStackTrace();
-            }          
+                MekHQ.getLogger().error(getClass(), "writeEquipmentData", e);
+            }
         }
     }
-    
+
     public void close() {
         try {
             if (preparedStatement != null) {
@@ -586,20 +607,9 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             if (connect != null) {
                 connect.close();
             }
-        } catch (Exception e) {
-            
-        }
+        } catch (Exception ignored) { }
     }
-    
-    private static String parseFirstName(String name) {
-        return name.split(" ")[0];
-    }
-    
-    private static String parseLastName(String name) {
-        String[] names = name.split(" ");
-        return names[names.length-1];
-    }
-    
+
     private static boolean hasColumn(ResultSet rs, String columnName) throws SQLException {
         ResultSetMetaData rsmd = rs.getMetaData();
         int columns = rsmd.getColumnCount();
@@ -610,29 +620,29 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
         }
         return false;
     }
-    
+
     private static String getShortSkillName(String name) {
         name = name.split("/")[0];
         name = name.replaceAll("\\s","");
         name = name.replaceAll("Hyperspace", "");
         return name;
     }
-    
-    private static String getMercRosterStatusName(int status) {
+
+    private static String getMercRosterStatusName(PersonnelStatus status) {
         switch(status) {
-        case Person.S_ACTIVE:
-            return "Active";
-        case Person.S_KIA:
-            return "Deceased";
-        case Person.S_RETIRED:
-            return "Retired";
-        case Person.S_MIA:
-            return "Missing in Action";
-        default:
-            return "?";
+            case ACTIVE:
+                return "Active";
+            case KIA:
+                return "Deceased";
+            case RETIRED:
+                return "Retired";
+            case MIA:
+                return "Missing in Action";
+            default:
+                return "?";
         }
     }
-    
+
     private static String truncateString(String s, int len) {
         if(s.length() < len) {
             return s;
@@ -645,20 +655,20 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
         writeCampaignData();
         return null;
     }
-    
+
     @Override
     public void done() {
         close();
     }
-    
+
     public String getProgressNote() {
         return progressNote;
     }
-    
+
     private int getLengthOfTask() {
         return 2 + campaign.getRanks().getAllRanks().size() + SkillType.skillList.length + Person.T_NUM * 2 + UnitType.SIZE + campaign.getPersonnel().size() * 4 + campaign.getUnits().size() + campaign.getAllForces().size() * 2;
     }
-    
+
     public void determineProgress() {
         double percent = ((double)progressTicker) / getLengthOfTask();
         percent = Math.min(percent, 1.0);

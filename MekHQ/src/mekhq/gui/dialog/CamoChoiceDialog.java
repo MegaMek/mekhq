@@ -6,7 +6,6 @@
 
 package mekhq.gui.dialog;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -30,6 +29,7 @@ import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.gui.preferences.JWindowPreference;
+import mekhq.gui.utilities.MekHqTableCellRenderer;
 import mekhq.preferences.PreferencesNode;
 
 /**
@@ -148,7 +148,7 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         getContentPane().add(comboCategories, gridBagConstraints);
-        
+
         btnSelect.setText(resourceMap.getString("btnSelect.text")); // NOI18N
         btnSelect.setName("btnSelect"); // NOI18N
         btnSelect.addActionListener(new java.awt.event.ActionListener() {
@@ -219,7 +219,7 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
     public int getColorIndex() {
         return colorIndex;
     }
-    
+
     public boolean clickedSelect() {
         return clickedSelect;
     }
@@ -321,9 +321,8 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
             return new CamoTableModel.Renderer(camos);
         }
 
-
         public class Renderer extends CamoPanel implements TableCellRenderer {
-			
+
         	public Renderer(DirectoryItems camos) {
 				super(camos);
 			}
@@ -331,18 +330,12 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
 			private static final long serialVersionUID = -7106605749246434963L;
 
 			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                Component c = this;
-                setOpaque(true);
                 String name = getValueAt(row, column).toString();
                 setText(getValueAt(row, column).toString());
                 setImage(category, name, row);
-                if(isSelected) {
-                    setBackground(new Color(220,220,220));
-                } else {
-                    setBackground(Color.WHITE);
-                }
 
-                return c;
+                MekHqTableCellRenderer.setupTableColors(this, table, isSelected, hasFocus, row);
+                return this;
             }
        }
     }
@@ -366,11 +359,11 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
             }
         }
     }
-    
+
     public class CamoPanel extends javax.swing.JPanel {
     	private static final long serialVersionUID = -4106360800407452822L;
     	private DirectoryItems camos;
-        
+
         /** Creates new form CamoPanel */
         public CamoPanel(DirectoryItems camos) {
             this.camos = camos;
@@ -399,17 +392,17 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
         public void setText(String text) {
             lblImage.setText(text);
         }
-        
+
         //public void setImage(Image image) {
           //  lblImage.setIcon(new ImageIcon(image));
         //}
-        
+
         public void setImage(String category, String name, int colorInd) {
 
             if (null == category) {
                 return;
             }
-            
+
             if(Player.NO_CAMO.equals(category)) {
                 if (colorInd == -1) {
                     colorInd = 0;
@@ -431,8 +424,8 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
                     category = ""; //$NON-NLS-1$
                 Image camo = (Image) camos.getItem(category, name);
                 lblImage.setIcon(new ImageIcon(camo));
-            } catch (Exception err) {
-                err.printStackTrace();
+            } catch (Exception e) {
+                MekHQ.getLogger().error(getClass(), "setImage", e);
             }
         }
         // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -449,6 +442,6 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
     private javax.swing.JTable tableCamo;
     // End of variables declaration//GEN-END:variables
 
-    
-    
+
+
 }

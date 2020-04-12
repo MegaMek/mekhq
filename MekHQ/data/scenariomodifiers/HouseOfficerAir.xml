@@ -1,30 +1,98 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>The house commanding officer will deploy along side your units. Keep them alive.</additionalBriefingText>
+	<additionalBriefingText>Your force will be deployed under the command of a house officer. Keep them alive. Additionally, allied command will dicatate retreat conditions.</additionalBriefingText>
 	<benefitsPlayer>true</benefitsPlayer>
-	<eventTiming>PostForceGeneration</eventTiming>
+	<eventTiming>PreForceGeneration</eventTiming>
 	<forceDefinition>
-<actualDeploymentZone>-1</actualDeploymentZone>
-<allowAeroBombs>true</allowAeroBombs>
-<allowedUnitType>9</allowedUnitType>
-<arrivalTurn>0</arrivalTurn>
-<canReinforceLinked>false</canReinforceLinked>
-<contributesToBV>false</contributesToBV>
-<contributesToMapSize>false</contributesToMapSize>
-<contributesToUnitCount>false</contributesToUnitCount>
-<deployOffboard>false</deployOffboard>
-<deploymentZones/>
-<destinationZone>4</destinationZone>
-<fixedUnitCount>-1</fixedUnitCount>
-<forceAlignment>1</forceAlignment>
-<forceMultiplier>1.0</forceMultiplier>
-<forceName>Allied Ground Support</forceName>
-<generationMethod>3</generationMethod>
-<generationOrder>3</generationOrder>
-<maxWeightClass>4</maxWeightClass>
-<retreatThreshold>50</retreatThreshold>
-<startingAltitude>0</startingAltitude>
-<syncDeploymentType>SameEdge</syncDeploymentType>
-<syncedForceName>Player</syncedForceName>
-<useArtillery>false</useArtillery>
+		<actualDeploymentZone>-1</actualDeploymentZone>
+		<allowAeroBombs>true</allowAeroBombs>
+		<allowedUnitType>9</allowedUnitType>
+		<arrivalTurn>0</arrivalTurn>
+		<canReinforceLinked>false</canReinforceLinked>
+		<contributesToBV>true</contributesToBV>
+		<contributesToMapSize>true</contributesToMapSize>
+		<contributesToUnitCount>true</contributesToUnitCount>
+		<deployOffboard>false</deployOffboard>
+		<deploymentZones/>
+		<destinationZone>4</destinationZone>
+		<fixedUnitCount>1</fixedUnitCount>
+		<forceAlignment>1</forceAlignment>
+		<forceMultiplier>1.0</forceMultiplier>
+		<forceName>House Officer</forceName>
+		<generationMethod>3</generationMethod>
+		<generationOrder>3</generationOrder>
+		<maxWeightClass>4</maxWeightClass>
+		<retreatThreshold>50</retreatThreshold>
+		<startingAltitude>5</startingAltitude>
+		<syncDeploymentType>SameEdge</syncDeploymentType>
+		<syncedForceName>Player</syncedForceName>
+		<useArtillery>false</useArtillery>
 	</forceDefinition>
+
+	<objectives>
+        <objective>
+            <associatedForceNames>
+                <associatedForceName>House Officer</associatedForceName>
+            </associatedForceNames>
+            <associatedUnitIDs/>
+            <successEffects>
+                <successEffect>
+                    <effectType>ScenarioVictory</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </successEffect>
+            </successEffects>
+            <failureEffects>
+                <failureEffect>
+                    <effectType>ScenarioDefeat</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </failureEffect>
+		<failureEffect>
+                    <effectType>ContractScoreUpdate</effectType>
+                    <effectScaling>Inverted</effectScaling>
+                    <howMuch>-1</howMuch>
+                </failureEffect>
+            </failureEffects>
+            <additionalDetails>
+		<additionalDetail>If the house unit is irrevocably destroyed, it will reduce contract score by 1.</additionalDetail>
+            </additionalDetails>
+            <description>Preserve 100% of the following force(s) and unit(s):</description>
+            <destinationEdge>NONE</destinationEdge>
+            <objectiveCriterion>Preserve</objectiveCriterion>
+            <percentage>100</percentage>
+            <timeLimit>0</timeLimit>
+            <timeLimitAtMost>true</timeLimitAtMost>
+            <timeLimitType>None</timeLimitType>
+        </objective>
+	<objective>
+            <associatedForceNames>
+                <associatedForceName>House Officer</associatedForceName>
+                <associatedForceName>Player</associatedForceName>
+                <associatedForceName>Allied Force</associatedForceName>
+            </associatedForceNames>
+            <associatedUnitIDs/>
+            <successEffects>
+                <successEffect>
+                    <effectType>ScenarioVictory</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </successEffect>
+            </successEffects>
+            <failureEffects>
+                <failureEffect>
+                    <effectType>ScenarioDefeat</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </failureEffect>
+            </failureEffects>
+            <additionalDetails/>
+            <description>Preserve 50% of the following force(s) and unit(s):</description>
+            <destinationEdge>NONE</destinationEdge>
+            <objectiveCriterion>Preserve</objectiveCriterion>
+            <percentage>50</percentage>
+            <timeLimit>0</timeLimit>
+            <timeLimitAtMost>true</timeLimitAtMost>
+            <timeLimitType>None</timeLimitType>
+        </objective>
+        </objectives>
 </AtBScenarioModifier>

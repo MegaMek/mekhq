@@ -1,6 +1,5 @@
 package mekhq.gui.model;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.FontMetrics;
 import java.text.SimpleDateFormat;
@@ -18,6 +17,7 @@ import javax.swing.text.StyleConstants;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.Kill;
+import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 public class PersonnelKillLogModel extends DataTableModel {
     private static final long serialVersionUID = 2930826794853379579L;
@@ -37,7 +37,7 @@ public class PersonnelKillLogModel extends DataTableModel {
         data = new ArrayList<Kill>();
         dateTextWidth = getRenderer().metrics.stringWidth(shortDateFormat.format(new Date())) + 10;
     }
-   
+
     @Override
     public int getRowCount() {
         return data.size();
@@ -59,7 +59,7 @@ public class PersonnelKillLogModel extends DataTableModel {
                 return EMPTY_CELL;
         }
     }
-    
+
     @Override
     public Object getValueAt(int row, int column) {
         Kill kill = getKill(row);
@@ -74,24 +74,24 @@ public class PersonnelKillLogModel extends DataTableModel {
                 return EMPTY_CELL;
         }
     }
-    
+
     @Override
     public Class<?> getColumnClass(int c) {
         return String.class;
     }
-    
+
     @Override
     public boolean isCellEditable(int row, int col) {
         return false;
     }
-    
+
     public Kill getKill(int row) {
         if((row < 0) || (row >= data.size())) {
             return null;
         }
         return (Kill) data.get(row);
     }
-    
+
     public int getAlignment(int column) {
         switch(column) {
             case COL_DATE:
@@ -102,7 +102,7 @@ public class PersonnelKillLogModel extends DataTableModel {
                 return StyleConstants.ALIGN_CENTER;
         }
     }
-    
+
     public int getPreferredWidth(int column) {
         switch(column) {
             case COL_DATE:
@@ -113,7 +113,7 @@ public class PersonnelKillLogModel extends DataTableModel {
                 return 100;
         }
     }
-    
+
     public boolean hasConstantWidth(int col) {
         switch(col) {
             case COL_DATE:
@@ -122,11 +122,11 @@ public class PersonnelKillLogModel extends DataTableModel {
                 return false;
         }
     }
-    
+
     public PersonnelKillLogModel.Renderer getRenderer() {
         return new PersonnelKillLogModel.Renderer();
     }
-    
+
     public static class Renderer extends JTextPane implements TableCellRenderer  {
         private static final long serialVersionUID = -2201201114822098877L;
         private final SimpleAttributeSet attribs = new SimpleAttributeSet();
@@ -159,13 +159,7 @@ public class PersonnelKillLogModel extends DataTableModel {
                 table.setRowHeight(row, height);
             }
 
-            setForeground(Color.BLACK);
-            // tiger stripes
-            if (row % 2 == 0) {
-                setBackground(new Color(230,230,230));
-            } else {
-                setBackground(Color.WHITE);
-            }
+            MekHqTableCellRenderer.setupTableColors(this, table, isSelected, hasFocus, row);
             return this;
         }
     }
