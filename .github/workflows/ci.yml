@@ -1,0 +1,219 @@
+#
+# Builds MekHQ for CI (and CD via artifacts)
+#
+# Jobs:
+#
+#    - ci_cd: Build MekHQ for CI/CD on Ubuntu with Java 1.8
+#        - This job will use MM and MML source directly
+#          for the build.
+#
+#    - other_os_ci: Build MekHQ on Windows and MacOS.
+#        - This job runs after `ci_cd` completes successfully.
+#
+
+name: MekHQ CI with Gradle
+
+#
+# This Action Definition should be triggered only on
+# Pull Requests being added/updated against master.
+#
+on:
+  pull_request:
+    branches: [ master ]
+
+#
+# Setup the Build Scan "VCS" link for all gradle invocations
+#
+env:
+  GRADLE_OPTS: "-Dscan.link.VCS=${{ github.event.pull_request.html_url }}"
+
+jobs:
+
+  #
+  # Perform CI (and CD as an artifact) of MekHQ
+  # any time a pull request is added or updated.
+  #
+  ci_cd:
+    
+    # For CI/CD running on *nix is sufficient
+    runs-on: ubuntu-latest
+
+    steps:
+    #
+    # Checkout the Pull Request source
+    # and put it in: ./mekhq
+    #
+    - uses: actions/checkout@v2
+      with:
+        path: mekhq
+
+    #
+    # Setup composite build for MekHQ
+    #
+    # see: https://github.com/MegaMek/megamek/wiki/Working-With-Gradle
+    #
+    - name: Setup Composite Build for MekHQ
+      run: |
+        echo "includeBuild '../megamek'" >./mekhq/settings_local.gradle
+        echo "includeBuild '../megameklab'" >>./mekhq/settings_local.gradle
+
+    #
+    # Find the repo and branch to use for MM
+    #
+    # Output variables:
+    #
+    #    - mmRepo: The MM repository to use.
+    #    - mmBranch: The MM branch to use.
+    #
+    - name: Find the Right MegaMek Branch
+      id: find_mm
+      # Override bash so that it doesn't fail fast (the default)
+      # if we can't find the branch
+      shell: bash {0}
+      # This shell script searches the PR submitter's MM repo for
+      # a branch that has the same name as the current PR branch.
+      # If found it sets the `mmRepo` and `mmBranch` step output variables
+      # to that branch.
+      run: |
+        git ls-remote --exit-code --heads ${{ github.event.pull_request.head.repo.owner.html_url }}/megamek.git ${{ github.event.pull_request.head.ref }}
+        if [ "$?" == "0" ]
+        then
+          echo "${{ github.event.pull_request.head.repo.owner.html_url }}" | awk -F/ '{print "::set-output name=mmRepo::" $4 "/megamek"}'
+          echo "::set-output name=mmBranch::${{ github.event.pull_request.head.ref }}"
+        else
+          echo "::set-output name=mmRepo::MegaMek/megamek"
+          echo "::set-output name=mmBranch::master"
+        fi
+        exit 0
+
+    #
+    # Checkout the latest Megamek source
+    # and put it in: ./megamek
+    #
+    - name: Checkout MegaMek
+      uses: actions/checkout@v2
+      with:
+        repository: ${{ steps.find_mm.outputs.mmRepo }}
+        ref:  ${{ steps.find_mm.outputs.mmBranch }}
+        path: megamek
+
+    #
+    # Find the repo and branch to use for MML
+    #
+    # Output variables:
+    #
+    #    - mmlRepo: The MML repository to use.
+    #    - mmlBranch: The MML branch to use.
+    #
+    - name: Find the Right MegaMekLab Branch
+      id: find_mml
+      # Override bash so that it doesn't fail fast (the default)
+      # if we can't find the branch
+      shell: bash {0}
+      # This shell script searches the PR submitter's MML repo for
+      # a branch that has the same name as the current PR branch.
+      # If found it sets the mmlRepo and mmlBranch step output variables
+      # to that branch.
+      run: |
+        git ls-remote --exit-code --heads ${{ github.event.pull_request.head.repo.owner.html_url }}/megameklab.git ${{ github.event.pull_request.head.ref }}
+        if [ "$?" == "0" ]
+        then
+          echo "${{ github.event.pull_request.head.repo.owner.html_url }}" | awk -F/ '{print "::set-output name=mmlRepo::" $4 "/megameklab"}'
+          echo "::set-output name=mmlBranch::${{ github.event.pull_request.head.ref }}"
+        else
+          echo "::set-output name=mmlRepo::MegaMek/megameklab"
+          echo "::set-output name=mmlBranch::master"
+        fi
+        exit 0
+
+    #
+    # Checkout the latest MegaMekLab source
+    # and put it in: ./megameklab
+    #
+    - name: Checkout MegaMekLab
+      uses: actions/checkout@v2
+      with:
+        repository: ${{ steps.find_mml.outputs.mmlRepo }}
+        ref: ${{ steps.find_mml.outputs.mmlBranch }}
+        path: megameklab
+
+    #
+    # Setup composite build for MegaMekLab
+    #
+    # see: https://github.com/MegaMek/megamek/wiki/Working-With-Gradle
+    #
+    - name: Setup Composite Build for MegaMekLab
+      run: |
+        echo "if (gradle.parent == null) includeBuild '../megamek'" >./megameklab/settings_local.gradle
+
+    #
+    # Use Java 1.8
+    #
+    - name: Set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+
+    #
+    # Make sure we can execute the Gradle wrapper        
+    #
+    - name: Grant execute permission for gradlew (*nix or MacOS)
+      working-directory: mekhq  
+      run: chmod +x gradlew
+
+    #
+    # Build the MekHQ project
+    #
+    # Directory layout:
+    #    /mekhq
+    #        /gradlew
+    #    /megamek
+    #    /megameklab
+    #
+    # Output Variables:
+    #    - buildScanUri
+    #
+    - name: Build with Gradle
+      id: gradle_build
+      working-directory: mekhq
+      run: ./gradlew -I .github/build-scan-init.gradle build --stacktrace --scan
+      
+    #
+    # If the build step fails, try to upload any
+    # test logs in case it was a unit test failure.
+    #
+    # The logs will be relative to the ./mekhq directory.
+    #
+    - name: Upload Test Logs on Failure
+      uses: actions/upload-artifact@v2-preview
+      if: failure()
+      with:
+        name: cd-failure-logs
+        path: ./mekhq/MekHQ/build/reports/
+
+    #
+    # If we have a buildScanUri comment on the PR
+    #
+    # NB: This only works if you're on the main MegaMek\mekhq repo
+    #     for now due to a GitHub Actions limitation.
+    #
+    - name: Comment on PR with Build Scan URI
+      uses: thollander/actions-comment-pull-request@master
+      if: always() && steps.gradle_build.outputs.buildScanUri != ''
+      with:
+        message: Build scan available at ${{ steps.gradle_build.outputs.buildScanUri }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    #
+    # Put the releases up in a single zip file called:
+    #
+    #     releases.zip
+    #
+    # NB: Due to a GitHub Actions limitation we won't know
+    #     what the filename is in order to display it somewhere.
+    #
+    - name: Upload Releases
+      uses: actions/upload-artifact@v2-preview
+      with:
+        name: releases
+        path: ./mekhq/MekHQ/build/distributions/

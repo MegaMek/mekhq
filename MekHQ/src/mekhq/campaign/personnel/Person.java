@@ -4055,7 +4055,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public void setOriginalUnit(Unit unit) {
         originalUnitId = unit.getId();
         if (unit.getEntity().isClan()) {
-            originalUnitTech += TECH_CLAN;
+            originalUnitTech = TECH_CLAN;
         } else if (unit.getEntity().getTechLevel() > megamek.common.TechConstants.T_INTRO_BOXSET) {
             originalUnitTech = TECH_IS2;
         } else {
