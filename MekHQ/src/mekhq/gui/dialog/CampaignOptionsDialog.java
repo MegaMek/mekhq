@@ -82,7 +82,6 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.GamePreset;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.event.OptionsChangedEvent;
-import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.Part;
@@ -90,6 +89,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.enums.MarriageSurnameStyle;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.RATManager;
@@ -98,7 +98,6 @@ import mekhq.gui.SpecialAbilityPanel;
 import mekhq.gui.model.RankTableModel;
 import mekhq.gui.model.SortedComboBoxModel;
 import mekhq.gui.preferences.JWindowPreference;
-import mekhq.gui.utilities.JMoneyTextField;
 import mekhq.gui.utilities.TableCellListener;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
@@ -1778,19 +1777,26 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(panMarriageAgeRange, gridBagConstraints);
 
-        JPanel panRandomMarriageSurnameWeights = new JPanel(new GridLayout((int) Math.ceil(Person.NUM_SURNAME / 3.0), 3));
+        MarriageSurnameStyle[] marriageSurnameStyles = MarriageSurnameStyle.values();
+        int surnameWeightLength = marriageSurnameStyles.length - 1;
+        JPanel panRandomMarriageSurnameWeights = new JPanel(new GridLayout((int)
+                Math.ceil(((double) surnameWeightLength) / 3.0), 3));
         panRandomMarriageSurnameWeights.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("randomMarriageSurnameWeights.text")));
         panRandomMarriageSurnameWeights.setToolTipText(resourceMap.getString("randomMarriageSurnameWeights.toolTipText"));
-        spnRandomMarriageSurnameWeights = new JSpinner[Person.NUM_SURNAME];
-        JSpinner spnRandomMarriageSurnameWeight;
-        JPanel panRandomMarriageSurnameWeight;
-        for (int i = 0; i < Person.NUM_SURNAME; i++) {
-            spnRandomMarriageSurnameWeight = new JSpinner(new SpinnerNumberModel((options.getRandomMarriageSurnameWeights(i) / 10.0), 0, 100, 0.1));
-            panRandomMarriageSurnameWeight = new JPanel();
-            panRandomMarriageSurnameWeight.add(spnRandomMarriageSurnameWeight);
-            panRandomMarriageSurnameWeight.add(new JLabel(Person.SURNAME_TYPE_NAMES[i]));
-            panRandomMarriageSurnameWeights.add(panRandomMarriageSurnameWeight);
+        spnRandomMarriageSurnameWeights = new JSpinner[surnameWeightLength];
+        for (int i = 0; i < surnameWeightLength; i++) {
+            JSpinner spnRandomMarriageSurnameWeight = new JSpinner(new SpinnerNumberModel(
+                    (options.getRandomMarriageSurnameWeights(i) / 10.0), 0, 100, 0.1));
             spnRandomMarriageSurnameWeights[i] = spnRandomMarriageSurnameWeight;
+
+            JPanel panRandomMarriageSurnameWeight = new JPanel();
+            panRandomMarriageSurnameWeight.add(spnRandomMarriageSurnameWeight);
+
+            JLabel lblRandomMarriageSurnameWeight = new JLabel(marriageSurnameStyles[i].getName());
+            lblRandomMarriageSurnameWeight.setToolTipText(marriageSurnameStyles[i].getToolTipText());
+            panRandomMarriageSurnameWeight.add(lblRandomMarriageSurnameWeight);
+
+            panRandomMarriageSurnameWeights.add(panRandomMarriageSurnameWeight);
         }
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(panRandomMarriageSurnameWeights, gridBagConstraints);
@@ -4833,7 +4839,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setUseRandomMarriages(chkUseRandomMarriages.isSelected());
         options.setChanceRandomMarriages((Double) spnChanceRandomMarriages.getModel().getValue() / 100.0);
         options.setMarriageAgeRange((Integer) spnMarriageAgeRange.getModel().getValue());
-        for (int i = 0; i < Person.NUM_SURNAME; i++) {
+        for (int i = 0; i < spnRandomMarriageSurnameWeights.length; i++) {
             int val = (int) Math.round(((Double) spnRandomMarriageSurnameWeights[i].getModel().getValue()) * 10);
             options.setRandomMarriageSurnameWeight(i, val);
         }

@@ -36,14 +36,10 @@ import java.util.stream.IntStream;
 import megamek.common.*;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
-import megamek.common.util.WeightedMap;
 import mekhq.campaign.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.*;
-import mekhq.campaign.personnel.enums.BodyLocation;
-import mekhq.campaign.personnel.enums.GenderDescriptors;
-import mekhq.campaign.personnel.enums.ModifierValue;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.enums.*;
 import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -184,26 +180,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //endregion Procreation
 
     //region Marriage
-    // Marriage Surnames
-    public static final int SURNAME_NO_CHANGE = 0;
-    public static final int SURNAME_YOURS = 1;
-    public static final int SURNAME_SPOUSE = 2;
-    public static final int SURNAME_HYP_YOURS = 3;
-    public static final int SURNAME_BOTH_HYP_YOURS = 4;
-    public static final int SURNAME_HYP_SPOUSE = 5;
-    public static final int SURNAME_BOTH_HYP_SPOUSE = 6;
-    public static final int SURNAME_MALE = 7;
-    public static final int SURNAME_FEMALE = 8;
-    public static final int SURNAME_WEIGHTED = 9; //should be equal to NUM_SURNAME at all times
-    public static final int NUM_SURNAME = 9; //number of surname options not counting the SURNAME_WEIGHTED OPTION
-
-    public static final String[] SURNAME_TYPE_NAMES = new String[] {
-        "No Change", "Yours", "Spouse",
-        "Yours-Spouse", "Both Yours-Spouse", "Spouse-Yours",
-        "Both Spouse-Yours", "Male", "Female"
-    };
-    //endregion Marriage Variables
-
     //region Divorce Variables
     public static final String OPT_SELECTED_CHANGE_SURNAME = "selected_change_surname";
     public static final String OPT_SPOUSE_CHANGE_SURNAME = "spouse_change_surname";
@@ -1358,7 +1334,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public void addRandomSpouse(boolean sameSex) {
         List<Person> potentials = new ArrayList<>();
         int gender = sameSex ? getGender() : (isMale() ? Crew.G_FEMALE : Crew.G_MALE);
-        for (Person p : campaign.getPersonnel()) {
+        for (Person p : getCampaign().getActivePersonnel()) {
             if (isPotentialRandomSpouse(p, gender)) {
                 potentials.add(p);
             }
@@ -1366,14 +1342,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
         int n = potentials.size();
         if (n > 0) {
-            marry(potentials.get(Compute.randomInt(n)), SURNAME_WEIGHTED);
+            marry(potentials.get(Compute.randomInt(n)), MarriageSurnameStyle.WEIGHTED);
         }
     }
 
     public boolean isPotentialRandomSpouse(Person p, int gender) {
-        if (p.getGender() != gender) {
-            return false;
-        } else if (!safeSpouse(p)) {
+        if ((p.getGender() != gender) || !p.isFree() || !safeSpouse(p)) {
             return false;
         }
 
@@ -1382,96 +1356,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return (ageDifference <= getCampaign().getCampaignOptions().getMarriageAgeRange());
     }
 
-    public void marry(Person spouse, int surnameOption) {
-        String surname = getSurname();
-        String spouseSurname = spouse.getSurname();
-
-        if (surnameOption == SURNAME_WEIGHTED) {
-            WeightedMap<Integer> map = createWeightedSurnameMap();
-            surnameOption = map.randomItem();
-        }
-
-        switch(surnameOption) {
-            case SURNAME_NO_CHANGE:
-                break;
-            case SURNAME_SPOUSE:
-                setSurname(spouseSurname);
-                setMaidenName(surname); //"" is handled in the divorce code
-                break;
-            case SURNAME_YOURS:
-                spouse.setSurname(surname);
-                spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
-                break;
-            case SURNAME_HYP_YOURS:
-                if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
-                    setSurname(surname + "-" + spouseSurname);
-                } else {
-                    setSurname(spouseSurname);
-                }
-
-                setMaidenName(surname); //"" is handled in the divorce code
-                break;
-            case SURNAME_BOTH_HYP_YOURS:
-                if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
-                    setSurname(surname + "-" + spouseSurname);
-                    spouse.setSurname(surname + "-" + spouseSurname);
-                } else if (!StringUtil.isNullOrEmpty(spouseSurname)) {
-                    setSurname(spouseSurname);
-                } else if (!StringUtil.isNullOrEmpty(surname)) {
-                    spouse.setSurname(surname);
-                }
-                //both null or "" is ignored as a case, as it would lead to no changes
-
-                setMaidenName(surname); //"" is handled in the divorce code
-                spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
-                break;
-            case SURNAME_HYP_SPOUSE:
-                if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
-                    spouse.setSurname(spouseSurname + "-" + surname);
-                } else {
-                    spouse.setSurname(surname);
-                }
-
-                spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
-                break;
-            case SURNAME_BOTH_HYP_SPOUSE:
-                if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
-                    setSurname(spouseSurname + "-" + surname);
-                    spouse.setSurname(spouseSurname + "-" + surname);
-                } else if (!StringUtil.isNullOrEmpty(spouseSurname)) {
-                    setSurname(spouseSurname);
-                } else if (!StringUtil.isNullOrEmpty(surname)) {
-                    spouse.setSurname(surname);
-                }
-                //both null or "" is ignored as a case, as it would lead to no changes
-
-                setMaidenName(surname); //"" is handled in the divorce code
-                spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
-                break;
-            case SURNAME_MALE:
-                if (isMale()) {
-                    spouse.setSurname(surname);
-                    spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
-                } else {
-                    setSurname(spouseSurname);
-                    setMaidenName(surname); //"" is handled in the divorce code
-                }
-                break;
-            case SURNAME_FEMALE:
-                if (isMale()) {
-                    setSurname(spouseSurname);
-                    setMaidenName(surname); //"" is handled in the divorce code
-                } else {
-                    spouse.setSurname(surname);
-                    spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
-                }
-                break;
-            default:
-                MekHQ.getLogger().log(getClass(), "marry", LogLevel.ERROR,
-                        String.format("Unknown error in Surname chooser between \"%s\" and \"%s\"",
-                        getFullName(), spouse.getFullName()));
-                break;
-        }
+    public void marry(Person spouse, MarriageSurnameStyle surnameStyle) {
+        surnameStyle.generateAndAssignSurnames(this, spouse, campaign);
 
         spouse.setSpouseId(getId());
         PersonalLogger.marriage(spouse, this, getCampaign().getDate());
@@ -1483,18 +1369,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
         MekHQ.triggerEvent(new PersonChangedEvent(this));
         MekHQ.triggerEvent(new PersonChangedEvent(spouse));
-    }
-
-    private WeightedMap<Integer> createWeightedSurnameMap() {
-        WeightedMap<Integer> map = new WeightedMap<>();
-
-        int[] weights = campaign.getCampaignOptions().getRandomMarriageSurnameWeights();
-
-        for (int i = 0; i < NUM_SURNAME; i++) {
-            map.add(weights[i], i);
-        }
-
-        return map;
     }
     //endregion Marriage
 

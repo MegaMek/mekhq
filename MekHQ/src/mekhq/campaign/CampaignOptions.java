@@ -27,6 +27,7 @@ import java.util.List;
 
 import mekhq.campaign.finances.Money;
 
+import mekhq.campaign.personnel.enums.MarriageSurnameStyle;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -502,16 +503,20 @@ public class CampaignOptions implements Serializable {
         useRandomMarriages = false;
         chanceRandomMarriages = 0.00025;
         marriageAgeRange = 10;
-        randomMarriageSurnameWeights = new int[Person.NUM_SURNAME];
-        randomMarriageSurnameWeights[Person.SURNAME_NO_CHANGE] = 100;
-        randomMarriageSurnameWeights[Person.SURNAME_YOURS] = 60;
-        randomMarriageSurnameWeights[Person.SURNAME_SPOUSE] = 60;
-        randomMarriageSurnameWeights[Person.SURNAME_HYP_YOURS] = 35;
-        randomMarriageSurnameWeights[Person.SURNAME_BOTH_HYP_YOURS] = 25;
-        randomMarriageSurnameWeights[Person.SURNAME_HYP_SPOUSE] = 35;
-        randomMarriageSurnameWeights[Person.SURNAME_BOTH_HYP_SPOUSE] = 25;
-        randomMarriageSurnameWeights[Person.SURNAME_MALE] = 500;
-        randomMarriageSurnameWeights[Person.SURNAME_FEMALE] = 160;
+        randomMarriageSurnameWeights = new int[MarriageSurnameStyle.values().length - 1];
+        randomMarriageSurnameWeights[MarriageSurnameStyle.NO_CHANGE.ordinal()] = 100;
+        randomMarriageSurnameWeights[MarriageSurnameStyle.YOURS.ordinal()] = 60;
+        randomMarriageSurnameWeights[MarriageSurnameStyle.SPOUSE.ordinal()] = 60;
+        randomMarriageSurnameWeights[MarriageSurnameStyle.SPACE_YOURS.ordinal()] = 0;
+        randomMarriageSurnameWeights[MarriageSurnameStyle.BOTH_SPACE_YOURS.ordinal()] = 0;
+        randomMarriageSurnameWeights[MarriageSurnameStyle.HYP_YOURS.ordinal()] = 35;
+        randomMarriageSurnameWeights[MarriageSurnameStyle.BOTH_HYP_YOURS.ordinal()] = 25;
+        randomMarriageSurnameWeights[MarriageSurnameStyle.SPACE_SPOUSE.ordinal()] = 0;
+        randomMarriageSurnameWeights[MarriageSurnameStyle.BOTH_SPACE_SPOUSE.ordinal()] = 0;
+        randomMarriageSurnameWeights[MarriageSurnameStyle.HYP_SPOUSE.ordinal()] = 35;
+        randomMarriageSurnameWeights[MarriageSurnameStyle.BOTH_HYP_SPOUSE.ordinal()] = 25;
+        randomMarriageSurnameWeights[MarriageSurnameStyle.MALE.ordinal()] = 500;
+        randomMarriageSurnameWeights[MarriageSurnameStyle.FEMALE.ordinal()] = 160;
         useRandomSameSexMarriages = false;
         chanceRandomSameSexMarriages = 0.00002;
         useUnofficialProcreation = false;
@@ -3345,8 +3350,15 @@ public class CampaignOptions implements Serializable {
                 retVal.marriageAgeRange = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageSurnameWeights")) {
                 String[] values = wn2.getTextContent().split(",");
-                for (int i = 0; i < values.length; i++) {
-                    retVal.randomMarriageSurnameWeights[i] = Integer.parseInt(values[i]);
+                if (values.length == 13) {
+                    for (int i = 0; i < values.length; i++) {
+                        retVal.randomMarriageSurnameWeights[i] = Integer.parseInt(values[i]);
+                    }
+                } else if (values.length == 9) {
+                    migrateMarriageSurnameWeights(retVal, values);
+                } else {
+                    MekHQ.getLogger().error(CampaignOptions.class, "generateCampaignOptionsFromXml",
+                            "");
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomSameSexMarriages")) {
                 retVal.useRandomSameSexMarriages = Boolean.parseBoolean(wn2.getTextContent().trim());
@@ -3663,6 +3675,52 @@ public class CampaignOptions implements Serializable {
                 "Load Campaign Options Complete!"); //$NON-NLS-1$
 
         return retVal;
+    }
+
+    /**
+     * This is annoyingly required for the case of anyone having changed the surname weights.
+     * The code is not nice, but will nicely handle the cases where anyone has moved.
+     * @param retVal the return CampaignOptions
+     * @param values the values to migrate
+     */
+    private static void migrateMarriageSurnameWeights(CampaignOptions retVal, String[] values) {
+        int[] weights = new int[values.length];
+
+        for (int i = 0; i < weights.length; i++) {
+            weights[i] = Integer.parseInt(values[i]);
+        }
+
+        // Now we need to test to figure out the weights have changed. If not, we will restore to the
+        // new default values. If they have, we save their changes and add the new surname weights
+        boolean changed = false;
+
+        if (
+                (weights[0] != retVal.randomMarriageSurnameWeights[0])
+                || (weights[1] != retVal.randomMarriageSurnameWeights[1])
+                || (weights[2] != retVal.randomMarriageSurnameWeights[2])
+                || (weights[3] != retVal.randomMarriageSurnameWeights[9])
+                || (weights[4] != retVal.randomMarriageSurnameWeights[10])
+                || (weights[5] != retVal.randomMarriageSurnameWeights[5])
+                || (weights[6] != retVal.randomMarriageSurnameWeights[6])
+                || (weights[7] != retVal.randomMarriageSurnameWeights[11])
+                || (weights[8] != retVal.randomMarriageSurnameWeights[12])
+        ) {
+            changed = true;
+        }
+
+        retVal.randomMarriageSurnameWeights[0] = changed ? weights[0] : retVal.randomMarriageSurnameWeights[0];
+        retVal.randomMarriageSurnameWeights[1] = changed ? weights[1] : retVal.randomMarriageSurnameWeights[1];
+        retVal.randomMarriageSurnameWeights[2] = changed ? weights[2] : retVal.randomMarriageSurnameWeights[2];
+        // 3 is newly added
+        // 4 is newly added
+        retVal.randomMarriageSurnameWeights[5] = changed ? weights[5] : retVal.randomMarriageSurnameWeights[5];
+        retVal.randomMarriageSurnameWeights[6] = changed ? weights[6] : retVal.randomMarriageSurnameWeights[6];
+        // 7 is newly added
+        // 8 is newly added
+        retVal.randomMarriageSurnameWeights[9] = changed ? weights[3] : retVal.randomMarriageSurnameWeights[9];
+        retVal.randomMarriageSurnameWeights[10] = changed ? weights[4] : retVal.randomMarriageSurnameWeights[10];
+        retVal.randomMarriageSurnameWeights[11] = changed ? weights[7] : retVal.randomMarriageSurnameWeights[11];
+        retVal.randomMarriageSurnameWeights[12] = changed ? weights[8] : retVal.randomMarriageSurnameWeights[12];
     }
 
     public static class MassRepairOption {
