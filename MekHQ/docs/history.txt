@@ -20,6 +20,7 @@ VERSION HISTORY:
 + PR #1656: Avoid NPE in Person::isMothballing
 + Issue #1635: Base Salaries Not Displaying Correctly in Nimbus
 + PR #1659: Implementing Log Maintenance
++ PR #1666: Fix bug with personnel original unit tech (if clan tech level)
 
 0.47.5 (2020-4-01 2000 UTC)
 + Issue #1470: Thumper artillery vehicle causes array index out of bounds exception error
