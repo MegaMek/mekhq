@@ -1297,6 +1297,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         // can't marry a prisoner, unless you are also a prisoner (this is purposely left open for prisoners to marry who they want)
         // can't marry a person who is dead or MIA
         // can't marry inactive personnel (this is to show how they aren't part of the force anymore)
+        // TODO : can't marry anyone who is not located at the same planet as the person - GitHub #1672: Implement current planet tracking for personnel
         // can't marry a close relative
         return (
                 !this.equals(p)
@@ -1306,26 +1307,27 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 && !p.isDeadOrMIA()
                 && p.isActive()
                 && ((getAncestorsId() == null)
-                    || !campaign.getAncestors(getAncestorsId()).checkMutualAncestors(campaign.getAncestors(p.getAncestorsId())))
+                    || !getCampaign().getAncestors(getAncestorsId()).checkMutualAncestors(
+                            getCampaign().getAncestors(p.getAncestorsId())))
         );
     }
 
     public boolean oldEnoughToMarry() {
-        return (getAge(getCampaign().getLocalDate()) >= campaign.getCampaignOptions().getMinimumMarriageAge());
+        return (getAge(getCampaign().getLocalDate()) >= getCampaign().getCampaignOptions().getMinimumMarriageAge());
     }
 
     public void randomMarriage() {
         // Don't attempt to generate is someone has a spouse, isn't old enough to marry,
-        // is actively deployed, or is currently a prisoner
-        if (hasSpouse() || !oldEnoughToMarry() || isDeployed() || isPrisoner()) {
+        // or is actively deployed
+        if (hasSpouse() || !oldEnoughToMarry() || isDeployed()) {
             return;
         }
 
         // setting is the fractional chance that this attempt at finding a marriage will result in one
-        if (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceRandomMarriages())) {
+        if (Compute.randomFloat() < (getCampaign().getCampaignOptions().getChanceRandomMarriages())) {
             addRandomSpouse(false);
-        } else if (campaign.getCampaignOptions().useRandomSameSexMarriages()) {
-            if (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceRandomSameSexMarriages())) {
+        } else if (getCampaign().getCampaignOptions().useRandomSameSexMarriages()) {
+            if (Compute.randomFloat() < (getCampaign().getCampaignOptions().getChanceRandomSameSexMarriages())) {
                 addRandomSpouse(true);
             }
         }
@@ -1347,7 +1349,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public boolean isPotentialRandomSpouse(Person p, int gender) {
-        if ((p.getGender() != gender) || !p.isFree() || !safeSpouse(p)) {
+        if ((p.getGender() != gender) || !safeSpouse(p) || !(isPrisoner() && p.isPrisoner())) {
             return false;
         }
 
