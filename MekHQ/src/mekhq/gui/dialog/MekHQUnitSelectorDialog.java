@@ -22,7 +22,6 @@ import megamek.client.ui.Messages;
 import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.common.*;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.UnitOrder;
@@ -63,7 +62,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         canonOnly = campaign.getCampaignOptions().allowCanonOnly();
         gameTechLevel = campaign.getCampaignOptions().getTechLevel();
 
-        if (campaign.getCampaignOptions().allowISPurchases() && campaign.getCampaignOptions().allowISPurchases()) {
+        if (campaign.getCampaignOptions().allowClanPurchases() && campaign.getCampaignOptions().allowISPurchases()) {
             techLevelDisplayType = TECH_LEVEL_DISPLAY_IS_CLAN;
         } else if (campaign.getCampaignOptions().allowClanPurchases()) {
             techLevelDisplayType = TECH_LEVEL_DISPLAY_CLAN;
