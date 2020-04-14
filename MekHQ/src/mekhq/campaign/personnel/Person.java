@@ -1349,7 +1349,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public boolean isPotentialRandomSpouse(Person p, int gender) {
-        if ((p.getGender() != gender) || !safeSpouse(p) || !(isPrisoner() && p.isPrisoner())) {
+        if ((p.getGender() != gender) || !safeSpouse(p) || !(isFree() || (isPrisoner() && p.isPrisoner()))) {
             return false;
         }
 
