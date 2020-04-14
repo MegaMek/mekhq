@@ -3713,12 +3713,12 @@ public class CampaignOptions implements Serializable {
         retVal.randomMarriageSurnameWeights[2] = changed ? weights[2] : retVal.randomMarriageSurnameWeights[2];
         // 3 is newly added
         // 4 is newly added
-        retVal.randomMarriageSurnameWeights[5] = changed ? weights[5] : retVal.randomMarriageSurnameWeights[5];
-        retVal.randomMarriageSurnameWeights[6] = changed ? weights[6] : retVal.randomMarriageSurnameWeights[6];
+        retVal.randomMarriageSurnameWeights[5] = changed ? weights[3] : retVal.randomMarriageSurnameWeights[5];
+        retVal.randomMarriageSurnameWeights[6] = changed ? weights[4] : retVal.randomMarriageSurnameWeights[6];
         // 7 is newly added
         // 8 is newly added
-        retVal.randomMarriageSurnameWeights[9] = changed ? weights[3] : retVal.randomMarriageSurnameWeights[9];
-        retVal.randomMarriageSurnameWeights[10] = changed ? weights[4] : retVal.randomMarriageSurnameWeights[10];
+        retVal.randomMarriageSurnameWeights[9] = changed ? weights[5] : retVal.randomMarriageSurnameWeights[9];
+        retVal.randomMarriageSurnameWeights[10] = changed ? weights[6] : retVal.randomMarriageSurnameWeights[10];
         retVal.randomMarriageSurnameWeights[11] = changed ? weights[7] : retVal.randomMarriageSurnameWeights[11];
         retVal.randomMarriageSurnameWeights[12] = changed ? weights[8] : retVal.randomMarriageSurnameWeights[12];
     }

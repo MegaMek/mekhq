@@ -102,46 +102,12 @@ public enum MarriageSurnameStyle {
                 break;
             case SPACE_YOURS:
                 if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
-                    origin.setSurname(surname + " " + spouseSurname);
-                } else {
-                    origin.setSurname(spouseSurname);
-                }
-                break;
-            case BOTH_SPACE_YOURS:
-                if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
-                    origin.setSurname(surname + " " + spouseSurname);
-                    spouse.setSurname(surname + " " + spouseSurname);
-                } else if (!StringUtil.isNullOrEmpty(spouseSurname)) {
-                    origin.setSurname(spouseSurname);
-                } else if (!StringUtil.isNullOrEmpty(surname)) {
-                    spouse.setSurname(surname);
-                }
-                break;
-            case HYP_YOURS:
-                if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
-                    origin.setSurname(surname + "-" + spouseSurname);
-                } else {
-                    origin.setSurname(spouseSurname);
-                }
-                break;
-            case BOTH_HYP_YOURS:
-                if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
-                    origin.setSurname(surname + "-" + spouseSurname);
-                    spouse.setSurname(surname + "-" + spouseSurname);
-                } else if (!StringUtil.isNullOrEmpty(spouseSurname)) {
-                    origin.setSurname(spouseSurname);
-                } else if (!StringUtil.isNullOrEmpty(surname)) {
-                    spouse.setSurname(surname);
-                }
-                break;
-            case SPACE_SPOUSE:
-                if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
                     spouse.setSurname(spouseSurname + " " + surname);
                 } else {
                     spouse.setSurname(surname);
                 }
                 break;
-            case BOTH_SPACE_SPOUSE:
+            case BOTH_SPACE_YOURS:
                 if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
                     origin.setSurname(spouseSurname + " " + surname);
                     spouse.setSurname(spouseSurname + " " + surname);
@@ -151,17 +117,51 @@ public enum MarriageSurnameStyle {
                     spouse.setSurname(surname);
                 }
                 break;
-            case HYP_SPOUSE:
+            case HYP_YOURS:
                 if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
                     spouse.setSurname(spouseSurname + "-" + surname);
                 } else {
                     spouse.setSurname(surname);
                 }
                 break;
-            case BOTH_HYP_SPOUSE:
+            case BOTH_HYP_YOURS:
                 if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
                     origin.setSurname(spouseSurname + "-" + surname);
                     spouse.setSurname(spouseSurname + "-" + surname);
+                } else if (!StringUtil.isNullOrEmpty(spouseSurname)) {
+                    origin.setSurname(spouseSurname);
+                } else if (!StringUtil.isNullOrEmpty(surname)) {
+                    spouse.setSurname(surname);
+                }
+                break;
+            case SPACE_SPOUSE:
+                if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
+                    origin.setSurname(surname + " " + spouseSurname);
+                } else {
+                    origin.setSurname(spouseSurname);
+                }
+                break;
+            case BOTH_SPACE_SPOUSE:
+                if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
+                    origin.setSurname(surname + " " + spouseSurname);
+                    spouse.setSurname(surname + " " + spouseSurname);
+                } else if (!StringUtil.isNullOrEmpty(spouseSurname)) {
+                    origin.setSurname(spouseSurname);
+                } else if (!StringUtil.isNullOrEmpty(surname)) {
+                    spouse.setSurname(surname);
+                }
+                break;
+            case HYP_SPOUSE:
+                if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
+                    origin.setSurname(surname + "-" + spouseSurname);
+                } else {
+                    origin.setSurname(spouseSurname);
+                }
+                break;
+            case BOTH_HYP_SPOUSE:
+                if (!StringUtil.isNullOrEmpty(surname) && !StringUtil.isNullOrEmpty(spouseSurname)) {
+                    origin.setSurname(surname + "-" + spouseSurname);
+                    spouse.setSurname(surname + "-" + spouseSurname);
                 } else if (!StringUtil.isNullOrEmpty(spouseSurname)) {
                     origin.setSurname(spouseSurname);
                 } else if (!StringUtil.isNullOrEmpty(surname)) {
@@ -190,6 +190,7 @@ public enum MarriageSurnameStyle {
                 break;
         }
 
+        // Now we set both Maiden Names, to avoid any divorce bugs (as the default is now an empty string)
         origin.setMaidenName(surname);
         spouse.setMaidenName(spouseSurname);
     }
