@@ -3690,10 +3690,8 @@ public class CampaignOptions implements Serializable {
             weights[i] = Integer.parseInt(values[i]);
         }
 
-        // Now we need to test to figure out the weights have changed. If not, we will restore to the
+        // Now we need to test to figure out the weights have changed. If not, we will keep the
         // new default values. If they have, we save their changes and add the new surname weights
-        boolean changed = false;
-
         if (
                 (weights[0] != retVal.randomMarriageSurnameWeights[0])
                 || (weights[1] != retVal.randomMarriageSurnameWeights[1])
@@ -3705,22 +3703,19 @@ public class CampaignOptions implements Serializable {
                 || (weights[7] != retVal.randomMarriageSurnameWeights[11])
                 || (weights[8] != retVal.randomMarriageSurnameWeights[12])
         ) {
-            changed = true;
-        }
-
-        retVal.randomMarriageSurnameWeights[0] = changed ? weights[0] : retVal.randomMarriageSurnameWeights[0];
-        retVal.randomMarriageSurnameWeights[1] = changed ? weights[1] : retVal.randomMarriageSurnameWeights[1];
-        retVal.randomMarriageSurnameWeights[2] = changed ? weights[2] : retVal.randomMarriageSurnameWeights[2];
-        // 3 is newly added
-        // 4 is newly added
-        retVal.randomMarriageSurnameWeights[5] = changed ? weights[3] : retVal.randomMarriageSurnameWeights[5];
-        retVal.randomMarriageSurnameWeights[6] = changed ? weights[4] : retVal.randomMarriageSurnameWeights[6];
-        // 7 is newly added
-        // 8 is newly added
-        retVal.randomMarriageSurnameWeights[9] = changed ? weights[5] : retVal.randomMarriageSurnameWeights[9];
-        retVal.randomMarriageSurnameWeights[10] = changed ? weights[6] : retVal.randomMarriageSurnameWeights[10];
-        retVal.randomMarriageSurnameWeights[11] = changed ? weights[7] : retVal.randomMarriageSurnameWeights[11];
-        retVal.randomMarriageSurnameWeights[12] = changed ? weights[8] : retVal.randomMarriageSurnameWeights[12];
+            retVal.randomMarriageSurnameWeights[0] = weights[0];
+            retVal.randomMarriageSurnameWeights[1] = weights[1];
+            retVal.randomMarriageSurnameWeights[2] = weights[2];
+            // 3 is newly added
+            // 4 is newly added
+            retVal.randomMarriageSurnameWeights[5] = weights[3];
+            retVal.randomMarriageSurnameWeights[6] = weights[4];
+            // 7 is newly added
+            // 8 is newly added
+            retVal.randomMarriageSurnameWeights[9] = weights[5];
+            retVal.randomMarriageSurnameWeights[10] = weights[6];
+            retVal.randomMarriageSurnameWeights[11] = weights[7];
+            retVal.randomMarriageSurnameWeights[12] = weights[8];        }
     }
 
     public static class MassRepairOption {
