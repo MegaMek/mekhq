@@ -1,0 +1,127 @@
+#
+# Builds MekHQ for CI each Night
+#
+# Jobs:
+#
+#    - nightly_ci: Build MekHQ for CI across multiple platforms
+#                  and Java versions.
+#
+
+name: MekHQ Nightly CI
+
+on:
+  schedule:
+    # Nightly at Midnight (UTC)
+    # ref: https://crontab.guru/every-night
+    - cron:  '0 0 * * *'
+
+#
+# Setup the Build Scan "VCS" link for all gradle invocations
+#
+env:
+  GRADLE_OPTS: "-Dscan.link.VCS=https://github.com/MegaMek/mekhq/commit/${{ github.sha }}"
+
+jobs:
+  nightly_ci:
+    # Run this job once for each combination in the
+    # matrix below.
+    strategy:
+      matrix:
+        os:   [ubuntu-latest, windows-latest]
+        java: [ 8, 11 ]
+      fail-fast: false
+
+    runs-on: ${{ matrix.os }}
+
+    name: Nightly MekHQ CI ${{ matrix.os }} on Java ${{ matrix.java }}
+
+    steps:
+
+    #
+    # Checkout the latest source
+    # and put it in: ./mekhq
+    #
+    - uses: actions/checkout@v2
+      with:
+        path: mekhq
+
+    #
+    # Setup composite build for MekHQ
+    #
+    # see: https://github.com/MegaMek/megamek/wiki/Working-With-Gradle
+    #
+    - name: Setup Composite Build for MekHQ
+      run: |
+        echo "includeBuild '../megamek'" >./mekhq/settings_local.gradle
+        echo "includeBuild '../megameklab'" >>./mekhq/settings_local.gradle
+
+    #
+    # Checkout the latest Megamek source
+    # and put it in: ./megamek
+    #
+    - name: Checkout MegaMek
+      uses: actions/checkout@v2
+      with:
+        repository: MegaMek/megamek
+        path: megamek
+
+    #
+    # Checkout the latest MegaMekLab source
+    # and put it in: ./megameklab
+    #
+    - name: Checkout MegaMekLab
+      uses: actions/checkout@v2
+      with:
+        repository: MegaMek/megameklab
+        path: megameklab
+
+    #
+    # Setup composite build for MegaMekLab
+    #
+    # see: https://github.com/MegaMek/megamek/wiki/Working-With-Gradle
+    #
+    - name: Setup Composite Build for MegaMekLab
+      run: |
+        echo "if (gradle.parent == null) includeBuild '../megamek'" >./megameklab/settings_local.gradle
+
+    #
+    # Setup the requested Java Version from the matrix
+    #
+    - name: Set up JDK ${{ matrix.java }}
+      uses: actions/setup-java@v1
+      with:
+        java-version: ${{ matrix.java }}
+
+    # Don't run this for Windows.
+    - name: Grant execute permission for gradlew (*nix or MacOS)
+      working-directory: mekhq
+      run: chmod +x gradlew
+      if: runner.os != 'Windows'
+      
+    # Include --stacktrace to make some build failures easier
+    # to figure out.
+    - name: Build with Gradle
+      working-directory: mekhq
+      run: ./gradlew -I .github/build-scan-init.gradle build --stacktrace --scan
+
+    - name: Upload Test Logs on Failure
+      uses: actions/upload-artifact@v2-preview
+      if: failure()
+      with:
+        name: ${{ matrix.os }}-jdk${{ matrix.java }}-ci-failure-logs
+        path: mekhq/MekHQ/build/reports/
+        
+    #
+    # Put the releases up in a single zip file called:
+    #
+    #     releases-{{ matrix.os }}.zip
+    #
+    # NB: Due to a GitHub Actions limitation we won't know
+    #     what the filename is in order to display it somewhere.
+    #
+    - name: Upload Releases
+      uses: actions/upload-artifact@v2-preview
+      if: matrix.os == 'ubuntu-latest'
+      with:
+        name: releases-java${{ matrix.java }}
+        path: mekhq/MekHQ/build/distributions/
