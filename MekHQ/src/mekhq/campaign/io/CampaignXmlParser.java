@@ -274,8 +274,8 @@ public class CampaignXmlParser {
                     // TODO: hoist registerAll out of this
                     InjuryTypes.registerAll();
                     processPersonnelNodes(retVal, wn, version);
-                } else if (xn.equalsIgnoreCase("ancestors")) {
-                    processAncestorNodes(retVal, wn, version);
+                } else if (xn.equalsIgnoreCase("ancestors")) { // Legacy
+                    migrateAncestorNodes(retVal, wn);
                 } else if (xn.equalsIgnoreCase("units")) {
                     processUnitNodes(retVal, wn, version);
                 } else if (xn.equalsIgnoreCase("missions")) {
@@ -1213,8 +1213,7 @@ public class CampaignXmlParser {
                 "Load Personnel Nodes Complete!"); //$NON-NLS-1$
     }
 
-    private static void processAncestorNodes(Campaign retVal, Node wn,
-            Version version) {
+    private static void migrateAncestorNodes(Campaign retVal, Node wn) {
         final String METHOD_NAME = "processAncestorNodes(Campaign,Node,Version)"; //$NON-NLS-1$
 
         MekHQ.getLogger().log(CampaignXmlParser.class, METHOD_NAME, LogLevel.INFO,
@@ -1241,10 +1240,14 @@ public class CampaignXmlParser {
                 continue;
             }
 
-            Ancestors a = Ancestors.generateInstanceFromXML(wn2, retVal, version);
+            Ancestors a = Ancestors.generateInstanceFromXML(wn2, retVal);
 
             if (a != null) {
-                retVal.importAncestors(a);
+//                     private Map<UUID, Ancestors> ancestors = new LinkedHashMap<>();
+//                     ancestors.put(a.getId(), a);
+//                retVal.importAncestors(a);
+
+
             }
         }
 

@@ -43,6 +43,7 @@ import mekhq.campaign.log.*;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.ModifierValue;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.familyTree.Genealogy;
 import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -145,10 +146,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     //region Family Variables
     // Lineage
-    private List<UUID> parents;
-    private UUID spouse;
-    private List<FormerSpouse> formerSpouses;
-    private List<UUID> children;
+    private Genealogy genealogy;
 
     //region Procreation
     private LocalDate dueDate;
@@ -365,6 +363,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private final static String DATE_DISPLAY_FORMAT = "yyyy-MM-dd";
 
     //region Reverse Compatibility
+    // v0.47.6 and earlier
+    private UUID ancestorsId = null; // this is require for mapping ancestry, and can not be avoided
+    // Unknown version
     private int oldId;
     private int oldUnitId = -1;
     private int oldDoctorId = -1;
@@ -425,10 +426,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         bloodname = "";
         biography = "";
         idleMonths = -1;
-        parents = new ArrayList<>();
-        spouse = null;
-        formerSpouses = new ArrayList<>();
-        children = new ArrayList<>();
+        genealogy = new Genealogy();
         dueDate = null;
         expectedDueDate = null;
         portraitCategory = Crew.ROOT_PORTRAIT;
@@ -1182,6 +1180,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return (getAge(getCampaign().getLocalDate()) <= 13);
     }
 
+    public Genealogy getGenealogy() {
+        return genealogy;
+    }
+
     //region Pregnancy
     public LocalDate getDueDate() {
         return dueDate;
@@ -1215,15 +1217,16 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public void procreate() {
         if (canProcreate()) {
             boolean conceived = false;
-            if (hasSpouse()) {
-                if (!getSpouse().isDeployed() && !getSpouse().isDeadOrMIA() && !getSpouse().isChild()
-                        && !(getSpouse().getGender() == getGender())) {
+            if (getGenealogy().hasSpouse()) {
+                Person spouse = getCampaign().getPerson(getGenealogy().getSpouse());
+                if (!spouse.isDeployed() && !spouse.isDeadOrMIA() && !spouse.isChild()
+                        && !(spouse.getGender() == getGender())) {
                     // setting is the decimal chance that this procreation attempt will create a child, base is 0.05%
-                    conceived = (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceProcreation()));
+                    conceived = (Compute.randomFloat() < (getCampaign().getCampaignOptions().getChanceProcreation()));
                 }
-            } else if (campaign.getCampaignOptions().useUnofficialProcreationNoRelationship()) {
+            } else if (getCampaign().getCampaignOptions().useUnofficialProcreationNoRelationship()) {
                 // setting is the decimal chance that this procreation attempt will create a child, base is 0.005%
-                conceived = (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceProcreationNoRelationship()));
+                conceived = (Compute.randomFloat() < (getCampaign().getCampaignOptions().getChanceProcreationNoRelationship()));
             }
 
             if (conceived) {
@@ -1241,15 +1244,17 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
         int size = PREGNANCY_SIZE.getAsInt();
         extraData.set(PREGNANCY_CHILDREN_DATA, size);
-        extraData.set(PREGNANCY_FATHER_DATA, (hasSpouse()) ? getSpouseId().toString() : null);
+        extraData.set(PREGNANCY_FATHER_DATA, (getGenealogy().hasSpouse())
+                ? getGenealogy().getSpouse().toString() : null);
 
         String sizeString = (size < PREGNANCY_MULTIPLE_NAMES.length) ? PREGNANCY_MULTIPLE_NAMES[size] : null;
 
-        campaign.addReport(getHyperlinkedName() + " has conceived" + (sizeString == null ? "" : (" " + sizeString)));
-        if (campaign.getCampaignOptions().logConception()) {
-            MedicalLogger.hasConceived(this, campaign.getDate(), sizeString);
-            if (hasSpouse()) {
-                PersonalLogger.spouseConceived(getSpouse(), getFullName(), campaign.getDate(), sizeString);
+        getCampaign().addReport(getHyperlinkedName() + " has conceived" + (sizeString == null ? "" : (" " + sizeString)));
+        if (getCampaign().getCampaignOptions().logConception()) {
+            MedicalLogger.hasConceived(this, getCampaign().getDate(), sizeString);
+            if (getGenealogy().hasSpouse()) {
+                PersonalLogger.spouseConceived(getCampaign().getPerson(getGenealogy().getSpouse()),
+                        getFullName(), getCampaign().getDate(), sizeString);
             }
         }
     }
@@ -1283,11 +1288,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
             campaign.recruitPerson(baby, false, true, false, false);
 
             // Create genealogy information
-            baby.setParents(getId(), fatherId);
-            baby.setMotherId(getId());
-            addChild(baby);
+            baby.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, getId());
+            getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, baby.getId());
             if (fatherId != null) {
-                getCampaign().getPerson(fatherId).addChild(baby);
+                baby.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, fatherId);
+                getCampaign().getPerson(fatherId).getGenealogy()
+                        .addFamilyMember(FamilialRelationshipType.CHILD, baby.getId());
             }
 
             // Log the birth
@@ -1316,9 +1322,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //region Marriage
     /**
      * Determines if another person is a safe spouse for the current person
-     * @param p the person to determine if they are a safe spouse
+     * @param person the person to determine if they are a safe spouse
      */
-    public boolean safeSpouse(Person p) {
+    public boolean safeSpouse(Person person) {
         // Huge convoluted return statement, with the following restrictions
         // can't marry yourself
         // can't marry someone who is already married
@@ -1328,15 +1334,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
         // TODO : can't marry anyone who is not located at the same planet as the person - GitHub #1672: Implement current planet tracking for personnel
         // can't marry a close relative
         return (
-                !this.equals(p)
-                && !p.hasSpouse()
-                && p.oldEnoughToMarry()
-                && (!p.isPrisoner() || isPrisoner())
-                && !p.isDeadOrMIA()
-                && p.isActive()
-                && ((getAncestorsId() == null)
-                    || !getCampaign().getAncestors(getAncestorsId()).checkMutualAncestors(
-                            getCampaign().getAncestors(p.getAncestorsId())))
+                !this.equals(person)
+                && !person.getGenealogy().hasSpouse()
+                && person.oldEnoughToMarry()
+                && (!person.isPrisoner() || isPrisoner())
+                && !person.isDeadOrMIA()
+                && person.isActive()
+                && !getGenealogy().checkMutualAncestors(person, getCampaign())
         );
     }
 
@@ -1347,7 +1351,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public void randomMarriage() {
         // Don't attempt to generate is someone has a spouse, isn't old enough to marry,
         // or is actively deployed
-        if (hasSpouse() || !oldEnoughToMarry() || isDeployed()) {
+        if (getGenealogy().hasSpouse() || !oldEnoughToMarry() || isDeployed()) {
             return;
         }
 
@@ -1477,12 +1481,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 break;
         }
 
-        spouse.setSpouseId(getId());
+        spouse.getGenealogy().setSpouse(getId());
         PersonalLogger.marriage(spouse, this, getCampaign().getDate());
-        setSpouseId(spouse.getId());
+        getGenealogy().setSpouse(spouse.getId());
         PersonalLogger.marriage(this, spouse, getCampaign().getDate());
 
-        campaign.addReport(String.format("%s has married %s!", getHyperlinkedName(),
+        getCampaign().addReport(String.format("%s has married %s!", getHyperlinkedName(),
                 spouse.getHyperlinkedName()));
 
         MekHQ.triggerEvent(new PersonChangedEvent(this));
@@ -1504,7 +1508,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     //region Divorce
     public void divorce(String divorceOption) {
-        Person spouse = getSpouse();
+        Person spouse = getCampaign().getPerson(getGenealogy().getSpouse());
         int reason = FormerSpouse.REASON_WIDOWED;
 
         switch (divorceOption) {
@@ -1543,14 +1547,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
             spouse.setMaidenName(null);
             setMaidenName(null);
 
-            spouse.setSpouseId(null);
-            setSpouseId(null);
+            spouse.getGenealogy().setSpouse(null);
+            getGenealogy().setSpouse(null);
         } else if (spouse.isDeadOrMIA()) {
             setMaidenName(null);
-            setSpouseId(null);
+            getGenealogy().setSpouse(null);
         } else if (isDeadOrMIA()) {
             spouse.setMaidenName(null);
-            spouse.setSpouseId(null);
+            spouse.getGenealogy().setSpouse(null);
         }
 
         // Output a message for Spouses who are KIA
@@ -1559,8 +1563,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
 
         // Add to former spouse list
-        spouse.addFormerSpouse(new FormerSpouse(getId(), getCampaign().getLocalDate(), reason));
-        addFormerSpouse(new FormerSpouse(spouse.getId(), getCampaign().getLocalDate(), reason));
+        spouse.getGenealogy().addFormerSpouse(new FormerSpouse(getId(), getCampaign().getLocalDate(), reason));
+        getGenealogy().addFormerSpouse(new FormerSpouse(spouse.getId(), getCampaign().getLocalDate(), reason));
 
         MekHQ.triggerEvent(new PersonChangedEvent(spouse));
         MekHQ.triggerEvent(new PersonChangedEvent(this));
@@ -1713,21 +1717,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
             if (idleMonths > 0) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "idleMonths", idleMonths);
             }
-            if (!parents.isEmpty()) {
-                //TODO : windchild fix me
-            }
-            if (spouse != null) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "spouse", spouse.toString());
-            }
-            if (!formerSpouses.isEmpty()) {
-                MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "formerSpouses");
-                for (FormerSpouse ex : formerSpouses) {
-                    ex.writeToXml(pw1, indent + 2);
-                }
-                MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "formerSpouses");
-            }
-            if (!children.isEmpty()) {
-                //TODO : windchild fix me
+            if (!genealogy.isEmpty()) {
+                genealogy.writeToXml(pw1, indent + 1);
             }
             if (dueDate != null) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "dueDate",
@@ -1922,7 +1913,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
 
-                if (wn2.getNodeName().equalsIgnoreCase("name")) { //included for backwards compatibility
+                if (wn2.getNodeName().equalsIgnoreCase("name")) { // legacy - 0.47.5 removal
                     retVal.migrateName(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("givenName")) {
                     retVal.givenName = wn2.getTextContent();
@@ -1972,30 +1963,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     } else {
                         retVal.id = UUID.fromString(wn2.getTextContent());
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("ancestors")) {
-                    // retVal.ancestorsId = UUID.fromString(wn2.getTextContent());
-                    // TODO : Windchild fix me and implement loading from XML
-                } else if (wn2.getNodeName().equalsIgnoreCase("spouse")) {
-                    retVal.spouse = UUID.fromString(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("formerSpouses")) {
-                    NodeList nl2 = wn2.getChildNodes();
-                    for (int y = 0; y < nl2.getLength(); y++) {
-                        Node wn3 = nl2.item(y);
-                        // If it's not an element node, we ignore it.
-                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
-                            continue;
-                        }
-
-                        if (!wn3.getNodeName().equalsIgnoreCase("formerSpouse")) {
-                            // Error condition of sorts!
-                            // Errr, what should we do here?
-                            MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
-                                    "Unknown node type not loaded in formerSpouses nodes: "
-                                            + wn3.getNodeName());
-                            continue;
-                        }
-                        retVal.formerSpouses.add(FormerSpouse.generateInstanceFromXML(wn3));
-                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("ancestors")) { // legacy - 0.47.6 removal
+                    retVal.ancestorsId = UUID.fromString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("spouse")) { // legacy - 0.47.6 removal
+                    retVal.genealogy.setSpouse(UUID.fromString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("formerSpouses")) { // legacy - 0.47.6 removal
+                    Genealogy.loadFormerSpouses(retVal.genealogy, wn2.getChildNodes());
+                } else if (wn2.getNodeName().equalsIgnoreCase("genealogy")) {
+                    retVal.genealogy = Genealogy.generateInstanceFromXML(wn2.getChildNodes());
                 } else if (wn2.getNodeName().equalsIgnoreCase("dueDate")) {
                     retVal.dueDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("expectedDueDate")) {
@@ -4116,507 +4091,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
 
-    //region Family
-    //region Family
-    public List<UUID> getParents() {
-        return parents;
-    }
-
-    public void addParentId(UUID id) {
-        getParents().add(id);
-    }
-
-    public List<UUID> getChildren() {
-        return children;
-    }
-
-    public void addChildId(UUID id) {
-        getChildren().add(id);
-    }
-
-    /**
-     *
-     * @param spouse the new spouse id for the current person
-     */
-    public void setSpouseId(UUID spouse) {
-        this.spouse = spouse;
-    }
-
-    /**
-     *
-     * @param formerSpouse a former spouse to add the the current person's list
-     */
-    public void addFormerSpouse(FormerSpouse formerSpouse) {
-        formerSpouses.add(formerSpouse);
-    }
-    //endregion setFamily
-
-    //region hasFamily
-    /**
-     *
-     * @return true if the person has either a spouse, any children, or specified parents.
-     *          These are required for any extended family to exist.
-     */
-    public boolean hasAnyFamily() {
-        return hasChildren() || hasSpouse() || hasParents();
-    }
-
-    /**
-     *
-     * @return true if the person has a spouse, false otherwise
-     */
-    public boolean hasSpouse() {
-        return (getSpouseId() != null);
-    }
-
-    /**
-     *
-     * @return true if the person has a former spouse, false otherwise
-     */
-    public boolean hasFormerSpouse() {
-        return !formerSpouses.isEmpty();
-    }
-
-    /**
-     *
-     * @return true if the person has at least one kid, false otherwise
-     */
-    public boolean hasChildren() {
-        if (getId() != null) {
-            for (Ancestors a : campaign.getAncestors()) {
-                if (getId().equals(a.getMotherId()) || getId().equals(a.getFatherId())) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     *
-     * @return true if the person has at least one grandchild, false otherwise
-     */
-    public boolean hasGrandchildren() {
-        for (Ancestors a : campaign.getAncestors()) {
-            if (getId().equals(a.getMotherId()) || getId().equals(a.getFatherId())) {
-                for (Person p : campaign.getPersonnel()) {
-                    if (a.getId().equals(p.getAncestorsId())) {
-                        if (p.hasChildren()) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     *
-     * @return true if the Person has either a mother or father, otherwise false
-     */
-    public boolean hasParents() {
-        return hasFather() || hasMother();
-    }
-
-    /**
-     *
-     * @return true if the person has a listed father, false otherwise
-     */
-    public boolean hasFather() {
-        return getFather() != null;
-    }
-
-    /**
-     *
-     * @return true if the Person has a listed mother, false otherwise
-     */
-    public boolean hasMother() {
-        return getMother() != null;
-    }
-
-    /**
-     *
-     * @return true if the person has siblings, false otherwise
-     */
-    public boolean hasSiblings() {
-        return !getSiblings().isEmpty();
-    }
-
-    /**
-     *
-     * @return true if the Person has a grandparent, false otherwise
-     */
-    public boolean hasGrandparent() {
-        if (hasFather()) {
-            if (hasFathersParents()) {
-                return true;
-            }
-        }
-
-        if (hasMother()) {
-            return hasMothersParents();
-        }
-        return false;
-    }
-
-    /**
-     *
-     * @return true if the person's father has any parents, false otherwise
-     */
-    public boolean hasFathersParents() {
-        return getFather().hasParents();
-    }
-
-    /**
-     *
-     * @return true if the person's mother has any parents, false otherwise
-     */
-    public boolean hasMothersParents() {
-        return getMother().hasParents();
-    }
-
-    /**
-     *
-     * @return true if the Person has an Aunt or Uncle, false otherwise
-     */
-    public boolean hasAuntOrUncle() {
-        if (hasFather()) {
-            if (hasFathersSiblings()) {
-                return true;
-            }
-        }
-
-        if (hasMother()) {
-            return hasMothersSiblings();
-        }
-        return false;
-    }
-
-    /**
-     *
-     * @return true if the person's father has siblings, false otherwise
-     */
-    public boolean hasFathersSiblings() {
-        return getFather().hasSiblings();
-    }
-
-    /**
-     *
-     * @return true if the person's mother has siblings, false otherwise
-     */
-    public boolean hasMothersSiblings() {
-        return getMother().hasSiblings();
-    }
-
-    /**
-     *
-     * @return true if the person has cousins, false otherwise
-     */
-    public boolean hasCousins() {
-        if (hasFather() && getFather().hasSiblings()) {
-            for (Person sibling : getFather().getSiblings()) {
-                if (sibling.hasChildren()) {
-                    return true;
-                }
-            }
-        }
-
-        if (hasMother() && getMother().hasSiblings()) {
-            for (Person sibling : getMother().getSiblings()) {
-                if (sibling.hasChildren()) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-    //endregion hasFamily
-
-    //region getFamily
-    /**
-     *
-     * @return the person's ancestor id
-     */
+    //region Legacy Methods
+    // This is part of a functionality that was removed in 0.47.6, and should not be used for anything
+    // outside of that migration.
     public UUID getAncestorsId() {
         return ancestorsId;
     }
-
-    /**
-     *
-     * @return the person's ancestors
-     */
-    public Ancestors getAncestors() {
-        return campaign.getAncestors(ancestorsId);
-    }
-
-    /**
-     *
-     * @return the current person's spouse
-     */
-    @Nullable
-    public Person getSpouse() {
-        return campaign.getPerson(spouse);
-    }
-
-    /**
-     *
-     * @return the current person's spouse's id
-     */
-    @Nullable
-    public UUID getSpouseId() {
-        return spouse;
-    }
-
-    /**
-     *
-     * @return a list of FormerSpouse objects for all the former spouses of the current person
-     */
-    public List<FormerSpouse> getFormerSpouses() {
-        return formerSpouses;
-    }
-
-    /**
-     * getChildren creates a list of all children from the current person
-     * @return a list of Person objects for all children of the current person
-     */
-/*    public List<Person> getChildren() {
-        List<UUID> ancestors = new ArrayList<>();
-        for (Ancestors a : campaign.getAncestors()) {
-            if ((a != null) && (getId().equals(a.getMotherId()) || getId().equals(a.getFatherId()))) {
-                ancestors.add(a.getId());
-            }
-        }
-
-        List<Person> children = new ArrayList<>();
-        for (Person p : campaign.getPersonnel()) {
-            if (ancestors.contains(p.getAncestorsId())) {
-                children.add(p);
-            }
-        }
-
-        return children;
-    }
-*/
-    public List<Person> getGrandchildren() {
-        List<Person> grandchildren = new ArrayList<>();
-        List<Person> tempChildList;
-
-        for (Ancestors a : campaign.getAncestors()) {
-            if ((a != null) && (getId().equals(a.getMotherId()) || getId().equals(a.getFatherId()))) {
-                for (Person p : campaign.getPersonnel()) {
-                    if ((a.getId().equals(p.getAncestorsId())) && p.hasChildren()) {
-                        tempChildList = p.getChildren();
-                        //prevents duplicates, if anyone uses a small number of depth for their ancestry
-                        tempChildList.removeAll(grandchildren);
-                        grandchildren.addAll(tempChildList);
-                    }
-                }
-            }
-        }
-
-        return grandchildren;
-    }
-
-    /**
-     *
-     * @return the current person's father
-     */
-    public Person getFather() {
-        Ancestors a = getAncestors();
-
-        if (a != null) {
-            return campaign.getPerson(a.getFatherId());
-        }
-        return null;
-    }
-
-    /**
-     *
-     * @return the current person's mother
-     */
-    public Person getMother() {
-        Ancestors a = getAncestors();
-
-        if (a != null) {
-            return campaign.getPerson(a.getMotherId());
-        }
-        return null;
-    }
-
-    /**
-     * getSiblings creates a list of all the siblings from the current person
-     * @return a list of Person objects for all the siblings of the current person
-     */
-    public List<Person> getSiblings() {
-        List<UUID> parents = new ArrayList<>();
-        List<Person> siblings = new ArrayList<>();
-        Person father = getFather();
-        Person mother = getMother();
-
-        for (Ancestors a : campaign.getAncestors()) {
-            if ((a != null)
-                    && (((father != null) && father.getId().equals(a.getFatherId()))
-                        || ((mother != null) && mother.getId().equals(a.getMotherId())))) {
-
-                parents.add(a.getId());
-            }
-        }
-
-        for (Person p : campaign.getPersonnel()) {
-            if (parents.contains(p.getAncestorsId()) && !(p.getId().equals(getId()))) {
-                siblings.add(p);
-            }
-        }
-
-        return siblings;
-    }
-
-    /**
-     *
-     * @return a list of the person's siblings with spouses (if any
-     */
-    public List<Person> getSiblingsAndSpouses(){
-        List<UUID> parents = new ArrayList<>();
-        List<Person> siblingsAndSpouses = new ArrayList<>();
-
-        Person father = getFather();
-        Person mother = getMother();
-
-        for (Ancestors a : campaign.getAncestors()) {
-            if ((a != null)
-                    && (((father != null) && father.getId().equals(a.getFatherId()))
-                        || ((mother != null) && mother.getId().equals(a.getMotherId())))) {
-
-                parents.add(a.getId());
-            }
-        }
-
-        for (Person p : campaign.getPersonnel()) {
-            if (parents.contains(p.getAncestorsId()) && !(p.getId().equals(getId()))) {
-                siblingsAndSpouses.add(p);
-                if (p.hasSpouse()) {
-                    siblingsAndSpouses.add(campaign.getPerson(p.getSpouseId()));
-                }
-            }
-        }
-
-        return siblingsAndSpouses;
-    }
-
-    /**
-     *
-     * @return a list of the person's grandparents
-     */
-    public List<Person> getGrandparents() {
-        List<Person> grandparents = new ArrayList<>();
-        if (hasFather()) {
-            grandparents.addAll(getFathersParents());
-        }
-
-        if (hasMother()) {
-            List<Person> mothersParents = getMothersParents();
-            //prevents duplicates, if anyone uses a small number of depth for their ancestry
-            mothersParents.removeAll(grandparents);
-            grandparents.addAll(mothersParents);
-        }
-        return grandparents;
-    }
-
-    /**
-     *
-     * @return a list of the person's father's parents
-     */
-    public List<Person> getFathersParents() {
-        List<Person> fathersParents = new ArrayList<>();
-        if (getFather().hasFather()) {
-            fathersParents.add(getFather().getFather());
-        }
-        if (getFather().hasMother()) {
-            fathersParents.add(getFather().getMother());
-        }
-
-        return fathersParents;
-    }
-
-    /**
-     *
-     * @return a list of the person's mother's parents
-     */
-    public List<Person> getMothersParents() {
-        List<Person> mothersParents = new ArrayList<>();
-        if (getMother().hasFather()) {
-            mothersParents.add(getMother().getFather());
-        }
-        if (getMother().hasMother()) {
-            mothersParents.add(getMother().getMother());
-        }
-
-        return mothersParents;
-    }
-
-    /**
-     *
-     * @return a list of the person's Aunts and Uncles
-     */
-    public List<Person> getsAuntsAndUncles() {
-        List<Person> auntsAndUncles = new ArrayList<>();
-        if (hasFather()) {
-            auntsAndUncles.addAll(getFathersSiblings());
-        }
-
-        if (hasMother()) {
-            List<Person> mothersSiblings = getMothersSiblings();
-            //prevents duplicates, if anyone uses a small number of depth for their ancestry
-            mothersSiblings.removeAll(auntsAndUncles);
-            auntsAndUncles.addAll(mothersSiblings);
-        }
-
-        return auntsAndUncles;
-    }
-
-    /**
-     *
-     * @return a list of the person's father's siblings and their current spouses
-     */
-    public List<Person> getFathersSiblings() {
-        return getFather().getSiblingsAndSpouses();
-    }
-
-    /**
-     *
-     * @return a list of the person's mothers's siblings and their current spouses
-     */
-    public List<Person> getMothersSiblings() {
-        return getMother().getSiblingsAndSpouses();
-    }
-
-    /**
-     *
-     * @return a list of the person'c cousins
-     */
-    public List<Person> getCousins() {
-        List<Person> cousins = new ArrayList<>();
-        List<Person> tempCousins;
-        if (hasFather() && getFather().hasSiblings()) {
-            for (Person sibling : getFather().getSiblings()) {
-                tempCousins = sibling.getChildren();
-                tempCousins.removeAll(cousins);
-                cousins.addAll(tempCousins);
-            }
-        }
-
-        if (hasMother() && getMother().hasSiblings()) {
-            for (Person sibling : getMother().getSiblings()) {
-                tempCousins = sibling.getChildren();
-                tempCousins.removeAll(cousins);
-                cousins.addAll(tempCousins);
-            }
-        }
-
-        return cousins;
-    }
-    //endregion getFamily
-    //endregion Family
+    //endregion Legacy Methods
 }

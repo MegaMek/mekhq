@@ -172,7 +172,6 @@ public class Campaign implements Serializable, ITechManager {
     private Map<UUID, Unit> units = new LinkedHashMap<>();
     private Set<UUID> transportShips = new HashSet<>();
     private Map<UUID, Person> personnel = new LinkedHashMap<>();
-    private Map<UUID, Ancestors> ancestors = new LinkedHashMap<>();
     private TreeMap<Integer, Part> parts = new TreeMap<>();
     private TreeMap<Integer, Force> forceIds = new TreeMap<>();
     private TreeMap<Integer, Mission> missions = new TreeMap<>();
@@ -1564,64 +1563,6 @@ public class Campaign implements Serializable, ITechManager {
         MekHQ.triggerEvent(new PersonChangedEvent(person));
     }
     //endregion Bloodnames
-
-    //region Ancestors
-    /**
-     * Imports an {@link Ancestors} into a campaign.
-     * @param a An {@link Ancestors} to import into the campaign.
-     */
-    public void importAncestors(Ancestors a) {
-        addAncestorsWithoutId(a);
-    }
-
-    private void addAncestorsWithoutId(Ancestors a) {
-        ancestors.put(a.getId(), a);
-    }
-
-    public Iterable<Ancestors> getAncestors() {
-        return ancestors.values();
-    }
-
-    /** @return a matching ancestors entry for the arguments, or null if there isn't any */
-    public Ancestors getAncestors(UUID fatherId, UUID motherId) {
-        for(Map.Entry<UUID, Ancestors> m : ancestors.entrySet()) {
-            Ancestors a = m.getValue();
-            if(Objects.equals(fatherId, a.getFatherId()) && Objects.equals(motherId, a.getMotherId())) {
-                return a;
-            }
-        }
-        return null;
-    }
-
-    public Ancestors getAncestors(UUID id) {
-        if (id == null) {
-            return null;
-        }
-        return ancestors.get(id);
-    }
-
-    /**
-     * This is used to get any ancestors where the person is the parent for
-     * @param personId the person's UUID
-     * @return the list of Ancestors objects where the person is the parent
-     */
-    public List<Ancestors> getChildAncestors(UUID personId) {
-        List<Ancestors> children = new ArrayList<>();
-
-        for (Ancestors a : getAncestors()) {
-            if (personId.equals(a.getMotherId()) || personId.equals(a.getFatherId())) {
-                children.add(a);
-            }
-        }
-        return children;
-    }
-
-    public Ancestors createAncestors(UUID father, UUID mother) {
-        Ancestors na = new Ancestors(father, mother, this);
-        ancestors.put(na.getId(), na);
-        return na;
-    }
-    //endregion Ancestors
 
     //region Other Personnel Methods
     /**
@@ -4221,12 +4162,17 @@ public class Campaign implements Serializable, ITechManager {
     /**
      * Cleans incongruent data present in the campaign
      */
-    public void cleanUp(){
+    public void cleanUp() {
         // Cleans non-existing spouses
         for (Person p : personnel.values()) {
-            if (p.hasSpouse()) {
-                if (!personnel.containsKey(p.getSpouseId())) {
-                    p.setSpouseId(null);
+            if (p.getGenealogy().hasSpouse()) {
+                if (!personnel.containsKey(p.getGenealogy().getSpouse())) {
+                    p.getGenealogy().setSpouse(null);
+                    if (!getCampaignOptions().getKeepMarriedNameUponSpouseDeath()
+                            && (p.getMaidenName() != null)) {
+                        p.setSurname(p.getMaidenName());
+                    }
+                    p.setMaidenName(null);
                 }
             }
         }
@@ -4670,7 +4616,6 @@ public class Campaign implements Serializable, ITechManager {
         // Lists of objects:
         writeMapToXml(pw1, 1, "units", units); // Units
         writeMapToXml(pw1, 1, "personnel", personnel); // Personnel
-        writeMapToXml(pw1, 1, "ancestors", ancestors); // Ancestry trees
         writeMapToXml(pw1, 1, "missions", missions); // Missions
         // the forces structure is hierarchical, but that should be handled
         // internally
@@ -6011,7 +5956,7 @@ public class Campaign implements Serializable, ITechManager {
             // set the date of death
             person.setDateOfDeath(getLocalDate());
             // Don't forget to tell the spouse
-            if (person.hasSpouse()) {
+            if (person.getGenealogy().hasSpouse()) {
                 person.divorce(getCampaignOptions().getKeepMarriedNameUponSpouseDeath()
                         ? Person.OPT_KEEP_SURNAME : Person.OPT_SPOUSE_CHANGE_SURNAME);
             }
