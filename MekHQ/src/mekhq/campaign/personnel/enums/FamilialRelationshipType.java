@@ -40,6 +40,9 @@ public enum FamilialRelationshipType {
     SIBLING("FamilialRelationshipType.SIBLING.MALE.text",
             "FamilialRelationshipType.SIBLING.FEMALE.text",
             "FamilialRelationshipType.SIBLING.OTHER.text"),
+    HALF_SIBLING("FamilialRelationshipType.HALF_SIBLING.MALE.text",
+            "FamilialRelationshipType.HALF_SIBLING.FEMALE.text",
+            "FamilialRelationshipType.HALF_SIBLING.OTHER.text"),
     CHILD("FamilialRelationshipType.CHILD.MALE.text",
             "FamilialRelationshipType.CHILD.FEMALE.text",
             "FamilialRelationshipType.CHILD.OTHER.text"),
@@ -157,5 +160,13 @@ public enum FamilialRelationshipType {
         String name = resources.getString("FamilialRelationshipType.late");
         name += " " + SPOUSE.getTypeName(gender);
         return name;
+    }
+
+    public static FamilialRelationshipType[] getSiblingRelationshipTypes() {
+        return new FamilialRelationshipType[] {
+                FamilialRelationshipType.SIBLING,
+                FamilialRelationshipType.HALF_SIBLING,
+                FamilialRelationshipType.STEPSIBLING
+        };
     }
 }
