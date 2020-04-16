@@ -980,16 +980,16 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         TargetRoll mods = new TargetRoll(campaign.getCampaignOptions().getMaintenanceBonus(), "maintenance");
         mods.addModifier(Availability.getTechModifier(getTechRating()), "tech rating " + ITechnology.getRatingName(getTechRating()));
 
-        if(null != getUnit()) {
+        if (null != getUnit()) {
             mods.append(getUnit().getSiteMod());
-            if(getUnit().getEntity().hasQuirk("easy_maintain")) {
+            if (getUnit().getEntity().hasQuirk("easy_maintain")) {
                 mods.addModifier(-1, "easy to maintain");
             }
-            else if(getUnit().getEntity().hasQuirk("difficult_maintain")) {
+            else if (getUnit().getEntity().hasQuirk("difficult_maintain")) {
                 mods.addModifier(1, "difficult to maintain");
             }
 
-            if(isClanTechBase() || (this instanceof MekLocation && getUnit().getEntity().isClan())) {
+            if (isClanTechBase() || ((this instanceof MekLocation) && getUnit().getEntity().isClan())) {
                 if (getUnit().getTech() == null) {
                     mods.addModifier(2, "Clan tech");
                 } else if (!getUnit().getTech().isClanner()
@@ -1772,4 +1772,3 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         return getTechAdvancement().getStaticTechLevel();
     }
 }
-

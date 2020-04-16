@@ -127,8 +127,8 @@ public class FilterableListModel<E> extends AbstractListModel<E> implements List
 
     @Override
     public E getElementAt(int index) {
-        if(null != peerModel) {
-            if(null == filter) {
+        if (null != peerModel) {
+            if (null == filter) {
                 return peerModel.getElementAt(index);
             } else {
                 return peerModel.getElementAt(indices.get(index));
