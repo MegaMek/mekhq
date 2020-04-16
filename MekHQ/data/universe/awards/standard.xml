@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<awards xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<?xml version="1.0"?>
 	<award>
 		<name>Medal of Honor</name>
 		<description>Distinguished oneself conspicuously by gallantry and intrepidity at the risk of life above and beyond the call of duty.</description>
