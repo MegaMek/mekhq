@@ -329,7 +329,7 @@
 	</award>
 	<award>
 		<name>Fourth Succession War Campaign</name>
-		<description>Partook in combat actions in support of the 4th succession war.</description>
+		<description>Partook in combat actions in support of the 4th Succession War.</description>
 		<medal>FourthSuccessionWarM.png</medal>
 		<ribbon>3-08-2-FourthSuccessionWar.png</ribbon>
 		<xp>1</xp>
@@ -341,7 +341,7 @@
 	</award>
 	<award>
 		<name>War of 3039 Campaign</name>
-		<description>Partook in combat actions in support of the war of 3039.</description>
+		<description>Partook in combat actions in support of the War of 3039.</description>
 		<medal>WarOf3039M.png</medal>
 		<ribbon>3-08-3-WarOf3039.png</ribbon>
 		<xp>1</xp>
@@ -353,7 +353,7 @@
 	</award>
 	<award>
 		<name>Clan Invasion Campaign</name>
-		<description>Partook in combat actions in support of clan invasion.</description>
+		<description>Partook in combat actions in support of Clan Invasion.</description>
 		<medal>ClanInvasionM.png</medal>
 		<ribbon>3-08-4-ClanInvasion.png</ribbon>
 		<xp>1</xp>
