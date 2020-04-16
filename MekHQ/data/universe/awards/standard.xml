@@ -365,26 +365,26 @@
 		<range>Career</range>
 	</award>
 	<award>
-		<name>Fedcom Civil War Campaign</name>
-		<description>Partook combat actions in support of fedcom civil war.</description>
-		<medal>FedComCivilWarM.png</medal>
-		<ribbon>3-08-5-FedComCivilWar.png</ribbon>
+		<name>Task Force Serpent Campaign</name>
+		<description>Partook combat actions in support of Task Force Serpent.</description>
+		<medal>TaskForceSerpentM.png</medal>
+		<ribbon>3-08-5-TaskForceSerpent.png</ribbon>
 		<xp>1</xp>
 		<position>3.08.5</position>
 		<qty>1</qty>
-		<item>CW</item>
+		<item>TFS</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
 	<award>
-		<name>Task Force Serpent Campaign</name>
-		<description>Partook combat actions in support of Task Force Serpent.</description>
-		<medal>TaskForceSerpentM.png</medal>
-		<ribbon>3-08-6-TaskForceSerpent.png</ribbon>
+		<name>Fedcom Civil War Campaign</name>
+		<description>Partook combat actions in support of FedCom Civil War.</description>
+		<medal>FedComCivilWarM.png</medal>
+		<ribbon>3-08-6-FedComCivilWar.png</ribbon>
 		<xp>1</xp>
 		<position>3.08.6</position>
 		<qty>1</qty>
-		<item>TFS</item>
+		<item>FCCW</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>

@@ -31,7 +31,7 @@ MekHQ uses an XML file located in the `\data\universe\awards` folder to generate
 
 9)  `<qty>` Required. Positive whole number value.
 
-10)  `<item>` Required. String value with no space. Reserved words include: 3SW, 4SW, AW, Civilian, Clan, Combat, Conduct, Covert, CSI, CW, Drill, Enlist, Foreign, Gunnery, Hero, Honor, House, Instructor, Jihad, Kills, Periphery, Pirates, Prisoner, Rank, RW, Security, TFS, Time, W39, W57, Wounded.
+10)  `<item>` Required. String value with no space. Reserved words include: 3SW, 4SW, AW, Civilian, Clan, Combat, Conduct, Covert, CSI, Drill, Enlist, FCCW, Foreign, Gunnery, Hero, Honor, House, Instructor, Jihad, Kills, Periphery, Pirates, Prisoner, Rank, RW, Security, TFS, Time, W39, W57, Wounded.
 
 11)  `<size>` Required. List of string value with no space.  List options include Individual, Lance, Company, Battalion.
 
