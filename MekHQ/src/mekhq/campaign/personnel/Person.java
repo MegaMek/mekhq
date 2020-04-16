@@ -709,7 +709,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         // Then, it depends on whether the person is a Clanner or not.
         // For Clan names:
         // Takes the input name, and assumes that person does not have a surname
-        // Bloodnames are assumed to have been assigned either through the
+        // Bloodnames are assumed to have been assigned by MekHQ
         // For Inner Sphere names:
         // Depending on the length of the resulting array, the name is processed differently
         // Array of length 1: the name is assumed to not have a surname, just a given name
@@ -718,48 +718,33 @@ public class Person implements Serializable, MekHqXmlSerializable {
         // Array of length 4+: the name is assumed to be as many given names as possible and two surnames
         //
         // Then, the full name is set
-        final String space = " ";
-        String[] name = n.split(space);
+        String[] name = n.trim().split("\\s+");
+
+        givenName = name[0];
 
         if (isClanner()) {
-            int i = 0;
-            givenName = name[i];
-            for (i = 1; i < name.length - 1; i++) {
-                if (!name[i].equals(space)) {
-                    givenName += space + name[i];
+            if (name.length > 1) {
+                int i;
+                for (i = 1; i < name.length - 1; i++) {
+                    givenName += " " + name[i];
                 }
-            }
 
-            if (!(!StringUtil.isNullOrEmpty(getBloodname()) && getBloodname().equals(name[i]))) {
-                givenName += space + name[i];
+                if (!(!StringUtil.isNullOrEmpty(getBloodname()) && getBloodname().equals(name[i]))) {
+                    givenName += " " + name[i];
+                }
             }
         } else {
-            if (name.length == 1) {
-                givenName = name[0];
-            } else if (name.length == 2) {
-                givenName = name[0];
+            if (name.length == 2) {
                 surname = name[1];
             } else if (name.length == 3) {
-                givenName = name[0];
-                if (name[1].equals(space)) {
-                    surname = name[2];
-                } else {
-                    surname = name[1] + space + name[2];
-                }
+                surname = name[1] + " " + name[2];
             } else if (name.length > 3) {
-                int i = 0;
-                givenName = name[i];
+                int i;
                 for (i = 1; i < name.length - 2; i++) {
-                    if (!name[i].equals(space)) {
-                        givenName += space + name[i];
-                    }
+                    givenName += " " + name[i];
                 }
 
-                if (name[i].equals(space)) {
-                    surname = name[i + 1];
-                } else {
-                    surname = name[i] + space + name[i + 1];
-                }
+                surname = name[i] + " " + name[i + 1];
             }
         }
 
