@@ -252,15 +252,15 @@ Partook in combat actions in support of clan invasion.
 
 **_New Personnel:_** Consult the Assignment Award Tables within AwardTracker.xlsx
 
-#### ![](img/FCCW.png) FEDCOM CIVIL WAR CAMPAIGN
-Partook combat actions in support of FedCom civil war.
+#### ![](img/TFS.png) TASK FORCE SERPENT CAMPAIGN
+Partook combat actions in support of Task Force Serpent.
 
 **_Gameplay:_** Recommended at end of mission if mission was in direct support of the specified campaign.
 
 **_New Personnel:_** Consult the Assignment Award Tables within AwardTracker.xlsx
 
-#### ![](img/TFS.png) TASK FORCE SERPENT CAMPAIGN
-Partook combat actions in support of Task Force Serpent.
+#### ![](img/FCCW.png) FEDCOM CIVIL WAR CAMPAIGN
+Partook combat actions in support of FedCom civil war.
 
 **_Gameplay:_** Recommended at end of mission if mission was in direct support of the specified campaign.
 
