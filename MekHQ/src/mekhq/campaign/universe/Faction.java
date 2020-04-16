@@ -412,7 +412,7 @@ public class Faction {
         factions = new HashMap<>();
         factionIdMap = new HashMap<>();
 
-        Document xmlDoc = null;
+        Document xmlDoc;
 
         try(FileInputStream fis = new FileInputStream("data/universe/factions.xml")) {
             // Using factory get an instance of document builder
@@ -422,6 +422,7 @@ public class Faction {
             xmlDoc = db.parse(fis);
         } catch (Exception ex) {
             MekHQ.getLogger().error(Faction.class, METHOD_NAME, ex);
+            return;
         }
 
         Element factionEle = xmlDoc.getDocumentElement();

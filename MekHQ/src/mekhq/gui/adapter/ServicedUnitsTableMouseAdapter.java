@@ -132,19 +132,16 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
                 }
             }
         } else if (command.contains("MASS_REPAIR_SALVAGE")) {
-            Unit unit = null;
-
             if (units.length > 0) {
-            	unit = units[0];
-            }
-
-            if (unit.isDeployed()) {
-    			JOptionPane.showMessageDialog(gui.getFrame(),
-    					"Unit is currently deployed and can not be repaired.",
-    					"Unit is deployed", JOptionPane.ERROR_MESSAGE);
-            } else {
-				MassRepairService.performSingleUnitMassRepairOrSalvage(gui, unit);
-				MekHQ.triggerEvent(new UnitChangedEvent(unit));
+                Unit unit = units[0];
+                if (unit.isDeployed()) {
+                    JOptionPane.showMessageDialog(gui.getFrame(),
+                            "Unit is currently deployed and can not be repaired.",
+                            "Unit is deployed", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    MassRepairService.performSingleUnitMassRepairOrSalvage(gui, unit);
+                    MekHQ.triggerEvent(new UnitChangedEvent(unit));
+                }
             }
         }
     }
