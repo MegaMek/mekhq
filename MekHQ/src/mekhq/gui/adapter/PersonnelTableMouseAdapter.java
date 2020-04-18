@@ -242,11 +242,10 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     for (Person person : people) {
                         person.setPrimaryDesignator(romDesignation);
                     }
-                    break;
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(getClass(), METHOD_NAME,
-                            "Failed to assign ROM designator", e);
+                    MekHQ.getLogger().error(getClass(), METHOD_NAME, "Failed to assign ROM designator", e);
                 }
+                break;
             }
             case CMD_SECONDARY_DESIGNATOR: {
                 try {
@@ -254,7 +253,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     for (Person person : people) {
                         person.setSecondaryDesignator(romDesignation);
                     }
-                    break;
                 } catch (Exception e) {
                     MekHQ.getLogger().error(getClass(), METHOD_NAME,
                             "Failed to assign ROM secondary designator", e);
