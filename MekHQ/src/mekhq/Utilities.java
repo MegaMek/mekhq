@@ -375,10 +375,6 @@ public class Utilities {
                     || !summary.getUnitType().equals(UnitType.determineUnitType(en))) {
                 continue;
             }
-            // If we only allow canon units and this isn't canon we continue
-            if (!summary.isCanon() && options.allowCanonRefitOnly()) {
-                continue;
-            }
             
             // Weight of the two units must match or we continue, but BA weight gets
             // checked differently
@@ -390,6 +386,11 @@ public class Utilities {
                 if (summary.getTons() != en.getWeight()) {
                     continue;
                 }
+            }
+            
+            // If we only allow canon units and this isn't canon we continue
+            if (!summary.isCanon() && options.allowCanonRefitOnly()) {
+                continue;
             }
             
             // If the unit doesn't meet the tech filter criteria we continue
