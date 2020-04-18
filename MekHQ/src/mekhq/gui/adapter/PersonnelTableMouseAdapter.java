@@ -54,6 +54,7 @@ import mekhq.campaign.event.PersonLogEvent;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.enums.ROMDesignation;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
@@ -236,16 +237,27 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 break;
             }
             case CMD_PRIMARY_DESIGNATOR: {
-                int designation = Integer.parseInt(data[1]);
-                for (Person person : people) {
-                    person.setPrimaryDesignator(designation);
+                try {
+                    ROMDesignation romDesignation = ROMDesignation.valueOf(data[1]);
+                    for (Person person : people) {
+                        person.setPrimaryDesignator(romDesignation);
+                    }
+                    break;
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(getClass(), METHOD_NAME,
+                            "Failed to assign ROM designator", e);
                 }
-                break;
             }
             case CMD_SECONDARY_DESIGNATOR: {
-                int secDesignation = Integer.parseInt(data[1]);
-                for (Person person : people) {
-                    person.setSecondaryDesignator(secDesignation);
+                try {
+                    ROMDesignation romDesignation = ROMDesignation.valueOf(data[1]);
+                    for (Person person : people) {
+                        person.setSecondaryDesignator(romDesignation);
+                    }
+                    break;
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(getClass(), METHOD_NAME,
+                            "Failed to assign ROM secondary designator", e);
                 }
                 break;
             }
@@ -1259,37 +1271,29 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 popup.add(menu);
             }
             if (StaticChecks.areAllWoBOrComstar(selected)) {
-                menu = new JMenu(resourceMap.getString("changePrimaryDesignation.text")); //$NON-NLS-1$
-                for (int i = Person.DESIG_NONE; i < Person.DESIG_NUM; i++) {
-                    cbMenuItem = new JCheckBoxMenuItem(Person.parseDesignator(i));
-                    cbMenuItem.setActionCommand(makeCommand(CMD_PRIMARY_DESIGNATOR, String.valueOf(i)));
+                menu = new JMenu(resourceMap.getString("changePrimaryDesignation.text"));
+                for (ROMDesignation romDesignation : ROMDesignation.values()) {
+                    cbMenuItem = new JCheckBoxMenuItem(romDesignation.toString());
+                    cbMenuItem.setActionCommand(makeCommand(CMD_PRIMARY_DESIGNATOR, romDesignation.name()));
                     cbMenuItem.addActionListener(this);
-                    cbMenuItem.setEnabled(true);
-                    if (i == person.getPrimaryDesignator()) {
+                    if (romDesignation == person.getPrimaryDesignator()) {
                         cbMenuItem.setSelected(true);
                     }
                     menu.add(cbMenuItem);
                 }
-                if (menu.getItemCount() > MAX_POPUP_ITEMS) {
-                    MenuScroller.setScrollerFor(menu, MAX_POPUP_ITEMS);
-                }
-                popup.add(menu);
+                JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
 
-                menu = new JMenu(resourceMap.getString("changeSecondaryDesignation.text")); //$NON-NLS-1$
-                for (int i = Person.DESIG_NONE; i < Person.DESIG_NUM; i++) {
-                    cbMenuItem = new JCheckBoxMenuItem(Person.parseDesignator(i));
-                    cbMenuItem.setActionCommand(makeCommand(CMD_SECONDARY_DESIGNATOR, String.valueOf(i)));
+                menu = new JMenu(resourceMap.getString("changeSecondaryDesignation.text"));
+                for (ROMDesignation romDesignation : ROMDesignation.values()) {
+                    cbMenuItem = new JCheckBoxMenuItem(romDesignation.toString());
+                    cbMenuItem.setActionCommand(makeCommand(CMD_SECONDARY_DESIGNATOR, romDesignation.name()));
                     cbMenuItem.addActionListener(this);
-                    cbMenuItem.setEnabled(true);
-                    if (i == person.getSecondaryDesignator()) {
+                    if (romDesignation == person.getSecondaryDesignator()) {
                         cbMenuItem.setSelected(true);
                     }
                     menu.add(cbMenuItem);
                 }
-                if (menu.getItemCount() > MAX_POPUP_ITEMS) {
-                    MenuScroller.setScrollerFor(menu, MAX_POPUP_ITEMS);
-                }
-                popup.add(menu);
+                JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
             }
             menu = new JMenu(resourceMap.getString("changeStatus.text"));
             for (PersonnelStatus status : PersonnelStatus.values()) {
