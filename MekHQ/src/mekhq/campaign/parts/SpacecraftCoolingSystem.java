@@ -1,20 +1,20 @@
 /*
  * SpacecraftCoolingSystem.java
- * 
+ *
  * Copyright (C) 2019, MegaMek team
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -41,9 +41,9 @@ import mekhq.campaign.personnel.SkillType;
 /**
  * Container for SC/DS/JS/WS/SS heat sinks. Eliminates need for tracking hundreds/thousands
  * of individual heat sink parts for spacecraft.
- * 
+ *
  * The remove action adds a single heatsink of the appropriate type to the warehouse.
- * Fix action replaces one. 
+ * Fix action replaces one.
  * Small craft and up don't actually track damage to heatsinks, so you only fix this part if you're salvaging/replacing.
  * There might be 5,000 heatsinks in here. Have fun with that.
  * @author MKerensky
@@ -51,7 +51,7 @@ import mekhq.campaign.personnel.SkillType;
 public class SpacecraftCoolingSystem extends Part {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -5530683467894875423L;
 
@@ -108,7 +108,7 @@ public class SpacecraftCoolingSystem extends Part {
         }
     }
 
-    @Override 
+    @Override
     public int getBaseTime() {
         //60m per 50 heatsinks, per 6-2019 SO errata
         return 60;
@@ -127,7 +127,7 @@ public class SpacecraftCoolingSystem extends Part {
         if(null != unit && unit.getEntity() instanceof Aero) {
             ((Aero)unit.getEntity()).setHeatSinks(currentSinks);
         }
-        
+
     }
 
     @Override
@@ -148,7 +148,7 @@ public class SpacecraftCoolingSystem extends Part {
 
     /**
      * Pulls up to 50 heatsinks of the appropriate type from the warehouse and adds them to the cooling system
-     * 
+     *
      */
     public void replaceHeatSinks() {
         if (unit != null && unit.getEntity() instanceof Aero) {
@@ -165,7 +165,7 @@ public class SpacecraftCoolingSystem extends Part {
 
     /**
      * Calculates 'weight free' heatsinks included with this spacecraft's engine. You can't remove or replace these
-     * 
+     *
      */
     public void setEngineHeatSinks() {
         //Only calculate this again if we've managed to keep a value of 0 engineSinks or go negative.
@@ -186,7 +186,7 @@ public class SpacecraftCoolingSystem extends Part {
 
     /**
      * Pulls up to 50 heatsinks of the appropriate type from the cooling system and adds them to the warehouse
-     * 
+     *
      */
     public void removeHeatSinks(boolean salvage) {
         if (unit != null && unit.getEntity() instanceof Aero) {
@@ -224,10 +224,12 @@ public class SpacecraftCoolingSystem extends Part {
         }
         Part spareHeatSink = new AeroHeatSink(0, sinkType, false, campaign);
         Part spare = campaign.checkForExistingSparePart(spareHeatSink);
-        if (!isSalvaging() && spare == null) {
-            return "No compatible heat sinks in warehouse!";
-        } else if (!isSalvaging() && spare.getQuantity() < Math.min(sinksNeeded, 50)) {
-            return "Insufficient compatible heat sinks in warehouse!";
+        if (!isSalvaging()) {
+            if (spare == null) {
+                return "No compatible heat sinks in warehouse!";
+            } else if (spare.getQuantity() < Math.min(sinksNeeded, 50)) {
+                return "Insufficient compatible heat sinks in warehouse!";
+            }
         }
         return null;
     }
@@ -293,7 +295,7 @@ public class SpacecraftCoolingSystem extends Part {
         NodeList nl = wn.getChildNodes();
 
         for (int x=0; x<nl.getLength(); x++) {
-            Node wn2 = nl.item(x);        
+            Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("sinkType")) {
                 sinkType = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("sinksNeeded")) {

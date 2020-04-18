@@ -689,7 +689,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         // Then, it depends on whether the person is a Clanner or not.
         // For Clan names:
         // Takes the input name, and assumes that person does not have a surname
-        // Bloodnames are assumed to have been assigned either through the
+        // Bloodnames are assumed to have been assigned by MekHQ
         // For Inner Sphere names:
         // Depending on the length of the resulting array, the name is processed differently
         // Array of length 1: the name is assumed to not have a surname, just a given name
@@ -698,48 +698,33 @@ public class Person implements Serializable, MekHqXmlSerializable {
         // Array of length 4+: the name is assumed to be as many given names as possible and two surnames
         //
         // Then, the full name is set
-        final String space = " ";
-        String[] name = n.split(space);
+        String[] name = n.trim().split("\\s+");
+
+        givenName = name[0];
 
         if (isClanner()) {
-            int i = 0;
-            givenName = name[i];
-            for (i = 1; i < name.length - 1; i++) {
-                if (!name[i].equals(space)) {
-                    givenName += space + name[i];
+            if (name.length > 1) {
+                int i;
+                for (i = 1; i < name.length - 1; i++) {
+                    givenName += " " + name[i];
                 }
-            }
 
-            if (!(!StringUtil.isNullOrEmpty(getBloodname()) && getBloodname().equals(name[i]))) {
-                givenName += space + name[i];
+                if (!(!StringUtil.isNullOrEmpty(getBloodname()) && getBloodname().equals(name[i]))) {
+                    givenName += " " + name[i];
+                }
             }
         } else {
-            if (name.length == 1) {
-                givenName = name[0];
-            } else if (name.length == 2) {
-                givenName = name[0];
+            if (name.length == 2) {
                 surname = name[1];
             } else if (name.length == 3) {
-                givenName = name[0];
-                if (name[1].equals(space)) {
-                    surname = name[2];
-                } else {
-                    surname = name[1] + space + name[2];
-                }
+                surname = name[1] + " " + name[2];
             } else if (name.length > 3) {
-                int i = 0;
-                givenName = name[i];
+                int i;
                 for (i = 1; i < name.length - 2; i++) {
-                    if (!name[i].equals(space)) {
-                        givenName += space + name[i];
-                    }
+                    givenName += " " + name[i];
                 }
 
-                if (name[i].equals(space)) {
-                    surname = name[i + 1];
-                } else {
-                    surname = name[i] + space + name[i + 1];
-                }
+                surname = name[i] + " " + name[i + 1];
             }
         }
 
@@ -1301,6 +1286,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         // can't marry a prisoner, unless you are also a prisoner (this is purposely left open for prisoners to marry who they want)
         // can't marry a person who is dead or MIA
         // can't marry inactive personnel (this is to show how they aren't part of the force anymore)
+        // TODO : can't marry anyone who is not located at the same planet as the person - GitHub #1672: Implement current planet tracking for personnel
         // can't marry a close relative
         return (
                 !this.equals(p)
@@ -1310,26 +1296,27 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 && !p.isDeadOrMIA()
                 && p.isActive()
                 && ((getAncestorsId() == null)
-                    || !campaign.getAncestors(getAncestorsId()).checkMutualAncestors(campaign.getAncestors(p.getAncestorsId())))
+                    || !getCampaign().getAncestors(getAncestorsId()).checkMutualAncestors(
+                            getCampaign().getAncestors(p.getAncestorsId())))
         );
     }
 
     public boolean oldEnoughToMarry() {
-        return (getAge(getCampaign().getLocalDate()) >= campaign.getCampaignOptions().getMinimumMarriageAge());
+        return (getAge(getCampaign().getLocalDate()) >= getCampaign().getCampaignOptions().getMinimumMarriageAge());
     }
 
     public void randomMarriage() {
         // Don't attempt to generate is someone has a spouse, isn't old enough to marry,
-        // is actively deployed, or is currently a prisoner
-        if (hasSpouse() || !oldEnoughToMarry() || isDeployed() || isPrisoner()) {
+        // or is actively deployed
+        if (hasSpouse() || !oldEnoughToMarry() || isDeployed()) {
             return;
         }
 
         // setting is the fractional chance that this attempt at finding a marriage will result in one
-        if (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceRandomMarriages())) {
+        if (Compute.randomFloat() < (getCampaign().getCampaignOptions().getChanceRandomMarriages())) {
             addRandomSpouse(false);
-        } else if (campaign.getCampaignOptions().useRandomSameSexMarriages()) {
-            if (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceRandomSameSexMarriages())) {
+        } else if (getCampaign().getCampaignOptions().useRandomSameSexMarriages()) {
+            if (Compute.randomFloat() < (getCampaign().getCampaignOptions().getChanceRandomSameSexMarriages())) {
                 addRandomSpouse(true);
             }
         }
@@ -1338,7 +1325,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public void addRandomSpouse(boolean sameSex) {
         List<Person> potentials = new ArrayList<>();
         int gender = sameSex ? getGender() : (isMale() ? Crew.G_FEMALE : Crew.G_MALE);
-        for (Person p : campaign.getPersonnel()) {
+        for (Person p : getCampaign().getActivePersonnel()) {
             if (isPotentialRandomSpouse(p, gender)) {
                 potentials.add(p);
             }
@@ -1351,9 +1338,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public boolean isPotentialRandomSpouse(Person p, int gender) {
-        if (p.getGender() != gender) {
-            return false;
-        } else if (!safeSpouse(p)) {
+        if ((p.getGender() != gender) || !safeSpouse(p) || !(isFree() || (isPrisoner() && p.isPrisoner()))) {
             return false;
         }
 

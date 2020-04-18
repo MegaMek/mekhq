@@ -28,7 +28,7 @@ jobs:
     strategy:
       matrix:
         os:   [ubuntu-latest, windows-latest]
-        java: [ 8, 11, 14 ]
+        java: [ 8, 11 ]
       fail-fast: false
 
     runs-on: ${{ matrix.os }}
@@ -66,15 +66,6 @@ jobs:
         path: megamek
 
     #
-    # Setup composite build for MegaMekLab
-    #
-    # see: https://github.com/MegaMek/megamek/wiki/Working-With-Gradle
-    #
-    - name: Setup Composite Build for MegaMekLab
-      run: |
-        echo "if (gradle.parent == null) includeBuild '../megamek'" >./megameklab/settings_local.gradle
-
-    #
     # Checkout the latest MegaMekLab source
     # and put it in: ./megameklab
     #
@@ -83,6 +74,15 @@ jobs:
       with:
         repository: MegaMek/megameklab
         path: megameklab
+
+    #
+    # Setup composite build for MegaMekLab
+    #
+    # see: https://github.com/MegaMek/megamek/wiki/Working-With-Gradle
+    #
+    - name: Setup Composite Build for MegaMekLab
+      run: |
+        echo "if (gradle.parent == null) includeBuild '../megamek'" >./megameklab/settings_local.gradle
 
     #
     # Setup the requested Java Version from the matrix
