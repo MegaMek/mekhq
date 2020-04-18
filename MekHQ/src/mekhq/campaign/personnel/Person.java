@@ -40,10 +40,7 @@ import megamek.common.util.WeightedMap;
 import mekhq.campaign.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.*;
-import mekhq.campaign.personnel.enums.BodyLocation;
-import mekhq.campaign.personnel.enums.GenderDescriptors;
-import mekhq.campaign.personnel.enums.ModifierValue;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.enums.*;
 import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -291,17 +288,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private int rankSystem;
     private Ranks ranks;
 
-    // Manei Domini "Classes"
-    public static final int MD_NONE			= 0;
-    public static final int MD_GHOST		= 1;
-    public static final int MD_WRAITH		= 2;
-    public static final int MD_BANSHEE		= 3;
-    public static final int MD_ZOMBIE		= 4;
-    public static final int MD_PHANTOM		= 5;
-    public static final int MD_SPECTER		= 6;
-    public static final int MD_POLTERGEIST	= 7;
-    public static final int MD_NUM			= 8;
-    private int maneiDominiClass;
+    private ManeiDominiClass maneiDominiClass;
     private int maneiDominiRank;
 
     //stuff to track for support teams
@@ -439,7 +426,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         rankLevel = 0;
         rankSystem = -1;
         maneiDominiRank = Rank.MD_RANK_NONE;
-        maneiDominiClass = MD_NONE;
+        maneiDominiClass = ManeiDominiClass.NONE;
         nTasks = 0;
         doctorId = null;
         unitId = null;
@@ -1739,8 +1726,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
             if (maneiDominiRank != Rank.MD_RANK_NONE) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maneiDominiRank", maneiDominiRank);
             }
-            if (maneiDominiClass != MD_NONE) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maneiDominiClass", maneiDominiClass);
+            if (maneiDominiClass != ManeiDominiClass.NONE) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maneiDominiClass", maneiDominiClass.name());
             }
             if (nTasks > 0) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "nTasks", nTasks);
@@ -2010,7 +1997,21 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("maneiDominiRank")) {
                     retVal.maneiDominiRank = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("maneiDominiClass")) {
-                    retVal.maneiDominiClass = Integer.parseInt(wn2.getTextContent());
+                    if (version.isLowerThan("0.47.6")) {
+                        int mdClass = Integer.parseInt(wn2.getTextContent().trim());
+                        if (ManeiDominiClass.values().length > mdClass) {
+                            retVal.maneiDominiClass = ManeiDominiClass.values()[mdClass];
+                        } else {
+                            retVal.maneiDominiClass = ManeiDominiClass.NONE;
+                        }
+                    } else {
+                        try {
+                            retVal.maneiDominiClass = ManeiDominiClass.valueOf(wn2.getTextContent().trim());
+                        } catch (Exception e) {
+                            MekHQ.getLogger().error(Person.class, METHOD_NAME,
+                                    "Failed to parse the enum value for ManeiDominiClass");
+                        }
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("doctorId")) {
                     if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
                         retVal.oldDoctorId = Integer.parseInt(wn2.getTextContent());
@@ -2543,17 +2544,18 @@ public class Person implements Serializable, MekHqXmlSerializable {
         rankName = getRank().getName(profession);
 
         // Manei Domini Additions
-        if (getRankSystem() != Ranks.RS_WOB) {
-            // Oops, clear our MD variables
-            maneiDominiClass = MD_NONE;
+        if (getRankSystem() == Ranks.RS_WOB) {
+            if (maneiDominiClass != ManeiDominiClass.NONE) {
+                rankName = maneiDominiClass.toString() + " " + rankName;
+            }
+            if (maneiDominiRank != Rank.MD_RANK_NONE) {
+                rankName += " " + Rank.getManeiDominiRankName(maneiDominiRank);
+            }
+        } else {
+            maneiDominiClass = ManeiDominiClass.NONE;
             maneiDominiRank = Rank.MD_RANK_NONE;
         }
-        if (maneiDominiClass != MD_NONE) {
-            rankName = getManeiDominiClassNames() + " " + rankName;
-        }
-        if (maneiDominiRank != Rank.MD_RANK_NONE) {
-            rankName += " " + Rank.getManeiDominiRankName(maneiDominiRank);
-        }
+
         if (getRankSystem() == Ranks.RS_COM || getRankSystem() == Ranks.RS_WOB) {
             rankName += getComStarBranchDesignation();
         }
@@ -2570,11 +2572,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return rankName;
     }
 
-    public int getManeiDominiClass() {
+    public ManeiDominiClass getManeiDominiClass() {
         return maneiDominiClass;
     }
 
-    public void setManeiDominiClass(int maneiDominiClass) {
+    public void setManeiDominiClass(ManeiDominiClass maneiDominiClass) {
         this.maneiDominiClass = maneiDominiClass;
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
@@ -2586,36 +2588,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public void setManeiDominiRank(int maneiDominiRank) {
         this.maneiDominiRank = maneiDominiRank;
         MekHQ.triggerEvent(new PersonChangedEvent(this));
-    }
-
-    public String getManeiDominiClassNames() {
-        return getManeiDominiClassNames(maneiDominiClass, getRankSystem());
-    }
-
-    public static String getManeiDominiClassNames(int maneiDominiClass, int rankSystem) {
-        // Only WoB
-        if (rankSystem != Ranks.RS_WOB)
-            return "";
-
-        switch (maneiDominiClass) {
-            case MD_GHOST:
-                return "Ghost";
-            case MD_WRAITH:
-                return "Wraith";
-            case MD_BANSHEE:
-                return "Banshee";
-            case MD_ZOMBIE:
-                return "Zombie";
-            case MD_PHANTOM:
-                return "Phantom";
-            case MD_SPECTER:
-                return "Specter";
-            case MD_POLTERGEIST:
-                return "Poltergeist";
-            case MD_NONE:
-            default:
-                return "";
-        }
     }
 
     /**
