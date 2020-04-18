@@ -1933,13 +1933,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     retVal.acquisitions = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("primaryDesignator")) {
                     if (version.isLowerThan("0.47.6")) {
-                        retVal.primaryDesignator = migrateROMDesignation(Integer.valueOf(wn2.getTextContent()));
+                        retVal.primaryDesignator = migrateROMDesignation(Integer.parseInt(wn2.getTextContent()));
                     } else {
                         retVal.primaryDesignator = ROMDesignation.valueOf(wn2.getTextContent().trim());
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("secondaryDesignator")) {
                     if (version.isLowerThan("0.47.6")) {
-                        retVal.secondaryDesignator = migrateROMDesignation(Integer.valueOf(wn2.getTextContent()));
+                        retVal.secondaryDesignator = migrateROMDesignation(Integer.parseInt(wn2.getTextContent()));
                     } else {
                         retVal.secondaryDesignator = ROMDesignation.valueOf(wn2.getTextContent().trim());
                     }
@@ -2365,7 +2365,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     private static ROMDesignation migrateROMDesignation(int designation) {
-        if (ROMDesignation.values().length <= designation) {
+        if (ROMDesignation.values().length > designation) {
             return ROMDesignation.values()[designation];
         } else {
             return ROMDesignation.NONE;
