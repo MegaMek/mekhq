@@ -51,6 +51,29 @@ public class ScenarioTemplate implements Cloneable {
     @XmlElement(name="scenarioObjective")
     public List<ScenarioObjective> scenarioObjectives = new ArrayList<>();
     
+    public ScenarioTemplate clone() {
+        ScenarioTemplate st = new ScenarioTemplate();
+        st.name = this.name;
+        st.shortBriefing = this.shortBriefing;
+        st.detailedBriefing = this.detailedBriefing;
+        for(ScenarioForceTemplate sft : scenarioForces.values()) {
+            st.scenarioForces.put(sft.getForceName(), sft.clone());
+        }
+        
+        for(String mod : scenarioModifiers) {
+            scenarioModifiers.add(mod);
+        }
+        
+        for(ScenarioObjective obj : scenarioObjectives) {
+            scenarioObjectives.add(new ScenarioObjective(obj));
+        }
+        
+        st.mapParameters = (ScenarioMapParameters) mapParameters.clone();
+        
+        
+        return st;
+    }
+    
     /**
      * Returns the "primary" player force. This is always the force with the name "Player".
      * @return Primary player force.

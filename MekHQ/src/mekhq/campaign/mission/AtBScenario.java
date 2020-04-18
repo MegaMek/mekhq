@@ -220,7 +220,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
    
     // key-value pairs linking transports and the units loaded onto them.
     private Map<String, List<String>> transportLinkages;
-    private Map<String, Entity> externalIDLookup;
+    protected Map<String, Entity> externalIDLookup;
 
     protected static ResourceBundle defaultResourceBundle = ResourceBundle.getBundle("mekhq.resources.AtBScenarioBuiltIn", new EncodeControl()); //$NON-NLS-1$
 

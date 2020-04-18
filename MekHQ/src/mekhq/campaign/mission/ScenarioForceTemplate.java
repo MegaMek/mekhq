@@ -76,6 +76,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     // this is used to indicate that a "fixed" size unit should deploy as a lance
     public static final int FIXED_UNIT_SIZE_LANCE = -1;
 
+    public static final String PRIMARY_FORCE_TEMPLATE_ID = "Player";
     public static final String REINFORCEMENT_TEMPLATE_ID = "Reinforcements";
 
     public enum ForceAlignment {
@@ -279,6 +280,11 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
      */
     private List<String> objectiveLinkedForces;
 
+    @Override
+    public ScenarioForceTemplate clone() {
+        return new ScenarioForceTemplate(this);
+    }
+    
     /**
      * Blank constructor for deserialization purposes.
      */
@@ -297,6 +303,42 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         this.allowedUnitType = allowedUnitType;
         this.deploymentZones = deploymentZones == null ? new ArrayList<>() : new ArrayList<>(deploymentZones);
         this.objectiveLinkedForces = new ArrayList<>();
+    }
+    
+    public ScenarioForceTemplate(ScenarioForceTemplate forceDefinition) {
+        forceAlignment = forceDefinition.forceAlignment;
+        generationMethod = forceDefinition.generationMethod;
+        forceMultiplier = forceDefinition.forceMultiplier;
+        deploymentZones = new ArrayList<>();
+        for(int zone : forceDefinition.deploymentZones) {
+            deploymentZones.add(zone);
+        }
+        
+        destinationZone = forceDefinition.destinationZone;
+        retreatThreshold = forceDefinition.retreatThreshold;
+        allowedUnitType = forceDefinition.allowedUnitType;
+        canReinforceLinked = forceDefinition.canReinforceLinked;
+        contributesToBV = forceDefinition.contributesToBV;
+        contributesToUnitCount = forceDefinition.contributesToUnitCount;
+        forceName = forceDefinition.forceName;
+        syncedForceName = forceDefinition.syncedForceName;
+        syncDeploymentType = forceDefinition.syncDeploymentType;
+        syncRetreatThreshold = forceDefinition.syncRetreatThreshold;
+        arrivalTurn = forceDefinition.arrivalTurn;
+        maxWeightClass = forceDefinition.maxWeightClass;
+        minWeightClass = forceDefinition.minWeightClass;
+        contributesToMapSize = forceDefinition.contributesToMapSize;
+        actualDeploymentZone =  forceDefinition.actualDeploymentZone;
+        fixedUnitCount = forceDefinition.fixedUnitCount;
+        generationOrder = forceDefinition.generationOrder;
+        allowAeroBombs = forceDefinition.allowAeroBombs;
+        startingAltitude = forceDefinition.startingAltitude;
+        useArtillery = forceDefinition.useArtillery;
+        deployOffBoard = forceDefinition.deployOffBoard;
+        objectiveLinkedForces = new ArrayList<String>();
+        for(String force : forceDefinition.objectiveLinkedForces) {
+            objectiveLinkedForces.add(force);
+        }
     }
 
     public int getForceAlignment() {

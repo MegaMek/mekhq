@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;

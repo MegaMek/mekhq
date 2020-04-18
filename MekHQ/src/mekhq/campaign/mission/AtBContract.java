@@ -1528,6 +1528,14 @@ public class AtBContract extends Contract implements Serializable {
     public int getBattleTypeMod() {
         return battleTypeMod + nextWeekBattleTypeMod;
     }
+    
+    public StratconCampaignState getStratconCampaignState() {
+        return stratconCampaignState;
+    }
+    
+    public void setStratconCampaignState(StratconCampaignState state) {
+        stratconCampaignState = state;
+    }
 
     public AtBContract(Contract c, Campaign campaign) {
         this(c.getName());
