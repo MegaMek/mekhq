@@ -372,14 +372,14 @@ public class Utilities {
             // If this isn't the same chassis, is our current unit, we continue
             if (!en.getChassis().equalsIgnoreCase(summary.getChassis())
                     || en.getModel().equalsIgnoreCase(summary.getModel())
-                    || !summary.getUnitType().equals(UnitType.determineUnitType(en))) {
+                    || !summary.getUnitType().equals(UnitType.getTypeName(en.getUnitType()))) {
                 continue;
             }
             
             // Weight of the two units must match or we continue, but BA weight gets
             // checked differently
             if (en instanceof BattleArmor) {
-                if (((BattleArmor)en).getTroopers() != (int) summary.getTWweight()) {
+                if (((BattleArmor) en).getTroopers() != (int) summary.getTWweight()) {
                     continue;
                 }
             } else {
