@@ -3694,12 +3694,12 @@ public class CampaignOptions implements Serializable {
         // new default values. If they have, we save their changes and add the new surname weights
         if (
                 (weights[0] != retVal.randomMarriageSurnameWeights[0])
-                || (weights[1] != retVal.randomMarriageSurnameWeights[1])
-                || (weights[2] != retVal.randomMarriageSurnameWeights[2])
-                || (weights[3] != retVal.randomMarriageSurnameWeights[9] - 5)
-                || (weights[4] != retVal.randomMarriageSurnameWeights[10] - 5)
-                || (weights[5] != retVal.randomMarriageSurnameWeights[5] - 5)
-                || (weights[6] != retVal.randomMarriageSurnameWeights[6] - 5)
+                || (weights[1] != retVal.randomMarriageSurnameWeights[1] + 5)
+                || (weights[2] != retVal.randomMarriageSurnameWeights[2] + 5)
+                || (weights[3] != retVal.randomMarriageSurnameWeights[9] + 5)
+                || (weights[4] != retVal.randomMarriageSurnameWeights[10] + 5)
+                || (weights[5] != retVal.randomMarriageSurnameWeights[5] + 5)
+                || (weights[6] != retVal.randomMarriageSurnameWeights[6] + 5)
                 || (weights[7] != retVal.randomMarriageSurnameWeights[11])
                 || (weights[8] != retVal.randomMarriageSurnameWeights[12])
         ) {

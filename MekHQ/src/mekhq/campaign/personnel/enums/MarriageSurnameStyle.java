@@ -67,10 +67,6 @@ public enum MarriageSurnameStyle {
     //endregion Constructors
 
     //region Getters
-    public String getName() {
-        return name;
-    }
-
     public String getToolTipText() {
         return toolTipText;
     }
@@ -206,5 +202,10 @@ public enum MarriageSurnameStyle {
         }
 
         return map;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

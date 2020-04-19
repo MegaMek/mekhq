@@ -1792,7 +1792,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             JPanel panRandomMarriageSurnameWeight = new JPanel();
             panRandomMarriageSurnameWeight.add(spnRandomMarriageSurnameWeight);
 
-            JLabel lblRandomMarriageSurnameWeight = new JLabel(marriageSurnameStyles[i].getName());
+            JLabel lblRandomMarriageSurnameWeight = new JLabel(marriageSurnameStyles[i].toString());
             lblRandomMarriageSurnameWeight.setToolTipText(marriageSurnameStyles[i].getToolTipText());
             panRandomMarriageSurnameWeight.add(lblRandomMarriageSurnameWeight);
 
