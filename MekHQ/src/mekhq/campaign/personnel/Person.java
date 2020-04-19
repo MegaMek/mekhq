@@ -1917,17 +1917,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("acquisitions")) {
                     retVal.acquisitions = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("primaryDesignator")) {
-                    if (version.isLowerThan("0.47.6")) {
-                        retVal.primaryDesignator = migrateROMDesignation(Integer.parseInt(wn2.getTextContent()));
-                    } else {
-                        retVal.primaryDesignator = ROMDesignation.valueOf(wn2.getTextContent().trim());
-                    }
+                    retVal.primaryDesignator = ROMDesignation.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("secondaryDesignator")) {
-                    if (version.isLowerThan("0.47.6")) {
-                        retVal.secondaryDesignator = migrateROMDesignation(Integer.parseInt(wn2.getTextContent()));
-                    } else {
-                        retVal.secondaryDesignator = ROMDesignation.valueOf(wn2.getTextContent().trim());
-                    }
+                    retVal.secondaryDesignator = ROMDesignation.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysToWaitForHealing")) {
                     retVal.daysToWaitForHealing = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("idleMonths")) {
@@ -2347,14 +2339,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
 
         return retVal;
-    }
-
-    private static ROMDesignation migrateROMDesignation(int designation) {
-        if (ROMDesignation.values().length > designation) {
-            return ROMDesignation.values()[designation];
-        } else {
-            return ROMDesignation.NONE;
-        }
     }
 
     public void setSalary(Money s) {

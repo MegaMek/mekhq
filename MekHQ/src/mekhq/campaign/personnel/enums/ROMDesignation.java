@@ -22,6 +22,7 @@ import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.Jumpship;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -128,5 +129,31 @@ public enum ROMDesignation {
     @Override
     public String toString() {
         return this.designation;
+    }
+
+    public static ROMDesignation parseFromString(String information) {
+        // Parse based on the enum name
+        try {
+            return valueOf(information);
+        } catch (Exception ignored) {
+
+        }
+
+        // Parse from Ordinal Int - Legacy save method
+        ROMDesignation[] values = values();
+        try {
+            int designation = Integer.parseInt(information);
+            if (values.length > designation) {
+                return values[designation];
+            }
+        } catch (Exception ignored) {
+
+        }
+
+        // Could not parse based on either method, so return NONE
+        MekHQ.getLogger().error(ROMDesignation.class, "parseFromString",
+                "Unable to parse " + information + " into a ROMDesignation. Returning NONE");
+
+        return ROMDesignation.NONE;
     }
 }
