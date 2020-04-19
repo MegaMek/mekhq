@@ -369,17 +369,30 @@ public class Utilities {
         CampaignOptions options = campaign.getCampaignOptions();
         ArrayList<String> variants = new ArrayList<>();
         for(MechSummary summary : MechSummaryCache.getInstance().getAllMechs()) {
-            // If this isn't the same chassis, is our current unit, or is a different weight we continue
-            if(!en.getChassis().equalsIgnoreCase(summary.getChassis())
+            // If this isn't the same chassis, is our current unit, we continue
+            if (!en.getChassis().equalsIgnoreCase(summary.getChassis())
                     || en.getModel().equalsIgnoreCase(summary.getModel())
-                    || summary.getTons() != en.getWeight()
-                    || !summary.getUnitType().equals(UnitType.determineUnitType(en))) {
+                    || !summary.getUnitType().equals(UnitType.getTypeName(en.getUnitType()))) {
                 continue;
             }
+            
+            // Weight of the two units must match or we continue, but BA weight gets
+            // checked differently
+            if (en instanceof BattleArmor) {
+                if (((BattleArmor) en).getTroopers() != (int) summary.getTWweight()) {
+                    continue;
+                }
+            } else {
+                if (summary.getTons() != en.getWeight()) {
+                    continue;
+                }
+            }
+            
             // If we only allow canon units and this isn't canon we continue
-            if(!summary.isCanon() && options.allowCanonRefitOnly()) {
+            if (!summary.isCanon() && options.allowCanonRefitOnly()) {
                 continue;
             }
+            
             // If the unit doesn't meet the tech filter criteria we continue
             ITechnology techProg = UnitTechProgression.getProgression(summary, campaign.getTechFaction(), true);
             if (null == techProg) {
@@ -937,6 +950,9 @@ public class Utilities {
             } else {
                 p.setGivenName(givenName);
                 p.setSurname(oldCrew.getExtraDataValue(crewIndex, Crew.MAP_SURNAME));
+                if (p.getSurname() == null) {
+                    p.setSurname("");
+                }
 
                 String phenotype = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_PHENOTYPE);
                 if (phenotype != null) {
