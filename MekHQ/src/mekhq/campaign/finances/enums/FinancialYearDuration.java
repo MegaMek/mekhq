@@ -20,46 +20,55 @@ package mekhq.campaign.finances.enums;
 
 import megamek.common.util.EncodeControl;
 
+import java.time.LocalDate;
 import java.util.ResourceBundle;
 
-public enum FinancesResetDuration {
+public enum FinancialYearDuration {
     //region Enum Declarations
-    DAILY("FinancesResetDuration.DAILY.text", "FinancesResetDuration.DAILY.toolTipText"),
-    WEEKLY("FinancesResetDuration.WEEKLY.text", "FinancesResetDuration.WEEKLY.toolTipText"),
-    MONTHLY("FinancesResetDuration.MONTHLY.text", "FinancesResetDuration.MONTHLY.toolTipText"),
-    SEMIANNUALLY("FinancesResetDuration.SEMIANNUALLY.text", "FinancesResetDuration.SEMIANNUALLY.toolTipText"),
-    ANNUALLY("FinancesResetDuration.ANNUALLY.text", "FinancesResetDuration.ANNUALLY.toolTipText"),
-    BIANNUALLY("FinancesResetDuration.BIANNUALLY.text", "FinancesResetDuration.BIANNUALLY.toolTipText"),
-    QUINQUENNIALLY("FinancesResetDuration.QUINQUENNIALLY.text", "FinancesResetDuration.QUINQUENNIALLY.toolTipText"),
-    DECENNIALLY("FinancesResetDuration.DECENNIALLY.text", "FinancesResetDuration.DECENNIALLY.toolTipText"),
-    QUADRANSCENTENNIALLY("FinancesResetDuration.QUADRANSCENTENNIALLY.text", "FinancesResetDuration.QUADRANSCENTENNIALLY.toolTipText"),
-    CENTENARY("FinancesResetDuration.CENTENARY.text", "FinancesResetDuration.CENTENARY.toolTipText"),
-    SESQUICENTENNIALLY("FinancesResetDuration.SESQUICENTENNIALLY.text", "FinancesResetDuration.SESQUICENTENNIALLY.toolTipText"),
-    NEVER("FinancesResetDuration.NEVER.text", "FinancesResetDuration.NEVER.toolTipText");
+    SEMIANNUAL("FinancialYearDuration.SEMIANNUAL.text", "FinancialYearDuration.SEMIANNUAL.toolTipText"),
+    ANNUAL("FinancialYearDuration.ANNUAL.text", "FinancialYearDuration.ANNUAL.toolTipText"),
+    BIANNUAL("FinancialYearDuration.BIANNUAL.text", "FinancialYearDuration.BIANNUAL.toolTipText"),
+    QUINQUENNIAL("FinancialYearDuration.QUINQUENNIAL.text", "FinancialYearDuration.QUINQUENNIAL.toolTipText"),
+    DECENNIAL("FinancialYearDuration.DECENNIAL.text", "FinancialYearDuration.DECENNIAL.toolTipText"),
+    FOREVER("FinancialYearDuration.FOREVER.text", "FinancialYearDuration.FOREVER.toolTipText");
     //endregion Enum Declarations
 
     //region Variable Declarations
     private final String typeName;
     private final String toolTipText;
 
-    public final static FinancesResetDuration DEFAULT_TYPE = ANNUALLY;
+    public final static FinancialYearDuration DEFAULT_TYPE = ANNUAL;
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Finances",
             new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
-    FinancesResetDuration(String typeName, String toolTipText) {
+    FinancialYearDuration(String typeName, String toolTipText) {
         this.typeName = resources.getString(typeName);
         this.toolTipText = resources.getString(toolTipText);
     }
     //endregion Constructors
 
-    public String getTypeName() {
-        return typeName;
-    }
-
     public String getToolTipText() {
         return toolTipText;
+    }
+
+    public boolean isEndOfFinancialYear(LocalDate today) {
+        switch (this) {
+            case SEMIANNUAL:
+                return (today.getDayOfYear() == 1) || (today.getDayOfYear() == 183);
+            case BIANNUAL:
+                return (today.getDayOfYear() == 1) && (today.getYear() % 2 == 0);
+            case QUINQUENNIAL:
+                return (today.getDayOfYear() == 1) && (today.getYear() % 5 == 0);
+            case DECENNIAL:
+                return (today.getDayOfYear() == 1) && (today.getYear() % 10 == 0);
+            case FOREVER:
+                return false;
+            case ANNUAL:
+            default:
+                return (today.getDayOfYear() == 1);
+        }
     }
 
     @Override

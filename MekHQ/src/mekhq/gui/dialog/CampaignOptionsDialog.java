@@ -83,8 +83,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.GamePreset;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.event.OptionsChangedEvent;
-import mekhq.campaign.finances.Finances;
-import mekhq.campaign.finances.enums.FinancesResetDuration;
+import mekhq.campaign.finances.enums.FinancialYearDuration;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.Part;
@@ -288,8 +287,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox usePeacetimeCostBox;
     private JCheckBox useExtendedPartsModifierBox;
     private JCheckBox showPeacetimeCostBox;
-    private JCheckBox yearlyFinancesToCSVExportBox;
-    private JComboBox<FinancesResetDuration> comboFinancesResetDuration;
+    private JCheckBox newFinancialYearFinancesToCSVExportBox;
+    private JComboBox<FinancialYearDuration> comboFinancialYearDuration;
     private JSpinner spnClanPriceModifier;
     private JSpinner[] spnUsedPartsValue;
     private JSpinner spnDamagedPartsValue;
@@ -2188,34 +2187,34 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panFinances.add(showPeacetimeCostBox, gridBagConstraints);
 
-        yearlyFinancesToCSVExportBox = new JCheckBox(resourceMap.getString("yearlyFinancesToCSVExportBox.text"));
-        yearlyFinancesToCSVExportBox.setToolTipText(resourceMap.getString("yearlyFinancesToCSVExportBox.toolTipText"));
-        yearlyFinancesToCSVExportBox.setName("yearlyFinancesToCSVExportBox");
-        yearlyFinancesToCSVExportBox.setSelected(options.getYearlyFinancesToCSVExport());
-        gridBagConstraints.gridy = gridy++;
-        panFinances.add(yearlyFinancesToCSVExportBox, gridBagConstraints);
-
-        DefaultComboBoxModel<FinancesResetDuration> financesResetDurationModel = new DefaultComboBoxModel<>(FinancesResetDuration.values());
-        comboFinancesResetDuration = new JComboBox<>(financesResetDurationModel);
-        comboFinancesResetDuration.setRenderer(new BasicComboBoxRenderer() {
+        DefaultComboBoxModel<FinancialYearDuration> financialYearDurationModel = new DefaultComboBoxModel<>(FinancialYearDuration.values());
+        comboFinancialYearDuration = new JComboBox<>(financialYearDurationModel);
+        comboFinancialYearDuration.setRenderer(new BasicComboBoxRenderer() {
                 @Override
                 public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                     super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                     if (isSelected && (index > -1)) {
-                        list.setToolTipText((list.getSelectedValue() instanceof FinancesResetDuration)
-                                ? ((FinancesResetDuration) list.getSelectedValue()).getToolTipText() : "");
+                        list.setToolTipText((list.getSelectedValue() instanceof FinancialYearDuration)
+                                ? ((FinancialYearDuration) list.getSelectedValue()).getToolTipText() : "");
                     }
 
                     return this;
                 }
             });
-        comboFinancesResetDuration.setSelectedItem(options.getFinancesResetDuration());
-        JPanel pnlFinancesResetDuration = new JPanel();
-        pnlFinancesResetDuration.add(new JLabel(resourceMap.getString("financesResetDuration.text")));
-        pnlFinancesResetDuration.setToolTipText(resourceMap.getString("financesResetDuration.toolTipText"));
-        pnlFinancesResetDuration.add(comboFinancesResetDuration);
+        comboFinancialYearDuration.setSelectedItem(options.getFinancialYearDuration());
+        JPanel pnlFinancialYearDuration = new JPanel();
+        pnlFinancialYearDuration.add(new JLabel(resourceMap.getString("financialYearDuration.text")));
+        pnlFinancialYearDuration.setToolTipText(resourceMap.getString("financialYearDuration.toolTipText"));
+        pnlFinancialYearDuration.add(comboFinancialYearDuration);
         gridBagConstraints.gridy = gridy++;
-        panFinances.add(pnlFinancesResetDuration, gridBagConstraints);
+        panFinances.add(pnlFinancialYearDuration, gridBagConstraints);
+
+        newFinancialYearFinancesToCSVExportBox = new JCheckBox(resourceMap.getString("newFinancialYearFinancesToCSVExportBox.text"));
+        newFinancialYearFinancesToCSVExportBox.setToolTipText(resourceMap.getString("newFinancialYearFinancesToCSVExportBox.toolTipText"));
+        newFinancialYearFinancesToCSVExportBox.setName("newFinancialYearFinancesToCSVExportBox");
+        newFinancialYearFinancesToCSVExportBox.setSelected(options.getNewFinancialYearFinancesToCSVExport());
+        gridBagConstraints.gridy = gridy++;
+        panFinances.add(newFinancialYearFinancesToCSVExportBox, gridBagConstraints);
 
         clanPriceModifierLabel.setText(resourceMap.getString("clanPriceModifierLabel.text")); // NOI18N
         clanPriceModifierLabel.setName("clanPriceModifierLabel"); // NOI18N
@@ -4720,8 +4719,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setUsePeacetimeCost(usePeacetimeCostBox.isSelected());
         options.setUseExtendedPartsModifier(useExtendedPartsModifierBox.isSelected());
         options.setShowPeacetimeCost(showPeacetimeCostBox.isSelected());
-        options.setYearlyFinancesToCSVExport(yearlyFinancesToCSVExportBox.isSelected());
-        options.setFinancesResetDuration((FinancesResetDuration) comboFinancesResetDuration.getSelectedItem());
+        options.setNewFinancialYearFinancesToCSVExport(newFinancialYearFinancesToCSVExportBox.isSelected());
+        options.setFinancialYearDuration((FinancialYearDuration) comboFinancialYearDuration.getSelectedItem());
         options.setAssignPortraitOnRoleChange(chkAssignPortraitOnRoleChange.isSelected());
 
         options.setEquipmentContractBase(btnContractEquipment.isSelected());

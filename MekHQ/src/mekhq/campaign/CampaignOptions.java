@@ -27,7 +27,7 @@ import java.util.List;
 
 import mekhq.campaign.finances.Money;
 
-import mekhq.campaign.finances.enums.FinancesResetDuration;
+import mekhq.campaign.finances.enums.FinancialYearDuration;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -176,8 +176,8 @@ public class CampaignOptions implements Serializable {
     private boolean usePeacetimeCost;
     private boolean useExtendedPartsModifier;
     private boolean showPeacetimeCost;
-    private boolean yearlyFinancesToCSVExport;
-    private FinancesResetDuration financesResetDuration;
+    private FinancialYearDuration financialYearDuration;
+    private boolean newFinancialYearFinancesToCSVExport;
     private double clanPriceModifier;
     private double[] usedPartsValue;
     private double damagedPartsValue;
@@ -585,8 +585,8 @@ public class CampaignOptions implements Serializable {
         usePeacetimeCost = false;
         useExtendedPartsModifier = false;
         showPeacetimeCost = false;
-        yearlyFinancesToCSVExport = false;
-        financesResetDuration = FinancesResetDuration.DEFAULT_TYPE;
+        financialYearDuration = FinancialYearDuration.DEFAULT_TYPE;
+        newFinancialYearFinancesToCSVExport = false;
         clanPriceModifier = 1.0;
         usedPartsValue = new double[6];
         usedPartsValue[0] = 0.1;
@@ -1518,26 +1518,32 @@ public class CampaignOptions implements Serializable {
         this.showPeacetimeCost = b;
     }
 
-    public boolean getYearlyFinancesToCSVExport() {
-        return yearlyFinancesToCSVExport;
-    }
-
-    public void setYearlyFinancesToCSVExport(boolean b) {
-        yearlyFinancesToCSVExport = b;
+    /**
+     * @return the duration of a financial year
+     */
+    public FinancialYearDuration getFinancialYearDuration() {
+        return financialYearDuration;
     }
 
     /**
-     * @return the duration between finance resets
+     * @param financialYearDuration the financial year duration to set
      */
-    public FinancesResetDuration getFinancesResetDuration() {
-        return financesResetDuration;
+    public void setFinancialYearDuration(FinancialYearDuration financialYearDuration) {
+        this.financialYearDuration = financialYearDuration;
     }
 
     /**
-     * @param financesResetDuration the reset duration to set for finances
+     * @return whether or not to export finances to CSV at the end of a financial year
      */
-    public void setFinancesResetDuration(FinancesResetDuration financesResetDuration) {
-        this.financesResetDuration = financesResetDuration;
+    public boolean getNewFinancialYearFinancesToCSVExport() {
+        return newFinancialYearFinancesToCSVExport;
+    }
+
+    /**
+     * @param b whether or not to export finances to CSV at the end of a financial year
+     */
+    public void setNewFinancialYearFinancesToCSVExport(boolean b) {
+        newFinancialYearFinancesToCSVExport = b;
     }
 
     public double getClanPriceModifier() {
@@ -2941,8 +2947,8 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePeacetimeCost", usePeacetimeCost);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useExtendedPartsModifier", useExtendedPartsModifier);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "showPeacetimeCost", showPeacetimeCost);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "yearlyFinancesToCSVExport", yearlyFinancesToCSVExport);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "financesResetDuration", financesResetDuration.name());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "financialYearDuration", financialYearDuration.name());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "newFinancialYearFinancesToCSVExport", newFinancialYearFinancesToCSVExport);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clanPriceModifier", clanPriceModifier);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueA", usedPartsValue[0]);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueB", usedPartsValue[1]);
@@ -3428,10 +3434,10 @@ public class CampaignOptions implements Serializable {
                 retVal.useExtendedPartsModifier = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("showPeacetimeCost")) {
                 retVal.showPeacetimeCost = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("yearlyFinancesToCSVExport")) {
-                retVal.yearlyFinancesToCSVExport = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("financesResetDuration")) {
-                retVal.financesResetDuration = FinancesResetDuration.valueOf(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("financialYearDuration")) {
+                retVal.financialYearDuration = FinancialYearDuration.valueOf(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("newFinancialYearFinancesToCSVExport")) {
+                retVal.newFinancialYearFinancesToCSVExport = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("clanPriceModifier")) {
                     retVal.clanPriceModifier = Double.parseDouble(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueA")) {
