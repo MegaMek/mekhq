@@ -1731,10 +1731,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
             if (unitId != null) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitId", unitId.toString());
             }
-            if (salary != Money.of(-1)) {
+            if (!salary.equals(Money.of(-1))) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "salary", salary.toXmlString());
             }
-            if (totalEarnings != Money.of(0)) {
+            if (!totalEarnings.equals(Money.of(0))) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "totalEarnings", totalEarnings.toXmlString());
             }
             // Always save a person's status, to make it easy to parse the personnel saved data
