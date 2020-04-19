@@ -30,27 +30,28 @@ import java.util.ResourceBundle;
 
 public enum MarriageSurnameStyle {
     //region Enum Declarations
-    NO_CHANGE("MarriageSurnameStyle.NO_CHANGE.text", "MarriageSurnameStyle.NO_CHANGE.toolTipText", "MarriageSurnameStyle.NO_CHANGE.dropDownText"),
-    YOURS("MarriageSurnameStyle.YOURS.text", "MarriageSurnameStyle.YOURS.toolTipText", "MarriageSurnameStyle.YOURS.dropDownText"),
-    SPOUSE("MarriageSurnameStyle.SPOUSE.text", "MarriageSurnameStyle.SPOUSE.toolTipText", "MarriageSurnameStyle.SPOUSE.dropDownText"),
+    NO_CHANGE(0, "MarriageSurnameStyle.NO_CHANGE.text", "MarriageSurnameStyle.NO_CHANGE.toolTipText", "MarriageSurnameStyle.NO_CHANGE.dropDownText"),
+    YOURS(1, "MarriageSurnameStyle.YOURS.text", "MarriageSurnameStyle.YOURS.toolTipText", "MarriageSurnameStyle.YOURS.dropDownText"),
+    SPOUSE(2, "MarriageSurnameStyle.SPOUSE.text", "MarriageSurnameStyle.SPOUSE.toolTipText", "MarriageSurnameStyle.SPOUSE.dropDownText"),
 
-    SPACE_YOURS("MarriageSurnameStyle.SPACE_YOURS.text", "MarriageSurnameStyle.SPACE_YOURS.toolTipText", "MarriageSurnameStyle.SPACE_YOURS.dropDownText"),
-    BOTH_SPACE_YOURS("MarriageSurnameStyle.BOTH_SPACE_YOURS.text", "MarriageSurnameStyle.BOTH_SPACE_YOURS.toolTipText", "MarriageSurnameStyle.BOTH_SPACE_YOURS.dropDownText"),
-    HYP_YOURS("MarriageSurnameStyle.HYP_YOURS.text", "MarriageSurnameStyle.HYP_YOURS.toolTipText", "MarriageSurnameStyle.HYP_YOURS.dropDownText"),
-    BOTH_HYP_YOURS("MarriageSurnameStyle.BOTH_HYP_YOURS.text", "MarriageSurnameStyle.BOTH_HYP_YOURS.toolTipText", "MarriageSurnameStyle.BOTH_HYP_YOURS.dropDownText"),
+    SPACE_YOURS(3, "MarriageSurnameStyle.SPACE_YOURS.text", "MarriageSurnameStyle.SPACE_YOURS.toolTipText", "MarriageSurnameStyle.SPACE_YOURS.dropDownText"),
+    BOTH_SPACE_YOURS(4, "MarriageSurnameStyle.BOTH_SPACE_YOURS.text", "MarriageSurnameStyle.BOTH_SPACE_YOURS.toolTipText", "MarriageSurnameStyle.BOTH_SPACE_YOURS.dropDownText"),
+    HYP_YOURS(5, "MarriageSurnameStyle.HYP_YOURS.text", "MarriageSurnameStyle.HYP_YOURS.toolTipText", "MarriageSurnameStyle.HYP_YOURS.dropDownText"),
+    BOTH_HYP_YOURS(6, "MarriageSurnameStyle.BOTH_HYP_YOURS.text", "MarriageSurnameStyle.BOTH_HYP_YOURS.toolTipText", "MarriageSurnameStyle.BOTH_HYP_YOURS.dropDownText"),
 
-    SPACE_SPOUSE("MarriageSurnameStyle.SPACE_SPOUSE.text", "MarriageSurnameStyle.SPACE_SPOUSE.toolTipText", "MarriageSurnameStyle.SPACE_SPOUSE.dropDownText"),
-    BOTH_SPACE_SPOUSE("MarriageSurnameStyle.BOTH_SPACE_SPOUSE.text", "MarriageSurnameStyle.BOTH_SPACE_SPOUSE.toolTipText", "MarriageSurnameStyle.BOTH_SPACE_SPOUSE.dropDownText"),
-    HYP_SPOUSE("MarriageSurnameStyle.HYP_SPOUSE.text", "MarriageSurnameStyle.HYP_SPOUSE.toolTipText", "MarriageSurnameStyle.HYP_SPOUSE.dropDownText"),
-    BOTH_HYP_SPOUSE("MarriageSurnameStyle.BOTH_HYP_SPOUSE.text", "MarriageSurnameStyle.BOTH_HYP_SPOUSE.toolTipText", "MarriageSurnameStyle.BOTH_HYP_SPOUSE.dropDownText"),
+    SPACE_SPOUSE(7, "MarriageSurnameStyle.SPACE_SPOUSE.text", "MarriageSurnameStyle.SPACE_SPOUSE.toolTipText", "MarriageSurnameStyle.SPACE_SPOUSE.dropDownText"),
+    BOTH_SPACE_SPOUSE(8, "MarriageSurnameStyle.BOTH_SPACE_SPOUSE.text", "MarriageSurnameStyle.BOTH_SPACE_SPOUSE.toolTipText", "MarriageSurnameStyle.BOTH_SPACE_SPOUSE.dropDownText"),
+    HYP_SPOUSE(9, "MarriageSurnameStyle.HYP_SPOUSE.text", "MarriageSurnameStyle.HYP_SPOUSE.toolTipText", "MarriageSurnameStyle.HYP_SPOUSE.dropDownText"),
+    BOTH_HYP_SPOUSE(10, "MarriageSurnameStyle.BOTH_HYP_SPOUSE.text", "MarriageSurnameStyle.BOTH_HYP_SPOUSE.toolTipText", "MarriageSurnameStyle.BOTH_HYP_SPOUSE.dropDownText"),
 
-    MALE("MarriageSurnameStyle.MALE.text", "MarriageSurnameStyle.MALE.toolTipText", "MarriageSurnameStyle.MALE.dropDownText"),
-    FEMALE("MarriageSurnameStyle.FEMALE.text", "MarriageSurnameStyle.FEMALE.toolTipText", "MarriageSurnameStyle.FEMALE.dropDownText"),
+    MALE(11, "MarriageSurnameStyle.MALE.text", "MarriageSurnameStyle.MALE.toolTipText", "MarriageSurnameStyle.MALE.dropDownText"),
+    FEMALE(12, "MarriageSurnameStyle.FEMALE.text", "MarriageSurnameStyle.FEMALE.toolTipText", "MarriageSurnameStyle.FEMALE.dropDownText"),
     WEIGHTED("MarriageSurnameStyle.WEIGHTED.text", "MarriageSurnameStyle.WEIGHTED.toolTipText", "MarriageSurnameStyle.WEIGHTED.dropDownText");
     // NOTE: WEIGHTED MUST be the last option, or otherwise the WeightedMap creation method must change
     //endregion Enum Declarations
 
     //region Variable Declarations
+    private final int weightsNumber;
     private final String name;
     private final String toolTipText;
     private final String dropDownText;
@@ -60,6 +61,11 @@ public enum MarriageSurnameStyle {
 
     //region Constructors
     MarriageSurnameStyle(String name, String toolTipText, String dropDownText) {
+        this(-1, name, toolTipText, dropDownText);
+    }
+
+    MarriageSurnameStyle(int weightsNumber, String name, String toolTipText, String dropDownText) {
+        this.weightsNumber = weightsNumber;
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
         this.dropDownText = resources.getString(dropDownText);
@@ -67,6 +73,10 @@ public enum MarriageSurnameStyle {
     //endregion Constructors
 
     //region Getters
+    public int getWeightsNumber() {
+        return weightsNumber;
+    }
+
     public String getToolTipText() {
         return toolTipText;
     }
