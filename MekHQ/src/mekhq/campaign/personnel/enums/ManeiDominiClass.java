@@ -19,6 +19,8 @@
 package mekhq.campaign.personnel.enums;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
+import mekhq.campaign.personnel.Person;
 
 import java.util.ResourceBundle;
 
@@ -48,5 +50,30 @@ public enum ManeiDominiClass {
     @Override
     public String toString() {
         return className;
+    }
+
+    public static ManeiDominiClass parseFromString(String information) {
+        // Parse based on the enum name
+        try {
+            return valueOf(information);
+        } catch (Exception ignored) {
+
+        }
+
+        // Parse from Ordinal Int - Legacy save method
+        ManeiDominiClass[] values = values();
+        try {
+            int mdClass = Integer.parseInt(information);
+            if (values.length > mdClass) {
+                return values[mdClass];
+            }
+        } catch (Exception ignored) {
+
+        }
+
+        MekHQ.getLogger().error(ManeiDominiClass.class, "parseFromString",
+                "Unable to parse " + information + "into a ManeiDominiClass. Returning NONE.");
+
+        return ManeiDominiClass.NONE;
     }
 }

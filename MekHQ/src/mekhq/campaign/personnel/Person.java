@@ -1997,21 +1997,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("maneiDominiRank")) {
                     retVal.maneiDominiRank = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("maneiDominiClass")) {
-                    if (version.isLowerThan("0.47.6")) {
-                        int mdClass = Integer.parseInt(wn2.getTextContent().trim());
-                        if (ManeiDominiClass.values().length > mdClass) {
-                            retVal.maneiDominiClass = ManeiDominiClass.values()[mdClass];
-                        } else {
-                            retVal.maneiDominiClass = ManeiDominiClass.NONE;
-                        }
-                    } else {
-                        try {
-                            retVal.maneiDominiClass = ManeiDominiClass.valueOf(wn2.getTextContent().trim());
-                        } catch (Exception e) {
-                            MekHQ.getLogger().error(Person.class, METHOD_NAME,
-                                    "Failed to parse the enum value for ManeiDominiClass");
-                        }
-                    }
+                    retVal.maneiDominiClass = ManeiDominiClass.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("doctorId")) {
                     if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
                         retVal.oldDoctorId = Integer.parseInt(wn2.getTextContent());
