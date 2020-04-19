@@ -128,7 +128,7 @@ public class Ranks {
         MekHQ.getLogger().log(Ranks.class, METHOD_NAME, LogLevel.INFO,
                 "Starting load of Rank Systems from XML..."); //$NON-NLS-1$
         // Initialize variables.
-        Document xmlDoc = null;
+        Document xmlDoc;
 
         try (InputStream is = new FileInputStream("data/universe/ranks.xml")) {
             // Using factory get an instance of document builder
@@ -138,6 +138,7 @@ public class Ranks {
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
             MekHQ.getLogger().error(Ranks.class, METHOD_NAME, ex);
+            return;
         }
 
         Element ranksEle = xmlDoc.getDocumentElement();
