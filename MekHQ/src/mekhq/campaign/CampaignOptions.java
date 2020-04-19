@@ -505,16 +505,16 @@ public class CampaignOptions implements Serializable {
         marriageAgeRange = 10;
         randomMarriageSurnameWeights = new int[MarriageSurnameStyle.values().length - 1];
         randomMarriageSurnameWeights[MarriageSurnameStyle.NO_CHANGE.ordinal()] = 100;
-        randomMarriageSurnameWeights[MarriageSurnameStyle.YOURS.ordinal()] = 60;
-        randomMarriageSurnameWeights[MarriageSurnameStyle.SPOUSE.ordinal()] = 60;
-        randomMarriageSurnameWeights[MarriageSurnameStyle.SPACE_YOURS.ordinal()] = 0;
-        randomMarriageSurnameWeights[MarriageSurnameStyle.BOTH_SPACE_YOURS.ordinal()] = 0;
-        randomMarriageSurnameWeights[MarriageSurnameStyle.HYP_YOURS.ordinal()] = 35;
-        randomMarriageSurnameWeights[MarriageSurnameStyle.BOTH_HYP_YOURS.ordinal()] = 25;
-        randomMarriageSurnameWeights[MarriageSurnameStyle.SPACE_SPOUSE.ordinal()] = 0;
-        randomMarriageSurnameWeights[MarriageSurnameStyle.BOTH_SPACE_SPOUSE.ordinal()] = 0;
-        randomMarriageSurnameWeights[MarriageSurnameStyle.HYP_SPOUSE.ordinal()] = 35;
-        randomMarriageSurnameWeights[MarriageSurnameStyle.BOTH_HYP_SPOUSE.ordinal()] = 25;
+        randomMarriageSurnameWeights[MarriageSurnameStyle.YOURS.ordinal()] = 55;
+        randomMarriageSurnameWeights[MarriageSurnameStyle.SPOUSE.ordinal()] = 55;
+        randomMarriageSurnameWeights[MarriageSurnameStyle.SPACE_YOURS.ordinal()] = 10;
+        randomMarriageSurnameWeights[MarriageSurnameStyle.BOTH_SPACE_YOURS.ordinal()] = 5;
+        randomMarriageSurnameWeights[MarriageSurnameStyle.HYP_YOURS.ordinal()] = 30;
+        randomMarriageSurnameWeights[MarriageSurnameStyle.BOTH_HYP_YOURS.ordinal()] = 20;
+        randomMarriageSurnameWeights[MarriageSurnameStyle.SPACE_SPOUSE.ordinal()] = 10;
+        randomMarriageSurnameWeights[MarriageSurnameStyle.BOTH_SPACE_SPOUSE.ordinal()] = 5;
+        randomMarriageSurnameWeights[MarriageSurnameStyle.HYP_SPOUSE.ordinal()] = 30;
+        randomMarriageSurnameWeights[MarriageSurnameStyle.BOTH_HYP_SPOUSE.ordinal()] = 20;
         randomMarriageSurnameWeights[MarriageSurnameStyle.MALE.ordinal()] = 500;
         randomMarriageSurnameWeights[MarriageSurnameStyle.FEMALE.ordinal()] = 160;
         useRandomSameSexMarriages = false;
@@ -3357,8 +3357,8 @@ public class CampaignOptions implements Serializable {
                 } else if (values.length == 9) {
                     migrateMarriageSurnameWeights(retVal, values);
                 } else {
-                    MekHQ.getLogger().error(CampaignOptions.class, "generateCampaignOptionsFromXml",
-                            "");
+                    MekHQ.getLogger().error(CampaignOptions.class,
+                            "generateCampaignOptionsFromXml", "");
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomSameSexMarriages")) {
                 retVal.useRandomSameSexMarriages = Boolean.parseBoolean(wn2.getTextContent().trim());
@@ -3679,7 +3679,7 @@ public class CampaignOptions implements Serializable {
 
     /**
      * This is annoyingly required for the case of anyone having changed the surname weights.
-     * The code is not nice, but will nicely handle the cases where anyone has moved.
+     * The code is not nice, but will nicely handle the cases where anyone has made changes
      * @param retVal the return CampaignOptions
      * @param values the values to migrate
      */
@@ -3696,10 +3696,10 @@ public class CampaignOptions implements Serializable {
                 (weights[0] != retVal.randomMarriageSurnameWeights[0])
                 || (weights[1] != retVal.randomMarriageSurnameWeights[1])
                 || (weights[2] != retVal.randomMarriageSurnameWeights[2])
-                || (weights[3] != retVal.randomMarriageSurnameWeights[9])
-                || (weights[4] != retVal.randomMarriageSurnameWeights[10])
-                || (weights[5] != retVal.randomMarriageSurnameWeights[5])
-                || (weights[6] != retVal.randomMarriageSurnameWeights[6])
+                || (weights[3] != retVal.randomMarriageSurnameWeights[9] - 5)
+                || (weights[4] != retVal.randomMarriageSurnameWeights[10] - 5)
+                || (weights[5] != retVal.randomMarriageSurnameWeights[5] - 5)
+                || (weights[6] != retVal.randomMarriageSurnameWeights[6] - 5)
                 || (weights[7] != retVal.randomMarriageSurnameWeights[11])
                 || (weights[8] != retVal.randomMarriageSurnameWeights[12])
         ) {
@@ -3715,7 +3715,8 @@ public class CampaignOptions implements Serializable {
             retVal.randomMarriageSurnameWeights[9] = weights[5];
             retVal.randomMarriageSurnameWeights[10] = weights[6];
             retVal.randomMarriageSurnameWeights[11] = weights[7];
-            retVal.randomMarriageSurnameWeights[12] = weights[8];        }
+            retVal.randomMarriageSurnameWeights[12] = weights[8];
+        }
     }
 
     public static class MassRepairOption {
