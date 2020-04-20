@@ -2352,7 +2352,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
         } catch (Exception e) {
             MekHQ.getLogger().error(Person.class, METHOD_NAME, "Failed to read person "
-                    + retVal.getFullName() + "from file", e);
+                    + retVal.getFullName() + " from file", e);
         }
 
         return retVal;
