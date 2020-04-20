@@ -13,17 +13,16 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.personnel;
 
 import java.awt.event.KeyEvent;
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
@@ -54,7 +53,6 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.Version;
@@ -68,7 +66,7 @@ import mekhq.campaign.universe.Planet;
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Person implements Serializable, MekHqXmlSerializable {
+public class Person extends AbstractPerson {
     //region Variable Declarations
     private static final long serialVersionUID = -847642980395311152L;
 
@@ -146,13 +144,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     //region Family Variables
     // Lineage
-    protected UUID ancestorsId;
-    protected UUID spouse;
-    protected List<FormerSpouse> formerSpouses;
+    private UUID ancestorsId;
+    private UUID spouse;
+    private List<FormerSpouse> formerSpouses;
 
     //region Procreation
-    protected LocalDate dueDate;
-    protected LocalDate expectedDueDate;
+    private LocalDate dueDate;
+    private LocalDate expectedDueDate;
 
     private static final int PREGNANCY_STANDARD_DURATION = 268; //standard duration of a pregnancy in days
 
@@ -212,76 +210,57 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //endregion Divorce Variables
     //endregion Family Variables
 
-    protected UUID id;
-    protected int oldId;
-
-    private String fullName;
-    private String givenName;
-    private String surname;
-    private String honorific;
-    private String maidenName;
-    private String callsign;
-    private int gender;
-
     private int primaryRole;
     private int secondaryRole;
 
     private int primaryDesignator;
     private int secondaryDesignator;
 
-    protected String biography;
-    protected LocalDate birthday;
-    protected LocalDate dateOfDeath;
-    protected LocalDate recruitment;
-    protected LocalDate lastRankChangeDate;
-    protected List<LogEntry> personnelLog;
-    protected List<LogEntry> missionLog;
+    private LocalDate recruitment;
+    private LocalDate lastRankChangeDate;
+    private List<LogEntry> personnelLog;
+    private List<LogEntry> missionLog;
 
     private Skills skills;
     private PersonnelOptions options;
     private int toughness;
 
-    private PersonnelStatus status;
-    protected int xp;
-    protected int engXp;
-    protected int acquisitions;
-    protected Money salary;
+    private int xp;
+    private int engXp;
+    private int acquisitions;
+    private Money salary;
     private Money totalEarnings;
     private int hits;
     private int prisonerStatus;
     // Is this person willing to defect? Only for prisoners ...
     private boolean willingToDefect;
 
-    boolean dependent;
-    boolean commander;
+    private boolean dependent;
+    private boolean commander;
 
     // Supports edge usage by a ship's engineer composite crewman
-    int edgeUsedThisRound;
+    private int edgeUsedThisRound;
     // To track how many edge points support personnel have left until next refresh
-    int currentEdge;
+    private int currentEdge;
 
     //phenotype and background
     private int phenotype;
     private boolean clan;
     private String bloodname;
-    private Faction originFaction;
-    private Planet originPlanet;
 
     //assignments
     private UUID unitId;
-    protected UUID doctorId;
+    private UUID doctorId;
     private List<UUID> techUnitIds;
 
     //days of rest
-    protected int idleMonths;
-    protected int daysToWaitForHealing;
+    private int idleMonths;
+    private int daysToWaitForHealing;
 
     //region portrait
-    protected String portraitCategory;
-    protected String portraitFile;
     // runtime override (not saved)
-    protected transient String portraitCategoryOverride = null;
-    protected transient String portraitFileOverride = null;
+    private transient String portraitCategoryOverride = null;
+    private transient String portraitFileOverride = null;
     //endregion portrait
 
     // Our rank
@@ -305,10 +284,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private int maneiDominiRank;
 
     //stuff to track for support teams
-    protected int minutesLeft;
-    protected int overtimeLeft;
-    protected int nTasks;
-    protected boolean engineer;
+    private int minutesLeft;
+    private int overtimeLeft;
+    private int nTasks;
+    private boolean engineer;
     public static final int PRIMARY_ROLE_SUPPORT_TIME = 480;
     public static final int PRIMARY_ROLE_OVERTIME_SUPPORT_TIME = 240;
     public static final int SECONDARY_ROLE_SUPPORT_TIME = 240;
@@ -366,10 +345,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private final static String DATE_DISPLAY_FORMAT = "yyyy-MM-dd";
 
     //region Reverse Compatibility
+    private int oldId = -1;
     private int oldUnitId = -1;
     private int oldDoctorId = -1;
-    //v0.1.8 and earlier
-    protected int teamId = -1;
     //endregion Reverse Compatibility
     //endregion Variable Declarations
 
@@ -1977,8 +1955,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     retVal.dueDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("expectedDueDate")) {
                     retVal.expectedDueDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("teamId")) {
-                    retVal.teamId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) {
                     retVal.setPortraitCategory(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("portraitFile")) {
@@ -2164,7 +2140,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         }
                         retVal.addMissionLogEntry(LogEntryFactory.getInstance().generateInstanceFromXML(wn3));
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("awards")){
+                } else if (wn2.getNodeName().equalsIgnoreCase("awards")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
 
