@@ -2109,23 +2109,24 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
                 JMenuHelpers.addMenuIfNonEmpty(menu, currentMenu, MAX_POPUP_ITEMS);
                 JMenuHelpers.addMenuIfNonEmpty(menu, newMenu, MAX_POPUP_ITEMS);
-            }
 
-            if (oneSelected && person.isActive()) {
-                // Edge
+                // Edge Purchasing
                 if (gui.getCampaign().getCampaignOptions().useEdge()) {
                     JMenu edgeMenu = new JMenu(resourceMap.getString("edge.text")); //$NON-NLS-1$
                     int cost = gui.getCampaign().getCampaignOptions().getEdgeCost();
-                    boolean available = (cost >= 0) && (person.getXp() >= cost);
 
-                    menuItem = new JMenuItem(String.format(resourceMap.getString("spendOnEdge.text"), cost)); //$NON-NLS-1$
-                    menuItem.setActionCommand(makeCommand(CMD_BUY_EDGE, String.valueOf(cost)));
-                    menuItem.addActionListener(this);
-                    menuItem.setEnabled(available);
-                    edgeMenu.add(menuItem);
-                    menu.add(edgeMenu);
-                    popup.add(menu);
+                    if ((cost >= 0) && (person.getXp() >= cost)) {
+                        menuItem = new JMenuItem(String.format(resourceMap.getString("spendOnEdge.text"), cost)); //$NON-NLS-1$
+                        menuItem.setActionCommand(makeCommand(CMD_BUY_EDGE, String.valueOf(cost)));
+                        menuItem.addActionListener(this);
+                        edgeMenu.add(menuItem);
+                    }
+                    JMenuHelpers.addMenuIfNonEmpty(menu, edgeMenu, MAX_POPUP_ITEMS);
+                }
+                JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
 
+                // Edge Triggers
+                if (gui.getCampaign().getCampaignOptions().useEdge()) {
                     // Edge Triggers
                     menu = new JMenu(resourceMap.getString("setEdgeTriggers.text")); //$NON-NLS-1$
                     //Start of Edge reroll options
