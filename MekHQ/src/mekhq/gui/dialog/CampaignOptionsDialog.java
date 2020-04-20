@@ -1854,8 +1854,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             private static final long serialVersionUID = -543354619818226314L;
 
             @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
-                                                          boolean isSelected, boolean cellHasFocus) {
+            public Component getListCellRendererComponent(JList<?> list,
+                                                          Object value,
+                                                          int index,
+                                                          boolean isSelected,
+                                                          boolean cellHasFocus)
+            {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (isSelected && (index > -1)) {
                     list.setToolTipText((list.getSelectedValue() instanceof BabySurnameStyle)
