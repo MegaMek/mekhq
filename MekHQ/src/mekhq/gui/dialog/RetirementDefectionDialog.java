@@ -572,7 +572,7 @@ public class RetirementDefectionDialog extends JDialog {
                 if (null != rdTracker.getPayout(id).getStolenUnitId() &&
                         null != hqView.getCampaign().getUnit(rdTracker.getPayout(id).getStolenUnitId()) &&
                         (null == hqView.getCampaign().getUnit(rdTracker.getPayout(id).getStolenUnitId()).getCommander() ||
-                                p.getId() == hqView.getCampaign().getUnit(rdTracker.getPayout(id).getStolenUnitId()).getCommander().getId())) {
+                                p.getId().equals(hqView.getCampaign().getUnit(rdTracker.getPayout(id).getStolenUnitId()).getCommander().getId()))) {
                     continue;
                 }
                 if (null != hqView.getCampaign().getPerson(id).getUnitId() &&

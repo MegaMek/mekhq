@@ -347,7 +347,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 // the old parts list here.
                 if (oPart instanceof LargeCraftAmmoBin
                         && part instanceof LargeCraftAmmoBin
-                        && ((LargeCraftAmmoBin)oPart).getType() == ((LargeCraftAmmoBin)part).getType()) {
+                        && ((LargeCraftAmmoBin) oPart).getType() == ((LargeCraftAmmoBin) part).getType()) {
                     lcBinsToChange.add(oPart.getId());
                 }
                 //FIXME: There have been instances of null oParts here. Save/load will fix these, but

@@ -923,7 +923,7 @@ public class ResolveScenarioTracker {
                 }
                 if (en.hasWorkingMisc(MiscType.F_COMMAND_CONSOLE)) {
                     for (Person p : crew) {
-                        if (p != commander && p != driver) {
+                        if (!p.equals(commander) && !p.equals(driver)) {
                             console = p;
                             break;
                         }
@@ -984,10 +984,10 @@ public class ResolveScenarioTracker {
                 } else {
                     //we have a multi-crewed vee
                     boolean wounded = false;
-                    if(en instanceof Tank) {
+                    if (en instanceof Tank) {
                         boolean destroyed = false;
-                        for(int loc = 0; loc < en.locations(); loc++) {
-                            if(loc == Tank.LOC_TURRET || loc == Tank.LOC_TURRET_2 || loc == Tank.LOC_BODY) {
+                        for (int loc = 0; loc < en.locations(); loc++) {
+                            if (loc == Tank.LOC_TURRET || loc == Tank.LOC_TURRET_2 || loc == Tank.LOC_BODY) {
                                 continue;
                             }
                             if (en.getInternal(loc) <= 0) {
@@ -995,35 +995,34 @@ public class ResolveScenarioTracker {
                                 break;
                             }
                         }
-                        if(destroyed || null == en.getCrew() || en.getCrew().isDead()) {
+                        if (destroyed || (null == en.getCrew()) || en.getCrew().isDead()) {
                             if (Compute.d6(2) >= 7) {
                                 wounded = true;
                             } else {
                                 status.setHits(6);
                             }
-                        } else if(((Tank)en).isDriverHit()
-                                && driver != null && driver.getId() == p.getId()) {
+                        } else if (((Tank) en).isDriverHit() && (driver != null)
+                                && p.getId().equals(driver.getId())) {
                             if (Compute.d6(2) >= 7) {
                                 wounded = true;
                             } else {
                                 status.setHits(6);
                                 status.setDead(true);
                             }
-                        } else if (((Tank)en).isCommanderHit()
-                                && (((commander != null && commander.getId() == p.getId())
-                                        || (console != null && console.getId() == p.getId())))) {
+                        } else if (((Tank) en).isCommanderHit()
+                                && (((commander != null) && p.getId().equals(commander.getId()))
+                                        || ((console != null) && p.getId().equals(console.getId())))) {
                             //If there is a command console, the commander hit flag does not
                             //get set until after the second such critical, which means that
                             //both commanders have been hit.
-                            if(Compute.d6(2) >= 7) {
+                            if (Compute.d6(2) >= 7) {
                                 wounded = true;
                             } else {
                                 status.setHits(6);
                                 status.setDead(true);
                             }
-                        } else if (((Tank)en).isUsingConsoleCommander()
-                                && commander != null
-                                && commander.getId() == p.getId()) {
+                        } else if (((Tank) en).isUsingConsoleCommander() && (commander != null)
+                                && commander.getId().equals(p.getId())) {
                             //If this flag is set we are using a command console and have already
                             //taken one commander hit critical, which takes out the primary commander.
                             if(Compute.d6(2) >= 7) {
