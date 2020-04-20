@@ -134,45 +134,18 @@ public class PersonAwardController {
         MekHQ.triggerEvent(new PersonChangedEvent(person));
     }
 
-    public void removeAward(String setName, String awardName, String stringDate) {
-        if (StringUtil.isNullOrEmpty(stringDate)) {
-            MekHQ.getLogger().error(getClass(), "removeAward",
-                    "Attempted to remove award with a null date. Returning without removing the award");
-        } else {
-            removeAward(setName, awardName, stringDate, null);
-        }
-    }
-
     /**
      * Removes an award given to this person based on:
      * @param setName is the name of the set of the award
      * @param awardName is the name of the award
-     * @param stringDate is the date it was awarded, or null if it is to be bulk removed
+     * @param awardedDate is the date it was awarded, or null if it is to be bulk removed
      * @param currentDate is the current date
      */
-    public void removeAward(String setName, String awardName, String stringDate, Date currentDate) {
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd"); // TODO : remove inline date format
-
-        Date date;
-        if (!StringUtil.isNullOrEmpty(stringDate)) {
-            try {
-                date = df.parse(stringDate);
-            } catch (ParseException e) {
-                MekHQ.getLogger().error(getClass(), "removeAward", e);
-                date = null;
-            }
-        } else {
-            date = null;
-        }
-
-        if (currentDate == null) {
-            currentDate = date;
-        }
-
+    public void removeAward(String setName, String awardName, Date awardedDate, Date currentDate) {
         for (Award award : awards) {
             if (award.equals(setName, awardName)) {
-                if ((date != null) && award.hasDates()) {
-                    award.removeDate(date);
+                if ((awardedDate != null) && award.hasDates()) {
+                    award.removeDate(awardedDate);
                 } else {
                     awards.remove(award);
                 }

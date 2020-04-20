@@ -23,6 +23,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
@@ -508,10 +509,15 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 break;
             }
             case CMD_RMV_AWARD: {
+                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
                 for (Person person : people) {
-                    if (person.awardController.hasAward(data[1], data[2])) {
-                        person.awardController.removeAward(data[1], data[2],
-                                (data.length > 3) ? data[3] : null, gui.getCampaign().getDate());
+                    try {
+                        if (person.awardController.hasAward(data[1], data[2])) {
+                            person.awardController.removeAward(data[1], data[2],
+                                    (data.length > 3) ? df.parse(data[3]) : null, gui.getCampaign().getDate());
+                        }
+                    } catch (Exception e) {
+                        MekHQ.getLogger().error(getClass(), METHOD_NAME, "Could not remove award.", e);
                     }
                 }
                 break;

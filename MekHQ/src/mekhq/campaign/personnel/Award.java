@@ -277,15 +277,15 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
     /**
      * @param date date to be removed from this award
      */
-    public void removeDate(Date date){
+    public void removeDate(Date date) {
         dates.remove(date);
     }
 
     /**
-     * @return true if this award has any dates
+     * @return true if this award has multiple (more than 1) dates
      */
-    public boolean hasDates(){
-        return dates.size() > 0;
+    public boolean hasDates() {
+        return dates.size() > 1;
     }
 
     /**
@@ -298,8 +298,7 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
     /**
      * @return an html formatted string to be used as tooltip.
      */
-    public String getTooltip(){
-
+    public String getTooltip() {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
         StringBuilder string = new StringBuilder();
