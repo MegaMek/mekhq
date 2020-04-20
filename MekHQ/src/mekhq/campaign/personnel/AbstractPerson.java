@@ -19,6 +19,7 @@
 package mekhq.campaign.personnel;
 
 import megamek.common.Crew;
+import megamek.common.annotations.Nullable;
 import megamek.common.util.StringUtil;
 import mekhq.MekHqXmlSerializable;
 import mekhq.Utilities;
@@ -60,10 +61,10 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
 
     //region Portraits
     private String portraitCategory;
-    private String portraitFile;
+    private String portraitFileName;
     // runtime override portraits (not saved)
     private transient String portraitCategoryOverride = null; // Potential Values are Crew.ROOT_PORTRAIT or null
-    private transient String portraitFileOverride = null; // Potential Values are Crew.PORTRAIT_NONE or null
+    private transient String portraitFileNameOverride = null; // Potential Values are Crew.PORTRAIT_NONE or null
     //endregion Portraits
     //endregion Variable Declarations
 
@@ -103,7 +104,7 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
 
         //region Portraits
         portraitCategory = Crew.ROOT_PORTRAIT;
-        portraitFile = Crew.PORTRAIT_NONE;
+        portraitFileName = Crew.PORTRAIT_NONE;
         //endregion Portraits
 
         // Initialize Data based on these settings
@@ -113,14 +114,14 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
 
     //region Getters/Setters
     /**
-     * @return the Person's Unique Id
+     * @return the person's id
      */
     public UUID getId() {
         return id;
     }
 
     /**
-     * @param id the Unique Id to set the person's id to
+     * @param id the person's new id
      */
     public void setId(UUID id) {
         this.id = id;
@@ -134,14 +135,24 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
     }
 
     //region Name
+    /**
+     * @return the person's full name
+     */
     public String getFullName() {
         return fullName;
     }
 
+    /**
+     * @return a hyperlinked string for the person's name
+     */
     public String getHyperlinkedName() {
         return String.format("<a href='PERSON:%s'>%s</a>", getId().toString(), getFullName());
     }
 
+    /**
+     * This is used to create the full name of the person, based on their pre-nominal, given name,
+     *
+     */
     public void setFullName() {
         String fullName = "";
         if (!StringUtil.isNullOrEmpty(getPreNominal())) {
@@ -158,92 +169,160 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
             fullName += " " + getPostNominal();
         }
 
+        setFullNameDirect(fullName);
+    }
+
+    /**
+     * @param fullName this sets the full name to be equal to the input string. This can ONLY be
+     *                 called by {@link AbstractPerson#setFullName()} or its overrides.
+     */
+    protected void setFullNameDirect(String fullName) {
         this.fullName = fullName;
     }
 
+    /**
+     * @return the person's pre-nominal
+     */
     public String getPreNominal() {
         return preNominal;
     }
 
+    /**
+     * @param preNominal the person's new pre-nominal
+     */
     public void setPreNominal(String preNominal) {
         this.preNominal = preNominal;
         setFullName();
     }
 
+    /**
+     * @return the person's given name
+     */
     public String getGivenName() {
         return givenName;
     }
 
+    /**
+     * @param givenName the person's new given name
+     */
     public void setGivenName(String givenName) {
         this.givenName = givenName;
         setFullName();
     }
 
+    /**
+     * @return the person's surname
+     */
     public String getSurname() {
         return surname;
     }
 
+    /**
+     * @param surname the person's new surname
+     */
     public void setSurname(String surname) {
         this.surname = surname;
         setFullName();
     }
 
+    /**
+     * @return the person's post-nominal
+     */
     public String getPostNominal() {
         return postNominal;
     }
 
+    /**
+     * @param postNominal the person's new post-nominal
+     */
     public void setPostNominal(String postNominal) {
         this.postNominal = postNominal;
         setFullName();
     }
 
-    public String getMaidenName() {
+    /**
+     * @return the person's maiden name
+     */
+    public @Nullable String getMaidenName() {
         return maidenName;
     }
 
-    public void setMaidenName(String maidenName) {
+    /**
+     * @param maidenName the person's new maiden name
+     */
+    public void setMaidenName(@Nullable String maidenName) {
         this.maidenName = maidenName;
     }
 
+    /**
+     * @return the person's callsign
+     */
     public String getCallsign() {
         return callsign;
     }
 
+    /**
+     * @param callsign the person's new callsign
+     */
     public void setCallsign(String callsign) {
         this.callsign = callsign;
     }
     //endregion Name
 
     //region Personal Information
+    /**
+     * @return the person's gender
+     */
     public int getGender() {
         return gender;
     }
 
+    /**
+     * @param gender the person's new gender
+     */
     public void setGender(int gender) {
         this.gender = gender;
     }
 
+    /**
+     * @return the person's status
+     */
     public PersonnelStatus getStatus() {
         return status;
     }
 
+    /**
+     * @param status the person's new status
+     */
     public void setStatus(PersonnelStatus status) {
         this.status = status;
     }
 
+    /**
+     * @return the person's birthday
+     */
     public LocalDate getBirthday() {
         return birthday;
     }
 
+    /**
+     * @param birthday the person's new birthday
+     */
     public void setBirthday(LocalDate birthday) {
         this.birthday = birthday;
     }
 
-    public LocalDate getDateOfDeath() {
+    /**
+     * @return the date of the person's death
+     */
+    public @Nullable LocalDate getDateOfDeath() {
         return dateOfDeath;
     }
 
-    public void setDateOfDeath(LocalDate dateOfDeath) {
+    /**
+     * @param dateOfDeath the date the person died
+     */
+    public void setDateOfDeath(@Nullable LocalDate dateOfDeath) {
         this.dateOfDeath = dateOfDeath;
     }
 
@@ -255,79 +334,183 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
         return Period.between(getBirthday(), Utilities.nonNull(getDateOfDeath(), today)).getYears();
     }
 
+    /**
+     * @return the person's biography
+     */
     public String getBiography() {
         return biography;
     }
 
+    /**
+     * @param biography the person's new biography
+     */
     public void setBiography(String biography) {
         this.biography = biography;
     }
 
+    /**
+     * @return the person's origin faction's code
+     */
     public String getOriginFactionCode() {
         return originFactionCode;
     }
 
+    /**
+     * This sets the person's origin faction and origin faction code based on the input origin faction code
+     * @param originFactionCode the person's new origin faction's code
+     */
     public void setOriginFactionCode(String originFactionCode) {
         this.originFactionCode = originFactionCode;
         this.originFaction = Faction.getFaction(originFactionCode);
     }
 
+    /**
+     * @return the person's origin faction
+     */
     public Faction getOriginFaction() {
         return originFaction;
     }
 
+    /**
+     * This sets the person's origin faction and origin faction code based on the input origin faction
+     * @param originFaction the person's new origin faction
+     */
     public void setOriginFaction(Faction originFaction) {
         this.originFaction = originFaction;
         this.originFactionCode = this.originFaction.getShortName();
     }
 
+    /**
+     * @return the person's origin planet
+     */
     public Planet getOriginPlanet() {
         return originPlanet;
     }
 
+    /**
+     * @param originPlanet the person's new origin planet
+     */
     public void setOriginPlanet(Planet originPlanet) {
         this.originPlanet = originPlanet;
     }
     //endregion Personal Information
 
     //region Portraits
+
+    /**
+     * @return the person's current portrait category, which is either the override if the portrait
+     * category was not found during load or their current category
+     */
     public String getPortraitCategory() {
-        return Utilities.nonNull(portraitCategoryOverride, portraitCategory);
+        return Utilities.nonNull(getPortraitCategoryOverrideDirect(), getPortraitCategoryDirect());
     }
 
-    public void setPortraitCategory(String s) {
-        this.portraitCategory = s;
+    /**
+     * @return the person's current portrait category.This can ONLY be called by
+     * {@link AbstractPerson#getPortraitCategory()} or its overrides.
+     */
+    private String getPortraitCategoryDirect() {
+        return portraitCategory;
     }
 
-    public void setPortraitCategoryOverride(String s) {
-        this.portraitCategoryOverride = s;
+    /**
+     * @param portraitCategory the person's portrait category
+     */
+    public void setPortraitCategory(String portraitCategory) {
+        this.portraitCategory = portraitCategory;
     }
 
+    /**
+     * @return the current portrait category override.This can ONLY be called by
+     * {@link AbstractPerson#getPortraitCategory()} or its overrides.
+     */
+    private @Nullable String getPortraitCategoryOverrideDirect() {
+        return portraitCategoryOverride;
+    }
+
+    /**
+     * This sets the person's Portrait Category Override to be equal to Crew.ROOT_PORTRAIT, which
+     * means that the portrait was not found
+     */
+    public void setPortraitCategoryOverride() {
+        this.portraitCategoryOverride = Crew.ROOT_PORTRAIT;
+    }
+
+    /**
+     * @return the person's current portrait file name
+     */
     public String getPortraitFileName() {
-        return Utilities.nonNull(portraitFileOverride, portraitFile);
+        return Utilities.nonNull(getPortraitFileNameOverrideDirect(), getPortraitFileNameDirect());
     }
 
-    public void setPortraitFileName(String s) {
-        this.portraitFile = s;
+    /**
+     * @return the person's current portrait file name.This can ONLY be called by
+     * {@link AbstractPerson#getPortraitFileName()} or its overrides.
+     */
+    private String getPortraitFileNameDirect() {
+        return portraitFileName;
     }
 
-    public void setPortraitFileNameOverride(String s) {
-        this.portraitFileOverride = s;
+    /**
+     * @param portraitFileName the person's portrait file name
+     */
+    public void setPortraitFileName(String portraitFileName) {
+        this.portraitFileName = portraitFileName;
+    }
+
+    /**
+     * @return the person's current portrait file name override.This can ONLY be called by
+     * {@link AbstractPerson#getPortraitFileName()} or its overrides.
+     */
+    private @Nullable String getPortraitFileNameOverrideDirect() {
+        return portraitFileNameOverride;
+    }
+
+    /**
+     * This sets the person's Portrait File Name to be equal to Crew.PORTRAIT_NONE, which
+     * means that the portrait was not found
+     */
+    public void setPortraitFileNameOverride() {
+        this.portraitFileNameOverride = Crew.PORTRAIT_NONE;
     }
     //endregion Portraits
     //endregion Getters/Setters
 
     //region Boolean Information Methods
+
+    /**
+     * @return true if the person is female, otherwise false
+     */
+    @Deprecated // this should be part of a gender enum
     public boolean isFemale() {
         return gender == Crew.G_FEMALE;
     }
 
+    /**
+     * @return true if the person is male, otherwise false
+     */
+    @Deprecated // this should be part of a gender enum
     public boolean isMale() {
         return gender == Crew.G_MALE;
     }
 
+    /**
+     * @param today the current date
+     * @return true if the person is a child (age is less than adulthood), otherwise false
+     */
     public boolean isChild(LocalDate today) {
-        return (getAge(today) <= 13);
+        // TODO : make this based on age of adulthood option
+        return (getAge(today) < 14);
     }
     //endregion Boolean Information Methods
+
+    //region Read/Write from XML
+    private static void fixBadDataOnLoad(AbstractPerson person) {
+/*
+        if (person.getBirthday() == null) {
+            person.setBirthday(Campaign.getDefaults().getDate());
+        }
+ */
+    }
+    //endregion Read/Write from XML
 }

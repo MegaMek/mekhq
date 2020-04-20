@@ -667,7 +667,7 @@ public class Person extends AbstractPerson {
             fullName += " " + getPostNominal();
         }
 
-        this.fullName = fullName;
+        setFullNameDirect(fullName);
     }
     //endregion Names
 

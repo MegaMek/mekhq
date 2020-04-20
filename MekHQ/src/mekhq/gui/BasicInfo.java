@@ -168,9 +168,9 @@ public class BasicInfo extends JPanel {
             portrait = (Image) icons.getPortraits().getItem(category, filename);
             if (null == portrait) {
                 // the image could not be found so switch to default one
-                p.setPortraitCategoryOverride(Crew.ROOT_PORTRAIT);
+                p.setPortraitCategoryOverride();
                 category = "";
-                p.setPortraitFileNameOverride(Crew.PORTRAIT_NONE);
+                p.setPortraitFileNameOverride();
                 filename = "default.gif";
                 portrait = (Image) icons.getPortraits().getItem(category, filename);
             }
