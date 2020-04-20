@@ -25,7 +25,7 @@ import megamek.common.util.EncodeControl;
 
 /**
  * Identifies the standard tabs and provides a factory method.
- * 
+ *
  * @author Neoancient
  *
  */
@@ -43,8 +43,8 @@ public enum GuiTabType {
     OVERVIEW(10, "panOverview.TabConstraints.tabTitle"), //$NON-NLS-1$
     CUSTOM(11, null);
 
-    private int defaultPos;
-    private String name;
+    private final int defaultPos;
+    private final String name;
 
     public int getDefaultPos() {
         return defaultPos;
