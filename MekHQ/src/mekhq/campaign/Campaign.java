@@ -38,10 +38,10 @@ import java.util.stream.Stream;
 import javax.swing.JOptionPane;
 
 import megamek.common.*;
+import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.*;
 import mekhq.campaign.finances.*;
 import mekhq.campaign.log.*;
-import mekhq.gui.sorter.NaturalOrderComparator;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
@@ -1174,7 +1174,7 @@ public class Campaign implements Serializable, ITechManager {
         List<Unit> units = getCopyOfUnits();
 
         // Natural order sorting the units alphabetically is the default for getSortedUnits
-        units.sort(Comparator.comparing(o -> o.getName(), new NaturalOrderComparator()));
+        units.sort(Comparator.comparing(Unit::getName, new NaturalOrderComparator()));
 
         if (weightClassSorted || weightSorted || unitTypeSorted) {
             // We need to determine these by both the weight sorted and weight class sorted values,
