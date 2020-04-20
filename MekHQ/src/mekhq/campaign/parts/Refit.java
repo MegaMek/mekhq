@@ -1463,11 +1463,19 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         String sCustomsDirCampaign = sCustomsDir + File.separator + oldUnit.getCampaign().getName();
         File customsDir = new File(sCustomsDir);
         if (!customsDir.exists()) {
-            customsDir.mkdir();
+            if (!customsDir.mkdir()) {
+                MekHQ.getLogger().error(getClass(), "saveCustomization",
+                        "Failed to create directory " + sCustomsDir + ", and therefore cannot save the unit.");
+                return;
+            }
         }
         File customsDirCampaign = new File(sCustomsDirCampaign);
         if (!customsDirCampaign.exists()) {
-            customsDirCampaign.mkdir();
+            if (!customsDirCampaign.mkdir()) {
+                MekHQ.getLogger().error(getClass(), "saveCustomization",
+                        "Failed to create directory " + sCustomsDirCampaign + ", and therefore cannot save the unit.");
+                return;
+            }
         }
 
         try {
@@ -1487,7 +1495,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 //if this file already exists then don't overwrite it or we will end up with a bunch of copies
                 String fileOutName = sCustomsDir + File.separator + fileName + ".blk";
                 String fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".blk";
-                if((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
+                if ((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
                     throw new IOException("A file already exists with the custom name "+fileNameCampaign+". Please choose a different name. (Unit name and/or model)");
                 }
                 BLKFile.encode(fileNameCampaign, newEntity);
