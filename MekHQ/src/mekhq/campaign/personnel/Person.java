@@ -2641,6 +2641,20 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return getFullName();
     }
 
+    /**
+     * Two people are determined to be equal if they have the same id
+     * @param object the object to check if it is equal to the person or not
+     * @return true if they have the same id, otherwise false
+     */
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof Person)) {
+            return false;
+        } else {
+            return getId().equals(((Person) object).getId());
+        }
+    }
+
     public int getExperienceLevel(boolean secondary) {
         int role = primaryRole;
         if (secondary) {
