@@ -383,14 +383,14 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
     /**
      * @return the person's origin planet
      */
-    public Planet getOriginPlanet() {
+    public @Nullable Planet getOriginPlanet() {
         return originPlanet;
     }
 
     /**
      * @param originPlanet the person's new origin planet
      */
-    public void setOriginPlanet(Planet originPlanet) {
+    public void setOriginPlanet(@Nullable Planet originPlanet) {
         this.originPlanet = originPlanet;
     }
     //endregion Personal Information
@@ -499,7 +499,7 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
      * @return true if the person is a child (age is less than adulthood), otherwise false
      */
     public boolean isChild(LocalDate today) {
-        // TODO : make this based on age of adulthood option
+        // TODO : Windchild - make this based on age of adulthood option
         return (getAge(today) < 14);
     }
     //endregion Boolean Information Methods
