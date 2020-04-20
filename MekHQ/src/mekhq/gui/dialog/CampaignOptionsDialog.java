@@ -3327,6 +3327,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panRandomPortrait.setName("panRandomPortrait"); // NOI18N
         panRandomPortrait.setLayout(new BorderLayout());
 
+        // The math below is used to determine how to split the personnel role options for portraits,
+        // which it does into 4 columns with rows equal to the number of roles plus two, with the
+        // additional two being the all role and no role options.
         JPanel panUsePortrait = new JPanel(new GridLayout((int) Math.ceil((Person.T_NUM + 2) / 4.0), 4));
         chkUsePortrait = new JCheckBox[Person.T_NUM];
         JCheckBox allPortraitsBox = new JCheckBox(resourceMap.getString("panUsePortrait.all.text"));
