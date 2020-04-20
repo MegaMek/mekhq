@@ -62,8 +62,8 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
     protected String portraitCategory;
     protected String portraitFile;
     // runtime override portraits (not saved)
-    private transient String portraitCategoryOverride = null;
-    private transient String portraitFileOverride = null;
+    private transient String portraitCategoryOverride = null; // Potential Values are Crew.ROOT_PORTRAIT or null
+    private transient String portraitFileOverride = null; // Potential Values are Crew.PORTRAIT_NONE or null
     //endregion Portraits
     //endregion Variable Declarations
 
