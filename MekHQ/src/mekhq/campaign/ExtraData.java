@@ -179,9 +179,11 @@ public class ExtraData {
      * @return true if the extraData fields are empty, otherwise false
      */
     public boolean isEmpty() {
-        for (Map<String, Object> map : values.values()) {
-            if (!map.isEmpty()) {
-                return false;
+        if (values != null) {
+            for (Map<String, Object> map : values.values()) {
+                if ((map != null) && (!map.isEmpty())) {
+                    return false;
+                }
             }
         }
         return true;
@@ -267,24 +269,24 @@ public class ExtraData {
         extends XmlAdapter<XmlValueListArray, Map<Class<?>, Map<String, Object>>> {
         @Override
         public Map<Class<?>, Map<String, Object>> unmarshal(XmlValueListArray v) throws Exception {
-            if((null == v) || (null == v.list) || v.list.isEmpty()) {
-                return null;
+            if ((null == v) || (null == v.list) || v.list.isEmpty()) {
+                return new HashMap<>();
             }
             Map<Class<?>, Map<String, Object>> result = new HashMap<>();
-            for(XmlValueList list : v.list) {
-                if(null == list.type) {
+            for (XmlValueList list : v.list) {
+                if (null == list.type) {
                     continue;
                 }
                 Class<?> type = null;
                 try {
                     type = Class.forName(list.type);
-                } catch(ClassNotFoundException cnfe) {}
-                if(null == type) {
+                } catch (ClassNotFoundException ignored) {}
+                if (null == type) {
                     continue;
                 }
                 Map<String, Object> map = ExtraData.getOrCreateClassMap(result, type);
-                for(XmlValueEntry item : list.entries) {
-                    if((null != item) && (null != item.key) && (null != item.value)) {
+                for (XmlValueEntry item : list.entries) {
+                    if ((null != item) && (null != item.key) && (null != item.value)) {
                         map.put(item.key, adapt(type, item.value));
                     }
                 }
@@ -294,32 +296,32 @@ public class ExtraData {
 
         @Override
         public XmlValueListArray marshal(Map<Class<?>, Map<String, Object>> v) throws Exception {
-            if((null == v) || v.isEmpty()) {
+            if ((null == v) || v.isEmpty()) {
                 return null;
             }
             ArrayList<XmlValueList> result = new ArrayList<>();
-            for(Entry<Class<?>, Map<String, Object>> entry : v.entrySet()) {
+            for (Entry<Class<?>, Map<String, Object>> entry : v.entrySet()) {
                 Map<String, Object> value = entry.getValue();
-                if((null == value) || value.isEmpty()) {
+                if ((null == value) || value.isEmpty()) {
                     continue;
                 }
                 XmlValueList val = new XmlValueList();
                 val.type = entry.getKey().getName();
                 val.entries = new ArrayList<>();
-                for(Entry<String, Object> data : value.entrySet()) {
-                    if(null != data.getValue()) {
+                for (Entry<String, Object> data : value.entrySet()) {
+                    if (null != data.getValue()) {
                         XmlValueEntry newEntry = new XmlValueEntry();
                         newEntry.key = data.getKey();
                         newEntry.value = ExtraData.toString(data.getValue());
                         val.entries.add(newEntry);
                     }
                 }
-                if(!val.entries.isEmpty()) {
+                if (!val.entries.isEmpty()) {
                     result.add(val);
                 }
             }
             XmlValueListArray arrayResult = new XmlValueListArray();
-            if(!result.isEmpty()) {
+            if (!result.isEmpty()) {
                 arrayResult.list = result;
             }
             return arrayResult;

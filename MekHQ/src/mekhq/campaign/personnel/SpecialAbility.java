@@ -330,10 +330,8 @@ public class SpecialAbility implements MekHqXmlSerializable {
     public static void generateInstanceFromXML(Node wn, PilotOptions options, Version v) {
         final String METHOD_NAME = "generateInstanceFromXML(Node,PilotOptions,Version)"; //$NON-NLS-1$
 
-        SpecialAbility retVal = null;
-
         try {
-            retVal = new SpecialAbility();
+            SpecialAbility retVal = new SpecialAbility();
             NodeList nl = wn.getChildNodes();
 
             for (int x=0; x<nl.getLength(); x++) {
@@ -368,51 +366,49 @@ public class SpecialAbility implements MekHqXmlSerializable {
                     retVal.prereqMisc.put(fields[0], fields[1]);
                 }
             }
+
+            if(retVal.displayName.isEmpty()) {
+                IOption option = options.getOption(retVal.lookupName);
+                if(null != option) {
+                    retVal.displayName = option.getDisplayableName();
+                }
+            }
+
+            if(retVal.desc.isEmpty()) {
+                IOption option = options.getOption(retVal.lookupName);
+                if(null != option) {
+                    retVal.desc = option.getDescription();
+                }
+            }
+            if (v != null) {
+                if (defaultSpecialAbilities != null && v.isLowerThan("0.3.6-r1965")) {
+                    if (defaultSpecialAbilities.get(retVal.lookupName) != null
+                            && defaultSpecialAbilities.get(retVal.lookupName).getPrereqSkills() != null) {
+                        retVal.prereqSkills = (Vector<SkillPrereq>) defaultSpecialAbilities.get(retVal.lookupName).getPrereqSkills().clone();
+                    }
+                }
+            }
+
+            if (wn.getNodeName().equalsIgnoreCase("edgetrigger")) {
+                edgeTriggers.put(retVal.lookupName, retVal);
+            } else if (wn.getNodeName().equalsIgnoreCase("implant")) {
+                implants.put(retVal.lookupName,  retVal);
+            } else {
+                specialAbilities.put(retVal.lookupName, retVal);
+            }
         } catch (Exception ex) {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
             MekHQ.getLogger().error(SpecialAbility.class, METHOD_NAME, ex);
-        }
-
-        if(retVal.displayName.isEmpty()) {
-            IOption option = options.getOption(retVal.lookupName);
-            if(null != option) {
-                retVal.displayName = option.getDisplayableName();
-            }
-        }
-
-        if(retVal.desc.isEmpty()) {
-            IOption option = options.getOption(retVal.lookupName);
-            if(null != option) {
-                retVal.desc = option.getDescription();
-            }
-        }
-        if (v != null) {
-            if (defaultSpecialAbilities != null && v.isLowerThan("0.3.6-r1965")) {
-                if (defaultSpecialAbilities.get(retVal.lookupName) != null
-                        && defaultSpecialAbilities.get(retVal.lookupName).getPrereqSkills() != null) {
-                    retVal.prereqSkills = (Vector<SkillPrereq>) defaultSpecialAbilities.get(retVal.lookupName).getPrereqSkills().clone();
-                }
-            }
-        }
-
-        if (wn.getNodeName().equalsIgnoreCase("edgetrigger")) {
-            edgeTriggers.put(retVal.lookupName, retVal);
-        } else if (wn.getNodeName().equalsIgnoreCase("implant")) {
-            implants.put(retVal.lookupName,  retVal);
-        } else {
-            specialAbilities.put(retVal.lookupName, retVal);
         }
     }
 
     public static void generateSeparateInstanceFromXML(Node wn, Hashtable<String, SpecialAbility> spHash, PilotOptions options) {
         final String METHOD_NAME = "generateSeparateInstanceFromXML(Node,Hashtable<String, SpecialAbility>,PilotOptions)"; //$NON-NLS-1$
 
-        SpecialAbility retVal = null;
-
         try {
-            retVal = new SpecialAbility();
+            SpecialAbility retVal = new SpecialAbility();
             NodeList nl = wn.getChildNodes();
 
             for (int x=0; x<nl.getLength(); x++) {
@@ -447,27 +443,27 @@ public class SpecialAbility implements MekHqXmlSerializable {
                     retVal.prereqMisc.put(fields[0], fields[1]);
                 }
             }
+
+            if(retVal.displayName.isEmpty()) {
+                IOption option = options.getOption(retVal.lookupName);
+                if(null != option) {
+                    retVal.displayName = option.getDisplayableName();
+                }
+            }
+
+            if(retVal.desc.isEmpty()) {
+                IOption option = options.getOption(retVal.lookupName);
+                if(null != option) {
+                    retVal.desc = option.getDescription();
+                }
+            }
+            spHash.put(retVal.lookupName, retVal);
         } catch (Exception ex) {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
             MekHQ.getLogger().error(SpecialAbility.class, METHOD_NAME, ex);
         }
-
-        if(retVal.displayName.isEmpty()) {
-            IOption option = options.getOption(retVal.lookupName);
-            if(null != option) {
-                retVal.displayName = option.getDisplayableName();
-            }
-        }
-
-        if(retVal.desc.isEmpty()) {
-            IOption option = options.getOption(retVal.lookupName);
-            if(null != option) {
-                retVal.desc = option.getDescription();
-            }
-        }
-        spHash.put(retVal.lookupName, retVal);
     }
 
     public static void initializeSPA() {
@@ -476,7 +472,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
         edgeTriggers = new Hashtable<>();
         implants = new Hashtable<>();
 
-        Document xmlDoc = null;
+        Document xmlDoc;
 
         try (InputStream is = new FileInputStream("data/universe/defaultspa.xml")) {
             // Using factory get an instance of document builder
@@ -486,6 +482,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
             MekHQ.getLogger().error(SpecialAbility.class, METHOD_NAME, ex);
+            return;
         }
 
         Element spaEle = xmlDoc.getDocumentElement();

@@ -31,6 +31,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
+import java.time.DayOfWeek;
 import java.util.*;
 import java.util.zip.GZIPOutputStream;
 
@@ -1294,7 +1295,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public boolean nagShortDeployments() {
-        if (getCampaign().getCalendar().get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
+        if (getCampaign().getLocalDate().getDayOfWeek() != DayOfWeek.SUNDAY) {
             return false;
         }
         for (Mission m : getCampaign().getMissions()) {
@@ -1500,15 +1501,21 @@ public class CampaignGUI extends JPanel {
 
     private void menuOptionsActionPerformed(java.awt.event.ActionEvent evt) {
         boolean atb = getCampaign().getCampaignOptions().getUseAtB();
-        boolean timein = getCampaign().getCampaignOptions().getUseTimeInService();
+        boolean timeIn = getCampaign().getCampaignOptions().getUseTimeInService();
+        boolean rankIn = getCampaign().getCampaignOptions().getUseTimeInRank();
         boolean staticRATs = getCampaign().getCampaignOptions().useStaticRATs();
         boolean factionIntroDate = getCampaign().getCampaignOptions().useFactionIntroDate();
         CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), true,
                 getCampaign(), getIconPackage().getCamos());
         cod.setVisible(true);
-        if (timein != getCampaign().getCampaignOptions().getUseTimeInService()) {
+        if (timeIn != getCampaign().getCampaignOptions().getUseTimeInService()) {
             if (getCampaign().getCampaignOptions().getUseTimeInService()) {
                 getCampaign().initTimeInService();
+            }
+        }
+        if (rankIn != getCampaign().getCampaignOptions().getUseTimeInRank()) {
+            if (getCampaign().getCampaignOptions().getUseTimeInRank()) {
+                getCampaign().initTimeInRank();
             }
         }
         if (atb != getCampaign().getCampaignOptions().getUseAtB()) {
@@ -2023,7 +2030,7 @@ public class CampaignGUI extends JPanel {
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                     "Starting load of personnel file from XML..."); //$NON-NLS-1$
             // Initialize variables.
-            Document xmlDoc = null;
+            Document xmlDoc;
 
             // Open the file
             try (InputStream is = new FileInputStream(personnelFile)) {
@@ -2033,7 +2040,8 @@ public class CampaignGUI extends JPanel {
                 // Parse using builder to get DOM representation of the XML file
                 xmlDoc = db.parse(is);
             } catch (Exception ex) {
-                MekHQ.getLogger().error(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
+                MekHQ.getLogger().error(getClass(), METHOD_NAME, "Cannot load person XML", ex);
+                return; // otherwise we NPE out in the next line
             }
 
             Element personnelEle = xmlDoc.getDocumentElement();
@@ -2084,6 +2092,30 @@ public class CampaignGUI extends JPanel {
                     p.clearTechUnitIDs();
                 }
             }
+
+            // Fix Spouse Id Information - This is required to fix spouse NPEs where one doesn't export
+            // both members of the couple
+            // TODO : make it so that exports will automatically include both spouses
+            for (Person p : getCampaign().getActivePersonnel()) {
+                if (p.hasSpouse() && !getCampaign().getPersonnel().contains(p.getSpouse())) {
+                    // If this happens, we need to clear the spouse
+                    if (p.getMaidenName() != null) {
+                        p.setSurname(p.getMaidenName());
+                    }
+
+                    p.setSpouseId(null);
+                }
+
+                if (p.isPregnant()) {
+                    String fatherIdString = p.getExtraData().get(Person.PREGNANCY_FATHER_DATA);
+                    UUID fatherId = (fatherIdString != null) ? UUID.fromString(fatherIdString) : null;
+                    if ((fatherId != null)
+                            && !getCampaign().getPersonnel().contains(getCampaign().getPerson(fatherId))) {
+                        p.getExtraData().set(Person.PREGNANCY_FATHER_DATA, null);
+                    }
+                }
+            }
+
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                     "Finished load of personnel file"); //$NON-NLS-1$
         }
@@ -2259,7 +2291,7 @@ public class CampaignGUI extends JPanel {
         MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                 "Starting load of parts file from XML..."); //$NON-NLS-1$
         // Initialize variables.
-        Document xmlDoc = null;
+        Document xmlDoc;
 
         // Open up the file.
         try (InputStream is = new FileInputStream(partsFile)) {
@@ -2270,6 +2302,7 @@ public class CampaignGUI extends JPanel {
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
             MekHQ.getLogger().error(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
+            return;
         }
 
         Element partsEle = xmlDoc.getDocumentElement();
@@ -2325,7 +2358,7 @@ public class CampaignGUI extends JPanel {
         MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                 "Starting load of options file from XML..."); //$NON-NLS-1$
         // Initialize variables.
-        Document xmlDoc = null;
+        Document xmlDoc;
 
         // Open up the file.
         try (InputStream is = new FileInputStream(optionsFile)) {
@@ -2336,6 +2369,7 @@ public class CampaignGUI extends JPanel {
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
             MekHQ.getLogger().error(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
+            return;
         }
 
         Element partsEle = xmlDoc.getDocumentElement();
