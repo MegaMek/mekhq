@@ -59,7 +59,6 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
@@ -1850,16 +1849,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         DefaultComboBoxModel<BabySurnameStyle> babySurnameStyleModel = new DefaultComboBoxModel<>(BabySurnameStyle.values());
         comboBabySurnameStyle = new JComboBox<>(babySurnameStyleModel);
-        comboBabySurnameStyle.setRenderer(new BasicComboBoxRenderer() {
+        comboBabySurnameStyle.setRenderer(new DefaultListCellRenderer() {
             private static final long serialVersionUID = -543354619818226314L;
 
             @Override
-            public Component getListCellRendererComponent(JList<?> list,
-                                                          Object value,
-                                                          int index,
-                                                          boolean isSelected,
-                                                          boolean cellHasFocus)
-            {
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                          boolean isSelected, boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (isSelected && (index > -1)) {
                     list.setToolTipText((list.getSelectedValue() instanceof BabySurnameStyle)
