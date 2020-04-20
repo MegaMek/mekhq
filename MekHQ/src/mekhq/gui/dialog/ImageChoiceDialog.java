@@ -713,8 +713,8 @@ public class ImageChoiceDialog extends JDialog {
     public static class ImagePanel extends JPanel {
         private static final long serialVersionUID = -3724175393116586310L;
         private DirectoryItems items;
+        private JLabel lblImage;
 
-        /** Creates new form ImagePanel */
         public ImagePanel(DirectoryItems items) {
             this.items = items;
             initComponents();
@@ -737,7 +737,7 @@ public class ImageChoiceDialog extends JDialog {
             gbc.weightx = 1.0;
             gbc.weighty = 1.0;
             add(lblImage, gbc);
-        }// </editor-fold>//GEN-END:initComponents
+        }
 
         public void setText(String text) {
             lblImage.setText(text);
@@ -754,20 +754,18 @@ public class ImageChoiceDialog extends JDialog {
                 if (Crew.ROOT_PORTRAIT.equals(category))
                     category = ""; //$NON-NLS-1$
                 Image image = (Image) items.getItem(category, name);
-                if (null != image) {
+                if (image != null) {
                     if (category.startsWith("Pieces/")) {
                         image = image.getScaledInstance(110, -1, Image.SCALE_SMOOTH);
                     } else {
                         image = image.getScaledInstance(-1, 76, Image.SCALE_SMOOTH);
                     }
+
+                    lblImage.setIcon(new ImageIcon(image));
                 }
-                lblImage.setIcon(new ImageIcon(image));
             } catch (Exception e) {
                 MekHQ.getLogger().error(getClass(), "setImage", e);
             }
         }
-        // Variables declaration - do not modify//GEN-BEGIN:variables
-        private JLabel lblImage;
-        // End of variables declaration//GEN-END:variables
     }
 }
