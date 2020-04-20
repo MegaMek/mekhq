@@ -2127,7 +2127,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 
                 // Edge Triggers
                 if (gui.getCampaign().getCampaignOptions().useEdge()) {
-                    // Edge Triggers
                     menu = new JMenu(resourceMap.getString("setEdgeTriggers.text")); //$NON-NLS-1$
                     //Start of Edge reroll options
                     //MechWarriors
