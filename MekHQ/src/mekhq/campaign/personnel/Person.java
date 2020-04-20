@@ -139,6 +139,7 @@ public class Person extends AbstractPerson {
     private static final Map<Integer, Money> MECHWARRIOR_AERO_RANSOM_VALUES;
     private static final Map<Integer, Money> OTHER_RANSOM_VALUES;
 
+    // TODO : Windchild I should NOT be public!
     public transient PersonAwardController awardController;
 
     //region Family Variables
