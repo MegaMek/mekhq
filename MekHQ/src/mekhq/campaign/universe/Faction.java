@@ -27,7 +27,6 @@ import java.io.FileInputStream;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -121,7 +120,7 @@ public class Faction {
     public boolean isClan() {
         return is(Tag.CLAN);
     }
-    
+
     public boolean isComstar() {
         return "CS".equals(shortname);
     }
@@ -150,7 +149,7 @@ public class Faction {
             if(year < 2570) {
                 //Era: Age of War
                 return eraMods[0];
-            } 
+            }
             else if(year < 2598) {
                 //Era: RW
                 return eraMods[1];
@@ -158,7 +157,7 @@ public class Faction {
             else if(year < 2785) {
                 //Era: Star League
                 return eraMods[2];
-            } 
+            }
             else if(year < 2828) {
                 //Era: 1st SW
                 return eraMods[3];
@@ -187,7 +186,7 @@ public class Faction {
     }
 
     public int getTechMod(Part part, Campaign campaign) {
-        int currentYear = campaign.getCalendar().get(Calendar.YEAR);
+        int currentYear = campaign.getGameYear();
 
         //TODO: This seems hacky - we shouldn't hardcode in universe details
         //like this
@@ -221,15 +220,15 @@ public class Faction {
 
         return factionMod;
     }
-    
+
     public boolean is(Faction.Tag tag) {
         return tags.contains(tag);
     }
-    
+
     public boolean validIn(int year) {
         return (year >= start) && (year <= end);
     }
-    
+
     public boolean validIn(DateTime time) {
         return validIn(time.getYear());
     }
@@ -253,7 +252,7 @@ public class Faction {
     public String getCurrencyCode() {
         return this.currencyCode;
     }
-    
+
     public boolean hasName(String name) {
         if (name.equals(fullname)
                 || nameChanges.values().stream().anyMatch(n -> n.equals(name))) {
@@ -268,11 +267,11 @@ public class Faction {
         }
         return false;
     }
-    
+
     public static Collection<Faction> getFactions() {
         return factions.values();
     }
-    
+
     public static Collection<String> getFactionList() {
         return new ArrayList<>(factions.keySet());
     }
@@ -312,21 +311,21 @@ public class Faction {
                 if (f.isPeriphery()) {
                     fRec = RATGenerator.getInstance().getFaction("Periphery");
                 } else if (f.isClan()) {
-                    fRec = RATGenerator.getInstance().getFaction("CLAN");                   
+                    fRec = RATGenerator.getInstance().getFaction("CLAN");
                 } else {
                     fRec = RATGenerator.getInstance().getFaction("IS");
                 }
             }
-            
+
             if (fRec == null) {
                 MekHQ.getLogger().log(RATGenerator.class, "getFactionRecordOrFallback", LogLevel.ERROR,
                         "Could not locate faction record for " + faction); //$NON-NLS-1$
             }
         }
-        
+
         return fRec;
     }
-    
+
     public static String getFactionCode(int faction) {
         Faction f = factionIdMap.get(faction);
         return (null != f) ? f.getShortName() : "IND"; //$NON-NLS-1$
@@ -334,7 +333,7 @@ public class Faction {
 
     public static Faction getFactionFromXML(Node wn) throws DOMException, ParseException {
         final String METHOD_NAME = "getFactionFromXML(Node)"; //$NON-NLS-1$
-        
+
         Faction retVal = new Faction();
         NodeList nl = wn.getChildNodes();
 
@@ -406,14 +405,14 @@ public class Faction {
 
     public static void generateFactions() throws DOMException, ParseException {
         final String METHOD_NAME = "generateFactions()";
-        
+
         MekHQ.getLogger().log(Faction.class, METHOD_NAME, LogLevel.INFO,
                 "Starting load of faction data from XML..."); //$NON-NLS-1$
         // Initialize variables.
         factions = new HashMap<>();
         factionIdMap = new HashMap<>();
 
-        Document xmlDoc = null;
+        Document xmlDoc;
 
         try(FileInputStream fis = new FileInputStream("data/universe/factions.xml")) {
             // Using factory get an instance of document builder
@@ -423,6 +422,7 @@ public class Faction {
             xmlDoc = db.parse(fis);
         } catch (Exception ex) {
             MekHQ.getLogger().error(Faction.class, METHOD_NAME, ex);
+            return;
         }
 
         Element factionEle = xmlDoc.getDocumentElement();
@@ -488,7 +488,7 @@ public class Faction {
         Collections.sort(factionNames);
         return Utilities.combineString(factionNames, "/"); //$NON-NLS-1$
     }
-    
+
     @Override
     public int hashCode() {
         final int prime = 31;

@@ -47,9 +47,9 @@ import megamek.common.SmallCraft;
 import megamek.common.SpaceStation;
 import megamek.common.Tank;
 import megamek.common.Warship;
+import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.sorter.NaturalOrderComparator;
 
 /**
  * @author Jay Lawson

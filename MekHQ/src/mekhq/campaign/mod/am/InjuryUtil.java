@@ -39,6 +39,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -285,7 +286,7 @@ public final class InjuryUtil {
                     result.add(new GameEffect(
                         String.format("%s made a mistake in the treatment of %s and caused %s %s to worsen.",
                             doc.getHyperlinkedFullTitle(), p.getHyperlinkedName(),
-                            p.getGenderString(GenderDescriptors.HIS_HER), i.getName()),
+                            GenderDescriptors.HIS_HER.getDescriptor(p.getGender()), i.getName()),
                         rnd -> {
                             int time = i.getTime();
                             i.setTime((int) Math.max(Math.ceil(time * 1.2), time + 5));
@@ -332,14 +333,14 @@ public final class InjuryUtil {
                 }
                 i.setWorkedOn(true);
                 Unit u = c.getUnit(p.getUnitId());
-                if(null != u) {
+                if (null != u) {
                     u.resetPilotAndEntity();
                 }
                 numTreated++;
             } else {
                 result.add(new GameEffect(
-                    String.format("%s spent time resting to heal %s %s.",
-                        p.getHyperlinkedName(), p.getGenderString(GenderDescriptors.HIS_HER), i.getName()),
+                    String.format("%s spent time resting to heal %s %s.", p.getHyperlinkedName(),
+                            GenderDescriptors.HIS_HER.getDescriptor(p.getGender()), i.getName()),
                     rnd -> {
 
                     }));
@@ -428,22 +429,22 @@ public final class InjuryUtil {
             result.add(new GameEffect("Infirmary health check-up",
                 rnd -> {
                     boolean dismissed = false;
-                    if(p.getStatus() == Person.S_KIA) {
+                    if (p.getStatus() == PersonnelStatus.KIA) {
                         dismissed = true;
                         MedicalLogger.diedInInfirmary(p, c.getDate());
-                    } else if(p.getStatus() == Person.S_MIA) {
+                    } else if (p.getStatus() == PersonnelStatus.MIA) {
                         // What? How?
                         dismissed = true;
                         MedicalLogger.abductedFromInfirmary(p, c.getDate());
-                    } else if(p.getStatus() == Person.S_RETIRED) {
+                    } else if (p.getStatus() == PersonnelStatus.RETIRED) {
                         dismissed = true;
                         MedicalLogger.retiredAndTransferredFromInfirmary(p, c.getDate());
-                    } else if(!p.needsFixing()) {
+                    } else if (!p.needsFixing()) {
                         dismissed = true;
                         MedicalLogger.dismissedFromInfirmary(p, c.getDate());
                     }
 
-                    if(dismissed) {
+                    if (dismissed) {
                         p.setDoctorId(null, c.getCampaignOptions().getHealingWaitingPeriod());
                     }
                 }));

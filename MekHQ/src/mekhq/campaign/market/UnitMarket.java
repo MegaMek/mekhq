@@ -18,13 +18,11 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.market;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Set;
 
 import org.w3c.dom.Node;
@@ -114,7 +112,7 @@ public class UnitMarket implements Serializable {
     }
 
     public void generateUnitOffers(Campaign campaign) {
-        if (method == TYPE_ATBMONTHLY && campaign.getCalendar().get(Calendar.DAY_OF_MONTH) == 1) {
+        if (method == TYPE_ATBMONTHLY && campaign.getLocalDate().getDayOfMonth() == 1) {
             offers.clear();
 
             AtBContract contract = null;
@@ -221,7 +219,7 @@ public class UnitMarket implements Serializable {
 
         UnitGeneratorParameters params = new UnitGeneratorParameters();
         params.setFaction(faction);
-        params.setYear(campaign.getCalendar().get(Calendar.YEAR));
+        params.setYear(campaign.getGameYear());
         params.setUnitType(unitType);
         params.setQuality(quality);
 
@@ -240,8 +238,8 @@ public class UnitMarket implements Serializable {
             }
             ms = campaign.getUnitGenerator().generate(params);
             if (ms != null) {
-                if (campaign.getCampaignOptions().limitByYear() &&
-                        campaign.getCalendar().get(Calendar.YEAR) < ms.getYear()) {
+                if (campaign.getCampaignOptions().limitByYear()
+                        && (campaign.getGameYear() < ms.getYear())) {
                     continue;
                 }
                 if ((campaign.getCampaignOptions().allowClanPurchases() && ms.isClan())
@@ -262,7 +260,7 @@ public class UnitMarket implements Serializable {
         int weight = getRandomWeight(unitType, faction,
                 campaign.getCampaignOptions().getRegionalMechVariations());
         MechSummary ms = campaign.getUnitGenerator().generate(faction, unitType, weight,
-                campaign.getCalendar().get(Calendar.YEAR), quality);
+                campaign.getGameYear(), quality);
         if (ms == null) {
             return null;
         } else {

@@ -1,6 +1,32 @@
 VERSION HISTORY:
 ----------------
-0.47.5-SNAPSHOT
+0.47.6-SNAPSHOT
++ PR #1610: Raised cost of edge points from 1 to 10 for the AtB configuration preset.
++ PR #1627: Moved pregnancy GM items to Personnel GM menu (and hide GM menu if not a GM)
++ Issue #1612: Adding Scrolling to Marriage Candidates
++ PR #1606: Abandon ship (MekHQ version)! Crews of large craft and units transported aboard large craft are handled during scenario resolution.
++ PR #1618: De-clutter assign lance tech menu in TO&E
++ Issue #1632: All random marriages default to same sex
++ Issue #1626: Adding Time in Rank to MekHQ
++ PR #1634: Fixing Activate/Mothball Display Text
++ Issue #1636: ExtraData Export Fails because of Null Mapping
++ PR #1642: Fixing Popup Display Text Spacing Issues in DataLoadingDialog
++ Issue #1218: Personnel Total Earnings Tracking
++ Issue #1613: Automatically Output Finances Table to File on New Year
++ Issue #1134: Option to Disable Dependent Automatic Addition in AtB
++ PR #1645: Deploying units as reinforcements to AtB and template scenarios no longer defaults them to the "any" deployment zone
++ Issue #1649, #1651: Fixing ExtraData Unmarshaller
++ PR #1654: Fixing Spouse and Baby Load from Personnel export
++ PR #1656: Avoid NPE in Person::isMothballing
++ Issue #1635: Base Salaries Not Displaying Correctly in Nimbus
++ PR #1659: Implementing Log Maintenance
++ PR #1666: Fix bug with personnel original unit tech (if clan tech level)
++ PR #1673: Removing Prisoner to Personnel Random Marriage by implementing Prisoner to Prisoner Random Marriage.
++ PR #1663: Fixing Clanner Name Migration
++ PR #1681: Change refit model weight calculation to work with BA
++ PR #1685: Adding All Role and No Role options for Portraits
+
+0.47.5 (2020-4-01 2000 UTC)
 + Issue #1470: Thumper artillery vehicle causes array index out of bounds exception error
 + Issue #1261: RFE: In Contract Market, hyperlink the system/location to the Interstellar Map
 + Issue #1090: Feature Request: Add Origin Faction to Fluff Information display of Personnel
@@ -51,7 +77,7 @@ v0.47.4 (2020-2-09 2200 UTC)
 + PR #1467: Made the Standard Value for Double Enemy Vehicles False
 + Issue #280: Adding Portrait folder documentation
 
-v0.47.3 (2020-2-01 2200 UTC) 
+v0.47.3 (2020-2-01 2200 UTC)
 + Issue #1344: Ensure techs show the right skill for Protomechs
 + PR #1348: Enable scenario modifiers to add objectives to scenarios generated from templates
 + Issue #1349: Problem with replacing Protomech limbs lost in combat
@@ -92,7 +118,7 @@ v0.47.3 (2020-2-01 2200 UTC)
 + Issue #1433: Enabling RandomizePortraits for personnel with pre-existing portraits
 + PR #1438: Adding Scrollbar to Personnel Settings under Campaign Options for small screens
 
-v0.47.2 (2019-11-15 2000 UTC) 
+v0.47.2 (2019-11-15 2000 UTC)
 + PR #1325: Customize protomechs and advanced aero in MekLab
 + PR #1326: Fix another potential error preventing day advancement when giving training XP
 + Issue #1327, 1329: Fixed multiple issues relating to scenario resolution introduced in 47.1
