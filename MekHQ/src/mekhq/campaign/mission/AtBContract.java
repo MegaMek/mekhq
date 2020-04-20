@@ -911,13 +911,11 @@ public class AtBContract extends Contract implements Serializable {
                     partsAvailabilityLevel++;
                     break;
                 case 6:
-                    String unit =
-                            c.getUnitMarket().addSingleUnit(c, UnitMarket.MARKET_EMPLOYER,
-                                    UnitType.MEK, getEmployerCode(),
-                                    IUnitRating.DRAGOON_F, 50) +
-                                    " offered by employer on the <a href='UNIT_MARKET'>unit market</a>";
+                    String unit = c.getUnitMarket().addSingleUnit(c, UnitMarket.MARKET_EMPLOYER,
+                        UnitType.MEK, getEmployerCode(),
+                        IUnitRating.DRAGOON_F, 50);
                     if (unit != null) {
-                        text += "Surplus Sale: " + unit;
+                        text += String.format("Surplus Sale: %s offered by employer on the <a href='UNIT_MARKET'>unit market</a>", unit);
                     }
                 }
                 c.addReport(text);

@@ -2292,7 +2292,7 @@ public class CampaignGUI extends JPanel {
         MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                 "Starting load of parts file from XML..."); //$NON-NLS-1$
         // Initialize variables.
-        Document xmlDoc = null;
+        Document xmlDoc;
 
         // Open up the file.
         try (InputStream is = new FileInputStream(partsFile)) {
@@ -2303,6 +2303,7 @@ public class CampaignGUI extends JPanel {
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
             MekHQ.getLogger().error(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
+            return;
         }
 
         Element partsEle = xmlDoc.getDocumentElement();
@@ -2358,7 +2359,7 @@ public class CampaignGUI extends JPanel {
         MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                 "Starting load of options file from XML..."); //$NON-NLS-1$
         // Initialize variables.
-        Document xmlDoc = null;
+        Document xmlDoc;
 
         // Open up the file.
         try (InputStream is = new FileInputStream(optionsFile)) {
@@ -2369,6 +2370,7 @@ public class CampaignGUI extends JPanel {
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
             MekHQ.getLogger().error(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
+            return;
         }
 
         Element partsEle = xmlDoc.getDocumentElement();

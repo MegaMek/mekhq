@@ -388,20 +388,16 @@ public class UnitTableModel extends DataTableModel {
                 }
             }
             if(actualCol == COL_WCLASS) {
-                if(null != u) {
-                    String desc = "<html><b>" + u.getName() + "</b><br>";
-                    desc += u.getEntity().getWeightClassName();
-                    if(!(u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship)) {
-                        desc += " " + UnitType.getTypeDisplayableName(u.getEntity().getUnitType());
-                    }
-                    desc += "<br>" + u.getStatus() + "</html>";
-                    setHtmlText(desc);
-                    Image mekImage = getImageFor(u);
-                    if(null != mekImage) {
-                        setImage(mekImage);
-                    } else {
-                        clearImage();
-                    }
+                String desc = "<html><b>" + u.getName() + "</b><br>";
+                desc += u.getEntity().getWeightClassName();
+                if(!(u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship)) {
+                    desc += " " + UnitType.getTypeDisplayableName(u.getEntity().getUnitType());
+                }
+                desc += "<br>" + u.getStatus() + "</html>";
+                setHtmlText(desc);
+                Image mekImage = getImageFor(u);
+                if(null != mekImage) {
+                    setImage(mekImage);
                 } else {
                     clearImage();
                 }

@@ -22,7 +22,7 @@ import mekhq.gui.model.ScenarioTableModel;
 
 public class ScenarioTableMouseAdapter extends MouseInputAdapter implements
         ActionListener {
-    
+
     private CampaignGUI gui;
     private JTable scenarioTable;
     private ScenarioTableModel scenarioModel;
@@ -38,11 +38,11 @@ public class ScenarioTableMouseAdapter extends MouseInputAdapter implements
     public void actionPerformed(ActionEvent action) {
         String command = action.getActionCommand();
         Scenario scenario = scenarioModel.getScenario(scenarioTable.getSelectedRow());
-        Mission mission = gui.getCampaign().getMission(scenario.getMissionId());
         if (command.equalsIgnoreCase("EDIT")) {
-            if (null != mission && null != scenario) {
+            Mission mission = gui.getCampaign().getMission(scenario.getMissionId());
+            if (null != mission) {
                 CustomizeScenarioDialog csd = new CustomizeScenarioDialog(
-                        gui.getFrame(), true, scenario, mission, gui.getCampaign());
+                    gui.getFrame(), true, scenario, mission, gui.getCampaign());
                 csd.setVisible(true);
                 MekHQ.triggerEvent(new ScenarioChangedEvent(scenario));
             }
@@ -52,7 +52,6 @@ public class ScenarioTableMouseAdapter extends MouseInputAdapter implements
                     "Delete Scenario?", JOptionPane.YES_NO_OPTION)) {
                 gui.getCampaign().removeScenario(scenario.getId());
             }
-
         }
     }
 

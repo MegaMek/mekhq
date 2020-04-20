@@ -288,35 +288,39 @@ public class MekLocation extends Part {
 	public void fix() {
 		super.fix();
 		if(isBlownOff()) {
-			blownOff = false;
-			unit.getEntity().setLocationBlownOff(loc, false);
-			for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
-	            CriticalSlot slot = unit.getEntity().getCritical(loc, i);
-	            // ignore empty & non-hittable slots
-	            if (slot == null) {
-	                continue;
-	            }
-	            slot.setMissing(false);
-	            Mounted m = slot.getMount();
-	            if(null != m) {
-	            	m.setMissing(false);
-	            }
-			}
+            blownOff = false;
+            if (null != unit) {
+                unit.getEntity().setLocationBlownOff(loc, false);
+                for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+                    CriticalSlot slot = unit.getEntity().getCritical(loc, i);
+                    // ignore empty & non-hittable slots
+                    if (slot == null) {
+                        continue;
+                    }
+                    slot.setMissing(false);
+                    Mounted m = slot.getMount();
+                    if(null != m) {
+                        m.setMissing(false);
+                    }
+                }
+            }
 		} else if(isBreached()) {
-			breached = false;
-			unit.getEntity().setLocationStatus(loc, ILocationExposureStatus.NORMAL, true);
-			for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
-	            CriticalSlot slot = unit.getEntity().getCritical(loc, i);
-	            // ignore empty & non-hittable slots
-	            if (slot == null) {
-	                continue;
-	            }
-	            slot.setBreached(false);
-	            Mounted m = slot.getMount();
-	            if(null != m) {
-	            	m.setBreached(false);
-	            }
-			}
+            breached = false;
+            if (null != unit) {
+                unit.getEntity().setLocationStatus(loc, ILocationExposureStatus.NORMAL, true);
+                for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+                    CriticalSlot slot = unit.getEntity().getCritical(loc, i);
+                    // ignore empty & non-hittable slots
+                    if (slot == null) {
+                        continue;
+                    }
+                    slot.setBreached(false);
+                    Mounted m = slot.getMount();
+                    if(null != m) {
+                        m.setBreached(false);
+                    }
+                }
+            }
 		} else {
 			percent = 1.0;
 			if(null != unit) {

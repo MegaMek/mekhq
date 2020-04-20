@@ -395,7 +395,12 @@ public class PersonnelMarketDialog extends JDialog {
 				unit = u;
 				break;
 			}
-		}
+        }
+        if (unit == null) {
+            // No such unit matching the entity.
+            return;
+        }
+
 		if (unit.usesSoloPilot()) {
 			unit.addPilotOrSoldier(selectedPerson);
 			selectedPerson.setOriginalUnit(unit);

@@ -3327,9 +3327,40 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panRandomPortrait.setName("panRandomPortrait"); // NOI18N
         panRandomPortrait.setLayout(new BorderLayout());
 
-        JPanel panUsePortrait = new JPanel(new GridLayout(nRow, 4));
-
+        // The math below is used to determine how to split the personnel role options for portraits,
+        // which it does into 4 columns with rows equal to the number of roles plus two, with the
+        // additional two being the all role and no role options.
+        JPanel panUsePortrait = new JPanel(new GridLayout((int) Math.ceil((Person.T_NUM + 2) / 4.0), 4));
         chkUsePortrait = new JCheckBox[Person.T_NUM];
+        JCheckBox allPortraitsBox = new JCheckBox(resourceMap.getString("panUsePortrait.all.text"));
+        JCheckBox noPortraitsBox = new JCheckBox(resourceMap.getString("panUsePortrait.no.text"));
+        allPortraitsBox.addActionListener(evt -> {
+            final boolean selected = allPortraitsBox.isSelected();
+            for (JCheckBox box : chkUsePortrait) {
+                if (selected) {
+                    box.setSelected(true);
+                }
+                box.setEnabled(!selected);
+            }
+            if (selected) {
+                noPortraitsBox.setSelected(false);
+            }
+        });
+        noPortraitsBox.addActionListener(evt -> {
+            final boolean selected = noPortraitsBox.isSelected();
+            for (JCheckBox box : chkUsePortrait) {
+                if (selected) {
+                    box.setSelected(false);
+                }
+                box.setEnabled(!selected);
+            }
+            if (selected) {
+                allPortraitsBox.setSelected(false);
+            }
+        });
+        panUsePortrait.add(allPortraitsBox);
+        panUsePortrait.add(noPortraitsBox);
+
         JCheckBox box;
         for (int i = 0; i < Person.T_NUM; i++) {
             box = new JCheckBox(Person.getRoleDesc(i, false));
