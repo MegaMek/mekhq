@@ -3933,7 +3933,7 @@ public class Campaign implements Serializable, ITechManager {
                         }
 
                         for (Person p : traineeUnit.getCrew()) {
-                            if (p.getId().equals(commander.getId())) {
+                            if (p.equals(commander)) {
                                 continue;
                             }
                             // ...and if their weakest role is Green or Ultra-Green
