@@ -1352,7 +1352,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void randomMarriage() {
         // Don't attempt to generate is someone isn't trying to marry, has a spouse,
-        // isn't old enought to marry, or is actively deployed
+        // isn't old enough to marry, or is actively deployed
         if (!tryingToMarry || hasSpouse() || !oldEnoughToMarry() || isDeployed()) {
             return;
         }
