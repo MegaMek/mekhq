@@ -578,7 +578,6 @@ public class StaticChecks {
         return false;
     }
 
-
     public static boolean areAllPrisoners(Person[] people) {
         for(Person person : people) {
             if(!person.isPrisoner()) {
