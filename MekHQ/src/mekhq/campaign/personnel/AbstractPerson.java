@@ -35,32 +35,32 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
     //region Variable Declarations
     private static final long serialVersionUID = 2190101430016271321L;
 
-    protected UUID id;
+    private UUID id;
 
     //region Name
     protected transient String fullName; // this is a runtime variable, and shouldn't be saved
-    protected String preNominal;
-    protected String givenName;
-    protected String surname;
-    protected String postNominal;
-    protected String maidenName;
-    protected String callsign;
+    private String preNominal;
+    private String givenName;
+    private String surname;
+    private String postNominal;
+    private String maidenName;
+    private String callsign;
     //endregion Name
 
     //region Personal Information
-    protected int gender;
-    protected PersonnelStatus status;
-    protected LocalDate birthday;
-    protected LocalDate dateOfDeath;
-    protected String biography;
+    private int gender;
+    private PersonnelStatus status;
+    private LocalDate birthday;
+    private LocalDate dateOfDeath;
+    private String biography;
     private String originFactionCode;
-    protected transient Faction originFaction;
-    protected Planet originPlanet;
+    private transient Faction originFaction;
+    private Planet originPlanet;
     //endregion Personal Information
 
     //region Portraits
-    protected String portraitCategory;
-    protected String portraitFile;
+    private String portraitCategory;
+    private String portraitFile;
     // runtime override portraits (not saved)
     private transient String portraitCategoryOverride = null; // Potential Values are Crew.ROOT_PORTRAIT or null
     private transient String portraitFileOverride = null; // Potential Values are Crew.PORTRAIT_NONE or null
@@ -124,6 +124,13 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
      */
     public void setId(UUID id) {
         this.id = id;
+    }
+
+    /**
+     * This creates a new random id for the person
+     */
+    public void setRandomId() {
+        this.id = UUID.randomUUID();
     }
 
     //region Name
@@ -258,6 +265,11 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
 
     public String getOriginFactionCode() {
         return originFactionCode;
+    }
+
+    public void setOriginFactionCode(String originFactionCode) {
+        this.originFactionCode = originFactionCode;
+        this.originFaction = Faction.getFaction(originFactionCode);
     }
 
     public Faction getOriginFaction() {

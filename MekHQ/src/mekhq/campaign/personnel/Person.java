@@ -389,7 +389,7 @@ public class Person extends AbstractPerson {
         secondaryDesignator = DESIG_NONE;
         commander = false;
         dependent = false;
-        clan = originFaction.isClan();
+        clan = getOriginFaction().isClan();
         phenotype = PHENOTYPE_NONE;
         bloodname = "";
         idleMonths = -1;
@@ -607,7 +607,8 @@ public class Person extends AbstractPerson {
         // Then, the full name is set
         String[] name = n.trim().split("\\s+");
 
-        givenName = name[0];
+        String givenName = name[0];
+        String surname = "";
 
         if (isClanner()) {
             if (name.length > 1) {
@@ -639,7 +640,8 @@ public class Person extends AbstractPerson {
             surname = "";
         }
 
-        setFullName();
+        setGivenName(givenName);
+        setSurname(surname);
     }
 
     @Override
@@ -1075,9 +1077,9 @@ public class Person extends AbstractPerson {
         int size = extraData.get(PREGNANCY_CHILDREN_DATA, 1);
         String fatherIdString = extraData.get(PREGNANCY_FATHER_DATA);
         UUID fatherId = (fatherIdString != null) ? UUID.fromString(fatherIdString) : null;
-        Ancestors anc = campaign.getAncestors(fatherId, id);
+        Ancestors anc = campaign.getAncestors(fatherId, getId());
         if (null == anc) {
-            anc = campaign.createAncestors(fatherId, id);
+            anc = campaign.createAncestors(fatherId, getId());
         }
         final UUID ancId = anc.getId();
 
@@ -1113,7 +1115,7 @@ public class Person extends AbstractPerson {
                 return campaign.getPerson(fatherId).getSurname();
             }
         }
-        return surname = getSurname();
+        return getSurname();
     }
     //endregion Pregnancy
 
@@ -1713,54 +1715,54 @@ public class Person extends AbstractPerson {
                 Node wn2 = nl.item(x);
 
                 if (wn2.getNodeName().equalsIgnoreCase("name")) { //included for backwards compatibility
-                    retVal.migrateName(wn2.getTextContent());
+                    retVal.migrateName(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("givenName")) {
-                    retVal.givenName = wn2.getTextContent();
+                    retVal.setGivenName(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("surname")) {
-                    retVal.surname = wn2.getTextContent();
+                    retVal.setSurname(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("honorific")) { //legacy
-                    retVal.postNominal = wn2.getTextContent();
+                    retVal.setPostNominal(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("maidenName")) {
-                    retVal.maidenName = wn2.getTextContent();
+                    retVal.setMaidenName(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("callsign")) {
-                    retVal.callsign = wn2.getTextContent();
+                    retVal.setCallsign(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("commander")) {
                     retVal.commander = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("dependent")) {
                     retVal.dependent = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("faction")) {
-                    retVal.originFaction = Faction.getFaction(wn2.getTextContent().trim());
+                    retVal.setOriginFactionCode(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("planetId")) {
                     String systemId = wn2.getAttributes().getNamedItem("systemId").getTextContent().trim();
                     String planetId = wn2.getTextContent().trim();
-                    retVal.originPlanet = c.getSystemById(systemId).getPlanetById(planetId);
+                    retVal.setOriginPlanet(c.getSystemById(systemId).getPlanetById(planetId));
                 } else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
                     retVal.clan = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("phenotype")) {
-                    retVal.phenotype = Integer.parseInt(wn2.getTextContent());
+                    retVal.phenotype = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("bloodname")) {
-                    retVal.bloodname = wn2.getTextContent();
+                    retVal.bloodname = wn2.getTextContent().trim();
                 } else if (wn2.getNodeName().equalsIgnoreCase("biography")) {
-                    retVal.biography = wn2.getTextContent();
+                    retVal.setBiography(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("primaryRole")) {
-                    retVal.primaryRole = Integer.parseInt(wn2.getTextContent());
+                    retVal.primaryRole = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("secondaryRole")) {
-                    retVal.secondaryRole = Integer.parseInt(wn2.getTextContent());
+                    retVal.secondaryRole = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("acquisitions")) {
-                    retVal.acquisitions = Integer.parseInt(wn2.getTextContent());
+                    retVal.acquisitions = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("primaryDesignator")) {
-                    retVal.primaryDesignator = Integer.parseInt(wn2.getTextContent());
+                    retVal.primaryDesignator = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("secondaryDesignator")) {
-                    retVal.secondaryDesignator = Integer.parseInt(wn2.getTextContent());
+                    retVal.secondaryDesignator = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysToWaitForHealing")) {
-                    retVal.daysToWaitForHealing = Integer.parseInt(wn2.getTextContent());
+                    retVal.daysToWaitForHealing = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("idleMonths")) {
-                    retVal.idleMonths = Integer.parseInt(wn2.getTextContent());
+                    retVal.idleMonths = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("id")) {
                     if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
                         retVal.oldId = Integer.parseInt(wn2.getTextContent());
                     } else {
-                        retVal.id = UUID.fromString(wn2.getTextContent());
+                        retVal.setId(UUID.fromString(wn2.getTextContent()));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("ancestors")) {
                     retVal.ancestorsId = UUID.fromString(wn2.getTextContent());
@@ -1800,7 +1802,7 @@ public class Person extends AbstractPerson {
                 } else if (wn2.getNodeName().equalsIgnoreCase("hits")) {
                     retVal.hits = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("gender")) {
-                    retVal.gender = Integer.parseInt(wn2.getTextContent());
+                    retVal.setGender(Integer.parseInt(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
                     if (version.isLowerThan("0.3.4-r1782")) {
                         RankTranslator rt = new RankTranslator(c);
@@ -1842,20 +1844,20 @@ public class Person extends AbstractPerson {
                     if (version.isLowerThan("0.47.6")) {
                         switch (Integer.parseInt(wn2.getTextContent())) {
                             case 1:
-                                retVal.status = PersonnelStatus.RETIRED;
+                                retVal.setStatus(PersonnelStatus.RETIRED);
                                 break;
                             case 2:
-                                retVal.status = PersonnelStatus.KIA;
+                                retVal.setStatus(PersonnelStatus.KIA);
                                 break;
                             case 3:
-                                retVal.status = PersonnelStatus.MIA;
+                                retVal.setStatus(PersonnelStatus.MIA);
                                 break;
                             default:
-                                retVal.status = PersonnelStatus.ACTIVE;
+                                retVal.setStatus(PersonnelStatus.ACTIVE);
                                 break;
                         }
                     } else {
-                        retVal.status = PersonnelStatus.valueOf(wn2.getTextContent());
+                        retVal.setStatus(PersonnelStatus.valueOf(wn2.getTextContent()));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("prisonerStatus")) {
                     retVal.prisonerStatus = Integer.parseInt(wn2.getTextContent());
@@ -1870,9 +1872,9 @@ public class Person extends AbstractPerson {
                 } else if (wn2.getNodeName().equalsIgnoreCase("overtimeLeft")) {
                     retVal.overtimeLeft = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("birthday")) {
-                    retVal.birthday = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
+                    retVal.setBirthday(MekHqXmlUtil.parseDate(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("deathday")) {
-                    retVal.dateOfDeath = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
+                    retVal.setDateOfDeath(MekHqXmlUtil.parseDate(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("recruitment")) {
                     retVal.recruitment = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("lastRankChangeDate")) {
@@ -2149,10 +2151,10 @@ public class Person extends AbstractPerson {
                 retVal.setCallsign(pilotNickname);
             }
 
-            if (retVal.id == null) {
+            if (retVal.getId() == null) {
                 MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
                         "Id not pre-defined; generating person's Id."); //$NON-NLS-1$
-                retVal.id = UUID.randomUUID();
+                retVal.setRandomId();
             }
 
             // Prisoner and Bondsman updating
@@ -2958,7 +2960,7 @@ public class Person extends AbstractPerson {
     }
 
     public boolean needsFixing() {
-        return ((hits > 0) || needsAMFixing()) && (status == PersonnelStatus.ACTIVE);
+        return ((hits > 0) || needsAMFixing()) && (getStatus() == PersonnelStatus.ACTIVE);
     }
 
     public String succeed() {
@@ -3882,7 +3884,7 @@ public class Person extends AbstractPerson {
     }
 
     public boolean isDeadOrMIA() {
-        return (status == PersonnelStatus.KIA) || (status == PersonnelStatus.MIA);
+        return (getStatus() == PersonnelStatus.KIA) || (getStatus() == PersonnelStatus.MIA);
     }
 
     public boolean isEngineer() {
