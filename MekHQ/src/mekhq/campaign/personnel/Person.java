@@ -31,7 +31,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.IntSupplier;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import megamek.common.*;
 import megamek.common.util.EncodeControl;
