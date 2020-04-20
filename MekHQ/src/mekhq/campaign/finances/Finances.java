@@ -1,6 +1,6 @@
-/* Finances.java
- *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+/*
+ * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2020 - The MegaMek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -17,13 +17,9 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.finances;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Serializable;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.ParseException;
@@ -31,6 +27,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import mekhq.io.FileType;
 import mekhq.campaign.personnel.Person;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
@@ -53,14 +50,9 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Finances implements Serializable {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = 8533117455496219692L;
 
     private ResourceBundle resourceMap;
@@ -160,7 +152,14 @@ public class Finances implements Serializable {
      * clear transactions By default, this will be called up on Jan 1 of every year
      * in order to keep the transaction record from becoming too large
      */
-    public void newFiscalYear(Date date) {
+    public void newFiscalYear(Date date, Campaign campaign) {
+        if (campaign.getCampaignOptions().getYearlyFinancesToCSVExport()) {
+            String exportFileName = campaign.getName() + " Finances for " + campaign.getLocalDate().getYear()
+                    + "." + FileType.CSV.getRecommendedExtension();
+            exportFinancesToCSV(new File(MekHQ.getCampaignsDirectory().getValue(), exportFileName).getPath(),
+                    FileType.CSV.getRecommendedExtension());
+        }
+
         Money carryover = getBalance();
         transactions = new ArrayList<>();
         credit(carryover, Transaction.C_START, resourceMap.getString("Carryover.text"), date);
@@ -235,9 +234,9 @@ public class Finances implements Serializable {
         GregorianCalendar calendar = campaign.getCalendar();
 
         // check for a new year
-        if (calendar.get(Calendar.MONTH) == Calendar.JANUARY && calendar.get(Calendar.DAY_OF_MONTH) == 1) {
+        if (campaign.getLocalDate().getDayOfYear() == 1) {
             // clear the ledger
-            newFiscalYear(calendar.getTime());
+            newFiscalYear(calendar.getTime(), campaign);
         }
 
         // Handle contract payments
@@ -257,14 +256,14 @@ public class Finances implements Serializable {
 
         // Handle assets
         for (Asset asset : assets) {
-            if (asset.getSchedule() == SCHEDULE_YEARLY && campaign.getCalendar().get(Calendar.DAY_OF_YEAR) == 1) {
+            if ((asset.getSchedule() == SCHEDULE_YEARLY) && (campaign.getLocalDate().getDayOfYear() == 1)) {
                 credit(asset.getIncome(), Transaction.C_MISC, "income from " + asset.getName(),
                         campaign.getCalendar().getTime());
                 campaign.addReport(String.format(
                         resourceMap.getString("AssetPayment.text"),
                         asset.getIncome().toAmountAndSymbolString(),
                         asset.getName()));
-            } else if (asset.getSchedule() == SCHEDULE_MONTHLY && campaign.getCalendar().get(Calendar.DAY_OF_MONTH) == 1) {
+            } else if ((asset.getSchedule() == SCHEDULE_MONTHLY) && (campaign.getLocalDate().getDayOfMonth() == 1)) {
                 credit(asset.getIncome(), Transaction.C_MISC, "income from " + asset.getName(),
                         campaign.getCalendar().getTime());
                 campaign.addReport(String.format(
@@ -275,7 +274,7 @@ public class Finances implements Serializable {
         }
 
         // Handle peacetime operating expenses, payroll, and loan payments
-        if (calendar.get(Calendar.DAY_OF_MONTH) == 1) {
+        if (campaign.getLocalDate().getDayOfMonth() == 1) {
             if (campaignOptions.usePeacetimeCost()) {
                 if (!campaignOptions.showPeacetimeCost()) {
                     // Do not include salaries as that will be tracked below

@@ -471,10 +471,8 @@ public class ForceViewPanel extends ScrollablePanel {
 			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 			pnlSubUnits.add(lblPerson, gridBagConstraints);
-			if(null != unit) {
-				lblUnit.setText(getSummaryFor(unit));
-				lblUnit.setIcon(new ImageIcon(getImageFor(unit, lblUnit)));
-			}
+            lblUnit.setText(getSummaryFor(unit));
+            lblUnit.setIcon(new ImageIcon(getImageFor(unit, lblUnit)));
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 1;
 			gridBagConstraints.gridy = nexty;

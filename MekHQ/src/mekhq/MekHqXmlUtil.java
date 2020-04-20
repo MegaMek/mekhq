@@ -239,6 +239,22 @@ public class MekHqXmlUtil {
         pw1.println("</"+name+">");
     }
 
+    public static void writeSimpleXMLOpenIndentedLine(PrintWriter pw1, int indent, String name) {
+        writeIndents(pw1, indent);
+        pw1.println("<" + name + ">");
+    }
+
+    public static void writeSimpleXMLCloseIndentedLine(PrintWriter pw1, int indent, String name) {
+        writeIndents(pw1, indent);
+        pw1.println("</" + name + ">");
+    }
+
+    private static void writeIndents(PrintWriter pw1, int indent) {
+        for (int x = 0; x < indent; x++) {
+            pw1.print("\t");
+        }
+    }
+
     private static final String[] INDENTS = new String[] {
         "",
         "\t",

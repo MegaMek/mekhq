@@ -105,13 +105,14 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
             return "";
         } else {
             u = campaign.getUnit(data.get(row));
+            if (u == null) {
+                return "?";
+            }
         }
+
         switch (col) {
         case COL_UNIT:
-            if(null != u) {
-                return u.getName();
-            }
-            return "-";
+            return u.getName();
         case COL_CLASS:
             return RetirementDefectionDialog.weightClassIndex(u);
         case COL_COST:

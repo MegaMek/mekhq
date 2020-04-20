@@ -22,6 +22,7 @@ package mekhq.campaign.rating;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -560,14 +561,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         }
         if (getWarshipCount() > 0) {
             totalValue += 10;
-            Calendar cal = Calendar.getInstance();
-            cal.set(Calendar.DAY_OF_YEAR, 1);
-            cal.set(Calendar.MONTH, 1);
-            cal.set(Calendar.YEAR, 2800);
-            cal.set(Calendar.HOUR, 0);
-            cal.set(Calendar.MINUTE, 0);
-            cal.set(Calendar.SECOND, 0);
-            if (getCampaign().getDate().after(cal.getTime())) {
+            if (getCampaign().getLocalDate().isAfter(LocalDate.of(2800, 1, 1))) {
                 totalValue += 5;
             }
         }

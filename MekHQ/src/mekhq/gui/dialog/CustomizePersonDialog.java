@@ -956,7 +956,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         }
         textBloodname.setText(Bloodname.randomBloodname(campaign.getFaction().isClan()
                 ? campaign.getFactionCode() : person.getOriginFaction().getShortName(),
-                phenotype, campaign.getCalendar().get(Calendar.YEAR)).getName());
+                phenotype, campaign.getGameYear()).getName());
     }
 
     public void refreshSkills() {

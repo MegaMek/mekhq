@@ -333,7 +333,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
         ArrayList<Person> unassigned = new ArrayList<Person>();
         for (Person patient : getCampaign().getPatients()) {
             // Knock out inactive doctors
-            if ((patient != null) && (patient.getDoctorId() != null)
+            if ((patient.getDoctorId() != null)
                     && (getCampaign().getPerson(patient.getDoctorId()) != null)
                     && getCampaign().getPerson(patient.getDoctorId()).isInActive()) {
                 patient.setDoctorId(null, getCampaign().getCampaignOptions().getNaturalHealingWaitingPeriod());
@@ -371,20 +371,20 @@ public final class InfirmaryTab extends CampaignGuiTab {
     }
 
     private ActionScheduler doctorListScheduler = new ActionScheduler(this::refreshDoctorsList);
-    private ActionScheduler patientListScheduler = new ActionScheduler(this::refreshPatientList);    
-    
+    private ActionScheduler patientListScheduler = new ActionScheduler(this::refreshPatientList);
+
     @Subscribe
     public void handle(ScenarioResolvedEvent ev) {
         doctorListScheduler.schedule();
         patientListScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(PersonEvent ev) {
         doctorListScheduler.schedule();
         patientListScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(MedicPoolChangedEvent ev) {
         doctorListScheduler.schedule();
