@@ -9,6 +9,7 @@ import javax.swing.ListCellRenderer;
 
 import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.BasicInfo;
 
@@ -70,9 +71,9 @@ public class PatientTableModel extends AbstractListModel<Person> {
             Person p = (Person)getElementAt(index);
             setPortrait(p);
             if (getCampaign().getCampaignOptions().useAdvancedMedical()) {
-                setHtmlText(p.getInjuriesDesc());
+                setHtmlText(getInjuriesDesc(p));
             } else {
-                setHtmlText(p.getPatientDesc());
+                setHtmlText(getPatientDesc(p));
             }
             if (isSelected) {
                 highlightBorder();
@@ -83,5 +84,28 @@ public class PatientTableModel extends AbstractListModel<Person> {
             setForeground(list.getForeground());
             return this;
         }
+    }
+
+    private String getInjuriesDesc(Person p) {
+        StringBuilder toReturn = new StringBuilder("<html><font size='2'><b>").append(p.getFullTitle())
+                .append("</b><br/>").append("&nbsp;&nbsp;&nbsp;Injuries:");
+        String sep = "<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+        for (Injury injury : p.getInjuries()) {
+            toReturn.append(sep).append(injury.getFluff());
+            if (sep.contains("<br/>")) {
+                sep = ", ";
+            } else {
+                sep = ",<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            }
+        }
+        toReturn.append("</font></html>");
+        return toReturn.toString();
+    }
+
+    private String getPatientDesc(Person p) {
+        String toReturn = "<html><font size='2'><b>" + p.getFullTitle() + "</b><br/>";
+        toReturn += p.getHits() + " hit(s)<br>[next check in " + p.getDaysToWaitForHealing() + " days]";
+        toReturn += "</font></html>";
+        return toReturn;
     }
 }

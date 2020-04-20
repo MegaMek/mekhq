@@ -1,7 +1,6 @@
 /*
- * CampaignOptions.java
- *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) - 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2020 - The MegaMek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -91,6 +90,10 @@ public class CampaignOptions implements Serializable {
     private boolean useFactionForNames;
     private boolean useUnitRating;
 
+    //region General Tab
+    private String displayDateFormat;
+    //endregion General Tab
+
     //region Personnel Tab
     private boolean useTactics;
     private boolean useInitBonus;
@@ -114,6 +117,8 @@ public class CampaignOptions implements Serializable {
     private boolean tougherHealing;
     private boolean useTransfers;
     private boolean useTimeInService;
+    private boolean useTimeInRank;
+    private boolean trackTotalEarnings;
     private boolean showOriginFaction;
     private boolean randomizeOrigin;
     private boolean randomizeDependentOrigin;
@@ -153,6 +158,30 @@ public class CampaignOptions implements Serializable {
     private Money[] salaryTypeBase;
     //endregion Personnel Tab
 
+    //region Finance tab
+    private boolean payForParts;
+    private boolean payForRepairs;
+    private boolean payForUnits;
+    private boolean payForSalaries;
+    private boolean payForOverhead;
+    private boolean payForMaintain;
+    private boolean payForTransport;
+    private boolean sellUnits;
+    private boolean sellParts;
+    private boolean payForRecruitment;
+    private boolean useLoanLimits;
+    private boolean usePercentageMaint; // Unofficial
+    private boolean infantryDontCount; // Unofficial
+    private boolean usePeacetimeCost;
+    private boolean useExtendedPartsModifier;
+    private boolean showPeacetimeCost;
+    private boolean yearlyFinancesToCSVExport;
+    private double clanPriceModifier;
+    private double[] usedPartsValue;
+    private double damagedPartsValue;
+    private double canceledOrderReimbursement;
+    //endregion Finance Tab
+
     //personnel market related
     private boolean personnelMarketReportRefresh;
     private String personnelMarketName;
@@ -177,29 +206,6 @@ public class CampaignOptions implements Serializable {
     private boolean variableTechLevel;
     private boolean factionIntroDate;
     private boolean useAmmoByType; // Unofficial
-
-    //finance related
-    private boolean payForParts;
-    private boolean payForRepairs;
-    private boolean payForUnits;
-    private boolean payForSalaries;
-    private boolean payForRecruitment;
-    private boolean payForOverhead;
-    private boolean payForMaintain;
-    private boolean payForTransport;
-    private boolean sellUnits;
-    private boolean sellParts;
-    private boolean useLoanLimits;
-    private boolean usePeacetimeCost;
-    private boolean useExtendedPartsModifier;
-    private boolean showPeacetimeCost;
-    private double[] usedPartsValue;
-    private double damagedPartsValue;
-    private double canceledOrderReimbursement;
-    private boolean usePercentageMaint; // Unofficial
-    private boolean infantryDontCount; // Unofficial
-    private double clanPriceModifier;
-    private int maxAcquisitions;
 
     //contract related
     private boolean equipmentContractBase;
@@ -233,6 +239,7 @@ public class CampaignOptions implements Serializable {
     private int penaltyClanPartsFromIS;
     private boolean noClanPartsFromIS;
     private boolean planetAcquisitionVerbose;
+    private int maxAcquisitions;
 
     //xp related
     private int scenarioXP;
@@ -250,7 +257,8 @@ public class CampaignOptions implements Serializable {
     private int adminXPPeriod;
     private int edgeCost;
 
-    //repair related
+    //region Repair and Maintenance Tab
+    // Repair
     private boolean destroyByMargin;
     private int destroyMargin;
     private int repairSystem;
@@ -260,13 +268,15 @@ public class CampaignOptions implements Serializable {
 	private int destroyPartTarget;
 	private boolean useAeroSystemHits;
 
-    //maintenance related
+    // Maintenance
     private boolean checkMaintenance;
     private int maintenanceCycleDays;
     private int maintenanceBonus;
     private boolean useQualityMaintenance;
-	private boolean useUnofficialMaintenance;
-	private boolean reverseQualityNames;
+    private boolean reverseQualityNames;
+    private boolean useUnofficialMaintenance;
+	private boolean logMaintenance;
+	//endregion Repair and Maintenance Tab
 
     //Unit Rating
     private UnitRatingMethod unitRatingMethod;
@@ -303,6 +313,7 @@ public class CampaignOptions implements Serializable {
     private boolean trackUnitFatigue;
     private boolean customRetirementMods;
     private boolean foundersNeverRetire;
+    private boolean atbAddDependents;
     private boolean dependentsNeverLeave;
     private boolean trackOriginalUnit;
     private boolean mercSizeLimited;
@@ -347,7 +358,10 @@ public class CampaignOptions implements Serializable {
     private boolean historicalDailyLog;
 
     public CampaignOptions() {
-        clanPriceModifier = 1.0;
+        //region General Tab
+        displayDateFormat = "yyyy-MM-dd";
+        //endregion General Tab
+
         useFactionForNames = true;
         repairSystem = REPAIR_SYSTEM_STRATOPS;
         useEraMods = false;
@@ -355,20 +369,6 @@ public class CampaignOptions implements Serializable {
 		resetToFirstTech = false;
         useUnitRating = true;
         useQuirks = false;
-        payForParts = false;
-        payForRepairs = false;
-        payForUnits = false;
-        payForSalaries = false;
-        payForRecruitment = false;
-        payForOverhead = false;
-        payForMaintain = false;
-        payForTransport = false;
-        useLoanLimits = false;
-        usePeacetimeCost = false;
-        useExtendedPartsModifier = false;
-        showPeacetimeCost = false;
-        sellUnits = false;
-        sellParts = false;
         limitByYear = true;
         disallowExtinctStuff = false;
         allowClanPurchases = true;
@@ -376,8 +376,6 @@ public class CampaignOptions implements Serializable {
         allowCanonOnly = false;
         allowCanonRefitOnly = false;
         useAmmoByType = false;
-        usePercentageMaint = false;
-        infantryDontCount = false;
         techLevel = TECH_EXPERIMENTAL;
         variableTechLevel = false;
         factionIntroDate = false;
@@ -388,15 +386,6 @@ public class CampaignOptions implements Serializable {
         tasksXP = 1;
         mistakeXP = 0;
         successXP = 0;
-        usedPartsValue = new double[6];
-        usedPartsValue[0] = 0.1;
-        usedPartsValue[1] = 0.2;
-        usedPartsValue[2] = 0.3;
-        usedPartsValue[3] = 0.5;
-        usedPartsValue[4] = 0.7;
-        usedPartsValue[5] = 0.9;
-        damagedPartsValue = 0.33;
-        canceledOrderReimbursement = 0.5;
         usePortraitForType = new boolean[Person.T_NUM];
         for (int i = 0; i < Person.T_NUM; i++) {
             usePortraitForType[i] = false;
@@ -462,13 +451,21 @@ public class CampaignOptions implements Serializable {
         destroyMargin = 4;
         destroyPartTarget = 10;
         useAeroSystemHits = false;
+
+        //endregion Repair and Maintenance Tab
+        // Maintenance
+        checkMaintenance = true;
         maintenanceCycleDays = 7;
         maintenanceBonus = -1;
         useQualityMaintenance = true;
-        useUnofficialMaintenance = false;
         reverseQualityNames = false;
-        checkMaintenance = true;
+        useUnofficialMaintenance = false;
+        logMaintenance = false;
+        //endregion Repair and Maintenance Tab
+
+        //region Supplies and Acquisitions Tab
         maxAcquisitions = 0;
+        //endregion Supplies and Acquisitions Tab
 
         //region Personnel Tab
         useTactics = false;
@@ -491,6 +488,8 @@ public class CampaignOptions implements Serializable {
         tougherHealing = false;
         useTransfers = true;
         useTimeInService = false;
+        useTimeInRank = false;
+        trackTotalEarnings = false;
         showOriginFaction = true;
         randomizeOrigin = false;
         randomizeDependentOrigin = false;
@@ -567,6 +566,36 @@ public class CampaignOptions implements Serializable {
         salaryTypeBase[Person.T_VEHICLE_CREW] = Money.of(900);
         //endregion Personnel Tab
 
+        //region Finances Tab
+        payForParts = false;
+        payForRepairs = false;
+        payForUnits = false;
+        payForSalaries = false;
+        payForOverhead = false;
+        payForMaintain = false;
+        payForTransport = false;
+        sellUnits = false;
+        sellParts = false;
+        payForRecruitment = false;
+        useLoanLimits = false;
+        usePercentageMaint = false;
+        infantryDontCount = false;
+        usePeacetimeCost = false;
+        useExtendedPartsModifier = false;
+        showPeacetimeCost = false;
+        yearlyFinancesToCSVExport = false;
+        clanPriceModifier = 1.0;
+        usedPartsValue = new double[6];
+        usedPartsValue[0] = 0.1;
+        usedPartsValue[1] = 0.2;
+        usedPartsValue[2] = 0.3;
+        usedPartsValue[3] = 0.5;
+        usedPartsValue[4] = 0.7;
+        usedPartsValue[5] = 0.9;
+        damagedPartsValue = 0.33;
+        canceledOrderReimbursement = 0.5;
+        //endregion Finances Tab
+
         //region Personnel Market Tab
         personnelMarketName = PersonnelMarket.getTypeName(PersonnelMarket.TYPE_STRAT_OPS);
         personnelMarketReportRefresh = true;
@@ -602,6 +631,7 @@ public class CampaignOptions implements Serializable {
         retirementRolls = true;
         customRetirementMods = false;
         foundersNeverRetire = false;
+        atbAddDependents = true;
         dependentsNeverLeave = false;
         trackUnitFatigue = false;
         trackOriginalUnit = false;
@@ -647,6 +677,82 @@ public class CampaignOptions implements Serializable {
 
         historicalDailyLog = false;
     }
+
+    //region General Tab
+    public String getDisplayDateFormat() {
+        return displayDateFormat;
+    }
+
+    public void setDisplayDateFormat(String s) {
+        displayDateFormat = s;
+    }
+    //endregion General Tab
+
+    //region Repair and Maintenance Tab
+    //region Repair
+    //endregion Repair
+
+    //region Maintenance
+    public boolean checkMaintenance() {
+        return checkMaintenance;
+    }
+
+    public void setCheckMaintenance(boolean b) {
+        checkMaintenance = b;
+    }
+
+    public int getMaintenanceCycleDays() {
+        return maintenanceCycleDays;
+    }
+
+    public void setMaintenanceCycleDays(int d) {
+        maintenanceCycleDays = d;
+    }
+
+    public int getMaintenanceBonus() {
+        return maintenanceBonus;
+    }
+
+    public void setMaintenanceBonus(int d) {
+        maintenanceBonus = d;
+    }
+
+    public boolean useQualityMaintenance() {
+        return useQualityMaintenance;
+    }
+
+    public void setUseQualityMaintenance(boolean b) {
+        useQualityMaintenance = b;
+    }
+
+    public boolean reverseQualityNames() {
+        return reverseQualityNames;
+    }
+
+    public void setReverseQualityNames(boolean b) {
+        reverseQualityNames = b;
+    }
+
+    public boolean useUnofficialMaintenance() {
+        return useUnofficialMaintenance;
+    }
+
+    public void setUseUnofficialMaintenance(boolean b) {
+        useUnofficialMaintenance = b;
+    }
+
+    public boolean logMaintenance() {
+        return logMaintenance;
+    }
+
+    public void setLogMaintenance(boolean b) {
+        logMaintenance = b;
+    }
+    //endregion Maintenance
+    //endregion Repair and Maintenance Tab
+
+    //region Supplies and Acquisitions Tab
+    //endregion Supplies and Acquisitions Tab
 
     //region Personnel Tab
     public boolean useTactics() {
@@ -809,6 +915,21 @@ public class CampaignOptions implements Serializable {
         useTimeInService = b;
     }
 
+    public boolean getUseTimeInRank() {
+        return useTimeInRank;
+    }
+
+    public void setUseTimeInRank(boolean b) {
+        useTimeInRank = b;
+    }
+
+    public boolean trackTotalEarnings() {
+        return trackTotalEarnings;
+    }
+
+    public void setTrackTotalEarnings(boolean b) {
+        trackTotalEarnings = b;
+    }
     /**
      * Gets a value indicating whether or not to show a person's
      * origin faction when displaying their details.
@@ -1265,6 +1386,176 @@ public class CampaignOptions implements Serializable {
     //endregion salary
     //endregion Personnel Tab
 
+    //region Finances Tab
+    public boolean payForParts() {
+        return payForParts;
+    }
+
+    public void setPayForParts(boolean b) {
+        this.payForParts = b;
+    }
+
+    public boolean payForRepairs() {
+        return payForRepairs;
+    }
+
+    public void setPayForRepairs(boolean b) {
+        this.payForRepairs = b;
+    }
+
+    public boolean payForUnits() {
+        return payForUnits;
+    }
+
+    public void setPayForUnits(boolean b) {
+        this.payForUnits = b;
+    }
+
+    public boolean payForSalaries() {
+        return payForSalaries;
+    }
+
+    public void setPayForSalaries(boolean b) {
+        this.payForSalaries = b;
+    }
+
+    public boolean payForOverhead() {
+        return payForOverhead;
+    }
+
+    public void setPayForOverhead(boolean b) {
+        this.payForOverhead = b;
+    }
+
+    public boolean payForMaintain() {
+        return payForMaintain;
+    }
+
+    public void setPayForMaintain(boolean b) {
+        this.payForMaintain = b;
+    }
+
+    public boolean payForTransport() {
+        return payForTransport;
+    }
+
+    public void setPayForTransport(boolean b) {
+        this.payForTransport = b;
+    }
+
+    public boolean canSellUnits() {
+        return sellUnits;
+    }
+
+    public void setSellUnits(boolean b) {
+        this.sellUnits = b;
+    }
+
+    public boolean canSellParts() {
+        return sellParts;
+    }
+
+    public void setSellParts(boolean b) {
+        this.sellParts = b;
+    }
+
+    public boolean payForRecruitment() {
+        return payForRecruitment;
+    }
+
+    public void setPayForRecruitment(boolean b) {
+        this.payForRecruitment = b;
+    }
+
+    public boolean useLoanLimits() {
+        return useLoanLimits;
+    }
+
+    public void setLoanLimits(boolean b) {
+        this.useLoanLimits = b;
+    }
+
+    public boolean usePercentageMaint() {
+        return usePercentageMaint;
+    }
+
+    public void setUsePercentageMaint(boolean b) {
+        usePercentageMaint = b;
+    }
+
+    public boolean useInfantryDontCount() {
+        return infantryDontCount;
+    }
+
+    public void setUseInfantryDontCount(boolean b) {
+        infantryDontCount = b;
+    }
+
+    public boolean usePeacetimeCost() {
+        return usePeacetimeCost;
+    }
+
+    public void setUsePeacetimeCost(boolean b) {
+        this.usePeacetimeCost = b;
+    }
+
+    public boolean useExtendedPartsModifier() {
+        return useExtendedPartsModifier;
+    }
+
+    public void setUseExtendedPartsModifier(boolean b) {
+        this.useExtendedPartsModifier = b;
+    }
+
+    public boolean showPeacetimeCost() {
+        return showPeacetimeCost;
+    }
+
+    public void setShowPeacetimeCost(boolean b) {
+        this.showPeacetimeCost = b;
+    }
+
+    public boolean getYearlyFinancesToCSVExport() {
+        return yearlyFinancesToCSVExport;
+    }
+
+    public void setYearlyFinancesToCSVExport(boolean b) {
+        yearlyFinancesToCSVExport = b;
+    }
+
+    public double getClanPriceModifier() {
+        return clanPriceModifier;
+    }
+
+    public void setClanPriceModifier(double d) {
+        this.clanPriceModifier = d;
+    }
+
+    public double getUsedPartsValue(int quality) {
+        return usedPartsValue[quality];
+    }
+
+    public void setUsedPartsValue(double d, int quality) {
+        this.usedPartsValue[quality] = d;
+    }
+
+    public double getDamagedPartsValue() {
+        return damagedPartsValue;
+    }
+
+    public void setDamagedPartsValue(double d) {
+        this.damagedPartsValue = d;
+    }
+
+    public double GetCanceledOrderReimbursement() {
+        return canceledOrderReimbursement;
+    }
+
+    public void setCanceledOrderReimbursement(double d) {
+        this.canceledOrderReimbursement = d;
+    }
+    //endregion Finances Tab
+
     /**
      * @return the method of unit rating to use
      */
@@ -1360,38 +1651,6 @@ public class CampaignOptions implements Serializable {
         this.useUnitRating = b;
     }
 
-    public double getClanPriceModifier() {
-        return clanPriceModifier;
-    }
-
-    public void setClanPriceModifier(double d) {
-        this.clanPriceModifier = d;
-    }
-
-    public double getUsedPartsValue(int quality) {
-        return usedPartsValue[quality];
-    }
-
-    public void setUsedPartsValue(double d, int quality) {
-        this.usedPartsValue[quality] = d;
-    }
-
-    public double getDamagedPartsValue() {
-        return damagedPartsValue;
-    }
-
-    public void setDamagedPartsValue(double d) {
-        this.damagedPartsValue = d;
-    }
-
-    public double GetCanceledOrderReimbursement() {
-        return canceledOrderReimbursement;
-    }
-
-    public void setCanceledOrderReimbursement(double d) {
-        this.canceledOrderReimbursement = d;
-    }
-
     public int getRepairSystem() {
         return repairSystem;
     }
@@ -1471,118 +1730,6 @@ public class CampaignOptions implements Serializable {
 
     public void setPersonnelMarketDylansWeight(double d) {
         personnelMarketDylansWeight = d;
-    }
-
-    public boolean payForParts() {
-        return payForParts;
-    }
-
-    public void setPayForParts(boolean b) {
-        this.payForParts = b;
-    }
-
-    public boolean payForRepairs() {
-        return payForRepairs;
-    }
-
-    public void setPayForRepairs(boolean b) {
-        this.payForRepairs = b;
-    }
-
-    public boolean payForUnits() {
-        return payForUnits;
-    }
-
-    public void setPayForUnits(boolean b) {
-        this.payForUnits = b;
-    }
-
-    public boolean payForSalaries() {
-        return payForSalaries;
-    }
-
-    public void setPayForSalaries(boolean b) {
-        this.payForSalaries = b;
-    }
-
-    public boolean payForRecruitment() {
-        return payForRecruitment;
-    }
-
-    public void setPayForRecruitment(boolean b) {
-        this.payForRecruitment = b;
-    }
-
-    public boolean payForOverhead() {
-        return payForOverhead;
-    }
-
-    public void setPayForOverhead(boolean b) {
-        this.payForOverhead = b;
-    }
-
-    public boolean payForMaintain() {
-        return payForMaintain;
-    }
-
-    public void setPayForMaintain(boolean b) {
-        this.payForMaintain = b;
-    }
-
-    public boolean payForTransport() {
-        return payForTransport;
-    }
-
-    public void setPayForTransport(boolean b) {
-        this.payForTransport = b;
-    }
-
-    public boolean usePeacetimeCost() {
-        return usePeacetimeCost;
-    }
-
-    public void setUsePeacetimeCost(boolean b) {
-        this.usePeacetimeCost = b;
-    }
-
-    public boolean useExtendedPartsModifier() {
-        return useExtendedPartsModifier;
-    }
-
-    public void setUseExtendedPartsModifier(boolean b) {
-        this.useExtendedPartsModifier = b;
-    }
-
-    public boolean showPeacetimeCost() {
-        return showPeacetimeCost;
-    }
-
-    public void setShowPeacetimeCost(boolean b) {
-        this.showPeacetimeCost = b;
-    }
-
-    public boolean canSellUnits() {
-        return sellUnits;
-    }
-
-    public void setSellUnits(boolean b) {
-        this.sellUnits = b;
-    }
-
-    public boolean canSellParts() {
-        return sellParts;
-    }
-
-    public void setSellParts(boolean b) {
-        this.sellParts = b;
-    }
-
-    public boolean useLoanLimits() {
-        return useLoanLimits;
-    }
-
-    public void setLoanLimits(boolean b) {
-        this.useLoanLimits = b;
     }
 
     public boolean useQuirks() {
@@ -1720,22 +1867,6 @@ public class CampaignOptions implements Serializable {
 
     public void setUseAmmoByType(boolean b) {
         useAmmoByType = b;
-    }
-
-    public boolean usePercentageMaint() {
-        return usePercentageMaint;
-    }
-
-    public void setUsePercentageMaint(boolean b) {
-        usePercentageMaint = b;
-    }
-
-    public boolean useInfantryDontCount() {
-    	return infantryDontCount;
-    }
-
-    public void setUseInfantryDontCount(boolean b) {
-    	infantryDontCount = b;
     }
 
     public int getTechLevel() {
@@ -2114,54 +2245,6 @@ public class CampaignOptions implements Serializable {
         this.planetOutputAcquisitionBonus[type] = base;
     }
 
-    public int getMaintenanceCycleDays() {
-        return maintenanceCycleDays;
-    }
-
-    public void setMaintenanceCycleDays(int d) {
-        maintenanceCycleDays = d;
-    }
-
-    public int getMaintenanceBonus() {
-        return maintenanceBonus;
-    }
-
-    public void setMaintenanceBonus(int d) {
-        maintenanceBonus = d;
-    }
-
-    public boolean useQualityMaintenance() {
-        return useQualityMaintenance;
-    }
-
-    public void setUseQualityMaintenance(boolean b) {
-        useQualityMaintenance = b;
-    }
-
-    public boolean useUnofficialMaintenance() {
-        return useUnofficialMaintenance;
-    }
-
-    public void setUseUnofficialMaintenance(boolean b) {
-    	useUnofficialMaintenance = b;
-    }
-
-    public boolean reverseQualityNames() {
-        return reverseQualityNames;
-    }
-
-    public void setReverseQualityNames(boolean b) {
-    	reverseQualityNames = b;
-    }
-
-    public boolean checkMaintenance() {
-        return checkMaintenance;
-    }
-
-    public void setCheckMaintenance(boolean b) {
-        checkMaintenance = b;
-    }
-
     public boolean isDestroyByMargin() {
         return destroyByMargin;
     }
@@ -2349,6 +2432,14 @@ public class CampaignOptions implements Serializable {
 	public void setFoundersNeverRetire(boolean mods) {
         foundersNeverRetire = mods;
 	}
+
+	public boolean canAtBAddDependents() {
+        return atbAddDependents;
+    }
+
+    public void setAtBAddDependents(boolean b) {
+        atbAddDependents = b;
+    }
 
     public boolean getDependentsNeverLeave() {
         return dependentsNeverLeave;
@@ -2691,11 +2782,16 @@ public class CampaignOptions implements Serializable {
 
 	public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clanPriceModifier", clanPriceModifier); //private double
-        // clanPriceModifier;
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useFactionForNames", useFactionForNames); //private boolean
-        // useFinances;
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "repairSystem", repairSystem); //private int repairSystem;
+        //region General Tab
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "displayDateFormat", displayDateFormat);
+        //endregion General Tab
+
+        //region Repair and Maintenance Tab
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "logMaintenance", logMaintenance);
+        //endregion Repair and Maintenance Tab
+
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useFactionForNames", useFactionForNames);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "repairSystem", repairSystem);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnitRating", useUnitRating);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitRatingMethod", unitRatingMethod.getDescription());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useEraMods", useEraMods);
@@ -2718,26 +2814,6 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "randomizeDependentOrigin", randomizeDependentOrigin);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "originSearchRadius", originSearchRadius);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "isOriginExtraRandom", isOriginExtraRandom);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForParts", payForParts);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForRepairs", payForRepairs);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForUnits", payForUnits);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForSalaries", payForSalaries);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForOverhead", payForOverhead);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForMaintain", payForMaintain);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForTransport", payForTransport);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePeacetimeCost", usePeacetimeCost);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useExtendedPartsModifier", useExtendedPartsModifier);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "showPeacetimeCost", showPeacetimeCost);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueA", usedPartsValue[0]);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueB", usedPartsValue[1]);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueC", usedPartsValue[2]);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueD", usedPartsValue[3]);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueE", usedPartsValue[4]);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueF", usedPartsValue[5]);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "damagedPartsValue", damagedPartsValue);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "canceledOrderReimbursement", canceledOrderReimbursement);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "sellUnits", sellUnits);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "sellParts", sellParts);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "scenarioXP", scenarioXP);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "killsForXP", killsForXP);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "killXPAward", killXPAward);
@@ -2761,7 +2837,6 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "variableTechLevel", variableTechLevel);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "factionIntroDate", factionIntroDate);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAmmoByType", useAmmoByType);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePercentageMaint", usePercentageMaint);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "waitingPeriod", waitingPeriod);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquisitionSkill", acquisitionSkill);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquisitionSupportStaffOnly", acquisitionSupportStaffOnly);
@@ -2789,8 +2864,6 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "blcSaleValue", blcSaleValue);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clanAcquisitionPenalty", clanAcquisitionPenalty);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "isAcquisitionPenalty", isAcquisitionPenalty);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useLoanLimits", useLoanLimits);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForRecruitment", payForRecruitment);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "healWaitingPeriod", healWaitingPeriod);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "naturalHealingWaitingPeriod", naturalHealingWaitingPeriod);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "destroyByMargin", destroyByMargin);
@@ -2806,6 +2879,8 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomHitsForVees", useRandomHitsForVees);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "minimumHitsForVees", minimumHitsForVees);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maxAcquisitions", maxAcquisitions);
+
+        //region Personnel Tab
         //region family
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "minimumMarriageAge", minimumMarriageAge);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "checkMutualAncestorsDepth", checkMutualAncestorsDepth);
@@ -2830,8 +2905,41 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomDeaths", useRandomDeaths);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "keepMarriedNameUponSpouseDeath", keepMarriedNameUponSpouseDeath);
         //endregion family
+        //endregion Personnel Tab
+
+        //region Finances Tab
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForParts", payForParts);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForRepairs", payForRepairs);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForUnits", payForUnits);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForSalaries", payForSalaries);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForOverhead", payForOverhead);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForMaintain", payForMaintain);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForTransport", payForTransport);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "sellUnits", sellUnits);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "sellParts", sellParts);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForRecruitment", payForRecruitment);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useLoanLimits", useLoanLimits);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePercentageMaint", usePercentageMaint);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "infantryDontCount", infantryDontCount);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePeacetimeCost", usePeacetimeCost);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useExtendedPartsModifier", useExtendedPartsModifier);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "showPeacetimeCost", showPeacetimeCost);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "yearlyFinancesToCSVExport", yearlyFinancesToCSVExport);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clanPriceModifier", clanPriceModifier);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueA", usedPartsValue[0]);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueB", usedPartsValue[1]);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueC", usedPartsValue[2]);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueD", usedPartsValue[3]);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueE", usedPartsValue[4]);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueF", usedPartsValue[5]);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "damagedPartsValue", damagedPartsValue);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "canceledOrderReimbursement", canceledOrderReimbursement);
+        //endregion Finances Tab
+
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTransfers", useTransfers);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTimeInService", useTimeInService);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTimeInRank", useTimeInRank);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "trackTotalEarnings", trackTotalEarnings);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "capturePrisoners", capturePrisoners);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "defaultPrisonerStatus", defaultPrisonerStatus);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketName", personnelMarketName);
@@ -2874,6 +2982,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "retirementRolls", retirementRolls);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "customRetirementMods", customRetirementMods);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "foundersNeverRetire", foundersNeverRetire);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "atbAddDependents", atbAddDependents);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "dependentsNeverLeave", dependentsNeverLeave);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "trackUnitFatigue", trackUnitFatigue);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "mercSizeLimited", mercSizeLimited);
@@ -3003,11 +3112,29 @@ public class CampaignOptions implements Serializable {
             }
 
             MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
-                    String.format("%s\n\t%s", //$NON-NLS-1$
-                            wn2.getNodeName(), wn2.getTextContent()));
+                    String.format("%s\n\t%s", wn2.getNodeName(), wn2.getTextContent()));
+            //region General Tab
+            if (wn2.getNodeName().equalsIgnoreCase("displayDateFormat")) {
+                retVal.displayDateFormat = wn2.getTextContent().trim();
+            //endregion General Tab
 
-            if (wn2.getNodeName().equalsIgnoreCase("clanPriceModifier")) {
-                retVal.clanPriceModifier = Double.parseDouble(wn2.getTextContent());
+            //region Repair and Maintenance Tab
+            } else if (wn2.getNodeName().equalsIgnoreCase("checkMaintenance")) {
+                retVal.checkMaintenance = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("maintenanceCycleDays")) {
+                retVal.maintenanceCycleDays = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("maintenanceBonus")) {
+                retVal.maintenanceBonus = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useQualityMaintenance")) {
+                retVal.useQualityMaintenance = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("reverseQualityNames")) {
+                retVal.reverseQualityNames = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficalMaintenance")) {
+                retVal.useUnofficialMaintenance = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("logMaintenance")) {
+                retVal.logMaintenance = Boolean.parseBoolean(wn2.getTextContent());
+            //endregion Repair and Maintenance Tab
+
             } else if (wn2.getNodeName().equalsIgnoreCase("useFactionForNames")) {
                 retVal.useFactionForNames = wn2.getTextContent().equalsIgnoreCase("true");
             } else if (wn2.getNodeName().equalsIgnoreCase("repairSystem")) {
@@ -3054,50 +3181,6 @@ public class CampaignOptions implements Serializable {
                 retVal.isOriginExtraRandom = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("originDistanceScale")) {
                 retVal.originDistanceScale = Double.parseDouble(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("payForParts")) {
-                retVal.payForParts = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("payForRepairs")) {
-                retVal.payForRepairs = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("payForUnits")) {
-                retVal.payForUnits = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("payForSalaries")) {
-                retVal.payForSalaries = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("payForOverhead")) {
-                retVal.payForOverhead = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("payForMaintain")) {
-                retVal.payForMaintain = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("payForTransport")) {
-                retVal.payForTransport = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("usePeacetimeCost")) {
-                retVal.usePeacetimeCost = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useExtendedPartsModifier")) {
-                retVal.useExtendedPartsModifier = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("showPeacetimeCost")) {
-                retVal.showPeacetimeCost = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("payForRecruitment")) {
-                retVal.payForRecruitment = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useLoanLimits")) {
-                retVal.useLoanLimits = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("sellUnits")) {
-                retVal.sellUnits = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("sellParts")) {
-                retVal.sellParts = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueA")) {
-                retVal.usedPartsValue[0] = Double.parseDouble(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueB")) {
-                retVal.usedPartsValue[1] = Double.parseDouble(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueC")) {
-                retVal.usedPartsValue[2] = Double.parseDouble(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueD")) {
-                retVal.usedPartsValue[3] = Double.parseDouble(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueE")) {
-                retVal.usedPartsValue[4] = Double.parseDouble(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueF")) {
-                retVal.usedPartsValue[5] = Double.parseDouble(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("damagedPartsValue")) {
-                retVal.damagedPartsValue = Double.parseDouble(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("canceledOrderReimbursement")) {
-                retVal.canceledOrderReimbursement = Double.parseDouble(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("scenarioXP")) {
                 retVal.scenarioXP = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("killsForXP")) {
@@ -3196,32 +3279,30 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("blcSaleValue")) {
                 retVal.blcSaleValue = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("acquisitionSupportStaffOnly")) {
-                retVal.acquisitionSupportStaffOnly = wn2.getTextContent().equalsIgnoreCase("true");
+                retVal.acquisitionSupportStaffOnly = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("limitByYear")) {
-                retVal.limitByYear = wn2.getTextContent().equalsIgnoreCase("true");
+                retVal.limitByYear = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("disallowExtinctStuff")) {
-                retVal.disallowExtinctStuff = wn2.getTextContent().equalsIgnoreCase("true");
+                retVal.disallowExtinctStuff = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("allowClanPurchases")) {
-                retVal.allowClanPurchases = wn2.getTextContent().equalsIgnoreCase("true");
+                retVal.allowClanPurchases = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("allowISPurchases")) {
-                retVal.allowISPurchases = wn2.getTextContent().equalsIgnoreCase("true");
+                retVal.allowISPurchases = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("allowCanonOnly")) {
-                retVal.allowCanonOnly = wn2.getTextContent().equalsIgnoreCase("true");
+                retVal.allowCanonOnly = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("allowCanonRefitOnly")) {
-                retVal.allowCanonRefitOnly = wn2.getTextContent().equalsIgnoreCase("true");
+                retVal.allowCanonRefitOnly = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useAmmoByType")) {
-                retVal.useAmmoByType = wn2.getTextContent().equalsIgnoreCase("true");
+                retVal.useAmmoByType = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("variableTechLevel")) {
                 retVal.variableTechLevel = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("factionIntroDate")) {
                 retVal.factionIntroDate = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("usePercentageMaint")) {
-                retVal.usePercentageMaint = wn2.getTextContent().equalsIgnoreCase("true");
             } else if (wn2.getNodeName().equalsIgnoreCase("techLevel")) {
                 retVal.techLevel = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useUnitRating") || wn2.getNodeName().equalsIgnoreCase
                     ("useDragoonRating")) {
-                retVal.useUnitRating = wn2.getTextContent().equalsIgnoreCase("true");
+                retVal.useUnitRating = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("unitRatingMethod") || wn2.getNodeName().equalsIgnoreCase
                     ("dragoonsRatingMethod")) {
                 if (!wn2.getTextContent().isEmpty() && (wn2.getTextContent() != null)) {
@@ -3245,22 +3326,12 @@ public class CampaignOptions implements Serializable {
                 retVal.destroyPartTarget = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useAeroSystemHits")) {
                 retVal.useAeroSystemHits = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("maintenanceCycleDays")) {
-                retVal.maintenanceCycleDays = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("maintenanceBonus")) {
-                retVal.maintenanceBonus = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useQualityMaintenance")) {
-                retVal.useQualityMaintenance = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("reverseQualityNames")) {
-                retVal.reverseQualityNames = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficalMaintenance")) {
-                retVal.useUnofficialMaintenance = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("checkMaintenance")) {
-                retVal.checkMaintenance = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("minimumHitsForVees")) {
                 retVal.minimumHitsForVees = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("maxAcquisitions")) {
                 retVal.maxAcquisitions = Integer.parseInt(wn2.getTextContent().trim());
+
+            //region Personnel Tab
             //region Family
             } else if (wn2.getNodeName().equalsIgnoreCase("minimumMarriageAge")) {
                 retVal.minimumMarriageAge = Integer.parseInt(wn2.getTextContent().trim());
@@ -3304,10 +3375,71 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("keepMarriedNameUponSpouseDeath")) {
                 retVal.keepMarriedNameUponSpouseDeath = Boolean.parseBoolean(wn2.getTextContent().trim());
             //endregion Family
+            //endregion Personnel Tab
+
+            //region Finances Tab
+            } else if (wn2.getNodeName().equalsIgnoreCase("payForParts")) {
+                retVal.payForParts = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("payForRepairs")) {
+                retVal.payForRepairs = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("payForUnits")) {
+                retVal.payForUnits = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("payForSalaries")) {
+                retVal.payForSalaries = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("payForOverhead")) {
+                retVal.payForOverhead = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("payForMaintain")) {
+                retVal.payForMaintain = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("payForTransport")) {
+                retVal.payForTransport = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("sellUnits")) {
+                retVal.sellUnits = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("sellParts")) {
+                retVal.sellParts = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("payForRecruitment")) {
+                retVal.payForRecruitment = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useLoanLimits")) {
+                retVal.useLoanLimits = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("usePercentageMaint")) {
+                retVal.usePercentageMaint = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("infantryDontCount")) {
+                retVal.infantryDontCount = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("usePeacetimeCost")) {
+                retVal.usePeacetimeCost = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useExtendedPartsModifier")) {
+                retVal.useExtendedPartsModifier = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("showPeacetimeCost")) {
+                retVal.showPeacetimeCost = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("yearlyFinancesToCSVExport")) {
+                retVal.yearlyFinancesToCSVExport = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("clanPriceModifier")) {
+                    retVal.clanPriceModifier = Double.parseDouble(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueA")) {
+                retVal.usedPartsValue[0] = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueB")) {
+                retVal.usedPartsValue[1] = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueC")) {
+                retVal.usedPartsValue[2] = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueD")) {
+                retVal.usedPartsValue[3] = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueE")) {
+                retVal.usedPartsValue[4] = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueF")) {
+                retVal.usedPartsValue[5] = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("damagedPartsValue")) {
+                retVal.damagedPartsValue = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("canceledOrderReimbursement")) {
+                retVal.canceledOrderReimbursement = Double.parseDouble(wn2.getTextContent().trim());
+            //endregion Finances Tab
+
             } else if (wn2.getNodeName().equalsIgnoreCase("useTransfers")) {
             	retVal.useTransfers = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useTimeInService")) {
                 retVal.useTimeInService = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useTimeInRank")) {
+                retVal.useTimeInRank = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("trackTotalEarnings")) {
+                retVal.trackTotalEarnings = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("capturePrisoners")) {
             	retVal.capturePrisoners = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("defaultPrisonerStatus")) {
@@ -3394,6 +3526,8 @@ public class CampaignOptions implements Serializable {
                 retVal.customRetirementMods = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("foundersNeverRetire")) {
                 retVal.foundersNeverRetire = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("atbAddDependents")) {
+                retVal.atbAddDependents = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("dependentsNeverLeave")) {
                 retVal.dependentsNeverLeave = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("trackUnitFatigue")) {

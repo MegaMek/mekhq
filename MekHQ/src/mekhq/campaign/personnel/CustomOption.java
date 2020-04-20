@@ -91,7 +91,7 @@ public class CustomOption {
         final String METHOD_NAME = "initCustomAbilities()"; //$NON-NLS-1$
         customAbilities = new ArrayList<>();
 
-        Document xmlDoc = null;
+        Document xmlDoc;
 
 
         try (InputStream is = new FileInputStream("data/universe/customspa.xml")) {
@@ -102,6 +102,7 @@ public class CustomOption {
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
             MekHQ.getLogger().error(CustomOption.class, METHOD_NAME, ex);
+            return;
         }
 
         Element spaEle = xmlDoc.getDocumentElement();
@@ -140,8 +141,6 @@ public class CustomOption {
     public static CustomOption generateInstanceFromXML(Node wn) {
         final String METHOD_NAME = "generateInstanceFromXML(Node)"; //$NON-NLS-1$
 
-        CustomOption retVal = null;
-
         String key = wn.getAttributes().getNamedItem("name").getTextContent();
         if (null == key) {
             MekHQ.getLogger().log(CustomOption.class, METHOD_NAME, LogLevel.ERROR,
@@ -149,8 +148,8 @@ public class CustomOption {
             return null;
         }
 
+        CustomOption retVal = new CustomOption(key);
         try {
-            retVal = new CustomOption(key);
             NodeList nl = wn.getChildNodes();
 
             for (int x = 0; x < nl.getLength(); x++) {
@@ -185,7 +184,4 @@ public class CustomOption {
 
         return retVal;
     }
-
-
-
 }

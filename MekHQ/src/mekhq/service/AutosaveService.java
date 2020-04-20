@@ -31,6 +31,8 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
@@ -42,19 +44,18 @@ public class AutosaveService implements IAutosaveService {
     public AutosaveService() { }
 
     @Override
-    public void requestDayAdvanceAutosave(Campaign campaign, Calendar calendar) {
+    public void requestDayAdvanceAutosave(Campaign campaign) {
         assert campaign != null;
+
+        LocalDate today = campaign.getLocalDate();
 
         if (this.isDailyAutosaveEnabled()) {
             this.performAutosave(campaign);
-        } else if (this.isWeeklyAutosaveEnabled()
-                && (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)) {
+        } else if (this.isWeeklyAutosaveEnabled() && (today.getDayOfWeek() == DayOfWeek.SUNDAY)) {
             this.performAutosave(campaign);
-        } else if (this.isMonthlyAutosaveEnabled()
-                && (calendar.get(Calendar.DAY_OF_MONTH) == calendar.getActualMaximum(Calendar.DAY_OF_MONTH))) {
+        } else if (this.isMonthlyAutosaveEnabled() && (today.getDayOfMonth() == today.lengthOfMonth())) {
             this.performAutosave(campaign);
-        } else if (this.isYearlyAutosaveEnabled()
-                && (calendar.get(Calendar.DAY_OF_YEAR) == calendar.getActualMaximum(Calendar.DAY_OF_YEAR))) {
+        } else if (this.isYearlyAutosaveEnabled() && (today.getDayOfYear() == today.lengthOfYear())) {
             this.performAutosave(campaign);
         }
     }

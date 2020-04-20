@@ -369,12 +369,15 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 
 	@Override
 	public String scrap() {
-		Part replace = findReplacement(false);
+        Part replace = findReplacement(false);
 		if(null != replace) {
 			replace.decrementQuantity();
-		}
+            return replace.getName() + " scrapped.";
+        }
+
 		skillMin = SkillType.EXP_GREEN;
-		return replace.getName() + " scrapped.";
+
+        return getName() + " scrapped.";
 	}
 
 	@Override

@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.Image;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.UUID;
 
 import javax.swing.JTable;
@@ -19,6 +20,7 @@ import megamek.common.TargetRoll;
 import megamek.common.UnitType;
 import mekhq.IconPackage;
 import mekhq.MekHQ;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
@@ -79,7 +81,7 @@ public class RetirementTableModel extends AbstractTableModel {
 
     public void setData(ArrayList<UUID> list,
             HashMap<UUID, UUID> unitAssignments) {
-        this.unitAssignments = unitAssignments;
+        this.unitAssignments = Utilities.nonNull(unitAssignments, new HashMap<>());
         data = list;
         fireTableDataChanged();
     }
@@ -289,8 +291,7 @@ public class RetirementTableModel extends AbstractTableModel {
             }
             return payout.toAmountAndSymbolString();
         case COL_UNIT:
-            if (null == campaign.getRetirementDefectionTracker().getPayout(p.getId()) ||
-                    null == unitAssignments) {
+            if (null == campaign.getRetirementDefectionTracker().getPayout(p.getId())) {
                 return "";
             }
             if (null != unitAssignments.get(p.getId())) {
