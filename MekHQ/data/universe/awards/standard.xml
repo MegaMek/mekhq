@@ -145,7 +145,7 @@
 		<range>Mission</range>
 	</award>
 	<award>
-		<name>Meritourious Service</name>
+		<name>Meritorious Service</name>
 		<description>36 lance kills in a mission.</description>
 		<medal>MeritoriousServiceM.png</medal>
 		<ribbon>1-10-2-MeritoriousService.png</ribbon>
@@ -218,7 +218,7 @@
 		<range>Mission</range>
 	</award>
 	<award>
-		<name>Meritourious Unit Commendation</name>
+		<name>Meritorious Unit Commendation</name>
 		<description>24 lance kills in a mission.</description>
 		<ribbon>2-02-2-MeritoriousUnitCommendation.png</ribbon>
 		<xp>2</xp>
@@ -353,7 +353,7 @@
 		<range>Career</range>
 	</award>
 	<award>
-		<name>Andrurien Wars Campaign</name>
+		<name>Andurien Wars Campaign</name>
 		<description>Partook in combat actions in support of the Andurien Wars.</description>
 		<medal>AndurienWarsM.png</medal>
 		<ribbon>3-08-03-AndurienWars.png</ribbon>
@@ -437,7 +437,7 @@
 		<range>Career</range>
 	</award>
 	<award>
-		<name>Fedcom Civil War Campaign</name>
+		<name>FedCom Civil War Campaign</name>
 		<description>Partook in combat actions in support of FedCom Civil War.</description>
 		<medal>FedComCivilWarM.png</medal>
 		<ribbon>3-08-10-FedComCivilWar.png</ribbon>
@@ -495,7 +495,7 @@
 		<range>Career</range>
 	</award>
 	<award>
-		<name>Longevitiy</name>
+		<name>Longevity</name>
 		<description>Award for every 4 years of service.</description>
 		<ribbon>4-03-1-Longevity.png</ribbon>
 		<xp>2</xp>
