@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign;
 
 import java.io.File;
@@ -188,7 +187,7 @@ public class ResolveScenarioTracker {
             }
 
             entities.put(UUID.fromString(e.getExternalIdAsString()), e);
-            //Convenience data 
+            //Convenience data
             idMap.put(e.getId(), UUID.fromString(e.getExternalIdAsString()));
 
             checkForLostLimbs(e, control);
@@ -246,7 +245,7 @@ public class ResolveScenarioTracker {
                 }
             }
         }
-        
+
         //If any units ended the game with others loaded in its bays, map those out
         for (Enumeration<Entity> iter = victoryEvent.getEntities(); iter.hasMoreElements();) {
             Entity e = iter.nextElement();
@@ -674,20 +673,20 @@ public class ResolveScenarioTracker {
             processPrisonerCapture(devastatedEnemyUnits);
         }
     }
-    
+
     /**
      * Helper function that handles crew and passengers ejected from a large spacecraft,
      * which may be scattered about on numerous other entities
      * @param ship The large craft unit we're currently processing
      * @param en The entity associated with the unit Ship
-     * @param crew The list of persons assigned to the ship as crew and marines
+     * @param personnel The list of persons assigned to the ship as crew and marines
      * @param unitStatus The post-battle status of en
      */
     private void processLargeCraft(Unit ship, Entity en, List<Person> personnel, UnitStatus unitStatus) {
         final String METHOD_NAME = "processLargeCraft(Unit,Entity,List<Person>,UnitStatus)"; //$NON-NLS-1$
         //The entity must be an Aero for us to get here
         Aero aero = (Aero) en;
-        //Find out if this large craft ejected or was in the process of ejecting, 
+        //Find out if this large craft ejected or was in the process of ejecting,
         // and if so what entities are carrying the personnel
         int rescuedCrew = 0;
         int rescuedPassengers = 0;
@@ -698,6 +697,7 @@ public class ResolveScenarioTracker {
                 if (e == null) {
                     MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                             "Null entity reference in:" + aero.getDisplayName() + "getEscapeCraft()");
+                    continue;
                 }
                 //If the escape craft was destroyed in combat, skip it
                 if (e.isDestroyed() || e.isDoomed()) {
@@ -741,7 +741,7 @@ public class ResolveScenarioTracker {
         casualties = (int) Math.ceil(Compute.getFullCrewSize(en) * (newHits / 6.0));
         //Now reduce the casualties if some "hits" were caused by ejection
         casualties = Math.max(0, casualties - rescuedCrew);
-        
+
         //And assign the casualties and experience amongst the crew and marines
         for (Person p : personnel) {
             PersonStatus status = new PersonStatus(p.getFullName(), ship.getEntity().getDisplayName(),
@@ -768,8 +768,8 @@ public class ResolveScenarioTracker {
             status.setDeployed(!en.wasNeverDeployed());
             peopleStatus.put(p.getId(), status);
         }
-        
-        //Now, did the passengers take any hits? 
+
+        //Now, did the passengers take any hits?
         //We'll assume that if units in transport bays were hit, their crews and techs might also have been
         Set<PersonStatus> allPassengersStatus = new HashSet<>(); //Use this to keep track of ejected passengers for the next step
         List<Entity> cargo = bayLoadedEntities.get(UUID.fromString(en.getExternalIdAsString()));
@@ -822,7 +822,7 @@ public class ResolveScenarioTracker {
             for (PersonStatus s : allPassengersStatus) {
                 allPassengersStatusList.add(s);
             }
-            
+
             //Let's go through and handle the list
             while (rescuedPassengers > 0) {
                 if (allPassengersStatus.isEmpty()) {
@@ -1085,7 +1085,7 @@ public class ResolveScenarioTracker {
             }
 
             killCredits = parser.getKills();
-            
+
             //Map everyone's ID to External Id
             for (Entity e : parser.getEntities()) {
                 idMap.put(e.getId(), UUID.fromString(e.getExternalIdAsString()));
@@ -1096,7 +1096,7 @@ public class ResolveScenarioTracker {
             for (Entity e : parser.getRetreated()) {
                 idMap.put(e.getId(), UUID.fromString(e.getExternalIdAsString()));
             }
-            
+
             //If any units ended the game with others loaded in its bays, map those out
             for (Entity e : parser.getEntities()) {
                 if (!e.getBayLoadedUnitIds().isEmpty()) {
