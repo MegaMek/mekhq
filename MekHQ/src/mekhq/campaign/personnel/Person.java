@@ -1876,12 +1876,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public static Person generateInstanceFromXML(Node wn, Campaign c, Version version) {
         final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign,Version)"; //$NON-NLS-1$
 
-        Person retVal = null;
+        Person retVal = new Person(c);
 
         try {
-            // Instantiate the correct child class, and call its parsing function.
-            retVal = new Person(c);
-
             // Okay, now load Person-specific fields!
             NodeList nl = wn.getChildNodes();
 
@@ -2354,8 +2351,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 }
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(Person.class, METHOD_NAME, "Failed to save for person "
-                    + retVal.getFullName(), e);
+            MekHQ.getLogger().error(Person.class, METHOD_NAME, "Failed to read person "
+                    + retVal.getFullName() + "from file", e);
         }
 
         return retVal;

@@ -5268,7 +5268,7 @@ public class Campaign implements Serializable, ITechManager {
                 mechCollars += 1;
             }
 
-            leasedASFCapacity += leasedLargeMechDropships * largeMechDropshipASFCapacity;
+            leasedASFCapacity += (int) Math.floor(leasedLargeMechDropships * largeMechDropshipASFCapacity);
             leasedCargoCapacity += (int) Math.floor(largeMechDropshipCargoCapacity);
         }
 
