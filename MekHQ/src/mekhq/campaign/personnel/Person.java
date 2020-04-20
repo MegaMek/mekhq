@@ -257,16 +257,11 @@ public class Person extends AbstractPerson {
     private int idleMonths;
     private int daysToWaitForHealing;
 
-    //region portrait
-    // runtime override (not saved)
-    private transient String portraitCategoryOverride = null;
-    private transient String portraitFileOverride = null;
-    //endregion portrait
-
     // Our rank
     private int rank;
     private int rankLevel;
     // If this Person uses a custom rank system (-1 for no)
+    // TODO : replace this with the rank system for the person, we just won't save the rank system if it is the campaign's
     private int rankSystem;
     private Ranks ranks;
 
@@ -358,61 +353,53 @@ public class Person extends AbstractPerson {
     }
 
     public Person(Campaign campaign, String factionCode) {
-        this(Crew.UNNAMED, Crew.UNNAMED_SURNAME, campaign, factionCode);
+        this(Crew.UNNAMED, Crew.UNNAMED_SURNAME, factionCode, campaign);
     }
 
     public Person(String givenName, String surname, Campaign campaign) {
-        this(givenName, surname, campaign, campaign.getFactionCode());
+        this(givenName, surname, campaign.getFactionCode(), campaign);
     }
 
-    public Person(String givenName, String surname, Campaign campaign, String factionCode) {
-        this(givenName, surname, "", campaign, factionCode);
+    public Person(String givenName, String surname, String factionCode, Campaign campaign) {
+        this("", givenName, surname, "", factionCode, campaign);
     }
 
     /**
      * Primary Person constructor, variables are initialized in the exact same order as they are
      * saved to the XML file
-     * @param givenName     the person's given name
-     * @param surname       the person's surname
-     * @param honorific     the person's honorific
-     * @param campaign      the campaign this person is a part of
-     * @param factionCode   the faction this person was borne into
+     * @param preNominal  the person's pre-nominal
+     * @param givenName   the person's given name
+     * @param surname     the person's surname
+     * @param postNominal the person's post-nominal
+     * @param factionCode the faction this person was borne into
+     * @param campaign    the campaign this person is a part of
      */
-    public Person(String givenName, String surname, String honorific, Campaign campaign,
-                  String factionCode) {
-        // First, we assign campaign
+    public Person(String preNominal, String givenName, String surname, String postNominal,
+                  String factionCode, Campaign campaign) {
+        // First, we call AbstractPerson's Constructor
+        super(preNominal, givenName, surname, postNominal, factionCode);
+
+        // Then, we assign campaign
         this.campaign = campaign;
 
-        // Then, we assign the variables in XML file order
-        id = null;
-        this.givenName = givenName;
-        this.surname = surname;
-        this.honorific = honorific;
-        maidenName = null; // this is set to null to handle divorce cases
-        callsign = "";
+        // Finally, we assign the Person-specific variables in XML file order
         primaryRole = T_NONE;
         secondaryRole = T_NONE;
         primaryDesignator = DESIG_NONE;
         secondaryDesignator = DESIG_NONE;
         commander = false;
         dependent = false;
-        originFaction = Faction.getFaction(factionCode);
-        originPlanet = null;
         clan = originFaction.isClan();
         phenotype = PHENOTYPE_NONE;
         bloodname = "";
-        biography = "";
         idleMonths = -1;
         ancestorsId = null;
         spouse = null;
         formerSpouses = new ArrayList<>();
         dueDate = null;
         expectedDueDate = null;
-        portraitCategory = Crew.ROOT_PORTRAIT;
-        portraitFile = Crew.PORTRAIT_NONE;
         xp = 0;
         daysToWaitForHealing = 0;
-        gender = Crew.G_MALE;
         rank = 0;
         rankLevel = 0;
         rankSystem = -1;
@@ -423,14 +410,11 @@ public class Person extends AbstractPerson {
         unitId = null;
         salary = Money.of(-1);
         totalEarnings = Money.of(0);
-        status = PersonnelStatus.ACTIVE;
         prisonerStatus = PRISONER_NOT;
         willingToDefect = false;
         hits = 0;
         toughness = 0;
         resetMinutesLeft(); // this assigns minutesLeft and overtimeLeft
-        birthday = null;
-        dateOfDeath = null;
         recruitment = null;
         lastRankChangeDate = null;
         skills = new Skills();
@@ -477,22 +461,6 @@ public class Person extends AbstractPerson {
 
     public void setBloodname(String bn) {
         bloodname = bn;
-    }
-
-    public Faction getOriginFaction() {
-        return originFaction;
-    }
-
-    public void setOriginFaction(Faction f) {
-        originFaction = f;
-    }
-
-    public Planet getOriginPlanet() {
-        return originPlanet;
-    }
-
-    public void setOriginPlanet(Planet p) {
-        originPlanet = p;
     }
 
     public boolean isCommander() {
@@ -617,65 +585,6 @@ public class Person extends AbstractPerson {
     //endregion Text Getters
 
     //region Names
-    public String getGivenName() {
-        return givenName;
-    }
-
-    public void setGivenName(String n) {
-        this.givenName = n;
-        setFullName();
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
-    public void setSurname(String n) {
-        this.surname = n;
-        setFullName();
-    }
-
-    public String getHonorific() {
-        return honorific;
-    }
-
-    public void setHonorific(String n) {
-        this.honorific = n;
-        setFullName();
-    }
-
-    public String getMaidenName() {
-        return maidenName;
-    }
-
-    public void setMaidenName(String n) {
-        this.maidenName = n;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName() {
-        if (isClanner()) {
-            if (!StringUtil.isNullOrEmpty(bloodname)) {
-                fullName = givenName + " " + bloodname;
-            } else {
-                fullName = givenName;
-            }
-        } else {
-            if (!StringUtil.isNullOrEmpty(surname)) {
-                fullName = givenName + " " + surname;
-            } else {
-                fullName = givenName;
-            }
-        }
-
-        if (!StringUtil.isNullOrEmpty(honorific)) {
-            fullName += " " + honorific;
-        }
-    }
-
     /**
      * This method is used to migrate names from being a joined name to split between given name and surname,
      * as part of the Personnel changes in MekHQ 0.47.4.
@@ -733,43 +642,32 @@ public class Person extends AbstractPerson {
         setFullName();
     }
 
-    public String getHyperlinkedName() {
-        return String.format("<a href='PERSON:%s'>%s</a>", getId().toString(), getFullName());
-    }
+    @Override
+    public void setFullName() {
+        String fullName = "";
+        if (!StringUtil.isNullOrEmpty(getPreNominal())) {
+            fullName = getPreNominal() + " ";
+        }
 
-    public String getCallsign() {
-        return callsign;
-    }
+        fullName += getGivenName();
 
-    public void setCallsign(String n) {
-        this.callsign = n;
+        if (isClanner()) {
+            if (!StringUtil.isNullOrEmpty(getBloodname())) {
+                fullName += " " + getBloodname();
+            }
+        } else {
+            if (!StringUtil.isNullOrEmpty(getSurname())) {
+                fullName += " " + getSurname();
+            }
+        }
+
+        if (!StringUtil.isNullOrEmpty(getPostNominal())) {
+            fullName += " " + getPostNominal();
+        }
+
+        this.fullName = fullName;
     }
     //endregion Names
-
-    public String getPortraitCategory() {
-        return Utilities.nonNull(portraitCategoryOverride, portraitCategory);
-    }
-
-    public String getPortraitFileName() {
-        return Utilities.nonNull(portraitFileOverride, portraitFile);
-    }
-
-    public void setPortraitCategory(String s) {
-        this.portraitCategory = s;
-    }
-
-    public void setPortraitFileName(String s) {
-        this.portraitFile = s;
-    }
-
-    public void setPortraitCategoryOverride(String s) {
-        this.portraitCategoryOverride = s;
-    }
-
-    public void setPortraitFileNameOverride(String s) {
-        this.portraitFileOverride = s;
-    }
-
 
     public int getPrimaryRole() {
         return primaryRole;
@@ -807,14 +705,6 @@ public class Person extends AbstractPerson {
      */
     public boolean hasRole(int role) {
         return (getPrimaryRole() == role) || (getSecondaryRole() == role);
-    }
-
-    public PersonnelStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(PersonnelStatus status) {
-        this.status = status;
     }
 
     public int getIdleMonths() {
@@ -1035,30 +925,6 @@ public class Person extends AbstractPerson {
         }
     }
 
-    public void setGender(int g) {
-        this.gender = g;
-    }
-
-    public int getGender() {
-        return gender;
-    }
-
-    public void setBirthday(LocalDate date) {
-        this.birthday = date;
-    }
-
-    public LocalDate getBirthday() {
-        return birthday;
-    }
-
-    public LocalDate getDateOfDeath() {
-        return dateOfDeath;
-    }
-
-    public void setDateOfDeath(LocalDate date) {
-        this.dateOfDeath = date;
-    }
-
     public void setRecruitment(LocalDate date) {
         this.recruitment = date;
     }
@@ -1089,16 +955,6 @@ public class Person extends AbstractPerson {
         } else {
             return getLastRankChangeDate().format(DateTimeFormatter.ofPattern(DATE_DISPLAY_FORMAT));
         }
-    }
-
-    public int getAge(LocalDate today) {
-        // Get age based on year
-        if (getDateOfDeath() != null) {
-            //use date of death instead of birthday
-            today = getDateOfDeath();
-        }
-
-        return Period.between(getBirthday(), today).getYears();
     }
 
     public int getTimeInService(LocalDate today) {
@@ -1132,18 +988,6 @@ public class Person extends AbstractPerson {
                 today.plus(1, ChronoUnit.DAYS)));
     }
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public boolean isChild() {
-        return (getAge(getCampaign().getLocalDate()) <= 13);
-    }
-
     //region Pregnancy
     public LocalDate getDueDate() {
         return dueDate;
@@ -1171,14 +1015,15 @@ public class Person extends AbstractPerson {
      */
     public boolean canProcreate() {
         return isFemale() && !isPregnant() && !isDeployed()
-                && !isChild() && (getAge(getCampaign().getLocalDate()) < 51);
+                && !isChild(getCampaign().getLocalDate()) && (getAge(getCampaign().getLocalDate()) < 51);
     }
 
     public void procreate() {
         if (canProcreate()) {
             boolean conceived = false;
             if (hasSpouse()) {
-                if (!getSpouse().isDeployed() && !getSpouse().isDeadOrMIA() && !getSpouse().isChild()
+                if (!getSpouse().isDeployed() && !getSpouse().isDeadOrMIA()
+                        && !getSpouse().isChild(getCampaign().getLocalDate())
                         && !(getSpouse().getGender() == getGender())) {
                     // setting is the decimal chance that this procreation attempt will create a child, base is 0.05%
                     conceived = (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceProcreation()));
@@ -1526,18 +1371,12 @@ public class Person extends AbstractPerson {
     }
     //endregion Divorce
 
-    public boolean isFemale() {
-        return gender == Crew.G_FEMALE;
-    }
-
-    public boolean isMale() {
-        return gender == Crew.G_MALE;
-    }
-
+    // TODO : Windchild - Rename me
     public int getXp() {
         return xp;
     }
 
+    // TODO : Windchild rename me
     public void setXp(int xp) {
         this.xp = xp;
     }
@@ -1546,10 +1385,12 @@ public class Person extends AbstractPerson {
         this.xp += xp;
     }
 
+    // TODO : Windchild rename me
     public int getEngineerXp() {
         return engXp;
     }
 
+    // TODO : Windchild rename me
     public void setEngineerXp(int xp) {
         engXp = xp;
     }
@@ -1594,14 +1435,6 @@ public class Person extends AbstractPerson {
         return false;
     }
 
-    public String getBiography() {
-        return biography;
-    }
-
-    public void setBiography(String s) {
-        this.biography = s;
-    }
-
     public boolean isActive() {
         return getStatus() == PersonnelStatus.ACTIVE;
     }
@@ -1616,61 +1449,62 @@ public class Person extends AbstractPerson {
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<person id=\"" + id.toString()
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "<person id=\"" + getId().toString()
                 + "\" type=\"" + this.getClass().getName() + "\">");
         try {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "id", id.toString());
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "givenName", givenName);
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "surname", surname);
-            if (!StringUtil.isNullOrEmpty(honorific)) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "honorific", honorific);
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "id", getId().toString());
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "preNominal", getPreNominal());
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "givenName", getGivenName());
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "surname", getSurname());
+            if (!StringUtil.isNullOrEmpty(getPostNominal())) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "postNominal", getPostNominal());
             }
-            if (maidenName != null) { // this is only a != null comparison because empty is a use case for divorce
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maidenName", maidenName);
+            if (getMaidenName() != null) { // this is only a != null comparison because empty is a use case for divorce
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maidenName", getMaidenName());
             }
-            if (!StringUtil.isNullOrEmpty(callsign)) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "callsign", callsign);
+            if (!StringUtil.isNullOrEmpty(getCallsign())) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "callsign", getCallsign());
             }
             // Always save the primary role
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "primaryRole", primaryRole);
-            if (secondaryRole != T_NONE) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "secondaryRole", secondaryRole);
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "primaryRole", getPrimaryRole());
+            if (getSecondaryRole() != T_NONE) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "secondaryRole", getSecondaryRole());
             }
-            if (primaryDesignator != DESIG_NONE) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "primaryDesignator", primaryDesignator);
+            if (getPrimaryDesignator() != DESIG_NONE) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "primaryDesignator", getPrimaryDesignator());
             }
-            if (secondaryDesignator != DESIG_NONE) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "secondaryDesignator", secondaryDesignator);
+            if (getSecondaryDesignator() != DESIG_NONE) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "secondaryDesignator", getSecondaryDesignator());
             }
-            if (commander) {
+            if (isCommander()) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "commander", true);
             }
-            if (dependent) {
+            if (isDependent()) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "dependent", true);
             }
             // Always save the person's origin faction
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "faction", originFaction.getShortName());
-            if (originPlanet != null) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "faction", getOriginFactionCode());
+            if (getOriginPlanet() != null) {
                 pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                         + "<planetId systemId=\""
-                        + originPlanet.getParentSystem().getId()
+                        + getOriginPlanet().getParentSystem().getId()
                         + "\">"
-                        + originPlanet.getId()
+                        + getOriginPlanet().getId()
                         + "</planetId>");
             }
             // Always save whether or not someone is a clanner
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clan", clan);
-            if (phenotype != PHENOTYPE_NONE) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "phenotype", phenotype);
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clan", isClanner());
+            if (getPhenotype() != PHENOTYPE_NONE) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "phenotype", getPhenotype());
             }
-            if (!StringUtil.isNullOrEmpty(bloodname)) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "bloodname", bloodname);
+            if (!StringUtil.isNullOrEmpty(getBloodname())) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "bloodname", getBloodname());
             }
-            if (!StringUtil.isNullOrEmpty(biography)) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "biography", biography);
+            if (!StringUtil.isNullOrEmpty(getBiography())) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "biography", getBiography());
             }
-            if (idleMonths > 0) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "idleMonths", idleMonths);
+            if (getIdleMonths() > 0) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "idleMonths", getIdleMonths());
             }
             if (ancestorsId != null) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "ancestors", ancestorsId.toString());
@@ -1685,43 +1519,47 @@ public class Person extends AbstractPerson {
                 }
                 MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "formerSpouses");
             }
-            if (dueDate != null) {
+            if (getDueDate() != null) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "dueDate",
-                        MekHqXmlUtil.saveFormattedDate(dueDate));
+                        MekHqXmlUtil.saveFormattedDate(getDueDate()));
             }
-            if (expectedDueDate != null) {
+            if (getExpectedDueDate() != null) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "expectedDueDate",
-                        MekHqXmlUtil.saveFormattedDate(expectedDueDate));
+                        MekHqXmlUtil.saveFormattedDate(getExpectedDueDate()));
             }
             if (!portraitCategory.equals(Crew.ROOT_PORTRAIT)) {
+                // We MUST save the portrait file in this format, as otherwise it would save the
+                // temporary override
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "portraitCategory", portraitCategory);
             }
             if (!portraitFile.equals(Crew.PORTRAIT_NONE)) {
+                // We MUST save the portrait file in this format, as otherwise it would save the
+                // temporary override
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "portraitFile", portraitFile);
             }
             // Always save the current XP
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "xp", xp);
-            if (daysToWaitForHealing != 0) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "daysToWaitForHealing", daysToWaitForHealing);
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "xp", getXp());
+            if (getDaysToWaitForHealing() != 0) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "daysToWaitForHealing", getDaysToWaitForHealing());
             }
             // Always save the person's gender, as it would otherwise get confusing fast
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "gender", gender);
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "gender", getGender());
             // Always save a person's rank
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "rank", rank);
             if (rankLevel != 0) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "rankLevel", rankLevel);
             }
-            if (rankSystem != -1) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "rankSystem", rankSystem);
+            if (getRankSystem() != getCampaign().getRanks().getRankSystem()) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "rankSystem", getRankSystem());
             }
-            if (maneiDominiRank != Rank.MD_RANK_NONE) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maneiDominiRank", maneiDominiRank);
+            if (getManeiDominiRank() != Rank.MD_RANK_NONE) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maneiDominiRank", getManeiDominiRank());
             }
-            if (maneiDominiClass != MD_NONE) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maneiDominiClass", maneiDominiClass);
+            if (getManeiDominiClass() != MD_NONE) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maneiDominiClass", getManeiDominiClass());
             }
-            if (nTasks > 0) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "nTasks", nTasks);
+            if (getNTasks() > 0) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "nTasks", getNTasks());
             }
             if (doctorId != null) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "doctorId", doctorId.toString());
@@ -1851,8 +1689,8 @@ public class Person extends AbstractPerson {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</person>");
     }
 
-    public static Person generateInstanceFromXML(Node wn, Campaign c, Version version) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign,Version)"; //$NON-NLS-1$
+    public static AbstractPerson generateInstanceFromXML(Node wn, Campaign c, Version version) {
+        final String METHOD_NAME = "generateInstanceFromXML";
 
         Person retVal = null;
 
@@ -2317,7 +2155,7 @@ public class Person extends AbstractPerson {
 
             if (retVal.id == null) {
                 MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
-                        "ID not pre-defined; generating person's ID."); //$NON-NLS-1$
+                        "Id not pre-defined; generating person's Id."); //$NON-NLS-1$
                 retVal.id = UUID.randomUUID();
             }
 
@@ -2443,7 +2281,7 @@ public class Person extends AbstractPerson {
 
     public int getRankSystem() {
         if (rankSystem == -1) {
-            return campaign.getRanks().getRankSystem();
+            return getCampaign().getRanks().getRankSystem();
         }
         return rankSystem;
     }
