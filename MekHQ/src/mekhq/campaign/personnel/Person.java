@@ -1687,7 +1687,7 @@ public class Person extends AbstractPerson {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</person>");
     }
 
-    public static AbstractPerson generateInstanceFromXML(Node wn, Campaign c, Version version) {
+    public static Person generateInstanceFromXML(Node wn, Campaign c, Version version) {
         final String METHOD_NAME = "generateInstanceFromXML";
 
         Person retVal = null;
