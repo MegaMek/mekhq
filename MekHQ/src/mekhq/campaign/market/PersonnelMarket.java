@@ -54,7 +54,6 @@ import mekhq.module.api.PersonnelMarketMethod;
 
 public class PersonnelMarket {
 	private List<Person> personnel = new ArrayList<>();
-	private Map<UUID, Person> personnelIds = new LinkedHashMap<>();
 	private PersonnelMarketMethod method;
 
 	public static final int TYPE_RANDOM = 0;
@@ -114,7 +113,6 @@ public class PersonnelMarket {
 		    if ((null != newPersonnel) && !newPersonnel.isEmpty()) {
     		    for (Person recruit : newPersonnel) {
                     personnel.add(recruit);
-                    personnelIds.put(recruit.getId(), recruit);
     		    }
     		    updated = true;
                 MekHQ.triggerEvent(new MarketNewPersonnelEvent(newPersonnel));

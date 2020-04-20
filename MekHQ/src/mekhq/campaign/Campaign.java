@@ -1336,7 +1336,7 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
 
-        UUID id = UUID.randomUUID();
+        UUID id = (p.getId() == null) ? UUID.randomUUID() : p.getId();
         p.setId(id);
         personnel.put(id, p);
 
@@ -8133,7 +8133,13 @@ public class Campaign implements Serializable, ITechManager {
                     }
                 }
             }
+
             u.setLastMaintenanceReport(maintenanceReport.toString());
+
+            if (getCampaignOptions().logMaintenance()) {
+                MekHQ.getLogger().info(getClass(), "doMaintenance", maintenanceReport.toString());
+            }
+
             int quality = u.getQuality();
             String qualityString;
             boolean reverse = getCampaignOptions().reverseQualityNames();

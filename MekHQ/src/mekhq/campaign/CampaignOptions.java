@@ -91,6 +91,10 @@ public class CampaignOptions implements Serializable {
     private boolean useFactionForNames;
     private boolean useUnitRating;
 
+    //region General Tab
+    private String displayDateFormat;
+    //endregion General Tab
+
     //region Personnel Tab
     private boolean useTactics;
     private boolean useInitBonus;
@@ -252,7 +256,8 @@ public class CampaignOptions implements Serializable {
     private int adminXPPeriod;
     private int edgeCost;
 
-    //repair related
+    //region Repair and Maintenance Tab
+    // Repair
     private boolean destroyByMargin;
     private int destroyMargin;
     private int repairSystem;
@@ -262,13 +267,15 @@ public class CampaignOptions implements Serializable {
 	private int destroyPartTarget;
 	private boolean useAeroSystemHits;
 
-    //maintenance related
+    // Maintenance
     private boolean checkMaintenance;
     private int maintenanceCycleDays;
     private int maintenanceBonus;
     private boolean useQualityMaintenance;
-	private boolean useUnofficialMaintenance;
-	private boolean reverseQualityNames;
+    private boolean reverseQualityNames;
+    private boolean useUnofficialMaintenance;
+	private boolean logMaintenance;
+	//endregion Repair and Maintenance Tab
 
     //Unit Rating
     private UnitRatingMethod unitRatingMethod;
@@ -350,6 +357,10 @@ public class CampaignOptions implements Serializable {
     private boolean historicalDailyLog;
 
     public CampaignOptions() {
+        //region General Tab
+        displayDateFormat = "yyyy-MM-dd";
+        //endregion General Tab
+
         useFactionForNames = true;
         repairSystem = REPAIR_SYSTEM_STRATOPS;
         useEraMods = false;
@@ -439,13 +450,21 @@ public class CampaignOptions implements Serializable {
         destroyMargin = 4;
         destroyPartTarget = 10;
         useAeroSystemHits = false;
+
+        //endregion Repair and Maintenance Tab
+        // Maintenance
+        checkMaintenance = true;
         maintenanceCycleDays = 7;
         maintenanceBonus = -1;
         useQualityMaintenance = true;
-        useUnofficialMaintenance = false;
         reverseQualityNames = false;
-        checkMaintenance = true;
+        useUnofficialMaintenance = false;
+        logMaintenance = false;
+        //endregion Repair and Maintenance Tab
+
+        //region Supplies and Acquisitions Tab
         maxAcquisitions = 0;
+        //endregion Supplies and Acquisitions Tab
 
         //region Personnel Tab
         useTactics = false;
@@ -657,6 +676,82 @@ public class CampaignOptions implements Serializable {
 
         historicalDailyLog = false;
     }
+
+    //region General Tab
+    public String getDisplayDateFormat() {
+        return displayDateFormat;
+    }
+
+    public void setDisplayDateFormat(String s) {
+        displayDateFormat = s;
+    }
+    //endregion General Tab
+
+    //region Repair and Maintenance Tab
+    //region Repair
+    //endregion Repair
+
+    //region Maintenance
+    public boolean checkMaintenance() {
+        return checkMaintenance;
+    }
+
+    public void setCheckMaintenance(boolean b) {
+        checkMaintenance = b;
+    }
+
+    public int getMaintenanceCycleDays() {
+        return maintenanceCycleDays;
+    }
+
+    public void setMaintenanceCycleDays(int d) {
+        maintenanceCycleDays = d;
+    }
+
+    public int getMaintenanceBonus() {
+        return maintenanceBonus;
+    }
+
+    public void setMaintenanceBonus(int d) {
+        maintenanceBonus = d;
+    }
+
+    public boolean useQualityMaintenance() {
+        return useQualityMaintenance;
+    }
+
+    public void setUseQualityMaintenance(boolean b) {
+        useQualityMaintenance = b;
+    }
+
+    public boolean reverseQualityNames() {
+        return reverseQualityNames;
+    }
+
+    public void setReverseQualityNames(boolean b) {
+        reverseQualityNames = b;
+    }
+
+    public boolean useUnofficialMaintenance() {
+        return useUnofficialMaintenance;
+    }
+
+    public void setUseUnofficialMaintenance(boolean b) {
+        useUnofficialMaintenance = b;
+    }
+
+    public boolean logMaintenance() {
+        return logMaintenance;
+    }
+
+    public void setLogMaintenance(boolean b) {
+        logMaintenance = b;
+    }
+    //endregion Maintenance
+    //endregion Repair and Maintenance Tab
+
+    //region Supplies and Acquisitions Tab
+    //endregion Supplies and Acquisitions Tab
 
     //region Personnel Tab
     public boolean useTactics() {
@@ -2149,54 +2244,6 @@ public class CampaignOptions implements Serializable {
         this.planetOutputAcquisitionBonus[type] = base;
     }
 
-    public int getMaintenanceCycleDays() {
-        return maintenanceCycleDays;
-    }
-
-    public void setMaintenanceCycleDays(int d) {
-        maintenanceCycleDays = d;
-    }
-
-    public int getMaintenanceBonus() {
-        return maintenanceBonus;
-    }
-
-    public void setMaintenanceBonus(int d) {
-        maintenanceBonus = d;
-    }
-
-    public boolean useQualityMaintenance() {
-        return useQualityMaintenance;
-    }
-
-    public void setUseQualityMaintenance(boolean b) {
-        useQualityMaintenance = b;
-    }
-
-    public boolean useUnofficialMaintenance() {
-        return useUnofficialMaintenance;
-    }
-
-    public void setUseUnofficialMaintenance(boolean b) {
-    	useUnofficialMaintenance = b;
-    }
-
-    public boolean reverseQualityNames() {
-        return reverseQualityNames;
-    }
-
-    public void setReverseQualityNames(boolean b) {
-    	reverseQualityNames = b;
-    }
-
-    public boolean checkMaintenance() {
-        return checkMaintenance;
-    }
-
-    public void setCheckMaintenance(boolean b) {
-        checkMaintenance = b;
-    }
-
     public boolean isDestroyByMargin() {
         return destroyByMargin;
     }
@@ -2734,6 +2781,14 @@ public class CampaignOptions implements Serializable {
 
 	public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
+        //region General Tab
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "displayDateFormat", displayDateFormat);
+        //endregion General Tab
+
+        //region Repair and Maintenance Tab
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "logMaintenance", logMaintenance);
+        //endregion Repair and Maintenance Tab
+
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useFactionForNames", useFactionForNames);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "repairSystem", repairSystem);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnitRating", useUnitRating);
@@ -3057,8 +3112,29 @@ public class CampaignOptions implements Serializable {
 
             MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
                     String.format("%s\n\t%s", wn2.getNodeName(), wn2.getTextContent()));
+            //region General Tab
+            if (wn2.getNodeName().equalsIgnoreCase("displayDateFormat")) {
+                retVal.displayDateFormat = wn2.getTextContent().trim();
+            //endregion General Tab
 
-            if (wn2.getNodeName().equalsIgnoreCase("useFactionForNames")) {
+            //region Repair and Maintenance Tab
+            } else if (wn2.getNodeName().equalsIgnoreCase("checkMaintenance")) {
+                retVal.checkMaintenance = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("maintenanceCycleDays")) {
+                retVal.maintenanceCycleDays = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("maintenanceBonus")) {
+                retVal.maintenanceBonus = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useQualityMaintenance")) {
+                retVal.useQualityMaintenance = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("reverseQualityNames")) {
+                retVal.reverseQualityNames = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficalMaintenance")) {
+                retVal.useUnofficialMaintenance = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("logMaintenance")) {
+                retVal.logMaintenance = Boolean.parseBoolean(wn2.getTextContent());
+            //endregion Repair and Maintenance Tab
+
+            } else if (wn2.getNodeName().equalsIgnoreCase("useFactionForNames")) {
                 retVal.useFactionForNames = wn2.getTextContent().equalsIgnoreCase("true");
             } else if (wn2.getNodeName().equalsIgnoreCase("repairSystem")) {
                 retVal.repairSystem = Integer.parseInt(wn2.getTextContent());
@@ -3249,18 +3325,6 @@ public class CampaignOptions implements Serializable {
                 retVal.destroyPartTarget = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useAeroSystemHits")) {
                 retVal.useAeroSystemHits = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("maintenanceCycleDays")) {
-                retVal.maintenanceCycleDays = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("maintenanceBonus")) {
-                retVal.maintenanceBonus = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useQualityMaintenance")) {
-                retVal.useQualityMaintenance = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("reverseQualityNames")) {
-                retVal.reverseQualityNames = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficalMaintenance")) {
-                retVal.useUnofficialMaintenance = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("checkMaintenance")) {
-                retVal.checkMaintenance = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("minimumHitsForVees")) {
                 retVal.minimumHitsForVees = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("maxAcquisitions")) {
