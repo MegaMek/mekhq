@@ -166,7 +166,7 @@ public class PersonTest {
     }
 
     private void initPerson(){
-        mockPerson = spy(new Person("TestGivenName", "TestSurname", null, "MERC"));
+        mockPerson = spy(new Person("TestGivenName", "TestSurname", "MERC", null));
     }
 
     private void initAwards(){
