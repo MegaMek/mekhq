@@ -18,6 +18,7 @@
  */
 package mekhq.campaign.personnel;
 
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import megamek.common.Crew;
 import megamek.common.annotations.Nullable;
 import megamek.common.util.StringUtil;
@@ -100,7 +101,7 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
         this.originFactionCode = originFactionCode;
         originFaction = Faction.getFaction(originFactionCode);
         originPlanet = null;
-        //region Personal Information
+        //endregion Personal Information
 
         //region Portraits
         portraitCategory = Crew.ROOT_PORTRAIT;
@@ -396,7 +397,6 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
     //endregion Personal Information
 
     //region Portraits
-
     /**
      * @return the person's current portrait category, which is either the override if the portrait
      * category was not found during load or their current category
@@ -477,7 +477,6 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
     //endregion Getters/Setters
 
     //region Boolean Information Methods
-
     /**
      * @return true if the person is female, otherwise false
      */
@@ -505,6 +504,7 @@ public abstract class AbstractPerson implements Serializable, MekHqXmlSerializab
     //endregion Boolean Information Methods
 
     //region Read/Write from XML
+    @Ignore
     private static void fixBadDataOnLoad(AbstractPerson person) {
 /*
         if (person.getBirthday() == null) {
