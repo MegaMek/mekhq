@@ -33,6 +33,7 @@ import java.util.function.IntSupplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import megamek.client.generator.RandomNameGenerator;
 import megamek.common.*;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
@@ -376,11 +377,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //region Constructors
     //default constructor
     public Person(Campaign campaign) {
-        this(Crew.UNNAMED, Crew.UNNAMED_SURNAME, campaign);
+        this(RandomNameGenerator.UNNAMED, RandomNameGenerator.UNNAMED_SURNAME, campaign);
     }
 
     public Person(Campaign campaign, String factionCode) {
-        this(Crew.UNNAMED, Crew.UNNAMED_SURNAME, campaign, factionCode);
+        this(RandomNameGenerator.UNNAMED, RandomNameGenerator.UNNAMED_SURNAME, campaign, factionCode);
     }
 
     public Person(String givenName, String surname, Campaign campaign) {
@@ -748,7 +749,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
         }
 
-        if ((surname == null) || (surname.equals(Crew.UNNAMED_SURNAME))) {
+        if ((surname == null) || (surname.equals(RandomNameGenerator.UNNAMED_SURNAME))) {
             surname = "";
         }
 
