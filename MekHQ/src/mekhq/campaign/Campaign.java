@@ -49,8 +49,8 @@ import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 import org.joda.time.DateTime;
 
-import megamek.client.RandomNameGenerator;
-import megamek.client.RandomUnitGenerator;
+import megamek.client.generator.RandomNameGenerator;
+import megamek.client.generator.RandomUnitGenerator;
 import megamek.common.annotations.Nullable;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;

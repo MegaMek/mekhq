@@ -32,7 +32,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 
-import megamek.client.RandomNameGenerator;
+import megamek.client.generator.RandomNameGenerator;
 import megamek.common.MechSummaryCache;
 import megamek.common.QuirksHandler;
 import megamek.common.logging.LogLevel;

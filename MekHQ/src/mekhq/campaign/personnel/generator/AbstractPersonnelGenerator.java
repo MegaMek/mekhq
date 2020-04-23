@@ -21,7 +21,7 @@ package mekhq.campaign.personnel.generator;
 import java.time.LocalDate;
 import java.util.Objects;
 
-import megamek.client.RandomNameGenerator;
+import megamek.client.generator.RandomNameGenerator;
 import megamek.common.Compute;
 import megamek.common.Crew;
 import mekhq.Utilities;

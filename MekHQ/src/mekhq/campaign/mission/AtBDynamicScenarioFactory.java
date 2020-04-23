@@ -33,9 +33,9 @@ import megamek.common.util.StringUtil;
 import org.joda.time.DateTime;
 
 import megamek.client.Client;
-import megamek.client.RandomNameGenerator;
-import megamek.client.RandomSkillsGenerator;
-import megamek.client.RandomUnitGenerator;
+import megamek.client.generator.RandomNameGenerator;
+import megamek.client.generator.RandomSkillsGenerator;
+import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.ratgenerator.MissionRole;
 import megamek.common.Board;

@@ -49,7 +49,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import chat.ChatClient;
-import megamek.client.RandomUnitGenerator;
+import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.swing.GameOptionsDialog;
 import megamek.common.Dropship;
 import megamek.common.Entity;

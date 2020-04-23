@@ -21,7 +21,7 @@ package mekhq.campaign.mission.atb.scenario;
 
 import java.util.ArrayList;
 
-import megamek.client.RandomSkillsGenerator;
+import megamek.client.generator.RandomSkillsGenerator;
 import megamek.common.Board;
 import megamek.common.Entity;
 import megamek.common.UnitType;
