@@ -33,7 +33,9 @@ import java.util.function.IntSupplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import megamek.client.generator.RandomNameGenerator;
 import megamek.common.*;
+import megamek.common.enums.Gender;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
 import megamek.common.util.WeightedMap;
@@ -221,7 +223,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private String honorific;
     private String maidenName;
     private String callsign;
-    private int gender;
+    private Gender gender;
 
     private int primaryRole;
     private int secondaryRole;
@@ -376,11 +378,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //region Constructors
     //default constructor
     public Person(Campaign campaign) {
-        this(Crew.UNNAMED, Crew.UNNAMED_SURNAME, campaign);
+        this(RandomNameGenerator.UNNAMED, RandomNameGenerator.UNNAMED_SURNAME, campaign);
     }
 
     public Person(Campaign campaign, String factionCode) {
-        this(Crew.UNNAMED, Crew.UNNAMED_SURNAME, campaign, factionCode);
+        this(RandomNameGenerator.UNNAMED, RandomNameGenerator.UNNAMED_SURNAME, campaign, factionCode);
     }
 
     public Person(String givenName, String surname, Campaign campaign) {
@@ -434,7 +436,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         portraitFile = Crew.PORTRAIT_NONE;
         xp = 0;
         daysToWaitForHealing = 0;
-        gender = Crew.G_MALE;
+        gender = Gender.MALE;
         rank = 0;
         rankLevel = 0;
         rankSystem = -1;
@@ -748,7 +750,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
         }
 
-        if ((surname == null) || (surname.equals(Crew.UNNAMED_SURNAME))) {
+        if ((surname == null) || (surname.equals(RandomNameGenerator.UNNAMED_SURNAME))) {
             surname = "";
         }
 
@@ -1057,11 +1059,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
 
-    public void setGender(int g) {
-        this.gender = g;
+    public void setGender(Gender gender) {
+        this.gender = gender;
     }
 
-    public int getGender() {
+    public Gender getGender() {
         return gender;
     }
 
@@ -1192,7 +1194,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * @return true if they can, otherwise false
      */
     public boolean canProcreate() {
-        return isFemale() && !isPregnant() && !isDeployed()
+        return getGender().isFemale() && !isPregnant() && !isDeployed()
                 && !isChild() && (getAge(getCampaign().getLocalDate()) < 51);
     }
 
@@ -1344,7 +1346,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void addRandomSpouse(boolean sameSex) {
         List<Person> potentials = new ArrayList<>();
-        int gender = sameSex ? getGender() : (isMale() ? Crew.G_FEMALE : Crew.G_MALE);
+        Gender gender = sameSex ? getGender() : (getGender().isMale() ? Gender.FEMALE : Gender.MALE);
         for (Person p : getCampaign().getActivePersonnel()) {
             if (isPotentialRandomSpouse(p, gender)) {
                 potentials.add(p);
@@ -1357,7 +1359,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
 
-    public boolean isPotentialRandomSpouse(Person p, int gender) {
+    public boolean isPotentialRandomSpouse(Person p, Gender gender) {
         if ((p.getGender() != gender) || !safeSpouse(p) || !(isFree() || (isPrisoner() && p.isPrisoner()))) {
             return false;
         }
@@ -1434,7 +1436,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
                 break;
             case SURNAME_MALE:
-                if (isMale()) {
+                if (getGender().isMale()) {
                     spouse.setSurname(surname);
                     spouse.setMaidenName(spouseSurname); //"" is handled in the divorce code
                 } else {
@@ -1443,7 +1445,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 }
                 break;
             case SURNAME_FEMALE:
-                if (isMale()) {
+                if (getGender().isMale()) {
                     setSurname(spouseSurname);
                     setMaidenName(surname); //"" is handled in the divorce code
                 } else {
@@ -1547,14 +1549,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
     //endregion Divorce
-
-    public boolean isFemale() {
-        return gender == Crew.G_FEMALE;
-    }
-
-    public boolean isMale() {
-        return gender == Crew.G_MALE;
-    }
 
     public int getXp() {
         return xp;
@@ -1727,7 +1721,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "daysToWaitForHealing", daysToWaitForHealing);
             }
             // Always save the person's gender, as it would otherwise get confusing fast
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "gender", gender);
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "gender", gender.name());
             // Always save a person's rank
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "rank", rank);
             if (rankLevel != 0) {
@@ -1990,7 +1984,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("hits")) {
                     retVal.hits = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("gender")) {
-                    retVal.gender = Integer.parseInt(wn2.getTextContent());
+                    retVal.gender = Gender.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
                     if (version.isLowerThan("0.3.4-r1782")) {
                         RankTranslator rt = new RankTranslator(c);

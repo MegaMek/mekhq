@@ -22,8 +22,9 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 import megamek.client.generator.RandomNameGenerator;
+import megamek.client.generator.RandomGenderGenerator;
 import megamek.common.Compute;
-import megamek.common.Crew;
+import megamek.common.enums.Gender;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomSkillPreferences;
@@ -79,7 +80,7 @@ public abstract class AbstractPersonnelGenerator {
      * @param gender The person's gender, or a randomize value
      * @return A new {@link Person}.
      */
-    public abstract Person generate(Campaign campaign, int primaryRole, int secondaryRole, int gender);
+    public abstract Person generate(Campaign campaign, int primaryRole, int secondaryRole, Gender gender);
 
     /**
      * Creates a {@link Person} object for the given {@link Campaign}.
@@ -113,16 +114,13 @@ public abstract class AbstractPersonnelGenerator {
      * @param person The {@link Person} being generated.
      * @param gender The person's gender, or a randomize value
      */
-    protected void generateName(Person person, int gender) {
-        boolean isFemale = gender == Crew.G_RANDOMIZE
-                ? getNameGenerator().isFemale()
-                : gender == Crew.G_FEMALE;
-
-        if (isFemale) {
-            person.setGender(Crew.G_FEMALE);
+    protected void generateName(Person person, Gender gender) {
+        if (gender == Gender.RANDOMIZE) {
+            gender = RandomGenderGenerator.generate();
+            person.setGender(gender);
         }
 
-        String[] name = getNameGenerator().generateGivenNameSurnameSplit(isFemale, person.isClanner(),
+        String[] name = getNameGenerator().generateGivenNameSurnameSplit(gender, person.isClanner(),
                 person.getOriginFaction().getShortName());
         person.setGivenName(name[0]);
         person.setSurname(name[1]);

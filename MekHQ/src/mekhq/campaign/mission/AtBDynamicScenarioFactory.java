@@ -29,6 +29,8 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import megamek.client.generator.RandomGenderGenerator;
+import megamek.common.enums.Gender;
 import megamek.common.util.StringUtil;
 import org.joda.time.DateTime;
 
@@ -1238,7 +1240,7 @@ public class AtBDynamicScenarioFactory {
 
         RandomNameGenerator rng = RandomNameGenerator.getInstance();
         rng.setChosenFaction(f.getNameGenerator());
-        boolean gender = rng.isFemale();
+        Gender gender = RandomGenderGenerator.generate();
         String[] crewNameArray = rng.generateGivenNameSurnameSplit(gender, f.isClan(), faction);
         String crewName = crewNameArray[0];
         crewName += !StringUtil.isNullOrEmpty(crewNameArray[1]) ?  " " + crewNameArray[1] : "";
@@ -1286,7 +1288,7 @@ public class AtBDynamicScenarioFactory {
         extraData.put(0, innerMap);
 
         en.setCrew(new Crew(en.getCrew().getCrewType(), crewName, Compute.getFullCrewSize(en),
-                skills[0], skills[1], Crew.getGenderAsInt(gender), extraData));
+                skills[0], skills[1], gender, extraData));
 
         UUID id = UUID.randomUUID();
         en.setExternalIdAsString(id.toString());
@@ -1341,9 +1343,9 @@ public class AtBDynamicScenarioFactory {
 
         if (faction.isClan()) rsg.setType(RandomSkillsGenerator.T_CLAN);
         int[] skills = rsg.getRandomSkills(en);
-        boolean isFemale = rng.isFemale();
-        en.setCrew(new Crew(en.getCrew().getCrewType(), rng.generate(isFemale),
-                Compute.getFullCrewSize(en),skills[0], skills[1], Crew.getGenderAsInt(isFemale), null));
+        Gender gender = RandomGenderGenerator.generate();
+        en.setCrew(new Crew(en.getCrew().getCrewType(), rng.generate(gender),
+                Compute.getFullCrewSize(en),skills[0], skills[1], gender, null));
 
         UUID id = UUID.randomUUID();
         en.setExternalIdAsString(id.toString());

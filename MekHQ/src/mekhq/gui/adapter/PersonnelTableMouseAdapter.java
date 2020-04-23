@@ -479,7 +479,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 break;
             }
             case CMD_ADD_PREGNANCY: {
-                if (selectedPerson.isFemale()) {
+                if (selectedPerson.getGender().isFemale()) {
                     selectedPerson.addPregnancy();
                     MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 }
@@ -1762,7 +1762,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             surnameMenu.addActionListener(this);
                             spouseMenu.add(surnameMenu);
 
-                            if (ps.isMale()) {
+                            if (ps.getGender().isMale()) {
                                 maleMenu.add(spouseMenu);
                             } else {
                                 femaleMenu.add(spouseMenu);
@@ -1770,7 +1770,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         }
                     }
 
-                    if (person.isMale()) {
+                    if (person.getGender().isMale()) {
                         JMenuHelpers.addMenuIfNonEmpty(menu, femaleMenu, MAX_POPUP_ITEMS);
                         JMenuHelpers.addMenuIfNonEmpty(menu, maleMenu, MAX_POPUP_ITEMS);
                     } else {
