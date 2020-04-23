@@ -26,6 +26,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
+import megamek.client.generator.RandomNameGenerator;
+import megamek.common.enums.Gender;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
@@ -211,8 +213,8 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     }
 
     private void randomName() {
-        String[] name = hqView.getCampaign().getRNG().generateGivenNameSurnameSplit(person.isFemale(),
-                person.isClanner(), person.getOriginFaction().getShortName());
+        String[] name = RandomNameGenerator.getInstance().generateGivenNameSurnameSplit(
+                person.getGender(), person.isClanner(), person.getOriginFaction().getShortName());
         person.setGivenName(name[0]);
         person.setSurname(name[1]);
         refreshView();
@@ -238,7 +240,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     }
 
     private void editPerson() {
-        int gender = person.getGender();
+        Gender gender = person.getGender();
         CustomizePersonDialog npd = new CustomizePersonDialog(hqView.getFrame(), true, person, hqView.getCampaign());
         npd.setVisible(true);
         if (gender != person.getGender()) {

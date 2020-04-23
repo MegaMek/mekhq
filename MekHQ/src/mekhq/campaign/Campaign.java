@@ -37,7 +37,9 @@ import java.util.stream.Stream;
 
 import javax.swing.JOptionPane;
 
+import megamek.client.generator.RandomGenderGenerator;
 import megamek.common.*;
+import megamek.common.enums.Gender;
 import mekhq.*;
 import mekhq.campaign.finances.*;
 import mekhq.campaign.log.*;
@@ -49,8 +51,8 @@ import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 import org.joda.time.DateTime;
 
-import megamek.client.RandomNameGenerator;
-import megamek.client.RandomUnitGenerator;
+import megamek.client.generator.RandomNameGenerator;
+import megamek.client.generator.RandomUnitGenerator;
 import megamek.common.annotations.Nullable;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
@@ -203,8 +205,6 @@ public class Campaign implements Serializable, ITechManager {
     private GameOptions gameOptions;
 
     private String name;
-
-    private RandomNameGenerator rng = RandomNameGenerator.getInstance();
 
     // hierarchically structured Force object to define TO&E
     private Force forces;
@@ -423,10 +423,6 @@ public class Campaign implements Serializable, ITechManager {
     @Deprecated
     public DateFormat getShortDateFormatter() {
         return new SimpleDateFormat(shortDateFormat);
-    }
-
-    public RandomNameGenerator getRNG() {
-        return rng;
     }
 
     public String getCurrentSystemName() {
@@ -1205,7 +1201,7 @@ public class Campaign implements Serializable, ITechManager {
             person = newPerson(type);
         } else {
             person = newPerson(type, Person.T_NONE, new DefaultFactionSelector(),
-                    new DefaultPlanetSelector(), Crew.G_RANDOMIZE);
+                    new DefaultPlanetSelector(), Gender.RANDOMIZE);
         }
 
         person.setDependent(true);
@@ -1232,7 +1228,7 @@ public class Campaign implements Serializable, ITechManager {
      * @return A new {@link Person}.
      */
     public Person newPerson(int type, int secondary) {
-        return newPerson(type, secondary, getFactionSelector(), getPlanetSelector(), Crew.G_RANDOMIZE);
+        return newPerson(type, secondary, getFactionSelector(), getPlanetSelector(), Gender.RANDOMIZE);
     }
 
     /**
@@ -1245,7 +1241,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param gender The gender of the person to be generated, or a randomize it value
      * @return A new {@link Person}.
      */
-    public Person newPerson(int type, int secondary, String factionCode, int gender) {
+    public Person newPerson(int type, int secondary, String factionCode, Gender gender) {
         return newPerson(type, secondary, new DefaultFactionSelector(factionCode), getPlanetSelector(), gender);
     }
 
@@ -1261,7 +1257,7 @@ public class Campaign implements Serializable, ITechManager {
      * @return A new {@link Person}.
      */
     public Person newPerson(int type, int secondary, AbstractFactionSelector factionSelector,
-                            AbstractPlanetSelector planetSelector, int gender) {
+                            AbstractPlanetSelector planetSelector, Gender gender) {
         AbstractPersonnelGenerator personnelGenerator = getPersonnelGenerator(factionSelector, planetSelector);
         return newPerson(type, secondary, personnelGenerator, gender);
     }
@@ -1274,7 +1270,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param gender The gender of the person to be generated, or a randomize it value
      * @return A new {@link Person} configured using {@code personnelGenerator}.
      */
-    public Person newPerson(int type, int secondary, AbstractPersonnelGenerator personnelGenerator, int gender) {
+    public Person newPerson(int type, int secondary, AbstractPersonnelGenerator personnelGenerator, Gender gender) {
         if (type == Person.T_LAM_PILOT) {
             type = Person.T_MECHWARRIOR;
             secondary = Person.T_AERO_PILOT;
@@ -1682,7 +1678,7 @@ public class Campaign implements Serializable, ITechManager {
      */
     public AbstractPersonnelGenerator getPersonnelGenerator(AbstractFactionSelector factionSelector, AbstractPlanetSelector planetSelector) {
         DefaultPersonnelGenerator generator = new DefaultPersonnelGenerator(factionSelector, planetSelector);
-        generator.setNameGenerator(rng);
+        generator.setNameGenerator(RandomNameGenerator.getInstance());
         generator.setSkillPreferences(getRandomSkillPreferences());
         return generator;
     }
@@ -3529,7 +3525,7 @@ public class Campaign implements Serializable, ITechManager {
             }
 
             // Procreation
-            if (p.isFemale()) {
+            if (p.getGender().isFemale()) {
                 if (p.isPregnant()) {
                     if (getCampaignOptions().useUnofficialProcreation()) {
                         if (getLocalDate().compareTo((p.getDueDate())) == 0) {
@@ -4601,9 +4597,9 @@ public class Campaign implements Serializable, ITechManager {
         ranks.writeToXml(pw1, 3);
 
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "nameGen",
-                rng.getChosenFaction());
+                RandomNameGenerator.getInstance().getChosenFaction());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "percentFemale",
-                rng.getPercentFemale());
+                RandomGenderGenerator.getPercentFemale());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "overtime", overtime);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "gmMode", gmMode);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "showOverview", app.getCampaigngui()
@@ -4628,10 +4624,10 @@ public class Campaign implements Serializable, ITechManager {
         {
             pw1.println("\t\t<nameGen>");
             pw1.print("\t\t\t<faction>");
-            pw1.print(MekHqXmlUtil.escape(rng.getChosenFaction()));
+            pw1.print(MekHqXmlUtil.escape(RandomNameGenerator.getInstance().getChosenFaction()));
             pw1.println("</faction>");
             pw1.print("\t\t\t<percentFemale>");
-            pw1.print(rng.getPercentFemale());
+            pw1.print(RandomGenderGenerator.getPercentFemale());
             pw1.println("</percentFemale>");
             pw1.println("\t\t</nameGen>");
         }
@@ -6296,7 +6292,7 @@ public class Campaign implements Serializable, ITechManager {
             unit.setNavigator(p);
         }
         if (unit.canTakeTechOfficer()) {
-            Person p = null;
+            Person p;
             //For vehicle command console we will default to gunner
             if (unit.getEntity() instanceof Tank) {
                 p = newPerson(Person.T_VEE_GUNNER);
@@ -6406,7 +6402,7 @@ public class Campaign implements Serializable, ITechManager {
         // and if none are found then /gender/rolegroup, then /gender/combat or
         // /gender/support, then in /gender.
         String searchCat_Gender = "";
-        if (p.getGender() == Crew.G_FEMALE) {
+        if (p.getGender().isFemale()) {
             searchCat_Gender += "Female/";
         } else {
             searchCat_Gender += "Male/";
