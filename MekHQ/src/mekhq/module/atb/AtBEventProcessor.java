@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018  - The MegaMek Team
+ * Copyright (c) 2018  - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -53,7 +53,6 @@ import mekhq.campaign.universe.UnitGeneratorParameters;
  * Main engine of the Against the Bot campaign system.
  *
  * @author Neoancient
- *
  */
 public class AtBEventProcessor {
 
@@ -68,50 +67,58 @@ public class AtBEventProcessor {
         MekHQ.unregisterHandler(this);
     }
 
+    private Campaign getCampaign() {
+        return campaign;
+    }
+
     @Subscribe
     public void handleNewDay(NewDayEvent ev) {
         // TODO: move code from Campaign here
-        if (campaign.getPersonnelMarket().getPaidRecruitment()
-                && (campaign.getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY)) {
-            if (campaign.getFinances().debit(Money.of(100000), Transaction.C_MISC,
-                    "Paid recruitment roll", campaign.getDate())) {
+        if (getCampaign().getPersonnelMarket().getPaidRecruitment()
+                && (getCampaign().getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY)) {
+            if (getCampaign().getFinances().debit(Money.of(100000), Transaction.C_MISC,
+                    "Paid recruitment roll", getCampaign().getDate())) {
                 doPaidRecruitment();
             } else {
-                campaign.addReport("<html><font color=\"red\">Insufficient funds for paid recruitment.</font></html>");
+                getCampaign().addReport("<html><font color=\"red\">Insufficient funds for paid recruitment.</font></html>");
             }
         }
     }
 
+
     private void doPaidRecruitment() {
         int mod;
-        switch (campaign.getPersonnelMarket().getPaidRecruitType()) {
-        case Person.T_MECHWARRIOR:
-            mod = -2;
-            break;
-        case Person.T_INFANTRY:
-            mod = 2;
-            break;
-        case Person.T_MECH_TECH:
-        case Person.T_AERO_TECH:
-        case Person.T_MECHANIC:
-        case Person.T_BA_TECH:
-        case Person.T_DOCTOR:
-            mod = 1;
-            break;
-        default:
-            mod = 0;
+        switch (getCampaign().getPersonnelMarket().getPaidRecruitType()) {
+            case Person.T_MECHWARRIOR:
+                mod = -2;
+                break;
+            case Person.T_INFANTRY:
+                mod = 2;
+                break;
+            case Person.T_MECH_TECH:
+            case Person.T_AERO_TECH:
+            case Person.T_MECHANIC:
+            case Person.T_BA_TECH:
+            case Person.T_DOCTOR:
+                mod = 1;
+                break;
+            default:
+                mod = 0;
+                break;
         }
 
-        mod += campaign.getUnitRatingMod() - IUnitRating.DRAGOON_C;
-        if (campaign.getFinances().isInDebt()) {
+        mod += getCampaign().getUnitRatingMod() - IUnitRating.DRAGOON_C;
+        if (getCampaign().getFinances().isInDebt()) {
             mod -= 3;
         }
 
-        Person adminHR = campaign.findBestInRole(Person.T_ADMIN_HR, SkillType.S_ADMIN);
-        int adminHRExp = (adminHR == null)?SkillType.EXP_ULTRA_GREEN:adminHR.getSkill(SkillType.S_ADMIN).getExperienceLevel();
+        Person adminHR = getCampaign().findBestInRole(Person.T_ADMIN_HR, SkillType.S_ADMIN);
+        int adminHRExp = (adminHR == null) ? SkillType.EXP_ULTRA_GREEN
+                : adminHR.getSkill(SkillType.S_ADMIN).getExperienceLevel();
         mod += adminHRExp - 2;
         int q = 0;
         int r = Compute.d6(2) + mod;
+
         if (r > 15) {
             q = 6;
         } else if (r > 12) {
@@ -125,11 +132,11 @@ public class AtBEventProcessor {
         } else if (r > 3) {
             q = 1;
         }
+
         for (int i = 0; i < q; i++) {
-            Person p = campaign.newPerson(campaign.getPersonnelMarket().getPaidRecruitType());
-            UUID id = UUID.randomUUID();
-            p.setId(id);
-            campaign.getPersonnelMarket().addPerson(p);
+            Person p = getCampaign().newPerson(getCampaign().getPersonnelMarket().getPaidRecruitType());
+            p.setId(UUID.randomUUID());
+            getCampaign().getPersonnelMarket().addPerson(p);
             addRecruitUnit(p);
         }
     }
