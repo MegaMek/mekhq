@@ -68,7 +68,7 @@ public class PersonnelMarket {
 	private Map<UUID, Entity> attachedEntities = new LinkedHashMap<>();
 	/* Alternate types of rolls, set by PersonnelMarketDialog */
 	private boolean paidRecruitment = false;
-	private int paidRecruitType;
+	private int paidRecruitType = Person.T_MECHWARRIOR;
 
 	public PersonnelMarket() {
 	    method = new PersonnelMarketRandom();
