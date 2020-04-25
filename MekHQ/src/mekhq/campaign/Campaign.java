@@ -3751,7 +3751,7 @@ public class Campaign implements Serializable, ITechManager {
 
         processNewDayUnits();
 
-        setShoppingList(goShopping(shoppingList));
+        setShoppingList(goShopping(getShoppingList()));
 
         // check for anything in finances
         getFinances().newDay(this);
