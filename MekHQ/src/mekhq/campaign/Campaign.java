@@ -321,6 +321,7 @@ public class Campaign implements Serializable, ITechManager {
         fatigueLevel = 0;
         atbConfig = null;
         autosaveService = new AutosaveService();
+        hasActiveContract = false;
     }
 
     /**
@@ -3790,7 +3791,7 @@ public class Campaign implements Serializable, ITechManager {
      * This is used to check if the current campaign has one or more active contacts, and sets the
      * value of hasActiveContract based on that check. This value should not be set elsewhere
      */
-    private void setHasActiveContract() {
+    public void setHasActiveContract() {
         hasActiveContract = false;
         for (Mission mission : getMissions()) {
             if (!(mission instanceof Contract)) {
@@ -6959,6 +6960,11 @@ public class Campaign implements Serializable, ITechManager {
                         + " for the remaining payout from contract "
                         + contract.getName());
             }
+
+            // This relies on the mission being a Contract, and AtB to be on
+            if (getCampaignOptions().getUseAtB()) {
+                setHasActiveContract();
+            }
         }
     }
 
@@ -8348,6 +8354,9 @@ public class Campaign implements Serializable, ITechManager {
             }
 
             addAllLances(this.forces);
+
+            // Determine whether or not there is an active contract
+            setHasActiveContract();
         }
 
         setAtBConfig(AtBConfiguration.loadFromXml());
