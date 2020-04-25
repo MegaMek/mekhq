@@ -67,28 +67,23 @@ public class AtBEventProcessor {
         MekHQ.unregisterHandler(this);
     }
 
-    private Campaign getCampaign() {
-        return campaign;
-    }
-
     @Subscribe
     public void handleNewDay(NewDayEvent ev) {
         // TODO: move code from Campaign here
-        if (getCampaign().getPersonnelMarket().getPaidRecruitment()
-                && (getCampaign().getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY)) {
-            if (getCampaign().getFinances().debit(Money.of(100000), Transaction.C_MISC,
-                    "Paid recruitment roll", getCampaign().getDate())) {
-                doPaidRecruitment();
+        if (ev.getCampaign().hasActiveContract() && ev.getCampaign().getPersonnelMarket().getPaidRecruitment()
+                && (ev.getCampaign().getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY)) {
+            if (ev.getCampaign().getFinances().debit(Money.of(100000), Transaction.C_MISC,
+                    "Paid recruitment roll", ev.getCampaign().getDate())) {
+                doPaidRecruitment(ev.getCampaign());
             } else {
-                getCampaign().addReport("<html><font color=\"red\">Insufficient funds for paid recruitment.</font></html>");
+                ev.getCampaign().addReport("<html><font color=\"red\">Insufficient funds for paid recruitment.</font></html>");
             }
         }
     }
 
-
-    private void doPaidRecruitment() {
+    private void doPaidRecruitment(Campaign campaign) {
         int mod;
-        switch (getCampaign().getPersonnelMarket().getPaidRecruitType()) {
+        switch (campaign.getPersonnelMarket().getPaidRecruitType()) {
             case Person.T_MECHWARRIOR:
                 mod = -2;
                 break;
@@ -107,12 +102,12 @@ public class AtBEventProcessor {
                 break;
         }
 
-        mod += getCampaign().getUnitRatingMod() - IUnitRating.DRAGOON_C;
-        if (getCampaign().getFinances().isInDebt()) {
+        mod += campaign.getUnitRatingMod() - IUnitRating.DRAGOON_C;
+        if (campaign.getFinances().isInDebt()) {
             mod -= 3;
         }
 
-        Person adminHR = getCampaign().findBestInRole(Person.T_ADMIN_HR, SkillType.S_ADMIN);
+        Person adminHR = campaign.findBestInRole(Person.T_ADMIN_HR, SkillType.S_ADMIN);
         int adminHRExp = (adminHR == null) ? SkillType.EXP_ULTRA_GREEN
                 : adminHR.getSkill(SkillType.S_ADMIN).getExperienceLevel();
         mod += adminHRExp - 2;
@@ -134,9 +129,9 @@ public class AtBEventProcessor {
         }
 
         for (int i = 0; i < q; i++) {
-            Person p = getCampaign().newPerson(getCampaign().getPersonnelMarket().getPaidRecruitType());
+            Person p = campaign.newPerson(campaign.getPersonnelMarket().getPaidRecruitType());
             p.setId(UUID.randomUUID());
-            getCampaign().getPersonnelMarket().addPerson(p);
+            campaign.getPersonnelMarket().addPerson(p);
             addRecruitUnit(p);
         }
     }
