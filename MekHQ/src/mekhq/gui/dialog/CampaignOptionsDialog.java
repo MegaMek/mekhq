@@ -244,6 +244,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     //Family
     private JSpinner spnMinimumMarriageAge;
     private JSpinner spnCheckMutualAncestorsDepth;
+    private JCheckBox chkLogMarriageNameChange;
     private JCheckBox chkUseRandomMarriages;
     private JSpinner spnChanceRandomMarriages;
     private JSpinner spnMarriageAgeRange;
@@ -1753,6 +1754,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panCheckMutualAncestorsDepth.setToolTipText(resourceMap.getString("checkMutualAncestorsDepth.toolTipText"));
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(panCheckMutualAncestorsDepth, gridBagConstraints);
+
+        chkLogMarriageNameChange = new JCheckBox(resourceMap.getString("logMarriageNameChange.text"));
+        chkLogMarriageNameChange.setToolTipText(resourceMap.getString("logMarriageNameChange.toolTipText"));
+        chkLogMarriageNameChange.setSelected(options.logMarriageNameChange());
+        gridBagConstraints.gridy = ++gridy;
+        panFamily.add(chkLogMarriageNameChange, gridBagConstraints);
 
         chkUseRandomMarriages = new JCheckBox(resourceMap.getString("useRandomMarriages.text"));
         chkUseRandomMarriages.setToolTipText(resourceMap.getString("useRandomMarriages.toolTipText"));
@@ -4861,6 +4868,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         //Family
         options.setMinimumMarriageAge((Integer) spnMinimumMarriageAge.getModel().getValue());
         options.setCheckMutualAncestorsDepth((Integer) spnCheckMutualAncestorsDepth.getModel().getValue());
+        options.setLogMarriageNameChange(chkLogMarriageNameChange.isSelected());
         options.setUseRandomMarriages(chkUseRandomMarriages.isSelected());
         options.setChanceRandomMarriages((Double) spnChanceRandomMarriages.getModel().getValue() / 100.0);
         options.setMarriageAgeRange((Integer) spnMarriageAgeRange.getModel().getValue());

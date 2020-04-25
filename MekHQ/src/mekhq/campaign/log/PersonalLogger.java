@@ -20,6 +20,7 @@
 package mekhq.campaign.log;
 
 import megamek.common.util.EncodeControl;
+import megamek.common.util.StringUtil;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
 
@@ -47,6 +48,18 @@ public class PersonalLogger {
     public static void marriage(Person person, Person spouse, Date date) {
         String message = logEntriesResourceMap.getString("marries.text");
         person.addLogEntry(new PersonalLogEntry(date, MessageFormat.format(message, spouse.getFullName())));
+    }
+
+    public static void marriageNameChange(Person person, Person spouse, Date date) {
+        String message = logEntriesResourceMap.getString("marriageNameChange.text");
+
+        message = MessageFormat.format(message,
+                GenderDescriptors.HIS_HER.getDescriptor(person.getGender()),
+                (!StringUtil.isNullOrEmpty(person.getMaidenName())) ? person.getMaidenName()
+                        : logEntriesResourceMap.getString("marriageNameChange.emptyMaidenName.text"),
+                person.getSurname(), spouse.getFullName());
+
+        person.addLogEntry(new PersonalLogEntry(date, message));
     }
 
     public static void gainedEdge(Person person, Date date) {
