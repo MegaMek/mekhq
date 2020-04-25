@@ -26,6 +26,7 @@ VERSION HISTORY:
 + PR #1681: Change refit model weight calculation to work with BA
 + PR #1685: Adding All Role and No Role options for Portraits
 + PR #1688: Single Portrait Bulk Assignment to Personnel
++ Issue #1683: Adding the option to log marriage name changes
 
 0.47.5 (2020-4-01 2000 UTC)
 + Issue #1470: Thumper artillery vehicle causes array index out of bounds exception error
