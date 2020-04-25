@@ -20,6 +20,7 @@
  */
 package mekhq.campaign;
 
+import java.awt.*;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.Serializable;
@@ -30,6 +31,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -266,6 +268,9 @@ public class Campaign implements Serializable, ITechManager {
     private Calendar shipSearchExpiration; //AtB
     private IUnitGenerator unitGenerator;
     private IUnitRating unitRating;
+
+    /** This is used to determine if the player has an active AtB Contract, and is recalculated on load */
+    private transient boolean hasActiveContract;
 
     private final IAutosaveService autosaveService;
 
@@ -3696,37 +3701,47 @@ public class Campaign implements Serializable, ITechManager {
 
     /** @return <code>true</code> if the new day arrived */
     public boolean newDay() {
-        if(MekHQ.triggerEvent(new DayEndingEvent(this))) {
+        if (MekHQ.triggerEvent(new DayEndingEvent(this))) {
             return false;
         }
 
+        // Autosave based on the previous day's information
         this.autosaveService.requestDayAdvanceAutosave(this);
 
+        // Advance the day by one - TODO : Swap me to LocalDate tracking instead
         calendar.add(Calendar.DAY_OF_MONTH, 1);
         currentDateTime = new DateTime(calendar);
 
-        currentReport.clear();
-        currentReportHTML = "";
+        // Determine if we have an active contract or not, as this can get used elsewhere before
+        // we actually hit the AtB new day (e.g. personnel market)
+        if (getCampaignOptions().getUseAtB()) {
+            setHasActiveContract();
+        }
+
+        // Clear Reports
+        getCurrentReport().clear();
+        setCurrentReportHTML("");
         newReports.clear();
         beginReport("<b>" + getDateAsString() + "</b>");
 
+        // New Year Changes
         if (getLocalDate().getDayOfYear() == 1) {
+            // News is reloaded
             reloadNews();
-        }
 
-        // Ensure that the MegaMek year GameOption matches the campaign year
-        if (gameOptions.intOption("year") != getGameYear()) {
-            gameOptions.getOption("year").setValue(getGameYear());
+            // Change Year Game Option
+            getGameOptions().getOption("year").setValue(getGameYear());
         }
 
         readNews();
 
-        location.newDay(this);
+        getLocation().newDay(this);
 
         // Manage the personnel market
-        personnelMarket.generatePersonnelForDay(this);
+        getPersonnelMarket().generatePersonnelForDay(this);
 
-        if (campaignOptions.getUseAtB()) {
+        // Process New Day for AtB
+        if (getCampaignOptions().getUseAtB()) {
             processNewDayATB();
         }
 
@@ -3736,7 +3751,7 @@ public class Campaign implements Serializable, ITechManager {
 
         processNewDayUnits();
 
-        shoppingList = goShopping(shoppingList);
+        setShoppingList(goShopping(shoppingList));
 
         // check for anything in finances
         getFinances().newDay(this);
@@ -3745,8 +3760,11 @@ public class Campaign implements Serializable, ITechManager {
         return true;
     }
 
-    public ArrayList<Contract> getActiveContracts() {
-        ArrayList<Contract> active = new ArrayList<>();
+    /**
+     * @return a list of all currently active contracts
+     */
+    public List<Contract> getActiveContracts() {
+        List<Contract> active = new ArrayList<>();
         for (Mission m : getMissions()) {
             if (!(m instanceof Contract)) {
                 continue;
@@ -3759,6 +3777,34 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
         return active;
+    }
+
+    /**
+     * @return whether or not the current campaign has an active contract for the current date
+     */
+    public boolean hasActiveContract() {
+        return hasActiveContract;
+    }
+
+    /**
+     * This is used to check if the current campaign has one or more active contacts, and sets the
+     * value of hasActiveContract based on that check. This value should not be set elsewhere
+     */
+    private void setHasActiveContract() {
+        hasActiveContract = false;
+        for (Mission mission : getMissions()) {
+            if (!(mission instanceof Contract)) {
+                continue;
+            }
+            Contract contract = (Contract) mission;
+
+            if (contract.isActive()
+                    && !getCalendar().getTime().after(contract.getEndingDate())
+                    && !getCalendar().getTime().before(contract.getStartDate())) {
+                hasActiveContract = true;
+                break;
+            }
+        }
     }
 
     public Person getFlaggedCommander() {
