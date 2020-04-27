@@ -20,7 +20,6 @@
  */
 package mekhq.campaign;
 
-import java.awt.*;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.Serializable;
@@ -31,7 +30,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
