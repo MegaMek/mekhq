@@ -870,7 +870,7 @@ public class PersonViewPanel extends ScrollablePanel {
             }
         }
 
-        if (campaign.getCampaignOptions().useParentage()) {
+        if (campaign.getCampaignOptions().displayParentage()) {
             if (person.hasChildren() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.PARENTS_CHILDREN_SIBLINGS)) {
                 lblChildren1.setName("lblChildren1"); // NOI18N //$NON-NLS-1$
                 lblChildren1.setText(resourceMap.getString("lblChildren1.text")); //$NON-NLS-1$

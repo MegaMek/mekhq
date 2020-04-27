@@ -1867,8 +1867,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(pnlBabySurnameStyle, gridBagConstraints);
 
-        chkUseParentage = new JCheckBox(resourceMap.getString("useParentage.text"));
-        chkUseParentage.setSelected(options.useParentage());
+        chkUseParentage = new JCheckBox(resourceMap.getString("displayParentage.text"));
+        chkUseParentage.setSelected(options.displayParentage());
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(chkUseParentage, gridBagConstraints);
 
@@ -4885,7 +4885,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setDisplayTrueDueDate(chkDisplayTrueDueDate.isSelected());
         options.setLogConception(chkLogConception.isSelected());
         options.setBabySurnameStyle(comboBabySurnameStyle.getSelectedIndex());
-        options.setUseParentage(chkUseParentage.isSelected());
+        options.setDisplayParentage(chkUseParentage.isSelected());
         options.setDisplayFamilyLevel(comboDisplayFamilyLevel.getSelectedIndex());
         options.setUseRandomDeaths(chkUseRandomDeaths.isSelected());
         options.setKeepMarriedNameUponSpouseDeath(chkKeepMarriedNameUponSpouseDeath.isSelected());
