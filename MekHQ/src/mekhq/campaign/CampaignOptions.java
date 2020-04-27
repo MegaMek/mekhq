@@ -27,6 +27,7 @@ import java.util.List;
 
 import mekhq.campaign.finances.Money;
 
+import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -117,7 +118,9 @@ public class CampaignOptions implements Serializable {
     private boolean tougherHealing;
     private boolean useTransfers;
     private boolean useTimeInService;
+    private TimeInDisplayFormat timeInServiceDisplayFormat;
     private boolean useTimeInRank;
+    private TimeInDisplayFormat timeInRankDisplayFormat;
     private boolean trackTotalEarnings;
     private boolean showOriginFaction;
     private boolean randomizeOrigin;
@@ -489,7 +492,9 @@ public class CampaignOptions implements Serializable {
         tougherHealing = false;
         useTransfers = true;
         useTimeInService = false;
+        timeInServiceDisplayFormat = TimeInDisplayFormat.YEARS;
         useTimeInRank = false;
+        timeInRankDisplayFormat = TimeInDisplayFormat.MONTHS_YEARS;
         trackTotalEarnings = false;
         showOriginFaction = true;
         randomizeOrigin = false;
@@ -909,29 +914,76 @@ public class CampaignOptions implements Serializable {
         useTransfers = b;
     }
 
+    /**
+     * @return whether or not to use time in service
+     */
     public boolean getUseTimeInService() {
         return useTimeInService;
     }
 
+    /**
+     * @param b the new value for whether to use time in service or not
+     */
     public void setUseTimeInService(boolean b) {
         useTimeInService = b;
     }
 
+    /**
+     * @return the format to display the Time in Service in
+     */
+    public TimeInDisplayFormat getTimeInServiceDisplayFormat() {
+        return timeInServiceDisplayFormat;
+    }
+
+    /**
+     * @param timeInServiceDisplayFormat the new display format for Time in Service
+     */
+    public void setTimeInServiceDisplayFormat(TimeInDisplayFormat timeInServiceDisplayFormat) {
+        this.timeInServiceDisplayFormat = timeInServiceDisplayFormat;
+    }
+
+    /**
+     * @return whether or not to use time in rank
+     */
     public boolean getUseTimeInRank() {
         return useTimeInRank;
     }
 
+    /**
+     * @param b the new value for whether or not to use time in rank
+     */
     public void setUseTimeInRank(boolean b) {
         useTimeInRank = b;
     }
 
+    /**
+     * @return the format to display the Time in Rank in
+     */
+    public TimeInDisplayFormat getTimeInRankDisplayFormat() {
+        return timeInRankDisplayFormat;
+    }
+
+    /**
+     * @param timeInRankDisplayFormat the new display format for Time in Rank
+     */
+    public void setTimeInRankDisplayFormat(TimeInDisplayFormat timeInRankDisplayFormat) {
+        this.timeInRankDisplayFormat = timeInRankDisplayFormat;
+    }
+
+    /**
+     * @return whether or not to track the total earnings of personnel
+     */
     public boolean trackTotalEarnings() {
         return trackTotalEarnings;
     }
 
+    /**
+     * @param b the new value for whether or not to track total earnings for personnel
+     */
     public void setTrackTotalEarnings(boolean b) {
         trackTotalEarnings = b;
     }
+
     /**
      * Gets a value indicating whether or not to show a person's
      * origin faction when displaying their details.
@@ -2955,7 +3007,9 @@ public class CampaignOptions implements Serializable {
 
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTransfers", useTransfers);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTimeInService", useTimeInService);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "timeInServiceDisplayFormat", timeInServiceDisplayFormat.name());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTimeInRank", useTimeInRank);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "timeInRankDisplayFormat", timeInRankDisplayFormat.name());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "trackTotalEarnings", trackTotalEarnings);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "capturePrisoners", capturePrisoners);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "defaultPrisonerStatus", defaultPrisonerStatus);
