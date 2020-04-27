@@ -243,6 +243,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     //Family
     private JSpinner spnMinimumMarriageAge;
     private JSpinner spnCheckMutualAncestorsDepth;
+    private JCheckBox chkLogMarriageNameChange;
     private JCheckBox chkUseRandomMarriages;
     private JSpinner spnChanceRandomMarriages;
     private JSpinner spnMarriageAgeRange;
@@ -1753,6 +1754,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panCheckMutualAncestorsDepth.setToolTipText(resourceMap.getString("checkMutualAncestorsDepth.toolTipText"));
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(panCheckMutualAncestorsDepth, gridBagConstraints);
+
+        chkLogMarriageNameChange = new JCheckBox(resourceMap.getString("logMarriageNameChange.text"));
+        chkLogMarriageNameChange.setToolTipText(resourceMap.getString("logMarriageNameChange.toolTipText"));
+        chkLogMarriageNameChange.setSelected(options.logMarriageNameChange());
+        gridBagConstraints.gridy = ++gridy;
+        panFamily.add(chkLogMarriageNameChange, gridBagConstraints);
 
         chkUseRandomMarriages = new JCheckBox(resourceMap.getString("useRandomMarriages.text"));
         chkUseRandomMarriages.setToolTipText(resourceMap.getString("useRandomMarriages.toolTipText"));
@@ -3349,9 +3356,40 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panRandomPortrait.setName("panRandomPortrait"); // NOI18N
         panRandomPortrait.setLayout(new BorderLayout());
 
-        JPanel panUsePortrait = new JPanel(new GridLayout(nRow, 4));
-
+        // The math below is used to determine how to split the personnel role options for portraits,
+        // which it does into 4 columns with rows equal to the number of roles plus two, with the
+        // additional two being the all role and no role options.
+        JPanel panUsePortrait = new JPanel(new GridLayout((int) Math.ceil((Person.T_NUM + 2) / 4.0), 4));
         chkUsePortrait = new JCheckBox[Person.T_NUM];
+        JCheckBox allPortraitsBox = new JCheckBox(resourceMap.getString("panUsePortrait.all.text"));
+        JCheckBox noPortraitsBox = new JCheckBox(resourceMap.getString("panUsePortrait.no.text"));
+        allPortraitsBox.addActionListener(evt -> {
+            final boolean selected = allPortraitsBox.isSelected();
+            for (JCheckBox box : chkUsePortrait) {
+                if (selected) {
+                    box.setSelected(true);
+                }
+                box.setEnabled(!selected);
+            }
+            if (selected) {
+                noPortraitsBox.setSelected(false);
+            }
+        });
+        noPortraitsBox.addActionListener(evt -> {
+            final boolean selected = noPortraitsBox.isSelected();
+            for (JCheckBox box : chkUsePortrait) {
+                if (selected) {
+                    box.setSelected(false);
+                }
+                box.setEnabled(!selected);
+            }
+            if (selected) {
+                allPortraitsBox.setSelected(false);
+            }
+        });
+        panUsePortrait.add(allPortraitsBox);
+        panUsePortrait.add(noPortraitsBox);
+
         JCheckBox box;
         for (int i = 0; i < Person.T_NUM; i++) {
             box = new JCheckBox(Person.getRoleDesc(i, false));
@@ -4853,6 +4891,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         //Family
         options.setMinimumMarriageAge((Integer) spnMinimumMarriageAge.getModel().getValue());
         options.setCheckMutualAncestorsDepth((Integer) spnCheckMutualAncestorsDepth.getModel().getValue());
+        options.setLogMarriageNameChange(chkLogMarriageNameChange.isSelected());
         options.setUseRandomMarriages(chkUseRandomMarriages.isSelected());
         options.setChanceRandomMarriages((Double) spnChanceRandomMarriages.getModel().getValue() / 100.0);
         options.setMarriageAgeRange((Integer) spnMarriageAgeRange.getModel().getValue());

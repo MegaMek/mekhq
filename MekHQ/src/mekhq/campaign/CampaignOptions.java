@@ -129,6 +129,7 @@ public class CampaignOptions implements Serializable {
     //family
     private int minimumMarriageAge;
     private int checkMutualAncestorsDepth;
+    private boolean logMarriageNameChange;
     private boolean useRandomMarriages;
     private double chanceRandomMarriages;
     private int marriageAgeRange;
@@ -501,6 +502,7 @@ public class CampaignOptions implements Serializable {
         //Family
         minimumMarriageAge = 16;
         checkMutualAncestorsDepth = 4;
+        logMarriageNameChange = false;
         useRandomMarriages = false;
         chanceRandomMarriages = 0.00025;
         marriageAgeRange = 10;
@@ -1061,6 +1063,20 @@ public class CampaignOptions implements Serializable {
      */
     public void setCheckMutualAncestorsDepth(int b) {
         checkMutualAncestorsDepth = b;
+    }
+
+    /**
+     * @return whether or not to log a name change in a marriage
+     */
+    public boolean logMarriageNameChange() {
+        return logMarriageNameChange;
+    }
+
+    /**
+     * @param b whether to log marriage name changes or not
+     */
+    public void setLogMarriageNameChange(boolean b) {
+        logMarriageNameChange = b;
     }
 
     /**
@@ -2907,6 +2923,7 @@ public class CampaignOptions implements Serializable {
         //region family
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "minimumMarriageAge", minimumMarriageAge);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "checkMutualAncestorsDepth", checkMutualAncestorsDepth);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "logMarriageNameChange", logMarriageNameChange);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomMarriages", useRandomMarriages);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "chanceRandomMarriages", chanceRandomMarriages);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "marriageAgeRange", marriageAgeRange);
@@ -3361,6 +3378,8 @@ public class CampaignOptions implements Serializable {
                 retVal.minimumMarriageAge = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("checkMutualAncestorsDepth")) {
                 retVal.checkMutualAncestorsDepth = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("logMarriageNameChange")) {
+                retVal.logMarriageNameChange = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomMarriages")) {
                 retVal.useRandomMarriages = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomMarriages")) {
