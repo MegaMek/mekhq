@@ -2375,8 +2375,7 @@ public class Campaign implements Serializable, ITechManager {
             return admin;
         } else if (skill.equals(CampaignOptions.S_TECH)) {
             for (Person p : getPersonnel()) {
-                if (getCampaignOptions().isAcquisitionSupportStaffOnly()
-                        && !p.isSupport()) {
+                if (getCampaignOptions().isAcquisitionSupportStaffOnly() && !p.hasSupportRole(false)) {
                     continue;
                 }
                 if (maxAcquisitions > 0 && p.getAcquisitions() >= maxAcquisitions) {
@@ -2390,8 +2389,7 @@ public class Campaign implements Serializable, ITechManager {
             }
         } else {
             for (Person p : getPersonnel()) {
-                if (getCampaignOptions().isAcquisitionSupportStaffOnly()
-                        && !p.isSupport()) {
+                if (getCampaignOptions().isAcquisitionSupportStaffOnly() && !p.hasSupportRole(false)) {
                     continue;
                 }
                 if (maxAcquisitions > 0 && p.getAcquisitions() >= maxAcquisitions) {
@@ -2423,8 +2421,7 @@ public class Campaign implements Serializable, ITechManager {
                 if (!p.isActive()) {
                     continue;
                 }
-                if (getCampaignOptions().isAcquisitionSupportStaffOnly()
-                        && !p.isSupport()) {
+                if (getCampaignOptions().isAcquisitionSupportStaffOnly() && !p.hasSupportRole(false)) {
                     continue;
                 }
                 if (maxAcquisitions > 0 && p.getAcquisitions() >= maxAcquisitions) {
@@ -4577,7 +4574,6 @@ public class Campaign implements Serializable, ITechManager {
         campaignOptions = options;
     }
 
-
     public void writeToXml(PrintWriter pw1) {
         // File header
         pw1.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
@@ -6437,7 +6433,7 @@ public class Campaign implements Serializable, ITechManager {
             searchCat_RoleGroup = "Vessel Crew/";
         }
 
-        if (p.isSupport()) {
+        if (p.hasPrimarySupportRole(true)) {
             searchCat_CombatSupport = "Support/";
         } else {
             searchCat_CombatSupport = "Combat/";
@@ -7822,8 +7818,7 @@ public class Campaign implements Serializable, ITechManager {
 
         for (Person p : getPersonnel()) {
             // Add them to the total count
-            if (Person.isCombatRole(p.getPrimaryRole()) && !p.isPrisoner()
-                    && !p.isBondsman() && p.isActive()) {
+            if (p.hasPrimaryCombatRole() && p.isFree() && p.isActive()) {
                 countPersonByType[p.getPrimaryRole()]++;
                 countTotal++;
                 if (getCampaignOptions().useAdvancedMedical() && p.getInjuries().size() > 0) {
@@ -7832,11 +7827,11 @@ public class Campaign implements Serializable, ITechManager {
                     countInjured++;
                 }
                 salary = salary.plus(p.getSalary());
-            } else if (Person.isCombatRole(p.getPrimaryRole()) && (p.getStatus() == PersonnelStatus.RETIRED)) {
+            } else if (p.hasPrimaryCombatRole() && (p.getStatus() == PersonnelStatus.RETIRED)) {
                 countRetired++;
-            } else if (Person.isCombatRole(p.getPrimaryRole()) && (p.getStatus() == PersonnelStatus.MIA)) {
+            } else if (p.hasPrimaryCombatRole() && (p.getStatus() == PersonnelStatus.MIA)) {
                 countMIA++;
-            } else if (Person.isCombatRole(p.getPrimaryRole()) && (p.getStatus() == PersonnelStatus.KIA)) {
+            } else if (p.hasPrimaryCombatRole() && (p.getStatus() == PersonnelStatus.KIA)) {
                 countKIA++;
             }
         }
@@ -7886,8 +7881,7 @@ public class Campaign implements Serializable, ITechManager {
 
         for (Person p : getPersonnel()) {
             // Add them to the total count
-            if (Person.isSupportRole(p.getPrimaryRole()) && !p.isPrisoner()
-                    && !p.isBondsman() && p.isActive()) {
+            if (p.hasPrimarySupportRole(false) && p.isFree() && p.isActive()) {
                 countPersonByType[p.getPrimaryRole()]++;
                 countTotal++;
                 if (p.getInjuries().size() > 0 || p.getHits() > 0) {
@@ -7904,14 +7898,11 @@ public class Campaign implements Serializable, ITechManager {
                 if (p.getInjuries().size() > 0 || p.getHits() > 0) {
                     countInjured++;
                 }
-            } else if (Person.isSupportRole(p.getPrimaryRole())
-                    && (p.getStatus() == PersonnelStatus.RETIRED)) {
+            } else if (p.hasPrimarySupportRole(false) && (p.getStatus() == PersonnelStatus.RETIRED)) {
                 countRetired++;
-            } else if (Person.isSupportRole(p.getPrimaryRole())
-                    && (p.getStatus() == PersonnelStatus.MIA)) {
+            } else if (p.hasPrimarySupportRole(false) && (p.getStatus() == PersonnelStatus.MIA)) {
                 countMIA++;
-            } else if (Person.isSupportRole(p.getPrimaryRole())
-                    && (p.getStatus() == PersonnelStatus.KIA)) {
+            } else if (p.hasPrimarySupportRole(false) && (p.getStatus() == PersonnelStatus.KIA)) {
                 countKIA++;
             }
         }
