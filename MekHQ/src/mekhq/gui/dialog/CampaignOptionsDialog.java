@@ -107,7 +107,7 @@ import mekhq.preferences.PreferencesNode;
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class CampaignOptionsDialog extends javax.swing.JDialog {
+public class CampaignOptionsDialog extends JDialog {
     //region Variable Declarations
     //region General Variables (ones not relating to a specific tab)
     private static final long serialVersionUID = 1935043247792962964L;
@@ -258,7 +258,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox chkDisplayTrueDueDate;
     private JCheckBox chkLogConception;
     private JComboBox<String> comboBabySurnameStyle;
-    private JCheckBox chkUseParentage;
+    private JCheckBox chkDisplayParentage;
     private JComboBox<String> comboDisplayFamilyLevel;
     private JCheckBox chkUseRandomDeaths;
     private JCheckBox chkKeepMarriedNameUponSpouseDeath;
@@ -1867,10 +1867,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(pnlBabySurnameStyle, gridBagConstraints);
 
-        chkUseParentage = new JCheckBox(resourceMap.getString("displayParentage.text"));
-        chkUseParentage.setSelected(options.displayParentage());
+        chkDisplayParentage = new JCheckBox(resourceMap.getString("displayParentage.text"));
+        chkDisplayParentage.setSelected(options.displayParentage());
         gridBagConstraints.gridy = ++gridy;
-        panFamily.add(chkUseParentage, gridBagConstraints);
+        panFamily.add(chkDisplayParentage, gridBagConstraints);
 
         DefaultComboBoxModel<String> familyLevelStatusModel = new DefaultComboBoxModel<>();
         familyLevelStatusModel.addElement(resourceMap.getString("displayFamilyLevel.ParentsChildren"));
@@ -4885,7 +4885,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setDisplayTrueDueDate(chkDisplayTrueDueDate.isSelected());
         options.setLogConception(chkLogConception.isSelected());
         options.setBabySurnameStyle(comboBabySurnameStyle.getSelectedIndex());
-        options.setDisplayParentage(chkUseParentage.isSelected());
+        options.setDisplayParentage(chkDisplayParentage.isSelected());
         options.setDisplayFamilyLevel(comboDisplayFamilyLevel.getSelectedIndex());
         options.setUseRandomDeaths(chkUseRandomDeaths.isSelected());
         options.setKeepMarriedNameUponSpouseDeath(chkKeepMarriedNameUponSpouseDeath.isSelected());
