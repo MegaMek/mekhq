@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018  - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2018 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -70,7 +70,7 @@ public class AtBEventProcessor {
     @Subscribe
     public void handleNewDay(NewDayEvent ev) {
         // TODO: move code from Campaign here
-        if (ev.getCampaign().hasActiveContract() && ev.getCampaign().getPersonnelMarket().getPaidRecruitment()
+        if (!ev.getCampaign().hasActiveContract() && ev.getCampaign().getPersonnelMarket().getPaidRecruitment()
                 && (ev.getCampaign().getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY)) {
             if (ev.getCampaign().getFinances().debit(Money.of(100000), Transaction.C_MISC,
                     "Paid recruitment roll", ev.getCampaign().getDate())) {
