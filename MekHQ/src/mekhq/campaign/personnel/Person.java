@@ -2659,7 +2659,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
      */
     @Override
     public boolean equals(Object object) {
-        if (!(object instanceof Person)) {
+        if (this == object) {
+            return true;
+        } else if (!(object instanceof Person)) {
             return false;
         } else {
             return getId().equals(((Person) object).getId());
