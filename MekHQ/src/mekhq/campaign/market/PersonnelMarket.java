@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.market;
 
 import java.io.PrintWriter;
@@ -68,7 +67,7 @@ public class PersonnelMarket {
 	private Map<UUID, Entity> attachedEntities = new LinkedHashMap<>();
 	/* Alternate types of rolls, set by PersonnelMarketDialog */
 	private boolean paidRecruitment = false;
-	private int paidRecruitType;
+	private int paidRecruitType = Person.T_MECHWARRIOR; // Default value to avoid errors from missing type
 
 	public PersonnelMarket() {
 	    method = new PersonnelMarketRandom();

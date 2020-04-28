@@ -1483,6 +1483,16 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 break;
         }
 
+        if (getCampaign().getCampaignOptions().logMarriageNameChange()) {
+            if (!spouse.getSurname().equals(spouseSurname)) {
+                PersonalLogger.marriageNameChange(spouse, this, getCampaign().getDate());
+
+            }
+            if (!getSurname().equals(surname)) {
+                PersonalLogger.marriageNameChange(this, spouse, getCampaign().getDate());
+            }
+        }
+
         setSpouseId(spouse.getId());
         spouse.setSpouseId(getId());
 

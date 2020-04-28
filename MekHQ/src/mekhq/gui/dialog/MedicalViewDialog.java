@@ -39,7 +39,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
+import java.time.Period;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -347,8 +347,7 @@ public class MedicalViewDialog extends JDialog {
         LocalDate birthday = p.getBirthday();
         String birthdayString = birthday.format(java.time.format.DateTimeFormatter.ofPattern(DISPLAY_FORMAT));
 
-        int ageInMonths = Math.toIntExact(ChronoUnit.MONTHS.between(birthday, campaign.getLocalDate()
-                .plus(1, ChronoUnit.DAYS)));
+        Period age = Period.between(birthday, campaign.getLocalDate());
 
         String phenotype = (p.getPhenotype() != Person.PHENOTYPE_NONE) ? p.getPhenotypeName() : resourceMap.getString("baselinePhenotype.text"); //$NON-NLS-1$
 
@@ -367,7 +366,7 @@ public class MedicalViewDialog extends JDialog {
         panel.add(genLabel(resourceMap.getString("birthDate.text"))); //$NON-NLS-1$
         panel.add(genLabel(resourceMap.getString("age.text"))); //$NON-NLS-1$
         panel.add(genWrittenPanel(birthdayString));
-        panel.add(genWrittenPanel(String.format(resourceMap.getString("age.format"), ageInMonths / 12, ageInMonths % 12))); //$NON-NLS-1$
+        panel.add(genWrittenPanel(String.format(resourceMap.getString("age.format"), age.getYears(), age.getMonths()))); //$NON-NLS-1$
         panel.add(genLabel(resourceMap.getString("gender.text"))); //$NON-NLS-1$
         panel.add(genLabel(resourceMap.getString("phenotype.text"))); //$NON-NLS-1$
         panel.add(genWrittenPanel(p.isMale() ? resourceMap.getString("genderMale.text") : resourceMap.getString("genderFemale.text"))); //$NON-NLS-1$ //$NON-NLS-2$

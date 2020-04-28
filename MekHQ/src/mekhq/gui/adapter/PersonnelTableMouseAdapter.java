@@ -808,11 +808,18 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         selectedPerson.getPortraitFileName(), gui.getIconPackage()
                         .getPortraits());
                 pcd.setVisible(true);
-                if (pcd.isChanged()) {
-                    selectedPerson.setPortraitCategory(pcd.getCategory());
-                    selectedPerson.setPortraitFileName(pcd.getFileName());
-                    gui.getCampaign().personUpdated(selectedPerson);
-                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+
+                final String category = pcd.getCategory();
+                final String fileName = pcd.getFileName();
+
+                for (Person person : people) {
+                    if (!person.getPortraitCategory().equals(category)
+                            && !person.getPortraitFileName().equals(fileName)) {
+                        person.setPortraitCategory(category);
+                        person.setPortraitFileName(fileName);
+                        gui.getCampaign().personUpdated(person);
+                        MekHQ.triggerEvent(new PersonChangedEvent(person));
+                    }
                 }
                 break;
             }
@@ -2515,52 +2522,51 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             menuItem = new JMenuItem(resourceMap.getString("randomizePortrait.text")); //$NON-NLS-1$
             menuItem.setActionCommand(CMD_RANDOM_PORTRAIT);
             menuItem.addActionListener(this);
-            menuItem.setEnabled(true);
             popup.add(menuItem);
+
+            // change portrait
+            menuItem = new JMenuItem(resourceMap.getString(oneSelected ? "changePortrait.text" : "bulkAssignSinglePortrait.text"));
+            menuItem.setActionCommand(CMD_EDIT_PORTRAIT);
+            menuItem.addActionListener(this);
+            popup.add(menuItem);
+
             if (oneSelected) {
-                // change portrait
-                menuItem = new JMenuItem(resourceMap.getString("changePortrait.text")); //$NON-NLS-1$
-                menuItem.setActionCommand(CMD_EDIT_PORTRAIT);
-                menuItem.addActionListener(this);
-                menuItem.setEnabled(true);
-                popup.add(menuItem);
                 // change Biography
                 menuItem = new JMenuItem(resourceMap.getString("changeBiography.text")); //$NON-NLS-1$
                 menuItem.setActionCommand(CMD_EDIT_BIOGRAPHY);
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(true);
                 popup.add(menuItem);
+
                 menuItem = new JMenuItem(resourceMap.getString("changeCallsign.text")); //$NON-NLS-1$
                 menuItem.setActionCommand(CMD_CALLSIGN);
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(true);
                 popup.add(menuItem);
+
                 menuItem = new JMenuItem(resourceMap.getString("editPersonnelLog.text")); //$NON-NLS-1$
                 menuItem.setActionCommand(CMD_EDIT_PERSONNEL_LOG);
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(true);
                 popup.add(menuItem);
-
             }
+
             menuItem = new JMenuItem(resourceMap.getString("addSingleLogEntry.text")); //$NON-NLS-1$
             menuItem.setActionCommand(CMD_ADD_LOG_ENTRY);
             menuItem.addActionListener(this);
-            menuItem.setEnabled(true);
             popup.add(menuItem);
+
             if (oneSelected) {
                 // Edit mission log
                 menuItem = new JMenuItem(resourceMap.getString("editMissionLog.text")); //$NON-NLS-1$
                 menuItem.setActionCommand(CMD_EDIT_MISSIONS_LOG);
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(true);
                 popup.add(menuItem);
             }
+
             // Add one item to all personnel mission logs
             menuItem = new JMenuItem(resourceMap.getString("addMissionEntry.text")); //$NON-NLS-1$
             menuItem.setActionCommand(CMD_ADD_MISSION_ENTRY);
             menuItem.addActionListener(this);
-            menuItem.setEnabled(true);
             popup.add(menuItem);
+
             if (oneSelected) {
                 menuItem = new JMenuItem(resourceMap.getString("editKillLog.text")); //$NON-NLS-1$
                 menuItem.setActionCommand(CMD_EDIT_KILL_LOG);

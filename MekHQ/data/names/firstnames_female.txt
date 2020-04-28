@@ -4273,14 +4273,13 @@ Zoraida,4,1
 Zula,3,1
 Zulema,2,1
 Zulma,3,1
-Aaliyah,1,2
-Aaliyah,1,2
+Aaliyah,2,2
 Abagail,1,2
 Abbey,1,2
 Abbie,1,2
 Abbie,1,2
 Abbigail,1,2
-Abby,1,2
+Abby,2,2
 Abigail,1,2
 Abigail,1,2
 Abigale,1,2
@@ -4310,8 +4309,7 @@ Alena,1,2
 Alessandra,1,2
 Alex,1,2
 Alexa,1,2
-Alexandra,1,2
-Alexandra,1,2
+Alexandra,2,2
 Alexandrea,1,2
 Alexandria,1,2
 Alexia,1,2
@@ -4325,8 +4323,7 @@ Alicia,1,2
 Alicia,1,2
 Alina,1,2
 Alisa,1,2
-Alisha,1,2
-Alisha,1,2
+Alisha,2,2
 Alison,1,2
 Alissa,1,2
 Alivia,1,2
@@ -4351,13 +4348,12 @@ Amani,1,2
 Amara,1,2
 Amari,1,2
 Amaya,1,2
-Amber,1,2
-Amelia,1,2
-Amelia,1,2
+Amber,2,2
+Amelia,2,2
 America,1,2
 Amina,1,2
 Amira,1,2
-Amy,1,2
+Amy,2,2
 Amya,1,2
 Ana,1,2
 Anabel,1,2
@@ -4439,10 +4435,8 @@ Beatriz,1,2
 Belen,1,2
 Bella,1,2
 Berenice,1,2
-Bethany,1,2
-Bethany,1,2
-Bianca,1,2
-Blanca,1,2
+Bethany,2,2
+Bianca,2,2
 Brandi,1,2
 Brandy,1,2
 Breana,1,2
@@ -4461,16 +4455,14 @@ Brisa,1,2
 Britney,1,2
 Brittany,1,2
 Brittney,1,2
-Brooke,1,2
-Brooke,1,2
+Brooke,2,2
 Brooklyn,1,2
 Brooklynn,1,2
 Bryana,1,2
 Bryanna,1,2
 Brynn,1,2
 Cadence,1,2
-Caitlin,1,2
-Caitlin,1,2
+Caitlin,2,2
 Caitlyn,1,2
 Cali,1,2
 Calista,1,2
@@ -4511,16 +4503,14 @@ Celeste,1,2
 Celia,1,2
 Celina,1,2
 Celine,1,2
-Cerys ,1,2
+Cerys,1,2
 Chana,1,2
 Charity,1,2
 Charlie,1,2
-Charlotte,1,2
-Charlotte,1,2
+Charlotte,2,2
 Chasity,1,2
 Chaya,1,2
-Chelsea,1,2
-Chelsea,1,2
+Chelsea,2,2
 Chelsey,1,2
 Cheyanne,1,2
 Cheyenne,1,2
@@ -4545,14 +4535,12 @@ Claudia,1,2
 Colleen,1,2
 Cora,1,2
 Corinne,1,2
-Courtney,1,2
-Courtney,1,2
+Courtney,2,2
 Cristal,1,2
 Cristina,1,2
 Crystal,1,2
 Cynthia,1,2
-Daisy,1,2
-Daisy,1,2
+Daisy,2,2
 Dakota,1,2
 Dalia,1,2
 Damaris,1,2
@@ -4600,8 +4588,7 @@ Edith,1,2
 Eileen,1,2
 Elaina,1,2
 Elaine,1,2
-Eleanor,1,2
-Eleanor,1,2
+Eleanor,2,2
 Elena,1,2
 Eliana,1,2
 Elisa,1,2
@@ -4716,8 +4703,7 @@ Heidi,1,2
 Helen,1,2
 Helena,1,2
 Hollie,1,2
-Holly,1,2
-Holly,1,2
+Holly,2,2
 Hope,1,2
 Hunter,1,2
 Iliana,1,2
@@ -4870,8 +4856,7 @@ Kasey,1,2
 Kassandra,1,2
 Kassidy,1,2
 Katarina,1,2
-Kate,1,2
-Kate ,1,2
+Kate,2,2
 Katelin,1,2
 Katelyn,1,2
 Katelynn,1,2
@@ -4882,8 +4867,7 @@ Katherine,1,2
 Kathleen,1,2
 Kathryn,1,2
 Kathy,1,2
-Katie,1,2
-Katie,1,2
+Katie,2,2
 Katlyn,1,2
 Katrina,1,2
 Katy,1,2
@@ -5024,8 +5008,7 @@ Madelyn,1,2
 Madelynn,1,2
 Madilyn,1,2
 Madisen,1,2
-Madison,1,2
-Madison ,1,2
+Madison,2,2
 Madisyn,1,2
 Madyson,1,2
 Maegan,1,2
@@ -5106,10 +5089,8 @@ Miranda,1,2
 Mireya,1,2
 Miriam,1,2
 Miya,1,2
-Mollie,1,2
-Mollie ,1,2
-Molly,1,2
-Molly,1,2
+Mollie,2,2
+Molly,2,2
 Monica,1,2
 Monique,1,2
 Monserrat,1,2
@@ -5287,7 +5268,7 @@ Stacy,1,2
 Stella,1,2
 Stephanie,1,2
 Stephany,1,2
-Summer,1,2
+Summer,2,2
 Susan,1,2
 Susana,1,2
 Sydnee,1,2
@@ -5318,7 +5299,7 @@ Tess,1,2
 Tessa,1,2
 Thalia,1,2
 Theresa,1,2
-Tia,1,2
+Tia,2,2
 Tiana,1,2
 Tianna,1,2
 Tiara,1,2
@@ -6113,109 +6094,109 @@ Uny,1,4
 Vevila,1,4
 Vevina,1,4
 Zaira,1,4
-Ada ,1,5
-Adalgisa ,1,5
-Adelaide ,1,5
-Adelina ,1,5
-Adelle ,1,5
-Adolfina ,1,5
-Alberta ,1,5
-Alice ,1,5
-Alison ,1,5
-Amara ,1,5
-Anna ,1,5
-Arabelle ,1,5
-Arnelle ,1,5
-Arnwlle ,1,5
-Aubrey ,1,5
-Ava ,1,5
-Bernadette ,1,5
-Bernadine ,1,5
-Berta ,1,5
-Callan ,1,5
-Carla ,1,5
-Carleigh ,1,5
-Carol ,1,5
-Carolyn ,1,5
-Chloris ,1,5
-Christa ,1,5
-Clay ,1,5
-Dagmar ,1,5
-Delia ,1,5
-Ebba ,1,5
-Edwina ,1,5
-Elga ,1,5
-Elke ,1,5
-Elsa ,1,5
-Elsbeth ,1,5
-Elvira ,1,5
-Emily ,1,5
-Emma ,1,5
-Erika ,1,5
-Ernestine ,1,5
-Faiga ,1,5
-Frederica ,1,5
-Galiana ,1,5
-Genevieve ,1,5
-Gerda ,1,5
-Gertrude ,1,5
-Giselle ,1,5
-Greta ,1,5
+Ada,1,5
+Adalgisa,1,5
+Adelaide,1,5
+Adelina,1,5
+Adelle,1,5
+Adolfina,1,5
+Alberta,1,5
+Alice,1,5
+Alison,1,5
+Amara,1,5
+Anna,1,5
+Arabelle,1,5
+Arnelle,1,5
+Arnwlle,1,5
+Aubrey,1,5
+Ava,1,5
+Bernadette,1,5
+Bernadine,1,5
+Berta,1,5
+Callan,1,5
+Carla,1,5
+Carleigh,1,5
+Carol,1,5
+Carolyn,1,5
+Chloris,1,5
+Christa,1,5
+Clay,1,5
+Dagmar,1,5
+Delia,1,5
+Ebba,1,5
+Edwina,1,5
+Elga,1,5
+Elke,1,5
+Elsa,1,5
+Elsbeth,1,5
+Elvira,1,5
+Emily,1,5
+Emma,1,5
+Erika,1,5
+Ernestine,1,5
+Faiga,1,5
+Frederica,1,5
+Galiana,1,5
+Genevieve,1,5
+Gerda,1,5
+Gertrude,1,5
+Giselle,1,5
+Greta,1,5
 Gretchen,1,5
-Heidi ,1,5
-Helga ,1,5
-Henrietta ,1,5
-Idonia ,1,5
-Imelda ,1,5
-Jarvia ,1,5
-Jenell ,1,5
-Leona ,1,5
-Leopolda ,1,5
-Leyna ,1,5
-Liese ,1,5
-Lorelei ,1,5
-Louise ,1,5
+Heidi,1,5
+Helga,1,5
+Henrietta,1,5
+Idonia,1,5
+Imelda,1,5
+Jarvia,1,5
+Jenell,1,5
+Leona,1,5
+Leopolda,1,5
+Leyna,1,5
+Liese,1,5
+Lorelei,1,5
+Louise,1,5
 Luann,1,5
-Mallory ,1,5
-Malorie ,1,5
-Margret ,1,5
-Mariel ,1,5
-Marlene ,1,5
-Mathilda ,1,5
-Maud ,1,5
-Millicent ,1,5
-Minna ,1,5
-Morgen ,1,5
-Nixie ,1,5
+Mallory,1,5
+Malorie,1,5
+Margret,1,5
+Mariel,1,5
+Marlene,1,5
+Mathilda,1,5
+Maud,1,5
+Millicent,1,5
+Minna,1,5
+Morgen,1,5
+Nixie,1,5
 Norberta,1,5
-Nordica ,1,5
-Olinda ,1,5
-Orlantha ,1,5
-Pepin ,1,5
-Raina ,1,5
-Richelle ,1,5
-Roderica ,1,5
-Rolanda ,1,5
-Schmetterling ,1,5
-Selma ,1,5
-Senta ,1,5
-Serilda ,1,5
-Sonnenschein ,1,5
-Trudy ,1,5
-Ula ,1,5
-Ulrika ,1,5
-Ulva ,1,5
-Unna ,1,5
-Vala ,1,5
-Velma ,1,5
-Viveka ,1,5
-Wanda ,1,5
+Nordica,1,5
+Olinda,1,5
+Orlantha,1,5
+Pepin,1,5
+Raina,1,5
+Richelle,1,5
+Roderica,1,5
+Rolanda,1,5
+Schmetterling,1,5
+Selma,1,5
+Senta,1,5
+Serilda,1,5
+Sonnenschein,1,5
+Trudy,1,5
+Ula,1,5
+Ulrika,1,5
+Ulva,1,5
+Unna,1,5
+Vala,1,5
+Velma,1,5
+Viveka,1,5
+Wanda,1,5
 Wilma,1,5
-Winifred ,1,5
-Winola ,1,5
-Zelda ,1,5
-Zelinda ,1,5
-Zelma ,1,5
+Winifred,1,5
+Winola,1,5
+Zelda,1,5
+Zelinda,1,5
+Zelma,1,5
 Abelina,1,5
 Abigail,1,5
 Adele,1,5
@@ -10087,6 +10068,7 @@ Zwanet,1,6
 Agathe,1,7
 Agnes,1,7
 Agnetha,1,7
+Ågot,1,7
 Aina,1,7
 Alexandra,1,7
 Alfhild,1,7
@@ -10100,7 +10082,7 @@ Annelie,1,7
 Anniken,1,7
 Antonia,1,7
 Arnbjørg,1,7
-_se,1,7
+Åse,1,7
 Aslaug,1,7
 Asta,1,7
 Astrid,1,7
@@ -10517,7 +10499,7 @@ Anne,1,7
 Annelie,1,7
 Annelise,1,7
 Antonia,1,7
-_se,1,7
+Åse,1,7
 Aslaug,1,7
 Asløg,1,7
 Asta,1,7
@@ -12136,36 +12118,23 @@ Adega,1,10
 Adela,1,10
 Adela,1,10
 Adelagia,1,10
-Adelaida,1,10
-Adelaida,1,10
-Adelaida,1,10
+Adelaida,3,10
 Adelaide,1,10
 Adelasia,1,10
 Adeleta,1,10
-Adelina,1,10
-Adelina,1,10
-Adeline,1,10
-Adeline,1,10
-Adelita,1,10
-Adelita,1,10
-Adeliz,1,10
-Adeliz,1,10
-Adella,1,10
-Adella,1,10
-Adlielia,1,10
-Adlielia,1,10
+Adelina,2,10
+Adeline,2,10
+Adelita,2,10
+Adeliz,2,10
+Adella,2,10
+Adlielia,2,10
 Adnas,1,10
-Adoncia,1,10
-Adoncia,1,10
-Adonia,1,10
-Adonia,1,10
-Adonie,1,10
-Adonie,1,10
-Adonine,1,10
-Adonine,1,10
+Adoncia,2,10
+Adonia,2,10
+Adonie,2,10
+Adonine,2,10
 Adora,1,10
-Adoracion,1,10
-Adoracion,1,10
+Adoracion,2,10
 Adorna,1,10
 Adra,1,10
 Adrea,1,10
@@ -12868,35 +12837,26 @@ Anna,1,10
 Annabel,1,10
 Annabel,1,10
 Annabele,1,10
-Annabell,1,10
-Annabell,1,10
-Annabella,1,10
-Annabella,1,10
-Annabelle,1,10
-Annabelle,1,10
+Annabell,2,10
+Annabella,2,10
+Annabelle,2,10
 Annable,1,10
-Annalicia,1,10
-Annalicia,1,10
+Annalicia,2,10
 Annalisse,1,10
-Annamaria,1,10
-Annamaria,1,10
-Annamarie,1,10
-Annamarie,1,10
+Annamaria,2,10
+Annamarie,2,10
 Anna-Nina,1,10
 Annaple,1,10
 Annarita,1,10
 Anne,1,10
-Annetta,1,10
-Annetta,1,10
-Annette,1,10
-Annette,1,10
+Annetta,2,10
+Annette,2,10
 Annina,1,10
 Annona,1,10
 Annor,1,10
 Annora,1,10
 Annunciata,1,10
-Annunziata,1,10
-Annunziata,1,10
+Annunziata,2,10
 Annuziata,1,10
 Anona,1,10
 Anora,1,10
@@ -13236,58 +13196,35 @@ Asensio,1,10
 Ases,1,10
 Ases,1,10
 Asia,1,10
-Asianah ,1,10
-Asianah ,1,10
+Asianah,2,10
 Asiannique,1,10
-Asiturri,1,10
-Asiturri,1,10
-Askoa,1,10
-Askoa,1,10
+Asiturri,2,10
+Askoa,2,10
 Asmin,1,10
-Assunta,1,10
-Assunta,1,10
+Assunta,2,10
 Assuntina,1,10
-Asuncion,1,10
-Asuncion,1,10
-Asuncion,1,10
-Asunta,1,10
-Asunta,1,10
-Atalaya,1,10
-Atalaya,1,10
-Atalaya,1,10
-Atallo,1,10
-Atallo,1,10
-Atalya,1,10
-Atalya,1,10
+Asuncion,3,10
+Asunta,2,10
+Atalaya,3,10
+Atallo,2,10
+Atalya,2,10
 Ataun,1,10
 Ataun,1,10
-Athalia,1,10
-Athalia,1,10
-Athalia,1,10
+Athalia,3,10
 Athena,1,10
-Atotz,1,10
-Atotz,1,10
-Atsegie,1,10
-Atsegie,1,10
-Atsegine,1,10
-Atsegine,1,10
-Atsegise,1,10
-Atsegise,1,10
+Atotz,2,10
+Atsegie,2,10
+Atsegine,2,10
+Atsegise,2,10
 Atta,1,10
 Attia,1,10
-Atxarte,1,10
-Atxarte,1,10
-Audrey,1,10
-Audrey,1,10
+Atxarte,2,10
+Audrey,2,10
 Augusta,1,10
 Auguste,1,10
-Augustina,1,10
-Augustina,1,10
+Augustina,2,10
 Augustine,1,10
-Aura,1,10
-Aura,1,10
-Aura,1,10
-Aura,1,10
+Aura,4,10
 Auralea,1,10
 Auralee,1,10
 Auralei,1,10
@@ -13296,35 +13233,23 @@ Aure,1,10
 Aurea,1,10
 Aurea,1,10
 Aureal,1,10
-Aurela,1,10
-Aurela,1,10
+Aurela,2,10
 Aurele,1,10
 Aurelea,1,10
 Aurelei,1,10
-Aurelia,1,10
-Aurelia,1,10
-Aurelia,1,10
-Aureliana,1,10
-Aureliana,1,10
-Aureliana,1,10
+Aurelia,3,10
+Aureliana,3,10
 Aurellee,1,10
-Auria,1,10
-Auria,1,10
+Auria,2,10
 Aurie,1,10
 Auriel,1,10
 Aurielle,1,10
 Aurillia,1,10
-Auriola,1,10
-Auriola,1,10
+Auriola,2,10
 Aurita,1,10
-Aurkena,1,10
-Aurkena,1,10
-Aurkena,1,10
-Aurkene,1,10
-Aurkene,1,10
-Aurkene,1,10
-Aurora,1,10
-Aurora,1,10
+Aurkena,3,10
+Aurkene,3,10
+Aurora,2,10
 Aurore,1,10
 Aurorette,1,10
 Austie,1,10
@@ -13834,16 +13759,11 @@ Borja,1,10
 Bortola,1,10
 Branca,1,10
 Brandi,1,10
-Brandy,1,10
-Brandy,1,10
-Brandye,1,10
-Brandye,1,10
-Brasa,1,10
-Brasa,1,10
-Breezy,1,10
-Breezy,1,10
-Brenda,1,10
-Brenda,1,10
+Brandy,2,10
+Brandye,2,10
+Brasa,2,10
+Breezy,2,10
+Brenda,2,10
 Briatiz,1,10
 Bridgette,1,10
 Bridgette,1,10
@@ -14037,23 +13957,12 @@ Carisa,1,10
 Carissa,1,10
 Carisse,1,10
 Carita,1,10
-Carla,1,10
-Carla,1,10
-Carla,1,10
-Carleigha,1,10
-Carleigha,1,10
-Carletta,1,10
-Carletta,1,10
-Carletta,1,10
-Carlita,1,10
-Carlita,1,10
-Carlita,1,10
-Carlota,1,10
-Carlota,1,10
-Carlota,1,10
-Carlotta,1,10
-Carlotta,1,10
-Carlotta,1,10
+Carla,3,10
+Carleigha,2,10
+Carletta,3,10
+Carlita,3,10
+Carlota,3,10
+Carlotta,3,10
 Carlutia,1,10
 Carme,1,10
 Carme,1,10
@@ -14134,12 +14043,8 @@ Casmundina,1,10
 Casola,1,10
 Casomira,1,10
 Casomira,1,10
-Cassandra,1,10
-Cassandra,1,10
-Cassandra,1,10
-Casta,1,10
-Casta,1,10
-Casta,1,10
+Cassandra,3,10
+Casta,3,10
 Caste,1,10
 Castellana,1,10
 Catala,1,10
@@ -14634,21 +14539,15 @@ Corabelle,1,10
 Coral,1,10
 Coral,1,10
 Corale,1,10
-Coralia,1,10
-Coralia,1,10
+Coralia,2,10
 Coralie,1,10
 Coraline,1,10
-Coraly,1,10
-Corazana,1,10
-Corazana,1,10
-Corazana,1,10
-Corazon,1,10
-Corazon,1,10
-Corazon,1,10
+Coraly,2,10
+Corazana,3,10
+Corazon,3,10
 Corbella,1,10
 Cordelia,1,10
-Corina,1,10
-Corina,1,10
+Corina,2,10
 Corinna,1,10
 Corneilla,1,10
 Cornela,1,10
@@ -14816,7 +14715,7 @@ Davina,1,10
 Dawn,1,10
 Dawn,1,10
 Dayami,1,10
-Dayanara,1,10
+Dayanara,2,10
 Daylof,1,10
 Dayluue,1,10
 Dea,1,10
@@ -15610,8 +15509,7 @@ Emilly,1,10
 Emillyann,1,10
 Emillyanna,1,10
 Emillyanne,1,10
-Emily,1,10
-Emily,1,10
+Emily,3,10
 Emilyann,1,10
 Emilyean,1,10
 Emina,1,10
@@ -15888,11 +15786,8 @@ Estela,1,10
 Estelita,1,10
 Estelita,1,10
 Estelita,1,10
-Estella,1,10
-Estella,1,10
-Estella,1,10
-Estelle,1,10
-Estelle,1,10
+Estella,3,10
+Estelle,2,10
 Estephanie,1,10
 Estephanie,1,10
 Estephanie,1,10
@@ -15964,10 +15859,8 @@ Eustaquia,1,10
 Eutiche,1,10
 Eutimia,1,10
 Eutimia,1,10
-Eva,1,10
-Eva,1,10
-Eva,1,10
-Evalisse,1,10
+Eva,4,10
+Evalisse,2,10
 Evangelia,1,10
 Evangelina,1,10
 Evangelina,1,10
@@ -16754,7 +16647,7 @@ Guadencia,1,10
 Gualdalupe,1,10
 Gualdalupe,1,10
 Gualterutia,1,10
-Guanina,1,10
+Guanina,2,10
 Guarnita,1,10
 Guccia,1,10
 Guendolina,1,10
@@ -16845,28 +16738,18 @@ Helmina,1,10
 Henrietta,1,10
 Henrietta,1,10
 Henriette,1,10
-Henriqua,1,10
-Henriqua,1,10
+Henriqua,2,10
 Hera,1,10
-Heriberto ,1,10
-Heriberto ,1,10
-Herlinda,1,10
-Herlinda,1,10
-Hermelinda,1,10
-Hermelinda,1,10
-Hermila,1,10
-Hermila,1,10
+Heriberto,2,10
+Herlinda,2,10
+Hermelinda,2,10
+Hermila,2,10
 Hermin,1,10
-Herminia,1,10
-Herminia,1,10
-Hermosa,1,10
-Hermosa,1,10
-Hernandez,1,10
-Hernandez,1,10
-Hernani,1,10
-Hernani,1,10
-Hiart,1,10
-Hiart,1,10
+Herminia,2,10
+Hermosa,2,10
+Hernandez,2,10
+Hernani,2,10
+Hiart,2,10
 Hiberna,1,10
 Hibernia,1,10
 Hibiscus,1,10
@@ -16961,12 +16844,9 @@ Idalia,1,10
 Idalia,1,10
 Idalitza,1,10
 Idalitza,1,10
-Idalyz,1,10
-Idalyz,1,10
-Idiazabal,1,10
-Idiazabal,1,10
-Idoia,1,10
-Idoia,1,10
+Idalyz,2,10
+Idiazabal,2,10
+Idoia,2,10
 Idoibaltzaga,1,10
 Idoibaltzaga,1,10
 Idoya,1,10
@@ -18710,7 +18590,7 @@ Madre,1,10
 Madrona,1,10
 Madrona,1,10
 Mae,1,10
-Maela ,1,10
+Maela,1,10
 Mafalda,1,10
 Mafalda,1,10
 Mag,1,10
@@ -21771,13 +21651,10 @@ Terza,1,10
 Tessa,1,10
 Tetxa,1,10
 Tetxa,1,10
-Teyra,1,10
-Teyra,1,10
-Thaimy ,1,10
-Thaimy ,1,10
+Teyra,2,10
+Thaimy,2,10
 Thais,1,10
-Thalia,1,10
-Thalia,1,10
+Thalia,2,10
 Thea,1,10
 Thekla,1,10
 Thelma,1,10
@@ -22974,7 +22851,7 @@ Joana,1,11
 Josefa,1,11
 Jovita,1,11
 Judite,1,11
-J_lia,1,11
+Júlia,1,11
 Juliana,1,11
 Laura,1,11
 Leocádia,1,11
@@ -22989,7 +22866,7 @@ Liliana,1,11
 Livia,1,11
 Lívia,1,11
 Lorena,1,11
-L_cia,1,11
+Lúcia,1,11
 Luciana,1,11
 Lucinda,1,11
 Luísa,1,11
@@ -23021,7 +22898,7 @@ Neves,1,11
 Nilda,1,11
 Noemí,1,11
 Noêmia,1,11
-N_ria,1,11
+Núria,1,11
 Ofélia,1,11
 Olga,1,11
 Olívia,1,11
@@ -23059,7 +22936,7 @@ Teresa,1,11
 Teresinha,1,11
 Tereza,1,11
 Terezinha,1,11
-_rsula,1,11
+Úrsula,1,11
 Valéria,1,11
 Vera,1,11
 Verônica,1,11
@@ -24832,8 +24709,7 @@ Alena,1,13
 Alexandra,1,13
 Alica,1,13
 Alojzia,1,13
-Albeta,1,13
-Albeta,1,13
+Alžbeta,2,13
 Amália,1,13
 Amálie,1,13
 Anastázia,1,13
@@ -24854,7 +24730,7 @@ Blanka,1,13
 Bohumila,1,13
 Bohuslava,1,13
 Boleslava,1,13
-Boena,1,13
+Božena,1,13
 Branislava,1,13
 Branka,1,13
 Bronislava,1,13
@@ -24871,9 +24747,9 @@ Dominika,1,13
 Dorota,1,13
 Drahomíra,1,13
 Drahoslava,1,13
-Duana,1,13
+Dušana,1,13
 Edita,1,13
-Elika,1,13
+Eliška,1,13
 Ema,1,13
 Emília,1,13
 Emílie,1,13
@@ -24881,7 +24757,7 @@ Erika,1,13
 Ester,1,13
 Estera,1,13
 Eva,1,13
-Frantika,1,13
+Františka,1,13
 Gabriela,1,13
 Hana,1,13
 Hedviga,1,13
@@ -24906,10 +24782,10 @@ Johana,1,13
 Jolana,1,13
 Josefa,1,13
 Judita,1,13
-J_lia,1,13
+Júlia,1,13
 Justina,1,13
 Justína,1,13
-Just_na,1,13
+Justýna,1,13
 Kája,1,13
 Kamila,1,13
 Karolína,1,13
@@ -24920,12 +24796,12 @@ Klaudia,1,13
 Klaudie,1,13
 Kristina,1,13
 Kristína,1,13
-Krist_na,1,13
+Kristýna,1,13
 Kveta,1,13
 Ladislava,1,13
 Lenka,1,13
 Libena,1,13
-Libue,1,13
+Libuše,1,13
 Lída,1,13
 Linda,1,13
 Lívia,1,13
@@ -24934,8 +24810,8 @@ Lucia,1,13
 Lucie,1,13
 Ludmila,1,13
 Ludmilla,1,13
-L_dia,1,13
-L_die,1,13
+Lýdia,1,13
+Lýdie,1,13
 Madlenka,1,13
 Magda,1,13
 Magdalena,1,13
@@ -24964,8 +24840,7 @@ Miloslava,1,13
 Miroslava,1,13
 Monika,1,13
 Nada,1,13
-Nadeda,1,13
-Nadeda,1,13
+Nadežda,2,13
 Natália,1,13
 Natálie,1,13
 Nikola,1,13
@@ -24986,18 +24861,18 @@ Radoslava,1,13
 Renata,1,13
 Renáta,1,13
 Romana,1,13
-Ruena,1,13
+Ružena,1,13
 Sabina,1,13
 Sára,1,13
-árka,1,13
+Šárka,1,13
 Silvia,1,13
 Silvie,1,13
 Simona,1,13
-imona,1,13
+Šimona,1,13
 Sona,1,13
 Stanislava,1,13
-tefánia,1,13
-tepánka,1,13
+Štefánia,1,13
+Štepánka,1,13
 Svetlana,1,13
 Svetlana,1,13
 Tatána,1,13
@@ -25019,8 +24894,8 @@ Vlasta,1,13
 Zdenka,1,13
 Zdenka,1,13
 Zita,1,13
-ofia,1,13
-ofie,1,13
+Žofia,1,13
+Žofie,1,13
 Zoja,1,13
 Zora,1,13
 Zuzana,1,13
@@ -25391,8 +25266,7 @@ Ester,1,16
 Esteri,1,16
 Eveliina,1,16
 Fanni,1,16
-Hanna,1,16
-Hanna,1,16
+Hanna,2,16
 Hannele,1,16
 Heidi,1,16
 Heleena,1,16
@@ -25766,9 +25640,9 @@ Adrijana,1,18
 Aleksandra,1,18
 Ana,1,18
 Andela,1,18
-Andjela ,1,18
+Andjela,1,18
 Anka,1,18
-Antonija ,1,18
+Antonija,1,18
 Biljana,1,18
 Bogdana,1,18
 Bojana,1,18
@@ -25784,7 +25658,7 @@ Dragica,1,18
 Dragoslava,1,18
 Dubravka,1,18
 Dunja,1,18
-Duana,1,18
+Dušana,1,18
 Ema,1,18
 Emilija,1,18
 Filipa,1,18
@@ -25821,14 +25695,14 @@ Milena,1,18
 Milica,1,18
 Milka,1,18
 Mirjana,1,18
-Mirna ,1,18
+Mirna,1,18
 Miroslava,1,18
-Mladenka ,1,18
+Mladenka,1,18
 Mojca,1,18
 Nada,1,18
 Naida,1,18
 Natalija,1,18
-Nataa,1,18
+Nataša,1,18
 Olga,1,18
 Olivera,1,18
 Radmila,1,18
@@ -25839,7 +25713,7 @@ Senka,1,18
 Severina,1,18
 Silvija,1,18
 Slavica,1,18
-Sneana,1,18
+Snežana,1,18
 Snjezana,1,18
 Sofija,1,18
 Sonja,1,18
@@ -25857,7 +25731,7 @@ Valerija,1,18
 Veca,1,18
 Vedrana,1,18
 Vesna,1,18
-Vinja,1,18
+Višnja,1,18
 Vjekoslava,1,18
 Zlata,1,18
 Zora,1,18
@@ -26005,7 +25879,7 @@ Isadora,1,19
 Isadorer,1,19
 Isaura,1,19
 Jace,1,19
-Jacinda ,1,19
+Jacinda,1,19
 Jacinta,1,19
 Kaia,1,19
 Kalika,1,19
@@ -26626,8 +26500,7 @@ Jale,1,20
 Jamilya,1,20
 Jihan,1,20
 Julide,1,20
-Kader,1,20
-Kader ,1,20
+Kader,2,20
 Kadriye,1,20
 Kamelya,1,20
 Kamile,1,20
@@ -28704,1680 +28577,1680 @@ Zinah,1,24
 Zoeya,1,24
 Zubaida,1,24
 Zulekha,1,24
-Aaarti ,1,25
-Aafreen ,1,25
-Abani ,1,25
-Abha ,1,25
-Abhaya ,1,25
-Abhilasha ,1,25
-Aboil ,1,25
-Achala ,1,25
-Adarsh ,1,25
-Adhira ,1,25
-Adishree ,1,25
-Aditi ,1,25
-Adrika ,1,25
-Aghanashini ,1,25
-Agrata ,1,25
-Agrima ,1,25
-Ahalya ,1,25
-Ahladita ,1,25
-Aishani ,1,25
-Aishwarya ,1,25
-Ajala ,1,25
-Ajanta ,1,25
-Akhila ,1,25
-Akriti ,1,25
-Akshaya ,1,25
-Akshita ,1,25
-Akuti ,1,25
-Alaka ,1,25
-Alaknanda ,1,25
-Alisha ,1,25
-Alka ,1,25
-Almas ,1,25
-Alopa ,1,25
-Alpa ,1,25
-Alpana ,1,25
-Amala ,1,25
-Amba ,1,25
-Ambika ,1,25
-Ambu ,1,25
-Ambuda ,1,25
-Ambuja ,1,25
-Ambuja ,1,25
-Amita ,1,25
-Amla ,1,25
-Amoda ,1,25
-Amodini ,1,25
-Amrapali ,1,25
-Amrita ,1,25
-Amritkala ,1,25
-Amrusha ,1,25
-Amshula ,1,25
-Amulya ,1,25
-Anagha ,1,25
-Anahita ,1,25
-Anala ,1,25
-Anamika ,1,25
-Anandamayi ,1,25
-Anandi ,1,25
-Anandini ,1,25
-Anandita ,1,25
-Ananya ,1,25
-Anarghya ,1,25
-Anasooya ,1,25
-Anasuya ,1,25
-Anchal ,1,25
-Anchita ,1,25
-Angana ,1,25
-Angarika ,1,25
-Anika ,1,25
-Anindita ,1,25
-Anisha ,1,25
-Anita ,1,25
-Anjali ,1,25
-Anjana ,1,25
-Anju ,1,25
-Anjushree ,1,25
-Anjushri ,1,25
-Ankita ,1,25
-Annapurna ,1,25
-Anoushka ,1,25
-Anshula ,1,25
-Antara ,1,25
-Anuhya ,1,25
-Anumati ,1,25
-Anupama ,1,25
-Anuprabha ,1,25
-Anuradha ,1,25
-Anuragini ,1,25
-Anurati ,1,25
-Anusha ,1,25
-Anushka ,1,25
-Anushri ,1,25
-Anuva ,1,25
-Anwesha ,1,25
-Apala ,1,25
-Aparijita ,1,25
-Aparna ,1,25
-Apoorva ,1,25
-Apsara ,1,25
+Aaarti,1,25
+Aafreen,1,25
+Abani,1,25
+Abha,1,25
+Abhaya,1,25
+Abhilasha,1,25
+Aboil,1,25
+Achala,1,25
+Adarsh,1,25
+Adhira,1,25
+Adishree,1,25
+Aditi,1,25
+Adrika,1,25
+Aghanashini,1,25
+Agrata,1,25
+Agrima,1,25
+Ahalya,1,25
+Ahladita,1,25
+Aishani,1,25
+Aishwarya,1,25
+Ajala,1,25
+Ajanta,1,25
+Akhila,1,25
+Akriti,1,25
+Akshaya,1,25
+Akshita,1,25
+Akuti,1,25
+Alaka,1,25
+Alaknanda,1,25
+Alisha,1,25
+Alka,1,25
+Almas,1,25
+Alopa,1,25
+Alpa,1,25
+Alpana,1,25
+Amala,1,25
+Amba,1,25
+Ambika,1,25
+Ambu,1,25
+Ambuda,1,25
+Ambuja,1,25
+Ambuja,1,25
+Amita,1,25
+Amla,1,25
+Amoda,1,25
+Amodini,1,25
+Amrapali,1,25
+Amrita,1,25
+Amritkala,1,25
+Amrusha,1,25
+Amshula,1,25
+Amulya,1,25
+Anagha,1,25
+Anahita,1,25
+Anala,1,25
+Anamika,1,25
+Anandamayi,1,25
+Anandi,1,25
+Anandini,1,25
+Anandita,1,25
+Ananya,1,25
+Anarghya,1,25
+Anasooya,1,25
+Anasuya,1,25
+Anchal,1,25
+Anchita,1,25
+Angana,1,25
+Angarika,1,25
+Anika,1,25
+Anindita,1,25
+Anisha,1,25
+Anita,1,25
+Anjali,1,25
+Anjana,1,25
+Anju,1,25
+Anjushree,1,25
+Anjushri,1,25
+Ankita,1,25
+Annapurna,1,25
+Anoushka,1,25
+Anshula,1,25
+Antara,1,25
+Anuhya,1,25
+Anumati,1,25
+Anupama,1,25
+Anuprabha,1,25
+Anuradha,1,25
+Anuragini,1,25
+Anurati,1,25
+Anusha,1,25
+Anushka,1,25
+Anushri,1,25
+Anuva,1,25
+Anwesha,1,25
+Apala,1,25
+Aparijita,1,25
+Aparna,1,25
+Apoorva,1,25
+Apsara,1,25
 Apurva,1,25
-Aradhana ,1,25
-Arati ,1,25
-Archa ,1,25
-Archan ,1,25
-Archana ,1,25
-Archisha ,1,25
-Archita ,1,25
-Arpana ,1,25
-Arpita ,1,25
-Arshia ,1,25
-Aruna ,1,25
-Arundhati ,1,25
-Aruni ,1,25
-Arunima ,1,25
-Asavari ,1,25
-Ascharya ,1,25
-Aseema ,1,25
-Asgari ,1,25
-Asha ,1,25
-Ashakiran ,1,25
-Ashalata ,1,25
-Ashavari ,1,25
-Ashima ,1,25
-Ashis ,1,25
-Ashna ,1,25
-Ashwini ,1,25
-Asita ,1,25
-Aslesha ,1,25
-Asmita ,1,25
-Atasi ,1,25
-Atmaja ,1,25
-Atreyi ,1,25
-Avani ,1,25
+Aradhana,1,25
+Arati,1,25
+Archa,1,25
+Archan,1,25
+Archana,1,25
+Archisha,1,25
+Archita,1,25
+Arpana,1,25
+Arpita,1,25
+Arshia,1,25
+Aruna,1,25
+Arundhati,1,25
+Aruni,1,25
+Arunima,1,25
+Asavari,1,25
+Ascharya,1,25
+Aseema,1,25
+Asgari,1,25
+Asha,1,25
+Ashakiran,1,25
+Ashalata,1,25
+Ashavari,1,25
+Ashima,1,25
+Ashis,1,25
+Ashna,1,25
+Ashwini,1,25
+Asita,1,25
+Aslesha,1,25
+Asmita,1,25
+Atasi,1,25
+Atmaja,1,25
+Atreyi,1,25
+Avani,1,25
 Avanti,1,25
-Avantika ,1,25
-Ayesha ,1,25
-Ayushmati ,1,25
-Aziza ,1,25
-Bageshri ,1,25
-Bahula ,1,25
-Baidehi ,1,25
-Baijayanthi ,1,25
-Baisakhi ,1,25
-Baishali ,1,25
-Bakul ,1,25
-Bakula ,1,25
-Bala ,1,25
-Ballari ,1,25
-Banamala ,1,25
-Banani ,1,25
-Bandana ,1,25
-Bandhula ,1,25
-Bandhura ,1,25
-Banhi ,1,25
-Banhishikha ,1,25
-Banita ,1,25
-Bansari ,1,25
-Barnali ,1,25
-Barsha ,1,25
-Baruna ,1,25
-Baruni ,1,25
-Basabi ,1,25
-Basanti ,1,25
-Bela ,1,25
-Beli ,1,25
-Benazir ,1,25
-Bhadra ,1,25
-Bhagirathi ,1,25
-Bhagwanti ,1,25
-Bhagya ,1,25
-Bhagyalakshmi ,1,25
-Bhagyashree ,1,25
-Bhagyawati ,1,25
-Bhairavi ,1,25
-Bhakti ,1,25
-Bhamini ,1,25
-Bhanuja ,1,25
-Bhanumati ,1,25
-Bhanupriya ,1,25
-Bharani ,1,25
-Bharati ,1,25
-Bhargavi ,1,25
-Bhavana ,1,25
-Bhavini ,1,25
-Bhavna ,1,25
-Bhilangana ,1,25
-Bhoomi ,1,25
-Bhoomika ,1,25
-Bhuvana ,1,25
-Bimala ,1,25
-Bina ,1,25
-Binata ,1,25
-Bindiya ,1,25
-Bindu ,1,25
-Binodini ,1,25
-Bipasha ,1,25
-Bishakha ,1,25
-Bratati ,1,25
-Brinda ,1,25
-Bulbul ,1,25
-Bulbuli ,1,25
-Cauvery ,1,25
-Chadna ,1,25
-Chaitali ,1,25
-Chaitaly ,1,25
-Chaitan ,1,25
-Chakori ,1,25
-Chakrika ,1,25
-Chameli ,1,25
-Chameli ,1,25
-Champa ,1,25
-Champabati ,1,25
-Champakali ,1,25
-Chanchala ,1,25
-Chandana ,1,25
-Chandana ,1,25
-Chandani ,1,25
-Chandanika ,1,25
-Chandika ,1,25
-Chandni ,1,25
-Chandrabali ,1,25
-Chandrabhaga ,1,25
-Chandrakala ,1,25
-Chandraki ,1,25
-Chandrakin ,1,25
-Chandraleksha ,1,25
-Chandrani ,1,25
-Chandrika ,1,25
-Chandrima ,1,25
-Changuna ,1,25
-Chapala ,1,25
-Charita ,1,25
-Charu ,1,25
-Charulata ,1,25
-Charulekha ,1,25
-Charumati ,1,25
-Charuprabha ,1,25
-Charusheela ,1,25
-Charvi ,1,25
-Chatura ,1,25
-Chhabi ,1,25
-Chhavvi ,1,25
-Chhaya ,1,25
-Chimayi ,1,25
-Chinmayi ,1,25
+Avantika,1,25
+Ayesha,1,25
+Ayushmati,1,25
+Aziza,1,25
+Bageshri,1,25
+Bahula,1,25
+Baidehi,1,25
+Baijayanthi,1,25
+Baisakhi,1,25
+Baishali,1,25
+Bakul,1,25
+Bakula,1,25
+Bala,1,25
+Ballari,1,25
+Banamala,1,25
+Banani,1,25
+Bandana,1,25
+Bandhula,1,25
+Bandhura,1,25
+Banhi,1,25
+Banhishikha,1,25
+Banita,1,25
+Bansari,1,25
+Barnali,1,25
+Barsha,1,25
+Baruna,1,25
+Baruni,1,25
+Basabi,1,25
+Basanti,1,25
+Bela,1,25
+Beli,1,25
+Benazir,1,25
+Bhadra,1,25
+Bhagirathi,1,25
+Bhagwanti,1,25
+Bhagya,1,25
+Bhagyalakshmi,1,25
+Bhagyashree,1,25
+Bhagyawati,1,25
+Bhairavi,1,25
+Bhakti,1,25
+Bhamini,1,25
+Bhanuja,1,25
+Bhanumati,1,25
+Bhanupriya,1,25
+Bharani,1,25
+Bharati,1,25
+Bhargavi,1,25
+Bhavana,1,25
+Bhavini,1,25
+Bhavna,1,25
+Bhilangana,1,25
+Bhoomi,1,25
+Bhoomika,1,25
+Bhuvana,1,25
+Bimala,1,25
+Bina,1,25
+Binata,1,25
+Bindiya,1,25
+Bindu,1,25
+Binodini,1,25
+Bipasha,1,25
+Bishakha,1,25
+Bratati,1,25
+Brinda,1,25
+Bulbul,1,25
+Bulbuli,1,25
+Cauvery,1,25
+Chadna,1,25
+Chaitali,1,25
+Chaitaly,1,25
+Chaitan,1,25
+Chakori,1,25
+Chakrika,1,25
+Chameli,1,25
+Chameli,1,25
+Champa,1,25
+Champabati,1,25
+Champakali,1,25
+Chanchala,1,25
+Chandana,1,25
+Chandana,1,25
+Chandani,1,25
+Chandanika,1,25
+Chandika,1,25
+Chandni,1,25
+Chandrabali,1,25
+Chandrabhaga,1,25
+Chandrakala,1,25
+Chandraki,1,25
+Chandrakin,1,25
+Chandraleksha,1,25
+Chandrani,1,25
+Chandrika,1,25
+Chandrima,1,25
+Changuna,1,25
+Chapala,1,25
+Charita,1,25
+Charu,1,25
+Charulata,1,25
+Charulekha,1,25
+Charumati,1,25
+Charuprabha,1,25
+Charusheela,1,25
+Charvi,1,25
+Chatura,1,25
+Chhabi,1,25
+Chhavvi,1,25
+Chhaya,1,25
+Chimayi,1,25
+Chinmayi,1,25
 Chintan,1,25
 Chintana,1,25
-Chintanika ,1,25
-Chiti ,1,25
-Chitkala ,1,25
-Chitra ,1,25
-Chitragandha ,1,25
-Chitralekha ,1,25
-Chitrali ,1,25
-Chitramala ,1,25
-Chitrangada ,1,25
-Chitrani ,1,25
-Chitrarekha ,1,25
-Chitrita ,1,25
-Daksha ,1,25
-Dakshata ,1,25
-Dakshayani ,1,25
-Damayanti ,1,25
-Damini ,1,25
-Darika ,1,25
-Darpana ,1,25
-Darshana ,1,25
-Darshwana ,1,25
-Daya ,1,25
-Dayamayee ,1,25
-Dayanita ,1,25
-Dayita ,1,25
-Deeba ,1,25
-Deepa ,1,25
-Deepabali ,1,25
-Deepali ,1,25
-Deepamala ,1,25
-Deepanwita ,1,25
-Deepaprabha ,1,25
-Deepashikha ,1,25
-Deepavali ,1,25
-Deepika ,1,25
-Deepta ,1,25
-Deepti ,1,25
-Deeptikana ,1,25
-Deeptimoyee ,1,25
-Devahuti ,1,25
-Devak ,1,25
-Devaki ,1,25
-Devangana ,1,25
-Devasree ,1,25
-Devi ,1,25
-Devika ,1,25
-Devyani ,1,25
-Dhanashri ,1,25
-Dhanishta ,1,25
-Dhanya ,1,25
-Dhanyata ,1,25
-Dhara ,1,25
-Dharani ,1,25
-Dharini ,1,25
-Dharitri ,1,25
-Dhatri ,1,25
-Dhriti ,1,25
-Dhvani ,1,25
-Dhwani ,1,25
-Diksha ,1,25
-Dilber ,1,25
-Dilshad ,1,25
-Disha ,1,25
-Diti ,1,25
-Divya ,1,25
-Doyel ,1,25
-Draupadi ,1,25
-Dristi ,1,25
-Dulari ,1,25
-Durba ,1,25
-Durga ,1,25
-Durva ,1,25
-Dwipavati ,1,25
-Ecchumati ,1,25
-Ekaparana ,1,25
-Ekata ,1,25
-Ekavali ,1,25
-Ekta ,1,25
-Ektaa ,1,25
-Ela ,1,25
-Enakshi ,1,25
-Esha ,1,25
-Eshana ,1,25
-Eshita ,1,25
-Faiza ,1,25
-Fajyaz ,1,25
-Falguni ,1,25
-Farha ,1,25
-Faria ,1,25
-Farida ,1,25
-Fatima ,1,25
-Fawiza ,1,25
-Firoza ,1,25
-Foolan ,1,25
-Foolwati ,1,25
-Fulki ,1,25
-Fullara ,1,25
-Gajagamini ,1,25
-Gajra ,1,25
-Gandhali ,1,25
-Ganga ,1,25
-Gangika ,1,25
-Gangotri ,1,25
-Gargi ,1,25
-Gatita ,1,25
-Gauhar ,1,25
-Gaura ,1,25
-Gauri ,1,25
-Gaurika ,1,25
-Gautami ,1,25
-Gayatri ,1,25
-Gazala ,1,25
-Geena ,1,25
-Geeta ,1,25
-Geeti ,1,25
-Geetika ,1,25
-Girija ,1,25
-Gitanjali ,1,25
-Godavari ,1,25
-Gomati ,1,25
-Gool ,1,25
-Gopa ,1,25
-Gopi ,1,25
-Gopika ,1,25
-Gorochana ,1,25
-Govindi ,1,25
-Gulab ,1,25
-Gunjana ,1,25
-Gunwanti ,1,25
-Gurjari ,1,25
-Gyanada ,1,25
-Habiba ,1,25
-Hafiza ,1,25
-Haimavati ,1,25
-Hamsa ,1,25
-Hanima ,1,25
-Hansa ,1,25
-Hansika ,1,25
-Hansini ,1,25
-Harathi ,1,25
-Harimanti ,1,25
-Harinakshi ,1,25
-Harini ,1,25
-Haripriya ,1,25
-Harita ,1,25
-Harsha ,1,25
-Harsha ,1,25
-Harshada ,1,25
-Harshini ,1,25
-Hasina ,1,25
-Hasita ,1,25
-Hasumati ,1,25
-Heera ,1,25
-Hema ,1,25
-Hemangi ,1,25
-Hemangini ,1,25
-Hemanti ,1,25
-Hemavati ,1,25
-Hemlata ,1,25
-Hena ,1,25
-Hetal ,1,25
-Hima ,1,25
-Himagouri ,1,25
-Himani ,1,25
-Hina ,1,25
-Hindola ,1,25
-Hiral ,1,25
-Hiranmayi ,1,25
-Hirkani ,1,25
-Hita ,1,25
-Hiya ,1,25
-Hoor ,1,25
-Husna ,1,25
-Iha ,1,25
-Ihina ,1,25
-Ikshu ,1,25
-Ila ,1,25
-Ina ,1,25
-Inayat ,1,25
-Indira ,1,25
-Indira ,1,25
-Indrakshi ,1,25
-Indrani ,1,25
-Indrasena ,1,25
-Indrayani ,1,25
-Indu ,1,25
-Induja ,1,25
-Induja ,1,25
-Indukala ,1,25
-Induleksh ,1,25
-Induma ,1,25
-Indumati ,1,25
-Indumukhi ,1,25
-Ipsa ,1,25
-Ipsita ,1,25
-Ira ,1,25
-Iravati ,1,25
-Isha ,1,25
-Ishana ,1,25
-Ishani ,1,25
-Ishika ,1,25
-Ishita ,1,25
-Ishrat ,1,25
-Ishwari ,1,25
-Ivy ,1,25
-Jabeen ,1,25
-Jagadamba ,1,25
-Jagriti ,1,25
-Jahanara ,1,25
-Jaheel ,1,25
-Jahnavi ,1,25
-Jaishree ,1,25
-Jaisudha ,1,25
-Jaiwanti ,1,25
-Jalabala ,1,25
-Jaladhija ,1,25
-Jalaja ,1,25
-Jamini ,1,25
-Jamna ,1,25
-Jamuna ,1,25
-Janaki ,1,25
-Janani ,1,25
-Janhavi ,1,25
-Jasoda ,1,25
-Jasodhara ,1,25
-Jaya ,1,25
-Jayalakshmi ,1,25
-Jayalalita ,1,25
-Jayamala ,1,25
-Jayani ,1,25
-Jayanti ,1,25
-Jayantika ,1,25
-Jayaprada ,1,25
-Jayashree ,1,25
-Jayashri ,1,25
-Jayati ,1,25
-Jayita ,1,25
-Jeeval ,1,25
-Jeevana ,1,25
-Jeevankala ,1,25
-Jeevanlata ,1,25
-Jeevika ,1,25
-Jetashri ,1,25
-Jharna ,1,25
-Jhilmil ,1,25
-Jhinuk ,1,25
-Jigya ,1,25
-Joel ,1,25
-Joshita ,1,25
-Jowaki ,1,25
-Juhi ,1,25
-Jui ,1,25
-Juily ,1,25
-Jyoti ,1,25
-Jyotibala ,1,25
-Jyotika ,1,25
-Jyotirmoyee ,1,25
-Jyotishmati ,1,25
-Jyotsna ,1,25
-Kadambari ,1,25
-Kadambini ,1,25
-Kaishori ,1,25
-Kajal ,1,25
-Kajjali ,1,25
-Kakali ,1,25
-Kala ,1,25
-Kalanidhi ,1,25
-Kalavati ,1,25
-Kalavati ,1,25
-Kali ,1,25
-Kalika ,1,25
-Kalindi ,1,25
-Kalindi ,1,25
-Kallol ,1,25
-Kalpana ,1,25
-Kalpita ,1,25
-Kalyani ,1,25
-Kalyani ,1,25
-Kamakshi ,1,25
-Kamala ,1,25
-Kamalakshi ,1,25
-Kamalika ,1,25
-Kamalini ,1,25
-Kamalkali ,1,25
-Kamana ,1,25
-Kamini ,1,25
-Kamna ,1,25
-Kana ,1,25
-Kanak ,1,25
-Kanaka ,1,25
-Kanakabati ,1,25
-Kanaklata ,1,25
-Kanakpriya ,1,25
-Kanan ,1,25
-Kananbala ,1,25
-Kanchan ,1,25
-Kanchana ,1,25
-Kanchi ,1,25
-Kanika ,1,25
-Kankana ,1,25
-Kanta ,1,25
-Kanti ,1,25
-Kapila ,1,25
-Kapotakshi ,1,25
-Karabi ,1,25
-Karishma ,1,25
-Karuna ,1,25
-Karunamayi ,1,25
-Kashi ,1,25
-Kashmira ,1,25
-Kasturi ,1,25
-Katyayani ,1,25
-Kaumudi ,1,25
-Kaushalya ,1,25
-Kaveri ,1,25
-Kavita ,1,25
-Keertana ,1,25
-Kesar ,1,25
-Kesari ,1,25
-Keshi ,1,25
-Keshika ,1,25
-Keshini ,1,25
-Ketaki ,1,25
-Ketana ,1,25
-Keya ,1,25
-Khyati ,1,25
-Kimaya ,1,25
-Kiran ,1,25
-Kiranmala ,1,25
-Kirtana ,1,25
-Kirti ,1,25
-Kishori ,1,25
-Kokila ,1,25
-Komal ,1,25
-Komala ,1,25
-Koyel ,1,25
-Krandasi ,1,25
-Kranti ,1,25
-Kripa ,1,25
-Krishna ,1,25
-Krishnaa ,1,25
-Krishnakali ,1,25
-Kriti ,1,25
-Krittika ,1,25
-Krupa ,1,25
-Kshama ,1,25
-Kshanika ,1,25
-Kumari ,1,25
-Kumkum ,1,25
-Kumud ,1,25
-Kumudini ,1,25
-Kunda ,1,25
-Kundanika ,1,25
-Kunjal ,1,25
-Kunjalata ,1,25
-Kunjana ,1,25
-Kuntal ,1,25
-Kuntala ,1,25
-Kunti ,1,25
-Kurangi ,1,25
-Kushala ,1,25
-Kusum ,1,25
-Kusuma ,1,25
-Kusumanjali ,1,25
-Kusumavati ,1,25
-Kusumita ,1,25
-Kusumlata ,1,25
-Laabha ,1,25
-Laalamani ,1,25
-Laasya ,1,25
-Labangalata ,1,25
-Laboni ,1,25
-Lajja ,1,25
-Lajjawati ,1,25
-Lajwanti ,1,25
-Lajwati ,1,25
-Laksha ,1,25
-Lakshana ,1,25
-Lakshmi ,1,25
-Lakshmishree ,1,25
-Lakshya ,1,25
-Lalan ,1,25
-Lalana ,1,25
-Lali ,1,25
-Lalima ,1,25
-Lalita ,1,25
-Lalitamohana ,1,25
-Lalitha ,1,25
-Lata ,1,25
-Latakara ,1,25
-Latangi ,1,25
-Latha ,1,25
-Latika ,1,25
-Lavali ,1,25
-Lavanya ,1,25
-Leela ,1,25
-Leelamayee ,1,25
-Leelavati ,1,25
-Leena ,1,25
-Lekha ,1,25
-Lekha ,1,25
-Lily ,1,25
-Lipi ,1,25
-Lipika ,1,25
-Lochan ,1,25
-Lochana ,1,25
-Lola ,1,25
-Lona ,1,25
-Lopa ,1,25
-Lopamudra ,1,25
-Maanasa ,1,25
-Maanika ,1,25
-Madhavi ,1,25
-Madhavilata ,1,25
-Madhu ,1,25
-Madhubala ,1,25
-Madhuchanda ,1,25
-Madhuksara ,1,25
-Madhulata ,1,25
-Madhulekha ,1,25
-Madhulika ,1,25
-Madhumalati ,1,25
-Madhumati ,1,25
-Madhunisha ,1,25
-Madhur ,1,25
-Madhura ,1,25
-Madhuri ,1,25
-Madhurima ,1,25
-Madhushri ,1,25
-Madirakshi ,1,25
-Magana ,1,25
-Mahadevi ,1,25
-Mahagauri ,1,25
-Mahajabeen ,1,25
-Mahalakshmi ,1,25
-Mahamaya ,1,25
-Mahasweta ,1,25
-Mahati ,1,25
-Mahi ,1,25
-Mahijuba ,1,25
-Mahika ,1,25
-Mahima ,1,25
-Mahua ,1,25
-Maina ,1,25
-Maithili ,1,25
-Maitreya ,1,25
-Maitreyi ,1,25
-Maitri ,1,25
-Makshi ,1,25
-Mala ,1,25
-Malashree ,1,25
-Malati ,1,25
-Malavika ,1,25
-Malaya ,1,25
-Malina ,1,25
-Malini ,1,25
-Mallika ,1,25
-Malti ,1,25
-Mamata ,1,25
-Manali ,1,25
-Manana ,1,25
-Manasa ,1,25
-Manasi ,1,25
-Manda ,1,25
-Mandakini ,1,25
-Mandakranta ,1,25
-Mandaraa ,1,25
-Mandarmalika ,1,25
-Mandira ,1,25
-Mangala ,1,25
-Mangla ,1,25
-Manideepa ,1,25
-Manik ,1,25
-Manikuntala ,1,25
-Manimala ,1,25
-Manimekhala ,1,25
-Manini ,1,25
-Manisha ,1,25
-Manjari ,1,25
-Manjira ,1,25
-Manjistha ,1,25
-Manju ,1,25
-Manjubala ,1,25
-Manjula ,1,25
-Manjulika ,1,25
-Manjusha ,1,25
-Manjushri ,1,25
-Manjusri ,1,25
-Manjyot ,1,25
-Manmayi ,1,25
-Manorama ,1,25
-Manoranjana ,1,25
-Manushri ,1,25
-Marala ,1,25
-Marichi ,1,25
-Marisa ,1,25
-Markandeya ,1,25
-Matangi ,1,25
-Mausumi ,1,25
-Maya ,1,25
-Mayuka ,1,25
-Mayukhi ,1,25
-Mayura ,1,25
-Mayuri ,1,25
-Medha ,1,25
-Medini ,1,25
-Meena ,1,25
-Meenakshi ,1,25
-Meera ,1,25
-Megha ,1,25
-Meghamala ,1,25
-Meghana ,1,25
-Mehal ,1,25
-Mehbooba ,1,25
-Meher ,1,25
-Mehrunissa ,1,25
-Mehul ,1,25
-Mekhala ,1,25
-Mena ,1,25
-Menaka ,1,25
-Minal ,1,25
-Minati ,1,25
-Mirium ,1,25
-Mita ,1,25
-Mitali ,1,25
-Mohana ,1,25
-Mohini ,1,25
-Mohisha ,1,25
-Mridula ,1,25
-Mriganayani ,1,25
-Mrinal ,1,25
-Mrinali ,1,25
-Mrinalini ,1,25
-Mrinalini ,1,25
-Mrinmayi ,1,25
-Mudra ,1,25
-Mudrika ,1,25
-Mugdha ,1,25
-Mukta ,1,25
-Mukti ,1,25
-Mukula ,1,25
-Mukulita ,1,25
-Muniya ,1,25
-Mythili ,1,25
-Mythily ,1,25
-Naaz ,1,25
-Nachni ,1,25
-Nadira ,1,25
-Nagina ,1,25
-Naina ,1,25
-Naiya ,1,25
-Najma ,1,25
-Nalini ,1,25
-Namita ,1,25
-Namrata ,1,25
-Nanda ,1,25
-Nandana ,1,25
-Nandika ,1,25
-Nandini ,1,25
-Nandita ,1,25
-Narayani ,1,25
-Narmada ,1,25
-Narois ,1,25
-Nartan ,1,25
-Naseen ,1,25
-Natun ,1,25
-Nauka ,1,25
-Navaneeta ,1,25
-Naveena ,1,25
-Nayana ,1,25
-Nayantara ,1,25
-Nazima ,1,25
-Neeharika ,1,25
-Neela ,1,25
-Neelabja ,1,25
-Neelakshi ,1,25
-Neelam ,1,25
-Neelanjana ,1,25
-Neelkamal ,1,25
-Neepa ,1,25
-Neeraja ,1,25
-Neeta ,1,25
-Neeti ,1,25
-Neha ,1,25
-Nehal ,1,25
-Netra ,1,25
-Netravati ,1,25
-Nidhi ,1,25
-Nidra ,1,25
-Niharika ,1,25
-Nikhita ,1,25
-Nilasha ,1,25
-Nilaya ,1,25
-Nileen ,1,25
-Nilima ,1,25
-Niloufer ,1,25
-Nina ,1,25
-Nipa ,1,25
-Niral ,1,25
-Niranjana ,1,25
-Nirmala ,1,25
-Nirmayi ,1,25
-Nirupa ,1,25
-Nirupama ,1,25
-Nisha ,1,25
-Nisha ,1,25
-Nishithini ,1,25
-Nishtha ,1,25
-Nishtha ,1,25
-Nita ,1,25
-Niti ,1,25
-Nitya ,1,25
-Nityapriya ,1,25
-Nivedita ,1,25
-Nivedita ,1,25
-Nivritti ,1,25
-Niyati ,1,25
-Noopur ,1,25
-Noor ,1,25
-Noorjehan ,1,25
-Nupura ,1,25
-Nusrat ,1,25
-Nutan ,1,25
-Ojal ,1,25
-Ojaswini ,1,25
-Omana ,1,25
-Padma ,1,25
-Padma ,1,25
-Padmaja ,1,25
-Padmajai ,1,25
-Padmakali ,1,25
-Padmal ,1,25
-Padmalaya ,1,25
-Padmalochana ,1,25
-Padmavati ,1,25
-Padmini ,1,25
-Pakhi ,1,25
-Pakshi ,1,25
-Pallavi ,1,25
-Pallavi ,1,25
-Pallavini ,1,25
-Panchali ,1,25
+Chintanika,1,25
+Chiti,1,25
+Chitkala,1,25
+Chitra,1,25
+Chitragandha,1,25
+Chitralekha,1,25
+Chitrali,1,25
+Chitramala,1,25
+Chitrangada,1,25
+Chitrani,1,25
+Chitrarekha,1,25
+Chitrita,1,25
+Daksha,1,25
+Dakshata,1,25
+Dakshayani,1,25
+Damayanti,1,25
+Damini,1,25
+Darika,1,25
+Darpana,1,25
+Darshana,1,25
+Darshwana,1,25
+Daya,1,25
+Dayamayee,1,25
+Dayanita,1,25
+Dayita,1,25
+Deeba,1,25
+Deepa,1,25
+Deepabali,1,25
+Deepali,1,25
+Deepamala,1,25
+Deepanwita,1,25
+Deepaprabha,1,25
+Deepashikha,1,25
+Deepavali,1,25
+Deepika,1,25
+Deepta,1,25
+Deepti,1,25
+Deeptikana,1,25
+Deeptimoyee,1,25
+Devahuti,1,25
+Devak,1,25
+Devaki,1,25
+Devangana,1,25
+Devasree,1,25
+Devi,1,25
+Devika,1,25
+Devyani,1,25
+Dhanashri,1,25
+Dhanishta,1,25
+Dhanya,1,25
+Dhanyata,1,25
+Dhara,1,25
+Dharani,1,25
+Dharini,1,25
+Dharitri,1,25
+Dhatri,1,25
+Dhriti,1,25
+Dhvani,1,25
+Dhwani,1,25
+Diksha,1,25
+Dilber,1,25
+Dilshad,1,25
+Disha,1,25
+Diti,1,25
+Divya,1,25
+Doyel,1,25
+Draupadi,1,25
+Dristi,1,25
+Dulari,1,25
+Durba,1,25
+Durga,1,25
+Durva,1,25
+Dwipavati,1,25
+Ecchumati,1,25
+Ekaparana,1,25
+Ekata,1,25
+Ekavali,1,25
+Ekta,1,25
+Ektaa,1,25
+Ela,1,25
+Enakshi,1,25
+Esha,1,25
+Eshana,1,25
+Eshita,1,25
+Faiza,1,25
+Fajyaz,1,25
+Falguni,1,25
+Farha,1,25
+Faria,1,25
+Farida,1,25
+Fatima,1,25
+Fawiza,1,25
+Firoza,1,25
+Foolan,1,25
+Foolwati,1,25
+Fulki,1,25
+Fullara,1,25
+Gajagamini,1,25
+Gajra,1,25
+Gandhali,1,25
+Ganga,1,25
+Gangika,1,25
+Gangotri,1,25
+Gargi,1,25
+Gatita,1,25
+Gauhar,1,25
+Gaura,1,25
+Gauri,1,25
+Gaurika,1,25
+Gautami,1,25
+Gayatri,1,25
+Gazala,1,25
+Geena,1,25
+Geeta,1,25
+Geeti,1,25
+Geetika,1,25
+Girija,1,25
+Gitanjali,1,25
+Godavari,1,25
+Gomati,1,25
+Gool,1,25
+Gopa,1,25
+Gopi,1,25
+Gopika,1,25
+Gorochana,1,25
+Govindi,1,25
+Gulab,1,25
+Gunjana,1,25
+Gunwanti,1,25
+Gurjari,1,25
+Gyanada,1,25
+Habiba,1,25
+Hafiza,1,25
+Haimavati,1,25
+Hamsa,1,25
+Hanima,1,25
+Hansa,1,25
+Hansika,1,25
+Hansini,1,25
+Harathi,1,25
+Harimanti,1,25
+Harinakshi,1,25
+Harini,1,25
+Haripriya,1,25
+Harita,1,25
+Harsha,1,25
+Harsha,1,25
+Harshada,1,25
+Harshini,1,25
+Hasina,1,25
+Hasita,1,25
+Hasumati,1,25
+Heera,1,25
+Hema,1,25
+Hemangi,1,25
+Hemangini,1,25
+Hemanti,1,25
+Hemavati,1,25
+Hemlata,1,25
+Hena,1,25
+Hetal,1,25
+Hima,1,25
+Himagouri,1,25
+Himani,1,25
+Hina,1,25
+Hindola,1,25
+Hiral,1,25
+Hiranmayi,1,25
+Hirkani,1,25
+Hita,1,25
+Hiya,1,25
+Hoor,1,25
+Husna,1,25
+Iha,1,25
+Ihina,1,25
+Ikshu,1,25
+Ila,1,25
+Ina,1,25
+Inayat,1,25
+Indira,1,25
+Indira,1,25
+Indrakshi,1,25
+Indrani,1,25
+Indrasena,1,25
+Indrayani,1,25
+Indu,1,25
+Induja,1,25
+Induja,1,25
+Indukala,1,25
+Induleksh,1,25
+Induma,1,25
+Indumati,1,25
+Indumukhi,1,25
+Ipsa,1,25
+Ipsita,1,25
+Ira,1,25
+Iravati,1,25
+Isha,1,25
+Ishana,1,25
+Ishani,1,25
+Ishika,1,25
+Ishita,1,25
+Ishrat,1,25
+Ishwari,1,25
+Ivy,1,25
+Jabeen,1,25
+Jagadamba,1,25
+Jagriti,1,25
+Jahanara,1,25
+Jaheel,1,25
+Jahnavi,1,25
+Jaishree,1,25
+Jaisudha,1,25
+Jaiwanti,1,25
+Jalabala,1,25
+Jaladhija,1,25
+Jalaja,1,25
+Jamini,1,25
+Jamna,1,25
+Jamuna,1,25
+Janaki,1,25
+Janani,1,25
+Janhavi,1,25
+Jasoda,1,25
+Jasodhara,1,25
+Jaya,1,25
+Jayalakshmi,1,25
+Jayalalita,1,25
+Jayamala,1,25
+Jayani,1,25
+Jayanti,1,25
+Jayantika,1,25
+Jayaprada,1,25
+Jayashree,1,25
+Jayashri,1,25
+Jayati,1,25
+Jayita,1,25
+Jeeval,1,25
+Jeevana,1,25
+Jeevankala,1,25
+Jeevanlata,1,25
+Jeevika,1,25
+Jetashri,1,25
+Jharna,1,25
+Jhilmil,1,25
+Jhinuk,1,25
+Jigya,1,25
+Joel,1,25
+Joshita,1,25
+Jowaki,1,25
+Juhi,1,25
+Jui,1,25
+Juily,1,25
+Jyoti,1,25
+Jyotibala,1,25
+Jyotika,1,25
+Jyotirmoyee,1,25
+Jyotishmati,1,25
+Jyotsna,1,25
+Kadambari,1,25
+Kadambini,1,25
+Kaishori,1,25
+Kajal,1,25
+Kajjali,1,25
+Kakali,1,25
+Kala,1,25
+Kalanidhi,1,25
+Kalavati,1,25
+Kalavati,1,25
+Kali,1,25
+Kalika,1,25
+Kalindi,1,25
+Kalindi,1,25
+Kallol,1,25
+Kalpana,1,25
+Kalpita,1,25
+Kalyani,1,25
+Kalyani,1,25
+Kamakshi,1,25
+Kamala,1,25
+Kamalakshi,1,25
+Kamalika,1,25
+Kamalini,1,25
+Kamalkali,1,25
+Kamana,1,25
+Kamini,1,25
+Kamna,1,25
+Kana,1,25
+Kanak,1,25
+Kanaka,1,25
+Kanakabati,1,25
+Kanaklata,1,25
+Kanakpriya,1,25
+Kanan,1,25
+Kananbala,1,25
+Kanchan,1,25
+Kanchana,1,25
+Kanchi,1,25
+Kanika,1,25
+Kankana,1,25
+Kanta,1,25
+Kanti,1,25
+Kapila,1,25
+Kapotakshi,1,25
+Karabi,1,25
+Karishma,1,25
+Karuna,1,25
+Karunamayi,1,25
+Kashi,1,25
+Kashmira,1,25
+Kasturi,1,25
+Katyayani,1,25
+Kaumudi,1,25
+Kaushalya,1,25
+Kaveri,1,25
+Kavita,1,25
+Keertana,1,25
+Kesar,1,25
+Kesari,1,25
+Keshi,1,25
+Keshika,1,25
+Keshini,1,25
+Ketaki,1,25
+Ketana,1,25
+Keya,1,25
+Khyati,1,25
+Kimaya,1,25
+Kiran,1,25
+Kiranmala,1,25
+Kirtana,1,25
+Kirti,1,25
+Kishori,1,25
+Kokila,1,25
+Komal,1,25
+Komala,1,25
+Koyel,1,25
+Krandasi,1,25
+Kranti,1,25
+Kripa,1,25
+Krishna,1,25
+Krishnaa,1,25
+Krishnakali,1,25
+Kriti,1,25
+Krittika,1,25
+Krupa,1,25
+Kshama,1,25
+Kshanika,1,25
+Kumari,1,25
+Kumkum,1,25
+Kumud,1,25
+Kumudini,1,25
+Kunda,1,25
+Kundanika,1,25
+Kunjal,1,25
+Kunjalata,1,25
+Kunjana,1,25
+Kuntal,1,25
+Kuntala,1,25
+Kunti,1,25
+Kurangi,1,25
+Kushala,1,25
+Kusum,1,25
+Kusuma,1,25
+Kusumanjali,1,25
+Kusumavati,1,25
+Kusumita,1,25
+Kusumlata,1,25
+Laabha,1,25
+Laalamani,1,25
+Laasya,1,25
+Labangalata,1,25
+Laboni,1,25
+Lajja,1,25
+Lajjawati,1,25
+Lajwanti,1,25
+Lajwati,1,25
+Laksha,1,25
+Lakshana,1,25
+Lakshmi,1,25
+Lakshmishree,1,25
+Lakshya,1,25
+Lalan,1,25
+Lalana,1,25
+Lali,1,25
+Lalima,1,25
+Lalita,1,25
+Lalitamohana,1,25
+Lalitha,1,25
+Lata,1,25
+Latakara,1,25
+Latangi,1,25
+Latha,1,25
+Latika,1,25
+Lavali,1,25
+Lavanya,1,25
+Leela,1,25
+Leelamayee,1,25
+Leelavati,1,25
+Leena,1,25
+Lekha,1,25
+Lekha,1,25
+Lily,1,25
+Lipi,1,25
+Lipika,1,25
+Lochan,1,25
+Lochana,1,25
+Lola,1,25
+Lona,1,25
+Lopa,1,25
+Lopamudra,1,25
+Maanasa,1,25
+Maanika,1,25
+Madhavi,1,25
+Madhavilata,1,25
+Madhu,1,25
+Madhubala,1,25
+Madhuchanda,1,25
+Madhuksara,1,25
+Madhulata,1,25
+Madhulekha,1,25
+Madhulika,1,25
+Madhumalati,1,25
+Madhumati,1,25
+Madhunisha,1,25
+Madhur,1,25
+Madhura,1,25
+Madhuri,1,25
+Madhurima,1,25
+Madhushri,1,25
+Madirakshi,1,25
+Magana,1,25
+Mahadevi,1,25
+Mahagauri,1,25
+Mahajabeen,1,25
+Mahalakshmi,1,25
+Mahamaya,1,25
+Mahasweta,1,25
+Mahati,1,25
+Mahi,1,25
+Mahijuba,1,25
+Mahika,1,25
+Mahima,1,25
+Mahua,1,25
+Maina,1,25
+Maithili,1,25
+Maitreya,1,25
+Maitreyi,1,25
+Maitri,1,25
+Makshi,1,25
+Mala,1,25
+Malashree,1,25
+Malati,1,25
+Malavika,1,25
+Malaya,1,25
+Malina,1,25
+Malini,1,25
+Mallika,1,25
+Malti,1,25
+Mamata,1,25
+Manali,1,25
+Manana,1,25
+Manasa,1,25
+Manasi,1,25
+Manda,1,25
+Mandakini,1,25
+Mandakranta,1,25
+Mandaraa,1,25
+Mandarmalika,1,25
+Mandira,1,25
+Mangala,1,25
+Mangla,1,25
+Manideepa,1,25
+Manik,1,25
+Manikuntala,1,25
+Manimala,1,25
+Manimekhala,1,25
+Manini,1,25
+Manisha,1,25
+Manjari,1,25
+Manjira,1,25
+Manjistha,1,25
+Manju,1,25
+Manjubala,1,25
+Manjula,1,25
+Manjulika,1,25
+Manjusha,1,25
+Manjushri,1,25
+Manjusri,1,25
+Manjyot,1,25
+Manmayi,1,25
+Manorama,1,25
+Manoranjana,1,25
+Manushri,1,25
+Marala,1,25
+Marichi,1,25
+Marisa,1,25
+Markandeya,1,25
+Matangi,1,25
+Mausumi,1,25
+Maya,1,25
+Mayuka,1,25
+Mayukhi,1,25
+Mayura,1,25
+Mayuri,1,25
+Medha,1,25
+Medini,1,25
+Meena,1,25
+Meenakshi,1,25
+Meera,1,25
+Megha,1,25
+Meghamala,1,25
+Meghana,1,25
+Mehal,1,25
+Mehbooba,1,25
+Meher,1,25
+Mehrunissa,1,25
+Mehul,1,25
+Mekhala,1,25
+Mena,1,25
+Menaka,1,25
+Minal,1,25
+Minati,1,25
+Mirium,1,25
+Mita,1,25
+Mitali,1,25
+Mohana,1,25
+Mohini,1,25
+Mohisha,1,25
+Mridula,1,25
+Mriganayani,1,25
+Mrinal,1,25
+Mrinali,1,25
+Mrinalini,1,25
+Mrinalini,1,25
+Mrinmayi,1,25
+Mudra,1,25
+Mudrika,1,25
+Mugdha,1,25
+Mukta,1,25
+Mukti,1,25
+Mukula,1,25
+Mukulita,1,25
+Muniya,1,25
+Mythili,1,25
+Mythily,1,25
+Naaz,1,25
+Nachni,1,25
+Nadira,1,25
+Nagina,1,25
+Naina,1,25
+Naiya,1,25
+Najma,1,25
+Nalini,1,25
+Namita,1,25
+Namrata,1,25
+Nanda,1,25
+Nandana,1,25
+Nandika,1,25
+Nandini,1,25
+Nandita,1,25
+Narayani,1,25
+Narmada,1,25
+Narois,1,25
+Nartan,1,25
+Naseen,1,25
+Natun,1,25
+Nauka,1,25
+Navaneeta,1,25
+Naveena,1,25
+Nayana,1,25
+Nayantara,1,25
+Nazima,1,25
+Neeharika,1,25
+Neela,1,25
+Neelabja,1,25
+Neelakshi,1,25
+Neelam,1,25
+Neelanjana,1,25
+Neelkamal,1,25
+Neepa,1,25
+Neeraja,1,25
+Neeta,1,25
+Neeti,1,25
+Neha,1,25
+Nehal,1,25
+Netra,1,25
+Netravati,1,25
+Nidhi,1,25
+Nidra,1,25
+Niharika,1,25
+Nikhita,1,25
+Nilasha,1,25
+Nilaya,1,25
+Nileen,1,25
+Nilima,1,25
+Niloufer,1,25
+Nina,1,25
+Nipa,1,25
+Niral,1,25
+Niranjana,1,25
+Nirmala,1,25
+Nirmayi,1,25
+Nirupa,1,25
+Nirupama,1,25
+Nisha,1,25
+Nisha,1,25
+Nishithini,1,25
+Nishtha,1,25
+Nishtha,1,25
+Nita,1,25
+Niti,1,25
+Nitya,1,25
+Nityapriya,1,25
+Nivedita,1,25
+Nivedita,1,25
+Nivritti,1,25
+Niyati,1,25
+Noopur,1,25
+Noor,1,25
+Noorjehan,1,25
+Nupura,1,25
+Nusrat,1,25
+Nutan,1,25
+Ojal,1,25
+Ojaswini,1,25
+Omana,1,25
+Padma,1,25
+Padma,1,25
+Padmaja,1,25
+Padmajai,1,25
+Padmakali,1,25
+Padmal,1,25
+Padmalaya,1,25
+Padmalochana,1,25
+Padmavati,1,25
+Padmini,1,25
+Pakhi,1,25
+Pakshi,1,25
+Pallavi,1,25
+Pallavi,1,25
+Pallavini,1,25
+Panchali,1,25
 Pankaja,1,25
-Panna ,1,25
-Parama ,1,25
-Parameshwari ,1,25
-Paramita ,1,25
-Parbarti ,1,25
-Pari ,1,25
-Paridhi ,1,25
-Parinita ,1,25
-Parnal ,1,25
-Parnashri ,1,25
-Parni ,1,25
-Parnik ,1,25
-Parnika ,1,25
-Parthivi ,1,25
-Parul ,1,25
-Parvani ,1,25
-Parvati ,1,25
-Parveen ,1,25
-Patmanjari ,1,25
-Patralekha ,1,25
-Pavana ,1,25
-Pavani ,1,25
-Payal ,1,25
-Payal ,1,25
-Payoja ,1,25
-Phiroza ,1,25
-Phoolan ,1,25
-Pia ,1,25
-Piki ,1,25
-Pingala ,1,25
-Pival ,1,25
-Piyali ,1,25
-Pooja ,1,25
-Poonam ,1,25
-Poorbi ,1,25
-Poornima ,1,25
-Poorvi ,1,25
-Poushali ,1,25
-Prabha ,1,25
-Prabhati ,1,25
-Prachi ,1,25
-Pradeepta ,1,25
-Pragati ,1,25
-Pragya ,1,25
-Pragya ,1,25
-Pragyaparamita ,1,25
-Pragyawati ,1,25
-Prama ,1,25
-Pramada ,1,25
-Pramila ,1,25
-Pramiti ,1,25
-Pranati ,1,25
-Prapti ,1,25
-Prarthana ,1,25
-Prashansa ,1,25
-Prashanti ,1,25
-Pratibha ,1,25
-Pratigya ,1,25
-Pratima ,1,25
-Pratishtha ,1,25
-Preeti ,1,25
-Prem ,1,25
-Prema ,1,25
-Premala ,1,25
-Prerana ,1,25
-Preyasi ,1,25
-Prita ,1,25
-Pritha ,1,25
-Priti ,1,25
-Pritika ,1,25
-Pritikana ,1,25
-Pritilata ,1,25
-Priya ,1,25
-Priyadarshini ,1,25
-Priyal ,1,25
-Priyam ,1,25
-Priyamvada ,1,25
-Priyanka ,1,25
-Puja ,1,25
-Pujita ,1,25
-Puloma ,1,25
-Punam ,1,25
-Punarnava ,1,25
+Panna,1,25
+Parama,1,25
+Parameshwari,1,25
+Paramita,1,25
+Parbarti,1,25
+Pari,1,25
+Paridhi,1,25
+Parinita,1,25
+Parnal,1,25
+Parnashri,1,25
+Parni,1,25
+Parnik,1,25
+Parnika,1,25
+Parthivi,1,25
+Parul,1,25
+Parvani,1,25
+Parvati,1,25
+Parveen,1,25
+Patmanjari,1,25
+Patralekha,1,25
+Pavana,1,25
+Pavani,1,25
+Payal,1,25
+Payal,1,25
+Payoja,1,25
+Phiroza,1,25
+Phoolan,1,25
+Pia,1,25
+Piki,1,25
+Pingala,1,25
+Pival,1,25
+Piyali,1,25
+Pooja,1,25
+Poonam,1,25
+Poorbi,1,25
+Poornima,1,25
+Poorvi,1,25
+Poushali,1,25
+Prabha,1,25
+Prabhati,1,25
+Prachi,1,25
+Pradeepta,1,25
+Pragati,1,25
+Pragya,1,25
+Pragya,1,25
+Pragyaparamita,1,25
+Pragyawati,1,25
+Prama,1,25
+Pramada,1,25
+Pramila,1,25
+Pramiti,1,25
+Pranati,1,25
+Prapti,1,25
+Prarthana,1,25
+Prashansa,1,25
+Prashanti,1,25
+Pratibha,1,25
+Pratigya,1,25
+Pratima,1,25
+Pratishtha,1,25
+Preeti,1,25
+Prem,1,25
+Prema,1,25
+Premala,1,25
+Prerana,1,25
+Preyasi,1,25
+Prita,1,25
+Pritha,1,25
+Priti,1,25
+Pritika,1,25
+Pritikana,1,25
+Pritilata,1,25
+Priya,1,25
+Priyadarshini,1,25
+Priyal,1,25
+Priyam,1,25
+Priyamvada,1,25
+Priyanka,1,25
+Puja,1,25
+Pujita,1,25
+Puloma,1,25
+Punam,1,25
+Punarnava,1,25
 Punita,1,25
-Punita ,1,25
-Punthali ,1,25
-Purnima ,1,25
-Purva ,1,25
-Purvaja ,1,25
-Pushpa ,1,25
-Pushpanjali ,1,25
-Pushpita ,1,25
-Pusti ,1,25
-Putul ,1,25
-Quarrtulain ,1,25
-Quasar ,1,25
-Raakhi ,1,25
-Rabia ,1,25
-Rachana ,1,25
-Rachita ,1,25
-Rachna ,1,25
-Radha ,1,25
-Radhika ,1,25
-Ragini ,1,25
-Rajalakshmi ,1,25
-Rajani ,1,25
-Rajanigandha ,1,25
-Rajata ,1,25
-Rajdulari ,1,25
-Rajeshwari ,1,25
-Rajhans ,1,25
-Rajkumari ,1,25
-Rajnandhini ,1,25
-Rajshri ,1,25
-Raka ,1,25
-Rakhi ,1,25
-Raksha ,1,25
-Rama ,1,25
-Ramani ,1,25
-Ramani ,1,25
-Rambha ,1,25
-Rameshwari ,1,25
-Ramita ,1,25
-Ramya ,1,25
-Rangana ,1,25
-Rani ,1,25
-Ranita ,1,25
-Ranjana ,1,25
-Ranjini ,1,25
-Ranjita ,1,25
-Rashi ,1,25
-Rashmi ,1,25
-Rashmika ,1,25
-Rasika ,1,25
-Rasna ,1,25
-Rati ,1,25
-Ratna ,1,25
-Ratnabala ,1,25
-Ratnabali ,1,25
-Ratnajyouti ,1,25
-Ratnalekha ,1,25
-Ratnali ,1,25
-Ratnamala ,1,25
-Ratnangi ,1,25
-Ratnaprabha ,1,25
-Ratnapriya ,1,25
-Ratnavali ,1,25
-Raviprabha ,1,25
-Rekha ,1,25
-Renu ,1,25
-Renuka ,1,25
-Renuka ,1,25
-Resham ,1,25
-Reshma ,1,25
-Reshmi ,1,25
-Reva ,1,25
-Revati ,1,25
-Richa ,1,25
-Riddhi ,1,25
-Riju ,1,25
-Rijuta ,1,25
-Rishika ,1,25
-Riti ,1,25
-Ritu ,1,25
-Rohini ,1,25
-Roma ,1,25
-Roshan ,1,25
-Roshni ,1,25
-Rubaina ,1,25
-Ruchi ,1,25
-Ruchira ,1,25
-Rudrani ,1,25
-Rudrapriya ,1,25
-Rujuta ,1,25
-Rukma ,1,25
-Rukmini ,1,25
-Ruksana ,1,25
-Ruma ,1,25
-Rupa ,1,25
-Rupali ,1,25
-Rupashi ,1,25
-Rupashri ,1,25
-Sachi ,1,25
-Sachita ,1,25
-Sadaf ,1,25
-Sadgati ,1,25
-Sadguna ,1,25
-Sadhan ,1,25
-Sadhana ,1,25
-Sadhika ,1,25
-Sadhvi ,1,25
-Sadiqua ,1,25
-Saeeda ,1,25
-Safia ,1,25
-Sagarika ,1,25
-Saguna ,1,25
-Saguna ,1,25
-Sahana ,1,25
-Saheli ,1,25
-Sahiba ,1,25
-Sahila ,1,25
-Sai ,1,25
-Sajala ,1,25
-Sajni ,1,25
-Sakhi ,1,25
-Sakina ,1,25
-Salena ,1,25
-Salila ,1,25
-Salima ,1,25
-Salma ,1,25
-Samata ,1,25
-Sameena ,1,25
-Samhita ,1,25
-Samidha ,1,25
-Samiksha ,1,25
-Samit ,1,25
-Samita ,1,25
-Sampada ,1,25
-Sampatti ,1,25
-Sampriti ,1,25
-Sana ,1,25
-Sananda ,1,25
-Sanchali ,1,25
-Sanchaya ,1,25
-Sanchita ,1,25
-Sandhaya ,1,25
-Sandhya ,1,25
-Sangita ,1,25
-Saniya ,1,25
-Sanjana ,1,25
-Sanjivani ,1,25
-Sanjukta ,1,25
-Sanjula ,1,25
-Sanjushree ,1,25
-Sankul ,1,25
-Sannidhi ,1,25
-Sanskriti ,1,25
-Santawana ,1,25
-Santayani ,1,25
-Sanvali ,1,25
-Sanwari ,1,25
-Sanyakta ,1,25
-Sanyukta ,1,25
-Saparna ,1,25
-Saphala ,1,25
-Sapna ,1,25
-Sarada ,1,25
-Sarakshi ,1,25
-Sarala ,1,25
-Sarama ,1,25
-Saranya ,1,25
-Sarasa ,1,25
-Sarasi ,1,25
-Sarasvati ,1,25
-Saraswati ,1,25
-Saravati ,1,25
-Sarayu ,1,25
-Sarbani ,1,25
-Sarika ,1,25
-Sarit ,1,25
-Sarita ,1,25
-Sarjana ,1,25
-Saroj ,1,25
-Saroja ,1,25
-Sarojini ,1,25
-Saruprani ,1,25
-Saryu ,1,25
-Sashi ,1,25
-Sasmita ,1,25
-Sati ,1,25
-Satya ,1,25
-Satyaki ,1,25
-Satyarupa ,1,25
-Satyavati ,1,25
-Saudamini ,1,25
-Saumya ,1,25
-Savarna ,1,25
-Savita ,1,25
-Savitashri ,1,25
-Savitri ,1,25
-Sawini ,1,25
-Sayeeda ,1,25
-Seema ,1,25
-Seemanti ,1,25
-Seemantini ,1,25
-Seerat ,1,25
-Sejal ,1,25
-Selma ,1,25
-Semanti ,1,25
-Serena ,1,25
-Sevati ,1,25
-Sevita ,1,25
-Shabab ,1,25
-Shabalini ,1,25
-Shabana ,1,25
-Shabari ,1,25
-Shabnum ,1,25
-Shachi ,1,25
-Shagufta ,1,25
-Shaheena ,1,25
-Shaila ,1,25
-Shaili ,1,25
-Shakambari ,1,25
-Shakeel ,1,25
-Shakeela ,1,25
-Shakti ,1,25
-Shakuntala ,1,25
-Shalaka ,1,25
-Shalin ,1,25
-Shalini ,1,25
-Shalini ,1,25
-Shalmali ,1,25
-Shama ,1,25
-Shambhavi ,1,25
-Shameena ,1,25
-Shamim ,1,25
-Shamita ,1,25
-Shampa ,1,25
-Shankari ,1,25
-Shankhamala ,1,25
-Shanta ,1,25
-Shantala ,1,25
-Shanti ,1,25
-Sharada ,1,25
-Sharadini ,1,25
-Sharanya ,1,25
-Sharika ,1,25
-Sharmila ,1,25
-Sharmistha ,1,25
-Sharmistha ,1,25
-Sharvani ,1,25
-Sharvari ,1,25
-Shashi ,1,25
-Shashibala ,1,25
-Shashirekha ,1,25
-Shaswati ,1,25
-Shatarupa ,1,25
-Sheela ,1,25
-Sheetal ,1,25
-Shefali ,1,25
-Shefalika ,1,25
-Shejali ,1,25
-Shekhar ,1,25
-Shevanti ,1,25
-Shibani ,1,25
-Shikha ,1,25
+Punita,1,25
+Punthali,1,25
+Purnima,1,25
+Purva,1,25
+Purvaja,1,25
+Pushpa,1,25
+Pushpanjali,1,25
+Pushpita,1,25
+Pusti,1,25
+Putul,1,25
+Quarrtulain,1,25
+Quasar,1,25
+Raakhi,1,25
+Rabia,1,25
+Rachana,1,25
+Rachita,1,25
+Rachna,1,25
+Radha,1,25
+Radhika,1,25
+Ragini,1,25
+Rajalakshmi,1,25
+Rajani,1,25
+Rajanigandha,1,25
+Rajata,1,25
+Rajdulari,1,25
+Rajeshwari,1,25
+Rajhans,1,25
+Rajkumari,1,25
+Rajnandhini,1,25
+Rajshri,1,25
+Raka,1,25
+Rakhi,1,25
+Raksha,1,25
+Rama,1,25
+Ramani,1,25
+Ramani,1,25
+Rambha,1,25
+Rameshwari,1,25
+Ramita,1,25
+Ramya,1,25
+Rangana,1,25
+Rani,1,25
+Ranita,1,25
+Ranjana,1,25
+Ranjini,1,25
+Ranjita,1,25
+Rashi,1,25
+Rashmi,1,25
+Rashmika,1,25
+Rasika,1,25
+Rasna,1,25
+Rati,1,25
+Ratna,1,25
+Ratnabala,1,25
+Ratnabali,1,25
+Ratnajyouti,1,25
+Ratnalekha,1,25
+Ratnali,1,25
+Ratnamala,1,25
+Ratnangi,1,25
+Ratnaprabha,1,25
+Ratnapriya,1,25
+Ratnavali,1,25
+Raviprabha,1,25
+Rekha,1,25
+Renu,1,25
+Renuka,1,25
+Renuka,1,25
+Resham,1,25
+Reshma,1,25
+Reshmi,1,25
+Reva,1,25
+Revati,1,25
+Richa,1,25
+Riddhi,1,25
+Riju,1,25
+Rijuta,1,25
+Rishika,1,25
+Riti,1,25
+Ritu,1,25
+Rohini,1,25
+Roma,1,25
+Roshan,1,25
+Roshni,1,25
+Rubaina,1,25
+Ruchi,1,25
+Ruchira,1,25
+Rudrani,1,25
+Rudrapriya,1,25
+Rujuta,1,25
+Rukma,1,25
+Rukmini,1,25
+Ruksana,1,25
+Ruma,1,25
+Rupa,1,25
+Rupali,1,25
+Rupashi,1,25
+Rupashri,1,25
+Sachi,1,25
+Sachita,1,25
+Sadaf,1,25
+Sadgati,1,25
+Sadguna,1,25
+Sadhan,1,25
+Sadhana,1,25
+Sadhika,1,25
+Sadhvi,1,25
+Sadiqua,1,25
+Saeeda,1,25
+Safia,1,25
+Sagarika,1,25
+Saguna,1,25
+Saguna,1,25
+Sahana,1,25
+Saheli,1,25
+Sahiba,1,25
+Sahila,1,25
+Sai,1,25
+Sajala,1,25
+Sajni,1,25
+Sakhi,1,25
+Sakina,1,25
+Salena,1,25
+Salila,1,25
+Salima,1,25
+Salma,1,25
+Samata,1,25
+Sameena,1,25
+Samhita,1,25
+Samidha,1,25
+Samiksha,1,25
+Samit,1,25
+Samita,1,25
+Sampada,1,25
+Sampatti,1,25
+Sampriti,1,25
+Sana,1,25
+Sananda,1,25
+Sanchali,1,25
+Sanchaya,1,25
+Sanchita,1,25
+Sandhaya,1,25
+Sandhya,1,25
+Sangita,1,25
+Saniya,1,25
+Sanjana,1,25
+Sanjivani,1,25
+Sanjukta,1,25
+Sanjula,1,25
+Sanjushree,1,25
+Sankul,1,25
+Sannidhi,1,25
+Sanskriti,1,25
+Santawana,1,25
+Santayani,1,25
+Sanvali,1,25
+Sanwari,1,25
+Sanyakta,1,25
+Sanyukta,1,25
+Saparna,1,25
+Saphala,1,25
+Sapna,1,25
+Sarada,1,25
+Sarakshi,1,25
+Sarala,1,25
+Sarama,1,25
+Saranya,1,25
+Sarasa,1,25
+Sarasi,1,25
+Sarasvati,1,25
+Saraswati,1,25
+Saravati,1,25
+Sarayu,1,25
+Sarbani,1,25
+Sarika,1,25
+Sarit,1,25
+Sarita,1,25
+Sarjana,1,25
+Saroj,1,25
+Saroja,1,25
+Sarojini,1,25
+Saruprani,1,25
+Saryu,1,25
+Sashi,1,25
+Sasmita,1,25
+Sati,1,25
+Satya,1,25
+Satyaki,1,25
+Satyarupa,1,25
+Satyavati,1,25
+Saudamini,1,25
+Saumya,1,25
+Savarna,1,25
+Savita,1,25
+Savitashri,1,25
+Savitri,1,25
+Sawini,1,25
+Sayeeda,1,25
+Seema,1,25
+Seemanti,1,25
+Seemantini,1,25
+Seerat,1,25
+Sejal,1,25
+Selma,1,25
+Semanti,1,25
+Serena,1,25
+Sevati,1,25
+Sevita,1,25
+Shabab,1,25
+Shabalini,1,25
+Shabana,1,25
+Shabari,1,25
+Shabnum,1,25
+Shachi,1,25
+Shagufta,1,25
+Shaheena,1,25
+Shaila,1,25
+Shaili,1,25
+Shakambari,1,25
+Shakeel,1,25
+Shakeela,1,25
+Shakti,1,25
+Shakuntala,1,25
+Shalaka,1,25
+Shalin,1,25
+Shalini,1,25
+Shalini,1,25
+Shalmali,1,25
+Shama,1,25
+Shambhavi,1,25
+Shameena,1,25
+Shamim,1,25
+Shamita,1,25
+Shampa,1,25
+Shankari,1,25
+Shankhamala,1,25
+Shanta,1,25
+Shantala,1,25
+Shanti,1,25
+Sharada,1,25
+Sharadini,1,25
+Sharanya,1,25
+Sharika,1,25
+Sharmila,1,25
+Sharmistha,1,25
+Sharmistha,1,25
+Sharvani,1,25
+Sharvari,1,25
+Shashi,1,25
+Shashibala,1,25
+Shashirekha,1,25
+Shaswati,1,25
+Shatarupa,1,25
+Sheela,1,25
+Sheetal,1,25
+Shefali,1,25
+Shefalika,1,25
+Shejali,1,25
+Shekhar,1,25
+Shevanti,1,25
+Shibani,1,25
+Shikha,1,25
 Shilavati,1,25
-Shilpa ,1,25
-Shilpita ,1,25
-Shinjini ,1,25
-Shipra ,1,25
-Shirin ,1,25
-Shishirkana ,1,25
-Shiuli ,1,25
-Shivangi ,1,25
-Shivani ,1,25
-Shobha ,1,25
-Shobha ,1,25
-Shobhana ,1,25
-Shobhita ,1,25
-Shobhna ,1,25
-Shorashi ,1,25
-Shrabana ,1,25
-Shraddha ,1,25
-Shradhdha ,1,25
-Shravana ,1,25
-Shravani ,1,25
-Shravanti ,1,25
-Shravasti ,1,25
-Shree ,1,25
-Shreela ,1,25
-Shreemayi ,1,25
-Shreeparna ,1,25
-Shreya ,1,25
-Shreyashi ,1,25
-Shri ,1,25
-Shridevi ,1,25
-Shridula ,1,25
-Shrigauri ,1,25
-Shrigeeta ,1,25
-Shrijani ,1,25
-Shrikirti ,1,25
-Shrikumari ,1,25
-Shrilata ,1,25
-Shrilekha ,1,25
-Shrimati ,1,25
-Shrimayi ,1,25
-Shrivalli ,1,25
-Shruti ,1,25
-Shruti ,1,25
-Shubha ,1,25
-Shubhada ,1,25
-Shubhangi ,1,25
-Shubhra ,1,25
-Shuchismita ,1,25
-Shuchita ,1,25
-Shukla ,1,25
-Shukti ,1,25
-Shulka ,1,25
-Shweta ,1,25
-Shyama ,1,25
-Shyamal ,1,25
-Shyamala ,1,25
-Shyamali ,1,25
-Shyamalika ,1,25
-Shyamalima ,1,25
-Shyamangi ,1,25
-Shyamari ,1,25
-Shyamasri ,1,25
-Shyamlata ,1,25
-Shyla ,1,25
-Sibani ,1,25
-Siddheshwari ,1,25
-Siddhi ,1,25
-Siddhima ,1,25
-Sikata ,1,25
-Sikta ,1,25
-Simran ,1,25
-Simrit ,1,25
-Sindhu ,1,25
-Sinsapa ,1,25
-Sita ,1,25
-Sitara ,1,25
-Siya ,1,25
-Smaram ,1,25
-Smita ,1,25
-Smrita ,1,25
-Smriti ,1,25
-Sneh ,1,25
-Sneha ,1,25
-Snehal ,1,25
-Snehalata ,1,25
-Snigdha ,1,25
-Sohalia ,1,25
-Sohni ,1,25
-Soma ,1,25
-Somalakshmi ,1,25
-Somansh ,1,25
-Somatra ,1,25
-Sona ,1,25
-Sonakshi ,1,25
-Sonal ,1,25
-Sonali ,1,25
-Sonia ,1,25
-Sonika ,1,25
-Soorat ,1,25
-Soumya ,1,25
-Sourabhi ,1,25
-Sreedevi ,1,25
-Sridevi ,1,25
-Sristi ,1,25
-Stavita ,1,25
-Stuti ,1,25
-Subarna ,1,25
-Subhadra ,1,25
-Subhaga ,1,25
-Subhagya ,1,25
-Subhashini ,1,25
-Subhuja ,1,25
-Subrata ,1,25
-Suchandra ,1,25
-Sucharita ,1,25
-Sucheta ,1,25
-Suchi ,1,25
-Suchira ,1,25
-Suchita ,1,25
-Suchitra ,1,25
-Sudakshima ,1,25
-Sudarshana ,1,25
-Sudeepa ,1,25
-Sudeepta ,1,25
-Sudeshna ,1,25
-Sudevi ,1,25
-Sudha ,1,25
-Sudhamayi ,1,25
-Sudhira ,1,25
-Sudipta ,1,25
-Sudipti ,1,25
-Sugita ,1,25
-Sugouri ,1,25
-Suhag ,1,25
-Suhaila ,1,25
-Suhasini ,1,25
-Suhina ,1,25
-Suhrita ,1,25
-Sujala ,1,25
-Sujata ,1,25
-Sujaya ,1,25
-Sukanya ,1,25
-Sukeshi ,1,25
-Sukriti ,1,25
-Suksma ,1,25
-Sukumari ,1,25
-Sulabha ,1,25
-Sulakshana ,1,25
-Sulalita ,1,25
-Sulekh ,1,25
-Suloch ,1,25
-Sulochana ,1,25
-Sultana ,1,25
-Sumana ,1,25
-Sumanolata ,1,25
-Sumati ,1,25
-Sumedha ,1,25
-Sumita ,1,25
-Sumitra ,1,25
-Sunanda ,1,25
-Sunandini ,1,25
-Sunandita ,1,25
-Sunayana ,1,25
-Sunayani ,1,25
-Sundari ,1,25
-Sundha ,1,25
-Suneeti ,1,25
-Sunetra ,1,25
-Sunila ,1,25
-Sunita ,1,25
-Suniti ,1,25
-Suparna ,1,25
-Suprabha ,1,25
-Supriti ,1,25
-Supriya ,1,25
-Surabhi ,1,25
-Suraksha ,1,25
-Surama ,1,25
-Suranjana ,1,25
-Suravinda ,1,25
-Surekha ,1,25
-Surina ,1,25
-Surotama ,1,25
-Suruchi ,1,25
-Surupa ,1,25
-Suryakanti ,1,25
-Sushama ,1,25
-Sushanti ,1,25
-Sushila ,1,25
-Sushma ,1,25
-Sushmita ,1,25
-Sushobhana ,1,25
-Susita ,1,25
-Susmita ,1,25
-Sutanuka ,1,25
-Sutapa ,1,25
-Suvarna ,1,25
-Suvarnaprabha ,1,25
-Suvarnarekha ,1,25
-Suvarnmala ,1,25
-Swagata ,1,25
-Swaha ,1,25
-Swapna ,1,25
-Swapnali ,1,25
-Swapnasundari ,1,25
-Swarnalata ,1,25
-Swarupa ,1,25
-Swasti ,1,25
-Swati ,1,25
+Shilpa,1,25
+Shilpita,1,25
+Shinjini,1,25
+Shipra,1,25
+Shirin,1,25
+Shishirkana,1,25
+Shiuli,1,25
+Shivangi,1,25
+Shivani,1,25
+Shobha,1,25
+Shobha,1,25
+Shobhana,1,25
+Shobhita,1,25
+Shobhna,1,25
+Shorashi,1,25
+Shrabana,1,25
+Shraddha,1,25
+Shradhdha,1,25
+Shravana,1,25
+Shravani,1,25
+Shravanti,1,25
+Shravasti,1,25
+Shree,1,25
+Shreela,1,25
+Shreemayi,1,25
+Shreeparna,1,25
+Shreya,1,25
+Shreyashi,1,25
+Shri,1,25
+Shridevi,1,25
+Shridula,1,25
+Shrigauri,1,25
+Shrigeeta,1,25
+Shrijani,1,25
+Shrikirti,1,25
+Shrikumari,1,25
+Shrilata,1,25
+Shrilekha,1,25
+Shrimati,1,25
+Shrimayi,1,25
+Shrivalli,1,25
+Shruti,1,25
+Shruti,1,25
+Shubha,1,25
+Shubhada,1,25
+Shubhangi,1,25
+Shubhra,1,25
+Shuchismita,1,25
+Shuchita,1,25
+Shukla,1,25
+Shukti,1,25
+Shulka,1,25
+Shweta,1,25
+Shyama,1,25
+Shyamal,1,25
+Shyamala,1,25
+Shyamali,1,25
+Shyamalika,1,25
+Shyamalima,1,25
+Shyamangi,1,25
+Shyamari,1,25
+Shyamasri,1,25
+Shyamlata,1,25
+Shyla,1,25
+Sibani,1,25
+Siddheshwari,1,25
+Siddhi,1,25
+Siddhima,1,25
+Sikata,1,25
+Sikta,1,25
+Simran,1,25
+Simrit,1,25
+Sindhu,1,25
+Sinsapa,1,25
+Sita,1,25
+Sitara,1,25
+Siya,1,25
+Smaram,1,25
+Smita,1,25
+Smrita,1,25
+Smriti,1,25
+Sneh,1,25
+Sneha,1,25
+Snehal,1,25
+Snehalata,1,25
+Snigdha,1,25
+Sohalia,1,25
+Sohni,1,25
+Soma,1,25
+Somalakshmi,1,25
+Somansh,1,25
+Somatra,1,25
+Sona,1,25
+Sonakshi,1,25
+Sonal,1,25
+Sonali,1,25
+Sonia,1,25
+Sonika,1,25
+Soorat,1,25
+Soumya,1,25
+Sourabhi,1,25
+Sreedevi,1,25
+Sridevi,1,25
+Sristi,1,25
+Stavita,1,25
+Stuti,1,25
+Subarna,1,25
+Subhadra,1,25
+Subhaga,1,25
+Subhagya,1,25
+Subhashini,1,25
+Subhuja,1,25
+Subrata,1,25
+Suchandra,1,25
+Sucharita,1,25
+Sucheta,1,25
+Suchi,1,25
+Suchira,1,25
+Suchita,1,25
+Suchitra,1,25
+Sudakshima,1,25
+Sudarshana,1,25
+Sudeepa,1,25
+Sudeepta,1,25
+Sudeshna,1,25
+Sudevi,1,25
+Sudha,1,25
+Sudhamayi,1,25
+Sudhira,1,25
+Sudipta,1,25
+Sudipti,1,25
+Sugita,1,25
+Sugouri,1,25
+Suhag,1,25
+Suhaila,1,25
+Suhasini,1,25
+Suhina,1,25
+Suhrita,1,25
+Sujala,1,25
+Sujata,1,25
+Sujaya,1,25
+Sukanya,1,25
+Sukeshi,1,25
+Sukriti,1,25
+Suksma,1,25
+Sukumari,1,25
+Sulabha,1,25
+Sulakshana,1,25
+Sulalita,1,25
+Sulekh,1,25
+Suloch,1,25
+Sulochana,1,25
+Sultana,1,25
+Sumana,1,25
+Sumanolata,1,25
+Sumati,1,25
+Sumedha,1,25
+Sumita,1,25
+Sumitra,1,25
+Sunanda,1,25
+Sunandini,1,25
+Sunandita,1,25
+Sunayana,1,25
+Sunayani,1,25
+Sundari,1,25
+Sundha,1,25
+Suneeti,1,25
+Sunetra,1,25
+Sunila,1,25
+Sunita,1,25
+Suniti,1,25
+Suparna,1,25
+Suprabha,1,25
+Supriti,1,25
+Supriya,1,25
+Surabhi,1,25
+Suraksha,1,25
+Surama,1,25
+Suranjana,1,25
+Suravinda,1,25
+Surekha,1,25
+Surina,1,25
+Surotama,1,25
+Suruchi,1,25
+Surupa,1,25
+Suryakanti,1,25
+Sushama,1,25
+Sushanti,1,25
+Sushila,1,25
+Sushma,1,25
+Sushmita,1,25
+Sushobhana,1,25
+Susita,1,25
+Susmita,1,25
+Sutanuka,1,25
+Sutapa,1,25
+Suvarna,1,25
+Suvarnaprabha,1,25
+Suvarnarekha,1,25
+Suvarnmala,1,25
+Swagata,1,25
+Swaha,1,25
+Swapna,1,25
+Swapnali,1,25
+Swapnasundari,1,25
+Swarnalata,1,25
+Swarupa,1,25
+Swasti,1,25
+Swati,1,25
 Sweta,1,25
-Tabassum ,1,25
-Tamali ,1,25
-Tamalika ,1,25
-Tamanna ,1,25
-Tamasa ,1,25
-Tamasi ,1,25
-Tambura ,1,25
-Tanaya ,1,25
-Tanika ,1,25
-Tanima ,1,25
-Tanmaya ,1,25
-Tannishtha ,1,25
-Tanseem ,1,25
-Tanu ,1,25
-Tanuja ,1,25
-Tanuka ,1,25
-Tanushri ,1,25
-Tanushri ,1,25
-Tanvi ,1,25
-Tapani ,1,25
-Tapasi ,1,25
-Tapati ,1,25
-Tapi ,1,25
-Tapti ,1,25
-Tara ,1,25
-Taraka ,1,25
-Tarakeshwari ,1,25
-Tarakini ,1,25
-Tarala ,1,25
-Tarana ,1,25
-Tarangini ,1,25
-Tarannum ,1,25
-Tarika ,1,25
-Tarini ,1,25
-Tarjani ,1,25
-Taru ,1,25
-Tarulata ,1,25
-Taruni ,1,25
-Tarunika ,1,25
-Tarunima ,1,25
-Tatini ,1,25
-Teertha ,1,25
-Teesta ,1,25
-Tehzeeb ,1,25
-Teja ,1,25
-Tejaswi ,1,25
-Tejaswini ,1,25
-Thumri ,1,25
-Tilaka ,1,25
-Tilottama ,1,25
-Timila ,1,25
-Titiksha ,1,25
-Toral ,1,25
-Tridhara ,1,25
-Triguna ,1,25
-Triguni ,1,25
-Trikaya ,1,25
-Trilochana ,1,25
-Trinayani ,1,25
-Trinetra ,1,25
-Triparna ,1,25
-Tripta ,1,25
-Tripti ,1,25
-Tripurasundari ,1,25
-Tripuri ,1,25
-Trisha ,1,25
-Trishala ,1,25
-Trishna ,1,25
-Triveni ,1,25
-Triyama ,1,25
-Trupti ,1,25
-Trusha ,1,25
-Tuhina ,1,25
-Tulasi ,1,25
-Tulika ,1,25
-Tusharkana ,1,25
-Tusti ,1,25
-Udaya ,1,25
-Udita ,1,25
-Uditi ,1,25
-Ujas ,1,25
-Ujjala ,1,25
-Ujjanini ,1,25
-Ujjwala ,1,25
-Ujwala ,1,25
-Ulka ,1,25
-Ulupi ,1,25
-Uma ,1,25
-Uma ,1,25
-Umika ,1,25
-Umrao ,1,25
-Unnati ,1,25
-Upala ,1,25
-Upama ,1,25
-Upasana ,1,25
-Ura ,1,25
-Urja ,1,25
-Urmi ,1,25
-Urmil ,1,25
-Urmila ,1,25
-Urmimala ,1,25
-Urna ,1,25
-Urshita ,1,25
-Urvashi ,1,25
-Urvasi ,1,25
-Urvi ,1,25
-Usha ,1,25
-Ushakiran ,1,25
-Ushakiran ,1,25
-Ushashi ,1,25
-Ushma ,1,25
-Usri ,1,25
-Utpala ,1,25
-Utpalini ,1,25
-Utsa ,1,25
-Uttara ,1,25
-Vagdevi ,1,25
-Vahini ,1,25
-Vaidehi ,1,25
-Vaijayanti ,1,25
-Vaijayantimala ,1,25
-Vaishali ,1,25
-Vaishali ,1,25
-Vaishavi ,1,25
-Vaishnodevi ,1,25
-Vajra ,1,25
-Vallari ,1,25
-Valli ,1,25
-Vallika ,1,25
-Vanadurga ,1,25
-Vanaja ,1,25
-Vanamala ,1,25
-Vanani ,1,25
-Vandana ,1,25
-Vandana ,1,25
-Vanhi ,1,25
-Vanhishikha ,1,25
-Vani ,1,25
-Vanita ,1,25
-Vanmala ,1,25
-Varada ,1,25
-Varana ,1,25
-Vari ,1,25
-Varija ,1,25
-Varsha ,1,25
-Varuna ,1,25
-Varuni ,1,25
-Varuni ,1,25
-Vasanta ,1,25
-Vasavi ,1,25
-Vasudha ,1,25
-Vasudhara ,1,25
-Vasumati ,1,25
-Vasundhara ,1,25
-Vatsala ,1,25
-Vedi ,1,25
-Vedika ,1,25
-Vedvalli ,1,25
-Veena ,1,25
-Veenapani ,1,25
-Vela ,1,25
-Vetravati ,1,25
-Vibha ,1,25
-Vibhavari ,1,25
-Vibhuti ,1,25
-Vidhut ,1,25
-Vidula ,1,25
-Vidya ,1,25
-Vidyul ,1,25
-Vidyut ,1,25
-Vijaya ,1,25
-Vijayalakshmi ,1,25
-Vijeta ,1,25
-Vijul ,1,25
-Vilasini ,1,25
-Vilina ,1,25
-Vimala ,1,25
-Vinanti ,1,25
-Vinata ,1,25
-Vinaya ,1,25
-Vindhya ,1,25
-Vineeta ,1,25
-Vinita ,1,25
-Vinoda ,1,25
-Vinodini ,1,25
-Vinodini ,1,25
-Vipasa ,1,25
-Vipula ,1,25
-Virata ,1,25
-Visala ,1,25
-Vishakha ,1,25
-Vishala ,1,25
-Vishalakshi ,1,25
-Vishaya ,1,25
-Vishnumaya ,1,25
-Vishnupriya ,1,25
-Viveka ,1,25
-Vrajabala ,1,25
-Vrinda ,1,25
-Vritti ,1,25
-Vrunda ,1,25
-Waheeda ,1,25
-Wamika ,1,25
-Wamil ,1,25
-Yaksha ,1,25
-Yamini ,1,25
-Yamuna ,1,25
-Yamuna ,1,25
-Yamune ,1,25
-Yashaswini ,1,25
-Yashawini ,1,25
-Yashila ,1,25
-Yashoda ,1,25
-Yasmeen ,1,25
-Yasmin ,1,25
-Yasmina ,1,25
-Yasmine ,1,25
-Yatee ,1,25
-Yauvani ,1,25
-YaVonne ,1,25
-Yogini ,1,25
-Yogita ,1,25
-Yojana ,1,25
-Yuvati ,1,25
-Zahra ,1,25
-Zarine ,1,25
-Zeenat ,1,25
+Tabassum,1,25
+Tamali,1,25
+Tamalika,1,25
+Tamanna,1,25
+Tamasa,1,25
+Tamasi,1,25
+Tambura,1,25
+Tanaya,1,25
+Tanika,1,25
+Tanima,1,25
+Tanmaya,1,25
+Tannishtha,1,25
+Tanseem,1,25
+Tanu,1,25
+Tanuja,1,25
+Tanuka,1,25
+Tanushri,1,25
+Tanushri,1,25
+Tanvi,1,25
+Tapani,1,25
+Tapasi,1,25
+Tapati,1,25
+Tapi,1,25
+Tapti,1,25
+Tara,1,25
+Taraka,1,25
+Tarakeshwari,1,25
+Tarakini,1,25
+Tarala,1,25
+Tarana,1,25
+Tarangini,1,25
+Tarannum,1,25
+Tarika,1,25
+Tarini,1,25
+Tarjani,1,25
+Taru,1,25
+Tarulata,1,25
+Taruni,1,25
+Tarunika,1,25
+Tarunima,1,25
+Tatini,1,25
+Teertha,1,25
+Teesta,1,25
+Tehzeeb,1,25
+Teja,1,25
+Tejaswi,1,25
+Tejaswini,1,25
+Thumri,1,25
+Tilaka,1,25
+Tilottama,1,25
+Timila,1,25
+Titiksha,1,25
+Toral,1,25
+Tridhara,1,25
+Triguna,1,25
+Triguni,1,25
+Trikaya,1,25
+Trilochana,1,25
+Trinayani,1,25
+Trinetra,1,25
+Triparna,1,25
+Tripta,1,25
+Tripti,1,25
+Tripurasundari,1,25
+Tripuri,1,25
+Trisha,1,25
+Trishala,1,25
+Trishna,1,25
+Triveni,1,25
+Triyama,1,25
+Trupti,1,25
+Trusha,1,25
+Tuhina,1,25
+Tulasi,1,25
+Tulika,1,25
+Tusharkana,1,25
+Tusti,1,25
+Udaya,1,25
+Udita,1,25
+Uditi,1,25
+Ujas,1,25
+Ujjala,1,25
+Ujjanini,1,25
+Ujjwala,1,25
+Ujwala,1,25
+Ulka,1,25
+Ulupi,1,25
+Uma,1,25
+Uma,1,25
+Umika,1,25
+Umrao,1,25
+Unnati,1,25
+Upala,1,25
+Upama,1,25
+Upasana,1,25
+Ura,1,25
+Urja,1,25
+Urmi,1,25
+Urmil,1,25
+Urmila,1,25
+Urmimala,1,25
+Urna,1,25
+Urshita,1,25
+Urvashi,1,25
+Urvasi,1,25
+Urvi,1,25
+Usha,1,25
+Ushakiran,1,25
+Ushakiran,1,25
+Ushashi,1,25
+Ushma,1,25
+Usri,1,25
+Utpala,1,25
+Utpalini,1,25
+Utsa,1,25
+Uttara,1,25
+Vagdevi,1,25
+Vahini,1,25
+Vaidehi,1,25
+Vaijayanti,1,25
+Vaijayantimala,1,25
+Vaishali,1,25
+Vaishali,1,25
+Vaishavi,1,25
+Vaishnodevi,1,25
+Vajra,1,25
+Vallari,1,25
+Valli,1,25
+Vallika,1,25
+Vanadurga,1,25
+Vanaja,1,25
+Vanamala,1,25
+Vanani,1,25
+Vandana,1,25
+Vandana,1,25
+Vanhi,1,25
+Vanhishikha,1,25
+Vani,1,25
+Vanita,1,25
+Vanmala,1,25
+Varada,1,25
+Varana,1,25
+Vari,1,25
+Varija,1,25
+Varsha,1,25
+Varuna,1,25
+Varuni,1,25
+Varuni,1,25
+Vasanta,1,25
+Vasavi,1,25
+Vasudha,1,25
+Vasudhara,1,25
+Vasumati,1,25
+Vasundhara,1,25
+Vatsala,1,25
+Vedi,1,25
+Vedika,1,25
+Vedvalli,1,25
+Veena,1,25
+Veenapani,1,25
+Vela,1,25
+Vetravati,1,25
+Vibha,1,25
+Vibhavari,1,25
+Vibhuti,1,25
+Vidhut,1,25
+Vidula,1,25
+Vidya,1,25
+Vidyul,1,25
+Vidyut,1,25
+Vijaya,1,25
+Vijayalakshmi,1,25
+Vijeta,1,25
+Vijul,1,25
+Vilasini,1,25
+Vilina,1,25
+Vimala,1,25
+Vinanti,1,25
+Vinata,1,25
+Vinaya,1,25
+Vindhya,1,25
+Vineeta,1,25
+Vinita,1,25
+Vinoda,1,25
+Vinodini,1,25
+Vinodini,1,25
+Vipasa,1,25
+Vipula,1,25
+Virata,1,25
+Visala,1,25
+Vishakha,1,25
+Vishala,1,25
+Vishalakshi,1,25
+Vishaya,1,25
+Vishnumaya,1,25
+Vishnupriya,1,25
+Viveka,1,25
+Vrajabala,1,25
+Vrinda,1,25
+Vritti,1,25
+Vrunda,1,25
+Waheeda,1,25
+Wamika,1,25
+Wamil,1,25
+Yaksha,1,25
+Yamini,1,25
+Yamuna,1,25
+Yamuna,1,25
+Yamune,1,25
+Yashaswini,1,25
+Yashawini,1,25
+Yashila,1,25
+Yashoda,1,25
+Yasmeen,1,25
+Yasmin,1,25
+Yasmina,1,25
+Yasmine,1,25
+Yatee,1,25
+Yauvani,1,25
+YaVonne,1,25
+Yogini,1,25
+Yogita,1,25
+Yojana,1,25
+Yuvati,1,25
+Zahra,1,25
+Zarine,1,25
+Zeenat,1,25
 Abi,1,26
 Abigeru,1,26
 Achika,1,26
@@ -30394,10 +30267,10 @@ Ageha,1,26
 Agunesu,1,26
 Agyoku,1,26
 Ahiko,1,26
-Ai,1,26
+Ai,2,26
 Aika,1,26
 Aiki,1,26
-Aiko,1,26
+Aiko,2,26
 Aimi,1,26
 Aina,1,26
 Ainoko,1,26
@@ -30407,19 +30280,19 @@ Airisu,1,26
 Akagame,1,26
 Akako,1,26
 Akana,1,26
-Akane,1,26
+Akane,2,26
 Akari,1,26
 Akashiko,1,26
 Akawana,1,26
 Akeko,1,26
-Akemi,1,26
+Akemi,2,26
 Akeru,1,26
-Aki,1,26
+Aki,2,26
 Akie,1,26
 Akiho,1,26
 Akikawa,1,26
 Akike,1,26
-Akiko,1,26
+Akiko,2,26
 Akimi,1,26
 Akina,1,26
 Akina,1,26
@@ -30434,7 +30307,7 @@ Akiyo,1,26
 Akko,1,26
 Ako,1,26
 Akumi,1,26
-Akuro,1,26
+Akuro,2,26
 Amago,1,26
 Amako,1,26
 Amami,1,26
@@ -30447,7 +30320,7 @@ Amaya,1,26
 Amaya,1,26
 Amba,1,26
 Ambari,1,26
-Ami,1,26
+Ami,2,26
 Amii,1,26
 Amika,1,26
 Amiko,1,26
@@ -30505,7 +30378,7 @@ Ariko,1,26
 Arimi,1,26
 A-ri-n,1,26
 Arina,1,26
-Arisa,1,26
+Arisa,2,26
 Arishia,1,26
 Arison,1,26
 Arisu,1,26
@@ -30522,8 +30395,8 @@ Asaeda,1,26
 Asago,1,26
 Asahiko,1,26
 Asaka,1,26
-Asako,1,26
-Asami,1,26
+Asako,2,26
+Asami,2,26
 Asanashia,1,26
 Asano,1,26
 Asawe,1,26
@@ -30541,21 +30414,21 @@ Atari,1,26
 Atomio,1,26
 Atsu,1,26
 Atsue,1,26
-Atsuko,1,26
+Atsuko,2,26
 Atsumi,1,26
 Atsuyo,1,26
-Aya,1,26
+Aya,2,26
 Ayae,1,26
 Ayaha,1,26
 Ayaka,1,26
 Ayaki,1,26
-Ayako,1,26
+Ayako,2,26
 Ayamasa,1,26
-Ayame,1,26
+Ayame,2,26
 Ayami,1,26
 Ayana,1,26
 Ayane,1,26
-Ayano,1,26
+Ayano,2,26
 Ayanomiya,1,26
 Ayao,1,26
 Ayari,1,26
@@ -30633,7 +30506,7 @@ Cha-rotto,1,26
 Cherona,1,26
 Cherushi,1,26
 Chi,1,26
-Chiaki,1,26
+Chiaki,2,26
 Chibana,1,26
 Chibi,1,26
 Chidori,1,26
@@ -30642,11 +30515,11 @@ Chidzue,1,26
 Chidzuko,1,26
 Chidzuru,1,26
 Chidzuyo,1,26
-Chie,1,26
+Chie,2,26
 Chiei,1,26
 Chieka,1,26
 Chieki,1,26
-Chieko,1,26
+Chieko,2,26
 Chiemi,1,26
 Chieno,1,26
 Chieri,1,26
@@ -30663,17 +30536,17 @@ Chihoko,1,26
 Chihomi,1,26
 Chii,1,26
 Chiiko,1,26
-Chika,1,26
+Chika,2,26
 Chikae,1,26
 Chikage,1,26
-Chikako,1,26
+Chikako,2,26
 Chikami,1,26
 Chikayo,1,26
 Chiki,1,26
 Chiko,1,26
 Chiko,1,26
 Chiku,1,26
-Chikuma,1,26
+Chikuma,2,26
 ChikyuuAi,1,26
 Chima,1,26
 Chimaki,1,26
@@ -30682,21 +30555,19 @@ Chimari,1,26
 Chimeko,1,26
 Chin,1,26
 Chinami,1,26
-Chinatsu,1,26
+Chinatsu,2,26
 Chiomi,1,26
 Chiori,1,26
 Chisa,1,26
 Chisako,1,26
 Chisaku,1,26
-Chisato,1,26
-Chisato ,1,26
+Chisato,2,26
 Chiseko,1,26
 Chishik,1,26
 Chishiko,1,26
 Chitae,1,26
 Chitako,1,26
-Chitose,1,26
-Chitose ,1,26
+Chitose,2,26
 Chitoyo,1,26
 Chitsuko,1,26
 Chiwa,1,26
@@ -30706,7 +30577,7 @@ Chiweko,1,26
 Chiya,1,26
 Chiyako,1,26
 Chiyami,1,26
-Chiyeko,1,26
+Chiyeko,2,26
 Chiyo,1,26
 Chiyo,1,26
 Chiyoe,1,26
@@ -30851,7 +30722,7 @@ Fuemi,1,26
 Fuifui,1,26
 Fuji,1,26
 Fujie,1,26
-Fujiko,1,26
+Fujiko,2,26
 Fujimi,1,26
 Fujino,1,26
 Fujita,1,26
@@ -30867,12 +30738,12 @@ Fukuko,1,26
 Fukumi,1,26
 Fukuno,1,26
 Fukuyo,1,26
-Fumi,1,26
-Fumie,1,26
+Fumi,2,26
+Fumie,2,26
 Fumieko,1,26
 Fumika,1,26
-Fumiki,1,26
-Fumiko,1,26
+Fumiki,2,26
+Fumiko,2,26
 Fumina,1,26
 Fuminori,1,26
 Fumio,1,26
@@ -30885,7 +30756,7 @@ Furoa,1,26
 Furo-rensu,1,26
 Furuyahitomi,1,26
 Fusa,1,26
-Fusae,1,26
+Fusae,2,26
 Fusako,1,26
 Fusami,1,26
 Fusayo,1,26
@@ -30901,7 +30772,7 @@ Fuyo,1,26
 Fuyoko,1,26
 Fuyu,1,26
 Fuyuka,1,26
-Fuyuko,1,26
+Fuyuko,2,26
 Fuyumi,1,26
 Fuziko,1,26
 Gaburiera,1,26
@@ -30909,7 +30780,7 @@ Gaburieru,1,26
 Ga-shia,1,26
 Ga-toru-do,1,26
 Geiru,1,26
-Gemmei,1,26
+Gemmei,2,26
 Gen,1,26
 Genmi,1,26
 Gin,1,26
@@ -31769,23 +31640,23 @@ Lumoi,1,26
 Maako,1,26
 Maasa,1,26
 Maaya,1,26
-Machi,1,26
+Machi,2,26
 Ma-chi,1,26
 Machie,1,26
 Machiki,1,26
-Machiko,1,26
+Machiko,2,26
 Machisa,1,26
 Machiyo,1,26
 Macho,1,26
 Machobo,1,26
 Madirin,1,26
 Madison,1,26
-Madoka,1,26
+Madoka,2,26
 Madoko,1,26
-Mae,1,26
+Mae,2,26
 Maeka,1,26
-Maeko,1,26
-Maemi,1,26
+Maeko,2,26
+Maemi,2,26
 Ma-garetto,1,26
 Magi,1,26
 Ma-go,1,26
@@ -31794,15 +31665,12 @@ Maha,1,26
 Maho,1,26
 Mahoka,1,26
 Mahoko,1,26
-Mai,1,26
-Mai ,1,26
+Mai,2,26
 Maika,1,26
-Maiko,1,26
-Maiko ,1,26
+Maiko,2,26
 Maina,1,26
 Maira,1,26
-Maiya,1,26
-Maiya,1,26
+Maiya,2,26
 Maiyo,1,26
 Ma-ji,1,26
 Ma-jori,1,26
@@ -31810,27 +31678,24 @@ Maju,1,26
 Makami,1,26
 Makana,1,26
 Makeira,1,26
-Maki,1,26
-Maki ,1,26
+Maki,2,26
 Makie,1,26
 Makikam,1,26
-Makiko,1,26
-Makiko ,1,26
+Makiko,2,26
 Makino,1,26
 Makkenji,1,26
-Mako,1,26
-Mako ,1,26
+Mako,2,26
 Makoto,1,26
 Makou,1,26
 Makushi-n,1,26
 Mamako,1,26
-Mami,1,26
-Mamiko,1,26
+Mami,2,26
+Mamiko,2,26
 Mamina,1,26
-Man,1,26
-Mana,1,26
+Man,2,26
+Mana,2,26
 Manako,1,26
-Manami,1,26
+Manami,2,26
 Manan,1,26
 Mandi,1,26
 Maniko,1,26
@@ -31843,7 +31708,7 @@ Maraia,1,26
 Mareko,1,26
 Mareni,1,26
 Mareo,1,26
-Mari,1,26
+Mari,2,26
 Maria,1,26
 Mariamu,1,26
 Marian,1,26
@@ -31853,7 +31718,7 @@ Marieko,1,26
 Marieru,1,26
 Marii,1,26
 Marika,1,26
-Mariko,1,26
+Mariko,2,26
 Marimo,1,26
 Marin,1,26
 Ma-ri-n,1,26
@@ -31870,14 +31735,14 @@ Marissa,1,26
 Mariwo,1,26
 Mariya,1,26
 Maron,1,26
-Maru,1,26
+Maru,2,26
 Marujani,1,26
 Maruko,1,26
 Marumi,1,26
 Marunu,1,26
 Masa,1,26
 Ma-sa,1,26
-Masae,1,26
+Masae,2,26
 Masai,1,26
 Masakan,1,26
 Masako,1,26
@@ -31897,14 +31762,14 @@ Masu,1,26
 Masue,1,26
 Masugin,1,26
 Masuko,1,26
-Masumi,1,26
+Masumi,2,26
 Masuyo,1,26
 Masuyoshi,1,26
 Ma-ti,1,26
 Ma-tina,1,26
 Matiruda,1,26
 Matoko,1,26
-Matsu,1,26
+Matsu,2,26
 Matsue,1,26
 Matsuki,1,26
 Matsuko,1,26
@@ -31914,11 +31779,11 @@ Matsuri,1,26
 Matsuwe,1,26
 Matsuyo,1,26
 Maurinako,1,26
-Maya,1,26
+Maya,2,26
 Mayaka,1,26
-Mayako,1,26
-Mayo,1,26
-Mayoko,1,26
+Mayako,2,26
+Mayo,2,26
+Mayoko,2,26
 Mayu,1,26
 Mayuka,1,26
 Mayuki,1,26
@@ -32078,32 +31943,32 @@ Misuyo,1,26
 Misuzu,1,26
 Mito,1,26
 Mitoko,1,26
-Mitsu,1,26
+Mitsu,2,26
 Mitsue,1,26
 Mitsuharu,1,26
 Mitsuho,1,26
 Mitsuki,1,26
-Mitsuko,1,26
+Mitsuko,2,26
 Mitsumi,1,26
 Mitsuno,1,26
 Mitsuo,1,26
 Mitsuru,1,26
 Mitsuwo,1,26
-Mitsuyo,1,26
+Mitsuyo,2,26
 Miwa,1,26
-Miwako,1,26
+Miwako,2,26
 Miwe,1,26
 Miya,1,26
 Miya,1,26
 Miyabi,1,26
 Miyae,1,26
-Miyako,1,26
+Miyako,2,26
 Miyaku,1,26
 Miyame,1,26
 Miyami,1,26
-Miyo,1,26
-Miyoko,1,26
-Miyoshi,1,26
+Miyo,2,26
+Miyoko,2,26
+Miyoshi,2,26
 Miyu,1,26
 Miyuki,1,26
 Miyuri,1,26
@@ -32115,8 +31980,7 @@ Mizuha,1,26
 Mizuho,1,26
 Mizuhoko,1,26
 Mizuka,1,26
-Mizuki,1,26
-Mizuki ,1,26
+Mizuki,2,26
 Mizuko,1,26
 Mizuna,1,26
 Mizuyo,1,26
@@ -32167,8 +32031,8 @@ Murikaz,1,26
 Musashi,1,26
 Mutsu,1,26
 Mutsuki,1,26
-Mutsuko,1,26
-Mutsumi,1,26
+Mutsuko,2,26
+Mutsumi,2,26
 Myeko,1,26
 Myka,1,26
 Myouko,1,26
@@ -32191,8 +32055,8 @@ Nagako,1,26
 Nagayo,1,26
 Nagiko,1,26
 Nagisa,1,26
-Naho,1,26
-Nahoko,1,26
+Naho,2,26
+Nahoko,2,26
 Nahomi,1,26
 Naima,1,26
 Naka,1,26
@@ -32202,19 +32066,17 @@ Nakao,1,26
 Nakayori,1,26
 Naki,1,26
 Nameko,1,26
-Nami,1,26
-Nami,1,26
-Nami,1,26
-Namie,1,26
-Namiji,1,26
-Namika,1,26
-Namiko,1,26
-Namiyo,1,26
+Nami,4,26
+Namie,2,26
+Namiji,2,26
+Namika,2,26
+Namiko,2,26
+Namiyo,2,26
 Nan,1,26
-Nana,1,26
+Nana,2,26
 Nanae,1,26
-Nanako,1,26
-Nanami,1,26
+Nanako,2,26
+Nanami,2,26
 Nanao,1,26
 Nanasato,1,26
 Nanase,1,26
@@ -32227,24 +32089,24 @@ Nanko,1,26
 Nanoko,1,26
 Nanshi,1,26
 Nansu,1,26
-Nao,1,26
+Nao,2,26
 Naoe,1,26
 Naohe,1,26
 Naohiko,1,26
-Naoko,1,26
-Naomi,1,26
-Naora,1,26
+Naoko,2,26
+Naomi,2,26
+Naora,2,26
 Naoya,1,26
 Nara,1,26
 Narae,1,26
 Narako,1,26
-Nari,1,26
-Nariko,1,26
+Nari,2,26
+Nariko,2,26
 Narimi,1,26
 Narin,1,26
 Naru,1,26
 Naruko,1,26
-Narumi,1,26
+Narumi,2,26
 Narushise,1,26
 Naruyo,1,26
 Nasa,1,26
@@ -32254,13 +32116,13 @@ Natasha,1,26
 Natsu,1,26
 Natsue,1,26
 Natsuki,1,26
-Natsuko,1,26
-Natsumi,1,26
+Natsuko,2,26
+Natsumi,2,26
 Natsuno,1,26
 Natsuo,1,26
 Natsuyo,1,26
 Nawoko,1,26
-Nayoko,1,26
+Nayoko,2,26
 Nayu,1,26
 Nayuko,1,26
 Nazuna,1,26
@@ -32272,7 +32134,7 @@ Neko,1,26
 Nekomi,1,26
 Nemu,1,26
 Nemuko,1,26
-Nene,1,26
+Nene,2,26
 Neora,1,26
 Neri,1,26
 Neru,1,26
@@ -32317,23 +32179,23 @@ Noiko,1,26
 Nojiko,1,26
 Nokki,1,26
 Noko,1,26
-Nomi,1,26
+Nomi,2,26
 Nona,1,26
 Nonoka,1,26
 Nora,1,26
-Nori,1,26
+Nori,2,26
 Norie,1,26
 Norihisa,1,26
 Noriho,1,26
 Norika,1,26
-Noriko,1,26
+Noriko,2,26
 Norimi,1,26
 Nori-n,1,26
 Noritake,1,26
 Noriyo,1,26
 Noriyuki,1,26
 Noya,1,26
-Nozomi,1,26
+Nozomi,2,26
 Nuiko,1,26
 Nunoko,1,26
 Nuriko,1,26
@@ -32452,14 +32314,14 @@ Purudensu,1,26
 Rabia,1,26
 Rabinia,1,26
 Rai,1,26
-Raicho,1,26
+Raicho,2,26
 Raichu,1,26
 Raiku,1,26
 Raina,1,26
 Raisa,1,26
 Raiza,1,26
 Rakeru,1,26
-Raku,1,26
+Raku,2,26
 Rakuko,1,26
 Ramie,1,26
 Ramiwe,1,26
@@ -32483,12 +32345,12 @@ Rei,1,26
 Reicheru,1,26
 Reika,1,26
 Reikibu,1,26
-Reiko,1,26
+Reiko,2,26
 Reimi,1,26
 Reina,1,26
 Reiri,1,26
 Reiya,1,26
-Remi,1,26
+Remi,2,26
 Remiko,1,26
 Ren,1,26
 Rena,1,26
@@ -32513,8 +32375,8 @@ Ribi,1,26
 Ribia,1,26
 Richiko,1,26
 Ridia,1,26
-Rie,1,26
-Rieko,1,26
+Rie,2,26
+Rieko,2,26
 Riena,1,26
 Rieo,1,26
 Rifumi,1,26
@@ -32522,20 +32384,20 @@ Riho,1,26
 Rihoko,1,26
 Riiko,1,26
 Riina,1,26
-Rika,1,26
-Rikako,1,26
+Rika,2,26
+Rikako,2,26
 Rikiko,1,26
 Rikki,1,26
 Riko,1,26
-Riku,1,26
+Riku,2,26
 Rikuko,1,26
 Rima,1,26
 Rimako,1,26
 Rimi,1,26
 Rimiko,1,26
 Rin,1,26
-Rina,1,26
-Rinako,1,26
+Rina,2,26
+Rinako,2,26
 Rinda,1,26
 Rini,1,26
 Rini,1,26
@@ -32555,12 +32417,12 @@ Ririn,1,26
 Ririse,1,26
 Ririsu,1,26
 Riru,1,26
-Risa,1,26
-Risako,1,26
+Risa,2,26
+Risako,2,26
 Riseko,1,26
 Rita,1,26
 Ritsu,1,26
-Ritsuko,1,26
+Ritsuko,2,26
 Riuko,1,26
 River,1,26
 Riya,1,26
@@ -32575,7 +32437,7 @@ Ro-ji,1,26
 Roko,1,26
 Rokuko,1,26
 Rokusannu,1,26
-Romi,1,26
+Romi,2,26
 Rona,1,26
 Ronda,1,26
 Roona,1,26
@@ -32597,28 +32459,28 @@ Ro-zumari,1,26
 Rubi,1,26
 Rueko,1,26
 Ruerin,1,26
-Rui,1,26
+Rui,2,26
 Ruiko,1,26
 Rui-sa,1,26
 Rui-zu,1,26
 Ruka,1,26
 Rumi,1,26
-Rumiko,1,26
+Rumiko,2,26
 Rumina,1,26
 Runa,1,26
 Runako,1,26
 Rune,1,26
 Rura,1,26
-Ruri,1,26
-Ruriko,1,26
+Ruri,2,26
+Ruriko,2,26
 Ruruko,1,26
 Rushi,1,26
 Ru-shi,1,26
 Rushi-ru,1,26
 Ru-su,1,26
 Rutsuko,1,26
-Ryo,1,26
-Ryoko,1,26
+Ryo,2,26
+Ryoko,2,26
 Ryosei,1,26
 Ryou,1,26
 Ryouka,1,26
@@ -32628,24 +32490,24 @@ Ryuko,1,26
 Ryuuko,1,26
 Sabanna,1,26
 Saburina,1,26
-Sachi,1,26
+Sachi,2,26
 Sachie,1,26
 Sachika,1,26
-Sachiko,1,26
+Sachiko,2,26
 Sachimi,1,26
 Sachiyo,1,26
 Sada,1,26
 Sada,1,26
 Sadae,1,26
 Sadaka,1,26
-Sadako,1,26
+Sadako,2,26
 Sadakoz,1,26
 Sadami,1,26
 Sadano,1,26
 Sadao,1,26
 Sadayo,1,26
-Sae,1,26
-Saeko,1,26
+Sae,2,26
+Saeko,2,26
 Saemi,1,26
 Safuron,1,26
 Sagako,1,26
@@ -32655,7 +32517,7 @@ Sahoko,1,26
 Saiko,1,26
 Saimi,1,26
 Saisho,1,26
-Saito,1,26
+Saito,2,26
 Saiyuri,1,26
 Sakae,1,26
 Sakako,1,26
@@ -32745,16 +32607,14 @@ Seira,1,26
 Seishi,1,26
 Seishiru,1,26
 Seka,1,26
-Seki,1,26
-Seki ,1,26
+Seki,2,26
 Sekiko,1,26
 Sekiwak,1,26
 Seko,1,26
 Sekogo,1,26
 Sema,1,26
 Semba,1,26
-Sen,1,26
-Sen ,1,26
+Sen,2,26
 Sena,1,26
 Sen-hi,1,26
 Sen-hik,1,26
@@ -32780,7 +32640,7 @@ Setoko,1,26
 Setsu,1,26
 Setsugi,1,26
 Setsuki,1,26
-Setsuko,1,26
+Setsuko,2,26
 Setsumi,1,26
 Setsuna,1,26
 Shana,1,26
@@ -32806,7 +32666,7 @@ Shieko,1,26
 Shifumi,1,26
 Shifuu,1,26
 Shigako,1,26
-Shige,1,26
+Shige,2,26
 Shigefumi,1,26
 Shigeho,1,26
 Shigeko,1,26
@@ -32852,14 +32712,14 @@ Shinko,1,26
 Shinmi,1,26
 Shino,1,26
 Shino,1,26
-Shinobu,1,26
+Shinobu,2,26
 Shinoko,1,26
 Shinshia,1,26
 Shio,1,26
-Shioko,1,26
+Shioko,2,26
 Shiomi,1,26
 Shion,1,26
-Shiori,1,26
+Shiori,2,26
 Shi-ra,1,26
 Shiria,1,26
 Shirubi,1,26
@@ -32872,17 +32732,17 @@ Shiwako,1,26
 Shiwasu,1,26
 Shiwori,1,26
 Shiyou,1,26
-Shizu,1,26
-Shizue,1,26
+Shizu,2,26
+Shizue,2,26
 Shizuho,1,26
-Shizuka,1,26
+Shizuka,2,26
 Shizuko,1,26
 Shizuo,1,26
 Shizuwe,1,26
 Shizuyo,1,26
 Shizuyoko,1,26
-Shoken,1,26
-Shoko,1,26
+Shoken,2,26
+Shoko,2,26
 Sho-na,1,26
 Shougyoku,1,26
 Shouko,1,26
@@ -32934,7 +32794,7 @@ Sugi,1,26
 Sugiko,1,26
 Suginek,1,26
 Suguho,1,26
-Sui,1,26
+Sui,2,26
 Suiko,1,26
 Su-ji,1,26
 Sujiko,1,26
@@ -32946,19 +32806,15 @@ Suki,1,26
 Sukiko,1,26
 Sukimin,1,26
 Sukki,1,26
-Suko,1,26
-Suko ,1,26
+Suko,2,26
 Sukomi,1,26
 Suma,1,26
 Sumako,1,26
 Sumayo,1,26
-Sumi,1,26
-Sumi ,1,26
-Sumie,1,26
-Sumie ,1,26
+Sumi,2,26
+Sumie,2,26
 Sumika,1,26
-Sumiko,1,26
-Sumiko ,1,26
+Sumiko,2,26
 Suminoto,1,26
 Sumio,1,26
 Sumire,1,26
@@ -32985,12 +32841,10 @@ Su-zan,1,26
 Suzanna,1,26
 Suzu,1,26
 Suzu,1,26
-Suzue,1,26
-Suzue ,1,26
+Suzue,2,26
 Suzuka,1,26
 Suzuki,1,26
-Suzuko,1,26
-Suzuko,1,26
+Suzuko,2,26
 Suzume,1,26
 Suzumi,1,26
 Suzuna,1,26
@@ -33342,12 +33196,9 @@ Ukiko,1,26
 Ukyo,1,26
 Uma,1,26
 Umako,1,26
-Ume,1,26
-Ume ,1,26
-Umeka,1,26
-Umeka,1,26
-Umeko,1,26
-Umeko,1,26
+Ume,2,26
+Umeka,2,26
+Umeko,2,26
 Umekogo,1,26
 Umeno,1,26
 Umeya,1,26
@@ -33359,7 +33210,7 @@ Uneko,1,26
 Unsuku,1,26
 U-pi,1,26
 Ura,1,26
-Urako,1,26
+Urako,2,26
 Uran,1,26
 Urara,1,26
 Urema,1,26
@@ -33373,8 +33224,7 @@ Uta,1,26
 Uta,1,26
 Utae,1,26
 Utagawa,1,26
-Utako,1,26
-Utako ,1,26
+Utako,2,26
 Utami,1,26
 Utashiro,1,26
 Utasumi,1,26
