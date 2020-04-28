@@ -25,6 +25,14 @@ VERSION HISTORY:
 + PR #1663: Fixing Clanner Name Migration
 + PR #1681: Change refit model weight calculation to work with BA
 + PR #1685: Adding All Role and No Role options for Portraits
++ PR #1688: Single Portrait Bulk Assignment to Personnel
++ Issue #1683: Adding the option to log marriage name changes
++ PR #1670: Improved Standard Awards
++ PR #1693: Fixing Campaign Options Display Spacing Issues
++ Issue #1285: Adding default value to prevent Personnel Market No-Role Personnel
++ Issues #880 and #1671: Paid Recruitment Roll is now based on having an active contract
++ Issues ##1614 and #1615: Adding a Financial Year Duration Option
++ PR #1700: Fixed NPE resulting in failure to display personnel tab when a unit is assigned to a non-existent scenario
 
 0.47.5 (2020-4-01 2000 UTC)
 + Issue #1470: Thumper artillery vehicle causes array index out of bounds exception error
