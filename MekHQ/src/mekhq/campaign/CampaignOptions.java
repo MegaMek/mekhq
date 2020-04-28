@@ -3509,8 +3509,12 @@ public class CampaignOptions implements Serializable {
             	retVal.useTransfers = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useTimeInService")) {
                 retVal.useTimeInService = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("timeInServiceDisplayFormat")) {
+                retVal.timeInServiceDisplayFormat = TimeInDisplayFormat.valueOf(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useTimeInRank")) {
                 retVal.useTimeInRank = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("timeInRankDisplayFormat")) {
+                retVal.timeInRankDisplayFormat = TimeInDisplayFormat.valueOf(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("trackTotalEarnings")) {
                 retVal.trackTotalEarnings = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("capturePrisoners")) {

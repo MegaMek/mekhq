@@ -21,6 +21,7 @@ package mekhq.campaign.personnel.enums;
 import megamek.common.util.EncodeControl;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.util.ResourceBundle;
 
@@ -30,6 +31,7 @@ import java.util.ResourceBundle;
 public enum TimeInDisplayFormat {
     //region Enum Declarations
     DAYS("TimeInDisplayFormat.DAYS.text", "TimeInDisplayFormat.DAYS.displayFormat"),
+    WEEKS("TimeInDisplayFormat.WEEKS.text", "TimeInDisplayFormat.WEEKS.displayFormat"),
     MONTHS("TimeInDisplayFormat.MONTHS.text", "TimeInDisplayFormat.MONTHS.displayFormat"),
     MONTHS_YEARS("TimeInDisplayFormat.MONTHS_YEARS.text", "TimeInDisplayFormat.MONTHS_YEARS.displayFormat"),
     YEARS("TimeInDisplayFormat.YEARS.text", "TimeInDisplayFormat.YEARS.displayFormat");
@@ -49,14 +51,31 @@ public enum TimeInDisplayFormat {
     }
     //endregion Constructors
 
+    private String getDisplayFormat() {
+        return displayFormat;
+    }
+
     public String getDisplayFormattedOutput(LocalDate initialDate, LocalDate today) {
+        int difference;
         switch (this) {
             case DAYS:
-                break;
+                difference = Math.toIntExact(ChronoUnit.DAYS.between(initialDate, today));
+                return String.format(getDisplayFormat(), difference);
+            case WEEKS:
+                difference = Math.toIntExact(ChronoUnit.WEEKS.between(initialDate, today));
+                return String.format(getDisplayFormat(), difference);
             case MONTHS:
-                int difference = Math.toIntExact(ChronoUnit.MONTHS.between(initialDate, today));
+                difference = Math.toIntExact(ChronoUnit.MONTHS.between(initialDate, today));
+                return String.format(getDisplayFormat(), difference);
+            case MONTHS_YEARS:
+                Period period = Period.between(initialDate, today);
+                return String.format(getDisplayFormat(), period.getMonths(), period.getYears());
+            case YEARS:
+                difference = Math.toIntExact(ChronoUnit.YEARS.between(initialDate, today));
+                return String.format(getDisplayFormat(), difference);
+            default:
+                return "";
         }
-        return "";
     }
 
     @Override
