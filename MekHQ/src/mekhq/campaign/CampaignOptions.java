@@ -144,6 +144,7 @@ public class CampaignOptions implements Serializable {
     private int babySurnameStyle;
     public static final int BABY_SURNAME_MINE = 0; //baby uses mother's surname
     public static final int BABY_SURNAME_SPOUSE = 1; //baby uses father's surname
+    private boolean determineFatherAtBirth;
     private boolean displayParentage;
     private int displayFamilyLevel;
     public static final int PARENTS_CHILDREN_SIBLINGS = 0;
@@ -523,6 +524,7 @@ public class CampaignOptions implements Serializable {
         displayTrueDueDate = false;
         logConception = false;
         babySurnameStyle = BABY_SURNAME_MINE;
+        determineFatherAtBirth = false;
         displayParentage = false;
         displayFamilyLevel = PARENTS_CHILDREN_SIBLINGS;
         useRandomDeaths = true;
@@ -1277,6 +1279,20 @@ public class CampaignOptions implements Serializable {
      */
     public void setBabySurnameStyle(int b) {
         babySurnameStyle = b;
+    }
+
+    /**
+     * @return whether or not to determine the father at birth instead of at conception
+     */
+    public boolean determineFatherAtBirth() {
+        return determineFatherAtBirth;
+    }
+
+    /**
+     * @param determineFatherAtBirth whether or not to determine the father at birth instead of at conception
+     */
+    public void setDetermineFatherAtBirth(boolean determineFatherAtBirth) {
+        this.determineFatherAtBirth = determineFatherAtBirth;
     }
 
     /**
@@ -2917,6 +2933,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "displayTrueDueDate", displayTrueDueDate);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "logConception", logConception);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "babySurnameStyle", babySurnameStyle);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "determineFatherAtBirth", determineFatherAtBirth);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useParentage", displayParentage);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "displayFamilyLevel", displayFamilyLevel);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomDeaths", useRandomDeaths);
@@ -3385,6 +3402,8 @@ public class CampaignOptions implements Serializable {
                 retVal.logConception = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("babySurnameStyle")) {
                 retVal.babySurnameStyle = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("determineFatherAtBirth")) {
+                retVal.setDetermineFatherAtBirth(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("useParentage")) {
                 retVal.displayParentage = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("displayFamilyLevel")) {

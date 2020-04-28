@@ -258,6 +258,7 @@ public class CampaignOptionsDialog extends JDialog {
     private JCheckBox chkDisplayTrueDueDate;
     private JCheckBox chkLogConception;
     private JComboBox<String> comboBabySurnameStyle;
+    private JCheckBox chkDetermineFatherAtBirth;
     private JCheckBox chkDisplayParentage;
     private JComboBox<String> comboDisplayFamilyLevel;
     private JCheckBox chkUseRandomDeaths;
@@ -1866,6 +1867,13 @@ public class CampaignOptionsDialog extends JDialog {
         pnlBabySurnameStyle.setToolTipText(resourceMap.getString("babySurnameStyle.toolTipText"));
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(pnlBabySurnameStyle, gridBagConstraints);
+
+        chkDetermineFatherAtBirth = new JCheckBox(resourceMap.getString("determineFatherAtBirth.text"));
+        chkDetermineFatherAtBirth.setToolTipText(resourceMap.getString("determineFatherAtBirth.toolTipText"));
+        chkDetermineFatherAtBirth.setName("chkDetermineFatherAtBirth");
+        chkDetermineFatherAtBirth.setSelected(options.determineFatherAtBirth());
+        gridBagConstraints.gridy = ++gridy;
+        panFamily.add(chkDetermineFatherAtBirth, gridBagConstraints);
 
         chkDisplayParentage = new JCheckBox(resourceMap.getString("displayParentage.text"));
         chkDisplayParentage.setSelected(options.displayParentage());
@@ -4885,6 +4893,7 @@ public class CampaignOptionsDialog extends JDialog {
         options.setDisplayTrueDueDate(chkDisplayTrueDueDate.isSelected());
         options.setLogConception(chkLogConception.isSelected());
         options.setBabySurnameStyle(comboBabySurnameStyle.getSelectedIndex());
+        options.setDetermineFatherAtBirth(chkDetermineFatherAtBirth.isSelected());
         options.setDisplayParentage(chkDisplayParentage.isSelected());
         options.setDisplayFamilyLevel(comboDisplayFamilyLevel.getSelectedIndex());
         options.setUseRandomDeaths(chkUseRandomDeaths.isSelected());

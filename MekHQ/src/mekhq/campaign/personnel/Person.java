@@ -31,7 +31,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.IntSupplier;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import megamek.common.*;
 import megamek.common.util.EncodeControl;
@@ -1248,10 +1247,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
         extraData.set(PREGNANCY_FATHER_DATA, null);
     }
 
-    public Collection<Person> birth() {
+    public void birth(Campaign campaign) {
         int size = extraData.get(PREGNANCY_CHILDREN_DATA, 1);
         String fatherIdString = extraData.get(PREGNANCY_FATHER_DATA);
         UUID fatherId = (fatherIdString != null) ? UUID.fromString(fatherIdString) : null;
+        fatherId = campaign.getCampaignOptions().determineFatherAtBirth()
+                ? Utilities.nonNull(getSpouseId(), fatherId) : fatherId;
+
         Ancestors anc = campaign.getAncestors(fatherId, id);
         if (null == anc) {
             anc = campaign.createAncestors(fatherId, id);
@@ -1263,14 +1265,15 @@ public class Person implements Serializable, MekHqXmlSerializable {
         // Cleanup
         removePregnancy();
 
-        return IntStream.range(0, size).mapToObj(i -> {
+        for (int i = 0; i < size; i++) {
             Person baby = campaign.newDependent(T_NONE, true);
             baby.setSurname(surname);
-            baby.setBirthday(getCampaign().getLocalDate());
-            UUID babyId = UUID.randomUUID();
+            baby.setBirthday(campaign.getLocalDate());
 
-            baby.setId(babyId);
+            baby.setId(UUID.randomUUID());
             baby.setAncestorsId(ancId);
+
+            campaign.recruitPerson(baby, false, true, true, false);
 
             campaign.addReport(String.format("%s has given birth to %s, a baby %s!", getHyperlinkedName(),
                     baby.getHyperlinkedName(), GenderDescriptors.BOY_GIRL.getDescriptor(baby.getGender())));
@@ -1280,8 +1283,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     PersonalLogger.ourChildBorn(campaign.getPerson(fatherId), baby, getFullName(), campaign.getDate());
                 }
             }
-            return baby;
-        }).collect(Collectors.toList());
+        }
     }
 
     private String generateBabySurname(UUID fatherId) {
