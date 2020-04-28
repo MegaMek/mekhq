@@ -328,14 +328,14 @@ public class MekHqXmlUtil {
         }
 
          if ((null != tgtEnt.getCamoCategory())
-                 && (!IPlayer.NO_CAMO.equals(tgtEnt.getCamoCategory()))
+                 && !IPlayer.NO_CAMO.equals(tgtEnt.getCamoCategory())
                  && !tgtEnt.getCamoCategory().isEmpty()) {
              retVal += "\" camoCategory=\"";
              retVal += String.valueOf(escape(tgtEnt.getCamoCategory()));
          }
 
          if ((null != tgtEnt.getCamoFileName())
-                 && (!IPlayer.NO_CAMO.equals(tgtEnt.getCamoFileName()))
+                 && !IPlayer.NO_CAMO.equals(tgtEnt.getCamoFileName())
                  && !tgtEnt.getCamoFileName().isEmpty()) {
              retVal += "\" camoFileName=\"";
              retVal += String.valueOf(escape(tgtEnt.getCamoFileName()));
