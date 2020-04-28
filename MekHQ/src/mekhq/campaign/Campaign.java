@@ -4236,7 +4236,7 @@ public class Campaign implements Serializable, ITechManager {
         
         // clean up units that are assigned to non-existing scenarios
         for (Unit unit : this.getUnits()) {
-            if(this.getScenario(unit.getScenarioId()) == null) {
+            if (this.getScenario(unit.getScenarioId()) == null) {
                 unit.setScenarioId(Scenario.S_DEFAULT_ID);
             }
         }
