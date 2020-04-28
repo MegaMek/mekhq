@@ -3515,11 +3515,9 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void processNewDayPersonnel() {
-        for (Person p : getPersonnel()) {
-            if (!p.isActive()) {
-                continue;
-            }
-
+        // This MUST use getActivePersonnel as we only want to process active personnel, and
+        // furthermore this allows us to add and remove personnel without issue
+        for (Person p : getActivePersonnel()) {
             // Random Death
 
             // Random Marriages
@@ -3554,6 +3552,8 @@ public class Campaign implements Serializable, ITechManager {
                 }
             }
 
+            // TODO : Reset this based on hasSupportRole(false) instead of checking for each type
+            // TODO : p.isEngineer will need to stay, however
             // Reset edge points to the purchased value each week. This should only
             // apply for support personnel - combat troops reset with each new mm game
             if ((p.isAdmin() || p.isDoctor() || p.isEngineer() || p.isTech())
