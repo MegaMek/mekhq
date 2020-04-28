@@ -25,9 +25,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import mekhq.campaign.finances.Money;
-
-import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -42,7 +39,10 @@ import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import mekhq.campaign.rating.UnitRatingMethod;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.FinancialYearDuration;
 
 /**
  * @author natit
@@ -129,6 +129,7 @@ public class CampaignOptions implements Serializable {
     //family
     private int minimumMarriageAge;
     private int checkMutualAncestorsDepth;
+    private boolean logMarriageNameChange;
     private boolean useRandomMarriages;
     private double chanceRandomMarriages;
     private int marriageAgeRange;
@@ -174,7 +175,8 @@ public class CampaignOptions implements Serializable {
     private boolean usePeacetimeCost;
     private boolean useExtendedPartsModifier;
     private boolean showPeacetimeCost;
-    private boolean yearlyFinancesToCSVExport;
+    private FinancialYearDuration financialYearDuration;
+    private boolean newFinancialYearFinancesToCSVExport;
     private double clanPriceModifier;
     private double[] usedPartsValue;
     private double damagedPartsValue;
@@ -498,6 +500,7 @@ public class CampaignOptions implements Serializable {
         //Family
         minimumMarriageAge = 16;
         checkMutualAncestorsDepth = 4;
+        logMarriageNameChange = false;
         useRandomMarriages = false;
         chanceRandomMarriages = 0.00025;
         marriageAgeRange = 10;
@@ -582,7 +585,8 @@ public class CampaignOptions implements Serializable {
         usePeacetimeCost = false;
         useExtendedPartsModifier = false;
         showPeacetimeCost = false;
-        yearlyFinancesToCSVExport = false;
+        financialYearDuration = FinancialYearDuration.DEFAULT_TYPE;
+        newFinancialYearFinancesToCSVExport = false;
         clanPriceModifier = 1.0;
         usedPartsValue = new double[6];
         usedPartsValue[0] = 0.1;
@@ -1060,6 +1064,20 @@ public class CampaignOptions implements Serializable {
     }
 
     /**
+     * @return whether or not to log a name change in a marriage
+     */
+    public boolean logMarriageNameChange() {
+        return logMarriageNameChange;
+    }
+
+    /**
+     * @param b whether to log marriage name changes or not
+     */
+    public void setLogMarriageNameChange(boolean b) {
+        logMarriageNameChange = b;
+    }
+
+    /**
      * @return whether or not to use random marriages
      */
     public boolean useRandomMarriages() {
@@ -1514,12 +1532,32 @@ public class CampaignOptions implements Serializable {
         this.showPeacetimeCost = b;
     }
 
-    public boolean getYearlyFinancesToCSVExport() {
-        return yearlyFinancesToCSVExport;
+    /**
+     * @return the duration of a financial year
+     */
+    public FinancialYearDuration getFinancialYearDuration() {
+        return financialYearDuration;
     }
 
-    public void setYearlyFinancesToCSVExport(boolean b) {
-        yearlyFinancesToCSVExport = b;
+    /**
+     * @param financialYearDuration the financial year duration to set
+     */
+    public void setFinancialYearDuration(FinancialYearDuration financialYearDuration) {
+        this.financialYearDuration = financialYearDuration;
+    }
+
+    /**
+     * @return whether or not to export finances to CSV at the end of a financial year
+     */
+    public boolean getNewFinancialYearFinancesToCSVExport() {
+        return newFinancialYearFinancesToCSVExport;
+    }
+
+    /**
+     * @param b whether or not to export finances to CSV at the end of a financial year
+     */
+    public void setNewFinancialYearFinancesToCSVExport(boolean b) {
+        newFinancialYearFinancesToCSVExport = b;
     }
 
     public double getClanPriceModifier() {
@@ -2883,6 +2921,7 @@ public class CampaignOptions implements Serializable {
         //region family
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "minimumMarriageAge", minimumMarriageAge);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "checkMutualAncestorsDepth", checkMutualAncestorsDepth);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "logMarriageNameChange", logMarriageNameChange);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomMarriages", useRandomMarriages);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "chanceRandomMarriages", chanceRandomMarriages);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "marriageAgeRange", marriageAgeRange);
@@ -2923,7 +2962,8 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePeacetimeCost", usePeacetimeCost);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useExtendedPartsModifier", useExtendedPartsModifier);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "showPeacetimeCost", showPeacetimeCost);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "yearlyFinancesToCSVExport", yearlyFinancesToCSVExport);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "financialYearDuration", financialYearDuration.name());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "newFinancialYearFinancesToCSVExport", newFinancialYearFinancesToCSVExport);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clanPriceModifier", clanPriceModifier);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueA", usedPartsValue[0]);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueB", usedPartsValue[1]);
@@ -3336,6 +3376,8 @@ public class CampaignOptions implements Serializable {
                 retVal.minimumMarriageAge = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("checkMutualAncestorsDepth")) {
                 retVal.checkMutualAncestorsDepth = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("logMarriageNameChange")) {
+                retVal.logMarriageNameChange = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomMarriages")) {
                 retVal.useRandomMarriages = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomMarriages")) {
@@ -3413,8 +3455,10 @@ public class CampaignOptions implements Serializable {
                 retVal.useExtendedPartsModifier = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("showPeacetimeCost")) {
                 retVal.showPeacetimeCost = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("yearlyFinancesToCSVExport")) {
-                retVal.yearlyFinancesToCSVExport = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("financialYearDuration")) {
+                retVal.financialYearDuration = FinancialYearDuration.valueOf(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("newFinancialYearFinancesToCSVExport")) {
+                retVal.newFinancialYearFinancesToCSVExport = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("clanPriceModifier")) {
                     retVal.clanPriceModifier = Double.parseDouble(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueA")) {
