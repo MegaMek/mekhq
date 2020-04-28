@@ -169,7 +169,7 @@ public class PersonnelMarketDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panelFilterBtns.add(comboPersonType, gridBagConstraints);
 
-        if (!campaign.hasActiveContract()) {
+        if (campaign.getCampaignOptions().getUseAtB() && !campaign.hasActiveContract()) {
             radioNormalRoll.setText("Make normal roll next week");
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 1;
