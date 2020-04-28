@@ -3978,7 +3978,7 @@ public class Campaign implements Serializable, ITechManager {
                         }
 
                         for (Person p : traineeUnit.getCrew()) {
-                            if (p == commander) {
+                            if (p.equals(commander)) {
                                 continue;
                             }
                             // ...and if their weakest role is Green or Ultra-Green
@@ -5320,7 +5320,7 @@ public class Campaign implements Serializable, ITechManager {
                 mechCollars += 1;
             }
 
-            leasedASFCapacity += leasedLargeMechDropships * largeMechDropshipASFCapacity;
+            leasedASFCapacity += (int) Math.floor(leasedLargeMechDropships * largeMechDropshipASFCapacity);
             leasedCargoCapacity += (int) Math.floor(largeMechDropshipCargoCapacity);
         }
 

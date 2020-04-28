@@ -1886,12 +1886,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public static Person generateInstanceFromXML(Node wn, Campaign c, Version version) {
         final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign,Version)"; //$NON-NLS-1$
 
-        Person retVal = null;
+        Person retVal = new Person(c);
 
         try {
-            // Instantiate the correct child class, and call its parsing function.
-            retVal = new Person(c);
-
             // Okay, now load Person-specific fields!
             NodeList nl = wn.getChildNodes();
 
@@ -2364,8 +2361,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 }
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(Person.class, METHOD_NAME, "Failed to save for person "
-                    + retVal.getFullName(), e);
+            MekHQ.getLogger().error(Person.class, METHOD_NAME, "Failed to read person "
+                    + retVal.getFullName() + " from file", e);
+            retVal = null;
         }
 
         return retVal;
@@ -2652,6 +2650,27 @@ public class Person implements Serializable, MekHqXmlSerializable {
     @Override
     public String toString() {
         return getFullName();
+    }
+
+    /**
+     * Two people are determined to be equal if they have the same id
+     * @param object the object to check if it is equal to the person or not
+     * @return true if they have the same id, otherwise false
+     */
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        } else if (!(object instanceof Person)) {
+            return false;
+        } else {
+            return getId().equals(((Person) object).getId());
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return getId().hashCode();
     }
 
     public int getExperienceLevel(boolean secondary) {

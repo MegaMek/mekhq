@@ -536,7 +536,7 @@ public class PersonViewPanel extends ScrollablePanel {
                     public void mouseClicked(MouseEvent e) {
                         PlanetarySystem system = person.getOriginPlanet().getParentSystem();
                         // Stay on the interstellar map if their origin planet is the primary planet...
-                        if (system.getPrimaryPlanet() == person.getOriginPlanet()) {
+                        if (system.getPrimaryPlanet().equals(person.getOriginPlanet())) {
                             gui.getMapTab().switchSystemsMap(system);
                         } else {
                             // ...otherwise, dive on in to the system view!
