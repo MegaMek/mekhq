@@ -2666,6 +2666,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
 
+    @Override
+    public int hashCode() {
+        return getId().hashCode();
+    }
+
     public int getExperienceLevel(boolean secondary) {
         int role = primaryRole;
         if (secondary) {
