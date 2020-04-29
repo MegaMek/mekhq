@@ -151,6 +151,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     protected List<FormerSpouse> formerSpouses;
 
     //region Procreation
+    // this is a flag used in random procreation to determine whether or not to attempt to procreate
+    private boolean tryingToConceive;
     protected LocalDate dueDate;
     protected LocalDate expectedDueDate;
 
@@ -184,6 +186,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //endregion Procreation
 
     //region Marriage
+    // this is a flag used in determine whether or not a person is a potential marriage candidate
+    // provided that they are not married, are old enough, etc.
+    private boolean tryingToMarry;
     // Marriage Surnames
     public static final int SURNAME_NO_CHANGE = 0;
     public static final int SURNAME_YOURS = 1;
@@ -428,6 +433,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         ancestorsId = null;
         spouse = null;
         formerSpouses = new ArrayList<>();
+        tryingToMarry = true;
+        tryingToConceive = true;
         dueDate = null;
         expectedDueDate = null;
         portraitCategory = Crew.ROOT_PORTRAIT;
@@ -1266,6 +1273,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     //region Pregnancy
+    public boolean isTryingToConceive() {
+        return tryingToConceive;
+    }
+
+    public void setTryingToConceive(boolean tryingToConceive) {
+        this.tryingToConceive = tryingToConceive;
+    }
+
     public LocalDate getDueDate() {
         return dueDate;
     }
@@ -1291,7 +1306,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * @return true if they can, otherwise false
      */
     public boolean canProcreate() {
-        return isFemale() && !isPregnant() && !isDeployed()
+        return isFemale() && tryingToConceive && !isPregnant() && !isDeployed()
                 && !isChild() && (getAge(getCampaign().getLocalDate()) < 51);
     }
 
@@ -1394,6 +1409,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //endregion Pregnancy
 
     //region Marriage
+    public boolean isTryingToMarry() {
+        return tryingToMarry;
+    }
+
+    public void setTryingToMarry(boolean tryingToMarry) {
+        this.tryingToMarry = tryingToMarry;
+    }
+
     /**
      * Determines if another person is a safe spouse for the current person
      * @param p the person to determine if they are a safe spouse
@@ -1402,6 +1425,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         // Huge convoluted return statement, with the following restrictions
         // can't marry yourself
         // can't marry someone who is already married
+        // can't marry someone who doesn't want to be married
         // can't marry a prisoner, unless you are also a prisoner (this is purposely left open for prisoners to marry who they want)
         // can't marry a person who is dead or MIA
         // can't marry inactive personnel (this is to show how they aren't part of the force anymore)
@@ -1410,6 +1434,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return (
                 !this.equals(p)
                 && !p.hasSpouse()
+                && p.isTryingToMarry()
                 && p.oldEnoughToMarry()
                 && (!p.isPrisoner() || isPrisoner())
                 && !p.isDeadOrMIA()
@@ -1425,9 +1450,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void randomMarriage() {
-        // Don't attempt to generate is someone has a spouse, isn't old enough to marry,
-        // or is actively deployed
-        if (hasSpouse() || !oldEnoughToMarry() || isDeployed()) {
+        // Don't attempt to generate is someone isn't trying to marry, has a spouse,
+        // isn't old enough to marry, or is actively deployed
+        if (!tryingToMarry || hasSpouse() || !oldEnoughToMarry() || isDeployed()) {
             return;
         }
 
@@ -1567,10 +1592,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
         }
 
-        spouse.setSpouseId(getId());
-        PersonalLogger.marriage(spouse, this, getCampaign().getDate());
         setSpouseId(spouse.getId());
+        spouse.setSpouseId(getId());
+
         PersonalLogger.marriage(this, spouse, getCampaign().getDate());
+        PersonalLogger.marriage(spouse, this, getCampaign().getDate());
 
         campaign.addReport(String.format("%s has married %s!", getHyperlinkedName(),
                 spouse.getHyperlinkedName()));
@@ -1652,8 +1678,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         spouse.addFormerSpouse(new FormerSpouse(getId(), getCampaign().getLocalDate(), reason));
         addFormerSpouse(new FormerSpouse(spouse.getId(), getCampaign().getLocalDate(), reason));
 
-        MekHQ.triggerEvent(new PersonChangedEvent(spouse));
         MekHQ.triggerEvent(new PersonChangedEvent(this));
+        MekHQ.triggerEvent(new PersonChangedEvent(spouse));
     }
     //endregion Divorce
 
@@ -2079,6 +2105,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         }
                         retVal.formerSpouses.add(FormerSpouse.generateInstanceFromXML(wn3));
                     }
+                } else if (wn2.getNodeName().equalsIgnoreCase("tryingToMarry")) {
+                    retVal.tryingToMarry = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("tryingToConceive")) {
+                    retVal.tryingToConceive = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("dueDate")) {
                     retVal.dueDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("expectedDueDate")) {
