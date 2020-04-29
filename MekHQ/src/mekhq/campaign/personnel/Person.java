@@ -1226,7 +1226,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             today = getDateOfDeath();
         }
 
-        return Period.between(getBirthday(), today).getYears();
+        return Math.toIntExact(ChronoUnit.YEARS.between(getBirthday(), today));
     }
 
     public int getTimeInService(LocalDate today) {
