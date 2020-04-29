@@ -76,8 +76,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * in isCombatRole(int) or isSupportRole(int). You should also increase the value of T_NUM
      * if you add new roles.
      */
-    public static final int T_NONE = 0;
-    public static final int T_MECHWARRIOR = 1;
+    public static final int T_NONE = 0; // Support Role
+    public static final int T_MECHWARRIOR = 1; // Start of Combat Roles
     public static final int T_AERO_PILOT = 2;
     public static final int T_GVEE_DRIVER = 3;
     public static final int T_NVEE_DRIVER = 4;
@@ -90,8 +90,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public static final int T_SPACE_PILOT = 11;
     public static final int T_SPACE_CREW = 12;
     public static final int T_SPACE_GUNNER = 13;
-    public static final int T_NAVIGATOR = 14; // End of combat roles
-    public static final int T_MECH_TECH = 15;
+    public static final int T_NAVIGATOR = 14; // End of Combat Roles
+    public static final int T_MECH_TECH = 15; // Start of Support Roles
     public static final int T_MECHANIC = 16;
     public static final int T_AERO_TECH = 17;
     public static final int T_BA_TECH = 18;
@@ -792,7 +792,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         this.portraitFileOverride = s;
     }
 
-
+    //region Personnel Roles
+    // TODO : Move me into an enum with checks for hasAdministratorRole, hasTechRole, hasMedicalRole, etc.
     public int getPrimaryRole() {
         return primaryRole;
     }
@@ -830,6 +831,104 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public boolean hasRole(int role) {
         return (getPrimaryRole() == role) || (getSecondaryRole() == role);
     }
+
+    /**
+     * This is used to determine whether the person has either a primary or secondary role within the
+     * two bounds. This is inclusive of the two bounds
+     * @param minimumRole the minimum role bound (inclusive)
+     * @param maximumRole the maximum role bound (inclusive)
+     * @return true if they have a role within the bounds (inclusive), otherwise false.
+     */
+    public boolean hasRoleWithin(int minimumRole, int maximumRole) {
+        return hasPrimaryRoleWithin(minimumRole, maximumRole)
+                || hasSecondaryRoleWithin(minimumRole, maximumRole);
+    }
+
+    /**
+     * @param minimumRole the minimum role bound (inclusive)
+     * @param maximumRole the maximum role bound (inclusive)
+     * @return true if they have a primary role within the bounds (inclusive), otherwise false
+     */
+    public boolean hasPrimaryRoleWithin(int minimumRole, int maximumRole) {
+        return (getPrimaryRole() >= minimumRole) && (getPrimaryRole() <= maximumRole);
+    }
+
+    /**
+     * @param minimumRole the minimum role bound (inclusive)
+     * @param maximumRole the maximum role bound (inclusive)
+     * @return true if they have a secondary role within the bounds (inclusive), otherwise false
+     */
+    public boolean hasSecondaryRoleWithin(int minimumRole, int maximumRole) {
+        return (getSecondaryRole() >= minimumRole) && (getSecondaryRole() <= maximumRole);
+    }
+
+    /**
+     * @return true if the person has a primary or secondary combat role
+     */
+    public boolean hasCombatRole() {
+        return hasPrimaryCombatRole() || hasSecondaryCombatRole();
+    }
+
+    /**
+     * @return true if the person has a primary combat role
+     */
+    public boolean hasPrimaryCombatRole() {
+        return hasPrimaryRoleWithin(T_MECHWARRIOR, T_SPACE_GUNNER)
+                || hasPrimaryRoleWithin(T_LAM_PILOT, T_VEHICLE_CREW);
+    }
+
+    /**
+     * @return true if the person has a secondary combat role
+     */
+    public boolean hasSecondaryCombatRole() {
+        return hasSecondaryRoleWithin(T_MECHWARRIOR, T_SPACE_GUNNER)
+                || hasSecondaryRoleWithin(T_LAM_PILOT, T_VEHICLE_CREW);
+    }
+
+    /**
+     * @param includeNoRole whether to include T_NONE in the primary check or not
+     * @return true if the person has a primary or secondary support role, except for secondary T_NONE
+     */
+    public boolean hasSupportRole(boolean includeNoRole) {
+        return hasPrimarySupportRole(includeNoRole) || hasSecondarySupportRole();
+    }
+
+    /**
+     * @param includeNoRole whether to include T_NONE in the check check or not
+     * @return true if the person has a primary support role
+     */
+    public boolean hasPrimarySupportRole(boolean includeNoRole) {
+        return hasPrimaryRoleWithin(T_MECH_TECH, T_ADMIN_HR) || (includeNoRole && (getPrimaryRole() == T_NONE));
+    }
+
+    /**
+     * @return true if the person has a secondary support role. Note that T_NONE is NOT a support
+     * role if it is a secondary role
+     */
+    public boolean hasSecondarySupportRole() {
+        return hasSecondaryRoleWithin(T_MECH_TECH, T_ADMIN_HR);
+    }
+
+    /**
+     * Determines whether a role is considered a combat role. Note that T_LAM_PILOT is a special
+     * placeholder which is not used for either primary or secondary role and will return false.
+     *
+     * @param role A value that can be used for a person's primary or secondary role.
+     * @return     Whether the role is considered a combat role
+     */
+    public static boolean isCombatRole(int role) {
+        return ((role > T_NONE) && (role <= T_NAVIGATOR))
+                || (role == T_VEHICLE_CREW);
+    }
+
+    /**
+     * @param role A value that can be used for a person's primary or secondary role.
+     * @return     Whether the role is considered a support role
+     */
+    public static boolean isSupportRole(int role) {
+        return (role >= T_MECH_TECH) && (role < T_LAM_PILOT);
+    }
+    //endregion Personnel Roles
 
     public PersonnelStatus getStatus() {
         return status;
@@ -1814,7 +1913,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "edge",
                         getOptionList("::", PilotOptions.EDGE_ADVANTAGES));
                 // For support personnel, write an available edge value
-                if (isSupport() || isEngineer()) {
+                if (hasSupportRole(false) || isEngineer()) {
                     MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "edgeAvailable", getCurrentEdge());
                 }
             }
@@ -3358,42 +3457,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
             return null;
         }
         return "<html>" + abilityString + "</html>";
-    }
-
-    /**
-     * @return true if this person has either a primary or a secondary role that is considered a combat
-     *         role
-     */
-    public boolean isCombat() {
-        return isCombatRole(primaryRole) || isCombatRole(secondaryRole);
-    }
-
-    /**
-     * @return true if this person has either a primary or a secondary role that is considered a support
-     *         role
-     */
-    public boolean isSupport() {
-        return isSupportRole(primaryRole) || isSupportRole(secondaryRole);
-    }
-
-    /**
-     * Determines whether a role is considered a combat role. Note that T_LAM_PILOT is a special
-     * placeholder which is not used for either primary or secondary role and will return false.
-     *
-     * @param role A value that can be used for a person's primary or secondary role.
-     * @return     Whether the role is considered a combat role
-     */
-    public static boolean isCombatRole(int role) {
-        return ((role > T_NONE) && (role <= T_NAVIGATOR))
-                || (role == T_VEHICLE_CREW);
-    }
-
-    /**
-     * @param role A value that can be used for a person's primary or secondary role.
-     * @return     Whether the role is considered a support role
-     */
-    public static boolean isSupportRole(int role) {
-        return (role >= T_MECH_TECH) && (role < T_LAM_PILOT);
     }
 
     public boolean canDrive(Entity ent) {
