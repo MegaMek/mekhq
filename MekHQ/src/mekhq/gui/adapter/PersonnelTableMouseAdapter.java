@@ -94,6 +94,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String CMD_CALLSIGN = "CALLSIGN"; //$NON-NLS-1$
     private static final String CMD_DEPENDENT = "DEPENDENT"; //$NON-NLS-1$
     private static final String CMD_COMMANDER = "COMMANDER"; //$NON-NLS-1$
+    private static final String CMD_TRYING_TO_CONCEIVE = "TRYING_TO_CONCEIVE";
+    private static final String CMD_TRYING_TO_MARRY = "TRYING_TO_MARRY";
+    private static final String CMD_FOUNDER = "FOUNDER";
     private static final String CMD_EDIT_PERSONNEL_LOG = "LOG"; //$NON-NLS-1$
     private static final String CMD_ADD_LOG_ENTRY = "ADD_PERSONNEL_LOG_SINGLE"; //$NON-NLS-1$
     private static final String CMD_EDIT_MISSIONS_LOG = "MISSIONS_LOG"; //$NON-NLS-1$
@@ -135,9 +138,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String CMD_RANSOM = "RANSOM";
 
     private static final String SEPARATOR = "@"; //$NON-NLS-1$
-    private static final String SPACE = " "; //$NON-NLS-1$
     private static final String HYPHEN = "-"; //$NON-NLS-1$
-    private static final String QUESTION_MARK = "?"; //$NON-NLS-1$
     private static final String TRUE = String.valueOf(true);
     private static final String FALSE = String.valueOf(false);
 
@@ -147,7 +148,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private ResourceBundle resourceMap;
 
     public PersonnelTableMouseAdapter(CampaignGUI gui, JTable personnelTable,
-            PersonnelTableModel personnelModel) {
+                                      PersonnelTableModel personnelModel) {
         super();
         this.gui = gui;
         this.personnelTable = personnelTable;
@@ -183,19 +184,15 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 
     @Override
     public void actionPerformed(ActionEvent action) {
-        final String METHOD_NAME = "actionPerformed(ActionEvent)"; //$NON-NLS-1$
-
         int row = personnelTable.getSelectedRow();
         if (row < 0) {
             return;
         }
-        Person selectedPerson = personnelModel.getPerson(personnelTable
-                .convertRowIndexToModel(row));
+        Person selectedPerson = personnelModel.getPerson(personnelTable.convertRowIndexToModel(row));
         int[] rows = personnelTable.getSelectedRows();
         Person[] people = new Person[rows.length];
         for (int i = 0; i < rows.length; i++) {
-            people[i] = personnelModel.getPerson(personnelTable
-                    .convertRowIndexToModel(rows[i]));
+            people[i] = personnelModel.getPerson(personnelTable.convertRowIndexToModel(rows[i]));
         }
 
         String[] data = action.getActionCommand().split(SEPARATOR, -1);
@@ -804,11 +801,18 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         selectedPerson.getPortraitFileName(), gui.getIconPackage()
                         .getPortraits());
                 pcd.setVisible(true);
-                if (pcd.isChanged()) {
-                    selectedPerson.setPortraitCategory(pcd.getCategory());
-                    selectedPerson.setPortraitFileName(pcd.getFileName());
-                    gui.getCampaign().personUpdated(selectedPerson);
-                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+
+                final String category = pcd.getCategory();
+                final String fileName = pcd.getFileName();
+
+                for (Person person : people) {
+                    if (!person.getPortraitCategory().equals(category)
+                            && !person.getPortraitFileName().equals(fileName)) {
+                        person.setPortraitCategory(category);
+                        person.setPortraitFileName(fileName);
+                        gui.getCampaign().personUpdated(person);
+                        MekHQ.triggerEvent(new PersonChangedEvent(person));
+                    }
                 }
                 break;
             }
@@ -987,7 +991,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             case CMD_DEPENDENT: {
                 if (people.length > 1) {
-                    boolean status = Boolean.parseBoolean(data[1]);
+                    boolean status = !people[0].isDependent();
                     for (Person person : people) {
                         person.setDependent(status);
                         gui.getCampaign().personUpdated(person);
@@ -995,6 +999,51 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     }
                 } else {
                     selectedPerson.setDependent(!selectedPerson.isDependent());
+                    gui.getCampaign().personUpdated(selectedPerson);
+                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                }
+                break;
+            }
+            case CMD_TRYING_TO_MARRY: {
+                if (people.length > 1) {
+                    boolean status = !people[0].isTryingToMarry();
+                    for (Person person : people) {
+                        person.setTryingToMarry(status);
+                        gui.getCampaign().personUpdated(person);
+                        MekHQ.triggerEvent(new PersonChangedEvent(person));
+                    }
+                } else {
+                    selectedPerson.setTryingToMarry(!selectedPerson.isTryingToMarry());
+                    gui.getCampaign().personUpdated(selectedPerson);
+                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                }
+                break;
+            }
+            case CMD_TRYING_TO_CONCEIVE: {
+                if (people.length > 1) {
+                    boolean status = !people[0].isTryingToConceive();
+                    for (Person person : people) {
+                        person.setTryingToConceive(status);
+                        gui.getCampaign().personUpdated(person);
+                        MekHQ.triggerEvent(new PersonChangedEvent(person));
+                    }
+                } else {
+                    selectedPerson.setTryingToConceive(!selectedPerson.isTryingToConceive());
+                    gui.getCampaign().personUpdated(selectedPerson);
+                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                }
+                break;
+            }
+            case CMD_FOUNDER: {
+                if (people.length > 1) {
+                    boolean status = !people[0].isFounder();
+                    for (Person person : people) {
+                        person.setFounder(status);
+                        gui.getCampaign().personUpdated(person);
+                        MekHQ.triggerEvent(new PersonChangedEvent(person));
+                    }
+                } else {
+                    selectedPerson.setFounder(!selectedPerson.isFounder());
                     gui.getCampaign().personUpdated(selectedPerson);
                     MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 }
@@ -2263,6 +2312,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 
                     popup.add(menu);
                 }
+
                 menu = new JMenu(resourceMap.getString("specialFlags.text")); //$NON-NLS-1$
                 cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("dependent.text")); //$NON-NLS-1$
                 cbMenuItem.setSelected(person.isDependent());
@@ -2272,6 +2322,25 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("commander.text")); //$NON-NLS-1$
                 cbMenuItem.setSelected(person.isCommander());
                 cbMenuItem.setActionCommand(CMD_COMMANDER);
+                cbMenuItem.addActionListener(this);
+                menu.add(cbMenuItem);
+                cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("tryingToMarry.text"));
+                cbMenuItem.setToolTipText(resourceMap.getString("tryingToMarry.toolTipText"));
+                cbMenuItem.setSelected(person.isTryingToMarry());
+                cbMenuItem.setActionCommand(CMD_TRYING_TO_MARRY);
+                cbMenuItem.addActionListener(this);
+                menu.add(cbMenuItem);
+                if (gui.getCampaign().getCampaignOptions().useUnofficialProcreation() && person.isFemale()) {
+                    cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("tryingToConceive.text"));
+                    cbMenuItem.setToolTipText(resourceMap.getString("tryingToConceive.toolTipText"));
+                    cbMenuItem.setSelected(person.isTryingToConceive());
+                    cbMenuItem.setActionCommand(CMD_TRYING_TO_CONCEIVE);
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
+                }
+                cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("founder.text"));
+                cbMenuItem.setSelected(person.isFounder());
+                cbMenuItem.setActionCommand(CMD_FOUNDER);
                 cbMenuItem.addActionListener(this);
                 menu.add(cbMenuItem);
                 popup.add(menu);
@@ -2408,69 +2477,92 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     menu.add(submenu);
                     popup.add(menu);
                 }
-                menu = new JMenu(resourceMap.getString("specialFlags.text")); //$NON-NLS-1$
-                submenu = new JMenu(resourceMap.getString("dependent.text")); //$NON-NLS-1$
-                menuItem = new JMenuItem(resourceMap.getString("yes.text")); //$NON-NLS-1$
-                menuItem.setActionCommand(makeCommand(CMD_DEPENDENT, TRUE));
-                menuItem.addActionListener(this);
-                submenu.add(menuItem);
-                menuItem = new JMenuItem(resourceMap.getString("no.text")); //$NON-NLS-1$
-                menuItem.setActionCommand(makeCommand(CMD_DEPENDENT, FALSE));
-                menuItem.addActionListener(this);
-                submenu.add(menuItem);
-                menu.add(submenu);
+
+                menu = new JMenu(resourceMap.getString("specialFlags.text"));
+                if (StaticChecks.areEitherAllDependentsOrNot(selected)) {
+                    cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("dependent.text"));
+                    cbMenuItem.setSelected(selected[0].isDependent());
+                    cbMenuItem.setActionCommand(CMD_DEPENDENT);
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
+                }
+                if (StaticChecks.areEitherAllTryingToMarryOrNot(selected)) {
+                    cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("tryingToMarry.text"));
+                    cbMenuItem.setToolTipText(resourceMap.getString("tryingToMarry.toolTipText"));
+                    cbMenuItem.setSelected(selected[0].isTryingToMarry());
+                    cbMenuItem.setActionCommand(CMD_TRYING_TO_MARRY);
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
+                }
+                if (gui.getCampaign().getCampaignOptions().useUnofficialProcreation()
+                        && StaticChecks.areAllFemale(selected)
+                        && StaticChecks.areEitherAllTryingToConceiveOrNot(selected)) {
+                    cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("tryingToConceive.text"));
+                    cbMenuItem.setToolTipText(resourceMap.getString("tryingToConceive.toolTipText"));
+                    cbMenuItem.setSelected(selected[0].isTryingToConceive());
+                    cbMenuItem.setActionCommand(CMD_TRYING_TO_CONCEIVE);
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
+                }
+                if (StaticChecks.areEitherAllFoundersOrNot(selected)) {
+                    cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("founder.text"));
+                    cbMenuItem.setSelected(person.isFounder());
+                    cbMenuItem.setActionCommand(CMD_FOUNDER);
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
+                }
                 popup.add(menu);
             }
+
             // generate new appropriate random portrait
             menuItem = new JMenuItem(resourceMap.getString("randomizePortrait.text")); //$NON-NLS-1$
             menuItem.setActionCommand(CMD_RANDOM_PORTRAIT);
             menuItem.addActionListener(this);
-            menuItem.setEnabled(true);
             popup.add(menuItem);
+
+            // change portrait
+            menuItem = new JMenuItem(resourceMap.getString(oneSelected ? "changePortrait.text" : "bulkAssignSinglePortrait.text"));
+            menuItem.setActionCommand(CMD_EDIT_PORTRAIT);
+            menuItem.addActionListener(this);
+            popup.add(menuItem);
+
             if (oneSelected) {
-                // change portrait
-                menuItem = new JMenuItem(resourceMap.getString("changePortrait.text")); //$NON-NLS-1$
-                menuItem.setActionCommand(CMD_EDIT_PORTRAIT);
-                menuItem.addActionListener(this);
-                menuItem.setEnabled(true);
-                popup.add(menuItem);
                 // change Biography
                 menuItem = new JMenuItem(resourceMap.getString("changeBiography.text")); //$NON-NLS-1$
                 menuItem.setActionCommand(CMD_EDIT_BIOGRAPHY);
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(true);
                 popup.add(menuItem);
+
                 menuItem = new JMenuItem(resourceMap.getString("changeCallsign.text")); //$NON-NLS-1$
                 menuItem.setActionCommand(CMD_CALLSIGN);
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(true);
                 popup.add(menuItem);
+
                 menuItem = new JMenuItem(resourceMap.getString("editPersonnelLog.text")); //$NON-NLS-1$
                 menuItem.setActionCommand(CMD_EDIT_PERSONNEL_LOG);
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(true);
                 popup.add(menuItem);
-
             }
+
             menuItem = new JMenuItem(resourceMap.getString("addSingleLogEntry.text")); //$NON-NLS-1$
             menuItem.setActionCommand(CMD_ADD_LOG_ENTRY);
             menuItem.addActionListener(this);
-            menuItem.setEnabled(true);
             popup.add(menuItem);
+
             if (oneSelected) {
                 // Edit mission log
                 menuItem = new JMenuItem(resourceMap.getString("editMissionLog.text")); //$NON-NLS-1$
                 menuItem.setActionCommand(CMD_EDIT_MISSIONS_LOG);
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(true);
                 popup.add(menuItem);
             }
+
             // Add one item to all personnel mission logs
             menuItem = new JMenuItem(resourceMap.getString("addMissionEntry.text")); //$NON-NLS-1$
             menuItem.setActionCommand(CMD_ADD_MISSION_ENTRY);
             menuItem.addActionListener(this);
-            menuItem.setEnabled(true);
             popup.add(menuItem);
+
             if (oneSelected) {
                 menuItem = new JMenuItem(resourceMap.getString("editKillLog.text")); //$NON-NLS-1$
                 menuItem.setActionCommand(CMD_EDIT_KILL_LOG);

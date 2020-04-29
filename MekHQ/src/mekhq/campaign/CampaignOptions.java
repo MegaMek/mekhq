@@ -25,9 +25,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import mekhq.campaign.finances.Money;
-
-import mekhq.campaign.personnel.enums.PrisonerStatus;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -42,7 +39,11 @@ import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.PrisonerStatus;
+import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
 import mekhq.campaign.rating.UnitRatingMethod;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.FinancialYearDuration;
 
 /**
  * @author natit
@@ -116,7 +117,9 @@ public class CampaignOptions implements Serializable {
     private boolean tougherHealing;
     private boolean useTransfers;
     private boolean useTimeInService;
+    private TimeInDisplayFormat timeInServiceDisplayFormat;
     private boolean useTimeInRank;
+    private TimeInDisplayFormat timeInRankDisplayFormat;
     private boolean trackTotalEarnings;
     private boolean showOriginFaction;
     private boolean randomizeOrigin;
@@ -127,6 +130,7 @@ public class CampaignOptions implements Serializable {
     //family
     private int minimumMarriageAge;
     private int checkMutualAncestorsDepth;
+    private boolean logMarriageNameChange;
     private boolean useRandomMarriages;
     private double chanceRandomMarriages;
     private int marriageAgeRange;
@@ -174,7 +178,8 @@ public class CampaignOptions implements Serializable {
     private boolean usePeacetimeCost;
     private boolean useExtendedPartsModifier;
     private boolean showPeacetimeCost;
-    private boolean yearlyFinancesToCSVExport;
+    private FinancialYearDuration financialYearDuration;
+    private boolean newFinancialYearFinancesToCSVExport;
     private double clanPriceModifier;
     private double[] usedPartsValue;
     private double damagedPartsValue;
@@ -487,7 +492,9 @@ public class CampaignOptions implements Serializable {
         tougherHealing = false;
         useTransfers = true;
         useTimeInService = false;
+        timeInServiceDisplayFormat = TimeInDisplayFormat.YEARS;
         useTimeInRank = false;
+        timeInRankDisplayFormat = TimeInDisplayFormat.MONTHS_YEARS;
         trackTotalEarnings = false;
         showOriginFaction = true;
         randomizeOrigin = false;
@@ -498,6 +505,7 @@ public class CampaignOptions implements Serializable {
         //Family
         minimumMarriageAge = 16;
         checkMutualAncestorsDepth = 4;
+        logMarriageNameChange = false;
         useRandomMarriages = false;
         chanceRandomMarriages = 0.00025;
         marriageAgeRange = 10;
@@ -582,7 +590,8 @@ public class CampaignOptions implements Serializable {
         usePeacetimeCost = false;
         useExtendedPartsModifier = false;
         showPeacetimeCost = false;
-        yearlyFinancesToCSVExport = false;
+        financialYearDuration = FinancialYearDuration.DEFAULT_TYPE;
+        newFinancialYearFinancesToCSVExport = false;
         clanPriceModifier = 1.0;
         usedPartsValue = new double[6];
         usedPartsValue[0] = 0.1;
@@ -906,29 +915,76 @@ public class CampaignOptions implements Serializable {
         useTransfers = b;
     }
 
+    /**
+     * @return whether or not to use time in service
+     */
     public boolean getUseTimeInService() {
         return useTimeInService;
     }
 
+    /**
+     * @param b the new value for whether to use time in service or not
+     */
     public void setUseTimeInService(boolean b) {
         useTimeInService = b;
     }
 
+    /**
+     * @return the format to display the Time in Service in
+     */
+    public TimeInDisplayFormat getTimeInServiceDisplayFormat() {
+        return timeInServiceDisplayFormat;
+    }
+
+    /**
+     * @param timeInServiceDisplayFormat the new display format for Time in Service
+     */
+    public void setTimeInServiceDisplayFormat(TimeInDisplayFormat timeInServiceDisplayFormat) {
+        this.timeInServiceDisplayFormat = timeInServiceDisplayFormat;
+    }
+
+    /**
+     * @return whether or not to use time in rank
+     */
     public boolean getUseTimeInRank() {
         return useTimeInRank;
     }
 
+    /**
+     * @param b the new value for whether or not to use time in rank
+     */
     public void setUseTimeInRank(boolean b) {
         useTimeInRank = b;
     }
 
+    /**
+     * @return the format to display the Time in Rank in
+     */
+    public TimeInDisplayFormat getTimeInRankDisplayFormat() {
+        return timeInRankDisplayFormat;
+    }
+
+    /**
+     * @param timeInRankDisplayFormat the new display format for Time in Rank
+     */
+    public void setTimeInRankDisplayFormat(TimeInDisplayFormat timeInRankDisplayFormat) {
+        this.timeInRankDisplayFormat = timeInRankDisplayFormat;
+    }
+
+    /**
+     * @return whether or not to track the total earnings of personnel
+     */
     public boolean trackTotalEarnings() {
         return trackTotalEarnings;
     }
 
+    /**
+     * @param b the new value for whether or not to track total earnings for personnel
+     */
     public void setTrackTotalEarnings(boolean b) {
         trackTotalEarnings = b;
     }
+
     /**
      * Gets a value indicating whether or not to show a person's
      * origin faction when displaying their details.
@@ -1057,6 +1113,20 @@ public class CampaignOptions implements Serializable {
      */
     public void setCheckMutualAncestorsDepth(int b) {
         checkMutualAncestorsDepth = b;
+    }
+
+    /**
+     * @return whether or not to log a name change in a marriage
+     */
+    public boolean logMarriageNameChange() {
+        return logMarriageNameChange;
+    }
+
+    /**
+     * @param b whether to log marriage name changes or not
+     */
+    public void setLogMarriageNameChange(boolean b) {
+        logMarriageNameChange = b;
     }
 
     /**
@@ -1514,12 +1584,32 @@ public class CampaignOptions implements Serializable {
         this.showPeacetimeCost = b;
     }
 
-    public boolean getYearlyFinancesToCSVExport() {
-        return yearlyFinancesToCSVExport;
+    /**
+     * @return the duration of a financial year
+     */
+    public FinancialYearDuration getFinancialYearDuration() {
+        return financialYearDuration;
     }
 
-    public void setYearlyFinancesToCSVExport(boolean b) {
-        yearlyFinancesToCSVExport = b;
+    /**
+     * @param financialYearDuration the financial year duration to set
+     */
+    public void setFinancialYearDuration(FinancialYearDuration financialYearDuration) {
+        this.financialYearDuration = financialYearDuration;
+    }
+
+    /**
+     * @return whether or not to export finances to CSV at the end of a financial year
+     */
+    public boolean getNewFinancialYearFinancesToCSVExport() {
+        return newFinancialYearFinancesToCSVExport;
+    }
+
+    /**
+     * @param b whether or not to export finances to CSV at the end of a financial year
+     */
+    public void setNewFinancialYearFinancesToCSVExport(boolean b) {
+        newFinancialYearFinancesToCSVExport = b;
     }
 
     public double getClanPriceModifier() {
@@ -2883,6 +2973,7 @@ public class CampaignOptions implements Serializable {
         //region family
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "minimumMarriageAge", minimumMarriageAge);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "checkMutualAncestorsDepth", checkMutualAncestorsDepth);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "logMarriageNameChange", logMarriageNameChange);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomMarriages", useRandomMarriages);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "chanceRandomMarriages", chanceRandomMarriages);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "marriageAgeRange", marriageAgeRange);
@@ -2923,7 +3014,8 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePeacetimeCost", usePeacetimeCost);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useExtendedPartsModifier", useExtendedPartsModifier);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "showPeacetimeCost", showPeacetimeCost);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "yearlyFinancesToCSVExport", yearlyFinancesToCSVExport);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "financialYearDuration", financialYearDuration.name());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "newFinancialYearFinancesToCSVExport", newFinancialYearFinancesToCSVExport);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clanPriceModifier", clanPriceModifier);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueA", usedPartsValue[0]);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueB", usedPartsValue[1]);
@@ -2937,7 +3029,9 @@ public class CampaignOptions implements Serializable {
 
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTransfers", useTransfers);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTimeInService", useTimeInService);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "timeInServiceDisplayFormat", timeInServiceDisplayFormat.name());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTimeInRank", useTimeInRank);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "timeInRankDisplayFormat", timeInRankDisplayFormat.name());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "trackTotalEarnings", trackTotalEarnings);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "capturePrisoners", capturePrisoners);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "defaultPrisonerStatus", defaultPrisonerStatus.name());
@@ -3336,6 +3430,8 @@ public class CampaignOptions implements Serializable {
                 retVal.minimumMarriageAge = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("checkMutualAncestorsDepth")) {
                 retVal.checkMutualAncestorsDepth = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("logMarriageNameChange")) {
+                retVal.logMarriageNameChange = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomMarriages")) {
                 retVal.useRandomMarriages = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomMarriages")) {
@@ -3409,8 +3505,10 @@ public class CampaignOptions implements Serializable {
                 retVal.useExtendedPartsModifier = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("showPeacetimeCost")) {
                 retVal.showPeacetimeCost = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("yearlyFinancesToCSVExport")) {
-                retVal.yearlyFinancesToCSVExport = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("financialYearDuration")) {
+                retVal.financialYearDuration = FinancialYearDuration.valueOf(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("newFinancialYearFinancesToCSVExport")) {
+                retVal.newFinancialYearFinancesToCSVExport = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("clanPriceModifier")) {
                     retVal.clanPriceModifier = Double.parseDouble(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueA")) {
@@ -3435,8 +3533,12 @@ public class CampaignOptions implements Serializable {
             	retVal.useTransfers = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useTimeInService")) {
                 retVal.useTimeInService = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("timeInServiceDisplayFormat")) {
+                retVal.timeInServiceDisplayFormat = TimeInDisplayFormat.valueOf(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useTimeInRank")) {
                 retVal.useTimeInRank = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("timeInRankDisplayFormat")) {
+                retVal.timeInRankDisplayFormat = TimeInDisplayFormat.valueOf(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("trackTotalEarnings")) {
                 retVal.trackTotalEarnings = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("capturePrisoners")) {

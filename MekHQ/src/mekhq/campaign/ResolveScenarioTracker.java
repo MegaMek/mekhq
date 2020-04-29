@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign;
 
 import java.io.File;
@@ -463,8 +462,7 @@ public class ResolveScenarioTracker {
         List<Person> sortedList = new ArrayList<>();
         Random generator = new Random();
 
-        while (source.size() > 0)
-        {
+        while (source.size() > 0) {
             int position = generator.nextInt(source.size());
             sortedList.add(source.get(position));
             source.remove(position);
@@ -485,7 +483,7 @@ public class ResolveScenarioTracker {
                     for (Person p : u.getActiveCrew()) {
                         PersonStatus status = peopleStatus.get(p.getId());
                         if (null == status) {
-                            //this shouldnt happen so report
+                            //this shouldn't happen so report
                             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                                     "A null person status was found for person id " + p.getId().toString() //$NON-NLS-1$
                                     + " when trying to assign kills"); //$NON-NLS-1$
@@ -624,7 +622,7 @@ public class ResolveScenarioTracker {
                                     status.setHits(6);
                                     status.setDead(true);
                                 }
-                            } else if (((Tank)en).isCommanderHit() && (u.isCommander(p)
+                            } else if (((Tank) en).isCommanderHit() && (u.isCommander(p)
                                     || u.isTechOfficer(p))) {
                                 //If there is a command console, the commander hit flag is set on the second such critical,
                                 //which means both commanders have been hit.
@@ -634,7 +632,7 @@ public class ResolveScenarioTracker {
                                     status.setHits(6);
                                     status.setDead(true);
                                 }
-                            } else if (((Tank)en).isUsingConsoleCommander() && u.isCommander(p)) {
+                            } else if (((Tank) en).isUsingConsoleCommander() && u.isCommander(p)) {
                                 //This flag is set after the first commander hit critical.
                                 if (Compute.d6(2) >= 7) {
                                     wounded = true;
@@ -699,6 +697,7 @@ public class ResolveScenarioTracker {
                 if (e == null) {
                     MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                             "Null entity reference in:" + aero.getDisplayName() + "getEscapeCraft()");
+                    continue;
                 }
                 //If the escape craft was destroyed in combat, skip it
                 if (e.isDestroyed() || e.isDoomed()) {
@@ -924,7 +923,7 @@ public class ResolveScenarioTracker {
                 }
                 if (en.hasWorkingMisc(MiscType.F_COMMAND_CONSOLE)) {
                     for (Person p : crew) {
-                        if (p != commander && p != driver) {
+                        if (!p.equals(commander) && !p.equals(driver)) {
                             console = p;
                             break;
                         }
@@ -993,23 +992,21 @@ public class ResolveScenarioTracker {
                                 break;
                             }
                         }
-                        if (destroyed || null == en.getCrew() || en.getCrew().isDead()) {
+
+                        if (destroyed || (null == en.getCrew()) || en.getCrew().isDead()) {
                             if (Compute.d6(2) >= 7) {
                                 wounded = true;
                             } else {
                                 status.setHits(6);
                             }
-                        } else if (((Tank)en).isDriverHit()
-                                && driver != null && driver.getId() == p.getId()) {
+                        } else if (((Tank) en).isDriverHit() && p.equals(driver)) {
                             if (Compute.d6(2) >= 7) {
                                 wounded = true;
                             } else {
                                 status.setHits(6);
                                 status.setDead(true);
                             }
-                        } else if (((Tank)en).isCommanderHit()
-                                && (((commander != null && commander.getId() == p.getId())
-                                        || (console != null && console.getId() == p.getId())))) {
+                        } else if (((Tank) en).isCommanderHit() && (p.equals(commander) || p.equals(console))) {
                             //If there is a command console, the commander hit flag does not
                             //get set until after the second such critical, which means that
                             //both commanders have been hit.
@@ -1019,9 +1016,7 @@ public class ResolveScenarioTracker {
                                 status.setHits(6);
                                 status.setDead(true);
                             }
-                        } else if (((Tank)en).isUsingConsoleCommander()
-                                && commander != null
-                                && commander.getId() == p.getId()) {
+                        } else if (((Tank) en).isUsingConsoleCommander() && p.equals(commander)) {
                             //If this flag is set we are using a command console and have already
                             //taken one commander hit critical, which takes out the primary commander.
                             if (Compute.d6(2) >= 7) {
@@ -1031,8 +1026,7 @@ public class ResolveScenarioTracker {
                                 status.setDead(true);
                             }
                         }
-                    }
-                    else if (en instanceof Infantry || en instanceof Aero) {
+                    } else if (en instanceof Infantry || en instanceof Aero) {
                         if (casualtiesAssigned < casualties) {
                             casualtiesAssigned++;
                             if (Compute.d6(2) >= 7) {

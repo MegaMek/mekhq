@@ -31,6 +31,7 @@ import megamek.common.*;
 import megamek.common.InfantryBay.PlatoonType;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.ServiceLogger;
+import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.*;
 
 import org.w3c.dom.NamedNodeMap;
@@ -197,7 +198,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         this.oldGunners = new ArrayList<>();
         this.oldVesselCrew = new ArrayList<>();
         this.oldNavigator = -1;
-        scenarioId = -1;
+        scenarioId = Scenario.S_DEFAULT_ID;
         this.refit = null;
         this.engineer = null;
         this.history = "";

@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.mission;
 
 import java.io.PrintWriter;
@@ -535,7 +534,7 @@ public class AtBContract extends Contract implements Serializable {
             moraleLevel -= 2;
         }
         // 2 – 5: Morale level decreases 1 level
-        else if (roll >= 2 && roll <= 5) {
+        else if (roll <= 5) {
             moraleLevel -= 1;
         }
         // 6 – 8: Morale level remains the same
