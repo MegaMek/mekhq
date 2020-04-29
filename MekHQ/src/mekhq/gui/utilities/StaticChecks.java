@@ -588,12 +588,90 @@ public class StaticChecks {
         return true;
     }
 
-    public static boolean isWillingToDefect(Person person) {
-        if (!(person.isBondsman() || person.isWillingToDefect())) {
-            return false;
+    /**
+     *
+     * @param people an array of people
+     * @return true if they are either all dependents or all not dependents, otherwise false
+     */
+    public static boolean areEitherAllDependentsOrNot(Person[] people) {
+        if (people.length > 0) {
+            boolean isDependent = people[0].isDependent();
+            for (Person person : people) {
+                if (isDependent != person.isDependent()) {
+                    return false;
+                }
+            }
         }
-
         return true;
+    }
+
+    /**
+     *
+     * @param people an array of people
+     * @return true if all of the people are female, otherwise false
+     */
+    public static boolean areAllFemale(Person[] people) {
+        for (Person person : people) {
+            if (person.isMale()) {
+               return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     *
+     * @param people an array of people
+     * @return true if they are either all trying to conceive or all not, otherwise false
+     */
+    public static boolean areEitherAllTryingToConceiveOrNot(Person[] people) {
+        if (people.length > 0) {
+            boolean tryingToConceive = people[0].isTryingToConceive();
+            for (Person person : people) {
+                if (tryingToConceive != person.isTryingToConceive()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     *
+     * @param people an array of people
+     * @return true if they are either all trying to marry or all not, otherwise false
+     */
+    public static boolean areEitherAllTryingToMarryOrNot(Person[] people) {
+        if (people.length > 0) {
+            boolean tryingToMarry = people[0].isTryingToMarry();
+            for (Person person : people) {
+                if (tryingToMarry != person.isTryingToMarry()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     *
+     * @param people an array of people
+     * @return true if they are either all founders or all not, otherwise false
+     */
+    public static boolean areEitherAllFoundersOrNot(Person[] people) {
+        if (people.length > 0) {
+            boolean founder = people[0].isFounder();
+            for (Person person : people) {
+                if (founder != person.isFounder()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public static boolean isWillingToDefect(Person person) {
+        return person.isBondsman() || person.isWillingToDefect();
     }
 
     public static boolean areAnyWillingToDefect(Person[] people) {
