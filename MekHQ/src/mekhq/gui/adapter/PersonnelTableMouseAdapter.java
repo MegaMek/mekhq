@@ -1724,7 +1724,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             menu.add(cbMenuItem);
 
             if (oneSelected && person.isActive()) {
-                if (person.oldEnoughToMarry() && (!person.hasSpouse())) {
+                if (person.oldEnoughToMarry(gui.getCampaign()) && (!person.hasSpouse())) {
                     menu = new JMenu(resourceMap.getString("chooseSpouse.text")); //$NON-NLS-1$
                     JMenu maleMenu = new JMenu(resourceMap.getString("spouseMenuMale.text"));
                     JMenu femaleMenu = new JMenu(resourceMap.getString("spouseMenuFemale.text"));
@@ -1736,7 +1736,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     personnel.sort(Comparator.comparing((Person p) -> p.getAge(today)).thenComparing(Person::getSurname));
 
                     for (Person ps : personnel) {
-                        if (person.safeSpouse(ps)) {
+                        if (person.safeSpouse(ps, gui.getCampaign())) {
                             String pStatus;
                             if (ps.isBondsman()) {
                                 pStatus = String.format(resourceMap.getString("marriageBondsmanDesc.format"), //$NON-NLS-1$

@@ -1403,8 +1403,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
     /**
      * Determines if another person is a safe spouse for the current person
      * @param p the person to determine if they are a safe spouse
+     * @param campaign the campaign to use to determine if they are a safe spouse
      */
-    public boolean safeSpouse(Person p) {
+    public boolean safeSpouse(Person p, Campaign campaign) {
         // Huge convoluted return statement, with the following restrictions
         // can't marry yourself
         // can't marry someone who is already married
@@ -1418,24 +1419,24 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 !this.equals(p)
                 && !p.hasSpouse()
                 && p.isTryingToMarry()
-                && p.oldEnoughToMarry()
+                && p.oldEnoughToMarry(campaign)
                 && (!p.isPrisoner() || isPrisoner())
                 && !p.isDeadOrMIA()
                 && p.isActive()
                 && ((getAncestorsId() == null)
-                    || !getCampaign().getAncestors(getAncestorsId()).checkMutualAncestors(
-                            getCampaign().getAncestors(p.getAncestorsId())))
+                    || !campaign.getAncestors(getAncestorsId()).checkMutualAncestors(
+                            campaign.getAncestors(p.getAncestorsId())))
         );
     }
 
-    public boolean oldEnoughToMarry() {
-        return (getAge(getCampaign().getLocalDate()) >= getCampaign().getCampaignOptions().getMinimumMarriageAge());
+    public boolean oldEnoughToMarry(Campaign campaign) {
+        return (getAge(campaign.getLocalDate()) >= campaign.getCampaignOptions().getMinimumMarriageAge());
     }
 
     public void randomMarriage(Campaign campaign) {
         // Don't attempt to generate is someone isn't trying to marry, has a spouse,
         // isn't old enough to marry, or is actively deployed
-        if (!isTryingToMarry() || hasSpouse() || !oldEnoughToMarry() || isDeployed()) {
+        if (!isTryingToMarry() || hasSpouse() || !oldEnoughToMarry(campaign) || isDeployed()) {
             return;
         }
 
@@ -1453,7 +1454,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         List<Person> potentials = new ArrayList<>();
         int gender = sameSex ? getGender() : (isMale() ? Crew.G_FEMALE : Crew.G_MALE);
         for (Person p : campaign.getActivePersonnel()) {
-            if (isPotentialRandomSpouse(p, gender)) {
+            if (isPotentialRandomSpouse(p, gender, campaign)) {
                 potentials.add(p);
             }
         }
@@ -1464,14 +1465,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
 
-    public boolean isPotentialRandomSpouse(Person p, int gender) {
-        if ((p.getGender() != gender) || !safeSpouse(p) || !(isFree() || (isPrisoner() && p.isPrisoner()))) {
+    public boolean isPotentialRandomSpouse(Person p, int gender, Campaign campaign) {
+        if ((p.getGender() != gender) || !safeSpouse(p, campaign) || !(isFree() || (isPrisoner() && p.isPrisoner()))) {
             return false;
         }
 
-        int ageDifference = Math.abs(p.getAge(getCampaign().getLocalDate()) - getAge(getCampaign().getLocalDate()));
+        int ageDifference = Math.abs(p.getAge(campaign.getLocalDate()) - getAge(campaign.getLocalDate()));
 
-        return (ageDifference <= getCampaign().getCampaignOptions().getMarriageAgeRange());
+        return (ageDifference <= campaign.getCampaignOptions().getMarriageAgeRange());
     }
 
     public void marry(Person spouse, MarriageSurnameStyle surnameStyle, Campaign campaign) {
