@@ -25,13 +25,8 @@ import mekhq.gui.BasicInfo;
  * Model for a list that displays a unit's crew with their role.
  *
  * @author Neoancient
- *
  */
 public class CrewListModel extends AbstractListModel<Person> {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = 3584521762881297199L;
 
     enum CrewRole {
@@ -44,8 +39,8 @@ public class CrewListModel extends AbstractListModel<Person> {
         TECH_OFFICER (6, "Tech Officer"),
         CREW (7, "Crew");
 
-        private int sortOrder;
-        private String displayName;
+        private final int sortOrder;
+        private final String displayName;
 
         public int getSortOrder() {
             return sortOrder;
