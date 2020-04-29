@@ -145,8 +145,8 @@ public class PlanetViewPanel extends ScrollablePanel {
         panel.add(txtPlanetType, gbcText);
         ++ infoRow;
 
-      //System Position
-        if(planet.getPlanetType() != "Asteroid Belt") {
+        //System Position
+        if (!"Asteroid Belt".equals(planet.getPlanetType())) {
             JLabel lblDiameter = new JLabel(resourceMap.getString("lblDiameter.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblDiameter, gbcLabel);
@@ -158,13 +158,13 @@ public class PlanetViewPanel extends ScrollablePanel {
         }
 
         //System Position
-        if((null != planet.getSystemPosition()) || (null != planet.getOrbitRadius())) {
+        if ((null != planet.getSystemPosition()) || (null != planet.getOrbitRadius())) {
             JLabel lblPosition = new JLabel(resourceMap.getString("lblPosition.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblPosition, gbcLabel);
             String text = "?";
-            if(null != planet.getOrbitRadius()) {
-            	if(planet.getPlanetType().equals("Asteroid Belt")) {
+            if (null != planet.getOrbitRadius()) {
+            	if (planet.getPlanetType().equals("Asteroid Belt")) {
             		text = String.format("%.3f AU", //$NON-NLS-1$
             				planet.getOrbitRadius());
             	} else {

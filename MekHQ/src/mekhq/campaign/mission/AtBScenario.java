@@ -19,7 +19,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.mission;
 
 import java.io.PrintWriter;
@@ -1183,8 +1182,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 list.add(en);
             }
         }
-        if (forceType == FORCE_NOVA || forceType == FORCE_VEENOVA) {
-            unitType = forceType == FORCE_VEENOVA ? UnitType.INFANTRY : UnitType.BATTLE_ARMOR;
+        if (forceType == FORCE_NOVA) {
+            unitType = UnitType.BATTLE_ARMOR;
             for (int i = 0; i < 5; i++) {
                 Entity en = getEntity(faction, skill, quality,
                         unitType, -1, campaign);
