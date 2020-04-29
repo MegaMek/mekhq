@@ -48,9 +48,9 @@ public enum GuiTabType {
     //endregion Enum Declaration
 
     //region Variable Declarations
-    private int defaultPos;
-    private String name;
-    private int mnemonic;
+    private final int defaultPos;
+    private final String name;
+    private final int mnemonic;
     //endregion Variable Declarations
 
     public int getDefaultPos() {
