@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, 2016, 2020  - The MegaMek Team
+ * Copyright (c) 2009, 2016, 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -25,15 +25,9 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.ResourceBundle;
-import java.util.Vector;
+import java.util.*;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
@@ -47,8 +41,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.WindowConstants;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
@@ -64,18 +56,14 @@ import mekhq.gui.utilities.MekHqTableCellRenderer;
 import mekhq.preferences.PreferencesNode;
 
 /**
- *
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class ImageChoiceDialog extends JDialog {
-
     private static final String PANEL_IMAGES = "panel_images";
     private static final String PANEL_LAYERED = "panel_layered";
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 7316667282566479439L;
+
     /**
      * The categorized image patterns.
      */
@@ -230,7 +218,7 @@ public class ImageChoiceDialog extends JDialog {
                 }
             }
         }
-        if(null != match) {
+        if (null != match) {
             categoryModel.setSelectedItem(match);
         } else {
             categoryModel.setSelectedItem(Crew.ROOT_PORTRAIT);
@@ -268,7 +256,8 @@ public class ImageChoiceDialog extends JDialog {
             panelTypes.add(scrTypes, gbc);
             typesModel.reset();
             typesModel.setCategory(IconPackage.FORCE_TYPE);
-            Iterator<String> imageNames = imageItems.getItemNames(IconPackage.FORCE_TYPE);
+            Iterator<String> imageNames = (imageItems != null)
+                    ? imageItems.getItemNames(IconPackage.FORCE_TYPE) : Collections.emptyIterator();
             while (imageNames.hasNext()) {
                 typesModel.addImage(imageNames.next());
             }
@@ -612,7 +601,7 @@ public class ImageChoiceDialog extends JDialog {
      * A table model for displaying images
      */
     public class ImageTableModel extends AbstractTableModel {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = -7469653910161174678L;
         private String[] columnNames;
         private String category;
         private ArrayList<String> names;
@@ -669,7 +658,7 @@ public class ImageChoiceDialog extends JDialog {
         }
 
         @Override
-        public Class<? extends Object> getColumnClass(int c) {
+        public Class<?> getColumnClass(int c) {
             return getValueAt(0, c).getClass();
         }
 
@@ -722,14 +711,10 @@ public class ImageChoiceDialog extends JDialog {
     }
 
     public static class ImagePanel extends JPanel {
-
-        /**
-         *
-         */
         private static final long serialVersionUID = -3724175393116586310L;
         private DirectoryItems items;
+        private JLabel lblImage;
 
-        /** Creates new form ImagePanel */
         public ImagePanel(DirectoryItems items) {
             this.items = items;
             initComponents();
@@ -752,7 +737,7 @@ public class ImageChoiceDialog extends JDialog {
             gbc.weightx = 1.0;
             gbc.weighty = 1.0;
             add(lblImage, gbc);
-        }// </editor-fold>//GEN-END:initComponents
+        }
 
         public void setText(String text) {
             lblImage.setText(text);
@@ -769,20 +754,18 @@ public class ImageChoiceDialog extends JDialog {
                 if (Crew.ROOT_PORTRAIT.equals(category))
                     category = ""; //$NON-NLS-1$
                 Image image = (Image) items.getItem(category, name);
-                if (null != image) {
+                if (image != null) {
                     if (category.startsWith("Pieces/")) {
                         image = image.getScaledInstance(110, -1, Image.SCALE_SMOOTH);
                     } else {
                         image = image.getScaledInstance(-1, 76, Image.SCALE_SMOOTH);
                     }
+
+                    lblImage.setIcon(new ImageIcon(image));
                 }
-                lblImage.setIcon(new ImageIcon(image));
             } catch (Exception e) {
                 MekHQ.getLogger().error(getClass(), "setImage", e);
             }
         }
-        // Variables declaration - do not modify//GEN-BEGIN:variables
-        private JLabel lblImage;
-        // End of variables declaration//GEN-END:variables
     }
 }

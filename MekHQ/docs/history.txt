@@ -32,6 +32,10 @@ VERSION HISTORY:
 + Issue #1285: Adding default value to prevent Personnel Market No-Role Personnel
 + Issues #880 and #1671: Paid Recruitment Roll is now based on having an active contract
 + Issues ##1614 and #1615: Adding a Financial Year Duration Option
++ PR #1700: Fixed NPE resulting in failure to display personnel tab when a unit is assigned to a non-existent scenario
++ Issue #1691: Personnel are now filtered by primary and secondary roles in the Personnel Tab
++ PR #1580: Adding TryingToMarry and TryingToConceive Flags
++ Issue #1625: Adding Display Format Options for Time in Rank and Time in Service
 
 0.47.5 (2020-4-01 2000 UTC)
 + Issue #1470: Thumper artillery vehicle causes array index out of bounds exception error
