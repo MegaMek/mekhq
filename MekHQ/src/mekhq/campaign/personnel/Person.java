@@ -1229,12 +1229,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return Math.toIntExact(ChronoUnit.YEARS.between(getBirthday(), today));
     }
 
-    public int getTimeInService(LocalDate today) {
+    public String getTimeInService(Campaign campaign) {
         // Get time in service based on year
         if (getRecruitment() == null) {
-            //use -1 they haven't been recruited or are dependents
-            return -1;
+            //use "" they haven't been recruited or are dependents
+            return "";
         }
+
+        LocalDate today = campaign.getLocalDate();
 
         // If the person is dead, we only care about how long they spent in service to the company
         if (getDateOfDeath() != null) {
@@ -1242,13 +1244,16 @@ public class Person implements Serializable, MekHqXmlSerializable {
             today = getDateOfDeath();
         }
 
-        return Period.between(getRecruitment(), today).getYears();
+        return campaign.getCampaignOptions().getTimeInServiceDisplayFormat()
+                .getDisplayFormattedOutput(getRecruitment(), today);
     }
 
-    public int getTimeInRank(LocalDate today) {
+    public String getTimeInRank(Campaign campaign) {
         if (getLastRankChangeDate() == null) {
-            return -1;
+            return "";
         }
+
+        LocalDate today = campaign.getLocalDate();
 
         // If the person is dead, we only care about how long it was from their last promotion till they died
         if (getDateOfDeath() != null) {
@@ -1256,8 +1261,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
             today = getDateOfDeath();
         }
 
-        return Math.toIntExact(ChronoUnit.MONTHS.between(getLastRankChangeDate(),
-                today.plus(1, ChronoUnit.DAYS)));
+        return campaign.getCampaignOptions().getTimeInRankDisplayFormat()
+                .getDisplayFormattedOutput(getLastRankChangeDate(), today);
     }
 
     public void setId(UUID id) {

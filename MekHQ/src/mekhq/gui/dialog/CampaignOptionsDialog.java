@@ -90,6 +90,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.RATManager;
@@ -234,7 +235,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox useTougherHealing;
     private JCheckBox chkUseTransfers;
     private JCheckBox chkUseTimeInService;
+    private JComboBox<TimeInDisplayFormat> comboTimeInServiceDisplayFormat;
     private JCheckBox chkUseTimeInRank;
+    private JComboBox<TimeInDisplayFormat> comboTimeInRankDisplayFormat;
     private JCheckBox chkTrackTotalEarnings;
     private JCheckBox chkShowOriginFaction;
     private JCheckBox chkRandomizeOrigin;
@@ -1701,10 +1704,30 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = ++gridy;
         panPersonnel.add(chkUseTimeInService, gridBagConstraints);
 
+        DefaultComboBoxModel<TimeInDisplayFormat> timeInServiceDisplayFormatModel = new DefaultComboBoxModel<>(TimeInDisplayFormat.values());
+        comboTimeInServiceDisplayFormat = new JComboBox<>(timeInServiceDisplayFormatModel);
+        comboTimeInServiceDisplayFormat.setName("comboTimeInServiceDisplayFormat");
+        comboTimeInServiceDisplayFormat.setSelectedItem(options.getTimeInServiceDisplayFormat());
+        JPanel pnlTimeInServiceDisplayFormat = new JPanel();
+        pnlTimeInServiceDisplayFormat.add(comboTimeInServiceDisplayFormat);
+        pnlTimeInServiceDisplayFormat.add(new JLabel(resourceMap.getString("timeInServiceDisplayFormat.text")));
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(pnlTimeInServiceDisplayFormat, gridBagConstraints);
+
         chkUseTimeInRank = new JCheckBox(resourceMap.getString("useTimeInRank.text"));
         chkUseTimeInRank.setSelected(options.getUseTimeInRank());
         gridBagConstraints.gridy = ++gridy;
         panPersonnel.add(chkUseTimeInRank, gridBagConstraints);
+
+        DefaultComboBoxModel<TimeInDisplayFormat> timeInRankDisplayFormatModel = new DefaultComboBoxModel<>(TimeInDisplayFormat.values());
+        comboTimeInRankDisplayFormat = new JComboBox<>(timeInRankDisplayFormatModel);
+        comboTimeInRankDisplayFormat.setName("comboTimeInRankDisplayFormat");
+        comboTimeInRankDisplayFormat.setSelectedItem(options.getTimeInRankDisplayFormat());
+        JPanel pnlTimeInRankDisplayFormat = new JPanel();
+        pnlTimeInRankDisplayFormat.add(comboTimeInRankDisplayFormat);
+        pnlTimeInRankDisplayFormat.add(new JLabel(resourceMap.getString("timeInRankDisplayFormat.text")));
+        gridBagConstraints.gridy = ++gridy;
+        panPersonnel.add(pnlTimeInRankDisplayFormat, gridBagConstraints);
 
         chkTrackTotalEarnings = new JCheckBox(resourceMap.getString("trackTotalEarnings.text"));
         chkTrackTotalEarnings.setToolTipText("trackTotalEarnings.toolTipText");
@@ -4882,7 +4905,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setTougherHealing(useTougherHealing.isSelected());
         options.setUseTransfers(chkUseTransfers.isSelected());
         options.setUseTimeInService(chkUseTimeInService.isSelected());
+        options.setTimeInServiceDisplayFormat((TimeInDisplayFormat) comboTimeInServiceDisplayFormat.getSelectedItem());
         options.setUseTimeInRank(chkUseTimeInRank.isSelected());
+        options.setTimeInRankDisplayFormat((TimeInDisplayFormat) comboTimeInRankDisplayFormat.getSelectedItem());
         options.setTrackTotalEarnings(chkTrackTotalEarnings.isSelected());
         options.setShowOriginFaction(chkShowOriginFaction.isSelected());
         options.setRandomizeOrigin(chkRandomizeOrigin.isSelected());

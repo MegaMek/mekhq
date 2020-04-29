@@ -715,8 +715,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 pnlInfo.add(lblTimeServed1, gridBagConstraints);
 
                 lblTimeServed2.setName("lblTimeServed2");
-                lblTimeServed2.setText(person.getTimeInService(campaign.getLocalDate())
-                        + " " + resourceMap.getString("Time.YearYears"));
+                lblTimeServed2.setText(person.getTimeInService(campaign));
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 3;
                 gridBagConstraints.gridy = secondy;
@@ -761,8 +760,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 pnlInfo.add(lblTimeInRank1, gridBagConstraints);
 
-                JLabel lblTimeInRank2 = new JLabel(person.getTimeInRank(campaign.getLocalDate())
-                        + " " + resourceMap.getString("Time.MonthMonths"));
+                JLabel lblTimeInRank2 = new JLabel(person.getTimeInRank(campaign));
                 lblTimeInRank2.setName("lblTimeInRank2");
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 3;
