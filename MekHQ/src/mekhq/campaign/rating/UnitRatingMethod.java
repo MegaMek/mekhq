@@ -29,8 +29,8 @@ public enum UnitRatingMethod {
     CAMPAIGN_OPS("Campaign Ops", new String[]{"Taharqa", "Interstellar Ops"}),
     FLD_MAN_MERCS_REV("FM: Mercenaries (rev)", new String[]{"FM: Mercenaries (rev)"});
 
-    private String description;
-    private String[] legacyDescriptions; // Old 'Taharqa' and 'Interstellar Ops' rating methods renamed to Campaign Ops.
+    private final String description;
+    private final String[] legacyDescriptions; // Old 'Taharqa' and 'Interstellar Ops' rating methods renamed to Campaign Ops.
     // This property exists for backwards compatibility.
 
     UnitRatingMethod(String description, String[] legacyDescriptions) {

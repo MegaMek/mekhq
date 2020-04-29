@@ -102,10 +102,6 @@ import mekhq.campaign.work.IPartWork;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Refit extends Part implements IPartWork, IAcquisitionWork {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = -1765098410743713570L;
     public static final int NO_CHANGE = 0;
     public static final int CLASS_OMNI = 1;
@@ -173,7 +169,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         kitFound = false;
         campaign = oldUnit.getCampaign();
         calculate();
-        if(customJob) {
+        if (customJob) {
             suggestNewName();
         }
     }
@@ -241,11 +237,11 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
     public String[] getShoppingListDescription() {
         Hashtable<String,Integer> tally = new Hashtable<>();
         Hashtable<String,String> desc = new Hashtable<>();
-        for(Part p : shoppingList) {
-            if(p instanceof Armor) {
+        for (Part p : shoppingList) {
+            if (p instanceof Armor) {
                 continue;
             }
-            if(null != tally.get(p.getName())) {
+            if (null != tally.get(p.getName())) {
                 tally.put(p.getName(), tally.get(p.getName()) + 1);
                 desc.put(p.getName(), p.getQuantityName(tally.get(p.getName())));
             } else {
@@ -253,21 +249,21 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 desc.put(p.getName(), p.getQuantityName(1));
             }
         }
-        if(null != newArmorSupplies) {
+        if (null != newArmorSupplies) {
             int actualAmountNeeded = armorNeeded;
             Armor existingSupplies = getExistingArmorSupplies();
-            if(null != existingSupplies) {
+            if (null != existingSupplies) {
                 actualAmountNeeded -= existingSupplies.getAmount();
             }
-            if(actualAmountNeeded > 0) {
-                Armor a = (Armor)newArmorSupplies.getNewPart();
+            if (actualAmountNeeded > 0) {
+                Armor a = (Armor) newArmorSupplies.getNewPart();
                 a.setAmount(actualAmountNeeded);
                 desc.put(a.getName(), a.getQuantityName(1));
             }
         }
         String[] descs = new String[desc.keySet().size()];
         int i = 0;
-        for(String name : desc.keySet()) {
+        for (String name : desc.keySet()) {
             descs[i] = desc.get(name);
             i++;
         }
@@ -351,7 +347,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 // the old parts list here.
                 if (oPart instanceof LargeCraftAmmoBin
                         && part instanceof LargeCraftAmmoBin
-                        && ((LargeCraftAmmoBin)oPart).getType() == ((LargeCraftAmmoBin)part).getType()) {
+                        && ((LargeCraftAmmoBin) oPart).getType() == ((LargeCraftAmmoBin) part).getType()) {
                     lcBinsToChange.add(oPart.getId());
                 }
                 //FIXME: There have been instances of null oParts here. Save/load will fix these, but
@@ -645,26 +641,25 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                     boolean matchFound = false;
                     int matchIndex = -1;
                     int rClass = CLASS_D;
-                    for(int pid : tempParts) {
+                    for (int pid : tempParts) {
                         Part oPart = oldUnit.getCampaign().getPart(pid);
                         i++;
                         int oLoc = -1;
                         int oCrits = -1;
                         EquipmentType oType = null;
-                        if(oPart instanceof EquipmentPart) {
+                        if (oPart instanceof MissingEquipmentPart) {
                             oLoc = oPart.getLocation();
-                            oType = ((EquipmentPart)oPart).getType();
+                            oType = ((MissingEquipmentPart) oPart).getType();
+                            oCrits = oType.getCriticals(oldUnit.getEntity());
+                        } else if (oPart instanceof EquipmentPart) {
+                            oLoc = oPart.getLocation();
+                            oType = ((EquipmentPart) oPart).getType();
                             oCrits = oType.getCriticals(oldUnit.getEntity());
                         }
-                        if(oPart instanceof MissingEquipmentPart) {
-                            oLoc = oPart.getLocation();
-                            oType = ((MissingEquipmentPart)oPart).getType();
-                            oCrits = oType.getCriticals(oldUnit.getEntity());
-                        }
-                        if(loc != oLoc) {
+                        if (loc != oLoc) {
                             continue;
                         }
-                        if(crits == oCrits
+                        if ((crits == oCrits) && (oType != null)
                                 && (type.hasFlag(WeaponType.F_LASER) == oType.hasFlag(WeaponType.F_LASER))
                                 && (type.hasFlag(WeaponType.F_MISSILE) == oType.hasFlag(WeaponType.F_MISSILE))
                                 && (type.hasFlag(WeaponType.F_BALLISTIC) == oType.hasFlag(WeaponType.F_BALLISTIC))
@@ -685,11 +680,11 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                             //don't break because we may find something better
                         }
                     }
-                    if(isOmniRefit && nPart.isOmniPoddable()) {
+                    if (isOmniRefit && nPart.isOmniPoddable()) {
                         rClass = CLASS_OMNI;
                     }
                     updateRefitClass(rClass);
-                    if(matchFound) {
+                    if (matchFound) {
                         tempParts.remove(matchIndex);
                     }
                 }
@@ -698,7 +693,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 
         //if oldUnitParts is not empty we are removing some stuff and so this should
         //be at least a Class A refit
-        if(!oldUnitParts.isEmpty()) {
+        if (!oldUnitParts.isEmpty()) {
             if (isOmniRefit) {
                 updateRefitClass(CLASS_OMNI);
             } else {
@@ -1464,15 +1459,23 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         //UnitUtil.reIndexCrits(newEntity); Method is gone?
 
         String fileName = MhqFileUtil.escapeReservedCharacters(newEntity.getChassis() + " " + newEntity.getModel());
-        String sCustomsDir = "data"+File.separator+"mechfiles"+File.separator+"customs";
-        String sCustomsDirCampaign = sCustomsDir+File.separator+oldUnit.getCampaign().getName();
+        String sCustomsDir = "data" + File.separator + "mechfiles" + File.separator + "customs";
+        String sCustomsDirCampaign = sCustomsDir + File.separator + oldUnit.getCampaign().getName();
         File customsDir = new File(sCustomsDir);
-        if(!customsDir.exists()) {
-            customsDir.mkdir();
+        if (!customsDir.exists()) {
+            if (!customsDir.mkdir()) {
+                MekHQ.getLogger().error(getClass(), "saveCustomization",
+                        "Failed to create directory " + sCustomsDir + ", and therefore cannot save the unit.");
+                return;
+            }
         }
         File customsDirCampaign = new File(sCustomsDirCampaign);
-        if(!customsDirCampaign.exists()) {
-            customsDirCampaign.mkdir();
+        if (!customsDirCampaign.exists()) {
+            if (!customsDirCampaign.mkdir()) {
+                MekHQ.getLogger().error(getClass(), "saveCustomization",
+                        "Failed to create directory " + sCustomsDirCampaign + ", and therefore cannot save the unit.");
+                return;
+            }
         }
 
         try {
@@ -1480,7 +1483,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 //if this file already exists then don't overwrite it or we will end up with a bunch of copies
                 String fileOutName = sCustomsDir + File.separator + fileName + ".mtf";
                 String fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".mtf";
-                if((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
+                if ((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
                     throw new IOException("A file already exists with the custom name "+fileNameCampaign+". Please choose a different name. (Unit name and/or model)");
                 }
                 FileOutputStream out = new FileOutputStream(fileNameCampaign);
@@ -1492,7 +1495,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 //if this file already exists then don't overwrite it or we will end up with a bunch of copies
                 String fileOutName = sCustomsDir + File.separator + fileName + ".blk";
                 String fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".blk";
-                if((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
+                if ((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
                     throw new IOException("A file already exists with the custom name "+fileNameCampaign+". Please choose a different name. (Unit name and/or model)");
                 }
                 BLKFile.encode(fileNameCampaign, newEntity);

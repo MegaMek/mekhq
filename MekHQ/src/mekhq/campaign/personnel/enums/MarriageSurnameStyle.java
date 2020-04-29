@@ -24,6 +24,7 @@ import megamek.common.util.StringUtil;
 import megamek.common.util.WeightedMap;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
 
 import java.util.ResourceBundle;
@@ -199,6 +200,20 @@ public enum MarriageSurnameStyle {
         // Now we set both Maiden Names, to avoid any divorce bugs (as the default is now an empty string)
         origin.setMaidenName(surname);
         spouse.setMaidenName(spouseSurname);
+
+        // Finally, we need to do this logging here to ensure the order is correct while only logging
+        // the marriage names if it changes.
+        PersonalLogger.marriage(origin, spouse, campaign.getDate());
+        PersonalLogger.marriage(spouse, origin, campaign.getDate());
+
+        if (campaign.getCampaignOptions().logMarriageNameChange()) {
+            if (!spouse.getSurname().equals(spouseSurname)) {
+                PersonalLogger.marriageNameChange(spouse, origin, campaign.getDate());
+            }
+            if (!origin.getSurname().equals(surname)) {
+                PersonalLogger.marriageNameChange(origin, spouse, campaign.getDate());
+            }
+        }
     }
 
 

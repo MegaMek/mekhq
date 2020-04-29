@@ -57,6 +57,9 @@ troopspace:4.0
 </armor>
 
 <Body Equipment>
+IS Machine Gun Ammo - Half
+IS Ammo SRM-4
+IS Ammo SRM-4
 </Body Equipment>
 
 <Front Equipment>
@@ -69,18 +72,14 @@ troopspace:4.0
 </Left Equipment>
 
 <Rear Equipment>
-Hitch
 </Rear Equipment>
 
 <Turret Equipment>
 Machine Gun
 Machine Gun
-IS Machine Gun Ammo - Half
 SRM 4
 SRM 4
 SRM 4
-IS Ammo SRM-4
-IS Ammo SRM-4
 </Turret Equipment>
 
 <source>
