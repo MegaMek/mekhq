@@ -3340,8 +3340,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panNameGen.add(lblFactionNames, gridBagConstraints);
 
         DefaultComboBoxModel<String> factionNamesModel = new DefaultComboBoxModel<>();
-        for (Iterator<String> i = RandomNameGenerator.getInstance().getFactions(); i.hasNext(); ) {
-            String faction = i.next();
+        for (String faction : RandomNameGenerator.getInstance().getFactions()) {
             factionNamesModel.addElement(faction);
         }
         factionNamesModel.setSelectedItem(RandomNameGenerator.getInstance().getChosenFaction());
@@ -4543,9 +4542,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         String factionCode = Faction.getFactionFromFullNameAndYear(String.valueOf(comboFaction.getSelectedItem()), date.get(Calendar.YEAR))
                                     .getNameGenerator();
         boolean found = false;
-        for (Iterator<String> i = RandomNameGenerator.getInstance().getFactions(); i.hasNext(); ) {
-            String nextFaction = i.next();
-            if (nextFaction.equals(factionCode)) {
+        for (String faction : RandomNameGenerator.getInstance().getFactions()) {
+            if (faction.equals(factionCode)) {
                 found = true;
                 break;
             }

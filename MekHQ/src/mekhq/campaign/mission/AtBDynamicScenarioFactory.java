@@ -1341,10 +1341,13 @@ public class AtBDynamicScenarioFactory {
         rsg.setMethod(RandomSkillsGenerator.M_TAHARQA);
         rsg.setLevel(skill);
 
-        if (faction.isClan()) rsg.setType(RandomSkillsGenerator.T_CLAN);
+        if (faction.isClan()) {
+            rsg.setType(RandomSkillsGenerator.T_CLAN);
+        }
+
         int[] skills = rsg.getRandomSkills(en);
         Gender gender = RandomGenderGenerator.generate();
-        en.setCrew(new Crew(en.getCrew().getCrewType(), rng.generate(gender),
+        en.setCrew(new Crew(en.getCrew().getCrewType(), rng.generate(gender, faction.isClan(), faction.getShortName()),
                 Compute.getFullCrewSize(en),skills[0], skills[1], gender, null));
 
         UUID id = UUID.randomUUID();
