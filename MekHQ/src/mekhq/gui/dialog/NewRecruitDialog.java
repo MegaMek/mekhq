@@ -45,7 +45,6 @@ public class NewRecruitDialog extends javax.swing.JDialog {
      */
     private static final long serialVersionUID = -6265589976779860566L;
     private Person person;
-    private boolean newHire;
 
     private CampaignGUI hqView;
 
@@ -79,9 +78,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         setTitle(resourceMap.getString("Form.title")); // NOI18N
-        if (newHire) {
-            setTitle(resourceMap.getString("Form.title.new")); // NOI18N
-        }
+
         setName("Form"); // NOI18N
         getContentPane().setLayout(new java.awt.BorderLayout());
 
