@@ -49,7 +49,6 @@ import java.util.Enumeration;
 import java.util.EventObject;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -385,7 +384,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
     //region Name and Portrait Generation Tab
     private JPanel panNameGen;
-    private JCheckBox useFactionForNamesBox;
+    private JCheckBox chkUseOriginFactionForNames;
     private JComboBox<String> comboFactionNames;
     private JSlider sldGender;
     private JPanel panRandomPortrait;
@@ -522,7 +521,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 		resetToFirstTechCheckBox.setSelected(options.useResetToFirstTech());
         useUnitRatingCheckBox.setSelected(options.useDragoonRating());
         unitRatingMethodCombo.setSelectedItem(options.getUnitRatingMethod().getDescription());
-        useFactionForNamesBox.setSelected(options.useFactionForNames());
         useTacticsBox.setSelected(options.useTactics());
         useInitBonusBox.setSelected(options.useInitBonus());
         useToughnessBox.setSelected(options.useToughness());
@@ -618,7 +616,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         JLabel clanPriceModifierLabel = new JLabel();
         JLabel usedPartsValueLabel = new JLabel();
         JLabel damagedPartsValueLabel = new JLabel();
-        useFactionForNamesBox = new JCheckBox();
         useTacticsBox = new JCheckBox();
         useInitBonusBox = new JCheckBox();
         useToughnessBox = new JCheckBox();
@@ -753,7 +750,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         comboFaction.setMinimumSize(new java.awt.Dimension(400, 30));
         comboFaction.setName("comboFaction"); // NOI18N
         comboFaction.setPreferredSize(new java.awt.Dimension(400, 30));
-        comboFaction.addActionListener(evt -> factionSelected());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -3314,21 +3310,22 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         // Name and Portraits tab controls below
         panNameGen.setName("panNameGen"); // NOI18N
-        panNameGen.setLayout(new java.awt.GridBagLayout());
+        panNameGen.setLayout(new GridBagLayout());
 
-        useFactionForNamesBox.setText(resourceMap.getString("useFactionForNamesBox.text")); // NOI18N
-        useFactionForNamesBox.setToolTipText(resourceMap.getString("useFactionForNamesBox.toolTipText")); // NOI18N
-        useFactionForNamesBox.setName("useFactionForNamesBox"); // NOI18N
-        useFactionForNamesBox.setSelected(options.useFactionForNames());
-        useFactionForNamesBox.addActionListener(this::useFactionForNamesBoxEvent);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        chkUseOriginFactionForNames = new JCheckBox(resourceMap.getString("chkUseOriginFactionForNames.text"));
+        chkUseOriginFactionForNames.setToolTipText(resourceMap.getString("chkUseOriginFactionForNames.toolTipText"));
+        chkUseOriginFactionForNames.setName("chkUseOriginFactionForNames"); // NOI18N
+        chkUseOriginFactionForNames.setSelected(options.useOriginFactionForNames());
+        chkUseOriginFactionForNames.addActionListener(
+                evt -> comboFactionNames.setEnabled(!chkUseOriginFactionForNames.isSelected()));
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridy = 0;
         gridBagConstraints.gridy = gridy;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panNameGen.add(useFactionForNamesBox, gridBagConstraints);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panNameGen.add(chkUseOriginFactionForNames, gridBagConstraints);
 
 
         JLabel lblFactionNames = new JLabel(resourceMap.getString("lblFactionNames.text")); // NOI18N
@@ -3348,7 +3345,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         comboFactionNames.setMinimumSize(new java.awt.Dimension(400, 30));
         comboFactionNames.setName("comboFactionNames"); // NOI18N
         comboFactionNames.setPreferredSize(new java.awt.Dimension(400, 30));
-        comboFactionNames.setEnabled(!useFactionForNamesBox.isSelected());
+        comboFactionNames.setEnabled(!chkUseOriginFactionForNames.isSelected());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = gridy;
@@ -4532,27 +4529,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtNameActionPerformed
 
-    private void factionSelected() {
-        if (useFactionForNamesBox.isSelected()) {
-            switchFaction();
-        }
-    }
-
-    private void switchFaction() {
-        String factionCode = Faction.getFactionFromFullNameAndYear(String.valueOf(comboFaction.getSelectedItem()), date.get(Calendar.YEAR))
-                                    .getNameGenerator();
-        boolean found = false;
-        for (String faction : RandomNameGenerator.getInstance().getFactions()) {
-            if (faction.equals(factionCode)) {
-                found = true;
-                break;
-            }
-        }
-        if (found) {
-            comboFactionNames.setSelectedItem(factionCode);
-        }
-    }
-
     private void fillRankInfo() {
         Ranks ranks = new Ranks(comboRanks.getSelectedIndex());
         ranksModel.setDataVector(ranks.getRanksForModel(), rankColNames);
@@ -4606,22 +4582,13 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         }
     }
 
-    private void useFactionForNamesBoxEvent(java.awt.event.ActionEvent evt) {
-        if (useFactionForNamesBox.isSelected()) {
-            comboFactionNames.setEnabled(false);
-            switchFaction();
-        } else {
-            comboFactionNames.setEnabled(true);
-        }
-    }
-
     private void btnLoadActionPerformed() {
     	ArrayList<GamePreset> presets = GamePreset.getGamePresetsIn(MekHQ.PRESET_DIR);
 
-		if(!presets.isEmpty()) {
+		if (!presets.isEmpty()) {
 			ChooseGamePresetDialog cgpd = new ChooseGamePresetDialog(null, true, presets);
 			cgpd.setVisible(true);
-			if(!cgpd.wasCancelled() && null != cgpd.getSelectedPreset()) {
+			if (!cgpd.wasCancelled() && null != cgpd.getSelectedPreset()) {
 				cgpd.getSelectedPreset().apply(campaign);
 				// TODO: it would be nice if we could just update the choices in this dialog now
 				// TODO: rather than closing it, but that is currently not possible given how
@@ -4639,7 +4606,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     	}
     	GamePresetDescriptionDialog gpdd = new GamePresetDescriptionDialog(null, true, "Enter a title", "Enter description of preset");
         gpdd.setVisible(true);
-        if(!gpdd.wasChanged()) {
+        if (!gpdd.wasChanged()) {
         	return;
         }
 
@@ -4719,8 +4686,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         }
         RandomGenderGenerator.setPercentFemale(sldGender.getValue());
         campaign.setRankSystem(comboRanks.getSelectedIndex());
-        if (comboRanks.getSelectedIndex() == Ranks.RS_CUSTOM)
-        {
+        if (comboRanks.getSelectedIndex() == Ranks.RS_CUSTOM) {
 	        campaign.getRanks().setRanksFromModel(ranksModel);
         }
         campaign.setCamoCategory(camoCategory);
@@ -4749,7 +4715,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setDragoonRating(useUnitRatingCheckBox.isSelected());
         options.setUnitRatingMethod(UnitRatingMethod.getUnitRatingMethod((String) unitRatingMethodCombo
                 .getSelectedItem()));
-        options.setFactionForNames(useFactionForNamesBox.isSelected());
+        options.setUseOriginFactionForNames(chkUseOriginFactionForNames.isSelected());
         options.setUseTactics(useTacticsBox.isSelected());
         campaign.getGameOptions().getOption("command_init").setValue(useTacticsBox.isSelected());
         options.setDestroyByMargin(useDamageMargin.isSelected());

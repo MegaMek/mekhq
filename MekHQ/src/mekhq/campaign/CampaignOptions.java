@@ -88,7 +88,7 @@ public class CampaignOptions implements Serializable {
     public static final int PLANET_ACQUISITION_SELF = 3;
 
 
-    private boolean useFactionForNames;
+    private boolean useOriginFactionForNames;
     private boolean useUnitRating;
 
     //region General Tab
@@ -367,7 +367,7 @@ public class CampaignOptions implements Serializable {
         displayDateFormat = "yyyy-MM-dd";
         //endregion General Tab
 
-        useFactionForNames = true;
+        useOriginFactionForNames = true;
         repairSystem = REPAIR_SYSTEM_STRATOPS;
         useEraMods = false;
         assignedTechFirst = false;
@@ -1749,12 +1749,18 @@ public class CampaignOptions implements Serializable {
         this.repairSystem = i;
     }
 
-    public boolean useFactionForNames() {
-        return useFactionForNames;
+    /**
+     * @return true to use the origin faction for personnel names instead of a set faction
+     */
+    public boolean useOriginFactionForNames() {
+        return useOriginFactionForNames;
     }
 
-    public void setFactionForNames(boolean b) {
-        this.useFactionForNames = b;
+    /**
+     * @param useOriginFactionForNames whether to use personnel names or a set faction
+     */
+    public void setUseOriginFactionForNames(boolean useOriginFactionForNames) {
+        this.useOriginFactionForNames = useOriginFactionForNames;
     }
 
     // Personnel Market
@@ -2880,7 +2886,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "logMaintenance", logMaintenance);
         //endregion Repair and Maintenance Tab
 
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useFactionForNames", useFactionForNames);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useFactionForNames", useOriginFactionForNames);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "repairSystem", repairSystem);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnitRating", useUnitRating);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitRatingMethod", unitRatingMethod.getDescription());
@@ -3230,7 +3236,7 @@ public class CampaignOptions implements Serializable {
             //endregion Repair and Maintenance Tab
 
             } else if (wn2.getNodeName().equalsIgnoreCase("useFactionForNames")) {
-                retVal.useFactionForNames = wn2.getTextContent().equalsIgnoreCase("true");
+                retVal.setUseOriginFactionForNames(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("repairSystem")) {
                 retVal.repairSystem = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useEraMods")) {

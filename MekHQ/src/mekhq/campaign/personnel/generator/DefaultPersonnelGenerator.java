@@ -99,7 +99,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
         specialAbilityGenerator.generateSpecialAbilities(person, expLvl);
 
         // Do naming at the end, to ensure the keys are set
-        generateName(person, gender);
+        generateName(campaign, person, gender);
 
         //check for Bloodname
         if (person.isClanner()) {

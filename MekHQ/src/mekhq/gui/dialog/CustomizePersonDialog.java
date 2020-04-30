@@ -927,9 +927,12 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     }//GEN-LAST:event_btnOkActionPerformed
 
     private void randomName() {
+        String factionCode = campaign.getCampaignOptions().useOriginFactionForNames()
+                ? person.getOriginFaction().getShortName()
+                : RandomNameGenerator.getInstance().getChosenFaction();
+
         String[] name = RandomNameGenerator.getInstance().generateGivenNameSurnameSplit(
-                (Gender) choiceGender.getSelectedItem(),
-                person.isClanner(), person.getOriginFaction().getShortName());
+                (Gender) choiceGender.getSelectedItem(), person.isClanner(), factionCode);
         textGivenName.setText(name[0]);
         textSurname.setText(name[1]);
     }

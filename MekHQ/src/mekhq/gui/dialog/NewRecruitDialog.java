@@ -213,8 +213,12 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     }
 
     private void randomName() {
+        String factionCode = hqView.getCampaign().getCampaignOptions().useOriginFactionForNames()
+                ? person.getOriginFaction().getShortName()
+                : RandomNameGenerator.getInstance().getChosenFaction();
+
         String[] name = RandomNameGenerator.getInstance().generateGivenNameSurnameSplit(
-                person.getGender(), person.isClanner(), person.getOriginFaction().getShortName());
+                person.getGender(), person.isClanner(), factionCode);
         person.setGivenName(name[0]);
         person.setSurname(name[1]);
         refreshView();

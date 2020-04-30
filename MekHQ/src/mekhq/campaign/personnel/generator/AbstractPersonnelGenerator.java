@@ -111,17 +111,22 @@ public abstract class AbstractPersonnelGenerator {
 
     /**
      * Generates a name for a {@link Person}.
-     * @param person The {@link Person} being generated.
+     * @param campaign The {@link Campaign} to use to generate the person
+     * @param person The {@link Person} whose name is being generated.
      * @param gender The person's gender, or a randomize value
      */
-    protected void generateName(Person person, Gender gender) {
+    protected void generateName(Campaign campaign, Person person, Gender gender) {
         if (gender == Gender.RANDOMIZE) {
             gender = RandomGenderGenerator.generate();
             person.setGender(gender);
         }
 
+        String factionCode = campaign.getCampaignOptions().useOriginFactionForNames()
+                ? person.getOriginFaction().getShortName()
+                : RandomNameGenerator.getInstance().getChosenFaction();
+
         String[] name = getNameGenerator().generateGivenNameSurnameSplit(gender, person.isClanner(),
-                person.getOriginFaction().getShortName());
+                factionCode);
         person.setGivenName(name[0]);
         person.setSurname(name[1]);
     }
