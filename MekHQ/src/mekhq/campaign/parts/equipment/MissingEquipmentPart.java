@@ -83,7 +83,7 @@ public class MissingEquipmentPart extends MissingPart {
         super(tonnage, c);
         this.type =et;
         if(null != type) {
-        	this.name = type.getName();
+        	this.name = type.getName(size);
         	this.typeName = type.getInternalName();
         }
         this.equipmentNum = equipNum;

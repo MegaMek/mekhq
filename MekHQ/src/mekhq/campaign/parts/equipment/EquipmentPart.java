@@ -88,7 +88,7 @@ public class EquipmentPart extends Part {
         super(tonnage, omniPodded, c);
         this.type = et;
         if (null != type) {
-            this.name = type.getName();
+            this.name = type.getName(size);
             this.typeName = type.getInternalName();
         }
         if (equipNum != -1) {
