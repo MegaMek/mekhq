@@ -3460,11 +3460,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("logConception")) {
                 retVal.logConception = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("babySurnameStyle")) {
-                try {
-                    retVal.babySurnameStyle = BabySurnameStyle.valueOf(wn2.getTextContent().trim());
-                } catch (Exception ignored) {
-                    retVal.babySurnameStyle = BabySurnameStyle.MOTHERS;
-                }
+                retVal.setBabySurnameStyle(BabySurnameStyle.parseFromString(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("useParentage")) {
                 retVal.useParentage = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("displayFamilyLevel")) {
