@@ -508,7 +508,9 @@ public class EquipmentPart extends Part {
         if (en != null) {
             varCost = Money.of(type.getCost(en, isArmored, getLocation(), getSize()));
         } else if (type instanceof MiscType) {
-            if (type.hasFlag(MiscType.F_OFF_ROAD)) {
+            if (type.hasFlag(MiscType.F_DRONE_CARRIER_CONTROL) || type.hasFlag(MiscType.F_MASH)) {
+                varCost = Money.of(10000 * getTonnage());
+            } else if (type.hasFlag(MiscType.F_OFF_ROAD)) {
                 varCost = Money.of(10 * getTonnage() * getTonnage());
             } else if (type.hasFlag(MiscType.F_FLOTATION_HULL) || type.hasFlag(MiscType.F_VACUUM_PROTECTION)
                     || type.hasFlag(MiscType.F_ENVIRONMENTAL_SEALING) || type.hasFlag(MiscType.F_OFF_ROAD)) {
