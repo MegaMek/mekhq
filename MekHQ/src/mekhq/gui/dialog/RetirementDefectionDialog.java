@@ -569,10 +569,9 @@ public class RetirementDefectionDialog extends JDialog {
                  * and either assigned to the current player or unassigned. If so, keep
                  * the previous value.
                  */
-                if (null != rdTracker.getPayout(id).getStolenUnitId() &&
-                        null != hqView.getCampaign().getUnit(rdTracker.getPayout(id).getStolenUnitId()) &&
-                        (null == hqView.getCampaign().getUnit(rdTracker.getPayout(id).getStolenUnitId()).getCommander() ||
-                                p.getId() == hqView.getCampaign().getUnit(rdTracker.getPayout(id).getStolenUnitId()).getCommander().getId())) {
+                if ((null != rdTracker.getPayout(id).getStolenUnitId())
+                        && (null != hqView.getCampaign().getUnit(rdTracker.getPayout(id).getStolenUnitId()))
+                        && p.equals(hqView.getCampaign().getUnit(rdTracker.getPayout(id).getStolenUnitId()).getCommander())) {
                     continue;
                 }
                 if (null != hqView.getCampaign().getPerson(id).getUnitId() &&

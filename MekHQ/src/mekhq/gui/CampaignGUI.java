@@ -443,15 +443,18 @@ public class CampaignGUI extends JPanel {
         }
         if (!standardTabs.containsKey(tab)) {
             CampaignGuiTab t = tab.createTab(this);
-            standardTabs.put(tab, t);
-            int index = tabMain.getTabCount();
-            for (int i = 0; i < tabMain.getTabCount(); i++) {
-                if (((CampaignGuiTab)tabMain.getComponentAt(i)).tabType().getDefaultPos() > tab.getDefaultPos()) {
-                    index = i;
-                    break;
+            if (t != null) {
+                standardTabs.put(tab, t);
+                int index = tabMain.getTabCount();
+                for (int i = 0; i < tabMain.getTabCount(); i++) {
+                    if (((CampaignGuiTab) tabMain.getComponentAt(i)).tabType().getDefaultPos() > tab.getDefaultPos()) {
+                        index = i;
+                        break;
+                    }
                 }
+                tabMain.insertTab(t.getTabName(), null, t, null, index);
+                tabMain.setMnemonicAt(index, tab.getMnemonic());
             }
-            tabMain.insertTab(t.getTabName(), null, t, null, index);
         }
     }
 
@@ -586,12 +589,20 @@ public class CampaignGUI extends JPanel {
         }
     }
 
+    /**
+     * This is used to initialize the top menu bar.
+     * All the top level menu bar and {@link GuiTabType} mnemonics must be unique, as they are both
+     * accessed through the same GUI page.
+     * The following mnemonic keys are being used as of 30-MAR-2020:
+     * A, B, C, E, F, H, I, L, M, N, O, P, R, S, T, V, W, /
+     *
+     * Note 1: the slash is used for the help, as it is normally the same key as the ?
+     * Note 2: the A mnemonic is used for the Advance Day button
+     */
     private void initMenu() {
         // TODO: Implement "Export All" versions for Personnel and Parts
-
+        // See the JavaDoc comment for used mnemonic keys
         menuBar = new JMenuBar();
-        // The Menu Bar uses the following Mnemonic keys as of 19-March-2020:
-        // A, C, F, H, M, R, V
 
         //region File Menu
         // The File menu uses the following Mnemonic keys as of 19-MAR-2020:
@@ -899,7 +910,7 @@ public class CampaignGUI extends JPanel {
         // The Reports menu uses the following Mnemonic keys as of 19-March-2020:
         // C, H, P, T, U
         JMenu menuReports = new JMenu(resourceMap.getString("menuReports.text")); // NOI18N
-        menuReports.setMnemonic(KeyEvent.VK_R);
+        menuReports.setMnemonic(KeyEvent.VK_E);
 
         JMenuItem miDragoonsRating = new JMenuItem(resourceMap.getString("miDragoonsRating.text")); // NOI18N
         miDragoonsRating.setMnemonic(KeyEvent.VK_U);
@@ -933,7 +944,7 @@ public class CampaignGUI extends JPanel {
         // The Community menu uses the following Mnemonic keys as of 19-March-2020:
         // C
         JMenu menuCommunity = new JMenu(resourceMap.getString("menuCommunity.text")); // NOI18N
-        menuCommunity.setMnemonic(KeyEvent.VK_C);
+        //menuCommunity.setMnemonic(KeyEvent.VK_?); // This will need to be replaced with a unique mnemonic key if this menu is ever added
 
         JMenuItem miChat = new JMenuItem(resourceMap.getString("miChat.text")); // NOI18N
         miChat.setMnemonic(KeyEvent.VK_C);
@@ -990,7 +1001,7 @@ public class CampaignGUI extends JPanel {
         // The Manage Campaign menu uses the following Mnemonic keys as of 19-March-2020:
         // A, B, G, M, S
         JMenu menuManage = new JMenu(resourceMap.getString("menuManageCampaign.text"));
-        menuManage.setMnemonic(KeyEvent.VK_A);
+        menuManage.setMnemonic(KeyEvent.VK_C);
         menuManage.setName("manageMenu");
 
         JMenuItem miGMToolsDialog = new JMenuItem(resourceMap.getString("miGMToolsDialog.text"));
@@ -1029,7 +1040,7 @@ public class CampaignGUI extends JPanel {
         // The Help menu uses the following Mnemonic keys as of 19-March-2020:
         // A
         JMenu menuHelp = new JMenu(resourceMap.getString("menuHelp.text")); // NOI18N
-        menuHelp.setMnemonic(KeyEvent.VK_H);
+        menuHelp.setMnemonic(KeyEvent.VK_SLASH);
         menuHelp.setName("helpMenu"); // NOI18N
 
         JMenuItem menuAboutItem = new JMenuItem(resourceMap.getString("menuAbout.text"));
@@ -1117,9 +1128,11 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
         btnPanel.add(btnOvertime, gridBagConstraints);
 
+        // This button uses a mnemonic that is unique and listed in the initMenu JavaDoc
         btnAdvanceDay = new JButton(resourceMap.getString("btnAdvanceDay.text")); // NOI18N
         btnAdvanceDay.setToolTipText(resourceMap.getString("btnAdvanceDay.toolTipText")); // NOI18N
         btnAdvanceDay.addActionListener(evt -> getCampaignController().advanceDay());
+        btnAdvanceDay.setMnemonic(KeyEvent.VK_A);
         btnAdvanceDay.setPreferredSize(new Dimension(250, 50));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;

@@ -816,7 +816,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                     // Or Gun Emplacements!
                     // TODO: Or Robotic Systems!
                     JMenu unsorted = new JMenu("Unsorted");
-                    for (Unit u : gui.getCampaign().getUnits(true, true)) {
+                    for (Unit u : gui.getCampaign().getUnits(true)) {
                         String type = UnitType.getTypeName(u.getEntity().getUnitType());
                         String className = u.getEntity().getWeightClassName();
                         if (null != u.getCommander()) {
