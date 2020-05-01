@@ -203,7 +203,7 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
         // If we wish to force the user to not be able to give awards for some reason (e.g. lack of kill count),
         // we need to create classes for each awards and override this method.
 
-        return (!person.awardController.hasAward(this) || stackable);
+        return (!person.getAwardController().hasAward(this) || stackable);
     }
 
     /**

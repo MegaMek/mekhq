@@ -505,7 +505,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             case CMD_ADD_AWARD: {
                 for (Person person : people) {
-                    person.awardController.addAndLogAward(data[1], data[2], gui.getCampaign().getDate());
+                    person.getAwardController().addAndLogAward(data[1], data[2], gui.getCampaign().getDate());
                 }
                 break;
             }
@@ -513,8 +513,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
                 for (Person person : people) {
                     try {
-                        if (person.awardController.hasAward(data[1], data[2])) {
-                            person.awardController.removeAward(data[1], data[2],
+                        if (person.getAwardController().hasAward(data[1], data[2])) {
+                            person.getAwardController().removeAward(data[1], data[2],
                                     (data.length > 3) ? df.parse(data[3]) : null, gui.getCampaign().getDate());
                         }
                     } catch (Exception e) {
@@ -2009,7 +2009,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 JMenu removeAwardMenu = new JMenu(resourceMap.getString("removeAward.text"));
 
                 if (oneSelected) {
-                    for (Award award : person.awardController.getAwards()) {
+                    for (Award award : person.getAwardController().getAwards()) {
                         JMenu singleAwardMenu = new JMenu(award.getName());
                         for (String date : award.getFormatedDates()) {
                             JMenuItem specificAwardMenu = new JMenuItem(date);
@@ -2028,7 +2028,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         }
                     });
                     for (Person p : selected) {
-                        awards.addAll(p.awardController.getAwards());
+                        awards.addAll(p.getAwardController().getAwards());
                     }
 
                     for (Award award : awards) {
