@@ -207,6 +207,20 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
     }
 
     /**
+     * Checks if an award can be awarded to a given group of people
+     * @param people to be given the award
+     * @return true if this award can be awarded to the selected people
+     */
+    public boolean canBeAwarded(Person[] people) {
+        for (Person person : people) {
+            if (!canBeAwarded(person)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Checks if two awards are equal
      * @param set is the name of the set of this award
      * @param name is the name of the award
@@ -263,15 +277,15 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
     /**
      * @param date date to be removed from this award
      */
-    public void removeDate(Date date){
+    public void removeDate(Date date) {
         dates.remove(date);
     }
 
     /**
-     * @return true if this award has any dates
+     * @return true if this award has multiple (more than 1) dates
      */
-    public boolean hasDates(){
-        return dates.size() > 0;
+    public boolean hasDates() {
+        return dates.size() > 1;
     }
 
     /**
@@ -284,8 +298,7 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
     /**
      * @return an html formatted string to be used as tooltip.
      */
-    public String getTooltip(){
-
+    public String getTooltip() {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
         StringBuilder string = new StringBuilder();

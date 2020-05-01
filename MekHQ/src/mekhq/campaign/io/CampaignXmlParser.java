@@ -334,7 +334,6 @@ public class CampaignXmlParser {
                 // If it's a text node or attribute or whatever at this level,
                 // it's probably white-space.
                 // We can safely ignore it even if it isn't, for now.
-                continue;
             }
         }
 
@@ -347,9 +346,6 @@ public class CampaignXmlParser {
         if (version.isLowerThan("0.3.4-r1782")) {
             retVal.setRankSystem(
                     RankTranslator.translateRankSystem(retVal.getRanks().getOldRankSystem(), retVal.getFactionCode()));
-            if (retVal.getRanks() == null) {
-
-            }
         }
 
         // if the version is earlier than 0.1.14, then we need to replace all
@@ -724,6 +720,7 @@ public class CampaignXmlParser {
             retVal.setRetirementDefectionTracker(new RetirementDefectionTracker());
         }
         if (retVal.getCampaignOptions().getUseAtB()) {
+            retVal.setHasActiveContract();
             retVal.setAtBConfig(AtBConfiguration.loadFromXml());
             retVal.setAtBEventProcessor(new AtBEventProcessor(retVal));
         }

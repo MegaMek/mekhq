@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2017 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -71,7 +71,6 @@ import mekhq.preferences.PreferencesNode;
 
 /**
  * Tab for interacting with all personnel
- *
  */
 public final class PersonnelTab extends CampaignGuiTab {
 
@@ -398,27 +397,22 @@ public final class PersonnelTab extends CampaignGuiTab {
             public boolean include(Entry<? extends PersonnelTableModel, ? extends Integer> entry) {
                 PersonnelTableModel personModel = entry.getModel();
                 Person person = personModel.getPerson(entry.getIdentifier());
-                int type = person.getPrimaryRole();
                 if (((nGroup == PG_ACTIVE)
-                        || ((nGroup == PG_COMBAT)
-                                && ((type <= Person.T_SPACE_GUNNER) && (type > Person.T_NONE)))
-                        || ((nGroup == PG_SUPPORT)
-                                && ((type > Person.T_SPACE_GUNNER) || (type == Person.T_NONE)))
-                        || ((nGroup == PG_MW) && (type == Person.T_MECHWARRIOR))
-                        || ((nGroup == PG_CREW) && ((type == Person.T_GVEE_DRIVER)
-                                || (type == Person.T_NVEE_DRIVER) || (type == Person.T_VTOL_PILOT)
-                                || (type == Person.T_VEE_GUNNER) || (type == Person.T_VEHICLE_CREW)))
-                        || ((nGroup == PG_PILOT) && (type == Person.T_AERO_PILOT))
-                        || ((nGroup == PG_CPILOT) && (type == Person.T_CONV_PILOT))
-                        || ((nGroup == PG_PROTO) && (type == Person.T_PROTO_PILOT))
-                        || ((nGroup == PG_BA) && (type == Person.T_BA))
-                        || ((nGroup == PG_SOLDIER) && (type == Person.T_INFANTRY))
-                        || ((nGroup == PG_VESSEL) && ((type == Person.T_SPACE_PILOT)
-                                || (type == Person.T_SPACE_CREW) || (type == Person.T_SPACE_GUNNER)
-                                || (type == Person.T_NAVIGATOR)))
-                        || ((nGroup == PG_TECH) && (type >= Person.T_MECH_TECH) && (type < Person.T_DOCTOR))
-                        || ((nGroup == PG_DOC) && ((type == Person.T_DOCTOR) || (type == Person.T_MEDIC)))
-                        || ((nGroup == PG_ADMIN) && (type > Person.T_MEDIC)))
+                        || ((nGroup == PG_COMBAT) && person.hasCombatRole())
+                        || ((nGroup == PG_SUPPORT) && person.hasSupportRole(true))
+                        || ((nGroup == PG_MW) && person.hasRole(Person.T_MECHWARRIOR))
+                        || ((nGroup == PG_CREW)
+                                && (person.hasRoleWithin(Person.T_GVEE_DRIVER, Person.T_VEE_GUNNER)
+                                        || person.hasRole(Person.T_VEHICLE_CREW)))
+                        || ((nGroup == PG_PILOT) && person.hasRole(Person.T_AERO_PILOT))
+                        || ((nGroup == PG_CPILOT) && person.hasRole(Person.T_CONV_PILOT))
+                        || ((nGroup == PG_PROTO) && person.hasRole(Person.T_PROTO_PILOT))
+                        || ((nGroup == PG_BA) && person.hasRole(Person.T_BA))
+                        || ((nGroup == PG_SOLDIER) && person.hasRole(Person.T_INFANTRY))
+                        || ((nGroup == PG_VESSEL) && person.hasRoleWithin(Person.T_SPACE_PILOT, Person.T_NAVIGATOR))
+                        || ((nGroup == PG_TECH) && person.hasRoleWithin(Person.T_MECH_TECH, Person.T_ASTECH))
+                        || ((nGroup == PG_DOC) && person.hasRoleWithin(Person.T_DOCTOR, Person.T_MEDIC))
+                        || ((nGroup == PG_ADMIN) && person.hasRoleWithin(Person.T_ADMIN_COM, Person.T_ADMIN_HR)))
                         && !person.isPrisoner()) {
                     return person.isActive();
                 } else if (nGroup == PG_DEPENDENT) {
