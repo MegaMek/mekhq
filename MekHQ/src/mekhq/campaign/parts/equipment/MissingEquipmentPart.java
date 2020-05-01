@@ -52,6 +52,7 @@ public class MissingEquipmentPart extends MissingPart {
     protected String typeName;
 	protected int equipmentNum = -1;
 	protected double equipTonnage;
+	protected double size;
 
     public EquipmentType getType() {
         return type;
@@ -66,15 +67,15 @@ public class MissingEquipmentPart extends MissingPart {
     }
 
     public MissingEquipmentPart() {
-    	this(0, null, -1, null, 0, false);
+    	this(0, null, -1, null, 0, 1.0, false);
     }
 
-    public MissingEquipmentPart(int tonnage, EquipmentType et, int equipNum, Campaign c, double eTonnage) {
-        this(tonnage, et, equipNum, c, eTonnage, false);
+    public MissingEquipmentPart(int tonnage, EquipmentType et, int equipNum, double size, Campaign c, double eTonnage) {
+        this(tonnage, et, equipNum, c, eTonnage, size, false);
     }
 
     public MissingEquipmentPart(int tonnage, EquipmentType et, int equipNum, Campaign c,
-            double eTonnage, boolean omniPodded) {
+            double eTonnage, double size, boolean omniPodded) {
         // TODO Memorize all entity attributes needed to calculate cost
         // As it is a part bought with one entity can be used on another entity
         // on which it would have a different price (only tonnage is taken into
@@ -87,6 +88,7 @@ public class MissingEquipmentPart extends MissingPart {
         }
         this.equipmentNum = equipNum;
         this.equipTonnage = eTonnage;
+        this.size = size;
         this.omniPodded = omniPodded;
     }
 
@@ -124,18 +126,11 @@ public class MissingEquipmentPart extends MissingPart {
     @Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<typeName>"
-				+MekHqXmlUtil.escape(typeName)
-				+"</typeName>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<equipmentNum>"
-				+equipmentNum
-				+"</equipmentNum>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<equipTonnage>"
-				+equipTonnage
-				+"</equipTonnage>");
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "typeName",
+                MekHqXmlUtil.escape(type.getInternalName()));
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentNum", equipmentNum);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "size", size);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipTonnage", equipTonnage);
 		writeToXmlEnd(pw1, indent);
 	}
 
@@ -148,7 +143,9 @@ public class MissingEquipmentPart extends MissingPart {
 			if (wn2.getNodeName().equalsIgnoreCase("equipmentNum")) {
 				equipmentNum = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("typeName")) {
-				typeName = wn2.getTextContent();
+                typeName = wn2.getTextContent();
+            } else if (wn2.getNodeName().equalsIgnoreCase("size")) {
+			    size = Double.parseDouble(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("equipTonnage")) {
 				equipTonnage = Double.parseDouble(wn2.getTextContent());
 			}
@@ -187,7 +184,9 @@ public class MissingEquipmentPart extends MissingPart {
 		if(part instanceof EquipmentPart) {
 			EquipmentPart eqpart = (EquipmentPart)part;
 			EquipmentType et = eqpart.getType();
-			return type.equals(et) && getTonnage() == part.getTonnage() && part.getStickerPrice().equals(newPart.getStickerPrice());
+			return type.equals(et) && getTonnage() == part.getTonnage()
+                    && size == eqpart.getSize()
+                    && part.getStickerPrice().equals(newPart.getStickerPrice());
 		}
 		return false;
 	}
@@ -260,7 +259,7 @@ public class MissingEquipmentPart extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		EquipmentPart epart = new EquipmentPart(getUnitTonnage(), type, -1, omniPodded, campaign);
+		EquipmentPart epart = new EquipmentPart(getUnitTonnage(), type, -1, size, omniPodded, campaign);
 		epart.setEquipTonnage(equipTonnage);
 		return epart;
 	}
@@ -299,6 +298,9 @@ public class MissingEquipmentPart extends MissingPart {
     	return -1;
     }
 
+    public double getSize() {
+	    return size;
+    }
 
     public boolean isRearFacing() {
     	if(null != unit) {

@@ -78,7 +78,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     public AmmoBin(int tonnage, EquipmentType et, int equipNum, int shots, boolean singleShot,
             boolean omniPodded, Campaign c) {
-        super(tonnage, et, equipNum, omniPodded, c);
+        super(tonnage, et, equipNum, 1.0, omniPodded, c);
         this.shotsNeeded = shots;
         this.oneShot = singleShot;
         this.checkedToday = false;

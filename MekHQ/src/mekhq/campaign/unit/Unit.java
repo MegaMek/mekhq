@@ -2720,7 +2720,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     Part[] eparts = baEquipParts.get(eqnum);
                     for(int i = 0; i < ((BattleArmor)entity).getSquadSize(); i++) {
                         if(null == eparts || null == eparts[i]) {
-                            Part epart = new BattleArmorEquipmentPart((int)entity.getWeight(), type, eqnum, i+BattleArmor.LOC_TROOPER_1, getCampaign());
+                            Part epart = new BattleArmorEquipmentPart((int) entity.getWeight(), type, eqnum,
+                                    m.getSize(), i+BattleArmor.LOC_TROOPER_1, getCampaign());
                             addPart(epart);
                             partsToAdd.add(epart);
                         }
@@ -2740,7 +2741,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                             //weapon bays aren't real parts
                             continue;
                         }
-                        epart = new EquipmentPart((int)entity.getWeight(), type, eqnum,
+                        epart = new EquipmentPart((int)entity.getWeight(), type, eqnum, m.getSize(),
                                 m.isOmniPodMounted(), getCampaign());
                         if(type instanceof MiscType && type.hasFlag(MiscType.F_MASC)) {
                             epart = new MASC((int)entity.getWeight(), type, eqnum, getCampaign(),
@@ -3168,7 +3169,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             if(null == infantryArmor) {
                 EquipmentType eq = ((Infantry)entity).getArmorKit();
                 if (null != eq) {
-                    infantryArmor = new EquipmentPart(0, eq, 0, false, getCampaign());
+                    infantryArmor = new EquipmentPart(0, eq, 0, 1.0,false, getCampaign());
                 } else {
                     infantryArmor = new InfantryArmorPart(0, getCampaign(), ((Infantry)entity).getDamageDivisor(), ((Infantry)entity).isArmorEncumbering(), ((Infantry)entity).hasDEST(), ((Infantry)entity).hasSneakCamo(), ((Infantry)entity).hasSneakECM(), ((Infantry)entity).hasSneakIR(), ((Infantry)entity).hasSpaceSuit());
                 }
