@@ -23,6 +23,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
@@ -499,11 +500,23 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 break;
             }
             case CMD_ADD_AWARD: {
-                selectedPerson.awardController.addAndLogAward(data[1], data[2], gui.getCampaign().getDate());
+                for (Person person : people) {
+                    person.awardController.addAndLogAward(data[1], data[2], gui.getCampaign().getDate());
+                }
                 break;
             }
             case CMD_RMV_AWARD: {
-                selectedPerson.awardController.removeAward(data[1], data[2], data[3]);
+                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                for (Person person : people) {
+                    try {
+                        if (person.awardController.hasAward(data[1], data[2])) {
+                            person.awardController.removeAward(data[1], data[2],
+                                    (data.length > 3) ? df.parse(data[3]) : null, gui.getCampaign().getDate());
+                        }
+                    } catch (Exception e) {
+                        MekHQ.getLogger().error(getClass(), "actionPerformed", "Could not remove award.", e);
+                    }
+                }
                 break;
             }
             case CMD_IMPROVE: {
@@ -1862,95 +1875,97 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 
                     popup.add(menu);
                 }
+            }
 
-                JMenu awardMenu = new JMenu(resourceMap.getString("award.text"));
-                List<String> setNames = AwardsFactory.getInstance().getAllSetNames();
-                Collections.sort(setNames);
-                for (String setName : setNames) {
-                    JMenu setAwardMenu = new JMenu(setName);
+            //region Awards Menu
+            JMenu awardMenu = new JMenu(resourceMap.getString("award.text"));
+            List<String> setNames = AwardsFactory.getInstance().getAllSetNames();
+            Collections.sort(setNames);
+            for (String setName : setNames) {
+                JMenu setAwardMenu = new JMenu(setName);
 
-                    List<Award> awardsOfSet = AwardsFactory.getInstance().getAllAwardsForSet(setName);
-                    Collections.sort(awardsOfSet);
+                List<Award> awardsOfSet = AwardsFactory.getInstance().getAllAwardsForSet(setName);
+                Collections.sort(awardsOfSet);
 
-                    for (Award award : awardsOfSet) {
+                for (Award award : awardsOfSet) {
+                    if (!award.canBeAwarded(selected)) {
+                        continue;
+                    }
 
-                        if (!award.canBeAwarded(person)) continue;
+                    StringBuilder awardMenuItem = new StringBuilder();
+                    awardMenuItem.append(String.format("%s", award.getName()));
 
-                        StringBuilder awardMenuItem = new StringBuilder();
-                        awardMenuItem.append(String.format("%s", award.getName()));
+                    if ((award.getXPReward() != 0) || (award.getEdgeReward() != 0)) {
+                        awardMenuItem.append(" (");
 
-                        if (award.getXPReward() != 0 || award.getEdgeReward() != 0) {
-                            awardMenuItem.append(" (");
-
-                            if (award.getXPReward() != 0) {
-                                awardMenuItem.append(award.getXPReward()).append(" XP");
-                                if (award.getEdgeReward() != 0)
-                                    awardMenuItem.append(" & ");
-                            }
-
+                        if (award.getXPReward() != 0) {
+                            awardMenuItem.append(award.getXPReward()).append(" XP");
                             if (award.getEdgeReward() != 0) {
-                                awardMenuItem.append(award.getEdgeReward()).append(" Edge");
+                                awardMenuItem.append(" & ");
                             }
-
-                            awardMenuItem.append(")");
                         }
 
-                        menuItem = new JMenuItem(awardMenuItem.toString());
-                        menuItem.setToolTipText(MultiLineTooltip.splitToolTip(award.getDescription()));
+                        if (award.getEdgeReward() != 0) {
+                            awardMenuItem.append(award.getEdgeReward()).append(" Edge");
+                        }
 
-                        if (!award.canBeAwarded(person) && !gui.getCampaign().isGM())
-                            menuItem.setEnabled(false);
-
-                        menuItem.setActionCommand(makeCommand(CMD_ADD_AWARD, award.getSet(), award.getName()));
-                        menuItem.addActionListener(this);
-
-                        setAwardMenu.add(menuItem);
+                        awardMenuItem.append(")");
                     }
-                    if (setAwardMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                        MenuScroller.setScrollerFor(setAwardMenu, MAX_POPUP_ITEMS);
-                    }
-                    awardMenu.add(setAwardMenu);
+
+                    menuItem = new JMenuItem(awardMenuItem.toString());
+                    menuItem.setToolTipText(MultiLineTooltip.splitToolTip(award.getDescription()));
+                    menuItem.setActionCommand(makeCommand(CMD_ADD_AWARD, award.getSet(), award.getName()));
+                    menuItem.addActionListener(this);
+                    setAwardMenu.add(menuItem);
                 }
-                awardMenu.addSeparator();
+
+                JMenuHelpers.addMenuIfNonEmpty(awardMenu, setAwardMenu, MAX_POPUP_ITEMS);
+            }
+
+            if (StaticChecks.doAnyHaveAnAward(selected)) {
+                if (awardMenu.getItemCount() > 0) {
+                    awardMenu.addSeparator();
+                }
+
                 JMenu removeAwardMenu = new JMenu(resourceMap.getString("removeAward.text"));
 
-                if (!person.awardController.hasAwards())
-                    removeAwardMenu.setEnabled(false);
-
-                for (Award award : person.awardController.getAwards()) {
-                    JMenu singleAwardMenu = new JMenu(award.getName());
-                    for (String date : award.getFormatedDates()) {
-                        JMenuItem specificAwardMenu = new JMenuItem(date);
-                        specificAwardMenu.setActionCommand(makeCommand(CMD_RMV_AWARD, award.getSet(), award.getName(), date));
-                        specificAwardMenu.addActionListener(this);
-                        singleAwardMenu.add(specificAwardMenu);
-                    }
-                    removeAwardMenu.add(singleAwardMenu);
-                }
-                awardMenu.add(removeAwardMenu);
-                popup.add(awardMenu);
-
-                menu = new JMenu(resourceMap.getString("spendXP.text")); //$NON-NLS-1$
-                JMenu currentMenu = new JMenu(resourceMap.getString("spendOnCurrentSkills.text")); //$NON-NLS-1$
-                JMenu newMenu = new JMenu(resourceMap.getString("spendOnNewSkills.text")); //$NON-NLS-1$
-                for (int i = 0; i < SkillType.getSkillList().length; i++) {
-                    String type = SkillType.getSkillList()[i];
-                    int cost = person.hasSkill(type) ? person.getSkill(type).getCostToImprove() : SkillType.getType(type).getCost(0);
-                    if (cost >= 0) {
-                        String desc = String.format(resourceMap.getString("skillDesc.format"), type, cost); //$NON-NLS-1$
-                        menuItem = new JMenuItem(desc);
-                        menuItem.setActionCommand(makeCommand(CMD_IMPROVE, type, String.valueOf(cost)));
-                        menuItem.addActionListener(this);
-                        menuItem.setEnabled(person.getXp() >= cost);
-                        if (person.hasSkill(type)) {
-                            currentMenu.add(menuItem);
-                        } else {
-                            newMenu.add(menuItem);
+                if (oneSelected) {
+                    for (Award award : person.awardController.getAwards()) {
+                        JMenu singleAwardMenu = new JMenu(award.getName());
+                        for (String date : award.getFormatedDates()) {
+                            JMenuItem specificAwardMenu = new JMenuItem(date);
+                            specificAwardMenu.setActionCommand(makeCommand(CMD_RMV_AWARD, award.getSet(), award.getName(), date));
+                            specificAwardMenu.addActionListener(this);
+                            singleAwardMenu.add(specificAwardMenu);
                         }
+                        JMenuHelpers.addMenuIfNonEmpty(removeAwardMenu, singleAwardMenu, MAX_POPUP_ITEMS);
+                    }
+                } else {
+                    Set<Award> awards = new TreeSet<>((a1, a2) -> {
+                        if (a1.getSet().equalsIgnoreCase(a2.getSet())) {
+                            return a1.getName().compareToIgnoreCase(a2.getName());
+                        } else {
+                            return a1.getSet().compareToIgnoreCase(a2.getSet());
+                        }
+                    });
+                    for (Person p : selected) {
+                        awards.addAll(p.awardController.getAwards());
+                    }
+
+                    for (Award award : awards) {
+                        JMenuItem singleAwardMenu = new JMenuItem(award.getName());
+                        singleAwardMenu.setActionCommand(makeCommand(CMD_RMV_AWARD, award.getSet(), award.getName()));
+                        singleAwardMenu.addActionListener(this);
+                        removeAwardMenu.add(singleAwardMenu);
                     }
                 }
-                menu.add(currentMenu);
-                menu.add(newMenu);
+                JMenuHelpers.addMenuIfNonEmpty(awardMenu, removeAwardMenu, MAX_POPUP_ITEMS);
+            }
+            popup.add(awardMenu);
+            //endregion Awards Menu
+
+            if (oneSelected && person.isActive()) {
+                menu = new JMenu(resourceMap.getString("spendXP.text")); //$NON-NLS-1$
                 if (gui.getCampaign().getCampaignOptions().useAbilities()) {
                     JMenu abMenu = new JMenu(resourceMap.getString("spendOnSpecialAbilities.text")); //$NON-NLS-1$
                     int cost;
@@ -2120,32 +2135,50 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             abMenu.add(menuItem);
                         }
                     }
-                    if (abMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                        MenuScroller.setScrollerFor(abMenu, MAX_POPUP_ITEMS);
-                    }
-                    menu.add(abMenu);
+                    JMenuHelpers.addMenuIfNonEmpty(menu, abMenu, MAX_POPUP_ITEMS);
                 }
-                menu.add(currentMenu);
-                menu.add(newMenu);
+
+                JMenu currentMenu = new JMenu(resourceMap.getString("spendOnCurrentSkills.text")); //$NON-NLS-1$
+                JMenu newMenu = new JMenu(resourceMap.getString("spendOnNewSkills.text")); //$NON-NLS-1$
+                for (int i = 0; i < SkillType.getSkillList().length; i++) {
+                    String type = SkillType.getSkillList()[i];
+                    int cost = person.hasSkill(type) ? person.getSkill(type).getCostToImprove() : SkillType.getType(type).getCost(0);
+                    if (cost >= 0) {
+                        String desc = String.format(resourceMap.getString("skillDesc.format"), type, cost); //$NON-NLS-1$
+                        menuItem = new JMenuItem(desc);
+                        menuItem.setActionCommand(makeCommand(CMD_IMPROVE, type, String.valueOf(cost)));
+                        menuItem.addActionListener(this);
+                        menuItem.setEnabled(person.getXp() >= cost);
+                        if (person.hasSkill(type)) {
+                            currentMenu.add(menuItem);
+                        } else {
+                            newMenu.add(menuItem);
+                        }
+                    }
+                }
+                JMenuHelpers.addMenuIfNonEmpty(menu, currentMenu, MAX_POPUP_ITEMS);
+                JMenuHelpers.addMenuIfNonEmpty(menu, newMenu, MAX_POPUP_ITEMS);
+
+                // Edge Purchasing
                 if (gui.getCampaign().getCampaignOptions().useEdge()) {
                     JMenu edgeMenu = new JMenu(resourceMap.getString("edge.text")); //$NON-NLS-1$
                     int cost = gui.getCampaign().getCampaignOptions().getEdgeCost();
-                    boolean available = (cost >= 0) && (person.getXp() >= cost);
 
-                    menuItem = new JMenuItem(String.format(resourceMap.getString("spendOnEdge.text"), cost)); //$NON-NLS-1$
-                    menuItem.setActionCommand(makeCommand(CMD_BUY_EDGE, String.valueOf(cost)));
-                    menuItem.addActionListener(this);
-                    menuItem.setEnabled(available);
-                    edgeMenu.add(menuItem);
-                    menu.add(edgeMenu);
+                    if ((cost >= 0) && (person.getXp() >= cost)) {
+                        menuItem = new JMenuItem(String.format(resourceMap.getString("spendOnEdge.text"), cost)); //$NON-NLS-1$
+                        menuItem.setActionCommand(makeCommand(CMD_BUY_EDGE, String.valueOf(cost)));
+                        menuItem.addActionListener(this);
+                        edgeMenu.add(menuItem);
+                    }
+                    JMenuHelpers.addMenuIfNonEmpty(menu, edgeMenu, MAX_POPUP_ITEMS);
                 }
-                popup.add(menu);
-            }
-            if (oneSelected && person.isActive()) {
+                JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
+
+                // Edge Triggers
                 if (gui.getCampaign().getCampaignOptions().useEdge()) {
                     menu = new JMenu(resourceMap.getString("setEdgeTriggers.text")); //$NON-NLS-1$
                     //Start of Edge reroll options
-                    //Mechwarriors
+                    //MechWarriors
                     cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerHeadHits.text")); //$NON-NLS-1$
                     cbMenuItem.setSelected(person.getOptions()
                             .booleanOption(OPT_EDGE_HEADHIT));
