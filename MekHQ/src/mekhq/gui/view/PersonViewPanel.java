@@ -536,7 +536,7 @@ public class PersonViewPanel extends ScrollablePanel {
                     public void mouseClicked(MouseEvent e) {
                         PlanetarySystem system = person.getOriginPlanet().getParentSystem();
                         // Stay on the interstellar map if their origin planet is the primary planet...
-                        if (system.getPrimaryPlanet() == person.getOriginPlanet()) {
+                        if (system.getPrimaryPlanet().equals(person.getOriginPlanet())) {
                             gui.getMapTab().switchSystemsMap(system);
                         } else {
                             // ...otherwise, dive on in to the system view!
@@ -715,8 +715,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 pnlInfo.add(lblTimeServed1, gridBagConstraints);
 
                 lblTimeServed2.setName("lblTimeServed2");
-                lblTimeServed2.setText(person.getTimeInService(campaign.getLocalDate())
-                        + " " + resourceMap.getString("Time.YearYears"));
+                lblTimeServed2.setText(person.getTimeInService(campaign));
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 3;
                 gridBagConstraints.gridy = secondy;
@@ -761,8 +760,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 pnlInfo.add(lblTimeInRank1, gridBagConstraints);
 
-                JLabel lblTimeInRank2 = new JLabel(person.getTimeInRank(campaign.getLocalDate())
-                        + " " + resourceMap.getString("Time.MonthMonths"));
+                JLabel lblTimeInRank2 = new JLabel(person.getTimeInRank(campaign));
                 lblTimeInRank2.setName("lblTimeInRank2");
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 3;
@@ -1271,7 +1269,7 @@ public class PersonViewPanel extends ScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlSkills.add(lblEdge2, gridBagConstraints);
 
-            if (campaign.getCampaignOptions().useSupportEdge() && person.isSupport()) {
+            if (campaign.getCampaignOptions().useSupportEdge() && person.hasSupportRole(false)) {
                 //Add the Edge Available field for support personnel only
                 lblEdgeAvail1.setName("lblEdgeAvail1"); // NOI18N //$NON-NLS-1$
                 lblEdgeAvail1.setText(resourceMap.getString("lblEdgeAvail1.text")); //$NON-NLS-1$

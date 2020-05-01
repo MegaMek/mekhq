@@ -22,6 +22,7 @@ import java.awt.Component;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
@@ -372,12 +373,9 @@ public class PersonnelTableModel extends DataTableModel {
                         return toReturn;
                     }
 
-                    // Get the crew for the unit
-                    ArrayList<Person> crew = u.getCrew();
-
                     // The crew count is the number of personnel under their charge,
                     // excepting themselves.
-                    int crewCount = crew.size() - 1;
+                    int crewCount = u.getCrew().size() - 1;
                     if (crewCount <= 0) {
                         // If there is only one crew member, just return their name
                         return toReturn;
@@ -668,12 +666,12 @@ public class PersonnelTableModel extends DataTableModel {
             setData(new ArrayList<>(getCampaign().getPersonnel()));
         } else {
             Campaign c = getCampaign();
-            ArrayList<Person> commanders = new ArrayList<>();
+            List<Person> commanders = new ArrayList<>();
             for (Person p : c.getPersonnel()) {
                 if (p.getUnitId() != null) {
                     UUID unitId = p.getUnitId();
                     Unit u = c.getUnit(unitId);
-                    if (u != null && u.getCommander() != p) {
+                    if ((u != null) && !p.equals(u.getCommander())) {
                         // this person is NOT the commander of their unit,
                         // skip them.
                         continue;
