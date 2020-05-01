@@ -37,9 +37,6 @@ import java.util.stream.Stream;
 
 import javax.swing.JOptionPane;
 
-import megamek.client.generator.RandomGenderGenerator;
-import megamek.common.*;
-import megamek.common.enums.Gender;
 import mekhq.*;
 import mekhq.campaign.finances.*;
 import mekhq.campaign.log.*;
@@ -51,8 +48,12 @@ import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 import org.joda.time.DateTime;
 
+import megamek.common.*;
+import megamek.common.enums.Gender;
+import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
+import megamek.client.generator.RandomGenderGenerator;
 import megamek.common.annotations.Nullable;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
@@ -1157,18 +1158,49 @@ public class Campaign implements Serializable, ITechManager {
         return units.values();
     }
 
-    public ArrayList<Unit> getUnits(boolean weightSorted, boolean alphaSorted) {
-        ArrayList<Unit> sortedUnits = getCopyOfUnits();
-        if (alphaSorted || weightSorted) {
-            if (alphaSorted) {
-                sortedUnits.sort(Comparator.comparing(Unit::getName));
-            }
-            if (weightSorted) {
+    public List<Unit> getUnits(boolean weightSorted) {
+        return getUnits(false, weightSorted, false);
+    }
+
+    /**
+     * This returns a list of the current units, sorted alphabetically and potentially by other methods
+     * @param weightSorted      True if the unit list is sorted by weight descending, otherwise false
+     * @param weightClassSorted True if the unit list is sorted by weight class in format heaviest to lightest, otherwise false
+     * @param unitTypeSorted    True if the unit list is sorted by the unit type
+     * @return a copy of the units in the campaign with the applicable sort format
+     */
+    public List<Unit> getUnits(boolean weightClassSorted, boolean weightSorted,
+                               boolean unitTypeSorted) {
+        List<Unit> units = getCopyOfUnits();
+
+        // Natural order sorting the units alphabetically is the default for getSortedUnits
+        units.sort(Comparator.comparing(Unit::getName, new NaturalOrderComparator()));
+
+        if (weightClassSorted || weightSorted || unitTypeSorted) {
+            // We need to determine these by both the weight sorted and weight class sorted values,
+            // as to properly sort by weight class and weight we should do both at the same time
+            if (weightSorted && weightClassSorted) {
+                units.sort((lhs, rhs) -> {
+                    int weightClass1 = lhs.getEntity().getWeightClass();
+                    int weightClass2 = rhs.getEntity().getWeightClass();
+                    if (weightClass1 == weightClass2) {
+                        return Double.compare(rhs.getEntity().getWeight(), lhs.getEntity().getWeight());
+                    } else {
+                        return weightClass2 - weightClass1;
+                    }
+                });
+            } else if (weightClassSorted) {
+                units.sort(Comparator.comparingInt(o -> o.getEntity().getWeightClass()));
+            } else if (weightSorted) {
                 // Sorted in descending order of weights
-                sortedUnits.sort((lhs, rhs) -> Double.compare(rhs.getEntity().getWeight(), lhs.getEntity().getWeight()));
+                units.sort(Comparator.comparingDouble(o -> o.getEntity().getWeight()));
+            }
+
+            if (unitTypeSorted) {
+                units.sort(Comparator.comparingInt(e -> e.getEntity().getUnitType()));
             }
         }
-        return sortedUnits;
+        return units;
     }
 
     // Since getUnits doesn't return a defensive copy and I don't know what I might break if I made it do so...
@@ -4271,7 +4303,7 @@ public class Campaign implements Serializable, ITechManager {
                 force.removeUnit(unitID);
             }
         }
-        
+
         // clean up units that are assigned to non-existing scenarios
         for (Unit unit : this.getUnits()) {
             if (this.getScenario(unit.getScenarioId()) == null) {
