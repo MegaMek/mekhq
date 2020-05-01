@@ -228,7 +228,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         person.setManeiDominiClass(mdClass);
                     }
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(getClass(), METHOD_NAME,
+                    MekHQ.getLogger().error(getClass(), "actionPerformed",
                             "Failed to assign Manei Domini Class", e);
                 }
                 break;
