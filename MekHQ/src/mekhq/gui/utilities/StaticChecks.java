@@ -564,6 +564,20 @@ public class StaticChecks {
         return true;
     }
 
+    /**
+     * Checks if there is at least one award in the selected group of people
+     * @param people the selected group of people
+     * @return true if at least one has one award
+     */
+    public static boolean doAnyHaveAnAward(Person[] people) {
+        for (Person person : people) {
+            if (person.awardController.hasAwards()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static boolean areAllPrisoners(Person[] people) {
         for(Person person : people) {
             if(!person.isPrisoner()) {

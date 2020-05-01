@@ -118,23 +118,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public static final int PHENOTYPE_VEE = 4;
     public static final int PHENOTYPE_NUM = 5;
 
-    // ROM Designations
-    public static final int DESIG_NONE    = 0;
-    public static final int DESIG_EPSILON = 1;
-    public static final int DESIG_PI      = 2;
-    public static final int DESIG_IOTA    = 3;
-    public static final int DESIG_XI      = 4;
-    public static final int DESIG_THETA   = 5;
-    public static final int DESIG_ZETA    = 6;
-    public static final int DESIG_MU      = 7;
-    public static final int DESIG_RHO     = 8;
-    public static final int DESIG_LAMBDA  = 9;
-    public static final int DESIG_PSI     = 10;
-    public static final int DESIG_OMICRON = 11;
-    public static final int DESIG_CHI     = 12;
-    public static final int DESIG_GAMMA   = 13;
-    public static final int DESIG_NUM     = 14;
-
     private static final Map<Integer, Money> MECHWARRIOR_AERO_RANSOM_VALUES;
     private static final Map<Integer, Money> OTHER_RANSOM_VALUES;
 
@@ -209,8 +192,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private int primaryRole;
     private int secondaryRole;
 
-    private int primaryDesignator;
-    private int secondaryDesignator;
+    private ROMDesignation primaryDesignator;
+    private ROMDesignation secondaryDesignator;
 
     protected String biography;
     protected LocalDate birthday;
@@ -397,8 +380,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         callsign = "";
         primaryRole = T_NONE;
         secondaryRole = T_NONE;
-        primaryDesignator = DESIG_NONE;
-        secondaryDesignator = DESIG_NONE;
+        primaryDesignator = ROMDesignation.NONE;
+        secondaryDesignator = ROMDesignation.NONE;
         commander = false;
         dependent = false;
         originFaction = Faction.getFaction(factionCode);
@@ -1664,11 +1647,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
             if (secondaryRole != T_NONE) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "secondaryRole", secondaryRole);
             }
-            if (primaryDesignator != DESIG_NONE) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "primaryDesignator", primaryDesignator);
+            if (primaryDesignator != ROMDesignation.NONE) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "primaryDesignator", primaryDesignator.name());
             }
-            if (secondaryDesignator != DESIG_NONE) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "secondaryDesignator", secondaryDesignator);
+            if (secondaryDesignator != ROMDesignation.NONE) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "secondaryDesignator", secondaryDesignator.name());
             }
             if (commander) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "commander", true);
@@ -1940,9 +1923,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("acquisitions")) {
                     retVal.acquisitions = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("primaryDesignator")) {
-                    retVal.primaryDesignator = Integer.parseInt(wn2.getTextContent());
+                    retVal.primaryDesignator = ROMDesignation.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("secondaryDesignator")) {
-                    retVal.secondaryDesignator = Integer.parseInt(wn2.getTextContent());
+                    retVal.secondaryDesignator = ROMDesignation.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysToWaitForHealing")) {
                     retVal.daysToWaitForHealing = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("idleMonths")) {
@@ -2563,7 +2546,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             rankName += " " + Rank.getManeiDominiRankName(maneiDominiRank);
         }
         if (getRankSystem() == Ranks.RS_COM || getRankSystem() == Ranks.RS_WOB) {
-            rankName += getComStarBranchDesignation();
+            rankName += ROMDesignation.getComStarBranchDesignation(this, campaign);
         }
 
         // If we have a rankLevel, add it
@@ -2921,125 +2904,17 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return String.format("<a href='PERSON:%s'>%s</a>", getId().toString(), getFullTitle());
     }
 
-    public String getComStarBranchDesignation() {
-        StringBuilder sb = new StringBuilder(" ");
-
-        // Primary
-        if (getPrimaryDesignator() != DESIG_NONE) {
-            sb.append(parseDesignator(getPrimaryDesignator()));
-        } else if (isTechPrimary()) {
-            sb.append("Zeta");
-        } else if (isAdminPrimary()) {
-            sb.append("Chi");
-        } else {
-            parseRoleForDesignation(getPrimaryRole(), sb);
-        }
-
-        // Secondary
-        if (getSecondaryDesignator() != DESIG_NONE) {
-            sb.append(" ");
-            sb.append(parseDesignator(getSecondaryDesignator()));
-        } else if (isTechSecondary()) {
-            sb.append(" Zeta");
-        } else if (isAdminSecondary()) {
-            sb.append(" Chi");
-        } else if (getSecondaryRole() != T_NONE) {
-            sb.append(" ");
-            parseRoleForDesignation(getSecondaryRole(), sb);
-        }
-
-        return sb.toString();
-    }
-
-    private void parseRoleForDesignation(int role, StringBuilder sb) {
-        switch (role) {
-            case T_MECHWARRIOR:
-                sb.append("Epsilon");
-                break;
-            case T_AERO_PILOT:
-                sb.append("Pi");
-                break;
-            case T_BA:
-            case T_INFANTRY:
-                sb.append("Iota");
-                break;
-            case T_SPACE_CREW:
-            case T_SPACE_GUNNER:
-            case T_SPACE_PILOT:
-            case T_NAVIGATOR:
-                Unit u = campaign.getUnit(getUnitId());
-                if (u != null) {
-                    Entity en = u.getEntity();
-                    if (en instanceof Dropship) {
-                        sb.append("Xi");
-                    }
-                    if (en instanceof Jumpship) {
-                        sb.append("Theta");
-                    }
-                }
-                break;
-            case T_DOCTOR:
-            case T_MEDIC:
-                sb.append("Kappa");
-                break;
-            case T_GVEE_DRIVER:
-            case T_NVEE_DRIVER:
-            case T_VTOL_PILOT:
-            case T_VEE_GUNNER:
-            case T_CONV_PILOT:
-            case T_VEHICLE_CREW:
-                sb.append("Lambda");
-                break;
-            default: break;
-        }
-    }
-
-    public static String parseDesignator(int designator) {
-        switch (designator) {
-            case DESIG_NONE:
-                return "None (Auto-Set)";
-            case DESIG_EPSILON:
-                return "Epsilon";
-            case DESIG_PI:
-                return "Pi";
-            case DESIG_IOTA:
-                return "Iota";
-            case DESIG_XI:
-                return "Xi";
-            case DESIG_THETA:
-                return "Theta";
-            case DESIG_ZETA:
-                return "Zeta";
-            case DESIG_MU:
-                return "Mu";
-            case DESIG_RHO:
-                return "Rho";
-            case DESIG_LAMBDA:
-                return "Lambda";
-            case DESIG_PSI:
-                return "Psi";
-            case DESIG_OMICRON:
-                return "Omicron";
-            case DESIG_CHI:
-                return "Chi";
-            case DESIG_GAMMA:
-                return "Gamma";
-            default:
-                return "";
-        }
-    }
-
     /**
      * @return the primaryDesignator
      */
-    public int getPrimaryDesignator() {
+    public ROMDesignation getPrimaryDesignator() {
         return primaryDesignator;
     }
 
     /**
      * @param primaryDesignator the primaryDesignator to set
      */
-    public void setPrimaryDesignator(int primaryDesignator) {
+    public void setPrimaryDesignator(ROMDesignation primaryDesignator) {
         this.primaryDesignator = primaryDesignator;
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
@@ -3047,14 +2922,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
     /**
      * @return the secondaryDesignator
      */
-    public int getSecondaryDesignator() {
+    public ROMDesignation getSecondaryDesignator() {
         return secondaryDesignator;
     }
 
     /**
      * @param secondaryDesignator the secondaryDesignator to set
      */
-    public void setSecondaryDesignator(int secondaryDesignator) {
+    public void setSecondaryDesignator(ROMDesignation secondaryDesignator) {
         this.secondaryDesignator = secondaryDesignator;
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
