@@ -25,7 +25,6 @@ import java.awt.event.KeyEvent;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -298,6 +297,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private ExtraData extraData;
 
     //lets just go ahead and pass in the campaign - to hell with OOP
+    @Deprecated // May 1st, 2020 - As part of moving Person to be a fully OOP class
     private Campaign campaign;
 
     // For upgrading personnel entries to missing log entries
@@ -443,7 +443,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
     //endregion Constructors
 
-    public Campaign getCampaign(){return campaign;}
+    @Deprecated // May 1st, 2020 - as part of turning Person into a fully OOP class
+    public Campaign getCampaign() {
+        return campaign;
+    }
 
     public int getPhenotype() {
         return phenotype;
