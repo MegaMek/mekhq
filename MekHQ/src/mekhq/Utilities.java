@@ -68,6 +68,7 @@ import javax.swing.table.TableModel;
 import megamek.common.util.StringUtil;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.*;
+import mekhq.campaign.personnel.enums.Phenotype;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.joda.time.DateTime;
@@ -375,7 +376,7 @@ public class Utilities {
                     || !summary.getUnitType().equals(UnitType.getTypeName(en.getUnitType()))) {
                 continue;
             }
-            
+
             // Weight of the two units must match or we continue, but BA weight gets
             // checked differently
             if (en instanceof BattleArmor) {
@@ -387,12 +388,12 @@ public class Utilities {
                     continue;
                 }
             }
-            
+
             // If we only allow canon units and this isn't canon we continue
             if (!summary.isCanon() && options.allowCanonRefitOnly()) {
                 continue;
             }
-            
+
             // If the unit doesn't meet the tech filter criteria we continue
             ITechnology techProg = UnitTechProgression.getProgression(summary, campaign.getTechFaction(), true);
             if (null == techProg) {
@@ -956,7 +957,7 @@ public class Utilities {
 
                 String phenotype = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_PHENOTYPE);
                 if (phenotype != null) {
-                    p.setPhenotype(Integer.parseInt(phenotype));
+                    p.setPhenotype(Phenotype.parseFromString(phenotype));
                 }
 
                 p.setBloodname(oldCrew.getExtraDataValue(crewIndex, Crew.MAP_BLOODNAME));

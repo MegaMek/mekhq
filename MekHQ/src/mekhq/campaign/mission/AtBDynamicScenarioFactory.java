@@ -30,6 +30,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import megamek.common.util.StringUtil;
+import mekhq.campaign.personnel.enums.Phenotype;
 import org.joda.time.DateTime;
 
 import megamek.client.Client;
@@ -1257,29 +1258,46 @@ public class AtBDynamicScenarioFactory {
         }
         int[] skills = rsg.getRandomSkills(en);
 
-        if (f.isClan() && Compute.d6(2) > 8 - skill + skills[0] + skills[1]) {
-            int phenotype;
+        if (f.isClan() && (Compute.d6(2) > (8 - skill + skills[0] + skills[1]))) {
+            Phenotype phenotype = Phenotype.NONE;
             switch (en.getUnitType()) {
-            case UnitType.MEK:
-                phenotype = Bloodname.P_MECHWARRIOR;
-                break;
-            case UnitType.BATTLE_ARMOR:
-                phenotype = Bloodname.P_ELEMENTAL;
-                break;
-            case UnitType.AERO:
-                phenotype = Bloodname.P_AEROSPACE;
-                break;
-            case UnitType.PROTOMEK:
-                phenotype = Bloodname.P_PROTOMECH;
-                break;
-            default:
-                phenotype = -1;
+                case UnitType.MEK:
+                    phenotype = Phenotype.MECHWARRIOR;
+                    break;
+                case UnitType.TANK:
+                case UnitType.VTOL:
+                    // The Vehicle Phenotype is unique to Clan Hell's Horses
+                    if (f.getShortName().equals("CHH")) {
+                        phenotype = Phenotype.VEHICLE;
+                    }
+                    break;
+                case UnitType.BATTLE_ARMOR:
+                    phenotype = Phenotype.ELEMENTAL;
+                    break;
+                case UnitType.AERO:
+                case UnitType.CONV_FIGHTER:
+                    phenotype = Phenotype.AEROSPACE;
+                    break;
+                case UnitType.PROTOMEK:
+                    phenotype = Phenotype.PROTOMECH;
+                    break;
+                case UnitType.SMALL_CRAFT:
+                case UnitType.DROPSHIP:
+                case UnitType.JUMPSHIP:
+                case UnitType.WARSHIP:
+                    // The Naval Phenotype is unique to Clan Snow Raven and the Raven Alliance
+                    if (f.getShortName().equals("CSR") || f.getShortName().equals("RA")) {
+                        phenotype = Phenotype.NAVAL;
+                    }
+                    break;
             }
-            if (phenotype >= 0) {
-                String bloodname = Bloodname.randomBloodname(faction, phenotype, campaign.getGameYear()).getName();
+
+            if (phenotype != Phenotype.NONE) {
+                String bloodname = Bloodname.randomBloodname(faction, phenotype,
+                        campaign.getGameYear()).getName();
                 crewName += " " + bloodname;
                 innerMap.put(Crew.MAP_BLOODNAME, bloodname);
-                innerMap.put(Crew.MAP_PHENOTYPE, Integer.toString(phenotype));
+                innerMap.put(Crew.MAP_PHENOTYPE, phenotype.name());
             }
         }
 
@@ -1287,63 +1305,6 @@ public class AtBDynamicScenarioFactory {
 
         en.setCrew(new Crew(en.getCrew().getCrewType(), crewName, Compute.getFullCrewSize(en),
                 skills[0], skills[1], Crew.getGenderAsInt(gender), extraData));
-
-        UUID id = UUID.randomUUID();
-        en.setExternalIdAsString(id.toString());
-
-        return en;
-    }
-
-    /**
-     * Generates a new Entity without using a RAT. Useful for "persistent" or fixed units.
-     *
-     * @param name            Full name (chassis + model) of the entity to generate.
-     * @param fName            Faction code to use for crew name generation
-     * @param skill            RandomSkillsGenerator.L_* constant for the average force skill level.
-     * @param campaign
-     * @return                A new Entity
-     */
-    @Deprecated //Deprecated 15-Feb-2020 as unused, needs the current name system to be implemented if activated
-    private static Entity getEntityByName(String name, String fName, int skill, Campaign campaign) {
-        final String METHOD_NAME = "getEntityByName(String,String,int,Campaign"; //$NON-NLS-1$
-
-        MechSummary mechSummary = MechSummaryCache.getInstance().getMech(
-                name);
-        if (mechSummary == null) {
-            return null;
-        }
-
-        MechFileParser mechFileParser = null;
-        try {
-            mechFileParser = new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName());
-        } catch (Exception ex) {
-            MekHQ.getLogger().log(AtBDynamicScenarioFactory.class, METHOD_NAME, LogLevel.ERROR,
-                    "Unable to load unit: " + name); //$NON-NLS-1$
-            MekHQ.getLogger().error(AtBDynamicScenarioFactory.class, METHOD_NAME, ex);
-        }
-        if (mechFileParser == null) {
-            return null;
-        }
-
-        Entity en = mechFileParser.getEntity();
-
-        en.setOwner(campaign.getPlayer());
-        en.setGame(campaign.getGame());
-
-        Faction faction = Faction.getFaction(fName);
-
-        RandomNameGenerator rng = RandomNameGenerator.getInstance();
-        rng.setChosenFaction(faction.getNameGenerator());
-
-        RandomSkillsGenerator rsg = new RandomSkillsGenerator();
-        rsg.setMethod(RandomSkillsGenerator.M_TAHARQA);
-        rsg.setLevel(skill);
-
-        if (faction.isClan()) rsg.setType(RandomSkillsGenerator.T_CLAN);
-        int[] skills = rsg.getRandomSkills(en);
-        boolean isFemale = rng.isFemale();
-        en.setCrew(new Crew(en.getCrew().getCrewType(), rng.generate(isFemale),
-                Compute.getFullCrewSize(en),skills[0], skills[1], Crew.getGenderAsInt(isFemale), null));
 
         UUID id = UUID.randomUUID();
         en.setExternalIdAsString(id.toString());

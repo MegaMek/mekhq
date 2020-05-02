@@ -1690,7 +1690,7 @@ public class CampaignGUI extends JPanel {
                         + ", "
                         + skillLvl
                         + " "
-                        + tech.getPrimaryRoleDesc(getCampaign())
+                        + tech.getPrimaryRoleDesc()
                         + " ("
                         + getCampaign().getTargetFor(r, tech).getValueAsString()
                         + "+)"

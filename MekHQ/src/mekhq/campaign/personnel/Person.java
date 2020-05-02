@@ -2297,6 +2297,36 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 retVal.setExpectedDueDate(retVal.getDueDate());
             }
 
+            //versions before 0.3.4 did not have proper clan phenotypes
+            if (version.isLowerThan("0.3.4") && c.getFaction().isClan()) {
+                //assume personnel are clan and trueborn if the right role
+                retVal.setClanner(true);
+                switch (retVal.getPrimaryRole()) {
+                    case Person.T_MECHWARRIOR:
+                        retVal.setPhenotype(Phenotype.MECHWARRIOR);
+                        break;
+                    case Person.T_AERO_PILOT:
+                    case Person.T_CONV_PILOT:
+                        retVal.setPhenotype(Phenotype.AEROSPACE);
+                        break;
+                    case Person.T_BA:
+                        retVal.setPhenotype(Phenotype.ELEMENTAL);
+                        break;
+                    case Person.T_VEE_GUNNER:
+                    case Person.T_GVEE_DRIVER:
+                    case Person.T_NVEE_DRIVER:
+                    case Person.T_VTOL_PILOT:
+                        retVal.setPhenotype(Phenotype.VEHICLE);
+                        break;
+                    case Person.T_PROTO_PILOT:
+                        retVal.setPhenotype(Phenotype.PROTOMECH);
+                        break;
+                    default:
+                        retVal.setPhenotype(Phenotype.NONE);
+                        break;
+                }
+            }
+
             if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 13) {
                 if (retVal.primaryRole > T_INFANTRY) {
                     retVal.primaryRole += 4;
