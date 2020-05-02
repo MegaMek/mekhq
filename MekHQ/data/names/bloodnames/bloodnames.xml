@@ -8,7 +8,7 @@
 		<name>Boques</name>
 		<founder>Devon</founder>
 		<clan>CBS</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 	</bloodname>
 	<bloodname>
@@ -25,7 +25,7 @@
 		<name>Campbell</name>
 		<founder>Moses</founder>
 		<clan>CBS</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 	</bloodname>
 	<bloodname>
@@ -42,7 +42,7 @@
 		<name>Church</name>
 		<founder>Kieren</founder>
 		<clan>CBS</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 	</bloodname>
 	<bloodname>
@@ -54,7 +54,7 @@
 		<name>Cluff</name>
 		<founder>Hannah</founder>
 		<clan>CBS</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 	</bloodname>
 	<bloodname>
@@ -111,14 +111,14 @@
 		<name>Johns</name>
 		<founder>Melanie</founder>
 		<clan>CBS</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 	</bloodname>
 	<bloodname>
 		<name>Keller</name>
 		<founder>Dale</founder>
 		<clan>CBS</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 	</bloodname>
 	<bloodname>
@@ -135,14 +135,14 @@
 		<name>Lewis</name>
 		<founder>Dain</founder>
 		<clan>CBS</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 	</bloodname>
 	<bloodname>
 		<name>McFadden</name>
 		<founder>Jose</founder>
 		<clan>CBS</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 	</bloodname>
 	<bloodname>
@@ -169,7 +169,7 @@
 		<name>Pitcher</name>
 		<founder>Stepan</founder>
 		<clan>CBS</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 	</bloodname>
 	<bloodname>
@@ -191,7 +191,7 @@
 		<name>Schmitt</name>
 		<founder>Colleen</founder>
 		<clan>CBS</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 	</bloodname>
 	<bloodname>
@@ -213,7 +213,7 @@
 		<name>Yanez</name>
 		<founder>Wison</founder>
 		<clan>CBS</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 	</bloodname>
 	<bloodname>
@@ -225,7 +225,7 @@
 		<name>Columbo</name>
 		<founder>Eriel</founder>
 		<clan>CB</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<absorbed date="3059">CSA</absorbed>
 		<postReaving>CSA</postReaving>
@@ -264,7 +264,7 @@
 		<name>Gastopiv</name>
 		<founder>Yasemin</founder>
 		<clan>CB</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<absorbed date="3059">CSA</absorbed>
 	</bloodname>
@@ -282,7 +282,7 @@
 		<name>Holliday</name>
 		<founder>Jonathan</founder>
 		<clan>CB</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<absorbed date="3059">CSA</absorbed>
 		<postReaving>CSA</postReaving>
@@ -291,7 +291,7 @@
 		<name>Hutchinson</name>
 		<founder>Qudi</founder>
 		<clan>CB</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<absorbed date="3059">CSA</absorbed>
 		<postReaving>CSA</postReaving>
@@ -320,7 +320,7 @@
 		<name>Lamongue</name>
 		<founder>Joseph</founder>
 		<clan>CB</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<absorbed date="3059">CSA</absorbed>
 	</bloodname>
@@ -328,7 +328,7 @@
 		<name>Linn</name>
 		<founder>Maki</founder>
 		<clan>CB</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<absorbed date="3059">CSA</absorbed>
 		<limited />
@@ -343,7 +343,7 @@
 		<name>Marghar</name>
 		<founder>Kim</founder>
 		<clan>CB</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<absorbed date="3059">CSA</absorbed>
 		<postReaving>CSA</postReaving>
@@ -352,7 +352,7 @@
 		<name>McMillan</name>
 		<founder>Charles</founder>
 		<clan>CB</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<absorbed date="3059">CSA</absorbed>
 	</bloodname>
@@ -370,7 +370,7 @@
 		<name>Moreau</name>
 		<founder>Abra</founder>
 		<clan>CB</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<absorbed date="3059">CSA</absorbed>
 		<postReaving>CSA,CSL</postReaving>
@@ -379,7 +379,7 @@
 		<name>Nga</name>
 		<founder>David</founder>
 		<clan>CB</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<absorbed date="3059">CSA</absorbed>
 		<limited />
@@ -389,7 +389,7 @@
 		<name>Opriq</name>
 		<founder>Park</founder>
 		<clan>CB</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<absorbed date="3059">CSA</absorbed>
 		<limited />
@@ -404,7 +404,7 @@
 		<name>Polczyk</name>
 		<founder>Herve</founder>
 		<clan>CB</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<absorbed date="3059">CSA</absorbed>
 	</bloodname>
@@ -412,7 +412,7 @@
 		<name>Polczyk</name>
 		<founder>Nigel</founder>
 		<clan>CB</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<absorbed date="3059">CSA</absorbed>
 	</bloodname>
@@ -450,7 +450,7 @@
 		<name>Van Houten</name>
 		<founder>Edith</founder>
 		<clan>CB</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<absorbed date="3059">CSA</absorbed>
 	</bloodname>
@@ -483,7 +483,7 @@
 		<name>Beckett</name>
 		<founder>Chinedu</founder>
 		<clan>CCC</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 	</bloodname>
 	<bloodname>
@@ -510,7 +510,7 @@
 		<name>Eaker</name>
 		<founder>Irene</founder>
 		<clan>CCC</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 	</bloodname>
 	<bloodname>
@@ -542,7 +542,7 @@
 		<name>Hobbes</name>
 		<founder>Pierre-Jean</founder>
 		<clan>CCC</clan>
-		<phenotype>ProtoMech</phenotype>
+		<phenotype>PROTOMECH</phenotype>
 		<exclusive />
 		<limited />
 		<postReaving>CCC</postReaving>
@@ -561,7 +561,7 @@
 		<name>Kardaan</name>
 		<founder>Rafe</founder>
 		<clan>CCC</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<postReaving>CCC</postReaving>
 	</bloodname>
@@ -569,7 +569,7 @@
 		<name>Khatib</name>
 		<founder>Windham</founder>
 		<clan>CCC</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<limited />
 		<postReaving>CCC</postReaving>
@@ -598,7 +598,7 @@
 		<name>Mannix</name>
 		<founder>Bershawn</founder>
 		<clan>CCC</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<postReaving>CCC</postReaving>
 	</bloodname>
@@ -621,7 +621,7 @@
 		<name>Morales</name>
 		<founder>Hezekiel</founder>
 		<clan>CCC</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 	</bloodname>
 	<bloodname>
@@ -643,7 +643,7 @@
 		<name>Quong</name>
 		<founder>R. L.</founder>
 		<clan>CCC</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<limited />
 		<postReaving>CCC</postReaving>
@@ -652,7 +652,7 @@
 		<name>Riaz</name>
 		<founder>Lee</founder>
 		<clan>CCC</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<limited />
 		<postReaving>CCC</postReaving>
@@ -671,7 +671,7 @@
 		<name>Spaatz</name>
 		<founder>Arman</founder>
 		<clan>CCC</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<postReaving>CCC</postReaving>
 	</bloodname>
@@ -679,7 +679,7 @@
 		<name>Steiner</name>
 		<founder>Kailen</founder>
 		<clan>CCC</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<postReaving>CCC</postReaving>
 	</bloodname>
@@ -687,7 +687,7 @@
 		<name>Telinov</name>
 		<founder>Iim</founder>
 		<clan>CCC</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<postReaving>CCC</postReaving>
 	</bloodname>
@@ -744,7 +744,7 @@
 		<name>Heller</name>
 		<founder>Tatyana</founder>
 		<clan>CCO</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<postReaving>CCO</postReaving>
 	</bloodname>
@@ -767,7 +767,7 @@
 		<name>Jerricho</name>
 		<founder>Kesar</founder>
 		<clan>CCO</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<limited />
 		<postReaving>CCO</postReaving>
@@ -800,7 +800,7 @@
 		<name>Koga</name>
 		<founder>Simon</founder>
 		<clan>CCO</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<postReaving>CCO,CSL,CSA</postReaving>
 	</bloodname>
@@ -819,7 +819,7 @@
 		<name>Levien</name>
 		<founder>Zarco</founder>
 		<clan>CCO</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 	</bloodname>
 	<bloodname>
@@ -849,7 +849,7 @@
 		<name>McTighe</name>
 		<founder>Lasannr</founder>
 		<clan>CCO</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<postReaving>CCO</postReaving>
 	</bloodname>
@@ -857,7 +857,7 @@
 		<name>Nash</name>
 		<founder>Jebediah</founder>
 		<clan>CCO</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<limited />
 		<postReaving>CCO</postReaving>
@@ -905,7 +905,7 @@
 		<name>Steele</name>
 		<founder>Warren</founder>
 		<clan>CCO</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<postReaving>CCO,CSL</postReaving>
 	</bloodname>
@@ -929,7 +929,7 @@
 		<name>Tchernovkov</name>
 		<founder>Gerek</founder>
 		<clan>CCO</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<postReaving>CCO</postReaving>
 	</bloodname>
@@ -972,7 +972,7 @@
 		<name>Beyl</name>
 		<founder>Timothy</founder>
 		<clan>CFM</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<dormant>3073</dormant>
 	</bloodname>
@@ -985,7 +985,7 @@
 		<name>Carrol</name>
 		<founder>Cho</founder>
 		<clan>CFM</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<dormant>3073</dormant>
 	</bloodname>
@@ -1008,7 +1008,7 @@
 		<name>Faraday</name>
 		<founder>Nathan</founder>
 		<clan>CFM</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<dormant>3073</dormant>
 	</bloodname>
@@ -1016,7 +1016,7 @@
 		<name>Goulet</name>
 		<founder>Róbert</founder>
 		<clan>CFM</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<dormant>3073</dormant>
 	</bloodname>
@@ -1050,7 +1050,7 @@
 		<name>Jannik</name>
 		<founder>Virginia</founder>
 		<clan>CFM</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<dormant>3073</dormant>
 	</bloodname>
@@ -1064,7 +1064,7 @@
 		<name>Kline</name>
 		<founder>Brigitte</founder>
 		<clan>CFM</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<dormant>3073</dormant>
 	</bloodname>
@@ -1077,7 +1077,7 @@
 		<name>Kreese</name>
 		<founder>Eamon</founder>
 		<clan>CFM</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<dormant>3073</dormant>
 	</bloodname>
@@ -1090,7 +1090,7 @@
 		<name>Lopez</name>
 		<founder>Lee</founder>
 		<clan>CFM</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<dormant>3073</dormant>
 	</bloodname>
@@ -1098,7 +1098,7 @@
 		<name>Lynn</name>
 		<founder>Suu</founder>
 		<clan>CFM</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<dormant>3073</dormant>
 	</bloodname>
@@ -1111,7 +1111,7 @@
 		<name>Mattila</name>
 		<founder>Dean</founder>
 		<clan>CFM</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<dormant>3073</dormant>
 	</bloodname>
@@ -1124,7 +1124,7 @@
 		<name>Mick</name>
 		<founder>Dénes</founder>
 		<clan>CFM</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<dormant>3073</dormant>
 	</bloodname>
@@ -1152,7 +1152,7 @@
 		<name>Payne</name>
 		<founder>Laura</founder>
 		<clan>CFM</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<dormant>3073</dormant>
 	</bloodname>
@@ -1160,7 +1160,7 @@
 		<name>Sainze</name>
 		<founder>Raymond</founder>
 		<clan>CFM</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<dormant>3073</dormant>
 	</bloodname>
@@ -1179,7 +1179,7 @@
 		<name>Tanaga</name>
 		<founder>Jean-Noel</founder>
 		<clan>CFM</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<dormant>3073</dormant>
 	</bloodname>
@@ -1217,14 +1217,14 @@
 		<name>Bekker</name>
 		<founder>Rafael</founder>
 		<clan>CGB</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<postReaving>CGB</postReaving>
 	</bloodname>
 	<bloodname>
 		<name>Bourjon</name>
 		<founder>Else</founder>
 		<clan>CGB</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<postReaving>CGB</postReaving>
 	</bloodname>
@@ -1247,7 +1247,7 @@
 		<name>DelVillar</name>
 		<founder>Norge</founder>
 		<clan>CGB</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<postReaving>CGB</postReaving>
 	</bloodname>
@@ -1255,7 +1255,7 @@
 		<name>Devon</name>
 		<founder>Marie</founder>
 		<clan>CGB</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<postReaving>CGB</postReaving>
 	</bloodname>
@@ -1268,7 +1268,7 @@
 		<name>Gilmour</name>
 		<founder>Darren</founder>
 		<clan>CGB</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<postReaving>CGB,CW,CSR</postReaving>
 	</bloodname>
@@ -1276,14 +1276,14 @@
 		<name>Gurdel</name>
 		<founder>Jaroslav</founder>
 		<clan>CGB</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<postReaving>CGB</postReaving>
 	</bloodname>
 	<bloodname>
 		<name>Hall</name>
 		<founder>Aslanbek</founder>
 		<clan>CGB</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<postReaving>CGB</postReaving>
 	</bloodname>
 	<bloodname>
@@ -1320,14 +1320,14 @@
 		<name>Jorgensson</name>
 		<founder>Hans</founder>
 		<clan>CGB</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<postReaving>CGB</postReaving>
 	</bloodname>
 	<bloodname>
 		<name>Kabrinski</name>
 		<founder>Bryan</founder>
 		<clan>CGB</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<postReaving>CGB</postReaving>
 	</bloodname>
@@ -1380,7 +1380,7 @@
 		<name>Snuka</name>
 		<founder>Guillaume</founder>
 		<clan>CGB</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<limited />
 		<postReaving>CGB</postReaving>
 	</bloodname>
@@ -1393,7 +1393,7 @@
 		<name>Tseng</name>
 		<founder>Sandra</founder>
 		<clan>CGB</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<limited />
 		<postReaving>CGB</postReaving>
 	</bloodname>
@@ -1406,7 +1406,7 @@
 		<name>Vong</name>
 		<founder>Chias</founder>
 		<clan>CGB</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<limited />
 		<postReaving>CGB</postReaving>
@@ -1435,7 +1435,7 @@
 		<name>Magnusson</name>
 		<founder>Ragnar</founder>
 		<clan>CGB</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<created>3075</created>
 		<exclusive />
 		<postReaving>CGB</postReaving>
@@ -1444,7 +1444,7 @@
 		<name>Arbuthnot</name>
 		<founder>Brian</founder>
 		<clan>CGS</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<postReaving>CGS,CCC</postReaving>
 	</bloodname>
@@ -1457,7 +1457,7 @@
 		<name>Baba</name>
 		<founder>David</founder>
 		<clan>CGS</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<postReaving>CGS</postReaving>
 	</bloodname>
@@ -1465,7 +1465,7 @@
 		<name>Ben-Shimon</name>
 		<founder>Bair</founder>
 		<clan>CGS</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<postReaving>CGS</postReaving>
 	</bloodname>
@@ -1498,7 +1498,7 @@
 		<name>Dinour</name>
 		<founder>Balázs</founder>
 		<clan>CGS</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<postReaving>CGS</postReaving>
 	</bloodname>
@@ -1506,7 +1506,7 @@
 		<name>Djerassi</name>
 		<founder>Naomi</founder>
 		<clan>CGS</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<postReaving>CCC</postReaving>
 	</bloodname>
@@ -1514,7 +1514,7 @@
 		<name>Elam</name>
 		<founder>Cyrus</founder>
 		<clan>CGS</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<postReaving>CGS,CCC</postReaving>
 	</bloodname>
@@ -1542,7 +1542,7 @@
 		<name>Kirov</name>
 		<founder>Hinrich</founder>
 		<clan>CGS</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<postReaving>CGS</postReaving>
 	</bloodname>
@@ -1580,7 +1580,7 @@
 		<name>Myers</name>
 		<founder>Brian</founder>
 		<clan>CGS</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<postReaving>CGS</postReaving>
 	</bloodname>
@@ -1608,7 +1608,7 @@
 		<name>Posavatz</name>
 		<founder>Jean-Christophe</founder>
 		<clan>CGS</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<postReaving>CGS</postReaving>
 	</bloodname>
@@ -1621,7 +1621,7 @@
 		<name>Scott</name>
 		<founder>Jenna</founder>
 		<clan>CGS</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<postReaving>CGS</postReaving>
 	</bloodname>
@@ -1629,7 +1629,7 @@
 		<name>Shaffer</name>
 		<founder>Dawn</founder>
 		<clan>CGS</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<postReaving>CGS</postReaving>
 	</bloodname>
@@ -1647,7 +1647,7 @@
 		<name>Suvorov</name>
 		<founder>Li</founder>
 		<clan>CGS</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<postReaving>CGS,CCC</postReaving>
 	</bloodname>
@@ -1670,7 +1670,7 @@
 		<name>Yeh</name>
 		<founder>Saho</founder>
 		<clan>CGS</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<postReaving>CGS</postReaving>
 	</bloodname>
@@ -1688,7 +1688,7 @@
 		<name>Amirault</name>
 		<founder>Shirvani</founder>
 		<clan>CHH</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<postReaving>CHH</postReaving>
 	</bloodname>
@@ -1728,7 +1728,7 @@
 		<name>Cobb</name>
 		<founder>Patricia</founder>
 		<clan>CHH</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<shared date="3075">CSL</shared>
 		<postReaving>CHH,CSL</postReaving>
@@ -1737,7 +1737,7 @@
 		<name>Cooper</name>
 		<founder>Dain</founder>
 		<clan>CHH</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<postReaving>CHH</postReaving>
 	</bloodname>
@@ -1745,7 +1745,7 @@
 		<name>DeLaurel</name>
 		<founder>Gella</founder>
 		<clan>CHH</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<postReaving>CHH</postReaving>
 	</bloodname>
@@ -1753,7 +1753,7 @@
 		<name>Dudzinsky</name>
 		<founder>Yavor</founder>
 		<clan>CHH</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<postReaving>CHH</postReaving>
 	</bloodname>
@@ -1761,7 +1761,7 @@
 		<name>Dwelley</name>
 		<founder>Olga</founder>
 		<clan>CHH</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<shared date="3075">CSL</shared>
 		<postReaving>CHH,CSL,CSL</postReaving>
@@ -1770,7 +1770,7 @@
 		<name>Fletcher</name>
 		<founder>John</founder>
 		<clan>CHH</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<postReaving>CHH</postReaving>
 	</bloodname>
@@ -1778,7 +1778,7 @@
 		<name>Grimheald</name>
 		<founder>Niu</founder>
 		<clan>CHH</clan>
-		<phenotype>ProtoMech</phenotype>
+		<phenotype>PROTOMECH</phenotype>
 		<shared date="3075">CSL</shared>
 		<postReaving>CHH,CSL</postReaving>
 	</bloodname>
@@ -1786,7 +1786,7 @@
 		<name>Houan</name>
 		<founder>Jeong</founder>
 		<clan>CHH</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<shared date="3075">CSL</shared>
 		<postReaving>CHH,CSL,CSL</postReaving>
@@ -1800,7 +1800,7 @@
 		<name>Johnston</name>
 		<founder>Kirsty</founder>
 		<clan>CHH</clan>
-		<phenotype>ProtoMech</phenotype>
+		<phenotype>PROTOMECH</phenotype>
 		<exclusive />
 		<limited />
 		<postReaving>CHH</postReaving>
@@ -1814,7 +1814,7 @@
 		<name>Lassenerra</name>
 		<founder>Roman</founder>
 		<clan>CHH</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<shared date="3075">CSL</shared>
 		<postReaving>CHH,CSL</postReaving>
@@ -1838,7 +1838,7 @@
 		<name>Mitchell</name>
 		<founder>Annett</founder>
 		<clan>CHH</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<limited />
 		<postReaving>CHH</postReaving>
@@ -1882,7 +1882,7 @@
 		<name>Ravenwater</name>
 		<founder>Tatiana</founder>
 		<clan>CHH</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<shared date="3075">CSL</shared>
 		<postReaving>CHH,CSL</postReaving>
@@ -1906,7 +1906,7 @@
 		<name>Seidman</name>
 		<founder>Nicolás</founder>
 		<clan>CHH</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<limited />
 		<postReaving>CHH</postReaving>
@@ -1947,7 +1947,7 @@
 		<name>Cage</name>
 		<founder>Stephan</founder>
 		<clan>CIH</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<postReaving>CCC</postReaving>
 	</bloodname>
@@ -1985,7 +1985,7 @@
 		<name>Hasbrin</name>
 		<founder>Fillip</founder>
 		<clan>CIH</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<absorbed date="3074">CGS</absorbed>
 		<postReaving>CGS,CCC</postReaving>
@@ -2004,7 +2004,7 @@
 		<name>Hordwon</name>
 		<founder>Malia</founder>
 		<clan>CIH</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<absorbed date="3074">CGS</absorbed>
 		<postReaving>CGS,CCC</postReaving>
@@ -2033,7 +2033,7 @@
 		<name>Klien</name>
 		<founder>Abel</founder>
 		<clan>CIH</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<absorbed date="3074">CGS</absorbed>
 		<postReaving>CGS,CCC</postReaving>
@@ -2052,7 +2052,7 @@
 		<name>Lienet</name>
 		<founder>Saskia</founder>
 		<clan>CIH</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<postReaving>CCC</postReaving>
 	</bloodname>
@@ -2075,7 +2075,7 @@
 		<name>Montose</name>
 		<founder>Broda</founder>
 		<clan>CIH</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<absorbed date="3074">CGS</absorbed>
 		<limited />
@@ -2085,7 +2085,7 @@
 		<name>Moore</name>
 		<founder>Lucius</founder>
 		<clan>CIH</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<absorbed date="3074">CGS</absorbed>
 		<postReaving>CGS,CCC</postReaving>
@@ -2099,7 +2099,7 @@
 		<name>Norizuchi</name>
 		<founder>Ryan</founder>
 		<clan>CIH</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<absorbed date="3074">CGS</absorbed>
 		<postReaving>CGS</postReaving>
@@ -2123,7 +2123,7 @@
 		<name>Rood</name>
 		<founder>Sibelis</founder>
 		<clan>CIH</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<absorbed date="3074">CGS</absorbed>
 		<postReaving>CGS</postReaving>
@@ -2142,7 +2142,7 @@
 		<name>Taney</name>
 		<founder>Zoran</founder>
 		<clan>CIH</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<absorbed date="3074">CGS</absorbed>
 		<postReaving>CGS</postReaving>
@@ -2151,7 +2151,7 @@
 		<name>Tyler</name>
 		<founder>Hope</founder>
 		<clan>CIH</clan>
-		<phenotype>ProtoMech</phenotype>
+		<phenotype>PROTOMECH</phenotype>
 		<exclusive />
 		<postReaving>CCC</postReaving>
 	</bloodname>
@@ -2174,7 +2174,7 @@
 		<name>Wick</name>
 		<founder>Leysa</founder>
 		<clan>CIH</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<postReaving>CCC,CSA</postReaving>
 	</bloodname>
@@ -2197,7 +2197,7 @@
 		<name>Binetti</name>
 		<founder>Hanati</founder>
 		<clan>CJF</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<limited />
 		<postReaving>CJF</postReaving>
@@ -2216,7 +2216,7 @@
 		<name>Buhallin</name>
 		<founder>Lisa</founder>
 		<clan>CJF</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<postReaving>CJF</postReaving>
 	</bloodname>
@@ -2229,7 +2229,7 @@
 		<name>Chistu</name>
 		<founder>Jill</founder>
 		<clan>CJF</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<limited />
 		<postReaving>CJF</postReaving>
@@ -2268,7 +2268,7 @@
 		<name>Hazen</name>
 		<founder>Elizabeth</founder>
 		<clan>CJF</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<postReaving>CJF</postReaving>
 	</bloodname>
@@ -2276,7 +2276,7 @@
 		<name>Helmer</name>
 		<founder>Samuel</founder>
 		<clan>CJF</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<limited />
 		<postReaving>CJF</postReaving>
@@ -2285,7 +2285,7 @@
 		<name>Icaza</name>
 		<founder>Carl</founder>
 		<clan>CJF</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<postReaving>CJF,CHH,CGB</postReaving>
 	</bloodname>
@@ -2313,7 +2313,7 @@
 		<name>Malthus</name>
 		<founder>Koji</founder>
 		<clan>CJF</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<limited />
 		<postReaving>CJF</postReaving>
@@ -2327,7 +2327,7 @@
 		<name>Mattlov</name>
 		<founder>Daniel</founder>
 		<clan>CJF</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<limited />
 		<postReaving>CJF</postReaving>
@@ -2341,7 +2341,7 @@
 		<name>Pryde</name>
 		<founder>Aeneas</founder>
 		<clan>CJF</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<postReaving>CJF</postReaving>
 	</bloodname>
@@ -2354,7 +2354,7 @@
 		<name>Roshak</name>
 		<founder>Roniel</founder>
 		<clan>CJF</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<postReaving>CJF</postReaving>
 	</bloodname>
@@ -2382,7 +2382,7 @@
 		<name>Thastus</name>
 		<founder>Ẑivko</founder>
 		<clan>CJF</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<postReaving>CJF,CDS,CGB</postReaving>
 	</bloodname>
@@ -2405,7 +2405,7 @@
 		<name>Von Jankmon</name>
 		<founder>Beezie</founder>
 		<clan>CJF</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<postReaving>CJF</postReaving>
 	</bloodname>
@@ -2673,7 +2673,7 @@
 		<name>Bavros</name>
 		<founder>Linda</founder>
 		<clan>CNC</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<abjured>3060</abjured>
 		<postReaving>CNC</postReaving>
@@ -2707,7 +2707,7 @@
 		<name>Deleportas</name>
 		<founder>Serena</founder>
 		<clan>CNC</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<abjured>3060</abjured>
 		<postReaving>CNC</postReaving>
@@ -2716,7 +2716,7 @@
 		<name>Devalis</name>
 		<founder>Isabella</founder>
 		<clan>CNC</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<abjured>3060</abjured>
 		<postReaving>CNC</postReaving>
@@ -2730,7 +2730,7 @@
 		<name>Drummond</name>
 		<founder>Phillip</founder>
 		<clan>CNC</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<abjured>3060</abjured>
 		<postReaving>CNC</postReaving>
@@ -2794,7 +2794,7 @@
 		<name>Lenardon</name>
 		<founder>Viorica</founder>
 		<clan>CNC</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<abjured>3060</abjured>
 		<postReaving>CNC</postReaving>
@@ -2803,7 +2803,7 @@
 		<name>Leroux</name>
 		<founder>Ronetta</founder>
 		<clan>CNC</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<abjured>3060</abjured>
 		<postReaving>CNC</postReaving>
@@ -2812,7 +2812,7 @@
 		<name>Lossey</name>
 		<founder>Andry</founder>
 		<clan>CNC</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<abjured>3060</abjured>
 		<postReaving>CNC</postReaving>
@@ -2826,7 +2826,7 @@
 		<name>Nostra</name>
 		<founder>Toby</founder>
 		<clan>CNC</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<abjured>3060</abjured>
 		<postReaving>CNC</postReaving>
@@ -2850,7 +2850,7 @@
 		<name>Rosse</name>
 		<founder>Jason</founder>
 		<clan>CNC</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<abjured>3060</abjured>
 		<postReaving>CNC</postReaving>
@@ -2884,7 +2884,7 @@
 		<name>Watson</name>
 		<founder>Susan</founder>
 		<clan>CNC</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<abjured>3060</abjured>
 		<postReaving>CNC</postReaving>
@@ -2893,7 +2893,7 @@
 		<name>West</name>
 		<founder>Sa</founder>
 		<clan>CNC</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<abjured>3060</abjured>
 		<postReaving>CNC</postReaving>
@@ -2902,7 +2902,7 @@
 		<name>Winters</name>
 		<founder>Roline</founder>
 		<clan>CNC</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<abjured>3060</abjured>
 		<postReaving>CNC</postReaving>
@@ -2931,7 +2931,7 @@
 		<name>Clarke</name>
 		<founder>Anton</founder>
 		<clan>CDS</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<postReaving>CDS</postReaving>
 	</bloodname>
@@ -2939,7 +2939,7 @@
 		<name>Coston</name>
 		<founder>Morad</founder>
 		<clan>CDS</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<limited />
 		<postReaving>CDS</postReaving>
@@ -2958,7 +2958,7 @@
 		<name>Faulk</name>
 		<founder>Eamon</founder>
 		<clan>CDS</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<postReaving>CDS,CJF,CSR</postReaving>
 	</bloodname>
@@ -2966,7 +2966,7 @@
 		<name>Fowler</name>
 		<founder>Marlo</founder>
 		<clan>CDS</clan>
-		<phenotype>ProtoMech</phenotype>
+		<phenotype>PROTOMECH</phenotype>
 		<exclusive />
 		<limited />
 		<postReaving>CDS</postReaving>
@@ -2985,7 +2985,7 @@
 		<name>Hammond</name>
 		<founder>Anthony</founder>
 		<clan>CDS</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<limited />
 		<postReaving>CDS</postReaving>
@@ -2994,7 +2994,7 @@
 		<name>Hawker</name>
 		<founder>Dalia</founder>
 		<clan>CDS</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<shared date="3060">CW</shared>
 		<postReaving>CDS,CGB,CHH,CW</postReaving>
@@ -3003,7 +3003,7 @@
 		<name>Horn</name>
 		<founder>Axel</founder>
 		<clan>CDS</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<postReaving>CDS,CJF</postReaving>
 	</bloodname>
@@ -3021,7 +3021,7 @@
 		<name>Kalasa</name>
 		<founder>David</founder>
 		<clan>CDS</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<postReaving>CDS</postReaving>
 	</bloodname>
@@ -3039,7 +3039,7 @@
 		<name>Maine</name>
 		<founder>Isabel</founder>
 		<clan>CDS</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<postReaving>CDS</postReaving>
 	</bloodname>
@@ -3057,7 +3057,7 @@
 		<name>Nagasawa</name>
 		<founder>Karen</founder>
 		<clan>CDS</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<postReaving>CDS</postReaving>
 	</bloodname>
@@ -3075,7 +3075,7 @@
 		<name>Oshika</name>
 		<founder>Eri</founder>
 		<clan>CDS</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<postReaving>CDS</postReaving>
 	</bloodname>
@@ -3083,7 +3083,7 @@
 		<name>Rodriguez</name>
 		<founder>Sora</founder>
 		<clan>CDS</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<postReaving>CDS</postReaving>
 	</bloodname>
@@ -3101,7 +3101,7 @@
 		<name>Sennet</name>
 		<founder>Dianne</founder>
 		<clan>CDS</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<limited />
 		<postReaving>CDS</postReaving>
@@ -3120,7 +3120,7 @@
 		<name>Sutherland</name>
 		<founder>Jack</founder>
 		<clan>CDS</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<postReaving>CDS</postReaving>
 	</bloodname>
 	<bloodname>
@@ -3142,7 +3142,7 @@
 		<name>Vewas</name>
 		<founder>Carlos</founder>
 		<clan>CDS</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<postReaving>CDS,CHH,CSR</postReaving>
 	</bloodname>
@@ -3175,7 +3175,7 @@
 		<name>Chrisholm</name>
 		<founder>Emma</founder>
 		<clan>CSJ</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<dormant>3060</dormant>
 	</bloodname>
@@ -3208,7 +3208,7 @@
 		<name>Furey</name>
 		<founder>Tessa</founder>
 		<clan>CSJ</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<dormant>3060</dormant>
 	</bloodname>
@@ -3256,7 +3256,7 @@
 		<name>Kotare</name>
 		<founder>Yelena</founder>
 		<clan>CSJ</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<dormant>3060</dormant>
 	</bloodname>
@@ -3284,7 +3284,7 @@
 		<name>Moon</name>
 		<founder>Michelle</founder>
 		<clan>CSJ</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<dormant>3060</dormant>
 	</bloodname>
@@ -3292,7 +3292,7 @@
 		<name>Nevversan</name>
 		<founder>Vic</founder>
 		<clan>CSJ</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<dormant>3060</dormant>
 	</bloodname>
@@ -3300,7 +3300,7 @@
 		<name>Osis</name>
 		<founder>Franklin</founder>
 		<clan>CSJ</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<dormant>3060</dormant>
 	</bloodname>
@@ -3308,7 +3308,7 @@
 		<name>Osis</name>
 		<founder>Terissa</founder>
 		<clan>CSJ</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<dormant>3060</dormant>
 	</bloodname>
@@ -3321,7 +3321,7 @@
 		<name>Perez</name>
 		<founder>André</founder>
 		<clan>CSJ</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<dormant>3060</dormant>
 	</bloodname>
@@ -3349,7 +3349,7 @@
 		<name>Showers</name>
 		<founder>Steve</founder>
 		<clan>CSJ</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<dormant>3060</dormant>
 	</bloodname>
@@ -3357,7 +3357,7 @@
 		<name>Stiles</name>
 		<founder>Massimiliano</founder>
 		<clan>CSJ</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<acquired date="3060">CW</acquired>
 	</bloodname>
@@ -3375,7 +3375,7 @@
 		<name>Wimmer</name>
 		<founder>Alice</founder>
 		<clan>CSJ</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<dormant>3060</dormant>
 	</bloodname>
@@ -3383,7 +3383,7 @@
 		<name>Wirth</name>
 		<founder>Aleksandar</founder>
 		<clan>CSJ</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<dormant>3060</dormant>
 		<acquired date="3060">CW</acquired>
@@ -3407,7 +3407,7 @@
 		<name>Chand</name>
 		<founder>Christophe</founder>
 		<clan>CSR</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<limited />
 		<postReaving>CSR</postReaving>
@@ -3421,7 +3421,7 @@
 		<name>Cooper</name>
 		<founder>Seth</founder>
 		<clan>CSR</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<postReaving>CSR,CW</postReaving>
 	</bloodname>
@@ -3460,7 +3460,7 @@
 		<name>Harper</name>
 		<founder>Tina</founder>
 		<clan>CSR</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<postReaving>CSR</postReaving>
 	</bloodname>
@@ -3468,7 +3468,7 @@
 		<name>Howe</name>
 		<founder>Sedat</founder>
 		<clan>CSR</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<postReaving>CSR</postReaving>
 	</bloodname>
@@ -3496,7 +3496,7 @@
 		<name>Lankenau</name>
 		<founder>Yin</founder>
 		<clan>CSR</clan>
-		<phenotype>Naval</phenotype>
+		<phenotype>NAVAL</phenotype>
 		<exclusive />
 		<postReaving>CSR</postReaving>
 	</bloodname>
@@ -3514,7 +3514,7 @@
 		<name>Magnus</name>
 		<founder>Sergey</founder>
 		<clan>CSR</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<postReaving>CSR</postReaving>
 	</bloodname>
@@ -3522,7 +3522,7 @@
 		<name>McCorkell</name>
 		<founder>Oleksandr</founder>
 		<clan>CSR</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<limited />
 		<postReaving>CSR</postReaving>
@@ -3531,7 +3531,7 @@
 		<name>McKenna</name>
 		<founder>Stephen</founder>
 		<clan>CSR</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<limited />
 		<postReaving>CSR</postReaving>
@@ -3590,14 +3590,14 @@
 		<name>Shu</name>
 		<founder>Bradley</founder>
 		<clan>CSR</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 	</bloodname>
 	<bloodname>
 		<name>Siegel</name>
 		<founder>Nicolás</founder>
 		<clan>CSR</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<postReaving>CSR</postReaving>
 	</bloodname>
@@ -3610,7 +3610,7 @@
 		<name>Sukhanov</name>
 		<founder>Zhang</founder>
 		<clan>CSR</clan>
-		<phenotype>Naval</phenotype>
+		<phenotype>NAVAL</phenotype>
 		<exclusive />
 		<postReaving>CSR</postReaving>
 	</bloodname>
@@ -3653,7 +3653,7 @@
 		<name>Banacek</name>
 		<founder>Heather</founder>
 		<clan>CSA</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<postReaving>CSA</postReaving>
 	</bloodname>
@@ -3661,7 +3661,7 @@
 		<name>Cannon</name>
 		<founder>Sarka</founder>
 		<clan>CSA</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<postReaving>CSA</postReaving>
 	</bloodname>
@@ -3706,7 +3706,7 @@
 		<name>Gena</name>
 		<founder>Mirela</founder>
 		<clan>CSA</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<postReaving>CSA</postReaving>
 	</bloodname>
@@ -3719,7 +3719,7 @@
 		<name>Guidice</name>
 		<founder>Arlitt</founder>
 		<clan>CSA</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<postReaving>CSA</postReaving>
 	</bloodname>
@@ -3747,7 +3747,7 @@
 		<name>Lahiri</name>
 		<founder>Murilo</founder>
 		<clan>CSA</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<limited />
 		<postReaving>CSA</postReaving>
@@ -3756,7 +3756,7 @@
 		<name>LeFabre</name>
 		<founder>Devon</founder>
 		<clan>CSA</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<postReaving>CSA</postReaving>
 	</bloodname>
@@ -3781,7 +3781,7 @@
 		<name>N'Buta</name>
 		<founder>Emiko</founder>
 		<clan>CSA</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<postReaving>CCC,CSA</postReaving>
 	</bloodname>
@@ -3804,7 +3804,7 @@
 		<name>Paik</name>
 		<founder>Sanjay</founder>
 		<clan>CSA</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<postReaving>CSA</postReaving>
 	</bloodname>
@@ -3832,7 +3832,7 @@
 		<name>Talasko</name>
 		<founder>Kensington</founder>
 		<clan>CSA</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<limited />
 		<postReaving>CSA</postReaving>
@@ -3846,7 +3846,7 @@
 		<name>Truscott</name>
 		<founder>Absalom</founder>
 		<clan>CSA</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<postReaving>CSA</postReaving>
 	</bloodname>
@@ -3854,7 +3854,7 @@
 		<name>Turgidson</name>
 		<founder>Frederic</founder>
 		<clan>CSA</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<postReaving>CSA</postReaving>
 	</bloodname>
@@ -3872,7 +3872,7 @@
 		<name>Ahmed</name>
 		<founder>Ian</founder>
 		<clan>CSV</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<postReaving>CCO,CSL</postReaving>
 	</bloodname>
@@ -3880,7 +3880,7 @@
 		<name>Andrews</name>
 		<founder>Adam</founder>
 		<clan>CSV</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<limited />
 		<postReaving>CSA</postReaving>
@@ -3899,7 +3899,7 @@
 		<name>Breen</name>
 		<founder>Steven</founder>
 		<clan>CSV</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<limited />
 		<postReaving>CSA</postReaving>
@@ -3918,7 +3918,7 @@
 		<name>Chapman</name>
 		<founder>Efe</founder>
 		<clan>CSV</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<dormant>3075</dormant>
 	</bloodname>
@@ -3926,7 +3926,7 @@
 		<name>Cochraine</name>
 		<founder>Gustavo</founder>
 		<clan>CSV</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<postReaving>CSL</postReaving>
 	</bloodname>
@@ -3954,7 +3954,7 @@
 		<name>Grimani</name>
 		<founder>Anton</founder>
 		<clan>CSV</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<postReaving>CGS,CSA</postReaving>
 	</bloodname>
@@ -3978,7 +3978,7 @@
 		<name>Masters</name>
 		<founder>Elena</founder>
 		<clan>CSV</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<postReaving>CCC,CSA,CSL</postReaving>
 	</bloodname>
@@ -3991,7 +3991,7 @@
 		<name>Mercer</name>
 		<founder>Christiane</founder>
 		<clan>CSV</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<limited />
 		<postReaving>CCO</postReaving>
@@ -4000,7 +4000,7 @@
 		<name>Moffat</name>
 		<founder>Kenny</founder>
 		<clan>CSV</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<postReaving>CSL</postReaving>
 	</bloodname>
@@ -4043,7 +4043,7 @@
 		<name>Roland</name>
 		<founder>Yun</founder>
 		<clan>CSV</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<postReaving>CCO</postReaving>
 	</bloodname>
@@ -4066,7 +4066,7 @@
 		<name>Tamm</name>
 		<founder>Summer</founder>
 		<clan>CSV</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<limited />
 		<postReaving>CSL</postReaving>
@@ -4105,7 +4105,7 @@
 		<name>Zalman</name>
 		<founder>Antonius</founder>
 		<clan>CSV</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<postReaving>CSA</postReaving>
 	</bloodname>
@@ -4125,7 +4125,7 @@
 		<name>Conners</name>
 		<founder>Santiago</founder>
 		<clan>CWI</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<absorbed date="2834">CW</absorbed>
 		<limited />
@@ -4213,7 +4213,7 @@
 		<name>Leroux</name>
 		<founder>Karin</founder>
 		<clan>CWI</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<absorbed date="2834">CW</absorbed>
 		<limited />
@@ -4229,7 +4229,7 @@
 		<name>Mutola</name>
 		<founder>Svetlana</founder>
 		<clan>CWI</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<absorbed date="2834">CW</absorbed>
 		<postReaving>CSL</postReaving>
 	</bloodname>
@@ -4267,7 +4267,7 @@
 		<name>Rhyde</name>
 		<founder>Dejan</founder>
 		<clan>CWI</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<absorbed date="2834">CW</absorbed>
 		<shared date="3057">CWIE</shared>
@@ -4295,7 +4295,7 @@
 		<name>Sender</name>
 		<founder>Sherone</founder>
 		<clan>CWI</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<absorbed date="2834">CW</absorbed>
 		<shared date="3057">CWIE</shared>
@@ -4341,7 +4341,7 @@
 		<name>Vickers</name>
 		<founder>Tamra</founder>
 		<clan>CWI</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<absorbed date="2834">CW</absorbed>
 		<shared date="3057">CWIE</shared>
@@ -4390,7 +4390,7 @@
 		<name>Carns</name>
 		<founder>Ma</founder>
 		<clan>CW</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<shared date="3057">CWIE</shared>
 		<postReaving>CW,CWIE</postReaving>
@@ -4399,7 +4399,7 @@
 		<name>Ch'in</name>
 		<founder>Olesya</founder>
 		<clan>CW</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<shared date="3057">CWIE</shared>
 		<limited />
@@ -4414,7 +4414,7 @@
 		<name>Dannvers</name>
 		<founder>Louis</founder>
 		<clan>CW</clan>
-		<phenotype>ProtoMech</phenotype>
+		<phenotype>PROTOMECH</phenotype>
 		<postReaving>CSL</postReaving>
 	</bloodname>
 	<bloodname>
@@ -4431,7 +4431,7 @@
 		<name>Fetladral</name>
 		<founder>Elise</founder>
 		<clan>CW</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<shared date="3057">CWIE</shared>
 		<postReaving>CW,CWIE</postReaving>
@@ -4468,7 +4468,7 @@
 		<name>Kerensky</name>
 		<founder>Andery</founder>
 		<clan>CW</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<shared date="3057">CWIE</shared>
 		<postReaving>CW,CWIE</postReaving>
@@ -4477,7 +4477,7 @@
 		<name>Kerensky</name>
 		<founder>Nicholas</founder>
 		<clan>CW</clan>
-		<phenotype>General</phenotype>
+		<phenotype>GENERAL</phenotype>
 		<exclusive />
 		<shared date="3057">CWIE</shared>
 		<postReaving>CW,CWIE</postReaving>
@@ -4508,7 +4508,7 @@
 		<name>Mehta</name>
 		<founder>Kaori</founder>
 		<clan>CW</clan>
-		<phenotype>Aerospace</phenotype>
+		<phenotype>AEROSPACE</phenotype>
 		<exclusive />
 		<shared date="3057">CWIE</shared>
 		<postReaving>CW,CWIE,CJF,CHH</postReaving>
@@ -4527,7 +4527,7 @@
 		<name>Radick</name>
 		<founder>Alicia</founder>
 		<clan>CW</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<shared date="3057">CWIE</shared>
 		<postReaving>CW,CWIE</postReaving>
@@ -4556,7 +4556,7 @@
 		<name>Shaw</name>
 		<founder>Britta</founder>
 		<clan>CW</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<shared date="3057">CWIE</shared>
 		<limited />
@@ -4571,7 +4571,7 @@
 		<name>Sradac</name>
 		<founder>Guo</founder>
 		<clan>CW</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<shared date="3057">CWIE</shared>
 		<postReaving>CW,CGB,CWIE</postReaving>
@@ -4605,7 +4605,7 @@
 		<name>Tutuola</name>
 		<founder>Mansueto</founder>
 		<clan>CW</clan>
-		<phenotype>Elemental</phenotype>
+		<phenotype>ELEMENTAL</phenotype>
 		<exclusive />
 		<shared date="3057">CWIE</shared>
 		<postReaving>CW,CWIE</postReaving>
@@ -4619,7 +4619,7 @@
 		<name>Ward</name>
 		<founder>Jal</founder>
 		<clan>CW</clan>
-		<phenotype>MechWarrior</phenotype>
+		<phenotype>MECHWARRIOR</phenotype>
 		<exclusive />
 		<shared date="3057">CWIE</shared>
 		<postReaving>CW,CWIE</postReaving>

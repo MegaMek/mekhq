@@ -18,34 +18,59 @@
  */
 package mekhq.campaign.personnel.enums;
 
+import megamek.common.util.EncodeControl;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+
 public enum Phenotype {
     //region Enum Declarations
-    // All External Phenotypes must be listed before any Internal Phenotypes
     // External Phenotypes
-    MECHWARRIOR(0, "Phenotype.MECHWARRIOR.text", "Phenotype.MECHWARRIOR.toolTipText"),
-    ELEMENTAL(1, "Phenotype.ELEMENTAL.text", "Phenotype.ELEMENTAL.toolTipText"),
-    AEROSPACE(2, "Phenotype.AEROSPACE.text", "Phenotype.AEROSPACE.toolTipText"),
-    VEHICLE(3, "Phenotype.VEHICLE.text", "Phenotype.VEHICLE.toolTipText"),
-    PROTOMECH(4, "Phenotype.PROTOMECH.text", "Phenotype.PROTOMECH.toolTipText"),
-    NAVAL(5, "Phenotype.NAVAL.text", "Phenotype.NAVAL.toolTipText"),
-    // Internal Phenotypes
-    NONE(-1, "Phenotype.NONE.text", "Phenotype.NONE.toolTipText"),
-    GENERAL(-1, "Phenotype.GENERAL.text", "Phenotype.GENERAL.toolTipText");
+    MECHWARRIOR(0, "Phenotype.MECHWARRIOR.text", "Phenotype.TRUEBORN", "Phenotype.MECHWARRIOR.text", "Phenotype.MECHWARRIOR.toolTipText"),
+    ELEMENTAL(1, "Phenotype.ELEMENTAL.text", "Phenotype.TRUEBORN", "Phenotype.ELEMENTAL.text", "Phenotype.ELEMENTAL.toolTipText"),
+    AEROSPACE(2, "Phenotype.AEROSPACE.text", "Phenotype.TRUEBORN", "Phenotype.AEROSPACE.groupingNameText", "Phenotype.AEROSPACE.toolTipText"),
+    VEHICLE(3, "Phenotype.VEHICLE.text", "Phenotype.TRUEBORN", "Phenotype.VEHICLE.groupingNameText", "Phenotype.VEHICLE.toolTipText"),
+    PROTOMECH(4, "Phenotype.PROTOMECH.text", "Phenotype.TRUEBORN", "Phenotype.PROTOMECH.groupingNameText", "Phenotype.PROTOMECH.toolTipText"),
+    NAVAL(5, "Phenotype.NAVAL.text", "Phenotype.TRUEBORN", "Phenotype.NAVAL.groupingNameText", "Phenotype.NAVAL.toolTipText"),
+    // Internal Phenotypes - Must have an index of -1 of they will be displayed in external facing methods
+    NONE(-1, "Phenotype.NONE.text", "Phenotype.FREEBORN", "Phenotype.NONE.text",  "Phenotype.NONE.toolTipText"),
+    GENERAL(-1, "Phenotype.GENERAL.text", "Phenotype.TRUEBORN","Phenotype.GENERAL.text", "Phenotype.GENERAL.toolTipText");
     //endregion Enum Declarations
 
     //region Variable Declarations
     private final String name;
+    private final String shortName;
+    private final String groupingName;
     private final String toolTip;
     private final int index;
+
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+            new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
-    Phenotype(int index, String name, String toolTip) {
-        this.name = name;
-        this.toolTip = toolTip;
+    Phenotype(int index, String name, String shortName, String groupingName, String toolTip) {
+        this.name = resources.getString(name);
+        this.shortName = resources.getString(shortName);
+        this.groupingName = resources.getString(groupingName);
+        this.toolTip = resources.getString(toolTip);
         this.index = index;
     }
     //endregion Constructors
+
+    //region Getters
+    public String getName() {
+        return name;
+    }
+
+    public String getShortName() {
+        return shortName;
+    }
+
+    public String getGroupingName() {
+        return groupingName;
+    }
 
     public String getToolTip() {
         return toolTip;
@@ -54,23 +79,32 @@ public enum Phenotype {
     public int getIndex() {
         return index;
     }
+    //endregion Getters
 
-    public static int getExternalPhenotypeCount() {
-        int count = 0;
-        for (Phenotype phenotype : values()) {
-            if (phenotype.getIndex() != -1) {
-                count++;
-            }
-        }
-        return count;
+    public String getPhenotypeName() {
+        return "";
     }
 
-    public Phenotype parseFromString(String text) {
+    public static List<Phenotype> getExternalPhenotypes() {
+        List<Phenotype> phenotypeList = new ArrayList<>();
+        for (Phenotype phenotype : values()) {
+            if (phenotype.getIndex() != -1) {
+                phenotypeList.add(phenotype);
+            }
+        }
+        return phenotypeList;
+    }
+
+    public static Phenotype parseFromString(String text) {
         return NONE;
     }
 
     @Override
     public String toString() {
-        return name;
+        if (this == NONE) {
+            return getShortName();
+        } else {
+            return getShortName() + " " + getGroupingName();
+        }
     }
 }

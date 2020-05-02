@@ -60,6 +60,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
 
+import mekhq.campaign.personnel.enums.Phenotype;
 import org.joda.time.chrono.GJChronology;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -349,7 +350,8 @@ public class MedicalViewDialog extends JDialog {
 
         Period age = Period.between(birthday, campaign.getLocalDate());
 
-        String phenotype = (p.getPhenotype() != Person.PHENOTYPE_NONE) ? p.getPhenotypeName() : resourceMap.getString("baselinePhenotype.text"); //$NON-NLS-1$
+        String phenotype = (p.getPhenotype() != Phenotype.NONE) ? p.getPhenotype().getPhenotypeName()
+                : resourceMap.getString("baselinePhenotype.text");
 
         Force f = c.getForceFor(p);
         String force = (null != f) ? f.getFullName() : "-"; //$NON-NLS-1$

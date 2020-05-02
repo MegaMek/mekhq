@@ -22,6 +22,7 @@ import java.util.Objects;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.*;
+import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.universe.AbstractFactionSelector;
 import mekhq.campaign.universe.AbstractPlanetSelector;
 import mekhq.campaign.universe.DefaultFactionSelector;
@@ -87,7 +88,8 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
 
         generatePhenotype(campaign, person);
 
-        generateBirthday(campaign, person, expLvl, person.isClanner() && person.getPhenotype() != Person.PHENOTYPE_NONE);
+        generateBirthday(campaign, person, expLvl, person.isClanner()
+                && person.getPhenotype() != Phenotype.NONE);
 
         AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator();
         skillGenerator.setSkillPreferences(getSkillPreferences());
@@ -102,7 +104,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
 
         //check for Bloodname
         if (person.isClanner()) {
-            campaign.checkBloodnameAdd(person, primaryRole, person.getOriginFaction().getShortName());
+            campaign.checkBloodnameAdd(person, false);
         }
 
         person.setDaysToWaitForHealing(campaign.getCampaignOptions().getNaturalHealingWaitingPeriod());

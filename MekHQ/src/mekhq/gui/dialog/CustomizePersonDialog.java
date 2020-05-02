@@ -10,7 +10,6 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -37,6 +36,7 @@ import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
@@ -90,7 +90,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private JCheckBox chkOnlyOurFaction;
     private JComboBox<Planet> choicePlanet;
     private JCheckBox chkClan;
-    private JComboBox<String> choicePheno;
+    private JComboBox<Phenotype> choicePhenotype;
 
     /* Against the Bot */
     private JComboBox<String> choiceUnitWeight;
@@ -123,7 +123,6 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         initComponents();
     }
 
-    @SuppressWarnings("serial")
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
@@ -247,12 +246,12 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
             btnRandomBloodname.setText(resourceMap.getString("btnRandomBloodname.text")); // NOI18N
             btnRandomBloodname.setName("btnRandomBloodname"); // NOI18N
             btnRandomBloodname.addActionListener(evt -> randomBloodname());
-            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 2;
             gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 1;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
             panDemog.add(btnRandomBloodname, gridBagConstraints);
         } else {
             lblNickname.setText(resourceMap.getString("lblNickname.text")); // NOI18N
@@ -449,40 +448,41 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
             choicePlanet.setSelectedIndex(planetsModel.getIndexOf(person.getOriginPlanet()));
         }
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         panDemog.add(choicePlanet, gridBagConstraints);
 
         y++;
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
         panDemog.add(new JLabel("Phenotype:"), gridBagConstraints);
 
-        DefaultComboBoxModel<String> phenoModel = new DefaultComboBoxModel<>();
-        for(int i = 0; i < Person.PHENOTYPE_NUM; i++) {
-            phenoModel.addElement(Person.getPhenotypeName(i));
+        DefaultComboBoxModel<Phenotype> phenotypeModel = new DefaultComboBoxModel<>();
+        phenotypeModel.addElement(Phenotype.NONE);
+        for (Phenotype phenotype : Phenotype.getExternalPhenotypes()) {
+            phenotypeModel.addElement(phenotype);
         }
-        choicePheno = new JComboBox<>(phenoModel);
-        choicePheno.setSelectedIndex(person.getPhenotype());
-        choicePheno.addActionListener(evt -> backgroundChanged());
-        choicePheno.setEnabled(person.isClanner());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        choicePhenotype = new JComboBox<>(phenotypeModel);
+        choicePhenotype.setSelectedItem(person.getPhenotype());
+        choicePhenotype.addActionListener(evt -> backgroundChanged());
+        choicePhenotype.setEnabled(person.isClanner());
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        panDemog.add(choicePheno, gridBagConstraints);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        panDemog.add(choicePhenotype, gridBagConstraints);
 
         chkClan = new JCheckBox("Clanner");
         chkClan.setSelected(person.isClanner());
@@ -906,7 +906,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         } else {
             person.setOriginPlanet(null);
         }
-        person.setPhenotype(choicePheno.getSelectedIndex());
+        person.setPhenotype((Phenotype) choicePhenotype.getSelectedItem());
         person.setClanner(chkClan.isSelected());
         try {
             person.setToughness(Integer.parseInt(textToughness.getText()));
@@ -932,31 +932,9 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     }
 
     private void randomBloodname() {
-        int phenotype = Bloodname.P_GENERAL;
-        switch (person.getPrimaryRole()) {
-            case Person.T_MECHWARRIOR:
-                phenotype = Bloodname.P_MECHWARRIOR;
-                break;
-            case Person.T_BA:
-                phenotype = Bloodname.P_ELEMENTAL;
-                break;
-            case Person.T_AERO_PILOT:
-            case Person.T_CONV_PILOT:
-                phenotype = Bloodname.P_AEROSPACE;
-                break;
-            case Person.T_SPACE_CREW:
-            case Person.T_NAVIGATOR:
-            case Person.T_SPACE_GUNNER:
-            case Person.T_SPACE_PILOT:
-                phenotype = Bloodname.P_NAVAL;
-                break;
-            case Person.T_PROTO_PILOT:
-                phenotype = Bloodname.P_PROTOMECH;
-                break;
-        }
         textBloodname.setText(Bloodname.randomBloodname(campaign.getFaction().isClan()
                 ? campaign.getFactionCode() : person.getOriginFaction().getShortName(),
-                phenotype, campaign.getGameYear()).getName());
+                person.getPhenotype(), campaign.getGameYear()).getName());
     }
 
     public void refreshSkills() {
@@ -981,7 +959,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         c.insets = new java.awt.Insets(0, 10, 0, 0);
         c.gridx = 0;
 
-        for(int i = 0; i < SkillType.getSkillList().length; i++) {
+        for (int i = 0; i < SkillType.getSkillList().length; i++) {
             c.gridy = i;
             c.gridx = 0;
             final String type = SkillType.getSkillList()[i];
@@ -1052,8 +1030,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         for (int i = 0; i < SkillType.getSkillList().length; i++) {
             final String type = SkillType.getSkillList()[i];
             if (skillChks.get(type).isSelected()) {
-                int lvl = (Integer)skillLvls.get(type).getModel().getValue();
-                int b = (Integer)skillBonus.get(type).getModel().getValue();
+                int lvl = (Integer) skillLvls.get(type).getModel().getValue();
+                int b = (Integer) skillBonus.get(type).getModel().getValue();
                 person.addSkill(type, lvl, b);
             } else {
                 person.removeSkill(type);
@@ -1249,36 +1227,39 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     }
 
     private void backgroundChanged() {
-        int pheno = choicePheno.getSelectedIndex();
         boolean clanner = chkClan.isSelected();
         clearAllPhenotypeBonuses();
         if (clanner) {
-            switch(pheno) {
-                case Person.PHENOTYPE_MW:
-                    skillBonus.get(SkillType.S_GUN_MECH).setValue(1);
-                    skillBonus.get(SkillType.S_PILOT_MECH).setValue(1);
-                    break;
-                case Person.PHENOTYPE_AERO:
-                    skillBonus.get(SkillType.S_GUN_AERO).setValue(1);
-                    skillBonus.get(SkillType.S_PILOT_AERO).setValue(1);
-                    skillBonus.get(SkillType.S_GUN_JET).setValue(1);
-                    skillBonus.get(SkillType.S_PILOT_JET).setValue(1);
-                    skillBonus.get(SkillType.S_GUN_PROTO).setValue(1);
-                    break;
-                case Person.PHENOTYPE_BA:
-                    skillBonus.get(SkillType.S_GUN_BA).setValue(1);
-                    break;
-                case Person.PHENOTYPE_VEE:
-                    skillBonus.get(SkillType.S_GUN_VEE).setValue(1);
-                    skillBonus.get(SkillType.S_PILOT_GVEE).setValue(1);
-                    skillBonus.get(SkillType.S_PILOT_NVEE).setValue(1);
-                    skillBonus.get(SkillType.S_PILOT_VTOL).setValue(1);
-                    break;
+            final Phenotype phenotype = (Phenotype) choicePhenotype.getSelectedItem();
+            if (phenotype != null) {
+                // TODO : Windchild should there be more bonus' here for the other phenotypes?
+                switch (phenotype) {
+                    case MECHWARRIOR:
+                        skillBonus.get(SkillType.S_GUN_MECH).setValue(1);
+                        skillBonus.get(SkillType.S_PILOT_MECH).setValue(1);
+                        break;
+                    case AEROSPACE:
+                        skillBonus.get(SkillType.S_GUN_AERO).setValue(1);
+                        skillBonus.get(SkillType.S_PILOT_AERO).setValue(1);
+                        skillBonus.get(SkillType.S_GUN_JET).setValue(1);
+                        skillBonus.get(SkillType.S_PILOT_JET).setValue(1);
+                        skillBonus.get(SkillType.S_GUN_PROTO).setValue(1);
+                        break;
+                    case ELEMENTAL:
+                        skillBonus.get(SkillType.S_GUN_BA).setValue(1);
+                        break;
+                    case VEHICLE:
+                        skillBonus.get(SkillType.S_GUN_VEE).setValue(1);
+                        skillBonus.get(SkillType.S_PILOT_GVEE).setValue(1);
+                        skillBonus.get(SkillType.S_PILOT_NVEE).setValue(1);
+                        skillBonus.get(SkillType.S_PILOT_VTOL).setValue(1);
+                        break;
+                }
             }
-            choicePheno.setEnabled(true);
+            choicePhenotype.setEnabled(true);
         } else {
-            choicePheno.setSelectedIndex(0);
-            choicePheno.setEnabled(false);
+            choicePhenotype.setSelectedItem(Phenotype.NONE);
+            choicePhenotype.setEnabled(false);
         }
     }
 

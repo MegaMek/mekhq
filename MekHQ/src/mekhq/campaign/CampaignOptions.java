@@ -614,7 +614,7 @@ public class CampaignOptions implements Serializable {
         personnelMarketDylansWeight = 0.3;
         //endregion Personnel Market Tab
 
-        phenotypeProbabilities = new int[Phenotype.getExternalPhenotypeCount()];
+        phenotypeProbabilities = new int[Phenotype.getExternalPhenotypes().size()];
         phenotypeProbabilities[Phenotype.MECHWARRIOR.getIndex()] = 95;
         phenotypeProbabilities[Phenotype.ELEMENTAL.getIndex()] = 100;
         phenotypeProbabilities[Phenotype.AEROSPACE.getIndex()] = 95;
@@ -1972,8 +1972,8 @@ public class CampaignOptions implements Serializable {
         return phenotypeProbabilities;
     }
 
-    public int getPhenotypeProbability(int index) {
-        return phenotypeProbabilities[index];
+    public int getPhenotypeProbability(Phenotype phenotype) {
+        return phenotypeProbabilities[phenotype.getIndex()];
     }
 
     public void setPhenotypeProbability(int index, int percentage) {

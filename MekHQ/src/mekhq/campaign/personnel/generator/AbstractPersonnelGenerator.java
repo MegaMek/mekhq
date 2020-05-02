@@ -151,18 +151,18 @@ public abstract class AbstractPersonnelGenerator {
         if (person.isClanner()) {
             switch (person.getPrimaryRole()) {
                 case Person.T_MECHWARRIOR:
-                    if (Utilities.rollProbability(campaign.getCampaignOptions().getPhenotypeProbability(Phenotype.MECHWARRIOR.getIndex()))) {
+                    if (Utilities.rollProbability(campaign.getCampaignOptions().getPhenotypeProbability(Phenotype.MECHWARRIOR))) {
                         person.setPhenotype(Phenotype.MECHWARRIOR);
                     }
                     break;
                 case Person.T_BA:
-                    if (Utilities.rollProbability(campaign.getCampaignOptions().getPhenotypeProbability(Phenotype.ELEMENTAL.getIndex()))) {
+                    if (Utilities.rollProbability(campaign.getCampaignOptions().getPhenotypeProbability(Phenotype.ELEMENTAL))) {
                         person.setPhenotype(Phenotype.ELEMENTAL);
                     }
                     break;
                 case Person.T_CONV_PILOT:
                 case Person.T_AERO_PILOT:
-                    if (Utilities.rollProbability(campaign.getCampaignOptions().getPhenotypeProbability(Phenotype.AEROSPACE.getIndex()))) {
+                    if (Utilities.rollProbability(campaign.getCampaignOptions().getPhenotypeProbability(Phenotype.AEROSPACE))) {
                         person.setPhenotype(Phenotype.AEROSPACE);
                     }
                     break;
@@ -172,13 +172,13 @@ public abstract class AbstractPersonnelGenerator {
                 case Person.T_VEE_GUNNER:
                     if (person.getOriginFaction().getShortName().equalsIgnoreCase("CHH")
                             && (campaign.getGameYear() >= 3100)
-                            && Utilities.rollProbability(campaign.getCampaignOptions().getPhenotypeProbability(Phenotype.VEHICLE.getIndex()))) {
+                            && Utilities.rollProbability(campaign.getCampaignOptions().getPhenotypeProbability(Phenotype.VEHICLE))) {
                         person.setPhenotype(Phenotype.VEHICLE);
                     }
                     break;
                 case Person.T_PROTO_PILOT:
                     if ((campaign.getGameYear() > 3060)
-                            && Utilities.rollProbability(campaign.getCampaignOptions().getPhenotypeProbability(Phenotype.PROTOMECH.getIndex()))) {
+                            && Utilities.rollProbability(campaign.getCampaignOptions().getPhenotypeProbability(Phenotype.PROTOMECH))) {
                         person.setPhenotype(Phenotype.PROTOMECH);
                     }
                     break;
@@ -188,7 +188,7 @@ public abstract class AbstractPersonnelGenerator {
                 case Person.T_NAVIGATOR:
                     if ((person.getOriginFaction().getShortName().equalsIgnoreCase("CSR")
                             || person.getOriginFaction().getShortName().equalsIgnoreCase("RA"))
-                            && Utilities.rollProbability(campaign.getCampaignOptions().getPhenotypeProbability(Phenotype.NAVAL.getIndex()))) {
+                            && Utilities.rollProbability(campaign.getCampaignOptions().getPhenotypeProbability(Phenotype.NAVAL))) {
                         person.setPhenotype(Phenotype.NAVAL);
                     }
                     break;

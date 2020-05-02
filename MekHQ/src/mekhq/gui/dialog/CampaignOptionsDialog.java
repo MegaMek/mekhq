@@ -2963,7 +2963,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panRandomSkill.add(chkExtraRandom, gridBagConstraints);
 
         // Phenotype Percentage Generation
-        Phenotype[] phenotypes = Phenotype.values();
+        List<Phenotype> phenotypes = Phenotype.getExternalPhenotypes();
         int[] phenotypeProbabilities = options.getPhenotypeProbabilities();
         phenotypeSpinners = new JSpinner[phenotypeProbabilities.length];
 
@@ -2972,10 +2972,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         for (int i = 0; i < phenotypeProbabilities.length; i++) {
             JSpinner phenotypeSpinner = new JSpinner(new SpinnerNumberModel(phenotypeProbabilities[i], 0, 100, 1));
+            phenotypeSpinners[i] = phenotypeSpinner;
             JPanel phenotypePanel = new JPanel();
             phenotypePanel.add(phenotypeSpinner);
-            phenotypePanel.add(new JLabel(phenotypes[i].toString()));
-            phenotypePanel.setToolTipText(phenotypes[i].getToolTip());
+            phenotypePanel.add(new JLabel(phenotypes.get(i).getName()));
+            phenotypePanel.setToolTipText(phenotypes.get(i).getToolTip());
             phenotypesPanel.add(phenotypePanel);
         }
 

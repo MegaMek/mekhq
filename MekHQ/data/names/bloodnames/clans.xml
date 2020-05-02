@@ -28,20 +28,29 @@
 		<fullName>Fire Mandrill</fullName>
 		<rivals>CBS,CGS,CHH,CSA,CSV</rivals>
 	</clan>
-	<clan code="CGS">
+	<clan code="CGS" end="3080">
 		<fullName>Goliath Scorpion</fullName>
-		<nameChange start="3080">El Escorpión Imerperio</nameChange>
+		<nameChange start="3080">Escorpión Imperio</nameChange>
 		<abjured>3078</abjured>
 		<rivals>CFM,CNC</rivals>
 		<homeClan />
 	</clan>
-	<clan code="CGB">
+	<clan code="CEI">
+		<fullName>Escorpión Imperio</fullName>
+		<abjured>3078</abjured>
+		<generateAsIf>CGS</generateAsIf>
+	</clan>
+	<clan code="CGB" end="3103">
 		<fullName>Ghost Bear</fullName>
 		<nameChange start="3060" end="3103">Ghost Bear Dominion</nameChange>
 		<nameChange start="3103">Rasalhague Dominion</nameChange>
 		<rivals end="3070">CHH</rivals>
 		<rivals start="3062">CNC</rivals>
 		<rivals>CSV</rivals>
+	</clan>
+	<clan code="RD" start="3103">
+		<fullname>Rasalhague Dominion</fullname>
+		<generateAsIf>CGB</generateAsIf>
 	</clan>
 	<clan code="CHH">
 		<fullName>Hell's Horses</fullName>
@@ -59,16 +68,20 @@
 		<fullName>Mongoose</fullName>
 		<rivals>CBS,CSR,CSA</rivals>
 	</clan>
-	<clan code="CNC">
+	<clan code="CNC" end="3143">
 		<fullName>Nova Cat</fullName>
 		<abjured>3060</abjured>
 		<rivals>CGS</rivals>
 		<rivals start="3062">CGB</rivals>
 	</clan>
-	<clan code="CSR">
+	<clan code="CSR" end="3083">
 		<fullName>Snow Raven</fullName>
 		<nameChange start="3083">Raven Alliance</nameChange>
 		<rivals>CDS,CMG,CSV,CWOV</rivals>
+	</clan>
+	<clan code="RA" start="3083">
+		<fullName>Raven Alliance</fullName>
+		<generateAsIf>CSR</generateAsIf>
 	</clan>
 	<clan code="CSJ" end="3060">
 		<fullName>Smoke Jaguar</fullName>
@@ -94,11 +107,16 @@
 		<fullName>Widowmaker</fullName>
 		<rivals>CW</rivals>
 	</clan>
-	<clan code="CW">
+	<clan code="CW" end="3142">
 		<fullName>Wolf</fullName>
 		<nameChange start="3142">Wolf Empire</nameChange>
 		<rivals>CJF,CSJ,CWI,CWOV</rivals>
 		<rivals end="3136">CWIE</rivals>
+	</clan>
+	<clan code="CWE" start="3142">
+		<fullName>Wolf Empire</fullName>
+		<rivals>CJF</rivals>
+		<generateAsIf>CW</generateAsIf>
 	</clan>
 	<clan code="CWIE" start="3057">
 		<fullName>Wolf-in-Exile</fullName>
