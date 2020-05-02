@@ -121,7 +121,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private static final Map<Integer, Money> MECHWARRIOR_AERO_RANSOM_VALUES;
     private static final Map<Integer, Money> OTHER_RANSOM_VALUES;
 
-    public PersonAwardController awardController;
+    private PersonAwardController awardController;
 
     //region Family Variables
     // Lineage
@@ -1880,9 +1880,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 }
                 MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "missionLog");
             }
-            if (!awardController.getAwards().isEmpty()) {
+            if (!getAwardController().getAwards().isEmpty()) {
                 MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "awards");
-                for (Award award : awardController.getAwards()) {
+                for (Award award : getAwardController().getAwards()) {
                     award.writeToXml(pw1, indent + 2);
                 }
                 MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "awards");
@@ -3072,6 +3072,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
     //endregion skill
+
+    //region Awards
+    public PersonAwardController getAwardController() {
+        return awardController;
+    }
+    //endregion Awards
 
     public int getHits() {
         return hits;
