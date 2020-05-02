@@ -350,7 +350,7 @@ public class MedicalViewDialog extends JDialog {
 
         Period age = Period.between(birthday, campaign.getLocalDate());
 
-        String phenotype = (p.getPhenotype() != Phenotype.NONE) ? p.getPhenotype().getPhenotypeName()
+        String phenotype = (p.getPhenotype() != Phenotype.NONE) ? p.getPhenotype().toString()
                 : resourceMap.getString("baselinePhenotype.text");
 
         Force f = c.getForceFor(p);

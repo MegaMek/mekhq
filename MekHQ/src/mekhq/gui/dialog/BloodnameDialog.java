@@ -24,6 +24,7 @@ import java.util.*;
 import java.util.List;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Bloodname;
@@ -33,6 +34,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.gui.preferences.JComboBoxPreference;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
+import sun.swing.DefaultLookup;
 
 /**
  * @author Neoancient
@@ -111,11 +113,31 @@ public class BloodnameDialog extends JDialog {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index,
                                                           boolean isSelected, boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                setOpaque(list.isOpaque());
+                if (isSelected) {
+                    setBackground(list.getSelectionBackground());
+                    setForeground(list.getSelectionForeground());
+                } else {
+                    setBackground(list.getBackground());
+                    setForeground(list.getForeground());
+                }
+                setFont(list.getFont());
 
-                setText((list.getSelectedValue() instanceof Phenotype)
-                        ? ((Phenotype) list.getSelectedValue()).getGroupingName()
-                        : "Renderer Error");
+                setText((value == null) ? ""
+                        : (value instanceof Phenotype ? ((Phenotype) value).getGroupingName() : "ERROR"));
+
+                setEnabled(list.isEnabled());
+
+                if (cellHasFocus) {
+                    Border border = null;
+                    if (isSelected) {
+                        border = DefaultLookup.getBorder(this, ui, "List.focusSelectedCellHighlightBorder");
+                    }
+                    if (border == null) {
+                        border = DefaultLookup.getBorder(this, ui, "List.focusCellHighlightBorder");
+                    }
+                    setBorder(border);
+                }
 
                 return this;
             }

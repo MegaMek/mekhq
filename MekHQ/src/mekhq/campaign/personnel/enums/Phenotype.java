@@ -19,6 +19,7 @@
 package mekhq.campaign.personnel.enums;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,10 +82,6 @@ public enum Phenotype {
     }
     //endregion Getters
 
-    public String getPhenotypeName() {
-        return "";
-    }
-
     public static List<Phenotype> getExternalPhenotypes() {
         List<Phenotype> phenotypeList = new ArrayList<>();
         for (Phenotype phenotype : values()) {
@@ -96,12 +93,39 @@ public enum Phenotype {
     }
 
     public static Phenotype parseFromString(String text) {
+        try {
+            return valueOf(text);
+        } catch (Exception ignored) {
+
+        }
+
+        try {
+            switch (Integer.parseInt(text)) {
+                case 1:
+                    return MECHWARRIOR;
+                case 2:
+                    return ELEMENTAL;
+                case 3:
+                    return AEROSPACE;
+                case 4:
+                    return VEHICLE;
+                case 0:
+                default:
+                    return NONE;
+            }
+        } catch (Exception ignored) {
+
+        }
+
+        MekHQ.getLogger().error(Phenotype.class, "parseFromString",
+                "Unable to parse the phenotype from string " + text + ". Returning Phenotype.NONE");
+
         return NONE;
     }
 
     @Override
     public String toString() {
-        if (this == NONE) {
+        if ((this == NONE) || (this == GENERAL)) {
             return getShortName();
         } else {
             return getShortName() + " " + getGroupingName();
