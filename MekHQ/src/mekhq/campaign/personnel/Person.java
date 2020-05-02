@@ -25,7 +25,6 @@ import java.awt.event.KeyEvent;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -188,13 +187,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         "Both Spouse-Yours", "Male", "Female"
     };
     //endregion Marriage Variables
-
-    //region Divorce Variables
-    public static final String OPT_SELECTED_CHANGE_SURNAME = "selected_change_surname";
-    public static final String OPT_SPOUSE_CHANGE_SURNAME = "spouse_change_surname";
-    public static final String OPT_BOTH_CHANGE_SURNAME = "both_change_surname";
-    public static final String OPT_KEEP_SURNAME = "keep_surname";
-    //endregion Divorce Variables
     //endregion Family Variables
 
     protected UUID id;
@@ -1602,71 +1594,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return map;
     }
     //endregion Marriage
-
-    //region Divorce
-    public void divorce(String divorceOption) {
-        Person spouse = getSpouse();
-        int reason = FormerSpouse.REASON_WIDOWED;
-
-        switch (divorceOption) {
-            case OPT_SELECTED_CHANGE_SURNAME:
-                if (getMaidenName() != null) {
-                    setSurname(getMaidenName());
-                }
-                break;
-            case OPT_SPOUSE_CHANGE_SURNAME:
-                if (spouse.getMaidenName() != null) {
-                    spouse.setSurname(spouse.getMaidenName());
-                }
-                break;
-            case OPT_BOTH_CHANGE_SURNAME:
-                if (getMaidenName() != null) {
-                    setSurname(getMaidenName());
-                }
-                if (spouse.getMaidenName() != null) {
-                    spouse.setSurname(spouse.getMaidenName());
-                }
-                break;
-            case OPT_KEEP_SURNAME:
-            default:
-                break;
-        }
-
-        if (!(spouse.isDeadOrMIA() && isDeadOrMIA())) {
-            reason = FormerSpouse.REASON_DIVORCE;
-
-            PersonalLogger.divorcedFrom(this, spouse, getCampaign().getDate());
-            PersonalLogger.divorcedFrom(spouse, this, getCampaign().getDate());
-
-            campaign.addReport(String.format("%s has divorced %s!", getHyperlinkedName(),
-                    spouse.getHyperlinkedName()));
-
-            spouse.setMaidenName(null);
-            setMaidenName(null);
-
-            spouse.setSpouseId(null);
-            setSpouseId(null);
-        } else if (spouse.isDeadOrMIA()) {
-            setMaidenName(null);
-            setSpouseId(null);
-        } else if (isDeadOrMIA()) {
-            spouse.setMaidenName(null);
-            spouse.setSpouseId(null);
-        }
-
-        // Output a message for Spouses who are KIA
-        if (reason == FormerSpouse.REASON_WIDOWED) {
-            PersonalLogger.spouseKia(spouse, this, getCampaign().getDate());
-        }
-
-        // Add to former spouse list
-        spouse.addFormerSpouse(new FormerSpouse(getId(), getCampaign().getLocalDate(), reason));
-        addFormerSpouse(new FormerSpouse(spouse.getId(), getCampaign().getLocalDate(), reason));
-
-        MekHQ.triggerEvent(new PersonChangedEvent(this));
-        MekHQ.triggerEvent(new PersonChangedEvent(spouse));
-    }
-    //endregion Divorce
 
     public boolean isFemale() {
         return gender == Crew.G_FEMALE;

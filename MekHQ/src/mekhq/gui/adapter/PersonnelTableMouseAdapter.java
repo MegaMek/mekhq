@@ -47,6 +47,7 @@ import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.PersonLogEvent;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.personnel.*;
+import mekhq.campaign.personnel.enums.Divorce;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.ROMDesignation;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
@@ -495,7 +496,11 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 break;
             }
             case CMD_REMOVE_SPOUSE: {
-                selectedPerson.divorce(data[1]);
+                for (Person person : people) {
+                    if (person.hasSpouse()) {
+                        Divorce.valueOf(data[1]).divorce(person, gui.getCampaign());
+                    }
+                }
                 break;
             }
             case CMD_ADD_SPOUSE: {
@@ -1925,34 +1930,15 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
                 if (person.hasSpouse()) {
                     menu = new JMenu(resourceMap.getString("removeSpouse.text"));
-                    JMenuItem divorceMenu;
-                    String type;
 
-                    type = resourceMap.getString("removeSpouseKeepSurname.text");
-                    divorceMenu = new JMenuItem(type);
-                    divorceMenu.setActionCommand(makeCommand(CMD_REMOVE_SPOUSE, Person.OPT_KEEP_SURNAME));
-                    divorceMenu.addActionListener(this);
-                    menu.add(divorceMenu);
+                    for (Divorce divorceType : Divorce.values()) {
+                        JMenuItem divorceMenu = new JMenuItem(divorceType.toString());
+                        divorceMenu.setActionCommand(makeCommand(CMD_REMOVE_SPOUSE, divorceType.name()));
+                        divorceMenu.addActionListener(this);
+                        menu.add(divorceMenu);
+                    }
 
-                    type = resourceMap.getString("removeSpouseSpouseChangeSurname.text");
-                    divorceMenu = new JMenuItem(type);
-                    divorceMenu.setActionCommand(makeCommand(CMD_REMOVE_SPOUSE, Person.OPT_SPOUSE_CHANGE_SURNAME));
-                    divorceMenu.addActionListener(this);
-                    menu.add(divorceMenu);
-
-                    type = resourceMap.getString("removeSpouseSelectedChangeSurname.text");
-                    divorceMenu = new JMenuItem(type);
-                    divorceMenu.setActionCommand(makeCommand(CMD_REMOVE_SPOUSE, Person.OPT_SELECTED_CHANGE_SURNAME));
-                    divorceMenu.addActionListener(this);
-                    menu.add(divorceMenu);
-
-                    type = resourceMap.getString("removeSpouseBothChangeSurname.text");
-                    divorceMenu = new JMenuItem(type);
-                    divorceMenu.setActionCommand(makeCommand(CMD_REMOVE_SPOUSE, Person.OPT_BOTH_CHANGE_SURNAME));
-                    divorceMenu.addActionListener(this);
-                    menu.add(divorceMenu);
-
-                    popup.add(menu);
+                    JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
                 }
             }
 
