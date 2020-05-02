@@ -85,7 +85,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
 
         generateXp(campaign, person, expLvl);
 
-        generatePhenotype(campaign, person, expLvl);
+        generatePhenotype(campaign, person);
 
         generateBirthday(campaign, person, expLvl, person.isClanner() && person.getPhenotype() != Person.PHENOTYPE_NONE);
 

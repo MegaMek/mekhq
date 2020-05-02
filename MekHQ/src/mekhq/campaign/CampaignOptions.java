@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import mekhq.campaign.personnel.enums.Phenotype;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -287,10 +288,7 @@ public class CampaignOptions implements Serializable {
     private UnitRatingMethod unitRatingMethod;
 
     //phenotype related
-    private int probPhenoMW;
-    private int probPhenoAero;
-    private int probPhenoBA;
-    private int probPhenoVee;
+    private int[] phenotypeProbabilities;
 
     //random portraits related
     private boolean[] usePortraitForType;
@@ -616,10 +614,13 @@ public class CampaignOptions implements Serializable {
         personnelMarketDylansWeight = 0.3;
         //endregion Personnel Market Tab
 
-        probPhenoMW = 95;
-        probPhenoAero = 95;
-        probPhenoBA = 100;
-        probPhenoVee = 0;
+        phenotypeProbabilities = new int[Phenotype.getExternalPhenotypeCount()];
+        phenotypeProbabilities[Phenotype.MECHWARRIOR.getIndex()] = 95;
+        phenotypeProbabilities[Phenotype.ELEMENTAL.getIndex()] = 100;
+        phenotypeProbabilities[Phenotype.AEROSPACE.getIndex()] = 95;
+        phenotypeProbabilities[Phenotype.VEHICLE.getIndex()] = 0;
+        phenotypeProbabilities[Phenotype.PROTOMECH.getIndex()] = 95;
+        phenotypeProbabilities[Phenotype.NAVAL.getIndex()] = 25;
 
         useAtB = false;
     	useAero = false;
@@ -1967,36 +1968,16 @@ public class CampaignOptions implements Serializable {
         techLevel = lvl;
     }
 
-    public int getProbPhenoMW() {
-        return probPhenoMW;
+    public int[] getPhenotypeProbabilities() {
+        return phenotypeProbabilities;
     }
 
-    public void setProbPhenoMW(int p) {
-        probPhenoMW = p;
+    public int getPhenotypeProbability(int index) {
+        return phenotypeProbabilities[index];
     }
 
-    public int getProbPhenoAero() {
-        return probPhenoAero;
-    }
-
-    public void setProbPhenoAero(int p) {
-        probPhenoAero = p;
-    }
-
-    public int getProbPhenoBA() {
-        return probPhenoBA;
-    }
-
-    public void setProbPhenoBA(int p) {
-        probPhenoBA = p;
-    }
-
-    public int getProbPhenoVee() {
-        return probPhenoVee;
-    }
-
-    public void setProbPhenoVee(int p) {
-        probPhenoVee = p;
+    public void setPhenotypeProbability(int index, int percentage) {
+        phenotypeProbabilities[index] = percentage;
     }
 
     public boolean usePortraitForType(int type) {
@@ -3052,10 +3033,10 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "salaryEnlistedMultiplier", salaryEnlistedMultiplier);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "salaryCommissionMultiplier", salaryCommissionMultiplier);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "salaryAntiMekMultiplier", salaryAntiMekMultiplier);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "probPhenoMW", probPhenoMW);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "probPhenoAero", probPhenoAero);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "probPhenoBA", probPhenoBA);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "probPhenoVee", probPhenoVee);
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                + "<phenotypeProbabilities>"
+                + StringUtils.join(phenotypeProbabilities, ',')
+                + "</phenotypeProbabilities>");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "tougherHealing", tougherHealing);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAtB", useAtB);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAero", useAero);
@@ -3406,7 +3387,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("usePortraitForType")) {
                 String[] values = wn2.getTextContent().split(","); //$NON-NLS-1$
                 for (int i = 0; i < values.length; i++) {
-                    if(i < retVal.usePortraitForType.length) {
+                    if (i < retVal.usePortraitForType.length) {
                         retVal.usePortraitForType[i] = Boolean.parseBoolean(values[i].trim());
                     }
                 }
@@ -3580,14 +3561,19 @@ public class CampaignOptions implements Serializable {
                 for (int i = 0; i < values.length; i++) {
                     retVal.salaryXpMultiplier[i] = Double.parseDouble(values[i]);
                 }
+            } else if (wn2.getNodeName().equalsIgnoreCase("phenotypeProbabilities")) {
+                String[] values = wn2.getTextContent().split(",");
+                for (int i = 0; i < values.length; i++) {
+                    retVal.phenotypeProbabilities[i] = Integer.parseInt(values[i]);
+                }
             } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoMW")) {
-                retVal.probPhenoMW = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoAero")) {
-                retVal.probPhenoAero = Integer.parseInt(wn2.getTextContent().trim());
+                retVal.phenotypeProbabilities[Phenotype.MECHWARRIOR.getIndex()] = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoBA")) {
-                retVal.probPhenoBA = Integer.parseInt(wn2.getTextContent().trim());
+                retVal.phenotypeProbabilities[Phenotype.ELEMENTAL.getIndex()] = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoAero")) {
+                retVal.phenotypeProbabilities[Phenotype.AEROSPACE.getIndex()] = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoVee")) {
-                retVal.probPhenoVee = Integer.parseInt(wn2.getTextContent().trim());
+                retVal.phenotypeProbabilities[Phenotype.VEHICLE.getIndex()] = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("tougherHealing")) {
                 retVal.tougherHealing = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useAtB")) {
