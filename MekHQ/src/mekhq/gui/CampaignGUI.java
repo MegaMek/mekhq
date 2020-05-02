@@ -281,8 +281,8 @@ public class CampaignGUI extends JPanel {
 
     public void showBloodnameDialog() {
         final int year = getCampaign().getGameYear();
-        BloodnameDialog bloodnameDialog = new BloodnameDialog(getFrame(), year);
-        bloodnameDialog.setFaction(getCampaign().getFaction().getFullName(year));
+        BloodnameDialog bloodnameDialog = new BloodnameDialog(getFrame(),
+                getCampaign().getFaction().getFullName(year), year);
 
         bloodnameDialog.setVisible(true);
     }

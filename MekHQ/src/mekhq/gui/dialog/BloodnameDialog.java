@@ -68,19 +68,20 @@ public class BloodnameDialog extends JDialog {
     private int year;
     //endregion Variable Declaration
 
-    public BloodnameDialog(JFrame parent, int year) {
+    public BloodnameDialog(JFrame parent, String factionName, int year) {
         super (parent, false);
         setTitle ("Bloodname Generator");
         getContentPane().setLayout(new GridBagLayout());
         setPreferredSize(new Dimension(350,300));
-
-        this.year = year;
 
         initComponents();
 
         setLocationRelativeTo(parent);
         pack();
         setUserPreferences();
+
+        setYear(year);
+        setFaction(factionName);
     }
 
     private void initComponents() {
