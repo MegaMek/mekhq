@@ -702,7 +702,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             }
         }
         //clear any planned replacement flags
-        for (Part rPart: plannedReplacementParts) {
+        for (Part rPart : plannedReplacementParts) {
             rPart.setUsedForRefitPlanning(false);
         }
 

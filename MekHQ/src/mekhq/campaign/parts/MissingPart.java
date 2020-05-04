@@ -170,7 +170,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		}
 		// don't just return with the first part if it is damaged
 		for(Part part : campaign.getSpareParts()) {
-			if(part.isReservedForRefit() || part.isBeingWorkedOn() || part.isReservedForReplacement() || !part.isPresent() || part.hasParentPart() || part.isUsedForRefitPlanning()) {
+			if (part.isReservedForRefit() || part.isBeingWorkedOn() || part.isReservedForReplacement() || !part.isPresent() || part.hasParentPart() || part.isUsedForRefitPlanning()) {
 				continue;
 			}
 
@@ -179,7 +179,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 					bestPart = part;
 				} else if(bestPart.needsFixing() && !part.needsFixing()) {
 					bestPart = part;
-				} else if(bestPart.getQuality() < part.getQuality()) {
+				} else if (bestPart.getQuality() < part.getQuality()) {
 				    bestPart = part;
                 }
 			}
@@ -448,4 +448,3 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
         return isExtinct(year, clan, techFaction);
     }
 }
-
