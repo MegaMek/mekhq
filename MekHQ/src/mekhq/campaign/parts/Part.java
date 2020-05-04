@@ -1236,9 +1236,13 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         return reserveId != null;
     }
 
-    public boolean isUsedForRefitPlanning() { return usedForRefitPlanning; }
+    public boolean isUsedForRefitPlanning() {
+        return usedForRefitPlanning;
+    }
 
-    public void setUsedForRefitPlanning(boolean flag) { usedForRefitPlanning = flag; }
+    public void setUsedForRefitPlanning(boolean flag) {
+        usedForRefitPlanning = flag;
+    }
 
     public void setDaysToArrival(int days) {
         daysToArrival = days;
