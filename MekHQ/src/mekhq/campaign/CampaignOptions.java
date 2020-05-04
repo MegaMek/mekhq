@@ -327,6 +327,7 @@ public class CampaignOptions implements Serializable {
     private boolean ignoreRatEra;
     private int searchRadius;
     private double intensity;
+    private boolean generateChases;
     private boolean variableContractLength;
     private boolean instantUnitMarketDelivery;
     private boolean useWeatherConditions;
@@ -340,7 +341,7 @@ public class CampaignOptions implements Serializable {
     private boolean restrictPartsByMission;
     private boolean limitLanceWeight;
     private boolean limitLanceNumUnits;
-    private boolean useAtBCapture;
+    private boolean useAtBCapture; // TODO : merge me with the Personnel Option capturePrisoners
     private boolean contractMarketReportRefresh;
     private boolean unitMarketReportRefresh;
     private int startGameDelay;
@@ -456,6 +457,20 @@ public class CampaignOptions implements Serializable {
         destroyMargin = 4;
         destroyPartTarget = 10;
         useAeroSystemHits = false;
+
+        //Mass Repair/Salvage Options
+        massRepairUseExtraTime = true;
+        massRepairUseRushJob = true;
+        massRepairAllowCarryover = true;
+        massRepairOptimizeToCompleteToday = false;
+        massRepairScrapImpossible = false;
+        massRepairUseAssignedTechsFirst = false;
+        massRepairReplacePod = true;
+        massRepairOptions = new ArrayList<>();
+
+        for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
+            massRepairOptions.add(new MassRepairOption(MassRepairOption.VALID_REPAIR_TYPES[i]));
+        }
 
         //endregion Repair and Maintenance Tab
         // Maintenance
@@ -621,39 +636,57 @@ public class CampaignOptions implements Serializable {
         probPhenoBA = 100;
         probPhenoVee = 0;
 
+        //region Against the Bot Tab
         useAtB = false;
-    	useAero = false;
-    	useVehicles = true;
-    	clanVehicles = false;
-    	doubleVehicles = false;
-        adjustPlayerVehicles = false;
-        opforLanceTypeMechs = 1;
-        opforLanceTypeMixed = 2;
-        opforLanceTypeVehicles = 3;
-        opforUsesVTOLs = true;
-    	useDropShips = false;
-    	skillLevel = 2;
-        aeroRecruitsHaveUnits = false;
+        skillLevel = 2;
         useShareSystem = false;
         sharesExcludeLargeCraft = false;
         sharesForAll = false;
+        aeroRecruitsHaveUnits = false;
         retirementRolls = true;
         customRetirementMods = false;
         foundersNeverRetire = false;
         atbAddDependents = true;
         dependentsNeverLeave = false;
         trackUnitFatigue = false;
+        useLeadership = true;
         trackOriginalUnit = false;
-        mercSizeLimited = false;
-    	regionalMechVariations = false;
-    	searchRadius = 800;
-    	intensity = 1.0;
-    	variableContractLength = false;
+    	useAero = false;
+    	useVehicles = true;
+    	clanVehicles = false;
         instantUnitMarketDelivery = false;
+        contractMarketReportRefresh = true;
+        unitMarketReportRefresh = true;
+
+        // Contract Operations
+        searchRadius = 800;
+        variableContractLength = false;
+
+        mercSizeLimited = false;
+        regionalMechVariations = false;
+        intensity = 1.0;
+        generateChases = true;
+
+        // Scenarios
+        doubleVehicles = false;
+        opforLanceTypeMechs = 1;
+        opforLanceTypeMixed = 2;
+        opforLanceTypeVehicles = 3;
+        opforUsesVTOLs = true;
+        allowOpforAeros = false;
+        opforAeroChance = 5;
+        allowOpforLocalUnits = false;
+        opforLocalUnitChance = 5;
+        adjustPlayerVehicles = false;
+
+    	useDropShips = false;
         useWeatherConditions = true;
+        useAtBCapture = false;
+        startGameDelay = 500;
+        //endregion Against the Bot Tab
+
     	useLightConditions = true;
     	usePlanetaryConditions = false;
-    	useLeadership = true;
     	useStrategy = true;
     	baseStrategyDeployment = 3;
     	additionalStrategyDeployment = 1;
@@ -661,30 +694,10 @@ public class CampaignOptions implements Serializable {
     	restrictPartsByMission = true;
     	limitLanceWeight = true;
     	limitLanceNumUnits = true;
-    	useAtBCapture = false;
-        contractMarketReportRefresh = true;
-        unitMarketReportRefresh = true;
-        startGameDelay = 500;
-        allowOpforAeros = false;
-        allowOpforLocalUnits = false;
-        opforAeroChance = 5;
-        opforLocalUnitChance = 5;
 
-        //Mass Repair/Salvage Options
-        massRepairUseExtraTime = true;
-        massRepairUseRushJob = true;
-        massRepairAllowCarryover = true;
-        massRepairOptimizeToCompleteToday = false;
-        massRepairScrapImpossible = false;
-        massRepairUseAssignedTechsFirst = false;
-        massRepairReplacePod = true;
-        massRepairOptions = new ArrayList<>();
-
-        for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
-        	massRepairOptions.add(new MassRepairOption(MassRepairOption.VALID_REPAIR_TYPES[i]));
-        }
-
+        //region Miscellaneous Tab
         historicalDailyLog = false;
+        //endregion Miscellaneous Tab
     }
 
     //region General Tab
@@ -2623,6 +2636,14 @@ public class CampaignOptions implements Serializable {
 		this.intensity = intensity;
 	}
 
+	public boolean generateChases() {
+        return generateChases;
+    }
+
+    public void setGenerateChases(boolean generateChases) {
+        this.generateChases = generateChases;
+    }
+
 	public boolean getVariableContractLength() {
 		return variableContractLength;
 	}
@@ -3084,6 +3105,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "regionalMechVariations", regionalMechVariations);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "searchRadius", searchRadius);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "intensity", intensity);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "generateChases", generateChases);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "variableContractLength", variableContractLength);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "instantUnitMarketDelivery", instantUnitMarketDelivery);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useWeatherConditions", useWeatherConditions);
@@ -3644,6 +3666,8 @@ public class CampaignOptions implements Serializable {
                 retVal.searchRadius = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("intensity")) {
                 retVal.intensity = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("generateChases")) {
+                retVal.setGenerateChases(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("variableContractLength")) {
                 retVal.variableContractLength = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("instantUnitMarketDelivery")) {
