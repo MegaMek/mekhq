@@ -1103,11 +1103,9 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             Part newPart = oldUnit.getCampaign().getPart(id);
             if(newPart.isSpare()) {
                 if(newPart.getQuantity() > 1) {
-                    int quality = newPart.getQuality();
                     newPart.decrementQuantity();
                     newPart = newPart.clone();
                     newPart.setRefitId(oldUnit.getId());
-                    newPart.setQuality(quality);
                     oldUnit.getCampaign().addPart(newPart, 0);
                     newNewUnitParts.add(newPart.getId());
                 } else {
