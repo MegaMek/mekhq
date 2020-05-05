@@ -185,7 +185,7 @@ public class CampaignOptions implements Serializable {
     private int defaultPrisonerStatus;
     public static final int PRISONER_RANK = 0;
     public static final int BONDSMAN_RANK = 1;
-	private boolean altQualityAveraging;
+    private boolean altQualityAveraging;
     private boolean useAdvancedMedical; // Unofficial
     private boolean useDylansRandomXp; // Unofficial
     private int healWaitingPeriod;
@@ -719,9 +719,9 @@ public class CampaignOptions implements Serializable {
         trackUnitFatigue = false;
         useLeadership = true;
         trackOriginalUnit = false;
-    	useAero = false;
-    	useVehicles = true;
-    	clanVehicles = false;
+        useAero = false;
+        useVehicles = true;
+        clanVehicles = false;
         instantUnitMarketDelivery = false;
         contractMarketReportRefresh = true;
         unitMarketReportRefresh = true;
@@ -757,7 +757,7 @@ public class CampaignOptions implements Serializable {
         opforLocalUnitChance = 5;
         adjustPlayerVehicles = false;
         regionalMechVariations = false;
-    	useDropShips = false;
+        useDropShips = false;
         useWeatherConditions = true;
         useLightConditions = true;
         usePlanetaryConditions = false;
@@ -1801,20 +1801,20 @@ public class CampaignOptions implements Serializable {
     }
 
     public boolean useAssignedTechFirst() {
-		return assignedTechFirst;
-	}
+        return assignedTechFirst;
+    }
 
-	public void setAssignedTechFirst(boolean assignedTechFirst) {
-		this.assignedTechFirst = assignedTechFirst;
-	}
+    public void setAssignedTechFirst(boolean assignedTechFirst) {
+        this.assignedTechFirst = assignedTechFirst;
+    }
 
-	public boolean useResetToFirstTech() {
-		return resetToFirstTech;
-	}
+    public boolean useResetToFirstTech() {
+        return resetToFirstTech;
+    }
 
-	public void setResetToFirstTech(boolean resetToFirstTech) {
-		this.resetToFirstTech = resetToFirstTech;
-	}
+    public void setResetToFirstTech(boolean resetToFirstTech) {
+        this.resetToFirstTech = resetToFirstTech;
+    }
 
     public boolean useDragoonRating() {
         return useUnitRating;
@@ -1983,7 +1983,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setDisallowExtinctStuff(boolean b) {
-    	disallowExtinctStuff = b;
+        disallowExtinctStuff = b;
     }
 
     public boolean allowClanPurchases() {
@@ -2249,59 +2249,59 @@ public class CampaignOptions implements Serializable {
     }
 
     public boolean usesPlanetaryAcquisition() {
-    	return usePlanetaryAcquisition;
+        return usePlanetaryAcquisition;
     }
 
     public void setPlanetaryAcquisition(boolean b) {
-    	usePlanetaryAcquisition = b;
+        usePlanetaryAcquisition = b;
     }
 
     public int getPlanetAcquisitionFactionLimit() {
-    	return planetAcquisitionFactionLimit;
+        return planetAcquisitionFactionLimit;
     }
 
     public void setPlanetAcquisitionFactionLimit(int b) {
-    	planetAcquisitionFactionLimit = b;
+        planetAcquisitionFactionLimit = b;
     }
 
     public boolean disallowPlanetAcquisitionClanCrossover() {
-    	return planetAcquisitionNoClanCrossover;
+        return planetAcquisitionNoClanCrossover;
     }
 
     public void setDisallowPlanetAcquisitionClanCrossover(boolean b) {
-    	planetAcquisitionNoClanCrossover = b;
+        planetAcquisitionNoClanCrossover = b;
     }
 
     public int getMaxJumpsPlanetaryAcquisition() {
-    	return maxJumpsPlanetaryAcquisition;
+        return maxJumpsPlanetaryAcquisition;
     }
 
     public void setMaxJumpsPlanetaryAcquisition(int m) {
-    	maxJumpsPlanetaryAcquisition = m;
+        maxJumpsPlanetaryAcquisition = m;
     }
 
     public int getPenaltyClanPartsFroIS() {
-    	return penaltyClanPartsFromIS;
+        return penaltyClanPartsFromIS;
     }
 
     public void setPenaltyClanPartsFroIS(int i) {
-    	penaltyClanPartsFromIS = i ;
+        penaltyClanPartsFromIS = i ;
     }
 
     public boolean disallowClanPartsFromIS() {
-    	return noClanPartsFromIS;
+        return noClanPartsFromIS;
     }
 
     public void setDisallowClanPartsFromIS(boolean b) {
-    	noClanPartsFromIS = b;
+        noClanPartsFromIS = b;
     }
 
     public boolean usePlanetAcquisitionVerboseReporting() {
-    	return planetAcquisitionVerbose;
+        return planetAcquisitionVerbose;
     }
 
     public void setPlanetAcquisitionVerboseReporting(boolean b) {
-    	planetAcquisitionVerbose = b;
+        planetAcquisitionVerbose = b;
     }
 
     public double getEquipmentContractPercent() {
@@ -2458,155 +2458,155 @@ public class CampaignOptions implements Serializable {
         maxAcquisitions = d;
     }
 
-	public boolean getUseAtB() {
-		return useAtB;
-	}
+    public boolean getUseAtB() {
+        return useAtB;
+    }
 
-	public void setUseAtB(boolean useAtB) {
-		this.useAtB = useAtB;
-	}
+    public void setUseAtB(boolean useAtB) {
+        this.useAtB = useAtB;
+    }
 
-	public boolean getUseAero() {
-		return useAero;
-	}
+    public boolean getUseAero() {
+        return useAero;
+    }
 
-	public void setUseAero(boolean useAero) {
-		this.useAero = useAero;
-	}
+    public void setUseAero(boolean useAero) {
+        this.useAero = useAero;
+    }
 
-	public boolean getUseVehicles() {
-		return useVehicles;
-	}
+    public boolean getUseVehicles() {
+        return useVehicles;
+    }
 
-	public void setUseVehicles(boolean useVehicles) {
-		this.useVehicles = useVehicles;
-	}
+    public void setUseVehicles(boolean useVehicles) {
+        this.useVehicles = useVehicles;
+    }
 
-	public boolean getClanVehicles() {
-		return clanVehicles;
-	}
+    public boolean getClanVehicles() {
+        return clanVehicles;
+    }
 
-	public void setClanVehicles(boolean clanVehicles) {
-		this.clanVehicles = clanVehicles;
-	}
+    public void setClanVehicles(boolean clanVehicles) {
+        this.clanVehicles = clanVehicles;
+    }
 
-	public boolean getDoubleVehicles() {
-		return doubleVehicles;
-	}
+    public boolean getDoubleVehicles() {
+        return doubleVehicles;
+    }
 
-	public void setDoubleVehicles(boolean doubleVehicles) {
-		this.doubleVehicles = doubleVehicles;
-	}
+    public void setDoubleVehicles(boolean doubleVehicles) {
+        this.doubleVehicles = doubleVehicles;
+    }
 
-	public boolean getAdjustPlayerVehicles() {
-		return adjustPlayerVehicles;
-	}
+    public boolean getAdjustPlayerVehicles() {
+        return adjustPlayerVehicles;
+    }
 
-	public int getOpforLanceTypeMechs() {
-		return opforLanceTypeMechs;
-	}
+    public int getOpforLanceTypeMechs() {
+        return opforLanceTypeMechs;
+    }
 
-	public void setOpforLanceTypeMechs(int weight) {
-		opforLanceTypeMechs = weight;
-	}
+    public void setOpforLanceTypeMechs(int weight) {
+        opforLanceTypeMechs = weight;
+    }
 
-	public int getOpforLanceTypeMixed() {
-		return opforLanceTypeMixed;
-	}
+    public int getOpforLanceTypeMixed() {
+        return opforLanceTypeMixed;
+    }
 
-	public void setOpforLanceTypeMixed(int weight) {
-		opforLanceTypeMixed = weight;
-	}
+    public void setOpforLanceTypeMixed(int weight) {
+        opforLanceTypeMixed = weight;
+    }
 
-	public int getOpforLanceTypeVehicles() {
-		return opforLanceTypeVehicles;
-	}
+    public int getOpforLanceTypeVehicles() {
+        return opforLanceTypeVehicles;
+    }
 
-	public void setOpforLanceTypeVehicles(int weight) {
-		opforLanceTypeVehicles = weight;
-	}
+    public void setOpforLanceTypeVehicles(int weight) {
+        opforLanceTypeVehicles = weight;
+    }
 
-	public boolean getOpforUsesVTOLs() {
-		return opforUsesVTOLs;
-	}
+    public boolean getOpforUsesVTOLs() {
+        return opforUsesVTOLs;
+    }
 
-	public void setOpforUsesVTOLs(boolean vtol) {
-		opforUsesVTOLs = vtol;
-	}
+    public void setOpforUsesVTOLs(boolean vtol) {
+        opforUsesVTOLs = vtol;
+    }
 
-	public void setAdjustPlayerVehicles(boolean adjust) {
-		adjustPlayerVehicles = adjust;
-	}
+    public void setAdjustPlayerVehicles(boolean adjust) {
+        adjustPlayerVehicles = adjust;
+    }
 
-	public boolean getUseDropShips() {
-		return useDropShips;
-	}
+    public boolean getUseDropShips() {
+        return useDropShips;
+    }
 
-	public void setUseDropShips(boolean useDropShips) {
-		this.useDropShips = useDropShips;
-	}
+    public void setUseDropShips(boolean useDropShips) {
+        this.useDropShips = useDropShips;
+    }
 
-	public int getSkillLevel() {
-		return skillLevel;
-	}
+    public int getSkillLevel() {
+        return skillLevel;
+    }
 
-	public void setSkillLevel(int level) {
-		skillLevel = level;
-	}
+    public void setSkillLevel(int level) {
+        skillLevel = level;
+    }
 
-	public boolean getAeroRecruitsHaveUnits() {
-		return aeroRecruitsHaveUnits;
-	}
+    public boolean getAeroRecruitsHaveUnits() {
+        return aeroRecruitsHaveUnits;
+    }
 
-	public void setAeroRecruitsHaveUnits(boolean haveUnits) {
-		aeroRecruitsHaveUnits = haveUnits;
-	}
+    public void setAeroRecruitsHaveUnits(boolean haveUnits) {
+        aeroRecruitsHaveUnits = haveUnits;
+    }
 
-	public boolean getUseShareSystem() {
-		return useShareSystem;
-	}
+    public boolean getUseShareSystem() {
+        return useShareSystem;
+    }
 
-	public boolean getSharesExcludeLargeCraft() {
-		return sharesExcludeLargeCraft;
-	}
+    public boolean getSharesExcludeLargeCraft() {
+        return sharesExcludeLargeCraft;
+    }
 
-	public void setSharesExcludeLargeCraft(boolean exclude) {
-		sharesExcludeLargeCraft = exclude;
-	}
+    public void setSharesExcludeLargeCraft(boolean exclude) {
+        sharesExcludeLargeCraft = exclude;
+    }
 
-	public boolean getSharesForAll() {
-		return sharesForAll;
-	}
+    public boolean getSharesForAll() {
+        return sharesForAll;
+    }
 
-	public void setSharesForAll(boolean set) {
-		sharesForAll = set;
-	}
+    public void setSharesForAll(boolean set) {
+        sharesForAll = set;
+    }
 
-	public boolean doRetirementRolls() {
-		return retirementRolls;
-	}
+    public boolean doRetirementRolls() {
+        return retirementRolls;
+    }
 
-	public void setRetirementRolls(boolean roll) {
-		retirementRolls = roll;
-	}
+    public void setRetirementRolls(boolean roll) {
+        retirementRolls = roll;
+    }
 
-	public boolean getCustomRetirementMods() {
-		return customRetirementMods;
-	}
+    public boolean getCustomRetirementMods() {
+        return customRetirementMods;
+    }
 
     public void setCustomRetirementMods(boolean mods) {
         customRetirementMods = mods;
     }
 
     public boolean getFoundersNeverRetire() {
-		return foundersNeverRetire;
-	}
+        return foundersNeverRetire;
+    }
 
-	public void setFoundersNeverRetire(boolean mods) {
+    public void setFoundersNeverRetire(boolean mods) {
         foundersNeverRetire = mods;
-	}
+    }
 
-	public boolean canAtBAddDependents() {
+    public boolean canAtBAddDependents() {
         return atbAddDependents;
     }
 
@@ -2623,90 +2623,90 @@ public class CampaignOptions implements Serializable {
     }
 
     public boolean getTrackOriginalUnit() {
-		return trackOriginalUnit;
-	}
+        return trackOriginalUnit;
+    }
 
-	public void setTrackOriginalUnit(boolean track) {
-		trackOriginalUnit = track;
-	}
+    public void setTrackOriginalUnit(boolean track) {
+        trackOriginalUnit = track;
+    }
 
-	public boolean isMercSizeLimited() {
-		return mercSizeLimited;
-	}
+    public boolean isMercSizeLimited() {
+        return mercSizeLimited;
+    }
 
-	public boolean getTrackUnitFatigue() {
-		return trackUnitFatigue;
-	}
+    public boolean getTrackUnitFatigue() {
+        return trackUnitFatigue;
+    }
 
-	public void setTrackUnitFatigue(boolean fatigue) {
-		trackUnitFatigue = fatigue;
-	}
+    public void setTrackUnitFatigue(boolean fatigue) {
+        trackUnitFatigue = fatigue;
+    }
 
-	public void setMercSizeLimited(boolean limit) {
-		mercSizeLimited = limit;
-	}
+    public void setMercSizeLimited(boolean limit) {
+        mercSizeLimited = limit;
+    }
 
-	public void setUseShareSystem(boolean shares) {
-		useShareSystem = shares;
-	}
+    public void setUseShareSystem(boolean shares) {
+        useShareSystem = shares;
+    }
 
-	public boolean getRegionalMechVariations() {
-		return regionalMechVariations;
-	}
+    public boolean getRegionalMechVariations() {
+        return regionalMechVariations;
+    }
 
-	public void setRegionalMechVariations(boolean regionalMechVariations) {
-		this.regionalMechVariations = regionalMechVariations;
-	}
+    public void setRegionalMechVariations(boolean regionalMechVariations) {
+        this.regionalMechVariations = regionalMechVariations;
+    }
 
-	public String[] getRATs() {
-		return rats;
-	}
+    public String[] getRATs() {
+        return rats;
+    }
 
-	public void setRATs (String[] rats) {
-		this.rats = rats;
-	}
+    public void setRATs (String[] rats) {
+        this.rats = rats;
+    }
 
-	public boolean useStaticRATs() {
-		return staticRATs;
-	}
+    public boolean useStaticRATs() {
+        return staticRATs;
+    }
 
-	public void setStaticRATs(boolean staticRATs) {
-		this.staticRATs = staticRATs;
-	}
+    public void setStaticRATs(boolean staticRATs) {
+        this.staticRATs = staticRATs;
+    }
 
-	public boolean canIgnoreRatEra() {
-	    return ignoreRatEra;
-	}
+    public boolean canIgnoreRatEra() {
+        return ignoreRatEra;
+    }
 
-	public void setIgnoreRatEra(boolean ignore) {
-	    ignoreRatEra = ignore;
-	}
+    public void setIgnoreRatEra(boolean ignore) {
+        ignoreRatEra = ignore;
+    }
 
-	public int getSearchRadius() {
-		return searchRadius;
-	}
+    public int getSearchRadius() {
+        return searchRadius;
+    }
 
-	public void setSearchRadius(int radius) {
-		searchRadius = radius;
-	}
+    public void setSearchRadius(int radius) {
+        searchRadius = radius;
+    }
 
-	public boolean getInstantUnitMarketDelivery() {
-		return instantUnitMarketDelivery;
-	}
+    public boolean getInstantUnitMarketDelivery() {
+        return instantUnitMarketDelivery;
+    }
 
-	public void setInstantUnitMarketDelivery(boolean instant) {
-		instantUnitMarketDelivery = instant;
-	}
+    public void setInstantUnitMarketDelivery(boolean instant) {
+        instantUnitMarketDelivery = instant;
+    }
 
-	public double getIntensity() {
-		return intensity;
-	}
+    public double getIntensity() {
+        return intensity;
+    }
 
-	public void setIntensity(double intensity) {
-		this.intensity = intensity;
-	}
+    public void setIntensity(double intensity) {
+        this.intensity = intensity;
+    }
 
-	public boolean generateChases() {
+    public boolean generateChases() {
         return generateChases;
     }
 
@@ -2714,180 +2714,180 @@ public class CampaignOptions implements Serializable {
         this.generateChases = generateChases;
     }
 
-	public boolean getVariableContractLength() {
-		return variableContractLength;
-	}
+    public boolean getVariableContractLength() {
+        return variableContractLength;
+    }
 
-	public void setVariableContractLength(boolean variable) {
-		variableContractLength = variable;
-	}
+    public void setVariableContractLength(boolean variable) {
+        variableContractLength = variable;
+    }
 
-	public boolean getUseWeatherConditions() {
-		return useWeatherConditions;
-	}
+    public boolean getUseWeatherConditions() {
+        return useWeatherConditions;
+    }
 
-	public void setUseWeatherConditions(boolean useWeatherConditions) {
-		this.useWeatherConditions = useWeatherConditions;
-	}
+    public void setUseWeatherConditions(boolean useWeatherConditions) {
+        this.useWeatherConditions = useWeatherConditions;
+    }
 
-	public boolean getUseLightConditions() {
-		return useLightConditions;
-	}
+    public boolean getUseLightConditions() {
+        return useLightConditions;
+    }
 
-	public void setUseLightConditions(boolean useLightConditions) {
-		this.useLightConditions = useLightConditions;
-	}
+    public void setUseLightConditions(boolean useLightConditions) {
+        this.useLightConditions = useLightConditions;
+    }
 
-	public boolean getUsePlanetaryConditions() {
-		return usePlanetaryConditions;
-	}
+    public boolean getUsePlanetaryConditions() {
+        return usePlanetaryConditions;
+    }
 
-	public void setUsePlanetaryConditions(boolean usePlanetaryConditions) {
-		this.usePlanetaryConditions = usePlanetaryConditions;
-	}
+    public void setUsePlanetaryConditions(boolean usePlanetaryConditions) {
+        this.usePlanetaryConditions = usePlanetaryConditions;
+    }
 
-	public boolean getUseLeadership() {
-		return useLeadership;
-	}
+    public boolean getUseLeadership() {
+        return useLeadership;
+    }
 
-	public void setUseLeadership(boolean useLeadership) {
-		this.useLeadership = useLeadership;
-	}
+    public void setUseLeadership(boolean useLeadership) {
+        this.useLeadership = useLeadership;
+    }
 
-	public boolean getUseStrategy() {
-		return useStrategy;
-	}
+    public boolean getUseStrategy() {
+        return useStrategy;
+    }
 
-	public void setUseStrategy(boolean useStrategy) {
-		this.useStrategy = useStrategy;
-	}
+    public void setUseStrategy(boolean useStrategy) {
+        this.useStrategy = useStrategy;
+    }
 
-	public int getBaseStrategyDeployment() {
-		return baseStrategyDeployment;
-	}
+    public int getBaseStrategyDeployment() {
+        return baseStrategyDeployment;
+    }
 
-	public void setBaseStrategyDeployment(int baseStrategyDeployment) {
-		this.baseStrategyDeployment = baseStrategyDeployment;
-	}
+    public void setBaseStrategyDeployment(int baseStrategyDeployment) {
+        this.baseStrategyDeployment = baseStrategyDeployment;
+    }
 
-	public int getAdditionalStrategyDeployment() {
-		return additionalStrategyDeployment;
-	}
+    public int getAdditionalStrategyDeployment() {
+        return additionalStrategyDeployment;
+    }
 
-	public void setAdditionalStrategyDeployment(int additionalStrategyDeployment) {
-		this.additionalStrategyDeployment = additionalStrategyDeployment;
-	}
+    public void setAdditionalStrategyDeployment(int additionalStrategyDeployment) {
+        this.additionalStrategyDeployment = additionalStrategyDeployment;
+    }
 
-	public boolean getAdjustPaymentForStrategy() {
-		return adjustPaymentForStrategy;
-	}
+    public boolean getAdjustPaymentForStrategy() {
+        return adjustPaymentForStrategy;
+    }
 
-	public void setAdjustPaymentForStrategy(boolean adjustPaymentForStrategy) {
-		this.adjustPaymentForStrategy = adjustPaymentForStrategy;
-	}
+    public void setAdjustPaymentForStrategy(boolean adjustPaymentForStrategy) {
+        this.adjustPaymentForStrategy = adjustPaymentForStrategy;
+    }
 
-	public boolean getRestrictPartsByMission() {
-		return restrictPartsByMission;
-	}
+    public boolean getRestrictPartsByMission() {
+        return restrictPartsByMission;
+    }
 
-	public void setRestrictPartsByMission(boolean restrictPartsByMission) {
-		this.restrictPartsByMission = restrictPartsByMission;
-	}
+    public void setRestrictPartsByMission(boolean restrictPartsByMission) {
+        this.restrictPartsByMission = restrictPartsByMission;
+    }
 
-	public boolean getLimitLanceWeight() {
-		return limitLanceWeight;
-	}
+    public boolean getLimitLanceWeight() {
+        return limitLanceWeight;
+    }
 
-	public void setLimitLanceWeight(boolean limit) {
-		limitLanceWeight = limit;
-	}
+    public void setLimitLanceWeight(boolean limit) {
+        limitLanceWeight = limit;
+    }
 
-	public boolean getLimitLanceNumUnits() {
-		return limitLanceNumUnits;
-	}
+    public boolean getLimitLanceNumUnits() {
+        return limitLanceNumUnits;
+    }
 
-	public void setLimitLanceNumUnits(boolean limit) {
-		limitLanceNumUnits = limit;
-	}
+    public void setLimitLanceNumUnits(boolean limit) {
+        limitLanceNumUnits = limit;
+    }
 
-	public boolean getUseAtBCapture() {
-		return useAtBCapture;
-	}
+    public boolean getUseAtBCapture() {
+        return useAtBCapture;
+    }
 
-	public void setUseAtBCapture(boolean set) {
-		useAtBCapture = set;
-	}
+    public void setUseAtBCapture(boolean set) {
+        useAtBCapture = set;
+    }
 
-	public boolean getContractMarketReportRefresh() {
-		return contractMarketReportRefresh;
-	}
+    public boolean getContractMarketReportRefresh() {
+        return contractMarketReportRefresh;
+    }
 
-	public void setContractMarketReportRefresh(boolean refresh) {
-		contractMarketReportRefresh = refresh;
-	}
+    public void setContractMarketReportRefresh(boolean refresh) {
+        contractMarketReportRefresh = refresh;
+    }
 
-	public boolean getUnitMarketReportRefresh() {
-		return unitMarketReportRefresh;
-	}
+    public boolean getUnitMarketReportRefresh() {
+        return unitMarketReportRefresh;
+    }
 
-	public void setUnitMarketReportRefresh(boolean refresh) {
-		unitMarketReportRefresh = refresh;
-	}
+    public void setUnitMarketReportRefresh(boolean refresh) {
+        unitMarketReportRefresh = refresh;
+    }
 
-	public int getStartGameDelay() {
-		return startGameDelay;
-	}
+    public int getStartGameDelay() {
+        return startGameDelay;
+    }
 
-	public void setStartGameDelay(int delay) {
-		startGameDelay = delay;
-	}
-	public boolean massRepairUseExtraTime() {
-		return massRepairUseExtraTime;
-	}
+    public void setStartGameDelay(int delay) {
+        startGameDelay = delay;
+    }
+    public boolean massRepairUseExtraTime() {
+        return massRepairUseExtraTime;
+    }
 
-	public void setMassRepairUseExtraTime(boolean b) {
-		this.massRepairUseExtraTime = b;
-	}
+    public void setMassRepairUseExtraTime(boolean b) {
+        this.massRepairUseExtraTime = b;
+    }
 
-	public boolean massRepairUseRushJob() {
-		return massRepairUseRushJob;
-	}
+    public boolean massRepairUseRushJob() {
+        return massRepairUseRushJob;
+    }
 
-	public void setMassRepairUseRushJob(boolean b) {
-		this.massRepairUseRushJob = b;
-	}
+    public void setMassRepairUseRushJob(boolean b) {
+        this.massRepairUseRushJob = b;
+    }
 
-	public boolean massRepairAllowCarryover() {
-		return massRepairAllowCarryover;
-	}
+    public boolean massRepairAllowCarryover() {
+        return massRepairAllowCarryover;
+    }
 
-	public void setMassRepairAllowCarryover(boolean b) {
-		this.massRepairAllowCarryover = b;
-	}
+    public void setMassRepairAllowCarryover(boolean b) {
+        this.massRepairAllowCarryover = b;
+    }
 
-	public boolean massRepairOptimizeToCompleteToday() {
-		return massRepairOptimizeToCompleteToday;
-	}
+    public boolean massRepairOptimizeToCompleteToday() {
+        return massRepairOptimizeToCompleteToday;
+    }
 
-	public void setMassRepairOptimizeToCompleteToday(boolean massRepairOptimizeToCompleteToday) {
-		this.massRepairOptimizeToCompleteToday = massRepairOptimizeToCompleteToday;
-	}
+    public void setMassRepairOptimizeToCompleteToday(boolean massRepairOptimizeToCompleteToday) {
+        this.massRepairOptimizeToCompleteToday = massRepairOptimizeToCompleteToday;
+    }
 
-	public boolean massRepairScrapImpossible() {
-		return massRepairScrapImpossible;
-	}
+    public boolean massRepairScrapImpossible() {
+        return massRepairScrapImpossible;
+    }
 
-	public void setMassRepairScrapImpossible(boolean b) {
-		this.massRepairScrapImpossible = b;
-	}
+    public void setMassRepairScrapImpossible(boolean b) {
+        this.massRepairScrapImpossible = b;
+    }
 
-	public boolean massRepairUseAssignedTechsFirst() {
-		return massRepairUseAssignedTechsFirst;
-	}
+    public boolean massRepairUseAssignedTechsFirst() {
+        return massRepairUseAssignedTechsFirst;
+    }
 
-	public void setMassRepairUseAssignedTechsFirst(boolean massRepairUseAssignedTechsFirst) {
-		this.massRepairUseAssignedTechsFirst = massRepairUseAssignedTechsFirst;
-	}
+    public void setMassRepairUseAssignedTechsFirst(boolean massRepairUseAssignedTechsFirst) {
+        this.massRepairUseAssignedTechsFirst = massRepairUseAssignedTechsFirst;
+    }
 
     public void setMassRepairReplacePod(boolean setMassRepairReplacePod) {
         this.massRepairReplacePod = setMassRepairReplacePod;
@@ -2897,47 +2897,47 @@ public class CampaignOptions implements Serializable {
         return massRepairReplacePod;
     }
 
-	public List<MassRepairOption> getMassRepairOptions() {
-		return massRepairOptions;
-	}
+    public List<MassRepairOption> getMassRepairOptions() {
+        return massRepairOptions;
+    }
 
-	public void setMassRepairOptions(List<MassRepairOption> massRepairOptions) {
-		this.massRepairOptions = massRepairOptions;
-	}
+    public void setMassRepairOptions(List<MassRepairOption> massRepairOptions) {
+        this.massRepairOptions = massRepairOptions;
+    }
 
-	public void addMassRepairOption(MassRepairOption mro) {
-		if (mro.getType() == -1) {
-			return;
-		}
+    public void addMassRepairOption(MassRepairOption mro) {
+        if (mro.getType() == -1) {
+            return;
+        }
 
-		int foundIdx = -1;
+        int foundIdx = -1;
 
-		for (int i = 0; i < massRepairOptions.size(); i++) {
-			if (massRepairOptions.get(i).getType() == mro.getType()) {
-				foundIdx = i;
-				break;
-			}
-		}
+        for (int i = 0; i < massRepairOptions.size(); i++) {
+            if (massRepairOptions.get(i).getType() == mro.getType()) {
+                foundIdx = i;
+                break;
+            }
+        }
 
-		if (foundIdx == -1) {
-			massRepairOptions.add(mro);
-		} else {
-			massRepairOptions.add(foundIdx, mro);
-			massRepairOptions.remove(foundIdx + 1);
-		}
+        if (foundIdx == -1) {
+            massRepairOptions.add(mro);
+        } else {
+            massRepairOptions.add(foundIdx, mro);
+            massRepairOptions.remove(foundIdx + 1);
+        }
 
-		massRepairOptions.sort(Comparator.comparingInt(MassRepairOption::getType));
-	}
+        massRepairOptions.sort(Comparator.comparingInt(MassRepairOption::getType));
+    }
 
-	public void setAllowOpforAeros(boolean allowOpforAeros) {
-	    this.allowOpforAeros = allowOpforAeros;
-	}
+    public void setAllowOpforAeros(boolean allowOpforAeros) {
+        this.allowOpforAeros = allowOpforAeros;
+    }
 
-	public boolean getAllowOpforAeros() {
-	    return allowOpforAeros;
-	}
+    public boolean getAllowOpforAeros() {
+        return allowOpforAeros;
+    }
 
-	public void setAllowOpforLocalUnits(boolean allowOpforLocalUnits) {
+    public void setAllowOpforLocalUnits(boolean allowOpforLocalUnits) {
         this.allowOpforLocalUnits = allowOpforLocalUnits;
     }
 
@@ -2961,7 +2961,7 @@ public class CampaignOptions implements Serializable {
         return opforLocalUnitChance;
     }
 
-	public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
         //region General Tab
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "displayDateFormat", displayDateFormat);
@@ -2977,7 +2977,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitRatingMethod", unitRatingMethod.getDescription());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useEraMods", useEraMods);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "assignedTechFirst", assignedTechFirst);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "resetToFirstTech", resetToFirstTech);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "resetToFirstTech", resetToFirstTech);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTactics", useTactics);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useInitBonus", useInitBonus);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useToughness", useToughness);
@@ -2986,7 +2986,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useEdge", useEdge);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useSupportEdge", useSupportEdge);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useImplants", useImplants);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "altQualityAveraging", altQualityAveraging);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "altQualityAveraging", altQualityAveraging);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAdvancedMedical", useAdvancedMedical);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useDylansRandomXp", useDylansRandomXp);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useQuirks", useQuirks);
@@ -3212,18 +3212,18 @@ public class CampaignOptions implements Serializable {
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<massRepairOptions>");
 
         for (int i = 0; i < massRepairOptions.size(); i++) {
-        	MassRepairOption mro = massRepairOptions.get(i);
+            MassRepairOption mro = massRepairOptions.get(i);
 
-        	pw1.println(MekHqXmlUtil.indentStr(indent + 2) + "<massRepairOption" + i + ">");
+            pw1.println(MekHqXmlUtil.indentStr(indent + 2) + "<massRepairOption" + i + ">");
 
-        	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "type", mro.getType());
-        	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "active", mro.isActive() ? 1 : 0);
-        	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "skillMin", mro.getSkillMin());
-        	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "skillMax", mro.getSkillMax());
-        	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "btnMin", mro.getBthMin());
-        	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "btnMax", mro.getBthMax());
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "type", mro.getType());
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "active", mro.isActive() ? 1 : 0);
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "skillMin", mro.getSkillMin());
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "skillMax", mro.getSkillMax());
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "btnMin", mro.getBthMin());
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "btnMax", mro.getBthMax());
 
-        	pw1.println(MekHqXmlUtil.indentStr(indent + 2) + "</massRepairOption" + i + ">");
+            pw1.println(MekHqXmlUtil.indentStr(indent + 2) + "</massRepairOption" + i + ">");
         }
 
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "</massRepairOptions>");
@@ -3326,15 +3326,15 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("repairSystem")) {
                 retVal.repairSystem = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useEraMods")) {
-            	retVal.useEraMods = Boolean.parseBoolean(wn2.getTextContent());
+                retVal.useEraMods = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("assignedTechFirst")) {
-            	retVal.assignedTechFirst = Boolean.parseBoolean(wn2.getTextContent());
-			} else if (wn2.getNodeName().equalsIgnoreCase("resetToFirstTech")) {
-            	retVal.resetToFirstTech = Boolean.parseBoolean(wn2.getTextContent());
+                retVal.assignedTechFirst = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("resetToFirstTech")) {
+                retVal.resetToFirstTech = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useTactics")) {
                 retVal.useTactics = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useInitBonus")) {
-            	retVal.useInitBonus = Boolean.parseBoolean(wn2.getTextContent());
+                retVal.useInitBonus = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useToughness")) {
                 retVal.useToughness = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useArtillery")) {
@@ -3347,8 +3347,8 @@ public class CampaignOptions implements Serializable {
                 retVal.useSupportEdge = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useImplants")) {
                 retVal.useImplants = Boolean.parseBoolean(wn2.getTextContent());
-			} else if (wn2.getNodeName().equalsIgnoreCase("altQualityAveraging")) {
-            	retVal.altQualityAveraging = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("altQualityAveraging")) {
+                retVal.altQualityAveraging = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useAdvancedMedical")) {
                 retVal.useAdvancedMedical = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useDylansRandomXp")) {
@@ -3541,11 +3541,11 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomSameSexMarriages")) {
                 retVal.chanceRandomSameSexMarriages = Double.parseDouble(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreation")) {
-            	retVal.useUnofficialProcreation = Boolean.parseBoolean(wn2.getTextContent().trim());
+                retVal.useUnofficialProcreation = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("chanceProcreation")) {
-            	retVal.chanceProcreation = Double.parseDouble(wn2.getTextContent().trim());
+                retVal.chanceProcreation = Double.parseDouble(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreationNoRelationship")) {
-            	retVal.useUnofficialProcreationNoRelationship = Boolean.parseBoolean(wn2.getTextContent().trim());
+                retVal.useUnofficialProcreationNoRelationship = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("chanceProcreationNoRelationship")) {
                 retVal.chanceProcreationNoRelationship = Double.parseDouble(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("displayTrueDueDate")) {
@@ -3623,7 +3623,7 @@ public class CampaignOptions implements Serializable {
             //endregion Finances Tab
 
             } else if (wn2.getNodeName().equalsIgnoreCase("useTransfers")) {
-            	retVal.useTransfers = Boolean.parseBoolean(wn2.getTextContent().trim());
+                retVal.useTransfers = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useTimeInService")) {
                 retVal.useTimeInService = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("timeInServiceDisplayFormat")) {
@@ -3635,7 +3635,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("trackTotalEarnings")) {
                 retVal.trackTotalEarnings = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("capturePrisoners")) {
-            	retVal.capturePrisoners = Boolean.parseBoolean(wn2.getTextContent().trim());
+                retVal.capturePrisoners = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("defaultPrisonerStatus")) {
                 retVal.defaultPrisonerStatus = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomHitsForVees")) {
@@ -3783,7 +3783,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("historicalDailyLog")) {
                 retVal.historicalDailyLog = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("rats")) {
-            	retVal.rats = MekHqXmlUtil.unEscape(wn2.getTextContent().trim()).split(",");
+                retVal.rats = MekHqXmlUtil.unEscape(wn2.getTextContent().trim()).split(",");
             } else if (wn2.getNodeName().equalsIgnoreCase("staticRATs")) {
                 retVal.staticRATs = true;
             } else if (wn2.getNodeName().equalsIgnoreCase("ignoreRatEra")) {
@@ -3813,10 +3813,10 @@ public class CampaignOptions implements Serializable {
                     }
 
                     for (int mroTypeIdx = 0; mroTypeIdx < MassRepairOption.VALID_REPAIR_TYPES.length; mroTypeIdx++) {
-                    	if (mroNode.getNodeName().equalsIgnoreCase("massRepairOption" + mroTypeIdx)) {
+                        if (mroNode.getNodeName().equalsIgnoreCase("massRepairOption" + mroTypeIdx)) {
 
-                    		MassRepairOption mro = new MassRepairOption();
-                    		mro.setType(-1);
+                            MassRepairOption mro = new MassRepairOption();
+                            mro.setType(-1);
 
                             NodeList mroItemList = mroNode.getChildNodes();
 
@@ -3832,24 +3832,24 @@ public class CampaignOptions implements Serializable {
                                                 mroTypeIdx, mroItemNode.getNodeName(), mroItemNode.getTextContent()));
 
                                 if (mroItemNode.getNodeName().equalsIgnoreCase("type")) {
-                                	mro.setType(Integer.parseInt(mroItemNode.getTextContent().trim()));
+                                    mro.setType(Integer.parseInt(mroItemNode.getTextContent().trim()));
                                 } else if (mroItemNode.getNodeName().equalsIgnoreCase("active")) {
                                     mro.setActive(Integer.parseInt(mroItemNode.getTextContent().trim()) == 1);
                                 } else if (mroItemNode.getNodeName().equalsIgnoreCase("skillMin")) {
-                                	mro.setSkillMin(Integer.parseInt(mroItemNode.getTextContent().trim()));
+                                    mro.setSkillMin(Integer.parseInt(mroItemNode.getTextContent().trim()));
                                 } else if (mroItemNode.getNodeName().equalsIgnoreCase("skillMax")) {
-                                	mro.setSkillMax(Integer.parseInt(mroItemNode.getTextContent().trim()));
+                                    mro.setSkillMax(Integer.parseInt(mroItemNode.getTextContent().trim()));
                                 } else if (mroItemNode.getNodeName().equalsIgnoreCase("btnMin")) {
-                                	mro.setBthMin(Integer.parseInt(mroItemNode.getTextContent().trim()));
+                                    mro.setBthMin(Integer.parseInt(mroItemNode.getTextContent().trim()));
                                 } else if (mroItemNode.getNodeName().equalsIgnoreCase("btnMax")) {
-                                	mro.setBthMax(Integer.parseInt(mroItemNode.getTextContent().trim()));
+                                    mro.setBthMax(Integer.parseInt(mroItemNode.getTextContent().trim()));
                                 }
                             }
 
                             if (mro.getType() != -1) {
-                            	retVal.addMassRepairOption(mro);
+                                retVal.addMassRepairOption(mro);
                             }
-                    	}
+                        }
                     }
                 }
             }
@@ -3862,81 +3862,81 @@ public class CampaignOptions implements Serializable {
     }
 
     public static class MassRepairOption {
-    	public MassRepairOption() {
+        public MassRepairOption() {
 
-    	}
+        }
 
-    	public MassRepairOption(int type) {
-    		this (type, false, SkillType.EXP_ULTRA_GREEN, SkillType.EXP_ELITE, 4, 4);
-    	}
+        public MassRepairOption(int type) {
+            this (type, false, SkillType.EXP_ULTRA_GREEN, SkillType.EXP_ELITE, 4, 4);
+        }
 
-    	public MassRepairOption(int type, boolean active, int skillMin, int skillMax, int bthMin, int bthMax) {
-			this.type = type;
-			this.active = active;
-			this.skillMin = skillMin;
-			this.skillMax = skillMax;
-			this.bthMin = bthMin;
-			this.bthMax = bthMax;
-		}
+        public MassRepairOption(int type, boolean active, int skillMin, int skillMax, int bthMin, int bthMax) {
+            this.type = type;
+            this.active = active;
+            this.skillMin = skillMin;
+            this.skillMax = skillMax;
+            this.bthMin = bthMin;
+            this.bthMax = bthMax;
+        }
 
-    	public static int[] VALID_REPAIR_TYPES = new int[] { Part.REPAIR_PART_TYPE.ARMOR, Part.REPAIR_PART_TYPE.AMMO,
-    			Part.REPAIR_PART_TYPE.WEAPON, Part.REPAIR_PART_TYPE.GENERAL_LOCATION, Part.REPAIR_PART_TYPE.ENGINE,
-    			Part.REPAIR_PART_TYPE.GYRO, Part.REPAIR_PART_TYPE.ACTUATOR, Part.REPAIR_PART_TYPE.ELECTRONICS,
-    			Part.REPAIR_PART_TYPE.POD_SPACE, Part.REPAIR_PART_TYPE.GENERAL };
+        public static int[] VALID_REPAIR_TYPES = new int[] { Part.REPAIR_PART_TYPE.ARMOR, Part.REPAIR_PART_TYPE.AMMO,
+                Part.REPAIR_PART_TYPE.WEAPON, Part.REPAIR_PART_TYPE.GENERAL_LOCATION, Part.REPAIR_PART_TYPE.ENGINE,
+                Part.REPAIR_PART_TYPE.GYRO, Part.REPAIR_PART_TYPE.ACTUATOR, Part.REPAIR_PART_TYPE.ELECTRONICS,
+                Part.REPAIR_PART_TYPE.POD_SPACE, Part.REPAIR_PART_TYPE.GENERAL };
 
-		private int type;
-    	private boolean active = true;
-    	private int skillMin;
-    	private int skillMax;
-    	private int bthMin;
-    	private int bthMax;
+        private int type;
+        private boolean active = true;
+        private int skillMin;
+        private int skillMax;
+        private int bthMin;
+        private int bthMax;
 
-		public int getType() {
-			return type;
-		}
+        public int getType() {
+            return type;
+        }
 
-		public void setType(int type) {
-			this.type = type;
-		}
+        public void setType(int type) {
+            this.type = type;
+        }
 
-		public boolean isActive() {
-			return active;
-		}
+        public boolean isActive() {
+            return active;
+        }
 
-		public void setActive(boolean active) {
-			this.active = active;
-		}
+        public void setActive(boolean active) {
+            this.active = active;
+        }
 
-		public int getSkillMin() {
-			return skillMin;
-		}
+        public int getSkillMin() {
+            return skillMin;
+        }
 
-		public void setSkillMin(int skillMin) {
-			this.skillMin = skillMin;
-		}
+        public void setSkillMin(int skillMin) {
+            this.skillMin = skillMin;
+        }
 
-		public int getSkillMax() {
-			return skillMax;
-		}
+        public int getSkillMax() {
+            return skillMax;
+        }
 
-		public void setSkillMax(int skillMax) {
-			this.skillMax = skillMax;
-		}
+        public void setSkillMax(int skillMax) {
+            this.skillMax = skillMax;
+        }
 
-		public int getBthMin() {
-			return bthMin;
-		}
+        public int getBthMin() {
+            return bthMin;
+        }
 
-		public void setBthMin(int bthMin) {
-			this.bthMin = bthMin;
-		}
+        public void setBthMin(int bthMin) {
+            this.bthMin = bthMin;
+        }
 
-		public int getBthMax() {
-			return bthMax;
-		}
+        public int getBthMax() {
+            return bthMax;
+        }
 
-		public void setBthMax(int bthMax) {
-			this.bthMax = bthMax;
-		}
+        public void setBthMax(int bthMax) {
+            this.bthMax = bthMax;
+        }
     }
 }
