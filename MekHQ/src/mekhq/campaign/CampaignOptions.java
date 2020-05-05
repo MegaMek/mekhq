@@ -1,6 +1,6 @@
 /*
  * Copyright (c) - 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * Copyright (c) 2020 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -11,11 +11,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign;
 
@@ -48,8 +48,10 @@ import mekhq.campaign.finances.enums.FinancialYearDuration;
  * @author natit
  */
 public class CampaignOptions implements Serializable {
+    //region Variable Declarations
     private static final long serialVersionUID = 5698008431749303602L;
 
+    //region Magic Numbers and Constants
     public static final int TECH_INTRO = 0;
     public static final int TECH_STANDARD = 1;
     public static final int TECH_ADVANCED = 2;
@@ -64,7 +66,6 @@ public class CampaignOptions implements Serializable {
     public static final int TRANSIT_UNIT_MONTH = 2;
     public static final int TRANSIT_UNIT_NUM = 3;
 
-
     public static final String S_TECH = "Tech";
     public static final String S_AUTO = "Automatic Success";
 
@@ -73,9 +74,6 @@ public class CampaignOptions implements Serializable {
     public static final int REPAIR_SYSTEM_GENERIC_PARTS = 2;
 
     public static final int MAXIMUM_D6_VALUE = 6;
-
-    //FIXME: This needs to be localized
-    public static final String[] REPAIR_SYSTEM_NAMES = {"Strat Ops", "Warchest Custom", "Generic Spare Parts"};
 
     public static final double MAXIMUM_COMBAT_EQUIPMENT_PERCENT = 5.0;
     public static final double MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT = 1.0;
@@ -86,14 +84,93 @@ public class CampaignOptions implements Serializable {
     public static final int PLANET_ACQUISITION_NEUTRAL = 1;
     public static final int PLANET_ACQUISITION_ALLY = 2;
     public static final int PLANET_ACQUISITION_SELF = 3;
+    //endregion Magic Numbers and Constants
 
+    //region Unlisted Variables
+    private int repairSystem;
+    public static final String[] REPAIR_SYSTEM_NAMES = {"Strat Ops", "Warchest Custom", "Generic Spare Parts"}; // FIXME: This needs to be localized
 
-    private boolean useFactionForNames;
-    private boolean useUnitRating;
+    //Mass Repair/Salvage Options
+    private boolean massRepairUseExtraTime;
+    private boolean massRepairUseRushJob;
+    private boolean massRepairAllowCarryover;
+    private boolean massRepairOptimizeToCompleteToday;
+    private boolean massRepairScrapImpossible;
+    private boolean massRepairUseAssignedTechsFirst;
+    private boolean massRepairReplacePod;
+    private List<MassRepairOption> massRepairOptions;
+    //endregion Unlisted Variables
 
     //region General Tab
-    private String displayDateFormat;
+    private boolean useUnitRating;
+    private UnitRatingMethod unitRatingMethod;
+    private String displayDateFormat; // This is currently unlisted, but will be added in the near future
     //endregion General Tab
+
+    //region Repair and Maintenance Tab
+    // Repair
+    private boolean useEraMods;
+    private boolean assignedTechFirst;
+    private boolean resetToFirstTech;
+    private boolean useQuirks;
+    private boolean useAeroSystemHits;
+    private boolean destroyByMargin;
+    private int destroyMargin;
+    private int destroyPartTarget;
+
+    // Maintenance
+    private boolean checkMaintenance;
+    private int maintenanceCycleDays;
+    private int maintenanceBonus;
+    private boolean useQualityMaintenance;
+    private boolean reverseQualityNames;
+    private boolean useUnofficialMaintenance;
+    private boolean logMaintenance;
+    //endregion Repair and Maintenance Tab
+
+    //region Supplies and Acquisition Tab
+    // Acquisition
+    private int waitingPeriod;
+    private String acquisitionSkill;
+    private boolean acquisitionSupportStaffOnly;
+    private int clanAcquisitionPenalty;
+    private int isAcquisitionPenalty;
+    private int maxAcquisitions;
+
+    // Delivery
+    private int nDiceTransitTime;
+    private int constantTransitTime;
+    private int unitTransitTime;
+    private int acquireMinimumTime;
+    private int acquireMinimumTimeUnit;
+    private int acquireMosBonus;
+    private int acquireMosUnit;
+
+    // Planetary Acquisition
+    private boolean usePlanetaryAcquisition;
+    private int maxJumpsPlanetaryAcquisition;
+    private int planetAcquisitionFactionLimit;
+    private boolean planetAcquisitionNoClanCrossover;
+    private boolean noClanPartsFromIS;
+    private int penaltyClanPartsFromIS;
+    private boolean planetAcquisitionVerbose;
+    private int[] planetTechAcquisitionBonus;
+    private int[] planetIndustryAcquisitionBonus;
+    private int[] planetOutputAcquisitionBonus;
+    //endregion Supplies and Acquisition Tab
+
+    //region Tech Limits Tab
+    private boolean limitByYear;
+    private boolean disallowExtinctStuff;
+    private boolean allowClanPurchases;
+    private boolean allowISPurchases;
+    private boolean allowCanonOnly;
+    private boolean allowCanonRefitOnly;
+    private int techLevel;
+    private boolean variableTechLevel;
+    private boolean factionIntroDate;
+    private boolean useAmmoByType; // Unofficial
+    //endregion Tech Limits Tab
 
     //region Personnel Tab
     private boolean useTactics;
@@ -104,7 +181,7 @@ public class CampaignOptions implements Serializable {
     private boolean useEdge;
     private boolean useSupportEdge;
     private boolean useImplants;
-    private boolean capturePrisoners;
+    private boolean capturePrisoners; // TODO : Merge me with the AtB option useAtBCapture
     private int defaultPrisonerStatus;
     public static final int PRISONER_RANK = 0;
     public static final int BONDSMAN_RANK = 1;
@@ -128,6 +205,7 @@ public class CampaignOptions implements Serializable {
     private int originSearchRadius;
     private boolean isOriginExtraRandom;
     private double originDistanceScale;
+
     //family
     private int minimumMarriageAge;
     private int checkMutualAncestorsDepth;
@@ -154,6 +232,7 @@ public class CampaignOptions implements Serializable {
     public static final int AUNTS_UNCLES_COUSINS = 2;
     private boolean useRandomDeaths;
     private boolean keepMarriedNameUponSpouseDeath;
+
     //salary
     private double salaryCommissionMultiplier;
     private double salaryEnlistedMultiplier;
@@ -187,246 +266,207 @@ public class CampaignOptions implements Serializable {
     private double canceledOrderReimbursement;
     //endregion Finance Tab
 
-    //personnel market related
-    private boolean personnelMarketReportRefresh;
+    //region Mercenary Tab
+    private boolean equipmentContractBase;
+    private double equipmentContractPercent;
+    private boolean equipmentContractSaleValue;
+    private double dropshipContractPercent;
+    private double jumpshipContractPercent;
+    private double warshipContractPercent;
+    private boolean blcSaleValue;
+    //endregion Mercenary Tab
+
+    //region Experience Tab
+    private int scenarioXP;
+    private int killXPAward;
+    private int killsForXP;
+    private int tasksXP;
+    private int nTasksXP;
+    private int successXP;
+    private int mistakeXP;
+    private int idleXP;
+    private int monthsIdleXP;
+    private int targetIdleXP;
+    private int contractNegotiationXP;
+    private int adminXP;
+    private int adminXPPeriod;
+    private int edgeCost;
+    //endregion Experience Tab
+
+    //region Skills Tab
+    //endregion Skills Tab
+
+    //region Special Abilities Tab
+    //endregion Special Abilities Tab
+
+    //region Skill Randomization Tab
+    private int probPhenoMW;
+    private int probPhenoAero;
+    private int probPhenoBA;
+    private int probPhenoVee;
+    //endregion Skill Randomization Tab
+
+    //region Rank System Tab
+    //endregion Rank System Tab
+
+    //region Name and Portrait Generation
+    private boolean useFactionForNames;
+    private boolean[] usePortraitForType;
+    private boolean assignPortraitOnRoleChange;
+    //endregion Name and Portrait Generation
+
+    //region Personnel Market Tab
     private String personnelMarketName;
+    private boolean personnelMarketReportRefresh;
     private int personnelMarketRandomEliteRemoval;
     private int personnelMarketRandomVeteranRemoval;
     private int personnelMarketRandomRegularRemoval;
     private int personnelMarketRandomGreenRemoval;
     private int personnelMarketRandomUltraGreenRemoval;
     private double personnelMarketDylansWeight;
+    //endregion Personnel Market Tab
 
-    //unit related
-    private boolean useQuirks;
-
-    //tech and unit limits
-    private boolean limitByYear;
-    private boolean disallowExtinctStuff;
-    private boolean allowClanPurchases;
-    private boolean allowISPurchases;
-    private boolean allowCanonOnly;
-    private boolean allowCanonRefitOnly;
-    private int techLevel;
-    private boolean variableTechLevel;
-    private boolean factionIntroDate;
-    private boolean useAmmoByType; // Unofficial
-
-    //contract related
-    private boolean equipmentContractBase;
-    private double equipmentContractPercent;
-    private double dropshipContractPercent;
-    private double jumpshipContractPercent;
-    private double warshipContractPercent;
-    private boolean equipmentContractSaleValue;
-    private boolean blcSaleValue;
-
-    //acquisition related
-    private int waitingPeriod;
-    private String acquisitionSkill;
-    private boolean acquisitionSupportStaffOnly;
-    private int nDiceTransitTime;
-    private int constantTransitTime;
-    private int unitTransitTime;
-    private int acquireMosBonus;
-    private int acquireMosUnit;
-    private int acquireMinimumTime;
-    private int acquireMinimumTimeUnit;
-    private int clanAcquisitionPenalty;
-    private int isAcquisitionPenalty;
-    private boolean usePlanetaryAcquisition;
-    private int maxJumpsPlanetaryAcquisition;
-    private int[] planetTechAcquisitionBonus;
-    private int[] planetIndustryAcquisitionBonus;
-    private int[] planetOutputAcquisitionBonus;
-    private int planetAcquisitionFactionLimit;
-    private boolean planetAcquisitionNoClanCrossover;
-    private int penaltyClanPartsFromIS;
-    private boolean noClanPartsFromIS;
-    private boolean planetAcquisitionVerbose;
-    private int maxAcquisitions;
-
-    //xp related
-    private int scenarioXP;
-    private int killsForXP;
-    private int killXPAward;
-    private int nTasksXP;
-    private int tasksXP;
-    private int mistakeXP;
-    private int successXP;
-    private int idleXP;
-    private int targetIdleXP;
-    private int monthsIdleXP;
-    private int contractNegotiationXP;
-    private int adminXP;
-    private int adminXPPeriod;
-    private int edgeCost;
-
-    //region Repair and Maintenance Tab
-    // Repair
-    private boolean destroyByMargin;
-    private int destroyMargin;
-    private int repairSystem;
-    private boolean useEraMods;
-	private boolean assignedTechFirst;
-	private boolean resetToFirstTech;
-	private int destroyPartTarget;
-	private boolean useAeroSystemHits;
-
-    // Maintenance
-    private boolean checkMaintenance;
-    private int maintenanceCycleDays;
-    private int maintenanceBonus;
-    private boolean useQualityMaintenance;
-    private boolean reverseQualityNames;
-    private boolean useUnofficialMaintenance;
-	private boolean logMaintenance;
-	//endregion Repair and Maintenance Tab
-
-    //Unit Rating
-    private UnitRatingMethod unitRatingMethod;
-
-    //phenotype related
-    private int probPhenoMW;
-    private int probPhenoAero;
-    private int probPhenoBA;
-    private int probPhenoVee;
-
-    //random portraits related
-    private boolean[] usePortraitForType;
-    private boolean assignPortraitOnRoleChange;
-
-    //Against the Bot related
+    //region Against the Bot Tab
     private boolean useAtB;
-    private boolean useAero;
-    private boolean useVehicles;
-    private boolean clanVehicles;
-    private boolean useDropShips;
     private int skillLevel;
-    private boolean doubleVehicles;
-    private boolean adjustPlayerVehicles;
-    private int opforLanceTypeMechs;
-    private int opforLanceTypeMixed;
-    private int opforLanceTypeVehicles;
-    private boolean opforUsesVTOLs;
-    private boolean regionalMechVariations;
-    private boolean aeroRecruitsHaveUnits;
+
+    // Unit Administration
     private boolean useShareSystem;
     private boolean sharesExcludeLargeCraft;
     private boolean sharesForAll;
+    private boolean aeroRecruitsHaveUnits;
     private boolean retirementRolls;
-    private boolean trackUnitFatigue;
     private boolean customRetirementMods;
     private boolean foundersNeverRetire;
     private boolean atbAddDependents;
     private boolean dependentsNeverLeave;
-    private boolean trackOriginalUnit;
-    private boolean mercSizeLimited;
-    private String[] rats = {"Xotl", "Total Warfare"};
-    private boolean staticRATs;
-    private boolean ignoreRatEra;
-    private int searchRadius;
-    private double intensity;
-    private boolean generateChases;
-    private boolean variableContractLength;
-    private boolean instantUnitMarketDelivery;
-    private boolean useWeatherConditions;
-    private boolean useLightConditions;
-    private boolean usePlanetaryConditions;
+    private boolean trackUnitFatigue;
     private boolean useLeadership;
+    private boolean trackOriginalUnit;
+    private boolean useAero;
+    private boolean useVehicles;
+    private boolean clanVehicles;
+    private boolean instantUnitMarketDelivery;
+    private boolean contractMarketReportRefresh;
+    private boolean unitMarketReportRefresh;
+
+    // Contract Operations
+    private int searchRadius;
+    private boolean variableContractLength;
+    private boolean mercSizeLimited;
+    private boolean restrictPartsByMission;
+    private boolean limitLanceWeight;
+    private boolean limitLanceNumUnits;
     private boolean useStrategy;
     private int baseStrategyDeployment;
     private int additionalStrategyDeployment;
     private boolean adjustPaymentForStrategy;
-    private boolean restrictPartsByMission;
-    private boolean limitLanceWeight;
-    private boolean limitLanceNumUnits;
-    private boolean useAtBCapture; // TODO : merge me with the Personnel Option capturePrisoners
-    private boolean contractMarketReportRefresh;
-    private boolean unitMarketReportRefresh;
-    private int startGameDelay;
+    private double intensity;
+    private boolean generateChases;
+
+    // RATs
+    private boolean staticRATs;
+    private String[] rats;
+    private boolean ignoreRatEra;
+
+    // Scenarios
+    private boolean doubleVehicles;
+    private int opforLanceTypeMechs;
+    private int opforLanceTypeMixed;
+    private int opforLanceTypeVehicles;
+    private boolean opforUsesVTOLs;
     private boolean allowOpforAeros;
-    private boolean allowOpforLocalUnits;
     private int opforAeroChance;
+    private boolean allowOpforLocalUnits;
     private int opforLocalUnitChance;
+    private boolean adjustPlayerVehicles;
+    private boolean regionalMechVariations;
+    private boolean useDropShips;
+    private boolean useWeatherConditions;
+    private boolean useLightConditions;
+    private boolean usePlanetaryConditions;
+    private boolean useAtBCapture; // TODO : merge me with the Personnel Option capturePrisoners
+    private int startGameDelay;
+    //endregion Against the Bot Tab
 
-    //Mass Repair/Salvage Options
-    private boolean massRepairUseExtraTime;
-    private boolean massRepairUseRushJob;
-    private boolean massRepairAllowCarryover;
-    private boolean massRepairOptimizeToCompleteToday;
-    private boolean massRepairScrapImpossible;
-    private boolean massRepairUseAssignedTechsFirst;
-    private boolean massRepairReplacePod;
-    private List<MassRepairOption> massRepairOptions;
-
-    //Miscellaneous
+    //region Miscellaneous Tab
     private boolean historicalDailyLog;
+    //endregion Miscellaneous Tab
+    //endregion Variable Declarations
 
     public CampaignOptions() {
+        //region Unlisted Variables
+        repairSystem = REPAIR_SYSTEM_STRATOPS;
+
+        //Mass Repair/Salvage Options
+        massRepairUseExtraTime = true;
+        massRepairUseRushJob = true;
+        massRepairAllowCarryover = true;
+        massRepairOptimizeToCompleteToday = false;
+        massRepairScrapImpossible = false;
+        massRepairUseAssignedTechsFirst = false;
+        massRepairReplacePod = true;
+        massRepairOptions = new ArrayList<>();
+
+        for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
+            massRepairOptions.add(new MassRepairOption(MassRepairOption.VALID_REPAIR_TYPES[i]));
+        }
+        //endregion Unlisted Variables
+
         //region General Tab
+        useUnitRating = true;
+        unitRatingMethod = UnitRatingMethod.CAMPAIGN_OPS;
         displayDateFormat = "yyyy-MM-dd";
         //endregion General Tab
 
-        useFactionForNames = true;
-        repairSystem = REPAIR_SYSTEM_STRATOPS;
+        //region Repair and Maintenance Tab
+        // Repair
         useEraMods = false;
         assignedTechFirst = false;
-		resetToFirstTech = false;
-        useUnitRating = true;
+        resetToFirstTech = false;
         useQuirks = false;
-        limitByYear = true;
-        disallowExtinctStuff = false;
-        allowClanPurchases = true;
-        allowISPurchases = true;
-        allowCanonOnly = false;
-        allowCanonRefitOnly = false;
-        useAmmoByType = false;
-        techLevel = TECH_EXPERIMENTAL;
-        variableTechLevel = false;
-        factionIntroDate = false;
-        scenarioXP = 1;
-        killsForXP = 0;
-        killXPAward = 0;
-        nTasksXP = 25;
-        tasksXP = 1;
-        mistakeXP = 0;
-        successXP = 0;
-        usePortraitForType = new boolean[Person.T_NUM];
-        for (int i = 0; i < Person.T_NUM; i++) {
-            usePortraitForType[i] = false;
-        }
-        usePortraitForType[Person.T_MECHWARRIOR] = true;
-        assignPortraitOnRoleChange = false;
-        idleXP = 0;
-        targetIdleXP = 10;
-        monthsIdleXP = 2;
-        contractNegotiationXP = 0;
-        adminXP = 0;
-        adminXPPeriod = 1;
-        edgeCost = 10;
-        unitRatingMethod = UnitRatingMethod.CAMPAIGN_OPS;
+        useAeroSystemHits = false;
+        destroyByMargin = false;
+        destroyMargin = 4;
+        destroyPartTarget = 10;
+
+        // Maintenance
+        checkMaintenance = true;
+        maintenanceCycleDays = 7;
+        maintenanceBonus = -1;
+        useQualityMaintenance = true;
+        reverseQualityNames = false;
+        useUnofficialMaintenance = false;
+        logMaintenance = false;
+        //endregion Repair and Maintenance Tab
+
+        //region Supplies and Acquisitions Tab
+        // Acquisition
         waitingPeriod = 7;
         acquisitionSkill = S_TECH;
         acquisitionSupportStaffOnly = true;
+        clanAcquisitionPenalty = 0;
+        isAcquisitionPenalty = 0;
+        maxAcquisitions = 0;
+
+        // Delivery
         nDiceTransitTime = 1;
         constantTransitTime = 0;
         unitTransitTime = TRANSIT_UNIT_MONTH;
-        acquireMosBonus = 1;
-        acquireMosUnit = TRANSIT_UNIT_MONTH;
         acquireMinimumTime = 1;
         acquireMinimumTimeUnit = TRANSIT_UNIT_MONTH;
-        equipmentContractBase = false;
-        equipmentContractPercent = 5.0;
-        dropshipContractPercent = 1.0;
-        jumpshipContractPercent = 0.0;
-        warshipContractPercent = 0.0;
-        equipmentContractSaleValue = false;
-        blcSaleValue = false;
-        clanAcquisitionPenalty = 0;
-        isAcquisitionPenalty = 0;
+        acquireMosBonus = 1;
+        acquireMosUnit = TRANSIT_UNIT_MONTH;
+
+        // Planetary Acquisition
         usePlanetaryAcquisition = false;
         maxJumpsPlanetaryAcquisition = 2;
+        planetAcquisitionFactionLimit = PLANET_ACQUISITION_NEUTRAL;
+        planetAcquisitionNoClanCrossover = true;
+        noClanPartsFromIS = true;
+        penaltyClanPartsFromIS = 4;
+        planetAcquisitionVerbose = false;
+        // Planet Socio-Industrial Modifiers
         planetTechAcquisitionBonus = new int[6];
         planetTechAcquisitionBonus[EquipmentType.RATING_A] = -1;
         planetTechAcquisitionBonus[EquipmentType.RATING_B] = 0;
@@ -448,44 +488,20 @@ public class CampaignOptions implements Serializable {
         planetOutputAcquisitionBonus[EquipmentType.RATING_D] = 2;
         planetOutputAcquisitionBonus[EquipmentType.RATING_E] = 4;
         planetOutputAcquisitionBonus[EquipmentType.RATING_F] = 8;
-        planetAcquisitionFactionLimit = PLANET_ACQUISITION_NEUTRAL;
-        planetAcquisitionNoClanCrossover = true;
-        planetAcquisitionVerbose = false;
-        noClanPartsFromIS = true;
-        penaltyClanPartsFromIS = 4;
-        destroyByMargin = false;
-        destroyMargin = 4;
-        destroyPartTarget = 10;
-        useAeroSystemHits = false;
-
-        //Mass Repair/Salvage Options
-        massRepairUseExtraTime = true;
-        massRepairUseRushJob = true;
-        massRepairAllowCarryover = true;
-        massRepairOptimizeToCompleteToday = false;
-        massRepairScrapImpossible = false;
-        massRepairUseAssignedTechsFirst = false;
-        massRepairReplacePod = true;
-        massRepairOptions = new ArrayList<>();
-
-        for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
-            massRepairOptions.add(new MassRepairOption(MassRepairOption.VALID_REPAIR_TYPES[i]));
-        }
-
-        //endregion Repair and Maintenance Tab
-        // Maintenance
-        checkMaintenance = true;
-        maintenanceCycleDays = 7;
-        maintenanceBonus = -1;
-        useQualityMaintenance = true;
-        reverseQualityNames = false;
-        useUnofficialMaintenance = false;
-        logMaintenance = false;
-        //endregion Repair and Maintenance Tab
-
-        //region Supplies and Acquisitions Tab
-        maxAcquisitions = 0;
         //endregion Supplies and Acquisitions Tab
+
+        //region Tech Limits Tab
+        limitByYear = true;
+        disallowExtinctStuff = false;
+        allowClanPurchases = true;
+        allowISPurchases = true;
+        allowCanonOnly = false;
+        allowCanonRefitOnly = false;
+        techLevel = TECH_EXPERIMENTAL;
+        variableTechLevel = false;
+        factionIntroDate = false;
+        useAmmoByType = false;
+        //endregion Tech Limits Tab
 
         //region Personnel Tab
         useTactics = false;
@@ -518,6 +534,7 @@ public class CampaignOptions implements Serializable {
         originSearchRadius = 45;
         isOriginExtraRandom = false;
         originDistanceScale = 0.6;
+
         //Family
         minimumMarriageAge = 16;
         checkMutualAncestorsDepth = 4;
@@ -548,6 +565,7 @@ public class CampaignOptions implements Serializable {
         displayFamilyLevel = PARENTS_CHILDREN_SIBLINGS;
         useRandomDeaths = true;
         keepMarriedNameUponSpouseDeath = true;
+
         //Salary
         salaryAntiMekMultiplier = 1.5;
         salaryEnlistedMultiplier = 1.0;
@@ -620,6 +638,59 @@ public class CampaignOptions implements Serializable {
         canceledOrderReimbursement = 0.5;
         //endregion Finances Tab
 
+        //region Mercenary Tab
+        equipmentContractBase = false;
+        equipmentContractPercent = 5.0;
+        equipmentContractSaleValue = false;
+        dropshipContractPercent = 1.0;
+        jumpshipContractPercent = 0.0;
+        warshipContractPercent = 0.0;
+        blcSaleValue = false;
+        //endregion Mercenary Tab
+
+        //region Experience Tab
+        scenarioXP = 1;
+        killXPAward = 0;
+        killsForXP = 0;
+        tasksXP = 1;
+        nTasksXP = 25;
+        successXP = 0;
+        mistakeXP = 0;
+        idleXP = 0;
+        monthsIdleXP = 2;
+        targetIdleXP = 10;
+        contractNegotiationXP = 0;
+        adminXP = 0;
+        adminXPPeriod = 1;
+        edgeCost = 10;
+        //endregion Experience Tab
+
+        //region Skills Tab
+        //endregion Skills Tab
+
+        //region Special Abilities Tab
+        //endregion Special Abilities Tab
+
+        //region Skill Randomization Tab
+        probPhenoMW = 95;
+        probPhenoAero = 95;
+        probPhenoBA = 100;
+        probPhenoVee = 0;
+        //endregion Skill Randomization Tab
+
+        //region Rank System Tab
+        //endregion Rank System Tab
+
+        //region Name and Portrait Generation Tab
+        useFactionForNames = true;
+        usePortraitForType = new boolean[Person.T_NUM];
+        for (int i = 0; i < Person.T_NUM; i++) {
+            usePortraitForType[i] = false;
+        }
+        usePortraitForType[Person.T_MECHWARRIOR] = true;
+        assignPortraitOnRoleChange = false;
+        //endregion Name and Portrait Generation Tab
+
         //region Personnel Market Tab
         personnelMarketName = PersonnelMarket.getTypeName(PersonnelMarket.TYPE_STRAT_OPS);
         personnelMarketReportRefresh = true;
@@ -631,14 +702,11 @@ public class CampaignOptions implements Serializable {
         personnelMarketDylansWeight = 0.3;
         //endregion Personnel Market Tab
 
-        probPhenoMW = 95;
-        probPhenoAero = 95;
-        probPhenoBA = 100;
-        probPhenoVee = 0;
-
         //region Against the Bot Tab
         useAtB = false;
         skillLevel = 2;
+
+        // Unit Administration
         useShareSystem = false;
         sharesExcludeLargeCraft = false;
         sharesForAll = false;
@@ -661,11 +729,21 @@ public class CampaignOptions implements Serializable {
         // Contract Operations
         searchRadius = 800;
         variableContractLength = false;
-
         mercSizeLimited = false;
-        regionalMechVariations = false;
+        restrictPartsByMission = true;
+        limitLanceWeight = true;
+        limitLanceNumUnits = true;
+        useStrategy = true;
+        baseStrategyDeployment = 3;
+        additionalStrategyDeployment = 1;
+        adjustPaymentForStrategy = false;
         intensity = 1.0;
         generateChases = true;
+
+        // RATs
+        staticRATs = false;
+        rats = new String[]{ "Xotl", "Total Warfare" }; // TODO : Localize me
+        ignoreRatEra = false;
 
         // Scenarios
         doubleVehicles = false;
@@ -678,22 +756,14 @@ public class CampaignOptions implements Serializable {
         allowOpforLocalUnits = false;
         opforLocalUnitChance = 5;
         adjustPlayerVehicles = false;
-
+        regionalMechVariations = false;
     	useDropShips = false;
         useWeatherConditions = true;
+        useLightConditions = true;
+        usePlanetaryConditions = false;
         useAtBCapture = false;
         startGameDelay = 500;
         //endregion Against the Bot Tab
-
-    	useLightConditions = true;
-    	usePlanetaryConditions = false;
-    	useStrategy = true;
-    	baseStrategyDeployment = 3;
-    	additionalStrategyDeployment = 1;
-    	adjustPaymentForStrategy = false;
-    	restrictPartsByMission = true;
-    	limitLanceWeight = true;
-    	limitLanceNumUnits = true;
 
         //region Miscellaneous Tab
         historicalDailyLog = false;
