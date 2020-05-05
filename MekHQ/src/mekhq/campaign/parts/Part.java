@@ -1215,6 +1215,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         this.hits = part.hits;
         this.brandNew = part.brandNew;
         this.omniPodded = part.omniPodded;
+        this.quality = part.quality;
     }
 
     public void setRefitId(UUID rid) {
