@@ -394,6 +394,7 @@ public class CampaignOptions implements Serializable {
     //endregion Miscellaneous Tab
     //endregion Variable Declarations
 
+    //region Constructors
     public CampaignOptions() {
         //region Unlisted Variables
         repairSystem = REPAIR_SYSTEM_STRATOPS;
@@ -769,6 +770,7 @@ public class CampaignOptions implements Serializable {
         historicalDailyLog = false;
         //endregion Miscellaneous Tab
     }
+    //endregion Constructors
 
     //region General Tab
     public String getDisplayDateFormat() {
