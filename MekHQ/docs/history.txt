@@ -1,6 +1,7 @@
 VERSION HISTORY:
 ----------------
 0.47.7-SNAPSHOT
++ Issue #1725: Refit does not save original part quality when the part is cloned
 
 0.47.6 (2020-5-03 1715 UTC)
 + PR #1610: Raised cost of edge points from 1 to 10 for the AtB configuration preset.
