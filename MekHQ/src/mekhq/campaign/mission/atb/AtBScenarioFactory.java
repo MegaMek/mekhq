@@ -118,17 +118,17 @@ public class AtBScenarioFactory {
 
     @SuppressWarnings("unchecked")
     public static void registerScenario(IAtBScenario scenario) {
-    final String METHOD_NAME = "registerScenario(IAtBScenario)"; //$NON-NLS-1$
+        final String METHOD_NAME = "registerScenario(IAtBScenario)"; //$NON-NLS-1$
 
-    if (!scenario.getClass().isAnnotationPresent(AtBScenarioEnabled.class)) {
-        MekHQ.getLogger().log(AtBScenarioFactory.class, METHOD_NAME, LogLevel.ERROR,
-                String.format("Unable to register an AtBScenario of class '%s' because is does not have the '%s' annotation.", //$NON-NLS-1$
-        scenario.getClass().getName(), AtBScenarioEnabled.class.getName()));
-    } else {
-        int type = scenario.getScenarioType();
-        List<Class<IAtBScenario>> list = scenarioMap.computeIfAbsent(type, k -> new ArrayList<>());
+        if (!scenario.getClass().isAnnotationPresent(AtBScenarioEnabled.class)) {
+            MekHQ.getLogger().log(AtBScenarioFactory.class, METHOD_NAME, LogLevel.ERROR,
+                    String.format("Unable to register an AtBScenario of class '%s' because is does not have the '%s' annotation.", //$NON-NLS-1$
+            scenario.getClass().getName(), AtBScenarioEnabled.class.getName()));
+        } else {
+            int type = scenario.getScenarioType();
+            List<Class<IAtBScenario>> list = scenarioMap.computeIfAbsent(type, k -> new ArrayList<>());
 
-        list.add((Class<IAtBScenario>) scenario.getClass());
+            list.add((Class<IAtBScenario>) scenario.getClass());
         }
     }
 
@@ -143,6 +143,12 @@ public class AtBScenarioFactory {
      * @param c the campaign for which to generate scenarios
      */
     public static void createScenariosForNewWeek(Campaign c) {
+        // First, we only want to generate if we have an active contract
+        if (!c.hasActiveContract()) {
+            return;
+        }
+
+        // If we have an active contract, then we can progress with generation
         Hashtable<Integer, Lance> lances = c.getLances();
 
         AtBContract atbContract;
