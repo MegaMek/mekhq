@@ -1447,7 +1447,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
         int n = potentials.size();
         if (n > 0) {
-            marry(potentials.get(Compute.randomInt(n)), MarriageSurnameStyle.WEIGHTED, campaign);
+            Marriage.WEIGHTED.marry(this, potentials.get(Compute.randomInt(n)), campaign);
         }
     }
 
@@ -1459,19 +1459,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         int ageDifference = Math.abs(p.getAge(campaign.getLocalDate()) - getAge(campaign.getLocalDate()));
 
         return (ageDifference <= campaign.getCampaignOptions().getMarriageAgeRange());
-    }
-
-    public void marry(Person spouse, MarriageSurnameStyle surnameStyle, Campaign campaign) {
-        surnameStyle.generateAndAssignSurnames(this, spouse, campaign);
-
-        setSpouseId(spouse.getId());
-        spouse.setSpouseId(getId());
-
-        campaign.addReport(String.format("%s has married %s!", getHyperlinkedName(),
-                spouse.getHyperlinkedName()));
-
-        MekHQ.triggerEvent(new PersonChangedEvent(this));
-        MekHQ.triggerEvent(new PersonChangedEvent(spouse));
     }
     //endregion Marriage
 

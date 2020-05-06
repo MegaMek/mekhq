@@ -90,7 +90,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
-import mekhq.campaign.personnel.enums.MarriageSurnameStyle;
+import mekhq.campaign.personnel.enums.Marriage;
 import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Faction;
@@ -1809,8 +1809,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(panMarriageAgeRange, gridBagConstraints);
 
-        MarriageSurnameStyle[] marriageSurnameStyles = MarriageSurnameStyle.values();
-        int surnameWeightLength = marriageSurnameStyles.length - 1;
+        Marriage[] marriageStyles = Marriage.values();
+        int surnameWeightLength = marriageStyles.length - 1;
         JPanel panRandomMarriageSurnameWeights = new JPanel(new GridLayout((int)
                 Math.ceil(((double) surnameWeightLength) / 3.0), 3));
         panRandomMarriageSurnameWeights.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("randomMarriageSurnameWeights.text")));
@@ -1824,8 +1824,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             JPanel panRandomMarriageSurnameWeight = new JPanel();
             panRandomMarriageSurnameWeight.add(spnRandomMarriageSurnameWeight);
 
-            JLabel lblRandomMarriageSurnameWeight = new JLabel(marriageSurnameStyles[i].toString());
-            lblRandomMarriageSurnameWeight.setToolTipText(marriageSurnameStyles[i].getToolTipText());
+            JLabel lblRandomMarriageSurnameWeight = new JLabel(marriageStyles[i].toString());
+            lblRandomMarriageSurnameWeight.setToolTipText(marriageStyles[i].getToolTipText());
             panRandomMarriageSurnameWeight.add(lblRandomMarriageSurnameWeight);
 
             panRandomMarriageSurnameWeights.add(panRandomMarriageSurnameWeight);

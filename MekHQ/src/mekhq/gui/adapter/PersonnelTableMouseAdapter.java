@@ -47,7 +47,7 @@ import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.PersonLogEvent;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.personnel.*;
-import mekhq.campaign.personnel.enums.MarriageSurnameStyle;
+import mekhq.campaign.personnel.enums.Marriage;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.ROMDesignation;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
@@ -501,7 +501,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             case CMD_ADD_SPOUSE: {
                 Person spouse = gui.getCampaign().getPerson(UUID.fromString(data[1]));
-                selectedPerson.marry(spouse, MarriageSurnameStyle.valueOf(data[2]), gui.getCampaign());
+                Marriage.valueOf(data[2]).marry(selectedPerson, spouse, gui.getCampaign());
                 break;
             }
             case CMD_ADD_AWARD: {
@@ -1843,7 +1843,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 
                             spouseMenu = new JMenu(pStatus);
 
-                            for (MarriageSurnameStyle style : MarriageSurnameStyle.values()) {
+                            for (Marriage style : Marriage.values()) {
                                 spouseMenu.add(newMenuItem(style.getDropDownText(),
                                         makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), style.name())));
                             }
