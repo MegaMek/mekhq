@@ -18,19 +18,14 @@
  */
 package mekhq.campaign.mission.atb;
 
-import java.awt.event.ActionListener;
 import java.util.*;
 
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Lance;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.scenario.AceDuelBuiltInScenario;
 import mekhq.campaign.mission.atb.scenario.AlliedTraitorsBuiltInScenario;
 import mekhq.campaign.mission.atb.scenario.AllyRescueBuiltInScenario;
@@ -158,14 +153,14 @@ public class AtBScenarioFactory {
         boolean hasBaseAttack;
         boolean hasBaseAttackAttacker;
 
-        // Determine active missions
-        for (Mission mission : c.getMissions()) {
-            if (!mission.isActive() || !(mission instanceof AtBContract) ) {
-                continue; //if not active or an AtBContract, we don't care about the mission
+        // We only need to process active contracts
+        for (Mission contract : c.getActiveContracts()) {
+            if (!(contract instanceof AtBContract) ) {
+                continue; //if not an AtBContract, we don't care about the mission
             }
 
             //region Value Initialization
-            atbContract = (AtBContract) mission;
+            atbContract = (AtBContract) contract;
             sList = new ArrayList<>();
             dontGenerateForces = new ArrayList<>();
             hasBaseAttack = false;
