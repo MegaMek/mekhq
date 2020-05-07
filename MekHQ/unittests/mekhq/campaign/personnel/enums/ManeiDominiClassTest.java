@@ -1,10 +1,8 @@
 package mekhq.campaign.personnel.enums;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.spy;
 
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.util.ResourceBundle;
 
