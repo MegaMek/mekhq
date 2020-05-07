@@ -112,7 +112,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
      * Unit status panel components
      */
     private List<JCheckBox> chksTotaled;
-    private List<JButton> btnsViewUnit;
     private List<JButton> btnsEditUnit;
     private List<UnitStatus> ustatuses;
     private List<JLabel> lblsUnitName;
@@ -144,7 +143,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private List<JCheckBox> salvageBoxes;
     private List<JCheckBox> escapeBoxes;
     private List<Unit> salvageables;
-    private List<JButton> btnsSalvageViewUnit;
     private List<JButton> btnsSalvageEditUnit;
 
     private JLabel lblSalvageValueUnit1;
@@ -252,6 +250,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
          * Unit Status Panel
          */
         pnlUnitStatus = new JPanel();
+
         pnlUnitStatus.setLayout(new GridBagLayout());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -260,9 +259,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.CENTER;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         pnlUnitStatus.add(new JLabel(resourceMap.getString("totaled")), gridBagConstraints);
+
         chksTotaled = new ArrayList<>();
         ustatuses = new ArrayList<>();
-        btnsViewUnit = new ArrayList<>();
         btnsEditUnit = new ArrayList<>();
         lblsUnitName = new ArrayList<>();
         int i = 2;
@@ -271,28 +270,31 @@ public class ResolveScenarioWizardDialog extends JDialog {
         JCheckBox chkTotaled;
         JButton btnViewUnit;
         JButton btnEditUnit;
+
         for (Unit unit : tracker.getUnits()) {
             UnitStatus status = tracker.getUnitsStatus().get(unit.getId());
             ustatuses.add(status);
             nameLbl = new JLabel(status.getDesc());
             lblsUnitName.add(nameLbl);
+
             chkTotaled = new JCheckBox("");
             chkTotaled.setSelected(status.isTotalLoss());
             chkTotaled.setName(Integer.toString(j));
             chkTotaled.setActionCommand(unit.getId().toString());
-            chksTotaled.add(chkTotaled);
             chkTotaled.addItemListener(new CheckTotalListener());
+            chksTotaled.add(chkTotaled);
+
             btnViewUnit = new JButton("View Unit");
-            btnViewUnit.setEnabled(!status.isTotalLoss());
             btnViewUnit.setActionCommand(unit.getId().toString());
             btnViewUnit.addActionListener(new ViewUnitListener());
-            btnsViewUnit.add(btnViewUnit);
+
             btnEditUnit = new JButton("Edit Unit");
             btnEditUnit.setEnabled(!status.isTotalLoss());
             btnEditUnit.setActionCommand(unit.getId().toString());
             btnEditUnit.setName(Integer.toString(j));
             btnEditUnit.addActionListener(new EditUnitListener());
             btnsEditUnit.add(btnEditUnit);
+
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
@@ -516,7 +518,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
         salvageBoxes = new ArrayList<>();
         escapeBoxes = new ArrayList<>();
         pnlSalvage.setLayout(new GridBagLayout());
-        btnsSalvageViewUnit = new ArrayList<>();
         btnsSalvageEditUnit = new ArrayList<>();
         JPanel pnlSalvageValue = new JPanel(new GridBagLayout());
         i = 0;
@@ -614,11 +615,11 @@ public class ResolveScenarioWizardDialog extends JDialog {
             escaped.addItemListener(evt -> checkSalvageRights());
             escaped.setActionCommand(u.getEntity().getExternalIdAsString());
             escapeBoxes.add(escaped);
+
             btnSalvageViewUnit = new JButton("View Unit");
-            btnSalvageViewUnit.setEnabled(true);
             btnSalvageViewUnit.setActionCommand(u.getId().toString());
             btnSalvageViewUnit.addActionListener(new ViewUnitListener(true));
-            btnsSalvageViewUnit.add(btnSalvageViewUnit);
+
             btnSalvageEditUnit = new JButton("Edit Unit");
             btnSalvageEditUnit.setEnabled(true);
             btnSalvageEditUnit.setActionCommand(u.getId().toString());
@@ -1710,7 +1711,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
         @Override
         public void itemStateChanged(ItemEvent evt) {
             int idx = Integer.parseInt(((JCheckBox) evt.getItem()).getName());
-            btnsViewUnit.get(idx).setEnabled(!chksTotaled.get(idx).isSelected());
             btnsEditUnit.get(idx).setEnabled(!chksTotaled.get(idx).isSelected());
         }
     }
