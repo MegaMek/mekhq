@@ -691,17 +691,17 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
             if (AmmoBin.ALLOWED_BY_TYPE.contains(thisType.getAmmoType())) {
                 predicate = part -> {
                     return part instanceof AmmoStorage
-                            && thisType.equalsAmmoTypeOnly(((AmmoStorage)part).getType())
-                            && thisType.getMunitionType() == ((AmmoType)((AmmoStorage)part).getType()).getMunitionType();
+                            && thisType.equalsAmmoTypeOnly(((AmmoStorage) part).getType())
+                            && thisType.getMunitionType() == ((AmmoType) ((AmmoStorage) part).getType()).getMunitionType();
                 };
             } else {
                 predicate = part -> {
                     return part instanceof AmmoStorage
-                            && thisType.equals(((AmmoStorage)part).getType())
-                            && thisType.getMunitionType() == ((AmmoType)((AmmoStorage)part).getType()).getMunitionType();
+                            && thisType.equals(((AmmoStorage) part).getType())
+                            && thisType.getMunitionType() == ((AmmoType) ((AmmoStorage) part).getType()).getMunitionType();
                 };
             }
-            AmmoStorage a = (AmmoStorage)campaign.findSparePart(predicate);
+            AmmoStorage a = (AmmoStorage) campaign.findSparePart(predicate);
             return a != null ? a.getShots() : 0;
         } else {
             return campaign.streamSpareParts()
