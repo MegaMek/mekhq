@@ -38,6 +38,7 @@ import java.util.stream.Stream;
 import javax.swing.JOptionPane;
 
 import megamek.common.*;
+import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.*;
 import mekhq.campaign.finances.*;
 import mekhq.campaign.log.*;
@@ -1161,18 +1162,49 @@ public class Campaign implements Serializable, ITechManager {
         return units.values();
     }
 
-    public ArrayList<Unit> getUnits(boolean weightSorted, boolean alphaSorted) {
-        ArrayList<Unit> sortedUnits = getCopyOfUnits();
-        if (alphaSorted || weightSorted) {
-            if (alphaSorted) {
-                sortedUnits.sort(Comparator.comparing(Unit::getName));
-            }
-            if (weightSorted) {
+    public List<Unit> getUnits(boolean weightSorted) {
+        return getUnits(false, weightSorted, false);
+    }
+
+    /**
+     * This returns a list of the current units, sorted alphabetically and potentially by other methods
+     * @param weightSorted      True if the unit list is sorted by weight descending, otherwise false
+     * @param weightClassSorted True if the unit list is sorted by weight class in format heaviest to lightest, otherwise false
+     * @param unitTypeSorted    True if the unit list is sorted by the unit type
+     * @return a copy of the units in the campaign with the applicable sort format
+     */
+    public List<Unit> getUnits(boolean weightClassSorted, boolean weightSorted,
+                               boolean unitTypeSorted) {
+        List<Unit> units = getCopyOfUnits();
+
+        // Natural order sorting the units alphabetically is the default for getSortedUnits
+        units.sort(Comparator.comparing(Unit::getName, new NaturalOrderComparator()));
+
+        if (weightClassSorted || weightSorted || unitTypeSorted) {
+            // We need to determine these by both the weight sorted and weight class sorted values,
+            // as to properly sort by weight class and weight we should do both at the same time
+            if (weightSorted && weightClassSorted) {
+                units.sort((lhs, rhs) -> {
+                    int weightClass1 = lhs.getEntity().getWeightClass();
+                    int weightClass2 = rhs.getEntity().getWeightClass();
+                    if (weightClass1 == weightClass2) {
+                        return Double.compare(rhs.getEntity().getWeight(), lhs.getEntity().getWeight());
+                    } else {
+                        return weightClass2 - weightClass1;
+                    }
+                });
+            } else if (weightClassSorted) {
+                units.sort(Comparator.comparingInt(o -> o.getEntity().getWeightClass()));
+            } else if (weightSorted) {
                 // Sorted in descending order of weights
-                sortedUnits.sort((lhs, rhs) -> Double.compare(rhs.getEntity().getWeight(), lhs.getEntity().getWeight()));
+                units.sort(Comparator.comparingDouble(o -> o.getEntity().getWeight()));
+            }
+
+            if (unitTypeSorted) {
+                units.sort(Comparator.comparingInt(e -> e.getEntity().getUnitType()));
             }
         }
-        return sortedUnits;
+        return units;
     }
 
     // Since getUnits doesn't return a defensive copy and I don't know what I might break if I made it do so...
@@ -2379,8 +2411,7 @@ public class Campaign implements Serializable, ITechManager {
             return admin;
         } else if (skill.equals(CampaignOptions.S_TECH)) {
             for (Person p : getPersonnel()) {
-                if (getCampaignOptions().isAcquisitionSupportStaffOnly()
-                        && !p.isSupport()) {
+                if (getCampaignOptions().isAcquisitionSupportStaffOnly() && !p.hasSupportRole(false)) {
                     continue;
                 }
                 if (maxAcquisitions > 0 && p.getAcquisitions() >= maxAcquisitions) {
@@ -2394,8 +2425,7 @@ public class Campaign implements Serializable, ITechManager {
             }
         } else {
             for (Person p : getPersonnel()) {
-                if (getCampaignOptions().isAcquisitionSupportStaffOnly()
-                        && !p.isSupport()) {
+                if (getCampaignOptions().isAcquisitionSupportStaffOnly() && !p.hasSupportRole(false)) {
                     continue;
                 }
                 if (maxAcquisitions > 0 && p.getAcquisitions() >= maxAcquisitions) {
@@ -2427,8 +2457,7 @@ public class Campaign implements Serializable, ITechManager {
                 if (!p.isActive()) {
                     continue;
                 }
-                if (getCampaignOptions().isAcquisitionSupportStaffOnly()
-                        && !p.isSupport()) {
+                if (getCampaignOptions().isAcquisitionSupportStaffOnly() && !p.hasSupportRole(false)) {
                     continue;
                 }
                 if (maxAcquisitions > 0 && p.getAcquisitions() >= maxAcquisitions) {
@@ -3978,7 +4007,7 @@ public class Campaign implements Serializable, ITechManager {
                         }
 
                         for (Person p : traineeUnit.getCrew()) {
-                            if (p == commander) {
+                            if (p.equals(commander)) {
                                 continue;
                             }
                             // ...and if their weakest role is Green or Ultra-Green
@@ -4628,7 +4657,6 @@ public class Campaign implements Serializable, ITechManager {
     public void setCampaignOptions(CampaignOptions options) {
         campaignOptions = options;
     }
-
 
     public void writeToXml(PrintWriter pw1) {
         // File header
@@ -5320,7 +5348,7 @@ public class Campaign implements Serializable, ITechManager {
                 mechCollars += 1;
             }
 
-            leasedASFCapacity += leasedLargeMechDropships * largeMechDropshipASFCapacity;
+            leasedASFCapacity += (int) Math.floor(leasedLargeMechDropships * largeMechDropshipASFCapacity);
             leasedCargoCapacity += (int) Math.floor(largeMechDropshipCargoCapacity);
         }
 
@@ -6489,7 +6517,7 @@ public class Campaign implements Serializable, ITechManager {
             searchCat_RoleGroup = "Vessel Crew/";
         }
 
-        if (p.isSupport()) {
+        if (p.hasPrimarySupportRole(true)) {
             searchCat_CombatSupport = "Support/";
         } else {
             searchCat_CombatSupport = "Combat/";
@@ -7879,8 +7907,7 @@ public class Campaign implements Serializable, ITechManager {
 
         for (Person p : getPersonnel()) {
             // Add them to the total count
-            if (Person.isCombatRole(p.getPrimaryRole()) && !p.isPrisoner()
-                    && !p.isBondsman() && p.isActive()) {
+            if (p.hasPrimaryCombatRole() && p.isFree() && p.isActive()) {
                 countPersonByType[p.getPrimaryRole()]++;
                 countTotal++;
                 if (getCampaignOptions().useAdvancedMedical() && p.getInjuries().size() > 0) {
@@ -7889,11 +7916,11 @@ public class Campaign implements Serializable, ITechManager {
                     countInjured++;
                 }
                 salary = salary.plus(p.getSalary());
-            } else if (Person.isCombatRole(p.getPrimaryRole()) && (p.getStatus() == PersonnelStatus.RETIRED)) {
+            } else if (p.hasPrimaryCombatRole() && (p.getStatus() == PersonnelStatus.RETIRED)) {
                 countRetired++;
-            } else if (Person.isCombatRole(p.getPrimaryRole()) && (p.getStatus() == PersonnelStatus.MIA)) {
+            } else if (p.hasPrimaryCombatRole() && (p.getStatus() == PersonnelStatus.MIA)) {
                 countMIA++;
-            } else if (Person.isCombatRole(p.getPrimaryRole()) && (p.getStatus() == PersonnelStatus.KIA)) {
+            } else if (p.hasPrimaryCombatRole() && (p.getStatus() == PersonnelStatus.KIA)) {
                 countKIA++;
             }
         }
@@ -7943,8 +7970,7 @@ public class Campaign implements Serializable, ITechManager {
 
         for (Person p : getPersonnel()) {
             // Add them to the total count
-            if (Person.isSupportRole(p.getPrimaryRole()) && !p.isPrisoner()
-                    && !p.isBondsman() && p.isActive()) {
+            if (p.hasPrimarySupportRole(false) && p.isFree() && p.isActive()) {
                 countPersonByType[p.getPrimaryRole()]++;
                 countTotal++;
                 if (p.getInjuries().size() > 0 || p.getHits() > 0) {
@@ -7961,14 +7987,11 @@ public class Campaign implements Serializable, ITechManager {
                 if (p.getInjuries().size() > 0 || p.getHits() > 0) {
                     countInjured++;
                 }
-            } else if (Person.isSupportRole(p.getPrimaryRole())
-                    && (p.getStatus() == PersonnelStatus.RETIRED)) {
+            } else if (p.hasPrimarySupportRole(false) && (p.getStatus() == PersonnelStatus.RETIRED)) {
                 countRetired++;
-            } else if (Person.isSupportRole(p.getPrimaryRole())
-                    && (p.getStatus() == PersonnelStatus.MIA)) {
+            } else if (p.hasPrimarySupportRole(false) && (p.getStatus() == PersonnelStatus.MIA)) {
                 countMIA++;
-            } else if (Person.isSupportRole(p.getPrimaryRole())
-                    && (p.getStatus() == PersonnelStatus.KIA)) {
+            } else if (p.hasPrimarySupportRole(false) && (p.getStatus() == PersonnelStatus.KIA)) {
                 countKIA++;
             }
         }

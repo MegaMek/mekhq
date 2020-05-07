@@ -203,7 +203,21 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
         // If we wish to force the user to not be able to give awards for some reason (e.g. lack of kill count),
         // we need to create classes for each awards and override this method.
 
-        return (!person.awardController.hasAward(this) || stackable);
+        return (!person.getAwardController().hasAward(this) || stackable);
+    }
+
+    /**
+     * Checks if an award can be awarded to a given group of people
+     * @param people to be given the award
+     * @return true if this award can be awarded to the selected people
+     */
+    public boolean canBeAwarded(Person[] people) {
+        for (Person person : people) {
+            if (!canBeAwarded(person)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -263,15 +277,15 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
     /**
      * @param date date to be removed from this award
      */
-    public void removeDate(Date date){
+    public void removeDate(Date date) {
         dates.remove(date);
     }
 
     /**
-     * @return true if this award has any dates
+     * @return true if this award has multiple (more than 1) dates
      */
-    public boolean hasDates(){
-        return dates.size() > 0;
+    public boolean hasDates() {
+        return dates.size() > 1;
     }
 
     /**
@@ -284,8 +298,7 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
     /**
      * @return an html formatted string to be used as tooltip.
      */
-    public String getTooltip(){
-
+    public String getTooltip() {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
         StringBuilder string = new StringBuilder();

@@ -1135,8 +1135,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
                 panForceList.add(lblWeightClass, gbc);
             }
 
-            JLabel lblArrivalTurn = new JLabel(sft.getArrivalTurn() < 0 
-                    ? ScenarioForceTemplate.SPECIAL_ARRIVAL_TURNS.get(sft.getArrivalTurn()) 
+            JLabel lblArrivalTurn = new JLabel(sft.getArrivalTurn() < 0
+                    ? ScenarioForceTemplate.SPECIAL_ARRIVAL_TURNS.get(sft.getArrivalTurn())
                     : Integer.toString(sft.getArrivalTurn()));
             gbc.gridx++;
             panForceList.add(lblArrivalTurn, gbc);
@@ -1277,7 +1277,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
             valBuilder.append("Non-artillery units cannot be deployed off board.");
         }
-        
+
         if(cboMinWeightClass.getSelectedIndex() > cboMaxWeightClass.getSelectedIndex()) {
             if(valBuilder.length() > 0) {
                 valBuilder.append("\n");
@@ -1474,15 +1474,15 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getActionCommand() == ADD_FORCE_COMMAND) {
+        if (ADD_FORCE_COMMAND.equals(e.getActionCommand())) {
             addForceButtonHandler();
-        } else if(e.getActionCommand().contains(REMOVE_FORCE_COMMAND)) {
+        } else if (e.getActionCommand().contains(REMOVE_FORCE_COMMAND)) {
             deleteForceButtonHandler(e.getActionCommand());
-        } else if(e.getActionCommand().contains(EDIT_FORCE_COMMAND)) {
+        } else if (e.getActionCommand().contains(EDIT_FORCE_COMMAND)) {
             editForceButtonHandler(e.getActionCommand());
-        } else if(e.getActionCommand() == SAVE_TEMPLATE_COMMAND) {
+        } else if (SAVE_TEMPLATE_COMMAND.equals(e.getActionCommand())) {
             saveTemplateButtonHandler();
-        } else if(e.getActionCommand() == LOAD_TEMPLATE_COMMAND) {
+        } else if (LOAD_TEMPLATE_COMMAND.equals(e.getActionCommand())) {
             loadTemplateButtonHandler();
         }
     }

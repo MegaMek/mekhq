@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2013, 2020 - The MegaMek Team. All Rights Reserved
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq;
 
 import java.awt.Graphics2D;
@@ -7,7 +25,6 @@ import java.awt.Image;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -26,7 +43,6 @@ import mekhq.gui.utilities.PortraitFileFactory;
  * This is a convenience class that will keep all the various directories and tilesets
  * for tracking graphics and icons
  * @author Jay Lawson
- *
  */
 public class IconPackage {
     //the various directory items we need to access
@@ -81,44 +97,46 @@ public class IconPackage {
     }
 
     public void loadDirectories() {
-        if(null == portraits) {
+        if (null == portraits) {
             try {
                 portraits = new DirectoryItems(new File("data/images/portraits"), "", //$NON-NLS-1$ //$NON-NLS-2$
                         PortraitFileFactory.getInstance());
             } catch (Exception e) {
+                MekHQ.getLogger().error(getClass(), "loadDirectories", "Unable to load portraits Directory", e);
                 portraits = null;
             }
         }
-        if(null == camos) {
+        if (null == camos) {
             try {
                 camos = new DirectoryItems(new File("data/images/camo"), "", //$NON-NLS-1$ //$NON-NLS-2$
                         ImageFileFactory.getInstance());
             } catch (Exception e) {
+                MekHQ.getLogger().error(getClass(), "loadDirectories", "Unable to load camo Directory", e);
                 camos = null;
             }
         }
-        if(null == forceIcons) {
+        if (null == forceIcons) {
             try {
                 forceIcons = new DirectoryItems(new File("data/images/force"), "", //$NON-NLS-1$ //$NON-NLS-2$
                         PortraitFileFactory.getInstance());
             } catch (Exception e) {
+                MekHQ.getLogger().error(getClass(), "loadDirectories", "Unable to load forceIcons Directory", e);
                 forceIcons = null;
             }
         }
-        if(null == mt) {
+        if (null == mt) {
             mt = new MechTileset(Configuration.unitImagesDir());
             try {
                 mt.loadFromFile("mechset.txt");
-            } catch (IOException ex) {
-                MekHQ.getLogger().error(getClass(), "loadDirectories()", ex);
-                //TODO: do something here
+            } catch (Exception e) {
+                MekHQ.getLogger().error(getClass(), "loadDirectories", "Unable to load mech tileset", e);
             }
         }
-        if(null == awardIcons){
-            try{
+        if (null == awardIcons) {
+            try {
                 awardIcons = new DirectoryItems(new File("data/images/awards"), "", PortraitFileFactory.getInstance());
-            }
-            catch (Exception e){
+            } catch (Exception e) {
+                MekHQ.getLogger().error(getClass(), "loadDirectories", "Unable to load awardIcons Directory", e);
                 awardIcons = null;
             }
         }
@@ -168,7 +186,7 @@ public class IconPackage {
         final String METHOD_NAME = "buildForceIcon(String,String, DirectoryItems,LinkedHashMap<String,Vector<String>>)"; //$NON-NLS-1$
         Image retVal = null;
 
-        if(Crew.ROOT_PORTRAIT.equals(category)) {
+        if (Crew.ROOT_PORTRAIT.equals(category)) {
             category = "";
         }
 
@@ -188,9 +206,9 @@ public class IconPackage {
                 int width = 0;
                 int height = 0;
                 // Gather height/width
-                for(String layer : FORCE_DRAW_ORDER) {
-                    if(iconMap.containsKey(layer)) {
-                        for(String value : iconMap.get(layer)) {
+                for (String layer : FORCE_DRAW_ORDER) {
+                    if (iconMap.containsKey(layer)) {
+                        for (String value : iconMap.get(layer)) {
                          // Load up the image piece
                             BufferedImage img = (BufferedImage) items.getItem(layer, value);
                             width = Math.max(img.getWidth(), width);
@@ -200,9 +218,9 @@ public class IconPackage {
                 }
                 base = config.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
                 g2d = base.createGraphics();
-                for(String layer : FORCE_DRAW_ORDER) {
-                    if(iconMap.containsKey(layer)) {
-                        for(String value : iconMap.get(layer)) {
+                for (String layer : FORCE_DRAW_ORDER) {
+                    if (iconMap.containsKey(layer)) {
+                        for (String value : iconMap.get(layer)) {
                             BufferedImage img = (BufferedImage) items.getItem(layer, value);
                             // Draw the current buffered image onto the base, aligning bottom and right side
                             g2d.drawImage(img, width - img.getWidth() + 1, height - img.getHeight() + 1, null);
@@ -226,10 +244,10 @@ public class IconPackage {
             }
         } else { // Standard force icon
             // Try to get the player's force icon file.
-            Image scaledImage = null;
+            Image scaledImage;
             try {
                 scaledImage = (Image) items.getItem(category, filename);
-                if(null == scaledImage) {
+                if (null == scaledImage) {
                     scaledImage = (Image) items.getItem("", "empty.png");
                 }
                 retVal = scaledImage;

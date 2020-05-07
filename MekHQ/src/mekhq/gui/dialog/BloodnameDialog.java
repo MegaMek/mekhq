@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package mekhq.gui.dialog;
 
@@ -26,7 +26,7 @@ import mekhq.preferences.PreferencesNode;
 
 /**
  * @author Neoancient
- * 
+ *
  * Randomly selects an appropriate Bloodname based on Clan, phenotype, and year
  *
  */
@@ -283,16 +283,16 @@ public class BloodnameDialog extends JDialog {
 				}
 			}
 		}
-		if ("ProtoMech" == phenotype && year < 3060) {
+		if ("ProtoMech".equals(phenotype) && year < 3060) {
 			txt += "ProtoMechs did not exist in "
 					+ year + ". Using Aerospace.\n";
 		}
-		if ("Naval" == phenotype && clan != CSR) {
+		if ("Naval".equals(phenotype) && clan != CSR) {
 			txt += "The Naval phenotype is unique to Clan Snow Raven. Using General.\n";
 		}
-		if ("TankWarrior" == phenotype && clan != CHH) {
+		if ("TankWarrior".equals(phenotype) && clan != CHH) {
 			 txt += "The TankWarrior phenotype is unique to Clan Hell's Horses. Using General.\n";
-		} else if ("TankWarrior" == phenotype && year < 3100) {
+		} else if ("TankWarrior".equals(phenotype) && year < 3100) {
 			txt += "The TankWarrior phenotype began development in the 32nd century. Using 3100.\n";
 		}
 		txtWarning.setText(txt);
