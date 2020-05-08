@@ -37,6 +37,7 @@ import megamek.common.util.StringUtil;
 import megamek.common.util.WeightedMap;
 import mekhq.campaign.*;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.io.CampaignXmlParser;
 import mekhq.campaign.log.*;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.ModifierValue;
@@ -339,8 +340,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private final static String DATE_DISPLAY_FORMAT = "yyyy-MM-dd";
 
     //region Reverse Compatibility
-    // v0.47.6 and earlier
-    private UUID ancestorsId = null; // this is require for mapping ancestry, and can not be avoided
     // Unknown version
     private int oldId;
     private int oldUnitId = -1;
@@ -2058,7 +2057,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         retVal.id = UUID.fromString(wn2.getTextContent());
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("ancestors")) { // legacy - 0.47.6 removal
-                    retVal.ancestorsId = UUID.fromString(wn2.getTextContent().trim());
+                    CampaignXmlParser.addToAncestryMigrationMap(UUID.fromString(wn2.getTextContent().trim()), retVal.getId());
                 } else if (wn2.getNodeName().equalsIgnoreCase("spouse")) { // legacy - 0.47.6 removal
                     retVal.genealogy.setSpouse(UUID.fromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("formerSpouses")) { // legacy - 0.47.6 removal
@@ -4041,12 +4040,4 @@ public class Person implements Serializable, MekHqXmlSerializable {
             return OTHER_RANSOM_VALUES.get(getExperienceLevel(false));
         }
     }
-
-    //region Legacy Methods
-    // This is part of a functionality that was removed in 0.47.6, and should not be used for anything
-    // outside of that migration.
-    public UUID getAncestorsId() {
-        return ancestorsId;
-    }
-    //endregion Legacy Methods
 }

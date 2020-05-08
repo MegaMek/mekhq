@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 - The MegaMek Team
+ * Copyright (c) 2018-2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,7 +35,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.UUID;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -1865,30 +1864,21 @@ public class CampaignXmlParser {
 
     //region Migration Methods
     //region Ancestry Migration
+    private static Map<UUID, List<UUID>> ancestryMigrationMap = new HashMap<>();
+
+    public static void addToAncestryMigrationMap(UUID ancestorsId, UUID person) {
+        ancestryMigrationMap.putIfAbsent(ancestorsId, new ArrayList<>());
+        ancestryMigrationMap.get(ancestorsId).add(person);
+    }
+
     private static void migrateAncestorNodes(Campaign retVal, Node wn) {
-        final String METHOD_NAME = "processAncestorNodes(Campaign,Node,Version)"; //$NON-NLS-1$
-
-        MekHQ.getLogger().log(CampaignXmlParser.class, METHOD_NAME, LogLevel.INFO,
-                "Loading Ancestor Nodes from XML..."); //$NON-NLS-1$
-
         NodeList wList = wn.getChildNodes();
 
-        // Okay, lets iterate through the children, eh?
         for (int x = 0; x < wList.getLength(); x++) {
             Node wn2 = wList.item(x);
 
-            // If it's not an element node, we ignore it.
-            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-
-            if (!wn2.getNodeName().equalsIgnoreCase("ancestor")) {
-                // Error condition of sorts!
-                // Errr, what should we do here?
-                MekHQ.getLogger().log(CampaignXmlParser.class, METHOD_NAME, LogLevel.ERROR,
-                        "Unknown node type not loaded in Ancestor nodes: " //$NON-NLS-1$
-                                + wn2.getNodeName());
-
+            if ((wn2.getNodeType() != Node.ELEMENT_NODE)
+                    || !wn2.getNodeName().equalsIgnoreCase("ancestor")) {
                 continue;
             }
 
@@ -1902,9 +1892,6 @@ public class CampaignXmlParser {
 
             }
         }
-
-        MekHQ.getLogger().log(CampaignXmlParser.class, METHOD_NAME, LogLevel.INFO,
-                "Load Ancestor Nodes Complete!"); //$NON-NLS-1$
     }
 
     private static class OldAncestor {
@@ -1941,7 +1928,9 @@ public class CampaignXmlParser {
                         retVal.motherId = UUID.fromString(wn2.getTextContent());
                     }
                 }
-            } catch (Exception ignored) { }
+            } catch (Exception ignored) {
+                retVal = null;
+            }
 
             return retVal;
         }
