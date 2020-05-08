@@ -24,6 +24,7 @@ package mekhq.campaign.parts.equipment;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.function.Predicate;
 
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
@@ -686,11 +687,21 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     public int getAmountAvailable() {
         final AmmoType thisType = (AmmoType)getType();
         if (campaign.getCampaignOptions().useAmmoByType()) {
-            AmmoStorage a = (AmmoStorage)campaign.findSparePart(part -> {
-                return part instanceof AmmoStorage
-                    && thisType.equals(((AmmoStorage)part).getType())
-                    && thisType.getMunitionType() == ((AmmoType)((AmmoStorage)part).getType()).getMunitionType();
-            });
+            Predicate<Part> predicate;
+            if (AmmoBin.ALLOWED_BY_TYPE.contains(thisType.getAmmoType())) {
+                predicate = part -> {
+                    return part instanceof AmmoStorage
+                            && thisType.equalsAmmoTypeOnly(((AmmoStorage) part).getType())
+                            && thisType.getMunitionType() == ((AmmoType) ((AmmoStorage) part).getType()).getMunitionType();
+                };
+            } else {
+                predicate = part -> {
+                    return part instanceof AmmoStorage
+                            && thisType.equals(((AmmoStorage) part).getType())
+                            && thisType.getMunitionType() == ((AmmoType) ((AmmoStorage) part).getType()).getMunitionType();
+                };
+            }
+            AmmoStorage a = (AmmoStorage) campaign.findSparePart(predicate);
             return a != null ? a.getShots() : 0;
         } else {
             return campaign.streamSpareParts()

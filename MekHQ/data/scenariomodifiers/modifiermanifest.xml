@@ -75,6 +75,9 @@
 		<modifier>
 			AlliedArtySupport.xml
 		</modifier>
+		<modifier>
+			AlliedReinforcements.xml
+		</modifier>
 		<!--modifier>
 			Need campaign state
 			Need way to change rat for opfor

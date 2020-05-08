@@ -3548,32 +3548,14 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void processNewDayPersonnel() {
-        List<Person> babies = new ArrayList<>();
-        for (Person p : getPersonnel()) {
-            if (!p.isActive()) {
-                continue;
-            }
-
+        // This MUST use getActivePersonnel as we only want to process active personnel, and
+        // furthermore this allows us to add and remove personnel without issue
+        for (Person p : getActivePersonnel()) {
             // Random Death
 
             // Random Marriages
             if (getCampaignOptions().useRandomMarriages()) {
                 p.randomMarriage(this);
-            }
-
-            // Procreation
-            if (p.isFemale()) {
-                if (p.isPregnant()) {
-                    if (getCampaignOptions().useUnofficialProcreation()) {
-                        if (getLocalDate().compareTo((p.getDueDate())) == 0) {
-                            babies.addAll(p.birth());
-                        }
-                    } else {
-                        p.removePregnancy();
-                    }
-                } else if (getCampaignOptions().useUnofficialProcreation()) {
-                    p.procreate();
-                }
             }
 
             p.resetMinutesLeft();
@@ -3603,6 +3585,8 @@ public class Campaign implements Serializable, ITechManager {
                 }
             }
 
+            // TODO : Reset this based on hasSupportRole(false) instead of checking for each type
+            // TODO : p.isEngineer will need to stay, however
             // Reset edge points to the purchased value each week. This should only
             // apply for support personnel - combat troops reset with each new mm game
             if ((p.isAdmin() || p.isDoctor() || p.isEngineer() || p.isTech())
@@ -3622,10 +3606,21 @@ public class Campaign implements Serializable, ITechManager {
                     p.setIdleMonths(0);
                 }
             }
-        }
 
-        for (Person baby : babies) {
-            recruitPerson(baby, false, true, false, false);
+            // Procreation
+            if (p.isFemale()) {
+                if (p.isPregnant()) {
+                    if (getCampaignOptions().useUnofficialProcreation()) {
+                        if (getLocalDate().compareTo((p.getDueDate())) == 0) {
+                            p.birth(this);
+                        }
+                    } else {
+                        p.removePregnancy();
+                    }
+                } else if (getCampaignOptions().useUnofficialProcreation()) {
+                    p.procreate();
+                }
+            }
         }
     }
 
@@ -3793,15 +3788,15 @@ public class Campaign implements Serializable, ITechManager {
      */
     public List<Contract> getActiveContracts() {
         List<Contract> active = new ArrayList<>();
-        for (Mission m : getMissions()) {
-            if (!(m instanceof Contract)) {
+        for (Mission mission : getMissions()) {
+            if (!(mission instanceof Contract)) {
                 continue;
             }
-            Contract c = (Contract) m;
-            if (c.isActive()
-                    && !getCalendar().getTime().after(c.getEndingDate())
-                    && !getCalendar().getTime().before(c.getStartDate())) {
-                active.add(c);
+            Contract contract = (Contract) mission;
+            if (contract.isActive()
+                    && !getCalendar().getTime().after(contract.getEndingDate())
+                    && !getCalendar().getTime().before(contract.getStartDate())) {
+                active.add(contract);
             }
         }
         return active;

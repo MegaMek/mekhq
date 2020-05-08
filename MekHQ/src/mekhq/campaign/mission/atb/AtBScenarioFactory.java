@@ -18,19 +18,14 @@
  */
 package mekhq.campaign.mission.atb;
 
-import java.awt.event.ActionListener;
 import java.util.*;
 
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Lance;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.scenario.AceDuelBuiltInScenario;
 import mekhq.campaign.mission.atb.scenario.AlliedTraitorsBuiltInScenario;
 import mekhq.campaign.mission.atb.scenario.AllyRescueBuiltInScenario;
@@ -118,17 +113,17 @@ public class AtBScenarioFactory {
 
     @SuppressWarnings("unchecked")
     public static void registerScenario(IAtBScenario scenario) {
-    final String METHOD_NAME = "registerScenario(IAtBScenario)"; //$NON-NLS-1$
+        final String METHOD_NAME = "registerScenario(IAtBScenario)"; //$NON-NLS-1$
 
-    if (!scenario.getClass().isAnnotationPresent(AtBScenarioEnabled.class)) {
-        MekHQ.getLogger().log(AtBScenarioFactory.class, METHOD_NAME, LogLevel.ERROR,
-                String.format("Unable to register an AtBScenario of class '%s' because is does not have the '%s' annotation.", //$NON-NLS-1$
-        scenario.getClass().getName(), AtBScenarioEnabled.class.getName()));
-    } else {
-        int type = scenario.getScenarioType();
-        List<Class<IAtBScenario>> list = scenarioMap.computeIfAbsent(type, k -> new ArrayList<>());
+        if (!scenario.getClass().isAnnotationPresent(AtBScenarioEnabled.class)) {
+            MekHQ.getLogger().log(AtBScenarioFactory.class, METHOD_NAME, LogLevel.ERROR,
+                    String.format("Unable to register an AtBScenario of class '%s' because is does not have the '%s' annotation.", //$NON-NLS-1$
+            scenario.getClass().getName(), AtBScenarioEnabled.class.getName()));
+        } else {
+            int type = scenario.getScenarioType();
+            List<Class<IAtBScenario>> list = scenarioMap.computeIfAbsent(type, k -> new ArrayList<>());
 
-        list.add((Class<IAtBScenario>) scenario.getClass());
+            list.add((Class<IAtBScenario>) scenario.getClass());
         }
     }
 
@@ -143,6 +138,12 @@ public class AtBScenarioFactory {
      * @param c the campaign for which to generate scenarios
      */
     public static void createScenariosForNewWeek(Campaign c) {
+        // First, we only want to generate if we have an active contract
+        if (!c.hasActiveContract()) {
+            return;
+        }
+
+        // If we have an active contract, then we can progress with generation
         Hashtable<Integer, Lance> lances = c.getLances();
 
         AtBContract atbContract;
@@ -152,14 +153,14 @@ public class AtBScenarioFactory {
         boolean hasBaseAttack;
         boolean hasBaseAttackAttacker;
 
-        // Determine active missions
-        for (Mission mission : c.getMissions()) {
-            if (!mission.isActive() || !(mission instanceof AtBContract) ) {
-                continue; //if not active or an AtBContract, we don't care about the mission
+        // We only need to process active contracts
+        for (Mission contract : c.getActiveContracts()) {
+            if (!(contract instanceof AtBContract) ) {
+                continue; //if not an AtBContract, we don't care about the mission
             }
 
             //region Value Initialization
-            atbContract = (AtBContract) mission;
+            atbContract = (AtBContract) contract;
             sList = new ArrayList<>();
             dontGenerateForces = new ArrayList<>();
             hasBaseAttack = false;
