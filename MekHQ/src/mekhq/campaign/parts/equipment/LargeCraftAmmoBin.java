@@ -141,10 +141,6 @@ public class LargeCraftAmmoBin extends AmmoBin {
         return size;
     }
 
-    public void setCapacity(double capacity) {
-        this.size = capacity;
-    }
-
     public double getUnusedCapacity() {
         return size - Math.ceil(getCurrentShots() * type.getTonnage(null) / ((AmmoType) type).getShots());
     }
