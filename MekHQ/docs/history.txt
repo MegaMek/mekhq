@@ -3,6 +3,10 @@ VERSION HISTORY:
 0.47.7-SNAPSHOT
 + Issue #1725: Refit does not save original part quality when the part is cloned
 + Issue #1665: Use ammo by type (unofficial) does not work
++ Issue #1741: Adding Unit::isPresent check for Maintenance
++ Issue #1734: Scenario Resolution Dialog: View Unit is now Always Enabled
++ PR #1728: Adding Option to Disable Chases
++ Issue #1698: Option to Determine Father Based on Spouse at Time of Birth
 
 0.47.6 (2020-5-03 1715 UTC)
 + PR #1610: Raised cost of edge points from 1 to 10 for the AtB configuration preset.
