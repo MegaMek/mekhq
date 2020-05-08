@@ -225,7 +225,8 @@ public class CampaignOptions implements Serializable {
     private int babySurnameStyle;
     public static final int BABY_SURNAME_MINE = 0; //baby uses mother's surname
     public static final int BABY_SURNAME_SPOUSE = 1; //baby uses father's surname
-    private boolean useParentage;
+    private boolean determineFatherAtBirth;
+    private boolean displayParentage;
     private int displayFamilyLevel;
     public static final int PARENTS_CHILDREN_SIBLINGS = 0;
     public static final int GRANDPARENTS_GRANDCHILDREN = 1;
@@ -562,7 +563,8 @@ public class CampaignOptions implements Serializable {
         displayTrueDueDate = false;
         logConception = false;
         babySurnameStyle = BABY_SURNAME_MINE;
-        useParentage = false;
+        determineFatherAtBirth = false;
+        displayParentage = false;
         displayFamilyLevel = PARENTS_CHILDREN_SIBLINGS;
         useRandomDeaths = true;
         keepMarriedNameUponSpouseDeath = true;
@@ -1419,17 +1421,31 @@ public class CampaignOptions implements Serializable {
     }
 
     /**
+     * @return whether or not to determine the father at birth instead of at conception
+     */
+    public boolean determineFatherAtBirth() {
+        return determineFatherAtBirth;
+    }
+
+    /**
+     * @param determineFatherAtBirth whether or not to determine the father at birth instead of at conception
+     */
+    public void setDetermineFatherAtBirth(boolean determineFatherAtBirth) {
+        this.determineFatherAtBirth = determineFatherAtBirth;
+    }
+
+    /**
      * @return whether or not to display parentage for personnel
      */
-    public boolean useParentage() {
-        return useParentage;
+    public boolean displayParentage() {
+        return displayParentage;
     }
 
     /**
      * @param b whether or not to display parentage for personnel
      */
-    public void setUseParentage(boolean b) {
-        useParentage = b;
+    public void setDisplayParentage(boolean b) {
+        displayParentage = b;
     }
 
     /**
@@ -3084,7 +3100,8 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "displayTrueDueDate", displayTrueDueDate);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "logConception", logConception);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "babySurnameStyle", babySurnameStyle);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useParentage", useParentage);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "determineFatherAtBirth", determineFatherAtBirth);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useParentage", displayParentage);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "displayFamilyLevel", displayFamilyLevel);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomDeaths", useRandomDeaths);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "keepMarriedNameUponSpouseDeath", keepMarriedNameUponSpouseDeath);
@@ -3556,8 +3573,10 @@ public class CampaignOptions implements Serializable {
                 retVal.logConception = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("babySurnameStyle")) {
                 retVal.babySurnameStyle = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("determineFatherAtBirth")) {
+                retVal.setDetermineFatherAtBirth(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("useParentage")) {
-                retVal.useParentage = Boolean.parseBoolean(wn2.getTextContent().trim());
+                retVal.displayParentage = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("displayFamilyLevel")) {
                 retVal.displayFamilyLevel = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomDeaths")) {
