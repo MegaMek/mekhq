@@ -31,7 +31,6 @@ import javax.swing.table.TableColumn;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.FormerSpouse;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
-import mekhq.campaign.personnel.familyTree.Genealogy;
 import org.joda.time.DateTime;
 
 import megamek.common.Crew;
@@ -869,7 +868,7 @@ public class PersonViewPanel extends ScrollablePanel {
             }
         }
 
-        if (campaign.getCampaignOptions().useParentage()) {
+        if (campaign.getCampaignOptions().displayParentage()) {
             List<UUID> children = person.getGenealogy().getChildren();
             if (!children.isEmpty() && (campaign.getCampaignOptions().displayFamilyLevel() >= CampaignOptions.PARENTS_CHILDREN_SIBLINGS)) {
                 lblChildren1.setName("lblChildren1"); // NOI18N //$NON-NLS-1$

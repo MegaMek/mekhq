@@ -107,7 +107,7 @@ import mekhq.preferences.PreferencesNode;
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class CampaignOptionsDialog extends javax.swing.JDialog {
+public class CampaignOptionsDialog extends JDialog {
     //region Variable Declarations
     //region General Variables (ones not relating to a specific tab)
     private static final long serialVersionUID = 1935043247792962964L;
@@ -260,7 +260,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox chkDisplayTrueDueDate;
     private JCheckBox chkLogConception;
     private JComboBox<String> comboBabySurnameStyle;
-    private JCheckBox chkUseParentage;
+    private JCheckBox chkDetermineFatherAtBirth;
+    private JCheckBox chkDisplayParentage;
     private JComboBox<String> comboDisplayFamilyLevel;
     private JCheckBox chkUseRandomDeaths;
     private JCheckBox chkKeepMarriedNameUponSpouseDeath;
@@ -443,6 +444,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JLabel lblDefendPct;
     private JLabel lblScoutPct;
     private JLabel lblTrainingPct;
+    private JCheckBox chkGenerateChases;
 
     //RATs
     private JRadioButton btnDynamicRATs;
@@ -1890,10 +1892,17 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = ++gridy;
         panFamily.add(pnlBabySurnameStyle, gridBagConstraints);
 
-        chkUseParentage = new JCheckBox(resourceMap.getString("useParentage.text"));
-        chkUseParentage.setSelected(options.useParentage());
+        chkDetermineFatherAtBirth = new JCheckBox(resourceMap.getString("determineFatherAtBirth.text"));
+        chkDetermineFatherAtBirth.setToolTipText(resourceMap.getString("determineFatherAtBirth.toolTipText"));
+        chkDetermineFatherAtBirth.setName("chkDetermineFatherAtBirth");
+        chkDetermineFatherAtBirth.setSelected(options.determineFatherAtBirth());
         gridBagConstraints.gridy = ++gridy;
-        panFamily.add(chkUseParentage, gridBagConstraints);
+        panFamily.add(chkDetermineFatherAtBirth, gridBagConstraints);
+
+        chkDisplayParentage = new JCheckBox(resourceMap.getString("displayParentage.text"));
+        chkDisplayParentage.setSelected(options.displayParentage());
+        gridBagConstraints.gridy = ++gridy;
+        panFamily.add(chkDisplayParentage, gridBagConstraints);
 
         DefaultComboBoxModel<String> familyLevelStatusModel = new DefaultComboBoxModel<>();
         familyLevelStatusModel.addElement(resourceMap.getString("displayFamilyLevel.ParentsChildren"));
@@ -3679,7 +3688,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         // End Personnel Market
 
         // Start Against the Bot
-
         panAtB = new JPanel();
         chkUseAtB = new JCheckBox();
 
@@ -3698,7 +3706,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         chkUseStrategy = new JCheckBox();
         spnBaseStrategyDeployment = new JSpinner();
         spnAdditionalStrategyDeployment = new JSpinner();
-        chkAdjustPaymentForStrategy = new JCheckBox();
 
         chkUseAero = new JCheckBox();
         chkUseVehicles = new JCheckBox();
@@ -3724,7 +3731,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         chkIgnoreRatEra = new JCheckBox();
 
         spnSearchRadius = new JSpinner();
-        spnIntensity = new JSpinner();
         chkVariableContractLength = new JCheckBox();
         chkMercSizeLimited = new JCheckBox();
         chkRestrictPartsByMission = new JCheckBox();
@@ -3742,7 +3748,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
 
         panAtB.setName("panAtB");
-        panAtB.setLayout(new java.awt.GridBagLayout());
+        panAtB.setLayout(new GridBagLayout());
 
         JPanel panSubAtBAdmin = new JPanel(new GridBagLayout());
         JPanel panSubAtBRat = new JPanel(new GridBagLayout());
@@ -4158,7 +4164,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = 9;
         panSubAtBContract.add(spnAdditionalStrategyDeployment, gridBagConstraints);
 
-        chkAdjustPaymentForStrategy.setText(resourceMap.getString("chkAdjustPaymentForStrategy.text"));
+        chkAdjustPaymentForStrategy = new JCheckBox(resourceMap.getString("chkAdjustPaymentForStrategy.text"));
+        chkAdjustPaymentForStrategy.setName("chkAdjustPaymentForStrategy");
         chkAdjustPaymentForStrategy.setSelected(options.getAdjustPaymentForStrategy());
         chkAdjustPaymentForStrategy.setToolTipText(resourceMap.getString("chkAdjustPaymentForStrategy.toolTipText"));
         gridBagConstraints.gridx = 0;
@@ -4171,7 +4178,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = 11;
         panSubAtBContract.add(lblIntensity, gridBagConstraints);
 
-        spnIntensity.setModel(new SpinnerNumberModel(options.getIntensity(), 0.0, 5.0, 0.1));
+        spnIntensity = new JSpinner(new SpinnerNumberModel(options.getIntensity(), 0.0, 5.0, 0.1));
         spnIntensity.setToolTipText(resourceMap.getString("spnIntensity.toolTipText"));
         spnIntensity.setValue(options.getIntensity());
         spnIntensity.setMinimumSize(new Dimension(60, 25));
@@ -4232,6 +4239,14 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panSubAtBContract.add(lblTrainingPct, gridBagConstraints);
 
         updateBattleChances();
+
+        chkGenerateChases = new JCheckBox(resourceMap.getString("chkGenerateChases.text"));
+        chkGenerateChases.setName("chkGenerateChases");
+        chkGenerateChases.setToolTipText(resourceMap.getString("chkGenerateChases.toolTipText"));
+        chkGenerateChases.setSelected(options.generateChases());
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 17;
+        panSubAtBContract.add(chkGenerateChases, gridBagConstraints);
 
         int yTablePosition = 0;
         chkDoubleVehicles.setText(resourceMap.getString("chkDoubleVehicles.text"));
@@ -4933,7 +4948,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setDisplayTrueDueDate(chkDisplayTrueDueDate.isSelected());
         options.setLogConception(chkLogConception.isSelected());
         options.setBabySurnameStyle(comboBabySurnameStyle.getSelectedIndex());
-        options.setUseParentage(chkUseParentage.isSelected());
+        options.setDetermineFatherAtBirth(chkDetermineFatherAtBirth.isSelected());
+        options.setDisplayParentage(chkDisplayParentage.isSelected());
         options.setDisplayFamilyLevel(comboDisplayFamilyLevel.getSelectedIndex());
         options.setUseRandomDeaths(chkUseRandomDeaths.isSelected());
         options.setKeepMarriedNameUponSpouseDeath(chkKeepMarriedNameUponSpouseDeath.isSelected());
@@ -4984,8 +5000,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setLimitLanceNumUnits(chkLimitLanceNumUnits.isSelected());
         options.setUseLeadership(chkUseLeadership.isSelected());
         options.setUseStrategy(chkUseStrategy.isSelected());
-        options.setBaseStrategyDeployment((Integer)spnBaseStrategyDeployment.getValue());
-        options.setAdditionalStrategyDeployment((Integer)spnAdditionalStrategyDeployment.getValue());
+        options.setBaseStrategyDeployment((Integer) spnBaseStrategyDeployment.getValue());
+        options.setAdditionalStrategyDeployment((Integer) spnAdditionalStrategyDeployment.getValue());
         options.setAdjustPaymentForStrategy(chkAdjustPaymentForStrategy.isSelected());
 
         options.setUseAero(chkUseAero.isSelected());
@@ -4993,9 +5009,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setClanVehicles(chkClanVehicles.isSelected());
         options.setDoubleVehicles(chkDoubleVehicles.isSelected());
         options.setAdjustPlayerVehicles(chkAdjustPlayerVehicles.isSelected());
-        options.setOpforLanceTypeMechs((Integer)spnOpforLanceTypeMechs.getValue());
-        options.setOpforLanceTypeMixed((Integer)spnOpforLanceTypeMixed.getValue());
-        options.setOpforLanceTypeVehicles((Integer)spnOpforLanceTypeVehicles.getValue());
+        options.setOpforLanceTypeMechs((Integer) spnOpforLanceTypeMechs.getValue());
+        options.setOpforLanceTypeMixed((Integer) spnOpforLanceTypeMixed.getValue());
+        options.setOpforLanceTypeVehicles((Integer) spnOpforLanceTypeVehicles.getValue());
         options.setOpforUsesVTOLs(chkOpforUsesVTOLs.isSelected());
         options.setAllowOpforAeros(chkOpforUsesAero.isSelected());
         options.setAllowOpforLocalUnits(chkOpforUsesLocalForces.isSelected());
@@ -5011,8 +5027,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         	ratList[i] = chosenRatModel.elementAt(i).replaceFirst(" \\(.*?\\)", "");
         }
         options.setRATs(ratList);
-        options.setSearchRadius((Integer)spnSearchRadius.getValue());
-        options.setIntensity((Double)spnIntensity.getValue());
+        options.setSearchRadius((Integer) spnSearchRadius.getValue());
+        options.setIntensity((Double) spnIntensity.getValue());
+        options.setGenerateChases(chkGenerateChases.isSelected());
         options.setVariableContractLength(chkVariableContractLength.isSelected());
         options.setMercSizeLimited(chkMercSizeLimited.isSelected());
         options.setRestrictPartsByMission(chkRestrictPartsByMission.isSelected());
@@ -5021,7 +5038,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setUseLightConditions(chkUseLightConditions.isSelected());
         options.setUsePlanetaryConditions(chkUsePlanetaryConditions.isSelected());
         options.setUseAtBCapture(chkUseAtBCapture.isSelected());
-        options.setStartGameDelay((Integer)spnStartGameDelay.getValue());
+        options.setStartGameDelay((Integer) spnStartGameDelay.getValue());
 
         options.setAeroRecruitsHaveUnits(chkAeroRecruitsHaveUnits.isSelected());
         options.setInstantUnitMarketDelivery(chkInstantUnitMarketDelivery.isSelected());
@@ -5301,7 +5318,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     }
 
     private void updateBattleChances() {
-        double intensity = (Double)spnIntensity.getValue();
+        double intensity = (Double) spnIntensity.getValue();
         if (intensity >= AtBContract.MINIMUM_INTENSITY) {
             lblFightPct.setText((int)(40.0 * intensity / (40.0 * intensity + 60.0) * 100.0 + 0.5) + "%");
             lblDefendPct.setText((int)(20.0 * intensity / (20.0 * intensity + 80.0) * 100.0 + 0.5) + "%");

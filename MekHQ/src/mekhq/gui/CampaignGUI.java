@@ -1271,13 +1271,11 @@ public class CampaignGUI extends JPanel {
         Vector<Unit> notMaintained = new Vector<>();
         int totalAstechMinutesNeeded = 0;
         for (Unit u : getCampaign().getUnits()) {
-            if (u.requiresMaintenance() && null == u.getTech()) {
+            if (u.requiresMaintenance() && (u.getTech() == null)) {
                 notMaintained.add(u);
-            } else {
-                // only add astech minutes for non-crewed units
-                if (null == u.getEngineer()) {
-                    totalAstechMinutesNeeded += (u.getMaintenanceTime() * 6);
-                }
+            } else if (u.isPresent() && (u.getEngineer() == null)) {
+                // only add astech minutes for non-crewed units who are present
+                totalAstechMinutesNeeded += (u.getMaintenanceTime() * 6);
             }
         }
 

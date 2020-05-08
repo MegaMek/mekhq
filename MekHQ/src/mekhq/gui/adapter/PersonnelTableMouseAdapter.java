@@ -47,6 +47,7 @@ import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.PersonLogEvent;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.personnel.*;
+import mekhq.campaign.personnel.enums.ManeiDominiClass;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.ROMDesignation;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
@@ -221,9 +222,14 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 break;
             }
             case CMD_MANEI_DOMINI_CLASS: {
-                int md_class = Integer.parseInt(data[1]);
-                for (Person person : people) {
-                    person.setManeiDominiClass(md_class);
+                try {
+                    ManeiDominiClass mdClass = ManeiDominiClass.valueOf(data[1]);
+                    for (Person person : people) {
+                        person.setManeiDominiClass(mdClass);
+                    }
+                } catch (Exception e) {
+                    MekHQ.getLogger().error(getClass(), "actionPerformed",
+                            "Failed to assign Manei Domini Class", e);
                 }
                 break;
             }
@@ -1295,35 +1301,27 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             Rank.getManeiDominiRankName(i));
                     cbMenuItem.setActionCommand(makeCommand(CMD_MANEI_DOMINI_RANK, String.valueOf(i)));
                     cbMenuItem.addActionListener(this);
-                    cbMenuItem.setEnabled(true);
                     if (i == person.getManeiDominiRank()) {
                         cbMenuItem.setSelected(true);
                     }
                     menu.add(cbMenuItem);
                 }
-                if (menu.getItemCount() > MAX_POPUP_ITEMS) {
-                    MenuScroller.setScrollerFor(menu, MAX_POPUP_ITEMS);
-                }
-                popup.add(menu);
+                JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
 
                 // MD Classes
-                menu = new JMenu(resourceMap.getString("changeMDClass.text")); //$NON-NLS-1$
-                for (int i = Person.MD_NONE; i < Person.MD_NUM; i++) {
-                    cbMenuItem = new JCheckBoxMenuItem(
-                            Person.getManeiDominiClassNames(i, Ranks.RS_WOB));
-                    cbMenuItem.setActionCommand(makeCommand(CMD_MANEI_DOMINI_CLASS, String.valueOf(i)));
+                menu = new JMenu(resourceMap.getString("changeMDClass.text"));
+                for (ManeiDominiClass maneiDominiClass : ManeiDominiClass.values()) {
+                    cbMenuItem = new JCheckBoxMenuItem(maneiDominiClass.toString());
+                    cbMenuItem.setActionCommand(makeCommand(CMD_MANEI_DOMINI_CLASS, maneiDominiClass.name()));
                     cbMenuItem.addActionListener(this);
-                    cbMenuItem.setEnabled(true);
-                    if (i == person.getManeiDominiClass()) {
+                    if (maneiDominiClass == person.getManeiDominiClass()) {
                         cbMenuItem.setSelected(true);
                     }
                     menu.add(cbMenuItem);
                 }
-                if (menu.getItemCount() > MAX_POPUP_ITEMS) {
-                    MenuScroller.setScrollerFor(menu, MAX_POPUP_ITEMS);
-                }
-                popup.add(menu);
+                JMenuHelpers.addMenuIfNonEmpty(popup, menu, MAX_POPUP_ITEMS);
             }
+
             if (StaticChecks.areAllWoBOrComstar(selected)) {
                 menu = new JMenu(resourceMap.getString("changePrimaryDesignation.text"));
                 for (ROMDesignation romDesignation : ROMDesignation.values()) {
