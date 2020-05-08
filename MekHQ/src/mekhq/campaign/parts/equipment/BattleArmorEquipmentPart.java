@@ -231,7 +231,7 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof BattleArmorEquipmentPart
-                && getType().equals(((BattleArmorEquipmentPart)part).getType())
+                && getType().equals(((BattleArmorEquipmentPart) part).getType())
                 && getSize() == ((BattleArmorEquipmentPart) part).getSize()
                 && getTonnage() == part.getTonnage();
     }

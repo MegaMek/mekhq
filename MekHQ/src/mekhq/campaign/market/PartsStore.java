@@ -277,7 +277,7 @@ public class PartsStore implements Serializable {
                         epart.setEquipTonnage(ton);
                         parts.add(epart);
                         if (poddable) {
-                            epart = new EquipmentPart(0, et, -1, 1.0,true, c);
+                            epart = new EquipmentPart(0, et, -1, 1.0, true, c);
                             epart.setEquipTonnage(ton);
                             parts.add(epart);
                             parts.add(new OmniPod(epart, c));
@@ -285,10 +285,10 @@ public class PartsStore implements Serializable {
                         //TODO: still need to deal with talons (unit tonnage) and masc (engine rating)
                     }
                 } else {
-                    Part p = new EquipmentPart(0, et, -1, 1.0,false, c);
+                    Part p = new EquipmentPart(0, et, -1, 1.0, false, c);
                     parts.add(p);
                     if (poddable) {
-                        parts.add(new EquipmentPart(0, et, -1, 1.0,true, c));
+                        parts.add(new EquipmentPart(0, et, -1, 1.0, true, c));
                         parts.add(new OmniPod(p, c));
                     }
                 }
