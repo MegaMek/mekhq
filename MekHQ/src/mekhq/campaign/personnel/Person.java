@@ -25,7 +25,6 @@ import java.awt.event.KeyEvent;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -346,8 +345,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private int oldId;
     private int oldUnitId = -1;
     private int oldDoctorId = -1;
-    //v0.1.8 and earlier
-    private int teamId = -1;
     //endregion Reverse Compatibility
     //endregion Variable Declarations
 
@@ -2076,8 +2073,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     retVal.dueDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("expectedDueDate")) {
                     retVal.expectedDueDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("teamId")) {
-                    retVal.teamId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) {
                     retVal.setPortraitCategory(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("portraitFile")) {
