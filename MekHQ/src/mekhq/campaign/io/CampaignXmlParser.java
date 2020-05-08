@@ -102,7 +102,6 @@ import mekhq.campaign.parts.equipment.MissingAmmoBin;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.parts.equipment.MissingLargeCraftAmmoBin;
 import mekhq.campaign.parts.equipment.MissingMASC;
-import mekhq.campaign.personnel.Ancestors;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.RankTranslator;
 import mekhq.campaign.personnel.Ranks;
@@ -1210,48 +1209,6 @@ public class CampaignXmlParser {
                 "Load Personnel Nodes Complete!"); //$NON-NLS-1$
     }
 
-    private static void migrateAncestorNodes(Campaign retVal, Node wn) {
-        final String METHOD_NAME = "processAncestorNodes(Campaign,Node,Version)"; //$NON-NLS-1$
-
-        MekHQ.getLogger().log(CampaignXmlParser.class, METHOD_NAME, LogLevel.INFO,
-                "Loading Ancestor Nodes from XML..."); //$NON-NLS-1$
-
-        NodeList wList = wn.getChildNodes();
-
-        // Okay, lets iterate through the children, eh?
-        for (int x = 0; x < wList.getLength(); x++) {
-            Node wn2 = wList.item(x);
-
-            // If it's not an element node, we ignore it.
-            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-
-            if (!wn2.getNodeName().equalsIgnoreCase("ancestor")) {
-                // Error condition of sorts!
-                // Errr, what should we do here?
-                MekHQ.getLogger().log(CampaignXmlParser.class, METHOD_NAME, LogLevel.ERROR,
-                        "Unknown node type not loaded in Ancestor nodes: " //$NON-NLS-1$
-                                + wn2.getNodeName());
-
-                continue;
-            }
-
-            Ancestors a = Ancestors.generateInstanceFromXML(wn2, retVal);
-
-            if (a != null) {
-//                     private Map<UUID, Ancestors> ancestors = new LinkedHashMap<>();
-//                     ancestors.put(a.getId(), a);
-//                retVal.importAncestors(a);
-
-
-            }
-        }
-
-        MekHQ.getLogger().log(CampaignXmlParser.class, METHOD_NAME, LogLevel.INFO,
-                "Load Ancestor Nodes Complete!"); //$NON-NLS-1$
-    }
-
     private static void processSkillTypeNodes(Campaign retVal, Node wn,
             Version version) {
         final String METHOD_NAME = "processSkillTypeNodes(Campaign,Node,Version)"; //$NON-NLS-1$
@@ -1904,4 +1861,91 @@ public class CampaignXmlParser {
             }
         }
     }
+
+
+    //region Migration Methods
+    //region Ancestry Migration
+    private static void migrateAncestorNodes(Campaign retVal, Node wn) {
+        final String METHOD_NAME = "processAncestorNodes(Campaign,Node,Version)"; //$NON-NLS-1$
+
+        MekHQ.getLogger().log(CampaignXmlParser.class, METHOD_NAME, LogLevel.INFO,
+                "Loading Ancestor Nodes from XML..."); //$NON-NLS-1$
+
+        NodeList wList = wn.getChildNodes();
+
+        // Okay, lets iterate through the children, eh?
+        for (int x = 0; x < wList.getLength(); x++) {
+            Node wn2 = wList.item(x);
+
+            // If it's not an element node, we ignore it.
+            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            if (!wn2.getNodeName().equalsIgnoreCase("ancestor")) {
+                // Error condition of sorts!
+                // Errr, what should we do here?
+                MekHQ.getLogger().log(CampaignXmlParser.class, METHOD_NAME, LogLevel.ERROR,
+                        "Unknown node type not loaded in Ancestor nodes: " //$NON-NLS-1$
+                                + wn2.getNodeName());
+
+                continue;
+            }
+
+            OldAncestor a = OldAncestor.generateInstanceFromXML(wn2);
+
+            if (a != null) {
+//                     private Map<UUID, Ancestors> ancestors = new LinkedHashMap<>();
+//                     ancestors.put(a.getId(), a);
+//                retVal.importAncestors(a);
+
+
+            }
+        }
+
+        MekHQ.getLogger().log(CampaignXmlParser.class, METHOD_NAME, LogLevel.INFO,
+                "Load Ancestor Nodes Complete!"); //$NON-NLS-1$
+    }
+
+    private static class OldAncestor {
+        private UUID id;
+        private UUID fatherId;
+        private UUID motherId;
+
+        public UUID getId() {
+            return id;
+        }
+
+        public UUID getFatherId() {
+            return fatherId;
+        }
+
+        public UUID getMotherId() {
+            return motherId;
+        }
+
+        public static OldAncestor generateInstanceFromXML(Node wn) {
+            OldAncestor retVal = new OldAncestor();
+
+            try {
+                NodeList nl = wn.getChildNodes();
+
+                for (int x = 0; x < nl.getLength(); x++) {
+                    Node wn2 = nl.item(x);
+
+                    if (wn2.getNodeName().equalsIgnoreCase("id")) {
+                        retVal.id = UUID.fromString(wn2.getTextContent());
+                    } else if (wn2.getNodeName().equalsIgnoreCase("fatherId")) {
+                        retVal.fatherId = UUID.fromString(wn2.getTextContent());
+                    } else if (wn2.getNodeName().equalsIgnoreCase("motherId")) {
+                        retVal.motherId = UUID.fromString(wn2.getTextContent());
+                    }
+                }
+            } catch (Exception ignored) { }
+
+            return retVal;
+        }
+    }
+    //endregion Ancestry Migration
+    //endregion Migration Methods
 }
