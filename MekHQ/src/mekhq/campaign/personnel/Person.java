@@ -2057,7 +2057,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         retVal.id = UUID.fromString(wn2.getTextContent());
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("ancestors")) { // legacy - 0.47.6 removal
-                    CampaignXmlParser.addToAncestryMigrationMap(UUID.fromString(wn2.getTextContent().trim()), retVal.getId());
+                    CampaignXmlParser.addToAncestryMigrationMap(UUID.fromString(wn2.getTextContent().trim()), retVal);
                 } else if (wn2.getNodeName().equalsIgnoreCase("spouse")) { // legacy - 0.47.6 removal
                     retVal.genealogy.setSpouse(UUID.fromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("formerSpouses")) { // legacy - 0.47.6 removal

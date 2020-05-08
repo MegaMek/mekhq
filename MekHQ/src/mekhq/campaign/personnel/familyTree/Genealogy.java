@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved
+ * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.personnel.familyTree;
 
-import com.sun.tools.javac.jvm.Gen;
 import megamek.common.Crew;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
@@ -111,9 +110,10 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
      * @param id the id of the person to add
      */
     public void addFamilyMember(FamilialRelationshipType relationshipType, UUID id) {
-        List<UUID> familyTypeMembers = getFamily().getOrDefault(relationshipType, new ArrayList<>());
-        familyTypeMembers.add(id);
-        getFamily().put(relationshipType, familyTypeMembers);
+        if (id != null) {
+            getFamily().putIfAbsent(relationshipType, new ArrayList<>());
+            getFamily().get(relationshipType).add(id);
+        }
     }
 
     /**
@@ -431,8 +431,7 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
                 }
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(Genealogy.class, "generateInstanceFromXML",
-                    "");
+            MekHQ.getLogger().error(Genealogy.class, "generateInstanceFromXML", "");
         }
 
         return retVal;
@@ -490,7 +489,7 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
         return familyIsEmpty();
     }
 
-    private boolean familyIsEmpty() {
+    public boolean familyIsEmpty() {
         for (List<UUID> list : getFamily().values()) {
             if ((list != null) && !list.isEmpty()) {
                 return false;

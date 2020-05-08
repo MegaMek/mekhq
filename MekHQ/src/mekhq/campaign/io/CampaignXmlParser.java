@@ -36,9 +36,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import javax.xml.parsers.DocumentBuilder;
 
+import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -1864,9 +1866,9 @@ public class CampaignXmlParser {
 
     //region Migration Methods
     //region Ancestry Migration
-    private static Map<UUID, List<UUID>> ancestryMigrationMap = new HashMap<>();
+    private static Map<UUID, List<Person>> ancestryMigrationMap = new HashMap<>();
 
-    public static void addToAncestryMigrationMap(UUID ancestorsId, UUID person) {
+    public static void addToAncestryMigrationMap(UUID ancestorsId, Person person) {
         ancestryMigrationMap.putIfAbsent(ancestorsId, new ArrayList<>());
         ancestryMigrationMap.get(ancestorsId).add(person);
     }
@@ -1875,6 +1877,10 @@ public class CampaignXmlParser {
         NodeList wList = wn.getChildNodes();
 
         for (int x = 0; x < wList.getLength(); x++) {
+            // First, we determine the node values
+            UUID id = null;
+            UUID fatherId = null;
+            UUID motherId = null;
             Node wn2 = wList.item(x);
 
             if ((wn2.getNodeType() != Node.ELEMENT_NODE)
@@ -1882,57 +1888,46 @@ public class CampaignXmlParser {
                 continue;
             }
 
-            OldAncestor a = OldAncestor.generateInstanceFromXML(wn2);
-
-            if (a != null) {
-//                     private Map<UUID, Ancestors> ancestors = new LinkedHashMap<>();
-//                     ancestors.put(a.getId(), a);
-//                retVal.importAncestors(a);
-
-
-            }
-        }
-    }
-
-    private static class OldAncestor {
-        private UUID id;
-        private UUID fatherId;
-        private UUID motherId;
-
-        public UUID getId() {
-            return id;
-        }
-
-        public UUID getFatherId() {
-            return fatherId;
-        }
-
-        public UUID getMotherId() {
-            return motherId;
-        }
-
-        public static OldAncestor generateInstanceFromXML(Node wn) {
-            OldAncestor retVal = new OldAncestor();
-
-            try {
-                NodeList nl = wn.getChildNodes();
-
-                for (int x = 0; x < nl.getLength(); x++) {
-                    Node wn2 = nl.item(x);
-
-                    if (wn2.getNodeName().equalsIgnoreCase("id")) {
-                        retVal.id = UUID.fromString(wn2.getTextContent());
-                    } else if (wn2.getNodeName().equalsIgnoreCase("fatherId")) {
-                        retVal.fatherId = UUID.fromString(wn2.getTextContent());
-                    } else if (wn2.getNodeName().equalsIgnoreCase("motherId")) {
-                        retVal.motherId = UUID.fromString(wn2.getTextContent());
-                    }
+            NodeList nl = wn2.getChildNodes();
+            for (int y = 0; y < nl.getLength(); y++) {
+                Node wn3 = nl.item(y);
+                if (wn3.getNodeName().equalsIgnoreCase("id")) {
+                    id = UUID.fromString(wn3.getTextContent());
+                } else if (wn3.getNodeName().equalsIgnoreCase("fatherId")) {
+                    fatherId = UUID.fromString(wn3.getTextContent());
+                } else if (wn3.getNodeName().equalsIgnoreCase("motherId")) {
+                    motherId = UUID.fromString(wn3.getTextContent());
                 }
-            } catch (Exception ignored) {
-                retVal = null;
             }
 
-            return retVal;
+            if (id == null) {
+                continue;
+            }
+
+            // Then, we migrate the individual person data
+            Iterator<Person> people = ancestryMigrationMap.get(id).iterator();
+            while (people.hasNext()) {
+                Person person = people.next();
+                people.remove();
+
+                if (fatherId != null) {
+                    person.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, fatherId);
+                    retVal.getPerson(fatherId).getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, person.getId());
+                }
+
+                if (motherId != null) {
+                    person.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, motherId);
+                    retVal.getPerson(motherId).getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, person.getId());
+                }
+
+                // Add siblings
+                Iterator<Person> siblings = people;
+                while (siblings.hasNext()) {
+                    Person sibling = siblings.next();
+                    person.getGenealogy().addFamilyMember(FamilialRelationshipType.SIBLING, sibling.getId());
+                    sibling.getGenealogy().addFamilyMember(FamilialRelationshipType.SIBLING, person.getId());
+                }
+            }
         }
     }
     //endregion Ancestry Migration
