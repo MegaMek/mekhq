@@ -3793,15 +3793,15 @@ public class Campaign implements Serializable, ITechManager {
      */
     public List<Contract> getActiveContracts() {
         List<Contract> active = new ArrayList<>();
-        for (Mission m : getMissions()) {
-            if (!(m instanceof Contract)) {
+        for (Mission mission : getMissions()) {
+            if (!(mission instanceof Contract)) {
                 continue;
             }
-            Contract c = (Contract) m;
-            if (c.isActive()
-                    && !getCalendar().getTime().after(c.getEndingDate())
-                    && !getCalendar().getTime().before(c.getStartDate())) {
-                active.add(c);
+            Contract contract = (Contract) mission;
+            if (contract.isActive()
+                    && !getCalendar().getTime().after(contract.getEndingDate())
+                    && !getCalendar().getTime().before(contract.getStartDate())) {
+                active.add(contract);
             }
         }
         return active;
@@ -4307,7 +4307,7 @@ public class Campaign implements Serializable, ITechManager {
                 force.removeUnit(unitID);
             }
         }
-        
+
         // clean up units that are assigned to non-existing scenarios
         for (Unit unit : this.getUnits()) {
             if (this.getScenario(unit.getScenarioId()) == null) {
