@@ -61,7 +61,7 @@ public class AwardLogger {
         Award award = null;
 
         if(matcher.matches()){
-            award = person.awardController.getAward(matcher.group(2), matcher.group(1));
+            award = person.getAwardController().getAward(matcher.group(2), matcher.group(1));
         }
         // In a first implementation, the award Set was not included in the log, so it is impossible to distinguish
         //  awards with same name but in different set. So it assumes it is the first it finds, using the old message format.
@@ -69,7 +69,7 @@ public class AwardLogger {
             pattern = Pattern.compile("Awarded (.*): (.*)");
             matcher = pattern.matcher(logEntryText);
             if(matcher.matches()){
-                award = person.awardController.getFirstAwardIgnoringSet(matcher.group(1));
+                award = person.getAwardController().getFirstAwardIgnoringSet(matcher.group(1));
             }
         }
         return award;
