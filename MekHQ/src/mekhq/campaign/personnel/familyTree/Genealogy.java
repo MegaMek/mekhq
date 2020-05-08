@@ -53,10 +53,19 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
 
     //region Getters/Setters
     /**
+     * @param campaign the campaign the person is in
+     * @return the person's spouse, or null if they don't have a spouse
+     */
+    @Nullable
+    public Person getSpouse(Campaign campaign) {
+        return campaign.getPerson(getSpouseId());
+    }
+
+    /**
      * @return the current person's spouse's id
      */
     @Nullable
-    public UUID getSpouse() {
+    public UUID getSpouseId() {
         return spouse;
     }
 
@@ -141,7 +150,7 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
      * @return true if the person has a spouse, false otherwise
      */
     public boolean hasSpouse() {
-        return (getSpouse() != null);
+        return (getSpouseId() != null);
     }
 
     /**
@@ -304,7 +313,7 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
                 // This prevents duplicates, in the case of two brothers marrying two sisters
                 siblingsAndSpouses.remove(sibling);
                 siblingsAndSpouses.add(sibling);
-                UUID spouse = campaign.getPerson(sibling).getGenealogy().getSpouse();
+                UUID spouse = campaign.getPerson(sibling).getGenealogy().getSpouseId();
                 siblingsAndSpouses.remove(spouse);
                 siblingsAndSpouses.add(spouse);
             }
@@ -381,8 +390,8 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "genealogy");
-        if (getSpouse() != null) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "spouse", getSpouse().toString());
+        if (getSpouseId() != null) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "spouse", getSpouseId().toString());
         }
         if (!getFormerSpouses().isEmpty()) {
             MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "formerSpouses");
@@ -474,12 +483,8 @@ public class Genealogy implements Serializable, MekHqXmlSerializable {
     }
 
     public boolean isEmpty() {
-        if (getSpouse() != null) {
-            return true;
-        }
-
-        if (getFormerSpouses().isEmpty()) {
-            return true;
+        if ((getSpouseId() != null) || !getFormerSpouses().isEmpty()) {
+            return false;
         }
 
         return familyIsEmpty();

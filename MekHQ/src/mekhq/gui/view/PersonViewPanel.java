@@ -155,8 +155,8 @@ public class PersonViewPanel extends ScrollablePanel {
             gridy++;
         }
 
-        if (person.awardController.hasAwards()) {
-            if (person.awardController.hasAwardsWithRibbons()) {
+        if (person.getAwardController().hasAwards()) {
+            if (person.getAwardController().hasAwardsWithRibbons()) {
                 Box boxRibbons = drawRibbons();
 
                 GridBagConstraints gbc_pnlAllRibbons = new GridBagConstraints();
@@ -172,21 +172,21 @@ public class PersonViewPanel extends ScrollablePanel {
             pnlAllAwards.setLayout(new BoxLayout(pnlAllAwards, BoxLayout.PAGE_AXIS));
             pnlAllAwards.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlAwards.title")));
 
-            if (person.awardController.hasAwardsWithMedals()) {
+            if (person.getAwardController().hasAwardsWithMedals()) {
                 JPanel pnlMedals = drawMedals();
                 pnlMedals.setName("pnlMedals");
                 pnlMedals.setLayout(new WrapLayout(FlowLayout.LEFT));
                 pnlAllAwards.add(pnlMedals);
             }
 
-            if (person.awardController.hasAwardsWithMiscs()) {
+            if (person.getAwardController().hasAwardsWithMiscs()) {
                 JPanel pnlMiscAwards = drawMiscAwards();
                 pnlMiscAwards.setName("pnlMiscAwards");
                 pnlMiscAwards.setLayout(new WrapLayout(FlowLayout.LEFT));
                 pnlAllAwards.add(pnlMiscAwards);
             }
 
-            if (person.awardController.hasAwardsWithMedals() || person.awardController.hasAwardsWithMiscs()) {
+            if (person.getAwardController().hasAwardsWithMedals() || person.getAwardController().hasAwardsWithMiscs()) {
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.fill = GridBagConstraints.BOTH;
                 gridBagConstraints.gridwidth = 2;
@@ -289,7 +289,7 @@ public class PersonViewPanel extends ScrollablePanel {
         Box boxRibbons = Box.createVerticalBox();
         boxRibbons.add(Box.createRigidArea(new Dimension(100, 0)));
 
-        List<Award> awards = person.awardController.getAwards().stream().filter(a -> a.getNumberOfRibbonFiles() > 0)
+        List<Award> awards = person.getAwardController().getAwards().stream().filter(a -> a.getNumberOfRibbonFiles() > 0)
                 .sorted().collect(Collectors.toList());
         Collections.reverse(awards);
 
@@ -306,7 +306,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 rowRibbonsBox.setBackground(Color.RED);
             }
             try {
-                int numberOfAwards = person.awardController.getNumberOfAwards(award);
+                int numberOfAwards = person.getAwardController().getNumberOfAwards(award);
                 String ribbonFileName = award.getRibbonFileName(numberOfAwards);
                 ribbon = (Image) awardIcons.getItem(award.getSet() + "/ribbons/", ribbonFileName);
                 if (ribbon == null)
@@ -342,7 +342,7 @@ public class PersonViewPanel extends ScrollablePanel {
     private JPanel drawMedals() {
         JPanel pnlMedals = new JPanel();
 
-        List<Award> awards = person.awardController.getAwards().stream().filter(a -> a.getNumberOfMedalFiles() > 0)
+        List<Award> awards = person.getAwardController().getAwards().stream().filter(a -> a.getNumberOfMedalFiles() > 0)
                 .sorted().collect(Collectors.toList());
 
         for (Award award : awards) {
@@ -350,7 +350,7 @@ public class PersonViewPanel extends ScrollablePanel {
 
             Image medal;
             try {
-                int numberOfAwards = person.awardController.getNumberOfAwards(award);
+                int numberOfAwards = person.getAwardController().getNumberOfAwards(award);
                 String medalFileName = award.getMedalFileName(numberOfAwards);
                 medal = (Image) awardIcons.getItem(award.getSet() + "/medals/", medalFileName);
                 if (medal == null)
@@ -372,7 +372,7 @@ public class PersonViewPanel extends ScrollablePanel {
      */
     private JPanel drawMiscAwards() {
         JPanel pnlMiscAwards = new JPanel();
-        ArrayList<Award> awards = person.awardController.getAwards().stream().filter(a -> a.getNumberOfMiscFiles() > 0)
+        ArrayList<Award> awards = person.getAwardController().getAwards().stream().filter(a -> a.getNumberOfMiscFiles() > 0)
                 .collect(Collectors.toCollection(ArrayList::new));
 
         for (Award award : awards) {
@@ -380,7 +380,7 @@ public class PersonViewPanel extends ScrollablePanel {
 
             Image miscAward;
             try {
-                int numberOfAwards = person.awardController.getNumberOfAwards(award);
+                int numberOfAwards = person.getAwardController().getNumberOfAwards(award);
                 String miscFileName = award.getMiscFileName(numberOfAwards);
                 Image miscAwardBufferedImage = (Image) awardIcons.getItem(award.getSet() + "/misc/", miscFileName);
                 if (miscAwardBufferedImage == null)
@@ -537,7 +537,7 @@ public class PersonViewPanel extends ScrollablePanel {
                     public void mouseClicked(MouseEvent e) {
                         PlanetarySystem system = person.getOriginPlanet().getParentSystem();
                         // Stay on the interstellar map if their origin planet is the primary planet...
-                        if (system.getPrimaryPlanet() == person.getOriginPlanet()) {
+                        if (system.getPrimaryPlanet().equals(person.getOriginPlanet())) {
                             gui.getMapTab().switchSystemsMap(system);
                         } else {
                             // ...otherwise, dive on in to the system view!
@@ -716,8 +716,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 pnlInfo.add(lblTimeServed1, gridBagConstraints);
 
                 lblTimeServed2.setName("lblTimeServed2");
-                lblTimeServed2.setText(person.getTimeInService(campaign.getLocalDate())
-                        + " " + resourceMap.getString("Time.YearYears"));
+                lblTimeServed2.setText(person.getTimeInService(campaign));
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 3;
                 gridBagConstraints.gridy = secondy;
@@ -762,8 +761,7 @@ public class PersonViewPanel extends ScrollablePanel {
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 pnlInfo.add(lblTimeInRank1, gridBagConstraints);
 
-                JLabel lblTimeInRank2 = new JLabel(person.getTimeInRank(campaign.getLocalDate())
-                        + " " + resourceMap.getString("Time.MonthMonths"));
+                JLabel lblTimeInRank2 = new JLabel(person.getTimeInRank(campaign));
                 lblTimeInRank2.setName("lblTimeInRank2");
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 3;
@@ -809,7 +807,7 @@ public class PersonViewPanel extends ScrollablePanel {
 
         int firsty = 0;
 
-        Person spouse = campaign.getPerson(person.getGenealogy().getSpouse());
+        Person spouse = person.getGenealogy().getSpouse(campaign);
         if (spouse != null) {
             JLabel lblSpouse1 = new JLabel(resourceMap.getString("lblSpouse1.text"));
             lblSpouse1.setName("lblSpouse1");
@@ -1257,7 +1255,7 @@ public class PersonViewPanel extends ScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlSkills.add(lblEdge2, gridBagConstraints);
 
-            if (campaign.getCampaignOptions().useSupportEdge() && person.isSupport()) {
+            if (campaign.getCampaignOptions().useSupportEdge() && person.hasSupportRole(false)) {
                 //Add the Edge Available field for support personnel only
                 lblEdgeAvail1.setName("lblEdgeAvail1"); // NOI18N //$NON-NLS-1$
                 lblEdgeAvail1.setText(resourceMap.getString("lblEdgeAvail1.text")); //$NON-NLS-1$
