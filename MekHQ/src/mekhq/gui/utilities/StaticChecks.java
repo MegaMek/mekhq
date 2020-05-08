@@ -570,7 +570,7 @@ public class StaticChecks {
      */
     public static boolean doAnyHaveAnAward(Person[] people) {
         for (Person person : people) {
-            if (person.awardController.hasAwards()) {
+            if (person.getAwardController().hasAwards()) {
                 return true;
             }
         }
