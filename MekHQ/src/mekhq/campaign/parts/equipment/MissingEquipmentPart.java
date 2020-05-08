@@ -126,8 +126,7 @@ public class MissingEquipmentPart extends MissingPart {
     @Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "typeName",
-                MekHqXmlUtil.escape(type.getInternalName()));
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "typeName", type.getInternalName());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentNum", equipmentNum);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "size", size);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipTonnage", equipTonnage);
