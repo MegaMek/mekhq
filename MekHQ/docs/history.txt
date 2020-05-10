@@ -7,6 +7,7 @@ VERSION HISTORY:
 + Issue #1734: Scenario Resolution Dialog: View Unit is now Always Enabled
 + PR #1728: Adding Option to Disable Chases
 + Issue #1698: Option to Determine Father Based on Spouse at Time of Birth
++ Issue #1740: Adding Unit::isPresent check for FMMR Unit Rating
 
 0.47.6 (2020-5-03 1715 UTC)
 + PR #1610: Raised cost of edge points from 1 to 10 for the AtB configuration preset.
