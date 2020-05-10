@@ -529,7 +529,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * moment because I have made so many other changes in this version.
      */
     public void runDiagnostic(boolean checkForDestruction) {
-
         //need to set up an array of part ids to avoid concurrent modification
         //problems because some updateCondition methods will remove the part and put
         //in a new one
@@ -1083,7 +1082,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         //We need to adjust this for equipment that doesn't show up as parts
         //Docking collars, Grav decks, KF Drive - Now parts
         //Drive unit - see SpacecraftEngine
-        if(entity instanceof SmallCraft || entity instanceof Jumpship) {
+        if (entity instanceof SmallCraft || entity instanceof Jumpship) {
             if (entity instanceof SmallCraft) {
                 //JS/SS/WS Bridge, Computer - see CombatInformationCenter
                 //bridge
@@ -1151,7 +1150,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
 
         //protomeks: heat sinks can't be hit
-        if(entity instanceof Protomech) {
+        if (entity instanceof Protomech) {
             int sinks = 0;
             for (Mounted mount : entity.getWeaponList()) {
                 if (mount.getType().hasFlag(WeaponType.F_ENERGY)) {
