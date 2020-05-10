@@ -1621,7 +1621,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
         if (salvage) {
             salvageBoxes.get(idx).setText(ustatus.getDesc(true));
-            checkSalvageRights(); // we need to update the total amount salvaged for
+            checkSalvageRights();
         } else {
             lblsUnitName.get(idx).setText(ustatus.getDesc());
         }
