@@ -9,6 +9,7 @@ VERSION HISTORY:
 + Issue #1698: Option to Determine Father Based on Spouse at Time of Birth
 + Issue #1740: Adding Unit::isPresent check for FMMR Unit Rating
 + PR #1750: Fixing LogEntryController Typo
++ Issues #1735, #1736, #1737: Fixing how units are edited in Scenario Resolution Wizard
 
 0.47.6 (2020-5-03 1715 UTC)
 + PR #1610: Raised cost of edge points from 1 to 10 for the AtB configuration preset.
