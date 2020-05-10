@@ -522,14 +522,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     /**
-     * Run a diagnostic on this unit
-     * TODO: This is being called in the PersonnelTableModel after changes to the personnel
-     * attached to a unit, but I am not sure it needs to be. I don't think any parts check
-     * attached personnel. I think it could b removed, but I am going to leave it for the
-     * moment because I have made so many other changes in this version.
+     * Run a diagnostic on this unit. This MUST be called in {@link mekhq.gui.adapter.UnitTableMouseAdapter}
+     * and {@link mekhq.gui.dialog.ResolveScenarioWizardDialog} to ensure that the parts are updated
+     * based on edits to the underlying entity.
      */
     public void runDiagnostic(boolean checkForDestruction) {
-
         //need to set up an array of part ids to avoid concurrent modification
         //problems because some updateCondition methods will remove the part and put
         //in a new one
@@ -1083,7 +1080,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         //We need to adjust this for equipment that doesn't show up as parts
         //Docking collars, Grav decks, KF Drive - Now parts
         //Drive unit - see SpacecraftEngine
-        if(entity instanceof SmallCraft || entity instanceof Jumpship) {
+        if (entity instanceof SmallCraft || entity instanceof Jumpship) {
             if (entity instanceof SmallCraft) {
                 //JS/SS/WS Bridge, Computer - see CombatInformationCenter
                 //bridge
@@ -1151,7 +1148,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
 
         //protomeks: heat sinks can't be hit
-        if(entity instanceof Protomech) {
+        if (entity instanceof Protomech) {
             int sinks = 0;
             for (Mounted mount : entity.getWeaponList()) {
                 if (mount.getType().hasFlag(WeaponType.F_ENERGY)) {
