@@ -19,7 +19,7 @@ the website: http://megamek.org/mekhq
 
 ### Support
 
-For bugs, crashes, or other issues you can fill out a [Github issue request](https://github.com/MegaMek/mekhq/issues).
+For bugs, crashes, or other issues, you can fill out a [Github issue request](https://github.com/MegaMek/mekhq/issues).
 
 ### License
 
