@@ -1,20 +1,20 @@
 /*
  * MissingAmmoBin.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -47,18 +47,18 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     public MissingAmmoBin() {
         this(0, null, -1, false, false, null);
     }
-    
+
     public MissingAmmoBin(int tonnage, EquipmentType et, int equipNum, boolean singleShot,
             boolean omniPodded, Campaign c) {
-        super(tonnage, et, equipNum, c, 1, omniPodded);
+        super(tonnage, et, equipNum, c, 1.0, 1.0, omniPodded);
         this.oneShot = singleShot;
         if(null != name) {
             this.name += " Bin";
         }
     }
-    
+
     /* Per TM, ammo for fighters is stored in the fuselage. This makes a difference for omnifighter
-     * pod space, so we're going to stick them in LOC_NONE where the heat sinks are */ 
+     * pod space, so we're going to stick them in LOC_NONE where the heat sinks are */
     @Override
     public String getLocationName() {
         if (unit.getEntity() instanceof Aero
@@ -67,7 +67,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
         }
         return super.getLocationName();
     }
-    
+
     @Override
     public int getLocation() {
         if (unit.getEntity() instanceof Aero
@@ -76,7 +76,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
         }
         return super.getLocation();
     }
-    
+
     @Override
     public int getDifficulty() {
         return -2;
