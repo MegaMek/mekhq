@@ -1849,14 +1849,13 @@ public class ResolveScenarioTracker {
      *
      */
     public static class UnitStatus {
-
         private String name;
         private String chassis;
         private String model;
         private boolean totalLoss;
         private Entity entity;
         private Entity baseEntity;
-        Unit unit;
+        private Unit unit;
 
         public UnitStatus(Unit unit) {
             this.unit = unit;
@@ -1908,6 +1907,10 @@ public class ResolveScenarioTracker {
 
         public void setBaseEntity(Entity baseEntity) {
             this.baseEntity = baseEntity;
+        }
+
+        public Unit getUnit() {
+            return unit;
         }
 
         public boolean isTotalLoss() {

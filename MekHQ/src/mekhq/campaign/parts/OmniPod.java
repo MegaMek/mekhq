@@ -201,7 +201,7 @@ public class OmniPod extends Part {
                                         "OmniPod for MASC lacks engine rating"); //$NON-NLS-1$
                             }
                         } else {
-                            partType = new EquipmentPart(tonnage, et, -1, false, campaign);
+                            partType = new EquipmentPart(tonnage, et, -1, 1.0, false, campaign);
                         }
                     }
                 }
