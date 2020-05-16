@@ -956,7 +956,7 @@ public class ResolveScenarioTracker {
                 casualties = (int) Math.ceil(Compute.getFullCrewSize(en) * (newHits / 6.0));
             }
             for (Person p : crew) {
-                // We need to assign them a UUID now to place them into the hash
+                // We need to assign them a UUID now to place them into the oppositionPersonnel hash
                 UUID id = (p.getId() == null) ? UUID.randomUUID() : p.getId();
                 p.setId(id);
 
