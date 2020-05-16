@@ -18,7 +18,9 @@
  */
 package mekhq.campaign.personnel.enums;
 
+import chat.In;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 
 import java.util.ResourceBundle;
 
@@ -79,5 +81,38 @@ public enum PrisonerStatus {
     @Override
     public String toString() {
         return getTypeName();
+    }
+
+    /**
+     * @param text The saved value to parse, either the older magic number save format or the
+     *             PrisonerStatus.name() value
+     * @return the Prisoner Status in question
+     */
+    public static PrisonerStatus parseFromString(String text) {
+        try {
+            return valueOf(text);
+        } catch (Exception ignored) {
+
+        }
+
+        // Magic Number Save Format
+        try {
+            switch (Integer.parseInt(text)) {
+                case 2:
+                    return BONDSMAN;
+                case 1:
+                    return PRISONER;
+                case 0:
+                default:
+                    return FREE;
+            }
+        } catch (Exception ignored) {
+
+        }
+
+        MekHQ.getLogger().error(PrisonerStatus.class, "parseFromString",
+                    "Unable to parse " + text + " into a PrisonerStatus. Returning FREE.");
+
+        return FREE;
     }
 }

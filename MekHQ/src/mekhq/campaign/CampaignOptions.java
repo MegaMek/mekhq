@@ -3657,6 +3657,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("capturePrisoners")) {
                 retVal.capturePrisoners = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("defaultPrisonerStatus")) {
+                // This cannot use PrisonerStatus::parseFromString due to former save format differences
                 try {
                     retVal.defaultPrisonerStatus = PrisonerStatus.valueOf(wn2.getTextContent().trim());
                 } catch (Exception ignored) {

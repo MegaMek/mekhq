@@ -515,31 +515,40 @@ public class Person implements Serializable, MekHqXmlSerializable {
         setPrisonerStatus(prisonerStatus, true);
     }
 
+    /**
+     * This requires expanded checks because a number of functionalities are strictly dependant on
+     * the current person's prisoner status.
+     * @param prisonerStatus The new prisoner status for the person in question
+     * @param log whether to log the change or not
+     */
     public void setPrisonerStatus(PrisonerStatus prisonerStatus, boolean log) {
-        boolean freed = !this.prisonerStatus.isFree();
+        if (getPrisonerStatus() == prisonerStatus) {
+            return;
+        }
+
+        final boolean freed = !getPrisonerStatus().isFree();
+        final boolean isPrisoner = prisonerStatus.isPrisoner();
         this.prisonerStatus = prisonerStatus;
 
         // Now, we need to fix values and ranks based on the Person's status
         switch (prisonerStatus) {
             case PRISONER:
             case PRISONER_DEFECTOR:
-                // They don't get to have a rank. Their rank is Bondsman.
-                getCampaign().changeRank(this, Ranks.RANK_BONDSMAN, true);
-                setRecruitment(null);
-                setLastRankChangeDate(null);
-                if (log) {
-                    ServiceLogger.madePrisoner(this, getCampaign().getDate(),
-                            getCampaign().getName(), "");
-                }
-                break;
             case BONDSMAN:
-                // They don't get to have a rank. Their rank is Bondsman.
-                getCampaign().changeRank(this, Ranks.RANK_BONDSMAN, true);
+                // They don't get to have a rank. Their rank is Prisoner or Bondsman
+                // TODO : Remove this as part of permitting ranked prisoners
+                getCampaign().changeRank(this,
+                        isPrisoner ? Ranks.RANK_PRISONER : Ranks.RANK_BONDSMAN, true);
                 setRecruitment(null);
                 setLastRankChangeDate(null);
                 if (log) {
-                    ServiceLogger.madeBondsman(this, getCampaign().getDate(),
-                            getCampaign().getName(), "");
+                    if (isPrisoner) {
+                        ServiceLogger.madePrisoner(this, getCampaign().getDate(),
+                                getCampaign().getName(), "");
+                    } else {
+                        ServiceLogger.madeBondsman(this, getCampaign().getDate(),
+                                getCampaign().getName(), "");
+                    }
                 }
                 break;
             case FREE:
@@ -2169,22 +2178,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         retVal.status = PersonnelStatus.valueOf(wn2.getTextContent());
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("prisonerStatus")) {
-                    // TODO : remove inline migration
-                    if (version.isLowerThan("0.47.6")) {
-                        switch (Integer.parseInt(wn2.getTextContent().trim())) {
-                            case 1:
-                                retVal.prisonerStatus = PrisonerStatus.PRISONER;
-                                break;
-                            case 2:
-                                retVal.prisonerStatus = PrisonerStatus.BONDSMAN;
-                            case 0:
-                            default:
-                                retVal.prisonerStatus = PrisonerStatus.FREE;
-                                break;
-                        }
-                    } else {
-                        retVal.prisonerStatus = PrisonerStatus.valueOf(wn2.getTextContent().trim());
-                    }
+                    retVal.prisonerStatus = PrisonerStatus.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("willingToDefect")) { // Legacy
                     if (Boolean.parseBoolean(wn2.getTextContent().trim())) {
                         retVal.prisonerStatus = PrisonerStatus.PRISONER_DEFECTOR;
