@@ -23,10 +23,12 @@ import java.util.Map;
 import megamek.common.Compute;
 import megamek.common.Crew;
 import megamek.common.Entity;
+import megamek.common.Mounted;
 import megamek.common.UnitType;
 import megamek.common.WeaponType;
 import megamek.common.options.OptionsConstants;
 import mekhq.Utilities;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SpecialAbility;
 
 /**
@@ -166,7 +168,10 @@ public class CrewSkillUpgrader {
             spaValue = pickRandomGunnerySpecialization(entity);
             break;
         case OptionsConstants.GUNNERY_WEAPON_SPECIALIST:
-            spaValue = pickRandomWeapon(entity);
+            spaValue = pickRandomWeapon(entity, false);
+            break;
+        case OptionsConstants.GUNNERY_SANDBLASTER:
+            spaValue = pickRandomWeapon(entity, true);
             break;
         default:
             entity.getCrew().getOptions().getOption(spa.getName()).setValue(true);
@@ -216,7 +221,16 @@ public class CrewSkillUpgrader {
      * @param entity The entity being manipulated
      * @return Weapon name
      */
-    private String pickRandomWeapon(Entity entity) {
+    private String pickRandomWeapon(Entity entity, boolean clusterOnly) {
+        List<Mounted> weapons = entity.getIndividualWeaponList();
+        List<Mounted> eligibleWeapons = new ArrayList<>();
+        
+        for(Mounted weapon : weapons) {
+            if(SpecialAbility.isWeaponEligibleForSPA(weapon.getType(), Person.T_NONE, clusterOnly)) {
+                eligibleWeapons.add(weapon);
+            }
+        }
+        
         int weaponIndex = Compute.randomInt(entity.getIndividualWeaponList().size());
         return entity.getIndividualWeaponList().get(weaponIndex).getName();
     }
