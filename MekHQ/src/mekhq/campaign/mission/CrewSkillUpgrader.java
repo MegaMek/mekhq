@@ -231,8 +231,8 @@ public class CrewSkillUpgrader {
             }
         }
         
-        int weaponIndex = Compute.randomInt(entity.getIndividualWeaponList().size());
-        return entity.getIndividualWeaponList().get(weaponIndex).getName();
+        int weaponIndex = Compute.randomInt(eligibleWeapons.size());
+        return eligibleWeapons.get(weaponIndex).getName();
     }
     
     /**
