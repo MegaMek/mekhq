@@ -231,6 +231,10 @@ public class CrewSkillUpgrader {
             }
         }
         
+        if(eligibleWeapons.size() == 0) {
+            return Crew.SPECIAL_NONE;
+        }
+        
         int weaponIndex = Compute.randomInt(eligibleWeapons.size());
         return eligibleWeapons.get(weaponIndex).getName();
     }
