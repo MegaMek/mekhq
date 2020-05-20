@@ -283,7 +283,6 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public String failToFind() {
-        resetDaysToWait();
         return "<font color='red'><b> part not found</b>.</font>";
     }
 
