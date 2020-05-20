@@ -114,6 +114,10 @@ public class CrewSkillUpgrader {
         // that cost less XP than the remaining cap
         for(int x = 0; (x < spaCap) && (xpCap > minAbilityCost); x++) {
             int spaCost = addSingleSPA(entity, xpCap);
+            // if we didn't assign an SPA, let's reroll it.
+            if (spaCost == 0) {
+                x--;
+            }
             xpCap -= spaCost;
         }
     }
@@ -176,6 +180,11 @@ public class CrewSkillUpgrader {
         default:
             entity.getCrew().getOptions().getOption(spa.getName()).setValue(true);
             return spa.getCost();
+        }
+        
+        // if we fail to pick a random weapon/specialization for whatever reason, don't assign the SPA
+        if (spaValue.equals(Crew.SPECIAL_NONE)) {
+            return 0;
         }
         
         entity.getCrew().getOptions().getOption(spa.getName()).setValue(spaValue);
