@@ -793,6 +793,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     @Subscribe
     public void handle(UnitRefitEvent ev) {
         partsScheduler.schedule();
+        procurementScheduler.schedule();
     }
 
     @Subscribe
