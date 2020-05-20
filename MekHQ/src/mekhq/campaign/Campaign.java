@@ -2729,7 +2729,7 @@ public class Campaign implements Serializable, ITechManager {
      * @return true if your target roll succeeded.
      */
     public boolean findContactForAcquisition(IAcquisitionWork acquisition, Person person, PlanetarySystem system) {
-        if (person.getAcquisitions() >= getCampaignOptions().getMaxAcquisitions()) {
+        if (null == person || !canAcquireParts(person)) {
             return false;
         }
         DateTime currentDate = Utilities.getDateTimeDay(getCalendar());
