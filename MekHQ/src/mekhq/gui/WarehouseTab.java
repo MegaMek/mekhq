@@ -473,6 +473,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     public void refreshAll() {
         refreshTechsList();
         refreshPartsList();
+        refreshProcurementList();
     }
 
     /*
