@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq;
 
@@ -53,16 +53,16 @@ public class IconPackage {
     protected static MechTileset mt;
 
     // Static defines for layered force icons
-    public static String FORCE_FRAME                = "Pieces/Frames/"; //$NON-NLS-1$
-    public static String FORCE_TYPE                 = "Pieces/Type/"; //$NON-NLS-1$
-    public static String FORCE_FORMATIONS           = "Pieces/Formations/"; //$NON-NLS-1$
-    public static String FORCE_ADJUSTMENTS          = "Pieces/Adjustments/"; //$NON-NLS-1$
-    public static String FORCE_ALPHANUMERICS        = "Pieces/Alphanumerics/"; //$NON-NLS-1$
-    public static String FORCE_SPECIAL_MODIFIERS    = "Pieces/Special Modifiers/"; //$NON-NLS-1$
-    public static String FORCE_BACKGROUNDS          = "Pieces/Backgrounds/"; //$NON-NLS-1$
-    public static String FORCE_LOGOS                = "Pieces/Logos/"; //$NON-NLS-1$
+    public static final String FORCE_FRAME                = "Pieces/Frames/"; //$NON-NLS-1$
+    public static final String FORCE_TYPE                 = "Pieces/Type/"; //$NON-NLS-1$
+    public static final String FORCE_FORMATIONS           = "Pieces/Formations/"; //$NON-NLS-1$
+    public static final String FORCE_ADJUSTMENTS          = "Pieces/Adjustments/"; //$NON-NLS-1$
+    public static final String FORCE_ALPHANUMERICS        = "Pieces/Alphanumerics/"; //$NON-NLS-1$
+    public static final String FORCE_SPECIAL_MODIFIERS    = "Pieces/Special Modifiers/"; //$NON-NLS-1$
+    public static final String FORCE_BACKGROUNDS          = "Pieces/Backgrounds/"; //$NON-NLS-1$
+    public static final String FORCE_LOGOS                = "Pieces/Logos/"; //$NON-NLS-1$
 
-    public static String[] FORCE_DRAW_ORDER = {
+    public static final String[] FORCE_DRAW_ORDER = {
             FORCE_BACKGROUNDS, FORCE_FRAME, FORCE_TYPE, FORCE_FORMATIONS,
             FORCE_ADJUSTMENTS, FORCE_ALPHANUMERICS, FORCE_SPECIAL_MODIFIERS, FORCE_LOGOS
     };
