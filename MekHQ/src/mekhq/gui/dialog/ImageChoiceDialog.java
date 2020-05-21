@@ -59,10 +59,11 @@ import mekhq.preferences.PreferencesNode;
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class ImageChoiceDialog extends JDialog {
+    //region Variable Declarations
+    private static final long serialVersionUID = 7316667282566479439L;
+
     private static final String PANEL_IMAGES = "panel_images";
     private static final String PANEL_LAYERED = "panel_layered";
-
-    private static final long serialVersionUID = 7316667282566479439L;
 
     /**
      * The categorized image patterns.
@@ -74,14 +75,11 @@ public class ImageChoiceDialog extends JDialog {
     private LinkedHashMap<String, Vector<String>> iconMap; // Key = Image Category, Value = Vector of Image Filenames
     private ImageTableMouseAdapter imagesMouseAdapter;
     private boolean force;
-    private JButton btnCancel;
-    private JButton btnSelect;
     private JComboBox<String> comboCategories;
-    private JScrollPane scrImages;
     private JTable tableImages;
     private boolean changed = false;
 
-    // BEGIN: Layered Images Support
+    //region Layered Images Support
     private ImageIcon imageIcon = null;
     private JLabel preview = new JLabel();
     private JTabbedPane tabbedPane = new JTabbedPane();
@@ -122,14 +120,14 @@ public class ImageChoiceDialog extends JDialog {
     private JTable tableLogos = new JTable();
     private JPanel panelLogos = new JPanel();
     private ImageTableModel logosModel = new ImageTableModel();
-    // END: Layered Images Support
+    //endregion Layered Images Support
+    //endregion Variable Declarations
 
-    /** Creates new form ImageChoiceDialog */
+    //region Constructors
     public ImageChoiceDialog(Frame parent, boolean modal, String category, String file, DirectoryItems items) {
         this(parent, modal, category, file, items, false);
     }
 
-    /** Creates new form ImageChoiceDialog */
     public ImageChoiceDialog(Frame parent, boolean modal, String category, String file, DirectoryItems items, boolean force) {
         super(parent, modal);
         this.category = category;
@@ -144,7 +142,7 @@ public class ImageChoiceDialog extends JDialog {
         initComponents();
         fillTable((String) comboCategories.getSelectedItem());
         int rowIndex = 0;
-        for(int i = 0; i < imageTableModel.getRowCount(); i++) {
+        for (int i = 0; i < imageTableModel.getRowCount(); i++) {
             if (imageTableModel.getValueAt(i, 0).equals(filename)) {
                 rowIndex = i;
                 break;
@@ -154,28 +152,22 @@ public class ImageChoiceDialog extends JDialog {
         setLocationRelativeTo(parent);
         setUserPreferences();
     }
+    //endregion Constructors
 
     private void initComponents() {
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ImageChoiceDialog", new EncodeControl()); //$NON-NLS-1$
         GridBagConstraints gbc;
 
-        scrImages = new JScrollPane();
-        tableImages = new JTable();
-        comboCategories = new JComboBox<>();
-        btnSelect = new JButton();
-        btnCancel = new JButton();
-        JPanel imagesPanel = new JPanel();
         getContentPane().setLayout(new GridBagLayout());
-
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ImageChoiceDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(force ? resourceMap.getString("Force.title") : resourceMap.getString("Portrait.title"));
+
+        JPanel imagesPanel = new JPanel();
         imagesPanel.setLayout(new GridBagLayout());
         imagesPanel.setName(PANEL_IMAGES);
 
-        scrImages.setName("scrImages"); // NOI18N
-
-        tableImages.setModel(imageTableModel);
+        tableImages = new JTable(imageTableModel);
         tableImages.setName("tableImages"); // NOI18N
         tableImages.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tableImages.getSelectionModel().addListSelectionListener(event -> {
@@ -191,8 +183,9 @@ public class ImageChoiceDialog extends JDialog {
         tableImages.setRowHeight(76);
         tableImages.getColumnModel().getColumn(0).setCellRenderer(imageTableModel.getRenderer());
         tableImages.addMouseListener(imagesMouseAdapter);
+        JScrollPane scrImages = new JScrollPane();
+        scrImages.setName("scrImages"); // NOI18N
         scrImages.setViewportView(tableImages);
-
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -206,15 +199,14 @@ public class ImageChoiceDialog extends JDialog {
         DefaultComboBoxModel<String> categoryModel = new DefaultComboBoxModel<>();
         String match = null;
         categoryModel.addElement(Crew.ROOT_PORTRAIT);
-        if (imageItems != null) {
-            Iterator<String> names = imageItems.getCategoryNames();
-            while (names.hasNext()) {
-                String name = names.next();
-                if (!"".equals(name)) { //$NON-NLS-1$
-                    categoryModel.addElement(name);
-                    if(category.equals(name)) {
-                        match = name;
-                    }
+        Iterator<String> names = (imageItems != null)
+                ? imageItems.getCategoryNames() : Collections.emptyIterator();
+        while (names.hasNext()) {
+            String name = names.next();
+            if (!"".equals(name)) { //$NON-NLS-1$
+                categoryModel.addElement(name);
+                if (category.equals(name)) {
+                    match = name;
                 }
             }
         }
@@ -223,7 +215,7 @@ public class ImageChoiceDialog extends JDialog {
         } else {
             categoryModel.setSelectedItem(Crew.ROOT_PORTRAIT);
         }
-        comboCategories.setModel(categoryModel);
+        comboCategories = new JComboBox<>(categoryModel);
         comboCategories.setName("comboCategories"); // NOI18N
         comboCategories.addItemListener(this::comboCategoriesItemStateChanged);
         gbc = new GridBagConstraints();
@@ -275,7 +267,8 @@ public class ImageChoiceDialog extends JDialog {
             panelFormations.add(scrFormations, gbc);
             formationsModel.reset();
             formationsModel.setCategory(IconPackage.FORCE_FORMATIONS);
-            Iterator<String> imageNamesTypes = imageItems.getItemNames(IconPackage.FORCE_FORMATIONS);
+            Iterator<String> imageNamesTypes = (imageItems != null)
+                    ? imageItems.getItemNames(IconPackage.FORCE_FORMATIONS) : Collections.emptyIterator();
             while (imageNamesTypes.hasNext()) {
                 formationsModel.addImage(imageNamesTypes.next());
             }
@@ -293,7 +286,8 @@ public class ImageChoiceDialog extends JDialog {
             panelAdjustments.add(scrAdjustments, gbc);
             adjustmentsModel.reset();
             adjustmentsModel.setCategory(IconPackage.FORCE_ADJUSTMENTS);
-            Iterator<String> imageNamesAdjustments = imageItems.getItemNames(IconPackage.FORCE_ADJUSTMENTS);
+            Iterator<String> imageNamesAdjustments = (imageItems != null)
+                    ? imageItems.getItemNames(IconPackage.FORCE_ADJUSTMENTS) : Collections.emptyIterator();
             while (imageNamesAdjustments.hasNext()) {
                 adjustmentsModel.addImage(imageNamesAdjustments.next());
             }
@@ -311,7 +305,8 @@ public class ImageChoiceDialog extends JDialog {
             panelAlphanumerics.add(scrAlphanumerics, gbc);
             alphanumericsModel.reset();
             alphanumericsModel.setCategory(IconPackage.FORCE_ALPHANUMERICS);
-            Iterator<String> imageNamesAlphanumerics = imageItems.getItemNames(IconPackage.FORCE_ALPHANUMERICS);
+            Iterator<String> imageNamesAlphanumerics = (imageItems != null)
+                    ? imageItems.getItemNames(IconPackage.FORCE_ALPHANUMERICS) : Collections.emptyIterator();
             while (imageNamesAlphanumerics.hasNext()) {
                 alphanumericsModel.addImage(imageNamesAlphanumerics.next());
             }
@@ -329,7 +324,8 @@ public class ImageChoiceDialog extends JDialog {
             panelSpecialModifiers.add(scrSpecialModifiers, gbc);
             specialModel.reset();
             specialModel.setCategory(IconPackage.FORCE_SPECIAL_MODIFIERS);
-            Iterator<String> imageNamesSpecial = imageItems.getItemNames(IconPackage.FORCE_SPECIAL_MODIFIERS);
+            Iterator<String> imageNamesSpecial = (imageItems != null)
+                    ? imageItems.getItemNames(IconPackage.FORCE_SPECIAL_MODIFIERS) : Collections.emptyIterator();
             while (imageNamesSpecial.hasNext()) {
                 specialModel.addImage(imageNamesSpecial.next());
             }
@@ -347,7 +343,8 @@ public class ImageChoiceDialog extends JDialog {
             panelBackgrounds.add(scrBackgrounds, gbc);
             backgroundsModel.reset();
             backgroundsModel.setCategory(IconPackage.FORCE_BACKGROUNDS);
-            Iterator<String> imageNamesBackgrounds = imageItems.getItemNames(IconPackage.FORCE_BACKGROUNDS);
+            Iterator<String> imageNamesBackgrounds = (imageItems != null)
+                    ? imageItems.getItemNames(IconPackage.FORCE_BACKGROUNDS) : Collections.emptyIterator();
             while (imageNamesBackgrounds.hasNext()) {
                 backgroundsModel.addImage(imageNamesBackgrounds.next());
             }
@@ -365,7 +362,8 @@ public class ImageChoiceDialog extends JDialog {
             panelLogos.add(scrLogos, gbc);
             logosModel.reset();
             logosModel.setCategory(IconPackage.FORCE_LOGOS);
-            Iterator<String> imageNamesLogos = imageItems.getItemNames(IconPackage.FORCE_LOGOS);
+            Iterator<String> imageNamesLogos = (imageItems != null)
+                    ? imageItems.getItemNames(IconPackage.FORCE_LOGOS) : Collections.emptyIterator();
             while (imageNamesLogos.hasNext()) {
                 logosModel.addImage(imageNamesLogos.next());
             }
@@ -412,7 +410,7 @@ public class ImageChoiceDialog extends JDialog {
             getContentPane().add(imagesPanel, gbc);
         }
 
-        btnSelect.setText(resourceMap.getString("btnSelect.text")); // NOI18N
+        JButton btnSelect = new JButton(resourceMap.getString("btnSelect.text")); // NOI18N
         btnSelect.setName("btnSelect"); // NOI18N
         btnSelect.addActionListener(this::btnSelectActionPerformed);
         gbc = new GridBagConstraints();
@@ -421,7 +419,7 @@ public class ImageChoiceDialog extends JDialog {
         gbc.weightx = 0.5;
         getContentPane().add(btnSelect, gbc);
 
-        btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
+        JButton btnCancel = new JButton(resourceMap.getString("btnCancel.text")); // NOI18N
         btnCancel.setName("btnCancel"); // NOI18N
         btnCancel.addActionListener(this::btnCancelActionPerformed);
         gbc = new GridBagConstraints();
@@ -445,9 +443,10 @@ public class ImageChoiceDialog extends JDialog {
     }
 
     private void btnSelectActionPerformed(ActionEvent evt) {
-        category = (null != tabbedPane.getSelectedComponent()) && PANEL_LAYERED.equals(tabbedPane.getSelectedComponent().getName())
+        category = ((null != tabbedPane.getSelectedComponent())
+                && PANEL_LAYERED.equals(tabbedPane.getSelectedComponent().getName()))
             ? Force.ROOT_LAYERED : imageTableModel.getCategory();
-        if(tableImages.getSelectedRow() != -1) {
+        if (tableImages.getSelectedRow() != -1) {
             filename = (String) imageTableModel.getValueAt(tableImages.getSelectedRow(), 0);
         } else {
             filename = Crew.PORTRAIT_NONE;
@@ -463,12 +462,11 @@ public class ImageChoiceDialog extends JDialog {
         return changed;
     }
 
-
     private void comboCategoriesItemStateChanged(ItemEvent evt) {
         if (evt.getStateChange() == ItemEvent.SELECTED) {
             fillTable((String) evt.getItem());
         }
-    }//GEN-LAST:event_comboCategoriesItemStateChanged
+    }
 
     public String getCategory() {
         return category;
@@ -583,16 +581,18 @@ public class ImageChoiceDialog extends JDialog {
         Iterator<String> imageNames;
         if (Crew.ROOT_PORTRAIT.equals(category)) {
             imageTableModel.addImage(Crew.PORTRAIT_NONE);
-            imageNames = imageItems.getItemNames(""); //$NON-NLS-1$
+            imageNames = (imageItems != null)
+                    ? imageItems.getItemNames("") : Collections.emptyIterator();
         } else {
-            imageNames = imageItems.getItemNames(category);
+            imageNames = (imageItems != null)
+                    ? imageItems.getItemNames(category) : Collections.emptyIterator();
         }
 
         // Get the image names for this category.
         while (imageNames.hasNext()) {
             imageTableModel.addImage(imageNames.next());
         }
-        if(imageTableModel.getRowCount() > 0) {
+        if (imageTableModel.getRowCount() > 0) {
             tableImages.setRowSelectionInterval(0, 0);
         }
     }
@@ -604,8 +604,8 @@ public class ImageChoiceDialog extends JDialog {
         private static final long serialVersionUID = -7469653910161174678L;
         private String[] columnNames;
         private String category;
-        private ArrayList<String> names;
-        private ArrayList<Image> images;
+        private List<String> names;
+        private List<Image> images;
 
         public ImageTableModel() {
             columnNames = new String[] {"Images"};
@@ -671,14 +671,12 @@ public class ImageChoiceDialog extends JDialog {
             return new ImageTableModel.Renderer(imageItems);
         }
 
-
         public class Renderer extends ImagePanel implements TableCellRenderer {
+            private static final long serialVersionUID = -6025788865509594987L;
 
             public Renderer(DirectoryItems images) {
                 super(images);
             }
-
-            private static final long serialVersionUID = -6025788865509594987L;
 
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -693,13 +691,12 @@ public class ImageChoiceDialog extends JDialog {
     }
 
     public class ImageTableMouseAdapter extends MouseInputAdapter {
-
         @Override
         public void mouseClicked(MouseEvent evt) {
-            if (evt.getButton() == MouseEvent.BUTTON1 && evt.getClickCount() == 2) {
+            if ((evt.getButton() == MouseEvent.BUTTON1) && (evt.getClickCount() == 2)) {
                 if (tableImages.equals(evt.getSource())) {
                     int row = tableImages.rowAtPoint(evt.getPoint());
-                    if(row < imageTableModel.getRowCount()) {
+                    if (row < imageTableModel.getRowCount()) {
                         category = imageTableModel.getCategory();
                         filename = (String) imageTableModel.getValueAt(row, 0);
                         changed = true;
@@ -751,8 +748,9 @@ public class ImageChoiceDialog extends JDialog {
             // Try to get the image file.
             try {
                 // Translate the root image directory name.
-                if (Crew.ROOT_PORTRAIT.equals(category))
+                if (Crew.ROOT_PORTRAIT.equals(category)) {
                     category = ""; //$NON-NLS-1$
+                }
                 Image image = (Image) items.getItem(category, name);
                 if (image != null) {
                     if (category.startsWith("Pieces/")) {
