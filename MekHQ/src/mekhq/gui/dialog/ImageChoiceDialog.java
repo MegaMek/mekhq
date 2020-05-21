@@ -80,7 +80,6 @@ public class ImageChoiceDialog extends JDialog {
     private boolean changed = false;
 
     //region Layered Images Support
-    private ImageIcon imageIcon = null;
     private JLabel preview = new JLabel();
     private JTabbedPane tabbedPane = new JTabbedPane();
     private JTabbedPane layerTabs = new JTabbedPane();
@@ -124,31 +123,23 @@ public class ImageChoiceDialog extends JDialog {
     //endregion Variable Declarations
 
     //region Constructors
-    public ImageChoiceDialog(Frame parent, boolean modal, String category, String file, DirectoryItems items) {
-        this(parent, modal, category, file, items, false);
+    public ImageChoiceDialog(Frame parent, boolean modal, String category, String filename, DirectoryItems items) {
+        this(parent, modal, category, filename, null, items, false);
     }
 
-    public ImageChoiceDialog(Frame parent, boolean modal, String category, String file, DirectoryItems items, boolean force) {
+    public ImageChoiceDialog(Frame parent, boolean modal, String category, String filename,
+                             LinkedHashMap<String, Vector<String>> iconMap, DirectoryItems items,
+                             boolean force) {
         super(parent, modal);
         this.category = category;
-        filename = file;
+        this.filename = filename;
+        this.iconMap = (iconMap != null) ? iconMap : new LinkedHashMap<>();
         imagesMouseAdapter = new ImageTableMouseAdapter();
         this.imageItems = items;
         this.force = force;
-        // If we're doing forces, initialize the hashmap for use
-        if (force) {
-            iconMap = new LinkedHashMap<>();
-        }
         initComponents();
-        fillTable((String) comboCategories.getSelectedItem());
-        int rowIndex = 0;
-        for (int i = 0; i < imageTableModel.getRowCount(); i++) {
-            if (imageTableModel.getValueAt(i, 0).equals(filename)) {
-                rowIndex = i;
-                break;
-            }
-        }
-        tableImages.setRowSelectionInterval(rowIndex, rowIndex);
+        initValues();
+
         setLocationRelativeTo(parent);
         setUserPreferences();
     }
@@ -240,7 +231,6 @@ public class ImageChoiceDialog extends JDialog {
             tableTypes.setModel(typesModel);
             tableTypes.setName("tableTypes"); // NOI18N
             tableTypes.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            tableTypes.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
             tableTypes.setRowHeight(76);
             tableTypes.getColumnModel().getColumn(0).setCellRenderer(typesModel.getRenderer());
             tableTypes.addMouseListener(new ImageTableMouseAdapter());
@@ -248,6 +238,7 @@ public class ImageChoiceDialog extends JDialog {
             panelTypes.add(scrTypes, gbc);
             typesModel.reset();
             typesModel.setCategory(IconPackage.FORCE_TYPE);
+            typesModel.addImage(Force.ICON_NONE);
             Iterator<String> imageNames = (imageItems != null)
                     ? imageItems.getItemNames(IconPackage.FORCE_TYPE) : Collections.emptyIterator();
             while (imageNames.hasNext()) {
@@ -259,7 +250,6 @@ public class ImageChoiceDialog extends JDialog {
             tableFormations.setModel(formationsModel);
             tableFormations.setName("tableFormations"); // NOI18N
             tableFormations.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            tableFormations.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
             tableFormations.setRowHeight(76);
             tableFormations.getColumnModel().getColumn(0).setCellRenderer(formationsModel.getRenderer());
             tableFormations.addMouseListener(new ImageTableMouseAdapter());
@@ -267,6 +257,7 @@ public class ImageChoiceDialog extends JDialog {
             panelFormations.add(scrFormations, gbc);
             formationsModel.reset();
             formationsModel.setCategory(IconPackage.FORCE_FORMATIONS);
+            formationsModel.addImage(Force.ICON_NONE);
             Iterator<String> imageNamesTypes = (imageItems != null)
                     ? imageItems.getItemNames(IconPackage.FORCE_FORMATIONS) : Collections.emptyIterator();
             while (imageNamesTypes.hasNext()) {
@@ -278,7 +269,6 @@ public class ImageChoiceDialog extends JDialog {
             tableAdjustments.setModel(adjustmentsModel);
             tableAdjustments.setName("tableAdjustments"); // NOI18N
             tableAdjustments.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-            tableAdjustments.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
             tableAdjustments.setRowHeight(76);
             tableAdjustments.getColumnModel().getColumn(0).setCellRenderer(adjustmentsModel.getRenderer());
             tableAdjustments.addMouseListener(new ImageTableMouseAdapter());
@@ -286,6 +276,7 @@ public class ImageChoiceDialog extends JDialog {
             panelAdjustments.add(scrAdjustments, gbc);
             adjustmentsModel.reset();
             adjustmentsModel.setCategory(IconPackage.FORCE_ADJUSTMENTS);
+            adjustmentsModel.addImage(Force.ICON_NONE);
             Iterator<String> imageNamesAdjustments = (imageItems != null)
                     ? imageItems.getItemNames(IconPackage.FORCE_ADJUSTMENTS) : Collections.emptyIterator();
             while (imageNamesAdjustments.hasNext()) {
@@ -297,7 +288,6 @@ public class ImageChoiceDialog extends JDialog {
             tableAlphanumerics.setModel(alphanumericsModel);
             tableAlphanumerics.setName("tableAalphanumerics"); // NOI18N
             tableAlphanumerics.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            tableAlphanumerics.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
             tableAlphanumerics.setRowHeight(76);
             tableAlphanumerics.getColumnModel().getColumn(0).setCellRenderer(alphanumericsModel.getRenderer());
             tableAlphanumerics.addMouseListener(new ImageTableMouseAdapter());
@@ -305,6 +295,7 @@ public class ImageChoiceDialog extends JDialog {
             panelAlphanumerics.add(scrAlphanumerics, gbc);
             alphanumericsModel.reset();
             alphanumericsModel.setCategory(IconPackage.FORCE_ALPHANUMERICS);
+            alphanumericsModel.addImage(Force.ICON_NONE);
             Iterator<String> imageNamesAlphanumerics = (imageItems != null)
                     ? imageItems.getItemNames(IconPackage.FORCE_ALPHANUMERICS) : Collections.emptyIterator();
             while (imageNamesAlphanumerics.hasNext()) {
@@ -316,7 +307,6 @@ public class ImageChoiceDialog extends JDialog {
             tableSpecialModifiers.setModel(specialModel);
             tableSpecialModifiers.setName("tableSpecialModifiers"); // NOI18N
             tableSpecialModifiers.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-            tableSpecialModifiers.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
             tableSpecialModifiers.setRowHeight(76);
             tableSpecialModifiers.getColumnModel().getColumn(0).setCellRenderer(specialModel.getRenderer());
             tableSpecialModifiers.addMouseListener(new ImageTableMouseAdapter());
@@ -324,6 +314,7 @@ public class ImageChoiceDialog extends JDialog {
             panelSpecialModifiers.add(scrSpecialModifiers, gbc);
             specialModel.reset();
             specialModel.setCategory(IconPackage.FORCE_SPECIAL_MODIFIERS);
+            specialModel.addImage(Force.ICON_NONE);
             Iterator<String> imageNamesSpecial = (imageItems != null)
                     ? imageItems.getItemNames(IconPackage.FORCE_SPECIAL_MODIFIERS) : Collections.emptyIterator();
             while (imageNamesSpecial.hasNext()) {
@@ -335,7 +326,6 @@ public class ImageChoiceDialog extends JDialog {
             tableBackgrounds.setModel(backgroundsModel);
             tableBackgrounds.setName("tableBackgrounds"); // NOI18N
             tableBackgrounds.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-            tableBackgrounds.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
             tableBackgrounds.setRowHeight(76);
             tableBackgrounds.getColumnModel().getColumn(0).setCellRenderer(backgroundsModel.getRenderer());
             tableBackgrounds.addMouseListener(new ImageTableMouseAdapter());
@@ -343,6 +333,7 @@ public class ImageChoiceDialog extends JDialog {
             panelBackgrounds.add(scrBackgrounds, gbc);
             backgroundsModel.reset();
             backgroundsModel.setCategory(IconPackage.FORCE_BACKGROUNDS);
+            backgroundsModel.addImage(Force.ICON_NONE);
             Iterator<String> imageNamesBackgrounds = (imageItems != null)
                     ? imageItems.getItemNames(IconPackage.FORCE_BACKGROUNDS) : Collections.emptyIterator();
             while (imageNamesBackgrounds.hasNext()) {
@@ -354,7 +345,6 @@ public class ImageChoiceDialog extends JDialog {
             tableLogos.setModel(logosModel);
             tableLogos.setName("tableLogos"); // NOI18N
             tableLogos.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-            tableLogos.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
             tableLogos.setRowHeight(76);
             tableLogos.getColumnModel().getColumn(0).setCellRenderer(logosModel.getRenderer());
             tableLogos.addMouseListener(new ImageTableMouseAdapter());
@@ -362,6 +352,7 @@ public class ImageChoiceDialog extends JDialog {
             panelLogos.add(scrLogos, gbc);
             logosModel.reset();
             logosModel.setCategory(IconPackage.FORCE_LOGOS);
+            logosModel.addImage(Force.ICON_NONE);
             Iterator<String> imageNamesLogos = (imageItems != null)
                     ? imageItems.getItemNames(IconPackage.FORCE_LOGOS) : Collections.emptyIterator();
             while (imageNamesLogos.hasNext()) {
@@ -381,11 +372,15 @@ public class ImageChoiceDialog extends JDialog {
             preview.setMinimumSize(new Dimension(300, 225));
             layerPanel.add(preview, gbc);
             layerPanel.setName(PANEL_LAYERED);
-            refreshLayeredPreview();
 
             // Add single and layered options to the dialog
             tabbedPane.addTab(resourceMap.getString("Force.single"), imagesPanel);
             tabbedPane.addTab(resourceMap.getString("Force.layered"), layerPanel);
+
+            // Set currently selected tab based on the initial category
+            if (!iconMap.isEmpty()) {
+                tabbedPane.setSelectedComponent(layerPanel);
+            }
 
             // Add the tabbed pane to the content pane
             gbc = new GridBagConstraints();
@@ -429,6 +424,124 @@ public class ImageChoiceDialog extends JDialog {
         getContentPane().add(btnCancel, gbc);
 
         pack();
+    }
+
+    /**
+     * This is separated from the above because we want to initialize after creating the tables
+     */
+    private void initValues() {
+        // Create rowIndex variable to track the assigned row
+        int rowIndex = 0;
+
+        fillTable((String) comboCategories.getSelectedItem());
+
+        // Determine the initial selection dependent on the initial icon map
+        if (iconMap.isEmpty()) {
+            // Determine the initial value for the selected image, if any
+            for (int i = 0; i < imageTableModel.getRowCount(); i++) {
+                if (imageTableModel.getValueAt(i, 0).equals(filename)) {
+                    rowIndex = i;
+                    break;
+                }
+            }
+            tableImages.setRowSelectionInterval(rowIndex, rowIndex);
+        } else {
+            // Determine the initial values for the Layered Icons
+            if (iconMap.containsKey(IconPackage.FORCE_TYPE)) {
+                String name = iconMap.get(IconPackage.FORCE_TYPE).get(0);
+                for (int i = 0; i < typesModel.getRowCount(); i++) {
+                    if (typesModel.getValueAt(i, 0).equals(name)) {
+                        rowIndex = i;
+                        break;
+                    }
+                }
+            }
+            tableTypes.setRowSelectionInterval(rowIndex, rowIndex);
+
+            rowIndex = 0;
+            if (iconMap.containsKey(IconPackage.FORCE_FORMATIONS)) {
+                String name = iconMap.get(IconPackage.FORCE_FORMATIONS).get(0);
+                for (int i = 0; i < formationsModel.getRowCount(); i++) {
+                    if (formationsModel.getValueAt(i, 0).equals(name)) {
+                        rowIndex = i;
+                        break;
+                    }
+                }
+            }
+            tableFormations.setRowSelectionInterval(rowIndex, rowIndex);
+
+            rowIndex = 0;
+            if (iconMap.containsKey(IconPackage.FORCE_ADJUSTMENTS)) {
+                String name = iconMap.get(IconPackage.FORCE_ADJUSTMENTS).get(0);
+                for (int i = 0; i < adjustmentsModel.getRowCount(); i++) {
+                    if (adjustmentsModel.getValueAt(i, 0).equals(name)) {
+                        rowIndex = i;
+                        break;
+                    }
+                }
+            }
+            tableAdjustments.setRowSelectionInterval(rowIndex, rowIndex);
+
+            rowIndex = 0;
+            if (iconMap.containsKey(IconPackage.FORCE_ALPHANUMERICS)) {
+                String name = iconMap.get(IconPackage.FORCE_ALPHANUMERICS).get(0);
+                for (int i = 0; i < alphanumericsModel.getRowCount(); i++) {
+                    if (alphanumericsModel.getValueAt(i, 0).equals(name)) {
+                        rowIndex = i;
+                        break;
+                    }
+                }
+            }
+            tableAlphanumerics.setRowSelectionInterval(rowIndex, rowIndex);
+
+            rowIndex = 0;
+            if (iconMap.containsKey(IconPackage.FORCE_SPECIAL_MODIFIERS)) {
+                String name = iconMap.get(IconPackage.FORCE_SPECIAL_MODIFIERS).get(0);
+                for (int i = 0; i < specialModel.getRowCount(); i++) {
+                    if (specialModel.getValueAt(i, 0).equals(name)) {
+                        rowIndex = i;
+                        break;
+                    }
+                }
+            }
+            tableSpecialModifiers.setRowSelectionInterval(rowIndex, rowIndex);
+
+            rowIndex = 0;
+            if (iconMap.containsKey(IconPackage.FORCE_BACKGROUNDS)) {
+                String name = iconMap.get(IconPackage.FORCE_BACKGROUNDS).get(0);
+                for (int i = 0; i < backgroundsModel.getRowCount(); i++) {
+                    if (backgroundsModel.getValueAt(i, 0).equals(name)) {
+                        rowIndex = i;
+                        break;
+                    }
+                }
+            }
+            tableBackgrounds.setRowSelectionInterval(rowIndex, rowIndex);
+
+            rowIndex = 0;
+            if (iconMap.containsKey(IconPackage.FORCE_LOGOS)) {
+                String name = iconMap.get(IconPackage.FORCE_LOGOS).get(0);
+                for (int i = 0; i < logosModel.getRowCount(); i++) {
+                    if (logosModel.getValueAt(i, 0).equals(name)) {
+                        rowIndex = i;
+                        break;
+                    }
+                }
+            }
+            tableLogos.setRowSelectionInterval(rowIndex, rowIndex);
+        }
+
+        // Add List Selection Listeners now that the values have been initialized
+        tableTypes.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
+        tableFormations.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
+        tableAdjustments.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
+        tableAlphanumerics.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
+        tableSpecialModifiers.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
+        tableBackgrounds.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
+        tableLogos.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
+
+        // Then trigger the initial refresh
+        refreshLayeredPreview();
     }
 
     private void setUserPreferences() {
@@ -476,99 +589,89 @@ public class ImageChoiceDialog extends JDialog {
         return filename;
     }
 
-    /**
-     * @return the iconMap
-     */
-    public LinkedHashMap<String, Vector<String>> getIconMap() {
-        return iconMap;
-    }
-
-    /**
-     * @param iconMap the iconMap to set
-     */
-    public void setIconMap(LinkedHashMap<String, Vector<String>> iconMap) {
-        this.iconMap = iconMap;
-    }
-
     private void refreshLayeredPreview() {
         // Add the image frame
         iconMap.clear();
         Vector<String> frameVector = new Vector<>();
         frameVector.add("Frame.png");
         iconMap.put(IconPackage.FORCE_FRAME, frameVector);
+
         // Check each table for what is, or is not, selected
         Vector<String> tmp;
-        if (tableTypes.getSelectedRow() == -1) {
+        if (tableTypes.getSelectedRow() <= 0) {
             iconMap.remove(IconPackage.FORCE_TYPE, iconMap.get(IconPackage.FORCE_TYPE));
         } else {
             tmp = new Vector<>();
             for (int index : tableTypes.getSelectedRows()) {
                 tmp.add((String) tableTypes.getValueAt(index, 0));
-                iconMap.put(IconPackage.FORCE_TYPE, tmp);
             }
+            iconMap.put(IconPackage.FORCE_TYPE, tmp);
         }
-        if (tableFormations.getSelectedRow() == -1) {
+        if (tableFormations.getSelectedRow() <= 0) {
             iconMap.remove(IconPackage.FORCE_FORMATIONS, iconMap.get(IconPackage.FORCE_FORMATIONS));
         } else {
             tmp = new Vector<>();
             for (int index : tableFormations.getSelectedRows()) {
                 tmp.add((String) tableFormations.getValueAt(index, 0));
-                iconMap.put(IconPackage.FORCE_FORMATIONS, tmp);
             }
+            iconMap.put(IconPackage.FORCE_FORMATIONS, tmp);
         }
-        if (tableAdjustments.getSelectedRow() == -1) {
+        if (tableAdjustments.getSelectedRow() <= 0) {
             iconMap.remove(IconPackage.FORCE_ADJUSTMENTS, iconMap.get(IconPackage.FORCE_ADJUSTMENTS));
         } else {
             tmp = new Vector<>();
             for (int index : tableAdjustments.getSelectedRows()) {
                 tmp.add((String) tableAdjustments.getValueAt(index, 0));
-                iconMap.put(IconPackage.FORCE_ADJUSTMENTS, tmp);
             }
+            iconMap.put(IconPackage.FORCE_ADJUSTMENTS, tmp);
         }
-        if (tableAlphanumerics.getSelectedRow() == -1) {
+        if (tableAlphanumerics.getSelectedRow() <= 0) {
             iconMap.remove(IconPackage.FORCE_ALPHANUMERICS, iconMap.get(IconPackage.FORCE_ALPHANUMERICS));
         } else {
             tmp = new Vector<>();
             for (int index : tableAlphanumerics.getSelectedRows()) {
                 tmp.add((String) tableAlphanumerics.getValueAt(index, 0));
-                iconMap.put(IconPackage.FORCE_ALPHANUMERICS, tmp);
             }
+            iconMap.put(IconPackage.FORCE_ALPHANUMERICS, tmp);
         }
-        if (tableSpecialModifiers.getSelectedRow() == -1) {
+        if (tableSpecialModifiers.getSelectedRow() <= 0) {
             iconMap.remove(IconPackage.FORCE_SPECIAL_MODIFIERS, iconMap.get(IconPackage.FORCE_SPECIAL_MODIFIERS));
         } else {
             tmp = new Vector<>();
             for (int index : tableSpecialModifiers.getSelectedRows()) {
                 tmp.add((String) tableSpecialModifiers.getValueAt(index, 0));
-                iconMap.put(IconPackage.FORCE_SPECIAL_MODIFIERS, tmp);
             }
+            iconMap.put(IconPackage.FORCE_SPECIAL_MODIFIERS, tmp);
         }
-        if (tableBackgrounds.getSelectedRow() == -1) {
+        if (tableBackgrounds.getSelectedRow() <= 0) {
             iconMap.remove(IconPackage.FORCE_BACKGROUNDS, iconMap.get(IconPackage.FORCE_BACKGROUNDS));
         } else {
             tmp = new Vector<>();
             for (int index : tableBackgrounds.getSelectedRows()) {
                 tmp.add((String) tableBackgrounds.getValueAt(index, 0));
-                iconMap.put(IconPackage.FORCE_BACKGROUNDS, tmp);
             }
+            iconMap.put(IconPackage.FORCE_BACKGROUNDS, tmp);
         }
-        if (tableLogos.getSelectedRow() == -1) {
+        if (tableLogos.getSelectedRow() <= 0) {
             iconMap.remove(IconPackage.FORCE_LOGOS, iconMap.get(IconPackage.FORCE_LOGOS));
         } else {
             tmp = new Vector<>();
             for (int index : tableLogos.getSelectedRows()) {
                 tmp.add((String) tableLogos.getValueAt(index, 0));
-                iconMap.put(IconPackage.FORCE_LOGOS, tmp);
             }
+            iconMap.put(IconPackage.FORCE_LOGOS, tmp);
         }
-        // Set the category to layered
+
         category = Force.ROOT_LAYERED;
         filename = Force.ICON_NONE;
+
         // Build the layered image
         Image forceImage = IconPackage.buildForceIcon(category, filename, imageItems, iconMap);
-        imageIcon = new ImageIcon(forceImage);
+        ImageIcon imageIcon = new ImageIcon(forceImage);
+
         // Disable selection of a static icon
         tableImages.clearSelection();
+
         // Update the preview
         preview.setIcon(imageIcon);
         preview.validate();
@@ -605,13 +708,11 @@ public class ImageChoiceDialog extends JDialog {
         private String[] columnNames;
         private String category;
         private List<String> names;
-        private List<Image> images;
 
         public ImageTableModel() {
             columnNames = new String[] {"Images"};
             category = Crew.ROOT_PORTRAIT;
             names = new ArrayList<>();
-            images = new ArrayList<>();
         }
 
         @Override
@@ -627,7 +728,6 @@ public class ImageChoiceDialog extends JDialog {
         public void reset() {
             category = Crew.ROOT_PORTRAIT;
             names = new ArrayList<>();
-            images = new ArrayList<>();
         }
 
         @Override
@@ -638,10 +738,6 @@ public class ImageChoiceDialog extends JDialog {
         @Override
         public Object getValueAt(int row, int col) {
             return names.get(row);
-        }
-
-        public Object getImageAt(int row) {
-            return images.get(row);
         }
 
         public void setCategory(String c) {
