@@ -19,10 +19,8 @@
 package mekhq.campaign.personnel;
 
 import java.io.*;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

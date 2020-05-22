@@ -20,13 +20,14 @@ package mekhq.campaign.personnel;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -264,17 +265,17 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
     }
 
     /**
-     * Generates a list of strings of formated dates yyyy-MM-dd
-     * @return a list of strings representing the dates in the format yyyy-MM-dd
+     * Generates a list of strings of formatted dates
+     * @param campaign the campaign to get the date format from
+     * @return a list of strings representing the dates in the input format
      */
-    public List<String> getFormatedDates() {
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-
-        List<String> formatedDates = new ArrayList<>();
+    public List<String> getFormattedDates(Campaign campaign) {
+        List<String> formattedDates = new ArrayList<>();
         for (LocalDate date : dates) {
-            formatedDates.add(df.format(date.getTime()));
+            formattedDates.add(date.format(DateTimeFormatter.ofPattern(campaign.getCampaignOptions()
+                    .getDisplayDateFormat())));
         }
-        return formatedDates;
+        return formattedDates;
     }
 
     /**
@@ -299,14 +300,15 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
     }
 
     /**
+     * @param campaign the campaign to get the date format from
      * @return an html formatted string to be used as tooltip.
      */
-    public String getTooltip() {
+    public String getTooltip(Campaign campaign) {
         StringBuilder string = new StringBuilder();
         string.append("<html>").append(getName()).append("<br>").append(getDescription())
                 .append("<br>").append("<br>");
-        for (LocalDate date : dates) {
-            string.append("(").append(df.format(date.getTime())).append(")").append("<br>");
+        for (String date : getFormattedDates(campaign)) {
+            string.append("(").append(date).append(")").append("<br>");
         }
 
         string.append("</html>");

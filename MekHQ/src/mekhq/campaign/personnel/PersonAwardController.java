@@ -101,7 +101,7 @@ public class PersonAwardController {
      * @param awardName is the name of the award
      * @param date is the date it was awarded
      */
-    public void addAndLogAward(String setName, String awardName, Date date) {
+    public void addAndLogAward(String setName, String awardName, LocalDate date) {
         Award award;
         if (hasAward(setName, awardName)) {
             award = getAward(setName, awardName);
@@ -148,7 +148,7 @@ public class PersonAwardController {
                 } else {
                     awards.remove(award);
                 }
-                // TODO : Swap me to using LocalDate instead of this conversion
+                // TODO : LocalDate : Replace me with direct LocalDate usage
                 AwardLogger.removedAward(person, Date.from(currentDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()), award);
                 MekHQ.triggerEvent(new PersonChangedEvent(person));
                 return;
@@ -160,8 +160,9 @@ public class PersonAwardController {
      * Adds an entry log for a given award.
      * @param award that was given.
      */
-    public void logAward(Award award, Date date) {
-        AwardLogger.award(person, date, award);
+    public void logAward(Award award, LocalDate date) {
+        // TODO : LocalDate : Replace me with direct LocalDate usage
+        AwardLogger.award(person, Date.from(date.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()), award);
         MekHQ.triggerEvent(new PersonChangedEvent(person));
     }
 
