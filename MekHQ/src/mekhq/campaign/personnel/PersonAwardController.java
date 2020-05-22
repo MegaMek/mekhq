@@ -18,13 +18,12 @@
  */
 package mekhq.campaign.personnel;
 
-import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.log.AwardLogger;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -141,7 +140,7 @@ public class PersonAwardController {
      * @param awardedDate is the date it was awarded, or null if it is to be bulk removed
      * @param currentDate is the current date
      */
-    public void removeAward(String setName, String awardName, Date awardedDate, Date currentDate) {
+    public void removeAward(String setName, String awardName, LocalDate awardedDate, LocalDate currentDate) {
         for (Award award : awards) {
             if (award.equals(setName, awardName)) {
                 if ((awardedDate != null) && award.hasDates()) {
@@ -149,7 +148,8 @@ public class PersonAwardController {
                 } else {
                     awards.remove(award);
                 }
-                AwardLogger.removedAward(person, currentDate, award);
+                // TODO : Swap me to using LocalDate instead of this conversion
+                AwardLogger.removedAward(person, Date.from(currentDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()), award);
                 MekHQ.triggerEvent(new PersonChangedEvent(person));
                 return;
             }
