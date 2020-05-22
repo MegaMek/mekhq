@@ -133,7 +133,18 @@ public class ImageChoiceDialog extends JDialog {
         super(parent, modal);
         this.category = category;
         this.filename = filename;
-        this.iconMap = (iconMap != null) ? iconMap : new LinkedHashMap<>();
+
+        // Clone the iconMap
+        this.iconMap = new LinkedHashMap<>();
+        if ((iconMap != null) && !iconMap.isEmpty()) {
+            for (Map.Entry<String, Vector<String>> entry : iconMap.entrySet()) {
+                if ((entry.getValue() != null) && !entry.getValue().isEmpty()) {
+                    Vector<String> temp = new Vector<>(entry.getValue());
+                    this.iconMap.put(entry.getKey(), temp);
+                }
+            }
+        }
+
         imagesMouseAdapter = new ImageTableMouseAdapter();
         this.imageItems = items;
         this.force = force;
@@ -161,16 +172,6 @@ public class ImageChoiceDialog extends JDialog {
         tableImages = new JTable(imageTableModel);
         tableImages.setName("tableImages"); // NOI18N
         tableImages.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tableImages.getSelectionModel().addListSelectionListener(event -> {
-            // Clear selections on the layered tables
-            tableAdjustments.clearSelection();
-            tableAlphanumerics.clearSelection();
-            tableFormations.clearSelection();
-            tableSpecialModifiers.clearSelection();
-            tableBackgrounds.clearSelection();
-            tableLogos.clearSelection();
-            tableTypes.clearSelection();
-        });
         tableImages.setRowHeight(76);
         tableImages.getColumnModel().getColumn(0).setCellRenderer(imageTableModel.getRenderer());
         tableImages.addMouseListener(imagesMouseAdapter);
@@ -531,7 +532,20 @@ public class ImageChoiceDialog extends JDialog {
             tableLogos.setRowSelectionInterval(rowIndex, rowIndex);
         }
 
-        // Add List Selection Listeners now that the values have been initialized
+        // Then trigger the initial refresh
+        refreshLayeredPreview();
+
+        // Finally, Add List Selection Listeners now that the values have been initialized
+        tableImages.getSelectionModel().addListSelectionListener(event -> {
+            // Clear selections on the layered tables
+            tableAdjustments.clearSelection();
+            tableAlphanumerics.clearSelection();
+            tableFormations.clearSelection();
+            tableSpecialModifiers.clearSelection();
+            tableBackgrounds.clearSelection();
+            tableLogos.clearSelection();
+            tableTypes.clearSelection();
+        });
         tableTypes.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
         tableFormations.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
         tableAdjustments.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
@@ -539,9 +553,6 @@ public class ImageChoiceDialog extends JDialog {
         tableSpecialModifiers.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
         tableBackgrounds.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
         tableLogos.getSelectionModel().addListSelectionListener(event -> refreshLayeredPreview());
-
-        // Then trigger the initial refresh
-        refreshLayeredPreview();
     }
 
     private void setUserPreferences() {
@@ -587,6 +598,10 @@ public class ImageChoiceDialog extends JDialog {
 
     public String getFileName() {
         return filename;
+    }
+
+    public LinkedHashMap<String, Vector<String>> getIconMap() {
+        return iconMap;
     }
 
     private void refreshLayeredPreview() {

@@ -349,9 +349,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements ActionListener
                 if (pcd.isChanged()) {
                     singleForce.setIconCategory(pcd.getCategory());
                     singleForce.setIconFileName(pcd.getFileName());
-                    if (!Force.ROOT_LAYERED.equals(singleForce.getIconCategory())) {
-                        singleForce.setIconMap(new LinkedHashMap<>());
-                    }
+                    singleForce.setIconMap(pcd.getIconMap());
                     MekHQ.triggerEvent(new OrganizationChangedEvent(singleForce));
                 }
             }
