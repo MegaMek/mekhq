@@ -37,6 +37,7 @@ import megamek.common.Configuration;
 import megamek.common.Crew;
 import megamek.common.util.DirectoryItems;
 import mekhq.campaign.force.Force;
+import mekhq.gui.enums.LayeredForceIcon;
 import mekhq.gui.utilities.PortraitFileFactory;
 
 /**
@@ -51,21 +52,6 @@ public class IconPackage {
     private DirectoryItems forceIcons;
     private DirectoryItems awardIcons;
     protected static MechTileset mt;
-
-    // Static defines for layered force icons
-    public static final String FORCE_FRAME                = "Pieces/Frames/"; //$NON-NLS-1$
-    public static final String FORCE_TYPE                 = "Pieces/Type/"; //$NON-NLS-1$
-    public static final String FORCE_FORMATIONS           = "Pieces/Formations/"; //$NON-NLS-1$
-    public static final String FORCE_ADJUSTMENTS          = "Pieces/Adjustments/"; //$NON-NLS-1$
-    public static final String FORCE_ALPHANUMERICS        = "Pieces/Alphanumerics/"; //$NON-NLS-1$
-    public static final String FORCE_SPECIAL_MODIFIERS    = "Pieces/Special Modifiers/"; //$NON-NLS-1$
-    public static final String FORCE_BACKGROUNDS          = "Pieces/Backgrounds/"; //$NON-NLS-1$
-    public static final String FORCE_LOGOS                = "Pieces/Logos/"; //$NON-NLS-1$
-
-    public static final String[] FORCE_DRAW_ORDER = {
-            FORCE_BACKGROUNDS, FORCE_FRAME, FORCE_TYPE, FORCE_FORMATIONS,
-            FORCE_ADJUSTMENTS, FORCE_ALPHANUMERICS, FORCE_SPECIAL_MODIFIERS, FORCE_LOGOS
-    };
 
     /** A map of keys to various gui elements, for future skinning purposes */
     private final Map<String, String> guiElements = new HashMap<>();
@@ -206,7 +192,8 @@ public class IconPackage {
                 int width = 0;
                 int height = 0;
                 // Gather height/width
-                for (String layer : FORCE_DRAW_ORDER) {
+                for (LayeredForceIcon layeredForceIcon : LayeredForceIcon.getInDrawOrder()) {
+                    String layer = layeredForceIcon.getLayerPath();
                     if (iconMap.containsKey(layer)) {
                         for (String value : iconMap.get(layer)) {
                          // Load up the image piece
@@ -218,7 +205,8 @@ public class IconPackage {
                 }
                 base = config.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
                 g2d = base.createGraphics();
-                for (String layer : FORCE_DRAW_ORDER) {
+                for (LayeredForceIcon layeredForceIcon : LayeredForceIcon.getInDrawOrder()) {
+                    String layer = layeredForceIcon.getLayerPath();
                     if (iconMap.containsKey(layer)) {
                         for (String value : iconMap.get(layer)) {
                             BufferedImage img = (BufferedImage) items.getItem(layer, value);
